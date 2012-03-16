@@ -29,6 +29,7 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -38,7 +39,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._("subscriptions")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>

@@ -4,22 +4,27 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>I2P Waarschuwing: Ongeldige eepsite destination</title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/">Adresboek</a>
 </div>
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>Waarschuwing: Ongeldige Eepsite Destination</h3>
+<p>
 De gespecificeerde eepsite destination is ongeldig,
 of anderzijds onbereikbaar. Mogelijk heb je de
 BASE64 string niet goed gekopieerd of is de link
 die je probeert te volgen ongeldig.  De I2P host kan
-ook offline zijn. Probeer 
+ook offline zijn. Probeer
 <a href="javascript: window.location.reload()">opnieuw</a>.
-<hr><b>Kon de volgende destination niet vinden:</b><BR><BR>
+</p>
+<hr>
+<p><b>Kon de volgende destination niet vinden:</b>
+</p>

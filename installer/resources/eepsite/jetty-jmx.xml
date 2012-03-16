@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+
+<!-- =============================================================== -->
+<!-- Configure the JVM JMX Server                                    -->
+<!-- this configuration file should be used in combination with      -->
+<!-- other configuration files.  e.g.                                -->
+<!--    java -jar start.jar etc/jetty-jmx.xml etc/jetty.xml          -->
+<!-- See jetty-jmx-mx4j.xml for a non JVM server solution            -->
+<!-- =============================================================== -->
+<Configure id="Server" class="org.mortbay.jetty.Server">
+
+    <!-- =========================================================== -->
+    <!-- Initialize an mbean server                                  -->
+    <!-- =========================================================== -->
+    <!-- Use the jdk 1.5 platformMBeanServer -->
+    <Call id="MBeanServer" class="java.lang.management.ManagementFactory" name="getPlatformMBeanServer"/>
+
+    <!-- =========================================================== -->
+    <!-- Initialize the Jetty MBean container                        -->
+    <!-- =========================================================== -->
+    <Get id="Container" name="container">
+      <Call name="addEventListener">
+        <Arg>
+          <New class="org.mortbay.management.MBeanContainer">
+            <Arg><Ref id="MBeanServer"/></Arg>
+            <Call name="start" />
+          </New>
+        </Arg>
+      </Call>
+    </Get>
+
+    <!-- =========================================================== -->
+    <!-- Enable stats (why else are you using JMX?                                -->
+    <!-- Sneakily replace the top-level handler with a StatisticsHandler          -->
+    <!-- Note we could use AtomicStatisticsHandler in jetty-java5-stats.jar (4KB) -->
+    <!-- but it really isn't worth bundling it.                                   -->
+    <!-- http://blog.markfeeney.com/2010/10/jmx-statistics-in-jetty-6-6122.html   -->
+    <!-- =========================================================== -->
+    <Get id="oldhandler" name="handler"/>
+    <Set name="handler">
+      <New id="StatsHandler" class="org.mortbay.jetty.handler.StatisticsHandler">
+        <Set name="handler"><Ref id="oldhandler"/></Set>
+      </New>
+    </Set>
+
+
+    <!--
+    When setting up the JMXConnectorServer via RMI, two TCP ports are used to communicate with
+    the remote server:
+    * the rmiregistry port (by default 1099) from where the RMI stub is downloaded
+    * the rmi server port (by default randomly chosen) where the actual RMI communication happens
+    The JMXServiceURL for the default configuration is therefore:
+
+    service:jmx:rmi:///jndi/rmi://<remotehost>:1099/jmxrmi
+
+    In case a firewall is restricting port access, you need to make sure that the rmi server port
+    is not chosen randomly, and this can be specified with the following JMXServiceURL:
+
+    service:jmx:rmi://<host>:2100/jndi/rmi://<host>:2099/jmxrmi
+
+    where 2099 is the rmiregistry port and 2100 is the rmi server port.
+    Make sure the firewall allow access to those ports.
+
+    When using the XML configuration below, you don't need to specify any of the JMX system properties
+    on the command line (see http://java.sun.com/j2se/1.5.0/docs/guide/management/agent.html).
+    -->
+
+    <!-- Setup the RMIRegistry on a specific port
+    <Call id="rmiRegistry" class="java.rmi.registry.LocateRegistry" name="createRegistry">
+      <Arg type="int">2099</Arg>
+    </Call>
+    -->
+    <!-- Setup the JMXConnectorServer on a specific rmi server port
+    <Call id="jmxConnectorServer" class="javax.management.remote.JMXConnectorServerFactory" name="newJMXConnectorServer">
+      <Arg>
+        <New  class="javax.management.remote.JMXServiceURL">
+          <Arg>service:jmx:rmi://localhost:2100/jndi/rmi://localhost:2099/jmxrmi</Arg>
+        </New>
+      </Arg>
+      <Arg/>
+      <Arg><Ref id="MBeanServer"/></Arg>
+      <Call name="start"/>
+    </Call>
+    -->
+
+</Configure>
+

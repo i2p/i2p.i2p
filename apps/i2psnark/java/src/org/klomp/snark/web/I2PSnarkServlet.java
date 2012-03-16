@@ -43,17 +43,16 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.TrackerClient;
 
-import org.mortbay.http.HttpResponse;
-import org.mortbay.jetty.servlet.Default;
-import org.mortbay.util.Resource;
-import org.mortbay.util.URI;
+import org.mortbay.jetty.servlet.DefaultServlet;
+import org.mortbay.resource.Resource;
+import org.mortbay.util.URIUtil;
 
 /**
  *  We extend Default instead of HTTPServlet so we can handle
  *  i2psnark/ file requests with http:// instead of the flaky and
  *  often-blocked-by-the-browser file://
  */
-public class I2PSnarkServlet extends Default {
+public class I2PSnarkServlet extends DefaultServlet {
     private I2PAppContext _context;
     private Log _log;
     private SnarkManager _manager;
@@ -99,13 +98,17 @@ public class I2PSnarkServlet extends Default {
      *  and we can't get any resources (like icons) out of the .war
      */
     @Override
-    protected Resource getResource(String pathInContext) throws IOException
+    public Resource getResource(String pathInContext)
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
-            pathInContext.equals("/index.html") || pathInContext.startsWith("/_icons/"))
+            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
-        return _resourceBase.addPath(pathInContext);
+        try {
+            return _resourceBase.addPath(pathInContext);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     /**
@@ -113,10 +116,8 @@ public class I2PSnarkServlet extends Default {
      *  @since 0.8.3
      */
     @Override
-    public void handleGet(HttpServletRequest request, HttpServletResponse response, String pathInContext, Resource resource, boolean endsWithSlash) throws ServletException, IOException {
-        if (resource.getName().startsWith("jar:file:"))
-            response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
-        super.handleGet(request, response, pathInContext, resource, endsWithSlash);
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doGet(request, response);
     }
 
     /**
@@ -144,33 +145,46 @@ public class I2PSnarkServlet extends Default {
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
         if (!(method.equals("GET") || method.equals("HEAD") || method.equals("POST"))) {
-            resp.sendError(HttpResponse.__405_Method_Not_Allowed);
+            resp.sendError(405);
             return;
         }
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
         // this is the part after /i2psnark
         String path = req.getServletPath();
+
+        // AJAX for mainsection
+        if ("/.ajax/xhr1.html".equals(path)) {
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/html; charset=UTF-8");
+            PrintWriter out = resp.getWriter();
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
+            writeMessages(out);
+            writeTorrents(out, req);
+            return;
+        }
+
         boolean isConfigure = "/configure".equals(path);
         // index.jsp doesn't work, it is grabbed by the war handler before here
         if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
             if (path.endsWith("/")) {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
-                String pathInContext = URI.addPaths(path, pathInfo);
+                String pathInContext = URIUtil.addPaths(path, pathInfo);
                 req.setCharacterEncoding("UTF-8");
                 resp.setCharacterEncoding("UTF-8");
                 resp.setContentType("text/html; charset=UTF-8");
                 Resource resource = getResource(pathInContext);
                 if (resource == null || (!resource.exists())) {
-                    resp.sendError(HttpResponse.__404_Not_Found);
+                    resp.sendError(404);
                 } else {
-                    String base = URI.addPaths(req.getRequestURI(), "/");
+                    String base = URIUtil.addPaths(req.getRequestURI(), "/");
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
                     if (listing != null)
                         resp.getWriter().write(listing);
                     else // shouldn't happen
-                        resp.sendError(HttpResponse.__404_Not_Found);
+                        resp.sendError(404);
                 }
             } else {
                 super.service(req, resp);
@@ -192,7 +206,8 @@ public class I2PSnarkServlet extends Default {
         
         String peerParam = req.getParameter("p");
         String peerString;
-        if (peerParam == null || !_manager.util().connected()) {
+        if (peerParam == null || (!_manager.util().connected()) ||
+            peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
             peerString = "";
         } else {
             peerString = "?p=" + peerParam;
@@ -208,13 +223,24 @@ public class I2PSnarkServlet extends Default {
         out.write("</title>\n");
                                          
         // we want it to go to the base URI so we don't refresh with some funky action= value
+        int delay = 0;
         if (!isConfigure) {
-            int delay = _manager.getRefreshDelaySeconds();
-            if (delay > 0)
-                out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
+            delay = _manager.getRefreshDelaySeconds();
+            if (delay > 0) {
+                //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
+                out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
+                          "<script type=\"text/javascript\">\n"  +
+                          "var failMessage = \"<b>" + _("Router is down") + "<\\/b>\";\n" +
+                          "function requestAjax1() { ajax(\"/i2psnark/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
+                          "function initAjax(delayMs) { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
+                          "</script>\n");
+            }
         }
-        out.write(HEADER_A + _themePath + HEADER_B);
-        out.write("</head><body>");
+        out.write(HEADER_A + _themePath + HEADER_B + "</head>\n");
+        if (isConfigure || delay <= 0)
+            out.write("<body>");
+        else
+            out.write("<body onload=\"initAjax()\">");
         out.write("<center>");
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
@@ -249,25 +275,36 @@ public class I2PSnarkServlet extends Default {
         String newURL = req.getParameter("newURL");
         if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
             _manager.addMessage(_("Click \"Add torrent\" button to fetch torrent"));
-        out.write("<div class=\"page\"><div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
+        out.write("<div class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
+
+        writeMessages(out);
+
+        if (isConfigure) {
+            // end of mainsection div
+            out.write("<div class=\"logshim\"></div></div>\n");
+            writeConfigForm(out, req);
+            writeTrackerForm(out, req);
+        } else {
+            writeTorrents(out, req);
+            // end of mainsection div
+            out.write("</div><div id=\"lowersection\">\n");
+            writeAddForm(out, req);
+            writeSeedForm(out, req);
+            writeConfigLink(out);
+            // end of lowersection div
+            out.write("</div>\n");
+        }
+        out.write(FOOTER);
+    }
+
+    private void writeMessages(PrintWriter out) throws IOException {
+        out.write("<div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
             out.write(msg + "\n");
         }
         out.write("</pre></td></tr></table></div>");
-
-        if (isConfigure) {
-            out.write("<div class=\"logshim\"></div></div>\n");
-            writeConfigForm(out, req);
-        } else {
-            writeTorrents(out, req);
-            out.write("</div>\n");
-            writeAddForm(out, req);
-            writeSeedForm(out, req);
-            writeConfigLink(out);
-        }
-        out.write(FOOTER);
     }
 
     private void writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -276,7 +313,6 @@ public class I2PSnarkServlet extends Default {
         String peerParam = req.getParameter("p");
 
         List snarks = getSortedSnarks(req);
-        String uri = req.getRequestURI();
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -390,6 +426,7 @@ public class I2PSnarkServlet extends Default {
             out.write("&nbsp;");
         }
         out.write("</th></tr></thead>\n");
+        String uri = "/i2psnark/";
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showDebug = "2".equals(peerParam);
@@ -650,14 +687,19 @@ public class I2PSnarkServlet extends Default {
             _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
                                   upLimit, upBW, useOpenTrackers, openTrackers, theme);
+        } else if ("Save2".equals(action)) {
+            String taction = req.getParameter("taction");
+            if (taction != null)
+                processTrackerForm(taction, req);
         } else if ("Create".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(_manager.getDataDir(), baseData);
                 String announceURL = req.getParameter("announceURL");
-                String announceURLOther = req.getParameter("announceURLOther");
-                if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
-                    announceURL = announceURLOther;
+                // make the user add a tracker on the config form now
+                //String announceURLOther = req.getParameter("announceURLOther");
+                //if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
+                //    announceURL = announceURLOther;
 
                 if (announceURL == null || announceURL.length() <= 0)
                     _manager.addMessage(_("Error creating torrent - you must select a tracker"));
@@ -668,7 +710,7 @@ public class I2PSnarkServlet extends Default {
                     try {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, null);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, req.getParameter("private") != null, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -709,6 +751,54 @@ public class I2PSnarkServlet extends Default {
                 if (snark.isStopped())
                     snark.startTorrent();
             }
+        } else {
+            _manager.addMessage("Unknown POST action: \"" + action + '\"');
+        }
+    }
+
+    /** @since 0.9 */
+    private void processTrackerForm(String action, HttpServletRequest req) {
+        if (action.equals(_("Delete selected"))) {
+            boolean changed = false;
+            Map<String, String> trackers = _manager.getTrackers();
+            Enumeration e = req.getParameterNames();
+            while (e.hasMoreElements()) {
+                 Object o = e.nextElement();
+                 if (!(o instanceof String))
+                     continue;
+                 String k = (String) o;
+                 if (!k.startsWith("delete_"))
+                     continue;
+                 k = k.substring(7);
+                 if (trackers.remove(k) != null) {
+                    _manager.addMessage(_("Removed") + ": " + k);
+                    changed = true;
+                }
+            }
+            if (changed) {
+                _manager.saveTrackerMap();
+            }
+        } else if (action.equals(_("Add tracker"))) {
+            String name = req.getParameter("tname");
+            String hurl = req.getParameter("thurl");
+            String aurl = req.getParameter("taurl");
+            if (name != null && hurl != null && aurl != null) {
+                name = name.trim();
+                hurl = hurl.trim();
+                aurl = aurl.trim().replace("=", "&#61;");
+                if (name.length() > 0 && hurl.startsWith("http://") && aurl.startsWith("http://")) {
+                    Map<String, String> trackers = _manager.getTrackers();
+                    trackers.put(name, aurl + '=' + hurl);
+                    _manager.saveTrackerMap();
+                } else {
+                    _manager.addMessage(_("Enter valid tracker name and URLs"));
+                }
+            } else {
+                _manager.addMessage(_("Enter valid tracker name and URLs"));
+            }
+        } else if (action.equals(_("Restore defaults"))) {
+            _manager.setDefaultTrackerMap();
+            _manager.addMessage(_("Restored default trackers"));
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }
@@ -1222,7 +1312,7 @@ public class I2PSnarkServlet extends Default {
         out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
-        out.write("<input type=\"submit\" value=\"");
+        out.write("<input type=\"submit\" class=\"add\" value=\"");
         out.write(_("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n");
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
@@ -1269,31 +1359,40 @@ public class I2PSnarkServlet extends Default {
         //out.write(_("Open trackers and DHT only"));
         out.write(_("Open trackers only"));
         out.write("</option>\n");
-        Map trackers = _manager.getTrackers();
-        for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String name = (String)entry.getKey();
-            String announceURL = (String)entry.getValue();
+        Map<String, String> trackers = _manager.getTrackers();
+        for (Map.Entry<String, String> entry : trackers.entrySet()) {
+            String name = entry.getKey();
+            String announceURL = entry.getValue();
             int e = announceURL.indexOf('=');
             if (e > 0)
-                announceURL = announceURL.substring(0, e);
+                announceURL = announceURL.substring(0, e).replace("&#61;", "=");
             if (announceURL.equals(_lastAnnounceURL))
                 announceURL += "\" selected=\"selected";
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
-        out.write(_("or"));
-        out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
-                  "title=\"");
-        out.write(_("Specify custom tracker announce URL"));
-        out.write("\" > " +
-                  "<input type=\"submit\" value=\"");
+        // make the user add a tracker on the config form now
+        //out.write(_("or"));
+        //out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
+        //          "title=\"");
+        //out.write(_("Specify custom tracker announce URL"));
+        //out.write("\" > " +
+        out.write(" <input type=\"submit\" class=\"create\" value=\"");
         out.write(_("Create torrent"));
-        out.write("\" name=\"foo\" ></table>\n" +
+        out.write("\" name=\"foo\" >\n" +
+                  "</td></tr><tr><td>");
+        out.write(_("Private?"));
+        out.write(" </td><td> <input type=\"checkbox\" class=\"optbox\" name=\"private\" value=\"true\" title=\"");
+            out.write(_("Use for private trackers"));
+        out.write("\"");
+        if (req.getParameter("private") != null)
+            out.write(" checked");
+        out.write("></td></tr>" +
+                  "</table>\n" +
                   "</form></div></div>");        
     }
     
-    private static final int[] times = { 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
+    private static final int[] times = { 5, 15, 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
 
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String dataDir = _manager.getDataDir().getAbsolutePath();
@@ -1356,7 +1455,7 @@ public class I2PSnarkServlet extends Default {
             out.write(Integer.toString(times[i]));
             out.write("\"");
             if (times[i] == delay)
-                out.write(" selected=\"true\"");
+                out.write(" selected=\"selected\"");
             out.write(">");
             if (times[i] > 0)
                 out.write(DataHelper.formatDuration2(times[i] * 1000));
@@ -1379,15 +1478,15 @@ public class I2PSnarkServlet extends Default {
 /*
         out.write("Seed percentage: <select name=\"seedPct\" disabled=\"true\" >\n\t");
         if (seedPct <= 0)
-            out.write("<option value=\"0\" selected=\"true\">Unlimited</option>\n\t");
+            out.write("<option value=\"0\" selected=\"selected\">Unlimited</option>\n\t");
         else
             out.write("<option value=\"0\">Unlimited</option>\n\t");
         if (seedPct == 100)
-            out.write("<option value=\"100\" selected=\"true\">100%</option>\n\t");
+            out.write("<option value=\"100\" selected=\"selected\">100%</option>\n\t");
         else
             out.write("<option value=\"100\">100%</option>\n\t");
         if (seedPct == 150)
-            out.write("<option value=\"150\" selected=\"true\">150%</option>\n\t");
+            out.write("<option value=\"150\" selected=\"selected\">150%</option>\n\t");
         else
             out.write("<option value=\"150\">150%</option>\n\t");
         out.write("</select><br>\n");
@@ -1473,6 +1572,57 @@ public class I2PSnarkServlet extends Default {
                   "</table></div></div></form>");
     }
     
+    /** @since 0.9 */
+    private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
+                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
+                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
+                  "<input type=\"hidden\" name=\"action\" value=\"Save2\" >\n" +
+                  "<span class=\"snarkConfigTitle\">" +
+                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+        buf.append(_("Trackers"));
+        buf.append("</span><hr>\n"   +
+                   "<table><tr><th>")
+           //.append(_("Remove"))
+           .append("</th><th>")
+           .append(_("Name"))
+           .append("</th><th>")
+           .append(_("Website URL"))
+           .append("</th><th>")
+           .append(_("Announce URL"))
+           .append("</th></tr>\n");
+        Map<String, String> trackers = _manager.getTrackers();
+        for (Map.Entry<String, String> entry : trackers.entrySet()) {
+            String name = entry.getKey();
+            String announceURL = entry.getValue();
+            int e = announceURL.indexOf('=');
+            if (e <= 0)
+                continue;
+            String homeURL = announceURL.substring(e + 1);
+            announceURL = announceURL.substring(0, e).replace("&#61;", "=");
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+               .append(name).append("\">" +
+                       "</td><td align=\"left\">").append(name)
+               .append("</td><td align=\"left\">").append(urlify(homeURL, 35))
+               .append("</td><td align=\"left\">").append(urlify(announceURL, 35))
+               .append("</td></tr>\n");
+        }
+        buf.append("<tr><td align=\"center\"><b>")
+           .append(_("Add")).append(":</b></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
+                   "<tr><td colspan=\"2\"></td><td colspan=\"2\" align=\"left\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
+                   // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
+                   "</td></tr></table></div></div></form>\n");
+        out.write(buf.toString());
+    }
+
     private void writeConfigLink(PrintWriter out) throws IOException {
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n" +
                   "<span class=\"snarkConfigTitle\"><a href=\"configure\">" +
@@ -1574,7 +1724,7 @@ public class I2PSnarkServlet extends Default {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
-                buf.append("selected=\"true\" ");
+                buf.append("selected=\"selected\" ");
             // constants to prevent tagging
             buf.append(">").append(ngettext(DUMMY1 + name, DUMMY0 + name + 's', i));
             buf.append("</option>\n");
@@ -1622,16 +1772,26 @@ public class I2PSnarkServlet extends Default {
     
     /** @since 0.7.14 */
     private static String urlify(String s) {
+        return urlify(s, 100);
+    }
+    
+    /** @since 0.9 */
+    private static String urlify(String s, int max) {
         StringBuilder buf = new StringBuilder(256);
         // browsers seem to work without doing this but let's be strict
         String link = urlEncode(s);
-        buf.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+        String display;
+        if (s.length() <= max)
+            display = link;
+        else
+            display = urlEncode(s.substring(0, max)) + "&hellip;";
+        buf.append("<a href=\"").append(link).append("\">").append(display).append("</a>");
         return buf.toString();
     }
     
     /** @since 0.8.13 */
     private static String urlEncode(String s) {
-        return s.replace("&", "&amp;").replace(" ", "%20").replace(":", "%3A").replace("/", "%2F").replace(";", "%3B");
+        return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20");
     }
 
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
@@ -1686,7 +1846,7 @@ public class I2PSnarkServlet extends Default {
         
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE + "<HTML><HEAD><TITLE>");
-        String title = URI.decodePath(base);
+        String title = URIUtil.decodePath(base);
         if (title.startsWith("/i2psnark/"))
             title = title.substring("/i2psnark/".length());
 
@@ -1795,7 +1955,7 @@ public class I2PSnarkServlet extends Default {
             .append(_("Priority")).append("</th>");
         buf.append("</tr></thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '4' : '3') + "\" class=\"ParentDir\"><A HREF=\"");
-        buf.append(URI.addPaths(base,"../"));
+        buf.append(URIUtil.addPaths(base,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
             .append(_("Up to higher level directory")).append("</A></td></tr>\n");
 
@@ -1805,7 +1965,7 @@ public class I2PSnarkServlet extends Default {
         boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
-            String encoded=URI.encodePath(ls[i]);
+            String encoded=URIUtil.encodePath(ls[i]);
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
@@ -1861,9 +2021,9 @@ public class I2PSnarkServlet extends Default {
                 }
             }
 
-            String path=URI.addPaths(base,encoded);
+            String path=URIUtil.addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
-                path=URI.addPaths(path,"/");
+                path=URIUtil.addPaths(path,"/");
             String icon = toIcon(item);
 
             if (complete) {
@@ -1991,12 +2151,12 @@ public class I2PSnarkServlet extends Default {
     
     /** @since 0.7.14 */
     private static String toImg(String icon) {
-        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\">";
+        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/.icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.2 */
     private static String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\">";
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/.icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.1 */
@@ -2080,8 +2240,8 @@ private static class FetchAndAdd implements Runnable {
                 //if (peerParam != null)
                 //    buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
                 buf.append(_("Torrent was not retrieved from {0}", urlify(_url)));
-                String link = urlEncode(_url);
              /**** FIXME ticket #575
+                String link = urlEncode(_url).replace(":", "%3A").replace("/", "%2F");
                 buf.append(" - [<a href=\"/i2psnark/?newURL=").append(link).append("#add\" >");
                 buf.append(_("Retry"));
                 buf.append("</a>]");

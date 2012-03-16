@@ -21,7 +21,12 @@
                 <pathelement location="../../../core/java/build/obj" />
                 <pathelement location="../../../router/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/build" />
@@ -54,7 +59,12 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
@@ -92,6 +102,7 @@
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
@@ -172,6 +183,7 @@
              basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.w.tr}" />
@@ -236,7 +248,9 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
-                <pathelement location="../../jetty/jettylib/ant.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="${ant.home}/lib/ant.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
@@ -269,6 +283,11 @@
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />

@@ -6,17 +6,15 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFile;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
@@ -49,7 +47,7 @@ public class PluginUpdateHandler extends UpdateHandler {
     public static final String PLUGIN_DIR = "plugins";
 
     private static PluginUpdateHandler _instance;
-    public static final synchronized PluginUpdateHandler getInstance(RouterContext ctx) { 
+    public static final synchronized PluginUpdateHandler getInstance(RouterContext ctx) {
         if (_instance != null)
             return _instance;
         _instance = new PluginUpdateHandler(ctx);
@@ -60,7 +58,7 @@ public class PluginUpdateHandler extends UpdateHandler {
         super(ctx);
         _appStatus = "";
     }
-    
+
     public void update(String xpi2pURL) {
         // don't block waiting for the other one to finish
         if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
@@ -79,7 +77,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             update.start();
         }
     }
-    
+
     public String getAppStatus() {
         return _appStatus;
     }
@@ -87,13 +85,13 @@ public class PluginUpdateHandler extends UpdateHandler {
     public boolean isRunning() {
         return _pluginUpdateRunner != null && _pluginUpdateRunner.isRunning();
     }
-    
+
     @Override
     public boolean isDone() {
         // FIXME
         return false;
     }
-    
+
     /** @since 0.8.13 */
     public boolean wasUpdateSuccessful() {
         return _updated;
@@ -116,31 +114,48 @@ public class PluginUpdateHandler extends UpdateHandler {
 
     public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
 
-        public PluginUpdateRunner(String url) { 
+        public PluginUpdateRunner(String url) {
             super();
         }
 
         @Override
         protected void update() {
             _updated = false;
-            updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
-            // use the same settings as for updater
-            boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
-            String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-            int proxyPort = ConfigUpdateHandler.proxyPort(_context);
-            try {
-                if (shouldProxy)
-                    // 10 retries!!
-                    _get = new EepGet(_context, proxyHost, proxyPort, 10, _updateFile, _xpi2pURL, false);
-                else
-                    _get = new EepGet(_context, 1, _updateFile, _xpi2pURL, false);
-                _get.addStatusListener(PluginUpdateRunner.this);
-                _get.fetch();
-            } catch (Throwable t) {
-                _log.error("Error downloading plugin", t);
+            if(_xpi2pURL.startsWith("file://")) {
+                updateStatus("<b>" + _("Attempting to copy plugin from {0}", _xpi2pURL) + "</b>");
+                // strip off "file://"
+                String xpi2pfile = _xpi2pURL.substring(7);
+                if(xpi2pfile.length() == 0) { // This is actually what String.isEmpty() does, so it should be safe.
+                        statusDone("<b>" + _("No file specified {0}", _xpi2pURL) + "</b>");
+                } else {
+                    // copy the contents of from to _updateFile
+                    long alreadyTransferred = (new File(xpi2pfile)).getAbsoluteFile().length();
+                    if(FileUtil.copy((new File(xpi2pfile)).getAbsolutePath(), _updateFile, true, false)) {
+                        transferComplete(alreadyTransferred, alreadyTransferred, 0L, _xpi2pURL, _updateFile, false);
+                    } else {
+                        statusDone("<b>" + _("Failed to copy file {0}", _xpi2pURL) + "</b>");
+                    }
+                }
+            } else {
+                updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
+                // use the same settings as for updater
+                boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+                String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+                int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+                try {
+                    if (shouldProxy)
+                        // 10 retries!!
+                        _get = new EepGet(_context, proxyHost, proxyPort, 10, _updateFile, _xpi2pURL, false);
+                    else
+                        _get = new EepGet(_context, 1, _updateFile, _xpi2pURL, false);
+                    _get.addStatusListener(PluginUpdateRunner.this);
+                    _get.fetch();
+                } catch (Throwable t) {
+                    _log.error("Error downloading plugin", t);
+                }
             }
         }
-        
+
         @Override
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
             StringBuilder buf = new StringBuilder(64);
@@ -158,6 +173,7 @@ public class PluginUpdateHandler extends UpdateHandler {
 
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+            boolean update = false;
             updateStatus("<b>" + _("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
             File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
@@ -302,7 +318,6 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Downloaded plugin is for new installs only, but the plugin is already installed", url) + "</b>");
                     return;
                 }
-
                 // compare previous version
                 File oldPropFile = new File(destDir, "plugin.config");
                 Properties oldProps = new OrderedProperties();
@@ -316,7 +331,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 }
                 String oldPubkey = oldProps.getProperty("key");
                 String oldKeyName = oldProps.getProperty("signer");
-                String oldAppName = props.getProperty("name");
+                String oldAppName = oldProps.getProperty("name");
                 if ((!pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
                     to.delete();
                     statusDone("<b>" + _("Signature of downloaded plugin does not match installed plugin") + "</b>");
@@ -358,7 +373,25 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Plugin requires Jetty version {0} or lower", maxVersion) + "</b>");
                     return;
                 }
-
+                // do we defer extraction and installation?
+                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue()) {
+                    // Yup!
+                    try {
+                        if(!FileUtil.copy(to, (new SecureFile( new SecureFile(appDir.getCanonicalPath() +"/" + appName +"/"+ ZIP).getCanonicalPath())) , true, true)) {
+                            to.delete();
+                            statusDone("<b>" + _("Cannot copy plugin to directory {0}", destDir.getAbsolutePath()) + "</b>");
+                            return;
+                        }
+                    } catch (Throwable t) {
+                        to.delete();
+                        _log.error("Error copying plugin {0}", t);
+                        return;
+                    }
+                    // we don't need the original file anymore.
+                    to.delete();
+                    statusDone("<b>" + _("Plugin will be installed on next restart.") + "</b>");
+                    return;
+                }
                 if (PluginStarter.isPluginRunning(appName, _context)) {
                     wasRunning = true;
                     try {
@@ -370,7 +403,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                         _log.error("Error stopping plugin " + appName, e);
                     }
                 }
-
+                update = true;
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
                     to.delete();
@@ -390,14 +423,12 @@ public class PluginUpdateHandler extends UpdateHandler {
                 statusDone("<b>" + _("Failed to install plugin in {0}", destDir.getAbsolutePath()) + "</b>");
                 return;
             }
-
             _updated = true;
             to.delete();
-            if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
-                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())
-                    statusDone("<b>" + _("Plugin {0} installed, router restart required", appName) + "</b>");
-                else {
-                    statusDone("<b>" + _("Plugin {0} installed", appName) + "</b>");
+            // install != update. Changing the user's settings like this is probabbly a bad idea.
+            if (Boolean.valueOf( props.getProperty("dont-start-at-install")).booleanValue()) {
+                statusDone("<b>" + _("Plugin {0} installed", appName) + "</b>");
+                if(!update) {
                     Properties pluginProps = PluginStarter.pluginProperties();
                     pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
                     PluginStarter.storePluginProperties(pluginProps);
@@ -441,11 +472,11 @@ public class PluginUpdateHandler extends UpdateHandler {
         }
 
     }
-    
+
     @Override
     protected void updateStatus(String s) {
         super.updateStatus(s);
         _appStatus = s;
     }
 }
-    
+

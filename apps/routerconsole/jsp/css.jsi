@@ -27,7 +27,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="shortcut icon" href="/themes/console/images/favicon.ico">
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
-<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%
    String conNonceParam = request.getParameter("consoleNonce");
    if (conNonceParam != null && conNonceParam.equals(System.getProperty("router.consoleNonce"))) {

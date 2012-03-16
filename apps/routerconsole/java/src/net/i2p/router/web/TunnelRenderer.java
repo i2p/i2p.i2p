@@ -134,6 +134,7 @@ public class TunnelRenderer {
         out.write("<div class=\"statusnotes\"><b>" + _("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
+        out.write("</div>");
     }
     
     private static class TunnelComparator implements Comparator<HopConfig> {
@@ -222,7 +223,7 @@ public class TunnelRenderer {
             }
         }
         if (live <= 0)
-            out.write("<div class=\"statusnotes\"><center><b>" + _("No tunnels; waiting for the grace period to end.") + "</center></b></div>\n");
+            out.write("<div class=\"statusnotes\"><center><b>" + _("No tunnels; waiting for the grace period to end.") + "</b></center></div>\n");
         out.write("<div class=\"statusnotes\"><center><b>" + _("Lifetime bandwidth usage") + ": " +
                   DataHelper.formatSize2(processedIn*1024) + "B " + _("in") + ", " +
                   DataHelper.formatSize2(processedOut*1024) + "B " + _("out") + "</b></center></div>");

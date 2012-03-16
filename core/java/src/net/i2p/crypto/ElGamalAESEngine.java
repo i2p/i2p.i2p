@@ -406,8 +406,8 @@ public class ElGamalAESEngine {
             _context.statManager().updateFrequency("crypto.elGamalAES.encryptNewSession");
             return encryptNewSession(data, target, key, tagsForDelivery, newKey, paddedSize);
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Current tag is NOT null, encrypting as existing session");
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info("Current tag is NOT null, encrypting as existing session");
         _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
         byte rv[] = encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
         if (_log.shouldLog(Log.DEBUG))

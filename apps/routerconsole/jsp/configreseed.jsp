@@ -1,4 +1,5 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
@@ -10,16 +11,16 @@
 <%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHelper" id="reseedHelper" scope="request" />
-<jsp:setProperty name="reseedHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="reseedHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <h1><%=intl._("I2P Reseeding Configuration")%></h1>
 <div class="main" id="main">
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHandler" id="formhandler" scope="request" />
 <% formhandler.storeMethod(request.getMethod()); %>
-<jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />
-<jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
+<jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter(\"action\")%>" />
+<jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter(\"nonce\")%>" />
 <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
 <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure"><form action="" method="POST">
@@ -41,7 +42,7 @@
 <input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
 <b><%=intl._("Use non-SSL only")%></b></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URLs")%>:</b></td>
-<td><textarea name="reseedURL" wrap="off" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
+<td><textarea wrap="off" name="reseedURL" cols="60" rows="7" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
 
 <tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTP Proxy?")%></b></td>
 <td><input type="checkbox" class="optbox" name="enable" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>

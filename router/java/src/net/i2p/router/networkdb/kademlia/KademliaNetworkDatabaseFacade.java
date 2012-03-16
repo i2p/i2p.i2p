@@ -47,8 +47,8 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
- * Kademlia based version of the network database
- *
+ * Kademlia based version of the network database.
+ * Never instantiated directly; see FloodfillNetworkDatabaseFacade.
  */
 public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final Log _log;
@@ -127,8 +127,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
+
     /** this needs to be long enough to give us time to start up,
-        but less than 20m (when we start accepting tunnels and could be a IBGW) */
+        but less than 20m (when we start accepting tunnels and could be a IBGW)
+        Actually no, we need this soon if we are a new router or
+        other routers have forgotten about us, else
+        we can't build IB exploratory tunnels.
+        Unused.
+     */
     protected final static long PUBLISH_JOB_DELAY = 5*60*1000l;
 
     private static final int MAX_EXPLORE_QUEUE = 128;

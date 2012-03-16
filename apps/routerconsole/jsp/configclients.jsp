@@ -1,4 +1,5 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
@@ -15,17 +16,17 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
-<jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter("edit")%>" />
+<jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter(\"edit\")%>" />
 <h1><%=intl._("I2P Client Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
  <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />
- <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter(\"action\")%>" />
+ <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter(\"nonce\")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure">
@@ -100,7 +101,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  </p><p>
  <%=intl._("A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method.")%>
  </p><div class="wideload">
-<form action="" method="POST">
+<form action="configclients" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form2" />
  <p><i><%=intl._("All changes require restart to take effect.")%></i>
@@ -124,7 +125,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
  <%=intl._("To install a plugin, enter the download URL:")%>
  </p><div class="wideload">
-<form action="" method="POST">
+<form action="configclients" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <p>
  <input type="text" size="60" name="pluginURL" >
@@ -132,6 +133,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" name="action" class="default" value="<%=intl._("Install Plugin")%>" />
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
+</div><hr><div class="formaction">
  <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
  </div></form></div>
 <% } %>

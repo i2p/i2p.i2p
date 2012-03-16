@@ -1655,7 +1655,7 @@ public class WebMail extends HttpServlet
 					", invert=" + sessionObject.invert +
 					", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
-					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" + link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" + mail.formattedDate + "</a></td><td>&nbsp;</td><td>" + ngettext("1 Byte", "{0} Bytes", mail.size) + "</a></td></tr>" );
+					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" + link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" + mail.formattedDate + "</td><td>&nbsp;</td><td>" + ngettext("1 Byte", "{0} Bytes", mail.size) + "</td></tr>" );
 			bg = 1 - bg;
 			i++;
 		}

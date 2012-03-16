@@ -1,4 +1,6 @@
-<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"%><?xml version="1.0" encoding="UTF-8"?>
+<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
+%><%@page trimDirectiveWhitespaces="true"
+%><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
@@ -355,11 +357,11 @@
                 </label>
                 <table border="0"><tr><!-- I give up -->
                 <td><input value="1" type="radio" id="startOnLoad" name="newDest" title="New Destination"
-                     <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <td><%=intl._("Enable")%>
+                     <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" /></td>
+                <td><%=intl._("Enable")%></td>
                 <td><input value="0" type="radio" id="startOnLoad" name="newDest" title="New Destination"
-                     <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />                
-                <td><%=intl._("Disable")%>
+                     <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" /></td>
+                <td><%=intl._("Disable")%></td></tr>
                 </table>
             </div>
             <div id="portField" class="rowItem">

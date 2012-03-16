@@ -27,13 +27,13 @@ import net.i2p.util.Log;
  *
  */
 class RequestLeaseSetJob extends JobImpl {
-    private Log _log;
-    private ClientConnectionRunner _runner;
-    private LeaseSet _ls;
-    private long _expiration;
-    private Job _onCreate;
-    private Job _onFail;
-    private LeaseRequestState _requestState;
+    private final Log _log;
+    private final ClientConnectionRunner _runner;
+    private final LeaseSet _ls;
+    private final long _expiration;
+    private final Job _onCreate;
+    private final Job _onFail;
+    private final LeaseRequestState _requestState;
     
     public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseSet set, long expiration, Job onCreate, Job onFail, LeaseRequestState state) {
         super(ctx);
@@ -92,8 +92,8 @@ class RequestLeaseSetJob extends JobImpl {
      *
      */
     private class CheckLeaseRequestStatus extends JobImpl {
-        private LeaseRequestState _req;
-        private long _start;
+        private final LeaseRequestState _req;
+        private final long _start;
         
         public CheckLeaseRequestStatus(RouterContext enclosingContext, LeaseRequestState state) {
             super(enclosingContext);
@@ -114,9 +114,9 @@ class RequestLeaseSetJob extends JobImpl {
                 return;
             } else {
                 RequestLeaseSetJob.CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetTimeout", 1, 0);
-                if (_log.shouldLog(Log.CRIT)) {
+                if (_log.shouldLog(Log.ERROR)) {
                     long waited = System.currentTimeMillis() - _start;
-                    _log.log(Log.CRIT, "Failed to receive a leaseSet in the time allotted (" + waited + "): " + _req + " for " 
+                    _log.error("Failed to receive a leaseSet in the time allotted (" + waited + "): " + _req + " for " 
                              + _runner.getConfig().getDestination().calculateHash().toBase64());
                 }
                 _runner.disconnectClient("Took too long to request leaseSet");

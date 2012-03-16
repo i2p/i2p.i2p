@@ -2,22 +2,21 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
-import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.PortMapper;
 
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpListener;
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.jetty.webapp.WebAppContext;
+import org.mortbay.jetty.handler.ContextHandler;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 
 
 /**
@@ -37,11 +36,16 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
  */
 public class WebAppStarter {
 
-    static final Map<String, Long> warModTimes = new ConcurrentHashMap();
-    static private Log _log;
+    private static final Map<String, Long> warModTimes = new ConcurrentHashMap();
+    static final Map INIT_PARAMS = new HashMap(4);
+    //static private Log _log;
 
     static {
-        _log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
+        //_log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
+        // see DefaultServlet javadocs
+        String pfx = "org.mortbay.jetty.servlet.Default.";
+        INIT_PARAMS.put(pfx + "cacheControl", "max-age=86400");
+        INIT_PARAMS.put(pfx + "dirAllowed", "false");
     }
 
 
@@ -49,10 +53,12 @@ public class WebAppStarter {
      *  adds and starts
      *  @throws just about anything, caller would be wise to catch Throwable
      */
-    static void startWebApp(I2PAppContext ctx, Server server, String appName, String warPath) throws Exception {
+    static void startWebApp(I2PAppContext ctx, ContextHandlerCollection server,
+                            String appName, String warPath) throws Exception {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
-         WebApplicationContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
-		 _log.debug("Loading war from: " + warPath);
+         WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
+         //_log.debug("Loading war from: " + warPath);
+         wac.setInitParams(INIT_PARAMS);
          wac.start();
     }
 
@@ -61,12 +67,13 @@ public class WebAppStarter {
      *  This is used only by RouterConsoleRunner, which adds all the webapps first
      *  and then starts all at once.
      */
-    static WebApplicationContext addWebApp(I2PAppContext ctx, Server server, String appName, String warPath, File tmpdir) throws IOException {
+    static WebAppContext addWebApp(I2PAppContext ctx, ContextHandlerCollection server,
+                                   String appName, String warPath, File tmpdir) throws IOException {
 
         // Jetty will happily load one context on top of another without stopping
         // the first one, so we remove any previous one here
         try {
-            stopWebApp(server, appName);
+            stopWebApp(appName);
         } catch (Throwable t) {}
 
         // To avoid ZipErrors from JarURLConnetion caching,
@@ -91,22 +98,22 @@ public class WebAppStarter {
             warPath = tmpPath;
         }
 
-        WebApplicationContext wac = server.addWebApplication("/"+ appName, warPath);
+        WebAppContext wac = new WebAppContext(warPath, "/"+ appName);
         tmpdir.mkdir();
         wac.setTempDirectory(tmpdir);
 
         // this does the passwords...
         RouterConsoleRunner.initialize(wac);
 
-
-
         // see WebAppConfiguration for info
-        String[] classNames = server.getWebApplicationConfigurationClassNames();
+        String[] classNames = wac.getConfigurationClasses();
         String[] newClassNames = new String[classNames.length + 1];
         for (int j = 0; j < classNames.length; j++)
              newClassNames[j] = classNames[j];
         newClassNames[classNames.length] = WebAppConfiguration.class.getName();
-        wac.setConfigurationClassNames(newClassNames);
+        wac.setConfigurationClasses(newClassNames);
+        server.addHandler(wac);
+        server.mapContexts();
         return wac;
     }
 
@@ -114,42 +121,55 @@ public class WebAppStarter {
      *  stop it and remove the context
      *  @throws just about anything, caller would be wise to catch Throwable
      */
-    static void stopWebApp(Server server, String appName) {
-        // this will return a new context if one does not exist
-        HttpContext wac = server.getContext('/' + appName);
+    static void stopWebApp(String appName) {
+        ContextHandler wac = getWebApp(appName);
+        if (wac == null)
+            return;
         try {
-            // false -> not graceful
-            wac.stop(false);
-        } catch (InterruptedException ie) {}
+            // not graceful is default in Jetty 6?
+            wac.stop();
+        } catch (Exception ie) {}
+        ContextHandlerCollection server = getConsoleServer();
+        if (server == null)
+            return;
         try {
-            server.removeContext(wac);
+            server.removeHandler(wac);
+            server.mapContexts();
         } catch (IllegalStateException ise) {}
     }
 
     static boolean isWebAppRunning(String appName) {
-        Server server = WebAppStarter.getConsoleServer();
-        if (server == null)
+        ContextHandler wac = getWebApp(appName);
+        if (wac == null)
             return false;
-        // this will return a new context if one does not exist
-        HttpContext wac = server.getContext('/' + appName);
         return wac.isStarted();
     }
     
-    /** see comments in ConfigClientsHandler */
-    static Server getConsoleServer() {
-        PortMapper pm = I2PAppContext.getGlobalContext().portMapper();
-        int p1 = pm.getPort(PortMapper.SVC_CONSOLE);
-        int p2 = pm.getPort(PortMapper.SVC_HTTPS_CONSOLE);
-        Collection c = Server.getHttpServers();
-        for (int i = 0; i < c.size(); i++) {
-            Server s = (Server) c.toArray()[i];
-            HttpListener[] hl = s.getListeners();
-            for (int j = 0; j < hl.length; j++) {
-                int port = hl[j].getPort();
-                if (port == p1 || port == p2)
-                    return s;
-            }
+    /** @since Jetty 6 */
+    static ContextHandler getWebApp(String appName) {
+        ContextHandlerCollection server = getConsoleServer();
+        if (server == null)
+            return null;
+        Handler handlers[] = server.getHandlers();
+        if (handlers == null)
+            return null;
+        String path = '/'+ appName;
+        for (int i = 0; i < handlers.length; i++) {
+            ContextHandler ch = (ContextHandler) handlers[i];
+            if (path.equals(ch.getContextPath()))
+                return ch;
         }
         return null;
+    }
+
+    /** see comments in ConfigClientsHandler */
+    static ContextHandlerCollection getConsoleServer() {
+        Server s = RouterConsoleRunner.getConsoleServer();
+        if (s == null)
+            return null;
+        Handler h = s.getChildHandlerByClass(ContextHandlerCollection.class);
+        if (h == null)
+            return null;
+        return (ContextHandlerCollection) h;
     }
 }

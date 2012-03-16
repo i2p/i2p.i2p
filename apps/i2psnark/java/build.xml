@@ -19,6 +19,7 @@
                 <pathelement location="../../ministreaming/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
             </classpath>
         </depend>
     </target>
@@ -34,7 +35,7 @@
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jetty/jettylib/jetty-util.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -61,6 +62,7 @@
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
@@ -95,11 +97,16 @@
     <target name="war" depends="jar, bundle, warUpToDate, listChangedFiles" unless="war.uptodate" > 
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <war destfile="../i2psnark.war" webxml="../web.xml" basedir="../" includes="_icons/*" >
+        <copy todir="build/icons/.icons" >
+            <fileset dir="../icons/" />
+        </copy>
+        <war destfile="../i2psnark.war" webxml="../web.xml" >
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
           <classes dir="./build/obj" includes="**/web/*.class" />
+            <fileset dir="build/icons/" />
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
@@ -109,7 +116,7 @@
     
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="../i2psnark.war" >
-            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../_icons/* ../web.xml" />
+            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../icons/* ../web.xml" />
         </uptodate>
     </target>
     

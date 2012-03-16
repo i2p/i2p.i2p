@@ -19,6 +19,7 @@
             <classpath>
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../core/java/build/i2p.jar" />
             </classpath>
         </javac>
@@ -46,6 +47,7 @@
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

@@ -60,6 +60,14 @@ public abstract class I2PTunnelTask extends EventDispatcherImpl {
 
     public abstract boolean close(boolean forced);
 
+    /**
+     *  For tasks that don't call I2PTunnel.addSession() directly
+     *  @since 0.8.13
+     */
+    public void connected(I2PSession session) {
+        getTunnel().addSession(session);
+    }
+
     public void disconnected(I2PSession session) {
         routerDisconnected();
         getTunnel().removeSession(session);

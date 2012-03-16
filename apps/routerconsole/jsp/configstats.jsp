@@ -1,4 +1,5 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
@@ -64,11 +65,11 @@ function toggleAll(category)
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
  <% formhandler.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHelper" id="statshelper" scope="request" />
- <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <div class="configure">
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >
@@ -76,10 +77,21 @@ function toggleAll(category)
  <h3><%=intl._("Configure I2P Stat Collection")%></h3>
  <p><%=intl._("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
- if (statshelper.getIsFull()) { %>checked="true" <% } %> >
+ if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
  (<%=intl._("change requires restart to take effect")%>)<br>
- <%=intl._("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
-<%=intl._("Filter")%>: (<a href="javascript:void(null);" onclick="toggleAll('*')"><%=intl._("toggle all")%></a>)<br></p>
+<%
+
+  // stats.log for devs only and grows without bounds, not recommended
+  boolean shouldShowLog = statshelper.shouldShowLog();
+  if (shouldShowLog) {
+
+%><%=intl._("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
+Warning - Log with care, stat file grows without limit.<br>
+<%
+
+  }  // shouldShowLog
+
+%><%=intl._("Filter")%>: (<a href="javascript:void(null);" onclick="toggleAll('*')"><%=intl._("toggle all")%></a>)<br></p>
  <div class="wideload">
  <table>
  <% while (statshelper.hasMoreStats()) {
@@ -90,27 +102,51 @@ function toggleAll(category)
      (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._("toggle all")%></a>)
      </td></tr>
  <tr class="tablefooter">
-    <td align="center"><b><%=intl._("Log")%></b></td>
-    <td align="center"><b><%=intl._("Graph")%></b></td>
+<%
+
+  if (shouldShowLog) {
+
+%>  <td align="center"><b><%=intl._("Log")%></b></td>
+<%
+
+  }  // shouldShowLog
+
+%>    <td align="center"><b><%=intl._("Graph")%></b></td>
     <td></td></tr>
         <%
      } // end iterating over required groups for the current stat %>
- <tr><td align="center">
+ <tr>
+<%
+
+  if (shouldShowLog) {
+
+%>   <td align="center">
      <a name="<%=statshelper.getCurrentStatName()%>"></a>
      <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
-     if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %> ></td>
-     <td align="center">
+     if (statshelper.getCurrentIsLogged()) { %>checked="checked" <% } %> ></td>
+<%
+
+  }  // shouldShowLog
+
+%>   <td align="center">
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
        <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
-       if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %> ><% } %></td>
+       if (statshelper.getCurrentIsGraphed()) { %>checked="checked" <% } %> ><% } %></td>
      <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br>
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
-    } // end iterating over all stats %>
- <tr><td colspan="3"></td></tr>
+    } // end iterating over all stats
+
+  if (shouldShowLog) {
+
+%> <tr><td colspan="3"></td></tr>
  <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" ></td>
      <td colspan="2"><%=intl._("Advanced filter")%>:
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
-     <tr class="tablefooter"><td colspan="3" align="right">
+<%
+
+  }  // shouldShowLog
+
+%>   <tr class="tablefooter"><td colspan="3" align="right">
 <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="shouldsave" class="accept" value="<%=intl._("Save changes")%>" >
 </td></tr>

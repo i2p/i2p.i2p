@@ -15,4 +15,26 @@
   <session-config>
     <session-timeout>15</session-timeout>
   </session-config>
-</web-app>
+
+<!--
+     Jetty 6 mulipart form handling
+     See http://docs.codehaus.org/display/JETTY/File+Upload+in+jetty6
+     and RequestWrapper.java.
+     Unused because it doesn't support content-type until Jetty 8.
+
+    <filter>
+        <filter-name>fileuploadfilter</filter-name>
+        <filter-class>org.mortbay.servlet.MultiPartFilter</filter-class>
+        <init-param>
+            <param-name>deleteFiles</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>fileuploadfilter</filter-name>
+        <url-pattern>/susimail</url-pattern>
+    </filter-mapping>
+-->
+
+-</web-app>

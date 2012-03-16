@@ -161,8 +161,7 @@ class ConnectionManager {
             //        active++;
             //}
             if (locked_tooManyStreams()) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Refusing connection since we have exceeded our max of " 
+                _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
                               + _maxConcurrentStreams + " connections");
                 reject = true;
             } else {
@@ -233,8 +232,7 @@ class ConnectionManager {
         while (true) {
             long remaining = expiration - _context.clock().now();
             if (remaining <= 0) { 
-                if (_log.shouldLog(Log.WARN))
-                _log.warn("Refusing to connect since we have exceeded our max of " 
+                _log.logAlways(Log.WARN, "Refusing to connect since we have exceeded our max of " 
                           + _maxConcurrentStreams + " connections");
                 _numWaiting--;
                 return null;
@@ -243,8 +241,7 @@ class ConnectionManager {
                 if (locked_tooManyStreams()) {
                     // allow a full buffer of pending/waiting streams
                     if (_numWaiting > _maxConcurrentStreams) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Refusing connection since we have exceeded our max of "
+                        _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of "
                                       + _maxConcurrentStreams + " and there are " + _numWaiting
                                       + " waiting already");
                         _numWaiting--;

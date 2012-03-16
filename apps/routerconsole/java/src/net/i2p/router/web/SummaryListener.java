@@ -55,7 +55,7 @@ class SummaryListener implements RateSummaryListener {
     
     static final int PERIODS = 60 * 24;  // 1440
     private static final int MIN_ROWS = PERIODS;
-    private static final int MAX_ROWS = 91 * MIN_ROWS;
+    static final int MAX_ROWS = 91 * MIN_ROWS;
     private static final long THREE_MONTHS = 91l * 24 * 60 * 60 * 1000;
     
     public SummaryListener(Rate r) {
@@ -191,10 +191,15 @@ class SummaryListener implements RateSummaryListener {
         _db = null;
     }
 
-    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+    /**
+     *  @param end number of periods before now
+     */
+    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
+                          boolean hideTitle, boolean showEvents, int periodCount,
+                          int end, boolean showCredit) throws IOException {
         if (_renderer == null || _db == null)
             throw new IOException("No RRD, check logs for previous errors");
-        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit); 
+        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit); 
     }
 
     public void renderPng(OutputStream out) throws IOException {

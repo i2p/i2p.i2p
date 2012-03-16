@@ -100,18 +100,18 @@ public class BSkipSpan extends SkipSpan {
 	@Override
 	public void killInstance() {
 		if (isKilled) {
-			BlockFile.log.error("Already killed!! " + this, new Exception());
+			bf.log.error("Already killed!! " + this, new Exception());
 			return;
 		}
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Killing " + this);
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("Killing " + this);
 		isKilled = true;
 		try {
 			int curPage = overflowPage;
 			bf.freePage(page);
 			freeContinuationPages(curPage);
 		} catch (IOException ioe) {
-			BlockFile.log.error("Error freeing " + this, ioe);
+			bf.log.error("Error freeing " + this, ioe);
 		}
 		bsl.spanHash.remove(Integer.valueOf(this.page));
 	}
@@ -146,7 +146,7 @@ public class BSkipSpan extends SkipSpan {
 	 */
 	private void fflush() {
 		if (isKilled) {
-			BlockFile.log.error("Already killed!! " + this, new Exception());
+			bf.log.error("Already killed!! " + this, new Exception());
 			return;
 		}
 		try {
@@ -163,7 +163,7 @@ public class BSkipSpan extends SkipSpan {
 			bf.file.writeShort((short) keys.length);
 			bf.file.writeShort((short) nKeys);
 			if (nKeys <= 0 && prev != null)
-				BlockFile.log.error("Flushing with no entries?" + this, new Exception());
+				bf.log.error("Flushing with no entries?" + this, new Exception());
 
 			int ksz, vsz;
 			int curPage = this.page;
@@ -193,7 +193,7 @@ public class BSkipSpan extends SkipSpan {
 				}
 				// Drop bad entry without throwing exception
 				if (keys[i] == null || vals[i] == null) {
-					BlockFile.log.error("Dropping null data in entry " + i + " page " + curPage +
+					bf.log.error("Dropping null data in entry " + i + " page " + curPage +
 					                    " key=" + this.keys[i] + " val=" + this.vals[i]);
 					nKeys--;
 					i--;
@@ -203,7 +203,7 @@ public class BSkipSpan extends SkipSpan {
 				valData = this.valSer.getBytes(vals[i]);
 				// Drop bad entry without throwing exception
 				if (keyData.length > 65535 || valData.length > 65535) {
-					BlockFile.log.error("Dropping huge data in entry " + i + " page " + curPage +
+					bf.log.error("Dropping huge data in entry " + i + " page " + curPage +
 					                    " keylen=" + keyData.length + " vallen=" + valData.length);
 					nKeys--;
 					i--;
@@ -227,10 +227,10 @@ public class BSkipSpan extends SkipSpan {
 					this.overflowPage = 0;
 				try {
 					int freed = freeContinuationPages(curNextPage[0]);
-					if (BlockFile.log.shouldLog(Log.DEBUG))
-						BlockFile.log.debug("Freed " + freed + " continuation pages");
+					if (bf.log.shouldLog(Log.DEBUG))
+						bf.log.debug("Freed " + freed + " continuation pages");
 				} catch (IOException ioe) {
-					BlockFile.log.error("Error freeing " + this, ioe);
+					bf.log.error("Error freeing " + this, ioe);
 				}
 			}
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
@@ -268,7 +268,7 @@ public class BSkipSpan extends SkipSpan {
 		bss.spanSize = bf.file.readUnsignedShort();
 		bss.nKeys = bf.file.readUnsignedShort();
 		if(bss.spanSize < 1 || bss.spanSize > SkipSpan.MAX_SIZE || bss.nKeys > bss.spanSize) {
-			BlockFile.log.error("Invalid span size " + bss.nKeys + " / "+  bss.spanSize);
+			bf.log.error("Invalid span size " + bss.nKeys + " / "+  bss.spanSize);
 			bss.nKeys = 0;
 			bss.spanSize = bf.spanSize;
 		}
@@ -306,7 +306,7 @@ public class BSkipSpan extends SkipSpan {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				int magic = bf.file.readInt();
 				if (magic != BlockFile.MAGIC_CONT) {
-					BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage[0]);
+					bf.log.error("Lost " + (this.nKeys - i) + " entries - Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage[0]);
 					lostEntries(i, curPage);
 					break;
 				}
@@ -324,7 +324,7 @@ public class BSkipSpan extends SkipSpan {
 				curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
 				curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
 			} catch (IOException ioe) {
-				BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
+				bf.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
 				lostEntries(i, lastGood);
 				break;
 			}
@@ -333,7 +333,7 @@ public class BSkipSpan extends SkipSpan {
 			this.vals[i] = this.valSer.construct(v);
 			// Drop bad entry without throwing exception
 			if (this.keys[i] == null || this.vals[i] == null) {
-				BlockFile.log.error("Null deserialized data in entry " + i + " page " + curPage +
+				bf.log.error("Null deserialized data in entry " + i + " page " + curPage +
 				                    " key=" + this.keys[i] + " val=" + this.vals[i]);
 				fail++;
 				nKeys--;
@@ -343,7 +343,7 @@ public class BSkipSpan extends SkipSpan {
 		}
 		// free any excess overflow pages?
 		if (fail > 0) {
-			BlockFile.log.error("Repairing corruption of " + fail + " entries");
+			bf.log.error("Repairing corruption of " + fail + " entries");
 			if (flushOnError)
 				fflush();
 			// FIXME can't get there from here
@@ -375,7 +375,7 @@ public class BSkipSpan extends SkipSpan {
 			}
 			bf.file.writeShort(this.nKeys);
 		} catch (IOException ioe) {
-			BlockFile.log.error("Error while recovering from corruption of " + this, ioe);
+			bf.log.error("Error while recovering from corruption of " + this, ioe);
 		}
 	}
 

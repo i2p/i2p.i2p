@@ -70,7 +70,7 @@ public class ConfigLoggingHandler extends FormHandler {
     private void saveChanges() {
         boolean shouldSave = false;
         
-        if (_levels != null || _newLogClass != null) {
+        if ((_levels != null && _levels.length() > 0) || _newLogClass != null) {
             try {
                 Properties props = new Properties();
                 if (_levels != null)
@@ -85,8 +85,9 @@ public class ConfigLoggingHandler extends FormHandler {
                 _context.logManager().getLog(ConfigLoggingHandler.class).error("Error reading from the props?", ioe);
                 addFormError("Error updating the log limits - levels not valid");
             }
-        } else {
+        } else if (!_context.logManager().getLimits().isEmpty()) {
             _context.logManager().setLimits(null);
+            shouldSave = true;
             addFormNotice("Log limits cleared");
         }
           

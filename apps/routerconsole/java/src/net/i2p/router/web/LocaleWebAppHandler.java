@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import net.i2p.I2PAppContext;
 
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.jetty.servlet.WebApplicationHandler;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * Convert foo.jsp to foo_xx.jsp for language xx.
@@ -19,13 +21,14 @@ import org.mortbay.jetty.servlet.WebApplicationHandler;
  *
  * @author zzz
  */
-public class LocaleWebAppHandler extends WebApplicationHandler
+public class LocaleWebAppHandler extends WebAppContext
 {
     private final I2PAppContext _context;
 
-    public LocaleWebAppHandler(I2PAppContext ctx) {
-        super();
+    public LocaleWebAppHandler(I2PAppContext ctx, String path, String warPath) {
+        super(warPath, path);
         _context = ctx;
+        setInitParams(WebAppStarter.INIT_PARAMS);
     }
     
     /**
@@ -36,13 +39,13 @@ public class LocaleWebAppHandler extends WebApplicationHandler
      */
     @Override
     public void handle(String pathInContext,
-                       String pathParams,
-                       HttpRequest httpRequest,
-                       HttpResponse httpResponse)
-         throws IOException
+                       HttpServletRequest httpRequest,
+                       HttpServletResponse httpResponse,
+                       int dispatch)
+         throws IOException, ServletException
     {
         // Handle OPTIONS (nothing to override)
-        if (HttpRequest.__OPTIONS.equals(httpRequest.getMethod()))
+        if ("OPTIONS".equals(httpRequest.getMethod()))
         {
             handleOptions(httpRequest, httpResponse);
             return;
@@ -74,7 +77,7 @@ public class LocaleWebAppHandler extends WebApplicationHandler
                 if (lang != null && lang.length() > 0 && !lang.equals("en")) {
                     String testPath = pathInContext.substring(0, len - 4) + '_' + lang + ".jsp";
                     // Do we have a servlet for the new path that isn't the catchall *.jsp?
-                    Map.Entry servlet = getHolderEntry(testPath);
+                    Map.Entry servlet = getServletHandler().getHolderEntry(testPath);
                     if (servlet != null) {
                         String servletPath = (String) servlet.getKey();
                         if (servletPath != null && !servletPath.startsWith("*")) {
@@ -87,7 +90,7 @@ public class LocaleWebAppHandler extends WebApplicationHandler
             }
         }
         //System.err.println("New path: " + newPath);
-        super.handle(newPath, pathParams, httpRequest, httpResponse);
+        super.handle(newPath, httpRequest, httpResponse, dispatch);
         //System.err.println("Was handled? " + httpRequest.isHandled());
     }
 
@@ -95,22 +98,24 @@ public class LocaleWebAppHandler extends WebApplicationHandler
      *  Overrides method in ServletHandler
      *  @since 0.8
      */
+/****  not in Jetty 6
     @Override
-    public void handleTrace(HttpRequest request,
-                            HttpResponse response)
+    public void handleTrace(HttpServletRequest request,
+                            HttpServletResponse response)
         throws IOException
     {
-        response.sendError(HttpResponse.__405_Method_Not_Allowed);
+        response.sendError(405);
     }
+****/
 
     /**
      *  Not an override
      *  @since 0.8
      */
-    public void handleOptions(HttpRequest request,
-                              HttpResponse response)
+    public void handleOptions(HttpServletRequest request,
+                              HttpServletResponse response)
         throws IOException
     {
-        response.sendError(HttpResponse.__405_Method_Not_Allowed);
+        response.sendError(405);
     }
 }

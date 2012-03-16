@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -13,6 +12,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -26,10 +26,10 @@ class OutboundEstablishState {
     private final RouterContext _context;
     private final Log _log;
     // SessionRequest message
-    private byte _sentX[];
+    private final byte _sentX[];
     private byte _bobIP[];
     private int _bobPort;
-    private DHSessionKeyBuilder _keyBuilder;
+    private final DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _receivedY[];
     private byte _aliceIP[];
@@ -73,7 +73,8 @@ class OutboundEstablishState {
     public static final int STATE_PENDING_INTRO = 5;
     
     public OutboundEstablishState(RouterContext ctx, InetAddress remoteHost, int remotePort, 
-                                  RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr) {
+                                  RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
+                                  DHSessionKeyBuilder dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
         if ( (remoteHost != null) && (remotePort > 0) ) {
@@ -92,6 +93,8 @@ class OutboundEstablishState {
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;
+        _keyBuilder = dh;
+        _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
         prepareSessionRequest();
         if ( (addr != null) && (addr.getIntroducerCount() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -128,10 +131,7 @@ class OutboundEstablishState {
     
     /** called from constructor, no need to synch */
     private void prepareSessionRequest() {
-        _keyBuilder = new DHSessionKeyBuilder();
         byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
-        if (_sentX == null)
-            _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
         if (X.length == 257)
             System.arraycopy(X, 1, _sentX, 0, _sentX.length);
         else if (X.length == 256)

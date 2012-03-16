@@ -1,3 +1,230 @@
+2012-03-15 sponge
+  * Plugins:
+    - String.isEmpty() [ java 6 ] -> (String.length() == 0) [ java 5 ]
+    - for a file: URL, use "Attempting to copy plugin from" message
+    - s/{0}// on non-translated string
+    - grammar: "File copy failed {0}" -> "Failed to copy file from {0}"
+    - use the context provided to get startup time
+    - getCanonicalPath() -> getAbsolutePath()
+    - install != update. Don't change the user's settings, and don't restart
+      it on an update if "dont-start-at-install". This gives the same
+      functionality as before.
+
+2012-03-14 zzz
+  * Blockfile, i2psnark: Remove static logs
+  * DHSessionKeyBuilder:
+    - Move from core to router/transport
+    - Make non-static, instantiate in TransportManager
+    - Generate keypair in constructor and make final
+      to move more processing to the precalc thread
+      and eliminate races
+    - Synchronize getSessionKey() to eliminate races
+    - Comment out unused methods
+  * Jetty:
+    - Set default cache-control for webapps and eepsite
+    - Disable dir listing for console webapps
+  * UDPTransport:
+    - Make key builder final in InboundEstablishState to
+      eliminate rare NPE (ticket #406)
+    - Remove unused static instance
+  * YKGenerator: Make non-static, instantiate in ElGamalEngine
+
+2012-03-13 sponge
+  * Add sponge.i2p :-D bump version.
+
+2012-03-13 sponge
+  * Plugins:
+    - Fix a bug in the updater. It was not comparing the correct name.
+    - Plugin updates can now be deferred if router-restart-required is set.
+      The update happens at the next router restart.
+
+2012-03-13 sponge
+  * Plugins:  
+     - Handle 'file://' URLs for installation and updates (ticket #429).
+       You must specify the entire path, e.g.
+       file:///home/someone/magicplugin.xpi2p
+       - This works for updates too!
+       - Only tested on Linux, needs to be tested on Windows.
+
+2012-03-12 zzz
+  * Console:
+    - Better IPv6 test, hopefully will work on Windows
+    - Hide home page flags once language is selected
+    - Home page shrinkage and other CSS tweaks
+
+2012-03-11 sponge
+  * Slackware package script updates
+
+2012-03-11 zzz
+  * Build:
+    - Include old commons logging classes in commons-logging.jar
+    - Preserve manifests in Jetty/Tomcat jars
+  * Jetty Logger: Promote warns to errors when a Throwable is the second arg
+
+2012-03-11 sponge
+  * fix broken comment in jetty.xml
+
+2012-03-10 zzz
+  * Build: Add new jetty jars to router.jar classpath so it works
+    on very old installs with individual jars specified in the
+    wrapper.config classpath
+  * configloggging: Fix clearing log overrides
+  * Console: Test if IPv6 addresses will work before instantiating
+             connectors, so Jetty will still start without them
+  * HTTP Proxy: Fix generation of jump links (ticket #616),
+                broken by refactoring in -1
+  * Jetty Logger: Put a note in wrapper log saying where the logs went
+
+2012-03-09 zzz
+  * Update default eepsite base context to use DefaultServlet
+    instead of ResourceHandler, to provide resume, directory
+    indexes, caching, etc.
+  * Simplify default eepsite base and CGI contexts to use a Context
+    instead of a ContextHolder, ServletHandler, and ServletHolder
+
+2012-03-08 zzz
+  * GarlicConfig: Remove unused reply block methods
+  * SessionKeyManager:
+    - Don't use unacked tagsets after consecutive ack failures
+      and revert to full ElGamal if necessary (ticket #574)
+    - Synchronize creation of new sessions to prevent dups
+    - Don't remove an unacked session until it's really out of tags
+    - Failsafe removal of old unacked tagsets
+    - Cleanups, final, comments, log tweaks, debug.jsp tweaks, synchronization tweaks
+
+2012-03-06 kytv
+ * German and Spanish translation updates from Transifex
+
+2012-03-06 zzz
+  * i2psnark: Fix NPE on magnet link addition
+  * Jetty logger: Fix stack trace logging
+  * viewstat.jsp: Properly close the ImageOutputStream to fix
+    NPEs in the finalizer, probably was the root cause of
+    what we blamed on Jetty
+  * Webapp class loader: Fix dup classes in classpath
+    caused by last checkin (symptom: i2psnark in wrong directory)
+
+2012-03-05 zzz
+  * Build: Make windows and non-windows installers for release
+  * configclients: Tweaks
+  * Graphs: Add time interval to legend
+  * NetDB: Increase min ff to 250
+  * Plugins: Fix setting webapp classpath on Jetty 6
+  * UDP: Log tweaks
+  * viewstat.jsp: Set Connection: Close to work around Jetty bug
+    http://jira.codehaus.org/browse/JETTY-1346
+
+2012-03-04 zzz
+  * Jetty: Upgrade to Jetty 6.1.26, Tomcat 6.0.35, and JSTL 1.2.
+    - Supports Servlet 2.5 / JSP 2.1 standards
+    - Jetty and Tomcat jars are checked in, no more need to
+      download Jetty in the build process.
+    - Bundle Jetty 6 rewrite handler and JMX
+    - Bundle sample Jetty config files for rewrite, JMX, and SSL
+    - Use ant's ant.jar instead of the one from Jetty
+    - Port router console, i2psnark, and I2PRequestLog code to Jetty 6
+    - Remove all old Jetty 5 patches and the custom Server() constructor,
+      this will break Seedless use of the custom constructor
+    - Fix up all .jsps to JSP 2.1 standards
+    - Include automatic migration of clients.config,
+      and of jetty.xml files for an eepsite at port 7658.
+      New config includes files in eepsite/contexts and eepsite/etc
+      Any other Jetty-hosted eepsites,
+      or an eepsite not at port 7658 or with custom
+      modifications of the jetty.xml file, will require
+      manual editing of the new Jetty config files.
+      This includes modifications for the seedless server in jetty.xml.
+    - The following plugins are not compatible with Jetty 6
+      and will be disabled until updates are available:
+         i2pcontrol, pebble, and zzzot
+    - Users updating must use the updaterWithJetty build target once,
+      to get the new Jetty and Tomcat.
+    - Put I2PRequestLog in its own jetty-i2p.jar
+    - Jetty logging moved from wrapper to I2P log using the new I2PLogger class,
+      also in jetty-i2p.jar
+  * Console: Start all wars after the main console war,
+    for faster startup and to prevent one failed war from preventing
+    startup of the entire console
+  * i2psnark: Disable i2psnark RunStandalone, unused and instantiated Jetty 5
+  * i2ptunnel: Move i2ptunnel Bean classes from the jar to the war.
+    These were deprecated for external use long ago.
+    This will break very old seedless plugins; updates have
+    been available for months.
+  * susimail: Copy MultiPartRequest and other required classes from Jetty 5.1.15
+    and add it to susimail, as the replacement MultiPartFilter in
+    Jetty 6 is difficult to migrate to, and does not support content-type
+
+2012-03-03 zzz
+  * Console:
+    - New simplified home page, refreshing with AJAX
+    - New home configuration page
+  * i2psnark:
+    - CSS tweaks
+    - Ajax and link fixes
+    - Move js to console in prep for merging w/ homepage
+  * NetDB: Remove bw stats (effective next release)
+
+2012-03-02 zzz
+  * BlockfileNamingService: Add negative cache
+  * Build: Add built-by to jars; check for corrupt jars on debug page
+  * configstats.jsp: Hide log settings unless already enabled
+  * DataStructures:
+    - Remove static logs
+    - Sort addresses in RouterInfo at initialization only;
+      change from Set to List to save space
+    - Remove unused counters in Lease to save space
+    - Increase max leases to 16
+  * Graphs:
+    - New single graph page with easy resizing
+    - Support graphing of previous intervals
+  * i2pinstall.exe: Add icon
+  * i2psnark:
+    - Add tracker configuration form
+    - Remove custom tracker option from create form
+    - Add private torrent option
+    - More icons in buttons
+    - Use js for refresh
+  * I2PTunnelHTTPClient:
+    - Refactoring to use Java URI parser to better handle
+      escapes, IPv6 addresses, ports
+    - Rewrite i2paddresshelper scanning/removal
+    - Refactor out local server code
+    - Nicer address helper error page
+  * NetDB:
+    - Reenable verify of RI stores, disabled in 0.7.9,
+      checkin comments claim reenabled in 0.7.10 but didn't happen.
+    - Synchronize StoreJob.sendNext() to avoid dups
+  * netdb.jsp: Fix debug leaseset count again
+  * susidns: Add b64 hash to details page
+
+* 2012-02-27 0.8.13 released
+
+2012-02-22 kytv
+  * Updated German, Italian, Spanish, Swedish, and Ukrainian translations
+    from Transifex.
+
+2012-02-22 zzz
+  * ExploratoryPeerSelector: Use fast peers if hidden for
+    inbound tunnels to improve success
+  * NetDB:
+    - Don't publish our RI if it has no addresses
+    - Publish our RI sooner after startup
+      to facilitate our IB tunnel builds
+
+2012-02-20 zzz
+  * i2ptunnel:
+    - Fix streamr session registration
+    - Don't delete privkey file for a non-persistent client tunnel
+      (ticket #599)
+  * Streaming: Fix race NPE (thx echelon)
+
+2012-02-17 zzz
+  * i2psnark: Escape fixes
+  * netdb.jsp: Fix debug median calculation
+
+20112-02-17 kytv
+  * Add Czech language from Transifex (thanks Waseihou)
+
 2012-02-12 str4d
   * i2ptunnel: Tunnel creation wizard
 

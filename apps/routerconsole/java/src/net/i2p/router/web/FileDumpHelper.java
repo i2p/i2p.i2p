@@ -18,6 +18,7 @@ import java.util.jar.Manifest;
 
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataHelper;
+import net.i2p.util.FileUtil;
 
 /**
  *  Dump info on jars and wars
@@ -29,7 +30,7 @@ public class FileDumpHelper extends HelperBase {
     public String getFileSummary() {
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<table><tr><th>File</th><th>Size</th><th>Date</th><th>SHA 256</th><th>Revision</th>" +
-                   "<th>JDK</th><th>Built</th><th>Mods</th></tr>");
+                   "<th>JDK</th><th>Built</th><th>By</th><th>Mods</th></tr>");
 
         // jars added in wrapper.config
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
@@ -95,7 +96,9 @@ public class FileDumpHelper extends HelperBase {
             buf.append((new Date(mod)).toString());
         else
             buf.append("<font color=\"red\">Not found</font>");
-        buf.append("</td><td>");
+        buf.append("</td><td align=\"center\">");
+        if (mod > 0 && !FileUtil.verifyZip(f))
+            buf.append("<font color=\"red\">CORRUPT</font><br>");
         byte[] hash = sha256(f);
         if (hash != null) {
             byte[] hh = new byte[16];
@@ -134,11 +137,15 @@ public class FileDumpHelper extends HelperBase {
         s = getAtt(att, "Build-Date");
         if (s != null)
             buf.append(s);
+        buf.append("</td><td align=\"center\">");
+        s = getAtt(att, "Built-By");
+        if (s != null)
+            buf.append(s);
         buf.append("</td><td><font color=\"red\">");
         s = getAtt(att, "Workspace-Changes");
         if (s != null)
             buf.append(s.replace(",", "<br>"));
-        buf.append("</font></td>");
+        buf.append("</font></td></tr>\n");
     }
 
     private static byte[] sha256(File f) {

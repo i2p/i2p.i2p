@@ -32,14 +32,16 @@ public class ReseedChecker {
         File noReseedFileAlt1 = new File(new File(System.getProperty("user.home")), "noreseed.i2p");
         File noReseedFileAlt2 = new File(context.getConfigDir(), ".i2pnoreseed");
         File noReseedFileAlt3 = new File(context.getConfigDir(), "noreseed.i2p");
+        Log _log = context.logManager().getLog(ReseedChecker.class);
         if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
-            Log _log = context.logManager().getLog(ReseedChecker.class);
             if (count <= 1)
                 _log.logAlways(Log.INFO, "Downloading peer router information for a new I2P installation");
             else
                 _log.logAlways(Log.WARN, "Very few known peers remaining - reseeding now");
             Reseeder reseeder = new Reseeder(context);
             reseeder.requestReseed();
+        } else {
+            _log.logAlways(Log.WARN, "Only " + count + " peers remaining but reseed disabled by config file");
         }
     }
 }

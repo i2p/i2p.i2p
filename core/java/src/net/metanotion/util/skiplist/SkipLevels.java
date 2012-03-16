@@ -30,6 +30,7 @@ package net.metanotion.util.skiplist;
 
 import net.metanotion.io.block.BlockFile;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
 public class SkipLevels {
@@ -45,6 +46,7 @@ public class SkipLevels {
 	public SkipLevels[] levels;
 	// bottom is final
 	public SkipSpan bottom;
+	private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
 
 	public SkipLevels newInstance(int levels, SkipSpan ss, SkipList sl) { return new SkipLevels(levels, ss); }
 	public void killInstance() { }
@@ -158,13 +160,13 @@ public class SkipLevels {
 					SkipSpan ssres = (SkipSpan)res[1];
 					if (bottom.firstKey().equals(ssres.firstKey())) {
 						// bottom copied the next span to itself
-						if (BlockFile.log.shouldLog(Log.INFO)) {
-							BlockFile.log.info("First Level, bottom.remove() copied and did not return itself!!!! in remove " + key);
-							BlockFile.log.info("Us:     " + print());
-							BlockFile.log.info("next:   " + levels[0].print());
-							BlockFile.log.info("ssres.firstKey():   " + ssres.firstKey());
-							BlockFile.log.info("ssres.keys[0]:   " + ssres.keys[0]);
-							BlockFile.log.info("FIXUP TIME");
+						if (_log.shouldLog(Log.INFO)) {
+							_log.info("First Level, bottom.remove() copied and did not return itself!!!! in remove " + key);
+							_log.info("Us:     " + print());
+							_log.info("next:   " + levels[0].print());
+							_log.info("ssres.firstKey():   " + ssres.firstKey());
+							_log.info("ssres.keys[0]:   " + ssres.keys[0]);
+							_log.info("FIXUP TIME");
 						}
 						
 						SkipLevels replace = levels[0];
@@ -174,16 +176,16 @@ public class SkipLevels {
 							if (i >= replace.levels.length)
 								break;
 							if (levels[i].key().equals(replace.key())) {
-								if (BlockFile.log.shouldLog(Log.INFO))
-							        	BlockFile.log.info("equal level " + i);
+								if (_log.shouldLog(Log.INFO))
+							        	_log.info("equal level " + i);
 								levels[i] = replace.levels[i];
-							} else if (BlockFile.log.shouldLog(Log.INFO)) {
-								BlockFile.log.info("not equal level " + i + ' ' + levels[i].key());
+							} else if (_log.shouldLog(Log.INFO)) {
+								_log.info("not equal level " + i + ' ' + levels[i].key());
 							}
 						}
 						this.flush();
-						if (BlockFile.log.shouldLog(Log.INFO))
-							BlockFile.log.info("new Us: " + print());
+						if (_log.shouldLog(Log.INFO))
+							_log.info("new Us: " + print());
 						replace.killInstance();
 					}
 				}
@@ -193,11 +195,11 @@ public class SkipLevels {
 		if((bottom.nKeys == 0) && (sl.first != bottom)) {
 			// from debugging other problems
 			if (res == null) {
-				BlockFile.log.warn("WTF killing with no return value " + print());
+				_log.warn("WTF killing with no return value " + print());
 			} else if (res[1] == null) {
-				BlockFile.log.warn("WTF killing with no return value 1 " + print());
+				_log.warn("WTF killing with no return value 1 " + print());
 			} else if (res[1] != this) {
-				BlockFile.log.warn("WTF killing with return value not us " + res[1] + ' ' + print());
+				_log.warn("WTF killing with return value not us " + res[1] + ' ' + print());
 			}
 			this.killInstance();
 		}

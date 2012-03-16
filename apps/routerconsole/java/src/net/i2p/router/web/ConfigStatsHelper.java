@@ -59,8 +59,16 @@ public class ConfigStatsHelper extends HelperBase {
             _filters.add(tok.nextToken().trim());
     }
 
-    public ConfigStatsHelper() {}
-    
+    /**
+     *  Just hide for everybody unless already set.
+     *  To enable set advanced config stat.logFilters=foo before starting...
+     *  it has to be set at startup anyway for logging to be enabled at all
+     *  @since 0.9
+     */
+    public boolean shouldShowLog() {
+        return !_filters.isEmpty();
+    }
+
     public String getFilename() { return _context.statManager().getStatFile(); }
     
     /** 

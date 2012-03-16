@@ -1,4 +1,5 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
@@ -17,7 +18,7 @@
         peerB64 = net.i2p.data.DataHelper.stripHTML(peerB64);  // XSS
 %>
 <jsp:useBean id="stathelper" class="net.i2p.router.web.StatHelper" />
-<jsp:setProperty name="stathelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="stathelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="stathelper" property="peer" value="<%=peerB64%>" />
 <% stathelper.storeWriter(out); %>
 <h2><%=intl._("Profile for peer {0}", peerB64)%></h2>

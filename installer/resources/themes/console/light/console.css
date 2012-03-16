@@ -319,9 +319,9 @@ div.main {
      width: auto;
      min-width: 500px;
      border: 1px solid #447;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
+     border-radius: 8px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
@@ -351,16 +351,16 @@ div.news {
      padding: 7px 20px 7px 20px;
      border: 1px solid #447;
      color: #224;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
+     border-radius: 8px;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
      text-align: right !important;
      font-size: 7.5pt;
      line-height: 140%;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
-     background: #f0f0f0;
+     background: #f0f0f0 url("/themes/snark/ubergine/images/hat.png") no-repeat scroll right bottom;
      min-width: 490px;
 }
 
@@ -599,46 +599,59 @@ td {
      border-bottom: 1px outset #99f;
 }
 
-/***********************************************************************************/
+/* begin home page */
 
 #appsummary {
-     margin-top: 53px;
+     margin-top: 0;
 }
 
 h2.app {
-     margin: 15px 10px 15px 0 !important;
+     margin: 15px 10px 15px 207px !important;
 }
 
 h4.app {
      clear: left;
-     margin: 12px 4px;
-     padding: 20px 0 8px 0;
+     margin: 0 4px 2px 0;
+     padding: 10px 0 8px 0;
 }
 
 div.app {
      float: left;
-     padding: 8px;
-     height: 100px;
+     padding: 2px;
+     height: 84px;
      width: 112px;
 }
 
 div.appgroup {
      clear: left;
-     margin: 4px 20px;
+     margin: 0;
      padding: 16px 8px;
      width: auto;
 }
 
 div.search {
-     margin: 20px;
-     padding: 8px;
+     margin: 10px 10px 0 207px;
+     padding: 8px 8px 0 8px;
      width: auto;
 }
 
-img.app {
-     height: 48px;
-     width: 48px;
+table.search {
+     background: none;
      padding: 8px;
+     width: auto;
+     margin-left:auto;
+     margin-right:auto;
+}
+
+img.app {
+     height: 32px;
+     width: 32px;
+     padding: 6px;
+}
+
+img.app2p {
+     height: 40px;
+     padding: 3px 6px 0 6px;
 }
 
 table.app {
@@ -673,7 +686,7 @@ div.applabel {
      text-align: center;
 }
 
-/***********************************************************************************/
+/* end home page */
 
 tt {
      font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
@@ -798,9 +811,9 @@ h1 {
      white-space: normal;
      background: #f0f0f0;
      border: 1px solid #447;
-     border-radius: 8px 8px 4px 4px;
-     -moz-border-radius: 8px 8px 4px 4px;
-     -khtml-border-radius: 8px 8px 4px 4px;
+     border-radius: 8px;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
      min-width: 500px;
 }
 

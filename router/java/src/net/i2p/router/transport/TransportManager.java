@@ -30,6 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
@@ -45,6 +46,7 @@ public class TransportManager implements TransportEventListener {
     private final Map<String, Transport> _transports;
     private final RouterContext _context;
     private final UPnPManager _upnpManager;
+    private final DHSessionKeyBuilder.PrecalcRunner _dhThread;
 
     /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
@@ -67,6 +69,7 @@ public class TransportManager implements TransportEventListener {
             _upnpManager = new UPnPManager(context, this);
         else
             _upnpManager = null;
+        _dhThread = new DHSessionKeyBuilder.PrecalcRunner(context);
     }
     
     public void addTransport(Transport transport) {
@@ -84,12 +87,12 @@ public class TransportManager implements TransportEventListener {
     private void configTransports() {
         boolean enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
         if (enableUDP) {
-            UDPTransport udp = new UDPTransport(_context);
+            UDPTransport udp = new UDPTransport(_context, _dhThread);
             addTransport(udp);
             initializeAddress(udp);
         }
         if (isNTCPEnabled(_context))
-            addTransport(new NTCPTransport(_context));
+            addTransport(new NTCPTransport(_context, _dhThread));
         if (_transports.isEmpty())
             _log.log(Log.CRIT, "No transports are enabled");
     }
@@ -135,6 +138,7 @@ public class TransportManager implements TransportEventListener {
     }
 
     public void startListening() {
+        _dhThread.start();
         // For now, only start UPnP if we have no publicly-routable addresses
         // so we don't open the listener ports to the world.
         // Maybe we need a config option to force on? Probably not.
@@ -161,6 +165,9 @@ public class TransportManager implements TransportEventListener {
         startListening();
     }
     
+    /**
+     *  Can be restarted.
+     */
     public void stopListening() {
         if (_upnpManager != null)
             _upnpManager.stop();
@@ -168,6 +175,16 @@ public class TransportManager implements TransportEventListener {
             t.stopListening();
         }
         _transports.clear();
+    }
+    
+    
+    /**
+     *  Cannot be restarted.
+     *  @since 0.9
+     */
+    public void shutdown() {
+        stopListening();
+        _dhThread.shutdown();
     }
     
     public Transport getTransport(String style) {
@@ -518,9 +535,9 @@ public class TransportManager implements TransportEventListener {
         buf.append("<h3>").append(_("Definitions")).append("</h3><div class=\"configure\">" +
                    "<p><b id=\"def.peer\">").append(_("Peer")).append("</b>: ").append(_("The remote peer, identified by router hash")).append("<br>\n" +
                    "<b id=\"def.dir\">").append(_("Dir")).append("</b>: " +
-                   "<img src=\"/themes/console/images/inbound.png\"> ").append(_("Inbound connection")).append("<br>\n" +
+                   "<img alt=\"Inbound\" src=\"/themes/console/images/inbound.png\"> ").append(_("Inbound connection")).append("<br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                   "<img src=\"/themes/console/images/outbound.png\"> ").append(_("Outbound connection")).append("<br>\n" +
+                   "<img alt=\"Outbound\" src=\"/themes/console/images/outbound.png\"> ").append(_("Outbound connection")).append("<br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
                    "<img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"> ").append(_("They offered to introduce us (help other peers traverse our firewall)")).append("<br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
@@ -531,7 +548,7 @@ public class TransportManager implements TransportEventListener {
                    "<b id=\"def.skew\">").append(_("Skew")).append("</b>: ").append(_("The difference between the peer's clock and your own")).append("<br>\n" +
                    "<b id=\"def.cwnd\">CWND</b>: ").append(_("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" / <br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of sent messages awaiting acknowledgement")).append(" /<br>\n" +
-                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The maximum number of concurrent messages to send")).append(" /<br>\n"+ 
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The maximum number of concurrent messages to send")).append(" /<br>\n"+
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of pending sends which exceed congestion window")).append("<br>\n" +
                    "<b id=\"def.ssthresh\">SST</b>: ").append(_("The slow start threshold")).append("<br>\n" +
                    "<b id=\"def.rtt\">RTT</b>: ").append(_("The round trip time in milliseconds")).append("<br>\n" +

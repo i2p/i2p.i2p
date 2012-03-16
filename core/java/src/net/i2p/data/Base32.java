@@ -29,7 +29,7 @@ import net.i2p.util.Log;
  */
 public class Base32 {
 
-    private final static Log _log = new Log(Base32.class);
+    //private final static Log _log = new Log(Base32.class);
 
     /** The 32 valid Base32 values. */
     private final static char[] ALPHABET = {'a', 'b', 'c', 'd',
@@ -248,12 +248,12 @@ public class Base32 {
                          outBuff[outBuffPosn] = next;
                          usedbits -= 3;
                      } else if (next != 0) {
-                       _log.warn("Extra data at the end: " + next + "(decimal)");
+                       //_log.warn("Extra data at the end: " + next + "(decimal)");
                        return null;
                      }
                  }
             } else {
-                _log.warn("Bad Base32 input character at " + i + ": " + source[i] + "(decimal)");
+                //_log.warn("Bad Base32 input character at " + i + ": " + source[i] + "(decimal)");
                 return null;
             }
         }

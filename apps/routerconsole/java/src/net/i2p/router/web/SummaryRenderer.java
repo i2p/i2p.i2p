@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -81,14 +83,23 @@ class SummaryRenderer {
     }
 
     public void render(OutputStream out) throws IOException { render(out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
-                                                                     false, false, false, false, -1, false); }
+                                                                     false, false, false, false, -1, 0, false); }
 
-    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+    /**
+     *  @param endp number of periods before now
+     */
+    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
+                       boolean hideTitle, boolean showEvents, int periodCount,
+                       int endp, boolean showCredit) throws IOException {
         long end = _listener.now() - 75*1000;
+        long period = _listener.getRate().getPeriod();
+        if (endp > 0)
+            end -= period * endp;
         if (periodCount <= 0 || periodCount > _listener.getRows())
             periodCount = _listener.getRows();
-        long start = end - _listener.getRate().getPeriod()*periodCount;
+        long start = end - (period * periodCount);
         //long begin = System.currentTimeMillis();
+        ImageOutputStream ios = null;
         try {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimeSpan(start/1000, end/1000);
@@ -103,9 +114,9 @@ class SummaryRenderer {
                 String p;
                 // we want the formatting and translation of formatDuration2(), except not zh, and not the &nbsp;
                 if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
-                    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
+                    p = DataHelper.formatDuration(period);
                 else
-                    p = DataHelper.formatDuration2(_listener.getRate().getPeriod()).replace("&nbsp;", " ");
+                    p = DataHelper.formatDuration2(period).replace("&nbsp;", " ");
                 if (showEvents)
                     title = name + ' ' + _("events in {0}", p);
                 else
@@ -141,6 +152,9 @@ class SummaryRenderer {
                 def.gprint(plotName, SummaryListener.CF, _("avg") + ": %.2f %s");
                 def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");
                 def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
+                // '07-Jul 21:09 UTC' with month name in the system locale
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
+                def.comment(sdf.format(new Date(start)) + " -- " + sdf.format(new Date(end)) + " UTC\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
@@ -173,7 +187,7 @@ class SummaryRenderer {
             BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
             Graphics gfx = img.getGraphics();
             graph.render(gfx);
-            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
+            ios = new MemoryCacheImageOutputStream(out);
             ImageIO.write(img, "png", ios);
             //System.out.println("Graph created");
 
@@ -190,6 +204,9 @@ class SummaryRenderer {
         } catch (OutOfMemoryError oom) {
             _log.error("Error rendering", oom);
             throw new IOException("Error plotting: " + oom.getMessage());
+        } finally {
+            // this does not close the underlying stream
+            if (ios != null) try {ios.close();} catch (IOException ioe) {}
         }
     }
 

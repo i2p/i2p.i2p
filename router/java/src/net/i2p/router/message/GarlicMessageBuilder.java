@@ -165,10 +165,8 @@ public class GarlicMessageBuilder {
         if (log.shouldLog(Log.INFO))
             log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
         
-        SessionKey curKey = skm.getCurrentKey(key);
+        SessionKey curKey = skm.getCurrentOrNewKey(key);
         SessionTag curTag = null;
-        if (curKey == null)
-            curKey = skm.createSession(key);
         if (!forceElGamal) {
             curTag = skm.consumeNextAvailableTag(key, curKey);
             

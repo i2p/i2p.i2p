@@ -36,7 +36,7 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class ClientManagerFacadeImpl extends ClientManagerFacade implements InternalClientManager {
-    private final static Log _log = new Log(ClientManagerFacadeImpl.class);
+    private final Log _log;
     private ClientManager _manager; 
     private RouterContext _context;
     /** note that this is different than the property the client side uses, i2cp.tcp.port */
@@ -48,7 +48,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     
     public ClientManagerFacadeImpl(RouterContext context) {
         _context = context;
-        _log.debug("Client manager facade created");
+        _log = _context.logManager().getLog(ClientManagerFacadeImpl.class);
+        //_log.debug("Client manager facade created");
     }
     
     public void startup() {

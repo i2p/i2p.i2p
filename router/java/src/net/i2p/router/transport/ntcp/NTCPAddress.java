@@ -11,6 +11,7 @@ package net.i2p.router.transport.ntcp;
 import java.net.InetAddress;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.transport.TransportImpl;
@@ -20,7 +21,6 @@ import net.i2p.util.Log;
  * Wrap up an address 
  */
 public class NTCPAddress {
-    private final static Log _log = new Log(NTCPAddress.class);
     private int _port;
     private String _host;
     //private InetAddress _addr;
@@ -68,7 +68,8 @@ public class NTCPAddress {
                 try {
                     _port = Integer.parseInt(port.trim());
                 } catch (NumberFormatException nfe) {
-                    _log.error("Invalid port [" + port + "]", nfe);
+                    Log log = I2PAppContext.getGlobalContext().logManager().getLog(NTCPAddress.class);
+                    log.error("Invalid port [" + port + "]", nfe);
                     _port = -1;
                 }
             } else {
@@ -119,8 +120,8 @@ public class NTCPAddress {
             //}
             return TransportImpl.isPubliclyRoutable(quad);
         } catch (Throwable t) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error checking routability", t);
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Error checking routability", t);
             return false;
         }
     }

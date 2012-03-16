@@ -239,13 +239,13 @@ class ClientConnectionRunner {
     }
     
     /**
-     *  Send a DisconnectMessage and log with level Log.CRIT.
+     *  Send a DisconnectMessage and log with level Log.ERROR.
      *  This is always bad.
      *  See ClientMessageEventListener.handleCreateSession()
      *  for why we don't send a SessionStatusMessage when we do this.
      */
     void disconnectClient(String reason) {
-        disconnectClient(reason, Log.CRIT);
+        disconnectClient(reason, Log.ERROR);
     }
 
     /**
@@ -254,9 +254,10 @@ class ClientConnectionRunner {
      */
     void disconnectClient(String reason, int logLevel) {
         if (_log.shouldLog(logLevel))
-            _log.log(logLevel, "Disconnecting the client (" 
-                     + _config
-                     + ") : " + reason);
+            _log.log(logLevel, "Disconnecting the client - " 
+                     + reason
+                     + " config: "
+                     + _config);
         DisconnectMessage msg = new DisconnectMessage();
         msg.setReason(reason);
         try {

@@ -49,7 +49,13 @@ XMLFILES="\
 ./installer/i2pstandalone.xml \
 ./installer/install.xml \
 ./installer/lib/launch4j/build.xml \
-./installer/resources/jetty.xml \
+./installer/resources/eepsite/jetty-ssl.xml
+./installer/resources/eepsite/contexts/cgi-context.xml
+./installer/resources/eepsite/contexts/base-context.xml
+./installer/resources/eepsite/jetty-rewrite.xml
+./installer/resources/eepsite/etc/webdefault.xml
+./installer/resources/eepsite/jetty-jmx.xml
+./installer/resources/eepsite/jetty.xml
 ./installer/resources/shortcutSpec.xml \
 ./router/java/build.xml \
 ./Slackware/i2p-base/build.xml \
@@ -61,7 +67,6 @@ HTMLFILES="\
 ./apps/BOB/src/net/i2p/BOB/package.html \
 ./apps/desktopgui/src/net/i2p/desktopgui/package.html \
 ./apps/ministreaming/java/src/net/i2p/client/streaming/package.html \
-./apps/routerconsole/jsp/i2psnark/index.html \
 ./apps/susidns/src/index.html \
 ./apps/susimail/src/index.html \
 ./core/java/src/net/i2p/client/datagram/package.html \
@@ -75,15 +80,15 @@ HTMLFILES="\
 ./core/java/src/net/i2p/stat/package.html \
 ./core/java/src/net/i2p/time/package.html \
 ./core/java/src/net/i2p/util/package.html \
-./installer/resources/eepsite.help/help/index_de.html \
-./installer/resources/eepsite.help/help/index_fr.html \
-./installer/resources/eepsite.help/help/index.html \
-./installer/resources/eepsite.help/help/index_na.html \
-./installer/resources/eepsite.help/help/index_nl.html \
-./installer/resources/eepsite.help/help/index_ru.html \
-./installer/resources/eepsite.help/help/index_sv.html \
-./installer/resources/eepsite.help/help/pagetemplate.html \
-./installer/resources/eepsite.help/index.html \
+./installer/resources/eepsite/docroot/help/index_de.html \
+./installer/resources/eepsite/docroot/help/index_fr.html \
+./installer/resources/eepsite/docroot/help/index.html \
+./installer/resources/eepsite/docroot/help/index_na.html \
+./installer/resources/eepsite/docroot/help/index_nl.html \
+./installer/resources/eepsite/docroot/help/index_ru.html \
+./installer/resources/eepsite/docroot/help/index_sv.html \
+./installer/resources/eepsite/docroot/help/pagetemplate.html \
+./installer/resources/eepsite/docroot/index.html \
 ./installer/resources/readme/readme_ar.html \
 ./installer/resources/readme/readme_de.html \
 ./installer/resources/readme/readme_es.html \

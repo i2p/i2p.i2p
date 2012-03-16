@@ -470,7 +470,7 @@ input {
      border: 1px inset #000;
      background: #212 url('/themes/snark/ubergine/images/graytile.png');	 
      color: #f60;
-     margin: 2px 0;
+     margin: 2px 4px;
 }
 
 input.r {
@@ -525,8 +525,46 @@ input[type=radio] {
      vertical-align: bottom;
 }
 
+input.default { width: 1px; height: 1px; visibility: hidden; }
+
 input.accept {
      background: #989 url('../../console/images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.add {
+     background: #989 url('../../console/images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.create {
+     background: #989 url('images/create.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #989 url('../../console/images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.create {
+     background: #989 url('images/create.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #989 url('../../console/images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #989 url('../../console/images/arrow_refresh.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
      min-height: 22px;
 }

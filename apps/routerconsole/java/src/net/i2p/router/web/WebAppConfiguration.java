@@ -1,12 +1,18 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.jetty.webapp.Configuration;
+import org.mortbay.jetty.webapp.WebAppClassLoader;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 
 /**
@@ -31,20 +37,23 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
  *  @since 0.7.12
  *  @author zzz
  */
-public class WebAppConfiguration implements WebApplicationContext.Configuration {
-    private WebApplicationContext _wac;
+public class WebAppConfiguration implements Configuration {
+    private WebAppContext _wac;
 
     private static final String CLASSPATH = ".classpath";
 
-    public void setWebApplicationContext(WebApplicationContext context) {
+    public void setWebAppContext(WebAppContext context) {
        _wac = context;
     }
 
-    public WebApplicationContext getWebApplicationContext() {
+    public WebAppContext getWebAppContext() {
         return _wac;
     }
 
-    public void configureClassPath() throws Exception {
+    /**
+     *  This was the interface in Jetty 5, now it's configureClassLoader()
+     */
+    private void configureClassPath() throws Exception {
         String ctxPath = _wac.getContextPath();
         //System.err.println("Configure Class Path " + ctxPath);
         if (ctxPath.equals("/"))
@@ -77,7 +86,11 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
         if (cp == null)
             return;
         StringTokenizer tok = new StringTokenizer(cp, " ,");
+        StringBuilder buf = new StringBuilder();
+        Set<URL> systemCP = getSystemClassPath();
         while (tok.hasMoreTokens()) {
+            if (buf.length() > 0)
+                buf.append(',');
             String elem = tok.nextToken().trim();
             String path;
             if (elem.startsWith("$I2P"))
@@ -86,11 +99,51 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
                 path = dir.getAbsolutePath() + elem.substring(7);
             else
                 path = dir.getAbsolutePath() + '/' + elem;
+            // As of Jetty 6, we can't add dups to the class path, or
+            // else it screws up statics
+            File jfile = new File(path);
+            File jdir = jfile.getParentFile();
+            if (systemCP.contains(jfile.toURI().toURL()) ||
+                (jdir != null && systemCP.contains(jdir.toURI().toURL()))) {
+                //System.err.println("Not adding " + path + " to classpath for " + appName + ", already in system classpath");
+                continue;
+            }
             System.err.println("Adding " + path + " to classpath for " + appName);
-            _wac.addClassPath(path);
+            buf.append(path);
         }
+        if (buf.length() <= 0)
+            return;
+        ClassLoader cl = _wac.getClassLoader();
+        if (cl != null && cl instanceof WebAppClassLoader) {
+            WebAppClassLoader wacl = (WebAppClassLoader) cl;
+            wacl.addClassPath(buf.toString());
+        } else {
+            // This was not working because the WebAppClassLoader already exists
+            // and it calls getExtraClasspath in its constructor
+            // Not sure why WACL already exists...
+            _wac.setExtraClasspath(buf.toString());
+        }
+    }
+
+    /** @since 0.9 */
+    private static Set<URL> getSystemClassPath() {
+        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URL urls[] = urlClassLoader.getURLs();
+        Set<URL> rv = new HashSet(32);
+        for (int i = 0; i < urls.length; i++) {
+            rv.add(urls[i]);
+        }
+        return rv;
     }
 
     public void configureDefaults() {}
     public void configureWebApp() {}
+
+    /** @since Jetty 6 */
+    public void deconfigureWebApp() {}
+
+    /** @since Jetty 6 */
+    public void configureClassLoader() throws Exception {
+        configureClassPath();
+    }
 }

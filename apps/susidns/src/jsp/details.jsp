@@ -26,6 +26,7 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -36,7 +37,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>${book.book} <%=intl._("addressbook")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
@@ -94,6 +95,9 @@
 <td><%=intl._("Base 32 Address")%></td>
 <td><a href="http://<%=b32%>/"><%=b32%></a></td>
 </tr><tr class="list${book.trClass}">
+<td><%=intl._("Base 64 Hash")%></td>
+<td><%=addr.getB64()%></td>
+</tr><tr class="list${book.trClass}">
 <td><%=intl._("Address Helper")%></td>
 <td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>"><%=intl._("link")%></a></td>
 </tr><tr class="list${book.trClass}">
@@ -119,7 +123,7 @@
 <td><%=addr.getNotes()%></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Destination")%></td>
-<td class="destinations"><textarea rows="1" style="height: 3em;" cols="70" wrap="off" readonly="readonly" ><%=addr.getDestination()%></textarea></td>
+<td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="70" readonly="readonly" ><%=addr.getDestination()%></textarea></td>
 </tr></table>
 </div>
 <div id="buttons">

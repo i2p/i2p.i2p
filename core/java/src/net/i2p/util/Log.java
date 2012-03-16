@@ -16,7 +16,7 @@ import net.i2p.I2PAppContext;
 /**
  * Wrapper class for whatever logging system I2P uses.  This class should be 
  * instantiated and kept as a variable for each class it is used by, ala:
- *  <code>private final static Log _log = new Log(MyClassName.class);</code>
+ *  <code>private final Log _log = context.logManager().getLog(MyClassName.class);</code>
  *
  * If there is anything in here that doesn't make sense, turn off your computer
  * and go fly a kite.

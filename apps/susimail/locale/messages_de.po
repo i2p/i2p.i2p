@@ -6,6 +6,7 @@
 # Translators:
 # blabla, 2011.
 #   <blabla@trash-mail.com>, 2011.
+# D.A. Loader <>, 2012.
 # ducki2p <ducki2p@gmail.com>, 2011.
 # foo <foo@bar>, 2009.
 # mixxy, 2011.
@@ -13,10 +14,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-12 11:16+0000\n"
-"PO-Revision-Date: 2011-10-07 01:36+0000\n"
-"Last-Translator: blabla <blabla@trash-mail.com>\n"
-"Language-Team: German (http://www.transifex.net/projects/p/I2P/team/de/)\n"
+"POT-Creation-Date: 2012-03-07 01:36+0000\n"
+"PO-Revision-Date: 2012-02-19 14:04+0000\n"
+"Last-Translator: D.A. Loader <>\n"
+"Language-Team: German (http://www.transifex.net/projects/p/I2P/language/"
+"de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -316,7 +318,7 @@ msgstr "Zurücksetzen"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1605
 msgid "Learn about I2P mail"
-msgstr ""
+msgstr "Erfahre etwas über I2P Mail"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1606
 msgid "Create Account"

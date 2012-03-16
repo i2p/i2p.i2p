@@ -52,22 +52,22 @@
     </target>
 
 
-    <!-- TODO: Move the web classes from the jar to the war - they are not part of the API
-      -  This will require sponge to rewrite some seedless stuff that uses it.
-     -->
+    <!-- The web classes are now in the war not the jar - they are not part of the API -->
     <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
-        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class">
+        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/EditBean.class **/IndexBean.class" >
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
             </manifest>
         </jar>
+        <jar destfile="./build/temp-beans.jar" basedir="./build/obj" includes="**/EditBean.class **/IndexBean.class" />
     </target>
 
     <target name="jarUpToDate">
@@ -129,13 +129,17 @@
         </exec>
     </target>
 
+    <!-- The web classes are now in the war not the jar - they are not part of the API -->
     <target name="war" depends="precompilejsp, bundle, warUpToDate, listChangedFiles2" unless="war.uptodate" > 
         <!-- set if unset -->
         <property name="workspace.changes.w.tr" value="" />
+        <copy file="build/obj/net/i2p/i2ptunnel/web/EditBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
+        <copy file="build/obj/net/i2p/i2ptunnel/web/IndexBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, web-fragment.xml, web-out.xml, **/*.java, *.jsp">
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.w.tr}" />
@@ -171,11 +175,14 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
-                <pathelement location="../../jetty/jettylib/ant.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
+                <pathelement location="build/temp-beans.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
+            <arg value="-v" />
             <arg value="-p" />
             <arg value="net.i2p.i2ptunnel.jsp" />
             <arg value="-webinc" />
@@ -192,7 +199,9 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
+                <pathelement location="build/temp-beans.jar" />
             </classpath>
         </javac>
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />

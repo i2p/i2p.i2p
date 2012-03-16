@@ -85,7 +85,7 @@ public class StatisticsManager implements Service {
         if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS)) {
             long publishedUptime = _context.router().getUptime();
             // Don't publish these for first hour
-            if (publishedUptime > 62*60*1000)
+            if (publishedUptime > 62*60*1000 && CoreVersion.VERSION.equals("0.8.13"))
                 includeAverageThroughput(stats);
             //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             //includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });

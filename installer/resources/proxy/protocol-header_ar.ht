@@ -4,18 +4,21 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ar" dir="rtl"><head>
 <title>HTTP تحذير: استعمال بروتوكول غير متوافق مع </title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">اعدادات</a> <a href="http://127.0.0.1:7657/help.jsp">مساعدة</a> <a href="http://127.0.0.1:7657/susidns/">دفتر العناوين</a>
 </div>
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>HTTP تحذير: استعمال بروتوكول غير متوافق مع </h3>
+<p>
 تم استعمال بروتوكول غير متوافق.
-بروكسي I2P يدعم طلبات http:// فقط. باقي البروتوكولات مثل https:// و ftp:// غير مدعومة.
+بروكسي I2P يدعم طلبات <code>http://</code> فقط. باقي البروتوكولات مثل <code>https://</code> و <code>ftp://</code> غير مدعومة.
+</p>
 </div>

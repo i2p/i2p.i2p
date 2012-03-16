@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure 1.2//EN" "http://jetty.mortbay.org/configure_1_2.dtd">
+
+<!-- ========================================================================= -->
+<!-- This file configures the Jetty server.                                    -->
+<!-- All changes require a restart of I2P.                                     -->
+<!--                                                                           -->
+<!-- Commonly changed settings:                                                -->
+<!--   * host: Change 127.0.0.1 to 0.0.0.0 in the addListener section          -->
+<!--           to access the server directly (bypassing i2p)                   -->
+<!--           from other computers.                                           -->
+<!--   * port: Default 7658 in the addConnector section                         -->
+<!--   * docroot: Change the ResourceBase in the contexts/base-context.xml file -->
+<!--           to serve files from a different location.                       -->
+<!--   * threads: Raise MinThreads and/or MaxThreads in the addListener section -->
+<!--           if you have a high-traffic site and get a lot of warnings.      -->
+<!--   * Uncomment the addWebApplications section to use to enable             -->
+<!--           war files placed in the webapps/ dir.                           -->
+<!--   * Uncomment the line to allow Jetty to follow symlinks                  -->
+<!--                                                                           -->
+<!-- I2P uses Jetty 6.1.26. If you need web server features not found          -->
+<!-- in Jetty 6, you may install and run Jetty 7 or 8 in a different JVM       -->
+<!-- or run any other web server such as Apache. If you do run another web     -->
+<!-- server instead, be sure and disable the Jetty 6 server for your           -->
+<!-- eepsite on http://127.0.0.1:7657/configclients.jsp .                      -->
+<!--                                                                           -->
+<!-- Jetty now uses the I2P logging system rather than wrapper.log.            -->
+<!-- Use the log override org.mortbay.jetty.Server to adjust the log level.    -->
+<!--                                                                           -->
+<!-- Note that the XML encoding for this file is UTF-8.                        -->
+<!--                                                                           -->
+<!-- If you have a 'split' directory installation, with configuration          -->
+<!-- files in ~/.i2p (Linux) or %APPDATA%\I2P (Windows), be sure to            -->
+<!-- edit the file in the configuration directory, NOT the install directory.  -->
+<!--                                                                           -->
+<!-- ========================================================================= -->
+
+<!-- =============================================================== -->
+<!-- Configure the Jetty Server                                      -->
+<!--                                                                 -->
+<!-- Documentation of this file format can be found at:              -->
+<!-- http://docs.codehaus.org/display/JETTY/jetty.xml                -->
+<!--                                                                 -->
+<!-- =============================================================== -->
+
+
+<Configure id="Server" class="org.mortbay.jetty.Server">
+
+    <!-- =========================================================== -->
+    <!-- Server Thread Pool                                          -->
+    <!-- =========================================================== -->
+    <Set name="ThreadPool">
+
+      <!-- PICK ONE -->
+
+      <!-- If you don't have or want threadpool
+           Requests above the max will be queued
+       -->
+     <!--
+      <New class="org.mortbay.thread.QueuedThreadPool">
+        <Set name="minThreads">1</Set>
+        <Set name="maxThreads">16</Set>
+        <Set name="lowThreads">2</Set>
+      </New>
+     -->
+
+      <!-- Optional Java 5 bounded threadpool with job queue 
+           Requests above the max will be rejected
+           TODO: would be nice to use the 5-arg constructor but
+                 how do you use an Enum as the TimeUnit argument?
+           Alternatively, make a custom class where we can
+           set the thread name, set daemon, etc.
+           See RouterConsoleRunner.
+       -->
+      <New class="org.mortbay.thread.concurrent.ThreadPool">
+        <Arg type="int">0</Arg>
+        <Set name="corePoolSize">1</Set>
+        <Set name="maximumPoolSize">16</Set>
+      </New>
+    </Set>
+
+
+
+    <!-- =========================================================== -->
+    <!-- Set connectors                                              -->
+    <!-- =========================================================== -->
+    <!-- One of each type!                                           -->
+    <!-- =========================================================== -->
+
+    <!-- Use this connector for many frequently idle connections
+         and for threadless continuations.
+    -->    
+    <Call name="addConnector">
+      <Arg>
+          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+            <Set name="host">127.0.0.1</Set>
+            <Set name="port">7658</Set>
+            <Set name="maxIdleTime">60000</Set>
+            <Set name="Acceptors">1</Set>
+            <Set name="statsOn">false</Set>
+            <Set name="confidentialPort">8443</Set>
+	    <Set name="lowResourcesConnections">5000</Set>
+	    <Set name="lowResourcesMaxIdleTime">5000</Set>
+          </New>
+      </Arg>
+    </Call>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- To add a HTTPS SSL listener                                     -->
+    <!-- see jetty-ssl.xml to add an ssl connector. use                  -->
+    <!-- To enable this change clients.config args to be:                -->
+    <!--                                                                 -->
+    <!--   clientApp3.args=etc/jetty.xml etc/jetty-ssl.xml               -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Add a HTTPS SSL listener on port 8443                               -->
+  <!--                                                                     -->
+  <!-- In the unlikely event you would want SSL support for your eepsite.  -->
+  <!-- You would need to generate a selfsigned certificate in a keystore   -->
+  <!-- in ~/.i2p/eepsite/keystore.ks, for example with the command line:   -->
+  <!--
+       keytool -genkey -storetype JKS -keystore ~/.i2p/eepsite/etc/keystore.ks -storepass changeit -alias console -dname CN=xyz123.eepsite.i2p.net,OU=Eepsite,O=I2P Anonymous Network,L=XX,ST=XX,C=XX -validity 3650 -keyalg DSA -keysize 1024 -keypass myKeyPassword 
+   -->
+  <!-- Change the CN and key password in the example, of course.           -->
+  <!-- You wouldn't want to open this up to the regular internet,          -->
+  <!-- would you?? Untested and not recommended.                           -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- =========================================================== -->
+    <!-- Set up global session ID manager                            -->
+    <!-- =========================================================== -->
+    <!--
+    <Set name="sessionIdManager">
+      <New class="org.mortbay.jetty.servlet.HashSessionIdManager">
+        <Set name="workerName">node1</Set>
+      </New>
+    </Set>
+    -->
+
+    <!-- =========================================================== -->
+    <!-- Set handler Collection Structure                            --> 
+    <!-- =========================================================== -->
+    <Set name="handler">
+      <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
+        <Set name="handlers">
+         <Array type="org.mortbay.jetty.Handler">
+           <Item>
+             <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
+           </Item>
+           <Item>
+             <New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
+           </Item>
+           <Item>
+             <New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
+           </Item>
+         </Array>
+        </Set>
+      </New>
+    </Set>
+    
+    <!-- =========================================================== -->
+    <!-- Configure the context deployer                              -->
+    <!-- A context deployer will deploy contexts described in        -->
+    <!-- configuration files discovered in a directory.              -->
+    <!-- The configuration directory can be scanned for hot          -->
+    <!-- deployments at the configured scanInterval.                 -->
+    <!--                                                             -->
+    <!-- This deployer is configured to deploy contexts configured   -->
+    <!-- in the $JETTY_HOME/contexts directory                       -->
+    <!--                                                             -->
+    <!-- =========================================================== -->
+    <Call name="addLifeCycle">
+      <Arg>
+        <New class="org.mortbay.jetty.deployer.ContextDeployer">
+          <Set name="contexts"><Ref id="Contexts"/></Set>
+          <Set name="configurationDir">./eepsite/contexts</Set>
+          <Set name="scanInterval">0</Set>
+        </New>
+      </Arg>
+    </Call>
+
+    <!-- =========================================================== -->
+    <!-- Configure the webapp deployer.                              -->
+    <!-- A webapp  deployer will deploy standard webapps discovered  -->
+    <!-- in a directory at startup, without the need for additional  -->
+    <!-- configuration files.    It does not support hot deploy or   -->
+    <!-- non standard contexts (see ContextDeployer above).          -->
+    <!--                                                             -->
+    <!-- This deployer is configured to deploy webapps from the      -->
+    <!-- $JETTY_HOME/webapps directory                               -->
+    <!--                                                             -->
+    <!-- Normally only one type of deployer need be used.            -->
+    <!--                                                             -->
+    <!-- =========================================================== -->
+    <Call name="addLifeCycle">
+      <Arg>
+        <New class="org.mortbay.jetty.deployer.WebAppDeployer">
+          <Set name="contexts"><Ref id="Contexts"/></Set>
+          <Set name="webAppDir">./eepsite/webapps</Set>
+	  <Set name="parentLoaderPriority">false</Set>
+	  <Set name="extract">true</Set>
+	  <Set name="allowDuplicates">false</Set>
+          <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
+        </New>
+      </Arg>
+    </Call>
+
+    <!-- =========================================================== -->
+    <!-- Configure Authentication Realms                             -->
+    <!-- Realms may be configured for the entire server here, or     -->
+    <!-- they can be configured for a specific web app in a context  -->
+    <!-- configuration (see $(jetty.home)/contexts/test.xml for an   -->
+    <!-- example).                                                   -->
+    <!-- =========================================================== -->
+  <!-- UNCOMMENT TO ACTIVATE
+    <Set name="UserRealms">
+      <Array type="org.mortbay.jetty.security.UserRealm">
+        <Item>
+          <New class="org.mortbay.jetty.security.HashUserRealm">
+            <Set name="name">Test Realm</Set>
+            <Set name="config">./eepsite/etc/realm.properties</Set>
+            <Set name="refreshInterval">0</Set>
+          </New>
+        </Item>
+      </Array>
+    </Set>
+  -->
+
+    <!-- =========================================================== -->
+    <!-- Configure Request Log                                       -->
+    <!-- Request logs  may be configured for the entire server here, -->
+    <!-- or they can be configured for a specific web app in a       -->
+    <!-- contexts configuration (see $(jetty.home)/contexts/test.xml -->
+    <!-- for an example).                                            -->
+    <!-- =========================================================== -->
+    <Ref id="RequestLog">
+      <Set name="requestLog">
+        <New id="RequestLogImpl" class="net.i2p.jetty.I2PRequestLog">
+          <Set name="filename">./eepsite/logs/yyyy_mm_dd.request.log</Set>
+          <Set name="filenameDateFormat">yyyy_MM_dd</Set>
+          <Set name="retainDays">90</Set>
+          <Set name="append">true</Set>
+          <Set name="extended">false</Set>
+          <Set name="logCookies">false</Set>
+          <Set name="LogTimeZone">GMT</Set>
+        </New>
+      </Set>
+    </Ref>
+
+    <!-- =========================================================== -->
+    <!-- extra options                                               -->
+    <!-- =========================================================== -->
+    <Set name="stopAtShutdown">true</Set>
+    <Set name="sendServerVersion">false</Set>
+    <Set name="sendDateHeader">true</Set>
+    <Set name="gracefulShutdown">1000</Set>
+
+</Configure>

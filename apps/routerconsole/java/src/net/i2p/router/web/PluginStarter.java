@@ -2,7 +2,6 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ClassLoader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -32,7 +31,7 @@ import net.i2p.util.Log;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 
 
 /**
@@ -198,7 +197,27 @@ public class PluginStarter implements Runnable {
             return false;
         }
 
+        // Do we need to extract an update?
+        File pluginUpdate = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + "/app.xpi2p.zip" );
+        if(pluginUpdate.exists()) {
+            // Compare the start time of the router with the plugin.
+            if(ctx.router().getWhenStarted() > pluginUpdate.lastModified()) {
+                if (!FileUtil.extractZip(pluginUpdate, pluginDir)) {
+                    pluginUpdate.delete();
+                    String foo = "Plugin '" + appName + "' failed to update! File '" + pluginUpdate +"' deleted. You may need to remove and install the plugin again.";
+                    log.error(foo);
+                    disablePlugin(appName);
+                    throw new Exception(foo);
+                } else {
+                    pluginUpdate.delete();
+                    // Need to always log this, and  log.logAlways() did not work for me.
+                    System.err.println("INFO: Plugin updated: " + appName);
+                }
+            } // silently fail to update, because we have not restarted.
+        }
+
         Properties props = pluginProperties(ctx, appName);
+
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
             (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
@@ -261,7 +280,7 @@ public class PluginStarter implements Runnable {
         }
 
         // start console webapps in console/webapps
-        Server server = WebAppStarter.getConsoleServer();
+        ContextHandlerCollection server = WebAppStarter.getConsoleServer();
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
             Properties wprops = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -361,8 +380,8 @@ public class PluginStarter implements Runnable {
         }
 
         // stop console webapps in console/webapps
-        Server server = WebAppStarter.getConsoleServer();
-        if (server != null) {
+        //ContextHandlerCollection server = WebAppStarter.getConsoleServer();
+        //if (server != null) {
         /*
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -382,11 +401,11 @@ public class PluginStarter implements Runnable {
                 Iterator <String> wars = pluginWars.get(appName).iterator();
                 while (wars.hasNext()) {
                     String warName = wars.next();
-                    WebAppStarter.stopWebApp(server, warName);
+                    WebAppStarter.stopWebApp(warName);
                 }
                 pluginWars.get(appName).clear();
             }
-        }
+        //}
 
         // remove summary bar link
         Properties props = pluginProperties(ctx, appName);

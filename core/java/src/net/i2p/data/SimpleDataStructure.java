@@ -24,7 +24,7 @@ import net.i2p.crypto.SHA256Generator;
  * and setData(null) is also OK. However,
  * once non-null data is set, the data reference is immutable;
  * subsequent attempts to set the data via setData(), readBytes(),
- * or fromBase64() will throw a RuntimeException.
+ * fromByteArray(), or fromBase64() will throw a RuntimeException.
  *
  * @since 0.8.2
  * @author zzz
@@ -136,6 +136,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
      * Does the same thing as setData() but null not allowed.
      * @param data non-null
      * @throws DataFormatException if null or wrong length
+     * @throws RuntimeException if data already set.
      */
     @Override
     public void fromByteArray(byte data[]) throws DataFormatException {

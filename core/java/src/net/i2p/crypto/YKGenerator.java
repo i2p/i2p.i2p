@@ -38,13 +38,13 @@ import net.i2p.util.NativeBigInteger;
  */
 class YKGenerator {
     //private final static Log _log = new Log(YKGenerator.class);
-    private static final int MIN_NUM_BUILDERS;
-    private static final int MAX_NUM_BUILDERS;
-    private static final int CALC_DELAY;
-    private static final LinkedBlockingQueue<BigInteger[]> _values;
-    private static Thread _precalcThread;
-    private static I2PAppContext ctx;
-    private static volatile boolean _isRunning;
+    private final int MIN_NUM_BUILDERS;
+    private final int MAX_NUM_BUILDERS;
+    private final int CALC_DELAY;
+    private final LinkedBlockingQueue<BigInteger[]> _values;
+    private final Thread _precalcThread;
+    private final I2PAppContext ctx;
+    private volatile boolean _isRunning;
 
     public final static String PROP_YK_PRECALC_MIN = "crypto.yk.precalc.min";
     public final static String PROP_YK_PRECALC_MAX = "crypto.yk.precalc.max";
@@ -53,8 +53,8 @@ class YKGenerator {
     public final static int DEFAULT_YK_PRECALC_MAX = 50;
     public final static int DEFAULT_YK_PRECALC_DELAY = 200;
 
-    static {
-        ctx = I2PAppContext.getGlobalContext();
+    public YKGenerator(I2PAppContext context) {
+        ctx = context;
 
         // add to the defaults for every 128MB of RAM, up to 1GB
         long maxMemory = Runtime.getRuntime().maxMemory();
@@ -73,15 +73,6 @@ class YKGenerator {
         //    _log.debug("ElGamal YK Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "
         //               + CALC_DELAY + ")");
 
-        startPrecalc();
-    }
-
-    /**
-     * Caller must synch on class
-     * @since 0.8.8
-     */
-    private static void startPrecalc() {
-        ctx = I2PAppContext.getGlobalContext();
         ctx.statManager().createRateStat("crypto.YKUsed", "Need a YK from the queue", "Encryption", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("crypto.YKEmpty", "YK queue empty", "Encryption", new long[] { 60*60*1000 });
         _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
@@ -92,39 +83,27 @@ class YKGenerator {
     }
 
     /**
-     *  Note that this stops the singleton precalc thread.
-     *  You don't want to do this if there are multiple routers in the JVM.
-     *  Fix this if you care. See Router.shutdown().
+     *  Note that this stops the precalc thread
+     *  and it cannot be restarted.
      *  @since 0.8.8
      */
-    public static void shutdown() {
+    public void shutdown() {
         _isRunning = false;
         _precalcThread.interrupt();
         _values.clear();
     }
 
-    /**
-     *  Only required if shutdown() previously called.
-     *  @since 0.8.8
-     */
-    public static void restart() {
-        synchronized(YKGenerator.class) {
-            if (!_isRunning)
-                startPrecalc();
-        }
-    }
-
-    private static final int getSize() {
+    private final int getSize() {
         return _values.size();
     }
 
     /** @return true if successful, false if full */
-    private static final boolean addValues(BigInteger yk[]) {
+    private final boolean addValues(BigInteger yk[]) {
         return _values.offer(yk);
     }
 
     /** @return rv[0] = Y; rv[1] = K */
-    public static BigInteger[] getNextYK() {
+    public BigInteger[] getNextYK() {
         ctx.statManager().addRateData("crypto.YKUsed", 1, 0);
         BigInteger[] rv = _values.poll();
         if (rv != null)
@@ -136,7 +115,7 @@ class YKGenerator {
     private final static BigInteger _two = new NativeBigInteger(1, new byte[] { 0x02});
 
     /** @return rv[0] = Y; rv[1] = K */
-    private static final BigInteger[] generateYK() {
+    private final BigInteger[] generateYK() {
         NativeBigInteger k = null;
         BigInteger y = null;
         //long t0 = 0;
@@ -186,7 +165,7 @@ class YKGenerator {
 ****/
 
     /** the thread */
-    private static class YKPrecalcRunner implements Runnable {
+    private class YKPrecalcRunner implements Runnable {
         private final int _minSize;
         private final int _maxSize;
 

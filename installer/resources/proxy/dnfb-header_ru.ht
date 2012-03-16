@@ -4,22 +4,29 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>Предупреждение I2P: Неверный адрес назначения</title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Консоль маршрутизатора"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="Консоль маршрутизатора"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Настройки</a> <a href="http://127.0.0.1:7657/help.jsp">Справка</a> <a href="http://127.0.0.1:7657/susidns/">Адресная книга</a>
 </div>
 
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>Предупреждение: Неверный адрес назначения для I2P-сайта</h3>
+<p>
+Указанный I2P-адрес либо неверен, либо недоступен. Возможно Вы скопировали
+поврежденную BASE64-строчку или перешли по битой ссылке. Также возможно, что
+I2P-хост в офлайне.
+</p>
+<p>
+Вы можете попробовать <a href="javascript: window.location.reload()">повторить запрос</a>.
+</p>
 
-Указанный I2P-адрес либо неверен, либо недоступен. Возможно Вы скопировали поврежденную BASE64-строчку или перешли по битой ссылке. Также возможно, что I2P-хост в офлайне.
-<BR><BR>
-Вы можете попробовать <a href="javascript: window.location.reload()">повторить запрос</a>. 
-
-<hr><b>Не удается открыть следующий адрес:</b><BR><BR>
+<hr>
+<p>
+<b>Не удается открыть следующий адрес:</b></p>

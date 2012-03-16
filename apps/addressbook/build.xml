@@ -56,6 +56,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="addressbook.Daemon"/>
 				<attribute name="Implementation-Version" value="${full.version}" />
+				<attribute name="Built-By" value="${build.built-by}" />
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
 		                <attribute name="Workspace-Changes" value="${workspace.changes}" />
@@ -75,6 +76,7 @@
 		<war basedir="${dist}/tmp" webxml="web.xml" destfile="${dist}/${war}">
 			<manifest>
 				<attribute name="Implementation-Version" value="${full.version}" />
+				<attribute name="Built-By" value="${build.built-by}" />
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
 		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

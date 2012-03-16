@@ -96,12 +96,12 @@ public class BSkipList extends SkipList {
 		for (BSkipSpan ss : spanHash.values()) {
 			total += ss.nKeys;
 		}
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Loaded " + this + " cached " + levelHash.size() + " levels and " + spanHash.size() + " spans with " + total + " entries");
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("Loaded " + this + " cached " + levelHash.size() + " levels and " + spanHash.size() + " spans with " + total + " entries");
 		if (bf.file.canWrite() &&
 		    (levelCount != levelHash.size() || spans != spanHash.size() || size != total)) {
-			if (BlockFile.log.shouldLog(Log.WARN))
-				BlockFile.log.warn("On-disk counts were " + levelCount + " / " + spans + " / " +  size + ", correcting");
+			if (bf.log.shouldLog(Log.WARN))
+				bf.log.warn("On-disk counts were " + levelCount + " / " + spans + " / " +  size + ", correcting");
 			size = total;
 			flush();
 		}
@@ -121,7 +121,7 @@ public class BSkipList extends SkipList {
                 if (!bf.file.canWrite())
                     return;
 		if (isClosed) {
-			BlockFile.log.error("Already closed!! " + this, new Exception());
+			bf.log.error("Already closed!! " + this, new Exception());
 			return;
 		}
 		try {
@@ -139,7 +139,7 @@ public class BSkipList extends SkipList {
 	/** must be open (do not call close() first) */
 	public void delete() throws IOException {
 		if (isClosed) {
-			BlockFile.log.error("Already closed!! " + this, new Exception());
+			bf.log.error("Already closed!! " + this, new Exception());
 			return;
 		}
 		SkipLevels curLevel = stack;
@@ -229,16 +229,16 @@ public class BSkipList extends SkipList {
 	 *  @return true if the levels were modified.
 	 */
 	public boolean bslck(boolean fix, boolean isMeta) {
-		BlockFile.log.info("    size " + this.size);
-		BlockFile.log.info("    spans " + this.spanHash.size());
-		BlockFile.log.info("    levels " + this.levelHash.size());
-		BlockFile.log.info("    skipPage " + this.skipPage);
-		BlockFile.log.info("    firstSpanPage " + this.firstSpanPage);
-		BlockFile.log.info("    firstLevelPage " + this.firstLevelPage);
-		BlockFile.log.info("    maxLevels " + this.maxLevels());
+		bf.log.info("    size " + this.size);
+		bf.log.info("    spans " + this.spanHash.size());
+		bf.log.info("    levels " + this.levelHash.size());
+		bf.log.info("    skipPage " + this.skipPage);
+		bf.log.info("    firstSpanPage " + this.firstSpanPage);
+		bf.log.info("    firstLevelPage " + this.firstLevelPage);
+		bf.log.info("    maxLevels " + this.maxLevels());
 		//printSL();
 		//print();
-		//BlockFile.log.info("*** Lvlck() ***");
+		//bf.log.info("*** Lvlck() ***");
 		boolean rv = stack.blvlck(fix);
 	     /****
 		int items = 0;
@@ -246,16 +246,16 @@ public class BSkipList extends SkipList {
 			String key = (String) iter.nextKey();
 			if (isMeta) {
 				int sz = ((Integer) iter.next()).intValue();
-				BlockFile.log.info("        Item " + key.toString() + " page " + sz);
+				bf.log.info("        Item " + key.toString() + " page " + sz);
 			} else {
 				String cls= iter.next().getClass().getSimpleName();
-				BlockFile.log.info("        Item " + key.toString() + " class " + cls);
+				bf.log.info("        Item " + key.toString() + " class " + cls);
 			}
 			items++;
 		}
-		BlockFile.log.warn("    actual size " + items);
+		bf.log.warn("    actual size " + items);
 		if (items != this.size)
-			BlockFile.log.warn("****** size mismatch, header = " + this.size + " actual = " + items);
+			bf.log.warn("****** size mismatch, header = " + this.size + " actual = " + items);
               ****/
 		return rv;
 	}

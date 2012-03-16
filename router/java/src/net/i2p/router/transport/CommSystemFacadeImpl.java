@@ -56,9 +56,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         startTimestamper();
     }
     
+    /**
+     *  Cannot be restarted.
+     */
     public void shutdown() {
         if (_manager != null)
-            _manager.stopListening();
+            _manager.shutdown();
     }
     
     public void restart() {

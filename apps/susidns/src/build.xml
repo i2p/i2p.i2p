@@ -17,9 +17,10 @@
         <pathelement location="${lib}/jasper-compiler.jar" />
         <pathelement location="${lib}/jasper-runtime.jar" />
         <pathelement location="${lib}/javax.servlet.jar" />
+        <pathelement location="${lib}/jsp-api.jar" />
         <pathelement location="${lib}/commons-logging.jar" />
         <pathelement location="${lib}/commons-el.jar" />
-        <pathelement location="${lib}/ant.jar" />
+        <pathelement location="${ant.home}/lib/ant.jar" />
         <pathelement location="../../../core/java/build/i2p.jar" />
  	</path>
 	<property name="javac.compilerargs" value="" />
@@ -98,6 +99,7 @@
         	</fileset>
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

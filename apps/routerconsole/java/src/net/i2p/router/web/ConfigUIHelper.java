@@ -14,7 +14,7 @@ public class ConfigUIHelper extends HelperBase {
         for (String theme : themes) {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
-                buf.append("checked=\"true\" ");
+                buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(theme).append("\">").append(_(theme)).append("<br>\n");
         }
         return buf.toString();
@@ -53,13 +53,13 @@ public class ConfigUIHelper extends HelperBase {
      *  Any language-specific flag added to the icon set must be
      *  added to the top-level build.xml for the updater.
      */
-    private static final String langs[] = {"ar", "da", "de", "ee", "en", "es", "fi",
+    private static final String langs[] = {"ar", "cs", "da", "de", "ee", "en", "es", "fi",
                                            "fr", "it", "nl", "pl", "pt", "ru",
                                            "sv", "uk", "vi", "zh"};
-    private static final String flags[] = {"lang_ar", "dk", "de", "ee", "us", "es", "fi",
+    private static final String flags[] = {"lang_ar", "cz", "dk", "de", "ee", "us", "es", "fi",
                                            "fr", "it", "nl", "pl", "pt", "ru",
                                            "se", "ua", "vn", "cn"};
-    private static final String xlangs[] = {_x("Arabic"), _x("Danish"),
+    private static final String xlangs[] = {_x("Arabic"), _x("Czech"), _x("Danish"),
                                             _x("German"), _x("Estonian"), _x("English"), _x("Spanish"), _x("Finnish"),
                                             _x("French"), _x("Italian"), _x("Dutch"), _x("Polish"),
                                             _x("Portuguese"), _x("Russian"), _x("Swedish"),
@@ -73,7 +73,7 @@ public class ConfigUIHelper extends HelperBase {
             // we use "lang" so it is set automagically in CSSHelper
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
             if (langs[i].equals(current))
-                buf.append("checked=\"true\" ");
+                buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(langs[i]).append("\">")
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(flags[i]).append("\"> ")
                .append(_(xlangs[i])).append("<br>\n");

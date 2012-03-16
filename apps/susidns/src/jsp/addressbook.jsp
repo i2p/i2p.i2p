@@ -29,6 +29,7 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -42,7 +43,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>${book.book} <%=intl._("address book")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
@@ -158,7 +159,7 @@ ${book.loadBookMessages}
 </td><td class="names">
 <span class="addrhlpr"><a href="details?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
 </td>
-<td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
+<td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="40" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
 </c:forEach>
 </table>
@@ -190,7 +191,7 @@ ${book.loadBookMessages}
 <table><tr><td>
 <b><%=intl._("Host Name")%></b></td><td><input type="text" name="hostname" value="${book.hostname}" size="54">
 </td></tr><tr><td>
-<b><%=intl._("Destination")%></b></td><td><textarea name="destination" rows="1" style="height: 3em;" cols="70" wrap="off" spellcheck="false">${book.destination}</textarea>
+<b><%=intl._("Destination")%></b></td><td><textarea name="destination" rows="1" style="height:3em" wrap="off" cols="70" spellcheck="false">${book.destination}</textarea>
 </td></tr></table>
 <p class="buttons">
 <input class="cancel" type="reset" value="<%=intl._("Cancel")%>" >
