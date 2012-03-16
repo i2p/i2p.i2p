@@ -610,9 +610,18 @@ h2.app {
 }
 
 h4.app {
-     clear: left;
      margin: 0 4px 2px 0;
      padding: 10px 0 8px 0;
+}
+
+h4.app2 {
+     clear: left;
+     margin: 0 4px 2px 0;
+     padding: 16px 0 8px 0;
+}
+
+div.ag2 {
+     margin: 0 0 0 207px;
 }
 
 div.app {
@@ -623,7 +632,6 @@ div.app {
 }
 
 div.appgroup {
-     clear: left;
      margin: 0;
      padding: 16px 8px;
      width: auto;

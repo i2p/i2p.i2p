@@ -159,6 +159,7 @@ public class HomeHelper extends HelperBase {
         buf.append("<div class=\"appgroup\">");
         for (App app : apps) {
             buf.append("<div class=\"app\">" +
+                       "<div class=\"appimg\">" +
                        "<a href=\"").append(app.url).append("\">" +
                        "<img class=\"");
             // toopie is 54x68, not 16x16, needs special alignment and sizing
@@ -166,7 +167,8 @@ public class HomeHelper extends HelperBase {
                 buf.append("app2p");
             else
                 buf.append("app");
-            buf.append("\" alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon).append("\"></a><br>\n" +
+            buf.append("\" alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon).append("\"></a>\n" +
+                       "</div>" +
                        "<table class=\"app\"><tr class=\"app\"><td class=\"app\">" +
                        "<div class=\"applabel\">" +
                        "<a href=\"").append(app.url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +

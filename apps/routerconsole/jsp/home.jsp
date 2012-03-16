@@ -18,6 +18,11 @@
         System.setProperty("router.consoleNonce", consoleNonce);
     }
 %>
+<jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
+<jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
+ <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+
 <div class="routersummaryouter" id="appsummary">
  <div class="routersummary">
   <div style="height: 36px;">
@@ -29,13 +34,21 @@
 <!-- for non-script -->
 <%@include file="xhr1.jsi" %>
   </div>
+<%
+   if (!newshelper.shouldShowNews()) {
+%>
+<hr>
+<jsp:getProperty name="updatehelper" property="newsStatus" />
+<%
+   }  // !shouldShowNews()
+%>
  </div>
 </div>
 
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
-<div class="welcome" title="Click a flag to select a language. Click 'configure language' below to change it later.">
+<div class="welcome" title="<%=intl._("Click a flag to select a language. Click 'configure language' below to change it later.")%>">
   <div class="langbox" id="langbox">
     <a href="/home?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=us" title="English" alt="English"></a> 
     <a href="/home?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
@@ -60,24 +73,20 @@
 </div>
 <% }  // shouldShowWelcome %>
 
-<div class="news" id="news">
- <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
- <jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%
    if (newshelper.shouldShowNews()) {
        java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
 %>
+<div class="news" id="news">
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
  <hr>
+ <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
+</div>
 <%
    }  // shouldShowNews()
 %>
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
-</div>
 
 <div class="home" id="home">
   <div class="search">
@@ -98,7 +107,7 @@
     <jsp:getProperty name="homehelper" property="favorites" /><br>
   </div>
   <div class="ag2">
-    <h4 class="app"><%=intl._("Local Services")%></h4>
+    <h4 class="app2"><%=intl._("Local Services")%></h4>
     <jsp:getProperty name="homehelper" property="services" /><br>
   </div>
 </div>
