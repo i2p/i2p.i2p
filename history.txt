@@ -1,3 +1,14 @@
+2012-03-16 zzz
+  * FragmentHandler: Zero-copy read of unfragmented messages
+                     for speed and to reduce object churn
+  * Home page: Tag tooltip; CSS tweaks; news tweak
+  * HTTP Proxy: Jump and addresshelper page tweaks
+  * Jetty: Add I2P mime types to default eepsite config
+  * OCMOSJ: Refactor cache to its own class, make non-static
+  * TransportManager: Fix fatal exception on soft restart caused by DHSKB refactoring
+  * TrustedUpdate: Preserve default key names even when keys are set
+                   in advanced config
+
 2012-03-15 sponge
   * Plugins:
     - String.isEmpty() [ java 6 ] -> (String.length() == 0) [ java 5 ]

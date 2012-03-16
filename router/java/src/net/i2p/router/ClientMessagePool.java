@@ -11,6 +11,7 @@ package net.i2p.router;
 import java.util.Properties;
 
 import net.i2p.client.I2PClient;
+import net.i2p.router.message.OutboundCache;
 import net.i2p.router.message.OutboundClientMessageOneShotJob;
 import net.i2p.util.Log;
 
@@ -25,10 +26,12 @@ import net.i2p.util.Log;
 public class ClientMessagePool {
     private final Log _log;
     private final RouterContext _context;
+    private final OutboundCache _cache;
     
     public ClientMessagePool(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(ClientMessagePool.class);
+        _cache = new OutboundCache(_context);
         OutboundClientMessageOneShotJob.init(_context);
     }
   
@@ -36,7 +39,7 @@ public class ClientMessagePool {
      *  @since 0.8.8
      */
     public void shutdown() {
-        OutboundClientMessageOneShotJob.clearAllCaches();
+        _cache.clearAllCaches();
     }
 
     /**
@@ -72,7 +75,7 @@ public class ClientMessagePool {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding message for remote delivery");
-            OutboundClientMessageOneShotJob j = new OutboundClientMessageOneShotJob(_context, msg);
+            OutboundClientMessageOneShotJob j = new OutboundClientMessageOneShotJob(_context, _cache, msg);
             if (true) // blocks the I2CP reader for a nontrivial period of time
                 j.runJob();
             else
