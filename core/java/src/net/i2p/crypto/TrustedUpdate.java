@@ -160,6 +160,15 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
     /** 172 */
     private static final int KEYSIZE_B64_BYTES = 2 + (SigningPublicKey.KEYSIZE_BYTES * 4 / 3);
 
+    private static final Map<String, String> DEFAULT_KEYS = new HashMap(4);
+    static {
+            //DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
+            DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
+            //DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY3, "complication@mail.i2p");
+            DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY4, "HungryHobo@mail.i2p");
+            DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY5, "killyourtv@mail.i2p");
+    }
+
     /**
      * Constructs a new <code>TrustedUpdate</code> with the default global
      * context.
@@ -184,15 +193,18 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         if ( (propertyTrustedKeys != null) && (propertyTrustedKeys.length() > 0) ) {
             StringTokenizer propertyTrustedKeysTokens = new StringTokenizer(propertyTrustedKeys, " ,\r\n");
 
-            while (propertyTrustedKeysTokens.hasMoreTokens())
-                addKey(propertyTrustedKeysTokens.nextToken().trim(), "");
-
+            while (propertyTrustedKeysTokens.hasMoreTokens()) {
+                // If a key from the defaults, use the same name
+                String key = propertyTrustedKeysTokens.nextToken().trim();
+                String name = DEFAULT_KEYS.get(key);
+                if (name == null)
+                    name = "";
+                addKey(key, name);
+            }
         } else {
-            //addKey(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
-            addKey(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
-            //addKey(DEFAULT_TRUSTED_KEY3, "complication@mail.i2p");
-            addKey(DEFAULT_TRUSTED_KEY4, "HungryHobo@mail.i2p");
-            addKey(DEFAULT_TRUSTED_KEY5, "killyourtv@mail.i2p");
+            for (Map.Entry<String, String> e : DEFAULT_KEYS.entrySet()) {
+                addKey(e.getKey(), e.getValue());
+            }
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
@@ -207,6 +219,8 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
      *  @return true if successful
      */
     public boolean addKey(String key, String name) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Adding " + name + ": " + key);
         SigningPublicKey signingPublicKey = new SigningPublicKey();
         try {
             // fromBase64() will throw a DFE if length is not right
