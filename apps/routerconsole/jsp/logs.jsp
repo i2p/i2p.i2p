@@ -25,6 +25,7 @@
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <b>Server version:</b> <jsp:getProperty name="logsHelper" property="jettyVersion" /><br>
+<b>Servlet version:</b> <%=getServletInfo()%><br>
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
