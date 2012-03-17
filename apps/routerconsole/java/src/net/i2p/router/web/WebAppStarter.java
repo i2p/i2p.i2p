@@ -101,6 +101,8 @@ public class WebAppStarter {
         WebAppContext wac = new WebAppContext(warPath, "/"+ appName);
         tmpdir.mkdir();
         wac.setTempDirectory(tmpdir);
+        // all the JSPs are precompiled, no need to extract
+        wac.setExtractWAR(false);
 
         // this does the passwords...
         RouterConsoleRunner.initialize(wac);

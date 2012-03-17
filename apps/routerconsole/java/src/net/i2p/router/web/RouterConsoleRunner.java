@@ -415,6 +415,7 @@ public class RouterConsoleRunner {
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
             rootWebApp.setTempDirectory(tmpdir);
+            rootWebApp.setExtractWAR(false);
             rootWebApp.setSessionHandler(new SessionHandler());
             rootServletHandler = new ServletHandler();
             rootWebApp.setServletHandler(rootServletHandler);
