@@ -50,6 +50,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private final BuildExecutor _executor;
     private final BuildHandler _handler;
     private boolean _isShutdown;
+    private final int _numHandlerThreads;
     private static final long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
 
     private static final int MIN_KBPS_TWO_HANDLERS = 512;
@@ -80,8 +81,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             numHandlerThreads = 2;
         else
             numHandlerThreads = 1;
-        numHandlerThreads = ctx.getProperty("router.buildHandlerThreads", numHandlerThreads);
-        for (int i = 1; i <= numHandlerThreads; i++) {
+        _numHandlerThreads = ctx.getProperty("router.buildHandlerThreads", numHandlerThreads);
+        for (int i = 1; i <= _numHandlerThreads; i++) {
             I2PThread hThread = new I2PThread(_handler, "BuildHandler " + i + '/' + numHandlerThreads, true);
             hThread.start();
         }
@@ -396,7 +397,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     public void restart() { 
-        shutdown();
+        _handler.restart();
+        _executor.restart();
+        shutdownExploratory();
         startup();
     }
         
@@ -548,12 +551,21 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
     
+    /**
+     *  Cannot be restarted
+     */
     public void shutdown() { 
+        _handler.shutdown(_numHandlerThreads);
+        _executor.shutdown();
+        shutdownExploratory();
+        _isShutdown = true;
+    }
+
+    private void shutdownExploratory() {
         if (_inboundExploratory != null)
             _inboundExploratory.shutdown();
         if (_outboundExploratory != null)
             _outboundExploratory.shutdown();
-        _isShutdown = true;
     }
     
     /** list of TunnelPool instances currently in play */

@@ -105,7 +105,7 @@ public class TunnelPool {
     
     void shutdown() {
         if (_log.shouldLog(Log.WARN))
-            _log.warn(toString() + ": Shutdown called", new Exception());
+            _log.warn(toString() + ": Shutdown called");
         _alive = false;
         _lastSelectionPeriod = 0;
         _lastSelected = null;

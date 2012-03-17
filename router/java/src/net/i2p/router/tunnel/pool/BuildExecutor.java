@@ -40,7 +40,7 @@ class BuildExecutor implements Runnable {
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _currentlyBuildingMap;
     /** indexed by ptcc.getReplyMessageId() */
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
-    private boolean _isRunning;
+    private volatile boolean _isRunning;
     private boolean _repoll;
     private static final int MAX_CONCURRENT_BUILDS = 10;
     /** accept replies up to a minute after we gave up on them */
@@ -84,6 +84,26 @@ class BuildExecutor implements Runnable {
         statMgr.createRateStat("tunnel.tierExpireUnknown", "Expired joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
     }
     
+    /**
+     *  @since 0.9
+     */
+    public void restart() {
+        synchronized (_recentBuildIds) { 
+            _recentBuildIds.clear();
+        }
+        _currentlyBuildingMap.clear();
+        _recentlyBuildingMap.clear();
+    }
+
+    /**
+     *  Cannot be restarted.
+     *  @since 0.9
+     */
+    public void shutdown() {
+        _isRunning = false;
+        restart();
+    }
+
     private int allowed() {
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
@@ -270,7 +290,7 @@ class BuildExecutor implements Runnable {
         long afterBuildReal = 0;
         long afterHandleInbound = 0;
                 
-        while (!_manager.isShutdown()){
+        while (_isRunning && !_manager.isShutdown()){
             //loopBegin = System.currentTimeMillis();
             try {
                 _repoll = false; // resets repoll to false unless there are inbound requeusts pending

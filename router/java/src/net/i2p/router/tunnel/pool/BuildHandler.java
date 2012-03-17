@@ -54,7 +54,7 @@ class BuildHandler implements Runnable {
     private final LinkedBlockingQueue<BuildMessageState> _inboundBuildMessages;
     private final BuildMessageProcessor _processor;
     private final ParticipatingThrottler _throttler;
-    private boolean _isRunning;
+    private volatile boolean _isRunning;
 
     /** TODO these may be too high, review and adjust */
     private static final int MIN_QUEUE = 18;
@@ -122,12 +122,33 @@ class BuildHandler implements Runnable {
     }
     
     /**
+     *  @since 0.9
+     */
+    public void restart() {
+        _inboundBuildMessages.clear();
+    }
+
+    /**
+     *  Cannot be restarted.
+     *  @param numThreads the number of threads to be shut down
+     *  @since 0.9
+     */
+    public void shutdown(int numThreads) {
+        _isRunning = false;
+        _inboundBuildMessages.clear();
+        BuildMessageState poison = new BuildMessageState(null, null, null);
+        for (int i = 0; i < numThreads; i++) {
+            _inboundBuildMessages.offer(poison);
+        }
+    }
+
+    /**
      * Thread to handle inbound requests
      * @since 0.8.11
      */
     public void run() {
         _isRunning = true;
-        while (!_manager.isShutdown()) {
+        while (_isRunning && !_manager.isShutdown()) {
             try {
                 handleInboundRequest();
             } catch (Exception e) {
@@ -150,6 +171,13 @@ class BuildHandler implements Runnable {
             } catch (InterruptedException ie) {
                 return;
             }
+
+            // check for poison
+            if (state.msg == null) {
+                _isRunning = false;
+                return;
+            }
+
             long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
             if (state.recvTime <= dropBefore) {
                 if (_log.shouldLog(Log.WARN))
