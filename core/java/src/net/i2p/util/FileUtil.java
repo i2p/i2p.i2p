@@ -147,9 +147,12 @@ public class FileUtil {
                                                System.getProperty("java.version"));
                         ioe.printStackTrace();
                         return false;
-                    } catch (Exception e) {  // ClassNotFoundException but compiler not happy with that
-                        System.err.println("ERROR: Error unpacking the zip entry (" + entry.getName() +
-                                           "), your JVM does not support unpack200");
+                    } catch (Exception e) {
+                        // Oracle unpack() should throw an IOE but other problems can happen, e.g:
+                        // java.lang.reflect.InvocationTargetException
+                        // Caused by: java.util.zip.ZipException: duplicate entry: xxxxx
+                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
+                        e.printStackTrace();
                         return false;
                     } finally {
                         try { if (in != null) in.close(); } catch (IOException ioe) {}
@@ -261,6 +264,7 @@ public class FileUtil {
      * @throws IOException on unpack error or if neither library is available.
      *         Will not throw ClassNotFoundException.
      * @throws org.apache.harmony.pack200.Pack200Exception which is not an IOException
+     * @throws java.lang.reflect.InvocationTargetException on duplicate zip entries in the packed jar
      * @since 0.8.1
      */
     private static void unpack(InputStream in, JarOutputStream out) throws Exception {
