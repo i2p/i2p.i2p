@@ -302,7 +302,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *
      * @param l logger to receive events and output
      */
-    public void runHelp(Logging l) {
+    private static void runHelp(Logging l) {
         l.log("Command list:");
         l.log("config <i2phost> <i2pport>");
         l.log("listen_on <ip>");
@@ -1107,13 +1107,14 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Specify the i2cp host and port 
+     * Deprecated - only used by CLI
      *
      * Sets the event "configResult" = "ok" or "error" after the configuration has been specified
      *
      * @param args {hostname, portNumber}
      * @param l logger to receive events and output
      */
-    public void runConfig(String args[], Logging l) {
+    private void runConfig(String args[], Logging l) {
         if (args.length == 2) {
             host = args[0];
             listenHost = host;
@@ -1128,13 +1129,14 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Specify whether to use its own destination for each outgoing tunnel
+     * Deprecated - only used by CLI
      *
      * Sets the event "owndestResult" = "ok" or "error" after the configuration has been specified
      *
      * @param args {yes or no}
      * @param l logger to receive events and output
      */
-    public void runOwnDest(String args[], Logging l) {
+    private void runOwnDest(String args[], Logging l) {
         if (args.length == 1 && (args[0].equalsIgnoreCase("yes") || args[0].equalsIgnoreCase("no"))) {
             ownDest = args[0].equalsIgnoreCase("yes");
             notifyEvent("owndestResult", "ok");
@@ -1190,21 +1192,22 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Generate a new keypair
+     * Deprecated - only used by CLI
      *
      * Sets the event "genkeysResult" = "ok" or "error" after the generation is complete
      *
      * @param args {privateKeyFilename, publicKeyFilename} or {privateKeyFilename}
      * @param l logger to receive events and output
      */
-    public void runGenKeys(String args[], Logging l) {
+    private static void runGenKeys(String args[], Logging l) {
         OutputStream pubdest = null;
         if (args.length == 2) {
             try {
                 pubdest = new FileOutputStream(args[1]);
             } catch (IOException ioe) {
                 l.log("Error opening output stream");
-                _log.error(getPrefix() + "Error generating keys to out", ioe);
-                notifyEvent("genkeysResult", "error");
+                //_log.error(getPrefix() + "Error generating keys to out", ioe);
+                //notifyEvent("genkeysResult", "error");
                 return;
             }
         } else if (args.length != 1) {
@@ -1212,7 +1215,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             l.log("   creates a new keypair and prints the public key.\n"
                   + "   if pubkeyfile is given, saves the public key there." + "\n"
                   + "   if the privkeyfile already exists, just print/save" + "the pubkey.");
-            notifyEvent("genkeysResult", "error");
+            //notifyEvent("genkeysResult", "error");
         }
         try {
             File privKeyFile = new File(args[0]);
@@ -1222,58 +1225,61 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             } else {
                 makeKey(new FileOutputStream(privKeyFile), pubdest, l);
             }
-            notifyEvent("genkeysResult", "ok");
+            //notifyEvent("genkeysResult", "ok");
         } catch (IOException ioe) {
             l.log("Error generating keys - " + ioe.getMessage());
-            notifyEvent("genkeysResult", "error");
-            _log.error(getPrefix() + "Error generating keys", ioe);
+            //notifyEvent("genkeysResult", "error");
+            //_log.error(getPrefix() + "Error generating keys", ioe);
         }
     }
 
     /**
      * Generate a new keypair
+     * Deprecated - only used by CLI
      *
      * Sets the event "privateKey" = base64 of the privateKey stream and
      * sets the event "publicDestination" = base64 of the destination
      *
      * @param l logger to receive events and output
      */
-    public void runGenTextKeys(Logging l) {
+    private static void runGenTextKeys(Logging l) {
         ByteArrayOutputStream privkey = new ByteArrayOutputStream(512);
         ByteArrayOutputStream pubkey = new ByteArrayOutputStream(512);
         makeKey(privkey, pubkey, l);
         l.log("Private key: " + Base64.encode(privkey.toByteArray()));
-        notifyEvent("privateKey", Base64.encode(privkey.toByteArray()));
-        notifyEvent("publicDestination", Base64.encode(pubkey.toByteArray()));
+        //notifyEvent("privateKey", Base64.encode(privkey.toByteArray()));
+        //notifyEvent("publicDestination", Base64.encode(pubkey.toByteArray()));
     }
 
     /**
      * Exit the JVM if there are no more tasks left running.  If there are tunnels
      * running, it returns.
+     * Deprecated - only used by CLI
      *
      * Sets the event "quitResult" = "error" if there are tasks running (but if there
      * aren't, well, there's no point in setting the quitResult to "ok", now is there?)
      *
      * @param l logger to receive events and output
      */
-    public void runQuit(Logging l) {
+    private void runQuit(Logging l) {
         purgetasks(l);
         if (tasks.isEmpty()) {
             System.exit(0);
         }
         l.log("There are running tasks. Try 'list'.");
-        notifyEvent("quitResult", "error");
+        //notifyEvent("quitResult", "error");
     }
 
     /**
      * Retrieve a list of currently running tasks
+     * Deprecated - only used by CLI
      *
      * Sets the event "listDone" = "done" after dumping the tasks to
      * the logger
      *
      * @param l logger to receive events and output
      */
-    public void runList(Logging l) {
+    private void runList(Logging l) {
         purgetasks(l);
         for (I2PTunnelTask t : tasks) {
             l.log("[" + t.getId() + "] " + t.toString());
@@ -1331,13 +1337,14 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Run all of the commands in the given file (one command per line)
+     * Deprecated - only used by CLI
      *
      * Sets the event "runResult" = "ok" or "error" after the closing is complete
      *
      * @param args {filename}
      * @param l logger to receive events and output
      */
-    public void runRun(String args[], Logging l) {
+    private void runRun(String args[], Logging l) {
         if (args.length == 1) {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(args[0]));
@@ -1362,13 +1369,14 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Perform a lookup of the name specified
+     * Deprecated - only used by CLI
      *
      * Sets the event "lookupResult" = base64 of the destination, or an error message 
      *
      * @param args {name}
      * @param l logger to receive events and output
      */
-    public void runLookup(String args[], Logging l) {
+    private void runLookup(String args[], Logging l) {
         if (args.length != 1) {
             l.log("lookup <name>");
             l.log("   try to resolve the name into a destination key");
@@ -1392,13 +1400,14 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Start up a ping task with the specified args (currently supporting -ns, -h, -l)
+     * Deprecated - only used by CLI
      *
      * Sets the event "pingTaskId" = Integer of the taskId, or -1
      *
      * @param allargs arguments to pass to the I2Ping task
      * @param l logger to receive events and output
      */
-    public void runPing(String allargs, Logging l) {
+    private void runPing(String allargs, Logging l) {
         if (allargs.length() != 0) {
             I2PTunnelTask task;
             // pings always use the main destination
@@ -1493,7 +1502,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param pubDest location to store the destination
      * @param l logger to send messages to
      */
-    public static void makeKey(OutputStream writeTo, OutputStream pubDest, Logging l) {
+    private static void makeKey(OutputStream writeTo, OutputStream pubDest, Logging l) {
         try {
             l.log("Generating new keys...");
             I2PClient client = I2PClientFactory.createClient();
@@ -1518,7 +1527,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param pubDest stream to write the destination to
      * @param l logger to send messages to
      */
-    public static void showKey(InputStream readFrom, OutputStream pubDest, Logging l) {
+    private static void showKey(InputStream readFrom, OutputStream pubDest, Logging l) {
         try {
             Destination d = new Destination();
             d.readBytes(readFrom);
