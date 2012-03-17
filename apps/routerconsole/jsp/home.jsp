@@ -37,7 +37,7 @@
 <%
    if (!newshelper.shouldShowNews()) {
 %>
-<hr>
+<hr><h3><%=intl._("News")%></h3><hr class="b">
 <jsp:getProperty name="updatehelper" property="newsStatus" />
 <%
    }  // !shouldShowNews()
