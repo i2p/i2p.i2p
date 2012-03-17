@@ -1,3 +1,10 @@
+2012-03-17 zzz
+  * BuildHandler: Implement restart and shutdown to stop the thread
+  * Jetty: Don't extract wars
+  * FileUtil: Better logging of weird unpack200 errors
+  * I2PTunnel: Make CLI-only methods private, and static where possible
+  * Streaming: Scheduler cleanup
+
 2012-03-16 zzz
   * FragmentHandler: Zero-copy read of unfragmented messages
                      for speed and to reduce object churn
