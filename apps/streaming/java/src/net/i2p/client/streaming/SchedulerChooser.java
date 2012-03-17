@@ -11,11 +11,11 @@ import net.i2p.util.Log;
  *
  */
 class SchedulerChooser {
-    private I2PAppContext _context;
-    private Log _log;
-    private TaskScheduler _nullScheduler;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final TaskScheduler _nullScheduler;
     /** list of TaskScheduler objects */
-    private List _schedulers;
+    private final List _schedulers;
     
     public SchedulerChooser(I2PAppContext context) {
         _context = context;
@@ -48,8 +48,9 @@ class SchedulerChooser {
         rv.add(new SchedulerDead(_context));
         return rv;
     }
+
     private class NullScheduler implements TaskScheduler {
-        private Log _log;
+        private final Log _log;
         public NullScheduler() {
             _log = _context.logManager().getLog(NullScheduler.class);
         }

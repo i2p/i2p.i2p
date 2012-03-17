@@ -8,8 +8,8 @@ import net.i2p.util.SimpleScheduler;
  * Base scheduler
  */
 abstract class SchedulerImpl implements TaskScheduler {
-    protected I2PAppContext _context;
-    private Log _log;
+    protected final I2PAppContext _context;
+    protected final Log _log;
     
     public SchedulerImpl(I2PAppContext ctx) {
         _context = ctx;
@@ -17,6 +17,6 @@ abstract class SchedulerImpl implements TaskScheduler {
     }
     
     protected void reschedule(long msToWait, Connection con) {
-        SimpleScheduler.getInstance().addEvent(con.getConnectionEvent(), msToWait);
+        _context.simpleScheduler().addEvent(con.getConnectionEvent(), msToWait);
     }
 }
