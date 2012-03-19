@@ -122,7 +122,7 @@ public class PluginUpdateHandler extends UpdateHandler {
         protected void update() {
             _updated = false;
             if(_xpi2pURL.startsWith("file://")) {
-                updateStatus("<b>" + _("Attempting to copy plugin from {0}", _xpi2pURL) + "</b>");
+                updateStatus("<b>" + _("Attempting to install from file {0}", _xpi2pURL) + "</b>");
                 // strip off "file://"
                 String xpi2pfile = _xpi2pURL.substring(7);
                 if(xpi2pfile.length() == 0) { // This is actually what String.isEmpty() does, so it should be safe.
@@ -133,7 +133,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                     if(FileUtil.copy((new File(xpi2pfile)).getAbsolutePath(), _updateFile, true, false)) {
                         transferComplete(alreadyTransferred, alreadyTransferred, 0L, _xpi2pURL, _updateFile, false);
                     } else {
-                        statusDone("<b>" + _("Failed to copy file {0}", _xpi2pURL) + "</b>");
+                        statusDone("<b>" + _("Failed to install from file {0}, copy failed.", _xpi2pURL) + "</b>");
                     }
                 }
             } else {

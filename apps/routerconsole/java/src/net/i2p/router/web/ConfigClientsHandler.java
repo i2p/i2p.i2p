@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,6 +87,15 @@ public class ConfigClientsHandler extends FormHandler {
             } else {
                 try {
                     PluginStarter.stopPlugin(_context, app);
+                } catch (ClassNotFoundException cnfe) {
+                    // don't complain here. Some plugins need to be ran to be deleted.
+                    // I tried to check to see if the plugin was ran elsewhere,
+                    // and it sait it was when it was not. -- Sponge
+                } catch (Throwable e) {
+                    addFormError(_("Error stopping plugin {0}", app) + ": " + e);
+                    _log.error("Error stopping plugin " + app,  e);
+                }
+                try {
                     PluginStarter.deletePlugin(_context, app);
                     addFormNotice(_("Deleted plugin {0}", app));
                 } catch (Throwable e) {

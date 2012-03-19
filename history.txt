@@ -1,3 +1,6 @@
+2012-03-19 sponge
+  * Plugins: less confusing message, fix CNFE by catch and ignore on delete.
+
 2012-03-17 zzz
   * BuildHandler: Implement restart and shutdown to stop the thread
   * Jetty: Don't extract wars
