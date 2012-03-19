@@ -1,5 +1,6 @@
 2012-03-19 sponge
-  * Plugins: less confusing message, fix CNFE by catch and ignore on delete.
+  * Plugins: Less confusing message, fix CNFE by catch and ignore on delete.
+             Order and reverse order plugin names for start/stop all cases.
 
 2012-03-17 zzz
   * BuildHandler: Implement restart and shutdown to stop the thread

@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.util.Collections;
+import java.util.List;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -27,7 +29,9 @@ public class PluginStopper extends PluginStarter {
      */
     private static void stopPlugins(RouterContext ctx) {
         Log log = ctx.logManager().getLog(PluginStopper.class);
-        for (String app : getPlugins()) {
+        List<String> pl = getPlugins();
+        Collections.reverse(pl); // reverse the order
+        for (String app : pl) {
             if (isPluginRunning(app, ctx)) {
                 try {
                    stopPlugin(ctx, app);

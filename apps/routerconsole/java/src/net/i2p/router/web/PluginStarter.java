@@ -8,6 +8,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -537,6 +538,7 @@ public class PluginStarter implements Runnable {
             if (files[i].isDirectory())
                 rv.add(files[i].getName());
         }
+        Collections.sort(rv); // ensure the list is in sorted order.
         return rv;
     }
 
