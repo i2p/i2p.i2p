@@ -82,7 +82,7 @@ body {
 }
 
 .snarkMessages {
-     font: bold 9pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     font: bold 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
      text-align: left;
      margin: 0 0 10px 0;
      padding: 3px 5px;
@@ -93,7 +93,8 @@ body {
      border: 1px solid #000;
      overflow: auto;
      color: #26f;
-     height: 70px;
+     max-height: 76px;
+     min-height: 45px;
      width: auto;
      background: #2a192a url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
 }
@@ -104,6 +105,17 @@ body {
 
 .snarkMessages a:hover {
      color: #f90 !important;
+}
+
+.snarkMessages ul {
+     margin: 0;
+     padding: 0 0 0 16px;
+}
+
+.snarkMessages p {
+     font-style: italic;
+     margin: 0;
+     text-align: right;
 }
 
 .logshim {

@@ -160,7 +160,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
-            writeMessages(out);
+            writeMessages(out, false);
             writeTorrents(out, req);
             return;
         }
@@ -277,7 +277,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             _manager.addMessage(_("Click \"Add torrent\" button to fetch torrent"));
         out.write("<div class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
 
-        writeMessages(out);
+        writeMessages(out, isConfigure);
 
         if (isConfigure) {
             // end of mainsection div
@@ -297,14 +297,20 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(FOOTER);
     }
 
-    private void writeMessages(PrintWriter out) throws IOException {
-        out.write("<div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
-        List msgs = _manager.getMessages();
-        for (int i = msgs.size()-1; i >= 0; i--) {
-            String msg = (String)msgs.get(i);
-            out.write(msg + "\n");
+    private void writeMessages(PrintWriter out, boolean isConfigure) throws IOException {
+        List<String> msgs = _manager.getMessages();
+        if (!msgs.isEmpty()) {
+            out.write("<div class=\"snarkMessages\"><ul>");
+            for (int i = msgs.size()-1; i >= 0; i--) {
+                String msg = (String)msgs.get(i);
+                out.write("<li>" + msg + "</li>\n");
+            }
+            // lazy GET, lose p parameter
+            out.write("</ul><p><a href=\"/i2psnark/");
+            if (isConfigure)
+                out.write("configure");
+            out.write("?action=Clear&amp;nonce=" + _nonce + "\">" + _("clear messages") + "</a></p></div>");
         }
-        out.write("</pre></td></tr></table></div>");
     }
 
     private void writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -751,6 +757,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                 if (snark.isStopped())
                     snark.startTorrent();
             }
+        } else if ("Clear".equals(action)) {
+            _manager.clearMessages();
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }

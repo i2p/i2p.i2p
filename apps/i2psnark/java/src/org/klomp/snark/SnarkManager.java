@@ -51,7 +51,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private Properties _config;
     private final I2PAppContext _context;
     private final Log _log;
-    private final List _messages;
+    private final List<String> _messages;
     private final I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
@@ -156,6 +156,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public I2PSnarkUtil util() { return _util; }
 
     private static final int MAX_MESSAGES = 5;
+
     public void addMessage(String message) {
         synchronized (_messages) {
             _messages.add(message);
@@ -167,9 +168,16 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     /** newest last */
-    public List getMessages() {
+    public List<String> getMessages() {
         synchronized (_messages) {
             return new ArrayList(_messages);
+        }
+    }
+    
+    /** @since 0.9 */
+    public void clearMessages() {
+        synchronized (_messages) {
+            _messages.clear();
         }
     }
     
