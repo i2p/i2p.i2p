@@ -399,10 +399,12 @@ public class Router implements RouterClock.ClockShiftListener {
     public RouterContext getContext() { return _context; }
     
     /**
-     *  Initializes the RouterContext.
+     *  This must be called after instantiation.
      *  Starts the threads. Does not install updates.
+     *  Most users will just call main() instead.
+     *  @since public as of 0.9 for Android and other embedded uses
      */
-    void runRouter() {
+    public void runRouter() {
         if (_isAlive)
             throw new IllegalStateException();
         startupStuff();
