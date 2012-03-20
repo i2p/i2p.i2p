@@ -1,6 +1,19 @@
+2012-03-20 zzz
+  * i2psnark: Message area tweaks and clear link
+  * NetDB:
+    - Don't reread RI if netdb date is recent
+    - Prevent LS/RI overwrites
+    - Disallow hash mismatches in RI files
+    - Reseed won't fetch our own RI
+    - Reseed won't overwrite recent RIs
+  * Router: Make runRouter() public
+
 2012-03-19 sponge
   * Plugins: Less confusing message, fix CNFE by catch and ignore on delete.
              Order and reverse order plugin names for start/stop all cases.
+
+2012-03-18 zzz
+  * Jetty: Fix check alias override
 
 2012-03-17 zzz
   * BuildHandler: Implement restart and shutdown to stop the thread

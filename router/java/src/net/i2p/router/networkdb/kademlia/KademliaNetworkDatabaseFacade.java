@@ -684,7 +684,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 // if it hasn't changed, no need to do anything
                 return rv;
             }
-        } catch (ClassCastException cce) {}
+        } catch (ClassCastException cce) {
+            throw new IllegalArgumentException("Attempt to replace RI with " + leaseSet);
+        }
         
         String err = validate(key, leaseSet);
         if (err != null)
@@ -811,7 +813,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return store(key, routerInfo, true);
     }
 
-    public RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
+    RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
         
         RouterInfo rv = null;
@@ -821,7 +823,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 // no need to validate
                 return rv;
             }
-        } catch (ClassCastException cce) {}
+        } catch (ClassCastException cce) {
+            throw new IllegalArgumentException("Attempt to replace LS with " + routerInfo);
+        }
         
         String err = validate(key, routerInfo);
         if (err != null)

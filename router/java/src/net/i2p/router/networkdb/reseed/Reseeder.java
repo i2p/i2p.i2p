@@ -334,6 +334,8 @@ public class Reseeder {
                 // This isn't really URLs, but Base64 hashes
                 // but they may include % encoding
                 Set<String> urls = new HashSet(1024);
+                Hash ourHash = _context.routerHash();
+                String ourB64 = ourHash != null ? ourHash.toBase64() : null;
                 int cur = 0;
                 int total = 0;
                 while (total++ < 1000) {
@@ -352,7 +354,13 @@ public class Reseeder {
                         continue;
                     }
                     String name = content.substring(start + ("href=\"" + ROUTERINFO_PREFIX).length(), end);
-                    urls.add(name);
+                    // never load our own RI
+                    if (ourB64 == null || !name.contains(ourB64)) {
+                        urls.add(name);
+                    } else {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Skipping our own RI");
+                    }
                     cur = end + 1;
                 }
                 if (total <= 0) {
@@ -372,7 +380,8 @@ public class Reseeder {
                         System.setProperty(PROP_STATUS,
                             _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
-                        fetchSeed(seedURL, iter.next());
+                        if (!fetchSeed(seedURL, iter.next()))
+                            continue;
                         fetched++;
                         if (echoStatus) {
                             System.out.print(".");
@@ -408,8 +417,9 @@ public class Reseeder {
          *  We do NOT validate the received data here - that is done in PersistentDataStore
          *
          *  @param peer The Base64 hash, may include % encoding. It is decoded and validated here.
+         *  @return true on success, false if skipped
          */
-        private void fetchSeed(String seedURL, String peer) throws IOException, URISyntaxException {
+        private boolean fetchSeed(String seedURL, String peer) throws IOException, URISyntaxException {
             // Use URI to do % decoding of the B64 hash (some servers escape ~ and =)
             // Also do basic hash validation. This prevents stuff like
             // .. or / in the file name
@@ -420,13 +430,16 @@ public class Reseeder {
             byte[] hash = Base64.decode(b64);
             if (hash == null || hash.length != Hash.HASH_LENGTH)
                 throw new IOException("bad hash " + peer);
+            Hash ourHash = _context.routerHash();
+            if (ourHash != null && DataHelper.eq(hash, ourHash.getData()))
+                return false;
 
             URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + ROUTERINFO_PREFIX + peer + ROUTERINFO_SUFFIX);
 
             byte data[] = readURL(url);
             if (data == null || data.length <= 0)
                 throw new IOException("Failed fetch of " + url);
-            writeSeed(b64, data);
+            return writeSeed(b64, data);
         }
 
         /** @return null on error */
@@ -468,16 +481,24 @@ public class Reseeder {
     
         /**
          *  @param name valid Base64 hash
+         *  @return true on success, false if skipped
          */
-        private void writeSeed(String name, byte data[]) throws IOException {
+        private boolean writeSeed(String name, byte data[]) throws IOException {
             String dirName = "netDb"; // _context.getProperty("router.networkDatabase.dbDir", "netDb");
             File netDbDir = new SecureDirectory(_context.getRouterDir(), dirName);
             if (!netDbDir.exists()) {
-                boolean ok = netDbDir.mkdirs();
+                netDbDir.mkdirs();
+            }
+            File file = new File(netDbDir, ROUTERINFO_PREFIX + name + ROUTERINFO_SUFFIX);
+            // don't overwrite recent file
+            // TODO: even better would be to compare to last-mod date from eepget
+            if (file.exists() && file.lastModified() > _context.clock().now() - 60*60*1000) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Skipping RI, ours is recent: " + file);
+                return false;
             }
             FileOutputStream fos = null;
             try {
-                File file = new File(netDbDir, ROUTERINFO_PREFIX + name + ROUTERINFO_SUFFIX);
                 fos = new SecureFileOutputStream(file);
                 fos.write(data);
                 if (_log.shouldLog(Log.INFO))
@@ -487,6 +508,7 @@ public class Reseeder {
                     if (fos != null) fos.close();
                 } catch (IOException ioe) {}
             }
+            return true;
         }
 
     }

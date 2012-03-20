@@ -392,12 +392,17 @@ class PersistentDataStore extends TransientDataStore {
     private class ReadRouterJob extends JobImpl {
         private final File _routerFile;
         private final Hash _key;
+        private long _knownDate;
 
+        /**
+         *  @param key must match the RI hash in the file
+         */
         public ReadRouterJob(File routerFile, Hash key) {
             super(PersistentDataStore.this._context);
             _routerFile = routerFile;
             _key = key;
         }
+
         public String getName() { return "Read RouterInfo"; }
         
         private boolean shouldRead() {
@@ -405,19 +410,21 @@ class PersistentDataStore extends TransientDataStore {
             DatabaseEntry data = get(_key, false);
             if (data == null) return true;
             if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-                long knownDate = ((RouterInfo)data).getPublished();
+                _knownDate = ((RouterInfo)data).getPublished();
                 long fileDate = _routerFile.lastModified();
-                if (fileDate > knownDate)
-                    return true;
-                else
-                    return false;
+                // don't overwrite recent netdb RIs with reseed data
+                return fileDate > _knownDate + (60*60*1000);
             } else {
-                // wtf
-                return true;
+                // wtf - prevent injection from reseeding
+                _log.error("Prevented LS overwrite by RI " + _key + " from " + _routerFile);
+                return false;
             }
         }
+
         public void runJob() {
             if (!shouldRead()) return;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Reading " + _routerFile);
             try {
                 InputStream fis = null;
                 boolean corrupt = false;
@@ -432,6 +439,15 @@ class PersistentDataStore extends TransientDataStore {
                             _log.error("The router "
                                        + ri.getIdentity().calculateHash().toBase64() 
                                        + " is from a different network");
+                    } else if (!ri.getIdentity().calculateHash().equals(_key)) {
+                        // prevent injection from reseeding
+                        // this is checked in KNDF.validate() but catch it sooner and log as error.
+                        corrupt = true;
+                        _log.error(ri.getIdentity().calculateHash() + " does not match " + _key + " from " + _routerFile);
+                    } else if (ri.getPublished() <= _knownDate) {
+                        // Don't store but don't delete
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Skipping since netdb newer than " + _routerFile);
                     } else {
                         try {
                             // persist = false so we don't write what we just read
@@ -441,7 +457,7 @@ class PersistentDataStore extends TransientDataStore {
                             // so add it here.
                             getContext().profileManager().heardAbout(ri.getIdentity().getHash(), ri.getPublished());
                         } catch (IllegalArgumentException iae) {
-                            _log.info("Refused locally loaded routerInfo - deleting");
+                            _log.info("Refused locally loaded routerInfo - deleting", iae);
                             corrupt = true;
                         }
                     }
