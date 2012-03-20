@@ -72,7 +72,7 @@
     <target name="compileTest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <!-- junit classes are in ant runtime -->
+        <!-- junit and hamcrest classes should be in ant runtime -->
         <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
                includeAntRuntime="true"
                destdir="./build/obj" >
@@ -119,6 +119,9 @@
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
+                <pathelement location="${ant.home}/lib/hamcrest-core.jar" />
+                <pathelement location="${ant.home}/lib/hamcrest-library.jar" />
+                <pathelement location="${ant.home}/lib/hamcrest-integration.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../build/jbigi.jar" />
