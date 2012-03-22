@@ -37,6 +37,9 @@ import net.i2p.util.LogManager;
 import net.i2p.util.PortMapper;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
@@ -86,6 +89,9 @@ public class I2PAppContext {
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
+    private SimpleScheduler _simpleScheduler;
+    private SimpleTimer _simpleTimer;
+    private SimpleTimer2 _simpleTimer2;
     private final PortMapper _portMapper;
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
@@ -103,6 +109,9 @@ public class I2PAppContext {
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
     protected volatile boolean _keyRingInitialized; // used in RouterContext
+    private volatile boolean _simpleSchedulerInitialized;
+    private volatile boolean _simpleTimerInitialized;
+    private volatile boolean _simpleTimer2Initialized;
     protected final Set<Runnable> _shutdownTasks;
     private File _baseDir;
     private File _configDir;
@@ -116,7 +125,7 @@ public class I2PAppContext {
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
                          _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
                          _lock13 = new Object(), _lock14 = new Object(), _lock15 = new Object(), _lock16 = new Object(),
-                         _lock17 = new Object();
+                         _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
 
     /**
      * Pull the default context, creating a new one if necessary, else using 
@@ -920,5 +929,59 @@ public class I2PAppContext {
      */
     public PortMapper portMapper() {
         return _portMapper;
+    }
+
+    /**
+     * Use instead of SimpleScheduler.getInstance()
+     * @since 0.9 to replace static instance in the class
+     */
+    public SimpleScheduler simpleScheduler() {
+        if (!_simpleSchedulerInitialized)
+            initializeSimpleScheduler();
+        return _simpleScheduler;
+    }
+
+    private void initializeSimpleScheduler() {
+        synchronized (_lock18) {
+            if (_simpleScheduler == null)
+                _simpleScheduler = new SimpleScheduler(this);
+            _simpleSchedulerInitialized = true;
+        }
+    }
+
+    /**
+     * Use instead of SimpleTimer.getInstance()
+     * @since 0.9 to replace static instance in the class
+     */
+    public SimpleTimer simpleTimer() {
+        if (!_simpleTimerInitialized)
+            initializeSimpleTimer();
+        return _simpleTimer;
+    }
+
+    private void initializeSimpleTimer() {
+        synchronized (_lock19) {
+            if (_simpleTimer == null)
+                _simpleTimer = new SimpleTimer(this);
+            _simpleTimerInitialized = true;
+        }
+    }
+
+    /**
+     * Use instead of SimpleTimer2.getInstance()
+     * @since 0.9 to replace static instance in the class
+     */
+    public SimpleTimer2 simpleTimer2() {
+        if (!_simpleTimer2Initialized)
+            initializeSimpleTimer2();
+        return _simpleTimer2;
+    }
+
+    private void initializeSimpleTimer2() {
+        synchronized (_lock20) {
+            if (_simpleTimer2 == null)
+                _simpleTimer2 = new SimpleTimer2(this);
+            _simpleTimer2Initialized = true;
+        }
     }
 }

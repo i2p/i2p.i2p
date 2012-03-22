@@ -27,21 +27,36 @@ import net.i2p.I2PAppContext;
  * @author zzz
  */
 public class SimpleScheduler {
-    private static final SimpleScheduler _instance = new SimpleScheduler();
-    public static SimpleScheduler getInstance() { return _instance; }
+
+    /**
+     *  If you have a context, use context.simpleScheduler() instead
+     */
+    public static SimpleScheduler getInstance() {
+        return I2PAppContext.getGlobalContext().simpleScheduler();
+    }
+
     private static final int MIN_THREADS = 2;
     private static final int MAX_THREADS = 4;
-    private final I2PAppContext _context;
     private final Log _log;
     private final ScheduledThreadPoolExecutor _executor;
     private final String _name;
     private int _count;
     private final int _threads;
 
-    protected SimpleScheduler() { this("SimpleScheduler"); }
-    protected SimpleScheduler(String name) {
-        _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(SimpleScheduler.class);
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer() instead
+     */
+    public SimpleScheduler(I2PAppContext context) {
+        this(context, "SimpleScheduler");
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer() instead
+     */
+    private SimpleScheduler(I2PAppContext context, String name) {
+        _log = context.logManager().getLog(SimpleScheduler.class);
         _name = name;
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
@@ -50,7 +65,7 @@ public class SimpleScheduler {
         _executor = new ScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
         _executor.prestartAllCoreThreads();
         // don't bother saving ref to remove hook if somebody else calls stop
-        _context.addShutdownTask(new Shutdown());
+        context.addShutdownTask(new Shutdown());
     }
     
     /**

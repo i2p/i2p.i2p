@@ -4,6 +4,9 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 
+/**
+ *  Deprecated - used only by SimpleTimer
+ */
 class Executor implements Runnable {
     private final I2PAppContext _context;
     private Log _log;

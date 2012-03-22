@@ -1,3 +1,11 @@
+2012-03-22 zzz
+  * Home page: CSS tweaks
+  * Reseeder: Get rid of static instance, root in netDB,
+              don't use system properties for status
+  * Router: When removing a config setting, remove from context also
+  * SimpleScheduler, SimpleTimer, SimpleTimer2: Replace static instances
+    with I2PAppContext-rooted references
+
 2012-03-20 zzz
   * i2psnark: Message area tweaks and clear link
   * NetDB:

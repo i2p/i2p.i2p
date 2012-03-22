@@ -26,19 +26,43 @@ import net.i2p.I2PAppContext;
  * @author zzz
  */
 public class SimpleTimer2 {
-    private static final SimpleTimer2 _instance = new SimpleTimer2();
-    public static SimpleTimer2 getInstance() { return _instance; }
+
+    /**
+     *  If you have a context, use context.simpleTimer2() instead
+     */
+    public static SimpleTimer2 getInstance() {
+        return I2PAppContext.getGlobalContext().simpleTimer2();
+    }
+
     private static final int MIN_THREADS = 2;
     private static final int MAX_THREADS = 4;
-    private final I2PAppContext _context;
     private final ScheduledThreadPoolExecutor _executor;
     private final String _name;
     private int _count;
     private final int _threads;
 
-    protected SimpleTimer2() { this("SimpleTimer2"); }
-    protected SimpleTimer2(String name) {
-        _context = I2PAppContext.getGlobalContext();
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer2() instead
+     */
+    public SimpleTimer2(I2PAppContext context) {
+        this(context, "SimpleTimer2");
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer2() instead
+     */
+    protected SimpleTimer2(I2PAppContext context, String name) {
+        this(context, name, true);
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer2() instead
+     *  @since 0.9
+     */
+    protected SimpleTimer2(I2PAppContext context, String name, boolean prestartAllThreads) {
         _name = name;
         _count = 0;
         long maxMemory = Runtime.getRuntime().maxMemory();
@@ -46,9 +70,10 @@ public class SimpleTimer2 {
             maxMemory = 96*1024*1024l;
         _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
         _executor = new CustomScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
-        _executor.prestartAllCoreThreads();
+        if (prestartAllThreads)
+            _executor.prestartAllCoreThreads();
         // don't bother saving ref to remove hook if somebody else calls stop
-        _context.addShutdownTask(new Shutdown());
+        context.addShutdownTask(new Shutdown());
     }
     
     /**
