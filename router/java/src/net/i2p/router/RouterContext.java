@@ -113,11 +113,25 @@ public class RouterContext extends I2PAppContext {
     /**
      * Modify the configuration attributes of this context, changing
      * one of the properties provided during the context construction.
+     *
      * @param propName The name of the property.
      * @param value The new value for the property.
+     * @since 0.8.4
+     * @deprecated Use Router.saveConfig()
      */
     public void setProperty(String propName, String value) {
     		_overrideProps.setProperty(propName, value);
+    }
+    
+    /**
+     * Remove a property provided during the context construction.
+     * Only for use by the router. Others use Router.saveConfig()
+     *
+     * @param propName The name of the property.
+     * @since 0.9
+     */
+    void removeProperty(String propName) {
+        _overrideProps.remove(propName);
     }
 
     

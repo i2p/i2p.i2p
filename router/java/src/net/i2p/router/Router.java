@@ -345,6 +345,8 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
+            // remove the backing default also
+            _context.removeProperty(name);
     }
 
     /**
@@ -1279,7 +1281,7 @@ public class Router implements RouterClock.ClockShiftListener {
         if (value != null)
             _config.put(name, value);
         else
-            _config.remove(name);
+            removeConfigSetting(name);
         return saveConfig();
     }
 
@@ -1298,7 +1300,7 @@ public class Router implements RouterClock.ClockShiftListener {
             _config.putAll(toAdd);
         if (toRemove != null) {
             for (String s : toRemove) {
-                _config.remove(s);
+                removeConfigSetting(s);
             }
         }
         return saveConfig();
