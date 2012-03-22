@@ -45,6 +45,7 @@
  </div>
 </div>
 
+<div id="homemain">
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
@@ -77,7 +78,7 @@
    if (newshelper.shouldShowNews()) {
        java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
 %>
-<div class="news" id="news">
+<div class="news" id="homenews">
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
@@ -110,5 +111,6 @@
     <h4 class="app2"><%=intl._("Local Services")%></h4>
     <jsp:getProperty name="homehelper" property="services" /><br>
   </div>
+</div>
 </div>
 </body></html>
