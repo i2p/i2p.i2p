@@ -33,11 +33,11 @@ class TCBShare {
     private static final int MAX_RTT = ((int) Connection.MAX_RESEND_DELAY) / 2;
     private static final int MAX_WINDOW_SIZE = Connection.MAX_WINDOW_SIZE / 4;
     
-    public TCBShare(I2PAppContext ctx) {
+    public TCBShare(I2PAppContext ctx, SimpleTimer2 timer) {
         _context = ctx;
         _log = ctx.logManager().getLog(TCBShare.class);
         _cache = new ConcurrentHashMap(4);
-        _cleaner = new CleanEvent();
+        _cleaner = new CleanEvent(timer);
         _cleaner.schedule(CLEAN_TIME);
     }
 
@@ -125,8 +125,9 @@ class TCBShare {
     }
 
     private class CleanEvent extends SimpleTimer2.TimedEvent {
-        public CleanEvent() {
-            super(RetransmissionTimer.getInstance());
+        public CleanEvent(SimpleTimer2 timer) {
+            // Use router's SimpleTimer2
+            super(timer);
         }
         public void timeReached() {
             for (Iterator iter = _cache.keySet().iterator(); iter.hasNext(); ) {

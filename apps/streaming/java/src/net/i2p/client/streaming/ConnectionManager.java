@@ -14,6 +14,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Coordinate all of the connections for a single local destination.
@@ -44,6 +45,8 @@ class ConnectionManager {
     private ConnThrottler _minuteThrottler;
     private ConnThrottler _hourThrottler;
     private ConnThrottler _dayThrottler;
+    /** since 0.9, each manager instantiates its own timer */
+    private final SimpleTimer2 _timer;
     
     public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
         _context = context;
@@ -58,7 +61,9 @@ class ConnectionManager {
         _connectionHandler = new ConnectionHandler(_context, this);
         _schedulerChooser = new SchedulerChooser(_context);
         _conPacketHandler = new ConnectionPacketHandler(_context);
-        _tcbShare = new TCBShare(_context);
+        _timer = new RetransmissionTimer(_context, "Streaming Timer " +
+                                         session.getMyDestination().calculateHash().toBase64().substring(0, 4));
+        _tcbShare = new TCBShare(_context, _timer);
         // PROTO_ANY is for backward compatibility (pre-0.7.1)
         // TODO change proto to PROTO_STREAMING someday.
         // Right now we get everything, and rely on Datagram to specify PROTO_UDP.
@@ -146,7 +151,7 @@ class ConnectionManager {
         ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
         opts.setPort(synPacket.getRemotePort());
         opts.setLocalPort(synPacket.getLocalPort());
-        Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
+        Connection con = new Connection(_context, this, _schedulerChooser, _timer, _outboundQueue, _conPacketHandler, opts);
         _tcbShare.updateOptsFromShare(con);
         con.setInbound();
         long receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
@@ -253,7 +258,7 @@ class ConnectionManager {
                     // try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
                     try { Thread.sleep(remaining/4); } catch (InterruptedException ie) {}
                 } else { 
-                    con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
+                    con = new Connection(_context, this, _schedulerChooser, _timer, _outboundQueue, _conPacketHandler, opts);
                     con.setRemotePeer(peer);
             
                     while (_connectionByInboundId.containsKey(Long.valueOf(receiveId))) {
@@ -368,6 +373,7 @@ class ConnectionManager {
             iter.remove();
         }
         _tcbShare.stop();
+        _timer.stop();
     }
     
     /**
@@ -467,8 +473,9 @@ class ConnectionManager {
     }
     
     private class PingFailed implements SimpleTimer.TimedEvent {
-        private Long _id;
-        private PingNotifier _notifier;
+        private final Long _id;
+        private final PingNotifier _notifier;
+
         public PingFailed(Long id, PingNotifier notifier) { 
             _id = id;
             _notifier = notifier;
@@ -487,15 +494,16 @@ class ConnectionManager {
     
     private static class PingRequest {
         private boolean _ponged;
-        private Destination _peer;
-        private PacketLocal _packet;
-        private PingNotifier _notifier;
+        private final Destination _peer;
+        private final PacketLocal _packet;
+        private final PingNotifier _notifier;
+
         public PingRequest(Destination peer, PacketLocal packet, PingNotifier notifier) { 
-            _ponged = false; 
             _peer = peer;
             _packet = packet;
             _notifier = notifier;
         }
+
         public void pong() { 
             // static, no log
             //_log.debug("Ping successful");

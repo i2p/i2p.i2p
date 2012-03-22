@@ -1,15 +1,26 @@
 package net.i2p.client.streaming;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleTimer2;
 
 /**
- *  Not clear that we really need to create our own timer group, but we do,
- *  to prevent us clogging the router's timer group.
- *  Use from outside this package is deprecated.
- *  (BOB instantiates this for thread group reasons)
+ *  Per-destination timer
  */
 public class RetransmissionTimer extends SimpleTimer2 {
-    private static final RetransmissionTimer _instance = new RetransmissionTimer();
-    public static final RetransmissionTimer getInstance() { return _instance; }
-    protected RetransmissionTimer() { super("StreamingTimer"); }
+
+    /**
+     *  @deprecated Don't use this to prestart threads, this is no longer a static instance
+     *  @return a new instance as of 0.9
+     */
+    public static final RetransmissionTimer getInstance() {
+        return new RetransmissionTimer(I2PAppContext.getGlobalContext(), "RetransmissionTimer");
+    }
+
+
+    /**
+     *  @since 0.9
+     */
+    RetransmissionTimer(I2PAppContext ctx, String name) {
+        super(ctx, name, false);
+    }
 }

@@ -49,13 +49,20 @@ class MessageOutputStream extends OutputStream {
      */
     private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 250;
 
+/****
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
     }
-    public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize) {
-        this(ctx, receiver, bufSize, DEFAULT_PASSIVE_FLUSH_DELAY);
+****/
+
+    /** */
+    public MessageOutputStream(I2PAppContext ctx, SimpleTimer2 timer,
+                               DataReceiver receiver, int bufSize) {
+        this(ctx, timer, receiver, bufSize, DEFAULT_PASSIVE_FLUSH_DELAY);
     }
-    public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize, int passiveFlushDelay) {
+
+    public MessageOutputStream(I2PAppContext ctx, SimpleTimer2 timer,
+                               DataReceiver receiver, int bufSize, int passiveFlushDelay) {
         super();
         _dataCache = ByteCache.getInstance(128, bufSize);
         _context = ctx;
@@ -68,7 +75,7 @@ class MessageOutputStream extends OutputStream {
         _nextBufferSize = -1;
         _sendPeriodBeginTime = ctx.clock().now();
         _context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        _flusher = new Flusher();
+        _flusher = new Flusher(timer);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("MessageOutputStream created");
     }
@@ -212,8 +219,8 @@ class MessageOutputStream extends OutputStream {
      */
     private class Flusher extends SimpleTimer2.TimedEvent {
         private boolean _enqueued;
-        public Flusher() { 
-            super(RetransmissionTimer.getInstance());
+        public Flusher(SimpleTimer2 timer) { 
+            super(timer);
         }
         public void enqueue() {
             // no need to be overly worried about duplicates - it would just 

@@ -74,6 +74,7 @@ class Connection {
     private final int _randomWait;
     private int _localPort;
     private int _remotePort;
+    private final SimpleTimer2 _timer;
     
     private long _lifetimeBytesSent;
     private long _lifetimeBytesReceived;
@@ -88,12 +89,16 @@ class Connection {
     
     public static final int MAX_WINDOW_SIZE = 128;
     
+/****
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
                       PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
     }
+****/
 
+    /** */
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
+                      SimpleTimer2 timer,
                       PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts) {
         _context = ctx;
         _connectionManager = manager;
@@ -104,7 +109,8 @@ class Connection {
         _receiver = new ConnectionDataReceiver(_context, this);
         _inputStream = new MessageInputStream(_context);
         // FIXME pass through a passive flush delay setting as the 4th arg
-        _outputStream = new MessageOutputStream(_context, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
+        _outputStream = new MessageOutputStream(_context, timer, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
+        _timer = timer;
         _outboundPackets = new TreeMap();
         if (opts != null) {
             _localPort = opts.getLocalPort();
@@ -895,7 +901,7 @@ class Connection {
     
     private class ActivityTimer extends SimpleTimer2.TimedEvent {
         public ActivityTimer() { 
-            super(RetransmissionTimer.getInstance());
+            super(_timer);
             setFuzz(5*1000); // sloppy timer, don't reschedule unless at least 5s later
         }
         public void timeReached() {
@@ -1093,7 +1099,7 @@ class Connection {
         private PacketLocal _packet;
         private long _nextSendTime;
         public ResendPacketEvent(PacketLocal packet, long delay) {
-            super(RetransmissionTimer.getInstance());
+            super(_timer);
             _packet = packet;
             _nextSendTime = delay + _context.clock().now();
             packet.setResendPacketEvent(ResendPacketEvent.this);
