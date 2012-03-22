@@ -124,7 +124,7 @@ class TunnelGateway {
         }
         
         if (delayedFlush) {
-            FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
+            _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
         if (_log.shouldLog(Log.DEBUG)) {
@@ -304,7 +304,7 @@ class TunnelGateway {
             }
             
             if (wantRequeue)
-                FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
+                _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
             else
                 _lastFlush = _context.clock().now();
             
