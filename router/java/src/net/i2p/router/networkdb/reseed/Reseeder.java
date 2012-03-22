@@ -42,10 +42,9 @@ import net.i2p.util.Translate;
  * the router log, and the wrapper log.
  */
 public class Reseeder {
-    /** FIXME don't keep a static reference, store _isRunning some other way */
-    private static ReseedRunner _reseedRunner;
     private final RouterContext _context;
     private final Log _log;
+    private final ReseedChecker _checker;
 
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 2 * 1024 * 1024;
@@ -81,11 +80,6 @@ public class Reseeder {
               "https://75.145.125.59/netDb/" + "," +
               "https://i2p.mooo.com/netDb/";
 
-    private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
-    /** the console shows this message while reseedInProgress == false */
-    private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
-    /** the console shows this message while reseedInProgress == true */
-    private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
     public static final String PROP_PROXY_HOST = "router.reseedProxyHost";
     public static final String PROP_PROXY_PORT = "router.reseedProxyPort";
     /** @since 0.8.2 */
@@ -106,32 +100,27 @@ public class Reseeder {
     public static final String PROP_SPROXY_USERNAME = "router.reseedSSLProxy.username";
     public static final String PROP_SPROXY_PASSWORD = "router.reseedSSLProxy.password";
     public static final String PROP_SPROXY_AUTH_ENABLE = "router.reseedSSLProxy.authEnable";
+    /** @since 0.9 */
+    public static final String PROP_DISABLE = "router.reseedDisable";
 
     // from PersistentDataStore
     private static final String ROUTERINFO_PREFIX = "routerInfo-";
     private static final String ROUTERINFO_SUFFIX = ".dat";
 
-    public Reseeder(RouterContext ctx) {
+    Reseeder(RouterContext ctx, ReseedChecker rc) {
         _context = ctx;
         _log = ctx.logManager().getLog(Reseeder.class);
+        _checker = rc;
     }
 
-    public void requestReseed() {
-        synchronized (Reseeder.class) {
-            if (_reseedRunner == null)
-                _reseedRunner = new ReseedRunner();
-            if (_reseedRunner.isRunning()) {
-                return;
-            } else {
-                // set to daemon so it doesn't hang a shutdown
-                Thread reseed = new I2PAppThread(_reseedRunner, "Reseed", true);
-                reseed.start();
-            }
-        }
-
+    void requestReseed() {
+        ReseedRunner reseedRunner = new ReseedRunner();
+        // set to daemon so it doesn't hang a shutdown
+        Thread reseed = new I2PAppThread(reseedRunner, "Reseed", true);
+        reseed.start();
     }
 
-    public class ReseedRunner implements Runnable, EepGet.StatusListener {
+    private class ReseedRunner implements Runnable, EepGet.StatusListener {
         private boolean _isRunning;
         private String _proxyHost;
         private int _proxyPort;
@@ -143,20 +132,21 @@ public class Reseeder {
         public ReseedRunner() {
         }
 
-        public boolean isRunning() { return _isRunning; }
-
         /*
          * Do it.
-         * We update PROP_ERROR here.
          */
         public void run() {
+            try {
+                run2();
+            } finally {
+                _checker.done();
+            }
+        }
+
+        private void run2() {
             _isRunning = true;
-            System.clearProperty(PROP_ERROR);
-            System.setProperty(PROP_STATUS, _("Reseeding"));
-            System.setProperty(PROP_INPROGRESS, "true");
-            _attemptStarted = 0;
-            _gotDate = 0;
-            _sslState = null;  // start fresh
+            _checker.setError("");
+            _checker.setStatus(_("Reseeding"));
             if (_context.getBooleanProperty(PROP_PROXY_ENABLE)) {
                 _proxyHost = _context.getProperty(PROP_PROXY_HOST);
                 _proxyPort = _context.getProperty(PROP_PROXY_PORT, -1);
@@ -165,24 +155,22 @@ public class Reseeder {
             int total = reseed(false);
             if (total >= 50) {
                 System.out.println("Reseed complete, " + total + " received");
-                System.clearProperty(PROP_ERROR);
+                _checker.setError("");
             } else if (total > 0) {
                 System.out.println("Reseed complete, only " + total + " received");
-                System.setProperty(PROP_ERROR, ngettext("Reseed fetched only 1 router.",
+                _checker.setError(ngettext("Reseed fetched only 1 router.",
                                                         "Reseed fetched only {0} routers.", total));
             } else {
                 System.out.println("Reseed failed, check network connection");
                 System.out.println(
                      "Ensure that nothing blocks outbound HTTP, check the logs, " +
                      "and if nothing helps, read the FAQ about reseeding manually.");
-                System.setProperty(PROP_ERROR, _("Reseed failed.") + ' '  +
+                _checker.setError(_("Reseed failed.") + ' '  +
                                                _("See {0} for help.",
                                                  "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>"));
             }	
-            System.setProperty(PROP_INPROGRESS, "false");
-            System.clearProperty(PROP_STATUS);
-            _sslState = null;  // don't hold ref
             _isRunning = false;
+            _checker.setStatus("");
         }
 
         // EepGet status listeners
@@ -311,7 +299,7 @@ public class Reseeder {
          * Jetty directory listings are not compatible, as they look like
          * HREF="/full/path/to/routerInfo-...
          *
-         * We update PROP_STATUS here.
+         * We update the status here.
          *
          * @param echoStatus apparently always false
          * @return count of routerinfos successfully fetched
@@ -320,7 +308,7 @@ public class Reseeder {
             try {
                 // Don't use context clock as we may be adjusting the time
                 final long timeLimit = System.currentTimeMillis() + MAX_TIME_PER_HOST;
-                System.setProperty(PROP_STATUS, _("Reseeding: fetching seed URL."));
+                _checker.setStatus(_("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 URL dir = new URL(seedURL);
                 byte contentRaw[] = readURL(dir);
@@ -377,7 +365,7 @@ public class Reseeder {
                 for (Iterator<String> iter = urlList.iterator();
                      iter.hasNext() && fetched < 200 && System.currentTimeMillis() < timeLimit; ) {
                     try {
-                        System.setProperty(PROP_STATUS,
+                        _checker.setStatus(
                             _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
                         if (!fetchSeed(seedURL, iter.next()))

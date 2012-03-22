@@ -20,13 +20,11 @@ public class ConfigReseedHandler extends FormHandler {
 
         if (_action.equals(_("Save changes and reseed now"))) {
             saveChanges();
-            boolean reseedInProgress = Boolean.valueOf(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress")).booleanValue();
-            if (reseedInProgress) {
+            if (!_context.netDb().reseedChecker().requestReseed()) {
                 addFormError(_("Reseeding is already in progress"));
             } else {
                 // skip the nonce checking in ReseedHandler
                 addFormNotice(_("Starting reseed process"));
-                (new ReseedHandler(_context)).requestReseed();
             }
             return;
         }
@@ -74,8 +72,15 @@ public class ConfigReseedHandler extends FormHandler {
         saveString(Reseeder.PROP_SPROXY_PASSWORD, "spassword");
         saveBoolean(Reseeder.PROP_SPROXY_AUTH_ENABLE, "sauth");
         String url = getJettyString("reseedURL");
-        if (url != null)
-            changes.put(Reseeder.PROP_RESEED_URL, url.trim().replace("\r\n", ",").replace("\n", ","));
+        if (url != null) {
+            url = url.trim().replace("\r\n", ",").replace("\n", ",");
+            if (url.length() <= 0) {
+                addFormNotice("Restoring default URLs");
+                removes.add(Reseeder.PROP_RESEED_URL);
+            } else {
+                changes.put(Reseeder.PROP_RESEED_URL, url);
+            }
+        }
         String mode = getJettyString("mode");
         boolean req = "1".equals(mode);
         boolean disabled = "2".equals(mode);

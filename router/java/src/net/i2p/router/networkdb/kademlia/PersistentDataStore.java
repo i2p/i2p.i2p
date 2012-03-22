@@ -382,7 +382,7 @@ class PersistentDataStore extends TransientDataStore {
                 }
             
             if (!_alreadyWarned) {
-                ReseedChecker.checkReseed(_context, routerCount);
+                _facade.reseedChecker().checkReseed(routerCount);
                 _alreadyWarned = true;
                 _initialized = true;
             }

@@ -42,6 +42,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
+import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -67,6 +68,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private long _lastExploreNew;
     protected final PeerSelector _peerSelector;
     protected final RouterContext _context;
+    private final ReseedChecker _reseedChecker;
+
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
      * This is added to when we create a new RepublishLeaseSetJob, and the values are 
@@ -146,6 +149,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _publishingLeaseSets = new HashMap(8);
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
+        _reseedChecker = new ReseedChecker(context);
         context.statManager().createRateStat("netDb.lookupLeaseSetDeferred", "how many lookups are deferred for a single leaseSet lookup?", "NetworkDatabase", new long[] { 60*60*1000 });
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 60*60*1000 });
         // following are for StoreJob
@@ -167,6 +171,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
     public PeerSelector getPeerSelector() { return _peerSelector; }
     
+    /** @since 0.9 */
+    @Override
+    public ReseedChecker reseedChecker() {
+        return _reseedChecker;
+    }
+
     KBucketSet getKBuckets() { return _kb; }
     DataStore getDataStore() { return _ds; }
     

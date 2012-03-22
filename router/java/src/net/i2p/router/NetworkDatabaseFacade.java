@@ -17,6 +17,7 @@ import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
+import net.i2p.router.networkdb.reseed.ReseedChecker;
 
 /**
  * Defines the mechanism for interacting with I2P's network database
@@ -73,4 +74,7 @@ public abstract class NetworkDatabaseFacade implements Service {
     public Set<LeaseSet> getLeases() { return Collections.EMPTY_SET; }
     /** public for NetDbRenderer in routerconsole */
     public Set<RouterInfo> getRouters() { return Collections.EMPTY_SET; }
+
+    /** @since 0.9 */
+    public ReseedChecker reseedChecker() { return null; };
 }

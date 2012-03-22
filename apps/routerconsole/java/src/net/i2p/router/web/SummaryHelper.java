@@ -676,12 +676,12 @@ public class SummaryHelper extends HelperBase {
                .append("</a></h4>");
         }
 
-        boolean reseedInProgress = Boolean.valueOf(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress")).booleanValue();
+        boolean reseedInProgress = _context.netDb().reseedChecker().inProgress();
         // If showing the reseed link is allowed
         if (allowReseed()) {
             if (reseedInProgress) {
                 // While reseed occurring, show status message instead
-                buf.append("<i>").append(System.getProperty("net.i2p.router.web.ReseedHandler.statusMessage","")).append("</i><br>");
+                buf.append("<i>").append(_context.netDb().reseedChecker().getStatus()).append("</i><br>");
             } else {
                 // While no reseed occurring, show reseed link
                 long nonce = _context.random().nextLong();
@@ -696,7 +696,7 @@ public class SummaryHelper extends HelperBase {
         }
         // If a new reseed ain't running, and the last reseed had errors, show error message
         if (!reseedInProgress) {
-            String reseedErrorMessage = System.getProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
+            String reseedErrorMessage = _context.netDb().reseedChecker().getError();
             if (reseedErrorMessage.length() > 0) {
                 buf.append("<i>").append(reseedErrorMessage).append("</i><br>");
             }

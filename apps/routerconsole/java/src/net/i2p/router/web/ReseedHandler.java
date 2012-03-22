@@ -24,11 +24,7 @@ public class ReseedHandler extends HelperBase {
         }
     }
     
-    public void requestReseed() {
-        synchronized (ReseedHandler.class) {
-            if (_reseedRunner == null)
-                _reseedRunner = new Reseeder(_context);
-            _reseedRunner.requestReseed();
-        }
+    private void requestReseed() {
+        _context.netDb().reseedChecker().requestReseed();
     }
 }
