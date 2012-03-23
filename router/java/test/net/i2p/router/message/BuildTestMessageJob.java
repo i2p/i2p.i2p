@@ -121,7 +121,6 @@ public class BuildTestMessageJob extends JobImpl {
         config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(_timeoutMs+getContext().clock().now()+2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipient(_target);
-        config.setRequestAck(false);
         
         return config;
     }
@@ -151,7 +150,6 @@ public class BuildTestMessageJob extends JobImpl {
         ackClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(msg);
         ackClove.setRecipient(_target);
-        ackClove.setRequestAck(false);
         
         return ackClove;
     }

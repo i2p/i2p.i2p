@@ -51,7 +51,6 @@ class MessageWrapper {
         payload.setPayload(m);
         payload.setRecipient(to);
         payload.setDeliveryInstructions(instructions);
-        payload.setRequestAck(false);
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKeyManager skm;

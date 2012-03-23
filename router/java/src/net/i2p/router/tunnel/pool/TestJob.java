@@ -124,7 +124,6 @@ class TestJob extends JobImpl {
         payload.setPayload(m);
         payload.setRecipient(getContext().router().getRouterInfo());
         payload.setDeliveryInstructions(instructions);
-        payload.setRequestAck(false);
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();

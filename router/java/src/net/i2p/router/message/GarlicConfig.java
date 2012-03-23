@@ -29,9 +29,10 @@ class GarlicConfig {
     private long _expiration;
     private final List<GarlicConfig> _cloveConfigs;
     private DeliveryInstructions _instructions;
-    private boolean _requestAck;
-    private RouterInfo _replyThroughRouter; // router through which any replies will be sent before delivery to us
-    private DeliveryInstructions _replyInstructions; // how the message will be sent from the replyThroughRouter to us
+    // unused
+    //private boolean _requestAck;
+    //private RouterInfo _replyThroughRouter; // router through which any replies will be sent before delivery to us
+    //private DeliveryInstructions _replyInstructions; // how the message will be sent from the replyThroughRouter to us
     // unused and undocumented
     //private Certificate _replyBlockCertificate;
     //private long _replyBlockMessageId;
@@ -100,8 +101,10 @@ class GarlicConfig {
      * no reply is expected.
      * 
      */
+  /****
     public void setRequestAck(boolean request) { _requestAck = request; }
     public boolean getRequestAck() { return _requestAck; }
+  ****/
     
     /**
      * Specify the router through which a reply to this clove can be sent.  The
@@ -109,8 +112,10 @@ class GarlicConfig {
      * and it them uses those to send the reply to this router.
      *
      */
+  /****
     public void setReplyThroughRouter(RouterInfo replyThroughRouter) { _replyThroughRouter = replyThroughRouter; }
     public RouterInfo getReplyThroughRouter() { return _replyThroughRouter; }
+  ****/
     
     /**
      * Specify how any reply will be routed so that it reaches this router after being
@@ -119,8 +124,10 @@ class GarlicConfig {
      * the replyThrough router
      *
      */
+  /****
     public void setReplyInstructions(DeliveryInstructions instructions) { _replyInstructions = instructions; }
     public DeliveryInstructions getReplyInstructions() { return _replyInstructions; }
+  ****/
     
   /****
     public long getReplyBlockMessageId() { return _replyBlockMessageId; }
@@ -164,9 +171,9 @@ class GarlicConfig {
 	//buf.append("<replyBlockCertificate>").append(getReplyBlockCertificate()).append("</replyBlockCertificate>").append(NL);
 	//buf.append("<replyBlockExpiration>").append(new Date(getReplyBlockExpiration())).append("</replyBlockExpiration>").append(NL);
 	//buf.append("<replyBlockMessageId>").append(getReplyBlockMessageId()).append("</replyBlockMessageId>").append(NL);
-	buf.append("<replyInstructions>").append(getReplyInstructions()).append("</replyInstructions>").append(NL);
-	buf.append("<replyThroughRouter>").append(getReplyThroughRouter()).append("</replyThroughRouter>").append(NL);
-	buf.append("<requestAck>").append(getRequestAck()).append("</requestAck>").append(NL);
+	//buf.append("<replyInstructions>").append(getReplyInstructions()).append("</replyInstructions>").append(NL);
+	//buf.append("<replyThroughRouter>").append(getReplyThroughRouter()).append("</replyThroughRouter>").append(NL);
+	//buf.append("<requestAck>").append(getRequestAck()).append("</requestAck>").append(NL);
 	buf.append(getSubData());
 	buf.append("<subcloves>").append(NL);
 	for (int i = 0; i < getCloveCount(); i++)

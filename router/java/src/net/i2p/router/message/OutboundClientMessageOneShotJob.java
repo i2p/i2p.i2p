@@ -725,8 +725,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         msg.setMessageExpiration(clove.getExpiration());
         
         clove.setPayload(msg);
-        clove.setRecipientPublicKey(null);
-        clove.setRequestAck(false);
+        // defaults
+        //clove.setRecipientPublicKey(null);
+        //clove.setRequestAck(false);
         
         _clove = clove;
         _cloveId = _clove.getId();

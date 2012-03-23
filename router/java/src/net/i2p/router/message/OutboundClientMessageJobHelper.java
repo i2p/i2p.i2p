@@ -121,7 +121,6 @@ class OutboundClientMessageJobHelper {
         config.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(expiration); // +2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipientPublicKey(recipientPK);
-        config.setRequestAck(false);
         
         if (log.shouldLog(Log.INFO))
             log.info("Creating garlic config to be encrypted to " + recipientPK 
