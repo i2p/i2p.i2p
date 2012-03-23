@@ -59,7 +59,7 @@ public class KeyGenerator {
     /**
      *  PBE the passphrase with the salt.
      *  Warning - SLOW
-     *  @deprecated unused
+     *  Deprecated - Used by Syndie only.
      */
     public SessionKey generateSessionKey(byte salt[], byte passphrase[]) {
         byte salted[] = new byte[16+passphrase.length];

@@ -1641,10 +1641,10 @@ public class DataHelper {
     /**
      *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
      *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *  Used by Syndie.
      *
      *  @return null if orig is null
      *  @throws RuntimeException
-     *  @deprecated unused
      */
     public static String getUTF8(byte orig[]) {
         if (orig == null) return null;
