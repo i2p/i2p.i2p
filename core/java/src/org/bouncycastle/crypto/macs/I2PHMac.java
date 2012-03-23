@@ -56,10 +56,10 @@ implements Mac
     private final static byte IPAD = (byte)0x36;
     private final static byte OPAD = (byte)0x5C;
 
-    private Digest digest;
-    private int digestSize;
-    private byte[] inputPad = new byte[BLOCK_LENGTH];
-    private byte[] outputPad = new byte[BLOCK_LENGTH];
+    private final Digest digest;
+    private final int digestSize;
+    private final byte[] inputPad = new byte[BLOCK_LENGTH];
+    private final byte[] outputPad = new byte[BLOCK_LENGTH];
 
     public I2PHMac(
         Digest digest)
