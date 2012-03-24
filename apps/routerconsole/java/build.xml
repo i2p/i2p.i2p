@@ -40,6 +40,7 @@
         <dependset>
              <srcfilelist dir="." files="../../../router/java/build/obj/net/i2p/router/RouterVersion.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/NewsFetcher.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/web/OldConsoleHelper.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/PluginStarter.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/SummaryHelper.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
