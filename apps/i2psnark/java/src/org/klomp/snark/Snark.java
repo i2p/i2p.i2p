@@ -1031,6 +1031,8 @@ public class Snark
     stopTorrent();
     if (t != null)
         s += ": " + t;
+    if (completeListener != null)
+        completeListener.fatal(this, s);
     throw new RuntimeException(s, t);
   }
 
@@ -1058,10 +1060,12 @@ public class Snark
    * @since 0.8.4
    */
   public void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo) {
-      meta = metainfo;
       try {
-          storage = new Storage(_util, meta, this);
+          // The following two may throw IOE...
+          storage = new Storage(_util, metainfo, this);
           storage.check(rootDataDir);
+          // ... so don't set meta until here
+          meta = metainfo;
           if (completeListener != null) {
               String newName = completeListener.gotMetaInfo(this);
               if (newName != null)
@@ -1168,6 +1172,11 @@ public class Snark
      * @since 0.8.4
      */
     public String gotMetaInfo(Snark snark);
+
+    /**
+     * @since 0.9
+     */
+    public void fatal(Snark snark, String error);
 
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);

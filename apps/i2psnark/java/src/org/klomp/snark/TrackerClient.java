@@ -348,7 +348,7 @@ public class TrackerClient extends I2PAppThread
             }  // *** end of trackers loop here
 
             // Get peers from PEX
-            if (left > 0 && coordinator.needPeers() && (!meta.isPrivate()) && !stop) {
+            if (left > 0 && coordinator.needPeers() && (meta == null || !meta.isPrivate()) && !stop) {
                 Set<PeerID> pids = coordinator.getPEXPeers();
                 if (!pids.isEmpty()) {
                     _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
@@ -370,7 +370,7 @@ public class TrackerClient extends I2PAppThread
 
             // Get peers from DHT
             // FIXME this needs to be in its own thread
-            if (_util.getDHT() != null && (!meta.isPrivate()) && !stop) {
+            if (_util.getDHT() != null && (meta == null || !meta.isPrivate()) && !stop) {
                 int numwant;
                 if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
                     numwant = 1;

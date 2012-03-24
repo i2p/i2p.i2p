@@ -1,3 +1,13 @@
+2012-03-24 zzz
+  * GarlicConfig: Remove more unused methods
+  * i2psnark:
+    - Fix dup torrent msg with magnets (tickets #433 and #504)
+    - Fix state when storage dies during transition out of magnet mode
+    - Fix NPE in magnet mode
+    - Error logging improvements
+    - Support add-torrent with infohash alone
+    - CSS tweaks
+
 2012-03-22 zzz
   * Home page: CSS tweaks
   * Reseeder: Get rid of static instance, root in netDB,

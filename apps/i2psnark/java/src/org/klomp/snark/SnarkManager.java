@@ -1280,8 +1280,11 @@ public class SnarkManager implements Snark.CompleteListener {
                 return null;
             }
             saveTorrentStatus(meta, storage.getBitField(), null); // no file priorities
-            String name = (new File(getDataDir(), storage.getBaseName() + ".torrent")).getAbsolutePath();
+            // temp for addMessage() in case canonical throws
+            String name = storage.getBaseName();
             try {
+                // _snarks must use canonical
+                name = (new File(getDataDir(), storage.getBaseName() + ".torrent")).getCanonicalPath();
                 // put the announce URL in the file
                 String announce = snark.getTrackerURL();
                 if (announce != null)
@@ -1305,6 +1308,14 @@ public class SnarkManager implements Snark.CompleteListener {
         return null;
     }
 
+    /**
+     * A Snark.CompleteListener method.
+     * @since 0.9
+     */
+    public void fatal(Snark snark, String error) {
+        addMessage(_("Error on torrent {0}", snark.getName()) + ": " + error);
+    }
+    
     // End Snark.CompleteListeners
 
     /**

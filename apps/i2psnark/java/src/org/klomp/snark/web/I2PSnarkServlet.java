@@ -544,6 +544,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                     fetch.start();
                 } else if (newURL.startsWith(MAGNET) || newURL.startsWith(MAGGOT)) {
                     addMagnet(newURL);
+                } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
+                    addMagnet(MAGNET_FULL + newURL);
                 } else {
                     _manager.addMessage(_("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"", MAGNET, MAGGOT));
                 }
@@ -1316,7 +1318,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("From URL"));
         out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\"");
         out.write(" title=\"");
-        out.write(_("Enter the torrent file download URL (I2P only), magnet link, or maggot link"));
+        out.write(_("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
         out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
@@ -1509,11 +1511,11 @@ public class I2PSnarkServlet extends DefaultServlet {
                   "<tr><td>");
         out.write(_("Up bandwidth limit"));
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>(");
+                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>");
         out.write(_("Half available bandwidth recommended."));
-        out.write(" <a href=\"/config.jsp\" target=\"blank\">");
+        out.write("<br><a href=\"/config.jsp\" target=\"blank\">");
         out.write(_("View or change router bandwidth"));
-        out.write("</a>)</i><br>\n" +
+        out.write("</a></i><br>\n" +
         
                   "<tr><td>");
         out.write(_("Use open trackers also"));
