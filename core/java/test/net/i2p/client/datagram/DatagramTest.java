@@ -56,8 +56,8 @@ public class DatagramTest extends TestCase {
         assertEquals(d, dd.getSender());
         assertEquals(d, dd.extractSender());
     }
-    
-    /*public void testMakeNullDatagram() throws Exception{
+
+    public void testMakeNullDatagram() throws Exception{
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         I2PClient client = I2PClientFactory.createClient();
         Destination d = client.createDestination(out);
@@ -66,9 +66,9 @@ public class DatagramTest extends TestCase {
         
         byte[] dg = dm.makeI2PDatagram(null);
         assertNull(dg);
-    }*/
-    
-    /*public void testExtractNullDatagram() throws Exception{
+    }
+
+    public void testExtractNullDatagram() throws Exception{
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         I2PClient client = I2PClientFactory.createClient();
         Destination d = client.createDestination(out);
@@ -76,8 +76,8 @@ public class DatagramTest extends TestCase {
         
         I2PDatagramDissector dd = new I2PDatagramDissector();
         dd.loadI2PDatagram(null);
-    }*/
-    
+    }
+
     public void testBadagram() throws Exception{
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         I2PClient client = I2PClientFactory.createClient();
