@@ -81,7 +81,7 @@ public class SAMStreamSend {
         public void streamClosedReceived(String result, int id, String message) {
             Sender sender = null;
             synchronized (_remotePeers) {
-                sender = (Sender)_remotePeers.remove(new Integer(id));
+                sender = _remotePeers.remove(new Integer(id));
             }
             if (sender != null) {
                 sender.closed();

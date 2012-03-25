@@ -184,14 +184,14 @@ public class BufferedRandomSource extends RandomSource {
         return nextBits(1) != 0;
     }
     
-    private static final double DOUBLE_DENOMENATOR = (double)(1L << 53);
+    private static final double DOUBLE_DENOMENATOR = (1L << 53);
     /** defined per javadoc ( ((nextBits(26)<<27) + nextBits(27)) / (1 << 53)) */
     @Override
     public final double nextDouble() { 
-        long top = (((long)nextBits(26) << 27) + nextBits(27));
+        long top = ((nextBits(26) << 27) + nextBits(27));
         return top / DOUBLE_DENOMENATOR;
     }
-    private static final float FLOAT_DENOMENATOR = (float)(1 << 24);
+    private static final float FLOAT_DENOMENATOR = (1 << 24);
     /** defined per javadoc (nextBits(24) / ((float)(1 << 24)) ) */
     @Override
     public float nextFloat() { 

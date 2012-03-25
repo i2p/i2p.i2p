@@ -118,7 +118,7 @@ public class TunnelRenderer {
                 lifetime = 1;
             if (lifetime > 10*60)
                 lifetime = 10*60;
-            int bps = 1024 * (int) cfg.getProcessedMessagesCount() / lifetime;
+            int bps = 1024 * cfg.getProcessedMessagesCount() / lifetime;
             out.write("<td class=\"cells\" align=\"center\">" + bps + " Bps</td>");
             if (cfg.getSendTo() == null)
                 out.write("<td class=\"cells\" align=\"center\">" + _("Outbound Endpoint") + "</td>");
@@ -139,7 +139,7 @@ public class TunnelRenderer {
     
     private static class TunnelComparator implements Comparator<HopConfig> {
          public int compare(HopConfig l, HopConfig r) {
-             return (int) (r.getProcessedMessagesCount() - l.getProcessedMessagesCount());
+             return (r.getProcessedMessagesCount() - l.getProcessedMessagesCount());
         }
     }
 

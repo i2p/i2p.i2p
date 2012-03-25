@@ -662,7 +662,7 @@ public class SnarkManager implements Snark.CompleteListener {
         File dataDir = getDataDir();
         Snark torrent = null;
         synchronized (_snarks) {
-            torrent = (Snark)_snarks.get(filename);
+            torrent = _snarks.get(filename);
         }
         // don't hold the _snarks lock while verifying the torrent
         if (torrent == null) {
@@ -1132,9 +1132,9 @@ public class SnarkManager implements Snark.CompleteListener {
         Snark torrent = null;
         synchronized (_snarks) {
             if (shouldRemove)
-                torrent = (Snark)_snarks.remove(filename);
+                torrent = _snarks.remove(filename);
             else
-                torrent = (Snark)_snarks.get(filename);
+                torrent = _snarks.get(filename);
             remaining = _snarks.size();
         }
         if (torrent != null) {

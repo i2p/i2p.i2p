@@ -409,7 +409,7 @@ public class NativeBigInteger extends BigInteger {
             System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
                                + "ms each)");
             System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("native = " + ((totalTime * 100.0d) / (double) javaTime) + "% of pure java time");
+            System.out.println("native = " + ((totalTime * 100.0d) / javaTime) + "% of pure java time");
         } else {
             System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
             System.out.println("However, we couldn't load the native library, so this doesn't test much");

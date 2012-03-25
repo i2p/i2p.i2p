@@ -296,7 +296,7 @@ public class BloomSHA1 {
     public final double falsePositives(int n) {
         // (1 - e(-kN/M))^k
         return java.lang.Math.pow ( 
-                (1l - java.lang.Math.exp(0d- ((double)k) * (long)n / (long)filterBits)), (long)k);
+                (1l - java.lang.Math.exp(0d- ((double)k) * (long)n / filterBits)), k);
     }
 
     public final double falsePositives() {

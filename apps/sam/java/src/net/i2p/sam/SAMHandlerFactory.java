@@ -144,8 +144,8 @@ public class SAMHandlerFactory {
 
 	if ((minMinor >= 10) || (maxMinor >= 10)) return null ;
 	
-	float fminVer = (float) minMajor + (float) minMinor / 10 ;
-	float fmaxVer = (float) maxMajor + (float) maxMinor / 10 ;
+	float fminVer = minMajor + (float) minMinor / 10 ;
+	float fmaxVer = maxMajor + (float) maxMinor / 10 ;
 	
 
 	if ( ( fminVer <=  3.0 ) && ( fmaxVer >= 3.0 ) ) return "3.0" ;

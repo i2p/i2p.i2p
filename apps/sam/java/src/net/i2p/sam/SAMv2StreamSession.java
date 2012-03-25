@@ -374,7 +374,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 								if ( !_data.isEmpty() )
 								{
 									int formerSize = _dataSize ;
-									data = ( ByteArray ) _data.remove ( 0 );
+									data = _data.remove ( 0 );
 									_dataSize -= data.getValid();
 
 									if ( ( formerSize >= SOCKET_HANDLER_BUF_SIZE ) && ( _dataSize < SOCKET_HANDLER_BUF_SIZE ) )

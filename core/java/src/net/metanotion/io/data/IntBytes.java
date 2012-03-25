@@ -42,10 +42,10 @@ public class IntBytes implements Serializer {
 	}
 
 	public Object construct(byte[] b) {
-		int v = (((int)(b[0] & 0xff) << 24) |
-				 ((int)(b[1] & 0xff) << 16) |
-				 ((int)(b[2] & 0xff) <<  8) |
-				 ((int)(b[3] & 0xff)));
+		int v = (((b[0] & 0xff) << 24) |
+				 ((b[1] & 0xff) << 16) |
+				 ((b[2] & 0xff) <<  8) |
+				 (b[3] & 0xff));
 		return new Integer(v);
 	}
 }

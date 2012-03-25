@@ -128,7 +128,7 @@ public class SimpleTimer {
         Long time = Long.valueOf(eventTime);
         synchronized (_events) {
             // remove the old scheduled position, then reinsert it
-            Long oldTime = (Long)_eventTimes.get(event);
+            Long oldTime = _eventTimes.get(event);
             if (oldTime != null) {
                 if (useEarliestTime) {
                     if (oldTime.longValue() < eventTime) {
@@ -155,8 +155,8 @@ public class SimpleTimer {
                 _log.error("Skewed events: " + _events.size() + " for " + _eventTimes.size());
                 for (Iterator iter = _eventTimes.keySet().iterator(); iter.hasNext(); ) {
                     TimedEvent evt = (TimedEvent)iter.next();
-                    Long when = (Long)_eventTimes.get(evt);
-                    TimedEvent cur = (TimedEvent)_events.get(when);
+                    Long when = _eventTimes.get(evt);
+                    TimedEvent cur = _events.get(when);
                     if (cur != evt) {
                         _log.error("event " + evt + " @ " + when + ": " + cur);
                     }
@@ -182,7 +182,7 @@ public class SimpleTimer {
     public boolean removeEvent(TimedEvent evt) {
         if (evt == null) return false;
         synchronized (_events) {
-            Long when = (Long)_eventTimes.remove(evt);
+            Long when = _eventTimes.remove(evt);
             if (when != null)
                 _events.remove(when);
             return null != when;
@@ -222,9 +222,9 @@ public class SimpleTimer {
                             if(_events.isEmpty()) {
                                 break;
                             }
-                            Long when = (Long)_events.firstKey();
+                            Long when = _events.firstKey();
                             if (when.longValue() <= now) {
-                                TimedEvent evt = (TimedEvent)_events.remove(when);
+                                TimedEvent evt = _events.remove(when);
                                 if (evt != null) {                            
                                     _eventTimes.remove(evt);
                                     eventsToFire.add(evt);

@@ -213,7 +213,7 @@ public class StatisticsManager implements Service {
                 double avgFrequency = rate.getLifetimeEventCount() / (double)numPeriods;
                 buf.append(num(avgFrequency)).append(';');
                 buf.append(num(rate.getExtremeEventCount())).append(';');
-                buf.append(num((double)rate.getLifetimeEventCount())).append(';');
+                buf.append(num(rate.getLifetimeEventCount())).append(';');
             }
         }
         return buf.toString();

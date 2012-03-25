@@ -613,7 +613,7 @@ public class ProfileOrganizer {
                 start = _context.random().nextInt(_notFailingPeersList.size());
                 for (int i = 0; i < _notFailingPeersList.size() && selected.size() < needed; i++) {
                     int curIndex = (i+start) % _notFailingPeersList.size();
-                    Hash cur = (Hash)_notFailingPeersList.get(curIndex);
+                    Hash cur = _notFailingPeersList.get(curIndex);
                     if (matches.contains(cur) ||
                         (exclude != null && exclude.contains(cur))) {
                         if (_log.shouldLog(Log.DEBUG))

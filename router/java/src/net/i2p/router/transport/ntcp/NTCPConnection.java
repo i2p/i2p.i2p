@@ -999,8 +999,8 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             _lastBytesReceived = totR;
             _lastRateUpdated = now;
 
-            _sendBps = (0.9f)*_sendBps + (0.1f)*((float)sent*1000f)/(float)time;
-            _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/(float)time;
+            _sendBps = (0.9f)*_sendBps + (0.1f)*(sent*1000f)/time;
+            _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/time;
 
             // Maintain an approximate average with a 15-second halflife
             // Weights (0.955 and 0.045) are tuned so that transition between two values (e.g. 0..10)

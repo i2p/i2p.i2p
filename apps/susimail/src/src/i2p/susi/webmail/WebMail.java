@@ -1532,7 +1532,7 @@ public class WebMail extends HttpServlet
 				button( RELOAD, _("Reload Config") ) + spacer +
 				button( LOGOUT, _("Logout") ) );
 
-		String from = (String)request.getParameter( NEW_FROM );
+		String from = request.getParameter( NEW_FROM );
 		String fixed = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
 		
 		if( from == null || fixed.compareToIgnoreCase( "false" ) != 0 ) {

@@ -136,7 +136,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
         long timeSince = now - _peakThroughputLastCoallesce;
         if (timeSince >= 60*1000) {
             long tot = _peakThroughputCurrentTotal;
-            double normalized = (double)tot * 60d*1000d / (double)timeSince;
+            double normalized = tot * 60d*1000d / timeSince;
             _peakThroughputLastCoallesce = now;
             _peakThroughputCurrentTotal = 0;
             if (_context != null)
@@ -158,7 +158,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
             rv += _peakThroughput[i];
-        rv /= (60d*1024d*(double)THROUGHPUT_COUNT);
+        rv /= (60d*1024d*THROUGHPUT_COUNT);
         return rv;
     }
     public void setPeakThroughputKBps(double kBps) {

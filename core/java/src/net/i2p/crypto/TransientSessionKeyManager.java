@@ -504,7 +504,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                     removed.add(set);
             }
             for (int i = 0; i < removed.size(); i++) {
-                TagSet cur = (TagSet)removed.get(i);
+                TagSet cur = removed.get(i);
                 for (Iterator<SessionTag> iter = cur.getTags().iterator(); iter.hasNext(); ) {
                     SessionTag tag = iter.next();
                     _inboundTagSets.remove(tag);
@@ -533,7 +533,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     public SessionKey consumeTag(SessionTag tag) {
         //if (false) aggressiveExpire();
         synchronized (_inboundTagSets) {
-            TagSet tagSet = (TagSet) _inboundTagSets.remove(tag);
+            TagSet tagSet = _inboundTagSets.remove(tag);
             if (tagSet == null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Cannot consume IB " + tag + " as it is not known");

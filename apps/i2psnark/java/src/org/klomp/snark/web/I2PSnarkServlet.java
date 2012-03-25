@@ -302,7 +302,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (!msgs.isEmpty()) {
             out.write("<div class=\"snarkMessages\"><ul>");
             for (int i = msgs.size()-1; i >= 0; i--) {
-                String msg = (String)msgs.get(i);
+                String msg = msgs.get(i);
                 out.write("<li>" + msg + "</li>\n");
             }
             // lazy GET, lose p parameter
@@ -1176,7 +1176,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 float pct;
                 if (isValid) {
-                    pct = (float) (100.0 * (float) peer.completed() / meta.getPieces());
+                    pct = (float) (100.0 * peer.completed() / meta.getPieces());
                     if (pct == 100.0)
                         out.write(_("Seed"));
                     else {

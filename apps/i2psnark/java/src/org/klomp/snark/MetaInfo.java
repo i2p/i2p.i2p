@@ -218,7 +218,7 @@ public class MetaInfo
             if (l < oldTotal)
               throw new InvalidBEncodingException("Huge total length");
 
-            val = (BEValue)desc.get("path");
+            val = desc.get("path");
             if (val == null)
               throw new InvalidBEncodingException("Missing path list");
             List<BEValue> path_list = val.getList();
@@ -244,7 +244,7 @@ public class MetaInfo
 
             m_files.add(Collections.unmodifiableList(file));
             
-            val = (BEValue)desc.get("path.utf-8");
+            val = desc.get("path.utf-8");
             if (val != null) {
                 path_list = val.getList();
                 path_length = path_list.size();

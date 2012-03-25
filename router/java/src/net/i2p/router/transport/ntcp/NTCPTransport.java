@@ -163,7 +163,7 @@ public class NTCPTransport extends TransportImpl {
         //_context.shitlist().unshitlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old = null;
         synchronized (_conLock) {
-            old = (NTCPConnection)_conByIdent.put(con.getRemotePeer().calculateHash(), con);
+            old = _conByIdent.put(con.getRemotePeer().calculateHash(), con);
         }
         if (old != null) {
             if (_log.shouldLog(Log.DEBUG))
@@ -181,7 +181,7 @@ public class NTCPTransport extends TransportImpl {
             NTCPConnection con = null;
             boolean isNew = false;
             synchronized (_conLock) {
-                con = (NTCPConnection)_conByIdent.get(ih);
+                con = _conByIdent.get(ih);
                 if (con == null) {
                     isNew = true;
                     RouterAddress addr = msg.getTarget().getTargetAddress(STYLE);
@@ -356,7 +356,7 @@ public class NTCPTransport extends TransportImpl {
     @Override
     public boolean isEstablished(Hash dest) {
         synchronized (_conLock) {
-            NTCPConnection con = (NTCPConnection)_conByIdent.get(dest);
+            NTCPConnection con = _conByIdent.get(dest);
             return (con != null) && con.isEstablished() && !con.isClosed();
         }
     }
@@ -364,7 +364,7 @@ public class NTCPTransport extends TransportImpl {
     @Override
     public boolean isBacklogged(Hash dest) {
         synchronized (_conLock) {
-            NTCPConnection con = (NTCPConnection)_conByIdent.get(dest);
+            NTCPConnection con = _conByIdent.get(dest);
             return (con != null) && con.isEstablished() && con.tooBacklogged();
         }
     }
@@ -374,7 +374,7 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_conLock) {
             RouterIdentity ident = con.getRemotePeer();
             if (ident != null)
-                removed = (NTCPConnection)_conByIdent.remove(ident.calculateHash());
+                removed = _conByIdent.remove(ident.calculateHash());
         }
         if ( (removed != null) && (removed != con) ) {// multiple cons, close 'em both
             if (_log.shouldLog(Log.WARN))

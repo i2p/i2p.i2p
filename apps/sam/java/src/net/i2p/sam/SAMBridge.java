@@ -109,7 +109,7 @@ public class SAMBridge implements Runnable {
      */
     public Destination getDestination(String name) {
         synchronized (nameToPrivKeys) {
-            String val = (String)nameToPrivKeys.get(name);
+            String val = nameToPrivKeys.get(name);
             if (val == null) return null;
             try {
                 Destination d = new Destination();
@@ -133,7 +133,7 @@ public class SAMBridge implements Runnable {
      */
     public String getKeystream(String name) {
         synchronized (nameToPrivKeys) {
-            String val = (String)nameToPrivKeys.get(name);
+            String val = nameToPrivKeys.get(name);
             if (val == null) return null;
             return val;
         }
@@ -191,7 +191,7 @@ public class SAMBridge implements Runnable {
                 out = new FileOutputStream(persistFilename);
                 for (Iterator iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
                     String name = (String)iter.next();
-                    String privKeys = (String)nameToPrivKeys.get(name);
+                    String privKeys = nameToPrivKeys.get(name);
                     out.write(name.getBytes());
                     out.write('=');
                     out.write(privKeys.getBytes());

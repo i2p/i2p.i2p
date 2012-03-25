@@ -293,8 +293,8 @@ public class NtpMessage {
         
         p[0] = (byte) (leapIndicator << 6 | version << 3 | mode);
         p[1] = (byte) stratum;
-        p[2] = (byte) pollInterval;
-        p[3] = (byte) precision;
+        p[2] = pollInterval;
+        p[3] = precision;
         
         // root delay is a signed 16.16-bit FP, in Java an int is 32-bits
         int l = (int) (rootDelay * 65536.0);
@@ -358,7 +358,7 @@ public class NtpMessage {
         if((b & 0x80)==0x80) 
             return (short) (128 + (b & 0x7f));
         else 
-            return (short) b;
+            return b;
     }
     
     
@@ -393,7 +393,7 @@ public class NtpMessage {
             array[pointer+i] = (byte) (timestamp / base);
             
             // Subtract captured value from remaining total
-            timestamp = timestamp - (double) (unsignedByteToShort(array[pointer+i]) * base);
+            timestamp = timestamp - (unsignedByteToShort(array[pointer+i]) * base);
         }
         
         // From RFC 2030: It is advisable to fill the non-significant

@@ -143,7 +143,7 @@ class PeerConnectionOut implements Runnable
                           }
                       }
                     if (m == null && !sendQueue.isEmpty()) {
-                      m = (Message)sendQueue.remove(0);
+                      m = sendQueue.remove(0);
                       //SimpleTimer.getInstance().removeEvent(m.expireEvent);
                     }
                   }

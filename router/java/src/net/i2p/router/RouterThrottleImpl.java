@@ -381,7 +381,7 @@ class RouterThrottleImpl implements RouterThrottle {
         // Now see if 1m rates are too high
         long overage = Math.max(used1mIn - (maxKBpsIn*1024), used1mOut - (maxKBpsOut*1024));
         if ( (overage > 0) && 
-             ((overage/(float)(maxKBps*1024f)) > _context.random().nextFloat()) ) {
+             ((overage/(maxKBps*1024f)) > _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + overage + " over) indicates overload.");
             setTunnelStatus(LIMIT_STR);
             return false;

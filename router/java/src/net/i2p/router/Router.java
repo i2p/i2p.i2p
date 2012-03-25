@@ -561,7 +561,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public void addCapabilities(RouterInfo ri) {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());
-        bwLim = (int)(((float)bwLim) * getSharePercentage());
+        bwLim = (int)(bwLim * getSharePercentage());
         if (_log.shouldLog(Log.INFO))
             _log.info("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         

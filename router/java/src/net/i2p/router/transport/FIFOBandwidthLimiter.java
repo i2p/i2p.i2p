@@ -373,13 +373,13 @@ public class FIFOBandwidthLimiter {
             _lastStatsUpdated = now;
 
             if (_sendBps <= 0)
-                _sendBps = ((float)sent*1000f)/(float)time;
+                _sendBps = (sent*1000f)/time;
             else
-                _sendBps = (0.9f)*_sendBps + (0.1f)*((float)sent*1000f)/(float)time;
+                _sendBps = (0.9f)*_sendBps + (0.1f)*(sent*1000f)/time;
             if (_recvBps <= 0)
-                _recvBps = ((float)recv*1000f)/(float)time;
+                _recvBps = (recv*1000f)/time;
             else
-                _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/(float)time;
+                _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/time;
 
             // warning, getStatLog() can be null
             //if (_log.shouldLog(Log.WARN)) {
@@ -395,12 +395,12 @@ public class FIFOBandwidthLimiter {
             //if (_sendBps15s <= 0)
             //    _sendBps15s = (0.045f)*((float)sent*15*1000f)/(float)time;
             //else
-                _sendBps15s = (0.955f)*_sendBps15s + (0.045f)*((float)sent*1000f)/(float)time;
+                _sendBps15s = (0.955f)*_sendBps15s + (0.045f)*(sent*1000f)/time;
 
             //if (_recvBps15s <= 0)
             //    _recvBps15s = (0.045f)*((float)recv*15*1000f)/(float)time;
             //else
-                _recvBps15s = (0.955f)*_recvBps15s + (0.045f)*((float)recv*1000)/(float)time;
+                _recvBps15s = (0.955f)*_recvBps15s + (0.045f)*((float)recv*1000)/time;
 
             // warning, getStatLog() can be null
             //if (_log.shouldLog(Log.WARN)) {

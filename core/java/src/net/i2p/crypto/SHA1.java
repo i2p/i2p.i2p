@@ -139,7 +139,7 @@ public final class SHA1 extends MessageDigest implements Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         SHA1 that = (SHA1)super.clone();
-        that.pad = (byte[])this.pad.clone();
+        that.pad = this.pad.clone();
         return that;
     }
  

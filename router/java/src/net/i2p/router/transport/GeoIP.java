@@ -356,7 +356,7 @@ class GeoIP {
         int rv = 0;
         for (int i = 0; i < 4; i++)
             rv |= (ip[i] & 0xff) << ((3-i)*8);
-        return ((long) rv) & 0xffffffffl;
+        return rv & 0xffffffffl;
     }
 
     /**

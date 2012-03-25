@@ -109,8 +109,8 @@ public class HMACSHA256Bench {
 	}
     
     private static void display(int times, long before, long after, int len, String name) {
-        double rate = ((double)times)/(((double)after-(double)before)/1000.0d);
-        double kbps = ((double)len/1024.0d)*((double)times)/(((double)after-(double)before)/1000.0d);
+        double rate = times/(((double)after-(double)before)/1000.0d);
+        double kbps = (len/1024.0d)*times/(((double)after-(double)before)/1000.0d);
         System.out.println(name + " HMAC pulled " + kbps + "KBps or " + rate + " calcs per second");
     }
 }

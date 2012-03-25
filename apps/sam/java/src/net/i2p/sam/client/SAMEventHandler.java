@@ -116,7 +116,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         while (true) {
             try {
                 synchronized (_namingReplyLock) {
-                    String val = (String)_namingReplies.remove(name);
+                    String val = _namingReplies.remove(name);
                     if (val == null) {
                         _namingReplyLock.wait();
                     } else {

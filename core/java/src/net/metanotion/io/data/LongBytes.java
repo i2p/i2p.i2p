@@ -53,7 +53,7 @@ public class LongBytes implements Serializer {
 				 ((long)(b[4] & 0xff) << 24) |
 				 ((long)(b[5] & 0xff) << 16) |
 				 ((long)(b[6] & 0xff) <<  8) |
-				 ((long)(b[7] & 0xff)));
+				 (b[7] & 0xff));
 		return new Long(v);
 	}
 }

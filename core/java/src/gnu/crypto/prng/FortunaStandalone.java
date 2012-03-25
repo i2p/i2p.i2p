@@ -132,7 +132,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
 
   public void seed(byte val[]) {
       Map props = new HashMap(1);
-      props.put(SEED, (Object)val);
+      props.put(SEED, val);
       init(props);
       fillBlock();
   }

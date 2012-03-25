@@ -507,7 +507,7 @@ public abstract class TransportImpl implements Transport {
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
         synchronized (_unreachableEntries) {
-            Long when = (Long)_unreachableEntries.get(peer);
+            Long when = _unreachableEntries.get(peer);
             if (when == null) return false;
             if (when.longValue() + UNREACHABLE_PERIOD < now) {
                 _unreachableEntries.remove(peer);
@@ -543,7 +543,7 @@ public abstract class TransportImpl implements Transport {
             synchronized (_unreachableEntries) {
                 for (Iterator iter = _unreachableEntries.keySet().iterator(); iter.hasNext(); ) {
                     Hash peer = (Hash)iter.next();
-                    Long when = (Long)_unreachableEntries.get(peer);
+                    Long when = _unreachableEntries.get(peer);
                     if (when.longValue() + UNREACHABLE_PERIOD < now)
                         iter.remove();
                 }

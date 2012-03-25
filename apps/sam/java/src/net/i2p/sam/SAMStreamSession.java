@@ -344,12 +344,12 @@ public class SAMStreamSession {
      */
     protected SAMStreamSessionSocketReader getSocketReader ( int id ) {
         synchronized (handlersMapLock) {
-            return (SAMStreamSessionSocketReader)handlersMap.get(new Integer(id));
+            return handlersMap.get(new Integer(id));
         }
     }
     private StreamSender getSender(int id) {
         synchronized (handlersMapLock) {
-            return (StreamSender)sendersMap.get(new Integer(id));
+            return sendersMap.get(new Integer(id));
         }
     }
 
@@ -375,8 +375,8 @@ public class SAMStreamSession {
         StreamSender sender = null;
 
         synchronized (handlersMapLock) {
-            reader = (SAMStreamSessionSocketReader)handlersMap.remove(new Integer(id));
-            sender = (StreamSender)sendersMap.remove(new Integer(id));
+            reader = handlersMap.remove(new Integer(id));
+            sender = sendersMap.remove(new Integer(id));
         }
 
         if (reader != null)
@@ -402,8 +402,8 @@ public class SAMStreamSession {
             
             while (iter.hasNext()) {
                  id = (Integer)iter.next();
-                 ((SAMStreamSessionSocketReader)handlersMap.get(id)).stopRunning();
-                 ((StreamSender)sendersMap.get(id)).shutDownGracefully();
+                 handlersMap.get(id).stopRunning();
+                 sendersMap.get(id).shutDownGracefully();
             }
             handlersMap.clear();
             sendersMap.clear();
@@ -740,7 +740,7 @@ public class SAMStreamSession {
                 try {
                     synchronized (_data) {
                         if (!_data.isEmpty()) {
-                            data = (ByteArray)_data.remove(0);
+                            data = _data.remove(0);
                         } else if (_shuttingDownGracefully) {
                             /* No data left and shutting down gracefully?
                                If so, stop the sender. */

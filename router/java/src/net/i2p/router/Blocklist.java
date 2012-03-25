@@ -123,7 +123,7 @@ public class Blocklist {
             for (Iterator<Hash> iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
                 Hash peer = iter.next();
                 String reason;
-                String comment = (String) _peerBlocklist.get(peer);
+                String comment = _peerBlocklist.get(peer);
                 if (comment != null)
                     reason = _x("Banned by router hash: {0}");
                 else

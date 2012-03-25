@@ -331,7 +331,7 @@ class UDPPacketReader {
                 off++;
                 off += size;
             }
-            return (int)_message[off];
+            return _message[off];
         }
         
         public long readMessageId(int fragmentNum) {
@@ -459,7 +459,7 @@ class UDPPacketReader {
                 off++;
                 buf.append(" frag# ").append(fragNum);
                 buf.append(" isLast? ").append(isLast);
-                buf.append(" info ").append((int)_message[off-1]);
+                buf.append(" info ").append(_message[off-1]);
                 int size = ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
                 buf.append(" with ").append(size).append(" bytes");
                 buf.append(' ');

@@ -86,7 +86,7 @@ public class Timestamper implements Runnable {
     }
     public String getServer(int index) { 
         synchronized (_servers) {
-            return (String)_servers.get(index); 
+            return _servers.get(index); 
         }
     }
     
@@ -305,7 +305,7 @@ public class Timestamper implements Runnable {
         _servers.clear();
         StringTokenizer tok = new StringTokenizer(serverList, ", ");
         while (tok.hasMoreTokens()) {
-            String val = (String)tok.nextToken();
+            String val = tok.nextToken();
             val = val.trim();
             if (val.length() > 0)
                 _servers.add(val);

@@ -77,7 +77,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     @Override
     public void seed(byte val[]) {
         Map props = new HashMap(1);
-        props.put(SEED, (Object)val);
+        props.put(SEED, val);
         init(props);
         //fillBlock();
     }

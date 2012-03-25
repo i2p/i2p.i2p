@@ -271,7 +271,7 @@ public class OutboundMessageRegistry {
                 //for (Iterator<MessageSelector> iter = _selectors.iterator(); iter.hasNext(); ) {
                 //    MessageSelector sel = iter.next();
                 for (int i = 0; i < _selectors.size(); i++) {
-                    MessageSelector sel = (MessageSelector)_selectors.get(i);
+                    MessageSelector sel = _selectors.get(i);
                     long expiration = sel.getExpiration();
                     if (expiration <= now) {
                         removing.add(sel);

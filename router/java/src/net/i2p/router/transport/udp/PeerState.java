@@ -481,7 +481,7 @@ class PeerState {
      *              A positive number means our clock is ahead of theirs.
      */
     public void adjustClockSkew(long skew) { 
-        _clockSkew = (long) (0.9*(float)_clockSkew + 0.1*(float)(skew - (_rtt / 2))); 
+        _clockSkew = (long) (0.9*_clockSkew + 0.1*(skew - (_rtt / 2))); 
     }
 
     /** what is the current receive second, for congestion control? */
@@ -542,7 +542,7 @@ class PeerState {
         if (duration >= 1000) {
             _sendWindowBytesRemaining = _sendWindowBytes;
             _sendBytes += size;
-            _sendBps = (int)(0.9f*(float)_sendBps + 0.1f*((float)_sendBytes * (1000f/(float)duration)));
+            _sendBps = (int)(0.9f*_sendBps + 0.1f*(_sendBytes * (1000f/duration)));
             //if (isForACK) {
             //    _sendACKBytes += size;
             //    _sendACKBps = (int)(0.9f*(float)_sendACKBps + 0.1f*((float)_sendACKBytes * (1000f/(float)duration)));
@@ -628,7 +628,7 @@ class PeerState {
         long now = _context.clock().now();
         long duration = now - _receivePeriodBegin;
         if (duration >= 1000) {
-            _receiveBps = (int)(0.9f*(float)_receiveBps + 0.1f*((float)_receiveBytes * (1000f/(float)duration)));
+            _receiveBps = (int)(0.9f*_receiveBps + 0.1f*(_receiveBytes * (1000f/duration)));
             //if (isForACK)
             //    _receiveACKBps = (int)(0.9f*(float)_receiveACKBps + 0.1f*((float)_receiveACKBytes * (1000f/(float)duration)));
             //_receiveACKBytes = 0;
@@ -1008,10 +1008,10 @@ class PeerState {
         // the faster we are going, the slower we want to reduce the rtt
         float scale = 0.1f;
         if (_sendBps > 0)
-            scale = ((float)lifetime) / (float)((float)lifetime + (float)_sendBps);
+            scale = lifetime / ((float)lifetime + (float)_sendBps);
         if (scale < 0.001f) scale = 0.001f;
         
-        _rtt = (int)(((float)_rtt)*(1.0f-scale) + (scale)*(float)lifetime);
+        _rtt = (int)(_rtt*(1.0f-scale) + (scale)*lifetime);
         _rto = _rtt + (_rttDeviation<<2);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt

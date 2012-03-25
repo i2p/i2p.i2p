@@ -568,7 +568,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         
         RepublishLeaseSetJob j = null;
         synchronized (_publishingLeaseSets) {
-            j = (RepublishLeaseSetJob)_publishingLeaseSets.get(h);
+            j = _publishingLeaseSets.get(h);
             if (j == null) {
                 j = new RepublishLeaseSetJob(_context, this, h);
                 _publishingLeaseSets.put(h, j);
@@ -920,7 +920,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         boolean isNew = true;
         SearchJob searchJob = null;
         synchronized (_activeRequests) {
-            searchJob = (SearchJob)_activeRequests.get(key);
+            searchJob = _activeRequests.get(key);
             if (searchJob == null) {
                 searchJob = new SearchJob(_context, this, key, onFindJob, onFailedLookupJob, 
                                          timeoutMs, true, isLease);

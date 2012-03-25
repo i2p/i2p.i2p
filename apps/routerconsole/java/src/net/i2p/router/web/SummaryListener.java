@@ -73,7 +73,7 @@ class SummaryListener implements RateSummaryListener {
             // add one value to the db (the average value for the period)
             try {
                 _sample.setTime(when);
-                double val = eventCount > 0 ? (totalValue / (double)eventCount) : 0d;
+                double val = eventCount > 0 ? (totalValue / eventCount) : 0d;
                 _sample.setValue(_name, val);
                 _sample.setValue(_eventName, eventCount);
                 //_sample.setValue(0, val);

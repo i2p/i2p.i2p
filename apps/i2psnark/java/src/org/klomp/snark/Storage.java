@@ -877,7 +877,7 @@ public class Storage
   {
     // First check if the piece is correct.
     // Copy the array first to be paranoid.
-    byte[] bs = (byte[]) ba.clone();
+    byte[] bs = ba.clone();
     int length = bs.length;
     boolean correctHash = metainfo.checkPiece(piece, bs, 0, length);
     if (listener != null)

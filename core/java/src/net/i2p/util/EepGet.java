@@ -362,20 +362,20 @@ public class EepGet {
                             buf.append(" ");
                             if ( bytesRemaining > 0 ) {
                                 double pct = 100 * ((double)_written + _previousWritten) /
-                                             ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);
+                                             ((double)alreadyTransferred + (double)currentWrite + bytesRemaining);
                                 fmt.format("%4.1f", Double.valueOf(pct));
                                 buf.append("%: ");
                             }
                             fmt.format("%8d", Long.valueOf(_written));
                             buf.append(" @ ");
                             double lineKBytes = ((double)_markSize * (double)_lineSize)/1024.0d;
-                            double kbps = lineKBytes/((double)timeToSend/1000.0d);
+                            double kbps = lineKBytes/(timeToSend/1000.0d);
                             fmt.format("%7.2f", Double.valueOf(kbps));
                             buf.append(" KBps");
                             
                             buf.append(" / ");
                             long lifetime = _context.clock().now() - _startedOn;
-                            double lifetimeKBps = (1000.0d*(double)(_written)/((double)lifetime*1024.0d));
+                            double lifetimeKBps = (1000.0d*(_written)/(lifetime*1024.0d));
                             fmt.format("%7.2f", Double.valueOf(lifetimeKBps));
                             buf.append(" KBps");
                             System.out.println(buf.toString());
@@ -415,7 +415,7 @@ public class EepGet {
             if (transferred > 0) {
                 StringBuilder buf = new StringBuilder(50);
                 buf.append("== Transfer rate: ");
-                double kbps = (1000.0d*(double)(transferred)/((double)timeToSend*1024.0d));
+                double kbps = (1000.0d*(transferred)/(timeToSend*1024.0d));
                 synchronized (_kbps) {
                     buf.append(_kbps.format(kbps));
                 }
@@ -440,7 +440,7 @@ public class EepGet {
                                + (bytesRemaining < 0 ? "unknown" : ""+bytesRemaining) + " remaining");
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
-            double kbps = (timeToSend > 0 ? (1000.0d*(double)(bytesTransferred)/((double)timeToSend*1024.0d)) : 0);
+            double kbps = (timeToSend > 0 ? (1000.0d*(bytesTransferred)/(timeToSend*1024.0d)) : 0);
             StringBuilder buf = new StringBuilder(50);
             buf.append("== Transfer rate: ");
             synchronized (_kbps) {

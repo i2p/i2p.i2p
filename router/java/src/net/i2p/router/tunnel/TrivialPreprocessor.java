@@ -242,7 +242,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
             target[offset] |= 1;  
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("CONTROL: " + Integer.toHexString((int)target[offset]) + "/" 
+            _log.debug("CONTROL: " + Integer.toHexString(target[offset]) + "/" 
                        + Base64.encode(target, offset, 1) + " at offset " + offset);
 
         offset++;

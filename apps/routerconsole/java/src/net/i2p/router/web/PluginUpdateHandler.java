@@ -161,7 +161,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             StringBuilder buf = new StringBuilder(64);
             buf.append("<b>").append(_("Downloading plugin")).append(' ');
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
-                         ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);
+                         ((double)alreadyTransferred + (double)currentWrite + bytesRemaining);
             synchronized (_pct) {
                 buf.append(_pct.format(pct));
             }

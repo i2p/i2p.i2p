@@ -172,10 +172,10 @@ public class EepHead extends EepGet {
         if (_transferFailed) {
             // 404, etc - transferFailed is called after all attempts fail, by fetch() above
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).attemptFailed(_url, 0, 0, _currentAttempt, _numRetries, new Exception("Attempt failed"));
+                _listeners.get(i).attemptFailed(_url, 0, 0, _currentAttempt, _numRetries, new Exception("Attempt failed"));
         } else {
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).transferComplete(
+                _listeners.get(i).transferComplete(
                         0, 0, 0, _url, "dummy", false);
         }
     }

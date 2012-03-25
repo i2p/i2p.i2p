@@ -275,7 +275,7 @@ abstract class BuildRequestor {
             log.debug("Build order: " + order + " for " + cfg);
         
         for (int i = 0; i < msg.getRecordCount(); i++) {
-            int hop = ((Integer)order.get(i)).intValue();
+            int hop = order.get(i).intValue();
             PublicKey key = null;
     
             if (BuildMessageGenerator.isBlank(cfg, hop)) {

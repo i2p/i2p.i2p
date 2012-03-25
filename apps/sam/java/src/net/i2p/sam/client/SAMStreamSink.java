@@ -83,7 +83,7 @@ public class SAMStreamSink {
         public void streamClosedReceived(String result, int id, String message) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = (Sink)_remotePeers.remove(new Integer(id));
+                sink = _remotePeers.remove(new Integer(id));
             }
             if (sink != null) {
                 sink.closed();
@@ -96,7 +96,7 @@ public class SAMStreamSink {
         public void streamDataReceived(int id, byte data[], int offset, int length) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = (Sink)_remotePeers.get(new Integer(id));
+                sink = _remotePeers.get(new Integer(id));
             }
             if (sink != null) {
                 sink.received(data, offset, length);

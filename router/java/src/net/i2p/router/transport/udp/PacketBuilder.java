@@ -459,7 +459,7 @@ class PacketBuilder {
         int fullACKCount = 0;
         int partialACKCount = 0;
         for (int i = 0; i < ackBitfields.size(); i++) {
-            if (((ACKBitfield)ackBitfields.get(i)).receivedComplete())
+            if (ackBitfields.get(i).receivedComplete())
                 fullACKCount++;
             else
                 partialACKCount++;
@@ -496,7 +496,7 @@ class PacketBuilder {
             DataHelper.toLong(data, off, 1, partialACKCount);
             off++;
             for (int i = 0; i < ackBitfields.size(); i++) {
-                ACKBitfield bitfield = (ACKBitfield)ackBitfields.get(i);
+                ACKBitfield bitfield = ackBitfields.get(i);
                 if (bitfield.receivedComplete()) continue;
                 DataHelper.toLong(data, off, 4, bitfield.getMessageId());
                 off += 4;

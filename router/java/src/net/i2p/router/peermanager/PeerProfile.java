@@ -285,9 +285,9 @@ public class PeerProfile {
         
         // weighted since we want to let the average grow quickly and shrink slowly
         if (ms < _tunnelTestResponseTimeAvg)
-            _tunnelTestResponseTimeAvg = 0.95*_tunnelTestResponseTimeAvg + .05*(double)ms;
+            _tunnelTestResponseTimeAvg = 0.95*_tunnelTestResponseTimeAvg + .05*ms;
         else
-            _tunnelTestResponseTimeAvg = 0.75*_tunnelTestResponseTimeAvg + .25*(double)ms;
+            _tunnelTestResponseTimeAvg = 0.75*_tunnelTestResponseTimeAvg + .25*ms;
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Updating tunnel test time for " + _peer.toBase64().substring(0,6) 
@@ -307,7 +307,7 @@ public class PeerProfile {
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
             rv += _peakThroughput[i];
-        rv /= (60d*1024d*(double)THROUGHPUT_COUNT);
+        rv /= (60d*1024d*THROUGHPUT_COUNT);
         return rv;
     }
     public void setPeakThroughputKBps(double kBps) {
@@ -338,7 +338,7 @@ public class PeerProfile {
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
             rv += _peakTunnelThroughput[i];
-        rv /= (10d*60d*1024d*(double)THROUGHPUT_COUNT);
+        rv /= (10d*60d*1024d*THROUGHPUT_COUNT);
         return rv;
     }
     public void setPeakTunnelThroughputKBps(double kBps) {
@@ -381,7 +381,7 @@ public class PeerProfile {
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
             rv += _peakTunnel1mThroughput[i];
-        rv /= (60d*1024d*(double)THROUGHPUT_COUNT);
+        rv /= (60d*1024d*THROUGHPUT_COUNT);
         return rv;
     }
     public void setPeakTunnel1mThroughputKBps(double kBps) {

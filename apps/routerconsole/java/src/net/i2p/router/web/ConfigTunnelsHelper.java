@@ -176,7 +176,7 @@ public class ConfigTunnelsHelper extends HelperBase {
                        "value=\"");
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
                 String prop = (String)iter.next();
-                String val = (String)props.getProperty(prop);
+                String val = props.getProperty(prop);
                 buf.append(prop).append('=').append(val).append(' ');
             }
             buf.append("\"></td></tr>\n");
@@ -189,7 +189,7 @@ public class ConfigTunnelsHelper extends HelperBase {
                        "value=\"");
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
                 String prop = (String)iter.next();
-                String val = (String)props.getProperty(prop);
+                String val = props.getProperty(prop);
                 buf.append(prop).append('=').append(val).append(' ');
             }
             buf.append("\"></td></tr>\n");

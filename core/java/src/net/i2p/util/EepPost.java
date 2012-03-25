@@ -218,7 +218,7 @@ public class EepPost {
         I2PAppContext.getGlobalContext().random().nextBytes(separator);
         StringBuilder sep = new StringBuilder(48);
         for (int i = 0; i < separator.length; i++)
-            sep.append((char)((int)'a' + (int)(separator[i]&0x0F))).append((char)((int)'a' + (int)((separator[i] >>> 4) & 0x0F)));
+            sep.append((char)('a' + (separator[i]&0x0F))).append((char)('a' + ((separator[i] >>> 4) & 0x0F)));
         return sep.toString();
     }
 }

@@ -175,9 +175,9 @@ public class LeaseSet extends DatabaseEntry {
 
     public Lease getLease(int index) {
         if (isEncrypted())
-            return (Lease) _decryptedLeases.get(index);
+            return _decryptedLeases.get(index);
         else
-            return (Lease) _leases.get(index);
+            return _leases.get(index);
     }
 
     /**
@@ -397,8 +397,8 @@ public class LeaseSet extends DatabaseEntry {
         int datalen = ((DATA_LEN * size / 16) + 1) * 16;
         ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
         for (int i = 0; i < size; i++) {
-            ((Lease)_leases.get(i)).getGateway().writeBytes(baos);
-            ((Lease)_leases.get(i)).getTunnelId().writeBytes(baos);
+            _leases.get(i).getGateway().writeBytes(baos);
+            _leases.get(i).getTunnelId().writeBytes(baos);
         }
         // pad out to multiple of 16 with random data before encryption
         int padlen = datalen - (DATA_LEN * size);
@@ -415,17 +415,17 @@ public class LeaseSet extends DatabaseEntry {
         RandomSource.getInstance().nextBytes(enc, datalen, padlen);
         // add the padded lease...
         Lease padLease = new Lease();
-        padLease.setEndDate(((Lease)_leases.get(0)).getEndDate());
+        padLease.setEndDate(_leases.get(0).getEndDate());
         _leases.add(padLease);
         // ...and replace all the gateways and tunnel ids
         ByteArrayInputStream bais = new ByteArrayInputStream(enc);
         for (int i = 0; i < size+1; i++) {
             Hash h = new Hash();
             h.readBytes(bais);
-            ((Lease)_leases.get(i)).setGateway(h);
+            _leases.get(i).setGateway(h);
             TunnelId t = new TunnelId();
             t.readBytes(bais);
-            ((Lease)_leases.get(i)).setTunnelId(t);
+            _leases.get(i).setTunnelId(t);
         }
     }
 
@@ -444,8 +444,8 @@ public class LeaseSet extends DatabaseEntry {
         int datalen = DATA_LEN * size;
         ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
         for (int i = 0; i < size; i++) {
-            ((Lease)_leases.get(i)).getGateway().writeBytes(baos);
-            ((Lease)_leases.get(i)).getTunnelId().writeBytes(baos);
+            _leases.get(i).getGateway().writeBytes(baos);
+            _leases.get(i).getTunnelId().writeBytes(baos);
         }
         byte[] iv = new byte[IV_LEN];
         System.arraycopy(_destination.getPublicKey().getData(), 0, iv, 0, IV_LEN);
@@ -464,7 +464,7 @@ public class LeaseSet extends DatabaseEntry {
             TunnelId t = new TunnelId();
             t.readBytes(bais);
             l.setTunnelId(t);
-            l.setEndDate(((Lease)_leases.get(i)).getEndDate());
+            l.setEndDate(_leases.get(i).getEndDate());
             _decryptedLeases.add(l);
         }
     }

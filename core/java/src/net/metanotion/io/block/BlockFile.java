@@ -325,7 +325,7 @@ public class BlockFile {
 	public static void pageSeek(RandomAccessInterface file, int page) throws IOException {
 		if (page < METAINDEX_PAGE)
 			throw new IOException("Negative page or superblock access attempt: " + page);
-		file.seek((((long)page) - 1L) * PAGESIZE );
+		file.seek((page - 1L) * PAGESIZE );
 	}
 
 	public int allocPage() throws IOException {

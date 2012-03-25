@@ -521,7 +521,7 @@ public class Rate {
      */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(_stat) ^ ((int)_period) ^ ((int) _creationDate);
+        return DataHelper.hashCode(_stat) ^ _period ^ ((int) _creationDate);
     }
 
     @Override
