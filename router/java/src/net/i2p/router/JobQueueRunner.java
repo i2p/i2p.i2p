@@ -40,7 +40,6 @@ class JobQueueRunner implements Runnable {
     public void run() {
         //_state = 2;
         long lastActive = _context.clock().now();
-        long jobNum = 0;
         while ( (_keepRunning) && (_context.jobQueue().isAlive()) ) { 
             //_state = 3;
             try {
@@ -69,7 +68,6 @@ class JobQueueRunner implements Runnable {
                     }
                 }
 
-                long betweenJobs = now - lastActive;
                 _currentJob = job;
                 _lastJob = null;
                 //_state = 9;
@@ -117,7 +115,6 @@ class JobQueueRunner implements Runnable {
                 _lastJob = _currentJob;
                 _currentJob = null;
                 _lastEnd = lastActive;
-                jobNum++;
                 //_state = 15;
                 
                 //if ( (jobNum % 10) == 0)

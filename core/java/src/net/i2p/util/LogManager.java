@@ -333,7 +333,6 @@ public class LogManager {
         _fileSize = getFileSize(config.getProperty(PROP_FILESIZE, DEFAULT_FILESIZE));
         _rotationLimit = -1;
         try {
-            String str = config.getProperty(PROP_ROTATIONLIMIT);
             _rotationLimit = Integer.parseInt(config.getProperty(PROP_ROTATIONLIMIT, DEFAULT_ROTATIONLIMIT));
         } catch (NumberFormatException nfe) {
             System.err.println("Invalid rotation limit");
@@ -521,14 +520,12 @@ public class LogManager {
     private void updateLimit(Log log) {
         List<LogLimit> limits = getLimits(log);
         LogLimit max = null;
-        LogLimit notMax = null;
         if (limits != null) {
             for (LogLimit cur : limits) {
                 if (max == null)
                     max = cur;
                 else {
                     if (cur.getRootName().length() > max.getRootName().length()) {
-                        notMax = max;
                         max = cur;
                     }
                 }

@@ -91,11 +91,10 @@ import net.i2p.util.EventDispatcher;
         
         // create i2pclient and destination
         I2PClient client = I2PClientFactory.createClient();
-        Destination destN;
         byte[] key;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream(512);
-            destN = client.createDestination(out);
+            client.createDestination(out);
             key = out.toByteArray();
         } catch(Exception exc) {
             throw new RuntimeException("failed to create i2p-destination", exc);

@@ -212,8 +212,7 @@ public class FileUtil {
                     }
                     try {
                         InputStream in = zip.getInputStream(entry);
-                        int read = 0;
-                        while ( (read = in.read(buf)) != -1) {
+                        while ( (in.read(buf)) != -1) {
                             // throw the data away
                         }
                         //System.err.println("INFO: File [" + entry.getName() + "] extracted");

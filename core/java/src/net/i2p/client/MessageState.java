@@ -100,7 +100,7 @@ class MessageState {
     }
 
     public void waitFor(int status, long expiration) {
-        long checkTime = -1;
+        //long checkTime = -1;
         boolean found = false;
         while (!found) {
             if (_cancelled) return;
@@ -112,13 +112,13 @@ class MessageState {
             }
             found = false;
             synchronized (_receivedStatus) {
-                long beforeCheck = _context.clock().now();
+                //long beforeCheck = _context.clock().now();
                 if (locked_isSuccess(status) || locked_isFailure(status)) {
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug(_prefix + "Received a confirm (one way or the other)");
                     found = true;
                 }
-                checkTime = _context.clock().now() - beforeCheck;
+                //checkTime = _context.clock().now() - beforeCheck;
                 if (!found) {
                     if (timeToWait > 5000) {
                         timeToWait = 5000;

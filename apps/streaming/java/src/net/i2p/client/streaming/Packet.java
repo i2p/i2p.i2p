@@ -270,7 +270,6 @@ class Packet {
         //_payload = null;
     }
     public ByteArray acquirePayload() {
-        ByteArray old = _payload;
         _payload = new ByteArray(new byte[Packet.MAX_PAYLOAD_SIZE]);
         return _payload;
     }

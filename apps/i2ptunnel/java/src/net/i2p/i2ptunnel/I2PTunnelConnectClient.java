@@ -176,7 +176,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             in = s.getInputStream();
             String line, method = null, host = null, destination = null, restofline = null;
             StringBuilder newRequest = new StringBuilder();
-            int ahelper = 0;
             String authorization = null;
             while (true) {
                 // Use this rather than BufferedReader because we can't have readahead,

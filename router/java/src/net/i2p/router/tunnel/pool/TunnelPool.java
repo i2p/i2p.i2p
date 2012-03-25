@@ -903,7 +903,6 @@ public class TunnelPool {
         
         int fallback = 0;
         synchronized (_tunnels) {
-            boolean enough = _tunnels.size() > wanted;
             for (int i = 0; i < _tunnels.size(); i++) {
                 TunnelInfo info = _tunnels.get(i);
                 if (allowZeroHop || (info.getLength() > 1)) {

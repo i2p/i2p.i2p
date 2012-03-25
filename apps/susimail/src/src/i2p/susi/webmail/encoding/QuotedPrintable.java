@@ -70,7 +70,6 @@ public class QuotedPrintable implements Encoding {
 	private static int BUFSIZE = 2;
 	private String encode( InputStream in ) throws EncodingException, IOException {
 		StringBuilder out = new StringBuilder();
-		int l = 0;
 		int read = 0, buffered = 0, tmp[] = new int[BUFSIZE];
 		while( true ) {
 			read = in.available();
@@ -88,7 +87,6 @@ public class QuotedPrintable implements Encoding {
 			
 			if( c > 32 && c < 127 && c != 61 ) {
 				out.append( (char)c );
-				l++;
 			}
 			else if( ( c == 32 || c == 9 ) ) {
 				if( buffered > 0 && ( tmp[0] == 10 || tmp[0] == 13 ) ) {
@@ -96,11 +94,9 @@ public class QuotedPrintable implements Encoding {
 					 * whitespace at end of line
 					 */
 					out.append( c == 32 ? "=20" : "=09" );
-					l += 3;
 				}
 				else {
 					out.append( (char)c );
-					l++;
 				}
 			}
 			else if( c == 13 && buffered > 0 && tmp[0] == 10 ) {
@@ -108,14 +104,12 @@ public class QuotedPrintable implements Encoding {
 				buffered--;
 				for( int j = 1; j < BUFSIZE; j++ )
 					tmp[j-1] = tmp[j];
-				l = 0;
 			}
 			else {
 				if( c < 0 || c > 255 ) {
 					throw new EncodingException( "Encoding supports only values of 0..255." );
 				}
 				out.append( HexTable.table[ c ] );
-				l += 3;
 			}
 		}
 		return out.toString();

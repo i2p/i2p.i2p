@@ -198,8 +198,6 @@ public class TrackerClient extends I2PAppThread
     long left = coordinator.getLeft();
 
     boolean completed = (left == 0);
-    int sleptTime = 0;
-
     try
       {
         if (!verifyConnected()) return;
@@ -258,8 +256,6 @@ public class TrackerClient extends I2PAppThread
               event = NO_EVENT;
             
             // *** loop once for each tracker
-            // Only do a request when necessary.
-            sleptTime = 0;
             int maxSeenPeers = 0;
             for (Iterator iter = trackers.iterator(); iter.hasNext(); ) {
               Tracker tr = (Tracker)iter.next();
@@ -308,7 +304,6 @@ public class TrackerClient extends I2PAppThread
                           // only delay if we actually make an attempt to add peer
                           if(coordinator.addPeer(cur) && it.hasNext()) {
                             int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
-                            sleptTime += delay;
                             try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                           }
                         }

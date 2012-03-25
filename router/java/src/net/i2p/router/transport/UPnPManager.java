@@ -120,7 +120,6 @@ class UPnPManager {
                  _log.debug("UPnP Callback:");
 
             DetectedIP[] ips = _upnp.getAddress();
-            byte[] detected = null;
             if (ips != null) {
                 for (DetectedIP ip : ips) {
                     // store the first public one and tell the transport manager if it changed

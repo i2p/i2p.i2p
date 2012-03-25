@@ -318,7 +318,6 @@ public class ElGamalAESEngine {
         //_log.debug("Hash of entire aes block after decryption: \n" + DataHelper.toString(h.getData(), 32));
         try {
             SessionKey newKey = null;
-            Hash readHash = null;
             List tags = null;
 
             //ByteArrayInputStream bais = new ByteArrayInputStream(decrypted);

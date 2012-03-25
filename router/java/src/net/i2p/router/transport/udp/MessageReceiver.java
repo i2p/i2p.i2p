@@ -115,7 +115,6 @@ class MessageReceiver {
         while (_alive) {
             int expired = 0;
             long expiredLifetime = 0;
-            int remaining = 0;
             try {
                     while (message == null) {
                         message = _completeMessages.take();

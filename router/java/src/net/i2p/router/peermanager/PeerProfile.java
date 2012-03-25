@@ -625,7 +625,6 @@ public class PeerProfile {
         System.out.println(numExpanded + "/" + numCompact + ": create array - Used: " + used + " bytes (or " + usedPer + " bytes per array entry)");
         
         int i = 0;
-        int j = 0;
         try {
             for (; i < numExpanded; i++)
                 profs[i] = new PeerProfile(ctx, new Hash(new byte[Hash.HASH_LENGTH]));

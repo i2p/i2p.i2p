@@ -103,10 +103,8 @@ public class ShellCommand {
         @Override
         public void run() {
 
-            String streamData;
-
             try {
-                while ((streamData = bufferedReader.readLine()) != null) {
+                while ((bufferedReader.readLine()) != null) {
                     // Just like a Hoover.
                 }
             } catch (IOException e) {

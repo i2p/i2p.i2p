@@ -118,7 +118,6 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 continue;
             }
             
-            int size = data.readMessageFragmentSize(i);
             InboundMessageState state = null;
             boolean messageComplete = false;
             boolean messageExpired = false;

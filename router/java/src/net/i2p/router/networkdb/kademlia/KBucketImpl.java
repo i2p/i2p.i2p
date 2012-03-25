@@ -391,7 +391,7 @@ class KBucketImpl implements KBucket {
             //buf.append(toString(rnd.getData())).append('\n');
             boolean ok = bucket.shouldContain(rnd);
             if (!ok) {
-                byte diff[] = bucket.getLocal().cachedXor(rnd);
+                //byte diff[] = bucket.getLocal().cachedXor(rnd);
                 //BigInteger dv = new BigInteger(1, diff);
                 //log.error("WTF! bucket doesn't want: \n" + toString(rnd.getData()) 
                 //          + "\nDelta: \n" + toString(diff) + "\nDelta val: \n" + dv.toString(2) 
@@ -427,7 +427,7 @@ class KBucketImpl implements KBucket {
             //buf.append(toString(rnd.getData())).append('\n');
             boolean ok = bucket.shouldContain(rnd);
             if (!ok) {
-                byte diff[] = bucket.getLocal().cachedXor(rnd);
+                //byte diff[] = bucket.getLocal().cachedXor(rnd);
                 //BigInteger dv = new BigInteger(1, diff);
                 //log.error("WTF! bucket doesn't want: \n" + toString(rnd.getData()) 
                 //          + "\nDelta: \n" + toString(diff) + "\nDelta val: \n" + dv.toString(2) 

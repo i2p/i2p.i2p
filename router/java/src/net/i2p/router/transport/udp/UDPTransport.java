@@ -1562,12 +1562,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int countActivePeers() {
         long now = _context.clock().now();
         int active = 0;
-        int inactive = 0;
-            for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
+        for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
                 PeerState peer = iter.next();
-                if (now-peer.getLastReceiveTime() > 5*60*1000)
-                    inactive++;
-                else
+                if (now-peer.getLastReceiveTime() <= 5*60*1000)
                     active++;
             }
         return active;
@@ -1577,12 +1574,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int countActiveSendPeers() {
         long now = _context.clock().now();
         int active = 0;
-        int inactive = 0;
-            for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
+        for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
                 PeerState peer = iter.next();
-                if (now-peer.getLastSendFullyTime() > 1*60*1000)
-                    inactive++;
-                else
+                if (now-peer.getLastSendFullyTime() <= 1*60*1000)
                     active++;
             }
         return active;
@@ -2089,9 +2083,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<td class=\"cells\" align=\"right\">");
             long skew = peer.getClockSkew();
-            buf.append(DataHelper.formatDuration2(peer.getClockSkew()));
+            buf.append(DataHelper.formatDuration2(skew));
             buf.append("</td>");
-            offsetTotal = offsetTotal + peer.getClockSkew();
+            offsetTotal = offsetTotal + skew;
 
             long sendWindow = peer.getSendWindowBytes();
             
@@ -2155,7 +2149,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //buf.append(peer.getPacketRetransmissionRate());
             buf.append("</td>");
             
-            double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(dupRecv); //formatPct(recvDupPct));
             buf.append("</td>");

@@ -495,7 +495,6 @@ public class I2PSnarkServlet extends DefaultServlet {
         //    return;
         //}
         if ("Add".equals(action)) {
-            String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
          /******
             // NOTE - newFile currently disabled in HTML form - see below

@@ -501,7 +501,7 @@ class EventPumper implements Runnable {
             chan.socket().setKeepAlive(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
-            NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
+            new NTCPConnection(_context, _transport, chan, ckey);
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("new NTCP connection established: " +con);
         } catch (IOException ioe) {

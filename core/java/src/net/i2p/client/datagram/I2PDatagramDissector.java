@@ -61,8 +61,6 @@ public final class I2PDatagramDissector {
      */
     public void loadI2PDatagram(byte[] dgram) throws DataFormatException {
         ByteArrayInputStream dgStream = new ByteArrayInputStream(dgram);
-        byte[] rxTrimmedPayload;
-        
         // set invalid(very important!)
         this.valid = false;
         

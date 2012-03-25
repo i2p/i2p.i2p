@@ -164,7 +164,6 @@ public class BSkipSpan extends SkipSpan {
 			if (nKeys <= 0 && prev != null)
 				bf.log.error("Flushing with no entries?" + this, new Exception());
 
-			int ksz, vsz;
 			int curPage = this.page;
 			int[] curNextPage = new int[1];
 			curNextPage[0] = this.overflowPage;

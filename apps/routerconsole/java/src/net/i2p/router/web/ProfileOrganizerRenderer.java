@@ -67,7 +67,6 @@ class ProfileOrganizerRenderer {
         int fast = 0;
         int reliable = 0;
         int integrated = 0;
-        int failing = 0;
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
         buf.append(ngettext("Showing 1 recent profile.", "Showing {0} recent profiles.", order.size())).append('\n');
@@ -101,7 +100,6 @@ class ProfileOrganizerRenderer {
                 tier = 2;
                 reliable++;
             } else if (_organizer.isFailing(peer)) {
-                failing++;
             } else {
                 tier = 3;
             }

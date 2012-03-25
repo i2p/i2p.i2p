@@ -89,8 +89,6 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     //...........................................................................
 
     static {
-        long time = Clock.getInstance().now();
-
         if (_RDEBUG && _debuglevel > 6) {
             System.out.println("Algorithm Name: Rijndael ver 0.1");
             System.out.println("Electronic Codebook (ECB) Mode");

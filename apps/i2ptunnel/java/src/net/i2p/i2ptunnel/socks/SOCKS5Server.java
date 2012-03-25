@@ -97,7 +97,6 @@ public class SOCKS5Server extends SOCKSServer {
      */
     private void init(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
         int nMethods = in.readUnsignedByte();
-        boolean methodOk = false;
         int method = Method.NO_ACCEPTABLE_METHODS;
 
         for (int i = 0; i < nMethods; ++i) {
@@ -247,7 +246,6 @@ public class SOCKS5Server extends SOCKSServer {
     }
 
     protected void confirmConnection() throws SOCKSException {
-        DataInputStream in;
         DataOutputStream out;
         try {
             out = new DataOutputStream(clientSock.getOutputStream());

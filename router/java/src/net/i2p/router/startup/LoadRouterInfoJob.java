@@ -55,9 +55,6 @@ public class LoadRouterInfoJob extends JobImpl {
     private void loadRouterInfo() {
         String routerInfoFile = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
         RouterInfo info = null;
-        boolean failedRead = false;
-        
-        
         String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
         
         File rif = new File(getContext().getRouterDir(), routerInfoFile);

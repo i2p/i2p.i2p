@@ -59,9 +59,7 @@ class PeerCheckerTask implements Runnable
         long worstdownload = Long.MAX_VALUE;
         Peer worstDownloader = null;
 
-        int peers = 0;
         int uploaders = 0;
-        int downloaders = 0;
         int removedCount = 0;
 
         long uploaded = 0;
@@ -84,12 +82,8 @@ class PeerCheckerTask implements Runnable
                 continue;
               }
 
-            peers++;
-
             if (!peer.isChoking())
               uploaders++;
-            if (!peer.isChoked() && peer.isInteresting())
-              downloaders++;
 
             long upload = peer.getUploaded();
             uploaded += upload;

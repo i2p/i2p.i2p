@@ -91,7 +91,6 @@ public class IBSkipIterator extends SkipIterator {
 	 */
 	@Override
 	public Comparable nextKey() {
-		Comparable c;
 		if(index < ss.nKeys) {
 			if (ss.keys == null) {
 				try {

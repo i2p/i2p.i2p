@@ -400,7 +400,7 @@ public class DoCMDS implements Runnable {
 	 */
 	private boolean is64ok(String data) {
 		try {
-			Destination x = new Destination(data);
+			new Destination(data);
 			return true;
 		} catch (Exception e) {
 			return false;

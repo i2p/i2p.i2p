@@ -71,7 +71,7 @@ class ExpireRoutersJob extends JobImpl {
                 // no need to impose our own expiration here.
                 // One issue is this will queue a ton of floodfill queries the first time it is run
                 // after the 1h router startup grace period.
-                RouterInfo ri = _facade.lookupRouterInfoLocally(key);
+                _facade.lookupRouterInfoLocally(key);
             }
         }
         

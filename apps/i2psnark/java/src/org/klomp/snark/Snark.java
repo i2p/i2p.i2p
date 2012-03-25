@@ -315,8 +315,6 @@ public class Snark
     id = generateID();
     debug("My peer id: " + PeerID.idencode(id), Snark.INFO);
 
-    int port;
-    IOException lastException = null;
 /*
  * Don't start a tunnel if the torrent isn't going to be started.
  * If we are starting,

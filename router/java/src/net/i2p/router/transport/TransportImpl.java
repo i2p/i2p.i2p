@@ -292,9 +292,9 @@ public abstract class TransportImpl implements Transport {
         }
 
         if (log) {
+            /*
             String type = msg.getMessageType();
             // the udp transport logs some further details
-            /*
             _context.messageHistory().sendMessage(type, msg.getMessageId(),
                                                   msg.getExpiration(),
                                                   msg.getTarget().getIdentity().getHash(),

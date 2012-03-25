@@ -157,8 +157,6 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
 
     protected int writeFirstFragment(TunnelGateway.Pending msg, byte target[], int offset) {
         boolean fragmented = false;
-        int origOffset = offset;
-        
         int instructionsLength = getInstructionsSize(msg);
         int payloadLength = msg.getData().length - msg.getOffset();
         if (offset + payloadLength + instructionsLength + IV_SIZE + 1 + 4 > PREPROCESSED_SIZE) {

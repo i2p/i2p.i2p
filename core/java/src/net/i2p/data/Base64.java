@@ -520,10 +520,9 @@ public class Base64 {
         //                          + ((len % 3) > 0 ? 4 : 0) // Account for padding
         //                          + (breakLines ? (len43 / MAX_LINE_LENGTH) : 0)]; // New lines      
         int d = 0;
-        int e = 0;
         int len2 = len - 2;
         int lineLength = 0;
-        for (; d < len2; d += 3, e += 4) {
+        for (; d < len2; d += 3) {
             //encode3to4(source, d + off, 3, outBuff, e);
             encode3to4(source, d + off, 3, out, alpha);
 
@@ -531,7 +530,6 @@ public class Base64 {
             if (breakLines && lineLength == MAX_LINE_LENGTH) {
                 //outBuff[e + 4] = NEW_LINE;
                 out.append('\n');
-                e++;
                 lineLength = 0;
             } // end if: end of line
         } // en dfor: each piece of array
@@ -539,7 +537,6 @@ public class Base64 {
         if (d < len) {
             //encode3to4(source, d + off, len - d, outBuff, e);
             encode3to4(source, d + off, len - d, out, alpha);
-            e += 4;
         } // end if: some padding needed
 
         //out.append(new String(outBuff, 0, e));

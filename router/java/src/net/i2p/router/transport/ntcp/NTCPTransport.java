@@ -737,12 +737,6 @@ public class NTCPTransport extends TransportImpl {
         }
         long offsetTotal = 0;
 
-        int bpsIn = 0;
-        int bpsOut = 0;
-        long uptimeMsTotal = 0;
-        long sendTotal = 0;
-        long recvTotal = 0;
-        int numPeers = 0;
         float bpsSend = 0;
         float bpsRecv = 0;
         long totalUptime = 0;

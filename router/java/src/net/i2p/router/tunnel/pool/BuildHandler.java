@@ -202,8 +202,6 @@ class BuildHandler implements Runnable {
         // search through the tunnels for a reply
         long replyMessageId = state.msg.getUniqueId();
         PooledTunnelCreatorConfig cfg = _exec.removeFromBuilding(replyMessageId);
-        StringBuilder buf = null;
-        
         if (cfg == null) {
             // cannot handle - not pending... took too long?
             if (_log.shouldLog(Log.WARN))

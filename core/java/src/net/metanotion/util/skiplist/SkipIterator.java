@@ -84,7 +84,6 @@ public class SkipIterator implements ListIterator {
 	 * @throws NoSuchElementException
 	 */
 	public Comparable nextKey() {
-		Comparable c;
 		if(index < ss.nKeys) { return ss.keys[index]; }
 		throw new NoSuchElementException();
 	}

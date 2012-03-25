@@ -131,7 +131,6 @@ public class SOCKS4aServer extends SOCKSServer {
     }
 
     protected void confirmConnection() throws SOCKSException {
-        DataInputStream in;
         DataOutputStream out;
         try {
             out = new DataOutputStream(clientSock.getOutputStream());

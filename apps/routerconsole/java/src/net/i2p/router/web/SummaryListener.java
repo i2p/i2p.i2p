@@ -141,7 +141,6 @@ class SummaryListener implements RateSummaryListener {
                 long heartbeat = period*10/1000;
                 def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
                 def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
-                int steps = 1;
                 if (_isPersistent) {
                     _rows = (int) Math.max(MIN_ROWS, Math.min(MAX_ROWS, THREE_MONTHS / period));
                 } else {

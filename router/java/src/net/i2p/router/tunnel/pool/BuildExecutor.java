@@ -284,11 +284,6 @@ class BuildExecutor implements Runnable {
         List<TunnelPool> wanted = new ArrayList(MAX_CONCURRENT_BUILDS);
         List<TunnelPool> pools = new ArrayList(8);
         
-        //long loopBegin = 0;
-        //long afterBuildZeroHop = 0;
-        long afterBuildReal = 0;
-        long afterHandleInbound = 0;
-                
         while (_isRunning && !_manager.isShutdown()){
             //loopBegin = System.currentTimeMillis();
             try {
@@ -383,7 +378,6 @@ class BuildExecutor implements Runnable {
                         }
                 }
                 
-                afterBuildReal = System.currentTimeMillis();
                 
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("build loop complete, tot=" + (afterHandleInbound-loopBegin) + 

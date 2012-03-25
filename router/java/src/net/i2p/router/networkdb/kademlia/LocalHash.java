@@ -67,8 +67,6 @@ class LocalHash extends Hash {
         byte[] distance = _xorCache.get(key);
         
         if (distance == null) {
-            // not cached, lets cache it
-            int cached = 0;
             synchronized (_xorCache) {
                 int toRemove = _xorCache.size() + 1 - MAX_CACHED_XOR;
                 if (toRemove > 0) {
@@ -83,7 +81,6 @@ class LocalHash extends Hash {
                 }
                 distance = DataHelper.xor(key.getData(), getData());
                 _xorCache.put(key, distance);
-                cached = _xorCache.size();
             }
           /****
             if (_log.shouldLog(Log.DEBUG)) {

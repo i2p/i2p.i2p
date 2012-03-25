@@ -653,9 +653,6 @@ class SearchJob extends JobImpl {
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
 
         if (outTunnel != null) {
-            TunnelId targetTunnelId = null; // not needed
-            Job onSend = null; // not wanted
-            
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("resending leaseSet out to " + to + " through " + outTunnel + ": " + msg);
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, to);

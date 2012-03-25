@@ -226,7 +226,6 @@ class PacketBuilder {
         int off = HEADER_SIZE;
 
         StringBuilder msg = null;
-        boolean acksIncluded = false;
         if (_log.shouldLog(Log.INFO)) {
             msg = new StringBuilder(128);
             msg.append("Data pkt to ").append(peer.getRemotePeer().toBase64());

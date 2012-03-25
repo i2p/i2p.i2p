@@ -152,7 +152,6 @@ public class Base64 implements Encoding {
 	}
 
 	private static byte decodeByte( byte b ) throws DecodingException {
-		byte a = b;
 		if( b >= 'A' && b <= 'Z' )
 			b -= 'A';
 		else if( b >= 'a' && b <= 'z' )

@@ -307,10 +307,7 @@ class Connection {
             packet.setFlag(Packet.FLAG_SIGNATURE_REQUESTED);
         }
         
-        boolean ackOnly = false;
-                
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
-            ackOnly = true;
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("No resend for " + packet);
         } else {

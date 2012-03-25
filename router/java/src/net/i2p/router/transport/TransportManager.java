@@ -149,7 +149,7 @@ public class TransportManager implements TransportEventListener {
         configTransports();
         _log.debug("Starting up the transport manager");
         for (Transport t : _transports.values()) {
-            RouterAddress addr = t.startListening();
+            t.startListening();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Transport " + t.getStyle() + " started");
         }

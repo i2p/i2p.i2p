@@ -78,7 +78,6 @@ public class RebuildRouterInfoJob extends JobImpl {
     }
     void rebuildRouterInfo(boolean alreadyRunning) {
         _log.debug("Rebuilding the new router info");
-        boolean fullRebuild = false;
         RouterInfo info = null;
         String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
         File infoFile = new File(getContext().getRouterDir(), infoFilename);
@@ -158,7 +157,6 @@ public class RebuildRouterInfoJob extends JobImpl {
             // this proc writes the keys and info to the file as well as builds the latest and greatest info
             CreateRouterInfoJob j = new CreateRouterInfoJob(getContext(), null);
             info = j.createRouterInfo();
-            fullRebuild = true;
         }
         
         //MessageHistory.initialize();

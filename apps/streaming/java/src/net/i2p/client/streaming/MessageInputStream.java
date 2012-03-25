@@ -335,11 +335,9 @@ class MessageInputStream extends InputStream {
                     ByteArray cur = _readyDataBlocks.get(0);
                     byte rv = cur.getData()[cur.getOffset()+_readyDataBlockIndex];
                     _readyDataBlockIndex++;
-                    boolean removed = false;
                     if (cur.getValid() <= _readyDataBlockIndex) {
                         _readyDataBlockIndex = 0;
                         _readyDataBlocks.remove(0);
-                        removed = true;
                     }
                     _readTotal++;
                     target[offset + i] = rv; // rv < 0 ? rv + 256 : rv

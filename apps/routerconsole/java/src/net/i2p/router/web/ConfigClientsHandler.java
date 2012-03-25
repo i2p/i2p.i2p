@@ -262,7 +262,6 @@ public class ConfigClientsHandler extends FormHandler {
     private void saveWebAppChanges() {
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = props.keySet();
-        int cur = 0;
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (! (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)))
@@ -279,7 +278,6 @@ public class ConfigClientsHandler extends FormHandler {
     private void savePluginChanges() {
         Properties props = PluginStarter.pluginProperties();
         Set keys = props.keySet();
-        int cur = 0;
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (! (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)))

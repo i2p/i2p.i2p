@@ -151,7 +151,7 @@ public class SAMUtils {
      * @return Properties with the parsed SAM params
      */
     public static Properties parseParams(StringTokenizer tok) throws SAMException {
-        int pos, nprops = 0, ntoks = tok.countTokens();
+        int pos, ntoks = tok.countTokens();
         String token, param;
         Properties props = new Properties();
         
@@ -175,7 +175,6 @@ public class SAMUtils {
 
             props.setProperty(param, value.toString());
             value.setLength(0);
-            nprops += 1;
         }
 
         if (_log.shouldLog(Log.DEBUG)) {

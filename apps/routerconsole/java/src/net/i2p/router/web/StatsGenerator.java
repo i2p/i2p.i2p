@@ -207,7 +207,6 @@ public class StatsGenerator {
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
-                double peakFrequency = curRate.getExtremeEventCount();
                 buf.append(" (").append(_("Average event count")).append(": ");
                 buf.append(num(avgFrequency));
                 buf.append("; ").append(_("Events in peak period")).append(": ");

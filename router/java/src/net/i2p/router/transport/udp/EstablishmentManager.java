@@ -496,7 +496,6 @@ class EstablishmentManager {
     private void handleCompletelyEstablished(InboundEstablishState state) {
         if (state.complete()) return;
         
-        long now = _context.clock().now();
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer = new PeerState(_context, _transport,
                                        state.getSentIP(), state.getSentPort(), remote.calculateHash(), true);
@@ -1076,7 +1075,6 @@ class EstablishmentManager {
         if ( (nextSendTime == -1) || (delay > 0) ) {
             if (delay > 1000)
                 delay = 1000;
-            boolean interrupted = false;
             try {
                 synchronized (_activityLock) {
                     if (_activity > 0)
@@ -1087,7 +1085,6 @@ class EstablishmentManager {
                         _activityLock.wait(delay);
                 }
             } catch (InterruptedException ie) {
-                interrupted = true;
             }
             // if (_log.shouldLog(Log.DEBUG))
             //     _log.debug("After waiting w/ nextSend=" + nextSendTime 

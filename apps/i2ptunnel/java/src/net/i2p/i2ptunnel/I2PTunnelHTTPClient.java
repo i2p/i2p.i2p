@@ -320,7 +320,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_DISABLE_HELPER = "i2ptunnel.httpclient.disableAddressHelper";
 
     protected void clientConnectionRun(Socket s) {
-        InputStream in = null;
         OutputStream out = null;
 
         /**
@@ -941,7 +940,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             I2PSocket i2ps = createI2PSocket(clientDest, getDefaultOptions(opts));
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-            I2PTunnelRunner runner = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+            new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
         } catch (SocketException ex) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix(requestId) + "Error trying to connect", ex);
