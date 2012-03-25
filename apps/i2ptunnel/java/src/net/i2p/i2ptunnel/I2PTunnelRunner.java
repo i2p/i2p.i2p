@@ -9,7 +9,6 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.HashMap;
 import java.util.List;
 
 import net.i2p.I2PAppContext;

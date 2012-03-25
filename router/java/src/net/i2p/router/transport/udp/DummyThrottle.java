@@ -1,7 +1,6 @@
 package net.i2p.router.transport.udp;
 
 import net.i2p.data.Hash;
-import net.i2p.router.OutNetMessage;
 
 /**
  * Since the TimedWeightedPriorityMessageQueue.add()

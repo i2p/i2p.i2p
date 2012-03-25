@@ -10,8 +10,6 @@ package net.i2p.router;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.i2p.util.Log;
-
 /**
  * Base implementation of a Job
  */

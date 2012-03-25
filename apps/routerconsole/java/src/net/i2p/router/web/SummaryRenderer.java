@@ -15,9 +15,6 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
-import net.i2p.stat.RateSummaryListener;
 import net.i2p.util.Log;
 
 import org.jrobin.core.RrdException;

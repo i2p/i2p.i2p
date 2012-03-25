@@ -10,7 +10,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.VariableTunnelBuildMessage;
 import net.i2p.router.JobImpl;

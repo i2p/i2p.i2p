@@ -40,14 +40,11 @@ import net.metanotion.io.RandomAccessInterface;
 import net.metanotion.io.Serializer;
 import net.metanotion.io.data.IdentityBytes;
 import net.metanotion.io.data.IntBytes;
-import net.metanotion.io.data.LongBytes;
-import net.metanotion.io.data.NullBytes;
 import net.metanotion.io.data.StringBytes;
 import net.metanotion.io.data.UTF8StringBytes;
 import net.metanotion.io.block.index.BSkipList;
 import net.metanotion.io.block.index.BSkipSpan;
 import net.metanotion.util.skiplist.SkipIterator;
-import net.metanotion.util.skiplist.SkipList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;

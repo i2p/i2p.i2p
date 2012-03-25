@@ -17,7 +17,6 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
-import net.i2p.util.Log;
 
 /**
  *  Method and class for garlic encrypting outbound netdb traffic,

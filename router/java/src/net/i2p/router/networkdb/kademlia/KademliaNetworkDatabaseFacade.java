@@ -9,26 +9,17 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
-import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
@@ -38,7 +29,6 @@ import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;

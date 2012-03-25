@@ -1,6 +1,5 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;

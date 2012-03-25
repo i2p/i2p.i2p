@@ -1,7 +1,6 @@
 package org.klomp.snark;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import net.i2p.util.Log;
 import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEncoder;
 import org.klomp.snark.bencode.BEValue;
-import org.klomp.snark.bencode.InvalidBEncodingException;
 
 /**
  * REF: BEP 10 Extension Protocol

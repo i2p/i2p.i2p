@@ -33,7 +33,6 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.metanotion.io.RandomAccessInterface;
 import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipLevels;

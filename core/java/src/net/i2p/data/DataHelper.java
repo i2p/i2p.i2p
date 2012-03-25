@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;

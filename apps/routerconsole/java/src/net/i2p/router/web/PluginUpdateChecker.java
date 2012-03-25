@@ -3,17 +3,13 @@ package net.i2p.router.web;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
-import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.Log;
 import net.i2p.util.PartialEepGet;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;

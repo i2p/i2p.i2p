@@ -17,7 +17,6 @@ import net.i2p.data.SessionKey;
 import net.i2p.util.SimpleByteCache;
 
 import org.bouncycastle.crypto.digests.MD5Digest;
-import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.macs.I2PHMac;
 
 /**

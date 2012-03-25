@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 
 /**

@@ -6,7 +6,6 @@
 package net.i2p.sam;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.util.Properties;
 
 import net.i2p.client.I2PSessionException;

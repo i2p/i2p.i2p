@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
-import net.i2p.util.Log;
 
 /**
  * An interface to an external naming service program, with in-memory caching.

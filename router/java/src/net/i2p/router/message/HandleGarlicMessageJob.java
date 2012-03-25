@@ -8,9 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DeliveryInstructions;

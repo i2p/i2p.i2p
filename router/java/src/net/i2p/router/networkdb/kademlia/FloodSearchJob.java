@@ -4,17 +4,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.data.Hash;
-import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.data.i2np.DatabaseSearchReplyMessage;
-import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.MessageSelector;
-import net.i2p.router.OutNetMessage;
-import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**

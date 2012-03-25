@@ -7,7 +7,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 
 /** 

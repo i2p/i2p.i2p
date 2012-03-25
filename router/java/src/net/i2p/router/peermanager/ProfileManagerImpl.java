@@ -8,13 +8,7 @@ package net.i2p.router.peermanager;
  *
  */
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.ProfileManager;

@@ -8,7 +8,6 @@ package net.i2p.i2ptunnel.socks;
 
 import java.net.Socket;
 
-import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.irc.IrcInboundFilter;
@@ -16,7 +15,6 @@ import net.i2p.i2ptunnel.irc.IrcOutboundFilter;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.Log;
 
 /*
  * Pipe SOCKS IRC connections through I2PTunnelIRCClient filtering,

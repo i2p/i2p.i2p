@@ -3,8 +3,6 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.util.Set;
-
 import net.i2p.client.I2PSession;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;

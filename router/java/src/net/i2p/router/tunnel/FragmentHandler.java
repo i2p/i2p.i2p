@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

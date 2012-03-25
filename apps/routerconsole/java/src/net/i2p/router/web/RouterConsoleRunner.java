@@ -25,8 +25,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
-import net.i2p.desktopgui.Main;
-import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
@@ -38,8 +36,6 @@ import net.i2p.util.ShellCommand;
 import net.i2p.util.VersionComparator;
 
 import org.mortbay.jetty.AbstractConnector;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.NCSARequestLog;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
@@ -57,7 +53,6 @@ import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.log.Log;
 import org.mortbay.thread.QueuedThreadPool;
 import org.mortbay.thread.concurrent.ThreadPool;
 

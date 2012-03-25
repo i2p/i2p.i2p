@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;

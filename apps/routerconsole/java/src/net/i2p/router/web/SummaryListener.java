@@ -21,9 +21,6 @@ import org.jrobin.core.RrdException;
 import org.jrobin.core.RrdMemoryBackendFactory;
 import org.jrobin.core.RrdNioBackendFactory;
 import org.jrobin.core.Sample;
-import org.jrobin.graph.RrdGraph;
-import org.jrobin.graph.RrdGraphDef;
-import org.jrobin.graph.RrdGraphDefTemplate;
 
 /**
  *  Creates and updates the in-memory or on-disk RRD database,

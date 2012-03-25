@@ -1,7 +1,6 @@
 package net.i2p.stat;
 
 import java.text.Collator;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;

@@ -2,7 +2,6 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;

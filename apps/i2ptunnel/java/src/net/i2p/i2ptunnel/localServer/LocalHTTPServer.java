@@ -17,7 +17,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
-import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
 /**

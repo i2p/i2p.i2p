@@ -21,10 +21,7 @@
 
 package i2p.susi.dns;
 
-import java.net.IDN;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +31,6 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 /**

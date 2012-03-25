@@ -3,8 +3,6 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.ArrayList;

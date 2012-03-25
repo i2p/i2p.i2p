@@ -19,8 +19,6 @@ package net.i2p.crypto;
 import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
- 
-import net.i2p.data.Base64;
 
 /**
  * NOTE: As of 0.8.7, use getInstance() instead of new SHA1(), which will

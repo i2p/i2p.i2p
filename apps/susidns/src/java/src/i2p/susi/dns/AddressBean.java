@@ -25,7 +25,6 @@
 package i2p.susi.dns;
 
 import java.net.IDN;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 

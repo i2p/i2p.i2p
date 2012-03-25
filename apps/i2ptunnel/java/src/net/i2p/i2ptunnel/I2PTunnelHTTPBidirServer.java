@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.net.InetAddress;
 
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.Log;
 
 public class I2PTunnelHTTPBidirServer extends I2PTunnelHTTPServer {
 

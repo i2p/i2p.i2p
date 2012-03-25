@@ -14,7 +14,6 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.util.EepGet;
-import net.i2p.util.Log;
 
 /**
  * A network-based naming service using HTTP, with in-memory caching.

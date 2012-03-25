@@ -37,10 +37,8 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
-import net.i2p.util.RandomSource;
 import net.i2p.util.SimpleByteCache;
 
 /** 

@@ -17,7 +17,6 @@ import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.util.Log;
 
 /**
  * Pull the caching used only by KBucketImpl out of Hash and put it here.

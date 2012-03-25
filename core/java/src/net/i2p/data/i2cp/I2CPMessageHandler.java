@@ -9,7 +9,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 

@@ -11,7 +11,6 @@ package net.i2p.router.startup;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Properties;
 
 import net.i2p.data.Certificate;

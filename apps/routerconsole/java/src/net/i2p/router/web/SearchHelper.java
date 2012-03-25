@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
-import net.i2p.util.PortMapper;
 
 /**
  *  Helper for searches.

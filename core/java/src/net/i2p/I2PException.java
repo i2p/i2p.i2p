@@ -9,8 +9,7 @@ package net.i2p;
  *
  */
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
+
 
 /**
  * Base class of I2P exceptions

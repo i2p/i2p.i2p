@@ -8,8 +8,6 @@ package net.i2p.router.dummy;
  *
  */
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;

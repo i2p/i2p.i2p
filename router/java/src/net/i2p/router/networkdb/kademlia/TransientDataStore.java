@@ -12,12 +12,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;

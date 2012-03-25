@@ -1,6 +1,5 @@
 package net.i2p.util;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import net.i2p.I2PAppContext;

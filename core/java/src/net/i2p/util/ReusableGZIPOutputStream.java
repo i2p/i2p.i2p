@@ -3,7 +3,6 @@ package net.i2p.util;
 //import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;

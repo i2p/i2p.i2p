@@ -18,8 +18,6 @@ import java.io.OutputStreamWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -28,7 +26,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;

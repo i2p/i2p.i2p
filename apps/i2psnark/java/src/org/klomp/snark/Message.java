@@ -23,8 +23,6 @@ package org.klomp.snark;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.i2p.util.SimpleTimer;
-
 // Used to queue outgoing connections
 // sendMessage() should be used to translate them to wire format.
 class Message

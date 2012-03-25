@@ -18,7 +18,6 @@ import java.util.TimeZone;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 
 /**
  * Component to manage the munging of hashes into routing keys - given a hash, 

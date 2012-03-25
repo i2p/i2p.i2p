@@ -1,12 +1,6 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.zip.GZIPOutputStream;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import net.i2p.data.DataHelper;
 
 /**
  * Provide a cache of reusable GZIP unzipper streams.

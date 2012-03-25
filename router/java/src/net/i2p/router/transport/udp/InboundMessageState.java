@@ -1,6 +1,5 @@
 package net.i2p.router.transport.udp;
 
-import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;

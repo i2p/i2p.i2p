@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,9 +33,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.util.HexDump;                             // debug
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.OrderedProperties;
 import net.i2p.util.VersionComparator;
 
 public class NetDbRenderer {

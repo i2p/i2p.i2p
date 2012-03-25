@@ -8,9 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.util.Properties;
-
-import net.i2p.client.I2PClient;
 import net.i2p.router.message.OutboundCache;
 import net.i2p.router.message.OutboundClientMessageOneShotJob;
 import net.i2p.util.Log;

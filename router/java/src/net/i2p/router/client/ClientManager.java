@@ -13,18 +13,15 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
-import net.i2p.data.TunnelId;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
@@ -34,7 +31,6 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelInfo;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 

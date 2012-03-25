@@ -44,13 +44,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
@@ -67,7 +65,6 @@ import net.i2p.i2ptunnel.socks.I2PSOCKSIRCTunnel;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.i2ptunnel.streamr.StreamrConsumer;
 import net.i2p.i2ptunnel.streamr.StreamrProducer;
-import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;
 

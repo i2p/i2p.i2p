@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;

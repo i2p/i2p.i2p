@@ -17,8 +17,6 @@ import java.util.Date;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DateAndFlags;
-import net.i2p.data.Destination;
-import net.i2p.data.Payload;
 
 /**
  * Same as SendMessageMessage, but with an expiration to be passed to the router

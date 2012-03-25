@@ -1,13 +1,9 @@
 package net.i2p.router.client;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.i2cp.I2CPMessage;
-import net.i2p.data.i2cp.I2CPMessageImpl;
-import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.PoisonI2CPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;

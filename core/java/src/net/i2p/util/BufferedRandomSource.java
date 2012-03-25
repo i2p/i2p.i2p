@@ -10,7 +10,6 @@ package net.i2p.util;
  */
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 
 /**
  * Allocate data out of a large buffer of data, rather than the PRNG's 

@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 

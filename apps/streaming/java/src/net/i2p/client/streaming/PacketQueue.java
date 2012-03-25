@@ -1,13 +1,9 @@
 package net.i2p.client.streaming;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.ByteArray;
-import net.i2p.data.SessionKey;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 

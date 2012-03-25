@@ -22,7 +22,6 @@ import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelRunner;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.Log;
 
 public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 

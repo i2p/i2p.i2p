@@ -18,7 +18,6 @@ import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelInfo;
 
 /**
  * Manage all interactions with clients 

@@ -3,7 +3,6 @@ package net.i2p.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.i2p.I2PAppContext;

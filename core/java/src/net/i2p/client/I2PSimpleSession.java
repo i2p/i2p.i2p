@@ -12,17 +12,11 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Destination;
-import net.i2p.data.Hash;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
-import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
-import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
-import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
-import net.i2p.util.I2PAppThread;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.

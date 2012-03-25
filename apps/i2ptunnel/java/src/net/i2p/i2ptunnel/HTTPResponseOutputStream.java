@@ -8,14 +8,12 @@ package net.i2p.i2ptunnel;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.zip.GZIPInputStream;
 import java.util.Locale;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -23,7 +21,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.BigPipedInputStream;
 import net.i2p.util.ByteCache;
-import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.ReusableGZIPInputStream;
 

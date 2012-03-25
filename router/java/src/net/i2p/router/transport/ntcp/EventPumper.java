@@ -21,7 +21,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.ConcurrentHashSet;

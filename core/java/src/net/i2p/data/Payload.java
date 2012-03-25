@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines the actual payload of a message being delivered, including the 
  * standard encryption wrapping, as defined by the I2P data structure spec.

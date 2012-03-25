@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Simple rate calculator for periodically sampled data points - determining an 

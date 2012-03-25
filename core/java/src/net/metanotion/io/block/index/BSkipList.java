@@ -30,9 +30,7 @@ package net.metanotion.io.block.index;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 
-import net.metanotion.io.RandomAccessInterface;
 import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.*;

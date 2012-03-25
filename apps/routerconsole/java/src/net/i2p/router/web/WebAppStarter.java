@@ -9,9 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.SecureDirectory;
-import net.i2p.util.PortMapper;
 
-import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;

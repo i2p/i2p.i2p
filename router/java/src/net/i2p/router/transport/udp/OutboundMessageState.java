@@ -1,6 +1,5 @@
 package net.i2p.router.transport.udp;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import net.i2p.I2PAppContext;

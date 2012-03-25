@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.ConcurrentHashSet;

@@ -5,27 +5,19 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.i2p.data.DataHelper;
-import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.pool.TunnelPool;
-import net.i2p.router.CommSystemFacade;
 import net.i2p.stat.RateStat;
-import net.i2p.util.ObjectCounter;
 
 /**
  *  tunnels.jsp

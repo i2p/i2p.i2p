@@ -2,7 +2,6 @@ package net.i2p.router.client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,7 +13,6 @@ import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

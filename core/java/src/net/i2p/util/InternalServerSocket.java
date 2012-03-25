@@ -1,9 +1,6 @@
 package net.i2p.util;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.InetAddress;
@@ -14,8 +11,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import net.i2p.I2PAppContext;
 
 /**
  *  A simple in-JVM ServerSocket using Piped Streams.

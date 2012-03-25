@@ -9,8 +9,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
 
-import net.i2p.I2PException;
-
 /**
  * Bridge to I2PSocket.
  *

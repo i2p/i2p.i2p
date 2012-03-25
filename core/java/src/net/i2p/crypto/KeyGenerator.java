@@ -12,19 +12,14 @@ package net.i2p.crypto;
 import java.math.BigInteger;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
-import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
-import net.i2p.util.RandomSource;
 
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom

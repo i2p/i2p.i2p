@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import java.io.IOException;
 import java.util.List;
 
-import net.i2p.apps.systray.SysTray;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;

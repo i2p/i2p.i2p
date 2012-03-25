@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.util.Log;

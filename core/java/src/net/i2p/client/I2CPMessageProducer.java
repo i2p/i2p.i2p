@@ -9,7 +9,6 @@ package net.i2p.client;
  *
  */
 
-import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;

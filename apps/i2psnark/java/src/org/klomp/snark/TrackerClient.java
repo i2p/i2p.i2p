@@ -39,8 +39,6 @@ import net.i2p.data.Hash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
-import org.klomp.snark.dht.DHT;
-
 /**
  * Informs metainfo tracker of events and gets new peers for peer
  * coordinator.

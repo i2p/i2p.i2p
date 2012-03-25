@@ -22,7 +22,6 @@ import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
-import net.i2p.util.Clock;
 import net.i2p.util.KeyRing;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 

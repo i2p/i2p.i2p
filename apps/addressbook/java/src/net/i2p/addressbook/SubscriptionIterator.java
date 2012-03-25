@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;  // debug
 
 /**
  * An iterator over the subscriptions in a SubscriptionList.  Note that this iterator

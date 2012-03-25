@@ -2,7 +2,6 @@ package net.i2p.i2ptunnel.irc;
 
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.client.streaming.I2PSocketManager;

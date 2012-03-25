@@ -5,8 +5,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import net.i2p.I2PAppContext;
-
 /**
  * Like ByteCache but works directly with byte arrays, not ByteArrays.
  * These are designed to be small caches, so there's no cleaner task

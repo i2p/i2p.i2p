@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateFactory;
@@ -17,9 +15,7 @@ import java.util.Locale;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;

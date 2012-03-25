@@ -1,7 +1,6 @@
 package net.i2p.internal;
 
 import net.i2p.client.I2PSessionException;
-import net.i2p.data.i2cp.I2CPMessage;
 
 /**
  * A manager for the in-JVM I2CP message interface

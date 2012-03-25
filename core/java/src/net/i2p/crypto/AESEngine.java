@@ -14,7 +14,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.util.SimpleByteCache;
 
 /** 

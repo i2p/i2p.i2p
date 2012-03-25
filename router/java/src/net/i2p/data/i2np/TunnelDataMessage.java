@@ -13,7 +13,6 @@ import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.TunnelId;
 import net.i2p.util.ByteCache;
-import net.i2p.util.Log;
 
 /**
  * Defines the message sent between routers as part of the tunnel delivery

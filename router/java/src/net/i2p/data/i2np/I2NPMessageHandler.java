@@ -8,7 +8,6 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 

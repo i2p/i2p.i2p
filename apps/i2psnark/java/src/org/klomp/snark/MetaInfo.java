@@ -33,7 +33,6 @@ import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 

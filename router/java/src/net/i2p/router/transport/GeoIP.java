@@ -18,8 +18,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;

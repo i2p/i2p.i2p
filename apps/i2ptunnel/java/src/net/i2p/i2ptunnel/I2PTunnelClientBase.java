@@ -14,10 +14,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -36,8 +34,6 @@ import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runnable {
 

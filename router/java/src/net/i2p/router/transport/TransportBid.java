@@ -8,8 +8,6 @@ package net.i2p.router.transport;
  *
  */
 
-import net.i2p.data.RouterInfo;
-
 /**
  * Provide a bid for how much it would "cost" to transfer a message of a 
  * particular peer
