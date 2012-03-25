@@ -168,6 +168,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             switch(CPUID.getCPUModel() + CPUID.getCPUExtendedModel()){
                 case 4:
                     modelString = "Athlon 64/Mobile XP-M";
+                    break;
                 case 5:
                     modelString = "Athlon 64 FX Opteron";
                     break;
