@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Inet4Address;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.util.HashMap;
@@ -311,13 +312,20 @@ public class RouterConsoleRunner {
                         // Test before we add the connector, because Jetty 6 won't start if any of the
                         // connectors are bad
                         InetAddress test = InetAddress.getByName(host);
-                        ServerSocket testSock = null;
                         if ((!hasIPV6) && (!(test instanceof Inet4Address)))
                             throw new IOException("IPv6 addresses unsupported");
                         if ((!hasIPV4) && (test instanceof Inet4Address))
                             throw new IOException("IPv4 addresses unsupported");
+                        ServerSocket testSock = null;
                         try {
-                            testSock = new ServerSocket(0, 0, test);
+                            // On Windows, this was passing and Jetty was still failing,
+                            // possibly due to %scope_id ???
+                            // https://issues.apache.org/jira/browse/ZOOKEEPER-667
+                            //testSock = new ServerSocket(0, 0, test);
+                            // so do exactly what Jetty does in SelectChannelConnector.open()
+                            testSock = new ServerSocket();
+                            InetSocketAddress isa = new InetSocketAddress(host, 0);
+                            testSock.bind(isa);
                         } finally {
                             if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                         }
@@ -369,7 +377,11 @@ public class RouterConsoleRunner {
                                 throw new IOException("IPv4 addresses unsupported");
                             ServerSocket testSock = null;
                             try {
-                                testSock = new ServerSocket(0, 0, test);
+                                // see comments above
+                                //testSock = new ServerSocket(0, 0, test);
+                                testSock = new ServerSocket();
+                                InetSocketAddress isa = new InetSocketAddress(host, 0);
+                                testSock.bind(isa);
                             } finally {
                                 if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                             }
