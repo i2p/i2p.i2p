@@ -143,7 +143,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     /** is this a follw up byte? */
     private static final byte MASK_IS_SUBSEQUENT = FragmentHandler.MASK_IS_SUBSEQUENT;
     /** how should this be delivered?  shift this 5 the right and get TYPE_* */
-    private static final byte MASK_TYPE = FragmentHandler.MASK_TYPE;
+    //private static final byte MASK_TYPE = FragmentHandler.MASK_TYPE;
     /** is this the first of a fragmented message? */
     private static final byte MASK_FRAGMENTED = FragmentHandler.MASK_FRAGMENTED;
 

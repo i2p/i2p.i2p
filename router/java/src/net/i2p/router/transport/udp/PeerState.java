@@ -180,8 +180,6 @@ class PeerState {
     private long _packetsPeriodTransmitted;
     private int _packetsPeriodRetransmitted;
     private int _packetRetransmissionRate;
-    /** at what time did we last break off the retransmission counter period */
-    private long _retransmissionPeriodStart;
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private long _packetsReceivedDuplicate;
     private long _packetsReceived;

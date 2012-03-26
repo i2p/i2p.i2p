@@ -187,11 +187,13 @@ class UDPReceiver {
         return queueSize;
     }
     
+  /****
     private class ArtificiallyDelayedReceive implements SimpleTimer.TimedEvent {
         private UDPPacket _packet;
         public ArtificiallyDelayedReceive(UDPPacket packet) { _packet = packet; }
         public void timeReached() { doReceive(_packet); }
     }
+  ****/
     
     /**
      * Blocking call to retrieve the next inbound packet, or null if we have

@@ -225,8 +225,6 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         return compressed;
     }
     
-    private static final int NUM_TAGS = 50;
-
     /**
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto

@@ -345,22 +345,6 @@ class ProfileOrganizerRenderer {
         return Messages.getString(s, _context);
     }
 
-    /**
-     *  translate a string with a parameter
-     *  This is a lot more expensive than _(s), so use sparingly.
-     *
-     *  @param s string to be translated containing {0}
-     *    The {0} will be replaced by the parameter.
-     *    Single quotes must be doubled, i.e. ' -> '' in the string.
-     *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
-     *    Do not double the single quotes in the parameter.
-     *    Use autoboxing to call with ints, longs, floats, etc.
-     */
-    private String _(String s, Object o) {
-        return Messages.getString(s, o, _context);
-    }
-
     /** translate (ngettext) @since 0.8.5 */
     public String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p, _context);

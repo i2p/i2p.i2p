@@ -98,8 +98,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private int _lastOurPort;
 
     private static final int DROPLIST_PERIOD = 10*60*1000;
-    private static final int MAX_DROPLIST_SIZE = 256;
-    
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
     /** now unused, we pick a random port */
@@ -1456,8 +1454,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return 0;
     }
 
-    private static final int DROP_INACTIVITY_TIME = 60*1000;
-    
     public void failed(OutboundMessageState msg) { failed(msg, true); }
     void failed(OutboundMessageState msg, boolean allowPeerFailure) {
         if (msg == null) return;
@@ -2218,13 +2214,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     private static final DecimalFormat _pctFmt = new DecimalFormat("#0.0%");
-    private static final String formatPct(double pct) {
-        synchronized (_pctFmt) {
-            return _pctFmt.format(pct);
-        }
-    }
-    
-    
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /**
@@ -2311,15 +2300,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    /**
-     * If we haven't had a non-unknown test result in 5 minutes, we really dont know.  Otherwise,
-     * when we receive an unknown we should ignore that value and try again (with different peers)
-     *
-     */
-    private static final long STATUS_GRACE_PERIOD = 5*60*1000;
-    private long _statusLastCalled;
-    private short _lastStatus = CommSystemFacade.STATUS_UNKNOWN;
-    
     void setReachabilityStatus(short status) { 
         short old = _reachabilityStatus;
         long now = _context.clock().now();
@@ -2355,8 +2335,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //}
                 break;
         }
-        _statusLastCalled = now;
-        _lastStatus = status;
         if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
@@ -2403,8 +2381,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         return null;
     }
-    
-    private static final String PROP_SHOULD_TEST = "i2np.udp.shouldTest";
     
     private boolean shouldTest() {
         return ! _context.router().isHidden();

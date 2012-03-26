@@ -36,7 +36,6 @@ class ConnectionManager {
     private final ConcurrentHashMap<Long, Connection> _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
     private final Map<Long, PingRequest> _pendingPings;
-    private boolean _allowIncoming;
     private boolean _throttlersInitialized;
     private int _maxConcurrentStreams;
     private final ConnectionOptions _defaultOptions;
@@ -494,13 +493,9 @@ class ConnectionManager {
     
     private static class PingRequest {
         private boolean _ponged;
-        private final Destination _peer;
-        private final PacketLocal _packet;
         private final PingNotifier _notifier;
 
         public PingRequest(Destination peer, PacketLocal packet, PingNotifier notifier) { 
-            _peer = peer;
-            _packet = packet;
             _notifier = notifier;
         }
 

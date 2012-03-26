@@ -1069,7 +1069,6 @@ class Connection {
      * fired to reschedule event notification
      */
     class ConEvent implements SimpleTimer.TimedEvent {
-        private Exception _addedBy; // unused?
         public ConEvent() { 
             //_addedBy = new Exception("added by");
         }

@@ -14,7 +14,6 @@ import net.i2p.util.Log;
  *
  */
 class Writer {
-    private final RouterContext _context;
     private final Log _log;
     private final List<NTCPConnection> _pendingConnections;
     private final List<NTCPConnection> _liveWrites;
@@ -22,7 +21,6 @@ class Writer {
     private final List<Runner> _runners;
     
     public Writer(RouterContext ctx) {
-        _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _pendingConnections = new ArrayList(16);
         _runners = new ArrayList(5);

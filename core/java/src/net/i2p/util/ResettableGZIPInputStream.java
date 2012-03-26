@@ -20,12 +20,10 @@ import net.i2p.data.DataHelper;
  */
 public class ResettableGZIPInputStream extends InflaterInputStream {
     private static final int FOOTER_SIZE = 8; // CRC32 + ISIZE
-    private static final boolean DEBUG = false;
     /** See below for why this is necessary */
     private final ExtraByteInputStream _extraByteInputStream;
     /** keep a typesafe copy of this */
     private final LookaheadInputStream _lookaheadStream;
-    private final InputStream _sequenceStream = null;
     private final CRC32 _crc32;
     private final byte _buf1[] = new byte[1];
     private boolean _complete;
@@ -179,8 +177,6 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
     }
 
-    private long getCurrentCRCVal() { return _crc32.getValue(); }
-    
     private void verifyFooter() throws IOException {
         byte footer[] = _lookaheadStream.getFooter();
         

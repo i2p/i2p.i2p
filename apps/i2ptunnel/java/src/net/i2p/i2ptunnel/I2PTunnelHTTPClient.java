@@ -1014,10 +1014,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      *  Todo: Limit line length for buffered reads, or go back to unbuffered for all
      */
     private static class InputReader {
-        BufferedReader _br;
         InputStream _s;
         public InputReader(InputStream s) {
-            _br = null;
             _s = s;
         }
         String readLine(String method) throws IOException {
@@ -1212,8 +1210,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             //_log.warn(getPrefix(requestId) + "Client disconnected before we could say that destination " + "was unknown", ex);
         }
     }
-
-    private final static String SUPPORTED_HOSTS[] = { "i2p", "www.i2p.com", "i2p."};
 
     /** @param host ignored */
     private static boolean isSupportedAddress(String host, String protocol) {

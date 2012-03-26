@@ -337,7 +337,6 @@ public abstract class TunnelPeerSelector {
         }
     }
     
-    private static final long DONT_EXCLUDE_PERIOD = 15*60*1000;
     /** 0.7.8 and earlier had major message corruption bugs */
     private static final String MIN_VERSION = "0.7.9";
     private static final VersionComparator _versionComparator = new VersionComparator();

@@ -21,10 +21,8 @@ import net.i2p.router.web.ConfigServiceHandler;
  */
 public class ConfigNetHandler extends FormHandler {
     private String _hostname;
-    private boolean _reseedRequested;
     private boolean _saveRequested;
     private boolean _recheckReachabilityRequested;
-    private boolean _timeSyncEnabled;
     private boolean _requireIntroductions;
     private boolean _hiddenMode;
     private boolean _dynamicKeys;
@@ -45,8 +43,6 @@ public class ConfigNetHandler extends FormHandler {
     private String _outboundRate;
     private String _outboundBurstRate;
     private String _outboundBurst;
-    private String _reseedFrom;
-    private boolean _enableLoadTesting;
     private String _sharePct;
     private boolean _ratesOnly;
     private boolean _udpDisabled;
@@ -65,11 +61,11 @@ public class ConfigNetHandler extends FormHandler {
     }
     
     public void setSave(String moo) { _saveRequested = true; }
-    public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
+    public void setEnabletimesync(String moo) { }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
     public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
-    public void setEnableloadtesting(String moo) { _enableLoadTesting = true; }
+    public void setEnableloadtesting(String moo) { }
     public void setUdpAutoIP(String mode) {
         _udpAutoIP = mode;
         _hiddenMode = "hidden".equals(mode);

@@ -62,9 +62,6 @@ public class Subscriber implements Sink {
     
     
     
-    private I2PSession sess;
-    private Source listener;
     private Set<Destination> subscriptions;
     private MultiSource multi;
-    private Source server;
 }

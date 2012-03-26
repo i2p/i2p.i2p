@@ -29,20 +29,12 @@ import net.i2p.util.Log;
 class RequestLeaseSetJob extends JobImpl {
     private final Log _log;
     private final ClientConnectionRunner _runner;
-    private final LeaseSet _ls;
-    private final long _expiration;
-    private final Job _onCreate;
-    private final Job _onFail;
     private final LeaseRequestState _requestState;
     
     public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseSet set, long expiration, Job onCreate, Job onFail, LeaseRequestState state) {
         super(ctx);
         _log = ctx.logManager().getLog(RequestLeaseSetJob.class);
         _runner = runner;
-        _ls = set;
-        _expiration = expiration;
-        _onCreate = onCreate;
-        _onFail = onFail;
         _requestState = state;
         ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 60*60*1000 });

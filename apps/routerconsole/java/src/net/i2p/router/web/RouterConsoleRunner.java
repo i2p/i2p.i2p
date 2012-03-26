@@ -67,7 +67,6 @@ public class RouterConsoleRunner {
     private String _sslListenHost;
     private String _webAppsDir;
 
-    private static final String PROP_WEBAPP_CONFIG_FILENAME = "router.webappsConfigFile";
     private static final String DEFAULT_WEBAPP_CONFIG_FILENAME = "webapps.config";
     private static final DigestAuthenticator authenticator = new DigestAuthenticator();
     public static final String ROUTERCONSOLE = "routerconsole";

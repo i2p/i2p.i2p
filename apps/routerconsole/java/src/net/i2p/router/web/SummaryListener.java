@@ -46,7 +46,6 @@ class SummaryListener implements RateSummaryListener {
     private String _eventName;
     private RrdDb _db;
     private Sample _sample;
-    private RrdMemoryBackendFactory _factory;
     private SummaryRenderer _renderer;
     private int _rows;
     

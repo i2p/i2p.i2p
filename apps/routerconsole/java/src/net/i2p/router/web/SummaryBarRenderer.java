@@ -385,9 +385,4 @@ public class SummaryBarRenderer {
     private String _(String s) {
         return Messages.getString(s, _context);
     }
-
-    /** translate a string with a parameter */
-    private String _(String s, Object o) {
-        return Messages.getString(s, o, _context);
-    }
 }

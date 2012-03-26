@@ -132,7 +132,7 @@ public final class SHA256Generator {
         }
     }
 
-    private static final int RUNS = 100000;
+    //private static final int RUNS = 100000;
 
     /**
      *  Test the GNU and the JVM's implementations for speed

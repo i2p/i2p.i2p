@@ -8,8 +8,6 @@ import net.i2p.util.FileUtil;
 import org.mortbay.jetty.Server;
 
 public class RunStandalone {
-    private Server _server;
-    
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
         System.setProperty("org.mortbay.xml.XmlParser.NotValidating", "true");

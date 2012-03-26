@@ -76,7 +76,6 @@ public class IndexBean {
     private String _profile;
     private boolean _startOnLoad;
     private boolean _sharedClient;
-    private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
     private final Set<String> _booleanOptions;
     private final Map<String, String> _otherOptions;

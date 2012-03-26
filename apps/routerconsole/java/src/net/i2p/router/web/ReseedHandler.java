@@ -7,8 +7,6 @@ import net.i2p.router.networkdb.reseed.Reseeder;
  * Handler to deal with reseed requests.
  */
 public class ReseedHandler extends HelperBase {
-    private static Reseeder _reseedRunner;
-
     public ReseedHandler() {
         this(ContextHelper.getContext(null));
     }

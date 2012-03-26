@@ -1038,13 +1038,6 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         /**
          *  Caller must synch.
          */
-        public boolean contains(SessionTag tag) {
-            return _sessionTags.contains(tag);
-        }
-
-        /**
-         *  Caller must synch.
-         */
         public void consume(SessionTag tag) {
             _sessionTags.remove(tag);
         }

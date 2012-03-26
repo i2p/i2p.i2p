@@ -159,9 +159,6 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         private Hash _router;
         private TunnelId _tunnelId;
 
-        public TunnelEndpoint() {
-        }
-
         public TunnelEndpoint(Hash router, TunnelId id) {
             _router = router;
             _tunnelId = id;
@@ -171,16 +168,8 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             return _router;
         }
 
-        public void setRouter(Hash router) {
-            _router = router;
-        }
-
         public TunnelId getTunnelId() {
             return _tunnelId;
-        }
-
-        public void setTunnelId(TunnelId tunnelId) {
-            _tunnelId = tunnelId;
         }
     }
 }

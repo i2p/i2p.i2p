@@ -193,15 +193,6 @@ public class TransportManager implements TransportEventListener {
     
     int getTransportCount() { return _transports.size(); }
     
-    private boolean isSupported(Set addresses, Transport t) {
-        for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
-            RouterAddress addr = (RouterAddress)iter.next();
-            if (addr.getTransportStyle().equals(t.getStyle()))
-                return true;
-        }
-        return false;
-    }
-    
     public int countActivePeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {

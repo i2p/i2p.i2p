@@ -24,15 +24,11 @@ import net.i2p.util.Log;
 class MessageReceivedJob extends JobImpl {
     private Log _log;
     private ClientConnectionRunner _runner;
-    private Destination _to;
-    private Destination _from;
     private Payload _payload;
     public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest, Destination fromDest, Payload payload) {
         super(ctx);
         _log = ctx.logManager().getLog(MessageReceivedJob.class);
         _runner = runner;
-        _to = toDest;
-        _from = fromDest;
         _payload = payload;
     }
     

@@ -8,7 +8,6 @@ class JobQueueRunner implements Runnable {
     private final RouterContext _context;
     private boolean _keepRunning;
     private final int _id;
-    private long _numJobs;
     private Job _currentJob;
     private Job _lastJob;
     private long _lastBegin;

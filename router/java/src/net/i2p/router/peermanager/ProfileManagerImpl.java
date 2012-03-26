@@ -148,11 +148,6 @@ public class ProfileManagerImpl implements ProfileManager {
     }
     
     
-    private int getSlowThreshold() {
-        // perhaps we should have this compare vs. tunnel.testSuccessTime?
-        return 5*1000;
-    }
-    
     /**
      * Note that the peer participated in a tunnel that failed.  Its failure may not have
      * been the peer's fault however.

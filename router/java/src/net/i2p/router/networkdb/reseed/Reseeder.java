@@ -501,16 +501,6 @@ public class Reseeder {
 
     }
 
-    /**
-     *  Mark a string for extraction by xgettext and translation.
-     *  Use this only in static initializers.
-     *  It does not translate!
-     *  @return s
-     */
-    private static final String _x(String s) {
-        return s;
-    }
-
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /** translate */

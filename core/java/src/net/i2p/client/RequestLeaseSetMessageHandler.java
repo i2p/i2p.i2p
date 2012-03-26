@@ -102,10 +102,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         private final PrivateKey _privKey;
         private final SigningPublicKey _signingPubKey;
         private final SigningPrivateKey _signingPrivKey;
-        private final Destination _dest;
-
         public LeaseInfo(Destination dest) {
-            _dest = dest;
             Object encKeys[] = KeyGenerator.getInstance().generatePKIKeypair();
             Object signKeys[] = KeyGenerator.getInstance().generateSigningKeypair();
             _pubKey = (PublicKey) encKeys[0];

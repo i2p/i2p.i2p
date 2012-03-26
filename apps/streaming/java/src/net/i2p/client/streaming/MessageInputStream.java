@@ -19,7 +19,6 @@ import net.i2p.util.Log;
  *
  */
 class MessageInputStream extends InputStream {
-    private final I2PAppContext _context;
     private final Log _log;
     /** 
      * List of ByteArray objects of data ready to be read,
@@ -57,7 +56,6 @@ class MessageInputStream extends InputStream {
     private final Object _dataLock;
     
     public MessageInputStream(I2PAppContext ctx) {
-        _context = ctx;
         _log = ctx.logManager().getLog(MessageInputStream.class);
         _readyDataBlocks = new ArrayList(4);
         _highestReadyBlockId = -1;

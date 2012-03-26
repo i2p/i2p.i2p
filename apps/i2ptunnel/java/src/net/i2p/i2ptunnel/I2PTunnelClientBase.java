@@ -64,7 +64,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     // private byte[] pubkey;
 
-    private String handlerName;
     private String privKeyFile;
 
     // true if we are chained from a server.
@@ -99,7 +98,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _clientId = clientId;
         this.localPort = localPort;
         this.l = l;
-        this.handlerName = localPort + " #" + _clientId;
         _ownDest = true; // == ! shared client
         _context = tunnel.getContext();
         _context.statManager().createRateStat("i2ptunnel.client.closeBacklog", "How many pending sockets remain when we close one due to backlog?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -166,7 +164,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _clientId = ++__clientId;
         this.localPort = localPort;
         this.l = l;
-        this.handlerName = handlerName + _clientId;
         _ownDest = ownDest; // == ! shared client
 
 

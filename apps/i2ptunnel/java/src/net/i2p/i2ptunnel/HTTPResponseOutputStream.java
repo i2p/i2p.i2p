@@ -43,7 +43,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private boolean _headerWritten;
     private final byte _buf1[];
     protected boolean _gzip;
-    private long _dataWritten;
     protected long _dataExpected;
     protected String _contentType;
 
@@ -76,7 +75,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     public void write(byte buf[], int off, int len) throws IOException {
         if (_headerWritten) {
             out.write(buf, off, len);
-            _dataWritten += len;
             //out.flush();
             return;
         }
@@ -92,7 +90,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (i + 1 < len) {
                     // write out the remaining
                     out.write(buf, off+i+1, len-i-1);
-                    _dataWritten += len-i-1;
                     //out.flush();
                 }
                 return;

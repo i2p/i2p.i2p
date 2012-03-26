@@ -35,9 +35,6 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     private Hash _fromHash;
     private FloodfillNetworkDatabaseFacade _facade;
 
-    private static final int ACK_TIMEOUT = 15*1000;
-    private static final int ACK_PRIORITY = 100;
-    
     public HandleFloodfillDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());

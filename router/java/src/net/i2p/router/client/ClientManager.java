@@ -52,9 +52,6 @@ class ClientManager {
     /** SSL interface (only) @since 0.8.3 */
     private static final String PROP_ENABLE_SSL = "i2cp.SSL";
 
-    /** ms to wait before rechecking for inbound messages to deliver to clients */
-    private final static int INBOUND_POLL_INTERVAL = 300;
-    
     public ClientManager(RouterContext context, int port) {
         _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);

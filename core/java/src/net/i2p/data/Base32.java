@@ -56,8 +56,6 @@ public class Base32 {
     };
 
     private final static byte BAD_ENCODING = -9; // Indicates error in encoding
-    private final static byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
-
     /** Defeats instantiation. */
     private Base32() { // nop
     }

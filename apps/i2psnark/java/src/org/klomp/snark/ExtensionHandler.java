@@ -167,8 +167,6 @@ abstract class ExtensionHandler {
     private static final int TYPE_DATA = 1;
     private static final int TYPE_REJECT = 2;
 
-    private static final int CHUNK_SIZE = 16*1024;
-
     /**
      * REF: BEP 9
      * @since 0.8.4
@@ -253,9 +251,11 @@ abstract class ExtensionHandler {
         sendMessage(peer, TYPE_REQUEST, piece);
     }
 
+  /****
     private static void sendReject(Peer peer, int piece) {
         sendMessage(peer, TYPE_REJECT, piece);
     }
+  ****/
 
     /** REQUEST and REJECT are the same except for message type */
     private static void sendMessage(Peer peer, int type, int piece) {

@@ -828,6 +828,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      *
      * @return true if the arrays have identical contents
      */
+  /****
     private static final boolean areEqual(byte[] a, byte[] b) {
         int aLength = a.length;
         if (aLength != b.length) return false;
@@ -835,15 +836,18 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
             if (a[i] != b[i]) return false;
         return true;
     }
+  ****/
 
     /**
      * Returns a string of 2 hexadecimal digits (most significant
      * digit first) corresponding to the lowest 8 bits of <i>n</i>.
      */
+  /****
     private static final String byteToString(int n) {
         char[] buf = { _HEX_DIGITS[(n >>> 4) & 0x0F], _HEX_DIGITS[n & 0x0F]};
         return new String(buf);
     }
+  ****/
 
     /**
      * Returns a string of 8 hexadecimal digits (most significant

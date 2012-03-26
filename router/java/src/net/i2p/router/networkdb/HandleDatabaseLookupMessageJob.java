@@ -37,8 +37,6 @@ import net.i2p.util.Log;
 public class HandleDatabaseLookupMessageJob extends JobImpl {
     private Log _log;
     private DatabaseLookupMessage _message;
-    private RouterIdentity _from;
-    private Hash _fromHash;
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
     private final static int REPLY_TIMEOUT = 60*1000;
@@ -54,8 +52,6 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         super(ctx);
         _log = getContext().logManager().getLog(HandleDatabaseLookupMessageJob.class);
         _message = receivedMessage;
-        _from = from;
-        _fromHash = fromHash;
     }
     
     protected boolean answerAllQueries() { return false; }

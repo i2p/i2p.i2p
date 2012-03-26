@@ -185,7 +185,6 @@ public class SAMStreamSink {
         private String _remoteDestination;
         private boolean _closed;
         private long _started;
-        private long _totalReceived;
         private long _lastReceivedOn;
         private OutputStream _out;
         
@@ -222,7 +221,6 @@ public class SAMStreamSink {
         }
         public void received(byte data[], int offset, int len) {
             if (_closed) return;
-            _totalReceived += len;
             try {
                 _out.write(data, offset, len);
             } catch (IOException ioe) {

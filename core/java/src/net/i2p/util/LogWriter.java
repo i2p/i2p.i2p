@@ -31,7 +31,6 @@ class LogWriter implements Runnable {
     // volatile as it changes on log file rotation
     private volatile Writer _currentOut;
     private int _rotationNum = -1;
-    private String _logFilenamePattern;
     private File _currentFile;
     private final LogManager _manager;
 

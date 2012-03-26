@@ -453,7 +453,7 @@ public class DSAEngine {
         return rv;
     }
 
-    private static final int RUNS = 1000;
+    //private static final int RUNS = 1000;
 
     /**
      *  Run consistency and speed tests with both TheCrypto and java.security libraries.

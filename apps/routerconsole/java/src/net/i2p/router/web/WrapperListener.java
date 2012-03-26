@@ -18,7 +18,6 @@ import org.tanukisoftware.wrapper.event.WrapperEventListener;
  *  @since 0.8.13
  */
 class WrapperListener {
-    private final RouterContext _context;
     private final WrapperEventListener _listener;
 
     private static final String PROP_GRACEFUL_HUP = "router.gracefulHUP";
@@ -28,7 +27,6 @@ class WrapperListener {
      *  Registers with the wrapper in the constructor.
      */
     public WrapperListener(RouterContext ctx) {
-        _context = ctx;
         _listener = new SignalHandler(ctx);
         long mask = WrapperEventListener.EVENT_FLAG_CONTROL;
         WrapperManager.addWrapperEventListener(_listener, mask);

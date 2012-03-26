@@ -86,8 +86,6 @@ public class FloodSearchJob extends JobImpl {
 
     protected static final int CONCURRENT_SEARCHES = 2;
     private static final int FLOOD_SEARCH_TIME_FACTOR = 2;
-    private static final int FLOOD_SEARCH_TIME_MIN = 30*1000;
-
     /**
      *  Deprecated, unused, see FOSJ override
      */

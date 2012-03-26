@@ -737,7 +737,7 @@ public final class SHA1 extends MessageDigest implements Cloneable {
         hC += /* c= */ (c << 30) | (c >>> 2);
     }
 
-    private static final int RUNS = 100000;
+    //private static final int RUNS = 100000;
 
     /**
      *  Test the GNU and the JVM's implementations for speed

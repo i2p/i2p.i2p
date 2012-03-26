@@ -291,12 +291,6 @@ class FloodfillPeerSelector extends PeerSelector {
             _wanted = wanted;
         }
 
-        /**
-         *  @return unsorted list of all with the 'f' mark in their netdb
-         *          except for shitlisted ones.
-         */
-        public List<Hash> getFloodfillParticipants() { return _floodfillMatches; }
-
         private static final int EXTRA_MATCHES = 100;
         public void add(Hash entry) {
             //if (_context.profileOrganizer().isFailing(entry))

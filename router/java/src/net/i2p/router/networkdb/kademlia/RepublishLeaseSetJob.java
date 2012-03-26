@@ -22,7 +22,6 @@ import net.i2p.util.Log;
  */
 public class RepublishLeaseSetJob extends JobImpl {
     private final Log _log;
-    private final static long REPUBLISH_LEASESET_DELAY = 5*60*1000;
     public final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
     private final static int RETRY_DELAY = 20*1000;
     private final Hash _dest;

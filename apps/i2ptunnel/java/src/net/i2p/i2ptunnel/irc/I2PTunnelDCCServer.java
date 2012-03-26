@@ -49,9 +49,6 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     private final ConcurrentHashMap<Integer, LocalAddress> _resume;
     private final List<I2PSocket> _sockList;
 
-    // list of client tunnels?
-    private static long _id;
-
     /** just to keep super() happy */
     private static final InetAddress DUMMY;
     static {
@@ -67,8 +64,6 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     private static final int MAX_OUTGOING_PENDING = 20;
     private static final int MAX_OUTGOING_ACTIVE = 20;
     private static final long OUTBOUND_EXPIRE = 30*60*1000;
-    private static final long ACTIVE_EXPIRE = 60*60*1000;
-
     /**
      * There's no support for unsolicited incoming I2P connections,
      * so there's no server host or port parameters.
@@ -231,17 +226,6 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
             }
         }
         return -1;
-    }
-
-    private InetAddress getListenHost(Logging l) {
-        try {
-            return InetAddress.getByName(getTunnel().listenHost);
-        } catch (UnknownHostException uhe) {
-            l.log("Could not find listen host to bind to [" + getTunnel().host + "]");
-            _log.error("Error finding host to bind", uhe);
-            notifyEvent("openBaseClientResult", "error");
-            return null;
-        }
     }
 
     private void expireOutbound() {

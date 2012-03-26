@@ -24,17 +24,8 @@ class RouterThrottleImpl implements RouterThrottle {
      *
      */
     private static int JOB_LAG_LIMIT = 2*1000;
-    /**
-     * Arbitrary hard limit - if we throttle our network connection this many
-     * times in the previous 2 minute period, don't accept requests to 
-     * participate in tunnels.
-     *
-     */
-    private static int THROTTLE_EVENT_LIMIT = 30;
-    
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final int DEFAULT_MAX_TUNNELS = 5000;
-    private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
 
     /**

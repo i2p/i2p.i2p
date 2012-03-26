@@ -808,10 +808,6 @@ public class FIFOBandwidthLimiter {
             satisfiedBuffer = new ArrayList(1);
             init(0, 0, null);
 	}
-        public SimpleRequest(int in, int out, String target) {
-            satisfiedBuffer = new ArrayList(1);
-            init(in, out, target);
-	}
         public SimpleRequest(int in, int out, String target, CompleteListener lsnr, Object attachment) {
             satisfiedBuffer = new ArrayList(1);
             _lsnr = lsnr;
@@ -830,7 +826,6 @@ public class FIFOBandwidthLimiter {
             _requestId = ++__requestId;
             _requestTime = now();
         }
-        public Object getAvailabilityMonitor() { return SimpleRequest.this; }
         public String getRequestName() { return "Req" + _requestId + " to " + _target; }
         public long getRequestTime() { return _requestTime; }
         public int getTotalOutboundRequested() { return _outTotal; }
@@ -873,14 +868,6 @@ public class FIFOBandwidthLimiter {
                 _lsnr.complete(SimpleRequest.this);
         }
         int getAllocationsSinceWait() { return _waited ? _allocationsSinceWait : 0; }
-        void allocateAll() {
-            _inAllocated = _inTotal;
-            _outAllocated = _outTotal;
-            if (_lsnr == null)
-                _allocationsSinceWait++;
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("allocate all");
-            notifyAllocation();
-	}
         void allocateBytes(int in, int out) {
             _inAllocated += in;
             _outAllocated += out;

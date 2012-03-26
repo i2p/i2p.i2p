@@ -403,37 +403,6 @@ public class POP3MailBox {
 	}
 	
 	/**
-	 * send command to pop3 server (and expect single line answer), if any
-	 * exception occurs, reconnect and try again
-	 * 
-	 * @param cmd command to send
-	 * @return true if command was successful (+OK)
-	 */
-	private boolean sendCmd1(String cmd) {
-		boolean result = false;
-
-		synchronized (synchronizer) {
-
-			if (!isConnected())
-				connect();
-
-			try {
-				result = sendCmd1a(cmd);
-			}
-			catch (Exception e) {
-				Debug.debug(Debug.ERROR, "Exception: " + e.getCause());
-				Debug.debug(Debug.ERROR, "trying to reconnect" );
-				connect();
-				try {
-					result = sendCmd1a(cmd);
-				} catch (IOException e2) {
-					Debug.debug(Debug.ERROR, "reconnect failed: " + e2.getCause());
-				}
-			}
-		}
-		return result;
-	}
-	/**
 	 * send command to pop3 server (and expect single line answer)
 	 * 
 	 * @param cmd command to send

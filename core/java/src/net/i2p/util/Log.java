@@ -202,13 +202,9 @@ public class Log {
     }
 
     private static final class LogScope {
-        private final String _scopeName;
-        private final Class _scopeClass;
         private final String _scopeCache;
 
         public LogScope(String name, Class cls) {
-            _scopeName = name;
-            _scopeClass = cls;
             _scopeCache = getScope(name, cls);
         }
 

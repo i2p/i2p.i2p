@@ -34,8 +34,6 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
     //private MessageHandler _handler;
     //private GarlicMessageParser _parser;
    
-    private final static int FORWARD_PRIORITY = 50;
-    
     /**
      *  @param from ignored
      *  @param fromHash ignored

@@ -9,19 +9,15 @@ import net.i2p.util.Log;
  */
 public class MessageStateMonitor {
     private Log _log;
-    private RouterContext _context;
     private volatile int _inboundLiveCount;
     private volatile int _inboundReadCount;
-    private volatile int _inboundFinalizedCount;
     private volatile int _outboundLiveCount;
     private volatile int _outboundDiscardedCount;
     
     public MessageStateMonitor(RouterContext context) {
-        _context = context;
         _log = context.logManager().getLog(MessageStateMonitor.class);
         _inboundLiveCount = 0;
         _inboundReadCount = 0;
-        _inboundFinalizedCount = 0;
         _outboundLiveCount = 0;
         _outboundDiscardedCount = 0;
     }
@@ -37,7 +33,6 @@ public class MessageStateMonitor {
     }
     public void inboundMessageFinalized() {
         _inboundReadCount--;
-        _inboundFinalizedCount++;
         logStatus("inboundFinalized ");
     }
     

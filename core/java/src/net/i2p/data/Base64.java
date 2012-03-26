@@ -93,9 +93,6 @@ public class Base64 {
     /** The equals sign (=) as a byte. */
     private final static byte EQUALS_SIGN = (byte) '=';
 
-    /** The new line character (\n) as a byte. */
-    private final static byte NEW_LINE = (byte) '\n';
-
     /** The 64 valid Base64 values. */
     private final static byte[] ALPHABET = { (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F',
                                             (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L',
@@ -159,7 +156,6 @@ public class Base64 {
      -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9         // Decimal 244 - 255 */
     };
 
-    private final static byte BAD_ENCODING = -9; // Indicates error in encoding
     private final static byte WHITE_SPACE_ENC = -5; // Indicates white space in encoding
     private final static byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
 
@@ -557,21 +553,7 @@ public class Base64 {
     } // end encodeString
 ******/
 
-    /**
-     * Encodes a string in Base64 notation with line breaks
-     * after every 75 Base64 characters.
-     *
-     * @param s the string to encode
-     * @param breakLines Break lines at 80 characters or less.
-     * @return the encoded string
-     * @since 1.3
-     */
-    private static String encodeString(String s, boolean breakLines) {
-        byte src[] = new byte[s.length()];
-        for (int i = 0; i < src.length; i++)
-            src[i] = (byte)(s.charAt(i) & 0xFF);
-        return encodeBytes(src, breakLines);
-    } // end encodeString
+    
 
     /* ********  D E C O D I N G   M E T H O D S  ******** */
 

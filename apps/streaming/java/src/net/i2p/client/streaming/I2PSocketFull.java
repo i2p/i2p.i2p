@@ -14,7 +14,6 @@ import net.i2p.data.Destination;
  */
 class I2PSocketFull implements I2PSocket {
     private Connection _connection;
-    private I2PSocket.SocketErrorListener _listener;
     private Destination _remotePeer;
     private Destination _localPeer;
     
@@ -118,7 +117,6 @@ class I2PSocketFull implements I2PSocket {
     }
     
     public void setSocketErrorListener(I2PSocket.SocketErrorListener lsnr) {
-        _listener = lsnr;
     }
     
     public boolean isClosed() { 
@@ -142,8 +140,7 @@ class I2PSocketFull implements I2PSocket {
      *  @since 0.8.13
      */
     void destroy2() { 
-        _connection = null; 
-        _listener = null;
+        _connection = null;
     }
     
     /**

@@ -32,8 +32,6 @@ public class GarlicMessageReceiver {
     private final Hash _clientDestination;
     private final GarlicMessageParser _parser;
    
-    private final static int FORWARD_PRIORITY = 50;
-    
     public interface CloveReceiver {
         public void handleClove(DeliveryInstructions instructions, I2NPMessage data);
     }

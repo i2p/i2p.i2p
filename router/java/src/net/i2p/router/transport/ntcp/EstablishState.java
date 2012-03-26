@@ -93,9 +93,6 @@ class EstablishState {
 
     /** bytes received so far */
     private int _received;
-    /** bytes sent so far */
-    private int _sent;
-
     private byte _extra[];
 
     private final DHSessionKeyBuilder _dh;

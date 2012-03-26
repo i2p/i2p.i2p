@@ -32,8 +32,6 @@ public class PeerTestJob extends JobImpl {
     private PeerManager _manager;
     private boolean _keepTesting;
     private static final long DEFAULT_PEER_TEST_DELAY = 5*60*1000;
-    private static final int TEST_PRIORITY = 100;
-    
     /** Creates a new instance of PeerTestJob */
     public PeerTestJob(RouterContext context) {
         super(context);

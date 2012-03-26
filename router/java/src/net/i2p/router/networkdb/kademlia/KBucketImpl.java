@@ -43,7 +43,6 @@ class KBucketImpl implements KBucket {
     private int _end;
     /** when did we last shake things up */
     private long _lastShuffle;
-    private static final int SHUFFLE_DELAY = 10*60*1000;
     private I2PAppContext _context;
     
     public KBucketImpl(I2PAppContext context, LocalHash local) {

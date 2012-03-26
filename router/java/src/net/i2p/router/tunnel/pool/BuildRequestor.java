@@ -186,7 +186,6 @@ abstract class BuildRequestor {
     private static final boolean SEND_VARIABLE = true;
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
     private static final int SHORT_RECORDS = 5;
-    private static final int LONG_RECORDS = TunnelBuildMessage.MAX_RECORD_COUNT;
     private static final VersionComparator _versionComparator = new VersionComparator();
     private static final List<Integer> SHORT_ORDER = new ArrayList(SHORT_RECORDS);
     static {

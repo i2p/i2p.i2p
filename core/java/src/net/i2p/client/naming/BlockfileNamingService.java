@@ -999,6 +999,7 @@ public class BlockfileNamingService extends DummyNamingService {
         _invalid.clear();
     }
 
+  /****
     private void dumpDB() {
         synchronized(_bf) {
             if (_isClosed)
@@ -1028,6 +1029,7 @@ public class BlockfileNamingService extends DummyNamingService {
             deleteInvalid();
         }
     }
+  ****/
 
     private void close() {
         synchronized(_bf) {

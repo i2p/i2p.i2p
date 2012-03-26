@@ -53,23 +53,8 @@ import net.i2p.util.EventDispatcher;
 
     protected Destination dest = null;
 
-    private boolean listenerReady = false;
-
-    private ServerSocket ss;
-
     private final Object startLock = new Object();
-    private boolean startRunning = false;
-
-    private byte[] pubkey;
-
-    private String handlerName;
-
     private Object conLock = new Object();
-    
-    /** How many connections will we allow to be in the process of being built at once? */
-    private int _numConnectionBuilders;
-    /** How long will we allow sockets to sit in the _waitingSockets map before killing them? */
-    private int _maxWaitTime;
     
     private I2PSession _session;
     private Source _i2pSource;
@@ -141,7 +126,6 @@ import net.i2p.util.EventDispatcher;
                 throw new RuntimeException("failed to connect session", exc);
             }
             start();
-            startRunning = true;
             startLock.notify();
         }
         open = true;

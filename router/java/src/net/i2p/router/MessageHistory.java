@@ -73,7 +73,6 @@ public class MessageHistory {
         _doLog = false;
     }
 
-    private void setDoLog(boolean log) { _doLog = log; }
     public boolean getDoLog() { return _doLog; }
     
     /** @deprecated unused */

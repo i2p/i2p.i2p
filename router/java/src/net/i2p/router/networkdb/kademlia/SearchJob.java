@@ -46,7 +46,6 @@ class SearchJob extends JobImpl {
     private final long _expiration;
     private final long _timeoutMs;
     private final boolean _keepStats;
-    private final boolean _isLease;
     private Job _pendingRequeueJob;
     private final PeerSelector _peerSelector;
     private final List _deferredSearches;
@@ -56,7 +55,6 @@ class SearchJob extends JobImpl {
     private int _floodfillSearchesOutstanding;
     
     private static final int SEARCH_BREDTH = 3; // 10 peers at a time 
-    private static final int SEARCH_PRIORITY = 400; // large because the search is probably for a real search
     /** only send the 10 closest "dont tell me about" refs */
     static final int MAX_CLOSEST = 10;
     
@@ -96,7 +94,6 @@ class SearchJob extends JobImpl {
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
         _keepStats = keepStats;
-        _isLease = isLease;
         _deferredSearches = new ArrayList(0);
         _peerSelector = facade.getPeerSelector();
         _startedOn = -1;
@@ -759,7 +756,6 @@ class SearchJob extends JobImpl {
         public Job getOnFind() { return _onFind; }
         public Job getOnFail() { return _onFail; }
         public long getExpiration() { return _expiration; }
-        public boolean getIsLease() { return _isLease; }
     }
     
     public String getName() { return "Kademlia NetDb Search"; }

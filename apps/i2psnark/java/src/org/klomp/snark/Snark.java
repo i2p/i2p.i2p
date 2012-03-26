@@ -71,10 +71,11 @@ public class Snark
   //public static int debug = NOTICE;
 
   // Whether or not to ask the user for commands while sharing
-  private static boolean command_interpreter = true;
+  //private static boolean command_interpreter = true;
 
   private static final String newline = System.getProperty("line.separator");
 
+/****
   private static final String copyright =
   "The Hunting of the Snark Project - Copyright (C) 2003 Mark J. Wielaard"
   + newline + newline
@@ -90,10 +91,12 @@ public class Snark
   "Press return for help. Type \"quit\" and return to stop.";
   private static final String help =
   "Commands: 'info', 'list', 'quit'.";
+****/
 
   // String indicating main activity
   String activity = "Not started";
   
+/****
   private static class OOMListener implements I2PThread.OOMEventListener {
       public void outOfMemory(OutOfMemoryError err) {
           try {
@@ -106,6 +109,7 @@ public class Snark
       }
       
   }
+****/
   
 /******** No, not maintaining a command-line client
 
@@ -597,10 +601,12 @@ public class Snark
         _util.disconnect();
   }
 
+/****
   private static Snark parseArguments(String[] args)
   {
     return parseArguments(args, null, null);
   }
+****/
 
     // Accessors
 
@@ -907,7 +913,7 @@ public class Snark
           }
         else if (args[i].equals("--no-commands"))
           {
-            command_interpreter = false;
+            //command_interpreter = false;
             i++;
           }
         //else if (args[i].equals("--eepproxy"))
@@ -1077,7 +1083,7 @@ public class Snark
       }
   }
 
-  private boolean allocating = false;
+  //private boolean allocating = false;
   public void storageCreateFile(Storage storage, String name, long length)
   {
     //if (allocating)
@@ -1085,7 +1091,7 @@ public class Snark
 
     //System.out.print("Creating file '" + name
     //                 + "' of length " + length + ": ");
-    allocating = true;
+    //allocating = true;
   }
 
   // How much storage space has been allocated
@@ -1093,9 +1099,9 @@ public class Snark
 
   public void storageAllocated(Storage storage, long length)
   {
-    allocating = true;
+    //allocating = true;
     //System.out.print(".");
-    allocated += length;
+    //allocated += length;
     //if (allocated == meta.getTotalLength())
     //  System.out.println(); // We have all the disk space we need.
   }
@@ -1105,7 +1111,7 @@ public class Snark
   private boolean prechecking = true;
   public void storageChecked(Storage storage, int num, boolean checked)
   {
-    allocating = false;
+    //allocating = false;
     if (!allChecked && !checking)
       {
         // Use the MetaInfo from the storage since our own might not

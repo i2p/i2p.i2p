@@ -48,8 +48,6 @@ public class DCCClientManager extends EventReceiver {
 
     private static final int MAX_INCOMING_PENDING = 10;
     private static final int MAX_INCOMING_ACTIVE = 10;
-    private static final long ACTIVE_EXPIRE = 60*60*1000;
-
     public DCCClientManager(I2PSocketManager sktMgr, Logging logging,
                             EventDispatcher dispatch, I2PTunnel tunnel) {
         sockMgr = sktMgr;

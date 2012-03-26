@@ -19,7 +19,6 @@ import net.i2p.I2PAppContext;
  * @deprecated unused
  */
 public class EepPost {
-    private I2PAppContext _context;
     private Log _log;
     private static final String CRLF = "\r\n";
     
@@ -27,7 +26,6 @@ public class EepPost {
         this(I2PAppContext.getGlobalContext());
     }
     public EepPost(I2PAppContext ctx) {
-        _context = ctx;
         _log = ctx.logManager().getLog(EepPost.class);
     }
     

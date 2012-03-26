@@ -204,11 +204,6 @@ class PersistentDataStore extends TransientDataStore {
             _context.statManager().addRateData("netDb.writePending", pending);
         }
 
-        /** check to see if it's in the write queue */
-        public DatabaseEntry get(Hash key) {
-            return _keys.get(key);
-        }
-
         public void remove(Hash key) {
             _keys.remove(key);
         }
@@ -500,10 +495,6 @@ class PersistentDataStore extends TransientDataStore {
     }
     private static String getRouterInfoName(Hash hash) {
         return ROUTERINFO_PREFIX + hash.toBase64() + ROUTERINFO_SUFFIX;
-    }
-    
-    private static Hash getLeaseSetHash(String filename) {
-        return getHash(filename, LEASESET_PREFIX, LEASESET_SUFFIX);
     }
     
     private static Hash getRouterInfoHash(String filename) {

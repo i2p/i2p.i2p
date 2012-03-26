@@ -32,9 +32,6 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
     private RouterIdentity _from;
     private Hash _fromHash;
 
-    private static final int ACK_TIMEOUT = 15*1000;
-    private static final int ACK_PRIORITY = 100;
-    
     public HandleDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         super(ctx);
         _log = ctx.logManager().getLog(HandleDatabaseStoreMessageJob.class);

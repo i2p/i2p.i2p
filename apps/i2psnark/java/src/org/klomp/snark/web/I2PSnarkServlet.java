@@ -2258,10 +2258,6 @@ private static class FetchAndAdd implements Runnable {
         }
     }
 
-    private String _(String s) {
-        return _manager.util().getString(s);
-    }
-
     private String _(String s, String o) {
         return _manager.util().getString(s, o);
     }

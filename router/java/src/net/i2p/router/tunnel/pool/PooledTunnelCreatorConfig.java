@@ -15,10 +15,6 @@ import net.i2p.util.Log;
 class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
     private TestJob _testJob;
-    // private Job _expireJob;
-    // private TunnelInfo _pairedTunnel;
-    private boolean _live;
-    
     /** Creates a new instance of PooledTunnelCreatorConfig */
     
     public PooledTunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
@@ -34,13 +30,11 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         if (_testJob != null)
             _testJob.testSuccessful(ms);
         super.testSuccessful(ms);
-        _live = true;
     }
     
     /** called from TestJob */
     public void testJobSuccessful(int ms) {
         super.testSuccessful(ms);
-        _live = true;
     }
     
     /**

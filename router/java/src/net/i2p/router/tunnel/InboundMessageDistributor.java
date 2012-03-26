@@ -32,8 +32,6 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
     private final Hash _client;
     private final GarlicMessageReceiver _receiver;
     
-    private static final int MAX_DISTRIBUTE_TIME = 10*1000;
-    
     public InboundMessageDistributor(RouterContext ctx, Hash client) {
         _context = ctx;
         _client = client;

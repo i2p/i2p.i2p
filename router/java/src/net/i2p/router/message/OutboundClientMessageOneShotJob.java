@@ -77,9 +77,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
     private final static long OVERALL_TIMEOUT_MS_MIN = 8*1000;
     
-    /** priority of messages, that might get honored some day... */
-    private final static int SEND_PRIORITY = 500;
-    
     /**
      * If the client's config specifies shouldBundleReplyInfo=true, messages sent from
      * that client to any peers will probabalistically include the sending destination's

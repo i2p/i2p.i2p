@@ -74,10 +74,6 @@ public class WebMail extends HttpServlet
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final int DEFAULT_PAGESIZE = 10;
-
-	private static final int BUFSIZE = 4096;
-
 	private static final String DEFAULT_HOST = "127.0.0.1";
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
@@ -142,8 +138,6 @@ public class WebMail extends HttpServlet
 	private static final String LIST = "list";
 	private static final String PREV = "prev";
 	private static final String NEXT = "next";
-	private static final String NEXTUNREAD = "nextunread";
-
 	private static final String SORT_ID = "sort_id";
 	private static final String SORT_SENDER = "sort_sender";
 	private static final String SORT_SUBJECT = "sort_subject";
@@ -162,8 +156,6 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_PORTS_POP3 = "ports.pop3";
 	private static final String CONFIG_PORTS_SMTP = "ports.smtp";
 
-	private static final String CONFIG_FAST_START = "fast.start";
-	
 	private static final String CONFIG_SENDER_FIXED = "sender.fixed";
 	private static final String CONFIG_SENDER_DOMAIN = "sender.domain";
 	
@@ -174,8 +166,6 @@ public class WebMail extends HttpServlet
 
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
-	private static final String thTags = "</th>\n<th>\n";
-	
 	/**
 	 * sorts Mail objects by id field
 	 * 
@@ -370,16 +360,6 @@ public class WebMail extends HttpServlet
 	private static String sortHeader( String name, String label )
 	{
 		return "" + label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself + "?" + name + "=down\"><img src=\"3down.png\" border=\"0\" alt=\"v\"></a>";
-	}
-	/**
-	 * prints debug message as a html comment
-	 * 
-	 * @param out
-	 * @param msg
-	 */
-	private static void debug( PrintWriter out, String msg )
-	{
-		out.println( "<!-- DEBUG: " + msg + " -->" );
 	}
 	/**
 	 * check, if a given button "was pressed" in the received http request

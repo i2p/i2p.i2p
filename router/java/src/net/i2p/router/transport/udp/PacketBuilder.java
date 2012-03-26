@@ -431,8 +431,6 @@ class PacketBuilder {
         return buildACK(peer, Collections.EMPTY_LIST);
     }
 
-    private static final int ACK_PRIORITY = 1;
-    
     /**
      *  Build the ack packet. The list need not be sorted into full and partial;
      *  this method will put all fulls before the partials in the outgoing packet.

@@ -409,18 +409,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return rv;
     }
 
-    /* aparently, not used?? should be public if used elsewhere. */
-    private class CountLeaseSets implements SelectionCollector {
-        private int _count;
-        public int size() { return _count; }
-        public void add(Hash entry) {
-            if (_ds == null) return;
-            DatabaseEntry o = _ds.get(entry);
-            if (o != null && o.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
-                _count++;
-        }
-    }
-
     /**
      *  This is fast and doesn't use synchronization,
      *  but it includes both routerinfos and leasesets.
