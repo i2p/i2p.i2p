@@ -13,6 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +27,9 @@ import java.util.Set;
 import java.util.Vector;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.SHA1;
+import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
@@ -332,6 +337,15 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
+     * Same as isValid()
+     * @since 0.9
+     */
+    @Override
+    public boolean verifySignature() {
+        return isValid();
+    }
+
+    /**
      * which network is this routerInfo a part of.  configured through the property
      * PROP_NETWORK_ID
      * @return -1 if unknown
@@ -488,38 +502,68 @@ public class RouterInfo extends DatabaseEntry {
      *  @throws IllegalStateException if RouterInfo was already read in
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
+        readBytes(in, false);
+    }
+
+    /**
+     *  If verifySig is true,
+     *  this validates the signature while reading in,
+     *  and throws a DataFormatException if the sig is invalid.
+     *  This is faster than reserializing to validate later.
+     *
+     *  @throws IllegalStateException if RouterInfo was already read in
+     *  @since 0.9
+     */
+    public void readBytes(InputStream in, boolean verifySig) throws DataFormatException, IOException {
         if (_signature != null)
             throw new IllegalStateException();
+        InputStream din;
+        MessageDigest digest;
+        if (verifySig) {
+            digest = SHA1.getInstance();
+            din = new DigestInputStream(in, digest);
+        } else {
+            digest = null;
+            din = in;
+        }
         _identity = new RouterIdentity();
-        _identity.readBytes(in);
+        _identity.readBytes(din);
         // avoid thrashing objects
         //Date when = DataHelper.readDate(in);
         //if (when == null)
         //    _published = 0;
         //else
         //    _published = when.getTime();
-        _published = DataHelper.readLong(in, 8);
-        int numAddresses = (int) DataHelper.readLong(in, 1);
+        _published = DataHelper.readLong(din, 8);
+        int numAddresses = (int) DataHelper.readLong(din, 1);
         for (int i = 0; i < numAddresses; i++) {
             RouterAddress address = new RouterAddress();
-            address.readBytes(in);
+            address.readBytes(din);
             _addresses.add(address);
         }
-        int numPeers = (int) DataHelper.readLong(in, 1);
+        int numPeers = (int) DataHelper.readLong(din, 1);
         if (numPeers == 0) {
             _peers = null;
         } else {
             _peers = new HashSet(numPeers);
             for (int i = 0; i < numPeers; i++) {
                 Hash peerIdentityHash = new Hash();
-                peerIdentityHash.readBytes(in);
+                peerIdentityHash.readBytes(din);
                 _peers.add(peerIdentityHash);
             }
         }
-        DataHelper.readProperties(in, _options);
+        DataHelper.readProperties(din, _options);
         _signature = new Signature();
         _signature.readBytes(in);
 
+        SHA1Hash hash = new SHA1Hash(digest.digest());
+        if (verifySig) {
+            _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
+            _validated = true;
+            if (!_isValid) {
+                throw new DataFormatException("Bad sig");
+            }
+        }
 
         //_log.debug("Read routerInfo: " + toString());
     }
@@ -610,7 +654,7 @@ public class RouterInfo extends DatabaseEntry {
                  if (ri.isValid())
                      System.out.println(ri.toString());
                  else
-                     System.err.println("Router info " + args[i] + "is invalid");
+                     System.err.println("Router info " + args[i] + " is invalid");
              } catch (Exception e) {
                  System.err.println("Error reading " + args[i] + ": " + e);
              } finally {

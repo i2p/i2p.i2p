@@ -424,7 +424,7 @@ class PersistentDataStore extends TransientDataStore {
                     fis = new FileInputStream(_routerFile);
                     fis = new BufferedInputStream(fis);
                     RouterInfo ri = new RouterInfo();
-                    ri.readBytes(fis);
+                    ri.readBytes(fis, true);  // true = verify sig on read
                     if (ri.getNetworkId() != Router.NETWORK_ID) {
                         corrupt = true;
                         if (_log.shouldLog(Log.ERROR))
