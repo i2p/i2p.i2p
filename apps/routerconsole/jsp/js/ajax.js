@@ -1,3 +1,5 @@
+var fails = 0;
+
 function ajax(url, target, refresh) {
   // native XMLHttpRequest object
   if (window.XMLHttpRequest) {
@@ -21,9 +23,13 @@ function ajaxDone(url, target, refresh) {
   if (req.readyState == 4) {
     // only if "OK"
     if (req.status == 200) {
+      fails = 0;
       results = req.responseText;
       document.getElementById(target).innerHTML = results;
       //document.getElementsbyClassName("hideifdown").style.display="block";
+    } else if (fails == 0) {
+      // avoid spurious message if cancelled by user action
+      fails++;
     } else {
       document.getElementById(target).innerHTML = failMessage;
       //document.getElementByClassName("hideifdown").style.display="none";
