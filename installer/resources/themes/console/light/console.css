@@ -500,17 +500,10 @@ div.graphspanel img {
      text-align: center !important;
      background: #001;
      -moz-box-shadow: inset 0px 0px 1px 1px #99f;
-     opacity: 0.9;
 }
 
 div.graphspanel img:hover {
-     border: 1px solid #447;
-     padding: 2px;
-     margin: 6px;
-     text-align: center !important;
-     background: #001;
      -moz-box-shadow: inset 0px 0px 2px 1px #f60;
-     opacity: 1;
 }
 
 div.graphspanel form {
