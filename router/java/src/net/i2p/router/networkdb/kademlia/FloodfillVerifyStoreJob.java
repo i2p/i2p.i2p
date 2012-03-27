@@ -24,7 +24,7 @@ import net.i2p.util.Log;
  * key to a random floodfill peer again (via FloodfillStoreJob)
  *
  */
-public class FloodfillVerifyStoreJob extends JobImpl {
+class FloodfillVerifyStoreJob extends JobImpl {
     private final Log _log;
     private final Hash _key;
     private Hash _target;
@@ -32,14 +32,14 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     private final FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
     private long _sendTime;
-    private long _published;
+    private final long _published;
     private final boolean _isRouterInfo;
     private MessageWrapper.WrappedMessage _wrappedMessage;
     private final Set<Hash> _ignore;
     
     private static final int START_DELAY = 20*1000;
-    private static final int VERIFY_TIMEOUT = 15*1000;
-    private static final int MAX_PEERS_TO_TRY = 5;
+    private static final int VERIFY_TIMEOUT = 20*1000;
+    private static final int MAX_PEERS_TO_TRY = 4;
     
     /**
      *  Delay a few seconds, then start the verify
@@ -218,16 +218,27 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Rcvd older data: " + dsm.getEntry());
             } else if (_message instanceof DatabaseSearchReplyMessage) {
+                DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage) _message;
                 // assume 0 old, all new, 0 invalid, 0 dup
                 getContext().profileManager().dbLookupReply(_target,  0,
-                                ((DatabaseSearchReplyMessage)_message).getNumReplies(), 0, 0, delay);
+                                dsrm.getNumReplies(), 0, 0, delay);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Verify failed (DSRM) for " + _key);
+                // only for RI... LS too dangerous?
+                if (_isRouterInfo)
+                    getContext().jobQueue().addJob(new SingleLookupJob(getContext(), dsrm));
             }
             // store failed, boo, hiss!
-            // For now, blame the sent-to peer, but not the verify peer
+            // blame the sent-to peer, but not the verify peer
             if (_sentTo != null)
                 getContext().profileManager().dbStoreFailed(_sentTo);
+            // Blame the verify peer also.
+            // We must use dbLookupFailed() or dbStoreFailed(), neither of which is exactly correct,
+            // but we have to use one of them to affect the FloodfillPeerSelector ordering.
+            // If we don't do this we get stuck using the same verify peer every time even
+            // though it is the real problem.
+            if (_target != null && !_target.equals(_sentTo))
+                getContext().profileManager().dbLookupFailed(_target);
             getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
             resend();
         }        
