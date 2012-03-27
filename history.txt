@@ -1,3 +1,11 @@
+2012-03-27 zzz
+  * FloodfillVerify:
+    - Fix verifies stuck on one peer by blamimg the verify peer on failure
+    - Follow DSRM in response to RI verifies
+    - Increase floodfill verify timeout
+  * Home page: Delay router down message until two consecutive fails
+  * RouterInfo: Add method to validate sig during read-in for speed
+
 2012-03-27 sponge
   * A hopeful fix to allow SHOUTcast/icecast to work over the http proxy.
   * A little more code clean up
@@ -9,7 +17,7 @@
     - Remove unused private fields
     - Remove unnecessary casts
   * Console:
-    - Try again to fix console on Windows w/o IPv6 (ticket # 621)
+    - Try again to fix console on Windows w/o IPv6 (ticket #621)
     - Move oldconsole rendering from Router to OldConsoleHelper
 
 2012-03-24 zzz
