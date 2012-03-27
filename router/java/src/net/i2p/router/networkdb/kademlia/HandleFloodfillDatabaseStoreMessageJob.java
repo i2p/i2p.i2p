@@ -29,11 +29,11 @@ import net.i2p.util.Log;
  *
  */
 public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
-    private Log _log;
-    private DatabaseStoreMessage _message;
-    private RouterIdentity _from;
+    private final Log _log;
+    private final DatabaseStoreMessage _message;
+    private final RouterIdentity _from;
     private Hash _fromHash;
-    private FloodfillNetworkDatabaseFacade _facade;
+    private final FloodfillNetworkDatabaseFacade _facade;
 
     public HandleFloodfillDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);

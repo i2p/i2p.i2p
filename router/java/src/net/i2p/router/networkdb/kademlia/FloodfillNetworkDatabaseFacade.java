@@ -167,10 +167,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         Hash key = ds.getHash();
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
-        List peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
+        List<Hash> peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
         int flooded = 0;
         for (int i = 0; i < peers.size(); i++) {
-            Hash peer = (Hash)peers.get(i);
+            Hash peer = peers.get(i);
             RouterInfo target = lookupRouterInfoLocally(peer);
             if ( (target == null) || (_context.shitlist().isShitlisted(peer)) )
                 continue;
