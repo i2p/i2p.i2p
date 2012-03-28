@@ -556,8 +556,8 @@ public class RouterInfo extends DatabaseEntry {
         _signature = new Signature();
         _signature.readBytes(in);
 
-        SHA1Hash hash = new SHA1Hash(digest.digest());
         if (verifySig) {
+            SHA1Hash hash = new SHA1Hash(digest.digest());
             _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
             _validated = true;
             if (!_isValid) {

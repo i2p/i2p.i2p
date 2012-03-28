@@ -1,3 +1,6 @@
+2012-03-28 zzz
+  * RouterInfo: Fix fatal NPE in last checkin
+
 2012-03-27 zzz
   * FloodfillVerify:
     - Fix verifies stuck on one peer by blamimg the verify peer on failure
