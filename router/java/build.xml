@@ -5,9 +5,6 @@
     <target name="builddep">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
-    <target name="builddeptest">
-        <ant dir="../../core/java/" target="jarTest" />
-    </target>
     <condition property="depend.available">
         <typefound name="depend" />
     </condition>
@@ -38,17 +35,6 @@
         <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
                includeAntRuntime="false"
                destdir="./build/obj" classpath="../../core/java/build/i2p.jar" >
-            <compilerarg line="${javac.compilerargs}" />
-        </javac>
-    </target>
-
-    <target name="compileTest" depends="builddeptest">
-        <mkdir dir="./build" />
-        <mkdir dir="./build/obj" />
-        <!-- junit classes are in ant runtime -->
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
-               includeAntRuntime="true"
-               destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -89,9 +75,6 @@
         </uptodate>
     </target>
 
-    <target name="jarTest" depends="compileTest">
-        <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
-    </target>
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
@@ -102,41 +85,76 @@
             splitindex="true" 
             windowtitle="I2P Router" />
     </target>
-    <target name="test" depends="compileTest">
-        <junit printsummary="on" fork="yes">
-            <classpath>
-                <pathelement path="${classpath}" />
-                <pathelement location="./build/obj" />
-                <pathelement location="../../core/java/build/i2ptest.jar" />
-                <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
-                <pathelement path="${ant.home}/lib/clover.jar"/>
-            </classpath>
-            <batchtest>
-                <fileset dir="./test/">
-                    <include name="**/*Test.java" />
-                </fileset>
-            </batchtest>
-            <formatter type="xml"/>
-        </junit>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/router/" />
+
+    <!-- unit tests -->
+    <target name="builddeptest">
+        <ant dir="../../core/java/" target="jarTest" />
+    </target>
+    <target name="compileTest" depends="builddeptest">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <!-- junit classes are in ant runtime -->
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="true"
+               destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+    <target name="jarTest" depends="compileTest">
+        <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
+    </target>
+    <!-- preparation of code coverage tool of choice -->
+    <target name="prepareClover" depends="compileTest" if="with.clover">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../reports/router/clover" />
+        <clover-setup initString="../../reports/router/clover/coverage.db"/>
+    </target>
+    <target name="prepareCobertura" depends="compileTest" if="with.cobertura">
+        <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
+        <mkdir dir="./build/obj_cobertura" />
+        <delete file="./cobertura.ser" />
+        <cobertura-instrument todir="./build/obj_cobertura">
+            <fileset dir="./build/obj">
+                <include name="**/*.class"/>
+                <exclude name="**/*Test.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
+    <target name="prepareTest" depends="prepareClover, prepareCobertura" />
+    <!-- end preparation of code coverage tool -->
+    <target name="test" depends="clean, compileTest, prepareTest">
         <mkdir dir="../../reports/router/junit/" />
         <delete>
             <fileset dir="../../reports/router/junit">
                 <include name="TEST-*.xml"/>
             </fileset>
         </delete>
-        <copy todir="../../reports/router/junit">
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </copy>
-        <delete>
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
+        <junit printsummary="on" fork="yes">
+            <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
+            <classpath>
+                <pathelement path="${classpath}" />
+                <pathelement location="./build/obj_cobertura" />
+                <pathelement location="./build/obj" />
+                <pathelement location="../../core/java/build/i2ptest.jar" />
+                <pathelement location="../../build/jbigi.jar" />
+                <pathelement location="${with.clover}" />
+                <pathelement location="${with.cobertura}" />
+            </classpath>
+            <batchtest todir="../../reports/router/junit/">
+                <fileset dir="./test/">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+        </junit>
+        <!-- fetch the real hostname of this machine -->
+        <exec executable="hostname" outputproperty="host.name"/>
+        <!-- set if unset -->
+        <property name="host.fakename" value="i2ptester" />
+        <!-- replace hostname that junit inserts into reports with fake one -->
+        <replace dir="../../reports/router/junit/" token="${host.name}" value="${host.fakename}"/>
     </target>
+    <!-- test reports -->
     <target name="junit.report">
         <junitreport todir="../../reports/router/junit">
             <fileset dir="../../reports/router/junit">
@@ -145,28 +163,25 @@
             <report format="frames" todir="../../reports/router/html/junit"/>
         </junitreport>
     </target>
-    <target name="clover.report">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/router" />
-        <mkdir dir="../../reports/router/clover" />
-        <clover-setup initString="../../reports/router/clover/coverage.db"/>
+    <target name="clover.report" depends="test" if="with.clover">
         <clover-report>
             <current outfile="../../reports/router/html/clover">
                 <format type="html"/>
             </current>
         </clover-report>
     </target>
-    <target name="test.report" depends="junit.report, clover.report"/>
-    <target name="useclover">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/router/" />
-        <mkdir dir="../../reports/router/clover" />
-        <clover-setup initString="../../reports/router/clover/coverage.db"/>
+    <target name="cobertura.report" depends="test" if="with.cobertura">
+        <mkdir dir="../../reports/router/cobertura" />
+        <cobertura-report format="xml" srcdir="./src" destdir="../../reports/router/cobertura" />
+        <mkdir dir="../../reports/router/html/cobertura" />
+        <cobertura-report format="html" srcdir="./src" destdir="../../reports/router/html/cobertura" />
+        <delete file="./cobertura.ser" />
     </target>
-    <target name="fulltest" depends="cleandep, builddeptest, jarTest, test, junit.report" />
-    <target name="fullclovertest" depends="cleandep, builddeptest, useclover, jarTest, test, test.report" />
+    <target name="test.report" depends="junit.report, clover.report, cobertura.report"/>
+    <!-- end test reports -->
+    <target name="fulltest" depends="cleandep, builddeptest, jarTest, test, test.report" />
+    <!-- end unit tests -->
+
     <target name="clean">
         <delete dir="./build" />
     </target>

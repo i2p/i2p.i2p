@@ -372,8 +372,10 @@ public class ElGamalTest extends TestCase{
     
     public void testYKGen(){
         RandomSource.getInstance().nextBoolean();
+        I2PAppContext context = new I2PAppContext();
+        YKGenerator ykgen = new YKGenerator(context);
         for (int i = 0; i < 5; i++) {
-            YKGenerator.getNextYK();
+            ykgen.getNextYK();
         }
     }
 }

@@ -1,4 +1,4 @@
-package net.i2p.crypto;
+package net.i2p.router.transport.crypto;
 
 /*
  * free (adj.): unencumbered; not under the control of others
