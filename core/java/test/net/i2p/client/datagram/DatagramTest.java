@@ -63,7 +63,7 @@ public class DatagramTest extends TestCase {
         Destination d = client.createDestination(out);
         I2PSession session = client.createSession(new ByteArrayInputStream(out.toByteArray()), null);
         I2PDatagramMaker dm = new I2PDatagramMaker(session);
-        
+
         byte[] dg = dm.makeI2PDatagram(null);
         assertNull(dg);
     }
@@ -73,7 +73,7 @@ public class DatagramTest extends TestCase {
         I2PClient client = I2PClientFactory.createClient();
         Destination d = client.createDestination(out);
         I2PSession session = client.createSession(new ByteArrayInputStream(out.toByteArray()), null);
-        
+
         I2PDatagramDissector dd = new I2PDatagramDissector();
         dd.loadI2PDatagram(null);
     }
