@@ -42,3 +42,7 @@ pkg-temp/lib/systray4j.jar usr/share/i2p/lib
 pkg-temp/lib/commons-el.jar usr/share/i2p/lib
 pkg-temp/lib/jetty-java5-threadpool.jar usr/share/i2p/lib
 pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib
+pkg-temp/lib/org.mortbay.jmx.jar usr/share/i2p/lib
+
+# dummy file (copying in case a plugin tries to load it directly)
+pkg-temp/lib/jasper-compiler.jar usr/share/i2p/lib
