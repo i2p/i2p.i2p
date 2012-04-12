@@ -756,12 +756,72 @@ button, button:visited {
      color: #494;
 }
 
+button.accept {
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.add {
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.check {
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.delete {
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.search {
+     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.stop {
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
 button:hover {
      border: 1px solid #f60;
      -moz-box-shadow: inset 0px 1px 1px 0px #EE9;
      -khtml-box-shadow: inset 0px 1px 1px 0px #EE9;
      box-shadow: inset 0px 1px 1px 0px #EE9;
-     background: #000;
+     background-color: #000;
      color: #f60;
 }
 
@@ -834,19 +894,73 @@ input {
      -khtml-border-radius: 4px;
 }
 
+input.accept {
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.add {
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.check {
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.search[type="text"] {
+     background: #001 url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
+input.stop {
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
 input:hover {
-     background: #000;
+     background-color: #000;
      color: #f60;
      border: 1px solid #f60;
      -moz-box-shadow: inset 0px 1px 1px 0px #9e9;
      -khtml-box-shadow: inset 0px 1px 1px 0px #9e9;
      box-shadow: inset 0px 1px 1px 0px #9e9;
-}
-
-input:active {
-     background: #000;
-     color: #f30;
-     border: 1px solid #f30;
 }
 
 input:active {
@@ -869,10 +983,6 @@ input[type=text], input[type=password] {
      -moz-box-shadow: inset 1px 1px 1px 0px #000;
      -khtml-box-shadow: inset 1px 1px 1px 0px #000;
      box-shadow: inset 1px 1px 1px 0px #000;
-}
-
-input[type=text]:active, input[type=text]:hover, input[type=password]:active, input[type=password]:hover {
-     background: #000;
 }
 
 fieldset {
@@ -1068,39 +1178,65 @@ div.footnote hr{
      margin-bottom: -5px;
      margin-right: 5px;
 }
-/***********************************************************************************/
+
+/* begin home page */
 
 #appsummary {
-     margin-top: 53px;
+     clear: none;
+     float: none;
+     left: 10px;
+     margin: 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homemain {
+     left: 217px;
+     margin: 0 10px 10px 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homenews {
+     margin: 0 10px 5px 0;
 }
 
 h2.app {
-     margin: 15px 10px 15px 0 !important;
+     border-radius: 8px;
+     margin: 1px 10px 15px 0 !important;
 }
 
 h4.app {
+     margin: 0 10px 2px 10px;
+     padding: 10px 0 8px 0;
+}
+
+h4.app2 {
      clear: left;
-     margin: 12px 4px;
-     padding: 20px 0 8px 0;
+     margin: 0 4px 2px 0;
+     padding: 16px 0 8px 0;
+}
+
+div.ag2 {
+     margin: 0;
 }
 
 div.app {
      float: left;
-     padding: 8px;
-     height: 100px;
+     padding: 2px;
+     height: 84px;
      width: 112px;
 }
 
 div.appgroup {
-     clear: left;
-     margin: 4px 20px;
+     margin: 0;
      padding: 16px 8px;
      width: auto;
 }
 
 div.search {
-     margin: 20px 20px 20px 240px;
-     padding: 8px;
+     margin: 10px 10px 0 0;
+     padding: 8px 8px 0 8px;
      width: auto;
 }
 
@@ -1113,14 +1249,14 @@ table.search {
 }
 
 img.app {
-     height: 40px;
-     width: 40px;
-     padding: 8px;
+     height: 32px;
+     width: 32px;
+     padding: 6px;
 }
 
 img.app2p {
-     height: 48px;
-     padding: 3px 8px;
+     height: 40px;
+     padding: 3px 6px 0 6px;
 }
 
 table.app {
@@ -1155,4 +1291,4 @@ div.applabel {
      text-align: center;
 }
 
-/***********************************************************************************/
+/* end home page */

@@ -26,8 +26,7 @@
 <div class="routersummaryouter" id="appsummary">
  <div class="routersummary">
   <div style="height: 36px;">
-   <!-- fixme theme, translation -->
-   <a href="/console"><img src="/themes/console/light/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"></a>
+   <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>"></a>
   </div>
   <hr>
   <div id="xhr">
