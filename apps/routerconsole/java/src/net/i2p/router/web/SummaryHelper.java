@@ -14,6 +14,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterVersion;
@@ -116,18 +117,21 @@ public class SummaryHelper extends HelperBase {
             return _("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)));
         if (_context.router().isHidden())
             return _("Hidden");
+        RouterInfo routerInfo = _context.router().getRouterInfo();
+        if (routerInfo == null)
+            return _("Testing");
 
         int status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
-                RouterAddress ra = _context.router().getRouterInfo().getTargetAddress("NTCP");
+                RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null || (new NTCPAddress(ra)).isPubliclyRoutable())
                     return _("OK");
                 return _("ERR-Private TCP Address");
             case CommSystemFacade.STATUS_DIFFERENT:
                 return _("ERR-SymmetricNAT");
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
+                if (routerInfo.getTargetAddress("NTCP") != null)
                     return _("WARN-Firewalled with Inbound TCP Enabled");
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                     return _("WARN-Firewalled and Floodfill");
@@ -138,7 +142,7 @@ public class SummaryHelper extends HelperBase {
                 return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
-                ra = _context.router().getRouterInfo().getTargetAddress("SSU");
+                ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
                         return _("ERR-No Active Peers, Check Network Connection and Firewall");

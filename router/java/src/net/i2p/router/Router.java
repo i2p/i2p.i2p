@@ -360,6 +360,9 @@ public class Router implements RouterClock.ClockShiftListener {
         return Collections.unmodifiableMap(_config); 
     }
     
+    /**
+     *  Warning, may be null if called very early
+     */
     public RouterInfo getRouterInfo() { return _routerInfo; }
 
     /**
