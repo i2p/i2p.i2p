@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-07 01:36+0000\n"
+"POT-Creation-Date: 2012-04-12 20:20+0000\n"
 "PO-Revision-Date: 2012-02-19 14:04+0000\n"
 "Last-Translator: D.A. Loader <>\n"
 "Language-Team: German (http://www.transifex.net/projects/p/I2P/language/"
@@ -25,428 +25,428 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: src/src/i2p/susi/webmail/WebMail.java:455
+#: src/src/i2p/susi/webmail/WebMail.java:435
 msgid "unknown"
 msgstr "unbekannt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:474
+#: src/src/i2p/susi/webmail/WebMail.java:454
 msgid "Warning: no transfer encoding found, fallback to 7bit."
 msgstr "Warnung: keine Übertragungskodierung gefunden, Rückgriff auf 7-bit"
 
-#: src/src/i2p/susi/webmail/WebMail.java:479
+#: src/src/i2p/susi/webmail/WebMail.java:459
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
 msgstr "kein Kodierer für Kodierung \\''{0}\\'' gefunden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:485
+#: src/src/i2p/susi/webmail/WebMail.java:465
 msgid "Warning: no charset found, fallback to US-ASCII."
 msgstr "Warnung: kein Zeichensatz gefunden; Rückgriff auf US-ASCII"
 
-#: src/src/i2p/susi/webmail/WebMail.java:499
+#: src/src/i2p/susi/webmail/WebMail.java:479
 #, java-format
 msgid "Charset \\''{0}\\'' not supported."
 msgstr "Zeichensatz \\''{0}\\'' nicht unterstützt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:503
+#: src/src/i2p/susi/webmail/WebMail.java:483
 #, java-format
 msgid "Part ({0}) not shown, because of {1}"
 msgstr "Teil ({0}) aufgrund von {1} nicht angezeigt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:526
+#: src/src/i2p/susi/webmail/WebMail.java:506
 msgid "Download"
 msgstr "Herunterladen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:526
+#: src/src/i2p/susi/webmail/WebMail.java:506
 msgid "File is packed into a zipfile for security reasons."
 msgstr "Die Datei wurde aus Sicherheitsgründen in ein Zip-Archiv gepackt."
 
-#: src/src/i2p/susi/webmail/WebMail.java:526
+#: src/src/i2p/susi/webmail/WebMail.java:506
 #, java-format
 msgid "attachment ({0})."
 msgstr "Anhang ({0})."
 
-#: src/src/i2p/susi/webmail/WebMail.java:530
+#: src/src/i2p/susi/webmail/WebMail.java:510
 #, java-format
 msgid "Attachment ({0})."
 msgstr "Anhang ({0})."
 
-#: src/src/i2p/susi/webmail/WebMail.java:580
+#: src/src/i2p/susi/webmail/WebMail.java:560
 msgid "Need username for authentication."
 msgstr "Benutzername zur Authentifizierung benötigt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:584
+#: src/src/i2p/susi/webmail/WebMail.java:564
 msgid "Need password for authentication."
 msgstr "Passwort zur Authentifizierung benötigt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:588
+#: src/src/i2p/susi/webmail/WebMail.java:568
 msgid "Need hostname for connect."
 msgstr "Host-Name für die Verbindung benötigt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:593
+#: src/src/i2p/susi/webmail/WebMail.java:573
 msgid "Need port number for pop3 connect."
 msgstr "POP3-Port für die Verbindung benötigt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:600
+#: src/src/i2p/susi/webmail/WebMail.java:580
 msgid "POP3 port number is not in range 0..65535."
 msgstr "Der POP3-Port liegt nicht im Bereich 0-65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:606
+#: src/src/i2p/susi/webmail/WebMail.java:586
 msgid "POP3 port number is invalid."
 msgstr "ungültiger POP3-Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:612
+#: src/src/i2p/susi/webmail/WebMail.java:592
 msgid "Need port number for smtp connect."
 msgstr "SMTP-Port für die SMTP-Verbindung benötigt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:619
+#: src/src/i2p/susi/webmail/WebMail.java:599
 msgid "SMTP port number is not in range 0..65535."
 msgstr "Der SMTP-Port liegt nicht im Bereich 0-65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:625
+#: src/src/i2p/susi/webmail/WebMail.java:605
 msgid "SMTP port number is invalid."
 msgstr "ungültiger SMTP-Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:672
+#: src/src/i2p/susi/webmail/WebMail.java:652
 msgid "User logged out."
 msgstr "Benutzer wurde abgemeldet"
 
-#: src/src/i2p/susi/webmail/WebMail.java:676
+#: src/src/i2p/susi/webmail/WebMail.java:656
 msgid "Internal error, lost connection."
 msgstr "interner Fehler; Verbindung unterbrochen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:772
+#: src/src/i2p/susi/webmail/WebMail.java:752
 #, java-format
 msgid "On {0} {1} wrote:"
 msgstr "Am {0} schrieb {1}:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:819
+#: src/src/i2p/susi/webmail/WebMail.java:799
 msgid "begin forwarded mail"
 msgstr "Anfang weitergeleiteter Nachricht"
 
-#: src/src/i2p/susi/webmail/WebMail.java:841
+#: src/src/i2p/susi/webmail/WebMail.java:821
 msgid "end forwarded mail"
 msgstr "Ende weitergeleiteter Nachricht"
 
-#: src/src/i2p/susi/webmail/WebMail.java:848
-#: src/src/i2p/susi/webmail/WebMail.java:1720
+#: src/src/i2p/susi/webmail/WebMail.java:828
+#: src/src/i2p/susi/webmail/WebMail.java:1700
 msgid "Could not fetch mail body."
 msgstr "konnte den Körper der Nachricht nicht holen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:876
+#: src/src/i2p/susi/webmail/WebMail.java:856
 msgid "Message id not valid."
 msgstr "ungültige Nachrichten-ID"
 
-#: src/src/i2p/susi/webmail/WebMail.java:959
+#: src/src/i2p/susi/webmail/WebMail.java:939
 #, java-format
 msgid "No Encoding found for {0}"
 msgstr "keine Kodierung für {0} gefunden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:963
+#: src/src/i2p/susi/webmail/WebMail.java:943
 #, java-format
 msgid "Could not encode data: {0}"
 msgstr "Konte Daten nicht kodieren: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:968
+#: src/src/i2p/susi/webmail/WebMail.java:948
 #, java-format
 msgid "Error reading uploaded file: {0}"
 msgstr "Fehler beim Lesen der hochzuladenen Datei: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1046
+#: src/src/i2p/susi/webmail/WebMail.java:1026
 msgid "Error parsing download parameter."
 msgstr "Fehler beim Parsen des Download-Parameters"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1090
+#: src/src/i2p/susi/webmail/WebMail.java:1070
 msgid "Invalid pagesize number, resetting to default value."
 msgstr "ungültige Seitengröße, wird auf Standardwert zurückgesetzt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1114
+#: src/src/i2p/susi/webmail/WebMail.java:1094
 msgid "No messages marked for deletion."
 msgstr "Keine Nachrichten zum Löschen markiert"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1134
+#: src/src/i2p/susi/webmail/WebMail.java:1114
 #, java-format
 msgid "Error deleting message: {0}"
 msgstr "Fehler beim Löschen der Nachricht: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1145
+#: src/src/i2p/susi/webmail/WebMail.java:1125
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
 msgstr[0] "Eine Nachricht gelöscht"
 msgstr[1] "{0} Nachrichten gelöscht"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1267
-#: src/src/i2p/susi/webmail/WebMail.java:1604
+#: src/src/i2p/susi/webmail/WebMail.java:1247
+#: src/src/i2p/susi/webmail/WebMail.java:1584
 msgid "Login"
 msgstr "Anmelden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1269
+#: src/src/i2p/susi/webmail/WebMail.java:1249
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
 msgstr[0] "Eine Nachricht"
 msgstr[1] "{0} Nachrichten"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1271
+#: src/src/i2p/susi/webmail/WebMail.java:1251
 msgid "Show Message"
 msgstr "Nachricht anzeigen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1333
+#: src/src/i2p/susi/webmail/WebMail.java:1313
 #, java-format
 msgid "Error decoding content: {0}"
 msgstr "Fehler beim Dekodieren des Inhalts: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1338
+#: src/src/i2p/susi/webmail/WebMail.java:1318
 msgid "Error decoding content: No encoder found."
 msgstr "Fehler bei der Dekodierung: kein Kodierer gefunden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1385
+#: src/src/i2p/susi/webmail/WebMail.java:1365
 msgid "no subject"
 msgstr "kein Betreff"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1402
+#: src/src/i2p/susi/webmail/WebMail.java:1382
 msgid "Found no valid sender address."
 msgstr "Keine gültige Absenderadresse vorgefunden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1408
+#: src/src/i2p/susi/webmail/WebMail.java:1388
 #, java-format
 msgid "Found no valid address in \\''{0}\\''."
 msgstr "keine gültige Adresse in \\''{0}\\''"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1427
+#: src/src/i2p/susi/webmail/WebMail.java:1407
 msgid "No recipients found."
 msgstr "keine Empfänger gefunden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1434
+#: src/src/i2p/susi/webmail/WebMail.java:1414
 msgid "Quoted printable encoder not available."
 msgstr "Der angegebene druckbare Kodierer ist nicht verfügbar."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1439
+#: src/src/i2p/susi/webmail/WebMail.java:1419
 msgid "Header line encoder not available."
 msgstr "Kodierer für die Kopfzeilen nicht verfügbar"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1490
+#: src/src/i2p/susi/webmail/WebMail.java:1470
 msgid "Mail sent."
 msgstr "Mail versandt."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1529
+#: src/src/i2p/susi/webmail/WebMail.java:1509
 msgid "Send"
 msgstr "Senden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1530
+#: src/src/i2p/susi/webmail/WebMail.java:1510
 msgid "Cancel"
 msgstr "Abbruch"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1531
+#: src/src/i2p/susi/webmail/WebMail.java:1511
 msgid "Delete Attachment"
 msgstr "Anhang löschen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1532
-#: src/src/i2p/susi/webmail/WebMail.java:1626
-#: src/src/i2p/susi/webmail/WebMail.java:1707
+#: src/src/i2p/susi/webmail/WebMail.java:1512
+#: src/src/i2p/susi/webmail/WebMail.java:1606
+#: src/src/i2p/susi/webmail/WebMail.java:1687
 msgid "Reload Config"
 msgstr "Einstellungen neu laden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1533
-#: src/src/i2p/susi/webmail/WebMail.java:1627
-#: src/src/i2p/susi/webmail/WebMail.java:1708
+#: src/src/i2p/susi/webmail/WebMail.java:1513
+#: src/src/i2p/susi/webmail/WebMail.java:1607
+#: src/src/i2p/susi/webmail/WebMail.java:1688
 msgid "Logout"
 msgstr "Abmelden"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1556
-#: src/src/i2p/susi/webmail/WebMail.java:1712
+#: src/src/i2p/susi/webmail/WebMail.java:1536
+#: src/src/i2p/susi/webmail/WebMail.java:1692
 msgid "From:"
 msgstr "Von:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1557
+#: src/src/i2p/susi/webmail/WebMail.java:1537
 msgid "To:"
 msgstr "An:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1558
+#: src/src/i2p/susi/webmail/WebMail.java:1538
 msgid "Cc:"
 msgstr "Kopie an:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1559
+#: src/src/i2p/susi/webmail/WebMail.java:1539
 msgid "Bcc:"
 msgstr "Blindkopie an:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1560
-#: src/src/i2p/susi/webmail/WebMail.java:1714
+#: src/src/i2p/susi/webmail/WebMail.java:1540
+#: src/src/i2p/susi/webmail/WebMail.java:1694
 msgid "Subject:"
 msgstr "Betreff:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1561
+#: src/src/i2p/susi/webmail/WebMail.java:1541
 msgid "Bcc to self"
 msgstr "Blindkopie zurück?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1564
+#: src/src/i2p/susi/webmail/WebMail.java:1544
 msgid "New Attachment:"
 msgstr "Neuer Anhang:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1564
+#: src/src/i2p/susi/webmail/WebMail.java:1544
 msgid "Upload File"
 msgstr "Datei hochladen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1570
+#: src/src/i2p/susi/webmail/WebMail.java:1550
 msgid "Attachments:"
 msgstr "Anhänge:"
 
 #. current postman hq length limits 16/12, new postman version 32/32
-#: src/src/i2p/susi/webmail/WebMail.java:1593
+#: src/src/i2p/susi/webmail/WebMail.java:1573
 msgid "User"
 msgstr "Benutzer"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1594
+#: src/src/i2p/susi/webmail/WebMail.java:1574
 msgid "Password"
 msgstr "Passwort"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1599
+#: src/src/i2p/susi/webmail/WebMail.java:1579
 msgid "Host"
 msgstr "Host"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1600
+#: src/src/i2p/susi/webmail/WebMail.java:1580
 msgid "POP3-Port"
 msgstr "POP3-Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1601
+#: src/src/i2p/susi/webmail/WebMail.java:1581
 msgid "SMTP-Port"
 msgstr "SMTP-Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1604
+#: src/src/i2p/susi/webmail/WebMail.java:1584
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1605
+#: src/src/i2p/susi/webmail/WebMail.java:1585
 msgid "Learn about I2P mail"
 msgstr "Erfahre etwas über I2P Mail"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1606
+#: src/src/i2p/susi/webmail/WebMail.java:1586
 msgid "Create Account"
 msgstr "Konto anlegen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1618
+#: src/src/i2p/susi/webmail/WebMail.java:1598
 msgid "Really delete the marked messages?"
 msgstr "Sollen die markierten Nachrichten wirklich gelöscht werden?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1618
+#: src/src/i2p/susi/webmail/WebMail.java:1598
 msgid "Yes, really delete them!"
 msgstr "Ja, löschen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1620
-#: src/src/i2p/susi/webmail/WebMail.java:1699
+#: src/src/i2p/susi/webmail/WebMail.java:1600
+#: src/src/i2p/susi/webmail/WebMail.java:1679
 msgid "New"
 msgstr "Verfassen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1621
-#: src/src/i2p/susi/webmail/WebMail.java:1700
+#: src/src/i2p/susi/webmail/WebMail.java:1601
+#: src/src/i2p/susi/webmail/WebMail.java:1680
 msgid "Reply"
 msgstr "Antworten"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1622
-#: src/src/i2p/susi/webmail/WebMail.java:1701
+#: src/src/i2p/susi/webmail/WebMail.java:1602
+#: src/src/i2p/susi/webmail/WebMail.java:1681
 msgid "Reply All"
 msgstr "Allen antworten"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1623
-#: src/src/i2p/susi/webmail/WebMail.java:1702
+#: src/src/i2p/susi/webmail/WebMail.java:1603
+#: src/src/i2p/susi/webmail/WebMail.java:1682
 msgid "Forward"
 msgstr "Weiterleiten"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1624
-#: src/src/i2p/susi/webmail/WebMail.java:1703
+#: src/src/i2p/susi/webmail/WebMail.java:1604
+#: src/src/i2p/susi/webmail/WebMail.java:1683
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1625
+#: src/src/i2p/susi/webmail/WebMail.java:1605
 msgid "Check Mail"
 msgstr "Nachrichten abrufen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1629
+#: src/src/i2p/susi/webmail/WebMail.java:1609
 msgid "Sender"
 msgstr "Absender"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1630
+#: src/src/i2p/susi/webmail/WebMail.java:1610
 msgid "Subject"
 msgstr "Betreff"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1631
+#: src/src/i2p/susi/webmail/WebMail.java:1611
 msgid "Date"
 msgstr "Datum"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1632
+#: src/src/i2p/susi/webmail/WebMail.java:1612
 msgid "Size"
 msgstr "Größe"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1658
+#: src/src/i2p/susi/webmail/WebMail.java:1638
 #, java-format
 msgid "1 Byte"
 msgid_plural "{0} Bytes"
 msgstr[0] "1 Byte"
 msgstr[1] "{0} Bytes"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1663
+#: src/src/i2p/susi/webmail/WebMail.java:1643
 msgid "Mark All"
 msgstr "Alles markieren"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1664
+#: src/src/i2p/susi/webmail/WebMail.java:1644
 msgid "Invert Selection"
 msgstr "Markierung umkehren"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1665
+#: src/src/i2p/susi/webmail/WebMail.java:1645
 msgid "Clear"
 msgstr "Verwerfen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1668
-#: src/src/i2p/susi/webmail/WebMail.java:1669
+#: src/src/i2p/susi/webmail/WebMail.java:1648
+#: src/src/i2p/susi/webmail/WebMail.java:1649
 msgid "First"
 msgstr "erste"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1668
-#: src/src/i2p/susi/webmail/WebMail.java:1669
-#: src/src/i2p/susi/webmail/WebMail.java:1704
+#: src/src/i2p/susi/webmail/WebMail.java:1648
+#: src/src/i2p/susi/webmail/WebMail.java:1649
+#: src/src/i2p/susi/webmail/WebMail.java:1684
 msgid "Previous"
 msgstr "vorherige"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1670
+#: src/src/i2p/susi/webmail/WebMail.java:1650
 #, java-format
 msgid "Page {0} of {1}"
 msgstr "Seite {0} von {1}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1672
-#: src/src/i2p/susi/webmail/WebMail.java:1673
+#: src/src/i2p/susi/webmail/WebMail.java:1652
+#: src/src/i2p/susi/webmail/WebMail.java:1653
 msgid "Last"
 msgstr "letzte"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1672
-#: src/src/i2p/susi/webmail/WebMail.java:1673
-#: src/src/i2p/susi/webmail/WebMail.java:1705
+#: src/src/i2p/susi/webmail/WebMail.java:1652
+#: src/src/i2p/susi/webmail/WebMail.java:1653
+#: src/src/i2p/susi/webmail/WebMail.java:1685
 msgid "Next"
 msgstr "nächste"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1676
+#: src/src/i2p/susi/webmail/WebMail.java:1656
 msgid "Pagesize:"
 msgstr "Seitengröße"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1677
+#: src/src/i2p/susi/webmail/WebMail.java:1657
 msgid "Set"
 msgstr "festlegen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1687
+#: src/src/i2p/susi/webmail/WebMail.java:1667
 msgid "Really delete this message?"
 msgstr "Diese Nachricht wirklich löschen?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1687
+#: src/src/i2p/susi/webmail/WebMail.java:1667
 msgid "Yes, really delete it!"
 msgstr "Ja, wirklich löschen"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1706
+#: src/src/i2p/susi/webmail/WebMail.java:1686
 msgid "Back to Folder"
 msgstr "Zurück zur Übersicht"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1713
+#: src/src/i2p/susi/webmail/WebMail.java:1693
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1724
+#: src/src/i2p/susi/webmail/WebMail.java:1704
 msgid "Could not fetch mail."
 msgstr "Konnte Nachrichten nicht abrufen."

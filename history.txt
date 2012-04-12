@@ -1,3 +1,6 @@
+2012-04-12 kytv
+ * German, Spanish, and Swedish translation updates from Transifex
+
 2012-04-12 zzz
   * Console:
     - Try again to fix console on Windows w/o IPv6
