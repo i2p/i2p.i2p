@@ -36,7 +36,7 @@ import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.ShellCommand;
 import net.i2p.util.VersionComparator;
 
-import org.mortbay.jetty.AbstractConnector;
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.NCSARequestLog;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
@@ -289,6 +289,7 @@ public class RouterConsoleRunner {
 
         WebAppContext rootWebApp = null;
         ServletHandler rootServletHandler = null;
+        List<Connector> connectors = new ArrayList(4);
         try {
             int boundAddresses = 0;
             Set addresses = Addresses.getAllAddresses();
@@ -333,13 +334,13 @@ public class RouterConsoleRunner {
                         //    _server.addListener('[' + host + "]:" + _listenPort);
                         //else
                         //    _server.addListener(host + ':' + _listenPort);
-                        // Use AbstractConnector instead of Connector so we can do setName()
-                        AbstractConnector lsnr = new SelectChannelConnector();
+                        SelectChannelConnector lsnr = new SelectChannelConnector();
                         lsnr.setHost(host);
                         lsnr.setPort(lport);
                         lsnr.setMaxIdleTime(90*1000);  // default 10 sec
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
-                        _server.addConnector(lsnr);
+                        //_server.addConnector(lsnr);
+                        connectors.add(lsnr);
                         boundAddresses++;
                     } catch (Exception ioe) {
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ": " + ioe);
@@ -397,7 +398,8 @@ public class RouterConsoleRunner {
                             ssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                             ssll.setMaxIdleTime(90*1000);  // default 10 sec
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
-                            _server.addConnector(ssll);
+                            //_server.addConnector(ssll);
+                            connectors.add(ssll);
                             boundAddresses++;
                         } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
@@ -437,13 +439,36 @@ public class RouterConsoleRunner {
             _server.start();
         } catch (Throwable me) {
             // NoClassFoundDefError from a webapp is a throwable, not an exception
-            System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
+            System.err.println("Error starting the Router Console server: " + me);
+            me.printStackTrace();
+        }
+
+        if (_server.isRunning()) {
+            // Add and start the connectors one-by-one
+            boolean error = false;
+            for (Connector conn : connectors) {
+                try {
+                    _server.addConnector(conn);
+                    // start after adding so it gets the right thread pool
+                    conn.start();
+                } catch (Throwable me) {
+                    try {
+                        _server.removeConnector(conn);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                    System.err.println("WARNING: Error starting " + conn + ": " + me);
+                    me.printStackTrace();
+                    error = true;
+                }
+            }
+            if (error) {
+                System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
                                "If your console is still accessible at http://127.0.0.1:7657/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
-                               "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.\n" +
-                               "Exception: " + me);
-            me.printStackTrace();
+                               "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");
+            }
         }
 
         // Start all the other webapps after the server is up,
