@@ -1,3 +1,7 @@
+2012-04-14 kytv
+ * Update wrapper to v3.5.14
+ * Update geoip.txt from Maxmind's April 2012 database
+
 2012-04-12 kytv
  * German, Spanish, and Swedish translation updates from Transifex
 
