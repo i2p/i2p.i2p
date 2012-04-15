@@ -26,5 +26,6 @@ usr/share/java/jsp-api-2.1.jar usr/share/i2p/lib/jsp-api.jar
 usr/share/java/el-api-2.1.jar usr/share/i2p/lib/el-api.jar
 
 # from glassfish-javaee
-## some I2P plugins explicitly look for jstl.jar when building
-/usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/jstl.jar
+## some I2P plugins explicitly look for jstl.jar when building, but linking this
+## to jstl.jar caused SusiDNS and I2P-Bote to break.
+/usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/glassfish-javaee.jar
