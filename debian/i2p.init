@@ -43,6 +43,10 @@ I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.pidfile=$JVMPIDFILE \
  wrapper.daemonize=TRUE"
 
+[ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
+[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
+
+
 for ENV_FILE in /etc/environment /etc/default/locale; do
 [ -r "$ENV_FILE" ] || continue
 [ -s "$ENV_FILE" ] || continue
@@ -56,12 +60,6 @@ for ENV_FILE in /etc/environment /etc/default/locale; do
      fi
  done
 done
-
-# this isn't really needed since we depend on lsb-base (>= 3.2-14)
-## Actually, we *do* need this since the versioned dependency has been dropped
-## the I2P packages can be installed in GnewSense.
-[ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
-[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
 
 # read config file
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
@@ -79,11 +77,11 @@ case "$RUN_DAEMON" in
 esac
 
 # We need the wrapper. If it's not found, abort.
-[ -x $DAEMON ] || exit 0
+[ -x $DAEMON ] || exit 1
 
 # Even though this script doesn't call it, check for i2prouter.  If it's not
 # found, it probably means that the package isn't installed anymore.
-[ -x /usr/bin/i2prouter ] || exit 0
+[ -x /usr/bin/i2prouter ] || exit 1
 
 do_start()
 {
