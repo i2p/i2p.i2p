@@ -731,7 +731,17 @@
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="preppkg-unix" depends="preppkg-base, prep-script-translation" />
+    <target name="preppkg-unix" depends="preppkg-base, prep-script-translation" >
+        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
+	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->
+        <copy file="installer/resources/eepget" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
+        <copy file="installer/resources/osid" todir="pkg-temp/" />
+        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
+        <copy todir="pkg-temp/man/">
+            <fileset dir="installer/resources/man/" />
+        </copy>
+    </target>
 
     <target name="preppkg-linux" depends="preppkg-linux-x86,preppkg-linux-nonx86" />
 
@@ -829,14 +839,6 @@
         <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
-        <copy file="installer/resources/eepget" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
-        <copy file="installer/resources/osid" todir="pkg-temp/" />
-        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
-        <copy todir="pkg-temp/man/">
-            <fileset dir="installer/resources/man/" />
-        </copy>
 	<!--
 	     Disabling per zzz's statement on IRC: jetty-i2psnark.xml is for an obscure feature that is broken anyway,
 	     					   you can remove the file, the link, and the patch from the package
