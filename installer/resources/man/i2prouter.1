@@ -1,17 +1,15 @@
-.\"Created with GNOME Manpages Editor Wizard
-.\"http://sourceforge.net/projects/gmanedit2
-.TH i2prouter 1 "November 13, 2010" "" "I2PRouter"
+.TH i2prouter 1 "April 19, 2012" "" "I2PROUTER"
 
 .SH NAME
 i2prouter \- start and stop the I2P router
 
 .SH SYNOPSIS
 .B i2prouter
-.RI { console | start | stop | restart | status | dump }
+.RI { console | start | stop | graceful | restart | condrestart | status | dump | install | remove }
 .br
 
 .SH DESCRIPTION
-\fBi2prouter\fP controls the I2P service. It takes options similar to init scripts.
+Control the I2P service.
 
 .B
 .IP console
@@ -28,6 +26,22 @@ Stops the I2P service.
 .B
 .IP restart
 Stops the I2P service and then starts it.
+
+.B
+.IP condrestart
+Restart the I2P service only if it is already running.
+
+.B
+.IP graceful
+Stop I2P gracefully (may take up to 11 minutes)
+
+.B
+.IP install
+Install initscript to start I2P automatically when the system boots.
+
+.B
+.IP remove
+Uninstall initscript that was installed with \fB install\fP
 
 .B
 .IP status
