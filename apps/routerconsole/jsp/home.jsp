@@ -89,6 +89,9 @@
 %>
 
 <div class="home" id="home">
+<%
+   if (homehelper.shouldShowSearch()) {
+%>
   <div class="search">
     <form action="/search.jsp" method="POST">
       <table class="search"><tr><td align="right">
@@ -102,6 +105,9 @@
       </td></tr></table>
     </form>
   </div>
+<%
+   }  // shouldShowSearch()
+%>
   <div class="ag2">
     <h4 class="app"><%=intl._("Eepsites of Interest")%></h4>
     <jsp:getProperty name="homehelper" property="favorites" /><br>
