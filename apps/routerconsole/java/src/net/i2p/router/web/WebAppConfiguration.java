@@ -68,13 +68,7 @@ public class WebAppConfiguration implements Configuration {
 
         File dir = libDir;
         String cp;
-        if (ctxPath.equals("/susidns")) {
-            // jars moved from the .war to lib/ in 0.7.12
-            cp = "jstl.jar,standard.jar";
-        } else if (ctxPath.equals("/i2psnark")) {
-            // duplicate classes removed from the .war in 0.7.12
-            cp = "i2psnark.jar";
-        } else if (pluginDir.exists()) {
+        if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
@@ -101,6 +95,9 @@ public class WebAppConfiguration implements Configuration {
                 path = dir.getAbsolutePath() + '/' + elem;
             // As of Jetty 6, we can't add dups to the class path, or
             // else it screws up statics
+            // This is not a complete solution because the Windows no-wrapper classpath is set
+            // by the launchi2p.jar (i2p.exe) manifest and is not detected below.
+            // TODO: Add a classpath to the command line in i2pstandalone.xml?
             File jfile = new File(path);
             File jdir = jfile.getParentFile();
             if (systemCP.contains(jfile.toURI().toURL()) ||

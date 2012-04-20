@@ -101,7 +101,8 @@
             <manifest>
                 <!-- top level installer will rename to jrobin.jar -->
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
-                <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar" />
+                <!-- very old installs don't have i2psnark,jstl,standard in the classpath... not added in WebAppConfiguration any more -->
+                <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar i2psnark.jar jstl.jar standard.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
