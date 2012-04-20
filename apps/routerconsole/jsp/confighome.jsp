@@ -40,6 +40,9 @@ input.default {
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>
 
+<%
+   if (homehelper.shouldShowSearch()) {
+%>
 <h3><%=intl._("Search Engines")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
@@ -53,6 +56,9 @@ input.default {
   <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>
+<%
+   }  // shouldShowSearch()
+%>
 
 <h3><%=intl._("Recommended Eepsites")%></h3>
 <form action="" method="POST">

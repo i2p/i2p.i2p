@@ -21,6 +21,7 @@ public class HomeHelper extends HelperBase {
     static final String PROP_SERVICES = "routerconsole.services";
     static final String PROP_FAVORITES = "routerconsole.favorites";
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
+    private static final String PROP_SEARCH = "routerconsole.showSearch";
 
     static final String DEFAULT_SERVICES =
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/susidns/index" + S + I + "book_addresses.png" + S +
@@ -60,6 +61,10 @@ public class HomeHelper extends HelperBase {
 
     public boolean shouldShowWelcome() {
         return _context.getProperty(Messages.PROP_LANG) == null;
+    }
+
+    public boolean shouldShowSearch() {
+        return _context.getBooleanProperty(PROP_SEARCH);
     }
 
     public String getServices() {
