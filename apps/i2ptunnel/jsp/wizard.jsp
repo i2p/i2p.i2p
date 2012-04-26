@@ -501,7 +501,8 @@ http://stats.i2p/cgi-bin/jump.cgi?a=
 http://i2jump.i2p/" /><%
                 } /* httpclient */
               } else { /* Server-only defaults */
-            %><input type="hidden" name="encrypt" value="" />
+            %><input type="hidden" name="privKeyFile" value="<%=editBean.getPrivateKeyFile(-1)%>" />
+            <input type="hidden" name="encrypt" value="" />
             <input type="hidden" name="encryptKey" value="" />
             <input type="hidden" name="accessMode" value="0" />
             <input type="hidden" name="accessList" value="" />
