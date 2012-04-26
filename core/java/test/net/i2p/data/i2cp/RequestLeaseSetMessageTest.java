@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -10,8 +10,12 @@ package net.i2p.data;
 
 import java.util.Date;
 
-import net.i2p.data.i2cp.RequestLeaseSetMessage;
-import net.i2p.data.i2cp.SessionId;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
+import net.i2p.data.TunnelId;
+import net.i2p.data.TunnelIdTest;
 
 /**
  * Test harness for loading / storing RequestLeaseSetMessage objects

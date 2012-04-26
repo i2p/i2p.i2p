@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,19 +8,20 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.i2cp.CreateSessionMessage;
-import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
 
 /**
  * Test harness for loading / storing Hash objects
  *
  * @author jrandom
  */
-public class CreateSessionMessageTest extends StructureTest {
+public class AbuseSeverityTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
-        CreateSessionMessage msg = new CreateSessionMessage();
-        msg.setSessionConfig((SessionConfig)(new SessionConfigTest()).createDataStructure());
-        return msg; 
+        AbuseSeverity sev = new AbuseSeverity();
+        sev.setSeverity(64);
+        return sev;
     }
-    public DataStructure createStructureToRead() { return new CreateSessionMessage(); }
+    public DataStructure createStructureToRead() { return new AbuseSeverity(); }
 }

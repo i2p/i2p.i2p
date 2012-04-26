@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,18 +8,20 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.i2cp.AbuseReason;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
 
 /**
  * Test harness for loading / storing Hash objects
  *
  * @author jrandom
  */
-public class AbuseReasonTest extends StructureTest {
+public class DisconnectMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
-        AbuseReason res = new AbuseReason();
-        res.setReason("Because they're mean");
-        return res;
+        DisconnectMessage msg = new DisconnectMessage();
+        msg.setReason("Because I say so");
+        return msg; 
     }
-    public DataStructure createStructureToRead() { return new AbuseReason(); }
+    public DataStructure createStructureToRead() { return new DisconnectMessage(); }
 }

@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -11,7 +11,11 @@ package net.i2p.data;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import net.i2p.data.i2cp.MessagePayloadMessage;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Payload;
+import net.i2p.data.PayloadTest;
 
 /**
  * Test harness for loading / storing SendMessageMessage objects

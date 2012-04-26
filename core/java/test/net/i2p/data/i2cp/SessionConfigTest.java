@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -10,7 +10,15 @@ package net.i2p.data;
 
 import java.util.Properties;
 
-import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
+import net.i2p.data.DestinationTest;
+import net.i2p.data.Signature;
+import net.i2p.data.SignatureTest;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPrivateKeyTest;
 
 /**
  * Test harness for loading / storing Hash objects

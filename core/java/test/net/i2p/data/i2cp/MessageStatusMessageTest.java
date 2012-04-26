@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,7 +8,9 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.i2cp.MessageStatusMessage;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
 
 /**
  * Test harness for loading / storing MessageStatusMessage objects

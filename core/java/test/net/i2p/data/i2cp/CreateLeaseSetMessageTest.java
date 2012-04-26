@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2cp;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,8 +8,15 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.i2cp.CreateLeaseSetMessage;
-import net.i2p.data.i2cp.SessionId;
+import net.i2p.data.StructureTest;
+import net.i2p.data.DataStructure;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PrivateKeyTest;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPrivateKeyTest;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSetTest;
 
 /**
  * Test harness for loading / storing CreateLeaseSetMessage objects
