@@ -28,6 +28,7 @@ pkg-temp/lib/i2psnark.jar usr/share/i2p/lib
 pkg-temp/lib/i2ptunnel.jar usr/share/i2p/lib
 pkg-temp/lib/jetty-i2p.jar usr/share/i2p/lib
 pkg-temp/lib/jrobin.jar usr/share/i2p/lib
+pkg-temp/lib/jstl.jar usr/share/i2p/lib
 pkg-temp/lib/mstreaming.jar usr/share/i2p/lib
 pkg-temp/lib/router.jar usr/share/i2p/lib
 pkg-temp/lib/routerconsole.jar usr/share/i2p/lib
