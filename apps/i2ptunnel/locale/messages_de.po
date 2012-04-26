@@ -7,6 +7,7 @@
 # blabla, 2011.
 #   <blabla@trash-mail.com>, 2011, 2012.
 # D.A. Loader <>, 2012.
+#   <driz@i2pmail.org>, 2012.
 # ducki2p <ducki2p@gmail.com>, 2011.
 # foo <foo@bar>, 2009.
 # mixxy, 2011.
@@ -14,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-12 20:20+0000\n"
-"PO-Revision-Date: 2012-03-13 20:51+0000\n"
+"POT-Creation-Date: 2012-04-20 19:30+0000\n"
+"PO-Revision-Date: 2012-04-20 15:15+0000\n"
 "Last-Translator: D.A. Loader <>\n"
 "Language-Team: German (http://www.transifex.net/projects/p/I2P/language/"
 "de/)\n"
@@ -54,7 +55,7 @@ msgstr "Host"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1012
 msgid "Base 32"
-msgstr ""
+msgstr "Base 32"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1016
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:376
@@ -1041,6 +1042,8 @@ msgid ""
 "With this tunnel type, your IRC client will be able to connect to an IRC "
 "network inside I2P."
 msgstr ""
+"Durch diese Art von Tunnel kann sich Ihr IRC-Klient mit einem IRC-Netzwerk "
+"in I2P verbinden."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:235
 msgid ""
@@ -1131,6 +1134,8 @@ msgid ""
 "A customised server tunnel that can both serve HTTP data and connect to "
 "other server tunnels."
 msgstr ""
+"Ein modifizierter Server Tunnel welcher HTTP Daten senden, als auch zu "
+"anderen Server Tunnel verbinden kann."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:273
 msgid "This tunnel type is predominantly used when running a Seedless server."
@@ -1140,13 +1145,15 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:275
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
-msgstr ""
+msgstr "Ein angepasster Servertunnel, um IRC-Netzwerke im I2P zu betreiben."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:277
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
 msgstr ""
+"Normalerweise muss ein anderer Tunnel für jeden IRC Server erstellt werden, "
+"auf welchen durch I2P zugegriffen werden soll."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:279
 msgid "A customised server tunnel for Streamr."
@@ -1178,13 +1185,15 @@ msgstr "Trenne mehrere Proxies mit Kommas."
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr ""
+msgstr "Gib das Ziel des I2P Dienstes ein zu dem dieser Tunnel verbinden soll."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:372
 msgid ""
 "This could be the full base 64 destination key, or an I2P URL from your "
 "address book."
 msgstr ""
+"Es kann der volle Base64 Ziel Schlüssel, sowohl als auch eine I2P URL aus "
+"deinem Adressbuch sein."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:402
 msgid ""
@@ -1204,13 +1213,15 @@ msgstr "Dies ist der Port den der Client Tunnel lokal verwendet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:448
 msgid "This is also the client port for the HTTPBidir server tunnel."
-msgstr ""
+msgstr "Dies ist auch der Client Port für den HTTPBidir Server Tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:467
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
 msgstr ""
+"Wie soll der Tunnel erreichbar sein? Nur von diesem Computer, dem gesamten "
+"Subnetz, oder dem Internet ?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:469
 msgid "You will most likely want to just allow 127.0.0.1"
@@ -1245,6 +1256,8 @@ msgid ""
 "Because you chose to automatically start the tunnel when the router starts, "
 "you don't have to do anything further."
 msgstr ""
+"Weil Sie ausgewählt haben, den Tunnel automatisch zu starten, müssen Sie "
+"nichts weiteres machen."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:548
 msgid "The router will start the tunnel once it has been set up."
@@ -1255,6 +1268,8 @@ msgid ""
 "Because you chose not to automatically start the tunnel, you will have to "
 "manually start it."
 msgstr ""
+"Weil Sie ausgewählt haben, den Tunnel nicht automatisch zu starten, müssen "
+"Sie ihn manuell starten."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:554
 msgid ""
