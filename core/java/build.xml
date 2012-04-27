@@ -96,6 +96,7 @@
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
                 <exclude name="**/*Test.class" />
+                <exclude name="**/*TestSuite.class" />
                 <exclude name="**/AllCoreTests.class" />
                 <exclude name="com/nettgryppa/**/*.class" />
                 <exclude name="freenet/**/*.class" />
