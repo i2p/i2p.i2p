@@ -1116,6 +1116,10 @@
         </copy>
     </target>
 
+    <target name="delete-j6-update">
+        <delete dir="pkg-temp/eepsite-jetty6" />
+    </target>
+
     <!-- Jetty 6 I2P logging addons, not really fixes -->
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
@@ -1266,6 +1270,15 @@
 	</exec>
     </target>
 
+    <!-- call between installer-xxx and installer-windows -->
+    <target name="delete-nonwindows">
+        <delete dir="pkg-temp/lib/wrapper/" />
+        <delete dir="pkg-temp/locale/" />
+        <delete dir="pkg-temp/man/" />
+        <delete dir="pkg-temp/Start I2P Router.app/" />
+        <delete dir="pkg-temp" includes="eepget i2prouter INSTALL-headless.txt osid postinstall.sh runplain.sh" />
+    </target>
+
     <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches, utility-jars" >
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
@@ -1273,6 +1286,7 @@
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows-only.exe" />
     </target>
 
+    <!-- this is broken as installer-xxx targets may delete (or not delete) things in pkg-temp -->
     <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer-nowindows, installer" >
     </target>
     <!-- end custom installers -->
@@ -1365,7 +1379,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, preppkgRepack, installer-nowindows, installer-windows" >
+    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
