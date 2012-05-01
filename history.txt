@@ -1,3 +1,5 @@
+* 2012-05-02 0.9 released
+
 2012-04-26 kytv
  * German, Spanish, and Swedish Translation updates
    from Transifex

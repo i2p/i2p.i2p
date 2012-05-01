@@ -1384,7 +1384,7 @@
 
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
-        <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}.exe" />
+        <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}_windows.exe" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
         <delete file="i2pupdate.sud" />
         <delete file="i2pupdate.su2" />
@@ -1483,13 +1483,13 @@
             <arg value="i2p-${release.number}/" />
         </exec>
         <echo message="Sign the files:" />
-        <delete file="i2pinstall_${release.number}.exe.sig" />
+        <delete file="i2pinstall_${release.number}_windows.exe.sig" />
         <delete file="i2pinstall_${release.number}.jar.sig" />
         <delete file="i2psource_${release.number}.tar.bz2.sig" />
         <delete file="i2pupdate_${release.number}.zip.sig" />
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
         </exec>
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
@@ -1505,13 +1505,13 @@
         </exec>
         <exec executable="chmod" failonerror="true">
             <arg value="444" />
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
-            <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2pinstall_${release.number}_windows.exe.sig" />
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
@@ -1519,20 +1519,20 @@
         <echo message="File sizes:" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
-            <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2pinstall_${release.number}_windows.exe.sig" />
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
         <echo message="SHA256 sums:" />
         <exec executable="sha256sum" failonerror="true">
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
