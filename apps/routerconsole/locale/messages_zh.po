@@ -1444,7 +1444,7 @@ msgid "Qatar"
 msgstr "卡塔尔"
 
 #: ../java/build/Countries.java:184
-msgid "Reunion"
+msgid "Réunion"
 msgstr "留尼汪岛"
 
 #: ../java/build/Countries.java:185

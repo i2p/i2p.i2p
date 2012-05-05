@@ -1511,7 +1511,7 @@ msgid "Qatar"
 msgstr "Katar"
 
 #: ../java/build/Countries.java:191
-msgid "Reunion"
+msgid "Réunion"
 msgstr "Réunion"
 
 #: ../java/build/Countries.java:192
