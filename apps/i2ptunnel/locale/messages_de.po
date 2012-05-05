@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-20 19:30+0000\n"
-"PO-Revision-Date: 2012-04-20 15:15+0000\n"
-"Last-Translator: D.A. Loader <>\n"
+"POT-Creation-Date: 2012-05-05 19:46+0000\n"
+"PO-Revision-Date: 2012-04-27 04:54+0000\n"
+"Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.net/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -637,7 +637,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:525
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:535
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:693
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:695
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -1011,7 +1011,7 @@ msgstr "Standart Tunnel zur Verbindung mit einem einzelnen Service im I2P Netz"
 msgid ""
 "Try this if none of the tunnel types below fit your requirements, or you "
 "don't know what type of tunnel you need."
-msgstr ""
+msgstr "Wenn keiner der anderen Tunneltypen den Anforderungen entspricht"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:225
 msgid "Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P."
@@ -1024,6 +1024,9 @@ msgid ""
 "\"http_proxy\" environment variable for command-line applications in GNU/"
 "Linux."
 msgstr ""
+"Konfiguriere diesen Tunnel als HTTP-Proxyserver in deinem Browser, oder "
+"setze deine \"http_proxy\"-Umgebungsvariable für Kommandozeilen-Anwendungen "
+"in GNU/Linux."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:229
 msgid ""
@@ -1050,6 +1053,8 @@ msgid ""
 "Each IRC network in I2P that you wish to connect to will require its own "
 "tunnel. (See Also, SOCKS IRC)"
 msgstr ""
+"Jedes IRC-Netzwerk, mit dem du dich verbinden willst, benötigt einen eigenen "
+"IRC-Tunnel. (Siehe auch SOCKS-IRC)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:237
 msgid "A tunnel that implements the SOCKS protocol."
@@ -1176,6 +1181,8 @@ msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
 msgstr ""
+"Wenn du andere Outproxys dieses Typs kennst (entweder HTTP oder SOCKS), "
+"kannst du sie hier eintragen."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:352
 msgid "Separate multiple proxies with commas."
@@ -1239,6 +1246,9 @@ msgid ""
 "but for tunnels that are only used occassionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
 msgstr ""
+"Diese Option kann für oftgenutzte Tunnel (z.B. Servertunel) nützlich sein. "
+"Bei Tunneln, die nur sporadisch genutzt werden, bedeutet dies jedoch den "
+"unnötigen Aufbau und Unterhalt ungenutzter Tunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:539
 msgid "The wizard has now collected enough information to create your tunnel."
@@ -1250,6 +1260,8 @@ msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
 msgstr ""
+"Nach Klicken des \"Speichern\"-Knopfes wird der Tunnel eingerichtet und du "
+"gelangst wieder auf die I2PTunel Hauptseite."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:546
 msgid ""
@@ -1276,6 +1288,8 @@ msgid ""
 "You can do this by clicking the Start button on the main page which "
 "corresponds to the new tunnel."
 msgstr ""
+"Klicke dazu auf der Hauptseite auf den entsprechenden Start-Knopf des neuen "
+"Tunnels."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:558
 msgid "Below is a summary of the options you chose:"
@@ -1286,6 +1300,8 @@ msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
 msgstr ""
+"Neben diesen grundlegenden Einstellungen gibt es eine Reihe fortgeschritener "
+"Tunneloptionen."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:658
 msgid ""
@@ -1293,19 +1309,22 @@ msgid ""
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
 msgstr ""
+"Es werden vernünftige Standardwerte gewählt, die durch Klicken auf den "
+"Tunnelnamen auf der I2PTunnel-Hauptseite eingesehen und/oder bearbeitet "
+"werden können."
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:698
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:700
 msgid "Previous"
 msgstr "Vorheriges"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:706
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:708
 msgid "Save Tunnel"
 msgstr "Speichere Tunnel"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:712
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:714
 msgid "Finish"
 msgstr "Abschließen"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:718
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:720
 msgid "Next"
 msgstr "Nächstes"
