@@ -55,9 +55,19 @@ for ENV_FILE in /etc/environment /etc/default/locale; do
      value=`egrep "^${var}=" "$ENV_FILE" | tail -n1 | cut -d= -f2`
      [ -n "$value" ] && eval export $var=$value
 
-     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
-         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
-     fi
+# This is commented out for Ubuntu: Ubuntu still creates
+# /etc/environment in the most recent release
+# (currently 'Precise').
+#
+# TODO Add logic to automatically handle this
+#
+# Commented for Ubuntu since PPA packages 0.9-1$DISTRO1.
+# Packages for Debian systems will have this stanza uncommented.
+#
+#     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
+#         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
+#     fi
+
  done
 done
 
@@ -124,6 +134,12 @@ do_dump()
     [ "$RETVAL" = 2 ] && return 2
 }
 
+do_graceful()
+{
+    start-stop-daemon --stop --quiet -s HUP --pidfile $PIDFILE -u $I2PUSER
+    [ "$RETVAL" = 2 ] && return 2
+}
+
 case "$1" in
   start)
         log_daemon_msg "Starting $DESC" "$NAME"
@@ -136,6 +152,15 @@ case "$1" in
   dump)
         log_daemon_msg "Dumping $DESC" "$NAME"
         do_dump
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
+  graceful)
+        log_daemon_msg "Attempting graceful shutdown of $DESC" "$NAME"
+        log_daemon_msg "(could take up to 11 minutes)"
+        do_graceful
         case "$?" in
                 0|1) log_end_msg 0 ;;
                 2) log_end_msg 1 ;;
@@ -172,7 +197,7 @@ case "$1" in
         ;;
 *)
     N=/etc/init.d/$NAME
-    echo "Usage: $N {start|stop|dump|status|restart|force-reload}" >&2
+    echo "Usage: $N {start|stop|dump|graceful|status|restart|force-reload}" >&2
     exit 3
     ;;
 
