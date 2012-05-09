@@ -691,14 +691,14 @@
     <target name="preppkg" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
+            <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
+            <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
@@ -708,16 +708,16 @@
         <!-- no use doing repack200 on jbigi.jar -->
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
+            <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-freebsd" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
-            <fileset dir="installer/lib/wrapper/freebsd/" />
+            <fileset dir="installer/lib/wrapper/freebsd/" excludes="*.txt" />
         </copy>
         <copy todir="pkg-temp/lib/wrapper/freebsd64/">
-            <fileset dir="installer/lib/wrapper/freebsd64" />
+            <fileset dir="installer/lib/wrapper/freebsd64" excludes="*.txt" />
         </copy>
     </target>
 
@@ -748,22 +748,22 @@
 
     <target name="preppkg-linux-x86" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/linux/">
-            <fileset dir="installer/lib/wrapper/linux/" />
+            <fileset dir="installer/lib/wrapper/linux/" excludes="*.txt" />
         </copy>
         <copy todir="pkg-temp/lib/wrapper/linux64/">
-            <fileset dir="installer/lib/wrapper/linux64/" />
+            <fileset dir="installer/lib/wrapper/linux64/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-linux-nonx86" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
-            <fileset dir="installer/lib/wrapper/linux-armv7/" />
+            <fileset dir="installer/lib/wrapper/linux-armv7/" excludes="*.txt" />
         </copy>
 	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
-	    <fileset dir="installer/lib/wrapper/linux-ppc/" />
+	    <fileset dir="installer/lib/wrapper/linux-ppc/" excludes="*.txt" />
 	</copy>
         <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
-            <fileset dir="installer/lib/wrapper/linux-armv5/" />
+            <fileset dir="installer/lib/wrapper/linux-armv5/" excludes="*.txt" />
         </copy>
     </target>
 
@@ -773,7 +773,7 @@
 	    <fileset dir="installer/resources/Start I2P Router.app" />
 	</copy>
         <copy todir="pkg-temp/lib/wrapper/macosx/">
-            <fileset dir="installer/lib/wrapper/macosx/" />
+            <fileset dir="installer/lib/wrapper/macosx/" excludes="*.txt" />
         </copy>
     </target>
 
@@ -796,10 +796,10 @@
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/win32/">
-            <fileset dir="installer/lib/wrapper/win32/" />
+            <fileset dir="installer/lib/wrapper/win32/" excludes="*.txt" />
         </copy>
 	<copy todir="pkg-temp/lib/wrapper/win64/">
-	    <fileset dir="installer/lib/wrapper/win64/" />
+	    <fileset dir="installer/lib/wrapper/win64/" excludes="*.txt" />
         </copy>
     </target>
 
