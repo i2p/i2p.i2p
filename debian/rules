@@ -31,7 +31,7 @@ ROUTERVERSION=$(CURDIR)/router/java/src/net/i2p/router/RouterVersion.java
 # I2P's version will be displayed in the router console as "$I2PVERSION-$EXTRAPREFIX$DEBIANVERSION", eg. 0.8.12-0-deb1
 export EXTRAPREFIX := deb
 export JAVA_HOME I2P
-export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/Version/{print $$2}' |sed 's/.*-\([[:digit:]]\{1,\}\).*$$/\1/')
+export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/Version:/{print $$2}' |sed 's/.*-\([[:digit:]]\{1,\}\).*$$/\1/')
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
