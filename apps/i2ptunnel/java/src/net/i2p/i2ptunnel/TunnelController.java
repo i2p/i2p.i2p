@@ -29,6 +29,8 @@ import net.i2p.util.SecureFileOutputStream;
  * These objects are bundled together under a TunnelControllerGroup where the
  * entire group is stored / loaded from a single config file.
  *
+ * This is the class used by several plugins to create tunnels, so
+ * take care to maintain the public methods as a stable API.
  */
 public class TunnelController implements Logging {
     private final Log _log;
@@ -523,8 +525,14 @@ public class TunnelController implements Logging {
         return true;
     }
     
+    /**
+     *  A text description of the tunnel.
+     *  @deprecated unused
+     */
     public void getSummary(StringBuilder buf) {
         String type = getType();
+        buf.append(type);
+      /****
         if ("httpclient".equals(type))
             getHttpClientSummary(buf);
         else if ("client".equals(type))
@@ -535,8 +543,10 @@ public class TunnelController implements Logging {
             getHttpServerSummary(buf);
         else
             buf.append("Unknown type ").append(type);
+       ****/
     }
     
+  /****
     private void getHttpClientSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
@@ -628,7 +638,11 @@ public class TunnelController implements Logging {
             }
         }
     }
+  ****/
     
+    /**
+     *
+     */
     public void log(String s) {
         synchronized (this) {
             _messages.add(s);
