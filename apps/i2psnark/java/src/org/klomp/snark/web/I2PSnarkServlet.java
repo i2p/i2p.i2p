@@ -148,6 +148,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         _imgPath = _themePath + "images/";
         // this is the part after /i2psnark
         String path = req.getServletPath();
+        resp.setHeader("X-Frame-Options", "SAMEORIGIN");
 
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {

@@ -1185,6 +1185,7 @@ public class WebMail extends HttpServlet
 	{
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+                response.setHeader("X-Frame-Options", "SAMEORIGIN");
 		RequestWrapper request = new RequestWrapper( httpRequest );
 		
 		SessionObject sessionObject = null;

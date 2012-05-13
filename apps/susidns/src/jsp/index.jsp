@@ -27,6 +27,8 @@
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
 
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %>
 <%@page pageEncoding="UTF-8"%>
 <%@page trimDirectiveWhitespaces="true"%>

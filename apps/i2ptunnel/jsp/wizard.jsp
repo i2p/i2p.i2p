@@ -5,6 +5,8 @@
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
 
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
 %><?xml version="1.0" encoding="UTF-8"?>

@@ -1,3 +1,7 @@
+2012-05-13 zzz
+ * Console: Add X-Frame-Options to headers,
+   disable with routerconsole.disableXFrame=true
+
 * 2012-05-02 0.9 released
 
 2012-04-26 kytv

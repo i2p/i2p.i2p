@@ -19,6 +19,7 @@ public class CSSHelper extends HelperBase {
     private static final String FORCE = "classic";
     public static final String PROP_REFRESH = "routerconsole.summaryRefresh";
     public static final String DEFAULT_REFRESH = "60";
+    private static final String PROP_XFRAME = "routerconsole.disableXFrame";
 
     public String getTheme(String userAgent) {
         String url = BASE_THEME_PATH;
@@ -56,6 +57,15 @@ public class CSSHelper extends HelperBase {
         // Protected with nonce in css.jsi
         if (val != null)
             NewsFetcher.getInstance(_context).showNews(val.equals("1"));
+    }
+
+    /**
+     *  Should we send X_Frame_Options=SAMEORIGIN
+     *  Default true
+     *  @since 0.9.1
+     */
+    public boolean shouldSendXFrame() {
+        return !_context.getBooleanProperty(PROP_XFRAME);
     }
 
     /** change refresh and save it */

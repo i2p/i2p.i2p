@@ -29,6 +29,10 @@
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
 <jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%
+   // clickjacking
+   if (intl.shouldSendXFrame())
+      response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
    String conNonceParam = request.getParameter("consoleNonce");
    if (conNonceParam != null && conNonceParam.equals(System.getProperty("router.consoleNonce"))) {
        intl.setLang(request.getParameter("lang"));
