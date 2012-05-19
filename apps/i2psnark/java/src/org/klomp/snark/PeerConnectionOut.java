@@ -395,7 +395,7 @@ class PeerConnectionOut implements Runnable
         while (it.hasNext())
           {
             Message m = (Message)it.next();
-            if (m.type == Message.REQUEST && m.piece == req.piece &&
+            if (m.type == Message.REQUEST && m.piece == req.getPiece() &&
                 m.begin == req.off && m.length == req.len)
               {
                 if (_log.shouldLog(Log.DEBUG))
@@ -406,7 +406,7 @@ class PeerConnectionOut implements Runnable
       }
     Message m = new Message();
     m.type = Message.REQUEST;
-    m.piece = req.piece;
+    m.piece = req.getPiece();
     m.begin = req.off;
     m.length = req.len;
     addMessage(m);
@@ -492,7 +492,7 @@ class PeerConnectionOut implements Runnable
           {
             Message m = (Message)it.next();
             if (m.type == Message.REQUEST
-                && m.piece == req.piece
+                && m.piece == req.getPiece()
                 && m.begin == req.off
                 && m.length == req.len)
               it.remove();
@@ -502,7 +502,7 @@ class PeerConnectionOut implements Runnable
     // Always send, just to be sure it it is really canceled.
     Message m = new Message();
     m.type = Message.CANCEL;
-    m.piece = req.piece;
+    m.piece = req.getPiece();
     m.begin = req.off;
     m.length = req.len;
     addMessage(m);

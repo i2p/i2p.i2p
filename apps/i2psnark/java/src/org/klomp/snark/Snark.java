@@ -1214,7 +1214,7 @@ public class Snark
         total += c.getCurrentUploadRate();
     }
     long limit = 1024l * _util.getMaxUpBW();
-    debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
+    debug("Total up bw: " + total + " Limit: " + limit, Snark.NOTICE);
     return total > limit;
   }
 

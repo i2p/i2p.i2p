@@ -184,6 +184,9 @@ public class I2PSnarkUtil {
     /** @since 0.8.9 */
     public void setFilesPublic(boolean yes) { _areFilesPublic = yes; }
 
+    /** @since 0.9.1 */
+    public File getTempDir() { return _tmpDir; }
+
     /**
      * Connect to the router, if we aren't already
      */

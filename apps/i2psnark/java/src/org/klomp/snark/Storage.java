@@ -873,54 +873,55 @@ public class Storage
    * matches), otherwise false.
    * @exception IOException when some storage related error occurs.
    */
-  public boolean putPiece(int piece, byte[] ba) throws IOException
+  public boolean putPiece(PartialPiece pp) throws IOException
   {
-    // First check if the piece is correct.
-    // Copy the array first to be paranoid.
-    byte[] bs = ba.clone();
-    int length = bs.length;
-    boolean correctHash = metainfo.checkPiece(piece, bs, 0, length);
-    if (listener != null)
-      listener.storageChecked(this, piece, correctHash);
-    if (!correctHash)
-      return false;
+      int piece = pp.getPiece();
+      try {
+          synchronized(bitfield) {
+              if (bitfield.get(piece))
+                  return true; // No need to store twice.
+          }
 
-    synchronized(bitfield)
-      {
-        if (bitfield.get(piece))
-          return true; // No need to store twice.
-      }
+          // TODO alternative - check hash on the fly as we write to the file,
+          // to save another I/O pass
+          boolean correctHash = metainfo.checkPiece(pp);
+          if (listener != null)
+            listener.storageChecked(this, piece, correctHash);
+          if (!correctHash) {
+              return false;
+          }
 
-    // Early typecast, avoid possibly overflowing a temp integer
-    long start = (long) piece * (long) piece_size;
-    int i = 0;
-    long raflen = lengths[i];
-    while (start > raflen)
-      {
-        i++;
-        start -= raflen;
-        raflen = lengths[i];
-      }
+          // Early typecast, avoid possibly overflowing a temp integer
+          long start = (long) piece * (long) piece_size;
+          int i = 0;
+          long raflen = lengths[i];
+          while (start > raflen) {
+              i++;
+              start -= raflen;
+              raflen = lengths[i];
+          }
     
-    int written = 0;
-    int off = 0;
-    while (written < length)
-      {
-        int need = length - written;
-        int len = (start + need < raflen) ? need : (int)(raflen - start);
-        synchronized(RAFlock[i])
-          {
-            checkRAF(i);
-            rafs[i].seek(start);
-            rafs[i].write(bs, off + written, len);
+          int written = 0;
+          int off = 0;
+          int length = metainfo.getPieceLength(piece);
+          while (written < length) {
+              int need = length - written;
+              int len = (start + need < raflen) ? need : (int)(raflen - start);
+              synchronized(RAFlock[i]) {
+                  checkRAF(i);
+                  rafs[i].seek(start);
+                  //rafs[i].write(bs, off + written, len);
+                  pp.write(rafs[i], off + written, len);
+              }
+              written += len;
+              if (need - len > 0) {
+                  i++;
+                  raflen = lengths[i];
+                  start = 0;
+              }
           }
-        written += len;
-        if (need - len > 0)
-          {
-            i++;
-            raflen = lengths[i];
-            start = 0;
-          }
+      } finally {
+          pp.release();
       }
 
     changed = true;

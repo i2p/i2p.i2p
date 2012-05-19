@@ -107,7 +107,7 @@ class PeerState implements DataLoader
         // The only problem with returning the partials to the coordinator
         // is that chunks above a missing request are lost.
         // Future enhancements to PartialPiece could keep track of the holes.
-        List<PartialPiece> pcs = returnPartialPieces();
+        List<Request> pcs = returnPartialPieces();
         if (!pcs.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(peer + " got choked, returning partial pieces to the PeerCoordinator: " + pcs);
@@ -304,22 +304,22 @@ class PeerState implements DataLoader
 
     if (_log.shouldLog(Log.DEBUG))
       _log.debug("got end of Chunk("
-                  + req.piece + "," + req.off + "," + req.len + ") from "
+                  + req.getPiece() + "," + req.off + "," + req.len + ") from "
                   + peer);
 
     // Last chunk needed for this piece?
-    if (getFirstOutstandingRequest(req.piece) == -1)
+    if (getFirstOutstandingRequest(req.getPiece()) == -1)
       {
         // warning - may block here for a while
-        if (listener.gotPiece(peer, req.piece, req.bs))
+        if (listener.gotPiece(peer, req.getPartialPiece()))
           {
             if (_log.shouldLog(Log.DEBUG))
-              _log.debug("Got " + req.piece + ": " + peer);
+              _log.debug("Got " + req.getPiece() + ": " + peer);
           }
         else
           {
             if (_log.shouldLog(Log.WARN))
-              _log.warn("Got BAD " + req.piece + " from " + peer);
+              _log.warn("Got BAD " + req.getPiece() + " from " + peer);
           }
       }
 
@@ -335,7 +335,7 @@ class PeerState implements DataLoader
   synchronized private int getFirstOutstandingRequest(int piece)
    {
     for (int i = 0; i < outstandingRequests.size(); i++)
-      if (outstandingRequests.get(i).piece == piece)
+      if (outstandingRequests.get(i).getPiece() == piece)
         return i;
     return -1;
   }
@@ -371,7 +371,7 @@ class PeerState implements DataLoader
     synchronized(this)
       {
         req = outstandingRequests.get(r);
-        while (req.piece == piece && req.off != begin
+        while (req.getPiece() == piece && req.off != begin
                && r < outstandingRequests.size() - 1)
           {
             r++;
@@ -379,7 +379,7 @@ class PeerState implements DataLoader
           }
         
         // Something wrong?
-        if (req.piece != piece || req.off != begin || req.len != length)
+        if (req.getPiece() != piece || req.off != begin || req.len != length)
           {
             if (_log.shouldLog(Log.INFO))
               _log.info("Unrequested or unneeded 'piece: "
@@ -427,13 +427,13 @@ class PeerState implements DataLoader
       Request rv = null;
       int lowest = Integer.MAX_VALUE;
       for (Request r :  outstandingRequests) {
-          if (r.piece == piece && r.off < lowest) {
+          if (r.getPiece() == piece && r.off < lowest) {
               lowest = r.off;
               rv = r;
           }
       }
       if (pendingRequest != null &&
-          pendingRequest.piece == piece && pendingRequest.off < lowest)
+          pendingRequest.getPiece() == piece && pendingRequest.off < lowest)
           rv = pendingRequest;
 
       if (_log.shouldLog(Log.DEBUG))
@@ -447,14 +447,16 @@ class PeerState implements DataLoader
    *  @return List of PartialPieces, even those with an offset == 0, or empty list
    *  @since 0.8.2
    */
-  synchronized List<PartialPiece> returnPartialPieces()
+  synchronized List<Request> returnPartialPieces()
   {
       Set<Integer> pcs = getRequestedPieces();
-      List<PartialPiece> rv = new ArrayList(pcs.size());
+      List<Request> rv = new ArrayList(pcs.size());
       for (Integer p : pcs) {
           Request req = getLowestOutstandingRequest(p.intValue());
-          if (req != null)
-              rv.add(new PartialPiece(req));
+          if (req != null) {
+              req.getPartialPiece().setDownloaded(req.off);
+              rv.add(req);
+          }
       }
       outstandingRequests.clear();
       pendingRequest = null;
@@ -468,9 +470,9 @@ class PeerState implements DataLoader
   synchronized private Set<Integer> getRequestedPieces() {
       Set<Integer> rv = new HashSet(outstandingRequests.size() + 1);
       for (Request req : outstandingRequests) {
-          rv.add(Integer.valueOf(req.piece));
+          rv.add(Integer.valueOf(req.getPiece()));
       if (pendingRequest != null)
-          rv.add(Integer.valueOf(pendingRequest.piece));
+          rv.add(Integer.valueOf(pendingRequest.getPiece()));
       }
       return rv;
   }
@@ -571,14 +573,14 @@ class PeerState implements DataLoader
    * @since 0.8.1
    */
   synchronized void cancelPiece(int piece) {
-        if (lastRequest != null && lastRequest.piece == piece)
+        if (lastRequest != null && lastRequest.getPiece() == piece)
           lastRequest = null;
         
         Iterator<Request> it = outstandingRequests.iterator();
         while (it.hasNext())
           {
             Request req = it.next();
-            if (req.piece == piece)
+            if (req.getPiece() == piece)
               {
                 it.remove();
                 // Send cancel even when we are choked to make sure that it is
@@ -594,10 +596,10 @@ class PeerState implements DataLoader
    * @since 0.8.1
    */
   synchronized boolean isRequesting(int piece) {
-      if (pendingRequest != null && pendingRequest.piece == piece)
+      if (pendingRequest != null && pendingRequest.getPiece() == piece)
           return true;
       for (Request req : outstandingRequests) {
-          if (req.piece == piece)
+          if (req.getPiece() == piece)
               return true;
       }
       return false;
@@ -679,7 +681,7 @@ class PeerState implements DataLoader
           {
             int pieceLength;
             boolean isLastChunk;
-            pieceLength = metainfo.getPieceLength(lastRequest.piece);
+            pieceLength = metainfo.getPieceLength(lastRequest.getPiece());
             isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
 
             // Last part of a piece?
@@ -687,14 +689,13 @@ class PeerState implements DataLoader
               more_pieces = requestNextPiece();
             else
               {
-                    int nextPiece = lastRequest.piece;
+                    PartialPiece nextPiece = lastRequest.getPartialPiece();
                     int nextBegin = lastRequest.off + PARTSIZE;
-                    byte[] bs = lastRequest.bs;
                     int maxLength = pieceLength - nextBegin;
                     int nextLength = maxLength > PARTSIZE ? PARTSIZE
                                                           : maxLength;
                     Request req
-                      = new Request(nextPiece, bs, nextBegin, nextLength);
+                      = new Request(nextPiece,nextBegin, nextLength);
                     outstandingRequests.add(req);
                     if (!choked)
                       out.sendRequest(req);
@@ -740,7 +741,7 @@ class PeerState implements DataLoader
         // what piece to give us next.
         int nextPiece = listener.wantPiece(peer, bitfield);
         if (nextPiece != -1
-            && (lastRequest == null || lastRequest.piece != nextPiece)) {
+            && (lastRequest == null || lastRequest.getPiece() != nextPiece)) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(peer + " want piece " + nextPiece);
                 // Fail safe to make sure we are interested

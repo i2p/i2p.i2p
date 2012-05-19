@@ -116,7 +116,7 @@ public class PeerCoordinator implements PeerListener
    */
   private final List<Piece> wantedPieces;
 
-  /** partial pieces - lock by synching on wantedPieces */
+  /** partial pieces - lock by synching on wantedPieces - TODO store Requests, not PartialPieces */
   private final List<PartialPiece> partialPieces;
 
   private boolean halted = false;
@@ -349,11 +349,12 @@ public class PeerCoordinator implements PeerListener
         return 6;
     int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
-    if (size <= 512*1024 || completed())
+    // Now that we use temp files, no memory concern
+    //if (size <= 512*1024 || completed())
       return max;
-    if (size <= 1024*1024)
-      return (max + max + 2) / 3;
-    return (max + 2) / 3;
+    //if (size <= 1024*1024)
+    //  return (max + max + 2) / 3;
+    //return (max + 2) / 3;
   }
 
   public boolean halted() { return halted; }
@@ -380,6 +381,9 @@ public class PeerCoordinator implements PeerListener
     }
     // delete any saved orphan partial piece
     synchronized (partialPieces) {
+        for (PartialPiece pp : partialPieces) {
+            pp.release();
+        }
         partialPieces.clear();
     }
   }
@@ -630,22 +634,23 @@ public class PeerCoordinator implements PeerListener
    * -1 if none of the given pieces are wanted.
    */
   public int wantPiece(Peer peer, BitField havePieces) {
-      return wantPiece(peer, havePieces, true);
+      Piece pc = wantPiece(peer, havePieces, true);
+      return pc != null ? pc.getId() : -1;
   }
 
   /**
    * Returns one of pieces in the given BitField that is still wanted or
-   * -1 if none of the given pieces are wanted.
+   * null if none of the given pieces are wanted.
    *
    * @param record if true, actually record in our data structures that we gave the
    *               request to this peer. If false, do not update the data structures.
    * @since 0.8.2
    */
-  private int wantPiece(Peer peer, BitField havePieces, boolean record) {
+  private Piece wantPiece(Peer peer, BitField havePieces, boolean record) {
     if (halted) {
       if (_log.shouldLog(Log.WARN))
           _log.warn("We don't want anything from the peer, as we are halted!  peer=" + peer);
-      return -1;
+      return null;
     }
 
     Piece piece = null;
@@ -680,7 +685,7 @@ public class PeerCoordinator implements PeerListener
             // If we do end game all the time, we generate lots of extra traffic
             // when the seeder is super-slow and all the peers are "caught up"
             if (wantedSize > END_GAME_THRESHOLD)
-                return -1;  // nothing to request and not in end game
+                return null;  // nothing to request and not in end game
             // let's not all get on the same piece
             // Even better would be to sort by number of requests
             if (record)
@@ -704,7 +709,7 @@ public class PeerCoordinator implements PeerListener
                     _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested);
                 //  _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested 
                 //            + " wanted = " + wantedPieces + " peerHas = " + havePieces);
-                return -1; //If we still can't find a piece we want, so be it.
+                return null; //If we still can't find a piece we want, so be it.
             } else {
                 // Should be a lot smarter here -
                 // share blocks rather than starting from 0 with each peer.
@@ -719,7 +724,7 @@ public class PeerCoordinator implements PeerListener
                 _log.info(peer + " is now requesting: piece " + piece + " priority " + piece.getPriority());
             piece.setRequested(peer, true);
         }
-        return piece.getId();
+        return piece;
       } // synch
   }
 
@@ -846,10 +851,11 @@ public class PeerCoordinator implements PeerListener
    *
    * @throws RuntimeException on IOE saving the piece
    */
-  public boolean gotPiece(Peer peer, int piece, byte[] bs)
+  public boolean gotPiece(Peer peer, PartialPiece pp)
   {
     if (metainfo == null || storage == null)
         return true;
+    int piece = pp.getPiece();
     if (halted) {
       _log.info("Got while-halted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
       return true; // We don't actually care anymore.
@@ -872,7 +878,7 @@ public class PeerCoordinator implements PeerListener
         
         try
           {
-            if (storage.putPiece(piece, bs))
+            if (storage.putPiece(pp))
               {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Got valid piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
@@ -922,6 +928,15 @@ public class PeerCoordinator implements PeerListener
             p.disconnect(true);
           }
     
+    if (completed()) {
+        synchronized (partialPieces) {
+            for (PartialPiece ppp : partialPieces) {
+                ppp.release();
+            }
+            partialPieces.clear();
+        }
+    }
+
     return true;
   }
 
@@ -998,17 +1013,24 @@ public class PeerCoordinator implements PeerListener
    *  Also mark the piece unrequested if this peer was the only one.
    *
    *  @param peer partials, must include the zero-offset (empty) ones too
+   *              No dup pieces, piece.setDownloaded() must be set
    *  @since 0.8.2
    */
-  public void savePartialPieces(Peer peer, List<PartialPiece> partials)
+  public void savePartialPieces(Peer peer, List<Request> partials)
   {
-      if (halted)
-          return;
       if (_log.shouldLog(Log.INFO))
           _log.info("Partials received from " + peer + ": " + partials);
+      if (halted || completed()) {
+          for (Request req : partials) {
+              PartialPiece pp = req.getPartialPiece();
+              pp.release();
+          }
+          return;
+      }
       synchronized(wantedPieces) {
-          for (PartialPiece pp : partials) {
-              if (pp.getDownloaded() > 0) {
+          for (Request req : partials) {
+              PartialPiece pp = req.getPartialPiece();
+              if (req.off > 0) {
                   // PartialPiece.equals() only compares piece number, which is what we want
                   int idx = partialPieces.indexOf(pp);
                   if (idx < 0) {
@@ -1017,10 +1039,12 @@ public class PeerCoordinator implements PeerListener
                           _log.info("Saving orphaned partial piece (new) " + pp);
                   } else if (idx >= 0 && pp.getDownloaded() > partialPieces.get(idx).getDownloaded()) {
                       // replace what's there now
+                      partialPieces.get(idx).release();
                       partialPieces.set(idx, pp);
                       if (_log.shouldLog(Log.INFO))
                           _log.info("Saving orphaned partial piece (bigger) " + pp);
                   } else {
+                      pp.release();
                       if (_log.shouldLog(Log.INFO))
                           _log.info("Discarding partial piece (not bigger)" + pp);
                   }
@@ -1029,10 +1053,14 @@ public class PeerCoordinator implements PeerListener
                       // sorts by remaining bytes, least first
                       Collections.sort(partialPieces);
                       PartialPiece gone = partialPieces.remove(max);
+                      gone.release();
                       if (_log.shouldLog(Log.INFO))
                           _log.info("Discarding orphaned partial piece (list full)" + gone);
                   }
-              }  // else drop the empty partial piece
+              } else {
+                  // drop the empty partial piece
+                  pp.release();
+              }
               // synchs on wantedPieces...
               markUnrequested(peer, pp.getPiece());
           }
@@ -1079,14 +1107,9 @@ public class PeerCoordinator implements PeerListener
       }
       // ...and this section turns this into the general move-requests-around code!
       // Temporary? So PeerState never calls wantPiece() directly for now...
-      int piece = wantPiece(peer, havePieces);
-      if (piece >= 0) {
-          try {
-              return new PartialPiece(piece, metainfo.getPieceLength(piece));
-          } catch (OutOfMemoryError oom) {
-              if (_log.shouldLog(Log.WARN))
-                  _log.warn("OOM creating new partial piece");
-          }
+      Piece piece = wantPiece(peer, havePieces, true);
+      if (piece != null) {
+          return new PartialPiece(piece, metainfo.getPieceLength(piece.getId()), _util.getTempDir());
       }
       if (_log.shouldLog(Log.DEBUG))
           _log.debug("We have no partial piece to return");
@@ -1121,7 +1144,7 @@ public class PeerCoordinator implements PeerListener
               }
           }
       }
-      return wantPiece(peer, havePieces, false) >= 0;
+      return wantPiece(peer, havePieces, false) != null;
   }
 
   /**

@@ -422,6 +422,20 @@ public class MetaInfo
         return false;
     return true;
   }
+  
+  /**
+   *  @since 0.9.1
+   */
+  boolean checkPiece(PartialPiece pp) throws IOException {
+    MessageDigest sha1 = SHA1.getInstance();
+    int piece = pp.getPiece();
+
+    byte[] hash = pp.getHash();
+    for (int i = 0; i < 20; i++)
+      if (hash[i] != piece_hashes[20 * piece + i])
+        return false;
+    return true;
+  }
 
   /**
    * Returns the total length of the torrent in bytes.

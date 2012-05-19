@@ -150,6 +150,15 @@ public class I2PSnarkServlet extends DefaultServlet {
         String path = req.getServletPath();
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
 
+        String peerParam = req.getParameter("p");
+        String peerString;
+        if (peerParam == null || (!_manager.util().connected()) ||
+            peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
+            peerString = "";
+        } else {
+            peerString = "?p=" + peerParam;
+        }
+
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
             resp.setCharacterEncoding("UTF-8");
@@ -157,7 +166,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
-            writeMessages(out, false);
+            writeMessages(out, false, peerString);
             writeTorrents(out, req);
             return;
         }
@@ -201,15 +210,6 @@ public class I2PSnarkServlet extends DefaultServlet {
                 _manager.addMessage("Please retry form submission (bad nonce)");
         }
         
-        String peerParam = req.getParameter("p");
-        String peerString;
-        if (peerParam == null || (!_manager.util().connected()) ||
-            peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
-            peerString = "";
-        } else {
-            peerString = "?p=" + peerParam;
-        }
-
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
                   "<head><link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n" +
@@ -274,7 +274,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             _manager.addMessage(_("Click \"Add torrent\" button to fetch torrent"));
         out.write("<div class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
 
-        writeMessages(out, isConfigure);
+        writeMessages(out, isConfigure, peerString);
 
         if (isConfigure) {
             // end of mainsection div
@@ -294,7 +294,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(FOOTER);
     }
 
-    private void writeMessages(PrintWriter out, boolean isConfigure) throws IOException {
+    private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
             out.write("<div class=\"snarkMessages\"><ul>");
@@ -302,11 +302,14 @@ public class I2PSnarkServlet extends DefaultServlet {
                 String msg = msgs.get(i);
                 out.write("<li>" + msg + "</li>\n");
             }
-            // lazy GET, lose p parameter
             out.write("</ul><p><a href=\"/i2psnark/");
             if (isConfigure)
                 out.write("configure");
-            out.write("?action=Clear&amp;nonce=" + _nonce + "\">" + _("clear messages") + "</a></p></div>");
+            if (peerString.length() > 0)
+                out.write(peerString + "&amp;");
+            else
+                out.write("?");
+            out.write("action=Clear&amp;nonce=" + _nonce + "\">" + _("clear messages") + "</a></p></div>");
         }
     }
 

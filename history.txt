@@ -1,3 +1,11 @@
+2012-05-19 zzz
+ * i2psnark:
+   - Store received chunks in temp files
+   - Don't allocate from heap for unneeded chunks
+   - Remove peer count restriction for torrents with large pieces
+   - Use priorities and rarest calculations to sort partials
+   - Preserve p parameter in clear messages link
+
 2012-05-13 zzz
  * Console: Add X-Frame-Options to headers,
    disable with routerconsole.disableXFrame=true
