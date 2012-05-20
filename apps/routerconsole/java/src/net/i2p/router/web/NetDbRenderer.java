@@ -16,6 +16,7 @@ import java.text.DecimalFormat;      // debug
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -187,7 +188,8 @@ public class NetDbRenderer {
             FloodfillNetworkDatabaseFacade netdb = (FloodfillNetworkDatabaseFacade)_context.netDb();
             buf.append("<p><b>Total Leasesets: ").append(leases.size());
             buf.append("</b></p><p><b>Published (RAP) Leasesets: ").append(netdb.getKnownLeaseSets());
-            //buf.append("</b></p><p><b>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()));
+            buf.append("</b></p><p><b>Mod Data: \"").append(DataHelper.getUTF8(_context.routingKeyGenerator().getModData()))
+               .append("\" Last Changed: ").append(new Date(_context.routingKeyGenerator().getLastChanged()));
             int ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
             buf.append("</b></p><p><b>Known Floodfills: ").append(ff);
             buf.append("</b></p><p><b>Currently Floodfill? ");
@@ -201,6 +203,8 @@ public class NetDbRenderer {
                 int total = (int) Math.round(Math.pow(2, 3 + 256 - 1 - log2));
                 buf.append("</b></p><p><b>Estimated total floodfills: ").append(total);
                 buf.append("</b></p><p><b>Estimated total leasesets: ").append(total * rapCount / 8);
+            } else {
+                buf.append("</b></p><p><b>Not floodfill or no data");
             }
             buf.append("</b></p>");
         }

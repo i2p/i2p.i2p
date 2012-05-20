@@ -45,14 +45,16 @@ public class RoutingKeyGenerator {
     public RoutingKeyGenerator(I2PAppContext context) {
         _log = context.logManager().getLog(RoutingKeyGenerator.class);
         _context = context;
+        // ensure non-null mod data
+        generateDateBasedModData();
     }
 
     public static RoutingKeyGenerator getInstance() {
         return I2PAppContext.getGlobalContext().routingKeyGenerator();
     }
     
-    private byte _currentModData[];
-    private long _lastChanged;
+    private volatile byte _currentModData[];
+    private volatile long _lastChanged;
 
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd");
@@ -65,17 +67,13 @@ public class RoutingKeyGenerator {
         return _lastChanged;
     }
 
-    public void setModData(byte modData[]) {
-        _currentModData = modData;
-        _lastChanged = _context.clock().now();
-    }
-
     /**
      * Update the current modifier data with some bytes derived from the current
      * date (yyyyMMdd in GMT)
      *
+     * @return true if changed
      */
-    public void generateDateBasedModData() {
+    public synchronized boolean generateDateBasedModData() {
         Date today = null;
         long now = _context.clock().now();
         synchronized (_cal) {
@@ -89,17 +87,18 @@ public class RoutingKeyGenerator {
             today = _cal.getTime();
         }
         
-        byte mod[] = null;
-        String modVal = null;
-        synchronized (_fmt) {
-            modVal = _fmt.format(today);
-        }
-        mod = new byte[modVal.length()];
+        String modVal = _fmt.format(today);
+        byte[] mod = new byte[modVal.length()];
         for (int i = 0; i < modVal.length(); i++)
             mod[i] = (byte)(modVal.charAt(i) & 0xFF);
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Routing modifier generated: " + modVal);
-        setModData(mod);
+        boolean changed = !DataHelper.eq(_currentModData, mod);
+        if (changed) {
+            _currentModData = mod;
+            _lastChanged = now;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Routing modifier generated: " + modVal);
+        }
+        return changed;
     }
     
     /**
@@ -113,7 +112,6 @@ public class RoutingKeyGenerator {
      */
     public Hash getRoutingKey(Hash origKey) {
         if (origKey == null) throw new IllegalArgumentException("Original key is null");
-        if (_currentModData == null) generateDateBasedModData();
         byte modVal[] = new byte[Hash.HASH_LENGTH + _currentModData.length];
         System.arraycopy(origKey.getData(), 0, modVal, 0, Hash.HASH_LENGTH);
         System.arraycopy(_currentModData, 0, modVal, Hash.HASH_LENGTH, _currentModData.length);

@@ -1,3 +1,14 @@
+2012-05-20 zzz
+ * Console: Add full file path to thread dump message
+ * i2psnark:
+   - Create sparse files at torrent creation and delay
+     "ballooning" until first write (ticket #641)
+   - Redo clear messages button
+   - Concurrent message queue
+ * Profiles: reduce same-country bonus
+ * RoutingKeyModifier: Several changes to ensure the routing key
+                       is correctly changed just after midnight.
+
 2012-05-19 zzz
  * i2psnark:
    - Store received chunks in temp files
