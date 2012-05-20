@@ -40,7 +40,7 @@ import net.i2p.util.SocketTimeout;
  *  @author zzz
  */
 public class I2PSocketEepGet extends EepGet {
-    private I2PSocketManager _socketManager;
+    private final I2PSocketManager _socketManager;
     /** this replaces _proxy in the superclass. Sadly, I2PSocket does not extend Socket. */
     private I2PSocket _socket;
     
