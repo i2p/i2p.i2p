@@ -19,7 +19,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -50,7 +52,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private Properties _config;
     private final I2PAppContext _context;
     private final Log _log;
-    private final List<String> _messages;
+    private final Queue<String> _messages;
     private final I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
@@ -123,7 +125,7 @@ public class SnarkManager implements Snark.CompleteListener {
         _addSnarkLock = new Object();
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SnarkManager.class);
-        _messages = new ArrayList(16);
+        _messages = new LinkedBlockingQueue();
         _util = new I2PSnarkUtil(_context);
         _configFile = new File(CONFIG_FILE);
         if (!_configFile.isAbsolute())
@@ -154,13 +156,12 @@ public class SnarkManager implements Snark.CompleteListener {
     /** hook to I2PSnarkUtil for the servlet */
     public I2PSnarkUtil util() { return _util; }
 
-    private static final int MAX_MESSAGES = 5;
+    private static final int MAX_MESSAGES = 100;
 
     public void addMessage(String message) {
-        synchronized (_messages) {
-            _messages.add(message);
-            while (_messages.size() > MAX_MESSAGES)
-                _messages.remove(0);
+        _messages.offer(message);
+        while (_messages.size() > MAX_MESSAGES) {
+            _messages.poll();
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("MSG: " + message);
@@ -168,16 +169,14 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** newest last */
     public List<String> getMessages() {
-        synchronized (_messages) {
-            return new ArrayList(_messages);
-        }
+        if (_messages.isEmpty())
+            return Collections.EMPTY_LIST;
+        return new ArrayList(_messages);
     }
     
     /** @since 0.9 */
     public void clearMessages() {
-        synchronized (_messages) {
             _messages.clear();
-        }
     }
     
     /**
@@ -1192,13 +1191,11 @@ public class SnarkManager implements Snark.CompleteListener {
             // don't bother delaying if auto start is false
             long delay = 60 * 1000 * getStartupDelayMinutes();
             if (delay > 0 && shouldAutoStart()) {
-                _messages.add(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
+                addMessage(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
-                // the first message was a "We are starting up in 1m" 
-                synchronized (_messages) { 
-                    if (_messages.size() == 1)
-                        _messages.remove(0);
-                }
+                // Remove that first message
+                if (_messages.size() == 1)
+                    _messages.poll();
             }
 
             // here because we need to delay until I2CP is up

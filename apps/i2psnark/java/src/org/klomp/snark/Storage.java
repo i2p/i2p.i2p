@@ -50,6 +50,8 @@ public class Storage
   private File[] RAFfile;    // File to make it easier to reopen
   /** priorities by file; default 0; may be null. @since 0.8.1 */
   private int[] priorities;
+  /** is the file empty and sparse? */
+  private boolean[] isSparse;
 
   private final StorageListener listener;
   private final I2PSnarkUtil _util;
@@ -72,6 +74,8 @@ public class Storage
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
 
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap();
+
+  private static final boolean _isWindows = System.getProperty("os.name").startsWith("Win");
 
   /**
    * Creates a new storage based on the supplied MetaInfo.  This will
@@ -202,7 +206,7 @@ public class Storage
     RAFtime = new long[size];
     RAFfile = new File[size];
     priorities = new int[size];
-
+    isSparse = new boolean[size];
 
     int i = 0;
     Iterator it = files.iterator();
@@ -462,6 +466,7 @@ public class Storage
         RAFlock = new Object[1];
         RAFtime = new long[1];
         RAFfile = new File[1];
+        isSparse = new boolean[1];
         lengths[0] = metainfo.getTotalLength();
         RAFlock[0] = new Object();
         RAFfile[0] = base;
@@ -488,6 +493,7 @@ public class Storage
         RAFlock = new Object[size];
         RAFtime = new long[size];
         RAFfile = new File[size];
+        isSparse = new boolean[size];
         for (int i = 0; i < size; i++)
           {
             List<String> path = files.get(i);
@@ -701,6 +707,7 @@ public class Storage
     }
 
     // Make sure all files are available and of correct length
+    // The files should all exist as they have been created with zero length by createFilesFromNames()
     for (int i = 0; i < rafs.length; i++)
       {
         long length = RAFfile[i].length();
@@ -725,6 +732,7 @@ public class Storage
           SnarkManager.instance().addMessage(msg);
           _util.debug(msg, Snark.ERROR);
           changed = true;
+          resume = true;
           _probablyComplete = false; // to force RW
           synchronized(RAFlock[i]) {
               checkRAF(i);
@@ -798,26 +806,54 @@ public class Storage
     }
   }
 
-  /** this calls openRAF(); caller must synnchronize and call closeRAF() */
+  /**
+   *  This creates a (presumably) sparse file so that reads won't fail with IOE.
+   *  Sets isSparse[nr] = true. balloonFile(nr) should be called later to
+   *  defrag the file.
+   *
+   *  This calls openRAF(); caller must synchronize and call closeRAF().
+   */
   private void allocateFile(int nr) throws IOException
   {
     // caller synchronized
     openRAF(nr, false);  // RW
-    // XXX - Is this the best way to make sure we have enough space for
-    // the whole file?
     long remaining = lengths[nr];
     if (listener != null)
         listener.storageCreateFile(this, names[nr], remaining);
+    rafs[nr].setLength(remaining);
+    // don't bother ballooning later on Windows since there is no sparse file support
+    // until JDK7 using the JSR-203 interface.
+    // RAF seeks/writes do not create sparse files.
+    // Windows will zero-fill up to the point of the write, which
+    // will make the file fairly unfragmented, on average, at least until
+    // near the end where it will get exponentially more fragmented.
+    if (!_isWindows)
+        isSparse[nr] = true;
+    // caller will close rafs[nr]
+    if (listener != null)
+      listener.storageAllocated(this, lengths[nr]);
+  }
+
+  /**
+   *  This "balloons" the file with zeros to eliminate disk fragmentation.,
+   *  Overwrites the entire file with zeros. Sets isSparse[nr] = false.
+   *
+   *  Caller must synchronize and call checkRAF() or openRAF().
+   *  @since 0.9.1
+   */
+  private void balloonFile(int nr) throws IOException
+  {
+    _util.debug("Ballooning " + nr + ": " + RAFfile[nr], Snark.INFO);
+    long remaining = lengths[nr];
     final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
     byte[] zeros = new byte[ZEROBLOCKSIZE];
+    rafs[nr].seek(0);
     while (remaining > 0) {
         int size = (int) Math.min(remaining, ZEROBLOCKSIZE);
         rafs[nr].write(zeros, 0, size);
         remaining -= size;
     }
-    // caller will close rafs[nr]
-    if (listener != null)
-      listener.storageAllocated(this, lengths[nr]);
+    isSparse[nr] = false;
   }
 
 
@@ -909,6 +945,17 @@ public class Storage
               int len = (start + need < raflen) ? need : (int)(raflen - start);
               synchronized(RAFlock[i]) {
                   checkRAF(i);
+                  if (isSparse[i]) {
+                      // If the file is a newly created sparse file,
+                      // AND we aren't skipping it, balloon it with all
+                      // zeros to un-sparse it by allocating the space.
+                      // Obviously this could take a while.
+                      // Once we have written to it, it isn't empty/sparse any more.
+                      if (priorities == null || priorities[i] >= 0)
+                          balloonFile(i);
+                      else
+                          isSparse[i] = false;
+                  }
                   rafs[i].seek(start);
                   //rafs[i].write(bs, off + written, len);
                   pp.write(rafs[i], off + written, len);
@@ -958,7 +1005,7 @@ public class Storage
     }
 
     return true;
-  }
+ }
 
   /**
    *  This is a dup of MetaInfo.getPieceLength() but we need it

@@ -93,7 +93,7 @@ body {
      border: 1px solid #000;
      overflow: auto;
      color: #26f;
-     max-height: 82px;
+     max-height: 76px;
      min-height: 45px;
      width: auto;
      background: #2a192a url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
@@ -116,6 +116,12 @@ body {
      font-style: italic;
      margin: 0;
      text-align: right;
+}
+
+.snarkMessages img {
+     float: right;
+     margin: -3px -4px 4px 4px;
+     opacity: 0.8;
 }
 
 .logshim {

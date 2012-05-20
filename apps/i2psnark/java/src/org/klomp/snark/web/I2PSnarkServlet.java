@@ -297,19 +297,23 @@ public class I2PSnarkServlet extends DefaultServlet {
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
-            out.write("<div class=\"snarkMessages\"><ul>");
-            for (int i = msgs.size()-1; i >= 0; i--) {
-                String msg = msgs.get(i);
-                out.write("<li>" + msg + "</li>\n");
-            }
-            out.write("</ul><p><a href=\"/i2psnark/");
+            out.write("<div class=\"snarkMessages\">");
+            out.write("<a href=\"/i2psnark/");
             if (isConfigure)
                 out.write("configure");
             if (peerString.length() > 0)
                 out.write(peerString + "&amp;");
             else
                 out.write("?");
-            out.write("action=Clear&amp;nonce=" + _nonce + "\">" + _("clear messages") + "</a></p></div>");
+            out.write("action=Clear&amp;nonce=" + _nonce + "\">" +
+                      "<img src=\"" + _imgPath + "delete.png\" title=\"" + _("clear messages") +
+                      "\" alt=\"" + _("clear messages") + "\"></a>" +
+                      "<ul>");
+            for (int i = msgs.size()-1; i >= 0; i--) {
+                String msg = msgs.get(i);
+                out.write("<li>" + msg + "</li>\n");
+            }
+            out.write("</ul></div>");
         }
     }
 
