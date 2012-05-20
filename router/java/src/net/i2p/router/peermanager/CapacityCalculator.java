@@ -22,7 +22,7 @@ class CapacityCalculator {
     // crappy peers start at 1 and the base is 5.
     private static final double BONUS_NEW = 0.85;
     private static final double BONUS_ESTABLISHED = 0.65;
-    private static final double BONUS_SAME_COUNTRY = 0.45;
+    private static final double BONUS_SAME_COUNTRY = 0.25;
     private static final double BONUS_XOR = .25;
     private static final double PENALTY_UNREACHABLE = 2;
     
