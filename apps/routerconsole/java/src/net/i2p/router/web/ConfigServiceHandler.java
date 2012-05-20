@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -208,7 +209,8 @@ public class ConfigServiceHandler extends FormHandler {
             } catch (Throwable t) {
                 addFormError("Warning: unable to contact the service manager - " + t.getMessage());
             }
-            addFormNotice("Threads dumped to wrapper.log");
+            File wlog = LogsHelper.wrapperLogFile(_context);
+            addFormNotice(_("Threads dumped to {0}", wlog.getAbsolutePath()));
         } else if (_("View console on startup").equals(_action)) {
             browseOnStartup(true);
             addFormNotice(_("Console is to be shown on startup"));
