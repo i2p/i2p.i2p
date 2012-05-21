@@ -96,7 +96,6 @@ interface PeerListener
    *
    * @param peer the Peer that got the piece.
    * @param piece the piece received.
-   * @param bs the byte array containing the piece.
    *
    * @return true when the bytes represent the piece, false otherwise.
    */

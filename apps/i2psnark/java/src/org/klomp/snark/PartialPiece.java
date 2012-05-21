@@ -198,7 +198,7 @@ class PartialPiece implements Comparable {
      *  Caller must synchronize on out and seek to starting point.
      *  Caller must call release() when done with the whole piece.
      *
-     *  @param start offset in the output file
+     *  @param out stream to write to
      *  @param offset offset in the piece
      *  @param len length to write
      *  @since 0.9.1
