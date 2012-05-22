@@ -424,13 +424,22 @@ public class MetaInfo
   }
   
   /**
+   *  @return good
    *  @since 0.9.1
    */
-  boolean checkPiece(PartialPiece pp) throws IOException {
+  boolean checkPiece(PartialPiece pp) {
     MessageDigest sha1 = SHA1.getInstance();
     int piece = pp.getPiece();
-
-    byte[] hash = pp.getHash();
+    byte[] hash;
+    try {
+        hash = pp.getHash();
+    } catch (IOException ioe) {
+        // Could be caused by closing a peer connnection
+        // we don't want the exception to propagate through
+        // to Storage.putPiece()
+        _log.warn("Error checking", ioe);
+        return false;
+    }
     for (int i = 0; i < 20; i++)
       if (hash[i] != piece_hashes[20 * piece + i])
         return false;

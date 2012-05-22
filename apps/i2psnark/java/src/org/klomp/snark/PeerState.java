@@ -308,6 +308,7 @@ class PeerState implements DataLoader
                   + peer);
 
     // Last chunk needed for this piece?
+    // FIXME if priority changed to skip, we will think we're done when we aren't
     if (getFirstOutstandingRequest(req.getPiece()) == -1)
       {
         // warning - may block here for a while
