@@ -741,6 +741,7 @@ public class PeerCoordinator implements PeerListener
           _log.debug("Updated piece priorities called but no priorities to set?");
           return;
       }
+      List<Piece> toCancel = new ArrayList();
       synchronized(wantedPieces) {
           // Add incomplete and previously unwanted pieces to the list
           // Temp to avoid O(n**2)
@@ -775,22 +776,30 @@ public class PeerCoordinator implements PeerListener
                    p.setPriority(priority);
                } else {
                    iter.remove();
-                   // cancel all peers
-                       for (Peer peer : peers) {
-                           peer.cancel(p.getId());
-                       }
+                   toCancel.add(p);
                }
           }
           if (_log.shouldLog(Log.DEBUG))
               _log.debug("Updated piece priorities, now wanted: " + wantedPieces);
           // if we added pieces, they will be in-order unless we shuffle
           Collections.shuffle(wantedPieces, _random);
+      }
 
-          // update request queues, in case we added wanted pieces
-          // and we were previously uninterested
-              for (Peer peer : peers) {
-                  peer.request();
+      // cancel outside of wantedPieces lock to avoid deadlocks
+      if (!toCancel.isEmpty()) {
+          // cancel all peers
+          for (Peer peer : peers) {
+              for (Piece p : toCancel) {
+                  peer.cancel(p.getId());
+              }
           }
+      }
+
+      // ditto, avoid deadlocks
+      // update request queues, in case we added wanted pieces
+      // and we were previously uninterested
+      for (Peer peer : peers) {
+          peer.request();
       }
   }
 

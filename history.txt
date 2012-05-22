@@ -2,6 +2,7 @@
  * i2psnark:
    - Refactor tracker map
    - Prevent torrent shutdown when changing file priority to skip
+   - Fix deadlock when changing file priorities
  * RoutingKeyModifier: Update after large clock shift
 
 2012-05-20 zzz
