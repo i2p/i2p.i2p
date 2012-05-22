@@ -37,6 +37,7 @@ import org.klomp.snark.Peer;
 import org.klomp.snark.Snark;
 import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
+import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 
 import org.mortbay.jetty.servlet.DefaultServlet;
@@ -239,6 +240,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         else
             out.write("<body onload=\"initAjax()\">");
         out.write("<center>");
+        List<Tracker> sortedTrackers = null;
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
             out.write(_("Torrents"));
@@ -256,16 +258,11 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write(_("Forum"));
             out.write("</a>\n");
 
-            Map trackers = _manager.getTrackers();
-            for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)iter.next();
-                String name = (String)entry.getKey();
-                String baseURL = (String)entry.getValue();
-                int e = baseURL.indexOf('=');
-                if (e < 0)
+            sortedTrackers = _manager.getSortedTrackers();
+            for (Tracker t : sortedTrackers) {
+                if (t.baseURL == null || !t.baseURL.startsWith("http"))
                     continue;
-                baseURL = baseURL.substring(e + 1);
-                out.write(" <a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
+                out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
             }
         }
         out.write("</div>\n");
@@ -286,7 +283,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             // end of mainsection div
             out.write("</div><div id=\"lowersection\">\n");
             writeAddForm(out, req);
-            writeSeedForm(out, req);
+            writeSeedForm(out, req, sortedTrackers);
             writeConfigLink(out);
             // end of lowersection div
             out.write("</div>\n");
@@ -773,7 +770,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     private void processTrackerForm(String action, HttpServletRequest req) {
         if (action.equals(_("Delete selected"))) {
             boolean changed = false;
-            Map<String, String> trackers = _manager.getTrackers();
+            Map<String, Tracker> trackers = _manager.getTrackerMap();
             Enumeration e = req.getParameterNames();
             while (e.hasMoreElements()) {
                  Object o = e.nextElement();
@@ -800,8 +797,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                 hurl = hurl.trim();
                 aurl = aurl.trim().replace("=", "&#61;");
                 if (name.length() > 0 && hurl.startsWith("http://") && aurl.startsWith("http://")) {
-                    Map<String, String> trackers = _manager.getTrackers();
-                    trackers.put(name, aurl + '=' + hurl);
+                    Map<String, Tracker> trackers = _manager.getTrackerMap();
+                    trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
                 } else {
                     _manager.addMessage(_("Enter valid tracker name and URLs"));
@@ -1271,18 +1268,14 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (announce != null && (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
               announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") ||
               announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/"))) {
-            Map<String, String> trackers = _manager.getTrackers();
-            for (Map.Entry<String, String> entry : trackers.entrySet()) {
-                String baseURL = entry.getValue();
-                if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
-                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
-                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
+            for (Tracker t : _manager.getTrackers()) {
+                String aURL = t.announceURL;
+                if (!(aURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
+                      (announce.startsWith("http://lnQ6yoBT") && aURL.startsWith("http://tracker2.postman.i2p/")) ||
+                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && aURL.startsWith("http://tracker2.postman.i2p/"))))
                     continue;
-                int e = baseURL.indexOf('=');
-                if (e < 0)
-                    continue;
-                baseURL = baseURL.substring(e + 1);
-                String name = entry.getKey();
+                String baseURL = t.baseURL;
+                String name = t.name;
                 StringBuilder buf = new StringBuilder(128);
                 buf.append("<a href=\"").append(baseURL).append("details.php?dllist=1&amp;filelist=1&amp;info_hash=")
                    .append(TrackerClient.urlencode(infohash))
@@ -1336,7 +1329,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write("</div></form></div>");  
     }
     
-    private void writeSeedForm(PrintWriter out, HttpServletRequest req) throws IOException {
+    private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
         String baseFile = req.getParameter("baseFile");
         if (baseFile == null || baseFile.trim().length() <= 0)
             baseFile = "";
@@ -1372,13 +1365,9 @@ public class I2PSnarkServlet extends DefaultServlet {
         //out.write(_("Open trackers and DHT only"));
         out.write(_("Open trackers only"));
         out.write("</option>\n");
-        Map<String, String> trackers = _manager.getTrackers();
-        for (Map.Entry<String, String> entry : trackers.entrySet()) {
-            String name = entry.getKey();
-            String announceURL = entry.getValue();
-            int e = announceURL.indexOf('=');
-            if (e > 0)
-                announceURL = announceURL.substring(0, e).replace("&#61;", "=");
+        for (Tracker t : sortedTrackers) {
+            String name = t.name;
+            String announceURL = t.announceURL.replace("&#61;", "=");
             if (announceURL.equals(_lastAnnounceURL))
                 announceURL += "\" selected=\"selected";
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
@@ -1605,15 +1594,10 @@ public class I2PSnarkServlet extends DefaultServlet {
            .append("</th><th>")
            .append(_("Announce URL"))
            .append("</th></tr>\n");
-        Map<String, String> trackers = _manager.getTrackers();
-        for (Map.Entry<String, String> entry : trackers.entrySet()) {
-            String name = entry.getKey();
-            String announceURL = entry.getValue();
-            int e = announceURL.indexOf('=');
-            if (e <= 0)
-                continue;
-            String homeURL = announceURL.substring(e + 1);
-            announceURL = announceURL.substring(0, e).replace("&#61;", "=");
+        for (Tracker t : _manager.getSortedTrackers()) {
+            String name = t.name;
+            String homeURL = t.baseURL;
+            String announceURL = t.announceURL.replace("&#61;", "=");
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(name).append("\">" +
                        "</td><td align=\"left\">").append(name)

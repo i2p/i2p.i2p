@@ -1,3 +1,9 @@
+2012-05-22 zzz
+ * i2psnark:
+   - Refactor tracker map
+   - Prevent torrent shutdown when changing file priority to skip
+ * RoutingKeyModifier: Update after large clock shift
+
 2012-05-20 zzz
  * Console: Add full file path to thread dump message
  * i2psnark:

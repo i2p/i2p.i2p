@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,7 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -58,7 +58,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private ConnectionAcceptor _connectionAcceptor;
     private Thread _monitor;
     private volatile boolean _running;
-    private final Map<String, String> _trackerMap;
+    private final Map<String, Tracker> _trackerMap;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -130,7 +130,7 @@ public class SnarkManager implements Snark.CompleteListener {
         _configFile = new File(CONFIG_FILE);
         if (!_configFile.isAbsolute())
             _configFile = new File(_context.getConfigDir(), CONFIG_FILE);
-        _trackerMap = Collections.synchronizedMap(new TreeMap(new IgnoreCaseComparator()));
+        _trackerMap = new ConcurrentHashMap(4);
         loadConfig(null);
     }
 
@@ -1404,11 +1404,29 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     /**
-     *  Sorted map of name to announceURL=baseURL
+     *  Unsorted map of name to Tracker object
      *  Modifiable, not a copy
+     *  @since 0.9.1
      */
-    public Map<String, String> getTrackers() { 
+    public Map<String, Tracker> getTrackerMap() { 
         return _trackerMap;
+    }
+
+    /**
+     *  Unsorted, do not modify
+     */
+    public Collection<Tracker> getTrackers() { 
+        return _trackerMap.values();
+    }
+
+    /**
+     *  Sorted copy
+     *  @since 0.9.1
+     */
+    public List<Tracker> getSortedTrackers() { 
+        List<Tracker> rv = new ArrayList(_trackerMap.values());
+        Collections.sort(rv, new IgnoreCaseComparator());
+        return rv;
     }
 
     /** @since 0.9 */
@@ -1416,28 +1434,37 @@ public class SnarkManager implements Snark.CompleteListener {
         String trackers = _config.getProperty(PROP_TRACKERS);
         if ( (trackers == null) || (trackers.trim().length() <= 0) )
             trackers = _context.getProperty(PROP_TRACKERS);
-        _trackerMap.clear();
         if ( (trackers == null) || (trackers.trim().length() <= 0) ) {
-            for (int i = 0; i < DEFAULT_TRACKERS.length; i += 2)
-                _trackerMap.put(DEFAULT_TRACKERS[i], DEFAULT_TRACKERS[i+1]);
+            setDefaultTrackerMap(true);
         } else {
             String[] toks = trackers.split(",");
             for (int i = 0; i < toks.length; i += 2) {
                 String name = toks[i].trim().replace("&#44;", ",");
                 String url = toks[i+1].trim().replace("&#44;", ",");
-                if ( (name.length() > 0) && (url.length() > 0) )
-                    _trackerMap.put(name, url);
+                if ( (name.length() > 0) && (url.length() > 0) ) {
+                    String urls[] = DEFAULT_TRACKERS[i+1].split("=", 2);
+                    String url2 = urls.length > 1 ? urls[1] : null;
+                    _trackerMap.put(name, new Tracker(name, urls[0], url2));
+                }
             }
         }
     }
 
     /** @since 0.9 */
     public void setDefaultTrackerMap() {
+        setDefaultTrackerMap(true);
+    }
+
+    /** @since 0.9.1 */
+    private void setDefaultTrackerMap(boolean save) {
         _trackerMap.clear();
         for (int i = 0; i < DEFAULT_TRACKERS.length; i += 2) {
-            _trackerMap.put(DEFAULT_TRACKERS[i], DEFAULT_TRACKERS[i+1]);
+            String name = DEFAULT_TRACKERS[i];
+            String urls[] = DEFAULT_TRACKERS[i+1].split("=", 2);
+            String url2 = urls.length > 1 ? urls[1] : null;
+            _trackerMap.put(name, new Tracker(name, urls[0], url2));
         }
-        if (_config.remove(PROP_TRACKERS) != null) {
+        if (save && _config.remove(PROP_TRACKERS) != null) {
             saveConfig();
         }
     }
@@ -1446,12 +1473,15 @@ public class SnarkManager implements Snark.CompleteListener {
     public void saveTrackerMap() {
         StringBuilder buf = new StringBuilder(2048);
         boolean comma = false;
-        for (Map.Entry<String, String> e : _trackerMap.entrySet()) {
+        for (Map.Entry<String, Tracker> e : _trackerMap.entrySet()) {
             if (comma)
                 buf.append(',');
             else
                 comma = true;
-            buf.append(e.getKey().replace(",", "&#44;")).append(',').append(e.getValue().replace(",", "&#44;"));
+            Tracker t = e.getValue();
+            buf.append(e.getKey().replace(",", "&#44;")).append(',').append(t.announceURL.replace(",", "&#44;"));
+            if (t.baseURL != null)
+                buf.append('=').append(t.baseURL);
         }
         _config.setProperty(PROP_TRACKERS, buf.toString());
         saveConfig();
@@ -1481,9 +1511,9 @@ public class SnarkManager implements Snark.CompleteListener {
      *  ignore case, current locale
      *  @since 0.9
      */
-    private static class IgnoreCaseComparator implements Comparator<String> {
-        public int compare(String l, String r) {
-            return l.toLowerCase().compareTo(r.toLowerCase());
+    private static class IgnoreCaseComparator implements Comparator<Tracker> {
+        public int compare(Tracker l, Tracker r) {
+            return l.name.toLowerCase().compareTo(r.name.toLowerCase());
         }
     }
 }
