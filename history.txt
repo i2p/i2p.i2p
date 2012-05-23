@@ -1,3 +1,11 @@
+2012-05-23 zzz
+ * i2psnark:
+   - Fixes when complete except for skipped files
+     (ticket #447) status in UI, don't connect outbound,
+     disconnect seeds when done
+   - More classes pkg private
+ * jobs.jsp: Add more queue diagnostics
+
 2012-05-22 zzz
  * i2psnark:
    - Refactor tracker map
@@ -9,7 +17,7 @@
  * Console: Add full file path to thread dump message
  * i2psnark:
    - Create sparse files at torrent creation and delay
-     "ballooning" until first write (ticket #641)
+     "ballooning" until first write (ticket #641, #447)
    - Redo clear messages button
    - Concurrent message queue
  * Profiles: reduce same-country bonus

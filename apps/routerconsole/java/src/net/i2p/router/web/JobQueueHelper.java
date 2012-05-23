@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
@@ -76,15 +75,17 @@ public class JobQueueHelper extends HelperBase {
         out.flush();
 
         buf.append("<hr><b>Scheduled jobs: ").append(timedJobs.size()).append("</b><ol>\n");
-        TreeMap<Long, Job> ordered = new TreeMap();
-        for (int i = 0; i < timedJobs.size(); i++) {
-            Job j = timedJobs.get(i);
-            ordered.put(Long.valueOf(j.getTiming().getStartAfter()), j);
-        }
-        for (Job j : ordered.values()) {
+        long prev = Long.MIN_VALUE;
+        for (Job j : timedJobs) {
             long time = j.getTiming().getStartAfter() - now;
             buf.append("<li>").append(j.getName()).append(" in ");
-            buf.append(DataHelper.formatDuration2(time)).append("</li>\n");
+            buf.append(DataHelper.formatDuration2(time));
+            if (time < 0)
+                buf.append(" <b>DELAYED</b>");
+            if (time < prev)
+                buf.append(" <b>** OUT OF ORDER **</b>");
+            prev = time;
+            buf.append("</li>\n");
         }
         buf.append("</ol></div>\n");
         
