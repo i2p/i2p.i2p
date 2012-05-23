@@ -338,7 +338,8 @@ public class Storage
   }
 
   /**
-   *  Must call setPiecePriorities() after calling this
+   *  Must call Snark.updatePiecePriorities()
+   *  (which calls getPiecePriorities()) after calling this.
    *  @param file canonical path (non-directory)
    *  @param pri default 0; <0 to disable
    *  @since 0.8.1

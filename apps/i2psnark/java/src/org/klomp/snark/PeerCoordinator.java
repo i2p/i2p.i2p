@@ -48,7 +48,7 @@ import org.klomp.snark.dht.DHT;
 /**
  * Coordinates what peer does what.
  */
-public class PeerCoordinator implements PeerListener
+class PeerCoordinator implements PeerListener
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerCoordinator.class);
 
@@ -116,6 +116,12 @@ public class PeerCoordinator implements PeerListener
    */
   private final List<Piece> wantedPieces;
 
+  /** The total number of bytes in wantedPieces, or -1 if not yet known.
+   *  Sync on wantedPieces.
+   *  @since 0.9.1
+   */
+  private long wantedBytes;
+
   /** partial pieces - lock by synching on wantedPieces - TODO store Requests, not PartialPieces */
   private final List<PartialPiece> partialPieces;
 
@@ -171,16 +177,22 @@ public class PeerCoordinator implements PeerListener
       }
   }
 
-  // only called externally from Storage after the double-check fails
+  /**
+   * Only called externally from Storage after the double-check fails.
+   * Sets wantedBytes too.
+   */
   public void setWantedPieces()
   {
-    if (metainfo == null || storage == null)
+    if (metainfo == null || storage == null) {
+        wantedBytes = -1;
         return;
+    }
     // Make a list of pieces
       synchronized(wantedPieces) {
           wantedPieces.clear();
           BitField bitfield = storage.getBitField();
           int[] pri = storage.getPiecePriorities();
+          long count = 0;
           for (int i = 0; i < metainfo.getPieces(); i++) {
               // only add if we don't have and the priority is >= 0
               if ((!bitfield.get(i)) &&
@@ -189,8 +201,10 @@ public class PeerCoordinator implements PeerListener
                   if (pri != null)
                       p.setPriority(pri[i]);
                   wantedPieces.add(p);
+                  count += metainfo.getPieceLength(i);
               }
           }
+          wantedBytes = count;
           Collections.shuffle(wantedPieces, _random);
       }
   }
@@ -233,7 +247,9 @@ public class PeerCoordinator implements PeerListener
   }
 
   /**
-   * Returns how many bytes are still needed to get the complete file.
+   *  Bytes not yet in storage. Does NOT account for skipped files.
+   *  Not exact (does not adjust for last piece size).
+   * Returns how many bytes are still needed to get the complete torrent.
    * @return -1 if in magnet mode
    */
   public long getLeft()
@@ -242,6 +258,15 @@ public class PeerCoordinator implements PeerListener
         return -1;
     // XXX - Only an approximation.
     return ((long) storage.needed()) * metainfo.getPieceLength(0);
+  }
+
+  /**
+   *  Bytes still wanted. DOES account for skipped files.
+   *  @return exact value. or -1 if no storage yet.
+   *  @since 0.9.1
+   */
+  public long getNeededLength() {
+      return wantedBytes;
   }
 
   /**
@@ -330,9 +355,23 @@ public class PeerCoordinator implements PeerListener
     return infohash;
   }
 
+  /**
+   *  Inbound.
+   *  Not halted, peers < max.
+   *  @since 0.9.1
+   */
   public boolean needPeers()
   {
         return !halted && peers.size() < getMaxConnections();
+  }
+
+  /**
+   *  Outbound.
+   *  Not halted, peers < max, and need pieces.
+   *  @since 0.9.1
+   */
+  public boolean needOutboundPeers() {
+        return wantedBytes != 0 && needPeers();
   }
   
   /**
@@ -472,7 +511,10 @@ public class PeerCoordinator implements PeerListener
     return null;
   }
 
-// returns true if actual attempt to add peer occurs
+  /**
+   * Add peer (inbound or outbound)
+   * @return true if actual attempt to add peer occurs
+   */
   public boolean addPeer(final Peer peer)
   {
     if (halted)
@@ -755,6 +797,7 @@ public class PeerCoordinator implements PeerListener
                   if (!want.get(i)) {
                       Piece piece = new Piece(i);
                       wantedPieces.add(piece);
+                      wantedBytes += metainfo.getPieceLength(i);
                       // As connections are already up, new Pieces will
                       // not have their PeerID list populated, so do that.
                           for (Peer p : peers) {
@@ -777,6 +820,7 @@ public class PeerCoordinator implements PeerListener
                } else {
                    iter.remove();
                    toCancel.add(p);
+                   wantedBytes -= metainfo.getPieceLength(p.getId());
                }
           }
           if (_log.shouldLog(Log.DEBUG))
@@ -910,10 +954,13 @@ public class PeerCoordinator implements PeerListener
             throw new RuntimeException(msg, ioe);
           }
         wantedPieces.remove(p);
+        wantedBytes -= metainfo.getPieceLength(p.getId());
       }
 
     // just in case
     removePartialPiece(piece);
+
+    boolean done = wantedBytes <= 0;
 
     // Announce to the world we have it!
     // Disconnect from other seeders when we get the last piece
@@ -924,7 +971,7 @@ public class PeerCoordinator implements PeerListener
             Peer p = it.next();
             if (p.isConnected())
               {
-                  if (completed() && p.isCompleted())
+                  if (done && p.isCompleted())
                       toDisconnect.add(p);
                   else
                       p.have(piece);
@@ -937,7 +984,11 @@ public class PeerCoordinator implements PeerListener
             p.disconnect(true);
           }
     
-    if (completed()) {
+    if (done) {
+        // put msg on the console if partial, since Storage won't do it
+        if (!completed())
+            snark.storageCompleted(storage);
+
         synchronized (partialPieces) {
             for (PartialPiece ppp : partialPieces) {
                 ppp.release();
@@ -1262,11 +1313,12 @@ public class PeerCoordinator implements PeerListener
   }
 
   /**
+   *  Get peers from PEX -
    *  PeerListener callback
    *  @since 0.8.4
    */
   public void gotPeers(Peer peer, List<PeerID> peers) {
-      if (completed() || !needPeers())
+      if (!needOutboundPeers())
           return;
       Destination myDest = _util.getMyDestination();
       if (myDest == null)

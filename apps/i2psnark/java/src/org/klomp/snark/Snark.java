@@ -782,6 +782,7 @@ public class Snark
     }
 
     /**
+     *  Bytes not yet in storage. Does NOT account for skipped files.
      *  @return exact value. or -1 if no storage yet.
      *          getNeeded() * pieceLength(0) isn't accurate if last piece
      *          is still needed.
@@ -802,6 +803,20 @@ public class Snark
     }
 
     /**
+     *  Bytes still wanted. DOES account for skipped files.
+     *  FIXME -1 when not running.
+     *  @return exact value. or -1 if no storage yet or when not running.
+     *  @since 0.9.1
+     */
+    public long getNeededLength() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getNeededLength();
+        return -1;
+    }
+
+    /**
+     *  Does not account for skipped files.
      *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
      *  @since 0.8.4
      */

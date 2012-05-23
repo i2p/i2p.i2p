@@ -72,7 +72,7 @@ public class TrackerClient extends I2PAppThread
   private boolean stop;
   private boolean started;
 
-  private List trackers;
+  private List<Tracker> trackers;
 
   /**
    * @param meta null if in magnet mode
@@ -260,7 +260,7 @@ public class TrackerClient extends I2PAppThread
             for (Iterator iter = trackers.iterator(); iter.hasNext(); ) {
               Tracker tr = (Tracker)iter.next();
               if ((!stop) && (!tr.stop) &&
-                  (completed || coordinator.needPeers()) &&
+                  (completed || coordinator.needOutboundPeers()) &&
                   (event.equals(COMPLETED_EVENT) || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
               {
                 try
@@ -292,7 +292,7 @@ public class TrackerClient extends I2PAppThread
                         }
                     }
 
-                    if ( (left != 0) && (!completed) ) {
+                    if (coordinator.needOutboundPeers()) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
                         List<Peer> ordered = new ArrayList(peers);
@@ -341,7 +341,7 @@ public class TrackerClient extends I2PAppThread
             }  // *** end of trackers loop here
 
             // Get peers from PEX
-            if (left > 0 && coordinator.needPeers() && (meta == null || !meta.isPrivate()) && !stop) {
+            if (coordinator.needOutboundPeers() && (meta == null || !meta.isPrivate()) && !stop) {
                 Set<PeerID> pids = coordinator.getPEXPeers();
                 if (!pids.isEmpty()) {
                     _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
@@ -365,7 +365,7 @@ public class TrackerClient extends I2PAppThread
             // FIXME this needs to be in its own thread
             if (_util.getDHT() != null && (meta == null || !meta.isPrivate()) && !stop) {
                 int numwant;
-                if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+                if (event.equals(STOPPED_EVENT) || !coordinator.needOutboundPeers())
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
@@ -459,7 +459,7 @@ public class TrackerClient extends I2PAppThread
     if (! event.equals(NO_EVENT))
         buf.append("&event=").append(event);
     buf.append("&numwant=");
-    if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+    if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needOutboundPeers())
         buf.append('0');
     else
         buf.append(_util.getMaxConnections());

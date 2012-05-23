@@ -890,14 +890,19 @@ public class I2PSnarkServlet extends DefaultServlet {
             }
         }
         long total = snark.getTotalLength();
+        // includes skipped files, -1 for magnet mode
         long remaining = snark.getRemainingLength(); 
         if (remaining > total)
             remaining = total;
+        // does not include skipped files, -1 for magnet mode or when not running.
+        long needed = snark.getNeededLength(); 
+        if (needed > total)
+            needed = total;
         long downBps = snark.getDownloadRate();
         long upBps = snark.getUploadRate();
         long remainingSeconds;
-        if (downBps > 0)
-            remainingSeconds = remaining / downBps;
+        if (downBps > 0 && needed > 0)
+            remainingSeconds = needed / downBps;
         else
             remainingSeconds = -1;
         boolean isRunning = !snark.isStopped();
@@ -938,18 +943,31 @@ public class I2PSnarkServlet extends DefaultServlet {
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                 "<br>" + err;
             }
-        } else if (remaining == 0) {  // < 0 means no meta size yet
-            if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "seeding.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Seeding") +
+        } else if (remaining == 0 || needed == 0) {  // < 0 means no meta size yet
+            // partial complete or seeding
+            if (isRunning) {
+                String img;
+                String txt;
+                if (remaining == 0) {
+                    img = "seeding";
+                    txt = _("Seeding");
+                } else {
+                    // partial
+                    img = "complete";
+                    txt = _("Complete");
+                }
+                if (curPeers > 0 && !showPeers)
+                    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + txt +
                                ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
-            else if (isRunning)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "seeding.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Seeding") +
+                else
+                    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + txt +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
-            else
+            } else {
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "complete.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Complete");
+            }
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
@@ -1062,7 +1080,7 @@ public class I2PSnarkServlet extends DefaultServlet {
            out.write(formatSize(uploaded));
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
-        if(isRunning && remaining != 0)
+        if(isRunning && needed > 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
@@ -1108,7 +1126,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 out.write("\" onclick=\"if (!confirm('");
                 // Can't figure out how to escape double quotes inside the onclick string.
                 // Single quotes in translate strings with parameters must be doubled.
-                // Then the remaining single quite must be escaped
+                // Then the remaining single quote must be escaped
                 out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
                 out.write("')) { return false; }\"");
                 out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
@@ -1127,7 +1145,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("\" onclick=\"if (!confirm('");
             // Can't figure out how to escape double quotes inside the onclick string.
             // Single quotes in translate strings with parameters must be doubled.
-            // Then the remaining single quite must be escaped
+            // Then the remaining single quote must be escaped
             out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
             out.write("')) { return false; }\"");
             out.write(" src=\"" + _imgPath + "delete.png\" alt=\"");
@@ -1194,7 +1212,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
-                if (remaining > 0) {
+                if (needed > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
                         out.write("<span class=\"unchoked\">");
                         out.write(formatSize(peer.getDownloadRate()) + "ps</span>");
@@ -1886,6 +1904,9 @@ public class I2PSnarkServlet extends DefaultServlet {
             else
                 buf.append("<br>").append(_("Complete"));
             // else unknown
+            long needed = snark.getNeededLength();
+            if (needed > 0)
+                buf.append("<br>").append(_("Remaining")).append(": ").append(formatSize(needed));
             buf.append("<br>").append(_("Size")).append(": ").append(formatSize(snark.getTotalLength()));
             MetaInfo meta = snark.getMetaInfo();
             if (meta != null) {
