@@ -1442,7 +1442,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 String name = toks[i].trim().replace("&#44;", ",");
                 String url = toks[i+1].trim().replace("&#44;", ",");
                 if ( (name.length() > 0) && (url.length() > 0) ) {
-                    String urls[] = DEFAULT_TRACKERS[i+1].split("=", 2);
+                    String urls[] = url.split("=", 2);
                     String url2 = urls.length > 1 ? urls[1] : null;
                     _trackerMap.put(name, new Tracker(name, urls[0], url2));
                 }

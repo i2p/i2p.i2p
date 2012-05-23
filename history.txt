@@ -3,6 +3,7 @@
    - Fixes when complete except for skipped files
      (ticket #447) status in UI, don't connect outbound,
      disconnect seeds when done
+   - Custom tracker map AIOOBE fix
    - More classes pkg private
  * jobs.jsp: Add more queue diagnostics
 
