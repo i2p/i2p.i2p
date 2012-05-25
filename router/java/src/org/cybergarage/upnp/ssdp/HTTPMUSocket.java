@@ -53,7 +53,6 @@ public class HTTPMUSocket
 		open(addr, port, bindAddr);
 	}
 
-    @Override
 	protected void finalize()
 	{
 		close();

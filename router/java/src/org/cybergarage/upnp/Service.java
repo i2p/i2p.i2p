@@ -396,13 +396,13 @@ public class Service
 		Node actionListNode = scdpNode.getNode(ActionList.ELEM_NAME);
 		if (actionListNode == null)
 			return actionList;
-		Node _serviceNode = getServiceNode();
+		Node serviceNode = getServiceNode();
 		int nNode = actionListNode.getNNodes();
 		for (int n=0; n<nNode; n++) {
 			Node node = actionListNode.getNode(n);
 			if (Action.isActionNode(node) == false)
 				continue;
-			Action action = new Action(_serviceNode, node);
+			Action action = new Action(serviceNode, node);
 			actionList.add(action);
 		} 
 		return actionList;
@@ -433,13 +433,13 @@ public class Service
 		Node stateTableNode = getSCPDNode().getNode(ServiceStateTable.ELEM_NAME);
 		if (stateTableNode == null)
 			return stateTable;
-		Node _serviceNode = getServiceNode();
+		Node serviceNode = getServiceNode();
 		int nNode = stateTableNode.getNNodes();
 		for (int n=0; n<nNode; n++) {
 			Node node = stateTableNode.getNode(n);
 			if (StateVariable.isStateVariableNode(node) == false)
 				continue;
-			StateVariable serviceVar = new StateVariable(_serviceNode, node);
+			StateVariable serviceVar = new StateVariable(serviceNode, node);
 			stateTable.add(serviceVar);
 		} 
 		return stateTable;

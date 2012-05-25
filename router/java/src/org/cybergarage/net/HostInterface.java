@@ -101,7 +101,7 @@ public class HostInterface
 				}
 			}
 		}
-		catch(Exception e){}
+		catch(Exception e){};
 		return nHostAddrs;
 	}
 
@@ -131,7 +131,7 @@ public class HostInterface
 				}
 			}
 		}
-		catch(Exception e){}
+		catch(Exception e){};
 		return "";
 	}
 

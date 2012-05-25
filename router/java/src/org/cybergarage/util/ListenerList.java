@@ -21,7 +21,6 @@ public class ListenerList extends Vector
 {
 	private static final long serialVersionUID = 8039231561720446173L;
 
-    @Override
 	public boolean add(Object obj)
 	{
 		if (0 <= indexOf(obj))

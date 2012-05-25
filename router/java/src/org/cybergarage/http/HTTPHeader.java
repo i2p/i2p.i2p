@@ -42,10 +42,10 @@ public class HTTPHeader
 		int colonIdx = lineStr.indexOf(':');
 		if (colonIdx < 0)
 			return;
-		String _name = new String(lineStr.getBytes(), 0, colonIdx);
-		String _value = new String(lineStr.getBytes(), colonIdx+1, lineStr.length()-colonIdx-1);
-		setName(_name.trim());
-		setValue(_value.trim());
+		String name = new String(lineStr.getBytes(), 0, colonIdx);				
+		String value = new String(lineStr.getBytes(), colonIdx+1, lineStr.length()-colonIdx-1);				
+		setName(name.trim());
+		setValue(value.trim());
 	}
 
 	////////////////////////////////////////////////

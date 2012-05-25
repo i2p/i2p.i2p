@@ -112,7 +112,6 @@ public class SSDPResponse extends HTTPResponse
 	//	getHeader (Override)
 	////////////////////////////////////////////////
 	
-    @Override
 	public String getHeader()
 	{
 		StringBuilder str = new StringBuilder();

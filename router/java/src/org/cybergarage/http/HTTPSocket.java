@@ -45,7 +45,6 @@ public class HTTPSocket
 		setOutputStream(socket.getOutputStream());
 	}
 	
-    @Override
 	public void finalize()
 	{
 		close();

@@ -72,10 +72,10 @@ public class StateVariable extends NodeData
 
 	public Service getService()
 	{
-		Node _serviceNode = getServiceNode();
-		if (_serviceNode == null)
+		Node serviceNode = getServiceNode();
+		if (serviceNode == null)
 			return null;
-		return new Service(_serviceNode);
+		return new Service(serviceNode);
 	}
 
 	public Node getStateVariableNode()
@@ -301,8 +301,8 @@ public class StateVariable extends NodeData
 			queryRes.setResponse(retVar);
 		}
 		else {
-			UPnPStatus _upnpStatus = retVar.getStatus();
-			queryRes.setFaultResponse(_upnpStatus.getCode(), _upnpStatus.getDescription());
+			UPnPStatus upnpStatus = retVar.getStatus();
+			queryRes.setFaultResponse(upnpStatus.getCode(), upnpStatus.getDescription());
 		}
 		queryReq.post(queryRes);
 		return true;

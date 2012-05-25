@@ -166,17 +166,17 @@ public class HTTPRequest extends HTTPPacket
 	public ParameterList getParameterList()
 	{
 		ParameterList paramList = new ParameterList();
-		String _uri = getURI();
-		if (_uri == null)
+		String uri = getURI();
+		if (uri == null)
 			return paramList;
-		int paramIdx = _uri.indexOf('?');
+		int paramIdx = uri.indexOf('?');
 		if (paramIdx < 0)
 			return paramList;
 		while (0 < paramIdx) {
-			int eqIdx = _uri.indexOf('=', (paramIdx+1));
-			String name = _uri.substring(paramIdx+1, eqIdx);
-			int nextParamIdx = _uri.indexOf('&', (eqIdx+1));
-			String value = _uri.substring(eqIdx+1, (0 < nextParamIdx) ? nextParamIdx : _uri.length());
+			int eqIdx = uri.indexOf('=', (paramIdx+1));
+			String name = uri.substring(paramIdx+1, eqIdx);
+			int nextParamIdx = uri.indexOf('&', (eqIdx+1));
+			String value = uri.substring(eqIdx+1, (0 < nextParamIdx) ? nextParamIdx : uri.length());
 			Parameter param = new Parameter(name, value);
 			paramList.add(param);
 			paramIdx = nextParamIdx;
@@ -437,15 +437,15 @@ public class HTTPRequest extends HTTPPacket
 			if (isKeepAlive == false) {	
 				try {
 					in.close();
-				} catch (Exception e) {}
+				} catch (Exception e) {};
 				if (in != null)
 				try {
 					out.close();
-				} catch (Exception e) {}
+				} catch (Exception e) {};
 				if (out != null)
 				try {
 					postSocket.close();
-				} catch (Exception e) {}
+				} catch (Exception e) {};
 				postSocket = null;
 			}
 		}
@@ -494,7 +494,6 @@ public class HTTPRequest extends HTTPPacket
 	//	toString
 	////////////////////////////////////////////////
 	
-    @Override
 	public String toString()
 	{
 		StringBuilder str = new StringBuilder();

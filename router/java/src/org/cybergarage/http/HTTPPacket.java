@@ -134,13 +134,13 @@ public class HTTPPacket
  		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			
-			String _firstLine = reader.readLine();
-			if (_firstLine == null || _firstLine.length() <= 0)
+			String firstLine = reader.readLine();
+			if (firstLine == null || firstLine.length() <= 0)
 				return false;
-			setFirstLine(_firstLine);
+			setFirstLine(firstLine);
 			
 			// Thanks for Giordano Sassaroli <sassarol@cefriel.it> (09/03/03)
-			HTTPStatus httpStatus = new HTTPStatus(_firstLine);
+			HTTPStatus httpStatus = new HTTPStatus(firstLine);
 			int statCode = httpStatus.getStatusCode();
 			if (statCode == HTTPStatus.CONTINUE){
 				//ad hoc code for managing iis non-standard behaviour
@@ -186,7 +186,7 @@ public class HTTPPacket
 					String chunkSizeLine = reader.readLine();
 					contentLen = Long.parseLong(new String(chunkSizeLine.getBytes(), 0, chunkSizeLine.length()-2));
 				}
-				catch (Exception e) {}
+				catch (Exception e) {};
 			}
 			else
 				contentLen = getContentLength();
@@ -231,7 +231,7 @@ public class HTTPPacket
 					}
 					catch (Exception e) {
 						contentLen = 0;
-					}
+					};
 				}
 				else
 					contentLen = 0;
@@ -650,21 +650,21 @@ public class HTTPPacket
 		try {
 			range[0] = Long.parseLong(firstPosStr);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException e) {};
 		if (strToken.hasMoreTokens() == false)
 			return range;
 		String lastPosStr = strToken.nextToken("-/");
 		try {
 			range[1] = Long.parseLong(lastPosStr);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException e) {};
 		if (strToken.hasMoreTokens() == false)
 			return range;
 		String lengthStr = strToken.nextToken("/");
 		try {
 			range[2] = Long.parseLong(lengthStr);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException e) {};
 		return range;
 	}
 	

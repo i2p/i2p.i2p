@@ -285,13 +285,13 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	
 	public Device getRootDevice()
 	{
-		Node _rootNode = getRootNode();
-		if (_rootNode == null)
+		Node rootNode = getRootNode();
+		if (rootNode == null)
 			return null;
-		Node devNode = _rootNode.getNode(Device.ELEM_NAME);
+		Node devNode = rootNode.getNode(Device.ELEM_NAME);
 		if (devNode == null)
 			return null;
-		return new Device(_rootNode, devNode);
+		return new Device(rootNode, devNode);
 	}
 
 	////////////////////////////////////////////////

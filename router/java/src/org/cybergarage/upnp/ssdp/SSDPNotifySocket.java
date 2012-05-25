@@ -27,6 +27,7 @@ package org.cybergarage.upnp.ssdp;
 import java.net.*;
 
 import org.cybergarage.net.*;
+import org.cybergarage.util.*;
 import org.cybergarage.http.*;
 import org.cybergarage.upnp.*;
 

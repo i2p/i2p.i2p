@@ -37,7 +37,6 @@ public class HTTPServerThread extends Thread
 	//	run	
 	////////////////////////////////////////////////
 
-    @Override
 	public void run()
 	{
 		HTTPSocket httpSock = new HTTPSocket(sock);

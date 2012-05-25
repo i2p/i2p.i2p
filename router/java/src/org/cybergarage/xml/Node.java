@@ -74,10 +74,10 @@ public class Node
 	public Node getRootNode()
 	{
 		Node rootNode = null;
-		Node _parentNode = getParentNode();
-		while (_parentNode != null) {
-			 rootNode = _parentNode;
-			 _parentNode = rootNode.getParentNode();
+		Node parentNode = getParentNode();
+		while (parentNode != null) {
+			 rootNode = parentNode;
+			 parentNode = rootNode.getParentNode();
 		}
 		return rootNode;
 	}
@@ -338,24 +338,24 @@ public class Node
 	{
 		String indentString = getIndentLevelString(indentLevel);
 
-		String _name = getName();
-		String _value = getValue();
+		String name = getName();
+		String value = getValue();
 
 		if (hasNodes() == false || hasChildNode == false) {
-			ps.print(indentString + "<" + _name);
+			ps.print(indentString + "<" + name);
 			outputAttributes(ps);
 			// Thnaks for Tho Beisch (11/09/04)
-			if (_value == null || _value.length() == 0) {
+			if (value == null || value.length() == 0) {
 				// No value, so use short notation <node />
 				ps.println(" />");
 			} else {
-				ps.println(">" + XML.escapeXMLChars(_value) + "</" + _name + ">");
+				ps.println(">" + XML.escapeXMLChars(value) + "</" + name + ">");
 			}
 			
 			return;
 		}
 		
-		ps.print(indentString + "<" + _name);
+		ps.print(indentString + "<" + name);
 		outputAttributes(ps);
 		ps.println(">");
 	
@@ -365,7 +365,7 @@ public class Node
 			cnode.output(ps, indentLevel+1, true);
 		}
 
-		ps.println(indentString +"</" + _name + ">");
+		ps.println(indentString +"</" + name + ">");
 	}
 
 	public String toString(boolean hasChildNode)
