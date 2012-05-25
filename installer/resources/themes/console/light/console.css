@@ -627,15 +627,14 @@ h2.app {
 }
 */
 
-h4.app {
+h4.app, h4.app2 {
      margin: 0 10px 2px 10px;
      padding: 10px 0 8px 0;
 }
 
 h4.app2 {
      clear: left;
-     margin: 0 4px 2px 0;
-     padding: 16px 0 8px 0;
+     margin-top: 5px !important;
 }
 
 div.ag2 {
@@ -647,6 +646,7 @@ div.app {
      padding: 2px;
      height: 84px;
      width: 112px;
+     text-align: center !important;
 }
 
 div.appgroup {
