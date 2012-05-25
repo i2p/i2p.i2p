@@ -15,7 +15,7 @@
 
 package org.cybergarage.upnp;
 
-import org.cybergarage.xml.*;
+import org.cybergarage.xml.Node;
 
 public class AllowedValueRange
 {
@@ -45,9 +45,24 @@ public class AllowedValueRange
 		allowedValueRangeNode = node;
 	}
 
+	public AllowedValueRange(){
+		//TODO Test
+		allowedValueRangeNode = new Node(ELEM_NAME);
+	}
 	////////////////////////////////////////////////
 	//	isAllowedValueRangeNode
 	////////////////////////////////////////////////
+	
+	public AllowedValueRange(Number max, Number min, Number step) {
+		//TODO Test
+		allowedValueRangeNode = new Node(ELEM_NAME);
+		if(max!=null)
+			setMaximum(max.toString());
+		if(min!=null)
+			setMinimum(min.toString());
+		if(step!=null)
+			setStep(step.toString());
+	}
 
 	public static boolean isAllowedValueRangeNode(Node node)
 	{

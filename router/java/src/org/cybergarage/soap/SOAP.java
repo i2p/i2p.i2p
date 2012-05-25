@@ -15,7 +15,8 @@
 
 package org.cybergarage.soap;
 
-import org.cybergarage.xml.*;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.Parser;
 
 public class SOAP
 {

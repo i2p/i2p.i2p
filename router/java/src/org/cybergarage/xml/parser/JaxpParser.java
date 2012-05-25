@@ -12,6 +12,10 @@
 *
 *	06/15/04
 *		- first revision.
+*	01/08/08
+*		- Fixed parse() not to occur null exception when the NamedNodeMap is null on Android.
+*	02/08/08
+*		- Change parse() to use Node::addValue() instead of the setValue().
 *
 ******************************************************************/
 
@@ -50,11 +54,15 @@ public class JaxpParser extends Parser
 			
 		String domNodeName = domNode.getNodeName();
 		String domNodeValue = domNode.getNodeValue();
+		NamedNodeMap attrs = domNode.getAttributes(); 
+		int arrrsLen = (attrs != null) ? attrs.getLength() : 0;
 
 //		Debug.message("[" + rank + "] ELEM : " + domNodeName + ", " + domNodeValue + ", type = " + domNodeType + ", attrs = " + arrrsLen);
 
 		if (domNodeType == org.w3c.dom.Node.TEXT_NODE) {
-			parentNode.setValue(domNodeValue);
+			// Change to use Node::addValue() instead of the setValue(). (2008/02/07)
+			//parentNode.setValue(domNodeValue);
+			parentNode.addValue(domNodeValue);
 			return parentNode;
 		}
 
@@ -69,20 +77,26 @@ public class JaxpParser extends Parser
 			parentNode.addNode(node);
 
 		NamedNodeMap attrMap = domNode.getAttributes(); 
-		int attrLen = attrMap.getLength();
-		//Debug.message("attrLen = " + attrLen);
-		for (int n = 0; n<attrLen; n++) {
-			org.w3c.dom.Node attr = attrMap.item(n);
-			String attrName = attr.getNodeName();
-			String attrValue = attr.getNodeValue();
-			node.setAttribute(attrName, attrValue);
+		if (attrMap != null) {
+			int attrLen = attrMap.getLength();
+			//Debug.message("attrLen = " + attrLen);
+			for (int n = 0; n<attrLen; n++) {
+				org.w3c.dom.Node attr = attrMap.item(n);
+				String attrName = attr.getNodeName();
+				String attrValue = attr.getNodeValue();
+				node.setAttribute(attrName, attrValue);
+			}
 		}
 		
 		org.w3c.dom.Node child = domNode.getFirstChild();
-		while (child != null) {
+		if(child==null){ 
+			node.setValue(""); 
+			return node; 
+		}
+		do{
 			parse(node, child, rank+1);
 			child = child.getNextSibling();
-		}
+		}while (child != null);		
 		
 		return node;
 	}

@@ -44,17 +44,35 @@
 *		- Added to check the range of Content-Range request in post().
 *	03/02/05
 *		- Changed post() to suppot chunked stream.
+*	06/10/05
+*		- Changed post() to add a HOST headedr before the posting.
+*	07/07/05
+*		- Lee Peik Feng <pflee@users.sourceforge.net>
+*		- Fixed post() to output the chunk size as a hex string.
 *
 ******************************************************************/
 
 package org.cybergarage.http;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.InetSocketAddress;
+import java.util.StringTokenizer;
 
 import org.cybergarage.util.Debug;
-
+/**
+ * 
+ * This class rappresnet an HTTP <b>request</b>, and act as HTTP client when it sends the request<br>
+ * 
+ * @author Satoshi "skonno" Konno
+ * @author Stefano "Kismet" Lenzi
+ * @version 1.8
+ *
+ */
 public class HTTPRequest extends HTTPPacket
 {
 	////////////////////////////////////////////////
@@ -63,6 +81,7 @@ public class HTTPRequest extends HTTPPacket
 	
 	public HTTPRequest()
 	{
+		setVersion(HTTP.VERSION_10);
 	}
 
 	public HTTPRequest(InputStream in)
@@ -298,7 +317,7 @@ public class HTTPRequest extends HTTPPacket
 	
 	public String getHeader()
 	{
-		StringBuilder str = new StringBuilder();
+		StringBuffer str = new StringBuffer();
 		
 		str.append(getFirstLineString());
 		
@@ -372,6 +391,8 @@ public class HTTPRequest extends HTTPPacket
 	{
 		HTTPResponse httpRes = new HTTPResponse();
 
+		setHost(host);
+		
 		setConnection((isKeepAlive == true) ? HTTP.KEEP_ALIVE : HTTP.CLOSE);
 		
 		boolean isHeaderRequest = isHeadRequest();
@@ -410,7 +431,8 @@ public class HTTPRequest extends HTTPPacket
 			
 			if (0 < contentLength) {
 				if (isChunkedRequest == true) {
-					String chunSizeBuf = Long.toString(contentLength);
+					// Thanks for Lee Peik Feng <pflee@users.sourceforge.net> (07/07/05)
+					String chunSizeBuf = Long.toHexString(contentLength);
 					pout.print(chunSizeBuf);
 					pout.print(HTTP.CRLF);
 				}
@@ -428,10 +450,13 @@ public class HTTPRequest extends HTTPPacket
 
 			in = postSocket.getInputStream();
 			httpRes.set(in, isHeaderRequest);		
-		}
-		catch (Exception e) {
+		} catch (SocketException e) {
 			httpRes.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR);
-			// I2P addition
+			Debug.warning(e);
+		} catch (IOException e) {
+			//Socket create but without connection
+			//TODO Blacklistening the device
+			httpRes.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR);
 			Debug.warning(e);
 		} finally {
 			if (isKeepAlive == false) {	
@@ -496,7 +521,7 @@ public class HTTPRequest extends HTTPPacket
 	
 	public String toString()
 	{
-		StringBuilder str = new StringBuilder();
+		StringBuffer str = new StringBuffer();
 
 		str.append(getHeader());
 		str.append(HTTP.CRLF);

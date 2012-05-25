@@ -68,6 +68,8 @@ public class Subscription
 	{
 		if (headerValue == null)
 			return "";
+		if (headerValue.startsWith(Subscription.UUID) == false)
+			return headerValue;
 		return headerValue.substring(Subscription.UUID.length(), headerValue.length());
 	}
 	

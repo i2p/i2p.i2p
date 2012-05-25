@@ -15,12 +15,10 @@
 
 package org.cybergarage.http;
 
-import java.util.*;
+import java.util.Vector;
 
 public class ParameterList extends Vector 
 {
-	private static final long serialVersionUID = -6026765325018137641L;
-
 	public ParameterList() 
 	{
 	}

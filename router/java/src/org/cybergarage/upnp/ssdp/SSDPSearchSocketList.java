@@ -18,11 +18,11 @@
 
 package org.cybergarage.upnp.ssdp;
 
-import java.util.*;
+import java.net.InetAddress;
+import java.util.Vector;
 
-import org.cybergarage.net.*;
-
-import org.cybergarage.upnp.device.*;
+import org.cybergarage.net.HostInterface;
+import org.cybergarage.upnp.device.SearchListener;
 
 public class SSDPSearchSocketList extends Vector 
 {
@@ -30,11 +30,39 @@ public class SSDPSearchSocketList extends Vector
 	//	Constructor
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = 4071292828166415028L;
+	private InetAddress[] binds = null;
+	private String multicastIPv4 = SSDP.ADDRESS;
+	private String multicastIPv6 = SSDP.getIPv6Address();
+	private int port = SSDP.PORT;
 
 	public SSDPSearchSocketList() 
 	{
 	}
+	/**
+	 * 
+	 * @param binds The IP address that we will used for bindind the service 
+	 */
+	public SSDPSearchSocketList(InetAddress[] binds) {
+		this.binds = binds;
+	}	
+
+	/**
+	 * 
+	 * @param binds The IP address that we will used for bindind the service
+	 * @param port	The port that we will used for bindind the service
+	 * @param multicastIPv4 The IPv4 address that we will used for multicast comunication
+	 * @param multicastIPv6 The IPv6 address that we will used for multicast comunication
+	 * @since 1.8
+	 */
+	public SSDPSearchSocketList(InetAddress[] binds,int port, String multicastIPv4, String multicastIPv6) {
+		this.binds = binds;
+		this.port = port;
+		this.multicastIPv4 = multicastIPv4;
+		this.multicastIPv6 = multicastIPv6;
+	}
+
+	
+	
 
 	////////////////////////////////////////////////
 	//	Methods
@@ -58,13 +86,31 @@ public class SSDPSearchSocketList extends Vector
 	//	Methods
 	////////////////////////////////////////////////
 	
-	public boolean open() 
-	{
-		int nHostAddrs = HostInterface.getNHostAddresses();
-		for (int n=0; n<nHostAddrs; n++) {
-			String bindAddr = HostInterface.getHostAddress(n);
-			SSDPSearchSocket ssdpSearchSocket = new SSDPSearchSocket(bindAddr);
-			add(ssdpSearchSocket);
+	public boolean open() {
+		InetAddress[] binds=this.binds;
+		String[] bindAddresses;
+		if(binds!=null){			
+			bindAddresses = new String[binds.length];
+			for (int i = 0; i < binds.length; i++) {
+				bindAddresses[i] = binds[i].getHostAddress();
+			}
+		}else{
+			int nHostAddrs = HostInterface.getNHostAddresses();
+			bindAddresses = new String[nHostAddrs]; 
+			for (int n=0; n<nHostAddrs; n++) {
+				bindAddresses[n] = HostInterface.getHostAddress(n);
+			}
+		}		
+		
+		for (int i = 0; i < bindAddresses.length; i++) {
+			if(bindAddresses[i]!=null){
+				SSDPSearchSocket ssdpSearchSocket;
+				if(HostInterface.isIPv6Address(bindAddresses[i]))
+					ssdpSearchSocket = new SSDPSearchSocket(bindAddresses[i],port ,multicastIPv6 );
+				else
+					ssdpSearchSocket = new SSDPSearchSocket(bindAddresses[i],port,multicastIPv4 );
+				add(ssdpSearchSocket);
+			}
 		}
 		return true;
 	}

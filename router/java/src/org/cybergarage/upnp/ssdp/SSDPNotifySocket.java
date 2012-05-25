@@ -19,18 +19,33 @@
 *		- Mikael Hakman <mhakman@dkab.net>
 *		- Handle receive() returning null.
 *		- Added close() in stop().
+*	08/23/07
+*		- Thanks for Kazuyuki Shudo
+* 		- Changed run() to catch IOException of HTTPMUSocket::receive().
+*	01/31/08
+*		- Changed start() not to abort when the interface infomation is null on Android m3-rc37a.
 *	
 ******************************************************************/
 
 package org.cybergarage.upnp.ssdp;
 
 import java.net.*;
+import java.io.IOException;
 
 import org.cybergarage.net.*;
 import org.cybergarage.util.*;
 import org.cybergarage.http.*;
 import org.cybergarage.upnp.*;
 
+/**
+ * 
+ * This class identifies a SSDP socket only for <b>notifing packet</b>.<br>
+ * 
+ * @author Satoshi "skonno" Konno
+ * @author Stefano "Kismet" Lenzi
+ * @version 1.8
+ *
+ */
 public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 {
 	private boolean useIPv6Address;
@@ -67,10 +82,13 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 		return controlPoint;
 	}
 
-	////////////////////////////////////////////////
-	//	post (SSDPNotifySocket)
-	////////////////////////////////////////////////
-
+	/**
+	 * This method send a {@link SSDPNotifyRequest} over {@link SSDPNotifySocket}
+	 * 
+	 * @param req the {@link SSDPNotifyRequest} to send
+	 * @return true if and only if the trasmission succeced<br>
+	 * 	Because it rely on UDP doesn't mean that it's also recieved
+	 */
 	public boolean post(SSDPNotifyRequest req)
 	{
 		String ssdpAddr = SSDP.ADDRESS;
@@ -94,7 +112,15 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 		
 		while (deviceNotifyThread == thisThread) {
 			Thread.yield();
-			SSDPPacket packet = receive();
+
+			// Thanks for Kazuyuki Shudo (08/23/07)
+			SSDPPacket packet = null;
+			try {
+				packet = receive();
+			}
+			catch (IOException e) { 
+				break;
+			}
 			
 			// Thanks for Mikael Hakman (04/20/05)
 			if (packet == null)
@@ -108,16 +134,23 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 				//Debug.warning("Invalidate Multicast Recieved : " + maddr + "," + pmaddr);
 				continue;
 			}
-												
+			//TODO Must be performed on a different Thread in order to prevent UDP packet losses.
 			if (ctrlPoint != null)
 				ctrlPoint.notifyReceived(packet); 
 		}
 	}
 	
-	public void start()
-	{
-		deviceNotifyThread = new Thread(this, "UPnP-SSDPNotifySocket");
-		deviceNotifyThread.setDaemon(true);
+	public void start(){
+		StringBuffer name = new StringBuffer("Cyber.SSDPNotifySocket/");
+		String localAddr = this.getLocalAddress();
+		// localAddr is null on Android m3-rc37a (01/30/08)
+		if (localAddr != null && 0 < localAddr.length()) {
+			name.append(this.getLocalAddress()).append(':');
+			name.append(this.getLocalPort()).append(" -> ");
+			name.append(this.getMulticastAddress()).append(':');
+			name.append(this.getMulticastPort());
+		}
+		deviceNotifyThread = new Thread(this,name.toString());
 		deviceNotifyThread.start();
 	}
 	

@@ -15,7 +15,7 @@
 
 package org.cybergarage.http;
 
-import java.net.*;
+import java.net.Socket;
 
 public class HTTPServerThread extends Thread
 {
@@ -28,9 +28,9 @@ public class HTTPServerThread extends Thread
 	
 	public HTTPServerThread(HTTPServer httpServer, Socket sock)
 	{
+        super("Cyber.HTTPServerThread");
 		this.httpServer = httpServer;
 		this.sock = sock;
-		this.setDaemon(true);
 	}
 
 	////////////////////////////////////////////////

@@ -17,14 +17,20 @@
 *		- Added a isOnlyHeader to post().
 *	03/02/05
 *		- Changed post() to suppot chunked stream.
+*	06/10/05
+*		- Changed post() to add a Date headedr to the HTTPResponse before the posting.
+*	07/07/05
+*		- Lee Peik Feng <pflee@users.sourceforge.net>
+*		- Fixed post() to output the chunk size as a hex string.
 *	
 ******************************************************************/
 
 package org.cybergarage.http;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Calendar;
 
 public class HTTPSocket
 {
@@ -119,6 +125,7 @@ public class HTTPSocket
 			sockOut = sock.getOutputStream();
 		}
 		catch (Exception e) {
+			//TODO Add blacklistening of the UPnP Device
 			return false;
 		}
 		return true;
@@ -146,7 +153,9 @@ public class HTTPSocket
 
 	private boolean post(HTTPResponse httpRes, byte content[], long contentOffset, long contentLength, boolean isOnlyHeader)
 	{
+		//TODO Check for bad HTTP agents, this method may be list for IOInteruptedException and for blacklistening
 		httpRes.setDate(Calendar.getInstance());
+		
 		OutputStream out = getOutputStream();
 
 		try {
@@ -162,7 +171,8 @@ public class HTTPSocket
 			boolean isChunkedResponse = httpRes.isChunked();
 			
 			if (isChunkedResponse == true) {
-				String chunSizeBuf = Long.toString(contentLength);
+				// Thanks for Lee Peik Feng <pflee@users.sourceforge.net> (07/07/05)
+				String chunSizeBuf = Long.toHexString(contentLength);
 				out.write(chunSizeBuf.getBytes());
 				out.write(HTTP.CRLF.getBytes());
 			}
@@ -187,7 +197,9 @@ public class HTTPSocket
 	
 	private boolean post(HTTPResponse httpRes, InputStream in, long contentOffset, long contentLength, boolean isOnlyHeader)
 	{
+		//TODO Check for bad HTTP agents, this method may be list for IOInteruptedException and for blacklistening
 		httpRes.setDate(Calendar.getInstance());
+		
 		OutputStream out = getOutputStream();
 
 		try {
@@ -213,7 +225,8 @@ public class HTTPSocket
 			int readLen = in.read(readBuf, 0, (int)readSize);
 			while (0 < readLen && readCnt < contentLength) {
 				if (isChunkedResponse == true) {
-					String chunSizeBuf = Long.toString(readLen);
+					// Thanks for Lee Peik Feng <pflee@users.sourceforge.net> (07/07/05)
+					String chunSizeBuf = Long.toHexString(readLen);
 					out.write(chunSizeBuf.getBytes());
 					out.write(HTTP.CRLF.getBytes());
 				}
@@ -242,6 +255,7 @@ public class HTTPSocket
 	
 	public boolean post(HTTPResponse httpRes, long contentOffset, long contentLength, boolean isOnlyHeader)
 	{
+		//TODO Close if Connection != keep-alive
 		if (httpRes.hasContentInputStream() == true)
 			return post(httpRes,httpRes.getContentInputStream(), contentOffset, contentLength, isOnlyHeader);
 		return post(httpRes,httpRes.getContent(), contentOffset, contentLength, isOnlyHeader);

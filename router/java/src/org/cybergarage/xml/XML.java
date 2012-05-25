@@ -21,6 +21,7 @@ package org.cybergarage.xml;
 public class XML 
 {
 	public final static String CONTENT_TYPE = "text/xml; charset=\"utf-8\"";
+	public final static String CHARSET_UTF8 = "utf-8";
 
 	////////////////////////////////////////////////
 	// escapeXMLChars
@@ -28,9 +29,9 @@ public class XML
 	
 	private final static String escapeXMLChars(String input, boolean quote) 
 	{
-		StringBuilder out = new StringBuilder();
 		if (input == null)
 			return null;
+		StringBuffer out = new StringBuffer();
 		int oldsize=input.length();
 		char[] old=new char[oldsize];
 		input.getChars(0,oldsize,old,0);
@@ -60,6 +61,26 @@ public class XML
 	public final static String escapeXMLChars(String input)
 	{
 		return escapeXMLChars(input, true);
+	}
+	
+	////////////////////////////////////////////////
+	// unescapeXMLChars
+	////////////////////////////////////////////////
+
+	public final static String unescapeXMLChars(String input)
+	{
+		if (input == null)
+			return null;
+		
+		String outStr;
+
+		outStr = input.replace("&amp;", "&");
+		outStr = outStr.replace("&lt;", "<");
+		outStr = outStr.replace("&gt;", ">");
+		outStr = outStr.replace("&apos;", "\'");
+		outStr = outStr.replace("&quot;", "\"");
+		
+		return outStr;
 	}
 }
 
