@@ -29,7 +29,7 @@ public class ConfigLoggingHelper extends HelperBase {
             return (bytes/(1024)) + "k";
     }
     public String getLogLevelTable() {
-        StringBuffer buf = new StringBuffer(32*1024);
+        StringBuilder buf = new StringBuilder(32*1024);
         Properties limits = _context.logManager().getLimits();
         TreeSet sortedLogs = new TreeSet();
         for (Iterator iter = limits.keySet().iterator(); iter.hasNext(); ) {
@@ -37,7 +37,7 @@ public class ConfigLoggingHelper extends HelperBase {
             sortedLogs.add(prefix);
         }
         
-        buf.append("<textarea name=\"levels\" rows=\"20\" cols=\"90\">");
+        buf.append("<textarea name=\"levels\" rows=\"4\" cols=\"60\">");
         for (Iterator iter = sortedLogs.iterator(); iter.hasNext(); ) {
             String prefix = (String)iter.next();
             String level = limits.getProperty(prefix);
@@ -51,7 +51,7 @@ public class ConfigLoggingHelper extends HelperBase {
     }
     public String getDefaultLogLevelBox() {
         String cur = _context.logManager().getDefaultLimit();
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("<select name=\"defaultloglevel\">\n");
         
         buf.append("<option value=\"DEBUG\" ");

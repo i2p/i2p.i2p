@@ -20,15 +20,15 @@ class I2PServerSocketImpl implements I2PServerSocket {
     private final static Log _log = new Log(I2PServerSocketImpl.class);
     private I2PSocketManager mgr;
     /** list of sockets waiting for the client to accept them */
-    private List pendingSockets = Collections.synchronizedList(new ArrayList(4));
+    private final List<I2PSocket> pendingSockets = Collections.synchronizedList(new ArrayList<I2PSocket>(4));
     
     /** have we been closed */
     private volatile boolean closing = false;
     
     /** lock on this when accepting a pending socket, and wait on it for notification of acceptance */
-    private Object socketAcceptedLock = new Object();
+    private final Object socketAcceptedLock = new Object();
     /** lock on this when adding a new socket to the pending list, and wait on it accordingly */
-    private Object socketAddedLock = new Object();
+    private final Object socketAddedLock = new Object();
     
     /**
      * Set Sock Option accept timeout stub, does nothing in ministreaming

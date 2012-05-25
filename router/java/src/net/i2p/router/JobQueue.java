@@ -33,7 +33,7 @@ public class JobQueue {
     private RouterContext _context;
     
     /** Integer (runnerId) to JobQueueRunner for created runners */
-    private HashMap _queueRunners;
+    private final HashMap _queueRunners;
     /** a counter to identify a job runner */
     private volatile static int _runnerId = 0;
     /** list of jobs that are ready to run ASAP */
@@ -41,7 +41,7 @@ public class JobQueue {
     /** list of jobs that are scheduled for running in the future */
     private ArrayList _timedJobs;
     /** job name to JobStat for that job */
-    private SortedMap _jobStats;
+    private final SortedMap _jobStats;
     /** how many job queue runners can go concurrently */
     private int _maxRunners = 1; 
     private QueuePumper _pumper;
@@ -50,7 +50,7 @@ public class JobQueue {
     /** have we been killed or are we alive? */
     private boolean _alive;
     
-    private Object _jobLock;
+    private final Object _jobLock;
     
     /** default max # job queue runners operating */
     private final static int DEFAULT_MAX_RUNNERS = 1;
@@ -94,7 +94,7 @@ public class JobQueue {
      * queue runners wait on this whenever they're not doing anything, and 
      * this gets notified *once* whenever there are ready jobs
      */
-    private Object _runnerLock = new Object();
+    private final Object _runnerLock = new Object();
     
     public JobQueue(RouterContext context) {
         _context = context;
@@ -245,7 +245,7 @@ public class JobQueue {
             _jobLock.notifyAll();
         }
         if (_log.shouldLog(Log.WARN)) {
-            StringBuffer buf = new StringBuffer(1024);
+            StringBuilder buf = new StringBuilder(1024);
             buf.append("current jobs: \n");
             for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
                 JobQueueRunner runner = (JobQueueRunner)iter.next();
@@ -587,7 +587,7 @@ public class JobQueue {
             numRunners = _queueRunners.size();
         }
         
-        StringBuffer str = new StringBuffer(128);
+        StringBuilder str = new StringBuilder(128);
         str.append("<!-- after queueRunner sync: states: ");
         for (int i = 0; states != null && i < states.length; i++)
             str.append(states[i]).append(" ");
@@ -606,31 +606,30 @@ public class JobQueue {
         out.write("<!-- jobQueue rendering: after jobLock sync -->\n");
         out.flush();
         
-        StringBuffer buf = new StringBuffer(32*1024);
-        buf.append("<h2>JobQueue</h2>");
-        buf.append("# runners: ").append(numRunners).append(" [states=");
+        StringBuilder buf = new StringBuilder(32*1024);
+        buf.append("<b><div class=\"joblog\"><h3>I2P JobQueue</h3><div class=\"wideload\"># runners: ").append(numRunners).append(" [states=");
         if (states != null) 
             for (int i = 0; i < states.length; i++) 
                 buf.append(states[i]).append(" ");
-        buf.append("]<br />\n");
+        buf.append("]</b><br />\n");
 
         long now = _context.clock().now();
 
-        buf.append("# active jobs: ").append(activeJobs.size()).append("<ol>\n");
+        buf.append("<hr><b># active jobs: ").append(activeJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
             Job j = (Job)activeJobs.get(i);
             buf.append("<li> [started ").append(now-j.getTiming().getStartAfter()).append("ms ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append("# just finished jobs: ").append(justFinishedJobs.size()).append("<ol>\n");
+        buf.append("<hr><b># just finished jobs: ").append(justFinishedJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = (Job)justFinishedJobs.get(i);
             buf.append("<li> [finished ").append(now-j.getTiming().getActualEnd()).append("ms ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append("# ready/waiting jobs: ").append(readyJobs.size()).append(" <i>(lots of these mean there's likely a big problem)</i><ol>\n");
+        buf.append("<hr><b># ready/waiting jobs: ").append(readyJobs.size()).append(" </b><i>(lots of these mean there's likely a big problem)</i><ol>\n");
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = (Job)readyJobs.get(i);
             buf.append("<li> [waiting ");
@@ -641,7 +640,7 @@ public class JobQueue {
         buf.append("</ol>\n");
         out.flush();
 
-        buf.append("# timed jobs: ").append(timedJobs.size()).append("<ol>\n");
+        buf.append("<hr><b># timed jobs: ").append(timedJobs.size()).append("</b><ol>\n");
         TreeMap ordered = new TreeMap();
         for (int i = 0; i < timedJobs.size(); i++) {
             Job j = (Job)timedJobs.get(i);
@@ -653,7 +652,7 @@ public class JobQueue {
             buf.append("<li>").append(j.getName()).append(" in ");
             buf.append(DataHelper.formatDuration(time)).append("</li>\n");
         }
-        buf.append("</ol>\n");
+        buf.append("</ol></div>\n");
         
         out.write("<!-- jobQueue rendering: after main buffer, before stats -->\n");
         out.flush();
@@ -667,11 +666,11 @@ public class JobQueue {
     }
     
     /** render the HTML for the job stats */
-    private void getJobStats(StringBuffer buf) { 
-        buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td><b>Job</b></td><td><b>Runs</b></td>");
-        buf.append("<td><b>Time</b></td><td><b><i>Avg</i></b></td><td><b><i>Max</i></b></td><td><b><i>Min</i></b></td>");
-        buf.append("<td><b>Pending</b></td><td><b><i>Avg</i></b></td><td><b><i>Max</i></b></td><td><b><i>Min</i></b></td></tr>\n");
+    private void getJobStats(StringBuilder buf) { 
+        buf.append("<table>\n");
+        buf.append("<tr><th>Job</th><th>Runs</th>");
+        buf.append("<th>Time</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th>");
+        buf.append("<th>Pending</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th></tr>\n");
         long totRuns = 0;
         long totExecTime = 0;
         long avgExecTime = 0;
@@ -735,6 +734,6 @@ public class JobQueue {
         buf.append("<td><i>").append(minPendingTime).append("</i></td>");
         buf.append("</tr>\n");
 	
-        buf.append("</table>\n");
+        buf.append("</table></div>\n");
     }
 }

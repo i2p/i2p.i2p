@@ -33,13 +33,14 @@ import net.i2p.util.SimpleTimer;
  * out to disk so this should not be considered secure in that sense.
  *
  */
-class TransientSessionKeyManager extends SessionKeyManager {
+public class TransientSessionKeyManager extends SessionKeyManager {
     private Log _log;
     /** Map allowing us to go from the targeted PublicKey to the OutboundSession used */
-    private Map _outboundSessions;
+    private Map<PublicKey, OutboundSession> _outboundSessions;
     /** Map allowing us to go from a SessionTag to the containing TagSet */
-    private Map _inboundTagSets;
+    private Map<SessionTag, TagSet> _inboundTagSets;
     protected I2PAppContext _context;
+    private volatile boolean _alive;
 
     /** 
      * Let session tags sit around for 10 minutes before expiring them.  We can now have such a large
@@ -55,6 +56,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     public final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 5 * 60 * 1000;
+    /**
+     * a few MB? how about 16MB!
+     * This is the max size of _inboundTagSets.
+     */
     public final static int MAX_INBOUND_SESSION_TAGS = 500 * 1000; // this will consume at most a few MB
 
     /** 
@@ -67,46 +72,61 @@ class TransientSessionKeyManager extends SessionKeyManager {
         super(context);
         _log = context.logManager().getLog(TransientSessionKeyManager.class);
         _context = context;
-        _outboundSessions = new HashMap(1024);
+        _outboundSessions = new HashMap(64);
         _inboundTagSets = new HashMap(1024);
         context.statManager().createRateStat("crypto.sessionTagsExpired", "How many tags/sessions are expired?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
         context.statManager().createRateStat("crypto.sessionTagsRemaining", "How many tags/sessions are remaining after a cleanup?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
-        SimpleScheduler.getInstance().addPeriodicEvent(new CleanupEvent(), 60*1000);
+         _alive = true;
+        SimpleScheduler.getInstance().addEvent(new CleanupEvent(), 60*1000);
     }
     private TransientSessionKeyManager() { this(null); }
     
+    public void shutdown() {
+         _alive = false;
+        synchronized (_inboundTagSets) {
+            _inboundTagSets.clear();
+        }
+        synchronized (_outboundSessions) {
+            _outboundSessions.clear();
+        }
+    }
+
     private class CleanupEvent implements SimpleTimer.TimedEvent {
         public void timeReached() {
+            if (!_alive)
+                return;
             long beforeExpire = _context.clock().now();
             int expired = aggressiveExpire();
             long expireTime = _context.clock().now() - beforeExpire;
             _context.statManager().addRateData("crypto.sessionTagsExpired", expired, expireTime);
+            SimpleScheduler.getInstance().addEvent(this, 60*1000);
         }
     }
 
+
     /** TagSet */
-    protected Set getInboundTagSets() {
+    protected Set<TagSet> getInboundTagSets() {
         synchronized (_inboundTagSets) {
             return new HashSet(_inboundTagSets.values());
         }
     }
 
     /** OutboundSession */
-    protected Set getOutboundSessions() {
+    protected Set<OutboundSession> getOutboundSessions() {
         synchronized (_outboundSessions) {
             return new HashSet(_outboundSessions.values());
         }
     }
 
-    protected void setData(Set inboundTagSets, Set outboundSessions) {
+    protected void setData(Set<TagSet> inboundTagSets, Set<OutboundSession> outboundSessions) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Loading " + inboundTagSets.size() + " inbound tag sets, and " 
                       + outboundSessions.size() + " outbound sessions");
-        Map tagSets = new HashMap(inboundTagSets.size());
-        for (Iterator iter = inboundTagSets.iterator(); iter.hasNext();) {
-            TagSet ts = (TagSet) iter.next();
-            for (Iterator tsIter = ts.getTags().iterator(); tsIter.hasNext();) {
-                SessionTag tag = (SessionTag) tsIter.next();
+        Map<SessionTag, TagSet> tagSets = new HashMap(inboundTagSets.size());
+        for (Iterator<TagSet> iter = inboundTagSets.iterator(); iter.hasNext();) {
+            TagSet ts = iter.next();
+            for (Iterator<SessionTag> tsIter = ts.getTags().iterator(); tsIter.hasNext();) {
+                SessionTag tag = tsIter.next();
                 tagSets.put(tag, ts);
             }
         }
@@ -114,9 +134,9 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _inboundTagSets.clear();
             _inboundTagSets.putAll(tagSets);
         }
-        Map sessions = new HashMap(outboundSessions.size());
-        for (Iterator iter = outboundSessions.iterator(); iter.hasNext();) {
-            OutboundSession sess = (OutboundSession) iter.next();
+        Map<PublicKey, OutboundSession> sessions = new HashMap(outboundSessions.size());
+        for (Iterator<OutboundSession> iter = outboundSessions.iterator(); iter.hasNext();) {
+            OutboundSession sess = iter.next();
             sessions.put(sess.getTarget(), sess);
         }
         synchronized (_outboundSessions) {
@@ -151,12 +171,25 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
+     * Unused except in tests?
      */
     @Override
     public void createSession(PublicKey target, SessionKey key) {
         OutboundSession sess = new OutboundSession(target);
         sess.setCurrentKey(key);
         addSession(sess);
+    }
+
+    /**
+     * Same as above but for internal use, returns OutboundSession so we don't have
+     * to do a subsequent getSession()
+     *
+     */
+    private OutboundSession createAndReturnSession(PublicKey target, SessionKey key) {
+        OutboundSession sess = new OutboundSession(target);
+        sess.setCurrentKey(key);
+        addSession(sess);
+        return sess;
     }
 
     /**
@@ -232,10 +265,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 _log.debug("Tags delivered: " + sessionTags.size() + " for key: " + key.toBase64() + ": " + sessionTags);
         }
         OutboundSession sess = getSession(target);
-        if (sess == null) {
-            createSession(target, key);
-            sess = getSession(target);
-        }
+        if (sess == null)
+            sess = createAndReturnSession(target, key);
         sess.setCurrentKey(key);
         TagSet set = new TagSet(sessionTags, key, _context.clock().now());
         sess.addTags(set);
@@ -257,13 +288,13 @@ class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     @Override
-    public void tagsReceived(SessionKey key, Set sessionTags) {
+    public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags) {
         int overage = 0;
         TagSet tagSet = new TagSet(sessionTags, key, _context.clock().now());
         TagSet old = null;
         SessionTag dupTag = null;
-        for (Iterator iter = sessionTags.iterator(); iter.hasNext();) {
-            SessionTag tag = (SessionTag) iter.next();
+        for (Iterator<SessionTag> iter = sessionTags.iterator(); iter.hasNext();) {
+            SessionTag tag = iter.next();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receiving tag " + tag + " for key " + key.toBase64() + " / " + key.toString() + ": tagSet: " + tagSet);
             synchronized (_inboundTagSets) {
@@ -284,12 +315,12 @@ class TransientSessionKeyManager extends SessionKeyManager {
         if (old != null) {
             // drop both old and tagSet tags
             synchronized (_inboundTagSets) {
-                for (Iterator iter = old.getTags().iterator(); iter.hasNext(); ) {
-                    SessionTag tag = (SessionTag)iter.next();
+                for (Iterator<SessionTag> iter = old.getTags().iterator(); iter.hasNext(); ) {
+                    SessionTag tag = iter.next();
                     _inboundTagSets.remove(tag);
                 }
-                for (Iterator iter = sessionTags.iterator(); iter.hasNext(); ) {
-                    SessionTag tag = (SessionTag)iter.next();
+                for (Iterator<SessionTag> iter = sessionTags.iterator(); iter.hasNext(); ) {
+                    SessionTag tag = iter.next();
                     _inboundTagSets.remove(tag);
                 }
             }
@@ -325,10 +356,11 @@ class TransientSessionKeyManager extends SessionKeyManager {
         int recent = 0;
         int tags = 0;
         int toRemove = overage * 2;
-        List removed = new ArrayList(toRemove);
+        _log.log(Log.CRIT, "TOO MANY SESSION TAGS! Starting cleanup, overage = " + overage);
+        List<TagSet> removed = new ArrayList(toRemove);
         synchronized (_inboundTagSets) {
-            for (Iterator iter = _inboundTagSets.values().iterator(); iter.hasNext(); ) {
-                TagSet set = (TagSet)iter.next();
+            for (Iterator<TagSet> iter = _inboundTagSets.values().iterator(); iter.hasNext(); ) {
+                TagSet set = iter.next();
                 int size = set.getTags().size();
                 if (size > 1000)
                     absurd++;
@@ -344,8 +376,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
             }
             for (int i = 0; i < removed.size(); i++) {
                 TagSet cur = (TagSet)removed.get(i);
-                for (Iterator iter = cur.getTags().iterator(); iter.hasNext(); ) {
-                    SessionTag tag = (SessionTag)iter.next();
+                for (Iterator<SessionTag> iter = cur.getTags().iterator(); iter.hasNext(); ) {
+                    SessionTag tag = iter.next();
                     _inboundTagSets.remove(tag);
                     tags++;
                 }
@@ -420,17 +452,17 @@ class TransientSessionKeyManager extends SessionKeyManager {
         int removed = 0;
         int remaining = 0;
         long now = _context.clock().now();
-        StringBuffer buf = null;
-        StringBuffer bufSummary = null;
+        StringBuilder buf = null;
+        StringBuilder bufSummary = null;
         if (_log.shouldLog(Log.DEBUG)) {
-            buf = new StringBuffer(128);
+            buf = new StringBuilder(128);
             buf.append("Expiring inbound: ");
-            bufSummary = new StringBuffer(1024);
+            bufSummary = new StringBuilder(1024);
         }
         synchronized (_inboundTagSets) {
-            for (Iterator iter = _inboundTagSets.keySet().iterator(); iter.hasNext();) {
-                SessionTag tag = (SessionTag) iter.next();
-                TagSet ts = (TagSet) _inboundTagSets.get(tag);
+            for (Iterator<SessionTag> iter = _inboundTagSets.keySet().iterator(); iter.hasNext();) {
+                SessionTag tag = iter.next();
+                TagSet ts = _inboundTagSets.get(tag);
                 long age = now - ts.getDate();
                 if (age > SESSION_LIFETIME_MAX_MS) {
                 //if (ts.getDate() < now - SESSION_LIFETIME_MAX_MS) {
@@ -454,9 +486,9 @@ class TransientSessionKeyManager extends SessionKeyManager {
         //_log.warn("Expiring tags: [" + tagsToDrop + "]");
 
         synchronized (_outboundSessions) {
-            for (Iterator iter = _outboundSessions.keySet().iterator(); iter.hasNext();) {
-                PublicKey key = (PublicKey) iter.next();
-                OutboundSession sess = (OutboundSession) _outboundSessions.get(key);
+            for (Iterator<PublicKey> iter = _outboundSessions.keySet().iterator(); iter.hasNext();) {
+                PublicKey key = iter.next();
+                OutboundSession sess = _outboundSessions.get(key);
                 removed += sess.expireTags();
                 if (sess.availableTags() <= 0) {
                     iter.remove();
@@ -468,25 +500,25 @@ class TransientSessionKeyManager extends SessionKeyManager {
     }
 
     public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<h2>Inbound sessions</h2>");
-        buf.append("<table border=\"1\">");
-        Set inbound = getInboundTagSets();
-        Map inboundSets = new HashMap(inbound.size());
-        for (Iterator iter = inbound.iterator(); iter.hasNext();) {
-            TagSet ts = (TagSet) iter.next();
+        buf.append("<table>");
+        Set<TagSet> inbound = getInboundTagSets();
+        Map<SessionKey, Set<TagSet>> inboundSets = new HashMap(inbound.size());
+        for (Iterator<TagSet> iter = inbound.iterator(); iter.hasNext();) {
+            TagSet ts = iter.next();
             if (!inboundSets.containsKey(ts.getAssociatedKey())) inboundSets.put(ts.getAssociatedKey(), new HashSet());
-            Set sets = (Set) inboundSets.get(ts.getAssociatedKey());
+            Set<TagSet> sets = inboundSets.get(ts.getAssociatedKey());
             sets.add(ts);
         }
-        for (Iterator iter = inboundSets.keySet().iterator(); iter.hasNext();) {
-            SessionKey skey = (SessionKey) iter.next();
-            Set sets = (Set) inboundSets.get(skey);
+        for (Iterator<SessionKey> iter = inboundSets.keySet().iterator(); iter.hasNext();) {
+            SessionKey skey = iter.next();
+            Set<TagSet> sets = inboundSets.get(skey);
             buf.append("<tr><td><b>Session key</b>: ").append(skey.toBase64()).append("</td>");
             buf.append("<td><b># Sets:</b> ").append(sets.size()).append("</td></tr>");
             buf.append("<tr><td colspan=\"2\"><ul>");
-            for (Iterator siter = sets.iterator(); siter.hasNext();) {
-                TagSet ts = (TagSet) siter.next();
+            for (Iterator<TagSet> siter = sets.iterator(); siter.hasNext();) {
+                TagSet ts = siter.next();
                 buf.append("<li><b>Received on:</b> ").append(new Date(ts.getDate())).append(" with ")
                    .append(ts.getTags().size()).append(" tags remaining</li>");
             }
@@ -496,18 +528,18 @@ class TransientSessionKeyManager extends SessionKeyManager {
 
         buf.append("<h2><b>Outbound sessions</b></h2>");
 
-        buf.append("<table border=\"1\">");
-        Set outbound = getOutboundSessions();
-        for (Iterator iter = outbound.iterator(); iter.hasNext();) {
-            OutboundSession sess = (OutboundSession) iter.next();
+        buf.append("<table>");
+        Set<OutboundSession> outbound = getOutboundSessions();
+        for (Iterator<OutboundSession> iter = outbound.iterator(); iter.hasNext();) {
+            OutboundSession sess = iter.next();
             buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toString()).append("<br />");
             buf.append("<b>Established:</b> ").append(new Date(sess.getEstablishedDate())).append("<br />");
             buf.append("<b>Last Used:</b> ").append(new Date(sess.getLastUsedDate())).append("<br />");
             buf.append("<b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>");
             buf.append("<tr><td><b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td></tr>");
             buf.append("<tr><td><ul>");
-            for (Iterator siter = sess.getTagSets().iterator(); siter.hasNext();) {
-                TagSet ts = (TagSet) siter.next();
+            for (Iterator<TagSet> siter = sess.getTagSets().iterator(); siter.hasNext();) {
+                TagSet ts = siter.next();
                 buf.append("<li><b>Sent on:</b> ").append(new Date(ts.getDate())).append(" with ").append(
                                                                                                           ts.getTags()
                                                                                                             .size())
@@ -525,13 +557,13 @@ class TransientSessionKeyManager extends SessionKeyManager {
         private SessionKey _currentKey;
         private long _established;
         private long _lastUsed;
-        private List _tagSets;
+        private List<TagSet> _tagSets;
 
         public OutboundSession(PublicKey target) {
             this(target, null, _context.clock().now(), _context.clock().now(), new ArrayList());
         }
 
-        OutboundSession(PublicKey target, SessionKey curKey, long established, long lastUsed, List tagSets) {
+        OutboundSession(PublicKey target, SessionKey curKey, long established, long lastUsed, List<TagSet> tagSets) {
             _target = target;
             _currentKey = curKey;
             _established = established;
@@ -540,7 +572,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         }
 
         /** list of TagSet objects */
-        List getTagSets() {
+        List<TagSet> getTagSets() {
             synchronized (_tagSets) {
                 return new ArrayList(_tagSets);
             }
@@ -559,7 +591,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             if (_currentKey != null) {
                 if (!_currentKey.equals(key)) {
                     int dropped = 0;
-                    List sets = _tagSets;
+                    List<TagSet> sets = _tagSets;
                     _tagSets = new ArrayList();
                     for (int i = 0; i < sets.size(); i++) {
                         TagSet set = (TagSet) sets.get(i);
@@ -641,8 +673,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         public long getLastExpirationDate() {
             long last = 0;
             synchronized (_tagSets) {
-                for (Iterator iter = _tagSets.iterator(); iter.hasNext();) {
-                    TagSet set = (TagSet) iter.next();
+                for (Iterator<TagSet> iter = _tagSets.iterator(); iter.hasNext();) {
+                    TagSet set = iter.next();
                     if ( (set.getDate() > last) && (set.getTags().size() > 0) ) 
                         last = set.getDate();
                 }
@@ -662,12 +694,12 @@ class TransientSessionKeyManager extends SessionKeyManager {
     }
 
     static class TagSet {
-        private Set _sessionTags;
+        private Set<SessionTag> _sessionTags;
         private SessionKey _key;
         private long _date;
         private Exception _createdBy;
 
-        public TagSet(Set tags, SessionKey key, long date) {
+        public TagSet(Set<SessionTag> tags, SessionKey key, long date) {
             if (key == null) throw new IllegalArgumentException("Missing key");
             if (tags == null) throw new IllegalArgumentException("Missing tags");
             _sessionTags = tags;
@@ -691,7 +723,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         }
 
         /** tags still available */
-        public Set getTags() {
+        public Set<SessionTag> getTags() {
             return _sessionTags;
         }
 

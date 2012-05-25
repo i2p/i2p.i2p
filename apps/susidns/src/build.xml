@@ -22,19 +22,22 @@
         <pathelement location="${lib}/ant.jar" />
         <pathelement location="../../../core/java/build/i2p.jar" />
  	</path>
+	<property name="javac.compilerargs" value="" />
  	<target name="compile">
 		<mkdir dir="${bin}" />
 		<javac debug="true" deprecation="on" source="1.5" target="1.5"
- 			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" />
+ 			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" >
+			<compilerarg line="${javac.compilerargs}" />
+		</javac>
 	</target>
     <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete file="WEB-INF/web-fragment.xml" />
         <delete file="WEB-INF/web-out.xml" />
     	<mkdir dir="${tmp}" />
         <echo message="Ignore any warning about /WEB-INF/web.xml not found" />
-        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp">
+        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp" failonerror="true">
             <arg value="-d" />
-            <arg value="WEB-INF/classes" />
+            <arg value="${tmp}" />
             <arg value="-v" />
             <arg value="-p" />
             <arg value="i2p.susi.dns.jsp" />
@@ -44,7 +47,8 @@
             <arg value="./jsp" />
         </java>
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
-               destdir="${bin}" srcdir="./WEB-INF/classes" includes="**/*.java" classpathref="cp">
+               destdir="${bin}" srcdir="${tmp}" includes="**/*.java" classpathref="cp">
+		<compilerarg line="${javac.compilerargs}" />
          </javac>
         <copy file="WEB-INF/web-template.xml" tofile="WEB-INF/web-out.xml" />
         <loadfile property="jspc.web.fragment" srcfile="WEB-INF/web-fragment.xml" />
@@ -81,6 +85,7 @@
         <fileset dir="WEB-INF" includes="web-fragment.xml, web-out.xml" />
       </delete>
       <delete dir="${bin}" />
+      <delete dir="${tmp}" />
     </target>
     <target name="distclean" depends="clean" />
 </project>

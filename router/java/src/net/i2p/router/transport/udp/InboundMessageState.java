@@ -30,7 +30,7 @@ public class InboundMessageState {
     
     /** expire after 10s */
     private static final long MAX_RECEIVE_TIME = 10*1000;
-    private static final int MAX_FRAGMENTS = 64;
+    public static final int MAX_FRAGMENTS = 64;
     
     private static final ByteCache _fragmentCache = ByteCache.getInstance(64, 2048);
     
@@ -138,8 +138,9 @@ public class InboundMessageState {
         }
         public boolean receivedComplete() { return false; }
         
+        @Override
         public String toString() { 
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Partial ACK of ");
             buf.append(_bitfieldMessageId);
             buf.append(" with ACKs for: ");
@@ -162,8 +163,9 @@ public class InboundMessageState {
     }
     public int getFragmentCount() { return _lastFragment+1; }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         buf.append("Message: ").append(_messageId);
         if (isComplete()) {
             buf.append(" completely received with ");

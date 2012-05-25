@@ -3,10 +3,8 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,7 +33,7 @@ class ProfileOrganizerRenderer {
         Set peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
-        long hideBefore = now - 3*60*60*1000;
+        long hideBefore = now - 2*60*60*1000;
         
         TreeSet order = new TreeSet(_comparator);
         TreeSet integratedPeers = new TreeSet(_comparator);
@@ -58,17 +56,18 @@ class ProfileOrganizerRenderer {
         int reliable = 0;
         int integrated = 0;
         int failing = 0;
-        StringBuffer buf = new StringBuffer(16*1024);
+        StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>Peer Profiles</h2>\n");
-        buf.append("<table border=\"1\">");
+        buf.append("<p>Showing ").append(order.size()).append(" recent profiles, hiding ").append(peers.size()-order.size()).append(" older profiles</p>");
+        buf.append("<table>");
         buf.append("<tr>");
-        buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(")</td>");
-        buf.append("<td><b>Groups (Caps)</b></td>");
-        buf.append("<td><b>Speed</b></td>");
-        buf.append("<td><b>Capacity</b></td>");
-        buf.append("<td><b>Integration</b></td>");
-        buf.append("<td><b>Failing?</b></td>");
-        buf.append("<td>&nbsp;</td>");
+        buf.append("<th>Peer</th>");
+        buf.append("<th>Groups (Caps)</th>");
+        buf.append("<th>Speed</th>");
+        buf.append("<th>Capacity</th>");
+        buf.append("<th>Integration</th>");
+        buf.append("<th>Failing?</th>");
+        buf.append("<th>&nbsp;</th>");
         buf.append("</tr>");
         int prevTier = 1;
         for (Iterator iter = order.iterator(); iter.hasNext();) {
@@ -99,19 +98,9 @@ class ProfileOrganizerRenderer {
                 buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
             prevTier = tier;
             
-            buf.append("<tr>");
-            buf.append("<td><code>");
-            if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">-- ").append(peer.toBase64().substring(0,6)).append("</font>");
-            } else {
-                if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++ ").append(peer.toBase64().substring(0,6)).append("</font>");
-                } else {
-                    buf.append("&nbsp;&nbsp;&nbsp;").append(peer.toBase64().substring(0,6));
-                }
-            }
-            buf.append("</code></td>");
-            buf.append("<td>");
+            buf.append("<tr><td align=\"center\" nowrap>");
+            buf.append(_context.commSystem().renderPeerHTML(peer));
+            buf.append("</td><td align=\"center\">");
             
             switch (tier) {
                 case 1: buf.append("Fast, High Capacity"); break;
@@ -148,8 +137,8 @@ class ProfileOrganizerRenderer {
                 buf.append(bonus).append(')');
             }
             buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
-            buf.append("</td><td>");
-            if (_context.shitlist().isShitlisted(peer)) buf.append("Shitlist");
+            buf.append("</td><td align=\"center\">");
+            if (_context.shitlist().isShitlisted(peer)) buf.append("Banned");
             if (prof.getIsFailing()) buf.append(" Failing");
             if (_context.commSystem().wasUnreachable(peer)) buf.append(" Unreachable");
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
@@ -161,50 +150,43 @@ class ProfileOrganizerRenderer {
                     buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
             }
             buf.append("&nbsp</td>");
-            //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
-            //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
-            buf.append("<td nowrap><a href=\"netdb.jsp?r=").append(peer.toBase64().substring(0,6)).append("\">netDb</a>");
-            buf.append("/<a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
-            buf.append("/<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
+            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
         }
         buf.append("</table>");
 
         buf.append("<h2>Floodfill and Integrated Peers</h2>\n");
-        buf.append("<table border=\"1\">");
+        buf.append("<table>");
         buf.append("<tr>");
-        buf.append("<td><b>Peer</b></td>");
-        buf.append("<td><b>Caps</b></td>");
-        buf.append("<td><b>Integ. Value</b></td>");
-        buf.append("<td><b>Last Heard About</b></td>");
-        buf.append("<td><b>Last Heard From</b></td>");
-        buf.append("<td><b>Last Successful Send</b></td>");
-        buf.append("<td><b>Last Failed Send</b></td>");
-        buf.append("<td><b>10m Resp. Time</b></td>");
-        buf.append("<td><b>1h Resp. Time</b></td>");
-        buf.append("<td><b>1d Resp. Time</b></td>");
-        buf.append("<td><b>Successful Lookups</b></td>");
-        buf.append("<td><b>Failed Lookups</b></td>");
-        buf.append("<td><b>New Stores</b></td>");
-        buf.append("<td><b>Old Stores</b></td>");
-        buf.append("<td><b>1h Fail Rate</b></td>");
-        buf.append("<td><b>1d Fail Rate</b></td>");
+        buf.append("<th class=\"smallhead\">Peer</th>");
+        buf.append("<th class=\"smallhead\">Caps</th>");
+        buf.append("<th class=\"smallhead\">Integ. Value</th>");
+        buf.append("<th class=\"smallhead\">Last Heard About</th>");
+        buf.append("<th class=\"smallhead\">Last Heard From</th>");
+//        buf.append("<th class=\"smallhead\">Last Successful Send</th>");
+        buf.append("<th class=\"smallhead\">Last Good Send</th>");        
+//        buf.append("<th class=\"smallhead\">Last Failed Send</th>");
+        buf.append("<th class=\"smallhead\">Last Bad Send</th>");
+        buf.append("<th class=\"smallhead\">10m Resp. Time</th>");
+        buf.append("<th class=\"smallhead\">1h Resp. Time</th>");
+        buf.append("<th class=\"smallhead\">1d Resp. Time</th>");
+//        buf.append("<th class=\"smallhead\">Successful Lookups</th>"); 
+        buf.append("<th class=\"smallhead\">Good Lookups</th>"); 
+//        buf.append("<th>Failed Lookups</th>");
+        buf.append("<th class=\"smallhead\">Bad Lookups</th>");        
+        buf.append("<th class=\"smallhead\">New Stores</th>");
+        buf.append("<th class=\"smallhead\">Old Stores</th>");
+        buf.append("<th class=\"smallhead\">1h Fail Rate</th>");
+        buf.append("<th class=\"smallhead\">1d Fail Rate</th>");
         buf.append("</tr>");
         for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
 
-            buf.append("<tr>");
-            buf.append("<td><code>");
-            if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">-- ").append(peer.toBase64().substring(0,6)).append("</font>");
-            } else {
-                if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++ ").append(peer.toBase64().substring(0,6)).append("</font>");
-                } else {
-                    buf.append("&nbsp;&nbsp;&nbsp;").append(peer.toBase64().substring(0,6));
-                }
-            }
+            buf.append("<tr><td align=\"center\" nowrap>");
+            buf.append(_context.commSystem().renderPeerHTML(peer));
+            buf.append("</td>");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null)
                 buf.append("<td align=\"center\">" + info.getCapabilities() + "</td>");
@@ -236,7 +218,11 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<p><i>Definitions:<ul>");
+        buf.append("<h3>Thresholds:</h3>");
+        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
+        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
+        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)");
+        buf.append("<h3>Definitions:</h3><ul>");
         buf.append("<li><b>groups</b>: as determined by the profile organizer</li>");
         buf.append("<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>");
         buf.append("<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>");
@@ -244,13 +230,6 @@ class ProfileOrganizerRenderer {
         buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
         buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
         buf.append("</ul></i>");
-        buf.append("Red peers prefixed with '--' means the peer is failing, and blue peers prefixed ");
-        buf.append("with '++' means we've sent or received a message from them ");
-        buf.append("in the last five minutes.</i><br />");
-        buf.append("<p><b>Thresholds:</b><br />");
-        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
-        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
-        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)<br />");
         out.write(buf.toString());
         out.flush();
     }

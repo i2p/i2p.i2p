@@ -18,7 +18,7 @@
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 
     <% if (editBean.allowCSS()) {
-  %><link href="images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
@@ -75,7 +75,11 @@
             </div>
                  
             <div id="accessField" class="rowItem">
+         <% if ("streamrclient".equals(tunnelType)) { %>
+                <label>Target:</label>
+         <% } else { %>
                 <label>Access Point:</label>
+         <% } %>
             </div>
             <div id="portField" class="rowItem">
                 <label for="port" accesskey="P">
@@ -87,14 +91,17 @@
                 </label>
                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />               
             </div>
+         <% String otherInterface = "";
+            String clientInterface = editBean.getClientInterface(curTunnel);
+            if ("streamrclient".equals(tunnelType)) {   
+                otherInterface = clientInterface;
+            } else { %>
             <div id="reachField" class="rowItem">
                 <label for="reachableBy" accesskey="r">
                     <span class="accessKey">R</span>eachable by:
                 </label>
                 <select id="reachableBy" name="reachableBy" title="Valid IP for Client Access" class="selectbox">
-                    <% String clientInterface = editBean.getClientInterface(curTunnel);
-                       String otherInterface = "";
-                       if (!("127.0.0.1".equals(clientInterface)) &&
+                  <%   if (!("127.0.0.1".equals(clientInterface)) &&
                            !("0.0.0.0".equals(clientInterface)) &&
                             (clientInterface != null) &&
                             (clientInterface.trim().length() > 0)) {
@@ -105,9 +112,18 @@
                     <option value="other"<%=(!("".equals(otherInterface))    ? " selected=\"selected\"" : "")%>>LAN Hosts (Please specify your LAN address)</option>
                 </select>                
             </div> 
+         <% } // streamrclient %>
             <div id="otherField" class="rowItem">
                 <label for="reachableByOther" accesskey="O">
+         <% if ("streamrclient".equals(tunnelType)) { %>
+                    Host:
+                    <% String vvv = otherInterface;
+                       if (vvv == null || "".equals(vvv.trim()))
+                           out.write(" <font color=\"red\">(required)</font>");
+                     %>
+         <% } else { %>
                     <span class="accessKey">O</span>ther:
+         <% } %>
                 </label>
                 <input type="text" size="20" id="reachableByOther" name="reachableByOther" title="Alternative IP for Client Access" value="<%=otherInterface%>" class="freetext" />                
             </div>
@@ -123,7 +139,7 @@
                 </label>
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
             </div>
-            <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
+            <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
                     <span class="accessKey">T</span>unnel Destination:
@@ -135,8 +151,9 @@
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
                 <span class="comment">(name or destination)</span>
             </div>
-            <% }
-          %><div id="profileField" class="rowItem">
+         <% } %>
+         <% if (!"streamrclient".equals(tunnelType)) { %>
+            <div id="profileField" class="rowItem">
                 <label for="profile" accesskey="f">
                     Pro<span class="accessKey">f</span>ile:
                 </label>
@@ -160,6 +177,7 @@
                 <input value="true" type="checkbox" id="shared" name="shared" title="Share tunnels with other clients"<%=(editBean.isSharedClient(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
                 <span class="comment">(Share tunnels with other clients and irc/httpclients? Change requires restart of client proxy)</span>
             </div>
+         <% } // !streamrclient %>
             <div id="startupField" class="rowItem">
                 <label for="startOnLoad" accesskey="a">
                     <span class="accessKey">A</span>uto Start:
@@ -266,34 +284,7 @@
                 <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
             </div>
                  
-            <div class="subdivider">
-                <hr />
-            </div>
-           
-            <div id="optionsField" class="rowItem">
-                <label for="reduce" accesskey="c">
-                    <span class="accessKey">C</span>lose tunnels when idle:
-                </label>
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="access" accesskey="c">
-                    Enable:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="close" title="Close Tunnels"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="access" accesskey="c">
-                    Generate New Destination Keys On Reopen:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="newDest" title="New Destination"<%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="reduceTime" accesskey="c">
-                    Close when idle (minutes):
-                </label>
-                <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
-            </div>
-                 
+         <% if (!"streamrclient".equals(tunnelType)) { // streamr client sends pings so it will never be idle %>
             <div class="subdivider">
                 <hr />
             </div>
@@ -317,7 +308,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="reduceTime" accesskey="d">
-                    Reduce when idle (minutes):
+                    Idle minutes:
                 </label>
                 <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
             </div>
@@ -325,6 +316,86 @@
             <div class="subdivider">
                 <hr />
             </div>
+           
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="c">
+                    <span class="accessKey">C</span>lose tunnels when idle: <i>Experimental</i>
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="close" title="Close Tunnels"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    New Keys on Reopen:
+                </label>
+                <table border="0"><tr><!-- I give up -->
+                <td><input value="1" type="radio" id="startOnLoad" name="newDest" title="New Destination"
+                     <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <td valign="center">Enable
+                <td><input value="0" type="radio" id="startOnLoad" name="newDest" title="New Destination"
+                     <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />                
+                <td valign="center">Disable
+                </table>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceTime" accesskey="c">
+                    Idle minutes:
+                </label>
+                <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="c">
+                    <span class="accessKey">D</span>elay tunnel open until required: <i>Experimental</i>
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="delayOpen" title="Delay Tunnel Open"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+         <% } // !streamrclient %>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+
+         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) { %>
+            <div id="optionsField" class="rowItem">
+                <label for="privKeyFile" accesskey="k">
+                    Persistent private <span class="accessKey">k</span>ey:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label>Enable:</label>
+                <input value="2" type="radio" id="startOnLoad" name="newDest" title="New Destination"
+                     <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="reachField" class="rowItem">
+                <label>File:</label>
+                <input type="text" size="30" id="clientHost" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
+            </div>
+            <div id="destinationField" class="rowItem">
+                <label for="localDestination" accesskey="L">
+                    <span class="accessKey">L</span>ocal destination:
+                </label>
+                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
+                <span class="comment">(if known)</span>
+            </div>
+
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } %>
            
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">

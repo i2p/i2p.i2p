@@ -8,6 +8,7 @@ package net.i2p.sam;
  *
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -19,8 +20,11 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.naming.NamingService;
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Log;
 
 /**
@@ -73,6 +77,22 @@ public class SAMUtils {
             return false;
         }
     }
+    
+    public static class InvalidDestination extends Exception {
+    	static final long serialVersionUID = 0x1 ;
+    }
+    public static void checkPrivateDestination(String dest) throws InvalidDestination {
+    	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(Base64.decode(dest));
+
+    	try {
+    		new Destination().readBytes(destKeyStream);
+    		new PrivateKey().readBytes(destKeyStream);
+    		new SigningPrivateKey().readBytes(destKeyStream);
+    	} catch (Exception e) {
+    		throw new InvalidDestination();
+    	}
+    }
+
 
     /**
      * Resolved the specified hostname.
@@ -102,6 +122,27 @@ public class SAMUtils {
     }
     
     /**
+     * Resolve the destination from a key or a hostname
+     *
+     * @param s Hostname or key to be resolved
+     *
+     * @return the Destination for the specified hostname, or null if not found
+     */
+    public static Destination getDest(String s) throws DataFormatException
+    {
+    	Destination d = new Destination() ;
+    	try {
+    		d.fromBase64(s);
+    	} catch (DataFormatException e) {
+    		d = lookupHost(s, null);
+    		if ( d==null ) {
+    			throw e ;
+    		}
+    	}
+    	return d ;
+    }
+
+    /**
      * Parse SAM parameters, and put them into a Propetries object
      *
      * @param tok A StringTokenizer pointing to the SAM parameters
@@ -114,7 +155,7 @@ public class SAMUtils {
         String token, param;
         Properties props = new Properties();
         
-        StringBuffer value = new StringBuffer();
+        StringBuilder value = new StringBuilder();
         for (int i = 0; i < ntoks; ++i) {
             token = tok.nextToken();
 

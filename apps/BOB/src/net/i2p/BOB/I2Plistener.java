@@ -25,9 +25,8 @@ package net.i2p.BOB;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
-import net.i2p.client.I2PSession;
-import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -42,24 +41,37 @@ public class I2Plistener implements Runnable {
 
 	private NamedDB info,  database;
 	private Log _log;
-	private int tgwatch;
+//	private int tgwatch;
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor
+	 * @param SS
 	 * @param S
 	 * @param info
 	 * @param database
 	 * @param _log
 	 */
-	I2Plistener(I2PSocketManager S, NamedDB info, NamedDB database, Log _log) {
+	I2Plistener(I2PServerSocket SS, I2PSocketManager S, NamedDB info, NamedDB database, Log _log, AtomicBoolean lives) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
-		serverSocket = this.socketManager.getServerSocket();
-		tgwatch = 1;
+		this.serverSocket = SS;
+//		tgwatch = 1;
+		this.lives = lives;
+	}
+
+	private void rlock() throws Exception {
+		database.getReadLock();
+		info.getReadLock();
+	}
+
+	private void runlock() throws Exception {
+		database.releaseReadLock();
+		info.releaseReadLock();
 	}
 
 	/**
@@ -69,69 +81,43 @@ public class I2Plistener implements Runnable {
 	public void run() {
 		boolean g = false;
 		I2PSocket sessSocket = null;
-
-		serverSocket.setSoTimeout(100);
-		database.getReadLock();
-		info.getReadLock();
-		if(info.exists("INPORT")) {
-			tgwatch = 2;
-		}
-		info.releaseReadLock();
-		database.releaseReadLock();
-		boolean spin = true;
-		while(spin) {
-
-			database.getReadLock();
-			info.getReadLock();
-			spin = info.get("RUNNING").equals(Boolean.TRUE);
-			info.releaseReadLock();
-			database.releaseReadLock();
-			try {
-				try {
-					sessSocket = serverSocket.accept();
-					g = true;
-				} catch(ConnectException ce) {
-					g = false;
-				} catch(SocketTimeoutException ste) {
-					g = false;
-				}
-				if(g) {
-					g = false;
-					// toss the connection to a new thread.
-					I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database);
-					Thread t = new Thread(conn_c, "BOBI2PtoTCP");
-					t.start();
-				}
-
-			} catch(I2PException e) {
-				//	System.out.println("Exception " + e);
-			}
-		}
-		// System.out.println("I2Plistener: Close");
+		int conn = 0;
 		try {
-			serverSocket.close();
-		} catch(I2PException e) {
-			// nop
-		}
-		// need to kill off the socket manager too.
-		I2PSession session = socketManager.getSession();
-		if(session != null) {
-			// System.out.println("I2Plistener: destroySession");
-			try {
-				session.destroySession();
-			} catch(I2PSessionException ex) {
-				// nop
-			}
-		}
-		// System.out.println("I2Plistener: Waiting for children");
-		while(Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-			try {
-				Thread.sleep(100); //sleep for 100 ms (One tenth second)
-			} catch(Exception e) {
-				// nop
-			}
-		}
+			die:
+			{
+				try {
+					serverSocket.setSoTimeout(50);
 
-		// System.out.println("I2Plistener: Done.");
+					while (lives.get()) {
+						try {
+							sessSocket = serverSocket.accept();
+							g = true;
+						} catch (ConnectException ce) {
+							g = false;
+						} catch (SocketTimeoutException ste) {
+							g = false;
+						}
+						if (g) {
+							g = false;
+							conn++;
+							// toss the connection to a new thread.
+							I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database, lives);
+							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " I2PtoTCP " + conn);
+							t.start();
+						}
+
+					}
+				} catch (I2PException e) {
+					// bad shit
+					System.out.println("Exception " + e);
+				}
+			}
+		} finally {
+			try {
+				serverSocket.close();
+			} catch (I2PException ex) {
+			}
+		// System.out.println("I2Plistener: Close");
+		}
 	}
 }

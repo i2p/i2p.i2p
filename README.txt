@@ -25,7 +25,5 @@ Need help?
 	http://forum.i2p2.de/
 
 Licenses:
-	http://www.i2p2.de/licenses.html
-	Also http://localhost:7657/help.jsp
-	Also see licenses for the individual bundled apps in apps/*
+	See LICENSE.txt
 

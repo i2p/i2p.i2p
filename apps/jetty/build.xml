@@ -6,6 +6,7 @@
     <property name="jetty.url" value="http://dist.codehaus.org/jetty/jetty-5.1.x/jetty-5.1.12.zip" />
     <property name="jetty.filename" value="jetty-5.1.12.zip" />
     <property name="verified.filename" value="verified.txt" />
+    <property name="javac.compilerargs" value="" />
 
     <target name="all" depends="build" />
 
@@ -90,9 +91,11 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./java/src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" source="1.5" target="1.5" 
             destdir="./build/obj" 
-            classpath="./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar" />
+            classpath="./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./jettylib/org.mortbay.jetty.jar" basedir="./build/obj" includes="**/*.class" update="true" >

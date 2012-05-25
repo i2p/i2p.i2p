@@ -105,6 +105,7 @@ public class UDPPacketReader {
     public RelayIntroReader getRelayIntroReader() { return _relayIntroReader; }
     public RelayResponseReader getRelayResponseReader() { return _relayResponseReader; }
     
+    @Override
     public String toString() {
         switch (readPayloadType()) {
             case UDPPacket.PAYLOAD_TYPE_DATA:
@@ -128,7 +129,7 @@ public class UDPPacketReader {
         }
     }
     
-    public void toRawString(StringBuffer buf) {
+    public void toRawString(StringBuilder buf) {
         if (_message != null)
             buf.append(Base64.encode(_message, _payloadBeginOffset, _payloadLength));
     }
@@ -398,8 +399,9 @@ public class UDPPacketReader {
             return ((_message[flagOffset] & flag) != 0);
         }
         
+        @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(256);
+            StringBuilder buf = new StringBuilder(256);
             long msAgo = _context.clock().now() - readTimestamp()*1000;
             buf.append("Data packet sent ").append(msAgo).append("ms ago ");
             buf.append("IV ");
@@ -461,7 +463,7 @@ public class UDPPacketReader {
             return buf.toString();
         }
         
-        public void toRawString(StringBuffer buf) { 
+        public void toRawString(StringBuilder buf) { 
             UDPPacketReader.this.toRawString(buf); 
             buf.append(" payload: ");
                   
@@ -502,8 +504,9 @@ public class UDPPacketReader {
             int flagNum = fragmentNum % 7;
             return (_message[byteNum] & (1 << flagNum)) != 0x0;
         }
+        @Override
         public String toString() { 
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Read partial ACK of ");
             buf.append(getMessageId());
             buf.append(" with ACKs for: ");

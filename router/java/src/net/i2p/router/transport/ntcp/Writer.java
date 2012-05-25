@@ -16,7 +16,7 @@ import net.i2p.util.Log;
 class Writer {
     private RouterContext _context;
     private Log _log;
-    private List _pendingConnections;
+    private final List _pendingConnections;
     private List _liveWrites;
     private List _writeAfterLive;
     private List _runners;

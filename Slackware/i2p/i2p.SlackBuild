@@ -18,7 +18,7 @@
 BUILD=1sim
 
 # put here installation dir, without first and last /
-# es: usr/local
+# eg: usr/local
 INSTALL_DIR=opt
 NAME=i2p
 ARCH=noarch
@@ -64,8 +64,8 @@ mkdir -p $PKG
 cd $CWD/../../
 
 ant distclean
-ant dist
-
+#ant dist
+ant tarball
 
 tar xjvf i2p.tar.bz2 -C $TMP
 
@@ -76,6 +76,34 @@ mkdir -p $PKG/$INSTALL_DIR/
 cp -a ../i2p $PKG/$INSTALL_DIR/
 
 mkdir -p $PKG/install
+
+#############################################################################
+# Preconfigureation to make package smaller
+#############################################################################
+cd $PKG/$INSTALL_DIR/i2p
+
+# wrapper.config $INSTALL_PATH and $SYSTEM_java_io_tmpdir
+sed "s|\$INSTALL_PATH|$INSTALL_DIR/i2p|g" wrapper.config > a
+sed "s|\$SYSTEM_java_io_tmpdir|/var/tmp|g" a > wrapper.config
+# eepget %INSTALL_PATH
+sed "s|\$INSTALL_PATH|$INSTALL_DIR/i2p|g" eepget > a
+rm eepget
+mv a eepget
+# runplain.sh %INSTALL_PATH and %SYSTEM_java_io_tmpdir
+sed "s|%INSTALL_PATH|$INSTALL_DIR/i2p|g" runplain.sh > a
+sed "s|%SYSTEM_java_io_tmpdir|/var/tmp|g" a > runplain.sh
+# i2prouter %INSTALL_PATH and %SYSTEM_java_io_tmpdir
+sed "s|%INSTALL_PATH|$INSTALL_DIR/i2p|g" i2prouter > a
+sed "s|%SYSTEM_java_io_tmpdir|/var/tmp|g" a > i2prouter
+
+chmod 744 ./i2prouter
+chmod 744 ./osid
+chmod 744 ./runplain.sh
+chmod 744 ./eepget
+chmod 744 ./scripts/i2pbench.sh
+chmod 744 ./scripts/i2ptest.sh
+rm -Rf ./lib/*.dll ./*.bat ./*.exe ./installer ./icons ./a postinstall.sh
+
 mv $PKG/$INSTALL_DIR/i2p/*.config $PKG/install
 mv $PKG/$INSTALL_DIR/i2p/blocklist.txt $PKG/$INSTALL_DIR/i2p/blocklist.txt.new
 mv $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml.new
@@ -83,6 +111,7 @@ mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html $PKG/$INSTALL_DIR/i2p/eepsit
 mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico.new
 sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
 cat $CWD/slack-desc > $PKG/install/slack-desc
+
 cd $PKG
 requiredbuilder -v -y -s $CWD $PKG
 makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.tgz

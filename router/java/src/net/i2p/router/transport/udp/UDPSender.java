@@ -20,7 +20,7 @@ public class UDPSender {
     private Log _log;
     private DatagramSocket _socket;
     private String _name;
-    private List _outboundQueue;
+    private final List _outboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
     
@@ -33,42 +33,43 @@ public class UDPSender {
         _socket = socket;
         _runner = new Runner();
         _name = name;
-        _context.statManager().createRateStat("udp.pushTime", "How long a UDP packet takes to get pushed out", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendQueueSize", "How many packets are queued on the UDP sender", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendQueueFailed", "How often it was unable to add a new packet to the queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendQueueTrimmed", "How many packets were removed from the queue for being too old (duration == remaining)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize", "How large packets sent are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendException", "How frequently we fail to send a packet (likely due to a windows exception)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.pushTime", "How long a UDP packet takes to get pushed out", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendQueueSize", "How many packets are queued on the UDP sender", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendQueueFailed", "How often it was unable to add a new packet to the queue", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendQueueTrimmed", "How many packets were removed from the queue for being too old (duration == remaining)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize", "How large packets sent are", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", UDPTransport.RATES);
+        // used in RouterWatchdog
+        _context.statManager().createRateStat("udp.sendException", "How frequently we fail to send a packet (likely due to a windows exception)", "udp", new long[] { 60*1000, 10*60*1000 });
 
-        _context.statManager().createRateStat("udp.sendPacketSize.1", "db store message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.2", "db lookup message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.3", "db search reply message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.6", "tunnel create message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.7", "tunnel create status message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.10", "delivery status message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.11", "garlic message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.16", "date message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.18", "tunnel data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.19", "tunnel gateway message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.21", "tunnel build", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.22", "tunnel build reply", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.42", "ack-only packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.43", "hole punch packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.44", "relay response packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.45", "relay intro packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.46", "relay request packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.47", "peer test charlie to bob packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.48", "peer test bob to charlie packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.49", "peer test to alice packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.50", "peer test from alice packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.51", "session confirmed packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.52", "session request packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("udp.sendPacketSize.53", "session created packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.1", "db store message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.2", "db lookup message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.3", "db search reply message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.6", "tunnel create message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.7", "tunnel create status message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.10", "delivery status message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.11", "garlic message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.16", "date message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.18", "tunnel data message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.19", "tunnel gateway message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.21", "tunnel build", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.22", "tunnel build reply", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.42", "ack-only packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.43", "hole punch packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.44", "relay response packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.45", "relay intro packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.46", "relay request packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.47", "peer test charlie to bob packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.48", "peer test bob to charlie packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.49", "peer test to alice packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.50", "peer test from alice packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.51", "session confirmed packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.52", "session request packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize.53", "session created packet size", "udp", UDPTransport.RATES);
     }
     
     public void startup() {

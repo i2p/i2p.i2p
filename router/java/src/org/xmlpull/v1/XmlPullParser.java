@@ -815,7 +815,7 @@ public interface XmlPullParser {
      * <a href="http://www.w3.org/TR/REC-xml-names/#ns-using">Namespaces in XML</a>
      * specification to "http://www.w3.org/XML/1998/namespace".
      *
-     * @param zero based index of attribute
+     * @param index zero based index of attribute
      * @return attribute namespace,
      *   empty string ("") is returned  if namesapces processing is not enabled or
      *   namespaces processing is enabled but attribute has no namespace (it has no prefix).
@@ -828,7 +828,7 @@ public interface XmlPullParser {
      * Throws an IndexOutOfBoundsException if the index is out of range
      * or current event type is not START_TAG.
      *
-     * @param zero based index of attribute
+     * @param index zero based index of attribute
      * @return attribute name (null is never returned)
      */
     String getAttributeName (int index);
@@ -840,7 +840,7 @@ public interface XmlPullParser {
      * Throws an IndexOutOfBoundsException if the index is out of range
      * or current event type is not START_TAG.
      *
-     * @param zero based index of attribute
+     * @param index zero based index of attribute
      * @return attribute prefix or null if namespaces processing is not enabled.
      */
     String getAttributePrefix(int index);
@@ -849,7 +849,7 @@ public interface XmlPullParser {
      * Returns the type of the specified attribute
      * If parser is non-validating it MUST return CDATA.
      *
-     * @param zero based index of attribute
+     * @param index zero based index of attribute
      * @return attribute type (null is never returned)
      */
     String getAttributeType(int index);
@@ -859,7 +859,7 @@ public interface XmlPullParser {
      * If parser is non-validating it MUST always return false.
      * This information is part of XML infoset:
      *
-     * @param zero based index of attribute
+     * @param index zero based index of attribute
      * @return false if attribute was in input
      */
     boolean isAttributeDefault(int index);
@@ -876,7 +876,7 @@ public interface XmlPullParser {
      *
      * @see #defineEntityReplacementText
      *
-     * @param zero based index of attribute
+     * @param index zero based index of attribute
      * @return value of attribute (null is never returned)
      */
     String getAttributeValue(int index);

@@ -31,24 +31,24 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
      */
     public I2PTunnelClient(int localPort, String destinations, Logging l, 
                            boolean ownDest, EventDispatcher notifyThis, 
-                           I2PTunnel tunnel) throws IllegalArgumentException {
-        super(localPort, ownDest, l, notifyThis, "SynSender", tunnel);
+                           I2PTunnel tunnel, String pkf) throws IllegalArgumentException {
+        super(localPort, ownDest, l, notifyThis, "SynSender", tunnel, pkf);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openClientResult", "error");
             return;
         }
 
-        StringTokenizer tok = new StringTokenizer(destinations, ",");
+        StringTokenizer tok = new StringTokenizer(destinations, ", ");
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();
             try {
-                Destination dest = I2PTunnel.destFromName(destination);
-                if (dest == null)
+                Destination destN = I2PTunnel.destFromName(destination);
+                if (destN == null)
                     l.log("Could not resolve " + destination);
                 else
-                    dests.add(dest);
+                    dests.add(destN);
             } catch (DataFormatException dfe) {
                 l.log("Bad format parsing \"" + destination + "\"");
             }
@@ -71,10 +71,10 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     public long getReadTimeout() { return readTimeout; }
     
     protected void clientConnectionRun(Socket s) {
-        Destination dest = pickDestination();
+        Destination destN = pickDestination();
         I2PSocket i2ps = null;
         try {
-            i2ps = createI2PSocket(dest);
+            i2ps = createI2PSocket(destN);
             i2ps.setReadTimeout(readTimeout);
             new I2PTunnelRunner(s, i2ps, sockLock, null, mySockets);
         } catch (Exception ex) {

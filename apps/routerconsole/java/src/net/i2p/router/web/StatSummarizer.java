@@ -87,7 +87,7 @@ public class StatSummarizer implements Runnable {
                 removeDb(r);
         }
         // add new ones
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < newSpecs.size(); i++) {
             Rate r = (Rate)newSpecs.get(i);
             if (!old.contains(r))

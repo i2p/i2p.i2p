@@ -218,9 +218,10 @@ public class TunnelParticipant {
         }
     }
     
+    @Override
     public String toString() { 
         if (_config != null) {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("participant at ").append(_config.toString());
             return buf.toString();
         } else {

@@ -4,19 +4,18 @@
 
 <html><head>
 <title>I2P Router Console - statistics</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="oldhelper" scope="request" />
 <jsp:setProperty name="oldhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <jsp:setProperty name="oldhelper" property="writer" value="<%=out%>" />
-
+ <h1>I2P Router Statistics</h1>
 <div class="main" id="main">
  <jsp:getProperty name="oldhelper" property="stats" />
 </div>
-
+</div>
 </body>
 </html>

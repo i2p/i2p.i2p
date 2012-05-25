@@ -2,20 +2,21 @@
  <head>
   <title>Welcome to your eepsite</title>
   <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="eepsite.css" />
  </head>
  <body>
  <h1>Welcome to your eepsite</h1>
-
+<p>(<a href="index_de.html">Deutsch</a>)</p>
  <p>This is your eepsite - simply edit the files under ./eepsite/docroot/ 
  and they'll be reachable by others once you follow the instructions below.
  In I2P, eepsites are addressed using a 'key', which is represented as a really long Base64 string.
  (The 'key' is somewhat analogous to an IP address, and
  is shown on the eepsite's I2PTunnel
- <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">configuration page</a>).
+ <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">configuration page</a>).
  The instructions below detail how to assign a name like "mysite.i2p" to your key and
  start up your eepsite.</p>
  <p>You can reach your eepsite locally through 
- <a href="http://localhost:7658/">http://localhost:7658/</a>.
+ <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.
 </p>
 
  <h2>Step-by-step instructions for starting your new eepsite and announcing it to the I2P community</h2>
@@ -27,24 +28,24 @@
  <ul>
  <li>Pick a name for your eepsite (<i>something</i>.i2p). Use all lower-case.
      You may wish to check first in your own router's address book
-     <a href="http://localhost:7657/susidns/addressbook.jsp?book=router&filter=none">here</a>,
+     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&filter=none">here</a>,
      or the file i2p/hosts.txt to see if your name is already taken.
      Enter the new name for your eepsite on the
-     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
      where it says "Website name". This will replace the default "mysite.i2p".
      Also, check the "Auto Start" box. Your eepsite will now start every time you start your router.
      Be sure and click "Save".
  <li>Click the start button for your eepsite on the
-     <a href="http://localhost:7657/i2ptunnel/index.jsp">main i2ptunnel configuration page</a>.
+     <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">main i2ptunnel configuration page</a>.
      You should now see "eepsite" listed under "Local Destinations" on the left side of the
-     <a href="http://localhost:7657/index.jsp">I2P Router Console</a>.
+     <a href="http://127.0.0.1:7657/index.jsp">I2P Router Console</a>.
      Your eepsite is now running.
  <li>Highlight the entire "Local destination" key on the
-     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
      and copy it for
      later pasting. Make sure you get the whole thing - it's over 500 characters and it must end in "AAAA".
  <li>Enter the name and paste in the destination key into your
-     <a href="http://localhost:7657/susidns/addressbook.jsp?book=master">master address book</a>.
+     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">master address book</a>.
      Click "Add" to add the destination to your address book.
  <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
      be right back here. Hopefully it worked.
@@ -57,14 +58,14 @@
      your eepsite name and key into a web interface on one or more of these sites.
      Here is <a href="http://stats.i2p/i2p/addkey.html">the key entry form at stats.i2p</a>.
      Again, your key is the entire "Local destination" key on the
-     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
      Be sure you get the whole thing, ending with "AAAA".
      Don't forget to click "add a key".
      Check to see if it reports the key was added.
      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your
      website by simply typing <i>something</i>.i2p into their browser.
  <li>Speaking of address book updates, this would be a good time to add some more addressbooks
-     to your own subscription list. Go to your <a href="http://localhost:7657/susidns/subscriptions.jsp">subscriptions configuration page</a>
+     to your own subscription list. Go to your <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">subscriptions configuration page</a>
      and add a couple of these -
      <a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a>,
      <a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a>,

@@ -41,6 +41,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         _log = context.logManager().getLog(BandwidthLimitedInputStream.class);
     }
     
+    @Override
     public int read() throws IOException {
         if (_pullFromOutbound)
             _currentRequest = _context.bandwidthLimiter().requestOutbound(1, _peerSource);
@@ -56,10 +57,12 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         return in.read();
     }
     
+    @Override
     public int read(byte dest[]) throws IOException {
         return read(dest, 0, dest.length);
     }
     
+    @Override
     public int read(byte dest[], int off, int len) throws IOException {
         int read = in.read(dest, off, len);
         if (read == -1) return -1;
@@ -84,6 +87,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         }
         return read;
     }
+    @Override
     public long skip(long numBytes) throws IOException {
         long skip = in.skip(numBytes);
         
@@ -105,6 +109,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         return skip;
     }
     
+    @Override
     public void close() throws IOException {
         synchronized (this) {
             if (_currentRequest != null)

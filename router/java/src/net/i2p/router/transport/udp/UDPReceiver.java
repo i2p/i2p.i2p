@@ -25,7 +25,7 @@ public class UDPReceiver {
     private Log _log;
     private DatagramSocket _socket;
     private String _name;
-    private List _inboundQueue;
+    private final List _inboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
     private UDPTransport _transport;
@@ -41,17 +41,15 @@ public class UDPReceiver {
         _socket = socket;
         _transport = transport;
         _runner = new Runner();
-        _context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.receiveRemaining", "How many packets are left sitting on the receiver's queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.droppedInboundProbabalistically", "How many packet we drop probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.acceptedInboundProbabalistically", "How many packet we accept probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.receiveHolePunch", "How often we receive a NAT hole punch", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.receiveRemaining", "How many packets are left sitting on the receiver's queue", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.receiveHolePunch", "How often we receive a NAT hole punch", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", UDPTransport.RATES);
     }
     
     public void startup() {
-        adjustDropProbability();
+        //adjustDropProbability();
         _keepRunning = true;
         I2PThread t = new I2PThread(_runner, _name + "." + _id);
         t.setDaemon(true);
@@ -66,6 +64,7 @@ public class UDPReceiver {
         }
     }
     
+/*********
     private void adjustDropProbability() {
         String p = _context.getProperty("i2np.udp.dropProbability");
         if (p != null) {
@@ -77,6 +76,7 @@ public class UDPReceiver {
             //ARTIFICIAL_DROP_PROBABILITY = 0;
         }
     }
+**********/
     
     /**
      * Replace the old listen port with the new one, returning the old. 
@@ -90,17 +90,21 @@ public class UDPReceiver {
     /** if a packet been sitting in the queue for a full second (meaning the handlers are overwhelmed), drop subsequent packets */
     private static final long MAX_QUEUE_PERIOD = 2*1000;
     
+/*********
     private static int ARTIFICIAL_DROP_PROBABILITY = 0; // 4
     
     private static final int ARTIFICIAL_DELAY = 0; // 200;
     private static final int ARTIFICIAL_DELAY_BASE = 0; //600;
+**********/
     
     private int receive(UDPPacket packet) {
+/*********
         //adjustDropProbability();
         
         if (ARTIFICIAL_DROP_PROBABILITY > 0) { 
             // the first check is to let the compiler optimize away this 
             // random block on the live system when the probability is == 0
+            // (not if it isn't final jr)
             int v = _context.random().nextInt(100);
             if (v <= ARTIFICIAL_DROP_PROBABILITY) {
                 if (_log.shouldLog(Log.ERROR))
@@ -119,6 +123,7 @@ public class UDPReceiver {
             SimpleScheduler.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
             return -1;
         }
+**********/
         
         return doReceive(packet);
     }
@@ -159,7 +164,7 @@ public class UDPReceiver {
         packet.release();
         _context.statManager().addRateData("udp.droppedInbound", queueSize, headPeriod);
         if (_log.shouldLog(Log.WARN)) {
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append("Dropping inbound packet with ");
             msg.append(queueSize);
             msg.append(" queued for ");

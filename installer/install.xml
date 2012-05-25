@@ -4,21 +4,78 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.7</appversion>
+        <appversion>0.7.6</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
         <url>http://www.i2p2.de/</url>
+
+        <!-- use pack200 compression, saves about 33%
+             see http://java.sun.com/j2se/1.5.0/docs/guide/deployment/deployment-guide/pack200.html
+             However it makes the unpacked jars much larger...
+             For further testing...
+             <pack200 />
+         -->
+
+        <!-- adding this element will make the installer attempt to launch itself with administrator permissions,
+             but see http://www.nabble.com/Classpath-security-issues-on-Vista-td22456230.html
+             which says it isn't sufficient:
+
+		Just to let you know that I managed to identify and resolve the problem (in
+		case anyone else has it).  The default installation directory for Vista is
+		under "Program Files" which is a "special" directory which can only be
+		written to (create sub-directories) by administrators.  However, stupid
+		Vista downgrades an administrator to a normal user when the program is run
+		via the application shortcut menu.  As you suggested, I added a script which
+		runs ICACLS which resolved the problem, i.e.
+
+		icacls %1 /grant Users:F /T > priv.log
+
+		The command needs to be run as a Process rather than as an executable tag in
+		order to pass $INSTALL_PATH as a parameter.
+         -->
+        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
     </info>
 
     <guiprefs width="590" height="356" resizable="yes">
         <laf name="liquid">
             <os family="unix"/>
         </laf>
+        <!-- full names, not iso3 codes -->
+        <modifier key="langDisplayType" value="native" />
     </guiprefs>
 
     <locale>
         <langpack iso3="eng"/>
+        <langpack iso3="cat"/>
+        <langpack iso3="chn"/>
+        <langpack iso3="cze"/>
+        <langpack iso3="dan"/>
+        <langpack iso3="deu"/>
+        <langpack iso3="ell"/>
+        <langpack iso3="fa"/>
+        <langpack iso3="fin"/>
+        <langpack iso3="fra"/>
+        <langpack iso3="glg"/>
+        <langpack iso3="hun"/>
+        <langpack iso3="ind"/>
+        <langpack iso3="ita"/>
+        <langpack iso3="jpn"/>
+        <langpack iso3="kor"/>
+        <langpack iso3="mys"/>
+        <langpack iso3="ned"/>
+        <langpack iso3="nor"/>
+        <langpack iso3="pol"/>
+        <langpack iso3="por"/>
+        <langpack iso3="rom"/>
+        <langpack iso3="rus"/>
+        <langpack iso3="scg"/>
+        <langpack iso3="spa"/>
+        <langpack iso3="svk"/>
+        <langpack iso3="swe"/>
+        <langpack iso3="tur"/>
+        <langpack iso3="twn"/>
+        <langpack iso3="ukr"/>
     </locale>
 
     <native type="izpack" name="ShellLink.dll" />
@@ -28,6 +85,7 @@
         <res id="InfoPanel.info" src="installer/resources/readme.license.txt"/>
         <!-- <res id="ProcessPanel.Spec.xml" src="installer/resources/ProcessPanel.Spec.xml"/> -->
 	<res id="shortcutSpec.xml" src="installer/resources/shortcutSpec.xml" />
+	<res id="XInfoPanel.info" src="installer/resources/start-i2p.txt" />
     </resources>
 
     <panels>
@@ -37,6 +95,9 @@
         <panel classname="InstallPanel"/>
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
         <!-- <panel classname="ProcessPanel"><os family="windows" /></panel> -->
+        <!-- unix|mac doesn't work, displays for windows too -->
+        <panel classname="XInfoPanel" ><os family="unix" /></panel>
+        <panel classname="XInfoPanel" ><os family="mac" /></panel>
         <panel classname="SimpleFinishPanel"/>
     </panels>
 
@@ -44,32 +105,53 @@
         <pack name="Base" required="yes">
             <description>Base installation files</description>
             <fileset dir="pkg-temp" includes="**/*" targetdir="$INSTALL_PATH"/>
+            <!--
+              Do variable substitution in these files. See:
+              http://www.javalobby.org/forums/thread.jspa?threadID=15967&tstart=0
+              and the izpack docs for some guidance.
+             -->
+            <parsable targetfile="$INSTALL_PATH/wrapper.config" type="plain" />
+            <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
             
             <!-- postinstall stuff for windows -->
-            <executable targetfile="$INSTALL_PATH/lib/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\i2prouter" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install_i2p_service_unix" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install-headless.txt" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\osid" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\postinstall.sh" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\postinstall.bat" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\uninstall_i2p_service_unix" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper" /></args></executable>
+
+            <!-- workaround for vista permission problems - see comments above -->
+            <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"
+                condition="izpack.windowsinstall.vista|izpack.windowsinstall.7" >
+                <args><arg value="$INSTALL_PATH" /></args>
+            </executable>
+            <!-- else delete it -->
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+                condition="izpack.windowsinstall.xp|izpack.windowsinstall.2003" >
+                <args><arg value="$INSTALL_PATH\fixperms.bat" /></args>
+            </executable>
+
             <!--
-            <executable targetfile="$INSTALL_PATH/lib/exec.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/exec.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH" /><arg value="$INSTALL_PATH\I2Psvc.exe" /><arg value="-c" /><arg value="$INSTALL_PATH\wrapper.config" /></args></executable>
             -->
                 

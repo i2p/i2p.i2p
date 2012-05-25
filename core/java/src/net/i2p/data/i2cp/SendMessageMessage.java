@@ -149,7 +149,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[SendMessageMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tNonce: ").append(getNonce());

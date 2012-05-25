@@ -232,6 +232,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     }
     
     
+    @Override
     public byte[] toByteArray() {
         byte rv[] = super.toByteArray();
         if (rv == null)
@@ -239,6 +240,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         return rv;
     }
 
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getNextRouter()) +
                DataHelper.hashCode(getNextTunnelId()) +
@@ -246,6 +248,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
                DataHelper.hashCode(getReplyTunnel());
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelCreateMessage) ) {
             TunnelCreateMessage msg = (TunnelCreateMessage)object;
@@ -258,8 +261,9 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[TunnelCreateMessage: ");
         buf.append("\n\tNext Router: ").append(getNextRouter());
         buf.append("\n\tNext Tunnel: ").append(getNextTunnelId());

@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -21,23 +22,29 @@ import java.util.Vector;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPAddress;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
     private Log _log;
     private RouterContext _context;
     private TransportManager _manager;
+    private GeoIP _geoIP;
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(CommSystemFacadeImpl.class);
         _manager = null;
+        startGeoIP();
     }
     
     public void startup() {
@@ -58,14 +65,22 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _manager.restart();
     }
     
+    @Override
     public int countActivePeers() { return (_manager == null ? 0 : _manager.countActivePeers()); }
+    @Override
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
-    public boolean haveCapacity() { return (_manager == null ? false : _manager.haveCapacity()); } 
+    @Override
+    public boolean haveInboundCapacity(int pct) { return (_manager == null ? false : _manager.haveInboundCapacity(pct)); } 
+    @Override
+    public boolean haveOutboundCapacity(int pct) { return (_manager == null ? false : _manager.haveOutboundCapacity(pct)); } 
+    @Override
+    public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
      */
+    @Override
     public Long getFramedAveragePeerClockSkew(int percentToInclude) {
         if (_manager == null) {
             if (_log.shouldLog(Log.INFO))
@@ -115,39 +130,52 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     int getTransportCount() { return _manager.getTransportCount(); }
     
+    /** Send the message out */
     public void processMessage(OutNetMessage msg) {	
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
         //j.runJob();
         GetBidsJob.getBids(_context, this, msg);
     }
     
+    @Override
     public boolean isBacklogged(Hash dest) { 
         return _manager.isBacklogged(dest); 
     }
     
+    @Override
     public boolean isEstablished(Hash dest) { 
         return _manager.isEstablished(dest); 
     }
     
+    @Override
     public boolean wasUnreachable(Hash dest) { 
         return _manager.wasUnreachable(dest); 
     }
     
+    public byte[] getIP(Hash dest) { 
+        return _manager.getIP(dest); 
+    }
+    
+    @Override
     public List getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
     }
 
+    @Override
     public short getReachabilityStatus() { 
-        if (_manager == null) return CommSystemFacade.STATUS_UNKNOWN;
-        if (_context.router().isHidden()) return CommSystemFacade.STATUS_OK;
+        if (_manager == null) return STATUS_UNKNOWN;
+        if (_context.router().isHidden()) return STATUS_OK;
         return _manager.getReachabilityStatus(); 
     }
+    @Override
     public void recheckReachability() { _manager.recheckReachability(); }
 
+    @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { 
         _manager.renderStatusHTML(out, urlBase, sortFlags); 
     }
     
+    @Override
     public Set createAddresses() {
         Map addresses = null;
         boolean newCreated = false;
@@ -174,15 +202,19 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
-    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoip";
-    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoport";
+    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
+    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
     
+    /**
+     * This only creates an address if the hostname AND port are set in router.config,
+     * which should be rare.
+     * Otherwise, notifyReplaceAddress() below takes care of it.
+     * Note this is called both from above and from NTCPTransport.startListening()
+     *
+     * This should really be moved to ntcp/NTCPTransport.java, why is it here?
+     */
     public static RouterAddress createNTCPAddress(RouterContext ctx) {
         if (!TransportManager.enableNTCP(ctx)) return null;
-        RouterAddress addr = new RouterAddress();
-        addr.setCost(10);
-        addr.setExpiration(null);
-        Properties props = new Properties();
         String name = ctx.router().getConfigSetting(PROP_I2NP_NTCP_HOSTNAME);
         String port = ctx.router().getConfigSetting(PROP_I2NP_NTCP_PORT);
         /*
@@ -205,12 +237,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         } catch (NumberFormatException nfe) {
             return null;
         }
+        Properties props = new Properties();
         props.setProperty(NTCPAddress.PROP_HOST, name);
         props.setProperty(NTCPAddress.PROP_PORT, port);
+        RouterAddress addr = new RouterAddress();
+        addr.setCost(10);
+        addr.setExpiration(null);
         addr.setOptions(props);
         addr.setTransportStyle(NTCPTransport.STYLE);
         //if (isNew) {
-            if (false) return null;
+            // why save the same thing?
             ctx.router().setConfigSetting(PROP_I2NP_NTCP_HOSTNAME, name);
             ctx.router().setConfigSetting(PROP_I2NP_NTCP_PORT, port);
             ctx.router().saveConfig();
@@ -220,11 +256,13 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     /**
      * UDP changed addresses, tell NTCP and restart
+     * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
+    @Override
     public void notifyReplaceAddress(RouterAddress UDPAddr) {
         if (UDPAddr == null)
             return;
-        NTCPTransport t = (NTCPTransport) _manager.getNTCPTransport();
+        NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
         if (t == null)
             return;
         Properties UDPProps = UDPAddr.getOptions();
@@ -232,7 +270,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             return;
         Properties newProps;
         RouterAddress oldAddr = t.getCurrentAddress();
-        //_log.warn("Changing NTCP Address? was " + oldAddr);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Changing NTCP Address? was " + oldAddr);
         RouterAddress newAddr = oldAddr;
         if (newAddr == null) {
             newAddr = new RouterAddress();
@@ -247,24 +286,51 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         boolean changed = false;
+
+        // Auto Port Setting
+        // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
+        // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
         String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) ) {
-            String nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
-            if (nport == null || nport.length() <= 0)
-                return;
-            if (oport == null || ! oport.equals(nport)) {
-                newProps.setProperty(NTCPAddress.PROP_PORT, nport);
-                changed = true;
-            }
-        } else if (oport == null || oport.length() <= 0) {
+        String nport = null;
+        String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
+        if (cport != null && cport.length() > 0) {
+            nport = cport;
+        } else if (Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "true")).booleanValue()) {
+            nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("old: " + oport + " config: " + cport + " new: " + nport);
+        if (nport == null || nport.length() <= 0)
             return;
+        if (oport == null || ! oport.equals(nport)) {
+            newProps.setProperty(NTCPAddress.PROP_PORT, nport);
+            changed = true;
         }
 
+        // Auto IP Setting
+        // old behavior (<= 0.7.3): auto-ip defaults to false, and trumps configured hostname,
+        //                          and ignores reachability status - leading to
+        //                          "firewalled with inbound TCP enabled" warnings.
+        // new behavior (>= 0.7.4): auto-ip defaults to true, and explicit setting trumps auto,
+        //                          and only takes effect if reachability is OK.
+        //                          And new "always" setting ignores reachability status, like
+        //                          "true" was in 0.7.3
         String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
-        enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) ) {
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true");
+        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        if (name != null && name.length() > 0)
+            enabled = "false";
+        Transport udp = _manager.getTransport(UDPTransport.STYLE);
+        short status = STATUS_UNKNOWN;
+        if (udp != null)
+            status = udp.getReachabilityStatus();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
+        if (enabled.equalsIgnoreCase("always") ||
+            (enabled.equalsIgnoreCase("true") && status == STATUS_OK)) {
             String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
             if (nhost == null || nhost.length() <= 0)
                 return;
             if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
@@ -273,18 +339,33 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             }
         } else if (ohost == null || ohost.length() <= 0) {
             return;
+        } else if (enabled.equalsIgnoreCase("true") && status != STATUS_OK) {
+            // UDP transitioned to not-OK, turn off NTCP address
+            // This will commonly happen at startup if we were initially OK
+            // because UPnP was successful, but a subsequent SSU Peer Test determines
+            // we are still firewalled (SW firewall, bad UPnP indication, etc.)
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: null");
+            newAddr = null;
+            changed = true;
         }
 
         if (!changed) {
-            //_log.warn("No change to NTCP Address");
+            _log.warn("No change to NTCP Address");
             return;
         }
 
         // stopListening stops the pumper, readers, and writers, so required even if
         // oldAddr == null since startListening starts them all again
+        //
+        // really need to fix this so that we can change or create an inbound address
+        // without tearing down everything
+        // Especially on disabling the address, we shouldn't tear everything down.
+        //
         _log.warn("Halting NTCP to change address");
         t.stopListening();
-        newAddr.setOptions(newProps);
+        if (newAddr != null)
+            newAddr.setOptions(newProps);
         // Wait for NTCP Pumper to stop so we don't end up with two...
         while (t.isAlive()) {
             try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
@@ -294,4 +375,110 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return;     	
     }
     
+    /*
+     * GeoIP stuff
+     *
+     * This is only used in the router console for now, but we put it here because
+     * 1) it's a lot easier, and 2) we could use it in the future for peer selection,
+     * tunnel selection, shitlisting, etc.
+     */
+
+    /* We hope the routerinfos are read in and things have settled down by now, but it's not required to be so */
+    private static final int START_DELAY = 5*60*1000;
+    private static final int LOOKUP_TIME = 30*60*1000;
+    private void startGeoIP() {
+        _geoIP = new GeoIP(_context);
+        SimpleScheduler.getInstance().addEvent(new QueueAll(), START_DELAY);
+    }
+
+    /**
+     * Collect the IPs for all routers in the DB, and queue them for lookup,
+     * then fire off the periodic lookup task for the first time.
+     */
+    private class QueueAll implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            for (Iterator<Hash> iter = _context.netDb().getAllRouters().iterator(); iter.hasNext(); ) {
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(iter.next());
+                if (ri == null)
+                    continue;
+                String host = getIPString(ri);
+                if (host == null)
+                    continue;
+                _geoIP.add(host);
+            }
+            SimpleScheduler.getInstance().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
+        }
+    }
+
+    private class Lookup implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            _geoIP.blockingLookup();
+        }
+    }
+
+    public void queueLookup(byte[] ip) {
+        _geoIP.add(ip);
+    }
+
+    /**
+     *  Uses the transport IP first because that lookup is fast,
+     *  then the SSU IP from the netDb.
+     *
+     *  @return two-letter lower-case country code or null
+     */
+    public String getCountry(Hash peer) {
+        byte[] ip = TransportImpl.getIP(peer);
+        if (ip != null)
+            return _geoIP.get(ip);
+        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+        if (ri == null)
+            return null;
+        String s = getIPString(ri);
+        if (s != null)
+            return _geoIP.get(s);
+        return null;
+    }
+
+    private String getIPString(RouterInfo ri) {
+        // use SSU only, it is likely to be an IP not a hostname,
+        // we don't want to generate a lot of DNS queries at startup
+        RouterAddress ra = ri.getTargetAddress("SSU");
+        if (ra == null)
+            return null;
+        Properties props = ra.getOptions();
+        if (props == null)
+            return null;
+        return props.getProperty("host");
+    }
+
+    /** full name for a country code, or the code if we don't know the name */
+    public String getCountryName(String c) {
+        if (_geoIP == null)
+            return c;
+        String n = _geoIP.fullName(c);
+        if (n == null)
+            return c;
+        return n;
+    }
+
+    /** Provide a consistent "look" for displaying router IDs in the console */
+    public String renderPeerHTML(Hash peer) {
+        String h = peer.toBase64().substring(0, 4);
+        StringBuilder buf = new StringBuilder(128);
+        String c = getCountry(peer);
+        if (c != null) {
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase()).append("\" title=\"");
+            buf.append(getCountryName(c));
+            buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
+        }
+        buf.append("<tt>");
+        boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
+        if (found)
+            buf.append("<a title=\"NetDb entry\" href=\"netdb.jsp?r=").append(h).append("\">");
+        buf.append(h);
+        if (found)
+            buf.append("</a>");
+        buf.append("</font></tt>");
+        return buf.toString();
+    }
 }

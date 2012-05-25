@@ -37,11 +37,11 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
     private String command;
     private long timeout = PING_TIMEOUT;
 
-    private Object simulLock = new Object();
+    private final Object simulLock = new Object();
     private int simulPings = 0;
     private long lastPingTime = 0;
 
-    private Object lock = new Object(), slock = new Object();
+    private final Object lock = new Object(), slock = new Object();
 
     //public I2Ping(String cmd, Logging l,
     //		  boolean ownDest) {
@@ -197,6 +197,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
             start();
         }
 
+        @Override
         public void run() {
             try {
                 Destination dest = I2PTunnel.destFromName(destination);
@@ -210,7 +211,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 int fail = 0;
                 long totalTime = 0;
                 int cnt = countPing ? CPING_COUNT : PING_COUNT;
-                StringBuffer pingResults = new StringBuffer(2 * cnt + destination.length() + 3);
+                StringBuilder pingResults = new StringBuilder(2 * cnt + destination.length() + 3);
                 for (int i = 0; i < cnt; i++) {
                     boolean sent;
                     sent = ping(dest);

@@ -87,12 +87,14 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getReceiveTunnelId()) +
                getStatus() +
                (int)getNonce();
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelCreateStatusMessage) ) {
             TunnelCreateStatusMessage msg = (TunnelCreateStatusMessage)object;
@@ -104,8 +106,9 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[TunnelCreateStatusMessage: ");
         buf.append("\n\tTunnel ID: ").append(getReceiveTunnelId());
         buf.append("\n\tStatus: ").append(getStatus());

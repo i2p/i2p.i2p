@@ -1,0 +1,30 @@
+body            { background-color:#000000; color: #ffffe0; margin-left: 8.7%; margin-right: 12.9%; margin-top: 6%; margin-bottom: 6%;}
+body,h1,h2,h3,h4,p,ul,ol,li,dl,dt,dd,div,td,th,address,blockquote { font-family:"DejaVu Serif", serif; }
+h1              { font-size:23pt; margin-bottom:20pt; }
+h1.ph1          { font-size:20pt; margin-bottom:18pt; }
+h2              { font-size:18pt; margin-bottom:18pt; }
+h3              { font-size:16pt; }
+h4              { font-size:14pt; }
+h5              { font-size:13pt; }
+p,ul,ol,li,dl,dt,dd,div,td,th,address,blockquote { font-size:12.2pt; }
+
+a.footref       { font-size: 70%; }
+a:link          { color:#ffc266; text-decoration:underline; }
+a:visited       { color:#ffd699; text-decoration:none; }
+a:active        { color:#ff9900; text-decoration:none; }
+a.nonexistent   { color: #ffffe0; text-decoration:underline; }
+a.nonexistent:visited { color: #ffffe0; text-decoration:none; }
+
+dl.contents	{ margin-top: 0; }
+dt.contents	{ margin-bottom: 0; }
+em		{ font-style: italic; }
+li,dt           { margin-top: 0.2em; }
+p.footnote      { font-size: 90%;  }
+p.verse         { white-space: pre; margin-left: 8.7%; }
+pre             { font-family: monospace; white-space: pre; margin-left: 8.7%; }
+strong		{ font-weight: bold; }
+table           { width:100%; }
+td              { border:0px solid #000; vertical-align:top; overflow:hidden; }
+ul		{ list-style-type: disc }
+
+

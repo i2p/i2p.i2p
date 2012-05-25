@@ -31,8 +31,10 @@ class RouterThrottleImpl implements RouterThrottle {
     private static int THROTTLE_EVENT_LIMIT = 30;
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final int DEFAULT_MAX_TUNNELS = 2000;
+    private static final int DEFAULT_MAX_TUNNELS = 2500;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
+    private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
+    private static final int DEFAULT_MAX_PROCESSINGTIME = 1500;
 
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
@@ -96,19 +98,48 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
 
         long lag = _context.jobQueue().getMaxLag();
-// reject here if lag too high???
+        // reject here if lag too high???
+        
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
-        Rate r = null;
-        if (rs != null)
-            r = rs.getRate(60*1000);
-        double processTime = (r != null ? r.getAverageValue() : 0);
-        if (processTime > 5000) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Refusing tunnel request with the job lag of " + lag 
-                           + "since the 1 minute message processing time is too slow (" + processTime + ")");
-            _context.statManager().addRateData("router.throttleTunnelProcessingTime1m", (long)processTime, (long)processTime);
-            setTunnelStatus("Rejecting tunnels: High message delay");
-            return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
+        Rate r = rs.getRate(60*1000);
+
+        //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
+        if(r != null) {
+            double totalSendProcessingTimeEvents = r.getCurrentEventCount() + r.getLastEventCount();
+            double avgSendProcessingTime = 0;
+            double currentSendProcessingTime = 0;
+            double lastSendProcessingTime = 0;
+            
+            //Calculate times
+            if(r.getCurrentEventCount() > 0) {
+                currentSendProcessingTime = r.getCurrentTotalValue()/r.getCurrentEventCount();
+            }
+            if(r.getLastEventCount() > 0) {
+                lastSendProcessingTime = r.getLastTotalValue()/r.getLastEventCount();
+            }
+            if(totalSendProcessingTimeEvents > 0) {
+                avgSendProcessingTime =  (r.getCurrentTotalValue() + r.getLastTotalValue())/totalSendProcessingTimeEvents;
+            }
+            else {
+                avgSendProcessingTime = r.getAverageValue();
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
+                }
+            }
+
+            int maxProcessingTime = _context.getProperty(PROP_MAX_PROCESSINGTIME, DEFAULT_MAX_PROCESSINGTIME);
+
+            //Set throttling if necessary
+            if((avgSendProcessingTime > maxProcessingTime*0.9 
+                    || currentSendProcessingTime > maxProcessingTime
+                    || lastSendProcessingTime > maxProcessingTime)) {
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("Refusing tunnel request due to sendProcessingTime of " + avgSendProcessingTime
+                            + " ms over the last two minutes, which is too much.");
+                }
+                setTunnelStatus("Rejecting tunnels: congestion");
+                return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            }
         }
         
         int numTunnels = _context.tunnelManager().getParticipatingCount();
@@ -262,6 +293,7 @@ class RouterThrottleImpl implements RouterThrottle {
     }
 
     private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
+    /** also limited to 90% - see below */
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     private static final String LIMIT_STR = "Rejecting tunnels: Bandwidth limit";
     
@@ -282,8 +314,11 @@ class RouterThrottleImpl implements RouterThrottle {
         int used1mOut = _context.router().get1mRate(true);
 
         // Check the inbound and outbound total bw available (separately)
-        int availBps = (maxKBpsIn*1024) - usedIn;
-        availBps = Math.min(availBps, (maxKBpsOut*1024) - usedOut);
+        // We block all tunnels when share bw is over (max * 0.9) - 4KB
+        // This gives reasonable growth room for existing tunnels on both low and high
+        // bandwidth routers. We want to be rejecting tunnels more aggressively than
+        // dropping packets with WRED
+        int availBps = Math.min((maxKBpsIn*1024*9/10) - usedIn, (maxKBpsOut*1024*9/10) - usedOut);
         if (availBps < MIN_AVAILABLE_BPS) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Reject, avail (" + availBps + ") less than min");
             setTunnelStatus(LIMIT_STR);
@@ -303,8 +338,7 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
         // Now see if 1m rates are too high
-        long overage = used1mIn - (maxKBpsIn*1024);
-        overage = Math.max(overage, used1mOut - (maxKBpsOut*1024));
+        long overage = Math.max(used1mIn - (maxKBpsIn*1024), used1mOut - (maxKBpsOut*1024));
         if ( (overage > 0) && 
              ((overage/(float)(maxKBps*1024f)) > _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + overage + " over) indicates overload.");
@@ -312,7 +346,8 @@ class RouterThrottleImpl implements RouterThrottle {
             return false;
         }
 
-            float maxBps = maxKBps * 1024f;
+            // limit at 90% - 4KBps (see above)
+            float maxBps = (maxKBps * 1024f * 0.9f) - MIN_AVAILABLE_BPS;
             float pctFull = (maxBps - availBps) / (maxBps);
             double probReject = Math.pow(pctFull, 16); // steep curve 
             double rand = _context.random().nextFloat();

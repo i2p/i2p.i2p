@@ -1,0 +1,329 @@
+/* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
+
+body {
+	background-color: #eef;
+	color:#001;
+	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+  font-size: 8pt;
+}
+
+.snarkTitle {
+	font-size: 12pt;
+	font-weight: bold;
+	text-align: center;
+}
+
+.snarkRefresh:link, .snarkRefresh:visited {
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  padding: 0 16px;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 11pt;
+  color: #005;
+  text-shadow: 0px 0px 1px rgba(0, 0, 148, 0.9);
+  }
+ 
+ .snarkRefresh:hover{
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  padding: 0 16px;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 11pt;
+  color: #f60;
+  border-bottom: 3px solid #f60;
+  border-top: 3px solid #f60;
+  text-shadow: 0px 0px 1px rgba(255, 128, 0, 0.9);
+  }
+  
+.snarkRefresh:active{
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  padding: 0 16px;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 11pt;
+  color: #f30;
+  border-bottom: 3px solid #f30;
+  border-top: 3px solid #f30;
+  text-shadow: 0px 0px 1px rgba(255, 163, 0, 0.9);
+  }
+
+.snarkMessages {
+  background-color: #f83;
+  font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+  font-size: 9pt;
+  font-weight: bold;
+  text-align: left;
+  margin: 0 0px 10px 0px;
+  padding: 0;
+  border-spacing: 0px;
+  -moz-border-radius: 4px 0 0 0;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  border: 2px solid #930;
+  text-align: left; 
+  overflow: auto;            
+  background: #f40 url('../console/images/orangetile.png');
+  color: #531;
+  height: 64px;
+  width: auto;
+}
+
+pre {
+  font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+  width: 100%;
+  font-size: 8pt;
+  padding: 0;
+  text-align: left !important;
+  height: 8px;
+}
+
+table {
+	margin: 0px 0px 10px 0px;
+	border: 0px;
+	padding: 0px;
+	border-width: 0px;
+	border-spacing: 0px;
+  border-collapse: collapse;
+}
+
+th {
+	padding: 5px;
+  font-size: 8pt;
+  border-top: 1px outset #001;
+  border-bottom: 1px inset #001;  
+  background: #f60 url('/themes/console/images/tabletitleorange.png') repeat-x;
+  text-align: right;
+  whitespace: nowrap;
+}
+
+.SnarkTorrents {
+	margin: 0;
+	border: 1px solid #001;
+  background-color: #f9f;
+}
+
+td {
+	padding: 5px;
+  text-align: right;
+}
+.snarkTorrentEven {
+	background-color: #fb1;
+  font-size: 7pt;
+}
+.snarkTorrentOdd {
+	background-color: #fa1;
+  font-size: 7pt;
+}
+.snarkNewTorrent {
+	font-size: 9pt;
+}
+.snarkAddInfo {
+	font-size: 9pt;
+  line-height: 130% !important;
+}
+.snarkConfigTitle {
+	font-size: 11pt;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.snarkConfig {
+  font-size: 10pt;
+}
+
+.page {
+	background-color: #fff;
+	color:#310;
+  min-width: 800px !important;
+/*  max-width: 800px !important; */
+  margin: 20px;
+  padding: 10px 20px 5px 20px;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #001;
+  font-size: 9pt !important;
+  line-height: 160% !important;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  text-align: center;
+  background: #ddf url('../console/light/images/lightbluetile.png');
+  opacity: 1.0;
+}
+
+form {
+  line-height: 250%
+}
+
+p { 
+  line-height: 150%
+}
+
+a:link {
+  padding 5px;
+}
+
+hr {
+  color: #003;
+  background: #003;
+  height: 1px;
+  border: 0px solid #003;
+  width: 100%;
+  margin: 10px 0 7px 0;
+  text-align: center;
+}
+
+a:link{
+  color: #930;
+  text-decoration: none;
+  font-weight: bold;
+  word-wrap: break-word;
+}
+
+a:visited{
+  color: #606;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover{
+  color: #900;
+  font-weight: bold;
+}
+
+input {
+/*  font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;*/
+  font-size: 9pt;
+  font-weight: bold;
+  text-align: left;
+  padding: 2px;
+}     
+
+select {
+	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+  background-color: #ffe;
+  color: #310;
+  font-size: 9pt;
+}
+
+img {
+  border: none;
+  margin: 5px 5px 0px 5px;
+  opacity: 1.0;
+  line-height: 100%
+}
+
+img:hover{
+  border: none;
+  margin: 5px 5px 0px 5px;
+  opacity: 0.5;
+  line-height: 100%
+}
+
+
+div.section {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/light/images/tabletile.png');
+  opacity: 1.0;
+}
+
+div.mainsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/light/images/tabletile.png');
+  opacity: 1.0;
+}
+
+div.newtorrentsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/images/yellowtile.png');
+  opacity: 1.0;
+}
+
+div.addtorrentsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/images/greentile.png');
+  opacity: 1.0;
+}
+
+div.configsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  color: #ffb;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 0px 1px #900;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/light/images/darkbluetile.png');
+  font-weight: bold; /* red tile needs bold text! */
+}
+
+div.configsection a{
+  color: #f90;
+}
+
+div.configsection a:hover{
+  color: #f60;
+  text-decoration: underline;
+}
+
+.snarknavbar {
+  margin: 5px 0 20px 0 !important;
+  padding: 10px;
+  border: 1px solid #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  background: #eef;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  background: #ddf url('../console/light/images/tabletile.png');
+}

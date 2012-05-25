@@ -3,7 +3,11 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
@@ -12,6 +16,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.util.EepGet;
+import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
@@ -23,10 +28,14 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private I2PAppContext _context;
     private Log _log;
     private boolean _updateAvailable;
+    private boolean _unsignedUpdateAvailable;
     private long _lastFetch;
     private long _lastUpdated;
     private String _updateVersion;
+    private String _unsignedUpdateVersion;
     private String _lastModified;
+    private File _newsFile;
+    private File _tempFile;
     private static NewsFetcher _instance;
     //public static final synchronized NewsFetcher getInstance() { return _instance; }
     public static final synchronized NewsFetcher getInstance(I2PAppContext ctx) { 
@@ -35,31 +44,34 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _instance = new NewsFetcher(ctx);
         return _instance;
     }
-    
+
     private static final String NEWS_FILE = "docs/news.xml";
-    private static final String TEMP_NEWS_FILE = "docs/news.xml.temp";
+    private static final String TEMP_NEWS_FILE = "news.xml.temp";
     
     private NewsFetcher(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
         _lastFetch = 0;
+        _newsFile = new File(_context.getRouterDir(), NEWS_FILE);
+        _tempFile = new File(_context.getTempDir(), TEMP_NEWS_FILE);
         updateLastFetched();
         _lastUpdated = _lastFetch;
         _updateVersion = "";
     }
     
     private void updateLastFetched() {
-        File news = new File(NEWS_FILE);
-        if (news.exists()) {
+        if (_newsFile.exists()) {
             if (_lastFetch == 0)
-                _lastFetch = news.lastModified();
+                _lastFetch = _newsFile.lastModified();
         } else
             _lastFetch = 0;
     }
     
     public boolean updateAvailable() { return _updateAvailable; }
     public String updateVersion() { return _updateVersion; }
+    public boolean unsignedUpdateAvailable() { return _unsignedUpdateAvailable; }
+    public String unsignedUpdateVersion() { return _unsignedUpdateVersion; }
 
     public String status() {
          long now = _context.clock().now();
@@ -72,8 +84,11 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         try { Thread.sleep(_context.random().nextLong(5*60*1000)); } catch (InterruptedException ie) {}
         while (true) {
             if (!_updateAvailable) checkForUpdates();
-            if (shouldFetchNews())
+            if (shouldFetchNews()) {
                 fetchNews();
+                if (shouldFetchUnsigned())
+                    fetchUnsignedHead();
+            }
             try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}
         }
     }
@@ -82,15 +97,14 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
         if ("notify".equals(policy))
             return false;
-        File zip = new File(Router.UPDATE_FILE);
+        File zip = new File(_context.getRouterDir(), Router.UPDATE_FILE);
         return !zip.exists();
     }
     
     private boolean shouldFetchNews() {
         updateLastFetched();
-        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY);
-        if (freq == null)
-            freq = ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY;
+        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
+                                           ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY);
         try {
             long ms = Long.parseLong(freq);
             if (ms <= 0)
@@ -110,22 +124,19 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         }
     }
     public void fetchNews() {
-        String newsURL = _context.getProperty(ConfigUpdateHandler.PROP_NEWS_URL, ConfigUpdateHandler.DEFAULT_NEWS_URL);
+        String newsURL = ConfigUpdateHelper.getNewsURL(_context);
         boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-        String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
-        File tempFile = new File(TEMP_NEWS_FILE);
-        if (tempFile.exists())
-            tempFile.delete();
+        int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+        if (_tempFile.exists())
+            _tempFile.delete();
         
-        int proxyPort = -1;
         try {
-            proxyPort = Integer.parseInt(port);
             EepGet get = null;
             if (shouldProxy)
-                get = new EepGet(_context, true, proxyHost, proxyPort, 2, TEMP_NEWS_FILE, newsURL, true, null, _lastModified);
+                get = new EepGet(_context, true, proxyHost, proxyPort, 2, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
             else
-                get = new EepGet(_context, false, null, 0, 0, TEMP_NEWS_FILE, newsURL, true, null, _lastModified);
+                get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
             get.addStatusListener(this);
             if (get.fetch())
                 _lastModified = get.getLastModified();
@@ -134,16 +145,112 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         }
     }
     
+    public boolean shouldFetchUnsigned() {
+        String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
+        return url != null && url.length() > 0 &&
+               Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED)).booleanValue();
+    }
+
+    /**
+     * HEAD the update url, and if the last-mod time is newer than the last update we
+     * downloaded, as stored in the properties, then we download it using eepget.
+     */
+    public void fetchUnsignedHead() {
+        String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
+        if (url == null || url.length() <= 0)
+            return;
+        // assume always proxied for now
+        //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+        String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+        int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+
+        try {
+            EepHead get = new EepHead(_context, proxyHost, proxyPort, 0, url);
+            if (get.fetch()) {
+                String lastmod = get.getLastModified();
+                if (lastmod != null) {
+                    if (!(_context instanceof RouterContext)) return;
+                    long modtime = parse822Date(lastmod);
+                    if (modtime <= 0) return;
+                    String lastUpdate = _context.getProperty(UpdateHandler.PROP_LAST_UPDATE_TIME);
+                    if (lastUpdate == null) {
+                        // we don't know what version you have, so stamp it with the current time,
+                        // and we'll look for something newer next time around.
+                        ((RouterContext)_context).router().setConfigSetting(UpdateHandler.PROP_LAST_UPDATE_TIME,
+                                                                            "" + _context.clock().now());
+                        ((RouterContext)_context).router().saveConfig();
+                        return;
+                    }
+                    long ms = 0;
+                    try {
+                        ms = Long.parseLong(lastUpdate);
+                    } catch (NumberFormatException nfe) {}
+                    if (ms <= 0) return;
+                    if (modtime > ms) {
+                        _unsignedUpdateAvailable = true;
+                        // '07-Jul 21:09' with month name in the system locale
+                        _unsignedUpdateVersion = (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime));
+                        if (shouldInstall())
+                            fetchUnsigned();
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            _log.error("Error fetching the unsigned update", t);
+        }
+    }
+
+    public void fetchUnsigned() {
+        String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
+        if (url == null || url.length() <= 0)
+            return;
+        UpdateHandler handler = new UnsignedUpdateHandler((RouterContext)_context, url,
+                                                          _unsignedUpdateVersion);
+        handler.update();
+    }
+
+    /**
+     * http://jimyjoshi.com/blog/2007/08/rfc822dateparsinginjava.html
+     * Apparently public domain
+     * Probably don't need all of these...
+     */
+    private static final SimpleDateFormat rfc822DateFormats[] = new SimpleDateFormat[] {
+                 new SimpleDateFormat("EEE, d MMM yy HH:mm:ss z", Locale.US),
+                 new SimpleDateFormat("EEE, d MMM yy HH:mm z", Locale.US),
+                 new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.US),
+                 new SimpleDateFormat("EEE, d MMM yyyy HH:mm z", Locale.US),
+                 new SimpleDateFormat("d MMM yy HH:mm z", Locale.US),
+                 new SimpleDateFormat("d MMM yy HH:mm:ss z", Locale.US),
+                 new SimpleDateFormat("d MMM yyyy HH:mm z", Locale.US),
+                 new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US)
+    };
+
+    /**
+     * new Date(String foo) is deprecated, so let's do this the hard way
+     *
+     * @param s non-null
+     * @return -1 on failure
+     */
+    public static long parse822Date(String s) {
+        for (int i = 0; i < rfc822DateFormats.length; i++) {
+            try {
+                Date date = rfc822DateFormats[i].parse(s);
+                if (date != null)
+                    return date.getTime();
+            } catch (ParseException pe) {}
+        }
+        return -1;
+    }
+
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
     private static final String VERSION_PREFIX = "version=\"";
     private void checkForUpdates() {
         _updateAvailable = false;
-        File news = new File(NEWS_FILE);
-        if ( (!news.exists()) || (news.length() <= 0) ) return;
+        if ( (!_newsFile.exists()) || (_newsFile.length() <= 0) ) return;
         FileInputStream in = null;
         try {
-            in = new FileInputStream(news);
-            StringBuffer buf = new StringBuffer(128);
+            in = new FileInputStream(_newsFile);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf)) {
                 int index = buf.indexOf(VERSION_PREFIX);
                 if (index == -1) {
@@ -220,13 +327,12 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         if (_log.shouldLog(Log.INFO))
             _log.info("News fetched from " + url + " with " + (alreadyTransferred+bytesTransferred));
         
-        File temp = new File(TEMP_NEWS_FILE);
         long now = _context.clock().now();
-        if (temp.exists()) {
-            boolean copied = FileUtil.copy(TEMP_NEWS_FILE, NEWS_FILE, true);
+        if (_tempFile.exists()) {
+            boolean copied = FileUtil.copy(_tempFile.getAbsolutePath(), _newsFile.getAbsolutePath(), true);
             if (copied) {
                 _lastUpdated = now;
-                temp.delete();
+                _tempFile.delete();
                 checkForUpdates();
             } else {
                 if (_log.shouldLog(Log.ERROR))
@@ -242,8 +348,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Failed to fetch the news from " + url);
-        File temp = new File(TEMP_NEWS_FILE);
-        temp.delete();
+        _tempFile.delete();
     }
     public void headerReceived(String url, int attemptNum, String key, String val) {}
     public void attempting(String url) {}

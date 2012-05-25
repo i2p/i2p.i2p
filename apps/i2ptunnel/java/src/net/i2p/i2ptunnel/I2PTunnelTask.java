@@ -73,6 +73,7 @@ public abstract class I2PTunnelTask implements EventDispatcher {
     public void reportAbuse(I2PSession session, int severity) {
     }
 
+    @Override
     public String toString() {
         return name;
     }

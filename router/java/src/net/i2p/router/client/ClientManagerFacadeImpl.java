@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -48,18 +49,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
     
     public void startup() {
         _log.info("Starting up the client subsystem");
-        String portStr = _context.router().getConfigSetting(PROP_CLIENT_PORT);
-        if (portStr != null) {
-            try {
-                int port = Integer.parseInt(portStr);
-                _manager = new ClientManager(_context, port);
-            } catch (NumberFormatException nfe) {
-                _log.error("Error setting the port: " + portStr + " is not valid", nfe);
-                _manager = new ClientManager(_context, DEFAULT_PORT);
-            }
-        } else {
-            _manager = new ClientManager(_context, DEFAULT_PORT);
-        }
+        int port = _context.getProperty(PROP_CLIENT_PORT, DEFAULT_PORT);
+        _manager = new ClientManager(_context, port);
     }    
     
     public void shutdown() {
@@ -74,7 +65,11 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             startup();
     }
     
+    @Override
+    public boolean isAlive() { return _manager != null && _manager.isAlive(); }
+
     private static final long MAX_TIME_TO_REBUILD = 10*60*1000;
+    @Override
     public boolean verifyClientLiveliness() {
         if (_manager == null) return true;
         boolean lively = true;
@@ -165,6 +160,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
 
+    @Override
     public boolean shouldPublishLeaseSet(Hash destinationHash) { return _manager.shouldPublishLeaseSet(destinationHash); }
     
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {
@@ -194,6 +190,20 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
     
+    /**
+     * Return the client's current manager or null if not connected
+     *
+     */
+    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+        if (_manager != null)
+            return _manager.getClientSessionKeyManager(dest);
+        else {
+            _log.error("Null manager on getClientSessionKeyManager!");
+            return null;
+        }
+    }
+    
+    @Override
     public void renderStatusHTML(Writer out) throws IOException { 
         if (_manager != null)
             _manager.renderStatusHTML(out); 
@@ -204,6 +214,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      *
      * @return set of Destination objects
      */
+    @Override
     public Set listClients() {
         if (_manager != null)
             return _manager.listClients();

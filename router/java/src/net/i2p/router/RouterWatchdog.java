@@ -3,6 +3,7 @@ package net.i2p.router;
 import net.i2p.data.DataHelper;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.ShellCommand;
 import net.i2p.util.Log;
 
 /**
@@ -13,6 +14,7 @@ import net.i2p.util.Log;
 class RouterWatchdog implements Runnable {
     private Log _log;
     private RouterContext _context;
+    private int _consecutiveErrors;
     
     private static final long MAX_JOB_RUN_LAG = 60*1000;
     
@@ -47,7 +49,15 @@ class RouterWatchdog implements Runnable {
     }
     
     private boolean shutdownOnHang() {
-        return Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "false")).booleanValue();
+        // prop default false
+        if (!Boolean.valueOf(_context.getProperty("watchdog.haltOnHang")).booleanValue())
+            return false;
+
+        // Client manager starts complaining after 10 minutes, and we run every minute,
+        // so this will restart 30 minutes after we lose a lease, if the wrapper is present.
+        if (_consecutiveErrors >= 20 && System.getProperty("wrapper.version") != null)
+            return true;
+        return false;
     }
     
     private void dumpStatus() {
@@ -80,6 +90,21 @@ class RouterWatchdog implements Runnable {
                 r = rs.getRate(60*1000);
             double kbps = (r != null ? r.getAverageValue() : 0);
             _log.error("Outbound send rate: " + kbps + "KBps");
+            long max = Runtime.getRuntime().maxMemory();
+            long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            _log.error("Memory: " + DataHelper.formatSize(used) + '/' + DataHelper.formatSize(max));
+            if (_consecutiveErrors == 1) {
+                _log.log(Log.CRIT, "Router appears hung, or there is severe network congestion.  Watchdog starts barking!");
+                // This works on linux...
+                // It won't on windows, and we can't call i2prouter.bat either, it does something
+                // completely different...
+                if (System.getProperty("wrapper.version") != null && !System.getProperty("os.name").startsWith("Win")) {
+                    ShellCommand sc = new ShellCommand();
+                    boolean success = sc.executeSilentAndWaitTimed("./i2prouter dump", 10);
+                    if (success)
+                        _log.log(Log.CRIT, "Threads dumped to wrapper log");
+                }
+            }
         }
     }
     
@@ -103,10 +128,13 @@ class RouterWatchdog implements Runnable {
 
         ok = ok && (verifyClientLiveliness() || netErrors >= 5);
         
-        if (!ok) {
+        if (ok) {
+            _consecutiveErrors = 0;
+        } else {
+            _consecutiveErrors++;
             dumpStatus();
             if (shutdownOnHang()) {
-                _log.log(Log.CRIT, "Router hung!  hard restart!");
+                _log.log(Log.CRIT, "Router hung!  Restart forced by watchdog!");
                 try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
                 // halt and not system.exit, since some of the shutdown hooks might be misbehaving
                 Runtime.getRuntime().halt(Router.EXIT_HARD_RESTART);

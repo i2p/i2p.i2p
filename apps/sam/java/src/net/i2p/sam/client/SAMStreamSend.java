@@ -31,10 +31,10 @@ public class SAMStreamSend {
     private OutputStream _samOut;
     private InputStream _samIn;
     private SAMReader _reader;
-    private boolean _dead;
+    //private boolean _dead;
     private SAMEventHandler _eventHandler;
     /** Connection id (Integer) to peer (Flooder) */
-    private Map _remotePeers;
+    private Map<Integer, Sender> _remotePeers;
     
     public static void main(String args[]) {
         if (args.length < 4) {
@@ -42,7 +42,7 @@ public class SAMStreamSend {
             return;
         }
         I2PAppContext ctx = new I2PAppContext();
-        String files[] = new String[args.length - 3];
+        //String files[] = new String[args.length - 3];
         SAMStreamSend sender = new SAMStreamSend(ctx, args[0], args[1], args[2], args[3]);
         sender.startup();
     }
@@ -50,14 +50,14 @@ public class SAMStreamSend {
     public SAMStreamSend(I2PAppContext ctx, String samHost, String samPort, String destFile, String dataFile) {
         _context = ctx;
         _log = ctx.logManager().getLog(SAMStreamSend.class);
-        _dead = false;
+        //_dead = false;
         _samHost = samHost;
         _samPort = samPort;
         _destFile = destFile;
         _dataFile = dataFile;
         _conOptions = "";
         _eventHandler = new SendEventHandler(_context);
-        _remotePeers = new HashMap();
+        _remotePeers = new HashMap<Integer,Sender>();
     }
     
     public void startup() {
@@ -207,7 +207,6 @@ public class SAMStreamSend {
             _started = _context.clock().now();
             _context.statManager().addRateData("send." + _connectionId + ".started", 1, 0);
             byte data[] = new byte[1024];
-            long value = 0;
             long lastSend = _context.clock().now();
             while (!_closed) {
                 try {

@@ -73,7 +73,7 @@ public class I2PSnarkUtil {
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
-        _tmpDir = new File("tmp", "i2psnark");
+        _tmpDir = new File(ctx.getTempDir(), "i2psnark");
         FileUtil.rmdir(_tmpDir, false);
         _tmpDir.mkdirs();
     }

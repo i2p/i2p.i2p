@@ -5,14 +5,17 @@
     <target name="builddep">
         <ant dir="../jetty/" target="build" />
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile">
         <javac 
             srcdir="./src/src"
             debug="true" deprecation="off" source="1.5" target="1.5" 
             destdir="./src/WEB-INF/classes">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../core/java/build/i2p.jar" />
             </classpath>
         </javac>
     </target>

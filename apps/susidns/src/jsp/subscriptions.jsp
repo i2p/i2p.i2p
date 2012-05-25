@@ -35,9 +35,10 @@
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
+<div class="page">
 <div id="logo">
 <img src="images/logo.png" alt="susidns logo" border="0"/>
-</div>
+</div><hr>
 <div id="navi">
 <p>addressbooks
 <a href="addressbook.jsp?book=master">master</a> |
@@ -48,7 +49,7 @@ subscriptions *
 <a href="config.jsp">configuration</a> *
 <a href="index.jsp">overview</a>
 </p>
-</div>
+</div><hr>
 <div id="headline">
 <h3>${subs.fileName}</h3>
 </div>
@@ -71,9 +72,10 @@ regularly (once per hour) checks this list for new eepsites. Those URLs simply c
 file of other people. The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.
 So it is a good idea to add additional subscriptions to sites that have the latest addresses.
 </p>
-</div>
+</div><hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+</div>
 </div>
 </body>
 </html>

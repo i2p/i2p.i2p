@@ -196,7 +196,7 @@ public class I2PSocketManagerFactory {
     }
 
     private static String getHost() {
-        return System.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        return System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     }
     private static int getPort() {
         int i2cpPort = 7654;

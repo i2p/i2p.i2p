@@ -104,7 +104,7 @@ public class Hash extends DataStructureImpl {
             }
             if (_log.shouldLog(Log.DEBUG)) {
                 // explicit buffer, since the compiler can't guess how long it'll be
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("miss [").append(cached).append("] from ");
                 buf.append(DataHelper.toHexString(getData())).append(" to ");
                 buf.append(DataHelper.toHexString(key.getData()));
@@ -113,7 +113,7 @@ public class Hash extends DataStructureImpl {
         } else {
             if (_log.shouldLog(Log.DEBUG)) {
                 // explicit buffer, since the compiler can't guess how long it'll be
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("hit from ");
                 buf.append(DataHelper.toHexString(getData())).append(" to ");
                 buf.append(DataHelper.toHexString(key.getData()));
@@ -155,7 +155,7 @@ public class Hash extends DataStructureImpl {
     @Override
     public String toString() {
         if (_stringified == null) {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("[Hash: ");
             if (_data == null) {
                 buf.append("null hash");

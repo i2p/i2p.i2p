@@ -25,7 +25,7 @@ public class IntroductionManager {
     /** map of relay tag to PeerState that should receive the introduction */
     private Map _outbound;
     /** list of peers (PeerState) who have given us introduction tags */
-    private List _inbound;
+    private final List _inbound;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -34,9 +34,9 @@ public class IntroductionManager {
         _builder = new PacketBuilder(ctx, transport);
         _outbound = Collections.synchronizedMap(new HashMap(128));
         _inbound = new ArrayList(128);
-        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", new long[] { 10*60*1000 });
-        ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", new long[] { 10*60*1000 });
-        ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", new long[] { 10*60*1000 });
+        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
+        ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
+        ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
     }
     
     public void reset() {
@@ -157,7 +157,7 @@ public class IntroductionManager {
         return found;
     }
     
-    public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
+    public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {// LINT -- Exporting non-public type through public API
         if (_context.router().isHidden())
             return;
         if (_log.shouldLog(Log.INFO))
@@ -166,7 +166,7 @@ public class IntroductionManager {
         _transport.send(_builder.buildHolePunch(reader));
     }
     
-    public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
+    public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {// LINT -- Exporting non-public type through public API
         if (_context.router().isHidden())
             return;
         long tag = reader.getRelayRequestReader().readTag();

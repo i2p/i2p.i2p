@@ -44,6 +44,7 @@ public class CapacityCalculator extends Calculator {
     /** the calculator estimates over a 1 hour period */
     private static long ESTIMATE_PERIOD = 60*60*1000;
     
+    @Override
     public double calc(PeerProfile profile) {
         RateStat acceptStat = profile.getTunnelCreateResponseTime();
         RateStat rejectStat = profile.getTunnelHistory().getRejectionRate();

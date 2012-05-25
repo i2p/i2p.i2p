@@ -18,6 +18,12 @@ import java.util.zip.ZipFile;
 /**
  * General helper methods for messing with files
  *
+ * These are static methods that do NOT convert arguments
+ * to absolute paths for a particular context and directtory.
+ *
+ * Callers should ALWAYS provide absolute paths as arguments,
+ * and should NEVER assume files are in the current working directory.
+ *
  */
 public class FileUtil {
     /**
@@ -70,9 +76,10 @@ public class FileUtil {
     }
     
     public static boolean extractZip(File zipfile, File targetDir) {
+        ZipFile zip = null;
         try {
             byte buf[] = new byte[16*1024];
-            ZipFile zip = new ZipFile(zipfile);
+            zip = new ZipFile(zipfile);
             Enumeration entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
@@ -118,13 +125,16 @@ public class FileUtil {
                     }
                 }
             }
-            zip.close();
             return true;
         } catch (IOException ioe) {
             System.err.println("ERROR: Unable to extract the zip file");
             ioe.printStackTrace();
             return false;
-        } 
+        } finally {
+            if (zip != null) {
+                try { zip.close(); } catch (IOException ioe) {}
+            }
+        }
     }
     
     /**
@@ -142,7 +152,7 @@ public class FileUtil {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(f);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             List lines = new ArrayList(maxNumLines > 0 ? maxNumLines : 64);
             String line = null;
             while ( (line = in.readLine()) != null) {
@@ -154,7 +164,7 @@ public class FileUtil {
                         lines.remove(0);
                 }
             }
-            StringBuffer buf = new StringBuffer(lines.size() * 80);
+            StringBuilder buf = new StringBuilder(lines.size() * 80);
             for (int i = 0; i < lines.size(); i++)
                 buf.append((String)lines.get(i)).append('\n');
             return buf.toString();
@@ -195,9 +205,18 @@ public class FileUtil {
         }
     }
 
-    
-    /** return true if it was copied successfully */
+    /**
+      * @return true if it was copied successfully
+      */
     public static boolean copy(String source, String dest, boolean overwriteExisting) {
+        return copy(source, dest, overwriteExisting, false);
+    }
+
+    /**
+      * @param quiet don't log fails to wrapper log if true
+      * @return true if it was copied successfully
+      */
+    public static boolean copy(String source, String dest, boolean overwriteExisting, boolean quiet) {
         File src = new File(source);
         File dst = new File(dest);
 
@@ -220,7 +239,8 @@ public class FileUtil {
             out.close();
             return true;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            if (!quiet)
+                ioe.printStackTrace();
             return false;
         }
     }

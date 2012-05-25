@@ -6,7 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import net.i2p.router.RouterContext;
-import net.i2p.router.admin.StatsGenerator;
 
 public class OldConsoleHelper extends HelperBase {
     public OldConsoleHelper() {}
@@ -22,7 +21,7 @@ public class OldConsoleHelper extends HelperBase {
                 return baos.toString();
             }
         } catch (IOException ioe) {
-            return "<b>Error rending the console</b>";
+            return "<b>Error displaying the console.</b>";
         }
     }
     
@@ -38,7 +37,7 @@ public class OldConsoleHelper extends HelperBase {
                 return baos.toString();
             }
         } catch (IOException ioe) {
-            return "<b>Error rending the console</b>";
+            return "<b>Error displaying the console.</b>";
         }
     }
 }

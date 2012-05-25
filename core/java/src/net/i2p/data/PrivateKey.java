@@ -77,7 +77,7 @@ public class PrivateKey extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[PrivateKey: ");
         if (_data == null) {
             buf.append("null key");

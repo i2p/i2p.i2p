@@ -34,6 +34,7 @@ public class ShellCommand {
     private static final boolean NO_WAIT_FOR_EXIT_STATUS = false;
 
     private boolean       _commandSuccessful;
+    private boolean       _commandCompleted;
     private CommandThread _commandThread;
     private InputStream   _errorStream;
     private InputStream   _inputStream;
@@ -43,6 +44,8 @@ public class ShellCommand {
 
     /**
      * Executes a shell command in its own thread.
+     * Use caution when repeatedly calling execute methods with the same object
+     * as there are some globals here...
      * 
      * @author hypercubus
      */
@@ -57,11 +60,16 @@ public class ShellCommand {
             this.caller = caller;
             this.shellCommand = shellCommand;
             this.consumeOutput = consumeOutput;
+            _commandSuccessful = false;
+            _commandCompleted = false;
         }
 
         @Override
         public void run() {
+            // FIXME these will corrupt the globals if the command times out and the caller
+            // makes another request with the same object.
             _commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
+            _commandCompleted = true;
             if (_isTimerRunning) {
                 synchronized(caller) {
                     caller.notifyAll();  // In case the caller is still in the wait() state.
@@ -248,7 +256,8 @@ public class ShellCommand {
                 _isTimerRunning = true;
                 wait(seconds * 1000);
                 _isTimerRunning = false;
-                return true;
+                if (!_commandCompleted)
+                    return true;
             }
 
         } catch (InterruptedException e) {
@@ -317,7 +326,8 @@ public class ShellCommand {
                 _isTimerRunning = true;
                 wait(seconds * 1000);
                 _isTimerRunning = false;
-                return true;
+                if (!_commandCompleted)
+                    return true;
             }
 
         } catch (InterruptedException e) {

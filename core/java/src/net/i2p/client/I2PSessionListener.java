@@ -20,7 +20,7 @@ public interface I2PSessionListener {
      * size # of bytes.
      * @param session session to notify
      * @param msgId message number available
-     * @param size size of the message
+     * @param size size of the message - why it's a long and not an int is a mystery
      */
     void messageAvailable(I2PSession session, int msgId, long size);
 

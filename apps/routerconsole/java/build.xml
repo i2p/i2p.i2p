@@ -40,6 +40,7 @@
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
         </dependset>
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="prepare, depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -47,6 +48,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
@@ -73,8 +75,9 @@
         <ant target="war" />
     </target>
     <target name="war" depends="precompilejsp">
+        <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, *.java, *.jsp, web-fragment.xml">
+             basedir="../jsp/" excludes="web.xml, *.css, *.java, *.jsp, web-fragment.xml">
         </war>
     </target>
     <target name="precompilejsp" unless="precompilejsp.uptodate">
@@ -84,7 +87,7 @@
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
-        <java classname="org.apache.jasper.JspC" fork="true">
+        <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
@@ -114,11 +117,13 @@
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                destdir="../jsp/WEB-INF/classes/" 
                srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
@@ -140,7 +145,7 @@
     </target>
 
     <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
-        <srcfiles dir= "../jsp" includes="**/*.jsp, **/*.html, susimail/susimail, web.xml"/>
+        <srcfiles dir= "../jsp" includes="**/*.jsp, **/*.html, *.css, susimail/susimail, web.xml"/>
     </uptodate>
 
     <target name="javadoc">

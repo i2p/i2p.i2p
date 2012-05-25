@@ -1,9 +1,9 @@
 package net.i2p.router.transport;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -34,7 +34,10 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages
@@ -44,11 +47,13 @@ public abstract class TransportImpl implements Transport {
     private Log _log;
     private TransportEventListener _listener;
     private RouterAddress _currentAddress;
-    private List _sendPool;
+    private final List _sendPool;
     protected RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
-    private Map _unreachableEntries;
-    private Set _wasUnreachableEntries;
+    private final Map<Hash, Long>  _unreachableEntries;
+    private Set<Hash> _wasUnreachableEntries;
+    /** global router ident -> IP */
+    private static Map<Hash, byte[]> _IPMap = new ConcurrentHashMap(128);
 
     /**
      * Initialize the new transport
@@ -57,7 +62,7 @@ public abstract class TransportImpl implements Transport {
     public TransportImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(TransportImpl.class);
-        
+
         _context.statManager().createRateStat("transport.sendMessageFailureLifetime", "How long the lifetime of messages that fail are?", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.sendMessageSize", "How large are the messages sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.receiveMessageSize", "How large are the messages received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -67,13 +72,19 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
         _unreachableEntries = new HashMap(16);
-        _wasUnreachableEntries = new HashSet(16);
+        _wasUnreachableEntries = new ConcurrentHashSet(16);
         _currentAddress = null;
+        SimpleScheduler.getInstance().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
-    
+
     /**
-     * How many peers can we talk to right now?
-     *
+     * How many peers are we connected to?
+     * For NTCP, this is the same as active,
+     * but SSU actually looks at idle time for countActivePeers()
+     */
+    public int countPeers() { return countActivePeers(); }
+    /**
+     * How many peers active in the last few minutes?
      */
     public int countActivePeers() { return 0; }
     /**
@@ -100,25 +111,36 @@ public abstract class TransportImpl implements Transport {
                 ! ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                 def = MAX_CONNECTION_FACTOR * (1 + bw - Router.CAPABILITY_BW12);
         }
+        // increase limit for SSU, for now
+        if (style.equals("udp"))
+            def = def * 3 / 2;
         return _context.getProperty("i2np." + style + ".maxConnections", def);
     }
 
+    private static final int DEFAULT_CAPACITY_PCT = 75;
     /**
      * Can we initiate or accept a connection to another peer, saving some margin
      */
-    public boolean haveCapacity() { return true; }
-    
+    public boolean haveCapacity() {
+        return haveCapacity(DEFAULT_CAPACITY_PCT);
+    }
+
+    /** @param pct are we under x% 0-100 */
+    public boolean haveCapacity(int pct) {
+        return countPeers() < getMaxConnections() * pct / 100;
+    }
+
     /**
      * Return our peer clock skews on a transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
      * Dummy version. Transports override it.
      */
     public Vector getClockSkews() { return new Vector(); }
-    
+
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     /**
      * Nonblocking call to pull the next outbound message
-     * off the queue.  
+     * off the queue.
      *
      * @return the next message or null if none are available
      */
@@ -131,7 +153,7 @@ public abstract class TransportImpl implements Transport {
         msg.beginSend();
         return msg;
     }
-    
+
     /**
      * The transport is done sending this message
      *
@@ -163,7 +185,7 @@ public abstract class TransportImpl implements Transport {
     }
     /**
      * The transport is done sending this message.  This is the method that actually
-     * does all of the cleanup - firing off jobs, requeueing, updating stats, etc. 
+     * does all of the cleanup - firing off jobs, requeueing, updating stats, etc.
      *
      * @param msg message in question
      * @param sendSuccessful true if the peer received it
@@ -176,64 +198,64 @@ public abstract class TransportImpl implements Transport {
             msg.timestamp("afterSend(successful)");
         else
             msg.timestamp("afterSend(failed)");
-        
+
         if (!sendSuccessful)
             msg.transportFailed(getStyle());
 
         if (msToSend > 1000) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("afterSend slow: [success=" + sendSuccessful + "] " + msg.getMessageSize() + "byte " 
-                          + msg.getMessageType() + " " + msg.getMessageId() + " to " 
-                          + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + " took " + msToSend 
+                _log.warn("afterSend slow: [success=" + sendSuccessful + "] " + msg.getMessageSize() + "byte "
+                          + msg.getMessageType() + " " + msg.getMessageId() + " to "
+                          + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + " took " + msToSend
                           + "/" + msg.getTransmissionTime());
         }
-        //if (true) 
+        //if (true)
         //    _log.error("(not error) I2NP message sent? " + sendSuccessful + " " + msg.getMessageId() + " after " + msToSend + "/" + msg.getTransmissionTime());
-        
+
         long lifetime = msg.getLifetime();
         if (lifetime > 3000) {
             int level = Log.WARN;
             if (!sendSuccessful)
                 level = Log.INFO;
             if (_log.shouldLog(level))
-                _log.log(level, "afterSend slow (" + lifetime + "/" + msToSend + "/" + msg.getTransmissionTime() + "): [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte " 
-                          + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6) 
+                _log.log(level, "afterSend slow (" + lifetime + "/" + msToSend + "/" + msg.getTransmissionTime() + "): [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte "
+                          + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + ": " + msg.toString());
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("afterSend: [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte " 
-                          + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6) 
+                _log.info("afterSend: [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte "
+                          + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + "\n" + msg.toString());
         }
 
         if (sendSuccessful) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Send message " + msg.getMessageType() + " to " 
-                           + msg.getTarget().getIdentity().getHash().toBase64() + " with transport " 
+                _log.debug("Send message " + msg.getMessageType() + " to "
+                           + msg.getTarget().getIdentity().getHash().toBase64() + " with transport "
                            + getStyle() + " successfully");
             Job j = msg.getOnSendJob();
-            if (j != null) 
+            if (j != null)
                 _context.jobQueue().addJob(j);
             log = true;
             msg.discardData();
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Failed to send message " + msg.getMessageType() 
-                          + " to " + msg.getTarget().getIdentity().getHash().toBase64() 
+                _log.info("Failed to send message " + msg.getMessageType()
+                          + " to " + msg.getTarget().getIdentity().getHash().toBase64()
                           + " with transport " + getStyle() + " (details: " + msg + ")");
             if (msg.getExpiration() < _context.clock().now())
                 _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime, lifetime);
-            
+
             if (allowRequeue) {
-                if ( ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) 
+                if ( ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) )
                      && (msg.getMessage() != null) ) {
                     // this may not be the last transport available - keep going
                     _context.outNetMessagePool().add(msg);
                     // don't discard the data yet!
                 } else {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("No more time left (" + new Date(msg.getExpiration()) 
-                                  + ", expiring without sending successfully the " 
+                        _log.info("No more time left (" + new Date(msg.getExpiration())
+                                  + ", expiring without sending successfully the "
                                   + msg.getMessageType());
                     if (msg.getOnFailedSendJob() != null)
                         _context.jobQueue().addJob(msg.getOnFailedSendJob());
@@ -247,8 +269,8 @@ public abstract class TransportImpl implements Transport {
             } else {
                 MessageSelector selector = msg.getReplySelector();
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Failed and no requeue allowed for a " 
-                              + msg.getMessageSize() + " byte " 
+                    _log.info("Failed and no requeue allowed for a "
+                              + msg.getMessageSize() + " byte "
                               + msg.getMessageType() + " message with selector " + selector, new Exception("fail cause"));
                 if (msg.getOnFailedSendJob() != null)
                     _context.jobQueue().addJob(msg.getOnFailedSendJob());
@@ -265,9 +287,9 @@ public abstract class TransportImpl implements Transport {
             String type = msg.getMessageType();
             // the udp transport logs some further details
             /*
-            _context.messageHistory().sendMessage(type, msg.getMessageId(), 
+            _context.messageHistory().sendMessage(type, msg.getMessageId(),
                                                   msg.getExpiration(),
-                                                  msg.getTarget().getIdentity().getHash(), 
+                                                  msg.getTarget().getIdentity().getHash(),
                                                   sendSuccessful);
              */
         }
@@ -277,23 +299,23 @@ public abstract class TransportImpl implements Transport {
         long allTime = now - msg.getCreated();
         if (allTime > 5*1000) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Took too long from preperation to afterSend(ok? " + sendSuccessful 
-                          + "): " + allTime + "ms/" + sendTime + "ms after failing on: " 
+                _log.info("Took too long from preperation to afterSend(ok? " + sendSuccessful
+                          + "): " + allTime + "ms/" + sendTime + "ms after failing on: "
                           + msg.getFailedTransports() + " and succeeding on " + getStyle());
             if ( (allTime > 60*1000) && (sendSuccessful) ) {
                 // WTF!!@#
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("WTF, more than a minute slow? " + msg.getMessageType() 
-                              + " of id " + msg.getMessageId() + " (send begin on " 
-                              + new Date(msg.getSendBegin()) + " / created on " 
+                    _log.warn("WTF, more than a minute slow? " + msg.getMessageType()
+                              + " of id " + msg.getMessageId() + " (send begin on "
+                              + new Date(msg.getSendBegin()) + " / created on "
                               + new Date(msg.getCreated()) + "): " + msg, msg.getCreatedBy());
-                _context.messageHistory().messageProcessingError(msg.getMessageId(), 
-                                                                 msg.getMessageType(), 
+                _context.messageHistory().messageProcessingError(msg.getMessageId(),
+                                                                 msg.getMessageType(),
                                                                  "Took too long to send [" + allTime + "ms]");
             }
         }
 
-        
+
         if (sendSuccessful) {
             _context.statManager().addRateData("transport.sendProcessingTime", lifetime, lifetime);
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), getStyle(), sendTime, msg.getMessageSize());
@@ -303,7 +325,7 @@ public abstract class TransportImpl implements Transport {
             _context.statManager().addRateData("transport.sendMessageFailureLifetime", lifetime, lifetime);
         }
     }
-    
+
     /**
      * Asynchronously send the message as requested in the message and, if the
      * send is successful, queue up any msg.getOnSendJob job, and register it
@@ -319,14 +341,14 @@ public abstract class TransportImpl implements Transport {
         }
         boolean duplicate = false;
         synchronized (_sendPool) {
-            if (_sendPool.contains(msg)) 
+            if (_sendPool.contains(msg))
                 duplicate = true;
             else
                 _sendPool.add(msg);
         }
         if (duplicate) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Message already is in the queue?  wtf.  msg = " + msg, 
+                _log.error("Message already is in the queue?  wtf.  msg = " + msg,
                            new Exception("wtf, requeued?"));
         }
 
@@ -342,20 +364,20 @@ public abstract class TransportImpl implements Transport {
      * and it should not block
      */
     protected abstract void outboundMessageReady();
-    
+
     /**
      * Message received from the I2NPMessageReader - send it to the listener
      *
      */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
-        //if (true) 
+        //if (true)
         //    _log.error("(not error) I2NP message received: " + inMsg.getUniqueId() + " after " + msToReceive);
-        
+
         int level = Log.INFO;
         if (msToReceive > 5000)
             level = Log.WARN;
         if (_log.shouldLog(level)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Message received: ").append(inMsg.getClass().getName());
             buf.append(" / ").append(inMsg.getUniqueId());
             buf.append(" in ").append(msToReceive).append("ms containing ");
@@ -381,7 +403,7 @@ public abstract class TransportImpl implements Transport {
             _context.profileManager().messageReceived(remoteIdentHash, getStyle(), msToReceive, bytesReceived);
             _context.statManager().addRateData("transport.receiveMessageSize", bytesReceived, msToReceive);
         }
-        
+
         _context.statManager().addRateData("transport.receiveMessageTime", msToReceive, msToReceive);
         if (msToReceive > 1000) {
             _context.statManager().addRateData("transport.receiveMessageTimeSlow", msToReceive, msToReceive);
@@ -390,7 +412,7 @@ public abstract class TransportImpl implements Transport {
         //// this functionality is built into the InNetMessagePool
         //String type = inMsg.getClass().getName();
         //MessageHistory.getInstance().receiveMessage(type, inMsg.getUniqueId(), inMsg.getMessageExpiration(), remoteIdentHash, true);
-            
+
         if (_listener != null) {
             _listener.messageReceived(inMsg, remoteIdent, remoteIdentHash);
         } else {
@@ -398,9 +420,9 @@ public abstract class TransportImpl implements Transport {
                 _log.error("WTF! Null listener! this = " + toString(), new Exception("Null listener"));
         }
     }
- 	
+
     /** What addresses are we currently listening to? */
-    public RouterAddress getCurrentAddress() { 
+    public RouterAddress getCurrentAddress() {
         return _currentAddress;
     }
     /**
@@ -415,19 +437,51 @@ public abstract class TransportImpl implements Transport {
         if ("SSU".equals(getStyle()))
             _context.commSystem().notifyReplaceAddress(address);
     }
-    
+
+    /**
+     *  Notify a transport of an external address change.
+     *  This may be from a local interface, UPnP, a config change, etc.
+     *  This should not be called if the ip didn't change
+     *  (from that source's point of view), or is a local address,
+     *  or if the ip is IPv6, but the transport should check anyway.
+     *  The transport should also do its own checking on whether to accept
+     *  notifications from this source.
+     *
+     *  This can be called before startListening() to set an initial address,
+     *  or after the transport is running.
+     *
+     *  @param source defined in Transport.java
+     *  @param ip typ. IPv4 non-local
+     *  @param port 0 for unknown or unchanged
+     */
+    public void externalAddressReceived(String source, byte[] ip, int port) {}
+
+    /**
+     *  Notify a transport of the results of trying to forward a port
+     */
+    public void forwardPortStatus(int port, boolean success, String reason) {}
+
+    /**
+     * What port would the transport like to have forwarded by UPnP.
+     * This can't be passed via getCurrentAddress(), as we have to open the port
+     * before we can publish the address.
+     *
+     * @return port or -1 for none or 0 for any
+     */
+    public int getRequestedPort() { return -1; }
+
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }
     /** Make this stuff pretty (only used in the old console) */
     public void renderStatusHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
-    
+
     public RouterContext getContext() { return _context; }
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
     public void recheckReachability() {}
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
-    
+
     private static final long UNREACHABLE_PERIOD = 5*60*1000;
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
@@ -461,13 +515,10 @@ public abstract class TransportImpl implements Transport {
         if (!isInbound)
             markWasUnreachable(peer, false);
     }
-    private class CleanupUnreachable extends JobImpl {
-        public CleanupUnreachable(RouterContext ctx) {
-            super(ctx);
-        }
-        public String getName() { return "Cleanup " + getStyle() + " unreachable list"; }
-        public void runJob() {
-            long now = getContext().clock().now();
+
+    private class CleanupUnreachable implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            long now = _context.clock().now();
             synchronized (_unreachableEntries) {
                 for (Iterator iter = _unreachableEntries.keySet().iterator(); iter.hasNext(); ) {
                     Hash peer = (Hash)iter.next();
@@ -476,7 +527,6 @@ public abstract class TransportImpl implements Transport {
                         iter.remove();
                 }
             }
-            requeue(60*1000);
         }
     }
 
@@ -485,10 +535,8 @@ public abstract class TransportImpl implements Transport {
      * This is NOT reset if the peer contacts us and it is never expired.
      */
     public boolean wasUnreachable(Hash peer) {
-        synchronized (_wasUnreachableEntries) {
-            if (_wasUnreachableEntries.contains(peer))
-                return true;
-        }
+        if (_wasUnreachableEntries.contains(peer))
+            return true;
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return false;
@@ -498,25 +546,33 @@ public abstract class TransportImpl implements Transport {
      * Maintain the WasUnreachable list
      */
     public void markWasUnreachable(Hash peer, boolean yes) {
-        synchronized (_wasUnreachableEntries) {
-            if (yes)
-                _wasUnreachableEntries.add(peer);
-            else
-                _wasUnreachableEntries.remove(peer);
-        }
+        if (yes)
+            _wasUnreachableEntries.add(peer);
+        else
+            _wasUnreachableEntries.remove(peer);
         if (_log.shouldLog(Log.WARN))
             _log.warn(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
+    }
+
+    public void setIP(Hash peer, byte[] ip) {
+        _IPMap.put(peer, ip);
+        _context.commSystem().queueLookup(ip);
+    }
+
+    public static byte[] getIP(Hash peer) {
+        return _IPMap.get(peer);
     }
 
     public static boolean isPubliclyRoutable(byte addr[]) {
         if (addr.length == 4) {
             if ((addr[0]&0xFF) == 127) return false;
-            if ((addr[0]&0xFF) == 10) return false; 
+            if ((addr[0]&0xFF) == 10) return false;
             if ( ((addr[0]&0xFF) == 172) && ((addr[1]&0xFF) >= 16) && ((addr[1]&0xFF) <= 31) ) return false;
             if ( ((addr[0]&0xFF) == 192) && ((addr[1]&0xFF) == 168) ) return false;
             if ((addr[0]&0xFF) >= 224) return false; // no multicast
             if ((addr[0]&0xFF) == 0) return false;
             if ( ((addr[0]&0xFF) == 169) && ((addr[1]&0xFF) == 254) ) return false;
+            if ((addr[0]&0xFF) == 5) return false;  // Hamachi
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             return false;

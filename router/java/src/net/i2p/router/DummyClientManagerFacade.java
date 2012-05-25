@@ -8,6 +8,7 @@ package net.i2p.router;
  *
  */
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -40,6 +41,7 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {}
     
     public SessionConfig getClientSessionConfig(Destination _dest) { return null; }
+    public SessionKeyManager getClientSessionKeyManager(Destination _dest) { return null; }
     
     public void requestLeaseSet(Hash dest, LeaseSet set) {}
     

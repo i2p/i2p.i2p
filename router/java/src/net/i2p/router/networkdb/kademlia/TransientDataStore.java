@@ -10,9 +10,7 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,14 +35,27 @@ class TransientDataStore implements DataStore {
             _log.info("Data Store initialized");
     }
     
-    public void restart() {
+    public boolean isInitialized() { return true; }
+
+    public void stop() {
         _data.clear();
     }
     
+    public void restart() {
+        stop();
+    }
+    
+    public void rescan() {}
+
     public Set getKeys() {
         return new HashSet(_data.keySet());
     }
     
+    /** for PersistentDataStore only - don't use here */
+    public DataStructure get(Hash key, boolean persist) {
+        throw new IllegalArgumentException("no");
+    }
+
     public DataStructure get(Hash key) {
         return _data.get(key);
     }
@@ -67,6 +78,11 @@ class TransientDataStore implements DataStore {
     /** don't accept tunnels set to expire more than 3 hours in the future, which is insane */
     private final static long MAX_FUTURE_EXPIRATION_DATE = KademliaNetworkDatabaseFacade.MAX_LEASE_FUTURE;
     
+    /** for PersistentDataStore only - don't use here */
+    public void put(Hash key, DataStructure data, boolean persist) {
+        throw new IllegalArgumentException("no");
+    }
+
     public void put(Hash key, DataStructure data) {
         if (data == null) return;
         if (_log.shouldLog(Log.DEBUG))
@@ -119,16 +135,19 @@ class TransientDataStore implements DataStore {
         }
     }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(_data);
     }
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || (obj.getClass() != getClass()) ) return false;
         TransientDataStore ds = (TransientDataStore)obj;
         return DataHelper.eq(ds._data, _data);
     }
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Transient DataStore: ").append(_data.size()).append("\nKeys: ");
         for (Map.Entry<Hash, DataStructure> e : _data.entrySet()) {
             Hash key = e.getKey();
@@ -139,8 +158,9 @@ class TransientDataStore implements DataStore {
         return buf.toString();
     }
     
-    public DataStructure removeLease(Hash key) {
-        return remove(key);
+    /** for PersistentDataStore only - don't use here */
+    public DataStructure remove(Hash key, boolean persist) {
+        throw new IllegalArgumentException("no");
     }
 
     public DataStructure remove(Hash key) {

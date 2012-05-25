@@ -6,7 +6,7 @@ import java.util.Properties;
  * Define the configuration for streaming and verifying data on the socket.
  *
  */
-class I2PSocketOptionsImpl implements I2PSocketOptions {
+public class I2PSocketOptionsImpl implements I2PSocketOptions {
     private long _connectTimeout;
     private long _readTimeout;
     private long _writeTimeout;
@@ -53,7 +53,7 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
         _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
     }
     
-    protected int getInt(Properties opts, String name, int defaultVal) {
+    protected static int getInt(Properties opts, String name, int defaultVal) {
         if (opts == null) return defaultVal;
         String val = opts.getProperty(name);
         if (val == null) {

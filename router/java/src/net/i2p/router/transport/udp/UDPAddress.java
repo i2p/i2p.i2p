@@ -40,8 +40,9 @@ public class UDPAddress {
         parse(addr);
     }
     
+    @Override
     public String toString() {
-        StringBuffer rv = new StringBuffer(64);
+        StringBuilder rv = new StringBuilder(64);
         if (_introHosts != null) {
             for (int i = 0; i < _introHosts.length; i++) {
                 rv.append("ssu://");

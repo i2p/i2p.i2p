@@ -145,7 +145,7 @@ public class Destination extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[Destination: ");
         buf.append("\n\tHash: ").append(calculateHash().toBase64());
         buf.append("\n\tPublic Key: ").append(getPublicKey());

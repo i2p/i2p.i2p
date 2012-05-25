@@ -33,7 +33,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
     /** how many bytes total have been pulled off the given queue */
     private long _bytesTransferred[];
     /** lock to notify message enqueue/removal (and block for getNext()) */
-    private Object _nextLock;
+    private final Object _nextLock;
     /** have we shut down or are we still alive? */
     private boolean _alive;
     /** which queue should we pull out of next */
@@ -76,8 +76,8 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
         _nextQueue = 0;
         _chokedPeers = Collections.synchronizedSet(new HashSet(16));
         _listener = lsnr;
-        _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.messageQueueSize", "How many messages are on the current class queue at removal", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.messageQueueSize", "How many messages are on the current class queue at removal", "udp", UDPTransport.RATES);
         _expirer = new Expirer();
         I2PThread t = new I2PThread(_expirer, "UDP outbound expirer");
         t.setDaemon(true);

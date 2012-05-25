@@ -10,7 +10,7 @@ public class ConfigAdvancedHelper extends HelperBase {
     public ConfigAdvancedHelper() {}
     
     public String getSettings() {
-        StringBuffer buf = new StringBuffer(4*1024);
+        StringBuilder buf = new StringBuilder(4*1024);
         Set names = _context.router().getConfigSettings();
         TreeSet sortedNames = new TreeSet(names);
         for (Iterator iter = sortedNames.iterator(); iter.hasNext(); ) {

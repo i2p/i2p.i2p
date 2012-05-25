@@ -1,0 +1,3 @@
+To start I2P, run:
+
+$INSTALL_PATH/i2prouter start

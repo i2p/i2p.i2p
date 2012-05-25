@@ -17,6 +17,7 @@ public class IntegrationCalculator extends Calculator {
         _log = context.logManager().getLog(IntegrationCalculator.class);
     }
     
+    @Override
     public double calc(PeerProfile profile) {
         // give more weight to recent counts
         long val = profile.getDbIntroduction().getRate(24*60*60*1000l).getCurrentEventCount();

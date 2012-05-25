@@ -47,7 +47,7 @@ public class ConfigTunnelsHandler extends FormHandler {
         boolean saveRequired = false;
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Saving changes, with props = " + _settings);
+            _log.debug("Saving changes, with props = " + _settings + ".");
         
         int updated = 0;
         int index = 0;
@@ -67,7 +67,7 @@ public class ConfigTunnelsHandler extends FormHandler {
                 try {
                     client.fromBase64(poolName);
                 } catch (DataFormatException dfe) {
-                    addFormError("Internal error (pool name could not resolve - " + poolName + ")");
+                    addFormError("Internal error (pool name could not resolve - " + poolName + ").");
                     index++;
                     continue;
                 }
@@ -76,7 +76,7 @@ public class ConfigTunnelsHandler extends FormHandler {
             }
             
             if ( (in == null) || (out == null) ) {
-                addFormError("Internal error (pool settings cound not be found for " + poolName + ")");
+                addFormError("Internal error (pool settings cound not be found for " + poolName + ").");
                 index++;
                 continue;
             }
@@ -131,14 +131,14 @@ public class ConfigTunnelsHandler extends FormHandler {
         }
         
         if (updated > 0)
-            addFormNotice("Updated settings for " + updated + " pools");
+            addFormNotice("Updated settings for " + updated + " pools.");
         
         if (saveRequired) {
             boolean saved = _context.router().saveConfig();
             if (saved) 
-                addFormNotice("Exploratory tunnel configuration saved successfully");
+                addFormNotice("Exploratory tunnel configuration saved successfully.");
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs.");
         }
     }
     private static final int getInt(Object val) { 

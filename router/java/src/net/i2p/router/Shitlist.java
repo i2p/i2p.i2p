@@ -13,8 +13,6 @@ import java.io.Writer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +65,7 @@ public class Shitlist {
             _toUnshitlist = new ArrayList(4);
             getTiming().setStartAfter(ctx.clock().now() + SHITLIST_CLEANER_START_DELAY);
         }
-        public String getName() { return "Cleanup shitlist"; }
+        public String getName() { return "Expire banned peers"; }
         public void runJob() {
             _toUnshitlist.clear();
             long now = getContext().clock().now();
@@ -254,8 +252,8 @@ public class Shitlist {
     }
 
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("<h2>Shitlist</h2>");
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<h2>Banned Peers</h2>");
         Map<Hash, Entry> entries = new TreeMap(new HashComparator());
         
         entries.putAll(_entries);
@@ -265,8 +263,7 @@ public class Shitlist {
         for (Map.Entry<Hash, Entry> e : entries.entrySet()) {
             Hash key = e.getKey();
             Entry entry = e.getValue();
-            buf.append("<li><b>").append(key.toBase64()).append("</b>");
-            buf.append(" (<a href=\"netdb.jsp?r=").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
+            buf.append("<li>").append(_context.commSystem().renderPeerHTML(key));
             buf.append(" expiring in ");
             buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
             Set transports = entry.transports;
@@ -276,7 +273,7 @@ public class Shitlist {
                 buf.append("<br />\n");
                 buf.append(entry.cause);
             }
-            buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64()).append("#unsh\">unshitlist now</a>)");
+            buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64()).append("#unsh\">unban now</a>)");
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");

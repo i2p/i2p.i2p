@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -41,8 +42,8 @@ import net.i2p.util.Log;
 public class ClientManager {
     private Log _log;
     private ClientListenerRunner _listener;
-    private HashMap _runners;        // Destination --> ClientConnectionRunner
-    private Set _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
+    private final HashMap _runners;        // Destination --> ClientConnectionRunner
+    private final Set _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
     private RouterContext _ctx;
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */
@@ -108,6 +109,8 @@ public class ClientManager {
         }
     }
     
+    public boolean isAlive() { return _listener.isListening(); }
+
     public void registerConnection(ClientConnectionRunner runner) {
         synchronized (_pendingRunners) {
             _pendingRunners.add(runner);
@@ -312,6 +315,18 @@ public class ClientManager {
             return null;
     }
     
+    /**
+     * Return the client's SessionKeyManager
+     *
+     */
+    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+        ClientConnectionRunner runner = getRunner(dest);
+        if (runner != null)
+            return runner.getSessionKeyManager();
+        else
+            return null;
+    }
+    
     private ClientConnectionRunner getRunner(Hash destHash) {
         if (destHash == null) 
             return null;
@@ -372,7 +387,7 @@ public class ClientManager {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(8*1024);
+        StringBuilder buf = new StringBuilder(8*1024);
         buf.append("<u><b>Local destinations</b></u><br />");
         
         Map runners = null;

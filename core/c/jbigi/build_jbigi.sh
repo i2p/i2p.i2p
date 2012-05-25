@@ -1,6 +1,7 @@
 #!/bin/sh
 # When executed in Mingw: Produces an jbigi.dll
-# When executed in Linux: Produces an libjbigi.so
+# When executed in Linux/FreeBSD: Produces an libjbigi.so
+# Darwin produces libjbigi.jnilib, right?
 
 CC="gcc"
 
@@ -32,7 +33,8 @@ esac
 
 #To link dynamically to GMP (use libgmp.so or gmp.lib), uncomment the first line below
 #To link statically to GMP, uncomment the second line below
-if test $1 = "dynamic"
+# Bug!!! Quote *BOTH* or neither! --Sponge
+if test "$1" = "dynamic"
 then
 	echo "Building jbigi lib that is dynamically linked to GMP" 
 	LIBPATH="-L.libs"

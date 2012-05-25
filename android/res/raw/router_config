@@ -1,0 +1,16 @@
+# initial router.config
+# temp directory
+i2p.dir.temp=/data/data/net.i2p.router/files/tmp
+i2p.dir.pid=/data/data/net.i2p.router/files/tmp
+# save memory
+router.prng.buffers=2
+router.decayingBloomFilterM=20
+stat.full=false
+i2np.udp.maxConnections=30
+# no I2CP
+i2p.dummyClientFacade=true
+# for now
+i2np.ntcp.enable=false
+# not on android
+i2np.upnp.enable=false
+routerconsole.geoip.enable=false

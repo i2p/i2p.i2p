@@ -18,7 +18,7 @@ public class MessageHandler implements I2PSessionListener {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;
-    private List _listeners;
+    private final List _listeners;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
@@ -73,8 +73,8 @@ public class MessageHandler implements I2PSessionListener {
      * @param session that has been terminated
      */
     public void disconnected(I2PSession session) {
-        if (_log.shouldLog(Log.ERROR))
-            _log.error("I2PSession disconnected");
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
         
         List listeners = null;

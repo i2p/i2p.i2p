@@ -51,6 +51,7 @@ public class Disposer extends ThreadCore
 	
 	public void run() 
 	{
+		Thread.currentThread().setName("UPnP-Disposer");
 		ControlPoint ctrlp = getControlPoint();
 		long monitorInterval = ctrlp.getExpiredDeviceMonitoringInterval() * 1000;
 		

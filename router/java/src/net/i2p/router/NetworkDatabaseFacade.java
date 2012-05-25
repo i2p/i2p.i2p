@@ -10,10 +10,6 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -59,8 +55,12 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract void unpublish(LeaseSet localLeaseSet);
     public abstract void fail(Hash dbEntry);
     
+    public abstract Set<Hash> getAllRouters();
     public int getKnownRouters() { return 0; }
     public int getKnownLeaseSets() { return 0; }
+    public boolean isInitialized() { return true; }
+    public void rescan() {}
     public void renderRouterInfoHTML(Writer out, String s) throws IOException {}
+    public void renderLeaseSetHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, boolean b) throws IOException {}
 }

@@ -33,12 +33,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import net.i2p.I2PAppContext;
+
 public class ConfigBean implements Serializable {
 	
 	/*
 	 * as this is not provided as constant in addressbook, we define it here
 	 */
-	public static final String addressbookPrefix = "addressbook/";
+ 	public static final String addressbookPrefix =
+ 		(new File(I2PAppContext.getGlobalContext().getRouterDir(), "addressbook")).getAbsolutePath()
+			+ File.separatorChar;
 	public static final String configFileName = addressbookPrefix + "config.txt";
 	
 	private String action, config;
@@ -79,7 +83,7 @@ public class ConfigBean implements Serializable {
 	{
 		File file = new File( configFileName );
 		if( file != null && file.isFile() ) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader( new FileReader( file ) );
@@ -142,7 +146,7 @@ public class ConfigBean implements Serializable {
 				}
 			}			
 			else {
-				message = "Invalid nonce. Are you being spoofed?";
+				message = "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
 			}
 		}
 		if( message.length() > 0 )

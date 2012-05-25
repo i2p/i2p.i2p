@@ -16,12 +16,13 @@ following non-public domain code:
 * Bouncycastle's hash routines (MIT license)
 * Cryptix's AES routines (Cryptix license)
 * Adam Buckley's SNTP routines (BSD)
+* FSF's PRNG and GMP (LGPL)
 
 Also included in this distribution are a bunch
 of third party client applications, all with
 their own dependencies.  Please see our license
 policy page for details: 
-  http://www.i2p.net/licenses
+  http://www.i2p2.de/licenses
 
 One of the bundled client apps (routerconsole) 
 requires us to say:
@@ -29,8 +30,11 @@ requires us to say:
   the Apache Software Foundation 
   (http://www.apache.org/)
 
-Another (I2PTunnel) is GPL licensed.  
+I2PTunnel, I2PSnark, SusiDNS, and SusiMail
+are GPL licensed.  
+
+For more information see LICENSE.txt
+in the install directory.
 
 For source, please see:
-   http://www.i2p.net/download
-or http://www.i2p.net/cvs
+   http://www.i2p2.de/monotone

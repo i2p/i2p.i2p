@@ -115,8 +115,8 @@ public class I2CPMessageReader {
     }
 
     private class I2CPMessageReaderRunner implements Runnable {
-        private boolean _doRun;
-        private boolean _stayAlive;
+        private volatile boolean _doRun;
+        private volatile boolean _stayAlive;
 
         public I2CPMessageReaderRunner() {
             _doRun = true;
@@ -143,7 +143,6 @@ public class I2CPMessageReader {
                     _log.error("Error closing the stream", ioe);
                 }
             }
-            _stream = null;
         }
 
         public void run() {
@@ -178,11 +177,15 @@ public class I2CPMessageReader {
                     // pause .5 secs when we're paused
                     try {
                         Thread.sleep(500);
-                    } catch (InterruptedException ie) { // nop
+                    } catch (InterruptedException ie) {
+                        // we should break away here.
+                        _log.warn("Breaking away stream", ie);
+                        _listener.disconnected(I2CPMessageReader.this);
+                        cancelRunner();
                     }
                 }
             }
-            // boom bye bye bad bwoy
+            _stream = null;
         }
     }
 }

@@ -1,0 +1,250 @@
+/* Welcome to the wonderful world of kludgey IE fixes */
+
+.wideload {
+     overflow: auto;
+     width: 100%;
+}
+
+.formaction {
+     text-align: left !important;
+     margin: -10px 0 10px 0;
+}
+
+div.configure {
+     text-align: center;
+}
+
+div.configure p, div.configure table  {
+     text-align: justify;
+}
+
+div.main ul {
+     margin-right: 20px;
+}
+
+div.configure textarea {
+     width: 450px !important;
+}
+
+div.configure input {
+     margin-left: 5px;
+}
+
+div.configure table {
+     width: 550px !important;
+     text-align: center;
+}
+
+h1 {
+     padding: 15px 10px 16px 10px !important;
+     margin: 0 0px 0 17	5px !important;
+     background-color: #bbf !important; /* background page color to fix overflow issue */
+     color: #001;
+}
+
+h2 {
+     padding-top: 0;
+     text-align: left !important;
+}
+
+h3 {
+     margin-top: 10px;
+     text-align: left !important
+}
+
+div.confignav {
+     padding: 15px 0 15px 0;
+     border-left: 0px;
+     margin-left: -15px;
+     border-top: 5px solid #bbf;
+     margin-bottom: 10px !important;
+}
+
+div.messages {
+     border-left: 0;
+     border-right: 0;     
+     margin: -10px -15px 0px -15px;
+}
+
+div.main, div.news {
+     margin: -5px 0px 10px 185px;
+     border: 5px solid #bbf;
+}
+
+div.main hr, div.news hr {
+     margin: 0;	
+}
+
+div.main {
+     border-top: 5px solid #bbf;
+}
+
+div.news {
+     border-left: 5px solid #bbf;
+     margin: -5px 0px 0 185px;
+     padding-bottom: 8px;
+}
+
+div.news hr {
+     color: #bbf;
+     background: #bbf;
+     height: 3px;
+     border: 0px;
+     margin: 0 -10px 0 -13px !important;
+}     
+
+div.routersummary {
+     color: #001;
+     padding-left: 0px;
+     border-left: 5px solid #bbf;
+     text-align: center !important;
+     overflow: hidden; /* prevents IE from borking the sidepanel */
+}
+
+div.routersummary submit {
+     padding: 0;
+     margin-bottom: 5px;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #eef;
+     background: #eef;
+     height: 2px;
+     border-bottom: 1px solid #eef;
+     margin: 8px 1px 7px 1px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
+}
+
+div.routersummary h3 {
+     border: 0px solid #f00;
+     text-align: center !important;
+     font-size: 10pt;
+     letter-spacing: 0.05em;
+     margin: -14px 0px -15px 1px;
+     padding: 5px 0px 5px 0px;
+     background: #c5d5fb;
+     text-transform: uppercase;
+}
+
+div.routersummary h4 {
+     border: 0px solid #f00;
+     border-bottom: 0 !important;
+     font-size: 9pt;
+     letter-spacing: 0.05em;
+     margin: -14px 0px -15px 1px !important;
+     padding: 2px 3px 3px 3px;
+     background: #c1d1f7;
+     text-transform: capitalize;
+     text-decoration: none !important;
+     color: #2b2;
+     text-align: center !important;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -5px 5px;
+     width: 175px !important;
+     overflow: hidden;
+     font-size: 8pt;
+     padding: 0px -10px;
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+}
+
+div.routersummary form {
+     margin-top: -25px !important;
+     margin-bottom: -25px !important;
+     text-align: center !important;
+}
+
+div.routersummary p {
+     padding: 0;
+}     
+
+div.routersummary img {
+     margin: 5px -10px -5px -10px;
+     overflow: hidden;
+}     
+
+div.routersummary a:link, div.routersummary a:visited {
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+}
+
+div.routersummary a:hover {
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     color: #f60;
+}
+
+div.routersummary td {
+     padding: 2px 4px;
+     background-image: none !important;
+     border: 0 !important;
+}
+
+div.routersummary tr:nth-child(even) {
+     background-color: #f60;
+     background-image: none !important;
+}
+
+div.routersummarytr:nth-child(odd) {
+     background-color: #f00;
+     background-image: none !important;
+}
+
+div.news li {
+     padding-top: 0px	0px !important;
+     margin-bottom: -23px !important;
+}
+
+div.logo {
+}
+
+div.warning {
+     padding: 0px 20px 20px 80px;
+     margin-top: -20px;
+     margin-left: -10px !important;
+}
+
+.langbox {
+     margin: 22px -20px 0px 5px;
+}
+
+td {
+     text-align: left;
+}
+
+th {
+     text-align: left;
+     padding-left: 3px; 
+     padding-right: 1px;
+}
+
+div.configure hr{
+     margin: 10px 0 15px 0;
+}
+
+input {
+     padding: 0;
+}
+
+div.graphspanel img {
+     border: 1px solid #99f;
+     margin: 6px 0 !important;
+     background: #ddf;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+}
+
+div.graphspanel hr {
+     margin: 20px 0;
+}

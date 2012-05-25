@@ -19,6 +19,8 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -40,17 +42,17 @@ public class ProfileOrganizer {
     private Log _log;
     private RouterContext _context;
     /** H(routerIdentity) to PeerProfile for all peers that are fast and high capacity*/
-    private Map _fastPeers;
+    private Map<Hash, PeerProfile> _fastPeers;
     /** H(routerIdentity) to PeerProfile for all peers that have high capacities */
-    private Map _highCapacityPeers;
+    private Map<Hash, PeerProfile> _highCapacityPeers;
     /** H(routerIdentity) to PeerProfile for all peers that well integrated into the network and not failing horribly */
-    private Map _wellIntegratedPeers;
+    private Map<Hash, PeerProfile> _wellIntegratedPeers;
     /** H(routerIdentity) to PeerProfile for all peers that are not failing horribly */
-    private Map _notFailingPeers;
+    private Map<Hash, PeerProfile> _notFailingPeers;
     /** H(routerIdnetity), containing elements in _notFailingPeers */
-    private List _notFailingPeersList;
+    private List<Hash> _notFailingPeersList;
     /** H(routerIdentity) to PeerProfile for all peers that ARE failing horribly (but that we haven't dropped reference to yet) */
-    private Map _failingPeers;
+    private Map<Hash, PeerProfile> _failingPeers;
     /** who are we? */
     private Hash _us;
     private ProfilePersistenceHelper _persistenceHelper;
@@ -74,6 +76,7 @@ public class ProfileOrganizer {
      */
     public static final String PROP_MINIMUM_FAST_PEERS = "profileOrganizer.minFastPeers";
     public static final int DEFAULT_MINIMUM_FAST_PEERS = 8;
+    private static final int DEFAULT_MAXIMUM_FAST_PEERS = 16;
     /**
      * Defines the minimum number of 'high capacity' peers that the organizer should 
      * select when using the mean - if less than this many are available, select the 
@@ -84,7 +87,7 @@ public class ProfileOrganizer {
     public static final int DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS = 10;
     
     /** synchronized against this lock when updating the tier that peers are located in (and when fetching them from a peer) */
-    private Object _reorganizeLock = new Object();
+    private final ReentrantReadWriteLock _reorganizeLock = new ReentrantReadWriteLock(true);
     
     /** incredibly weak PRNG, just used for shuffling peers.  no need to waste the real PRNG on this */
     private Random _random = new Random();
@@ -105,13 +108,36 @@ public class ProfileOrganizer {
         _thresholdIntegrationValue = 0.0d;
         _persistenceHelper = new ProfilePersistenceHelper(_context);
         
-        _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("peer.profileCoalesceTime", "How long the reorg takes coalescing peer stats", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("peer.profileThresholdTime", "How long the reorg takes determining the tier thresholds", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("peer.profileCoalesceTime", "How long the reorg takes coalescing peer stats", "Peers", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("peer.profileThresholdTime", "How long the reorg takes determining the tier thresholds", "Peers", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 10*60*1000 });
     }
     
+    private void getReadLock() {
+        _reorganizeLock.readLock().lock();
+    }
+
+    private void releaseReadLock() {
+        _reorganizeLock.readLock().unlock();
+    }
+
+    /** @return true if the lock was acquired */
+    private boolean getWriteLock() {
+        try {
+            boolean rv = _reorganizeLock.writeLock().tryLock(5000, TimeUnit.MILLISECONDS);
+            if (!rv)
+                _log.error("no lock, size is: " + _reorganizeLock.getQueueLength(), new Exception("rats"));
+            return rv;
+        } catch (InterruptedException ie) {}
+        return false;
+    }
+
+    private void releaseWriteLock() {
+        _reorganizeLock.writeLock().unlock();
+    }
+
     public void setUs(Hash us) { _us = us; }
     Hash getUs() { return _us; }
     
@@ -124,42 +150,52 @@ public class ProfileOrganizer {
      *
      */
     public PeerProfile getProfile(Hash peer) {
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             return locked_getProfile(peer);
-        }
+        } finally { releaseReadLock(); }
     }
     
     /**
      * Add the new profile, returning the old value (or null if no profile existed)
      *
      */
-    public PeerProfile addProfile(PeerProfile profile) throws IllegalStateException {
+    public PeerProfile addProfile(PeerProfile profile) {
         if ( (profile == null) || (profile.getPeer() == null) ) return null;
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New profile created for " + profile.getPeer().toBase64());
         
-        synchronized (_reorganizeLock) {
-            PeerProfile old = locked_getProfile(profile.getPeer());
-            profile.coalesceStats();
+        PeerProfile old = getProfile(profile.getPeer());
+        profile.coalesceStats();
+        if (!getWriteLock())
+            return old;
+        try {
             locked_placeProfile(profile);
             _strictCapacityOrder.add(profile);
-            return old;
-        }
+        } finally { releaseWriteLock(); }
+        return old;
     }
     
-    public int countFastPeers() { synchronized (_reorganizeLock) { return _fastPeers.size(); } }
-    public int countHighCapacityPeers() { synchronized (_reorganizeLock) { return _highCapacityPeers.size(); } }
-    public int countWellIntegratedPeers() { synchronized (_reorganizeLock) { return _wellIntegratedPeers.size(); } }
-    public int countNotFailingPeers() { synchronized (_reorganizeLock) { return _notFailingPeers.size(); } }
-    public int countFailingPeers() { synchronized (_reorganizeLock) { return _failingPeers.size(); } }
+    private int count(Map m) {
+        getReadLock();
+        try {
+            return m.size();
+        } finally { releaseReadLock(); }
+    }
+
+    public int countFastPeers() { return count(_fastPeers); }
+    public int countHighCapacityPeers() { return count(_highCapacityPeers); }
+    public int countWellIntegratedPeers() { return count(_wellIntegratedPeers); }
+    public int countNotFailingPeers() { return count(_notFailingPeers); }
+    public int countFailingPeers() { return count(_failingPeers); }
     
     public int countActivePeers() {
-        synchronized (_reorganizeLock) {
-            int activePeers = 0;
-            
-            long hideBefore = _context.clock().now() - 6*60*60*1000;
-            
+        int activePeers = 0;
+        long hideBefore = _context.clock().now() - 6*60*60*1000;
+       
+        getReadLock();
+        try {
             for (Iterator iter = _failingPeers.values().iterator(); iter.hasNext(); ) {
                 PeerProfile profile = (PeerProfile)iter.next();
                 if (profile.getLastSendSuccessful() >= hideBefore)
@@ -174,15 +210,21 @@ public class ProfileOrganizer {
                 else if (profile.getLastHeardFrom() >= hideBefore)
                     activePeers++;
             }
-            
-            return activePeers;
-        }
+        } finally { releaseReadLock(); }
+        return activePeers;
     }
     
-    public boolean isFast(Hash peer) { synchronized (_reorganizeLock) { return _fastPeers.containsKey(peer); } }
-    public boolean isHighCapacity(Hash peer) { synchronized (_reorganizeLock) { return _highCapacityPeers.containsKey(peer); } }
-    public boolean isWellIntegrated(Hash peer) { synchronized (_reorganizeLock) { return _wellIntegratedPeers.containsKey(peer); } }
-    public boolean isFailing(Hash peer) { synchronized (_reorganizeLock) { return _failingPeers.containsKey(peer); } }
+    private boolean isX(Map m, Hash peer) {
+        getReadLock();
+        try {
+            return m.containsKey(peer);
+        } finally { releaseReadLock(); }
+    }
+
+    public boolean isFast(Hash peer) { return isX(_fastPeers, peer); }
+    public boolean isHighCapacity(Hash peer) { return isX(_highCapacityPeers, peer); }
+    public boolean isWellIntegrated(Hash peer) { return isX(_wellIntegratedPeers, peer); }
+    public boolean isFailing(Hash peer) { return isX(_failingPeers, peer); }
         
     /** 
      * if a peer sends us more than 5 replies in a searchReply that we cannot
@@ -236,9 +278,10 @@ public class ProfileOrganizer {
         selectFastPeers(howMany, exclude, matches, 0);
     }
     public void selectFastPeers(int howMany, Set exclude, Set matches, int mask) {
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             locked_selectPeers(_fastPeers, howMany, exclude, matches, mask);
-        }
+        } finally { releaseReadLock(); }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
@@ -258,7 +301,8 @@ public class ProfileOrganizer {
         selectHighCapacityPeers(howMany, exclude, matches, 0);
     }
     public void selectHighCapacityPeers(int howMany, Set exclude, Set matches, int mask) {
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             // we only use selectHighCapacityPeers when we are selecting for PURPOSE_TEST
             // or we are falling back due to _fastPeers being too small, so we can always 
             // exclude the fast peers
@@ -269,11 +313,11 @@ public class ProfileOrganizer {
                 exclude.addAll(_fastPeers.keySet());
              */
             locked_selectPeers(_highCapacityPeers, howMany, exclude, matches, mask);
-        }
+        } finally { releaseReadLock(); }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("selectHighCap("+howMany+"), not enough fast (" + matches.size() + ") going on to notFailing");
-            selectNotFailingPeers(howMany, exclude, matches, mask);
+                _log.info("selectHighCap("+howMany+"), not enough highcap (" + matches.size() + ") going on to ANFP2");
+            selectActiveNotFailingPeers2(howMany, exclude, matches, mask);
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
@@ -288,9 +332,10 @@ public class ProfileOrganizer {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
     }
     public void selectWellIntegratedPeers(int howMany, Set exclude, Set matches, int mask) {
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches, mask);
-        }
+        } finally { releaseReadLock(); }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
@@ -330,38 +375,68 @@ public class ProfileOrganizer {
             selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, mask);
         return;
     }
+
     /**
      * Return a set of Hashes for peers that are both not failing and we're actively
      * talking with.
      *
+     * We use commSystem().isEstablished(), not profile.getIsActive(), as the
+     * NTCP idle time is now shorter than the 5 minute getIsActive() threshold,
+     * and we're using this to try and limit connections.
+     *
+     * Caution, this does NOT cascade further to non-connected peers, so it should only
+     * be used when there is a good number of connected peers.
+     *
+     * @param exclude non-null
+     * No mask parameter, to be fixed
      */
-    /*
-    private void selectActiveNotFailingPeers(int howMany, Set exclude, Set matches) {
-        if (true) {
-            selectAllNotFailingPeers(howMany, exclude, matches);
-            return;
-        }
-        // pick out the not-failing peers that we're actively talking with
+    public void selectActiveNotFailingPeers(int howMany, Set exclude, Set matches) {
         if (matches.size() < howMany) {
-            synchronized (_reorganizeLock) {
-                for (Iterator iter = _notFailingPeers.keySet().iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
-                    if ( (exclude != null) && exclude.contains(peer) ) continue;
-                    if (matches.contains(peer)) continue;
-                    PeerProfile prof = (PeerProfile)_notFailingPeers.get(peer);
-                    if (prof.getIsActive())
-                        matches.add(peer);
-                    if (matches.size() >= howMany)
-                        return;
+            getReadLock();
+            try {
+                for (Iterator<Hash> iter = _notFailingPeers.keySet().iterator(); iter.hasNext(); ) {
+                    Hash peer = iter.next();
+                    if (!_context.commSystem().isEstablished(peer))
+                        exclude.add(peer);
                 }
-            }
+                locked_selectPeers(_notFailingPeers, howMany, exclude, matches, 0);
+            } finally { releaseReadLock(); }
         }
-        // ok, still not enough, pick out the not-failing peers that we aren't talking with
-        if (matches.size() < howMany)
-            selectAllNotFailingPeers(howMany, exclude, matches);
-        return;
     }
-    */
+
+    /**
+     * Return a set of Hashes for peers that are both not failing and we're actively
+     * talking with.
+     *
+     * We use commSystem().isEstablished(), not profile.getIsActive(), as the
+     * NTCP idle time is now shorter than the 5 minute getIsActive() threshold,
+     * and we're using this to try and limit connections.
+     *
+     * This DOES cascade further to non-connected peers.
+     */
+    private void selectActiveNotFailingPeers2(int howMany, Set exclude, Set matches, int mask) {
+        if (matches.size() < howMany) {
+            Map<Hash, PeerProfile> activePeers = new HashMap();
+            getReadLock();
+            try {
+                for (Iterator<Map.Entry<Hash, PeerProfile>> iter = _notFailingPeers.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<Hash, PeerProfile> e = iter.next();
+                    if (_context.commSystem().isEstablished(e.getKey()))
+                        activePeers.put(e.getKey(), e.getValue());
+                }
+                locked_selectPeers(activePeers, howMany, exclude, matches, mask);
+            } finally { releaseReadLock(); }
+        }
+        if (matches.size() < howMany) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectANFP2("+howMany+"), not enough ANFP (" + matches.size() + ") going on to notFailing");
+            selectNotFailingPeers(howMany, exclude, matches, mask);
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectANFP2("+howMany+"), found enough ANFP (" + matches.size() + ")");
+        }
+    }
+
     /**
      * Return a set of Hashes for peers that are not failing.
      *
@@ -369,13 +444,18 @@ public class ProfileOrganizer {
     public void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
         selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
+    /**
+     * @param mask ignored, should call locked_selectPeers, to be fixed
+     *
+     */
     private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany) {
             int orig = matches.size();
             int needed = howMany - orig;
             int start = 0;
             List selected = new ArrayList(needed);
-            synchronized (_reorganizeLock) {
+            getReadLock();
+            try {
                 // we randomize the whole list when rebuilding it, but randomizing 
                 // the entire list on each peer selection is a bit crazy
                 start = _context.random().nextInt(_notFailingPeersList.size());
@@ -397,7 +477,7 @@ public class ProfileOrganizer {
                             _log.debug("Not selectable: " + cur.toBase64());
                     }
                 }
-            }
+            } finally { releaseReadLock(); }
             if (_log.shouldLog(Log.INFO))
                 _log.info("Selecting all not failing (strict? " + onlyNotFailing + " start=" + start 
                           + ") found " + selected.size() + " new peers: " + selected + " all=" + _notFailingPeersList.size() + " strict=" + _strictCapacityOrder.size());
@@ -418,25 +498,27 @@ public class ProfileOrganizer {
      *
      */
     public void selectFailingPeers(int howMany, Set exclude, Set matches) {
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             locked_selectPeers(_failingPeers, howMany, exclude, matches);
-        }
-        return;
-    }
-    
-    /**
+        } finally { releaseReadLock(); }
+        return;        
+    }                  
+
+    /**                
      * Get the peers the transport layer thinks are unreachable, and
      * add in the peers with the SSU peer testing bug,
      * and peers requiring introducers.
-     *
-     */
+     *                 
+     */                
     public List selectPeersLocallyUnreachable() { 
         List n;
         int count;
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             count = _notFailingPeers.size();
             n = new ArrayList(_notFailingPeers.keySet());
-        }
+        } finally { releaseReadLock(); }
         List l = new ArrayList(count / 4);
         for (Iterator iter = n.iterator(); iter.hasNext(); ) {
             Hash peer = (Hash)iter.next();
@@ -459,9 +541,11 @@ public class ProfileOrganizer {
                         l.add(peer);
                     else {
                         RouterAddress ra = info.getTargetAddress("SSU");
-                        // Definitely don't want peers with no SSU address at all
+                        // peers with no SSU address at all are fine.
+                        // as long as they have NTCP
                         if (ra == null) {
-                            l.add(peer);
+                            if (info.getTargetAddress("NTCP") == null)
+                                l.add(peer);
                             continue;
                         }
                         // This is the quick way of doing UDPAddress.getIntroducerCount() > 0
@@ -472,8 +556,8 @@ public class ProfileOrganizer {
                 }
             }
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Unreachable: " + l);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Unreachable: " + l);
         return l;
     }
 
@@ -483,7 +567,8 @@ public class ProfileOrganizer {
      *
      */
     public List selectPeersRecentlyRejecting() { 
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             long cutoff = _context.clock().now() - (20*1000);
             int count = _notFailingPeers.size();
             List l = new ArrayList(count / 128);
@@ -493,7 +578,7 @@ public class ProfileOrganizer {
                     l.add(prof.getPeer());
             }
             return l;
-        }
+        } finally { releaseReadLock(); }
     }
 
     /**
@@ -501,16 +586,23 @@ public class ProfileOrganizer {
      *
      */
     public Set selectAllPeers() {
-        synchronized (_reorganizeLock) {
+        getReadLock();
+        try {
             Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             allPeers.addAll(_failingPeers.keySet());
             allPeers.addAll(_notFailingPeers.keySet());
             allPeers.addAll(_highCapacityPeers.keySet());
             allPeers.addAll(_fastPeers.keySet());
             return allPeers;
-        }
+        } finally { releaseReadLock(); }
     }
     
+    private static final long MIN_EXPIRE_TIME = 3*60*60*1000;
+    private static final long MAX_EXPIRE_TIME = 6*60*60*1000;
+    private static final long ADJUST_EXPIRE_TIME = 60*1000;
+    private static final int ENOUGH_PROFILES = 600;
+    private long _currentExpireTime = MAX_EXPIRE_TIME;
+
     /**
      * Place peers into the correct tier, as well as expand/contract and even drop profiles
      * according to whatever limits are in place.  Peer profiles are not coalesced during
@@ -528,12 +620,19 @@ public class ProfileOrganizer {
         long uptime = _context.router().getUptime();
         long expireOlderThan = -1;
         if (uptime > 60*60*1000) {
-            // drop profiles that we haven't spoken with in 6 hours
-            expireOlderThan = _context.clock().now() - 6*60*60*1000;
+            // dynamically adjust expire time to control memory usage
+            if (countNotFailingPeers() > ENOUGH_PROFILES)
+                _currentExpireTime = Math.max(_currentExpireTime - ADJUST_EXPIRE_TIME, MIN_EXPIRE_TIME);
+            else
+                _currentExpireTime = Math.min(_currentExpireTime + ADJUST_EXPIRE_TIME, MAX_EXPIRE_TIME);
+            // drop profiles that we haven't spoken to in a while
+            expireOlderThan = _context.clock().now() - _currentExpireTime;
         }
             
+        if (!getWriteLock())
+            return;
         long start = System.currentTimeMillis();
-        synchronized (_reorganizeLock) {
+        try {
             Set allPeers = _strictCapacityOrder; //new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             //allPeers.addAll(_failingPeers.values());
             //allPeers.addAll(_notFailingPeers.values());
@@ -557,38 +656,40 @@ public class ProfileOrganizer {
             }
             sortTime = System.currentTimeMillis() - sortStart;
             _strictCapacityOrder = reordered;
-            
+
             long thresholdStart = System.currentTimeMillis();
             locked_calculateThresholds(allPeers);
             thresholdTime = System.currentTimeMillis()-thresholdStart;
-            
+
             _failingPeers.clear();
             _fastPeers.clear();
             _highCapacityPeers.clear();
             _notFailingPeers.clear();
             _notFailingPeersList.clear();
             _wellIntegratedPeers.clear();
-            
+
             long placeStart = System.currentTimeMillis();
-            
+
             for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
                 PeerProfile profile = (PeerProfile)iter.next();
                 locked_placeProfile(profile);
             }
-            
+
             locked_unfailAsNecessary();
             locked_promoteFastAsNecessary();
 
             Collections.shuffle(_notFailingPeersList, _context.random());
-            
-            placeTime = System.currentTimeMillis()-placeStart;
 
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
-                           + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
+            placeTime = System.currentTimeMillis()-placeStart;
+        } finally { releaseWriteLock(); }
+
+
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
+                       + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
             /*****
             if (_log.shouldLog(Log.DEBUG)) {
-                StringBuffer buf = new StringBuffer(512);
+                StringBuilder buf = new StringBuilder(512);
                 for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                     PeerProfile prof = (PeerProfile)iter.next();
                     buf.append('[').append(prof.toString()).append('=').append(prof.getCapacityValue()).append("] ");
@@ -597,7 +698,6 @@ public class ProfileOrganizer {
                 _log.debug("fast: " + _fastPeers.values());
             }
             *****/
-        }
         
         long total = System.currentTimeMillis()-start;
         _context.statManager().addRateData("peer.profileSortTime", sortTime, profileCount);
@@ -899,11 +999,12 @@ public class ProfileOrganizer {
         all.removeAll(matches);
         all.remove(_us);
         Collections.shuffle(all, _random);
+        Set IPSet = new HashSet(8);
         for (int i = 0; (matches.size() < howMany) && (i < all.size()); i++) {
             Hash peer = (Hash)all.get(i);
             boolean ok = isSelectable(peer);
             if (ok) {
-                ok = mask <= 0 || notRestricted(peer, matches, mask);
+                ok = mask <= 0 || notRestricted(peer, IPSet, mask);
                 if ((!ok) && _log.shouldLog(Log.WARN))
                     _log.warn("IP restriction prevents " + peer + " from joining " + matches);
             }
@@ -917,77 +1018,67 @@ public class ProfileOrganizer {
     /**
      * Does the peer's IP address NOT match the IP address of any peer already in the set,
      * on any transport, within a given mask?
-     * mask is 1-4 (number of bytes to match) or 0 to disable
-     * Perhaps rewrite this to just make a set of all the IP addresses rather than loop.
+     * @param mask is 1-4 (number of bytes to match)
+     * @param IPMatches all IPs so far, modified by this routine
      */
-    private boolean notRestricted(Hash peer, Set matches, int mask) {
-        if (mask <= 0) return true;
-        if (matches.size() <= 0) return true;
-        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
-        if (pinfo == null) return false;
-        Set paddr = pinfo.getAddresses();
-        if (paddr == null || paddr.size() == 0)
+    private boolean notRestricted(Hash peer, Set IPSet, int mask) {
+        Set peerIPs = maskedIPSet(peer, mask);
+        if (containsAny(IPSet, peerIPs))
             return false;
-        List pladdr = new ArrayList(paddr);
-        List lmatches = new ArrayList(matches);
-        // for each match
-        for (int i = 0; i < matches.size(); i++) {
-            RouterInfo minfo = _context.netDb().lookupRouterInfoLocally((Hash) lmatches.get(i));
-            if (minfo == null) continue;
-            Set maddr = minfo.getAddresses();
-            if (maddr == null || maddr.size() == 0)
-                continue;
-            List mladdr = new ArrayList(maddr);
-            String oldphost = null;
-            // for each peer address
-            for (int j = 0; j < paddr.size(); j++) {
-                RouterAddress pa = (RouterAddress) pladdr.get(j);
-                if (pa == null) continue;
-                Properties pprops = pa.getOptions();
-                if (pprops == null) continue;
-                String phost = pprops.getProperty("host");
-                if (phost == null) continue;
-                if (oldphost != null && oldphost.equals(phost)) continue;
-                oldphost = phost;
-                InetAddress pi;
-                try {
-                    pi = InetAddress.getByName(phost);
-                } catch (UnknownHostException uhe) {
-                    continue;
-                }
-                if (pi == null) continue;
-                byte[] pib = pi.getAddress();
-                String oldmhost = null;
-                // for each match address
-                for (int k = 0; k < maddr.size(); k++) {
-                    RouterAddress ma = (RouterAddress) mladdr.get(k);
-                    if (ma == null) continue;
-                    Properties mprops = ma.getOptions();
-                    if (mprops == null) continue;
-                    String mhost = mprops.getProperty("host");
-                    if (mhost == null) continue;
-                    if (oldmhost != null && oldmhost.equals(mhost)) continue;
-                    oldmhost = mhost;
-                    InetAddress mi;
-                    try {
-                        mi = InetAddress.getByName(mhost);
-                    } catch (UnknownHostException uhe) {
-                        continue;
-                    }
-                    if (mi == null) continue;
-                    byte[] mib = mi.getAddress();
-                    // assume ipv4, compare 1 to 4 bytes
-                    // log.info("Comparing " + pi + " with " + mi);
-                    for (int m = 0; m < mask; m++) {
-                        if (pib[m] != mib[m])
-                            break;
-                        if (m == mask-1)
-                            return false; // IP match
-                    }
-                }
-            }
-        }
+        IPSet.addAll(peerIPs);
         return true;
+    }
+
+    /**
+      * The Set of IPs for this peer, with a given mask.
+      * Includes the comm system's record of the IP, and all netDb addresses.
+      *
+      * @return an opaque set of masked IPs for this peer
+      */
+    private Set maskedIPSet(Hash peer, int mask) {
+        Set rv = new HashSet(2);
+        byte[] commIP = _context.commSystem().getIP(peer);
+        if (commIP != null)
+            rv.add(maskedIP(commIP, mask));
+        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
+        if (pinfo == null)
+            return rv;
+        Set<RouterAddress> paddr = pinfo.getAddresses();
+        if (paddr == null)
+            return rv;
+        for (RouterAddress pa : paddr) {
+            Properties pprops = pa.getOptions();
+            if (pprops == null) continue;
+            String phost = pprops.getProperty("host");
+            if (phost == null) continue;
+            InetAddress pi;
+            try {
+                pi = InetAddress.getByName(phost);
+            } catch (UnknownHostException uhe) {
+                continue;
+            }
+            if (pi == null) continue;
+            byte[] pib = pi.getAddress();
+            rv.add(maskedIP(pib, mask));
+        }
+        return rv;
+    }
+
+    /** generate an arbitrary unique value for this ip/mask (mask = 1-4) */
+    private Integer maskedIP(byte[] ip, int mask) {
+        int rv = 0;
+        for (int i = 0; i < mask; i++)
+             rv = (rv << 8) | (ip[i] & 0xff);
+        return Integer.valueOf(rv);
+    }
+
+    /** does a contain any of the elements in b? */
+    private boolean containsAny(Set a, Set b) {
+        for (Object o : b) {
+            if (a.contains(o))
+                return true;
+        }
+        return false;
     }
 
     public boolean isSelectable(Hash peer) {
@@ -1028,7 +1119,7 @@ public class ProfileOrganizer {
     
     /**
      * called after locking the reorganizeLock, place the profile in the appropriate tier.
-     * This is where we implement the (betterThanAverage ? goToPierX : goToPierY) algorithms
+     * This is where we implement the (betterThanAverage ? goToTierX : goToTierY) algorithms
      *
      */
     private void locked_placeProfile(PeerProfile profile) {
@@ -1098,10 +1189,14 @@ public class ProfileOrganizer {
      * This parameter should help deal with a lack of diversity in the tunnels created when some 
      * peers are particularly fast.
      *
+     * Increase default by two for every local destination, up to a max.
+     *
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumFastPeers() {
-        return _context.getProperty(PROP_MINIMUM_FAST_PEERS, DEFAULT_MINIMUM_FAST_PEERS);
+        int def = Math.min(DEFAULT_MAXIMUM_FAST_PEERS,
+                           (2 *_context.clientManager().listClients().size()) + DEFAULT_MINIMUM_FAST_PEERS - 2);
+        return _context.getProperty(PROP_MINIMUM_FAST_PEERS, def);
     }
     
     
@@ -1153,7 +1248,6 @@ public class ProfileOrganizer {
                                      organizer.isHighCapacity(peer) ? "IR  " :
                                      organizer.isFailing(peer) ? "IX  " : "I   ") + "]: "
                            + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
-                           + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
                            + " Active?\t" + profile.getIsActive() 
@@ -1164,7 +1258,6 @@ public class ProfileOrganizer {
                                      organizer.isHighCapacity(peer) ? "R   " :
                                      organizer.isFailing(peer) ? "X   " : "    ") + "]: "
                            + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
-                           + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
                            + " Active?\t" + profile.getIsActive() 

@@ -8,11 +8,7 @@ import java.util.List;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.data.i2np.DatabaseSearchReplyMessage;
-import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
-import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
@@ -44,8 +40,8 @@ class FloodOnlySearchJob extends FloodSearchJob {
     protected Log _log;
     private FloodfillNetworkDatabaseFacade _facade;
     protected Hash _key;
-    private List _onFind;
-    private List _onFailed;
+    private final List _onFind;
+    private final List _onFailed;
     private long _expiration;
     protected int _timeoutMs;
     private long _origExpiration;
@@ -54,9 +50,9 @@ class FloodOnlySearchJob extends FloodSearchJob {
     private volatile boolean _dead;
     private long _created;
     private boolean _shouldProcessDSRM;
-    private HashSet _unheardFrom;
+    private final HashSet _unheardFrom;
     
-    protected List _out;
+    protected final List _out;
     protected MessageSelector _replySelector;
     protected ReplyJob _onReply;
     protected Job _onTimeout;
@@ -83,6 +79,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         _created = System.currentTimeMillis();
         _shouldProcessDSRM = false;
     }
+    @Override
     void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
         if (_dead) {
             getContext().jobQueue().addJob(onFailed);
@@ -91,18 +88,22 @@ class FloodOnlySearchJob extends FloodSearchJob {
             if (onFailed != null) synchronized (_onFailed) { _onFailed.add(onFailed); }
         }
     }
+    @Override
     public long getExpiration() { return _expiration; }
     public long getCreated() { return _created; }
     public boolean shouldProcessDSRM() { return _shouldProcessDSRM; }
     private static final int CONCURRENT_SEARCHES = 2;
+    @Override
     public void runJob() {
         // pick some floodfill peers and send out the searches
         List floodfillPeers = _facade.getFloodfillPeers();
         if (floodfillPeers.size() <= 3)
             _shouldProcessDSRM = true;
         if (floodfillPeers.size() <= 0) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Running netDb searches against the floodfill peers, but we don't know any");
+            // ask anybody, they may not return the answer but they will return a few ff peers we can go look up,
+            // so this situation should be temporary
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running netDb searches against the floodfill peers, but we don't know any");
             floodfillPeers = new ArrayList(_facade.getAllRouters());
             if (floodfillPeers.size() <= 0) {
                 if (_log.shouldLog(Log.ERROR))
@@ -184,10 +185,14 @@ class FloodOnlySearchJob extends FloodSearchJob {
             failed();
         }
     }
+    @Override
     public String getName() { return "NetDb flood search (phase 1)"; }
     
+    @Override
     Hash getKey() { return _key; }
+    @Override
     void decrementRemaining() { if (_lookupsRemaining > 0) _lookupsRemaining--; }
+    @Override
     int getLookupsRemaining() { return _lookupsRemaining; }
     /** Note that we heard from the peer */
     void decrementRemaining(Hash peer) {
@@ -197,6 +202,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         }
     }
     
+    @Override
     void failed() {
         synchronized (this) {
             if (_dead) return;
@@ -224,6 +230,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
             }
         }
     }
+    @Override
     void success() {
         synchronized (this) {
             if (_dead) return;

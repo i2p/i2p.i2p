@@ -26,7 +26,7 @@ import net.i2p.util.Log;
 public class MessageHistory {
     private Log _log;
     private RouterContext _context;
-    private List _unwrittenEntries; // list of raw entries (strings) yet to be written
+    private final List _unwrittenEntries = new ArrayList(64); // list of raw entries (strings) yet to be written
     private String _historyFile; // where to write 
     private String _localIdent; // placed in each entry to uniquely identify the local router
     private boolean _doLog; // true == we want to log
@@ -61,7 +61,7 @@ public class MessageHistory {
     }
     
     void setDoLog(boolean log) { _doLog = log; }
-    boolean getDoLog() { return _doLog; }
+    public boolean getDoLog() { return _doLog; }
     
     void setPauseFlushes(boolean doPause) { _doPause = doPause; }
     String getFilename() { return _historyFile; }
@@ -104,7 +104,7 @@ public class MessageHistory {
             _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
             _historyFile = filename;
             _localIdent = getName(_context.routerHash());
-            _unwrittenEntries = new ArrayList(64);
+            // _unwrittenEntries = new ArrayList(64);
             updateSettings();
             // clear the history file on startup
             if (_firstPass) {
@@ -144,7 +144,7 @@ public class MessageHistory {
      */
     public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, TunnelId replyTunnel, Hash replyThrough) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("request [").append(getName(peerRequested)).append("] to create tunnel [");
         buf.append(createTunnel.getTunnelId()).append("] ");
@@ -169,7 +169,7 @@ public class MessageHistory {
      */
     public void receiveTunnelCreate(TunnelId createTunnel, Hash nextPeer, Date expire, boolean ok, Hash sourceRoutePeer) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("receive tunnel create [").append(createTunnel.getTunnelId()).append("] ");
         if (nextPeer != null)
@@ -187,7 +187,7 @@ public class MessageHistory {
     public void tunnelJoined(String state, TunnelInfo tunnel) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("joining as [").append(state);
         buf.append("] to tunnel: ").append(tunnel.toString());
@@ -203,7 +203,7 @@ public class MessageHistory {
     public void tunnelJoined(String state, HopConfig tunnel) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("joining as [").append(state);
         buf.append("] to tunnel: ").append(tunnel.toString());
@@ -242,7 +242,7 @@ public class MessageHistory {
     public void tunnelFailed(TunnelId tunnel) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("failing tunnel [").append(tunnel.getTunnelId()).append("]");
         addEntry(buf.toString());
@@ -258,7 +258,7 @@ public class MessageHistory {
     public void tunnelValid(TunnelInfo tunnel, long timeToTest) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel ").append(tunnel).append(" tested ok after ").append(timeToTest).append("ms");
         addEntry(buf.toString());
@@ -271,7 +271,7 @@ public class MessageHistory {
     public void tunnelRejected(Hash peer, TunnelId tunnel, Hash replyThrough, String reason) {
         if (!_doLog) return;
         if ( (tunnel == null) || (peer == null) ) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel [").append(tunnel.getTunnelId()).append("] was rejected by [");
         buf.append(getName(peer)).append("] for [").append(reason).append("]");
@@ -283,7 +283,7 @@ public class MessageHistory {
     public void tunnelParticipantRejected(Hash peer, String msg) {
         if (!_doLog) return;
         if (peer == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel participation rejected by [");
         buf.append(getName(peer)).append("]: ").append(msg);
@@ -298,7 +298,7 @@ public class MessageHistory {
     public void tunnelRequestTimedOut(Hash peer, TunnelId tunnel) {
         if (!_doLog) return;
         if ( (tunnel == null) || (peer == null) ) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel [").append(tunnel.getTunnelId()).append("] timed out on [");
         buf.append(getName(peer)).append("]");
@@ -314,7 +314,7 @@ public class MessageHistory {
      */
     public void droppedTunnelMessage(TunnelId id, long msgId, Date expiration, Hash from) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("dropped message ").append(msgId).append(" for unknown tunnel [").append(id.getTunnelId());
         buf.append("] from [").append(getName(from)).append("]").append(" expiring on ");
@@ -328,7 +328,7 @@ public class MessageHistory {
     public void droppedOtherMessage(I2NPMessage message, Hash from) {
         if (!_doLog) return;
         if (message == null) return;
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(getPrefix());
         buf.append("dropped [").append(message.getClass().getName()).append("] ").append(message.getUniqueId());
         buf.append(" [").append(message.toString()).append("] from [");
@@ -342,7 +342,7 @@ public class MessageHistory {
     
     public void droppedInboundMessage(long messageId, Hash from, String info) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(getPrefix());
         buf.append("dropped inbound message ").append(messageId);
         buf.append(" from ");
@@ -364,7 +364,7 @@ public class MessageHistory {
     public void replyTimedOut(OutNetMessage sentMessage) {
         if (!_doLog) return;
         if (sentMessage == null) return;
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(getPrefix());
         buf.append("timed out waiting for a reply to [").append(sentMessage.getMessageType());
         buf.append("] [").append(sentMessage.getMessageId()).append("] expiring on [");
@@ -383,7 +383,7 @@ public class MessageHistory {
      */
     public void messageProcessingError(long messageId, String messageType, String error) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("Error processing [").append(messageType).append("] [").append(messageId).append("] failed with [").append(error).append("]");
         addEntry(buf.toString());
@@ -420,7 +420,7 @@ public class MessageHistory {
     public void sendMessage(String messageType, long messageId, long expiration, Hash peer, boolean sentOk, String info) {
         if (!_doLog) return;
         if (false) return;
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(getPrefix());
         buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
         buf.append("to [").append(getName(peer)).append("] ");
@@ -448,7 +448,7 @@ public class MessageHistory {
     public void receiveMessage(String messageType, long messageId, long expiration, Hash from, boolean isValid) {
         if (!_doLog) return;
         if (false) return;
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(getPrefix());
         buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");
         if (from != null)
@@ -470,7 +470,7 @@ public class MessageHistory {
      */
     public void wrap(String bodyMessageType, long bodyMessageId, String containerMessageType, long containerMessageId) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("Wrap message [").append(bodyMessageType).append("] id [").append(bodyMessageId).append("] ");
         buf.append("in [").append(containerMessageType).append("] id [").append(containerMessageId).append("]");
@@ -483,7 +483,7 @@ public class MessageHistory {
      */
     public void receivePayloadMessage(long messageId) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append(getPrefix());
         buf.append("Receive payload message [").append(messageId).append("]");
         addEntry(buf.toString());
@@ -498,7 +498,7 @@ public class MessageHistory {
      */
     public void sendPayloadMessage(long messageId, boolean successfullySent, long timeToSend) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("Send payload message in [").append(messageId).append("] in [").append(timeToSend).append("] successfully? ").append(successfullySent);
         addEntry(buf.toString());
@@ -507,7 +507,7 @@ public class MessageHistory {
     public void receiveTunnelFragment(long messageId, int fragmentId, Object status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Receive fragment ").append(fragmentId).append(" in ").append(messageId);
         buf.append(" status: ").append(status.toString());
@@ -516,7 +516,7 @@ public class MessageHistory {
     public void receiveTunnelFragmentComplete(long messageId) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Receive fragmented message completely: ").append(messageId);
         addEntry(buf.toString());
@@ -524,7 +524,7 @@ public class MessageHistory {
     public void droppedFragmentedMessage(long messageId, String status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Fragmented message dropped: ").append(messageId);
         buf.append(" ").append(status);
@@ -533,7 +533,7 @@ public class MessageHistory {
     public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
         if (!_doLog) return;
         //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
         buf.append(" total size ").append(totalLength);
@@ -545,7 +545,7 @@ public class MessageHistory {
     public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, Object tunnel, String msg) {
         if (!_doLog) return;
         //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
         buf.append(" total size ").append(totalLength);
@@ -559,7 +559,7 @@ public class MessageHistory {
     public void droppedTunnelDataMessageUnknown(long msgId, long tunnelId) {
         if (!_doLog) return;
         if (msgId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Dropped data message ").append(msgId).append(" for unknown tunnel ").append(tunnelId);
         addEntry(buf.toString());
@@ -567,7 +567,7 @@ public class MessageHistory {
     public void droppedTunnelGatewayMessageUnknown(long msgId, long tunnelId) {
         if (!_doLog) return;
         if (msgId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Dropped gateway message ").append(msgId).append(" for unknown tunnel ").append(tunnelId);
         addEntry(buf.toString());
@@ -585,7 +585,7 @@ public class MessageHistory {
     }
     
     private final String getPrefix() {
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getTime(_context.clock().now()));
         buf.append(' ').append(_localIdent).append(": ");
         return buf.toString();

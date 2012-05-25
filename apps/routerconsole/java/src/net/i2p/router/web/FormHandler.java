@@ -12,7 +12,7 @@ import net.i2p.util.Log;
  * <jsp:setProperty name="handler" property="*" />
  *
  * The form is "processed" after the properties are set and the first output
- * property is retrieved - either getNotices() or getErrors().
+ * property is retrieved - either getAll(), getNotices() or getErrors().
  *
  */
 public class FormHandler {
@@ -21,8 +21,8 @@ public class FormHandler {
     private String _nonce;
     protected String _action;
     protected String _passphrase;
-    private List _errors;
-    private List _notices;
+    private List<String> _errors;
+    private List<String> _notices;
     private boolean _processed;
     private boolean _valid;
     
@@ -79,12 +79,38 @@ public class FormHandler {
     }
     
     /**
+     * Display everything, wrap it in a div for consistent presentation
+     *
+     */
+    public String getAllMessages() { 
+        validate();
+        process();
+        if (_errors.size() <= 0 && _notices.size() <= 0)
+            return "";
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<div class=\"messages\" id=\"messages\"><p>");
+        if (_errors.size() > 0) {
+            buf.append("<span class=\"error\">");
+            buf.append(render(_errors));
+            buf.append("</span>");
+        }
+        if (_notices.size() > 0) {
+            buf.append("<span class=\"notice\">");
+            buf.append(render(_notices));
+            buf.append("</span>");
+        }
+        buf.append("</p></div>");
+        return buf.toString();
+    }
+    
+    /**
      * Display any error messages (processing the form if it hasn't 
      * been yet)
      *
      */
     public String getErrors() { 
         validate();
+        process();
         return render(_errors);
     }
     
@@ -95,6 +121,7 @@ public class FormHandler {
      */
     public String getNotices() { 
         validate();
+        process();
         return render(_notices);
     }
     
@@ -133,28 +160,29 @@ public class FormHandler {
             if ( (expected != null) && (expected.trim().length() > 0) && (expected.equals(_passphrase)) ) {
                 // ok
             } else {
-                addFormError("Invalid nonce, are you being spoofed?");
+                addFormError("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.");
                 _valid = false;
             }
         }
     }
     
-    private String render(List source) {
+    private void process() {
         if (!_processed) {
             if (_valid)
                 processForm();
             _processed = true;
         }
+    }
+    
+    private String render(List<String> source) {
         if (source.size() <= 0) {
             return "";
-        } else if (source.size() == 1) {
-            return (String)source.get(0);
         } else {
-            StringBuffer buf = new StringBuffer(512);
+            StringBuilder buf = new StringBuilder(512);
             buf.append("<ul>\n");
             for (int i = 0; i < source.size(); i++) {
                 buf.append("<li>");
-                buf.append((String)source.get(i));
+                buf.append(source.get(i));
                 buf.append("</li>\n");
             }
             buf.append("</ul>\n");

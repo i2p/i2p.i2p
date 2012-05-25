@@ -1,0 +1,261 @@
+<html>
+    <head>
+        <title>Small Guide to I2P</title>
+    </head>
+    <body>
+        <h1>Small Guide to I2P</h1>
+
+        <h2>So, what's this all about?</h2>
+
+        <p>I2P builds up a new net inside the usual internet, connecting nodes together 
+        via encrypted connections.
+        It is a JAVA prgram with its most used part (the encryption of the data) written
+        in handoptimized assembler code.
+        It will use your bandwith, your RAM and your CPU. It will use them all up if you
+        do not limit it.
+        I2P will route unknown traffic through your node, even stuff you dislike.
+        As that data is encrypted, nobody knows whats data went to or drom your node.
+        </p>
+
+        <p>
+        First, ALWAYS use the latest stable release.
+        Development releases are called "mtn version" and are marked with a -, e.g. 
+        0.6.5-1. Those are usually useable by all but could do harm to your I2P 
+        experience.
+        You can get the latest MTN builds from my eepsite echelon.i2p, but always
+        remember: I built them, you need to trust me not to changed the code!
+        After you get the right "i2pupdate.zip" file, put that file into the I2P
+        directory and hit restart on the router console http://127.0.0.1:7657.
+        Do NOT deflate the zip file!
+        </p>
+
+        <p>
+        I2P is very dynamic - after startup it tries to get known to other I2P routers
+        and measures their speed - you need to wait some 10-120 minutes until your
+        I2P router knows enough other ones to obtain full power of I2P.
+        </p>
+
+        <h2>Filesharing</h2>
+
+        <p>
+        I2P is able to do anonymous filesharing.
+        But as there are NO gateways between real net and I2P, you can only share/
+        download torrents from within I2P. Look e.g. postman.i2p or planet.i2p.
+        You CANNOT use azureus, utorrent or any other usual client.
+        You cannot download anonymous torrents from mininova, piratebay or else.
+        You need to use I2P internal torrents and I2P aware programs like 
+        I2Psnark (builtin, suitable for 1-20 torrents)
+        I2PRufus (external, python, high CPU load, suitable >20 torrents) http://echelon.i2p/i2prufus
+        I2P-BT (external, python) 
+        I2PsnarkXL (mod of I2Psnark made by fwd)
+        </p>
+
+        <p>
+        There are also gnutella and edonkey clients:
+        i2phex for gnutella (http://echelon.i2p/i2phex)
+        imule for edonkey (http://echelon.i2p/imule)
+        </p>
+
+        <p>
+        Remember, as I2P uses other routers to route your traffic via 1-6 other PCs,
+        your transferrates in P2P are slower than in usual internet.
+        But you are anonymous, no one can easily (within 2 months-2 years) get your IP!
+        torrents inside of I2P reaches up to 50 kb/sec, usual are 10-20 kb/sec per torrent
+        i2phex reaches up to 20 kb/sec, usually 5-10 kb/sec
+        imule in times reaches 10 kb/sec, usually 5-10 kb/sec
+        </p>
+
+        <p>
+        In I2PHex and imule you can just tell "share file or directory", in torrent
+        you need to create a .torrent file and upload that (and ONLY that small .torrent)
+        file to the trackers like tracker.postman.i2p/
+        </p>
+
+        <p>
+        I2P is a smaller net (1000 users) which grows slowly. As of which amount of shared
+        data will slowly rise.
+        </p>
+
+        <p>
+        I2P is anonymous and it does not censor - there is no administrator.
+        There IS unwanted stuff like kiddyporn, nazism, or else.
+        If you dislike all this, do not use I2P.
+        There is NO way to prohibite this stuff to appear in a anonymous net like I2P.
+        (as that stuff is available shows the anonymity and transfer function of I2P
+        is working well enough)
+        You can delete the destinations in question from your local hosts.txt file (or
+        deface them) which will partly prevent you to reach those bad sies by accident.
+        </p>
+         
+        <h2>Internet (the websites)</h2>
+
+        <p>         
+        Only one outproxy (gateway I2P - webpages in usual Internet) is working.
+        It is NOT official from I2P, I2P does work without.
+        If that outproxy is slow, offline, gone,.. I2P still works on and cannot do
+        anything to change that failure.
+        That outproxy translates usual internet webpages into the I2P net and you can 
+        reach them via your Router.
+        The best way for usual webpages is TOR, not that outproxy.
+        Remember: the owner of the outproxy got ALL traffic from all I2P users
+        visiting Internet pages and will risk that into the police!
+        </p>
+        
+        <p>
+        This proxy is false.i2p. In newer I2P routers it is enabled, but not in
+        older ones. Go to http://127.0.0.1:7657/i2ptunnel/index.jsp tunnels page and
+        click on the eepProxy tunnel. Change the entry for the "Outproxies" to false.i2p
+        and save.  On the tunnels page, stop the epproxy tunnel and start it again,
+        now your router will use the false.i2p outproxy. 
+        </p>
+        
+        <p>
+        No other (known) gateways are setup and running. No one we know will run
+        the gateway for torrent or any other P2P data (and risk his life).
+        </p>
+        
+        <h2>Bandwidth</h2>
+        
+        <p>http://127.0.0.1:7657/config.jsp</p>
+        
+        <p>Setup your bandwith wisely. Know your linespeed!</p>
+        
+        <p>
+        E.g. most common terms are:
+        1Mbit = roughly 100 kbyte/sec
+        10 MBit = roughly 1100 kbyte/sec
+        512 kbit = roughly 50 kbyte/sec
+        or in germany:
+        16000er = roughly 1500 kbyte/sec
+        6000er = roughly 600 kbyte/sec
+        1000er = roughly 100 kb/sec
+        </p>        
+        
+        <p>
+        Set your bandwith limits to 10% under your line speed and burst  rate to
+        your line speed.
+        Set the bandwith share percentage to:
+        >80% if lowest bandwith setting is >50k
+        >50% if lowest bandwith setting is >30k
+        >20% if lowest bandwith setting is >16k
+        </p>
+        
+        <p>There is no shared bandwith under 16k.</p>
+        
+        <p>
+        Limit your participating tunnels (shared bandwith) on:
+        http://127.0.0.1:7657/configadvanced.jsp
+        with the line:
+        router.maxParticipatingTunnels=500
+        </p>
+        
+        <p>
+        2000 is for roughly 600 kb/sec - very high value with high CPU load
+        1000 is for roughly 300 kb/sec
+        600 is a good value for 150-200kb/sec
+        300 is roughly 90 kb/sec
+        150 roughly 50 kb/sec 
+        Remember: even failed tunnel requests will result in a part tunnel on the hops in between!
+        Those said, there are far more part tunnels unused than used in the live net under load, which 
+        results in slower bandwith per tunnel in the end.
+        It is wise to first limit the bandwith and afterwards the part tunnels, e.g. set some more part
+        tunnels and let I2P reach the bandwith limit instead of the part tunnels limit!
+        </p>
+        
+        <h2>What is shared bandwidth?</h2>
+         
+        <p>
+        I2P transports your date from the client to the server through 1-6 hops 
+        (other I2P routers). Each of this hops sees the data from you as "participating
+        tunnel" - which is the shared bandwith of them.
+        With this in mind, I2P needs some amount of this shared bandwith at some 
+        amount of routers.
+        Share as much as you are able of - others will thank you!
+        </p>
+        
+        <p>
+        With the "share percentage" set like above, you will obtain enough speed for
+        your own traffic and obtain some participating tunnels (if >16kb/sec) with some 
+        noise traffic to hide your traffic in the stream.
+        </p>
+        
+        <p>
+        With release 0.6.5 there is some method to prefer your own traffic ahead
+        of shared traffic which will result in better experience to you!
+        </p>
+        
+        <h2>Addressbook</h2>
+
+        <p>
+        I2P uses a local addressbook to link short DNS names with the internal used 512bit
+        hashes (which are destination IDs).
+        Those links are saved insside the hosts.txt and userhosts.txt files in the i2p 
+        directory.
+        Hosts which are not in those files cannot be reached via the short DNS names
+        and a error message with "jumper links" will appear. Those links will ask
+        some hosts services and forward to the correct site (if the site is known to them).
+        Those hosts services just made a form to add new "hosts" and those results public
+        available.
+        You can subscribe to those hosts service and let your hosts.txt file be updated
+        automatic. Go to http://127.0.0.1:7657/susidns/subscriptions.jsp SusiDNS
+        and enter the hosts services into the textbox (and save afterwards):
+        http://www.i2p2.i2p/hosts.txt
+        http://stats.i2p/cgi-bin/newhosts.txt
+        http://tino.i2p/hosts.txt
+        http://i2host.i2p/cgi-bin/i2hostag
+        You can add one of them, two or all. 
+        SusiDNS will now ask those hosts for new entries to the hosts.txt and those
+        will be added to your hosts.txt. The userhosts.txt will ONLY be updated by
+        yourself (the user) and not be published into the net!
+        Remember, names once set could not be changed! If you loose your key (destination
+        ID) to your eepsite, service,..., there is no way to change the linking 
+        between the DNS name and the (lost) destination ID automatic! Only manual by each 
+        user itself - great topic to discuss of need to renew DNS hostnames.
+        As this subscription will not update old entries, you can "deface" unwanted 
+        eepsites with a false key and if you hit the bad name in browser by accident, 
+        you will not see the bad stuff!
+        </p>
+
+        <h2>Out of Memory errors </h2>
+
+        <p>
+        If your router hits the Out of Memory error - check your logs!
+        Usual point for OOM are to much torrents in i2psnark - i2psnark is a real
+        memory hogg and >10 torrents it requiers hell a lot of memory!
+        </p>
+
+        <p>
+        Maybe it is possible for you to increase the wrapper memory config.
+        This ONLY works if you start the I2P service restartable with console
+        (on Windows).
+        In I2P directory edit the wrapper.config file and change the values:
+        wrapper.java.maxmemory=256 (or even to 512, IF possible)
+        Afterwards shutdown I2P complete (the service) and restart it.
+        </p>
+
+        <h2>Blocklists</h2>
+
+        <p>
+        Sometimes attackers trying to flood the I2P net and try to do some harm.
+        And some folks setting localnet IPs as their internet reachable address.
+        To prevent those bad router to harm the local router, I2P implemented
+        a local blocklist system. It is NOT integrated automatic as it could 
+        really harm your I2P experience if setup the wrong way.
+        The way to enable blocklists is:
+        Get the file http://zzz.i2p/files/blocklist.txt and copy this file into the
+        I2P directory.
+        On http://127.0.0.1:7657/configadvanced.jsp set the option 
+        router.blocklist.enable=true - click on Apply and restart the router 
+        with the restart link left on router console.
+        The blockfile.txt file follows a special order, you´ll get it if you read it.
+        The first entry is the reason to be shown on http://127.0.0.1:7657/profiles.jsp
+        at the bottom in the shitlist section.
+        The second entry is the IP or the dest ID of a router.
+        Right now there are only private subnets in the blocklist AND one chinese router
+        which floods the floodfill DB while restarting every few minutes with a different
+        router ID and far to less bandwith for being a floodfill router.
+        </p>
+
+        <p>(By echelon -- echelon.i2p )</p>
+    </body>
+</html>

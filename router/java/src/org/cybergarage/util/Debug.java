@@ -15,32 +15,21 @@
 
 package org.cybergarage.util;
 
-import java.io.PrintStream;
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
-public final class Debug{		
-	
-	public static Debug debug = new Debug();
-	
-	private PrintStream out = System.out;
-	
-	
-	public Debug(){
-		
+public final class Debug
+{
+	private static Log _log;
+
+	/** I2P this is all static so have the UPnPManager call this */
+	public static void initialize(I2PAppContext ctx) {
+		_log = ctx.logManager().getLog(Debug.class);
+		// org.cybergarage.util.Debug=DEBUG at startup
+		enabled = _log.shouldLog(Log.DEBUG);
 	}
-	
-	public synchronized PrintStream getOut() {
-		return out;
-	}
-	public synchronized void setOut(PrintStream out) {
-		this.out = out;
-	}
-	
-	
+
 	public static boolean enabled = false;
-
-	public static Debug getDebug(){
-		return Debug.debug;
-	}
 	
 	public static final void on() {
 		enabled = true;
@@ -52,30 +41,25 @@ public final class Debug{
 		return enabled;
 	}
 	public static final void message(String s) {
-		if (enabled == true)
-			Debug.debug.getOut().println("CyberGarage message : " + s);
+		if (_log != null)
+			_log.debug(s);
 	}
 	public static final void message(String m1, String m2) {
-		if (enabled == true)
-			Debug.debug.getOut().println("CyberGarage message : ");
-			Debug.debug.getOut().println(m1);
-			Debug.debug.getOut().println(m2);
-	}
-	public static final void warning(String s) {
-		Debug.debug.getOut().println("CyberGarage warning : " + s);
-	}
-	public static final void warning(String m, Exception e) {
-		if(e.getMessage()==null){
-			Debug.debug.getOut().println("CyberGarage warning : " + m + " START");
-			e.printStackTrace(Debug.debug.getOut());
-			Debug.debug.getOut().println("CyberGarage warning : " + m + " END");
-		}else{
-			Debug.debug.getOut().println("CyberGarage warning : " + m + " (" + e.getMessage() + ")");
-			e.printStackTrace(Debug.debug.getOut());
+		if (_log != null) {
+			_log.debug(m1);
+			_log.debug(m2);
 		}
 	}
+	public static final void warning(String s) {
+		if (_log != null)
+			_log.error(s);
+	}
+	public static final void warning(String m, Exception e) {
+		if (_log != null)
+			_log.error(m, e);
+	}
 	public static final void warning(Exception e) {
-		warning(e.getMessage());
-		e.printStackTrace(Debug.debug.getOut());
+		if (_log != null)
+			_log.error("", e);
 	}
 }

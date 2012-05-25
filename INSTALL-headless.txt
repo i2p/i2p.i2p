@@ -1,0 +1,33 @@
+Headless I2P installation instructions
+
+1) java -jar i2pinstall.exe -console       (you've already done this)
+
+This will run the installer in text mode, including running the postinstall.sh
+script, which will start the router and launch a browser.
+
+If you do not have an X server running, the browser launch will fail, and
+you may use:
+  lynx http://localhost:7657/index.jsp
+to configure the router.
+
+If you're having trouble, swing by http://forum.i2p2.de/, check the
+website at http://www.i2p2.de/, or get on irc://irc.freenode.net/#i2p
+
+To run I2P explicitly:
+   (*nix): sh i2prouter start
+   (win*): I2P.exe
+
+To stop the router (gracefully):
+   lynx http://localhost:7657/configservice.jsp ("Shutdown gracefully")
+
+To stop the router (immediately):
+   sh i2prouter stop
+
+To uninstall I2P:
+   rm -rf $i2pInstallDir
+
+Supported JVMs:
+  Windows: Latest available from http://java.sun.com/ (1.5+ supported)
+  Linux:   Latest available from http://java.sun.com/ (1.5+ supported)
+  FreeBSD: Sun 1.5-compatible (NIO required)
+  various: http://www.kaffe.org/ Sun 1.5-compatible (NIO required)

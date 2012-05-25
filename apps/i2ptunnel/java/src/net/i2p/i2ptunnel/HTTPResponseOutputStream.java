@@ -59,13 +59,16 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         _buf1 = new byte[1];
     }
 
+    @Override
     public void write(int c) throws IOException {
         _buf1[0] = (byte)c;
         write(_buf1, 0, 1);
     }
+    @Override
     public void write(byte buf[]) throws IOException { 
         write(buf, 0, buf.length); 
     }
+    @Override
     public void write(byte buf[], int off, int len) throws IOException {
         if (_headerWritten) {
             out.write(buf, off, len);
@@ -207,6 +210,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         out.write("\r\n".getBytes()); // end of the headers
     }
     
+    @Override
     public void close() throws IOException {
         out.close();
     }
@@ -303,11 +307,13 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 return true;
             }
         }
+        @Override
         public String toString() { 
             return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
         }
     }
     
+    @Override
     public String toString() {
         return super.toString() + ": " + _in;
     }

@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
+// import net.i2p.util.Log;
 
 /**
  * Defines a message containing arbitrary bytes of data
@@ -20,11 +20,11 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DataMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DataMessage.class);
+    // private final static Log _log = new Log(DataMessage.class);
     public final static int MESSAGE_TYPE = 20;
     private byte _data[];
     
-    private static final int MAX_SIZE = 64*1024;
+    // private static final int MAX_SIZE = 64*1024;  // LINT -- field hides another field, and not used
     
     public DataMessage(I2PAppContext context) {
         super(context);
@@ -81,6 +81,7 @@ public class DataMessage extends I2NPMessageImpl {
         return curIndex;
     }
     
+    @Override
     protected void written() {
         super.written();
         _data = null;
@@ -88,10 +89,12 @@ public class DataMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getData());
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DataMessage) ) {
             DataMessage msg = (DataMessage)object;
@@ -101,8 +104,9 @@ public class DataMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DataMessage: ");
         buf.append("\n\tData: ").append(DataHelper.toString(getData(), 64));
         buf.append("]");

@@ -138,7 +138,7 @@ public class RouterAddress extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[RouterAddress: ");
         buf.append("\n\tTransportStyle: ").append(getTransportStyle());
         buf.append("\n\tCost: ").append(getCost());

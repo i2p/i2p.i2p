@@ -1,0 +1,331 @@
+package net.i2p.router.transport;
+/*
+ * free (adj.): unencumbered; not under the control of others
+ * Use at your own risk.
+ */
+
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.i2p.data.DataHelper;
+import net.i2p.router.RouterContext;
+import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.Log;
+
+/**
+ * Manage geoip lookup in a file with the Tor geoip format.
+ *
+ * The lookup is expensive, so a lookup is queued with add().
+ * The actual lookup of multiple IPs is fired with lookup().
+ * To get a country for an IP, use get() which returns a lower-case,
+ * generally two-letter country code or null.
+ *
+ * Everything here uses longs, since Java is signed-only, the file is
+ * sorted by unsigned, and we don't store the table in memory
+ * (unlike in Blocklist.java, where it's in-memory so we want to be
+ * space-efficient)
+ *
+ * @author zzz
+ */
+public class GeoIP {
+    private Log _log;
+    private RouterContext _context;
+    private final Map<String, String> _codeToName;
+    private final Map<Long, String> _IPToCountry;
+    private final Set<Long> _pendingSearch;
+    private final Set<Long> _notFound;
+    private final AtomicBoolean _lock;
+    
+    public GeoIP(RouterContext context) {
+        _context = context;
+        _log = context.logManager().getLog(GeoIP.class);
+        _codeToName = new ConcurrentHashMap();
+        _IPToCountry = new ConcurrentHashMap();
+        _pendingSearch = new ConcurrentHashSet();
+        _notFound = new ConcurrentHashSet();
+        _lock = new AtomicBoolean();
+        readCountryFile();
+    }
+    
+    static final String PROP_GEOIP_ENABLED = "routerconsole.geoip.enable";
+    static final String GEOIP_DIR_DEFAULT = "geoip";
+    static final String GEOIP_FILE_DEFAULT = "geoip.txt";
+    static final String COUNTRY_FILE_DEFAULT = "countries.txt";
+    public static final String PROP_IP_COUNTRY = "i2np.lastCountry";
+
+    /**
+     * Fire off a thread to lookup all pending IPs.
+     * There is no indication of completion.
+     * Results will be added to the table and available via get() after completion.
+     */
+/******
+    public void lookup() {
+        if (! Boolean.valueOf(_context.getProperty(PROP_GEOIP_ENABLED, "true")).booleanValue()) {
+            _pendingSearch.clear();
+            return;
+        }
+        Thread t = new Thread(new LookupJob());
+        t.start();
+    }
+******/
+
+    /**
+     * Blocking lookup of all pending IPs.
+     * Results will be added to the table and available via get() after completion.
+     */
+    public void blockingLookup() {
+        if (! Boolean.valueOf(_context.getProperty(PROP_GEOIP_ENABLED, "true")).booleanValue()) {
+            _pendingSearch.clear();
+            return;
+        }
+        LookupJob j = new LookupJob();
+        j.run();
+        updateOurCountry();
+    }
+
+    private class LookupJob implements Runnable {
+        public void run() {
+            if (_lock.getAndSet(true))
+                return;
+            Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
+            if (search.length <= 0)
+                return;
+            _pendingSearch.clear();
+            Arrays.sort(search);
+            String[] countries = readGeoIPFile(search);
+
+            for (int i = 0; i < countries.length; i++) {
+                if (countries[i] != null)
+                    _IPToCountry.put(search[i], countries[i]);
+                else
+                    _notFound.add(search[i]);
+            }
+            _lock.set(false);
+        }
+    }
+
+   /**
+    * Read in and parse the country file.
+    * The file need not be sorted.
+    *
+    * Acceptable formats:
+    *   #comment (# must be in column 1)
+    *   code,full name
+    *
+    * Example:
+    *   US,UNITED STATES
+    *
+    * To create:
+    * wget http://ip-to-country.webhosting.info/downloads/ip-to-country.csv.zip
+    * unzip ip-to-country.csv.zip
+    * cut -d, -f3,5 < ip-to-country.csv|sed 's/"//g' | sort | uniq > countries.txt
+    *
+    */
+    private void readCountryFile() {
+        File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        GeoFile = new File(GeoFile, COUNTRY_FILE_DEFAULT);
+        if (GeoFile == null || (!GeoFile.exists())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Country file not found: " + GeoFile.getAbsolutePath());
+            return;
+        }
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(GeoFile);
+            StringBuilder buf = new StringBuilder(128);
+            while (DataHelper.readLine(in, buf)) {
+                try {
+                    if (buf.charAt(0) == '#') {
+                        buf.setLength(0);
+                        continue;
+                    }
+                    String[] s = buf.toString().split(",");
+                    // todo convert name to mixed upper/lower case
+                    _codeToName.put(s[0].toLowerCase(), s[1]);
+                } catch (IndexOutOfBoundsException ioobe) {
+                }
+                buf.setLength(0);
+            }
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error reading the Country File", ioe);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
+    }
+
+   /**
+    * Read in and parse the geoip file.
+    * The geoip file must be sorted, and may not contain overlapping entries.
+    *
+    * Acceptable formats (IPV4 only):
+    *   #comment (# must be in column 1)
+    *   integer IP,integer IP, country code
+    *
+    * Example:
+    *   121195296,121195327,IT
+    *
+    * This is identical to the Tor geoip file, which can be found in
+    * src/config/geoip in their distribution, or /usr/local/lib/share/tor/geoip
+    * in their installation.
+    * Thanks to Tor for finding a source for the data, and the format script.
+    *
+    * To create:
+    * wget http://ip-to-country.webhosting.info/downloads/ip-to-country.csv.zip
+    * unzip ip-to-country.csv.zip
+    * cut -d, -f0-3 < ip-to-country.csv|sed 's/"//g' > geoip.txt
+    *
+    * @param search a sorted array of IPs to search
+    * @return an array of country codes, same order as the search param,
+    *         or a zero-length array on failure
+    *
+    */
+    private String[] readGeoIPFile(Long[] search) {
+        File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        GeoFile = new File(GeoFile, GEOIP_FILE_DEFAULT);
+        if (GeoFile == null || (!GeoFile.exists())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("GeoIP file not found: " + GeoFile.getAbsolutePath());
+            return new String[0];
+        }
+        String[] rv = new String[search.length];
+        int idx = 0;
+        long start = _context.clock().now();
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(GeoFile);
+            StringBuilder buf = new StringBuilder(128);
+            while (DataHelper.readLine(in, buf) && idx < search.length) {
+                try {
+                    if (buf.charAt(0) == '#') {
+                        buf.setLength(0);
+                        continue;
+                    }
+                    String[] s = buf.toString().split(",");
+                    long ip1 = Long.parseLong(s[0]);
+                    long ip2 = Long.parseLong(s[1]);
+                    while (idx < search.length && search[idx].longValue() < ip1) {
+                        idx++;
+                    }
+                    while (idx < search.length && search[idx].longValue() >= ip1 && search[idx].longValue() <= ip2) {
+                        rv[idx++] = s[2].toLowerCase();
+                    }
+                } catch (IndexOutOfBoundsException ioobe) {
+                } catch (NumberFormatException nfe) {
+                }
+                buf.setLength(0);
+            }
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error reading the GeoFile", ioe);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
+
+        if (_log.shouldLog(Log.WARN)) {
+            _log.warn("GeoIP processing finished, time: " + (_context.clock().now() - start));
+        }
+        return rv;
+    }
+
+    /**
+     *  Put our country code in the config, where others (such as Timestamper) can get it,
+     *  and it will be there next time at startup.
+     */
+    private void updateOurCountry() {
+        String oldCountry = _context.router().getConfigSetting(PROP_IP_COUNTRY);
+        String country = _context.commSystem().getCountry(_context.routerHash());
+        if (country != null && !country.equals(oldCountry)) {
+            _context.router().setConfigSetting(PROP_IP_COUNTRY, country);
+            _context.router().saveConfig();
+        }
+    }
+
+    /**
+     * Add to the list needing lookup
+     */
+    public void add(String ip) {
+        InetAddress pi;
+        try {
+            pi = InetAddress.getByName(ip);
+        } catch (UnknownHostException uhe) {
+            return;
+        }
+        if (pi == null) return;
+        byte[] pib = pi.getAddress();
+        add(pib);
+    }
+
+    public void add(byte ip[]) {
+        if (ip.length != 4)
+            return;
+        add(toLong(ip));
+    }
+
+    private void add(long ip) {
+        Long li = Long.valueOf(ip);
+        if (!(_IPToCountry.containsKey(li) || _notFound.contains(li)))
+            _pendingSearch.add(li);
+    }
+
+    /**
+     * Get the country for an IP
+     * @return lower-case code, generally two letters.
+     */
+    public String get(String ip) {
+        InetAddress pi;
+        try {
+            pi = InetAddress.getByName(ip);
+        } catch (UnknownHostException uhe) {
+            return null;
+        }
+        if (pi == null) return null;
+        byte[] pib = pi.getAddress();
+        return get(pib);
+    }
+
+    public String get(byte ip[]) {
+        if (ip.length != 4)
+            return null;
+        return get(toLong(ip));
+    }
+
+    private String get(long ip) {
+        return _IPToCountry.get(Long.valueOf(ip));
+    }
+
+    private static long toLong(byte ip[]) {
+        int rv = 0;
+        for (int i = 0; i < 4; i++)
+            rv |= (ip[i] & 0xff) << ((3-i)*8);
+        return ((long) rv) & 0xffffffffl;
+    }
+
+    public String fullName(String code) {
+        return _codeToName.get(code);
+    }
+
+/*** doesn't work since switched to RouterContext above
+    public static void main(String args[]) {
+        GeoIP g = new GeoIP(new I2PAppContext());
+        String tests[] = {"0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.255", "1.0.0.0",
+                                        "94.3.3.3", "77.1.2.3", "127.0.0.0", "127.127.127.127", "128.0.0.0",
+                                        "89.8.9.3", "72.5.6.8", "217.4.9.7", "175.107.027.107", "135.6.5.2",
+                                        "129.1.2.3", "255.255.255.254", "255.255.255.255"};
+        for (int i = 0; i < tests.length; i++)
+            g.add(tests[i]);
+        g.blockingLookup();
+        for (int i = 0; i < tests.length; i++)
+            System.out.println(tests[i] + " : " + g.get(tests[i]));
+
+    }
+***/
+}

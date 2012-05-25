@@ -33,11 +33,17 @@ public class FIFOBandwidthRefiller implements Runnable {
     public static final String PROP_OUTBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.outboundBurstKBytes";
     //public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
 
-    // no longer allow unlimited bandwidth - the user must specify a value, and if they do not, it is 32/16KBps
-    public static final int DEFAULT_INBOUND_BANDWIDTH = 48;
-    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 24;
-    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 64;
-    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 32;
+    // no longer allow unlimited bandwidth - the user must specify a value, else use defaults below (KBps)
+    public static final int DEFAULT_INBOUND_BANDWIDTH = 96;
+    /**
+     *  Caution, do not make DEFAULT_OUTBOUND_BANDWIDTH * DEFAULT_SHARE_PCT > 32
+     *  without thinking about the implications (default connection limits, for example)
+     *  of moving the default bandwidth class from L to M, or maybe
+     *  adjusting bandwidth class boundaries.
+     */
+    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 40;
+    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 80;
+    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 40;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
     

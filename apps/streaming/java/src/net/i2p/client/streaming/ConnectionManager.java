@@ -34,32 +34,32 @@ public class ConnectionManager {
     /** Inbound stream ID (Long) to Connection map */
     private Map _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
-    private Map _pendingPings;
+    private final Map _pendingPings;
     private boolean _allowIncoming;
     private int _maxConcurrentStreams;
     private ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
-    private Object _connectionLock;
+    private final Object _connectionLock;
     private long SoTimeout;
     
     public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
         _context = context;
-        _log = context.logManager().getLog(ConnectionManager.class);
+        _session = session;
+        _maxConcurrentStreams = maxConcurrent;
+        _defaultOptions = defaultOptions;
+        _log = _context.logManager().getLog(ConnectionManager.class);
         _connectionByInboundId = new HashMap(32);
         _pendingPings = new HashMap(4);
         _connectionLock = new Object();
-        _messageHandler = new MessageHandler(context, this);
-        _packetHandler = new PacketHandler(context, this);
-        _connectionHandler = new ConnectionHandler(context, this);
-        _schedulerChooser = new SchedulerChooser(context);
-        _conPacketHandler = new ConnectionPacketHandler(context);
-        _tcbShare = new TCBShare(context);
-        _session = session;
-        session.setSessionListener(_messageHandler);
-        _outboundQueue = new PacketQueue(context, session, this);
+        _messageHandler = new MessageHandler(_context, this);
+        _packetHandler = new PacketHandler(_context, this);
+        _connectionHandler = new ConnectionHandler(_context, this);
+        _schedulerChooser = new SchedulerChooser(_context);
+        _conPacketHandler = new ConnectionPacketHandler(_context);
+        _tcbShare = new TCBShare(_context);
+        _session.setSessionListener(_messageHandler);
+        _outboundQueue = new PacketQueue(_context, _session, this);
         _allowIncoming = false;
-        _maxConcurrentStreams = maxConcurrent;
-        _defaultOptions = defaultOptions;
         _numWaiting = 0;
         /** Socket timeout for accept() */
         SoTimeout = -1;
@@ -277,11 +277,15 @@ public class ConnectionManager {
     
     public MessageHandler getMessageHandler() { return _messageHandler; }
     public PacketHandler getPacketHandler() { return _packetHandler; }
-    public ConnectionHandler getConnectionHandler() { return _connectionHandler; }
     public I2PSession getSession() { return _session; }
-    public PacketQueue getPacketQueue() { return _outboundQueue; }
     public void updateOptsFromShare(Connection con) { _tcbShare.updateOptsFromShare(con); }
     public void updateShareOpts(Connection con) { _tcbShare.updateShareOpts(con); }
+    // Both of these methods are 
+    // exporting non-public type through public API, this is a potential bug.
+    public ConnectionHandler getConnectionHandler() { return _connectionHandler; }
+    public PacketQueue getPacketQueue() { return _outboundQueue; }
+    /** do we respond to pings that aren't on an existing connection? */
+    public boolean answerPings() { return _defaultOptions.getAnswerPings(); }
     
     /**
      * Something b0rked hard, so kill all of our connections without mercy.
@@ -345,13 +349,13 @@ public class ConnectionManager {
             return new HashSet(_connectionByInboundId.values());
         }
     }
-    
     public boolean ping(Destination peer, long timeoutMs) {
         return ping(peer, timeoutMs, true);
     }
     public boolean ping(Destination peer, long timeoutMs, boolean blocking) {
         return ping(peer, timeoutMs, blocking, null, null, null);
     }
+
     public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set tagsToSend, PingNotifier notifier) {
         Long id = new Long(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
         PacketLocal packet = new PacketLocal(_context, peer);
@@ -390,7 +394,7 @@ public class ConnectionManager {
         return ok;
     }
 
-    interface PingNotifier {
+    public interface PingNotifier {
         public void pingComplete(boolean ok);
     }
     

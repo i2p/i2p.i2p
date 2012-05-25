@@ -253,6 +253,12 @@ public class TunnelDispatcher implements Service {
         return _participatingConfig.size();
     }
     
+    /*******  may be used for congestion control later...
+    public int getParticipatingInboundGatewayCount() {
+        return _inboundGateways.size();
+    }
+    *******/
+    
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     public long getLastParticipatingExpiration() { return _lastParticipatingExpiration; }
     
@@ -492,14 +498,14 @@ public class TunnelDispatcher implements Service {
 
     /**
      * Generate a current estimate of usage per-participating-tunnel lifetime.
-     * The router code calls this every 20s.
+     * The router code calls this every 'ms' millisecs.
      * This is better than waiting until the tunnel expires to update the rate,
      * as we want this to be current because it's an important part of
      * the throttle code.
      * Stay a little conservative by taking the counts only for tunnels 1-10m old
      * and computing the average from that.
      */
-    public void updateParticipatingStats() {
+    public void updateParticipatingStats(int ms) {
         List<HopConfig> participating = listParticipatingTunnels();
         int size = participating.size();
         long count = 0;
@@ -521,9 +527,9 @@ public class TunnelDispatcher implements Service {
         }
         if (tcount > 0)
             count = count * 30 / tcount;
-        _context.statManager().addRateData("tunnel.participatingMessageCount", count, 20*1000);
-        _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/20, 20*1000);
-        _context.statManager().addRateData("tunnel.participatingBandwidthOut", bwOut*1024/20, 20*1000);
+        _context.statManager().addRateData("tunnel.participatingMessageCount", count, ms);
+        _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/(ms/1000), ms);
+        _context.statManager().addRateData("tunnel.participatingBandwidthOut", bwOut*1024/(ms/1000), ms);
         _context.statManager().addRateData("tunnel.participatingTunnels", size, 0);
     }
 

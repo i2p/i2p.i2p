@@ -67,8 +67,8 @@ public class LogManager {
     /** when was the config file last read (or -1 if never) */
     private long _configLastRead;
 
-    /** filename of the config file */
-    private String _location;
+    /** the config file */
+    private File _locationFile;
     /** Ordered list of LogRecord elements that have not been written out yet */
     private List _records;
     /** List of explicit overrides of log levels (LogLimit objects) */
@@ -115,11 +115,11 @@ public class LogManager {
         _logs = new HashMap(128);
         _defaultLimit = Log.ERROR;
         _configLastRead = 0;
-        _location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         _context = context;
         _log = getLog(LogManager.class);
+        String location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
+        setConfig(location);
         _consoleBuffer = new LogConsoleBuffer(context);
-        loadConfig();
         _writer = new LogWriter(this);
         Thread t = new I2PThread(_writer);
         t.setName("LogWriter");
@@ -196,9 +196,14 @@ public class LogManager {
     }
 
     public void setConfig(String filename) {
-        _log.debug("Config filename set to " + filename);
-        _location = filename;
+        _locationFile = new File(filename);
+        if (!_locationFile.isAbsolute())
+            _locationFile = new File(_context.getConfigDir(), filename);
         loadConfig();
+    }
+
+    public String currentFile() {
+        return _writer.currentFile();
     }
 
     /**
@@ -232,20 +237,12 @@ public class LogManager {
         loadConfig();
     }
 
-    ///
-    ///
-
-    //
-    //
-    //
-
     private void loadConfig() {
-        File cfgFile = new File(_location);
+        File cfgFile = _locationFile;
         if (!cfgFile.exists()) {
             if (!_alreadyNoticedMissingConfig) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Log file " + _location + " does not exist");
-                //System.err.println("Log file " + _location + " does not exist");
+                    _log.warn("Log file " + _locationFile.getAbsolutePath() + " does not exist");
                 _alreadyNoticedMissingConfig = true;
             }
             parseConfig(new Properties());
@@ -262,9 +259,6 @@ public class LogManager {
             return;
         }
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Loading config from " + _location);
-
         Properties p = new Properties();
         FileInputStream fis = null;
         try {
@@ -272,7 +266,7 @@ public class LogManager {
             p.load(fis);
             _configLastRead = _context.clock().now();
         } catch (IOException ioe) {
-            System.err.println("Error loading logger config from " + new File(_location).getAbsolutePath());
+            System.err.println("Error loading logger config from " + cfgFile.getAbsolutePath());
         } finally {
             if (fis != null) try {
                 fis.close();
@@ -540,7 +534,7 @@ public class LogManager {
         String config = createConfig();
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_location);
+            fos = new FileOutputStream(_locationFile);
             fos.write(config.getBytes());
             return true;
         } catch (IOException ioe) {
@@ -552,7 +546,7 @@ public class LogManager {
     }
     
     private String createConfig() {
-        StringBuffer buf = new StringBuffer(8*1024);
+        StringBuilder buf = new StringBuilder(8*1024);
         buf.append(PROP_FORMAT).append('=').append(new String(_format)).append('\n');
         buf.append(PROP_DATEFORMAT).append('=').append(_dateFormatPattern).append('\n');
         buf.append(PROP_DISPLAYONSCREEN).append('=').append((_displayOnScreen ? "TRUE" : "FALSE")).append('\n');

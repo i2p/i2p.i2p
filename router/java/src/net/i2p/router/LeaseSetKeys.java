@@ -73,6 +73,7 @@ public class LeaseSetKeys extends DataStructureImpl {
 	_revocationKey.writeBytes(out);
     }
     
+    @Override
     public int hashCode() {
 	int rv = 0;
 	rv += DataHelper.hashCode(_dest);
@@ -81,6 +82,7 @@ public class LeaseSetKeys extends DataStructureImpl {
 	return rv;
     }
     
+    @Override
     public boolean equals(Object obj) {
 	if ( (obj != null) && (obj instanceof LeaseSetKeys) ) {
 	    LeaseSetKeys keys = (LeaseSetKeys)obj;

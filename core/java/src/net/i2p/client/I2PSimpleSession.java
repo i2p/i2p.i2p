@@ -17,25 +17,32 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
+import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
- * Create a new session for doing naming queries only. Do not create a Destination.
+ * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
  * Don't create a producer. Do not send/receive messages to other Destinations.
  * Cannot handle multiple simultaneous queries atm.
  * Could be expanded to ask the router other things.
+ *
+ * @author zzz
  */
 class I2PSimpleSession extends I2PSessionImpl2 {
     private boolean _destReceived;
     private Object _destReceivedLock;
     private Destination _destination;
+    private boolean _bwReceived;
+    private Object _bwReceivedLock;
+    private int[] _bwLimits;
 
     /**
-     * Create a new session for doing naming queries only. Do not create a destination.
+     * Create a new session for doing naming and bandwidth queries only. Do not create a destination.
      *
      * @throws I2PSessionException if there is a problem
      */
@@ -94,6 +101,14 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         }
     }
 
+    void bwReceived(int[] i) {
+        _bwReceived = true;
+        _bwLimits = i;
+        synchronized (_bwReceivedLock) {
+            _bwReceivedLock.notifyAll();
+        }
+    }
+
     public Destination lookupDest(Hash h) throws I2PSessionException {
         if (_closed)
             return null;
@@ -110,14 +125,31 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         return _destination;
     }
 
+    public int[] bandwidthLimits() throws I2PSessionException {
+        if (_closed)
+            return null;
+        _bwReceivedLock = new Object();
+        sendMessage(new GetBandwidthLimitsMessage());
+        for (int i = 0; i < 5 && !_bwReceived; i++) {
+            try {
+                synchronized (_bwReceivedLock) {
+                    _bwReceivedLock.wait(1000);
+                }
+            } catch (InterruptedException ie) {}
+        }
+        _bwReceived = false;
+        return _bwLimits;
+    }
+
     /**
      * Only map message handlers that we will use
      */
     class SimpleMessageHandlerMap extends I2PClientMessageHandlerMap {
         public SimpleMessageHandlerMap(I2PAppContext context) {
-            int highest = DestReplyMessage.MESSAGE_TYPE;
+            int highest = Math.max(DestReplyMessage.MESSAGE_TYPE, BandwidthLimitsMessage.MESSAGE_TYPE);
             _handlers = new I2CPMessageHandler[highest+1];
             _handlers[DestReplyMessage.MESSAGE_TYPE] = new DestReplyMessageHandler(context);
+            _handlers[BandwidthLimitsMessage.MESSAGE_TYPE] = new BWLimitsMessageHandler(context);
         }
     }
 }

@@ -76,7 +76,7 @@ public class WebMail extends HttpServlet
 
 	private static final int BUFSIZE = 4096;
 
-	private static final String DEFAULT_HOST = "localhost";
+	private static final String DEFAULT_HOST = "127.0.0.1";
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
 	
@@ -444,7 +444,7 @@ public class WebMail extends HttpServlet
 			boolean showBody = false;
 			boolean prepareAttachment = false;
 			String reason = "";
-			StringBuffer body = null;
+			StringBuilder body = null;
 			
 			String ident = quoteHTML(
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
@@ -485,7 +485,7 @@ public class WebMail extends HttpServlet
 					try {
 						ReadBuffer decoded = e.decode( mailPart.buffer.content, mailPart.beginBody, mailPart.end - mailPart.beginBody );
 						BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), charset ) );
-						body = new StringBuffer();
+						body = new StringBuilder();
 						String line;
 						while( ( line = reader.readLine() ) != null ) {
 							body.append( quoteHTML( line ) );
@@ -503,7 +503,7 @@ public class WebMail extends HttpServlet
 				}
 			}
 			if( html )
-				out.println( "<tr class=\"mailbody\"><td colspan=\"2\">" );
+				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
 			if( reason != null && reason.length() > 0 ) {
 				if( html )
 					out.println( "<p class=\"info\">");
@@ -782,7 +782,7 @@ public class WebMail extends HttpServlet
 							/*
 							 * extract additional recipients
 							 */
-							StringBuffer buf = new StringBuffer();
+							StringBuilder buf = new StringBuilder();
 							String pad = "";
 							if( mail.to != null ) {
 								for( int i = 0; i < mail.to.length; i++ ) {
@@ -1271,7 +1271,7 @@ public class WebMail extends HttpServlet
 				 * write header
 				 */
 				out.println( "<head>\n<title>susimail v0." + version + " - " + subtitle +
-						"</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css.css\">\n</head>\n<body>\n<p><img src=\"susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
+						"</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css.css\">\n</head>\n<body>\n<div class=\"page\"><p><img src=\"susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<p class=\"error\">" + sessionObject.error + "</p>" );
@@ -1294,7 +1294,7 @@ public class WebMail extends HttpServlet
 				else if( sessionObject.state == STATE_NEW )
 					showCompose( out, sessionObject, request );
 				
-				out.println( "</form>\n<p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></body>\n</html>");				
+				out.println( "</form><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></body>\n</html>");				
 				out.flush();
 			}
 		}
@@ -1429,7 +1429,7 @@ public class WebMail extends HttpServlet
 		}
 
 		if( ok ) {
-			StringBuffer body = new StringBuffer();
+			StringBuilder body = new StringBuilder();
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
 			Mail.appendRecipients( body, ccList, "To: " );
@@ -1539,26 +1539,26 @@ public class WebMail extends HttpServlet
 		sessionObject.body = null;
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
-				"<tr><td colspan=\"2\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">From:</td><td><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( fixed.compareToIgnoreCase( "false" ) != 0 ? "disabled" : "" ) +"></td></tr>\n" +
-				"<tr><td align=\"right\">To:</td><td><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">Cc:</td><td><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">Bcc:</td><td><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">Subject:</td><td><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
-				"<tr><td>&nbsp;</td><td><input type=\"checkbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( bccToSelf.compareToIgnoreCase( "false" ) != 0 ? "checked" : "" )+ ">Bcc to self</td></tr>\n" +
-				"<tr><td colspan=\"2\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
-				"<tr><td colspan=\"2\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">New Attachment:</td><td><input type=\"file\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"Upload File\"></td></tr>" );
+				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
+				"<tr><td align=\"right\">From:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( fixed.compareToIgnoreCase( "false" ) != 0 ? "disabled" : "" ) +"></td></tr>\n" +
+				"<tr><td align=\"right\">To:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">Cc:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">Bcc:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">Subject:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
+				"<tr><td>&nbsp;</td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( bccToSelf.compareToIgnoreCase( "false" ) != 0 ? "checked" : "" )+ ">Bcc to self</td></tr>\n" +
+				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
+				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
+				"<tr><td align=\"right\">New Attachment:</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"Upload File\"></td></tr>" );
 		
 		if( sessionObject.attachments != null && sessionObject.attachments.size() > 0 ) {
 			boolean wroteHeader = false;
 			for( Iterator it = sessionObject.attachments.iterator(); it.hasNext(); ) {
 				if( !wroteHeader ) {
-					out.println( "<tr><td colspan=\"2\">Attachments:</td></tr>" );
+					out.println( "<tr><td colspan=\"2\" align=\"center\">Attachments:</td></tr>" );
 					wroteHeader = true;
 				}
 				Attachment attachment = (Attachment)it.next();
-				out.println( "<tr><td colspan=\"2\"><input type=\"checkbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
+				out.println( "<tr><td colspan=\"2\" align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
 			}
 		}
 		out.println( "</table>" );
@@ -1576,11 +1576,11 @@ public class WebMail extends HttpServlet
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
-			"<tr><td>User</td><td><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n" +
-			"<tr><td>Pass</td><td><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n" +
-			"<tr><td>Host</td><td><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td>POP3-Port</td><td><input type=\"text\" size=\"32\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td>SMTP-Port</td><td><input type=\"text\" size=\"32\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">User</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">Pass</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">Host</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">POP3-Port</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">SMTP-Port</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
 			"<tr><td align=\"center\" colspan=\"2\"><a href=\"http://hq.postman.i2p/?page_id=16\">Create Account</a> " + button( LOGIN, "Login" ) + " <input type=\"reset\" value=\"Reset\"></td></tr>\n" +
 			"</table>");
 	}
@@ -1632,7 +1632,7 @@ public class WebMail extends HttpServlet
 					", markAll=" + sessionObject.markAll +
 					", invert=" + sessionObject.invert +
 					", clear=" + sessionObject.clear );
-			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" name=\"check" + i + "\" value=\"1\"" + 
+			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" + link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" + mail.formattedDate + "</a></td><td>&nbsp;</td><td>" + mail.size + " Bytes</a></td></tr>" );
 			bg = 1 - bg;
 			i++;
@@ -1686,21 +1686,21 @@ public class WebMail extends HttpServlet
 			button( LOGOUT, "Logout" ) );
 		if( mail != null ) {
 			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
-					"<tr><td colspan=\"2\"><hr></td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\">From:</td><td>" + quoteHTML( mail.formattedSender ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\">Date:</td><td>" + mail.quotedDate + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\">Subject:</td><td>" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
-					"<tr><td colspan=\"2\"><hr></td></tr>" );
+					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\">From:</td><td align=\"left\">" + quoteHTML( mail.formattedSender ) + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\">Date:</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\">Subject:</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
+					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
 			if( mail.body != null ) {
 				showPart( out, mail.part, 0, SHOW_HTML );
 			}
 			else {
-				out.println( "<tr class=\"mailbody\"><td colspan=\"2\"><p class=\"error\">Could not fetch mail body.</p></td></tr>" );
+				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">Could not fetch mail body.</p></td></tr>" );
 			}
 		}
 		else {
-			out.println( "<tr class=\"mailbody\"><td colspan=\"2\"><p class=\"error\">Could not fetch mail.</p></td></tr>" );
+			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">Could not fetch mail.</p></td></tr>" );
 		}
-		out.println( "<tr><td colspan=\"2\"><hr></td></tr>\n</table>" );
+		out.println( "<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n</table>" );
 	}
 }

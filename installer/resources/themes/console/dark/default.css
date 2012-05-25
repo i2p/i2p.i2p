@@ -1,0 +1,310 @@
+body {
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     background-color: #001;
+     color: #000000;
+     font-size: 9pt;
+/* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of 
+    ** box rendering. (and therefore one of mozilla's
+    ** proprietry -moz properties (which hopefully they'll
+    ** drop soon).
+    */
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+div {
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+label {
+     margin: 0;
+     padding: 5px 4px 4px 4px;
+     float: left;
+     width: 120px;
+/*    height :  24px; */
+     font-weight: normal;
+     text-align: right;
+     font-size: 8pt;
+     font-style: italic;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+h4 {
+     font-size: 14px;
+     font-weight: bold !important;
+     text-align: center;
+     border: 1px solid #99f;
+     margin: 5px 0 15px 0;
+     padding: 5px 10px;
+     background: #004 url(images/tabletitledark.png) repeat-x;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
+     letter-spacing: 0.08em;
+     -moz-box-shadow: inset 0px 0px 4px 0px #009;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+a {
+     text-decoration: none;
+}
+
+form {
+     margin: 0px;
+}
+
+textarea, input, select, button, a {
+     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     font-size: 9pt;
+     float: left;
+}
+
+button {
+     float: none;
+}
+
+textarea {
+     border: 1px solid #9999ff;
+}
+
+br {
+     clear: left;
+}
+
+div.statusNotRunning {
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #dd0000;
+     padding-top: 24px;
+     margin-top: 6px;
+     background: url('images/console_status_stopped.png') 0 0 no-repeat;
+}
+
+div.statusRunning {
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #00dd00;
+     padding-top: 24px;
+     margin-top: 6px;
+     background: url('images/console_status_running.png') 0 0 no-repeat;
+}
+
+div.statusStarting {
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #339933;
+     padding-top: 24px;
+     margin-top: 6px;
+     background: url('images/console_status_starting.png') 0 0 no-repeat;
+}
+
+hr {
+     display: none;
+}
+
+.separator, .subdivider {
+     clear: both;
+     height: 1px;
+     margin: 3px 0px 3px 0px;
+     border-bottom: 1px solid #99f;
+}
+
+.subdivider {
+     border-bottom: 1px solid #99f;
+     padding: 5px 0px 0px 0px;
+}
+
+.freetext {
+     width: 150px;
+     height : 22px; 
+     border: 1px solid #9999ff;
+     padding: 2px;
+     margin: 4px 0 2px 4px;
+     background-color: #002;
+     font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+
+.control {
+     margin: 6px 0 0 2px !important;
+     padding: 2px 0;
+     overflow: hidden;
+     min-width: 60px;
+     max-height: 24px;
+     font-size: 9pt;
+     font-weight: bold;
+     background-color: #b4c8ff;
+     color: black;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/tabletitlelight.png) repeat: x;
+     vertical-align: middle;
+     text-decoration: none;
+}
+
+.control:link {
+     color: #001;
+     text-decoration: none;
+}
+
+.control:hover {
+     border: 1px solid #eeeeff;
+     background-color: #003;
+     color: #ff6600 !important;
+     text-decoration: none;
+}
+
+.control:active {
+     border: 1px inset;
+     background-color: #f60;
+     color: #fff !important;
+     text-decoration: none;
+}
+
+.control:visited {
+     color: #001;
+     text-decoration: none;
+}
+
+.panel {
+     width: 800px;
+     margin: 16px auto 16px auto;
+     overflow: hidden;
+     text-align: left;
+     font-size: 9pt;
+     color: white;
+     background-color: #002;
+     background: url(images/darkbluebg.png);
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #99f;
+     padding: 10px 20px;
+}
+
+.panel .footer {
+     float: right;
+     padding: 4px;
+}
+
+.toolbox {
+     float: right;
+}
+
+.rowItem {
+     width: 750px;
+     float: left;
+     margin: 0px;
+}
+
+.comment {
+     font-style: italic;
+}
+
+.text {
+/*     height: 24px;*/
+     width: 150px;
+     padding: 4px 0 0 2px;
+     float: left;
+     margin: 0;
+     font-size: 9pt !important;
+     font-weight: bold;
+}
+
+.accessKey {
+     text-decoration: underline;
+}
+
+#globalOperationsPanel {
+     background-color: #003;
+     border: 1px solid #99f;
+     background: url(images/darkbluebg.png);
+     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
+     padding: 5px 20px 11px 10px !important;
+}
+
+#globalOperationsPanel .control {
+     width: 100px;
+}
+
+.header {
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 0;
+}
+
+a:link{
+     color: #99f;
+     text-decoration: none;
+}
+
+a:visited{
+     color: #7bb;
+     text-decoration: none;
+}
+
+a:hover{
+     color: #ff6600;
+     text-decoration: underline;
+}
+
+a:active{
+     color: #900;
+     text-decoration: underline;
+}
+
+input {
+     background-color: #002;
+     color: #eef;
+     margin: 0 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #99f;
+/*
+     padding: 0px 2px 1px 2px;
+*/
+     text-decoration: none;
+}
+
+input hover {
+     background-color: #f00;
+     color: #eef;
+     margin: 0 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #99f;
+     padding: 2px;
+     text-decoration: none;
+}
+
+select {
+     background-color: #001;
+     color: #eef;
+     margin: 6px 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #99f;
+     padding: 2px 2px 2px 4px;
+     max-height: 24px;
+}
+
+form {}

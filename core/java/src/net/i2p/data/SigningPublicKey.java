@@ -74,7 +74,7 @@ public class SigningPublicKey extends DataStructureImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[SigningPublicKey: ");
         if (_data == null) {
             buf.append("null key");

@@ -47,7 +47,7 @@ class SearchJob extends JobImpl {
     private boolean _isLease;
     private Job _pendingRequeueJob;
     private PeerSelector _peerSelector;
-    private List _deferredSearches;
+    private final List _deferredSearches;
     private boolean _deferredCleared;
     private long _startedOn;
     private boolean _floodfillPeersExhausted;
@@ -452,6 +452,7 @@ class SearchJob extends JobImpl {
     }
     
     /** we're searching for a router, so we can just send direct */
+/******* always send through the lease
     protected void sendRouterSearch(RouterInfo router) {
         int timeout = _facade.getPeerTimeout(router.getIdentity().getHash());
         long expiration = getContext().clock().now() + timeout;
@@ -471,6 +472,7 @@ class SearchJob extends JobImpl {
         j.runJob();
         //getContext().jobQueue().addJob(j);
     }
+**********/
     
     /** 
      * what tunnel will we send the search out through? 
@@ -513,6 +515,7 @@ class SearchJob extends JobImpl {
      * replies sent back to us directly)
      *
      */
+/******* always send through the lease
     protected DatabaseLookupMessage buildMessage(long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
@@ -522,6 +525,7 @@ class SearchJob extends JobImpl {
         msg.setReplyTunnel(null);
         return msg;
     }
+*********/
     
     void replyFound(DatabaseSearchReplyMessage message, Hash peer) {
         long duration = _state.replyFound(peer);
@@ -780,6 +784,7 @@ class SearchJob extends JobImpl {
     
     public String getName() { return "Kademlia NetDb Search"; }
     
+    @Override
     public String toString() { 
         return super.toString() + " started " 
                + DataHelper.formatDuration((getContext().clock().now() - _startedOn)) + " ago";

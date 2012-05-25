@@ -9,8 +9,6 @@ package net.i2p.router.message;
  */
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;

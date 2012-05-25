@@ -15,15 +15,21 @@
             destdir="./build/obj" >
         </depend>
     </target>
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" />
+        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="compileTest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />

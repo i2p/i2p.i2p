@@ -40,7 +40,7 @@ public class TunnelControllerGroup {
      * no more tunnels are using it)
      *
      */
-    private Map _sessions;
+    private final Map _sessions;
     
     public static TunnelControllerGroup getInstance() { 
         synchronized (TunnelControllerGroup.class) {
@@ -231,6 +231,8 @@ public class TunnelControllerGroup {
     public void saveConfig(String configFile) {
         _configFile = configFile;
         File cfgFile = new File(configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
@@ -243,7 +245,7 @@ public class TunnelControllerGroup {
             map.putAll(cur);
         }
         
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
             String key = (String)iter.next();
             String val = (String)map.get(key);
@@ -270,9 +272,11 @@ public class TunnelControllerGroup {
      */
     private Properties loadConfig(String configFile) {
         File cfgFile = new File(configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
         if (!cfgFile.exists()) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to load the controllers from " + configFile);
+                _log.error("Unable to load the controllers from " + cfgFile.getAbsolutePath());
             return null;
         }
         
@@ -282,7 +286,7 @@ public class TunnelControllerGroup {
             return props;
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error reading the controllers from " + configFile, ioe);
+                _log.error("Error reading the controllers from " + cfgFile.getAbsolutePath(), ioe);
             return null;
         }
     }

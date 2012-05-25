@@ -10,12 +10,15 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -42,6 +45,7 @@ import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
+import net.i2p.util.ObjectCounter;
 
 /**
  * Kademlia based version of the network database
@@ -53,7 +57,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private Set _exploreKeys; // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    private final Set _exploreKeys = new HashSet(64); // set of Hash objects that we should search on (to fill up a bucket, not to get data)
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -69,7 +73,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * removed when the job decides to stop running.
      *
      */
-    private Map _publishingLeaseSets;   
+    private final Map _publishingLeaseSets;
     
     /** 
      * Hash of the key currently being searched for, pointing the SearchJob that
@@ -77,7 +81,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * added on to the list of jobs fired on success/failure
      *
      */
-    private Map _activeRequests;
+    private final Map _activeRequests;
     
     /**
      * The search for the given key is no longer active
@@ -115,11 +119,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final static int MIN_REMAINING_ROUTERS = 25;
     
     /** 
-     * dont accept any dbDtore of a router over 24 hours old (unless we dont 
-     * know anyone or just started up) 
+     * limits for accepting a dbDtore of a router (unless we dont 
+     * know anyone or just started up) -- see validate() below
      */
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_MIN = 3*60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
     private final static long PUBLISH_JOB_DELAY = 5*60*1000l;
@@ -137,6 +143,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 10*60*1000 });
     }
     
+    @Override
+    public boolean isInitialized() {
+        return _initialized && _ds != null && _ds.isInitialized();
+    }
+
     protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
     public PeerSelector getPeerSelector() { return _peerSelector; }
     
@@ -175,8 +186,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void shutdown() {
         _initialized = false;
         _kb = null;
+        if (_ds != null)
+            _ds.stop();
         _ds = null;
-        _exploreKeys = null;
+        _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
+        // _exploreKeys = null;
     }
     
     public void restart() {
@@ -199,6 +213,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         publish(ri);
     }
     
+    @Override
+    public void rescan() {
+        if (isInitialized())
+           _ds.rescan();
+    }
+
     String getDbDir() { return _dbDir; }
     
     public void startup() {
@@ -218,7 +238,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
         _ds = new PersistentDataStore(_context, dbDir, this);
         //_ds = new TransientDataStore();
-        _exploreKeys = new HashSet(64);
+//        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
         
         createHandlers();
@@ -307,7 +327,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     /** get the hashes for all known routers */
-    Set getAllRouters() {
+    public Set<Hash> getAllRouters() {
         if (!_initialized) return new HashSet(0);
         Set keys = _ds.getKeys();
         Set rv = new HashSet(keys.size());
@@ -331,6 +351,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return rv;
     }
     
+    @Override
     public int getKnownRouters() { 
         if (_kb == null) return 0;
         CountRouters count = new CountRouters();
@@ -349,11 +370,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    @Override
     public int getKnownLeaseSets() {  
         if (_ds == null) return 0;
         return _ds.countLeaseSets();
     }
-    
+
+    /* aparently, not used?? should be public if used elsewhere. */
     private class CountLeaseSets implements SelectionCollector {
         private int _count;
         public int size() { return _count; }
@@ -364,7 +387,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _count++;
         }
     }
-    
+
     /**
      *  This is fast and doesn't use synchronization,
      *  but it includes both routerinfos and leasesets.
@@ -566,7 +589,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.error("LeaseSet to expire too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
+            return "Future expiring leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
                    + " expiring in " + DataHelper.formatDuration(age);
         }
         return null;
@@ -620,7 +643,23 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
-        
+        boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
+        // Once we're over 150 routers, reduce the expiration time down from the default,
+        // as a crude way of limiting memory usage.
+        // i.e. at 300 routers the expiration time will be about half the default, etc.
+        // And if we're floodfill, we can keep the expiration really short, since
+        // we are always getting the latest published to us.
+        // As the net grows this won't be sufficient, and we'll have to implement
+        // flushing some from memory, while keeping all on disk.
+        long adjustedExpiration;
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
+            adjustedExpiration = ROUTER_INFO_EXPIRATION_FLOODFILL;
+        else
+            // _kb.size() includes leasesets but that's ok
+            adjustedExpiration = Math.min(ROUTER_INFO_EXPIRATION,
+                                          ROUTER_INFO_EXPIRATION_MIN +
+                                          ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * 150 / (_kb.size() + 1)));
+
         if (!key.equals(routerInfo.getIdentity().getHash())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
@@ -629,7 +668,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature on " + key.toBase64();
-        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION) && (_context.router().getUptime() > 60*60*1000) ) {
+        } else if (upLongEnough && !routerInfo.isCurrent(adjustedExpiration)) {
             if (routerInfo.getNetworkId() != Router.NETWORK_ID) {
                 _context.shitlist().shitlistRouter(key, "Peer is not in our network");
                 return "Peer is not in our network (" + routerInfo.getNetworkId() + ", wants " 
@@ -657,10 +696,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             String rv = "Peer " + key.toBase64() + " is from another network, not accepting it (id=" 
                         + routerInfo.getNetworkId() + ", want " + Router.NETWORK_ID + ")";
             return rv;
-        } else if ( (_context.router().getUptime() > 60*60*1000) && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
+        } else if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
             long age = _context.clock().now() - routerInfo.getPublished();
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
-        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT) && (_context.router().getUptime() > 60*60*1000) ) {
+        } else if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
             if (routerInfo.getAddresses().size() <= 0)
                 return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
@@ -680,9 +719,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * @throws IllegalArgumentException if the routerInfo is not valid
      */
     public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
+        return store(key, routerInfo, true);
+    }
+
+    public RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        RouterInfo rv = (RouterInfo)_ds.get(key);
+        RouterInfo rv = (RouterInfo)_ds.get(key, persist);
         
         if ( (rv != null) && (rv.equals(routerInfo)) ) {
             // no need to validate
@@ -699,7 +742,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                        + new Date(routerInfo.getPublished()));
     
         _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
-        _ds.put(key, routerInfo);
+        _ds.put(key, routerInfo, persist);
         if (rv == null)
             _kb.add(key);
         return rv;
@@ -730,10 +773,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // if we dont know the key, lets make sure it isn't a now-dead peer
         }
         
-        if (isRouterInfo)
-            _ds.remove(dbEntry);
-        else
-            _ds.removeLease(dbEntry);
+        _ds.remove(dbEntry, isRouterInfo);
     }
     
     /** don't use directly - see F.N.D.F. override */
@@ -868,8 +908,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
 
+    @Override
     public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
-        StringBuffer buf = new StringBuffer(4*1024);
+        StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
@@ -895,23 +936,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         renderStatusHTML(out, true);
     }
 
-    public void renderStatusHTML(Writer out, boolean full) throws IOException {
-        int size = getKnownRouters() * 512;
-        if (full)
-            size *= 4;
-        StringBuffer buf = new StringBuffer(size);
+    @Override
+    public void renderLeaseSetHTML(Writer out) throws IOException {
+        StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>Network Database Contents</h2>\n");
-        if (!_initialized) {
-            buf.append("<i>Not initialized</i>\n");
-            out.write(buf.toString());
-            out.flush();
-            return;
-        }
+        buf.append("<a href=\"netdb.jsp\">View RouterInfo</a>");
+        buf.append("<h3>LeaseSets</h3>\n");
         Set leases = new TreeSet(new LeaseSetComparator());
         leases.addAll(getLeases());
-        buf.append("<h3>Leases</h3>\n");
-        out.write(buf.toString());
-        buf.setLength(0);
         long now = _context.clock().now();
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
             LeaseSet ls = (LeaseSet)iter.next();
@@ -951,9 +983,27 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             out.write(buf.toString());
             buf.setLength(0);
         }
+        out.write(buf.toString());
+        out.flush();
+    }
+
+    @Override
+    public void renderStatusHTML(Writer out, boolean full) throws IOException {
+        int size = getKnownRouters() * 512;
+        if (full)
+            size *= 4;
+        StringBuilder buf = new StringBuilder(size);
+        out.write("<h2>Network Database Contents</h2>\n");
+        if (!_initialized) {
+            buf.append("<i>Not initialized</i>\n");
+            out.write(buf.toString());
+            out.flush();
+            return;
+        }
         
+        out.write("<a href=\"netdb.jsp?l=1\">View LeaseSets</a>");
         Hash us = _context.routerHash();
-        out.write("<a name=\"routers\" /><h3>Routers (<a href=\"netdb.jsp");
+        out.write("<a name=\"routers\" ></a><h3>Routers (<a href=\"netdb.jsp");
         if (full)
             out.write("#routers\" >view without");
         else
@@ -965,8 +1015,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         out.write(buf.toString());
         buf.setLength(0);
         
-        /* coreVersion to Map of routerVersion to Integer */
-        Map versions = new TreeMap();
+        ObjectCounter<String> versions = new ObjectCounter();
+        ObjectCounter<String> countries = new ObjectCounter();
         
         Set routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(getRouters());
@@ -978,49 +1028,56 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 renderRouterInfo(buf, ri, false, full);
                 out.write(buf.toString());
                 buf.setLength(0);
-                String coreVersion = ri.getOption("coreVersion");
                 String routerVersion = ri.getOption("router.version");
-                if ( (coreVersion != null) && (routerVersion != null) ) {
-                    Map routerVersions = (Map)versions.get(coreVersion);
-                    if (routerVersions == null) {
-                        routerVersions = new TreeMap();
-                        versions.put(coreVersion, routerVersions);
-                    }
-                    Integer val = (Integer)routerVersions.get(routerVersion);
-                    if (val == null)
-                        routerVersions.put(routerVersion, Integer.valueOf(1));
-                    else
-                        routerVersions.put(routerVersion, Integer.valueOf(val.intValue() + 1));
-                }
+                if (routerVersion != null)
+                    versions.increment(routerVersion);
+                String country = _context.commSystem().getCountry(key);
+                if(country != null)
+                    countries.increment(country);
             }
         }
             
-        if (versions.size() > 0) {
-            buf.append("<table border=\"1\">\n");
-            buf.append("<tr><td><b>Core version</b></td><td><b>Router version</b></td><td><b>Number</b></td></tr>\n");
-            for (Iterator iter = versions.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)iter.next();
-                String coreVersion = (String)entry.getKey();
-                Map routerVersions = (Map)entry.getValue();
-                for (Iterator routerIter = routerVersions.keySet().iterator(); routerIter.hasNext(); ) {
-                    String routerVersion = (String)routerIter.next();
-                    Integer num = (Integer)routerVersions.get(routerVersion);
-                    buf.append("<tr><td>").append(DataHelper.stripHTML(coreVersion));
-                    buf.append("</td><td>").append(DataHelper.stripHTML(routerVersion));
-                    buf.append("</td><td>").append(num.intValue()).append("</td></tr>\n");
-                }
+        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td>");
+        List<String> versionList = new ArrayList(versions.objects());
+        if (versionList.size() > 0) {
+            Collections.sort(versionList, Collections.reverseOrder());
+            buf.append("<table>\n");
+            buf.append("<tr><th>Version</th><th>Count</th></tr>\n");
+            for (String routerVersion : versionList) {
+                int num = versions.count(routerVersion);
+                buf.append("<tr><td>").append(DataHelper.stripHTML(routerVersion));
+                buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }
+        buf.append("</td><td>");
+        out.write(buf.toString());
+        buf.setLength(0);
+            
+        List<String> countryList = new ArrayList(countries.objects());
+        if (countryList.size() > 0) {
+            Collections.sort(countryList);
+            buf.append("<table>\n");
+            buf.append("<tr><th>Country</th><th>Count</th></tr>\n");
+            for (String country : countryList) {
+                int num = countries.count(country);
+                buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
+                buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
+                buf.append(_context.commSystem().getCountryName(country));
+                buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
+            }
+            buf.append("</table>\n");
+        }
+        buf.append("</td></tr></table>");
         out.write(buf.toString());
         out.flush();
     }
     
-    private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs, boolean full) {
+    private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
+        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" /a><b>Our info: ").append(hash).append("</b><br />\n");
+            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b><br />\n");
         } else {
             buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");
         }
@@ -1033,6 +1090,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else
             buf.append("Published: <i>in ").append(DataHelper.formatDuration(0-age)).append("???</i><br />\n");
         buf.append("Address(es): <i>");
+        String country = _context.commSystem().getCountry(info.getIdentity().getHash());
+        if(country != null) {
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
+            buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
+        }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
             buf.append(addr.getTransportStyle()).append(": ");

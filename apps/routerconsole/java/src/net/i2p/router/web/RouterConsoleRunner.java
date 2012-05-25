@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.SysTray;
@@ -36,6 +37,14 @@ public class RouterConsoleRunner {
         System.setProperty("java.awt.headless", "true");
     }
     
+    /**
+     *  @param args second arg may be a comma-separated list of bind addresses,
+     *              for example ::1,127.0.0.1
+     *              On XP, the other order (127.0.0.1,::1) fails the IPV6 bind,
+     *              because 127.0.0.1 will bind ::1 also. But even though it's bound
+     *              to both, we can't connect to [::1]:7657 for some reason.
+     *              So the wise choice is ::1,127.0.0.1
+     */
     public RouterConsoleRunner(String args[]) {
         if (args.length == 3) {
             _listenPort = args[0].trim();
@@ -50,7 +59,7 @@ public class RouterConsoleRunner {
     }
     
     public void startConsole() {
-        File workDir = new File("work");
+        File workDir = new File(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
         if (!workDirRemoved)
             System.err.println("ERROR: Unable to remove Jetty temporary work directory");
@@ -65,10 +74,43 @@ public class RouterConsoleRunner {
             props.setProperty(PREFIX + ROUTERCONSOLE + ENABLED, "true");
             rewrite = true;
         }
+
+        // Get an absolute path with a trailing slash for the webapps dir
+        // We assume relative to the base install dir for backward compatibility
+        File app = new File(_webAppsDir);
+        if (!app.isAbsolute()) {
+            app = new File(I2PAppContext.getGlobalContext().getBaseDir(), _webAppsDir);
+            try {
+                _webAppsDir = app.getCanonicalPath();
+            } catch (IOException ioe) {}
+        }
+        if (!_webAppsDir.endsWith("/"))
+            _webAppsDir += '/';
+
         try {
-            _server.addListener(_listenHost + ':' + _listenPort);
+            StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
+            int boundAddresses = 0;
+            while (tok.hasMoreTokens()) {
+                String host = tok.nextToken().trim();
+                try {
+                    if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
+                        _server.addListener('[' + host + "]:" + _listenPort);
+                    else
+                        _server.addListener(host + ':' + _listenPort);
+                    boundAddresses++;
+                } catch (IOException ioe) { // this doesn't seem to work, exceptions don't happen until start() below
+                    System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
+                }
+            }
+            if (boundAddresses <= 0) {
+                System.err.println("Unable to bind routerconsole to any address on port " + _listenPort);
+                return;
+            }
             _server.setRootWebApp(ROUTERCONSOLE);
             WebApplicationContext wac = _server.addWebApplication("/", _webAppsDir + ROUTERCONSOLE + ".war");
+            File tmpdir = new File(workDir, ROUTERCONSOLE + "-" + _listenPort);
+            tmpdir.mkdir();
+            wac.setTempDirectory(tmpdir);
             initialize(wac);
             File dir = new File(_webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());
@@ -80,6 +122,9 @@ public class RouterConsoleRunner {
                         if (! "false".equals(enabled)) {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
                             wac = _server.addWebApplication("/"+ appName, path);
+                            tmpdir = new File(workDir, appName + "-" + _listenPort);
+                            tmpdir.mkdir();
+                            wac.setTempDirectory(tmpdir);
                             initialize(wac);
                             if (enabled == null) {
                                 // do this so configclients.jsp knows about all apps from reading the config
@@ -99,8 +144,14 @@ public class RouterConsoleRunner {
             storeWebAppProperties(props);
         try {
             _server.start();
-        } catch (Exception me) {
-            me.printStackTrace();
+        } catch (Throwable me) {
+            // NoClassFoundDefError from a webapp is a throwable, not an exception
+            System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
+                               "If your console is still accessible at http://127.0.0.1:7657/,\n" +
+                               "this may be a problem only with binding to the IPV6 address ::1.\n" +
+                               "If so, you may ignore this error, or remove the\n" +
+                               "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.\n" +
+                               "Exception: " + me);
         }
         try {
             SysTray tray = SysTray.getInstance();
@@ -108,25 +159,6 @@ public class RouterConsoleRunner {
             t.printStackTrace();
         }
 
-        // we check the i2p installation directory (.) for a flag telling us not to reseed, 
-        // but also check the home directory for that flag too, since new users installing i2p
-        // don't have an installation directory that they can put the flag in yet.
-        File noReseedFile = new File(new File(System.getProperty("user.home")), ".i2pnoreseed");
-        File noReseedFileAlt1 = new File(new File(System.getProperty("user.home")), "noreseed.i2p");
-        File noReseedFileAlt2 = new File(".i2pnoreseed");
-        File noReseedFileAlt3 = new File("noreseed.i2p");
-        if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
-            File netDb = new File("netDb");
-            // sure, some of them could be "my.info" or various leaseSet- files, but chances are, 
-            // if someone has those files, they've already been seeded (at least enough to let them
-            // get i2p started - they can reseed later in the web console)
-            String names[] = (netDb.exists() ? netDb.list() : null);
-            if ( (names == null) || (names.length < 15) ) {
-                ReseedHandler reseedHandler = new ReseedHandler();
-                reseedHandler.requestReseed();
-            }
-        }
-        
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
         I2PThread t = new I2PThread(fetcher, "NewsFetcher");
         t.setDaemon(true);
@@ -185,7 +217,7 @@ public class RouterConsoleRunner {
         Properties rv = new Properties();
         // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
-        File cfgFile = new File(webappConfigFile);
+        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), webappConfigFile);
         
         try {
             DataHelper.loadProps(rv, cfgFile);
@@ -199,7 +231,7 @@ public class RouterConsoleRunner {
     public static void storeWebAppProperties(Properties props) {
         // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
-        File cfgFile = new File(webappConfigFile);
+        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), webappConfigFile);
         
         try {
             DataHelper.storeProps(props, cfgFile);

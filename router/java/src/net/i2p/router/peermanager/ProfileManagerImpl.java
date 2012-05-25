@@ -50,7 +50,6 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
-        data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
     }
     
     /**
@@ -61,7 +60,6 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
-        data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
     }
     
     /**
@@ -74,8 +72,6 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
-        data.getSendFailureSize().addData(1, 0); // yeah, should be a frequency...
-        data.getCommError().addData(1, 0); // see above
     }
     
     /**
@@ -125,8 +121,6 @@ public class ProfileManagerImpl implements ProfileManager {
         if (data == null) return;
         data.updateTunnelTestTimeAverage(responseTimeMs);
         data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
-        if (responseTimeMs > getSlowThreshold())
-            data.getTunnelTestResponseTimeSlow().addData(responseTimeMs, responseTimeMs);
     }
     
     public void tunnelDataPushed(Hash peer, long rtt, int size) {
@@ -310,7 +304,7 @@ public class ProfileManagerImpl implements ProfileManager {
             PeerProfile prof = getProfile(peer);
             if (prof == null) continue;
             
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             
             buf.append("status: ");
             if (_context.profileOrganizer().isFast(peer)) {

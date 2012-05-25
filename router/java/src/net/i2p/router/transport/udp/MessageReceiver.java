@@ -24,7 +24,7 @@ public class MessageReceiver {
     private Log _log;
     private UDPTransport _transport;
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
-    private List _completeMessages;
+    private final List _completeMessages;
     private boolean _alive;
     private ByteCache _cache;
     
@@ -34,12 +34,12 @@ public class MessageReceiver {
         _transport = transport;
         _completeMessages = new ArrayList(16);
         _cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
-        _context.statManager().createRateStat("udp.inboundExpired", "How many messages were expired before reception?", "udp", new long[] { 60*1000l, 10*60*1000l });
-        _context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", new long[] { 60*1000l, 10*60*1000l });
-        _context.statManager().createRateStat("udp.inboundReady", "How many messages were ready when a message is added to the complete queue?", "udp", new long[] { 60*1000l, 10*60*1000l });
-        _context.statManager().createRateStat("udp.inboundReadTime", "How long it takes to parse in the completed fragments into a message?", "udp", new long[] { 60*1000l, 10*60*1000l });
-        _context.statManager().createRateStat("udp.inboundReceiveProcessTime", "How long it takes to add the message to the transport?", "udp", new long[] { 60*1000l, 10*60*1000l });
-        _context.statManager().createRateStat("udp.inboundLag", "How long the olded ready message has been sitting on the queue (period is the queue size)?", "udp", new long[] { 60*1000l, 10*60*1000l });
+        _context.statManager().createRateStat("udp.inboundExpired", "How many messages were expired before reception?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundReady", "How many messages were ready when a message is added to the complete queue?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundReadTime", "How long it takes to parse in the completed fragments into a message?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundReceiveProcessTime", "How long it takes to add the message to the transport?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundLag", "How long the olded ready message has been sitting on the queue (period is the queue size)?", "udp", UDPTransport.RATES);
         
         _alive = true;
     }

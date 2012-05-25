@@ -10,9 +10,12 @@
 package net.i2p.apps.systray;
 
 import java.awt.Frame;
+import java.io.File;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;
@@ -36,7 +39,8 @@ public class SysTray implements SysTrayMenuListener {
     private static UrlLauncher    _urlLauncher    = new UrlLauncher();
 
     static {
-        if (!_configFile.init("systray.config")) {
+        File config = new File(I2PAppContext.getGlobalContext().getConfigDir(), "systray.config");
+        if (!_configFile.init(config.getAbsolutePath())) {
             _configFile.setProperty("browser", "default");
             _configFile.setProperty("port", "7657");
         }
@@ -132,7 +136,7 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+        openRouterConsole("http://127.0.0.1:" + _portString + "/index.jsp");
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -153,7 +157,7 @@ public class SysTray implements SysTrayMenuListener {
             if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
                 setBrowser(browser);
         } else if (e.getActionCommand().equals("openconsole")) {
-            openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+            openRouterConsole("http://127.0.0.1:" + _portString + "/index.jsp");
         }
     }
 

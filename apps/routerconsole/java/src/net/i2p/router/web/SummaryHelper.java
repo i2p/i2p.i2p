@@ -1,14 +1,19 @@
 package net.i2p.router.web;
 
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
@@ -44,7 +49,7 @@ public class SummaryHelper extends HelperBase {
      *
      */
     public String getVersion() { 
-        return RouterVersion.VERSION + "-" + RouterVersion.BUILD;
+        return RouterVersion.FULL_VERSION;
     }
     /**
      * Retrieve a pretty printed uptime count (ala 4d or 7h or 39m)
@@ -60,48 +65,34 @@ public class SummaryHelper extends HelperBase {
             return DataHelper.formatDuration(router.getUptime());
     }
     
-    private static final DateFormat _fmt = new java.text.SimpleDateFormat("HH:mm:ss", Locale.UK);
-    public String getTime() {
+    private String timeSkew() {
         if (_context == null) return "";
-        
-        String now = null;
-        synchronized (_fmt) {
-            now = _fmt.format(new Date(_context.clock().now()));
-        }
-        
-        if (!_context.clock().getUpdatedSuccessfully())
-            return now + " (Unknown skew)";
-        
+        //if (!_context.clock().getUpdatedSuccessfully())
+        //    return " (Unknown skew)";
         long ms = _context.clock().getOffset();
-        
-        long diff = ms;
-        if (diff < 0)
-            diff = 0 - diff;
-        if (diff == 0) {
-            return now + " (no skew)";
-        } else if (diff < 1000) {
-            return now + " (" + ms + "ms skew)";
-        } else if (diff < 5 * 1000) {
-            return now + " (" + (ms / 1000) + "s skew)";
-        } else if (diff < 60 * 1000) {
-            return now + " <b>(" + (ms / 1000) + "s skew)</b>";
-        } else if (diff < 60 * 60 * 1000) {
-            return now + " <b>(" + (ms / (60 * 1000)) + "m skew)</b>";
-        } else if (diff < 24 * 60 * 60 * 1000) {
-            return now + " <b>(" + (ms / (60 * 60 * 1000)) + "h skew)</b>";
-        } else {
-            return now + " <b>(" + (ms / (24 * 60 * 60 * 1000)) + "d skew)</b>";
-        }
+        long diff = Math.abs(ms);
+        if (diff < 3000)
+            return "";
+        return " (" + DataHelper.formatDuration(diff) + " skew)";
     }
     
     public boolean allowReseed() {
-        return (_context.netDb().getKnownRouters() < 30) ||
-                Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed", "false")).booleanValue();
+        return _context.netDb().isInitialized() &&
+               ((_context.netDb().getKnownRouters() < 30) ||
+                Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed")).booleanValue());
     }
     
-    public int getAllPeers() { return _context.netDb().getKnownRouters(); }
+    /** subtract one for ourselves, so if we know no other peers it displays zero */
+    public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
     
     public String getReachability() {
+        return reachability() + timeSkew();
+    }
+
+    private String reachability() {
+        if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
+            !_context.clientManager().isAlive())
+            return "ERR-Client Manager I2CP Error - check logs";  // not a router problem but the user should know
         if (!_context.clock().getUpdatedSuccessfully())
             return "ERR-ClockSkew";
         if (_context.router().isHidden())
@@ -128,7 +119,7 @@ public class SummaryHelper extends HelperBase {
                 return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
-                ra = _context.router().getRouterInfo().getTargetAddress("UDP");
+                ra = _context.router().getRouterInfo().getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
@@ -346,41 +337,74 @@ public class SummaryHelper extends HelperBase {
      * @return html section summary
      */
     public String getDestinations() {
-        Set clients = _context.clientManager().listClients();
+        // covert the set to a list so we can sort by name and not lose duplicates
+        List clients = new ArrayList(_context.clientManager().listClients());
+        Collections.sort(clients, new AlphaComparator());
         
-        StringBuffer buf = new StringBuffer(512);
-        buf.append("<u><b>Local destinations</b></u><br />");
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"Add/remove/edit &amp; control your client and server tunnels (local destinations).\"  title=\"View existing tunnels and tunnel build status.\">Local destinations</a></h3><hr><table>");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
-            TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(client.calculateHash());
-            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(client.calculateHash());
-            String name = (in != null ? in.getDestinationNickname() : null);
-            if (name == null)
-                name = (out != null ? out.getDestinationNickname() : null);
-            if (name == null)
-                name = client.calculateHash().toBase64().substring(0,6);
+            String name = getName(client);
+            Hash h = client.calculateHash();
             
-            buf.append("<b>*</b> ").append(name).append("<br />\n");
-            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
+            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/");
+            if (_context.clientManager().shouldPublishLeaseSet(h))
+                buf.append("server.png\" alt=\"Server\" title=\"Server\" />");
+            else
+                buf.append("client.png\" alt=\"Client\" title=\"Client\" />");
+            buf.append("</td><td align=\"left\"><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
+            buf.append("\" target=\"_top\" title=\"Show tunnels\">");
+            if (name.length() < 16)
+                buf.append(name);
+            else
+                buf.append(name.substring(0,15)).append("&hellip;");
+            buf.append("</a></td>\n");
+            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                 if (timeToExpire < 0) {
-                    buf.append("<i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
-                    buf.append(" ago</i><br />\n");
+                    // red or yellow light                 
+                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Rebuilding&hellip;\" title=\"Leases expired ").append(DataHelper.formatDuration(0-timeToExpire));
+                    buf.append(" ago. Rebuilding..\"></td></tr>\n");                    
+            } else {
+                    // green light 
+                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"Ready\"></td></tr>\n");
                 }
             } else {
-                buf.append("<i>No leases</i><br />\n");
+                // yellow light
+                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Building&hellip;\" title=\"Tunnel building in progress&hellip;\"></td></tr>\n");
             }
-            buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
-            buf.append("\">Details</a> ");
-            buf.append("<a href=\"configtunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
-            buf.append("\">Config</a><br />\n");
         }
-        buf.append("<hr />\n");
+        buf.append("</table><hr>\n");
         return buf.toString();
     }
     
+    private class AlphaComparator implements Comparator {
+        public int compare(Object lhs, Object rhs) {
+            String lname = getName((Destination)lhs);
+            String rname = getName((Destination)rhs);
+            if (lname.equals("shared clients"))
+                return -1;
+            if (rname.equals("shared clients"))
+                return 1;
+            return Collator.getInstance().compare(lname, rname);
+        }
+    }
+
+    private String getName(Destination d) {
+        TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(d.calculateHash());
+        String name = (in != null ? in.getDestinationNickname() : null);
+        if (name == null) {
+            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(d.calculateHash());
+            name = (out != null ? out.getDestinationNickname() : null);
+            if (name == null)
+                name = d.calculateHash().toBase64().substring(0,6);
+        }
+        return name;
+    }
+
     /**
      * How many free inbound tunnels we have.
      *
@@ -510,5 +534,17 @@ public class SummaryHelper extends HelperBase {
 
     public boolean updateAvailable() { 
         return NewsFetcher.getInstance(_context).updateAvailable();
+    }
+
+    public boolean unsignedUpdateAvailable() { 
+        return NewsFetcher.getInstance(_context).unsignedUpdateAvailable();
+    }
+
+    public String getUpdateVersion() { 
+        return NewsFetcher.getInstance(_context).updateVersion();
+    }
+
+    public String getUnsignedUpdateVersion() { 
+        return NewsFetcher.getInstance(_context).unsignedUpdateVersion();
     }
 }

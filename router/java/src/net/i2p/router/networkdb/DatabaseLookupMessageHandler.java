@@ -28,19 +28,12 @@ public class DatabaseLookupMessageHandler implements HandlerJobBuilder {
         _context = context;
         _log = context.logManager().getLog(DatabaseLookupMessageHandler.class);
         _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        // FIXME: is netDb.lookupsDropped actually used elsewhere?
         _context.statManager().createRateStat("netDb.lookupsDropped", "How many netDb lookups did we drop due to throttling?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
-
-        if (true || _context.throttle().acceptNetDbLookupRequest(((DatabaseLookupMessage)receivedMessage).getSearchKey())) {
-            return new HandleDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
-        } else {
-            if (_log.shouldLog(Log.INFO)) 
-                _log.info("Dropping lookup request as throttled");
-            _context.statManager().addRateData("netDb.lookupsDropped", 1, 1);
-            return null;
-        }
+        return new HandleDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
     }
 }

@@ -69,7 +69,7 @@ public class DestReplyMessage extends I2CPMessageImpl {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DestReplyMessage: ");
         buf.append("\n\tDestination: ").append(_dest);
         buf.append("]");

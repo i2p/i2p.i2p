@@ -18,7 +18,7 @@
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 
     <% if (editBean.allowCSS()) {
-  %><link href="images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
@@ -82,11 +82,19 @@
             </div>
                  
             <div id="targetField" class="rowItem">
+         <% if ("streamrserver".equals(tunnelType)) { %>
+                <label>Access Point:</label>
+         <% } else { %>
                 <label>Target:</label>
+         <% } %>
             </div>
             <div id="hostField" class="rowItem">
                 <label for="targetHost" accesskey="H">
+         <% if ("streamrserver".equals(tunnelType)) { %>
+                    <span class="accessKey">R</span>eachable by:
+         <% } else { %>
                     <span class="accessKey">H</span>ost:
+         <% } %>
                 </label>
                 <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=editBean.getTargetHost(curTunnel)%>" class="freetext" />                
             </div>
@@ -124,6 +132,7 @@
                 </label>
                 <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
             </div>
+         <% if (!"streamrserver".equals(tunnelType)) { %>
             <div id="profileField" class="rowItem">
                 <label for="profile" accesskey="f">
                     Pro<span class="accessKey">f</span>ile:
@@ -134,12 +143,15 @@
                     <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk">bulk connection (downloads/websites/BT) </option>
                 </select>                
             </div> 
+         <% } // !streamrserver %>
             <div id="destinationField" class="rowItem">
                 <label for="localDestination" accesskey="L">
                     <span class="accessKey">L</span>ocal destination:
                 </label>
-                <textarea rows="1" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
-                <span class="comment">(if known)</span>
+                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
+         <% if (!"".equals(editBean.getDestinationBase64(curTunnel))) { %>    
+            <a href="/susidns/addressbook.jsp?book=private&hostname=<%=editBean.getTunnelName(curTunnel)%>&destination=<%=editBean.getDestinationBase64(curTunnel)%>#add">Add to local addressbook</a>    
+         <% } %>
             </div>
             
             <div class="footer">
@@ -256,15 +268,15 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="encrypt" accesskey="e">
-                    Leaseset Encryption Key:
+                    Encryption Key:
                 </label>
-                <textarea rows="1" cols="44" id="portField" name="encryptKey" title="Encrypt Key" wrap="off"><%=editBean.getEncryptKey(curTunnel)%></textarea>               
+                <textarea rows="1" style="height: 3em;" cols="44" id="portField" name="encryptKey" title="Encrypt Key" wrap="off"><%=editBean.getEncryptKey(curTunnel)%></textarea>               
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
-                    Generate Key:
+                    Generate New Key:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now">Generate New Key</button>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now">Generate</button>
                 <span class="comment">(Tunnel must be stopped first)</span>
             </div>
                  
@@ -274,7 +286,7 @@
            
             <div id="optionsField" class="rowItem">
                 <label for="access" accesskey="s">
-                    Restricted Acce<span class="accessKey">s</span>s List:
+                    Restricted Acce<span class="accessKey">s</span>s List: <i>Unimplemented</i>
                 </label>
             </div>
             <div id="portField" class="rowItem">
@@ -287,7 +299,7 @@
                 <label for="accessList" accesskey="s">
                     Access List:
                 </label>
-                <textarea rows="2" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <textarea rows="2" style="height: 4em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
                 <span class="comment">(Restrict to these clients only)</span>
             </div>
                  
@@ -314,7 +326,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="reduceTime" accesskey="d">
-                    Reduce when idle (minutes):
+                    Idle minutes:
                 </label>
                 <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
             </div>
@@ -342,7 +354,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
-                    Estimate Hashcash Calc Time:
+                    Hashcash Calc Time:
                 </label>
                 <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Estimate" title="Estimate Calculation Time">Estimate</button>
             </div>

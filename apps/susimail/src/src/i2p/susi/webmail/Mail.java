@@ -142,7 +142,7 @@ public class Mail {
 		}
 		return ok;
 	}
-	public static void appendRecipients( StringBuffer buf, ArrayList recipients, String prefix )
+	public static void appendRecipients( StringBuilder buf, ArrayList recipients, String prefix )
 	{
 		for( Iterator it = recipients.iterator(); it.hasNext(); ) {
 			buf.append( prefix );

@@ -15,7 +15,7 @@
 
 mkdir -p lib/
 mkdir -p bin/local
-VER=4.2.2
+VER=4.2.4
 
 if [ "$1" != "dynamic" -a ! -d gmp-$VER ]
 then

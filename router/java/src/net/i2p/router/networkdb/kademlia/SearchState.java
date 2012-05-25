@@ -17,12 +17,12 @@ import net.i2p.router.RouterContext;
  */
 class SearchState {
     private RouterContext _context;
-    private HashSet _pendingPeers;
+    private final HashSet _pendingPeers;
     private HashMap _pendingPeerTimes;
-    private HashSet _attemptedPeers;
-    private HashSet _failedPeers;
-    private HashSet _successfulPeers;
-    private HashSet _repliedPeers;
+    private final HashSet _attemptedPeers;
+    private final HashSet _failedPeers;
+    private final HashSet _successfulPeers;
+    private final HashSet _repliedPeers;
     private Hash _searchKey;
     private volatile long _completed;
     private volatile long _started;
@@ -166,8 +166,9 @@ class SearchState {
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("Searching for ").append(_searchKey);
         buf.append(" ");
         if (_completed <= 0)

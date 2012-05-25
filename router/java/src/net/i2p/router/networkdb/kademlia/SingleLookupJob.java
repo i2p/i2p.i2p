@@ -8,6 +8,12 @@ import net.i2p.util.Log;
 
 /**
  * Ask the peer who sent us the DSRM for the RouterInfos.
+ *
+ * If we have the routerInfo already, try to refetch it from that router itself,
+ * if we aren't already connected to that router,
+ * which will help us establish that router as a good floodfill and speed our
+ * integration into the network.
+ *
  * A simple version of SearchReplyJob in SearchJob.java.
  * Skip the profile updates - this should be rare.
  *
@@ -28,6 +34,8 @@ class SingleLookupJob extends JobImpl {
                 continue;
             if (getContext().netDb().lookupRouterInfoLocally(peer) == null)
                 getContext().jobQueue().addJob(new SingleSearchJob(getContext(), peer, from));
+            else if (!getContext().commSystem().isEstablished(peer))
+                getContext().jobQueue().addJob(new SingleSearchJob(getContext(), peer, peer));
         }
     }
     public String getName() { return "NetDb process DSRM"; }

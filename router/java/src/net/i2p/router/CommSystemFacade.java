@@ -34,7 +34,9 @@ public abstract class CommSystemFacade implements Service {
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }
-    public boolean haveCapacity() { return true; }
+    public boolean haveInboundCapacity(int pct) { return true; }
+    public boolean haveOutboundCapacity(int pct) { return true; }
+    public boolean haveHighOutboundCapacity() { return true; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
     /**
@@ -58,6 +60,11 @@ public abstract class CommSystemFacade implements Service {
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean wasUnreachable(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
+    public byte[] getIP(Hash dest) { return null; }
+    public void queueLookup(byte[] ip) {}
+    public String getCountry(Hash peer) { return null; }
+    public String getCountryName(String code) { return code; }
+    public String renderPeerHTML(Hash peer) { return null; }
     
     /** 
      * Tell other transports our address changed

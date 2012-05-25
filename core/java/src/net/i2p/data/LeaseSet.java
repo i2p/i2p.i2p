@@ -67,7 +67,7 @@ public class LeaseSet extends DataStructureImpl {
     private boolean _checked;
 
     /** This seems like plenty  */
-    private final static int MAX_LEASES = 6;
+    public final static int MAX_LEASES = 6;
 
     public LeaseSet() {
         setDestination(null);
@@ -355,7 +355,7 @@ public class LeaseSet extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet: ");
         buf.append("\n\tDestination: ").append(getDestination());
         buf.append("\n\tEncryptionKey: ").append(getEncryptionKey());

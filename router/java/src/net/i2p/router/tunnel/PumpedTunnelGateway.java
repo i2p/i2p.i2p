@@ -32,7 +32,7 @@ import net.i2p.util.Log;
  *
  */
 public class PumpedTunnelGateway extends TunnelGateway {
-    private List _prequeue;
+    private final List _prequeue;
     private TunnelGatewayPumper _pumper;
     
     /**
@@ -58,6 +58,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * @param toRouter router to send to after the endpoint (or null for endpoint processing)
      * @param toTunnel tunnel to send to after the endpoint (or null for endpoint or router processing)
      */
+    @Override
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);

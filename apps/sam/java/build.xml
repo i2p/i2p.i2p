@@ -4,6 +4,7 @@
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
         <ant dir="../../ministreaming/java/" target="build" />
+        <ant dir="../../streaming/java/" target="build" />
 	<!-- ministreaming will build core -->
     </target>
     <condition property="depend.available">
@@ -18,9 +19,11 @@
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
                 <pathelement location="../../ministreaming/java/build/obj" />
+                <pathelement location="../../streaming/java/build/obj" />
             </classpath>
         </depend>
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -28,20 +31,24 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
-                <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
+                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
             </manifest>
         </jar>
     </target>
@@ -52,7 +59,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src" destdir="./build/javadoc" 
+            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src:../../streaming/java/src" destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 
@@ -64,9 +71,11 @@
     <target name="cleandep" depends="clean">
 	<!-- ministreaming will clean core -->
         <ant dir="../../ministreaming/java/" target="distclean" />
+        <ant dir="../../streaming/java/" target="distclean" />
     </target>
     <target name="distclean" depends="clean">
 	<!-- ministreaming will clean core -->
         <ant dir="../../ministreaming/java/" target="distclean" />
+        <ant dir="../../streaming/java/" target="distclean" />
     </target>
 </project>

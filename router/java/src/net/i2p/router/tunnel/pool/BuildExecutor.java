@@ -21,11 +21,12 @@ import net.i2p.util.Log;
  *
  */
 class BuildExecutor implements Runnable {
+    private final List _recentBuildIds = new ArrayList(100);
     private RouterContext _context;
     private Log _log;
     private TunnelPoolManager _manager;
     /** list of TunnelCreatorConfig elements of tunnels currently being built */
-    private List _currentlyBuilding;
+    private final List _currentlyBuilding;
     private boolean _isRunning;
     private BuildHandler _handler;
     private boolean _repoll;
@@ -37,12 +38,12 @@ class BuildExecutor implements Runnable {
         _currentlyBuilding = new ArrayList(10);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientExpire", "How often a client tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientSuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientExpire", "How often a client tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "Response time for success", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientSuccess", "Response time for success", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "Response time for rejection", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientReject", "Response time for rejection", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestTime", "How long it takes to build a tunnel request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -50,7 +51,7 @@ class BuildExecutor implements Runnable {
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
-        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS;
+        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS; // LINT -- Accessing static field "BW_CAPABILITY_CHARS"
         // For each bandwidth tier, create tunnel build agree/reject/expire stats
         for (int i = 0; i < bwTiers.length(); i++) {
             String bwTier = String.valueOf(bwTiers.charAt(i));
@@ -423,7 +424,6 @@ class BuildExecutor implements Runnable {
         }
     }
     
-    private List _recentBuildIds = new ArrayList(100);
     public boolean wasRecentlyBuilding(long replyId) {
         synchronized (_recentBuildIds) {
             return _recentBuildIds.contains(new Long(replyId));

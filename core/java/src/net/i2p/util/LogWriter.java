@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
+
 /**
  * Log writer thread that pulls log records from the LogManager, writes them to
  * the current logfile, and rotates the logs as necessary.  This also periodically
@@ -22,6 +24,7 @@ import java.util.List;
  *
  */
 class LogWriter implements Runnable {
+    /** every 10 seconds? why? Just have the gui force a reread after a change?? */
     private final static long CONFIG_READ_ITERVAL = 10 * 1000;
     private long _lastReadConfig = 0;
     private long _numBytesInCurrentFile = 0;
@@ -38,6 +41,7 @@ class LogWriter implements Runnable {
 
     public LogWriter(LogManager manager) {
         _manager = manager;
+        _lastReadConfig = Clock.getInstance().now();
     }
 
     public void stopWriting() {
@@ -89,7 +93,10 @@ class LogWriter implements Runnable {
         }
     }
     
-    
+    public String currentFile() {
+        return _currentFile != null ? _currentFile.getAbsolutePath() : "uninitialized";
+    }
+
     private void rereadConfig() {
         long now = Clock.getInstance().now();
         if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {
@@ -168,15 +175,21 @@ class LogWriter implements Runnable {
      *
      */
     private File getNextFile(String pattern) {
-        File f = null;
+        File f = new File(pattern);
+        File base = null;
+        if (!f.isAbsolute())
+            base = I2PAppContext.getGlobalContext().getLogDir();
 
         if ( (pattern.indexOf('#') < 0) && (pattern.indexOf('@') <= 0) ) {
-            return new File(pattern);
+            if (base != null)
+                return new File(base, pattern);
+            else
+                return f;
         }
         
         int max = _manager.getRotationLimit();
         if (_rotationNum == -1) {
-            return getFirstFile(pattern, max);
+            return getFirstFile(base, pattern, max);
         }
              
         // we're in rotation, just go to the next  
@@ -190,9 +203,13 @@ class LogWriter implements Runnable {
      * Retrieve the first file, updating the rotation number accordingly
      *
      */
-    private File getFirstFile(String pattern, int max) {
+    private File getFirstFile(File base, String pattern, int max) {
         for (int i = 0; i < max; i++) {
-            File f = new File(replace(pattern, i));
+            File f;
+            if (base != null)
+                f = new File(base, replace(pattern, i));
+            else
+                f = new File(replace(pattern, i));
             if (!f.exists()) {
                 _rotationNum = i;
                 return f;
@@ -202,7 +219,11 @@ class LogWriter implements Runnable {
         // all exist, pick the oldest to replace
         File oldest = null;
         for (int i = 0; i < max; i++) {
-            File f = new File(replace(pattern, i));
+            File f;
+            if (base != null)
+                f = new File(base, replace(pattern, i));
+            else
+                f = new File(replace(pattern, i));
             if (oldest == null) {
                 oldest = f;
             } else {
@@ -217,7 +238,7 @@ class LogWriter implements Runnable {
 
     private static final String replace(String pattern, int num) {
         char c[] = pattern.toCharArray();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < c.length; i++) {
             if ( (c[i] != '#') && (c[i] != '@') )
                 buf.append(c[i]);

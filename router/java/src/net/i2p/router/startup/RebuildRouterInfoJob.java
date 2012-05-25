@@ -57,18 +57,11 @@ public class RebuildRouterInfoJob extends JobImpl {
     
     public void runJob() {
         _log.debug("Testing to rebuild router info");
-        String infoFile = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-        if (infoFile == null) {
-            _log.debug("Info filename not configured, defaulting to " + Router.PROP_INFO_FILENAME_DEFAULT);
-            infoFile = Router.PROP_INFO_FILENAME_DEFAULT;
-        }
+        String infoFile = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
+        File info = new File(getContext().getRouterDir(), infoFile);
+        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
+        File keyFile = new File(getContext().getRouterDir(), keyFilename);
         
-        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-        if (keyFilename == null)
-            keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-        File keyFile = new File(keyFilename);
-        
-        File info = new File(infoFile);
         if (!info.exists() || !keyFile.exists()) {
             _log.info("Router info file [" + info.getAbsolutePath() + "] or private key file [" + keyFile.getAbsolutePath() + "] deleted, rebuilding");
             rebuildRouterInfo();
@@ -86,14 +79,10 @@ public class RebuildRouterInfoJob extends JobImpl {
         _log.debug("Rebuilding the new router info");
         boolean fullRebuild = false;
         RouterInfo info = null;
-        String infoFilename = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-        if (infoFilename == null)
-            infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
-        
-        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-        if (keyFilename == null)
-            keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-        File keyFile = new File(keyFilename);
+        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
+        File infoFile = new File(getContext().getRouterDir(), infoFilename);
+        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
+        File keyFile = new File(getContext().getRouterDir(), keyFilename);
         
         if (keyFile.exists()) {
             // ok, no need to rebuild a brand new identity, just update what we can
@@ -146,7 +135,7 @@ public class RebuildRouterInfoJob extends JobImpl {
             
             FileOutputStream fos = null;
             try {
-                fos = new FileOutputStream(infoFilename);
+                fos = new FileOutputStream(infoFile);
                 info.writeBytes(fos);
             } catch (DataFormatException dfe) {
                 _log.error("Error rebuilding the router information", dfe);

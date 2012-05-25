@@ -13,9 +13,9 @@ public class ConfigClientsHelper extends HelperBase {
     public ConfigClientsHelper() {}
     
     public String getForm1() {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>Client</td><td>Run at Startup?</td><td>Start Now</td><td>Class and arguments</td></tr>\n");
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<table>\n");
+        buf.append("<tr><th align=\"right\">Client</th><th>Run at Startup?</th><th>Start Now</th><th align=\"left\">Class and arguments</th></tr>\n");
         
         List clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
@@ -29,9 +29,9 @@ public class ConfigClientsHelper extends HelperBase {
     }
 
     public String getForm2() {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>WebApp</td><td>Run at Startup?</td><td>Start Now</td><td>Description</td></tr>\n");
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<table>\n");
+        buf.append("<tr><th align=\"right\">WebApp</th><th>Run at Startup?</th><th>Start Now</th><th align=\"left\">Description</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = new TreeSet(props.keySet());
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
@@ -46,8 +46,8 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
-    private void renderForm(StringBuffer buf, String index, String name, boolean urlify, boolean enabled, boolean ro, String desc) {
-        buf.append("<tr><td>");
+    private void renderForm(StringBuilder buf, String index, String name, boolean urlify, boolean enabled, boolean ro, String desc) {
+        buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
@@ -56,16 +56,16 @@ public class ConfigClientsHelper extends HelperBase {
         } else {
             buf.append(name);
         }
-        buf.append("</td><td align=\"center\"><input type=\"checkbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
+        buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {
             buf.append("checked=\"true\" ");
             if (ro)
                 buf.append("disabled=\"true\" ");
         }
-        buf.append("/></td><td>&nbsp");
+        buf.append("/></td><td align=\"center\" width=\"15%\">");
         if (!enabled) {
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >Start</button>");
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >Start<span class=hide> ").append(index).append("</span></button>");
         }
-        buf.append("&nbsp</td><td>").append(desc).append("</td></tr>\n");
+        buf.append("</td><td align=\"left\" width=\"50%\">").append(desc).append("</td></tr>\n");
     }
 }

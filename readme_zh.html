@@ -1,0 +1,35 @@
+<div align="right"> 
+  <div class="langbox" align="right"><a href="/index.jsp?lang=en"><img src="/flags.jsp?c=us" title="English" alt="English"></a> 
+    <a href="/index.jsp?lang=zh"><img src="/flags.jsp?c=cn" title="Chinese" alt="Chinese"></a> 
+    <a href="/index.jsp?lang=de"><img src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> 
+    <a href="/index.jsp?lang=fr"><img src="/flags.jsp?c=fr" title="Fran&ccedil;ais" alt="Fran&ccedil;ais"></a> 
+    <a href="/index.jsp?lang=nl"><img src="/flags.jsp?c=nl" title="Nederlands" alt="Nederlands"></a> 
+    <a href="/index.jsp?lang=sv"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a></div>
+</div>
+<h2>Welcome to I2P!</h2>
+<p>如果 I2P 已经运行，未来的几分钟里控制台左侧的活动节点(Active)数量将开始增长，并会出现名为 &quot;已共享客户&quot;(&quot;shared clients&quot;) 的本地目标。(如果没有,请见 <a href="#trouble">疑难解答</a>)。待出现以上消息后，您可以:</p>
+<ul>
+ <li><B>浏览 IIP网站 &quot;eepsites&quot;</B> -  I2P 网络内匿名运行的站点 - 您要首先设置浏览器的 <B>HTTP 代理</B> 为 localhost:4444 然后才能浏览IIP站点 - <ul>
+         <li><a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p</a> 和 <a href="http://perv.i2p/stats.cgi">perv.i2p</a>: 这两个站点用于跟踪哪些 IIP 站点在线。</li>
+         <li><a href="http://forum.i2p/">forum.i2p</a>: 安全匿名的访问I2P官方论坛 <a href="http://forum.i2p2.de/">forum.i2p2.de</a></li>
+         <li><a href="http://www.i2p2.i2p/">www.i2p2.i2p</a> 与其镜像 <a href="http://i2p-projekt.i2p">i2p-projekt.i2p</a>: 安全匿名的访问I2P官网 <a href="http://www.i2p2.de/">www.i2p2.de</a></li>
+         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>: 匿名建立的IIP网站搜索引擎</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>: UGHA 的IIP站点, 任何人都可以编辑的WIKI, 有丰富的链接</li>
+         <li><a href="http://fproxy.tino.i2p">fproxy.tino.i2p</a>: FREENET 代理</li>
+     </ul> <br>
+      I2P网络中还有很多其他的IIP网站(EEPSITE) - 访问上面的网站你会找到更多，收藏你喜爱的 IIP 网站，别忘了常去看看！</li><br>
+ <li><B>浏览 Web 网页</B> - 目前 IP2 网络中只有一个 HTTP 出口代理(&quot;outproxy&quot;)挂接在你主机4444端口的HTTP代理上。- 只要将浏览器的代理设置指向为前面的地址(localhost:4444)，然后访问任何普通链接即可 - 您的HTTP请求将在 I2P 网络内部传递。</li>
+ <li><B>文件交换</B> - 本机的其中一个内置 <a href="i2psnark/">端口</a> 中提供 <a href="http://www.klomp.org/snark/">Snark</a> <a href="http://www.bittorrent.com/">BitTorrent</a> 客户端。</li>
+ <li><B>匿名电邮</B> - POSTMAN 创建了兼容普通邮件客户端 (POP3 / SMTP)的邮件系统，该系统可以在 I2P 网络内部收发Email 也可以收发来自外部 Internet 的邮件！电邮账号请到 <a href="http://hq.postman.i2p/">hq.postman.i2p</a> 申请。我们将用于匿名POP3/SMTP的Web邮件客户端 <a href="/susimail/susimail">SUSIMail</a>, 集成在I2P中，并将其配置为使用POSTMAN 的邮件服务。</li>
+ <li><B>匿名聊天</B> - 打开您的 IRC 客户端并链接至 <B>localhost:6668</B>。这样可以访问两个匿名的 IRC 服务器, 但无论你还是服务器都不知道其他人在哪里。</li>
+ <li><B>匿名博客</B> - 请访问 <a href="http://syndie.i2p2.de/">Syndie</a></li>
+ <li>以及其他服务。</li>
+</ul>
+
+<h2>想创建属于您自己的 IIP 站点(EEPSITE)？</h2>
+
+<p>我们已经集成了一些软件来帮助你运行自己的EEPSITE - 有一个<a href="http://jetty.mortbay.org/">Jetty</a> 实例监听于本机 <a href="http://localhost:7658/">http://localhost:7658/</a>上。只要将你的文件放在 <code>eepsite/docroot/</code> 文件夹中 (或将任何标准的 JSP/Servlet <code>.war</code> 文件放置于 <code>eepsite/webapps</code> 中, 标准的 CGI 脚本应置于 <code>eepsite/cgi-bin</code> 目录内) 之后就可以浏览啦。此后运行 <a href="/i2ptunnel/">IIP站点隧道(EEPSITE TUNEL)</a> 将其指向站点的端口, 您的站点就可以被他人看到了。当您创建IIP站点时的具体操作参见 <a href="http://localhost:7658/">您的临时EEPSITE页面</a>。</p>
+
+<h2><a name="trouble">疑难解答</a></h2>
+
+<p>保持耐心 - I2P 第一次启动时需要搜索节点，可能比较缓慢。如果30分钟后，您的活动节点(Active:已连接/新近连接) 计数仍在 10 个节点以下, 请在防火墙中打开 8887 端口改善连接性能。如果您根本无法打开任何EEPSITE(甚至 <a href="http://www.i2p2.i2p/">www.i2p2.i2p</a>)，检查您的浏览器代理设置是否为本地的 localhost:4444。你也可以查看 <a href="http://www.i2p2.i2p/">I2P 网站</a> 上的信息, 在 <a href="http://forum.i2p2.de/">I2P 论坛</a> 中发帖, 来 <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a> , irc.postman.i2p 或 irc.freshcoffee.i2p 上的 #i2p 或 #i2p-chat 两个IRC频道坐坐。 (这些服务器上的这两个频道是相通的)。</p><hr>

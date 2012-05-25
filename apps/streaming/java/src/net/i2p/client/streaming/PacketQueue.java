@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  * mode=bestEffort doesnt block in the SDK.
  *
  */
-class PacketQueue {
+public class PacketQueue {
     private I2PAppContext _context;
     private Log _log;
     private I2PSession _session;
@@ -89,9 +89,17 @@ class PacketQueue {
                 // so if we retransmit it will use a new tunnel/lease combo
                 expires = rpe.getNextSendTime() - 500;
             if (expires > 0)
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
+                // I2PSessionImpl2
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
+                // I2PSessionMuxedImpl
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires,
+                                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
             else
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);
+                // I2PSessionImpl2
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, 0);
+                // I2PSessionMuxedImpl
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent,
+                                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
             end = _context.clock().now();
             
             if ( (end-begin > 1000) && (_log.shouldLog(Log.WARN)) ) 

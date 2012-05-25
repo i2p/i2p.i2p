@@ -106,6 +106,7 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
         }
     }
     
+    @Override
     public void dropped() {
         getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                          _message.getClass().getName(), 

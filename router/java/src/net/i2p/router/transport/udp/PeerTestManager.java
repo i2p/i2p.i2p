@@ -27,7 +27,7 @@ class PeerTestManager {
     private UDPTransport _transport;
     private PacketBuilder _packetBuilder;
     /** map of Long(nonce) to PeerTestState for tests currently in progress */
-    private Map _activeTests;
+    private final Map _activeTests;
     /** current test we are running, or null */
     private PeerTestState _currentTest;
     private boolean _currentTestComplete;
@@ -45,9 +45,9 @@ class PeerTestManager {
         _packetBuilder = new PacketBuilder(context, transport);
         _currentTest = null;
         _currentTestComplete = false;
-        _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.receiveTestReply", "How often we get a reply to our peer test?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.receiveTest", "How often we get a packet requesting us to participate in a peer test?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.receiveTestReply", "How often we get a reply to our peer test?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.receiveTest", "How often we get a packet requesting us to participate in a peer test?", "udp", UDPTransport.RATES);
     }
     
     private static final int RESEND_TIMEOUT = 5*1000;

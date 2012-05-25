@@ -36,13 +36,13 @@ import net.i2p.util.SimpleTimer;
 public class TunnelGateway {
     protected I2PAppContext _context;
     protected Log _log;
-    protected List _queue;
+    protected final List _queue;
     protected QueuePreprocessor _preprocessor;
     protected Sender _sender;
     protected Receiver _receiver;
     protected long _lastFlush;
     protected int _flushFrequency;
-    protected DelayedFlush _delayedFlush;
+    protected DelayedFlush _delayedFlush;// LINT -- Exporting non-public type through public API
     protected int _messagesSent;
     
     /**
@@ -236,8 +236,9 @@ public class TunnelGateway {
             super(message, toRouter, toTunnel, _context.clock().now());
         }        
         
+        @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Message ").append(_messageId).append(" on ");
             buf.append(TunnelGateway.this.toString());
             if (_toRouter != null) {
@@ -257,6 +258,7 @@ public class TunnelGateway {
             return buf.toString();
         }
 
+        @Override
         public long getLifetime() { return _context.clock().now()-_created; }
     }
     

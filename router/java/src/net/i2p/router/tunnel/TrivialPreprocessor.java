@@ -43,9 +43,9 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      */
     public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
         long begin = System.currentTimeMillis();
-        StringBuffer buf = null;
+        StringBuilder buf = null;
         if (_log.shouldLog(Log.DEBUG)) {
-            buf = new StringBuffer(256);
+            buf = new StringBuilder(256);
             buf.append("Trivial preprocessing of ").append(pending.size()).append(" ");
         }
         while (pending.size() > 0) {

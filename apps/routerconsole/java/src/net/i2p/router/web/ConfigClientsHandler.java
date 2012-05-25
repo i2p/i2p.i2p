@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,8 +42,20 @@ public class ConfigClientsHandler extends FormHandler {
                 startClient(appnum);
             else
                 startWebApp(app);
+        } else if (_action.toLowerCase().startsWith("start<span class=hide> ") &&
+                   _action.toLowerCase().endsWith("</span>")) {
+            // IE sucks
+            String app = _action.substring(23, _action.length() - 7);
+            int appnum = -1;
+            try {
+                appnum = Integer.parseInt(app);
+            } catch (NumberFormatException nfe) {}
+            if (appnum >= 0)
+                startClient(appnum);
+            else
+                startWebApp(app);
         } else {
-            addFormError("Unsupported " + _action);
+            addFormError("Unsupported " + _action + ".");
         }
     }
     
@@ -57,18 +70,18 @@ public class ConfigClientsHandler extends FormHandler {
                 ca.disabled = val == null;
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);
-        addFormNotice("Client configuration saved successfully - restart required to take effect");
+        addFormNotice("Client configuration saved successfully - restart required to take effect.");
     }
 
     private void startClient(int i) {
         List clients = ClientAppConfig.getClientApps(_context);
         if (i >= clients.size()) {
-            addFormError("Bad client index");
+            addFormError("Bad client index.");
             return;
         }
         ClientAppConfig ca = (ClientAppConfig) clients.get(i);
         LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
-        addFormNotice("Client " + ca.clientName + " started");
+        addFormNotice("Client " + ca.clientName + " started.");
     }
 
     private void saveWebAppChanges() {
@@ -85,7 +98,7 @@ public class ConfigClientsHandler extends FormHandler {
                 props.setProperty(name, "" + (val != null));
         }
         RouterConsoleRunner.storeWebAppProperties(props);
-        addFormNotice("WebApp configuration saved successfully - restart required to take effect");
+        addFormNotice("WebApp configuration saved successfully - restart required to take effect.");
     }
 
     // Big hack for the moment, not using properties for directory and port
@@ -99,16 +112,18 @@ public class ConfigClientsHandler extends FormHandler {
             for (int j = 0; j < hl.length; j++) {
                 if (hl[j].getPort() == 7657) {
                     try {
-                        s.addWebApplication("/"+ app, "./webapps/" + app + ".war").start();
+                        File path = new File(_context.getBaseDir(), "webapps");
+                        path = new File(path, app + ".war");
+                        s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
                         // no passwords... initialize(wac);
-                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "<a> started");
+                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "</a> started.");
                     } catch (Exception ioe) {
-                        addFormError("Failed to start " + app + " " + ioe);
+                        addFormError("Failed to start " + app + " " + ioe + ".");
                     }
                     return;
                 }
             }
         }
-        addFormError("Failed to find server");
+        addFormError("Failed to find server.");
     }
 }

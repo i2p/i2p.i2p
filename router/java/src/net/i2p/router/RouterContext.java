@@ -6,19 +6,15 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
-import net.i2p.router.admin.AdminManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.Calculator;
 import net.i2p.router.peermanager.CapacityCalculator;
 import net.i2p.router.peermanager.IntegrationCalculator;
-import net.i2p.router.peermanager.IsFailingCalculator;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
-import net.i2p.router.peermanager.ReliabilityCalculator;
 import net.i2p.router.peermanager.SpeedCalculator;
-import net.i2p.router.peermanager.StrictSpeedCalculator;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
@@ -38,7 +34,6 @@ import net.i2p.util.KeyRing;
  */
 public class RouterContext extends I2PAppContext {
     private Router _router;
-    private AdminManager _adminManager;
     private ClientManagerFacade _clientManagerFacade;
     private ClientMessagePool _clientMessagePool;
     private JobQueue _jobQueue;
@@ -61,13 +56,10 @@ public class RouterContext extends I2PAppContext {
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
-    private RouterClock _clock;
-    private Calculator _isFailingCalc;
+    private RouterClock _clockX;  // LINT field hides another field, hope rename won't break anything.
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
-    private Calculator _reliabilityCalc;
     private Calculator _capacityCalc;
-    private Calculator _oldSpeedCalc;
 
 
     private static List _contexts = new ArrayList(1);
@@ -76,7 +68,11 @@ public class RouterContext extends I2PAppContext {
     public RouterContext(Router router, Properties envProps) { 
         super(filterProps(envProps));
         _router = router;
-        initAll();
+        // Disabled here so that the router can get a context and get the
+        // directory locations from it, to do an update, without having
+        // to init everything. Caller MUST call initAll() afterwards.
+        // Sorry, this breaks some main() unit tests out there.
+        //initAll();
         _contexts.add(this);
     }
     /**
@@ -92,8 +88,7 @@ public class RouterContext extends I2PAppContext {
             envProps.setProperty("time.disabled", "false");
         return envProps;
     }
-    private void initAll() {
-        _adminManager = new AdminManager(this);
+    public void initAll() {
         if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
             _clientManagerFacade = new ClientManagerFacadeImpl(this);
         else
@@ -132,11 +127,8 @@ public class RouterContext extends I2PAppContext {
         _messageValidator = new MessageValidator(this);
         //_throttle = new RouterThrottleImpl(this);
         _throttle = new RouterDoSThrottle(this);
-        _isFailingCalc = new IsFailingCalculator(this);
         _integrationCalc = new IntegrationCalculator(this);
         _speedCalc = new SpeedCalculator(this);
-        _oldSpeedCalc = new StrictSpeedCalculator(this);
-        _reliabilityCalc = new ReliabilityCalculator(this);
         _capacityCalc = new CapacityCalculator(this);
     }
     
@@ -154,11 +146,6 @@ public class RouterContext extends I2PAppContext {
     /** convenience method for querying the router's ident */
     public Hash routerHash() { return _router.getRouterInfo().getIdentity().getHash(); }
 
-    /**
-     * Controls a basic admin interface
-     *
-     */
-    public AdminManager adminManager() { return _adminManager; }
     /**
      * How are we coordinating clients for the router?
      */
@@ -264,20 +251,16 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterThrottle throttle() { return _throttle; }
     
-    /** how do we rank the failure of profiles? */
-    public Calculator isFailingCalculator() { return _isFailingCalc; }
     /** how do we rank the integration of profiles? */
     public Calculator integrationCalculator() { return _integrationCalc; }
     /** how do we rank the speed of profiles? */
     public Calculator speedCalculator() { return _speedCalc; } 
-    public Calculator oldSpeedCalculator() { return _oldSpeedCalc; }
-    /** how do we rank the reliability of profiles? */
-    public Calculator reliabilityCalculator() { return _reliabilityCalc; }
     /** how do we rank the capacity of profiles? */
     public Calculator capacityCalculator() { return _capacityCalc; }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("RouterContext: ").append(super.toString()).append('\n');
         buf.append(_router).append('\n');
         buf.append(_clientManagerFacade).append('\n');
@@ -298,10 +281,8 @@ public class RouterContext extends I2PAppContext {
         buf.append(_statPublisher).append('\n');
         buf.append(_shitlist).append('\n');
         buf.append(_messageValidator).append('\n');
-        buf.append(_isFailingCalc).append('\n');
         buf.append(_integrationCalc).append('\n');
         buf.append(_speedCalc).append('\n');
-        buf.append(_reliabilityCalc).append('\n');
         return buf.toString();
     }
     
@@ -310,6 +291,7 @@ public class RouterContext extends I2PAppContext {
      * I2PAppContext says.
      *
      */
+    @Override
     public String getProperty(String propName) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -322,6 +304,7 @@ public class RouterContext extends I2PAppContext {
      * I2PAppContext says.
      *
      */
+    @Override
     public String getProperty(String propName, String defaultVal) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -333,6 +316,7 @@ public class RouterContext extends I2PAppContext {
     /**
      * Return an int with an int default
      */
+    @Override
     public int getProperty(String propName, int defaultVal) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -355,14 +339,16 @@ public class RouterContext extends I2PAppContext {
      * that it triggers initializeClock() of which we definitely
      * need the local version to run.
      */
+    @Override
     public Clock clock() {
         if (!_clockInitialized) initializeClock();
-        return _clock;
+        return _clockX;
     }
+    @Override
     protected void initializeClock() {
         synchronized (this) {
-            if (_clock == null)
-                _clock = new RouterClock(this);
+            if (_clockX == null)
+                _clockX = new RouterClock(this);
             _clockInitialized = true;
         }
     }

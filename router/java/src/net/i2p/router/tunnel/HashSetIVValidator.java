@@ -9,7 +9,7 @@ import net.i2p.data.DataHelper;
  * waste lots of RAM 
  */
 class HashSetIVValidator implements IVValidator {
-    private HashSet _received;
+    private final HashSet _received;
     
     public HashSetIVValidator() {
         _received = new HashSet();

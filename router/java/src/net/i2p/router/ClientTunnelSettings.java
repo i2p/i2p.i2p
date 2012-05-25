@@ -44,8 +44,9 @@ public class ClientTunnelSettings {
         _outboundSettings.writeToProperties("outbound.", props);
     }
 
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Properties p = new Properties();
         writeToProperties(p);
         buf.append("Client tunnel settings:\n");

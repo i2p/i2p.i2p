@@ -20,7 +20,7 @@ class OutboundClientMessageStatus {
     private ClientMessage _msg;
     private PayloadGarlicConfig _clove;
     private LeaseSet _leaseSet;
-    private Set _sent;
+    private final Set _sent;
     private int _numLookups;
     private boolean _success;
     private boolean _failure;
@@ -114,6 +114,7 @@ class OutboundClientMessageStatus {
         public Hash getGateway() { return _gateway; }
         public TunnelId getTunnel() { return _tunnel; }
 
+        @Override
         public int hashCode() {
             int rv = 0;
             if (_gateway != null)
@@ -123,6 +124,7 @@ class OutboundClientMessageStatus {
             return rv;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o == null) return false;
             if (o.getClass() != Tunnel.class) return false;

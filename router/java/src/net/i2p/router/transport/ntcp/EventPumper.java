@@ -31,13 +31,13 @@ import net.i2p.util.Log;
 public class EventPumper implements Runnable {
     private RouterContext _context;
     private Log _log;
-    private boolean _alive;
+    private volatile boolean _alive;
     private Selector _selector;
-    private List _bufCache;
-    private List _wantsRead;
-    private List _wantsWrite;
-    private List _wantsRegister;
-    private List _wantsConRegister;
+    private final List _bufCache;
+    private final List _wantsRead = new ArrayList(16);
+    private final List _wantsWrite = new ArrayList(4);
+    private final List _wantsRegister = new ArrayList(1);
+    private final List _wantsConRegister = new ArrayList(4);
     private NTCPTransport _transport;
     private long _expireIdleWriteTime;
     
@@ -51,7 +51,8 @@ public class EventPumper implements Runnable {
      * the time to iterate across them to check a few flags shouldn't be a problem.
      */
     private static final long FAILSAFE_ITERATION_FREQ = 2*1000l;
-    private static final long MIN_EXPIRE_IDLE_TIME = 5*60*1000l;
+    /** tunnel test is every 30-60s, so this should be longer than, say, 3*45s to allow for drops */
+    private static final long MIN_EXPIRE_IDLE_TIME = 3*60*1000l;
     private static final long MAX_EXPIRE_IDLE_TIME = 15*60*1000l;
     
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
@@ -63,25 +64,28 @@ public class EventPumper implements Runnable {
         _expireIdleWriteTime = MAX_EXPIRE_IDLE_TIME;
     }
     
-    public void startPumping() {
+    public synchronized void startPumping() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting pumper");
-        _alive = true;
-        _wantsRead = new ArrayList(16);
-        _wantsWrite = new ArrayList(4);
-        _wantsRegister = new ArrayList(1);
-        _wantsConRegister = new ArrayList(4);
+//        _wantsRead = new ArrayList(16);
+//        _wantsWrite = new ArrayList(4);
+//        _wantsRegister = new ArrayList(1);
+//        _wantsConRegister = new ArrayList(4);
         try {
             _selector = Selector.open();
+            _alive = true;
+            new I2PThread(this, "NTCP Pumper", true).start();
         } catch (IOException ioe) {
-            _log.error("Error opening the selector", ioe);
+            _log.log(Log.CRIT, "Error opening the NTCP selector", ioe);
+        } catch (java.lang.InternalError jlie) {
+            // "unable to get address of epoll functions, pre-2.6 kernel?"
+            _log.log(Log.CRIT, "Error opening the NTCP selector", jlie);
         }
-        new I2PThread(this, "NTCP Pumper", true).start();
     }
     
-    public void stopPumping() {
+    public synchronized void stopPumping() {
         _alive = false;
-        if (_selector.isOpen())
+        if (_selector != null && _selector.isOpen())
             _selector.wakeup();
     }
     

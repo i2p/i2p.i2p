@@ -31,10 +31,14 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+// needed only for debugging.
+// import java.util.logging.Level;
+// import java.util.logging.Logger;
 
 /**
  * Simplistic command parser for BOB
@@ -46,7 +50,7 @@ public class DoCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "03",  BEXT = "";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "08",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -57,6 +61,8 @@ public class DoCMDS implements Runnable {
 	private boolean dk,  ns,  ip,  op;
 	private NamedDB nickinfo;
 	private Log _log;
+	private AtomicBoolean LIVE;
+	private AtomicBoolean lock;
 	/* database strings */
 	private static final String P_DEST = "DESTINATION";
 	private static final String P_INHOST = "INHOST";
@@ -94,6 +100,8 @@ public class DoCMDS implements Runnable {
 	private static final String C_status = "status";
 	private static final String C_stop = "stop";
 	private static final String C_verify = "verify";
+	private static final String C_visit = "visit";
+	private static final String C_zap = "zap";
 
 	/* all the coomands available, plus description */
 	private static final String C_ALL[][] = {
@@ -119,6 +127,8 @@ public class DoCMDS implements Runnable {
 		{C_status, C_status + " nickname * Display status of a nicknamed tunnel."},
 		{C_stop, C_stop + " * Stops the current nicknamed tunnel."},
 		{C_verify, C_verify + " BASE64_key * Verifies BASE64 destination."},
+		{C_visit, C_visit + " * Thread dump to wrapper.log."},
+		{C_zap, C_zap + " * Shuts down BOB."},
 		{"", "COMMANDS: " + // this is ugly, but...
 			C_help + " " +
 			C_clear + " " +
@@ -141,19 +151,23 @@ public class DoCMDS implements Runnable {
 			C_start + " " +
 			C_status + " " +
 			C_stop + " " +
-			C_verify
+			C_verify + " " +
+			C_visit + " " +
+			C_zap
 		},
 		{" ", " "} // end of list
 	};
 
 	/**
-	 *
+	 * @param LIVE
 	 * @param server
 	 * @param props
 	 * @param database
 	 * @param _log
 	 */
-	DoCMDS(Socket server, Properties props, NamedDB database, Log _log) {
+	DoCMDS(AtomicBoolean LIVE, AtomicBoolean lock, Socket server, Properties props, NamedDB database, Log _log) {
+		this.lock = lock;
+		this.LIVE = LIVE;
 		this.server = server;
 		this.props = new Properties();
 		this.database = database;
@@ -393,445 +407,545 @@ public class DoCMDS implements Runnable {
 	 */
 	public void run() {
 		dk = ns = ip = op = false;
-
 		try {
-			// Get input from the client
-			BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
-			PrintStream out = new PrintStream(server.getOutputStream());
-			quit:
-			{
-				die:
+			try {
+				// Get input from the client
+				BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
+				PrintStream out = new PrintStream(server.getOutputStream());
+				quit:
 				{
-					prikey = new ByteArrayOutputStream();
-					out.println("BOB " + BOBversion);
-					out.println("OK");
-					while ((line = in.readLine()) != null) {
-						StringTokenizer token = new StringTokenizer(line, " "); // use a space as a delimiter
-						String Command = "";
-						String Arg = "";
-						NamedDB info;
+					die:
+					{
+						prikey = new ByteArrayOutputStream();
+						out.println("BOB " + BOBversion);
+						out.println("OK");
+						while ((line = in.readLine()) != null) {
+							StringTokenizer token = new StringTokenizer(line, " "); // use a space as a delimiter
+							String Command = "";
+							String Arg = "";
+							NamedDB info;
 
-						if (token.countTokens() != 0) {
-							Command = token.nextToken();
-							Command =
-								Command.toLowerCase();
 							if (token.countTokens() != 0) {
-								Arg = token.nextToken();
-							} else {
-								Arg = "";
-							}
-							// The rest of the tokens are considered junk,
-							// and discarded without any warnings.
-							if (Command.equals(C_help)) {
-								for (int i = 0; !C_ALL[i][0].equals(" "); i++) {
-									if (C_ALL[i][0].equalsIgnoreCase(Arg)) {
-										out.println("OK " + C_ALL[i][1]);
-									}
-
+								Command = token.nextToken();
+								Command =
+									Command.toLowerCase();
+								if (token.countTokens() != 0) {
+									Arg = token.nextToken();
+								} else {
+									Arg = "";
 								}
-							} else if (Command.equals(C_getdest)) {
-								if (ns) {
-									if (dk) {
-										try {
-											rlock();
-										} catch (Exception ex) {
-											break die;
+								// The rest of the tokens are considered junk,
+								// and discarded without any warnings.
+								if (Command.equals(C_help)) {
+									for (int i = 0; !C_ALL[i][0].equals(" "); i++) {
+										if (C_ALL[i][0].equalsIgnoreCase(Arg)) {
+											out.println("OK " + C_ALL[i][1]);
 										}
 
-										try {
-											out.println("OK " + nickinfo.get(P_DEST));
-										} catch (Exception e) {
+									}
+								} else if (Command.equals(C_visit)) {
+									visitAllThreads();
+									out.println("OK ");
+								} else if (Command.equals(C_getdest)) {
+									if (ns) {
+										if (dk) {
+											try {
+												rlock();
+											} catch (Exception ex) {
+												break die;
+											}
+
+											try {
+												out.println("OK " + nickinfo.get(P_DEST));
+											} catch (Exception e) {
+												try {
+													runlock();
+												} catch (Exception ex) {
+													break die;
+												}
+												break die;
+											}
+
 											try {
 												runlock();
 											} catch (Exception ex) {
 												break die;
 											}
-											break die;
-										}
 
-										try {
-											runlock();
-										} catch (Exception ex) {
-											break die;
+										} else {
+											out.println("ERROR keys not set.");
 										}
 
 									} else {
-										out.println("ERROR keys not set.");
+										nns(out);
 									}
 
-								} else {
-									nns(out);
-								}
-
-							} else if (Command.equals(C_list)) {
-								// Produce a formatted list of all nicknames
-								database.getReadLock();
-								for (int i = 0; i <
-									database.getcount(); i++) {
-									try {
-										info = (NamedDB) database.getnext(i);
-										out.print("DATA");
-									} catch (Exception e) {
-										database.releaseReadLock();
-										break die;
-									}
-
-									try {
-										info.getReadLock();
-									} catch (Exception ex) {
-										break die;
-									}
-									try {
-										nickprint(out, info);
-									} catch (Exception e) {
+								} else if (Command.equals(C_list)) {
+									// Produce a formatted list of all nicknames
+									database.getReadLock();
+									for (int i = 0; i <
+										database.getcount(); i++) {
 										try {
-											info.releaseReadLock();
+											info = (NamedDB) database.getnext(i);
+											out.print("DATA");
+										} catch (Exception e) {
 											database.releaseReadLock();
+											break die;
+										}
+
+										try {
+											info.getReadLock();
 										} catch (Exception ex) {
 											break die;
 										}
-										break die;
+										try {
+											nickprint(out, info);
+										} catch (Exception e) {
+											try {
+												info.releaseReadLock();
+												database.releaseReadLock();
+											} catch (Exception ex) {
+												break die;
+											}
+											break die;
+										}
+
+										try {
+											info.releaseReadLock();
+										} catch (Exception ex) {
+											break die;
+										}
 									}
 
 									try {
-										info.releaseReadLock();
+										database.releaseReadLock();
 									} catch (Exception ex) {
 										break die;
 									}
-								}
-
-								try {
-									database.releaseReadLock();
-								} catch (Exception ex) {
-									break die;
-								}
-								out.println("OK Listing done");
-							} else if (Command.equals(C_quit)) {
-								// End the command session
-								break quit;
-							} else if (Command.equals(C_newkeys)) {
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											try {
-												// Make a new PublicKey and PrivateKey
-												prikey = new ByteArrayOutputStream();
-												d = I2PClientFactory.createClient().createDestination(prikey);
+									out.println("OK Listing done");
+								} else if (Command.equals(C_quit)) {
+									// End the command session
+									break quit;
+								} else if (Command.equals(C_zap)) {
+									// Kill BOB!! (let's hope this works!)
+									LIVE.set(false);
+									// End the command session
+									break quit;
+								} else if (Command.equals(C_newkeys)) {
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
 												try {
-													wlock();
-												} catch (Exception e) {
-													break die;
-												}
+													// Make a new PublicKey and PrivateKey
+													prikey = new ByteArrayOutputStream();
+													d = I2PClientFactory.createClient().createDestination(prikey);
+													try {
+														wlock();
+													} catch (Exception e) {
+														break die;
+													}
 
-												try {
-													nickinfo.add(P_KEYS, prikey.toByteArray());
-													nickinfo.add(P_DEST, d.toBase64());
-												} catch (Exception e) {
+													try {
+														nickinfo.add(P_KEYS, prikey.toByteArray());
+														nickinfo.add(P_DEST, d.toBase64());
+													} catch (Exception e) {
+														try {
+															wunlock();
+														} catch (Exception ex) {
+															break die;
+														}
+														break die;
+													}
+
+													dk = true;
 													try {
 														wunlock();
 													} catch (Exception ex) {
 														break die;
 													}
-													break die;
-												}
 
-												dk = true;
-												try {
-													wunlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
-												try {
-													rlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
-												try {
-													out.println("OK " + nickinfo.get(P_DEST));
-												} catch (Exception e) {
-													runlock();
-													break die;
-												}
-
-												try {
-													runlock();
-												} catch (Exception ex) {
-													break die;
-												}
-											} catch (I2PException ipe) {
-												BOB.error("Error generating keys" + ipe);
-												out.println("ERROR generating keys");
-											}
-
-										}
-									} catch (Exception e) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_getkeys)) {
-								// Return public key
-								if (dk) {
-									prikey = new ByteArrayOutputStream();
-									try {
-										rlock();
-									} catch (Exception e) {
-										break die;
-									}
-									try {
-										prikey.write(((byte[]) nickinfo.get(P_KEYS)));
-									} catch (Exception ex) {
-										try {
-											runlock();
-										} catch (Exception ee) {
-											break die;
-										}
-										break die;
-									}
-									try {
-										runlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-									out.println("OK " + net.i2p.data.Base64.encode(prikey.toByteArray()));
-								} else {
-									out.println("ERROR no public key has been set");
-								}
-
-							} else if (Command.equals(C_quiet)) {
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											try {
-												wlock();
-											} catch (Exception ex) {
-												break die;
-											}
-											try {
-												nickinfo.add(P_QUIET, new Boolean(Boolean.parseBoolean(Arg) == true));
-											} catch (Exception ex) {
-												try {
-													wunlock();
-												} catch (Exception ee) {
-													break die;
-												}
-												break die;
-											}
-
-											try {
-												wunlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											out.println("OK Quiet set");
-										}
-
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_verify)) {
-								if (is64ok(Arg)) {
-									out.println("OK");
-								} else {
-									out.println("ERROR not in BASE64 format");
-								}
-							} else if (Command.equals(C_setkeys)) {
-								// Set the NamedDB to a privatekey in BASE64 format
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											try {
-												prikey = new ByteArrayOutputStream();
-												prikey.write(net.i2p.data.Base64.decode(Arg));
-												d.fromBase64(Arg);
-											} catch (Exception ex) {
-												Arg = "";
-											}
-
-											if ((Arg.length() == 884) && is64ok(Arg)) {
-												try {
-													wlock();
-												} catch (Exception ex) {
-													break die;
-												}
-												try {
-													nickinfo.add(P_KEYS, prikey.toByteArray());
-													nickinfo.add(P_DEST, d.toBase64());
-												} catch (Exception ex) {
 													try {
-														wunlock();
-													} catch (Exception ee) {
+														rlock();
+													} catch (Exception ex) {
 														break die;
 													}
-													break die;
-												}
-												dk = true;
-												try {
-													wunlock();
-												} catch (Exception ex) {
-													break die;
-												}
 
-												try {
-													rlock();
-												} catch (Exception ex) {
-													break die;
-												}
+													try {
+														out.println("OK " + nickinfo.get(P_DEST));
+													} catch (Exception e) {
+														runlock();
+														break die;
+													}
 
-												try {
-													out.println("OK " + nickinfo.get(P_DEST));
-												} catch (Exception e) {
 													try {
 														runlock();
 													} catch (Exception ex) {
 														break die;
 													}
+												} catch (I2PException ipe) {
+													BOB.error("Error generating keys" + ipe);
+													out.println("ERROR generating keys");
+												}
+
+											}
+										} catch (Exception e) {
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception ex) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_getkeys)) {
+									// Return public key
+									if (dk) {
+										prikey = new ByteArrayOutputStream();
+										try {
+											rlock();
+										} catch (Exception e) {
+											break die;
+										}
+										try {
+											prikey.write(((byte[]) nickinfo.get(P_KEYS)));
+										} catch (Exception ex) {
+											try {
+												runlock();
+											} catch (Exception ee) {
+												break die;
+											}
+											break die;
+										}
+										try {
+											runlock();
+										} catch (Exception e) {
+											break die;
+										}
+
+										out.println("OK " + net.i2p.data.Base64.encode(prikey.toByteArray()));
+									} else {
+										out.println("ERROR no public key has been set");
+									}
+
+								} else if (Command.equals(C_quiet)) {
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
+												try {
+													wlock();
+												} catch (Exception ex) {
+													break die;
+												}
+												try {
+													nickinfo.add(P_QUIET, new Boolean(Boolean.parseBoolean(Arg) == true));
+												} catch (Exception ex) {
+													try {
+														wunlock();
+													} catch (Exception ee) {
+														break die;
+													}
 													break die;
 												}
 
 												try {
-													runlock();
+													wunlock();
 												} catch (Exception ex) {
 													break die;
 												}
+
+												out.println("OK Quiet set");
+											}
+
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception ex) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_verify)) {
+									if (is64ok(Arg)) {
+										out.println("OK");
+									} else {
+										out.println("ERROR not in BASE64 format");
+									}
+								} else if (Command.equals(C_setkeys)) {
+									// Set the NamedDB to a privatekey in BASE64 format
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
 											} else {
-												out.println("ERROR not in BASE64 format");
+												try {
+													prikey = new ByteArrayOutputStream();
+													prikey.write(net.i2p.data.Base64.decode(Arg));
+													d.fromBase64(Arg);
+												} catch (Exception ex) {
+													Arg = "";
+												}
+
+												if ((Arg.length() == 884) && is64ok(Arg)) {
+													try {
+														wlock();
+													} catch (Exception ex) {
+														break die;
+													}
+													try {
+														nickinfo.add(P_KEYS, prikey.toByteArray());
+														nickinfo.add(P_DEST, d.toBase64());
+													} catch (Exception ex) {
+														try {
+															wunlock();
+														} catch (Exception ee) {
+															break die;
+														}
+														break die;
+													}
+													dk = true;
+													try {
+														wunlock();
+													} catch (Exception ex) {
+														break die;
+													}
+
+													try {
+														rlock();
+													} catch (Exception ex) {
+														break die;
+													}
+
+													try {
+														out.println("OK " + nickinfo.get(P_DEST));
+													} catch (Exception e) {
+														try {
+															runlock();
+														} catch (Exception ex) {
+															break die;
+														}
+														break die;
+													}
+
+													try {
+														runlock();
+													} catch (Exception ex) {
+														break die;
+													}
+												} else {
+													out.println("ERROR not in BASE64 format");
+												}
+
+											}
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception ex) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_setnick)) {
+									ns = dk = ip = op = false;
+									try {
+										database.getReadLock();
+									} catch (Exception ex) {
+										break die;
+									}
+									try {
+										nickinfo = (NamedDB) database.get(Arg);
+										if (!tunnelactive(nickinfo)) {
+											nickinfo = null;
+											ns = true;
+										}
+
+									} catch (Exception b) {
+										nickinfo = null;
+										ns = true;
+									}
+
+									try {
+										database.releaseReadLock();
+									} catch (Exception ex) {
+										break die;
+									}
+									// Clears and Sets the initial NamedDB structure to work with
+									if (ns) {
+										nickinfo = new NamedDB();
+										try {
+											wlock();
+										} catch (Exception e) {
+											break die;
+										}
+
+										try {
+											database.add(Arg, nickinfo);
+											nickinfo.add(P_NICKNAME, Arg);
+											nickinfo.add(P_STARTING, new Boolean(false));
+											nickinfo.add(P_RUNNING, new Boolean(false));
+											nickinfo.add(P_STOPPING, new Boolean(false));
+											nickinfo.add(P_QUIET, new Boolean(false));
+											nickinfo.add(P_INHOST, "localhost");
+											nickinfo.add(P_OUTHOST, "localhost");
+											Properties Q = new Properties();
+											Lifted.copyProperties(this.props, Q);
+											Q.setProperty("inbound.nickname", Arg);
+											Q.setProperty("outbound.nickname", Arg);
+											nickinfo.add(P_PROPERTIES, Q);
+										} catch (Exception e) {
+											try {
+												wunlock();
+												break die;
+											} catch (Exception ee) {
+												break die;
 											}
 
 										}
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_setnick)) {
-								ns = dk = ip = op = false;
-								try {
-									database.getReadLock();
-								} catch (Exception ex) {
-									break die;
-								}
-								try {
-									nickinfo = (NamedDB) database.get(Arg);
-									if (!tunnelactive(nickinfo)) {
-										nickinfo = null;
-										ns =
-											true;
-									}
-
-								} catch (Exception b) {
-									nickinfo = null;
-									ns =
-										true;
-								}
-
-								try {
-									database.releaseReadLock();
-								} catch (Exception ex) {
-									break die;
-								}
-								// Clears and Sets the initial NamedDB structure to work with
-								if (ns) {
-									nickinfo = new NamedDB();
-									try {
-										wlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-									try {
-										database.add(Arg, nickinfo);
-										nickinfo.add(P_NICKNAME, Arg);
-										nickinfo.add(P_STARTING, Boolean.FALSE);
-										nickinfo.add(P_RUNNING, Boolean.FALSE);
-										nickinfo.add(P_STOPPING, Boolean.FALSE);
-										nickinfo.add(P_QUIET, Boolean.FALSE);
-										nickinfo.add(P_INHOST, "localhost");
-										nickinfo.add(P_OUTHOST, "localhost");
-										Properties Q = new Properties();
-										Lifted.copyProperties(this.props, Q);
-										Q.setProperty("inbound.nickname", Arg);
-										Q.setProperty("outbound.nickname", Arg);
-										nickinfo.add(P_PROPERTIES, Q);
-									} catch (Exception e) {
 										try {
 											wunlock();
-											break die;
-										} catch (Exception ee) {
+										} catch (Exception e) {
 											break die;
 										}
 
+										out.println("OK Nickname set to " + Arg);
+									} else {
+										out.println("ERROR tunnel is active");
 									}
+
+								} else if (Command.equals(C_option)) {
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
+												StringTokenizer otoken = new StringTokenizer(Arg, "="); // use an equal sign as a delimiter
+												if (otoken.countTokens() != 2) {
+													out.println("ERROR to many or no options.");
+												} else {
+													String pname = otoken.nextToken();
+													String pval = otoken.nextToken();
+													try {
+														rlock();
+													} catch (Exception ex) {
+														break die;
+													}
+
+													Properties Q = (Properties) nickinfo.get(P_PROPERTIES);
+													try {
+														runlock();
+													} catch (Exception ex) {
+														break die;
+													}
+
+													Q.setProperty(pname, pval);
+													try {
+														wlock();
+													} catch (Exception ex) {
+														break die;
+													}
+
+													try {
+														nickinfo.add(P_PROPERTIES, Q);
+													} catch (Exception ex) {
+														try {
+															wunlock();
+														} catch (Exception ee) {
+															break die;
+														}
+														break die;
+													}
+													try {
+														wunlock();
+													} catch (Exception ex) {
+														break die;
+													}
+
+													out.println("OK " + pname + " set to " + pval);
+												}
+
+											}
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										nns(out);
+									}
+
+								} else if (Command.equals(C_getnick)) {
+									// Get the NamedDB to work with...
 									try {
-										wunlock();
-									} catch (Exception e) {
+										database.getReadLock();
+									} catch (Exception ex) {
 										break die;
 									}
-
-									out.println("OK Nickname set to " + Arg);
-								} else {
-									out.println("ERROR tunnel is active");
-								}
-
-							} else if (Command.equals(C_option)) {
-								if (ns) {
 									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											StringTokenizer otoken = new StringTokenizer(Arg, "="); // use an equal sign as a delimiter
-											if (otoken.countTokens() != 2) {
-												out.println("ERROR to many or no options.");
+										nickinfo = (NamedDB) database.get(Arg);
+										ns = true;
+									} catch (RuntimeException b) {
+										try {
+											nns(out);
+										} catch (Exception ex) {
+											try {
+												database.releaseReadLock();
+											} catch (Exception ee) {
+												break die;
+											}
+											break die;
+										}
+									}
+
+									database.releaseReadLock();
+									if (ns) {
+										try {
+											rlock();
+										} catch (Exception e) {
+											break die;
+										}
+										try {
+											dk = nickinfo.exists(P_KEYS);
+											ip = nickinfo.exists(P_INPORT);
+											op = nickinfo.exists(P_OUTPORT);
+										} catch (Exception ex) {
+											try {
+												runlock();
+											} catch (Exception ee) {
+												break die;
+											}
+											break die;
+										}
+										try {
+											runlock();
+										} catch (Exception e) {
+											break die;
+										}
+// Finally say OK.
+										out.println("OK Nickname set to " + Arg);
+									}
+
+								} else if (Command.equals(C_inport)) {
+									// Set the NamedDB inbound TO the router port
+									// app --> BOB
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
 											} else {
-												String pname = otoken.nextToken();
-												String pval = otoken.nextToken();
-												try {
-													rlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
-												Properties Q = (Properties) nickinfo.get(P_PROPERTIES);
-												try {
-													runlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
-												Q.setProperty(pname, pval);
+												int prt;
 												try {
 													wlock();
 												} catch (Exception ex) {
@@ -839,7 +953,181 @@ public class DoCMDS implements Runnable {
 												}
 
 												try {
-													nickinfo.add(P_PROPERTIES, Q);
+													nickinfo.kill(P_INPORT);
+												} catch (Exception ex) {
+													try {
+														wunlock();
+													} catch (Exception ee) {
+														break die;
+													}
+
+													break die;
+												}
+												try {
+													prt = Integer.parseInt(Arg);
+													if (prt > 1 && prt < 65536) {
+														try {
+															nickinfo.add(P_INPORT, new Integer(prt));
+														} catch (Exception ex) {
+															try {
+																wunlock();
+															} catch (Exception ee) {
+																break die;
+															}
+
+															break die;
+														}
+													}
+
+												} catch (NumberFormatException nfe) {
+													out.println("ERROR not a number");
+												}
+
+												try {
+													wunlock();
+												} catch (Exception ex) {
+													break die;
+												}
+												try {
+													rlock();
+												} catch (Exception ex) {
+													break die;
+												}
+
+												try {
+													ip = nickinfo.exists(P_INPORT);
+												} catch (Exception ex) {
+													try {
+														runlock();
+													} catch (Exception ee) {
+														break die;
+													}
+													break die;
+												}
+												try {
+													runlock();
+												} catch (Exception ex) {
+													break die;
+												}
+
+												if (ip) {
+													out.println("OK inbound port set");
+												} else {
+													out.println("ERROR port out of range");
+												}
+
+											}
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										nns(out);
+									}
+
+								} else if (Command.equals(C_outport)) {
+									// Set the NamedDB outbound FROM the router port
+									// BOB --> app
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
+												int prt;
+												try {
+													wlock();
+												} catch (Exception ex) {
+													break die;
+												}
+
+												try {
+													nickinfo.kill(P_OUTPORT);
+												} catch (Exception ex) {
+													try {
+														wunlock();
+													} catch (Exception ee) {
+														break die;
+													}
+													break die;
+												}
+												try {
+													prt = Integer.parseInt(Arg);
+													if (prt > 1 && prt < 65536) {
+														try {
+															nickinfo.add(P_OUTPORT, new Integer(prt));
+														} catch (Exception ex) {
+															try {
+																wunlock();
+															} catch (Exception ee) {
+																break die;
+															}
+															break die;
+														}
+													}
+
+												} catch (NumberFormatException nfe) {
+													out.println("ERROR not a number");
+												}
+
+												try {
+													wunlock();
+												} catch (Exception ex) {
+													break die;
+												}
+												try {
+													rlock();
+												} catch (Exception ex) {
+													break die;
+												}
+
+												try {
+													ip = nickinfo.exists(P_OUTPORT);
+												} catch (Exception ex) {
+													try {
+														runlock();
+													} catch (Exception ee) {
+														break die;
+													}
+													break die;
+												}
+												try {
+													runlock();
+												} catch (Exception ex) {
+													break die;
+												}
+
+												if (ip) {
+													out.println("OK outbound port set");
+												} else {
+													out.println("ERROR port out of range");
+												}
+
+											}
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception ex) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_inhost)) {
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
+												try {
+													wlock();
+												} catch (Exception ex) {
+													break die;
+												}
+												try {
+													nickinfo.add(P_INHOST, Arg);
 												} catch (Exception ex) {
 													try {
 														wunlock();
@@ -854,543 +1142,89 @@ public class DoCMDS implements Runnable {
 													break die;
 												}
 
-												out.println("OK " + pname + " set to " + pval);
+												out.println("OK inhost set");
 											}
 
-										}
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									nns(out);
-								}
-
-							} else if (Command.equals(C_getnick)) {
-								// Get the NamedDB to work with...
-								try {
-									database.getReadLock();
-								} catch (Exception ex) {
-									break die;
-								}
-								try {
-									nickinfo = (NamedDB) database.get(Arg);
-									ns = true;
-								} catch (RuntimeException b) {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										try {
-											database.releaseReadLock();
-										} catch (Exception ee) {
+										} catch (Exception ex) {
 											break die;
 										}
-										break die;
-									}
-								}
 
-								database.releaseReadLock();
-								if (ns) {
-									try {
-										rlock();
-									} catch (Exception e) {
-										break die;
-									}
-									try {
-										dk = nickinfo.exists(P_KEYS);
-										ip = nickinfo.exists(P_INPORT);
-										op = nickinfo.exists(P_OUTPORT);
-									} catch (Exception ex) {
+									} else {
 										try {
-											runlock();
-										} catch (Exception ee) {
+											nns(out);
+										} catch (Exception ex) {
 											break die;
 										}
-										break die;
 									}
-									try {
-										runlock();
-									} catch (Exception e) {
-										break die;
-									}
-// Finally say OK.
-									out.println("OK Nickname set to " + Arg);
-								}
 
-							} else if (Command.equals(C_inport)) {
-								// Set the NamedDB inbound TO the router port
-								// app --> BOB
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											int prt;
-											try {
-												wlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											try {
-												nickinfo.kill(P_INPORT);
-											} catch (Exception ex) {
+								} else if (Command.equals(C_outhost)) {
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
 												try {
-													wunlock();
-												} catch (Exception ee) {
+													wlock();
+												} catch (Exception ex) {
 													break die;
 												}
-
-												break die;
-											}
-											try {
-												prt = Integer.parseInt(Arg);
-												if (prt > 1 && prt < 65536) {
+												try {
+													nickinfo.add(P_OUTHOST, Arg);
+												} catch (Exception ex) {
 													try {
-														nickinfo.add(P_INPORT, new Integer(prt));
-													} catch (Exception ex) {
-														try {
-															wunlock();
-														} catch (Exception ee) {
-															break die;
-														}
-
+														wunlock();
+													} catch (Exception ee) {
 														break die;
 													}
-												}
-
-											} catch (NumberFormatException nfe) {
-												out.println("ERROR not a number");
-											}
-
-											try {
-												wunlock();
-											} catch (Exception ex) {
-												break die;
-											}
-											try {
-												rlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											try {
-												ip = nickinfo.exists(P_INPORT);
-											} catch (Exception ex) {
-												try {
-													runlock();
-												} catch (Exception ee) {
 													break die;
 												}
-												break die;
-											}
-											try {
-												runlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											if (ip) {
-												out.println("OK inbound port set");
-											} else {
-												out.println("ERROR port out of range");
-											}
-
-										}
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									nns(out);
-								}
-
-							} else if (Command.equals(C_outport)) {
-								// Set the NamedDB outbound FROM the router port
-								// BOB --> app
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											int prt;
-											try {
-												wlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											try {
-												nickinfo.kill(P_OUTPORT);
-											} catch (Exception ex) {
 												try {
 													wunlock();
-												} catch (Exception ee) {
+												} catch (Exception ex) {
 													break die;
 												}
-												break die;
-											}
-											try {
-												prt = Integer.parseInt(Arg);
-												if (prt > 1 && prt < 65536) {
-													try {
-														nickinfo.add(P_OUTPORT, new Integer(prt));
-													} catch (Exception ex) {
-														try {
-															wunlock();
-														} catch (Exception ee) {
-															break die;
-														}
-														break die;
-													}
-												}
 
-											} catch (NumberFormatException nfe) {
-												out.println("ERROR not a number");
+												out.println("OK outhost set");
 											}
 
-											try {
-												wunlock();
-											} catch (Exception ex) {
-												break die;
-											}
-											try {
-												rlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											try {
-												ip = nickinfo.exists(P_OUTPORT);
-											} catch (Exception ex) {
-												try {
-													runlock();
-												} catch (Exception ee) {
-													break die;
-												}
-												break die;
-											}
-											try {
-												runlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											if (ip) {
-												out.println("OK outbound port set");
-											} else {
-												out.println("ERROR port out of range");
-											}
-
-										}
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_inhost)) {
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											try {
-												wlock();
-											} catch (Exception ex) {
-												break die;
-											}
-											try {
-												nickinfo.add(P_INHOST, Arg);
-											} catch (Exception ex) {
-												try {
-													wunlock();
-												} catch (Exception ee) {
-													break die;
-												}
-												break die;
-											}
-											try {
-												wunlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											out.println("OK inhost set");
-										}
-
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_outhost)) {
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											try {
-												wlock();
-											} catch (Exception ex) {
-												break die;
-											}
-											try {
-												nickinfo.add(P_OUTHOST, Arg);
-											} catch (Exception ex) {
-												try {
-													wunlock();
-												} catch (Exception ee) {
-													break die;
-												}
-												break die;
-											}
-											try {
-												wunlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
-											out.println("OK outhost set");
-										}
-
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception ex) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_show)) {
-								// Get the current NamedDB properties
-								if (ns) {
-									out.print("OK");
-									try {
-										rlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-									try {
-										nickprint(out, nickinfo);
-									} catch (Exception e) {
-										try {
-											runlock();
-										} catch (Exception ee) {
+										} catch (Exception ex) {
 											break die;
 										}
 
-										out.println(); // this will cause an IOE if IOE
-										break die;
-									}
-
-									try {
-										runlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception e) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_show_props)) {
-								// Get the current options properties
-								if (ns) {
-									out.print("OK");
-									try {
-										rlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-									try {
-										propprint(out, nickinfo);
-									} catch (Exception e) {
+									} else {
 										try {
-											runlock();
-										} catch (Exception ee) {
+											nns(out);
+										} catch (Exception ex) {
 											break die;
 										}
-
-										out.println(); // this will cause an IOE if IOE
-										break die;
 									}
 
-									try {
-										runlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception e) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_start)) {
-								// Start the tunnel, if we have all the information
-								if (ns && dk && (ip || op)) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											MUXlisten tunnel;
-											try {
-												tunnel = new MUXlisten(database, nickinfo, _log);
-												Thread t = new Thread(tunnel);
-												t.start();
-												out.println("OK tunnel starting");
-											} catch (I2PException e) {
-												out.println("ERROR starting tunnel: " + e);
-											} catch (IOException e) {
-												out.println("ERROR starting tunnel: " + e);
-											}
-
-										}
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									out.println("ERROR tunnel settings incomplete");
-								}
-
-							} else if (Command.equals(C_stop)) {
-								// Stop the tunnel, if it is running
-								if (ns) {
-									try {
-										rlock();
-									} catch (Exception e) {
-										break die;
-									}
-
-									try {
-										if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
-											try {
-												runlock();
-											} catch (Exception e) {
-												break die;
-											}
-
-											try {
-												wlock();
-											} catch (Exception e) {
-												break die;
-											}
-
-											nickinfo.add(P_STOPPING, Boolean.TRUE);
-											try {
-												wunlock();
-
-											} catch (Exception e) {
-												break die;
-											}
-
-											out.println("OK tunnel stopping");
-										} else {
-											try {
-												runlock();
-											} catch (Exception e) {
-												break die;
-											}
-
-											out.println("ERROR tunnel is inactive");
-										}
-									} catch (Exception e) {
+								} else if (Command.equals(C_show)) {
+									// Get the current NamedDB properties
+									if (ns) {
+										out.print("OK");
 										try {
-											runlock();
-										} catch (Exception ee) {
-											break die;
-										}
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception e) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_clear)) {
-								// Clear use of the NamedDB if stopped
-								if (ns) {
-									try {
-										if (tunnelactive(nickinfo)) {
-											out.println("ERROR tunnel is active");
-										} else {
-											try {
-												database.getWriteLock();
-											} catch (Exception e) {
-												break die;
-											}
-											try {
-												database.kill(nickinfo.get(P_NICKNAME));
-											} catch (Exception e) {
-												try {
-													database.releaseWriteLock();
-												} catch (Exception ee) {
-													break die;
-												}
-												break die;
-											}
-											try {
-												database.releaseWriteLock();
-											} catch (Exception e) {
-												break die;
-											}
-											dk = ns = ip = op = false;
-											out.println("OK cleared");
-										}
-
-									} catch (Exception ex) {
-										break die;
-									}
-
-								} else {
-									try {
-										nns(out);
-									} catch (Exception e) {
-										break die;
-									}
-								}
-
-							} else if (Command.equals(C_status)) {
-								try {
-									if (database.exists(Arg)) {
-										// Show status of a NamedDB
-										out.print("OK ");
-										try {
-											ttlpnt(out, Arg);
+											rlock();
 										} catch (Exception e) {
+											break die;
+										}
+
+										try {
+											nickprint(out, nickinfo);
+										} catch (Exception e) {
+											try {
+												runlock();
+											} catch (Exception ee) {
+												break die;
+											}
+
 											out.println(); // this will cause an IOE if IOE
+											break die;
+										}
+
+										try {
+											runlock();
+										} catch (Exception e) {
 											break die;
 										}
 
@@ -1401,27 +1235,273 @@ public class DoCMDS implements Runnable {
 											break die;
 										}
 									}
-								} catch (Exception e) {
-									break die;
+
+								} else if (Command.equals(C_show_props)) {
+									// Get the current options properties
+									if (ns) {
+										out.print("OK");
+										try {
+											rlock();
+										} catch (Exception e) {
+											break die;
+										}
+
+										try {
+											propprint(out, nickinfo);
+										} catch (Exception e) {
+											try {
+												runlock();
+											} catch (Exception ee) {
+												break die;
+											}
+
+											out.println(); // this will cause an IOE if IOE
+											break die;
+										}
+
+										try {
+											runlock();
+										} catch (Exception e) {
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception e) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_start)) {
+									// Start the tunnel, if we have all the information
+									if (ns && dk && (ip || op)) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
+												MUXlisten tunnel;
+												try {
+													while (!lock.compareAndSet(false, true)) {
+														// wait
+													}
+													tunnel = new MUXlisten(lock, database, nickinfo, _log);
+													Thread t = new Thread(tunnel);
+													t.start();
+													// try {
+													//	Thread.sleep(1000 * 10); // Slow down the startup.
+													// } catch(InterruptedException ie) {
+													//	// ignore it
+													// }
+													out.println("OK tunnel starting");
+												} catch (I2PException e) {
+													lock.set(false);
+													out.println("ERROR starting tunnel: " + e);
+												} catch (IOException e) {
+													lock.set(false);
+													out.println("ERROR starting tunnel: " + e);
+												}
+											}
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										out.println("ERROR tunnel settings incomplete");
+									}
+
+								} else if (Command.equals(C_stop)) {
+									// Stop the tunnel, if it is running
+									if (ns) {
+										try {
+											rlock();
+										} catch (Exception e) {
+											break die;
+										}
+
+										try {
+											if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
+												try {
+													runlock();
+												} catch (Exception e) {
+													break die;
+												}
+
+												try {
+													wlock();
+												} catch (Exception e) {
+													break die;
+												}
+
+												nickinfo.add(P_STOPPING, new Boolean(true));
+												try {
+													wunlock();
+
+												} catch (Exception e) {
+													break die;
+												}
+
+												out.println("OK tunnel stopping");
+											} else {
+												try {
+													runlock();
+												} catch (Exception e) {
+													break die;
+												}
+
+												out.println("ERROR tunnel is inactive");
+											}
+										} catch (Exception e) {
+											try {
+												runlock();
+											} catch (Exception ee) {
+												break die;
+											}
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception e) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_clear)) {
+									// Clear use of the NamedDB if stopped
+									if (ns) {
+										try {
+											if (tunnelactive(nickinfo)) {
+												out.println("ERROR tunnel is active");
+											} else {
+												try {
+													database.getWriteLock();
+												} catch (Exception e) {
+													break die;
+												}
+												try {
+													database.kill(nickinfo.get(P_NICKNAME));
+												} catch (Exception e) {
+													try {
+														database.releaseWriteLock();
+													} catch (Exception ee) {
+														break die;
+													}
+													break die;
+												}
+												try {
+													database.releaseWriteLock();
+												} catch (Exception e) {
+													break die;
+												}
+												dk = ns = ip = op = false;
+												out.println("OK cleared");
+											}
+
+										} catch (Exception ex) {
+											break die;
+										}
+
+									} else {
+										try {
+											nns(out);
+										} catch (Exception e) {
+											break die;
+										}
+									}
+
+								} else if (Command.equals(C_status)) {
+									try {
+										if (database.exists(Arg)) {
+											// Show status of a NamedDB
+											out.print("OK ");
+											try {
+												ttlpnt(out, Arg);
+											} catch (Exception e) {
+												out.println(); // this will cause an IOE if IOE
+												break die;
+											}
+
+										} else {
+											try {
+												nns(out);
+											} catch (Exception e) {
+												break die;
+											}
+										}
+									} catch (Exception e) {
+										break die;
+									}
+
+								} else {
+									out.println("ERROR UNKNOWN COMMAND! Try help");
 								}
 
-							} else {
-								out.println("ERROR UNKNOWN COMMAND! Try help");
 							}
-
 						}
-					}
-				} // die
-				out.print("ERROR A really bad error just happened, ");
-			} // quit
+					} // die
+					out.print("ERROR A really bad error just happened, ");
+				} // quit
 // Say goodbye.
 
-			out.println("OK Bye!");
+				out.println("OK Bye!");
 
-			server.close();
-		} catch (IOException ioe) {
-			BOB.warn("IOException on socket listen: " + ioe);
-			ioe.printStackTrace();
+			} catch (IOException ioe) {
+				// not really needed, except to debug.
+				// BOB.warn("IOException on socket listen: " + ioe);
+				// ioe.printStackTrace();
+			}
+		} finally {
+			try {
+				server.close();
+			} catch (IOException ex) {
+				// nop
+			}
+		}
+	}
+	// Debugging... None of this is normally used.
+
+	/**
+	 *	Find the root thread group and print them all.
+	 *
+	 */
+	private void visitAllThreads() {
+		ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+		while (root.getParent() != null) {
+			root = root.getParent();
+		}
+
+		// Visit each thread group
+		visit(root, 0, root.getName());
+	}
+
+	/**
+	 * Recursively visits all thread groups under `group' and dumps them.
+	 * @param group ThreadGroup to visit
+	 * @param level Current level
+	 */
+	private static void visit(ThreadGroup group, int level, String tn) {
+		// Get threads in `group'
+		int numThreads = group.activeCount();
+		Thread[] threads = new Thread[numThreads * 2];
+		numThreads = group.enumerate(threads, false);
+		String indent = "------------------------------------".substring(0, level) + "-> ";
+		// Enumerate each thread in `group' and print it.
+		for (int i = 0; i < numThreads; i++) {
+			// Get thread
+			Thread thread = threads[i];
+			System.out.println("BOB: " + indent + tn + ": " + thread.toString());
+		}
+
+		// Get thread subgroups of `group'
+		int numGroups = group.activeGroupCount();
+		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+		numGroups = group.enumerate(groups, false);
+
+		// Recursively visit each subgroup
+		for (int i = 0; i < numGroups; i++) {
+			visit(groups[i], level + 1, groups[i].getName());
 		}
 	}
 }

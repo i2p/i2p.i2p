@@ -35,12 +35,20 @@ public interface Transport {
     public RouterAddress startListening();
     public void stopListening();
     public RouterAddress getCurrentAddress();
+    public static final String SOURCE_UPNP = "upnp";
+    public static final String SOURCE_INTERFACE = "local";
+    public static final String SOURCE_CONFIG = "config"; // unused
+    public void externalAddressReceived(String source, byte[] ip, int port);
+    public void forwardPortStatus(int port, boolean success, String reason);
+    public int getRequestedPort();
     public void setListener(TransportEventListener listener);
     public String getStyle();
     
+    public int countPeers();    
     public int countActivePeers();    
     public int countActiveSendPeers();
     public boolean haveCapacity();
+    public boolean haveCapacity(int pct);
     public Vector getClockSkews();
     public List getMostRecentErrorMessages();
     

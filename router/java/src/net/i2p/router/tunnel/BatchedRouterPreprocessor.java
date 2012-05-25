@@ -57,6 +57,7 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     }
 
     /** how long should we wait before flushing */
+    @Override
     protected long getSendDelay() { 
         String freq = null;
         if (_config != null) {
@@ -77,6 +78,7 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
         return DEFAULT_BATCH_FREQUENCY;
     }
     
+    @Override
     protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
         if (_config != null)
             _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _config, msg);

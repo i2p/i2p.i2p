@@ -1,0 +1,598 @@
+/* Optimised for less capable browers and system specifications */
+
+body {
+     margin: 2px 0 0 2px;
+     padding: 0;
+     text-align: left;
+     background: #bbf;
+     color: #000;
+     font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+.hide {
+     display: none;
+}
+
+img {
+     border: none;
+}
+
+pre {
+     overflow: auto;
+     font-size: 8pt !important;
+     width: 100%;
+}
+
+div.logo {
+     float: left;
+     position-relative: top 20px ;
+     width: 200px;
+     margin: 0 0 0 20px;
+     padding: 10px 5px;
+     text-align: center;
+     border: 5px solid #ddf;
+     background-color: #eef;
+     -moz-border-radius: 15px;
+     -moz-box-shadow: inset 0px 0px 0px 2px #99f;
+     -khtml-border-radius: 15px;
+     -khtml-box-shadow: inset 0px 0px 0px 2px #99f;
+}
+
+div.logo hr {
+     color: #ddf;
+     background: #ddf;
+     height: 5px;
+     border: 0px solid #ddf;
+     margin: 8px -3px;
+}
+
+div.logo a:link, div.logo a:visited {
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
+}
+
+div.logo a:active {
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     color: #f60;
+}
+
+div.logo a:hover {
+     text-shadow: 0px 0px 1px rgba(128, 0, 0, 0.7);
+     color: #900;
+}
+
+div.warning {
+     margin: 20px 20px 10px 260px;
+     padding: 0px 20px 20px 75px;
+     background: #ffd;
+     border: 5px solid #fb7;
+     text-align: left;
+     color: inherit;
+     background-image:url("../images/errortriangle.png");
+     background-position: 17px center;
+     background-repeat:no-repeat;
+     -moz-border-radius: 15px;
+     -moz-box-shadow: inset 0px 0px 0px 2px #f60;
+     -kthml-border-radius: 15px;
+     -khtml-box-shadow: inset 0px 0px 0px 2px #f60;
+}
+
+div.warning a:link {
+     color: #f60;
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.5);
+}
+
+div.warning a:visited{
+     color: #f90;
+}
+
+div.warning a:hover{
+     color: #d30;
+  text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+}
+
+div.warning a:active{
+     color: #900;
+}
+
+div.warning hr {
+     color: #fb7;
+     background: #fb7;
+     height: 5px;
+     border: 0px solid #fb7;
+     margin: 5px 0;
+}
+
+div.toolbar {
+     margin: 0em 0em 2em 0em;
+     font-weight: bold;
+     display: none !important;
+}
+
+div.routersummaryouter {
+     float: left; 
+     width: 205px;
+     margin: 0;
+     padding: 0;
+     border: 0;
+     clear: left; /* fixes a bug in Opera */
+}
+
+div.routersummary {
+     background: #ddf;
+     width: 190px;
+     color: inherit;
+     margin: 0;
+     padding: 7px 1px;
+     text-align: center !important;
+     border: 5px solid #bbf;
+     font-size: 9pt;
+     word-wrap: break-word;
+     font: 9pt/125%;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #eef;
+     background: #eef;
+     height: 2px;
+     border-bottom: 1px solid #eef;
+     margin: 8px 1px 7px 1px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
+}
+
+div.routersummary h3 {
+     border: 0px solid #f00;
+/*     border-bottom: 1px solid #99f !important;*/
+     font-size: 10pt;
+     letter-spacing: 0.05em;
+     margin: -7px 1px -7px 1px;
+     padding: 5px 0px 5px 0px;
+     background: #c5d5fb;
+     text-transform: uppercase;
+}
+
+div.routersummary h4 {
+     border: 0px solid #f00;
+     border-bottom: 0 !important;
+     font-size: 9pt;
+     letter-spacing: 0.05em;
+     margin: -7px 1px -7px 1px !important;
+     padding: 2px 3px 3px 3px;
+     background: #c1d1f7;
+     text-transform: capitalize;
+     text-decoration: none !important;
+     color: #2b2;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -5px 5px;
+     width: 180px !important;
+     overflow: hidden;
+     font-size: 8pt;
+     padding: 0px -10px;
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+}
+
+div.routersummary form {
+     margin-top: 8px;
+}
+
+div.routersummary p {
+     padding: 0;
+}     
+
+div.routersummary a:link, div.routersummary a:visited {
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+}
+
+div.routersummary a:hover {
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     color: #f60;
+}
+
+div.routersummary td {
+     padding: 2px 4px;
+     background-image: none !important;
+     border: 0 !important;
+}
+
+div.routersummary tr:nth-child(even) {
+     background-color: #f60;
+     background-image: none !important;
+}
+
+div.routersummarytr:nth-child(odd) {
+     background-color: #f00;
+     background-image: none !important;
+}
+
+div.warning h3 {
+     border-bottom: 5px solid #fb7;
+     padding-bottom: 10px;
+}
+
+div.main {
+     margin: 0px 0px 0px 196px;
+     padding: 15px 15px 15px 15px;
+     background: #eef;
+     border: 5px solid #bbf;
+     border-top: 0;
+     text-align: left;
+     color: #001;
+     min-width: 570px;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+div.main li {
+     padding-bottom: 10px;
+     list-style: square;
+}
+
+div.main li:first-child {
+     padding-top: 20px;
+}
+
+div.main textarea {
+     width: 98% !important; 
+     margin: 2px 0 2px 5px;
+}
+
+div.news {
+     margin: -5px 0px 0 196px;
+     padding: -10px 15px 8px 15px;
+     background: #ffffc0;
+     border: 5px solid #bbf;
+     text-align: justify;
+     color: inherit;
+     min-width: 600px;
+     padding-bottom: 8px;
+     padding-left: 10px;
+     padding-right: 10px;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+/* convert the list entry to our title */
+
+div.news li {
+     text-align: justify;
+     list-style: none;
+     margin: -15px 15px -20px -20px;
+     padding: 0px 0 15px 0;
+     border-bottom: 2px solid #cc7;
+     border-top: 0px solid #cc7;     
+     padding: 3px 5px 5px 5px;
+     font-size: 12pt;
+     color: #540;
+}
+
+div.news p {
+     color: #330;
+}
+div.news a:link {
+     color: #773;
+     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+}
+
+div.news a:visited {
+     color: #f00 !important;
+     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+}
+
+div.news hr {
+     color: #cc7;
+     background: #cc7;
+     height: 2px;
+     border: 0px solid #cc7;
+     margin: 5px 0;
+}
+
+div.confignav {
+     padding: 12px 0 15px 0;
+     background: #cfc;
+     margin: -20px -20px 0 -20px;
+     border: 5px solid #bbf;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+div.configure {
+     margin: 1px -20px 0 -20px;
+     padding: 0px 20px 0px 20px;
+}
+
+div.configure table {
+     font-size: 9pt;
+     font-weight: bold;
+     -moz-box-shadow: inset 0px 0px 1px 1px #001;
+}
+
+div.configure tr, div.configure td {
+     padding: 10px 2px;
+}
+
+div.configure tr {
+     -moz-box-shadow: inset 0px 0px 1px 0px #bbf;
+}
+
+div.messages {
+     padding: 0px 10px;
+     background: #fff;
+     border: 5px solid #bbf;
+     border-right: 0;
+     margin: -5px -15px 10px -20px;
+     text-align: center;
+     font-size: 9pt;
+     font-weight: bold;
+     color: #474;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+div.messages li, div.messages ul {
+     padding: 15px 0 5px 5px;
+     margin: -15px 0 0 0;
+}
+
+div.messages span.error {
+     color: #d00000;
+}
+
+div.messages span.notice {
+     font-style: italic;
+}
+
+h1 {
+     font-size: 18pt;
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.7);
+     text-align: center;
+     border: 5px solid #bbf;
+     padding: 13px 10px 12px 10px;
+     margin: 0 0px 0 196px;
+     line-height: 93%;
+     text-transform: uppercase;
+     letter-spacing: 0.3em;
+     background: #fff;
+     min-width: 600px;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+h2 {
+     font-size: 14pt;
+     padding: 10px;
+     border-bottom: 5px solid #bbf;
+     border-top: 0px solid #bbf;
+     letter-spacing: 0.04em;
+}
+
+h3 {
+     font-size: 12pt;
+     padding: 0 10px 10px 10px;
+     border-bottom: 5px solid #bbf;
+     border-top: 0px solid #bbf;
+     letter-spacing: 0.04em;
+}
+
+.proxyfooter{
+     font-size: 7pt;
+     display: none !important;
+}
+
+table {
+     border-collapse: collapse; 
+     border: 5px solid #bbf;
+     margin: 5px 0px;
+     cell-padding: 1px;
+     font-size: 7pt;
+     background: #fff;
+     width: 100%;
+}
+
+table hr {
+     padding: 0px 0;
+     color: #bbf;
+     background: #bbf;
+     border: 0px solid #bbf;
+     margin: 0px -5px;
+     height: 1px;
+}
+
+table tt {
+     font-size: 7.5pt;
+}
+
+th {
+     background-color: #fff;
+     padding: 8px 2px;
+     text-align: center;
+     border-bottom: 1px solid #88f;
+}
+
+tt {
+     font-size: 8pt;
+}
+
+tt, pre {
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+     
+td {
+     padding: 4px;
+}
+
+tr:nth-child(even) {
+     background-color: #eef;
+}
+
+tr:nth-child(odd) {
+     background-color: #ddf;
+}
+
+hr {
+     color: #bbf;
+     background: #bbf;
+     height: 5px;
+     border: 0px solid #bbf;
+     margin: 5px 0;
+}
+
+.statusnotes {
+     font-style: italic;
+     font-size: 8pt;
+     color: #001;
+     text-align: center;
+     margin: -7px 0 7px 0; 
+     background: #bbf;
+     border: 5px solid #bbf;
+     border-top: 0;
+     padding: 4px 0 2px 0;
+}
+ 
+input {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+input[type=text] {
+     margin: 3px 5px 3px 5px;
+     vertical-align: middle;
+}
+select {
+     margin: 3px 5px 3px 5px;
+     vertical-align: middle;
+}
+
+submit {
+     margin: 3px 5px 3px 5px;
+     padding 2px 0;
+     font: 8pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+p {
+     padding: 5px 20px 0px 20px;
+     text-align: justify;
+}
+
+.formaction {
+     text-align: right;
+}
+
+.langbox {
+     margin: 29px -15px 0px 5px;
+     color: #001;
+     font-size: 7pt;
+     width: 180px;
+     text-align: center;
+     float: right;
+     valign: middle;
+}
+
+.langbox img {
+     padding: 0 2px; /* Ignored by IE8 */
+}
+
+a:link{
+     color: #006;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited{
+     color: #448;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover{
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active{
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+pre {
+     font-size: 9pt;
+     margin: 0px 20px;
+}
+
+tt {
+     font-size: 9pt;
+     font-weight: bold;
+     color: darkgreen;
+}
+
+.tablefooter {
+     border: 1px solid #88f;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #bbf;
+     font-size: 8pt;
+     font-weight: bold;
+     line-height: 150%;
+     word-wrap: nowrap;
+     padding: 8px 1px;
+}
+
+.tidylist {
+     text-align: justify;
+     padding-right: 30px;
+}
+
+div.graphspanel {
+     padding: 20px 10px;
+     margin: -20px;
+     background: #ddf url('images/lightbluetile.png');
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 5px solid #bbf;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center !important;   
+}
+
+div.graphspanel img {
+     border: 1px solid #99f;
+     padding: 2px;
+     margin: 6px;
+     background: #ddf;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+}
+
+div.graphspanel img:hover {
+     border: 1px solid #003;
+     padding: 2px;
+     margin: 6px;
+     text-align: center !important;
+     background: #001;
+     -moz-box-shadow: inset 0px 0px 2px 1px #f60;
+}
+
+div.graphspanel hr {
+     margin: 20px 0;
+}
+
+div.graphspanel form {
+     text-align: left;
+     margin: 0 20px;
+}
+
+div.graphspanel h3 {
+     text-align: left;
+}

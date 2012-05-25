@@ -42,10 +42,15 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // exclude.addAll(fac.getFloodfillPeers());
         HashSet matches = new HashSet(length);
         boolean exploreHighCap = shouldPickHighCap(ctx);
+        //
+        // We don't honor IP Restriction here, to be fixed
+        //
         if (exploreHighCap) 
             ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
-        else
+        else if (ctx.commSystem().haveHighOutboundCapacity())
             ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
+        else // use only connected peers so we don't make more connections
+            ctx.profileOrganizer().selectActiveNotFailingPeers(length, exclude, matches);
         
         if (l.shouldLog(Log.DEBUG))
             l.debug("profileOrganizer.selectNotFailing(" + length + ") found " + matches);

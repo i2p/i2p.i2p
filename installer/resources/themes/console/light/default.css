@@ -1,0 +1,373 @@
+body {
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     background-color: #eef;
+     color: #001;
+     font-size: 10pt;
+/* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of 
+    ** box rendering. (and therefore one of mozilla's
+    ** proprietry -moz properties (which hopefully they'll
+    ** drop soon).
+ */  
+     -moz-box-sizing: border-box;
+     box-sizing: border-box; 
+}
+
+div {
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+label {
+     margin: 0px 4px;
+     padding: 1px 10px 2px 0px;
+     float: left;
+     width: 120px;
+     height: 24px;
+     font-weight: normal;
+     text-align: right;
+     font-size: 8pt;
+     font-style: italic;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     line-height: 120%;
+     color: #427;
+}
+
+h4 {
+     font-size: 14px;
+     font-weight: bold !important;
+     color: #001;
+     text-align: center;
+     border: 1px solid #225;
+     margin: 5px 0 15px 0;
+     padding: 5px 10px;
+     background: #b4c8ff url(images/tabletitlelight.png) repeat-x;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 2px rgba(64, 64, 255, 0.9);
+     letter-spacing: 0.08em;
+     -moz-box-shadow: inset 0px 0px 4px 0px #bbf;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+a {
+     text-decoration: none;
+}
+
+form {
+     margin: 0px;
+}
+
+textarea, input, select, button, a {
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     font-size: 9pt;
+     float: left;
+     vertical-align: middle;
+}
+
+button {
+     float: none;
+     text-decoration: none;
+}
+
+textarea {
+     border: 1px solid #9999ff;
+}
+
+br {
+     clear: left;
+}
+
+div.statusNotRunning {
+     float: left;
+     width: 68px;
+     height: 24px;
+     overflow: hidden;
+     color: #d00;
+     background: url('images/console_status_stopped.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 4px;
+}
+
+div.statusRunning {
+   float: left;
+     width: 68px;
+     height: 24px;
+     overflow: hidden;
+     color: #0b0;
+     background: url('images/console_status_running.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 4px;
+}
+
+div.statusStarting {
+     float: left;
+     width: 68px;
+     height: 24px;
+     overflow: hidden;
+     color: #339933;
+     background: url('images/console_status_starting.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 4px;
+}
+
+hr {
+     display: none;
+}
+
+.separator, .subdivider {
+     clear: both;
+     height: 1px;
+     margin: 1px 0px 1px 0px;
+     border-bottom: 1px solid #225;
+/*
+     display: none;
+*/
+}
+
+.subdivider {
+     border-bottom: 1px solid #225;
+     padding: 5px 0px 0px 0px;
+}
+
+.freetext {
+     width: 150px;
+     height: 24px;
+     border: 1px solid #44d;
+     padding: 2px;
+     margin: 4px 0 2px 0px;
+     font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-weight: bold;
+     background: #ddf;
+     color: #001;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     border-radius: 0 4px 4px 0;
+/*
+     -moz-box-shadow: inset 0px -1px 1px 0px #fff;
+*/
+}
+
+.control, control:link, control:visited {
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     min-width: 60px;
+     font-weight: bold;
+     background-color: #bbbbff;
+     color: #001;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     text-decoration: none;
+}
+
+/*
+.control:active {
+     border: 1px inset;
+     background-color: #003;
+     color: #f60;
+     text-decoration: none;
+}
+*/
+.control:hover, control:visited:hover {
+     border: 1px solid #eef;
+     background-color: #f60;
+     color: #fff !important;
+     text-decoration: none;
+}
+
+.control:link, control:visited {
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     min-width: 60px;
+     font-weight: bold;
+     color: #001;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: #bbf url(images/tabletitlelight.png) 0 0 repeat: x !important;
+     text-decoration: none;
+}
+
+.panel {
+     width: 800px;
+     margin: 16px auto 16px auto;
+     overflow: hidden;
+     text-align: left !important;
+     font-size: 7pt;
+     background-color: #fff;
+     background: url(images/lightbluetile.png);
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #002;
+     padding: 10px 20px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+.panel .footer {
+     float: right;
+     padding: 4px;
+}
+
+.toolbox {
+     float: right;
+}
+
+.rowItem {
+     width: 750px;
+     float: left;
+     margin: 0px;
+}
+
+.comment {
+     font-weight: bold;
+     display: block; 
+     padding: 2px 10px 0 20px;
+     text-align: left;
+}
+
+.text {
+     height: 24px;
+     width: 150px;
+     padding: 0 0 0 2px;
+     float: left;
+     margin: 0;
+     font-size: 9pt !important;
+     font-weight: bold;
+}
+
+.accessKey {
+     text-decoration: underline;
+}
+
+#globalOperationsPanel {
+     background-color: #ddf;
+     border: 1px solid #003;
+     padding: 5px 20px 11px 10px;
+     background: url(images/lightbluetile.png);
+     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
+}
+
+#globalOperationsPanel .control {
+     min-width: 120px;
+}
+
+#globalOperationsPanel .control:link {
+     min-width: 120px;
+}
+
+
+globalOperationsPanel .control:link {
+     min-width: 120px;
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     font-weight: bold;
+     background-color: #bbbbff;
+     color: black;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/tabletitlelight.png) 0 0 repeat: x !important;
+}
+
+
+globalOperationsPanel .control:visited {
+     min-width: 120px;
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     font-weight: bold;
+     background-color: #bbbbff;
+     color: black;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/tabletitlelight.png) 0 0 repeat: x !important;
+}
+
+globalOperationsPanel .control:hover {
+     min-width: 120px;
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     font-weight: bold;
+     background-color: #003;
+     color: #f60;
+     border: 1px outset #fff;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/tabletitlelight.png) 0 0 repeat: x !important;
+}
+.header {
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+select {
+     background-color: #eef;
+     color: #001;
+     margin: 4px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #001;
+     padding: 2px;
+     min-width: 270px;
+     font-size: 8pt;
+     max-height: 24px;
+}
+
+a:link{
+     color: #007;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited{
+     color: #606;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover{
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active{
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}

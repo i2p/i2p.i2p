@@ -27,8 +27,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import net.i2p.client.I2PSession;
-import net.i2p.client.I2PSessionException;
+// import net.i2p.client.I2PSession;
+// import net.i2p.client.I2PSessionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.util.Log;
@@ -42,10 +43,10 @@ public class TCPlistener implements Runnable {
 
 	private NamedDB info,  database;
 	private Log _log;
-	private int tgwatch;
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
 	private ServerSocket listener;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor
@@ -54,13 +55,23 @@ public class TCPlistener implements Runnable {
 	 * @param database
 	 * @param _log
 	 */
-	TCPlistener(ServerSocket listener, I2PSocketManager S, NamedDB info, NamedDB database, Log _log) {
+	TCPlistener(ServerSocket listener, I2PSocketManager S, NamedDB info, NamedDB database, Log _log, AtomicBoolean lives) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
 		this.listener = listener;
-		tgwatch = 1;
+		this.lives = lives;
+	}
+
+	private void rlock() throws Exception {
+		database.getReadLock();
+		info.getReadLock();
+	}
+
+	private void runlock() throws Exception {
+		database.releaseReadLock();
+		info.releaseReadLock();
 	}
 
 	/**
@@ -69,79 +80,38 @@ public class TCPlistener implements Runnable {
 	 */
 	public void run() {
 		boolean g = false;
-		boolean spin = true;
-		database.getReadLock();
-		info.getReadLock();
-		if(info.exists("OUTPORT")) {
-			tgwatch = 2;
-		}
+		int conn = 0;
 		try {
-			Socket server = new Socket();
-			listener.setSoTimeout(1000);
-			info.releaseReadLock();
-			database.releaseReadLock();
-			while(spin) {
-				database.getReadLock();
-				info.getReadLock();
-				spin = info.get("RUNNING").equals(Boolean.TRUE);
-				info.releaseReadLock();
-				database.releaseReadLock();
+			die:
+			{
 				try {
-					server = listener.accept();
-					g = true;
-				} catch(SocketTimeoutException ste) {
-					g = false;
-				}
-				if(g) {
-					// toss the connection to a new thread.
-					TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database);
-					Thread t = new Thread(conn_c, "BOBTCPtoI2P");
-					t.start();
-					g = false;
+					Socket server = new Socket();
+					listener.setSoTimeout(50); // We don't block, we cycle and check.
+					while (lives.get()) {
+						try {
+							server = listener.accept();
+							g = true;
+						} catch (SocketTimeoutException ste) {
+							g = false;
+						}
+						if (g) {
+							conn++;
+							// toss the connection to a new thread.
+							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database, lives);
+							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
+							t.start();
+							g = false;
+						}
+					}
+				} catch (IOException ioe) {
 				}
 			}
-			//System.out.println("TCPlistener: destroySession");
-			listener.close();
-		} catch(IOException ioe) {
+		} finally {
 			try {
 				listener.close();
-			} catch(IOException e) {
+			} catch (IOException ex) {
 			}
-			// Fatal failure, cause a stop event
-			database.getReadLock();
-			info.getReadLock();
-			spin = info.get("RUNNING").equals(Boolean.TRUE);
-			info.releaseReadLock();
-			database.releaseReadLock();
-			if(spin) {
-				database.getWriteLock();
-				info.getWriteLock();
-				info.add("STOPPING", new Boolean(true));
-				info.add("RUNNING", new Boolean(false));
-				info.releaseWriteLock();
-				database.releaseWriteLock();
-			}
+		//System.out.println("TCPlistener: " + Thread.currentThread().getName() +  "Done.");
 		}
-
-		// need to kill off the socket manager too.
-		I2PSession session = socketManager.getSession();
-		if(session != null) {
-			try {
-				session.destroySession();
-			} catch(I2PSessionException ex) {
-				// nop
-			}
-		}
-		//System.out.println("TCPlistener: Waiting for children");
-		while(Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-			try {
-				Thread.sleep(100); //sleep for 100 ms (One tenth second)
-			} catch(Exception e) {
-				// nop
-				}
-		}
-		//System.out.println("TCPlistener: Done.");
 	}
 }
-
-

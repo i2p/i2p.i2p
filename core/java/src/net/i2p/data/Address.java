@@ -73,7 +73,7 @@ public class Address extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[Address: ");
         buf.append("\n\tHostname: ").append(getHostname());
         buf.append("\n\tDestination: ").append(getDestination());

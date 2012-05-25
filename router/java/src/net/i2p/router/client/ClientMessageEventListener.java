@@ -11,10 +11,12 @@ package net.i2p.router.client;
 import java.util.Properties;
 
 import net.i2p.data.Payload;
+import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
+import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -92,6 +94,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 break;
             case ReconfigureSessionMessage.MESSAGE_TYPE:
                 handleReconfigureSession(reader, (ReconfigureSessionMessage)message);
+                break;
+            case GetBandwidthLimitsMessage.MESSAGE_TYPE:
+                handleGetBWLimits(reader, (GetBandwidthLimitsMessage)message);
                 break;
             default:
                 if (_log.shouldLog(Log.ERROR))
@@ -267,6 +272,24 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionStatusMessage msg = new SessionStatusMessage();
         msg.setSessionId(_runner.getSessionId());
         msg.setStatus(status);
+        try {
+            _runner.doSend(msg);
+        } catch (I2CPMessageException ime) {
+            _log.error("Error writing out the session status message", ime);
+        }
+    }
+
+    /**
+     * Divide router limit by 1.75 for overhead.
+     * This could someday give a different answer to each client.
+     * But it's not enforced anywhere.
+     */
+    private void handleGetBWLimits(I2CPMessageReader reader, GetBandwidthLimitsMessage message) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Got BW Limits request");
+        int in = _context.bandwidthLimiter().getInboundKBytesPerSecond() * 4 / 7;
+        int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond() * 4 / 7;
+        BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in, out);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {

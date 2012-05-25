@@ -8,10 +8,11 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.router.RouterContext;
@@ -41,11 +42,11 @@ class ExploreJob extends SearchJob {
     /** only send the closest "dont tell me about" refs...
      *  Override to make this bigger because we want to include both the
      *  floodfills and the previously-queried peers */
-    static final int MAX_CLOSEST = 20;
+    static final int MAX_CLOSEST = 20; // LINT -- field hides another field, this isn't an override.
     
     /** Override to make this shorter, since we don't sort out the
      *  unresponsive ff peers like we do in FloodOnlySearchJob */
-    static final int PER_FLOODFILL_PEER_TIMEOUT = 5*1000;
+    static final int PER_FLOODFILL_PEER_TIMEOUT = 5*1000; // LINT -- field hides another field, this isn't an override.
 
     /**
      * Create a new search for the routingKey specified
@@ -78,6 +79,7 @@ class ExploreJob extends SearchJob {
      * @param replyGateway gateway for the reply tunnel
      * @param expiration when the search should stop
      */
+    @Override
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
@@ -96,7 +98,13 @@ class ExploreJob extends SearchJob {
         
         available = MAX_CLOSEST - msg.getDontIncludePeers().size();
         if (available > 0) {
-            List peers = _peerSelector.selectNearestExplicit(getState().getTarget(), available, msg.getDontIncludePeers(), getFacade().getKBuckets());
+            // selectNearestExplicit adds our hash to the dontInclude set (3rd param) ...
+            // And we end up with MAX_CLOSEST+1 entries.
+            // We don't want our hash in the message's don't-include list though.
+            // We're just exploring, but this could give things away, and tie our exploratory tunnels to our router,
+            // so let's not put our hash in there.
+            Set dontInclude = new HashSet(msg.getDontIncludePeers());
+            List peers = _peerSelector.selectNearestExplicit(getState().getTarget(), available, dontInclude, getFacade().getKBuckets());
             msg.getDontIncludePeers().addAll(peers);
         }
         
@@ -106,17 +114,8 @@ class ExploreJob extends SearchJob {
         return msg;
     }
     
-    
-    /**
-     * We're looking for a router, so lets build the lookup message (no need to tunnel route either, so just have
-     * replies sent back to us directly).  This uses the similar overrides as the other buildMessage above.
-     *
-     */
-    protected DatabaseLookupMessage buildMessage(long expiration) {
-        return buildMessage(null, getContext().router().getRouterInfo().getIdentity().getHash(), expiration);
-    }
-    
     /** max # of concurrent searches */
+    @Override
     protected int getBredth() { return EXPLORE_BREDTH; }
     
     
@@ -125,6 +124,7 @@ class ExploreJob extends SearchJob {
      * number of peers that we didn't know about before.
      *
      */
+    @Override
     protected void newPeersFound(int numNewPeers) {
         // who cares about how many new peers.  well, maybe we do.  but for now,
         // we'll do the simplest thing that could possibly work.
@@ -139,5 +139,6 @@ class ExploreJob extends SearchJob {
      *
      */
     
+    @Override
     public String getName() { return "Kademlia NetDb Explore"; }
 }

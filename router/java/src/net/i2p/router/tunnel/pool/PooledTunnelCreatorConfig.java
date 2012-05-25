@@ -31,6 +31,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     }
     
     // calls TestJob
+    @Override
     public void testSuccessful(int ms) {
         if (_testJob != null)
             _testJob.testSuccessful(ms);
@@ -47,6 +48,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     /**
      * The tunnel failed a test, so (maybe) stop using it
      */
+    @Override
     public boolean tunnelFailed() {
         boolean rv = super.tunnelFailed();
         if (!rv) {
@@ -60,6 +62,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         return rv;
     }
     
+    @Override
     public Properties getOptions() {
         if (_pool == null) return null;
         return _pool.getSettings().getUnknownOptions();
@@ -75,7 +78,8 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     }
     public TunnelPool getTunnelPool() { return _pool; }
     
-    public void setTestJob(TestJob job) { _testJob = job; }
+
+    public void setTestJob(TestJob job) { _testJob = job; } // LINT -- Exporting non-public type through public API
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
     // Fix memory leaks caused by references if you need to use pairedTunnel

@@ -72,28 +72,59 @@ Public domain except as listed below:
    From freenet
    See licenses/LICENSE-GPLv2.txt
 
-   UPnP subsystem:
+   UPnP subsystem 1.7:
    Copyright (C) 2003-2006 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
    XMLPull library used by UPnP:
    See licenses/LICENSE-Apache2.0.txt
 
+   GeoIP data free to use, courtesy http://ip-to-country.webhosting.info/
 
 
 Installer:
-   Launch4j:
+   Launch4j 2.0.RC3:
    Copyright (C) 2005 Grzegorz Kowal
    See licenses/LICENSE-GPLv2.txt
+   The following projects are used by Launch4j...
+	MinGW binutils (http://www.mingw.org/)
 
-   Izpack:
-   See licenses/LICENSE-Apache1.1.txt
+	Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
+
+ 	Commons Logging (http://jakarta.apache.org/commons/logging/)
+        See licenses/LICENSE-Apache1.1.txt
+        See licenses/NOTICE-Commons-Logging.txt
+
+	XStream (http://xstream.codehaus.org/)
+        Copyright (c) 2003-2004, Joe Walnes
+        See licenses/LICENSE-XStream.txt
+
+	JGoodies Forms (http://www.jgoodies.com/freeware/forms/)
+        Copyright (c) 2002-2004 JGoodies Karsten Lentzsch. All rights reserved.
+        See licenses/LICENSE-JGoodies-Forms.txt
+
+	JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
+        Copyright (c) 2003 JGoodies Karsten Lentzsch. All rights reserved.
+        See licenses/LICENSE-JGoodies-Looks.txt
+
+	Foxtrot (http://foxtrot.sourceforge.net/)
+        Copyright (c) 2002, Simone Bordet & Marco Cravero. All rights reserved.
+        See licenses/LICENSE-Foxtrot.txt
+
+	Nuvola Icon Theme (http://www.icon-king.com)
+        See licenses/LICENSE-LGPLv2.1.txt
+
+	Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
+
+   Izpack 4.3.0:
+   Copyright (c) 2001-2008 Julien Ponge
+   See licenses/LICENSE-Apache2.0.txt
 
 
 
-Wrapper:
-Copyright (c) 1999, 2004 Tanuki Software
-See licenses/LICENSE-Wrapper.txt
+Wrapper 3.1.1:
+   Copyright (c) 1999, 2004 Tanuki Software
+   See licenses/LICENSE-Wrapper.txt
 
 
 
@@ -123,11 +154,14 @@ Applications:
    See licenses/LICENSE-I2PTunnel.txt
    See licenses/LICENSE-GPLv2.txt
 
+   I2PTunnel UDP and Streamr:
+   By welterde.
+   See licenses/LICENSE-GPLv2.txt
+
    Jetty 5.1.12:
    Copyright 2000-2004 Mort Bay Consulting Pty. Ltd.
    See licenses/LICENSE-Apache1.1.txt
    See licenses/LICENSE-Apache2.0.txt
-   See licenses/NOTICE-Ant.txt
    See licenses/NOTICE-Commons-Logging.txt
 
    JRobin 1.4.0:
@@ -143,6 +177,11 @@ Applications:
 
    Router console:
    Public domain.
+       Flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
+
+       GeoIP Data:
+       Copyright (c) 2003 Direct Information Pvt. Ltd. All Rights Reserved.
+       See licenses/LICENSE-GeoIP.txt
 
    SAM:
    Public domain.
@@ -173,6 +212,10 @@ distributions. See the source package for the additional license information.
 
    Atalk:
    Public domain
+
+   Desktopgui
+   Copyright (c) Mathias De Maré
+   See apps/desktopgui/LICENSE
 
    SAM C Library:
    Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>

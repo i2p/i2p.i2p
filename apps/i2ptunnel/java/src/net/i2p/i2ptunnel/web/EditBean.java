@@ -8,7 +8,6 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -60,8 +59,9 @@ public class EditBean extends IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
-        else
-            return "";
+        if (tunnel < 0)
+            tunnel = _group.getControllers().size();
+        return "i2ptunnel" + tunnel + "-privKeys.dat";
     }
     
     public boolean startAutomatically(int tunnel) {
@@ -153,7 +153,17 @@ public class EditBean extends IndexBean {
     }
     
     public boolean getNewDest(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.newDestOnResume");
+        return getBooleanProperty(tunnel, "i2cp.newDestOnResume") &&
+               getBooleanProperty(tunnel, "i2cp.closeOnIdle") &&
+               !getBooleanProperty(tunnel, "persistentClientKey");
+    }
+    
+    public boolean getPersistentClientKey(int tunnel) {
+        return getBooleanProperty(tunnel, "persistentClientKey");
+    }
+    
+    public boolean getDelayOpen(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.delayOpen");
     }
     
     private int getProperty(int tunnel, String prop, int def) {
@@ -197,7 +207,7 @@ public class EditBean extends IndexBean {
         if (tun != null)
             return tun.getI2CPHost();
         else
-            return "localhost";
+            return "127.0.0.1";
     }
     
     public String getI2CPPort(int tunnel) {
@@ -213,7 +223,7 @@ public class EditBean extends IndexBean {
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts == null) return "";
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             int i = 0;
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();

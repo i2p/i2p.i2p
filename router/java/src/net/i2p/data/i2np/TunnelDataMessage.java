@@ -112,11 +112,13 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return (int)_tunnelId +
                DataHelper.hashCode(_data);
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelDataMessage) ) {
             TunnelDataMessage msg = (TunnelDataMessage)object;
@@ -127,6 +129,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public byte[] toByteArray() {
         byte rv[] = super.toByteArray();
         if (rv == null)
@@ -134,8 +137,9 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         return rv;
     }
 
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[TunnelDataMessage:");
         buf.append(" MessageId: ").append(getUniqueId());
         buf.append(" Tunnel ID: ").append(getTunnelId());

@@ -30,7 +30,7 @@ class LogRecordFormatter {
         int size = 128 + rec.getMessage().length();
         if (rec.getThrowable() != null)
             size += 512;
-        StringBuffer buf = new StringBuffer(size);
+        StringBuilder buf = new StringBuilder(size);
         char format[] = manager.getFormat();
         for (int i = 0; i < format.length; ++i) {
             switch (format[i]) {
@@ -93,7 +93,7 @@ class LogRecordFormatter {
     }
 
     private static String toString(String str, int size) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (str == null) str = "";
         if (str.length() > size) str = str.substring(str.length() - size);
         buf.append(str);

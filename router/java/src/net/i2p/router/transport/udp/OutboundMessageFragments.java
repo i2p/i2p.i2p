@@ -12,35 +12,35 @@ import net.i2p.util.Log;
 
 /**
  * Coordinate the outbound fragments and select the next one to be built.
- * This pool contains messages we are actively trying to send, essentially 
+ * This pool contains messages we are actively trying to send, essentially
  * doing a round robin across each message to send one fragment, as implemented
- * in {@link #getNextVolley()}.  This also honors per-peer throttling, taking 
+ * in {@link #getNextVolley()}.  This also honors per-peer throttling, taking
  * note of each peer's allocations.  If a message has each of its fragments
- * sent more than a certain number of times, it is failed out.  In addition, 
- * this instance also receives notification of message ACKs from the 
- * {@link InboundMessageFragments}, signaling that we can stop sending a 
+ * sent more than a certain number of times, it is failed out.  In addition,
+ * this instance also receives notification of message ACKs from the
+ * {@link InboundMessageFragments}, signaling that we can stop sending a
  * message.
- * 
+ *
  */
 public class OutboundMessageFragments {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;
-    private ActiveThrottle _throttle;
+    private ActiveThrottle _throttle; // LINT not used ??
     /** peers we are actively sending messages to */
-    private List _activePeers;
+    private final List _activePeers;
     private boolean _alive;
     /** which peer should we build the next packet out of? */
     private int _nextPeer;
     private PacketBuilder _builder;
     /** if we can handle more messages explicitly, set this to true */
-    private boolean _allowExcess;
-    private volatile long _packetsRetransmitted;
-    
-    private static final int MAX_ACTIVE = 64;
+    private boolean _allowExcess; // LINT not used??
+    private volatile long _packetsRetransmitted; // LINT not used??
+
+    // private static final int MAX_ACTIVE = 64; // not used.
     // don't send a packet more than 10 times
     static final int MAX_VOLLEYS = 10;
-    
+
     public OutboundMessageFragments(RouterContext ctx, UDPTransport transport, ActiveThrottle throttle) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundMessageFragments.class);
@@ -51,26 +51,25 @@ public class OutboundMessageFragments {
         _builder = new PacketBuilder(ctx, transport);
         _alive = true;
         _allowExcess = false;
-        _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendConfirmTime", "How long it takes to send a message and get the ACK", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendConfirmFragments", "How many fragments are included in a fully ACKed message", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendConfirmVolley", "How many times did fragments need to be sent before ACK", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendFailed", "How many sends a failed message was pushed", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendAggressiveFailed", "How many volleys was a packet sent before we gave up", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.outboundActiveCount", "How many messages are in the peer's active pool", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendRejected", "What volley are we on when the peer was throttled (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.partialACKReceived", "How many fragments were partially ACKed (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendSparse", "How many fragments were partially ACKed and hence not resent (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendPiggyback", "How many acks were piggybacked on a data packet (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendPiggybackPartial", "How many partial acks were piggybacked on a data packet (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.activeDelay", "How often we wait blocking on the active queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.packetsRetransmitted", "Lifetime of packets during their retransmission (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.peerPacketsRetransmitted", "How many packets have been retransmitted to the peer (lifetime) when a burst of packets are retransmitted (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.blockedRetransmissions", "How packets have been transmitted to the peer when we blocked a retransmission to them?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendCycleTime", "How long it takes to cycle through all of the active messages?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendCycleTimeSlow", "How long it takes to cycle through all of the active messages, when its going slowly?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendConfirmTime", "How long it takes to send a message and get the ACK", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendConfirmFragments", "How many fragments are included in a fully ACKed message", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendConfirmVolley", "How many times did fragments need to be sent before ACK", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendFailed", "How many sends a failed message was pushed", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendAggressiveFailed", "How many volleys was a packet sent before we gave up", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.outboundActiveCount", "How many messages are in the peer's active pool", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendRejected", "What volley are we on when the peer was throttled (time == message lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.partialACKReceived", "How many fragments were partially ACKed (time == message lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendSparse", "How many fragments were partially ACKed and hence not resent (time == message lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPiggyback", "How many acks were piggybacked on a data packet (time == message lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPiggybackPartial", "How many partial acks were piggybacked on a data packet (time == message lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.packetsRetransmitted", "Lifetime of packets during their retransmission (period == packets transmitted, lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.peerPacketsRetransmitted", "How many packets have been retransmitted to the peer (lifetime) when a burst of packets are retransmitted (period == packets transmitted, lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.blockedRetransmissions", "How packets have been transmitted to the peer when we blocked a retransmission to them?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendCycleTime", "How long it takes to cycle through all of the active messages?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendCycleTimeSlow", "How long it takes to cycle through all of the active messages, when its going slowly?", "udp", UDPTransport.RATES);
     }
-    
+
     public void startup() { _alive = true; }
     public void shutdown() {
         _alive = false;
@@ -87,7 +86,7 @@ public class OutboundMessageFragments {
             _activePeers.notifyAll();
         }
     }
-    
+
     /**
      * Block until we allow more messages to be admitted to the active
      * pool.  This is called by the {@link OutboundRefiller}
@@ -95,11 +94,11 @@ public class OutboundMessageFragments {
      * @return true if more messages are allowed
      */
     public boolean waitForMoreAllowed() {
-        // test without choking.  
+        // test without choking.
         // perhaps this should check the lifetime of the first activeMessage?
         if (true) return true;
         /*
-        
+
         long start = _context.clock().now();
         int numActive = 0;
         int maxActive = Math.max(_transport.countActivePeers(), MAX_ACTIVE);
@@ -123,7 +122,7 @@ public class OutboundMessageFragments {
          */
         return false;
     }
-    
+
     /**
      * Add a new message to the active pool
      *
@@ -133,7 +132,7 @@ public class OutboundMessageFragments {
         RouterInfo target = msg.getTarget();
         if ( (msgBody == null) || (target == null) )
             return;
-        
+
         // todo: make sure the outNetMessage is initialzed once and only once
         OutboundMessageState state = new OutboundMessageState(_context);
         boolean ok = state.initialize(msg, msgBody);
@@ -164,9 +163,9 @@ public class OutboundMessageFragments {
         }
         //finishMessages();
     }
-    
-    /** 
-     * short circuit the OutNetMessage, letting us send the establish 
+
+    /**
+     * short circuit the OutNetMessage, letting us send the establish
      * complete message reliably
      */
     public void add(OutboundMessageState state) {
@@ -228,11 +227,11 @@ public class OutboundMessageFragments {
             rv += remaining;
         }
     }
-    
+
     private long _lastCycleTime = System.currentTimeMillis();
-    
+
     /**
-     * Fetch all the packets for a message volley, blocking until there is a 
+     * Fetch all the packets for a message volley, blocking until there is a
      * message which can be fully transmitted (or the transport is shut down).
      * The returned array may be sparse, with null packets taking the place of
      * already ACKed fragments.
@@ -270,7 +269,7 @@ public class OutboundMessageFragments {
                         }
                     }
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Done looping, next peer we are sending for: " + 
+                        _log.debug("Done looping, next peer we are sending for: " +
                                    (peer != null ? peer.getRemotePeer().toBase64() : "none"));
                     if (state == null) {
                         if (_log.shouldLog(Log.DEBUG))
@@ -291,10 +290,10 @@ public class OutboundMessageFragments {
                     _log.debug("Woken up while waiting");
             }
         }
-        
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending " + state);
-   
+
         UDPPacket packets[] = preparePackets(state, peer);
         if ( (state != null) && (state.getMessage() != null) ) {
             int valid = 0;
@@ -303,21 +302,21 @@ public class OutboundMessageFragments {
                     valid++;
             /*
             state.getMessage().timestamp("sending a volley of " + valid
-                                         + " lastReceived: " 
+                                         + " lastReceived: "
                                          + (_context.clock().now() - peer.getLastReceiveTime())
-                                         + " lastSentFully: " 
+                                         + " lastSentFully: "
                                          + (_context.clock().now() - peer.getLastSendFullyTime()));
             */
         }
         return packets;
     }
-    
+
     private UDPPacket[] preparePackets(OutboundMessageState state, PeerState peer) {
         if ( (state != null) && (peer != null) ) {
             int fragments = state.getFragmentCount();
             if (fragments < 0)
                 return null;
-            
+
             // ok, simplest possible thing is to always tack on the bitfields if
             List msgIds = peer.getCurrentFullACKs();
             if (msgIds == null) msgIds = new ArrayList();
@@ -353,7 +352,7 @@ public class OutboundMessageFragments {
             }
             if (sparseCount > 0)
                 remaining.clear();
-            
+
             int piggybackedAck = 0;
             if (msgIds.size() != remaining.size()) {
                 for (int i = 0; i < msgIds.size(); i++) {
@@ -364,7 +363,7 @@ public class OutboundMessageFragments {
                     }
                 }
             }
-            
+
             if (sparseCount > 0)
                 _context.statManager().addRateData("udp.sendSparse", sparseCount, state.getLifetime());
             if (piggybackedAck > 0)
@@ -390,10 +389,10 @@ public class OutboundMessageFragments {
             return null;
         }
     }
-    
+
     /**
      * We received an ACK of the given messageId from the given peer, so if it
-     * is still unacked, mark it as complete. 
+     * is still unacked, mark it as complete.
      *
      * @return fragments acked
      */
@@ -409,7 +408,7 @@ public class OutboundMessageFragments {
             return 0;
         }
     }
-    
+
     public void acked(ACKBitfield bitfield, Hash ackedBy) {
         PeerState peer = _transport.getPeerState(ackedBy);
         if (peer != null) {
@@ -421,7 +420,7 @@ public class OutboundMessageFragments {
                 _log.debug("partial acked [" + bitfield + "] by an unknown remote peer?  " + ackedBy.toBase64());
         }
     }
-    
+
     public interface ActiveThrottle {
         public void choke(Hash peer);
         public void unchoke(Hash peer);

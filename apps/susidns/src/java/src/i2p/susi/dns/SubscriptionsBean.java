@@ -86,7 +86,7 @@ public class SubscriptionsBean
 	{
 		File file = new File( getFileName() );
 		if( file != null && file.isFile() ) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader( new FileReader( file ) );
@@ -136,7 +136,7 @@ public class SubscriptionsBean
 				}
 			}			
 			else {
-				message = "Invalid nonce. Are you being spoofed?";
+				message = "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
 			}
 		}
 		if( message.length() > 0 )

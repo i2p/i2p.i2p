@@ -5,43 +5,23 @@ Connection: close
 Proxy-Connection: close
 
 <html><head>
-<title>Eepsite unknown</title>
-<link rel="shortcut icon" href="http://localhost:7657/favicon.ico" />
-<style type='text/css'>
-div.warning {
-	margin: 0em 1em 1em 224px;
-	padding: .5em 1em;
-	background-color: #ffefef;
-	border: medium solid #ffafaf;
-	text-align: left;
-	color: inherit;
-}
-div.logo {
-	float: left;
-	width: 200px;
-	left: 1em;
-	top: 1em;
-	margin: 0em;
-	padding: .5em;
-	text-align: left;
-	border: medium solid #efefff;
-	background-color: #fafaff;
-	color: inherit;
-}
-</style>
+<title>I2P Warning: Eepsite unknown</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" />
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class=logo>
- <a href="http://localhost:7657/index.jsp" title="Router Console"><img src="http://localhost:7657/i2plogo.png" alt="Router Console" width="187" height="35" border="0"/></a><br />
- [<a href="http://localhost:7657/config.jsp">configuration</a> | <a href="http://localhost:7657/help.jsp">help</a>]
+ <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"/></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/index.jsp">Addressbook</a>
 </div>
 <div class=warning id=warning>
+<h3>Warning: Eepsite Not Found in Addressbook</h3>
 The eepsite was not found in your router's addressbook.
 Check the link or find a BASE64 address.
 If you have the BASE64 address,  paste it into your userhosts.txt using
-<a href="http://localhost:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
-use a BASE64 address helper, or use a jump service link below.
+<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
+use a BASE64 address helper, or use a jump service link below.<br><br>
 Seeing this page often? See <a href="http://www.i2p2.i2p/faq.html#subscriptions">the FAQ</a>
-for help in <a href="http://localhost:7657/susidns/config.jsp">adding some subscriptions</a>
-to your addressbook.
-<BR><BR>Could not find the following destination:<BR><BR>
+for help in <a href="http://127.0.0.1:7657/susidns/config.jsp">adding some subscriptions</a>
+to your addressbook.<hr>
+<b>Could not find the following destination:</b><BR><BR>

@@ -31,7 +31,7 @@ import net.i2p.util.Log;
  */
 public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacade {
     public static final char CAPACITY_FLOODFILL = 'f';
-    private Map _activeFloodQueries;
+    private final Map _activeFloodQueries;
     private boolean _floodfillEnabled;
     /** for testing, see isFloodfill() below */
     private static String _alwaysQuery;
@@ -55,11 +55,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
     }
 
+    @Override
     public void startup() {
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
     }
 
+    @Override
     protected void createHandlers() {
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context));
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new FloodfillDatabaseStoreMessageHandler(_context, this));
@@ -70,6 +72,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     /**
      * @throws IllegalArgumentException if the local router info is invalid
      */
+    @Override
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
         if (_context.router().isHidden()) return; // DE-nied!
@@ -77,6 +80,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
     }
     
+    @Override
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
         // if we are a part of the floodfill netDb, don't send out our own leaseSets as part 
         // of the flooding - instead, send them to a random floodfill peer so *they* can flood 'em out.
@@ -131,6 +135,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private static final int FLOOD_PRIORITY = 200;
     private static final int FLOOD_TIMEOUT = 30*1000;
     
+    @Override
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     
     public void setFloodfillEnabled(boolean yes) { _floodfillEnabled = yes; }
@@ -183,6 +188,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      * without any match)
      *
      */
+    @Override
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         //if (true) return super.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
         if (key == null) throw new IllegalArgumentException("searchin for nothin, eh?");
@@ -282,6 +288,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
       * Search for a newer router info, drop it from the db if the search fails,
       * unless just started up or have bigger problems.
       */
+    @Override
     protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
         // following are some special situations, we don't want to
         // drop the peer in these cases
@@ -356,8 +363,8 @@ class FloodSearchJob extends JobImpl {
     private Log _log;
     private FloodfillNetworkDatabaseFacade _facade;
     private Hash _key;
-    private List _onFind;
-    private List _onFailed;
+    private final List _onFind;
+    private final List _onFailed;
     private long _expiration;
     private int _timeoutMs;
     private long _origExpiration;

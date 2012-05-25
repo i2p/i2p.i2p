@@ -8,6 +8,7 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,25 +21,20 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Go through the routing table pick routers that are performing poorly or
- * is out of date, but don't expire routers we're actively tunneling through.
- * If a peer is performing worse than some threshold (via profile.rankLiveliness)
- * drop it and don't ask any questions.  If a peer isn't ranked really poorly, but
- * we just haven't heard from it in a while, drop it and add it to the set of
- * keys we want the netDb to explore.
+ * Go through the routing table pick routers that are
+ * is out of date, but don't expire routers we're actively connected to.
+ *
+ * We could in the future use profile data, netdb total size, a Kademlia XOR distance,
+ * or other criteria to minimize netdb size, but for now we just use _facade's
+ * validate(), which is a sliding expriation based on netdb size.
  *
  */
 class ExpireRoutersJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
     
+    /** rerun fairly often, so the fails don't queue up too many netdb searches at once */
     private final static long RERUN_DELAY_MS = 120*1000;
-    /**
-     * If a routerInfo structure isn't updated within an hour, drop it
-     * and search for a later version.  This value should be large enough
-     * to deal with the Router.CLOCK_FUDGE_FACTOR.
-     */
-    public final static long EXPIRE_DELAY = 60*60*1000;
     
     public ExpireRoutersJob(RouterContext ctx, KademliaNetworkDatabaseFacade facade) {
         super(ctx);
@@ -62,44 +58,25 @@ class ExpireRoutersJob extends JobImpl {
     
     /**
      * Run through all of the known peers and pick ones that have really old
-     * routerInfo publish dates, excluding ones that are in use by some tunnels,
+     * routerInfo publish dates, excluding ones that we are connected to,
      * so that they can be failed & queued for searching
      *
+     * @return nothing for now
      */
     private Set selectKeysToExpire() {
-        Set possible = getNotInUse();
-        Set expiring = new HashSet(16);
-        
-        for (Iterator iter = possible.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            RouterInfo ri = _facade.lookupRouterInfoLocally(key);
-            if (ri != null) {
-                if (!ri.isCurrent(EXPIRE_DELAY)) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Expiring RouterInfo for " + key.toBase64() + " [published on " + new Date(ri.getPublished()) + "]");
-                    expiring.add(key);
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Not expiring routerInfo for " + key.toBase64() + " [published on " + new Date(ri.getPublished()) + "]");
-                }
-            }
-        }
-        
-        return expiring;
-    }
-    
-    /** all peers not in use by tunnels */
-    private Set getNotInUse() {
-        Set possible = new HashSet(16);
         for (Iterator iter = _facade.getAllRouters().iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
-            if (!getContext().tunnelManager().isInUse(peer)) {
-                possible.add(peer);
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Peer is in use: " + peer.toBase64());
+            Hash key = (Hash)iter.next();
+            // Don't expire anybody we are connected to
+            if (!getContext().commSystem().isEstablished(key)) {
+                // This does a _facade.validate() and fail() which is sufficient...
+                // no need to impose our own expiration here.
+                // One issue is this will queue a ton of floodfill queries the first time it is run
+                // after the 1h router startup grace period.
+                RouterInfo ri = _facade.lookupRouterInfoLocally(key);
             }
         }
-        return possible;
+        
+        // let _facade do all the work for now
+        return Collections.EMPTY_SET;
     }
 }

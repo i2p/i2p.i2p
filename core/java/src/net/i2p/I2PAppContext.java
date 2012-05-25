@@ -1,5 +1,6 @@
 package net.i2p;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -17,12 +18,14 @@ import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
 import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
-import net.i2p.crypto.PersistentSessionKeyManager;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
+import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
@@ -94,6 +97,14 @@ public class I2PAppContext {
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
     protected volatile boolean _keyRingInitialized; // used in RouterContext
+    private Set<Runnable> _shutdownTasks;
+    private File _baseDir;
+    private File _configDir;
+    private File _routerDir;
+    private File _pidDir;
+    private File _logDir;
+    private File _appDir;
+    private File _tmpDir;
     
     
     /**
@@ -152,8 +163,146 @@ public class I2PAppContext {
         _elGamalAESEngineInitialized = false;
         _logManagerInitialized = false;
         _keyRingInitialized = false;
+        _shutdownTasks = new ConcurrentHashSet(0);
+        initializeDirs();
     }
     
+   /**
+    *  Directories. These are all set at instantiation and will not be changed by
+    *  subsequent property changes.
+    *  All properties, if set, should be absolute paths.
+    *
+    *  Name	Property 	Method		Files
+    *  -----	-------- 	-----		-----
+    *  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
+    *  Temp	i2p.dir.temp	getTempDir()	Temporary files
+    *  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
+    *  PID	i2p.dir.pid	getPIDDir()	router.ping
+    *
+    *  (the following all default to the same as Config)
+    *
+    *  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
+    *  Log	i2p.dir.log	getLogDir()	logs/
+    *  App	i2p.dir.app	getAppDir()	eepsite/, ...
+    *
+    *  Note that we can't control where the wrapper puts its files.
+    *
+    *  The app dir is where all data files should be. Apps should always read and write files here,
+    *  using a constructor such as:
+    *
+    *       String path = mypath;
+    *       File f = new File(path);
+    *       if (!f.isAbsolute())
+    *           f = new File(_context.geAppDir(), path);
+    *
+    *  and never attempt to access files in the CWD using
+    *
+    *       File f = new File("foo");
+    *
+    *  An app should assume the CWD is not writable.
+    *
+    *  Here in I2PAppContext, all the dirs default to CWD.
+    *  However these will be different in RouterContext, as Router.java will set
+    *  the properties in the RouterContext constructor.
+    *
+    *  Apps should never need to access the base dir, which is the location of the base I2P install.
+    *  However this is provided for the router's use, and for backward compatibility should an app
+    *  need to look there as well.
+    *
+    *  All dirs except the base are created if they don't exist, but the creation will fail silently.
+    */
+    private void initializeDirs() {
+        String s = getProperty("i2p.dir.base", System.getProperty("user.dir"));
+        _baseDir = new File(s);
+        // config defaults to base
+        s = getProperty("i2p.dir.config");
+        if (s != null) {
+            _configDir = new File(s);
+            if (!_configDir.exists())
+                _configDir.mkdir();
+        } else {
+            _configDir = _baseDir;
+        }
+        // router defaults to config
+        s = getProperty("i2p.dir.router");
+        if (s != null) {
+            _routerDir = new File(s);
+            if (!_routerDir.exists())
+                _routerDir.mkdir();
+        } else {
+            _routerDir = _configDir;
+        }
+        // pid defaults to system temp directory
+        s = getProperty("i2p.dir.pid", System.getProperty("java.io.tmpdir"));
+        _pidDir = new File(s);
+        if (!_pidDir.exists())
+            _pidDir.mkdir();
+        // these all default to router
+        s = getProperty("i2p.dir.log");
+        if (s != null) {
+            _logDir = new File(s);
+            if (!_logDir.exists())
+                _logDir.mkdir();
+        } else {
+            _logDir = _routerDir;
+        }
+        s = getProperty("i2p.dir.app");
+        if (s != null) {
+            _appDir = new File(s);
+            if (!_appDir.exists())
+                _appDir.mkdir();
+        } else {
+            _appDir = _routerDir;
+        }
+        /******
+        System.err.println("Base directory:   " + _baseDir.getAbsolutePath());
+        System.err.println("Config directory: " + _configDir.getAbsolutePath());
+        System.err.println("Router directory: " + _routerDir.getAbsolutePath());
+        System.err.println("App directory:    " + _appDir.getAbsolutePath());
+        System.err.println("Log directory:    " + _logDir.getAbsolutePath());
+        System.err.println("PID directory:    " + _pidDir.getAbsolutePath());
+        System.err.println("Temp directory:   " + getTempDir().getAbsolutePath());
+        ******/
+    }
+
+    public File getBaseDir() { return _baseDir; }
+    public File getConfigDir() { return _configDir; }
+    public File getRouterDir() { return _routerDir; }
+    public File getPIDDir() { return _pidDir; }
+    public File getLogDir() { return _logDir; }
+    public File getAppDir() { return _appDir; }
+    public File getTempDir() {
+        // fixme don't synchronize every time
+        synchronized (this) {
+            if (_tmpDir == null) {
+                String d = getProperty("i2p.dir.temp", System.getProperty("java.io.tmpdir"));
+                // our random() probably isn't warmed up yet
+                String f = "i2p-" + Math.abs((new java.util.Random()).nextInt()) + ".tmp";
+                _tmpDir = new File(d, f);
+                if (_tmpDir.exists()) {
+                    // good or bad ?
+                } else if (_tmpDir.mkdir()) {
+                    _tmpDir.deleteOnExit();
+                } else {
+                    System.err.println("Could not create temp dir " + _tmpDir.getAbsolutePath());
+                    _tmpDir = new File(_routerDir, "tmp");
+                    _tmpDir.mkdir();
+                }
+            }
+        }
+        return _tmpDir;
+    }
+
+    /** don't rely on deleteOnExit() */
+    public void deleteTempDir() {
+        synchronized (this) {
+            if (_tmpDir != null) {
+                FileUtil.rmdir(_tmpDir, false);
+                _tmpDir = null;
+            }
+        }
+    }
+
     /**
      * Access the configuration attributes of this context, using properties 
      * provided during the context construction, or falling back on 
@@ -253,7 +402,8 @@ public class I2PAppContext {
     private void initializeSessionKeyManager() {
         synchronized (this) {
             if (_sessionKeyManager == null) 
-                _sessionKeyManager = new PersistentSessionKeyManager(this);
+                //_sessionKeyManager = new PersistentSessionKeyManager(this);
+                _sessionKeyManager = new TransientSessionKeyManager(this);
             _sessionKeyManagerInitialized = true;
         }
     }
@@ -557,4 +707,13 @@ public class I2PAppContext {
             _randomInitialized = true;
         }
     }
+
+    public void addShutdownTask(Runnable task) {
+        _shutdownTasks.add(task);
+    }
+    
+    public Set<Runnable> getShutdownTasks() {
+        return new HashSet(_shutdownTasks);
+    }
+    
 }

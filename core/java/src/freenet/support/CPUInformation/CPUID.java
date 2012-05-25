@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.FileUtil;
+
 /**
  * @author Iakin
  * A class for retrieveing details about the CPU using the CPUID assembly instruction.
@@ -71,7 +74,7 @@ public class CPUID {
     private static String getCPUVendorID()
     {
         CPUIDResult c = doCPUID(0);
-        StringBuffer sb= new StringBuffer(13);
+        StringBuilder sb= new StringBuilder(13);
         sb.append((char)( c.EBX        & 0xFF));
         sb.append((char)((c.EBX >> 8)  & 0xFF));
         sb.append((char)((c.EBX >> 16) & 0xFF));
@@ -482,8 +485,11 @@ public class CPUID {
      * 
      * <p>This is a pretty ugly hack, using the general technique illustrated by the
      * onion FEC libraries.  It works by pulling the resource, writing out the 
-     * byte stream to a temporary file, loading the native library from that file,
-     * then deleting the file.</p>
+     * byte stream to a temporary file, loading the native library from that file.
+     * We then attempt to copy the file from the temporary dir to the base install dir,
+     * so we don't have to do this next time - but we don't complain if it fails,
+     * so we transparently support read-only base dirs.
+     * </p>
      *
      * @return true if it was loaded successfully, else false
      *
@@ -501,11 +507,13 @@ public class CPUID {
 
         File outFile = null;
         FileOutputStream fos = null;
+        String filename = libPrefix + "jcpuid" + libSuffix;
         try {
             InputStream libStream = resource.openStream();
-            outFile = new File(libPrefix + "jcpuid" + libSuffix);
+            outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
-            byte buf[] = new byte[4096*1024];
+            // wtf this was 4096*1024 which is really excessive for a roughly 4KB file
+            byte buf[] = new byte[4096];
             while (true) {
                 int read = libStream.read(buf);
                 if (read < 0) break;
@@ -514,7 +522,6 @@ public class CPUID {
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath());//System.load requires an absolute path to the lib
-            return true;
         } catch (UnsatisfiedLinkError ule) {
             if (_doLog) {
                 System.err.println("ERROR: The resource " + resourceName 
@@ -533,6 +540,10 @@ public class CPUID {
                 try { fos.close(); } catch (IOException ioe) {}
             }
         }
+        // copy to install dir, ignore failure
+        File newFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), filename);
+        FileUtil.copy(outFile.getAbsolutePath(), newFile.getAbsolutePath(), false, true);
+        return true;
     }
     
     private static final String getResourceName()

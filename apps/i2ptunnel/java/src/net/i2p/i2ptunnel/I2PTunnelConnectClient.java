@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,7 +18,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
@@ -55,7 +55,7 @@ import net.i2p.util.Log;
 public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelConnectClient.class);
 
-    private List<String> _proxyList;
+    private final List<String> _proxyList;
 
     private final static byte[] ERR_DESTINATION_UNKNOWN =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -107,6 +107,8 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
+    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
+
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -116,14 +118,14 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
+        _proxyList = new ArrayList();
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openConnectClientResult", "error");
             return;
         }
 
-        _proxyList = new ArrayList();
         if (wwwProxy != null) {
-            StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
+            StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())
                 _proxyList.add(tok.nextToken().trim());
         }
@@ -157,6 +159,8 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             defaultOpts.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, ""+DEFAULT_READ_TIMEOUT);
         if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
             defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        verifySocketManager();
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
@@ -175,7 +179,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             out = s.getOutputStream();
             in = s.getInputStream();
             String line, method = null, host = null, destination = null, restofline = null;
-            StringBuffer newRequest = new StringBuffer();
+            StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
             while (true) {
                 // Use this rather than BufferedReader because we can't have readahead,
@@ -260,9 +264,9 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                 String str;
                 byte[] header;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else
-                    str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfh-header.ht")).getAbsolutePath(), 100, true);
                 if (str != null)
                     header = str.getBytes();
                 else
@@ -356,9 +360,9 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             String str;
             byte[] header;
             if (usingWWWProxy)
-                str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
             else
-                str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
             if (str != null)
                 header = str.getBytes();
             else

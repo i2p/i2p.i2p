@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project basedir="." default="all" name="i2p">
    
+    <!-- Things you might want to change -->
+    <!-- This keeps gcj a lot quieter -->
+    <!--
+        <property name="javac.compilerargs" value="-warn:-unchecked,raw,unused,serial" />
+    -->
+
+    <!-- You probably don't want to change anything from here down -->
     <target name="all" >
         <echo message="Useful targets: " />
         <echo message="  pkg:       distclean then package everything up (installer, clean tarball, update tarball)" />
@@ -9,6 +16,9 @@
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
+        <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
+        <echo message="  updaterWithJettyFixesAndGeoIP" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, news.xml, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
@@ -17,6 +27,10 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
+        <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
+        <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
+        <echo message="  distWithDesktopgui: pkgWithDesktopgui and javadoc" />
+        <echo message="  distcleanWithDesktopgui: clean up all derived files (including desktopgui files)" />
     </target>
     <target name="debianhowto">
         <echo message="To build debian packages, you must run dpkg-buildpackage as root in the source directory. It will then run ant for you. dpkg-buildpackage is found in the 'dpkg-dev' package. Also it should work fine to use the 'fakeroot' package with dpkg-buildpackage, if you don't want to run as root. Please read 'man dpkg-buildpackage' before building any packages yourself." />
@@ -25,7 +39,10 @@
     </target>
     <target name="build" depends="build2">
         <!-- so we don't build standalone for the updater -->
+        <!-- This builds apps/i2psnark/java/i2psnark-standalone.zip,
+          -   which we don't distribute anywhere...
         <ant dir="apps/i2psnark/java/" target="standalone" />
+        -->
     </target>
     <target name="build2" depends="builddep, jar, buildWEB" />
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
@@ -60,7 +77,6 @@
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
         <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/ant.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
@@ -91,7 +107,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
@@ -189,16 +205,13 @@
             <fileset dir="." includes="**/*.java~" />
         </delete>
     </target>
-    <target name="pkg" depends="distclean, updater, tarball, installer" />
-    <target name="pkgclean">
-        <delete dir="pkg-temp" />
+    <target name="pkg" depends="distclean, updater, preppkg, installer" />
+    <target name="pkgclean" depends="deletepkg-temp">
         <delete>
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
         </delete>
     </target>
-    <target name="preppkg" depends="build, buildexe">
-        <delete dir="pkg-temp" />
-        <copy file="build/ant.jar" todir="pkg-temp/lib/" />
+    <target name="preppkg" depends="build, buildexe, preplicenses, prepconsoleDocs">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
@@ -230,7 +243,7 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <!-- <copy file="build/syndie.war" todir="pkg-temp/webapps/" /> -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
@@ -238,6 +251,7 @@
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
         <!-- <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
@@ -267,17 +281,12 @@
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="install-headless.txt" todir="pkg-temp/" />
+        <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
         <copy file="core/perl/i2pbench.sh" todir="pkg-temp/scripts/" />
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
-        <mkdir dir="pkg-temp/docs" />
-        <copy file="readme.html" todir="pkg-temp/docs/" />
-        <copy file="readme_de.html" todir="pkg-temp/docs/" />
-        <copy file="readme_nl.html" todir="pkg-temp/docs/" />
-        <copy file="readme_sv.html" todir="pkg-temp/docs/" />
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
@@ -286,11 +295,6 @@
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/uninstall.ico" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnf-header.ht" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnfp-header.ht" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnfb-header.ht" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnfh-header.ht" todir="pkg-temp/docs/" />
-	<copy file="installer/resources/ahelper-conflict-header.ht" todir="pkg-temp/docs/" />
         <mkdir dir="pkg-temp/docs/themes/" />
         <copy todir="pkg-temp/docs/themes/" >
           <fileset dir="installer/resources/themes/" />
@@ -301,30 +305,84 @@
         <mkdir dir="pkg-temp/eepsite/docroot" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
-        <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+        <copy file="installer/resources/eepsite_index_de.html" tofile="pkg-temp/eepsite/docroot/index_de.html" />
+        <copy file="installer/resources/eepsite.css" todir="pkg-temp/eepsite/docroot/" />
+        <copy file="installer/resources/robots.txt" todir="pkg-temp/eepsite/docroot/" />
+        <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
+    </target>
+    <target name="preplicenses">
         <copy file="LICENSE.txt" todir="pkg-temp/" />
-        <mkdir dir="pkg-temp/licenses/" />
         <copy todir="pkg-temp/licenses/" >
           <fileset dir="licenses/" />
         </copy>
+        <copy file="installer/lib/launch4j/lib/foxtrot.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Foxtrot.txt" />
+        <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
+        <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
+        <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
+    <target name="prepthemeupdates">
+        <!-- CSS now in docs/, not in the .war; just in case anybody is using defCon1 -->
+        <copy file="installer/resources/themes/console/defCon1/console.css" todir="pkg-temp/docs/themes/console/defCon1/" />
+        <!-- Add extricated I2PSnark css here, for now -->
+        <copy file="installer/resources/themes/console/snark.css" todir="pkg-temp/docs/themes/console/" />
+        <!-- these files now in docs/, not in the .war -->
+        <!-- No need to copy these individually, we're copying the whole dir below.. 
+        <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
+        <copy file="installer/resources/themes/console/images/i2plogo.png" todir="pkg-temp/docs/themes/console/images/" />
+        -->
+        <!-- Since the logo moved, we have to update the error pages -->
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="installer/resources/" includes="*-header.ht" />
+        </copy>
+        <!-- make a "classic" theme -->
+        <copy todir="pkg-temp/docs/themes/console/classic/" >
+            <fileset  dir="installer/resources/themes/console/classic/" />
+        </copy>
+        <!-- Add dark theme -->
+        <copy todir="pkg-temp/docs/themes/console/dark/" >
+            <fileset  dir="installer/resources/themes/console/dark/" />
+        </copy>
+        <!-- Add light theme -->
+        <copy todir="pkg-temp/docs/themes/console/light/" >
+            <fileset  dir="installer/resources/themes/console/light/" />
+        </copy>
+        <!-- Add shared images.. these are subject to flux and change! -->
+        <copy todir="pkg-temp/docs/themes/console/images/" >
+            <fileset  dir="installer/resources/themes/console/images/" />
+        </copy>          
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="." includes="readme*.html" />
+        </copy>
+    </target>
+
+    <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
-    <target name="updater" depends="prepupdate">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    <target name="deletepkg-temp">
+        <delete dir="pkg-temp" />
     </target>
-    <target name="updaterWithJetty" depends="prepjupdate">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    <target name="prepconsoleDocs" depends="prepgeoupdate">
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="." includes="readme*.html" />
+          <fileset dir="installer/resources/" includes="*-header.ht" />
+        </copy>
     </target>
-    <target name="updaterSmall" depends="prepupdateSmall">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    <target name="consoleDocs" depends="deletepkg-temp, prepconsoleDocs">
+        <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
-    <target name="updaterRouter" depends="prepupdateRouter">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    <target name="updater" depends="prepupdate, preplicenses, zipit" />
+    <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
+    <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
+    <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
+    <target name="updaterWithJettyFixesAndGeoIP" depends="prepjupdatefixes, prepgeoupdate, preplicenses, zipit" />
+    <target name="updaterSmall" depends="prepupdateSmall, zipit" />
+    <target name="updaterRouter" depends="prepupdateRouter, zipit" />
+    <target name="zipit">
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
     <target name="updateTest" depends="prepupdate">
         <ant dir="core/java/" target="jarTest" />    
@@ -335,42 +393,37 @@
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
-        <!-- include systray fixes in 0.6.5 -->
+        <!-- include systray changes in 0.7.5 -->
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
-        <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
-        <copy file="LICENSE.txt" todir="pkg-temp/" />
-        <mkdir dir="pkg-temp/licenses/" />
-        <copy todir="pkg-temp/licenses/" >
-          <fileset dir="licenses/" />
-        </copy>
     </target>
-    <target name="prepupdateSmall" depends="buildSmall">
-        <delete dir="pkg-temp" />
-        <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
-        <mkdir dir="pkg-temp/docs" />
-        <copy file="readme_sv.html" todir="pkg-temp/docs/" />
+        <copy file="readme_zh.html" todir="pkg-temp/docs/" />
     </target>
-    <target name="prepupdateRouter" depends="buildrouter">
-        <delete dir="pkg-temp" />
+    <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
     </target>
+    <target name="prepgeoupdate">
+        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <copy todir="pkg-temp/docs/icons/flags" >
+          <fileset dir="installer/resources/icons/flags" />
+        </copy>
+    </target>
     <target name="prepjupdate" depends="prepupdate, buildWEB">
-        <copy file="build/ant.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
         <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
@@ -378,15 +431,19 @@
         <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
     </target>
+    <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
+        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+    </target>
     <target name="installer" depends="preppkg">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
-        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
+        <mkdir dir="pkg-temp/installer" />
+        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
+        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Delete" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
+        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
         </jar>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
@@ -462,7 +519,7 @@
             <arg value="-output"/>
             <arg value="findbugs.xml"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->
@@ -485,5 +542,141 @@
             <arg value="build/systray.jar"/>
         </exec>
         <echo message="Findbugs output stored in findbugs.xml" />
+    </target>
+    <target name="buildWithDesktopgui" depends="buildrouter,builddepSmall">
+        <ant dir="apps/desktopgui" target="build_jar" />
+    </target>
+    <target name="preppkgWithDesktopgui" depends="buildWithDesktopgui,preppkg">
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
+        <mkdir dir="pkg-temp/desktopgui/resources/" />
+        <copy todir="pkg-temp/desktopgui/resources/">
+            <fileset dir="apps/desktopgui/desktopgui/resources/" />
+        </copy>
+    </target>
+    <target name="installerWithDesktopgui" depends="preppkgWithDesktopgui,installer" />
+    <target name="prepupdateWithDesktopgui" depends="buildWithDesktopgui,prepupdate">
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
+        <mkdir dir="pkg-temp/desktopgui/resources/" />
+        <copy todir="pkg-temp/desktopgui/resources/">
+            <fileset dir="apps/desktopgui/desktopgui/resources/" />
+        </copy>
+    </target>
+    <target name="updaterWithDesktopgui" depends="prepupdateWithDesktopgui,updater" />
+    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, preppkg" />
+    <target name="distWithDesktopgui" depends="pkgWithDesktopgui, javadoc" />
+    <target name="distcleanWithDesktopgui" depends="distclean">
+        <ant dir="apps/desktopgui" target="build_clean" />
+    </target>
+    <target name="release" depends="pkg">
+        <echo message="================================================================" />
+        <echo message="Did you update these files?" />
+        <exec executable="ls">
+            <arg value="-l" />
+            <arg value="history.txt" />
+            <arg value="initialNews.xml" />
+            <arg value="installer/install.xml" />
+            <arg value="news.xml" />
+	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
+	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+        </exec>
+        <echo message="Everything is checked in, right?" />
+        <input message="Enter new version number:" addproperty="release.number" />
+        <fail message="You must enter a version number." >
+            <condition>
+                <equals arg1="${release.number}" arg2=""/>
+            </condition>
+        </fail>
+        <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
+        <copy file="i2pinstall.exe" tofile="i2pinstall_${release.number}.exe" />
+        <delete file="i2pupdate.sud" failonerror="false" />
+        <input message="Enter private signing key file:" addproperty="release.privkey" />
+        <fail message="You must enter a path." >
+            <condition>
+                <equals arg1="${release.privkey}" arg2=""/>
+            </condition>
+        </fail>
+        <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="sign" />
+            <arg value="i2pupdate.zip" />
+            <arg value="i2pupdate.sud" />
+            <arg value="${release.privkey}" />
+            <arg value="${release.number}" />
+        </java>
+        <fail message="i2pupdate.sud generation failed!" >
+            <condition>
+                <length file="i2pupdate.sud" when="lt" length="1000000" />
+            </condition>
+        </fail>
+        <echo message="Verify version and VALID signature:" />
+        <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="verifysig" />
+            <arg value="i2pupdate.sud" />
+        </java>
+        <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="showversion" />
+            <arg value="i2pupdate.sud" />
+        </java>
+        <!-- will this use the monotonerc file in the current workspace? -->
+        <echo message="Checking out fresh copy into ../i2p-${release-number} for tarballing:" />
+        <exec executable="mtn">
+            <arg value="co" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
+            <arg value="../i2p-${release.number}/" />
+        </exec>
+        <exec executable="tar">
+            <arg value="cjf" />
+            <arg value="i2psource_${release.number}.tar.bz2" />
+            <arg value="-C" />
+            <arg value=".." />
+            <arg value="--exclude" />
+            <arg value="i2p-${release.number}/_MTN/" />
+            <arg value="i2p-${release.number}/" />
+        </exec>
+        <echo message="Sign the files:" />
+        <exec executable="gpg">
+            <arg value="-b" />
+            <arg value="i2pinstall_${release.number}.exe" />
+        </exec>
+        <exec executable="gpg">
+            <arg value="-b" />
+            <arg value="i2psource_${release.number}.tar.bz2" />
+        </exec>
+        <exec executable="gpg">
+            <arg value="-b" />
+            <arg value="i2pupdate_${release.number}.zip" />
+        </exec>
+        <echo message="File sizes:" />
+        <exec executable="ls">
+            <arg value="-l" />
+            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2psource_${release.number}.tar.bz2" />
+            <arg value="i2pupdate_${release.number}.zip" />
+            <arg value="i2pupdate.sud" />
+            <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2psource_${release.number}.tar.bz2.sig" />
+            <arg value="i2pupdate_${release.number}.zip.sig" />
+        </exec>
+        <echo message="SHA256 sums:" />
+        <exec executable="sha256sum">
+            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2psource_${release.number}.tar.bz2" />
+            <arg value="i2pupdate_${release.number}.zip" />
+            <arg value="i2pupdate.sud" />
+        </exec>
+        <echo message="Don't forget to mtn tag h: i2p-${release-number}" />
     </target>
 </project>

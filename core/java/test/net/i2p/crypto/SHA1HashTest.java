@@ -133,7 +133,7 @@ public class SHA1HashTest extends TestCase{
     }
  
     private final String toHex(final byte[] bytes) {
-        StringBuffer buf = new StringBuffer(bytes.length * 2);
+        StringBuilder buf = new StringBuilder(bytes.length * 2);
         for (int i = 0; i < bytes.length; i++) {
             if ((i & 3) == 0 && i != 0)
                buf.append(' ');

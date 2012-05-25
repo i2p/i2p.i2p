@@ -12,7 +12,6 @@ import java.util.Set;
 
 import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
-import net.i2p.router.RouterContext;
 
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.ActionList;
@@ -26,6 +25,7 @@ import org.cybergarage.upnp.ServiceList;
 import org.cybergarage.upnp.ServiceStateTable;
 import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.device.DeviceChangeListener;
+import org.cybergarage.upnp.event.EventListener;
 import org.freenetproject.DetectedIP;
 import org.freenetproject.ForwardPort;
 import org.freenetproject.ForwardPortCallback;
@@ -47,14 +47,16 @@ import org.freenetproject.ForwardPortStatus;
  *
  * some code has been borrowed from Limewire : @see com.limegroup.gnutella.UPnPManager
  *
- * @see http://www.upnp.org/
- * @see http://en.wikipedia.org/wiki/Universal_Plug_and_Play
- * 
+ * @see "http://www.upnp.org/"
+ * @see "http://en.wikipedia.org/wiki/Universal_Plug_and_Play"
+ */
+
+/* 
  * TODO: Support multiple IGDs ?
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  */ 
-public class UPnP extends ControlPoint implements DeviceChangeListener {
+public class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private Log _log;
 	private I2PAppContext _context;
 	
@@ -87,13 +89,15 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		addDeviceChangeListener(this);
 	}
 	
-	public void runPlugin() {
-		super.start();
+	public boolean runPlugin() {
+		return super.start();
 	}
 
 	public void terminate() {
 		unregisterPortMappings();
 		super.stop();
+		_router = null;
+		_service = null;
 	}
 	
 	public DetectedIP[] getAddress() {
@@ -108,11 +112,17 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		
 		DetectedIP result = null;
 		final String natAddress = getNATAddress();
+                if (natAddress == null || natAddress.length() <= 0) {
+			_log.warn("No external address returned");
+			return null;
+		}
 		try {
 			InetAddress detectedIP = InetAddress.getByName(natAddress);
+
 			short status = DetectedIP.NOT_SUPPORTED;
 			thinksWeAreDoubleNatted = !TransportImpl.isPubliclyRoutable(detectedIP.getAddress());
 			// If we have forwarded a port AND we don't have a private address
+			_log.warn("NATAddress: \"" + natAddress + "\" detectedIP: " + detectedIP + " double? " + thinksWeAreDoubleNatted);
 			if((portsForwarded.size() > 1) && (!thinksWeAreDoubleNatted))
 				status = DetectedIP.FULL_INTERNET;
 			
@@ -134,10 +144,13 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 				return;
 			}
 		}
-		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice())
-				return; // Silently ignore non-IGD devices
-		else if(isNATPresent()) {
-			_log.error("We got a second IGD on the network! the plugin doesn't handle that: let's disable it.");
+		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice()) {
+			_log.warn("UP&P non-IGD device found, ignoring : " + dev.getFriendlyName());
+			return; // ignore non-IGD devices
+		} else if(isNATPresent()) {
+                        // maybe we should see if the old one went away before ignoring the new one?
+			_log.warn("UP&P ignoring additional IGD device found: " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+			/********** seems a little drastic
 			isDisabled = true;
 			
 			synchronized(lock) {
@@ -146,24 +159,28 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 			}
 			
 			stop();
+			**************/
 			return;
 		}
 		
-		_log.warn("UP&P IGD found : " + dev.getFriendlyName());
+		_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN() + " lease time: " + dev.getLeaseTime());
 		synchronized(lock) {
 			_router = dev;
 		}
 		
 		discoverService();
 		// We have found the device we need: stop the listener thread
-		stop();
+		/// No, let's stick around to get notifications
+		//stop();
 		synchronized(lock) {
+			/// we should look for the next one
 			if(_service == null) {
 				_log.error("The IGD device we got isn't suiting our needs, let's disable the plugin");
 				isDisabled = true;
 				_router = null;
 				return;
 			}
+			subscribe(_service);
 		}
 		registerPortMappings();
 	}
@@ -226,21 +243,41 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 	public void unregisterPortMappings() {
 		Set ports;
 		synchronized(lock) {
-			ports = portsForwarded;
+			ports = new HashSet(portsForwarded);
 		}
 		this.unregisterPorts(ports);
 	}
 	
 	public void deviceRemoved(Device dev ){
+		_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
 		synchronized (lock) {
 			if(_router == null) return;
-			if(_router.equals(dev)) {
+			// I2P this wasn't working
+			//if(_router.equals(dev)) {
+		        if(ROUTER_DEVICE.equals(dev.getDeviceType()) &&
+			   dev.isRootDevice() &&
+			   stringEquals(_router.getFriendlyName(), dev.getFriendlyName()) &&
+			   stringEquals(_router.getUDN(), dev.getUDN())) {
+				_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
 				_router = null;
 				_service = null;
 			}
 		}
 	}
 	
+	/** event callback - unused for now - how many devices support events? */
+	public void eventNotifyReceived(String uuid, long seq, String varName, String value) {
+		if (_log.shouldLog(Log.WARN))
+			_log.error("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
+	}
+
+	/** compare two strings, either of which could be null */
+	private static boolean stringEquals(String a, String b) {
+		if (a != null)
+			return a.equals(b);
+		return b == null;
+	}
+
 	/**
 	 * @return whether we are behind an UPnP-enabled NAT/router
 	 */
@@ -260,13 +297,17 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		if(getIP == null || !getIP.postControlAction())
 			return null;
 
-		return (getIP.getOutputArgumentList().getArgument("NewExternalIPAddress")).getValue();
+		String rv = (getIP.getOutputArgumentList().getArgument("NewExternalIPAddress")).getValue();
+		// I2P some devices return 0.0.0.0 when not connected
+		if ("0.0.0.0".equals(rv))
+			return null;
+		return rv;
 	}
 
 	/**
 	 * @return the reported upstream bit rate in bits per second. -1 if it's not available. Blocking.
 	 */
-	public int getUpstramMaxBitRate() {
+	public int getUpstreamMaxBitRate() {
 		if(!isNATPresent() || thinksWeAreDoubleNatted)
 			return -1;
 
@@ -291,6 +332,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		return Integer.valueOf(getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate").getValue());
 	}
 	
+/***
 	private void listStateTable(Service serv, StringBuilder sb) {
 		ServiceStateTable table = serv.getServiceStateTable();
 		sb.append("<div><small>");
@@ -320,136 +362,143 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 			sb.append("</div>");
 		}
 	}
+***/
 	
-	private String toString(String action, String Argument, Service serv) {
-		Action getIP = serv.getAction(action);
-		if(getIP == null || !getIP.postControlAction())
-			return null;
-		
-		Argument ret = getIP.getOutputArgumentList().getArgument(Argument);
-		return ret.getValue();
+	/**
+	 * A blocking toString(). That's interesting.
+         * Cache the last ArgumentList to speed it up some.
+	 * Count on listSubServices() to call multiple combinations of arguments
+         * so we don't get old data.
+         */
+	private String _lastAction;
+	private Service _lastService;
+	private ArgumentList _lastArgumentList;
+	private Object toStringLock = new Object();
+	private String toString(String action, String arg, Service serv) {
+		synchronized(toStringLock) {
+			if ((!action.equals(_lastAction)) ||
+			    (!serv.equals(_lastService)) ||
+			    _lastArgumentList == null) {
+				Action getIP = serv.getAction(action);
+				if(getIP == null || !getIP.postControlAction()) {
+					_lastAction = null;
+					return null;
+				}
+				_lastAction = action;
+				_lastService = serv;
+				_lastArgumentList = getIP.getOutputArgumentList();
+			}
+			return _lastArgumentList.getArgument(arg).getValue();
+		}
 	}
 	
 	// TODO: extend it! RTFM
 	private void listSubServices(Device dev, StringBuilder sb) {
 		ServiceList sl = dev.getServiceList();
+		if (sl.size() <= 0)
+			return;
+		sb.append("<ul>\n");
 		for(int i=0; i<sl.size(); i++) {
 			Service serv = sl.getService(i);
 			if(serv == null) continue;
-			sb.append("<div>service ("+i+") : "+serv.getServiceType()+"<br>");
+			sb.append("<li>Service: ");
 			if("urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1".equals(serv.getServiceType())){
-				sb.append("WANCommonInterfaceConfig");
-				sb.append(" status: " + toString("GetCommonLinkProperties", "NewPhysicalLinkStatus", serv));
-				sb.append(" type: " + toString("GetCommonLinkProperties", "NewWANAccessType", serv));
-				sb.append(" upstream: " + toString("GetCommonLinkProperties", "NewLayer1UpstreamMaxBitRate", serv));
-				sb.append(" downstream: " + toString("GetCommonLinkProperties", "NewLayer1DownstreamMaxBitRate", serv) + "<br>");
+				sb.append("WAN Common Interface Config<ul>");
+				sb.append("<li>Status: " + toString("GetCommonLinkProperties", "NewPhysicalLinkStatus", serv));
+				sb.append("<li>Type: " + toString("GetCommonLinkProperties", "NewWANAccessType", serv));
+				sb.append("<li>Upstream: " + toString("GetCommonLinkProperties", "NewLayer1UpstreamMaxBitRate", serv));
+				sb.append("<li>Downstream: " + toString("GetCommonLinkProperties", "NewLayer1DownstreamMaxBitRate", serv) + "<br>");
 			}else if("urn:schemas-upnp-org:service:WANPPPConnection:1".equals(serv.getServiceType())){
-				sb.append("WANPPPConnection");
-				sb.append(" status: " + toString("GetStatusInfo", "NewConnectionStatus", serv));
-				sb.append(" type: " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
-				sb.append(" upstream: " + toString("GetLinkLayerMaxBitRates", "NewUpstreamMaxBitRate", serv));
-				sb.append(" downstream: " + toString("GetLinkLayerMaxBitRates", "NewDownstreamMaxBitRate", serv) + "<br>");
-				sb.append(" external IP: " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
+				sb.append("WAN PPP Connection<ul>");
+				sb.append("<li>Status: " + toString("GetStatusInfo", "NewConnectionStatus", serv));
+				sb.append("<li>Type: " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
+				sb.append("<li>Upstream: " + toString("GetLinkLayerMaxBitRates", "NewUpstreamMaxBitRate", serv));
+				sb.append("<li>Downstream: " + toString("GetLinkLayerMaxBitRates", "NewDownstreamMaxBitRate", serv) + "<br>");
+				sb.append("<li>External IP: " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
 			}else if("urn:schemas-upnp-org:service:Layer3Forwarding:1".equals(serv.getServiceType())){
-				sb.append("Layer3Forwarding");
-				sb.append("DefaultConnectionService: " + toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv));
+				sb.append("Layer 3 Forwarding<ul>");
+				sb.append("<li>Default Connection Service: " + toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv));
 			}else if(WAN_IP_CONNECTION.equals(serv.getServiceType())){
-				sb.append("WANIPConnection");
-				sb.append(" status: " + toString("GetStatusInfo", "NewConnectionStatus", serv));
-				sb.append(" type: " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
-				sb.append(" external IP: " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
+				sb.append("WAN IP Connection<ul>");
+				sb.append("<li>Status: " + toString("GetStatusInfo", "NewConnectionStatus", serv));
+				sb.append("<li>Type: " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
+				sb.append("<li>External IP: " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
 			}else if("urn:schemas-upnp-org:service:WANEthernetLinkConfig:1".equals(serv.getServiceType())){
-				sb.append("WANEthernetLinkConfig");
-				sb.append(" status: " + toString("GetEthernetLinkStatus", "NewEthernetLinkStatus", serv) + "<br>");
+				sb.append("WAN Ethernet Link Config<ol>");
+				sb.append("<li>Status: " + toString("GetEthernetLinkStatus", "NewEthernetLinkStatus", serv) + "<br>");
 			}else
-				sb.append("~~~~~~~ "+serv.getServiceType());
-			listActions(serv, sb);
-			listStateTable(serv, sb);
-			sb.append("</div>");
+				sb.append("~~~~~~~ "+serv.getServiceType() + "<ul>");
+			//listActions(serv, sb);
+			//listStateTable(serv, sb);
+			sb.append("</ul>\n");
 		}
+		sb.append("</ul>\n");
 	}
 	
 	private void listSubDev(String prefix, Device dev, StringBuilder sb){
-		sb.append("<div><p>Device : "+dev.getFriendlyName()+" - "+ dev.getDeviceType()+"<br>");
+                if (prefix == null)
+			sb.append("Device: ");
+		else
+			sb.append("<li>Subdevice: ");
+		sb.append(dev.getFriendlyName());
 		listSubServices(dev, sb);
 		
 		DeviceList dl = dev.getDeviceList();
+		if (dl.size() <= 0)
+			return;
+		sb.append("<ul>\n");
 		for(int j=0; j<dl.size(); j++) {
 			Device subDev = dl.getDevice(j);
 			if(subDev == null) continue;
-			
-			sb.append("<div>");
 			listSubDev(dev.getFriendlyName(), subDev, sb);
-			sb.append("</div></div>");
 		}
-		sb.append("</p></div>");
+		sb.append("</ul>\n");
 	}
 	
-/*****
-	public String handleHTTPGet(HTTPRequest request) throws PluginHTTPException {
-		if(request.isParameterSet("getDeviceCapabilities")) {
-			final StringBuilder sb = new StringBuilder();
-			sb.append("<html><head><title>UPnP report</title></head><body>");
-			listSubDev("WANDevice", _router, sb);
-			sb.append("</body></html>");
+	/** warning - slow */
+	public String renderStatusHTML() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<a name=\"upnp\"></a><b>UPnP Status:</b><br />");
+		
+		if(isDisabled) {
+			sb.append("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?");
+			return sb.toString();
+		} else if(!isNATPresent()) {
+			sb.append("UPnP has not found any UPnP-aware, compatible device on your LAN.");
 			return sb.toString();
 		}
 		
-		HTMLNode pageNode = pr.getPageMaker().getPageNode("UP&P plugin configuration page", false, null);
-		HTMLNode contentNode = pr.getPageMaker().getContentNode(pageNode);
-		
-		if(isDisabled) {
-			HTMLNode disabledInfobox = contentNode.addChild("div", "class", "infobox infobox-error");
-			HTMLNode disabledInfoboxHeader = disabledInfobox.addChild("div", "class", "infobox-header");
-			HTMLNode disabledInfoboxContent = disabledInfobox.addChild("div", "class", "infobox-content");
-
-			disabledInfoboxHeader.addChild("#", "UP&P plugin report");
-			disabledInfoboxContent.addChild("#", "The plugin has been disabled; Do you have more than one UP&P IGD on your LAN ?");
-			return pageNode.generate();
-		} else if(!isNATPresent()) {
-			HTMLNode notFoundInfobox = contentNode.addChild("div", "class", "infobox infobox-warning");
-			HTMLNode notFoundInfoboxHeader = notFoundInfobox.addChild("div", "class", "infobox-header");
-			HTMLNode notFoundInfoboxContent = notFoundInfobox.addChild("div", "class", "infobox-content");
-
-			notFoundInfoboxHeader.addChild("#", "UP&P plugin report");
-			notFoundInfoboxContent.addChild("#", "The plugin hasn't found any UP&P aware, compatible device on your LAN.");
-			return pageNode.generate();			
-		}
-		
-		HTMLNode foundInfobox = contentNode.addChild("div", "class", "infobox infobox-normal");
-		HTMLNode foundInfoboxHeader = foundInfobox.addChild("div", "class", "infobox-header");
-		HTMLNode foundInfoboxContent = foundInfobox.addChild("div", "class", "infobox-content");
-		
 		// FIXME L10n!
-		foundInfoboxHeader.addChild("#", "UP&P plugin report");
-		foundInfoboxContent.addChild("p", "The following device has been found : ").addChild("a", "href", "?getDeviceCapabilities").addChild("#", _router.getFriendlyName());
-		foundInfoboxContent.addChild("p", "Our current external ip address is : " + getNATAddress());
+		sb.append("<p>Found ");
+		listSubDev(null, _router, sb);
+		String addr = getNATAddress();
+		if (addr != null)
+		    sb.append("<br>The current external IP address reported by UPnP is " + addr);
+		else
+		    sb.append("<br>The current external IP address is not available.");
 		int downstreamMaxBitRate = getDownstreamMaxBitRate();
-		int upstreamMaxBitRate = getUpstramMaxBitRate();
+		int upstreamMaxBitRate = getUpstreamMaxBitRate();
 		if(downstreamMaxBitRate > 0)
-			foundInfoboxContent.addChild("p", "Our reported max downstream bit rate is : " + getDownstreamMaxBitRate()+ " bits/sec");
+			sb.append("<br>UPnP reports the max downstream bit rate is : " + downstreamMaxBitRate+ " bits/sec\n");
 		if(upstreamMaxBitRate > 0)
-			foundInfoboxContent.addChild("p", "Our reported max upstream bit rate is : " + getUpstramMaxBitRate()+ " bits/sec");
+			sb.append("<br>UPnP reports the max upstream bit rate is : " + upstreamMaxBitRate+ " bits/sec\n");
 		synchronized(lock) {
 			if(portsToForward != null) {
 				for(ForwardPort port : portsToForward) {
-					if(portsForwarded.contains(port)) {
-						foundInfoboxContent.addChild("p", "The "+port.name+" port "+port.portNumber+" / "+port.protocol+" has been forwarded successfully.");
-					} else {
-						foundInfoboxContent.addChild("p", "The "+port.name+" port "+port.portNumber+" / "+port.protocol+" has not been forwarded.");
-					}
+					sb.append("<br>" + protoToString(port.protocol) + " port " + port.portNumber + " for " + port.name);
+					if(portsForwarded.contains(port))
+						sb.append(" has been forwarded successfully by UPnP.\n");
+					else
+						sb.append(" has not been forwarded by UPnP.\n");
 				}
 			}
 		}
 		
-		return pageNode.generate();
+		sb.append("</p>");
+		return sb.toString();
 	}
-
-	public String handleHTTPPost(HTTPRequest request) throws PluginHTTPException {
-		return null;
-	}
-***/
 	
+	/** blocking */
 	private boolean addMapping(String protocol, int port, String description, ForwardPort fp) {
 		if(isDisabled || !isNATPresent() || _router == null) {
                         _log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
@@ -457,8 +506,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
                 }
 		
 		// Just in case...
-                // this confuses my linksys - zzz
-		// removeMapping(protocol, port, fp, true);
+                // this confuses my linksys? - zzz
+		removeMapping(protocol, port, fp, true);
 		
 		Action add = _service.getAction("AddPortMapping");
 		if(add == null) {
@@ -484,6 +533,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		} else return false;
 	}
 	
+	/** blocking */
 	private boolean removeMapping(String protocol, int port, ForwardPort fp, boolean noLog) {
 		if(isDisabled || !isNATPresent())
 			return false;
@@ -508,6 +558,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		return retval;
 	}
 
+	/** non-blocking */
 	public void onChangePublicPorts(Set<ForwardPort> ports, ForwardPortCallback cb) {
 		Set<ForwardPort> portsToDumpNow = null;
 		Set<ForwardPort> portsToForwardNow = null;
@@ -530,7 +581,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 				// Ports in ports but not in portsToForwardNow we must forward
 				// Ports in portsToForwardNow but not in ports we must dump
 				for(ForwardPort port: ports) {
-					if(portsToForward.contains(port)) {
+					//if(portsToForward.contains(port)) {
+					// If not in portsForwarded, it wasn't successful, try again
+					if(portsForwarded.contains(port)) {
 						// We have forwarded it, and it should be forwarded, cool.
 					} else {
 						// Needs forwarding
@@ -557,45 +610,86 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 			registerPorts(portsToForwardNow);
 	}
 
+        private static String protoToString(int p) {
+		if(p == ForwardPort.PROTOCOL_UDP_IPV4)
+			return "UDP";
+		if(p == ForwardPort.PROTOCOL_TCP_IPV4)
+			return "TCP";
+		return "?";
+	}
+
+	private static int __id = 0;
+
+	/**
+	 *  postControlAction() can take many seconds, especially if it's failing,
+         *  and onChangePublicPorts() may be called from threads we don't want to slow down,
+         *  so throw this in a thread.
+         */
 	private void registerPorts(Set<ForwardPort> portsToForwardNow) {
-		for(ForwardPort port : portsToForwardNow) {
-			String proto;
-			if(port.protocol == ForwardPort.PROTOCOL_UDP_IPV4)
-				proto = "UDP";
-			else if(port.protocol == ForwardPort.PROTOCOL_TCP_IPV4)
-				proto = "TCP";
-			else {
-				HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-				map.put(port, new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber));
-				forwardCallback.portForwardStatus(map);
-				continue;
-			}
-			if(tryAddMapping(proto, port.portNumber, port.name, port)) {
-				HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-				map.put(port, new ForwardPortStatus(ForwardPortStatus.MAYBE_SUCCESS, "Port apparently forwarded by UPnP", port.portNumber));
-				forwardCallback.portForwardStatus(map);
-				continue;
-			} else {
-				HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-				map.put(port, new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber));
-				forwardCallback.portForwardStatus(map);
-				continue;
+	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));
+		t.setName("UPnP Port Opener " + (++__id));
+		t.setDaemon(true);
+		t.start();
+	}
+
+	private class RegisterPortsThread implements Runnable {
+		private Set<ForwardPort> portsToForwardNow;
+
+		public RegisterPortsThread(Set<ForwardPort> ports) {
+			portsToForwardNow = ports;
+		}
+
+		public void run() {
+			for(ForwardPort port : portsToForwardNow) {
+				String proto = protoToString(port.protocol);
+				if (proto.length() <= 1) {
+					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
+					map.put(port, new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber));
+					forwardCallback.portForwardStatus(map);
+					continue;
+				}
+				if(tryAddMapping(proto, port.portNumber, port.name, port)) {
+					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
+					map.put(port, new ForwardPortStatus(ForwardPortStatus.MAYBE_SUCCESS, "Port apparently forwarded by UPnP", port.portNumber));
+					forwardCallback.portForwardStatus(map);
+					continue;
+				} else {
+					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
+					map.put(port, new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber));
+					forwardCallback.portForwardStatus(map);
+					continue;
+				}
 			}
 		}
 	}
 
+	/**
+	 *  postControlAction() can take many seconds, especially if it's failing,
+         *  and onChangePublicPorts() may be called from threads we don't want to slow down,
+         *  so throw this in a thread.
+         */
 	private void unregisterPorts(Set<ForwardPort> portsToForwardNow) {
-		for(ForwardPort port : portsToForwardNow) {
-			String proto;
-			if(port.protocol == ForwardPort.PROTOCOL_UDP_IPV4)
-				proto = "UDP";
-			else if(port.protocol == ForwardPort.PROTOCOL_TCP_IPV4)
-				proto = "TCP";
-			else {
-				// Ignore, we've already complained about it
-				continue;
+	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
+		t.setName("UPnP Port Opener " + (++__id));
+		t.setDaemon(true);
+		t.start();
+	}
+
+	private class UnregisterPortsThread implements Runnable {
+		private Set<ForwardPort> portsToForwardNow;
+
+		public UnregisterPortsThread(Set<ForwardPort> ports) {
+			portsToForwardNow = ports;
+		}
+
+		public void run() {
+			for(ForwardPort port : portsToForwardNow) {
+				String proto = protoToString(port.protocol);
+				if (proto.length() <= 1)
+					// Ignore, we've already complained about it
+					continue;
+				removeMapping(proto, port.portNumber, port, false);
 			}
-			removeMapping(proto, port.portNumber, port, false);
 		}
 	}
 

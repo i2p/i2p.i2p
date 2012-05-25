@@ -190,7 +190,7 @@ public class PeerID implements Comparable
   {
     boolean leading_zeros = true;
 
-    StringBuffer sb = new StringBuffer(bs.length*2);
+    StringBuilder sb = new StringBuilder(bs.length*2);
     for (int i = 0; i < bs.length; i++)
       {
         int c = bs[i] & 0xFF;

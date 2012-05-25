@@ -26,8 +26,6 @@ public class TunnelHistory {
     private volatile long _lastFailed;
     private RateStat _rejectRate;
     private RateStat _failRate;
-    private RateStat _processSuccessRate;
-    private RateStat _processFailureRate;
     private String _statGroup;
     
     /** probabalistic tunnel rejection due to a flood of requests */
@@ -47,14 +45,10 @@ public class TunnelHistory {
     }
     
     private void createRates(String statGroup) {
-        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", statGroup, new long[] { 60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", statGroup, new long[] { 60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _processSuccessRate = new RateStat("tunnelHistory.processSuccessRate", "How many messages does a tunnel process?", statGroup, new long[] { 5*60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _processFailureRate = new RateStat("tunnelHistory.processfailureRate", "How many messages does a tunnel fail?", statGroup, new long[] { 5*60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", statGroup, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", statGroup, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _rejectRate.setStatLog(_context.statManager().getStatLog());
         _failRate.setStatLog(_context.statManager().getStatLog());
-        _processSuccessRate.setStatLog(_context.statManager().getStatLog());
-        _processFailureRate.setStatLog(_context.statManager().getStatLog());
     }
     
     /** total tunnels the peer has agreed to participate in */
@@ -77,10 +71,7 @@ public class TunnelHistory {
     public long getLastFailed() { return _lastFailed; }
     
     public void incrementProcessed(int processedSuccessfully, int failedProcessing) { 
-        if (processedSuccessfully > 0)
-            _processSuccessRate.addData(processedSuccessfully, 0);
-        if (failedProcessing > 0)
-            _processFailureRate.addData(failedProcessing, 0);
+        // old strict speed calculator
     }
     
     public void incrementAgreedTo() {
@@ -129,22 +120,18 @@ public class TunnelHistory {
     
     public RateStat getRejectionRate() { return _rejectRate; }
     public RateStat getFailedRate() { return _failRate; }
-    public RateStat getProcessSuccessRate() { return _processSuccessRate; }
-    public RateStat getProcessFailureRate() { return _processFailureRate; }
     
     public void coalesceStats() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Coallescing stats");
         _rejectRate.coalesceStats();
         _failRate.coalesceStats();
-        _processFailureRate.coalesceStats();
-        _processSuccessRate.coalesceStats();
     }
     
     private final static String NL = System.getProperty("line.separator");
     
     public void store(OutputStream out) throws IOException {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(NL);
         buf.append("#################").append(NL);
         buf.append("# Tunnel history").append(NL);
@@ -161,11 +148,9 @@ public class TunnelHistory {
         out.write(buf.toString().getBytes());
         _rejectRate.store(out, "tunnelHistory.rejectRate");
         _failRate.store(out, "tunnelHistory.failRate");
-        _processSuccessRate.store(out, "tunnelHistory.processSuccessRate");
-        _processFailureRate.store(out, "tunnelHistory.processFailureRate");
     }
     
-    private void add(StringBuffer buf, String name, long val, String description) {
+    private void add(StringBuilder buf, String name, long val, String description) {
         buf.append("# ").append(name.toUpperCase()).append(NL).append("# ").append(description).append(NL);
         buf.append("tunnels.").append(name).append('=').append(val).append(NL).append(NL);
     }
@@ -187,12 +172,6 @@ public class TunnelHistory {
             _failRate.load(props, "tunnelHistory.failRate", true);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loading tunnelHistory.failRate");
-            _processFailureRate.load(props, "tunnelHistory.processFailureRate", true);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Loading tunnelHistory.processFailureRate");
-            _processSuccessRate.load(props, "tunnelHistory.processSuccessRate", true);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Loading tunnelHistory.processSuccessRate");
         } catch (IllegalArgumentException iae) {
             _log.warn("TunnelHistory rates are corrupt, resetting", iae);
             createRates(_statGroup);

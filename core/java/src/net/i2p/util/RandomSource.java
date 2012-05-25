@@ -142,7 +142,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     private static final String SEEDFILE = "prngseed.rnd";
     
     public static final void writeSeed(byte buf[]) {
-        File f = new File(SEEDFILE);
+        File f = new File(I2PAppContext.getGlobalContext().getConfigDir(), SEEDFILE);
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(f);
@@ -164,7 +164,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     }
     
     private static final boolean seedFromFile(String filename, byte buf[]) {
-        File f = new File(filename);
+        File f = new File(I2PAppContext.getGlobalContext().getConfigDir(), filename);
         if (f.exists()) {
             FileInputStream fis = null;
             try {

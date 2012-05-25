@@ -30,11 +30,13 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PTunnelHTTPClientRunner.class);
     }
 
+    @Override
     protected OutputStream getSocketOut() throws IOException { 
         OutputStream raw = super.getSocketOut();
         return new HTTPResponseOutputStream(raw);
     }
         
+    @Override
     protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin, Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
         try { 
             i2pin.close();

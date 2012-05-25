@@ -218,7 +218,7 @@ public class SessionConfig extends DataStructureImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer("[SessionConfig: ");
+        StringBuilder buf = new StringBuilder("[SessionConfig: ");
         buf.append("\n\tDestination: ").append(getDestination());
         buf.append("\n\tSignature: ").append(getSignature());
         buf.append("\n\tCreation Date: ").append(getCreationDate());

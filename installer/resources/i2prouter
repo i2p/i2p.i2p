@@ -12,20 +12,30 @@
 #-----------------------------------------------------------------------------
 # These settings can be modified to fit the needs of your application
 
+# Paths
+# Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
+# should have been replaced by the izpack installer.
+# If you did not run the installer, replace them with the appropriate path.
+I2P="%INSTALL_PATH"
+I2PTEMP="%SYSTEM_java_io_tmpdir"
+# PORTABLE installation:
+# Use the following instead.
+#I2PTEMP="%INSTALL_PATH"
+
 # Application
 APP_NAME="i2p"
 APP_LONG_NAME="I2P Service"
 
 # Wrapper
-WRAPPER_CMD="./i2psvc"
-WRAPPER_CONF="wrapper.config"
+WRAPPER_CMD="$I2P/i2psvc"
+WRAPPER_CONF="$I2P/wrapper.config"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="."
+PIDDIR="$I2PTEMP"
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -46,40 +56,6 @@ PIDDIR="."
 
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
-
-# Get the fully qualified path to the script
-case $0 in
-    /*)
-        SCRIPT="$0"
-        ;;
-    *)
-        PWD=`pwd`
-        SCRIPT="$PWD/$0"
-        ;;
-esac
-
-# Change spaces to ":" so the tokens can be parsed.
-SCRIPT=`echo $SCRIPT | sed -e 's; ;:;g'`
-# Get the real path to this script, resolving any symbolic links
-TOKENS=`echo $SCRIPT | sed -e 's;/; ;g'`
-REALPATH=
-for C in $TOKENS; do
-    REALPATH="$REALPATH/$C"
-    while [ -h "$REALPATH" ] ; do
-        LS="`ls -ld "$REALPATH"`"
-        LINK="`expr "$LS" : '.*-> \(.*\)$'`"
-        if expr "$LINK" : '/.*' > /dev/null; then
-            REALPATH="$LINK"
-        else
-            REALPATH="`dirname "$REALPATH"`""/$LINK"
-        fi
-    done
-done
-# Change ":" chars back to spaces.
-REALPATH=`echo $REALPATH | sed -e 's;:; ;g'`
-
-# Change the current directory to the location of the script
-cd "`dirname "$REALPATH"`"
 
 # Process ID
 ANCHORFILE="$PIDDIR/$APP_NAME.anchor"

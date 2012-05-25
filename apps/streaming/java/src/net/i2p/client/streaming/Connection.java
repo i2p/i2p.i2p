@@ -49,7 +49,7 @@ public class Connection {
     private boolean _isInbound;
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
-    private Map _outboundPackets;
+    private final Map _outboundPackets;
     private PacketQueue _outboundQueue;
     private ConnectionPacketHandler _handler;
     private ConnectionOptions _options;
@@ -66,7 +66,7 @@ public class Connection {
     private long _lastCongestionHighestUnacked;
     private boolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
-    private Object _connectLock;
+    private final Object _connectLock;
     /** how many messages have been resent and not yet ACKed? */
     private int _activeResends;
     private ConEvent _connectionEvent;
@@ -90,21 +90,22 @@ public class Connection {
     }
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts) {
         _context = ctx;
-        _log = ctx.logManager().getLog(Connection.class);
-        _receiver = new ConnectionDataReceiver(ctx, this);
-        _inputStream = new MessageInputStream(ctx);
-        _outputStream = new MessageOutputStream(ctx, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
+        _connectionManager = manager;
         _chooser = chooser;
-        _outboundPackets = new TreeMap();
         _outboundQueue = queue;
         _handler = handler;
+        _log = _context.logManager().getLog(Connection.class);
+        _receiver = new ConnectionDataReceiver(_context, this);
+        _inputStream = new MessageInputStream(_context);
+        _outputStream = new MessageOutputStream(_context, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
+        _outboundPackets = new TreeMap();
         _options = (opts != null ? opts : new ConnectionOptions());
         _outputStream.setWriteTimeout((int)_options.getWriteTimeout());
         _inputStream.setReadTimeout((int)_options.getReadTimeout());
         _lastSendId = -1;
         _nextSendTime = -1;
         _ackedPackets = 0;
-        _createdOn = ctx.clock().now();
+        _createdOn = _context.clock().now();
         _closeSentOn = -1;
         _closeReceivedOn = -1;
         _unackedPacketsReceived = 0;
@@ -113,7 +114,6 @@ public class Connection {
         _lastCongestionSeenAt = MAX_WINDOW_SIZE*2; // lets allow it to grow
         _lastCongestionTime = -1;
         _lastCongestionHighestUnacked = -1;
-        _connectionManager = manager;
         _resetReceived = false;
         _connected = true;
         _disconnectScheduledOn = -1;
@@ -126,7 +126,7 @@ public class Connection {
         _isInbound = false;
         _updatedShareOpts = false;
         _connectionEvent = new ConEvent();
-	_hardDisconnected = false;
+        _hardDisconnected = false;
         _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -187,12 +187,12 @@ public class Connection {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "/" 
                                        + _activeResends + "), waiting " + timeLeft);
-                        try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) {}
+                        try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) { if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends +")"); return false;}
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
                                        + "), waiting indefinitely");
-                        try { _outboundPackets.wait(250); } catch (InterruptedException ie) {} //10*1000
+                        try { _outboundPackets.wait(250); } catch (InterruptedException ie) {if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends + ")"); return false;} //10*1000
                     }
                 } else {
                     _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
@@ -810,7 +810,11 @@ public class Connection {
                 synchronized (_connectLock) {
                     _connectLock.wait(timeLeft); 
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("waitForConnect(): InterruptedException");
+                _connectionError = "InterruptedException";
+                return;
+            }
         }
     }
     
@@ -895,7 +899,7 @@ public class Connection {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Closing connection due to inactivity");
                     if (_log.shouldLog(Log.DEBUG)) {
-                        StringBuffer buf = new StringBuffer(128);
+                        StringBuilder buf = new StringBuilder(128);
                         buf.append("last sent was: ").append(_context.clock().now() - _lastSendTime);
                         buf.append("ms ago, last received was: ").append(_context.clock().now()-_lastReceivedOn);
                         buf.append("ms ago, inactivity timeout is: ").append(_options.getInactivityTimeout());
@@ -930,7 +934,7 @@ public class Connection {
     
 	@Override
     public String toString() { 
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[Connection ");
         if (_receiveStreamId > 0)
             buf.append(Packet.toId(_receiveStreamId));
@@ -1014,6 +1018,7 @@ public class Connection {
             //    _log.debug("firing event on " + _connection, _addedBy);
             eventOccurred(); 
         }
+        @Override
         public String toString() { return "event on " + Connection.this.toString(); }
     }
     

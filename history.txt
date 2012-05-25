@@ -1,3 +1,1207 @@
+2009-08-11 zzz
+    * Android:
+      - Merge in the branch
+      - Build instructions in the android/ dir
+      - Rename HMac to I2PHMac to avoid android lib conflicts
+      - Configurable number of PRNG buffers in AsyncFortunaStandalone
+        (router.prng.buffers=16) to control memory use - these
+        are 256KB each.
+      - Configurable size of the DecayingBloomFilters
+        (router.decayingBloomFilterM=23) to control memory use - there
+        are 4 pairs of these (8 total), each 2**(M-3) bytes,
+        or 8MB total for M=23.
+      - There's at least two unsolved fatal problems:
+        1) Most of the routerinfo signature verifications fail,
+           including our own
+        2) It randomly dies after a while
+    * Console:
+      - Rename the shitlist and the blocklist
+      - Try to reduce servlet problems on iframe
+      - Select server or client icon for local dests
+    * EepHead: New
+    * Move StatsGenerator from router to routerconsole
+    * Move the unused AdminManager from router to the apps directory
+    * NetDb stats: Hide part. tunnel total events, effective next release
+    * Router: Comment out dead oldconsole code
+    * Updater:
+      - Add new unsigned update option, triggered by
+        last-modified date, using the new EepHead.
+        Buttons still are not hidden after download complete.
+      - Make the .sud updater use the temp dir when proxied
+      - Several cleanups
+
+2009-08-11 dr|z3d
+    * Extensive sidepanel overhaul
+      - Ensure all sidepanel headings link to pertinent pages
+      - First stage of enhanced Local Destinations sub-panel presentation
+      - Move Configuration, Help, and I2PTunnel manager links to headings
+      - Add tooltips to all linked content; table content next in line
+
+2009-08-07 dr|z3d
+    * summarynoframe.jsp
+      - Main content now tabulated for better presentation
+      - Headings now more prominent
+      - Pruning where necessary of text strings
+    * Console themes (light/dark/classic)
+      - Ensure functionality with new sidepanel layout
+      - Custom hacks for IE/classic
+      - Enhanced form/button presentation    
+
+2009-08-07 zzz
+    * build.xml:
+      - Try to automate the release process
+      - Take jetty back out of the updater after 4 releases
+    * Console:
+      - Add a custom error page
+      - Don't count ourselves in known peers
+      - Hide update button when shutting down
+      - Increase skew warning threshold to 3s (was 100ms)
+      - Remove UTC time from summary bar
+      - Truncate long dest names
+      - Try to reduce servlet problems on index page
+    * Core:
+      - Catch unzip fd leaks on error
+      - Move 2 test classes out of the lib
+    * Eepsite:
+      - Quote the jetty.xml path in clients.config,
+        and adjust the migration function, to fix the
+        eepsite-won't-start bug on windows
+    * HTTP Proxy:
+      - Restore the localhost error message
+      - Catch 127.0.0.1:xxxx addresses too
+    * I2PTunnel:
+      - Move the privkey files from the app dir to the
+        config dir, in preparation for splitting the two
+        dirs by default
+    * Ministreaming:
+      - Make getInt() static
+      - Move the big TestSwarm class out of the lib
+    * NetDb stats: Post-release cleanup
+    * PersistentKeyRing: Fix broken storage of keys in config file
+    * Router: Move the WorkingDir class from i2p.jar to router.jar
+    * Streaming: New option i2p.streaming.answerPings (default true)
+    * Timestamper: Don't start thread if not enabled
+    * Wrapper:
+      - Extend timeout to 20s (was 5s)
+      - Shorten ping interval to 5m (was 10m)
+
+2009-08-03 dr|z3d
+    * Extensive update to the Classic theme; custom css hacks for IE.
+
+2009-08-02 dr|z3d
+    * Better support for Internet Explorer/classic theme.
+    * Incremental improvements to classic theme.
+    * More UI tweaks and fiddles. 
+    * Fixes for I2PSnark UI; more to come.
+    
+2009-07-31 dr|z3d
+    * Resolve anomalous buttons and text fields in console ui. 
+    * Enhance presentation of data in /peers.jsp.
+    * Fix themes issue with horizontal width of radio/checkbox icons.
+    * Other cosmetic UI enhancements.
+
+* 2009-07-31  0.7.6 released
+
+2009-07-31 zzz
+    * Update versions, package release
+    * Fix snark.css link
+    * Revert graph antialias enable
+    * Remove <center> from iframe head
+    * Fix tunnels.jsp HTML
+    * Prevent linux-only installer screen from displaying on windows
+
+2009-07-28 zzz
+    * Add new reseed URL (thanks eche|on!)
+
+2009-07-27 zzz
+    * Add flag dimensions to speed up profiles.jsp rendering
+    * Catch i2psnark create torrent with no data entered error
+      http://forum.i2p/viewtopic.php?t=3763
+    * Fix typos in proxy error files
+
+2009-07-26 zzz
+    * Add wrapper.config and i2prouter comments for 'portable'
+    * Recognize same base and config dir in WorkingDir
+    * Reformat XInfoPanel in installer for clarity
+
+2009-07-25 dr|z3d
+    * Enhance the layout of /graphs.jsp
+    * Fix some of the irks in I2PSnark UI.
+    * Ongoing tweaks and fiddles to the themes' css. Not finished by any means!
+
+2009-07-24 zzz
+    * Eepsite: Add Deutsch index page and css (thanks sperrbezirk!)
+    * Router: Support i2p.dir.base and i2p.dir.config passed in via properties
+    * Throttle: Decrease default max tunnels to 2500
+
+2009-07-23 dr|z3d
+    * Include additional tile graphics and I2PSnark header logo in /console/images/
+    * Tidy up some layout irks; add some last minute 0.7.6 pre-release sparkle!
+    * Ongoing overhaul of the I2PSnark UI.
+
+2009-07-23 sponge
+    * Add bob.i2p and sponge.i2p keys to hosts.txt
+
+2009-07-23 sponge
+    * Fix jdk 1.6izm in BOB as per zzz
+
+2009-07-22 dr|z3d
+    * More work on the I2PSnark UI.
+    * Start of improvements to tunnel table data.
+    * Ongoing theme enhancements.
+
+2009-07-21 dr|z3d
+    * First stage of overhaul of webapps ui. 
+      susidns, susimail & i2psnark now lightly themed.
+    * Proxy error messages now themed as per chosen theme.
+    * Modest tweaks to the classic theme, et al.
+
+2009-07-21 zzz
+    * configclients.jsp: Close anchor
+    * Console: Drop top-level css, unused now
+    * Eepsite: Add default robots.txt (thanks v1v4)
+    * GeoIP: Add license info
+    * HTTP Proxy: Additional proxy.i2p restrictions
+    * ServiceManager: Drop, unused
+
+2009-07-20 zzz
+    * BuildHandler: Increase threshold for dropping instead
+      of rejecting to 81% (was 75%)
+    * Console: Hide configui.jsp from IE, disable selection
+    * GeoIP: Fix minor bugs (thanks Arsene)
+    * graphs.jsp: Reduce refresh time to eliminate double iframe load
+    * HTTP Proxy: Fix proxy.i2p "home page" (thanks dr|z3d)
+    * I2PSnark: Remove Postman tracker
+    * Peer Profiles:
+      - Reduce max age for display to 2h (was 3h)
+      - Drop unused Persist classes
+      - Dynamically adjust expire time to control memory use
+      - Increase reorganize time to 45s (was 30s) to reduce CPU use
+        and lock contention
+      - Remove some stat rates
+      - Delay start of PeerTestJob
+    * Stats: Increase coalesce time to 50s (was 20s) to reduce CPU use
+    * summarynoframe.jsp: Cleanup
+    * Transports: Reduce the number of Rates
+
+2009-07-16 zzz
+    * HTTP Proxy: Themes for error pages
+
+2009-07-16 sponge
+    * ministreaming:
+      - small pedantic fix
+    * streaming:
+      - Fix a deadly race condition.
+      - Some small pedantic fixes.
+    * core:
+      - Fix a deadly race condition.
+    * BOB:
+      - Fixed some races that occured from fixing races in streaming and core.
+      - Some badly needed code refactoring to depend less on the database.
+
+2009-07-15 zzz
+    * Console:
+      - Make light the default theme
+      - Convert readme_zh.html from GB2312 to UTF-8
+    * Installer: Don't launch the router from the postinstall.sh script
+      on linux anymore; add a panel to the installer to provide launch instructions.
+
+2009-07-15 sponge
+    * Slackware SlackBuild fixes.
+
+2009-07-14 dr|z3d
+    * Increment to 0.7.5-10
+    * Tidy up layout of readme.* files.
+    * Work on console css to make it more Opera/webkit friendly.
+    * Other cosmetic tweaks.
+
+2009-07-13 zzz
+    * Build: Add readme*.html files to the udpater
+    * Build Handler: Don't reject for conn limits if class O,
+      under the assumption that they are already talking
+      to most of the routers, so there's no reason to reject. This may drive them
+      to their conn. limits, but it's hopefully a temporary solution to the
+      tunnel build congestion. As the net grows this will have to be revisited.
+    * Throttle: Increase default max tunnels to 3000,
+      to give us more capacity during congestion
+    * Tunnels: Change the default variance from 1 to 0.
+      Under the one-packet-enough theory, and the fact that most
+      tunnels in a x+1 pool are of length x, variable lengths
+      don't really help that much. Also, a default of 1 led
+      to all sorts of problems with iMule/SAM, who was not
+      setting the variance properties.
+      This will affect exploratory tunnels for new users,
+      and those that have never saved a change on configtunnels.jsp,
+      and iMule users 1.4.5 and earlier.
+
+2009-07-12 zzz
+    * Add configui.jsp
+    * orange flash remove take 2
+
+2009-07-11 zzz
+    * netdb.jsp: Fix bad tag causing orange mouseovers
+
+2009-07-11 dr|z3d
+    * More enhancements to the router console, consolidation of the
+      light and dark themes.     
+      - Apply new themes with routerconsole.theme=light/dark/classic
+        added to advanced config.
+
+2009-07-11 zzz
+    * Build Handler: Drop rather than reject requests when near
+      conn limits and the next hop is not connected, to reduce
+      connection congestion
+    * Console: Force IE to the classic theme
+    * I2PSnark:
+      - Bring back details links for Postman2 B64 torrents
+    * I2PTunnel:
+      - Make reduce-on-idle the default for all the shared clients
+        for new installs (15m)
+    * Profile Organizer:
+      - Allow NTCP-only peers in inbound tunnels
+    * Transports:
+      - Move from a single connection limit threshold (80%) to
+        two (75% and 87%), and only start rejecting tunnels
+        at the higher threshold, to increase build success
+      - Move some limit methods from the transports to TransportImpl
+      - Add limit methods with a threshold argument
+      - Increase default SSU conn limits a little more
+
+2009-07-07 dr|z3d
+    * Introducing 2 new console themes (light & dark), in addition
+      to changes to the console navigation; navbar now resides in 
+      the sidepanel and other stuff besides. More to follow!
+
+2009-07-06 zzz
+    * Console: Fix small textareas on Opera
+    * EepGet: Don't send X-Accept-Encoding for non-proxied fetches
+    * HTTP Proxy: Limit proxy.i2p to /themes/ directory
+    * I2PSnark:
+      - Change postman2 announce URL to use hostname rather than B64
+      - Shorten torrent name to fit better on one line
+    * I2PTunnel:
+      - Add edit text
+      - Fix broken favicon
+    * Move almost all uses of StringBuffer to StringBuilder,
+      for efficiency (thanks Arsene for the suggestion)
+    * Reseed:
+      - Fix console status messages broken by global replace
+      - Remove tino, add b.netdb.i2p2.de
+    * SSUDemo: Move to the router/java/test directory
+    * Startup: Log clients.config problems
+    * Transport: Implement NTCP auto-transition from an
+      address to no address, so that inbound NTCP is disabled
+      after SSU detects a firewall. When UPnP was apparently successful
+      but the router is still firewalled (due to an additional
+      software firewall or a bad UPnP indication, for example)
+      the router will now remove the NTCP address.
+
+2009-07-05 sponge
+    * Added X-I2P-DestB64 and X-I2P-DestB32 http headers
+
+2009-06-29 zzz
+    * Big directory rework:
+      Eliminate all uses of the current working directory, and
+      set up multiple directories specified by absolute paths for various uses.
+
+      Add a WorkingDir class to create a user config directory and
+      migrate certain files to it for new installs.
+      The directory will be $HOME/.i2p on linux and %APPDATA%\I2P on Windows,
+      or as specified in the system property -Di2p.dir.config=/path/to/i2pdir
+      All files except for the base install and temp files will be
+      in the config directory by default.
+      Temp files will be in a i2p-xxxxx subdirectory of the system temp directory
+      specified by the system property java.io.tmpdir.
+
+      Convert all file opens in the code to be relative to a specific directory,
+      as specified in the context. Code and applications should never open
+      files relative to the current working directory (e.g. new File("foo")).
+      All files should be accessed in the appropriate context directory,
+      e.g. new File(_context.getAppDir(), "foo").
+
+      The router.config file location may be specified as a system property on the
+      java command line with -Drouter.configLocation=/path/to/router.config
+      All directories may be specified as properties in the router.config file.
+
+      There will be no migration from an existing installation
+      unless the system property -Di2p.dir.migrate=true is set.
+      If there is no migration, it will continue to use $I2P for all files,
+      except for temporary and PID files.
+
+      The following linux scripts are now customized with the install path at,
+      installation, and may be moved to /usr/local/bin and run from any
+      working directory:
+          eepget, i2prouter, runplain.sh
+
+      For new installs, the i2p base directory ($I2P) may be read-only
+      if updates are disabled. The only time i2p should write to the base directory
+      is to unzip the update file. Updates are downloaded to the config dir. If, upon
+      restart, the base dir is not writable, it will log a message and continue.
+
+      Additional information, copied from I2PAppContext:
+
+      #  Directories. These are all set at instantiation and will not be changed by
+      #  subsequent property changes.
+      #  All properties, if set, should be absolute paths.
+      #
+      #  Name	Property 	Method		Files
+      #  -----	-------- 	-----		-----
+      #  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
+      #  Temp	i2p.dir.temp	getTempDir()	Temporary files
+      #  PID	i2p.dir.pid	getPIDDir()	router.ping
+      #  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
+      #
+      #  (the following all default to the same as Config)
+      #
+      #  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
+      #  Log	i2p.dir.log	getLogDir()	logs/
+      #  App	i2p.dir.app	getAppDir()	eepsite/, ...
+      
+      *  Note that the router can't control where the wrapper actually puts its files.
+
+      All these will be set appropriately in a Router Context.
+      In an I2P App Context, all except Temp and PID will be the current working directory.
+
+      Related changes:
+      i2prouter:
+      - Don't cd to script location, no longer required
+      jbigi, cpuid:
+      - Extract files from jar to temp dir, load from that dir, then
+        copy to the base dir if we have permissions (and failing silently
+        if we don't), so we have optimized libs and no complaints
+        when we have a read-only base dir.
+      logs.jsp:
+      - Get wrapper log location from a property too
+      - Display log file locations
+      RouterLaunch:
+      - If no wrapper, put wrapper.log in system temp dir
+        unless specified with -Dwrapper.logfile=/path/to/wrapper.log
+        or it already exists in CWD (for backward compatibility)
+      - Append rather than replace wrapper.log
+      - Pass wrapper log location to router as a property, so that logs.jsp can find it
+      runplain.sh:
+      - Add path substitution to runplain.sh on install
+      - Pass I2P base dir to the router as a property
+      Systray:
+      - Fix NPE if no config file
+      wrapper.config:
+      - Put wrapper.log in system temp dir for new installs
+      - Pass I2P base dir to the router as a property
+
+2009-06-29 zzz
+    * HTTP Proxy:
+      - Add simple web server for "proxy.i2p" to serve
+        images and CSS for the error pages
+      - Take CSS out of the error pages; use internal server
+        for CSS, image, and favicon
+    * i2psnark build:
+      - Move FetchAndAdd to static inner class
+      - Fix standalone build to include i2psnark.jar since classes
+        aren't in the .war anymore
+      - Have standalone jetty use I2PAppContext temp directory
+      - Replace launch-i2psnark.jar with launch-i2psnark script,
+        since RunStandalone is in i2p.jar
+      - Clean up jetty-i2psnark.xml, turn off jetty logging
+      - Remove standalone build from the pkg target in the main build.xml
+    * Jbigi, CPUID:
+      - Reduce memory demand on startup from 4MB to 4KB each
+    * NetDb: Fix an NPE on early shutdown
+    * Reseeding / NetDb:
+      - Move reseeding from the routerconsole app to
+        the router, so that we can bootstrap an embedded router lacking a routerconsole
+        (iMule or android for example), without additional modifications.
+        This allows better integration between the reseeding function
+        and the netDb.
+      - Call reseed from PersistentDataStore, not from the
+        routerconsole init, and start seeding as soon as the netdb has read
+        the netDb/ directory, not when the console starts.
+      - Wake up the netdb reader as soon as reseeding is done,
+        rather than waiting up to 60s.
+      - Don't display the reseed button on the console until the
+        netdb initialization is done.
+    * RouterConsoleRunner:
+      - Catch a class not found error better
+
+2009-06-29 zzz
+    * Console: Convert table headers to <th> to prep for CSS changes
+    * Console CSS: Move css file, make a classic theme to prep for CSS changes
+    * Console: Move favicon.ico and i2plogo.png out of the .war
+      so that the HTTP proxy can use them directly;
+      proxy error pages must be updated next
+    * NetDb stats: Normalize tunnel build stats for increased anonymity,
+      effective in 0.7.6
+
+2009-06-30 sponge
+    * General cleanup on streaming and ministreaming.
+      This fixes some compile warnings, and prepares for a larger fix.
+      There is no code-flow changes, just lint. One warning remains as I am
+      unsure exactly how to solve the problem yet.
+
+* 2009-06-29  0.7.5 released
+
+2009-06-29 Complication
+    * Update versions, package release
+    * Remove the last reference to my eepsite as a "news.xml" source,
+      and likewise stop my public key from being included
+      among valid release signing keys.
+
+2009-06-25 sponge
+    * Summary frame layout change so it makes sense.
+
+2009-06-23 zzz
+    * Browser Launch: Add sensible-browser, x-www-browser, defaultbrowser, and
+      www-browser in an attempt to launch the user's preferred browser
+    * configupdate.jsp: Cleanup
+    * Installer: Include console.css!!!
+    * NTCP: Try again to prevent two Event Pumpers
+    * Update: Increase max retries
+    * UPnP: Catch AIOOBE reported by tuna
+
+2009-06-21 zzz
+    * Browser Launch: Wait until the routerconsole is up before launching the browser
+    * Installer: Fix wrapper.config parsing on windows
+    * netdb.jsp: Add country chart at bottom, clean up version chart
+    * News Fetcher:
+      - Change default news URL, use it instead of the old one even if
+        the old one is saved in the configuration, to assist in the transition
+    * ReseedHandler:
+      - check for upper case HREF to be compatible with apache indexes
+    * Statistics Manager: post-0.7.4 cleanup
+    * Transport: Treat 5.0.0.0/8 (Hamachi) as local
+
+2009-06-17 Mathiasdm
+    * desktopgui:
+      - Added client and server tunnel view
+        (saving does not work yet)
+
+2009-06-17 zzz
+    * PeerSelector:
+      - Limit exploratory tunnels to connected peers when over
+        half the connection limit (was 80%)
+      - Have the high capacity tier fall back to a new connected tier
+        before moving on to the not failing tier
+        so that tunnel build success doesn't collapse and drive
+        connections to the limit
+    * PeerTestJob:
+      - Limit to connected peers
+
+2009-06-12 zzz
+    * Console:
+      - Move the console css from default.css in the .war to docs/themes/console/console.css,
+        and support console themes in the main console with routerconsole.theme=foo
+      - Remove unused NoticeHelper
+
+    * Installer:
+        Upgrade to izpack 4.3.0 and add a short script to fix Vista install problems.
+        (previous izpack was 3.7.2 from 2005-04-22)
+        
+        izpack 4.3.0 from :
+        http://dist.codehaus.org/izpack/releases/4.3.0/IzPack-install-4.3.0.jar
+        SHA1 f06da6b26ac2c68fed64ab38980352989b8d8841
+        (no signatures or sha1sums found on website, and the jar is unsigned)
+        License: Apache 2.0
+        
+        upack izpack:
+        java -jar IzPack-install-4.3.0.jar
+        or
+        java -jar IzPack-install-4.3.0.jar -console
+        
+        get the standalone-compiler.jar from the installation lib/ directory:
+        SHA1 6d2b4a5657bfb864a333b1c4b1c0f8223aa57d80
+        (no signatures or sha1sums found on website, and the jar is unsigned)
+        
+        This fixes the bug with the install windows centered in all the
+        workspaces, not the current workspace. And who knows what other
+        bugs in the last 4 years.
+        
+        To fix Vista (and presumably Windows 7) permissiom problems,
+        add a run-privileged flag for those, and run the new fixperms.bat
+        which calls icacls to add the privileges to the install directory.
+        
+        Add support for 6 more language packs found in the new release.
+        Change from ISO3 codes to native language names.
+        
+        Disable creation of the i2p.tar.bz2 file in build.xml
+        (distributed as i2pheadless-0.7.x.tar.bz2), as izpack 4.3.0 now
+        supports headless installation with java -jar i2pinstall.exe -console.
+        Update INSTALL.txt and INSTALL-headless.txt accordingly.
+
+      - Add install and temp path substitution to wrapper.config and
+        i2prouter on install
+
+      - Change the wrapper.config classpath to one line: lib/*.jar
+        This means we lose control of classpath load order, so move the windows installer
+        jars copy.jar, delete.jar, and exec.jar to a new installer/ directory so
+        these jars won't be in the classpath or potentially conflict, since
+        copy.jar and delete.jar include FileUtil.class, and we don't want to have
+        to remember to add them to the updater if we ever change FileUtil.class.
+        Delete the installer/ directory in postinstall.sh since it is windows-only.
+
+    * Watchdog: Only try to dump threads if there is a wrapper
+         and we aren't on windows
+
+* 2009-06-12  0.7.4 released
+
+2009-06-12 Complication
+    * Update versions, package release
+
+2009-06-09 zzz
+    * NTCP: Fix startup race NPE (thanks postman!)
+
+2009-06-08 sponge
+    * Last commit for this cycle. All debugging except for WARN removed.
+      I can use the visit command to debug now anyway.
+
+2009-06-08 sponge
+    * Removed BOB debugging as-per zzz
+
+2009-06-08 sponge
+    * Fixed NPE and some other goofups in BOB.
+    * BOB bump version
+
+2009-06-07 zzz
+    * Build file:
+      - Add updaterWithJettyFixesAndGeoIP, use it in pkg for one release
+      - Cleanups
+    * Console:
+      - netdb.jsp cleanup
+      - tunnels.jsp cleanup
+    * ExploratoryPeerSelector:
+      - Limit to connected peers when near connection limit
+    * Timestamper:
+      - Use locale country if geoip unavailable
+    * Transport:
+      - Lower min NTCP idle time to 3m (was 5m)
+      - Increase SSU conn limit by 33%
+    * UPnP: Fix deprecation warning
+    * Watchdog:
+     - Defang him again
+
+2009-06-06 sponge
+    * Added BOB's license to licenses
+    * Janitorial javadoc fixes *sigh*
+    * bump to -13
+
+2009-06-05 sponge
+    * Merge and bump to -12
+
+2009-06-05 sponge
+    * BOB now cleans up tunnels, although they can take up to 5 minutes to
+      disapear. This is due to the fact that the streaming lib doesn't
+      actually remove the connections properly and kill them off when the
+      manager is destroyed. I'm not certain if this is a bug, or a feature,
+      but it sure is annoying, and you have to wait for the connections to
+      time out. What should happen is the streaming lib should cause an IO
+      error to the pending read or write.
+
+2009-06-05 zzz
+    * Build file:
+      - Add license info for launch4j includes
+    * Console:
+      - 16x11 transparent flags for ch and np, thanks anonim!
+
+2009-06-04 zzz
+    * Console:
+      - Update geoip file to June 3 version
+      - Hide some controls if no wrapper on configservice.jsp
+    * I2PTunnel:
+      - Fix bug where delayed-open and close-on-idle tunnels would
+        use a different tunnel pool instead of building their own
+      - Add standby indication to web page
+    * NetDb:
+      - Try to talk directly to a floodfill if we don't know enough,
+        to help integrate more quickly
+      - Change a no-floodfill error to a warn
+    * NetDb Stats:
+      - Average TX and RX bw stats for additional anonymity,
+        effective in next release
+    * Reseed:
+      - Limit to 200 pulled randomly from the full fetched list
+    * Transport:
+      - Increase default bw for new installs to 96/40
+        (was 64/32). This is as high as we can go upstream
+        without making the default class M.
+    * Watchdog:
+      - Allow disabling by property again
+      - Logging tweaks
+
+2009-05-30 zzz
+    * Console:
+      - config.jsp now cause graceful restart
+      - More peers.jsp and profiles.jsp cleanup
+      - tunnels.jsp improvements
+      - Use CSS for form messages
+      - Goodbye nonce spoof messages (sorry jr)
+      - config.jsp: Comment out unused burst config code
+      - Don't forget Serbia!
+      - configadvanced.jsp cleanup
+    * LoadTestManager: Delete, unused
+    * Peer Selector: Make strict order opaque to hash value
+    * SendGarlicMessageJob: Delete, unused
+    * Session Keys:
+      - Don't instantiate unused SessionKeyPersistenceHelper
+      - Use TransientSessionKeyManager instead of PersistentSessionKeyManager
+      - Add generics to TransientSessionKeyManager to help understand it
+      - Change initial session map size to 64 (was 1024)
+      - Prepare for per-destination SessionKeyManagers in ElGamalAESEngine
+      - More stubs for per-destination managers in the client manager
+    * Transports:
+      - Adjust bids when near conn capacity
+    * UDP:
+      - Remove unused stats and test code
+      - Only save IP when it changes
+    * UPnP:
+      - Prevent NPE after ParserException
+      - Tweak to help startup problems?
+      - Retry port forward if it fails
+      - Make peers.jsp display faster
+      - Lengthen POST timeout
+      - More comments
+
+2009-05-29 sponge
+    * added big fat start/stop lock into BOB
+    * added zap command to shut down BOB... now we need a way to start it
+      after it stops. :-)
+
+2009-05-27 Mathiasdm
+    * Increase sendProcessingTime some more, add a property to configure.
+      Configure with 'router.defaultProcessingTimeThrottle'.
+
+2009-05-27 Mathiasdm
+    * Increased sendProcessingTime limits and added testSuccessTime
+      to avoid unwanted throttling
+
+2009-05-26 Mathiasdm
+    * Throttling extension by looking at sendProcessingTime
+
+2009-05-26 zzz
+    * Console:
+      - configlogging.jsp cleanup
+      - Flags tweak
+    * NetDb:
+      - Don't send our own hash in the don't-include list when exploring
+      - Remove any pending write when removing a RouterInfo
+      - Cleanup to use routerHash()
+    * Streaming: Hopefuly fix infinite loop in the SYN queue handler
+
+2009-05-25 zzz
+    * GeoIP:
+      - Save our own location in the config
+      - Check whole netDb at startup (last try didn't work)
+    * NTCP:
+      - Increase routerinfo send frequency to every 90m (was 9h)
+      - Don't send 3 floodfill infos at startup or with routerinfo
+    * Profile Organizer: Increase min fast peers based on
+      number of local destinations
+    * Timestamper:
+      - Use GeoIP to query a closer ntp source if available
+      - Lengthen query time if well-synced
+      - Cleanup
+
+2009-05-24 mkvore
+    * SAM: logging some exceptions at INFO level instead of ERROR
+
+2009-05-24 zzz
+    * Connection limits / throttle:
+      - Better limits when no inbound TCP
+        (limit inbound and outbound separately)
+      - Don't offer to SSU introduce when near connection limit
+    * Console:
+      - Move flags from icons/ to docs/icons
+      - peers.jsp cleanup
+      - Add readme_zh.html
+    * GeoIP:
+      - Check netDb SSU IP too
+      - Check whole netDb at startup
+    * NTCP: Log who is sending us big messages
+    * UPnP: Move logging from wrapper log to router log
+
+2009-05-23 Mathiasdm
+    * Router netDB:
+      - Added flags to the netDB page
+
+2009-05-22 Mathiasdm
+    * desktopgui:
+      - Updating works in general config
+      - Switched to Swingworker threads for improved responsiveness
+
+2009-05-21 zzz
+    * Router Watchdog:
+      - Log memory stats
+      - Dump threads on linux
+      - Restart after 20 minutes (give the dog his teeth back)
+
+2009-05-21 zzz
+    * DataStore:
+      - Adjust interface to have persistent and non-persistent methods,
+        to prepare for partial storage in RAM
+    * ExpireRoutersJob:
+      - Rewrite, not enabled yet
+    * I2Punnel:
+      - Increase eepsite default to 3+0 for new installs
+    * PersistentDataStore:
+      - Cleanup, simplify, and concurrentify
+      - Tweak stats
+      - Remove write limit
+      - Flush to disk on shutdown
+      - Don't write out what we just read in
+    * Router and console:
+      - Bundle geoIP files and flags in new installs,
+        spiff up tunnels.jsp and profiles.jsp.
+        Existing installs can get files with 'ant updaterWIthGeoIP'
+        or in the console docs bundle 'ant consoleDocs'
+      - Use flags for shitlist and peers.jsp too
+      - Tweak tunnels.jsp to show class letters
+      - Hide in-progress details on tunnels.jsp
+      - Add a little color to confignav
+      - Remove 'no skew' message
+      - More message tweaks if no wrapper
+    * TunnelManager:
+      - Remove now-unused isInUse()
+    * UPnP:
+      - Fix up port binding, add some logging on bind fails
+      - Force IPv4 only for binds
+
+2009-05-20 Mathiasdm
+    * General configuration enabled by default
+    * General configuration speed tab works completely
+
+2009-05-17 zzz
+    * Merge i2p.i2p.zzz.upnp branch
+     * Major changes:
+      - Detect IP with UPnP
+      - Open firewall ports with UPnP
+      - Detect IP by checking local interface addresses
+      - Enable TCP auto-IP and auto-port by default, if UDP status is "OK"
+      - Network configuration page rework
+     * Other stuff:
+      - Remove unused verifyupdate.jsp
+     * Details of the UPnP and related Transport changes:
+      - Add UDP Port configuration to config.jsp
+      - Don't restart router when configs change on config.jsp;
+        simply rebuild router info.
+      - Clean up some port config code in UDP
+      - Implement UPnP enable/disable
+      - Start to rework inbound configuration
+      - Tweak UPnP warning messages
+      - Start of callbacks from UPnP to transports
+      - Tell UDP local addresses at startup
+      - NTCP Port must now be either auto or configured;
+        now defaults to auto; and configured now trumps auto.
+        Port configuration now does not affect whether inbound
+        NTCP is enabled - the host configuration alone can do that.
+      - i2np.ntcp.autoip=true redefined to enable inbound only if
+        SSU reachability is OK. i2np.ntcp.autoip=always for the old behavior.
+        autoip default is now "true".
+        i2np.ntcp.hostname=xxx now trumps i2np.tcp.autoip.
+      - SSU always tells NTCP when status changes.
+      - Implement config save of new IP address options
+      - Implement local address and UPnP configuration of UDP address
+      - Limit received port to 1024 minimum
+      - Simplify bw form
+      - Add config link to UPnP status
+      - Make short timeouts for UPnP HTTP POST so we don't hang when
+        the UPnP device goes away
+      - Fix a bug in UPnP HTTP Server timeout
+      - Make short timeouts for the XML parser so we don't hang when
+        the UPnP device goes away - same as for HTTP POST
+      - Stuff the port mapping requester into a thread so it doesn't
+        delay everything for several seconds
+      - Handle UPnP devices that return IP = 0.0.0.0
+      - Better HTML output when no IP found
+      - Tweak logging
+      - Set Disposer thread name
+      - Keep the control point running after we find an IGD,
+        so that we get notifications of it leaving or
+        coming back or replaced.
+      - Detect UPnP start failure
+      - Sort local addresses
+      - Store last IP for future laptop mode
+      - Subscribe to service, doesn't seem to do anything though,
+        need to test it more
+      - Change UPnP listener port defaults, allow configuration option
+      - Don't notify for non-changed options on config.jsp
+      - Simplify config.jsp some more
+      - No longer use i2np.udp.forceIntroducers
+      - Tweak UDP port qualification
+      - Fix allowing low ports again
+      - Add option to completely disable NTCP, for those behind nasty firewalls
+      - Use SSU reachability rather than global reachability for determining NTCP reachability,
+        since we are now reporting NTCP reachability too
+      - Tweak the config sub-navbar
+      - Don't start UPnP if we have a public interface address
+      - Fix setting IP to a local interface address
+      - Work on the configuration help some more
+      - Rework UDP peers.jsp table a little
+      - Don't let UDP bid on messages that are too long
+      - Clean up the max fragments code in UDP
+
+2009-05-17 zzz
+    * Build files:
+      - Remove unneeded ant.jar from package (900KB)
+      - Fail on Jsp compile errors
+    * FloodfillVerifyJob: Don't consider an older search result as verified
+    * logs.jsp: Add link to config
+    * NetDb: Lower the routerinfo expiration again
+    * SusiDNS:
+      - Reduce displayed entries from 300 to 100
+      - Add ability to go forward or back
+      - Make textareas bigger
+      - Clean up file names
+      - Clarify messages about filter and search
+
+* 2009-05-16  0.7.3 released
+
+2009-05-16 Complication
+    * Update versions, package release
+
+2009-05-12 sponge
+    * BOB clean up, change println's to _log.warn, bump BOB version
+    * I2PSessionMuxedImpl.java changes as per zzz, and they test OK for me.
+
+2009-05-12 mkvore
+    * SAM: fix: warnings when generating javadoc
+
+2009-05-11 zzz
+    * Connect client: Fix NPE when used with advanced i2ptunnel features
+    * Context: Don't instantiate unused AdminManager
+    * logs.jsp: Put critical log at the top
+    * NetDb: Don't accept stores of our own LeaseSets or RouterInfo
+
+2009-05-11 mkvore
+    * SAM: fix: removed ERROR level logging when a client disconnects
+
+2009-05-09 sponge
+    * merge
+
+2009-05-09 sponge
+    * fixed OOM on lock (woops! my bad!)
+
+2009-05-08 Mathiasdm
+    * desktopgui: moved files to stop polluting the namespace
+          (everything now in net.i2p.desktopgui)
+    * desktopgui: some variable renaming in general configuration
+
+2009-05-07 mkvore
+    * SAM: version 3 added
+    * SAM: blocking case corrected on simultaneous client connection (v.1-3)
+
+2009-05-07 zzz
+    * Add nibble.i2p to proxy list and hosts.txt
+
+2009-05-07 zzz
+    * Addressbook: Name the thread
+    * Console:
+      - More IE button fixes, try harder to not refresh the iframe after shutdown
+      - Disable idle options for streamr client, it will never be
+        idle because it pings the server
+    * Floodfill Monitor: Slow down the volunteers
+    * Throttle: Throttle at 90% so we throttle before we WRED
+
+2009-05-06 Mathiasdm
+    * Improvements to popup menu rightclick action
+    * Added general configuration options (still not available by default)
+    * General fixes
+    * Added ant build options (irc says eche|on would like that ;))
+
+2009-05-06 sponge
+    * Hopefully the last fixes for BOB.
+    * Fixes to prevent race in client-side I2CP and Notifier.
+
+2009-05-03 sponge
+    * More hopeful fixes for BOB.
+    * Added new Robert ID to snark
+
+2009-05-01 zzz
+    * Build files:
+      - Fix up susidns build file so it will work with gcj
+      - Add consoleDocs target
+    * Client: Fix race NPE (thanks sponge)
+    * Console: fix ERR-UDP Disabled and Inbound TCP host/port not set
+    * I2CP: Fix race NPE
+    * I2PTunnel:
+      - Try to fix locking to prevent duplicate destinations when using
+        the new option new-dest-on-resume. Still not right for shared clients
+        but should be better for non-shared.
+    * Router console:
+      - Add jbigi and cpu info to logs.jsp
+    * Session key manager:
+      - Log before a hang maybe
+    * URL Launcher:
+      - Launcher on linux was stopping after trying opera, whether it succeeded or failed.
+        Now it keeps going to try firefox, etc. as designed.
+      - Extend default delay from 5s to 15s so it will reliably start
+
+2009-04-27 sponge
+    * more BOB fixes, complete with warnings when things go wrong, and
+      success messages when things turn around and go right. Terminates
+      early so that applications wait no more than 10 seconds or so.
+    * Reversed a few earlier patches that caused some odd behavior.
+    * Changed some core println()'s to debugging messages.
+
+2009-04-27 zzz
+    * Build files:
+      - New updaterWithJettyFixes target, build it for pkg
+      - Pass compiler args down from top build.xml
+    * GarlicMessageBuilder: Reduce bundled tags to 40 (was 100)
+    * i2psnark: Add Postman2 tracker
+    * I2PTunnel: Allow spaces in dest and proxy lists
+    * NetDb:
+      - Adjust RouterInfo expiration down to control memory usage
+      - Display LeaseSets and RouterInfos on separate console pages
+    * NTCP:
+      - Correct the meanings of the i2np.ntcp.autoip and i2np.ntcp.autoport
+        advanced config. If you have one of these set but not the other, you
+        will have to adjust your configuration on config.jsp.
+    * RouterConsole: iframe tweaks
+    * StatisticsManager: Cleanup
+    * Streaming: Don't let jrandom yell so loud
+    * Tunnel Pool: Don't self-destruct if more than 6 IB tunnels configured
+
+2009-04-25 sponge
+    * I2PSessionMuxedImpl atomic fixes
+    * BOB fixes. This should be the final bug wack. Good Luck to everybody!
+
+2009-04-23 zzz
+    * Blocklist: cleanup
+    * eepget: handle -h, --help, bad options, etc.
+      (http://forum.i2p/viewtopic.php?p=16261#16261)
+    * Fragmenter: don't re-throw the corrupt fragment IllegalStateException,
+      to limit the damage - root cause still not found
+    * i2psnark: (http://forum.i2p/viewtopic.php?t=3317)
+      - Change file limit to 512 (was 256)
+      - Change size limit to 10GB (was 5GB)
+      - Change request size to 16KB (was 32KB)
+      - Change pipeline to 5 (was 3)
+    * logs.jsp: Move version info to the top
+    * Jetty: Fix temp dir name handling on windows, which was
+      causing susidns not to start
+      (http://forum.i2p/viewtopic.php?t=3364)
+    * NTCP: Prevent IllegalStateException
+    * PeerProfile:
+      - Replace a hot lock with concurrent RW lock
+      - Rewrite ugly IP Restriction code
+      - Also use transport IP in restriction code
+    * RouterConsole: Make summary bar a refreshing iframe
+    * Transport: Start the previously unused CleanupUnreachable
+
+2009-04-21 sponge
+    * Code janitor work, basic corrections involving @Override, and
+      appling final where it is important. Also fixed some equals methods
+      and commented places that need fixing.
+
+2009-04-18 Complication
+    * Fix typo in "news.xml", no build number increase.
+
+* 2009-04-18  0.7.2 released
+
+2009-04-18 Complication
+    * Update versions, package release
+
+2009-04-17 sponge
+    * fixed setIP, just be sure to distclean before building :-)
+    * more lint taken care of as well.
+
+2009-04-17 sponge
+    * setIP wants to be a static method in the class, but it produces
+      warnings about it being static from other code.
+
+2009-04-17 sponge
+    * Catch NPE in NTCP.
+      This possibly augments fix 2009-04-11 welterde below.
+    * Various LINT on NTCP sources, and removal of space-wasting
+      spaces at end of lines in sources touched.
+
+2009-04-13 Mathiasdm
+    * Bugfix on tray icon updating
+    * Some more work on the general configuration menu
+      (currently not added to the tray icon menu yet, needs more work)
+    * Tweaked the desktopgui logo
+
+2009-04-13 Mathiasdm
+    * Added I2P version and GUI version to desktopgui
+    * Tweaks to the tray icon menu
+    * Some starting work on a GUI general configuration menu
+    * Bugfix allowing spaces in directory structure
+
+2009-04-13 welterde
+    * small fix in the eepproxy
+
+2009-04-11 welterde
+    * fixed NPE in NTCP transport
+
+2009-04-11 sponge
+    * i2ptunnel janitorial work and fixes on most locks.
+      Some locks still need work, and are marked with LINT in the comment.
+      Just grep for "LINT" to see where the remaining places are.
+
+2009-04-10 sponge
+    * More BOB threadgroup fixes, plus debug dump when things go wrong.
+    * Fixes to streaminglib, I2CP, which are related to the TG problem.
+    * JavaDocs fixups.
+
+2009-04-08 sponge
+    * More hopeful fixups to the infamous orpahned tunnel problem. *Sigh*
+
+2009-04-08 zzz
+    * IPV6/localhost:
+      - Enable IPv6 stack in the JVM, hopefully won't break anything
+      - Patch Jetty to support binding to IPv6 addresses
+      - Allow multiple bind addresses for the router console
+        in the clients.config file; for new installs the
+        default is now "127.0.0.1,::1"
+      - Change most instances of "localhost" to "127.0.0.1"
+        throughout the code
+    * Router:
+      - Move some classes to private static inner
+
+2009-04-07 sponge
+    * BOB prevent jvac from optimizing out thread-group code from -10
+
+2009-04-07 zzz
+    * NTCP: Prevent occasional NPE introduced in -4
+    * streamr: Synchronize DatagramMaker
+
+2009-04-07 sponge
+    * SimpleTimer2, SimpleScheduler fixed so that the threads all run from
+      The main threadgroup, not in the current possible child threadgroup.
+      So long as any SimpleTimer2/SimpleScheduler is started *BEFORE* any
+      child threadgroups, the constructors are threadgroup safe. What would
+      be super cool is if they were to be all jailed within thier very own
+      threadgroup too, but, I2P isn't up to the task of this yet.
+    * Fixes to BOB to ensure the above is true.
+
+2009-04-06 sponge
+    * Debugging to make SimpleTimer2 and SimpleScheduler easier to debug.
+    * Fix for the config files in the GUI from mathiasdm
+
+2009-04-04 sponge
+    * Hopeful fixups to the infamous orpahned tunnel problem.
+    * BOB now 0.0.5
+
+2009-04-04 zzz
+    * NTCP: Don't bid on messages too big to handle
+
+2009-04-03 zzz
+    * Console:
+      - Fix bug with IE buttons not working,
+        because it sends the label instead of the value
+      - Display version of downloaded update
+    * Update:
+      - Change default to "Download and verify"
+      - Change news fetch default to 24h (was 12h)
+
+2009-04-03 sponge
+    * Fix broken dependencies for BOB.jar
+    * Router build version incremented to 5.
+
+2009-04-02 zzz
+    * Profiles:
+      - Remove unused calculators and RateStats:
+        CapacityCalculator, StrictSpeedCalculator, IsFailingCalculator;
+        sendFailureSize, processSuccessRate, processfailureRate, commErrorRate,
+        tunnelTestResponseTimeSlow
+      - Reduced number of Rates in these RateStats:
+        sendSuccessSize, receiveSize, rejectRate, failRate
+      - ~5KB/profile savings total
+      - Deflate speed calculation once an hour instead of once a day,
+        to improve fast tier selection
+      - Remove dup comment in persisted files
+    * StatisticsManager - effective in 0.7.2:
+      - Spoof uptime to 90m for all
+      - Change tunnel stats from 10m to 60m
+    * Transport:
+      - Maintain a router hash -> IP map in transport,
+        to support additional IP checks (unused for now)
+      - Catch error on pre-2.6 kernels
+      - Some concurrent conversion
+      - Fix an HTML error on peers.jsp
+
+2009-04-01 zzz
+    * I2PTunnel: Fix tunnel close
+      http://forum.i2p/viewtopic.php?t=3231
+
+2009-03-30 zzz
+    * I2CP:
+      - Implement BandwidthLimitsMessage
+      - Have i2psnark use new message, remove
+        build dependency on router
+    * Peer Selection:
+      - Limit peers to a max % of all tunnels with
+        router.maxTunnelPercentage=nn, default 33
+      - Add chart to tunnels.jsp to see results
+
+* 2009-03-29  0.7.1 released
+
+2009-03-29 Complication
+    * Update versions, package release
+
+2009-03-27 zzz
+    * Add readme_fr.html
+    * License splash update
+    * Catch rare TunnelGatewayMessage AIOOB, root cause unknown
+
+2009-03-24 zzz
+    * I2PTunnel:
+      - Add some warnings about new features
+      - Fix encrypted leasesets broken in about -4
+      - Suppress log error on manual stop
+      - Fix NPE on close of a tunnel not open yet
+    * Transport:
+      - Increase default bw to 64/32, burst 80/40
+    * Tunnels: Change some fragmentation errors to warns
+
+2009-03-16 zzz
+    * help.jsp: Add some
+    * I2PTunnel: Cleanup
+    * I2PTunnelHTTPClient: Fix NPE on delayed open
+    * I2PTunnelHTTPServer: Maybe catch an NPE
+    * SOCKS: Allow .onion addresses for onioncat testing
+    * Tunnel: Catch a rare AIOOB
+
+2009-03-09 zzz
+    * Client:
+      - Clean up retry code
+      - Bring I2CP listen error to the summary bar
+        http://forum.i2p/viewtopic.php?t=3133
+    * I2PSnark: Remove the http from the add torrent box
+    * I2PTunnel:
+      - Add persistent key option for standard and IRC clients
+      - Add delay-open option for clients
+      - Get regenerate-dest-on-reconnect working
+      - Add default key file name
+      - Add link to addressbook
+      - I2PSink: Send protocol byte
+    * OCMOSJ:
+      - Change from 5% reply requests to at least
+        once per minute, in hopes of reducing IRC drops
+      - More clean up of the cache cleaning
+    * Routerconsole: Don't OOM configpeer.jsp on huge blocklists
+
+2009-02-26 zzz
+    * I2CP Client: Add support for muxing
+    * I2PTunnel:
+      - Add new IRCServer tunnel type
+      - Add SOCKS 4/4a support
+      - Catch OOMs in HTTPServer
+      - Name the IRCClient filter threads
+      - Port Streamr to I2PTunnel
+      - The beginnings of SOCKS UDP support
+    * Naming: Add reverse lookup by hash
+    * OCMOSJ: Clean up the cache cleaning
+    * Router: Move addShutdownTask from Router to I2PAppContext
+      so that apps can register more easily
+    * Routerconsole:
+      - Thread hard shutdown and restart requests from the routerconsole,
+        and add a delay even if no tunnels, to allow time for a UI response
+      - Sort the summary bar destinations
+      - Move dest-to-hash converter to new helper class so we can
+        use it in i2ptunnel
+
+2009-02-22 sponge
+    * BOB: Orphan tunnel issue fix, bump BOB version
+    * bump to Build 6
+
 2009-02-16 zzz
     * Streaming lib: Plug timer leak, don't send keepalives
       after close, don't disconnect hard after close

@@ -138,9 +138,10 @@ class KBucketSet {
         _log.info(toString());
     }
     
+    @Override
     public String toString() {
         BigInteger us = new BigInteger(1, _us.getData());
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("Bucket set rooted on: ").append(us.toString()).append(" (aka ").append(us.toString(2)).append("): \n");
         for (int i = 0; i < NUM_BUCKETS; i++) {
             buf.append("* Bucket ").append(i).append("/").append(NUM_BUCKETS-1).append(": )\n");
@@ -158,7 +159,7 @@ class KBucketSet {
             System.arraycopy(b, 0, val, Hash.HASH_LENGTH-b.length-1, b.length);
         else
             System.arraycopy(b, Hash.HASH_LENGTH-b.length, val, 0, val.length);
-        StringBuffer buf = new StringBuffer(KEYSIZE_BITS);
+        StringBuilder buf = new StringBuilder(KEYSIZE_BITS);
         for (int i = 0; i < val.length; i++) {
             for (int j = 7; j >= 0; j--) {
                 boolean bb = (0 != (val[i] & (1<<j)));

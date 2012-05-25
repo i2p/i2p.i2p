@@ -94,6 +94,10 @@ public class I2CPMessageHandler {
             return new DestLookupMessage();
         case DestReplyMessage.MESSAGE_TYPE:
             return new DestReplyMessage();
+        case GetBandwidthLimitsMessage.MESSAGE_TYPE:
+            return new GetBandwidthLimitsMessage();
+        case BandwidthLimitsMessage.MESSAGE_TYPE:
+            return new BandwidthLimitsMessage();
         default:
             throw new I2CPMessageException("The type " + type + " is an unknown I2CP message");
         }

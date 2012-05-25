@@ -4,13 +4,12 @@
 
 <html><head>
 <title>I2P Router Console - peer profiles</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
-<div class="main" id="main">
+ <h1>I2P Network Peer Profiles</h1>
+<div class="main" id="main"><div class="wideload">
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="profilesHelper" property="profileSummary" />
@@ -18,6 +17,6 @@
  <a name="shitlist"> </a>
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
 </div>
-
+</div>
 </body>
 </html>

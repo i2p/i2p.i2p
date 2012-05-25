@@ -41,7 +41,7 @@ public class ConfigServiceHandler extends FormHandler {
         }
         public void run() {
             try {
-                Router.killKeys();
+                ContextHelper.getContext(null).router().killKeys();
                 WrapperManager.signalStopped(_exitCode);
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -53,31 +53,31 @@ public class ConfigServiceHandler extends FormHandler {
         if (_action == null) return;
         
         if ("Shutdown gracefully".equals(_action)) {
-            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
+            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully();
             addFormNotice("Graceful shutdown initiated");
         } else if ("Shutdown immediately".equals(_action)) {
-            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
+            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
             _context.router().shutdown(Router.EXIT_HARD);
             addFormNotice("Shutdown immediately!  boom bye bye bad bwoy");
         } else if ("Cancel graceful shutdown".equals(_action)) {
             _context.router().cancelGracefulShutdown();
             addFormNotice("Graceful shutdown cancelled");
         } else if ("Graceful restart".equals(_action)) {
-            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             addFormNotice("Graceful restart requested");
         } else if ("Hard restart".equals(_action)) {
-            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
+            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice("Hard restart requested");
         } else if ("Rekey and Restart".equals(_action)) {
             addFormNotice("Rekeying after graceful restart");
-            _context.router().addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+            _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
         } else if ("Rekey and Shutdown".equals(_action)) {
             addFormNotice("Rekeying after graceful shutdown");
-            _context.router().addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL));
+            _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
         } else if ("Run I2P on startup".equals(_action)) {
             installService();
@@ -155,7 +155,7 @@ public class ConfigServiceHandler extends FormHandler {
         }
         // releases <= 0.6.5 deleted the entry completely
         if (shouldLaunchBrowser && !found) {
-            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser", "http://localhost:7657", 5, false);
+            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser", "http://127.0.0.1:7657", 5, false);
             clients.add(ca);
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);

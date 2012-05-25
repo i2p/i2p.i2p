@@ -58,6 +58,7 @@ public class MultiRouter {
         _defaultContext.clock().setOffset(0);
         
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 Thread.currentThread().setName("Router* Shutdown");
                 try { Thread.sleep(120*1000); } catch (InterruptedException ie) {}

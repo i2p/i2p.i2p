@@ -18,7 +18,7 @@ public class ACKSender implements Runnable {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** list of peers (PeerState) who we have received data from but not yet ACKed to */
-    private List _peersToACK;
+    private final List _peersToACK;
     private boolean _alive;
     
     /** how frequently do we want to send ACKs to a peer? */
@@ -31,10 +31,10 @@ public class ACKSender implements Runnable {
         _peersToACK = new ArrayList(4);
         _builder = new PacketBuilder(_context, transport);
         _alive = true;
-        _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", new long[] { 60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.ackFrequency", "how long ago did we send an ACK to this peer?", "udp", new long[] { 60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.sendACKRemaining", "when we ack a peer, how many peers are left waiting to ack?", "udp", new long[] { 60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.abortACK", "How often do we schedule up an ACK send only to find it had already been sent (through piggyback)?", "udp", new long[] { 60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.ackFrequency", "how long ago did we send an ACK to this peer?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendACKRemaining", "when we ack a peer, how many peers are left waiting to ack?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.abortACK", "How often do we schedule up an ACK send only to find it had already been sent (through piggyback)?", "udp", UDPTransport.RATES);
     }
     
     public void ackPeer(PeerState peer) {

@@ -4,32 +4,31 @@
 
 <html><head>
 <title>I2P Router Console - config keyring</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
+<h1>I2P Keyring Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
-  
+
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
+ <jsp:getProperty name="formhandler" property="allMessages" />
  
 
 
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHelper" id="keyringhelper" scope="request" />
  <jsp:setProperty name="keyringhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
+<div class="configure">
  <p>
- <h2>Keyring</h2>
+ <h3>Keyring</h3>
  The router keyring is used to decrypt encrypted leaseSets.
  The keyring may contain keys for local or remote encrypted destinations.
- <p><jsp:getProperty name="keyringhelper" property="summary" />
- </p>
+ <div class="wideload"><p> 
+ <jsp:getProperty name="keyringhelper" property="summary" />
+</p></div>
 
  <hr />
 
@@ -38,21 +37,27 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigKeyringHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigKeyringHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce")%>" />
- <h2>Manual Keyring Addition</h2>
+ <h3>Manual Keyring Addition</h3>
  Enter keys for encrypted remote destinations here.
  Keys for local destinations must be entered on the <a href="i2ptunnel/index.jsp">I2PTunnel page</a>.
  <p>
- <table>
- <tr><td>Dest. name, hash, or full key:
- <td><textarea name="peer" cols="44" rows="1" wrap="off"></textarea>
- <tr><td align="right">Session Key:
- <td><input type="text" size="55" name="key" />
- <tr><td><td><input type="submit" name="action" value="Add key" />
- </table>
+  <div class="wideload"> 
+      <table>
+        <tr>
+          <td class="mediumtags" align="right">Dest. name, hash, or full key:</td> 
+          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea></td> 
+        <tr>
+          <td class="mediumtags" align="right">Session Key:</td> 
+          <td><input type="text" size="55" name="key" /></td> 
+        <tr>
+          <td>
+          <td align="right"> 
+            <input type="submit" name="action" value="Add key" /></td>
+      </table>
  </form>
 
-
 </div>
-
+</div>
+</div>
 </body>
 </html>

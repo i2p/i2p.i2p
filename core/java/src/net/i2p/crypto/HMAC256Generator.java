@@ -7,7 +7,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
 import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.Mac;
+import org.bouncycastle.crypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
@@ -19,15 +20,15 @@ public class HMAC256Generator extends HMACGenerator {
     public HMAC256Generator(I2PAppContext context) { super(context); }
     
     @Override
-    protected HMac acquire() {
+    protected I2PHMac acquire() {
         synchronized (_available) {
             if (_available.size() > 0)
-                return (HMac)_available.remove(0);
+                return (I2PHMac)_available.remove(0);
         }
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
-        return new HMac(new Sha256ForMAC());
+        return new I2PHMac(new Sha256ForMAC());
     }
     
     private class Sha256ForMAC extends Sha256Standalone implements Digest {

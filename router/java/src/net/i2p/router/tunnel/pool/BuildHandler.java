@@ -39,11 +39,11 @@ class BuildHandler {
     private Job _buildMessageHandlerJob;
     private Job _buildReplyMessageHandlerJob;
     /** list of BuildMessageState, oldest first */
-    private List _inboundBuildMessages;
+    private final List _inboundBuildMessages;
     /** list of BuildReplyMessageState, oldest first */
-    private List _inboundBuildReplyMessages;
+    private final List _inboundBuildReplyMessages;
     /** list of BuildEndMessageState, oldest first */
-    private List _inboundBuildEndMessages;
+    private final List _inboundBuildEndMessages;
     private BuildMessageProcessor _processor;
     
     public BuildHandler(RouterContext ctx, BuildExecutor exec) {
@@ -65,6 +65,7 @@ class BuildHandler {
 
         _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.acceptLoad", "Delay before processing the accepted request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropConnLimits", "Drop instead of reject due to conn limits", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoad", "How long we had to wait before finally giving up on an inbound request (period is queue count)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadDelay", "How long we had to wait before finally giving up on an inbound request?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadBacklog", "How many requests were pending when they were so lagged that we had to drop a new inbound request??", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -206,7 +207,7 @@ class BuildHandler {
         long replyMessageId = state.msg.getUniqueId();
         PooledTunnelCreatorConfig cfg = null;
         List building = _exec.locked_getCurrentlyBuilding();
-        StringBuffer buf = null;
+        StringBuilder buf = null;
         synchronized (building) {
             for (int i = 0; i < building.size(); i++) {
                 PooledTunnelCreatorConfig cur = (PooledTunnelCreatorConfig)building.get(i);
@@ -217,7 +218,7 @@ class BuildHandler {
                 }
             }
             if ( (cfg == null) && (_log.shouldLog(Log.DEBUG)) )
-                buf = new StringBuffer(building.toString());
+                buf = new StringBuilder(building.toString());
         }
         
         if (cfg == null) {
@@ -466,7 +467,6 @@ class BuildHandler {
         return 0;
     }
     
-    private static final String PROP_REJECT_NONPARTICIPANT = "router.participantOnly";
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
         long nextId = req.readNextTunnelId();
@@ -508,10 +508,17 @@ class BuildHandler {
          * Being a IBGW or OBEP generally leads to more connections, so if we are
          * approaching our connection limit (i.e. !haveCapacity()),
          * reject this request.
+         *
+         * Don't do this for class O, under the assumption that they are already talking
+         * to most of the routers, so there's no reason to reject. This may drive them
+         * to their conn. limits, but it's hopefully a temporary solution to the
+         * tunnel build congestion. As the net grows this will have to be revisited.
          */
-        if (response == 0 && (isInGW || isOutEnd) &&
-            (Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT)).booleanValue() ||
-             ! _context.commSystem().haveCapacity())) {
+        RouterInfo ri = _context.router().getRouterInfo();
+        if (response == 0 &&
+            (ri == null || ri.getBandwidthTier().charAt(0) != 'O') &&
+            ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
+             (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
                 _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
@@ -569,6 +576,18 @@ class BuildHandler {
                                                      (isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
         }
 
+        // Connection congestion control:
+        // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
+        // just drop it.
+        // 81% = between 75% control measures in Transports and 87% rejection above
+        if (response != 0 &&
+            (! _context.routerHash().equals(nextPeer)) &&
+            (! _context.commSystem().haveOutboundCapacity(81)) &&
+            (! _context.commSystem().isEstablished(nextPeer))) {
+            _context.statManager().addRateData("tunnel.dropConnLimits", 1, 0);
+            return;
+        }
+
         BuildResponseRecord resp = new BuildResponseRecord();
         byte reply[] = resp.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
         for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
@@ -607,7 +626,7 @@ class BuildHandler {
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
             // (enough layers jrandom?)
             TunnelBuildReplyMessage replyMsg = new TunnelBuildReplyMessage(_context);
-            for (int i = 0; i < state.msg.RECORD_COUNT; i++)
+            for (int i = 0; i < state.msg.RECORD_COUNT; i++) // LINT -- Accessing Static field "RECORD_COUNT"
                 replyMsg.setRecord(i, state.msg.getRecord(i));
             replyMsg.setUniqueId(req.readReplyMessageId());
             replyMsg.setMessageExpiration(_context.clock().now() + 10*1000);

@@ -1,10 +1,16 @@
+body {
+	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+	background-color: #eef;
+	color:#001;
+}
+
 p {
-	font-family:Verdana,Tahoma,Arial,Helvetica;
 	color:black;
 	line-height:12pt;
 	margin-left:5mm;
 	margin-right:5mm;
 	font-size:10pt;
+  text-align: justify;
 }
 
 span.addrhlpr {
@@ -12,7 +18,7 @@ span.addrhlpr {
 }
 	
 h3 {
-	font-family:Verdana,Tahoma,Arial,Helvetica;
+
 	color:black;
 	font-size:12pt;
 	letter-spacing:2pt;
@@ -20,22 +26,19 @@ h3 {
 	font-weight:bold;
 }
 
-body {
-	background-color: white;
-	color:black;
-}
-
 a {
 	color:#327BBF;
 	text-decoration:none;
+  font-weight: bold;
 }
 
 a:hover {
 	text-decoration:underline;
+  font-weight: bold;
 }
 
 th {
-	font-family:Verdana,Tahoma,Arial,Helvetica;
+
 	color:black;
 	line-height:12pt;
 	margin-left:5mm;
@@ -44,7 +47,7 @@ th {
 }
 
 td {
-	font-family:Verdana,Tahoma,Arial,Helvetica;
+
 	color:black;
 	line-height:12pt;
 	margin-left:5mm;
@@ -54,7 +57,7 @@ td {
 }
 
 li {
-	font-family:Verdana,Tahoma,Arial,Helvetica;
+
 	color:black;
 	line-height:12pt;
 	margin-left:5mm;
@@ -91,4 +94,31 @@ p.messages {
 
 p.footer {
 	font-size:7pt;
+  text-align: center;
+}
+
+.illustrate {
+  margin: 10px;
+  padding: 10px;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #001;
+  font-size: 10pt;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  background: #fff;
+}
+
+.page {
+	background-color: #fff;
+	color:#001;
+  margin: 20px;
+  padding: 10px 20px 20px 20px;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #001;
+  font-size: 10pt !important;
+  line-height: 160% !important;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }

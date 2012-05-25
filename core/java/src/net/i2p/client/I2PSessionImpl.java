@@ -16,7 +16,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -77,12 +76,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected OutputStream _out;
 
     /** who we send events to */
-    private I2PSessionListener _sessionListener;
+    protected I2PSessionListener _sessionListener;
 
     /** class that generates new messages */
     protected I2CPMessageProducer _producer;
     /** map of Long --> MessagePayloadMessage */
-    private Map<Long, MessagePayloadMessage> _availableMessages;
+    protected Map<Long, MessagePayloadMessage> _availableMessages;
     
     protected I2PClientMessageHandlerMap _handlerMap;
     
@@ -90,7 +89,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2PAppContext _context;
 
     /** monitor for waiting until a lease set has been granted */
-    private Object _leaseSetWait = new Object();
+    private final Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
     protected boolean _closed;
@@ -101,8 +100,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
     /** lock that we wait upon, that the SetDateMessageHandler notifies */
-    private Object _dateReceivedLock = new Object();
-    
+    private final Object _dateReceivedLock = new Object();
+
+    /** whether the session connection is in the process of being opened */
+    protected boolean _opening;
+
+    /** monitor for waiting until opened */
+    private final Object _openingWait = new Object();
     /** 
      * thread that we tell when new messages are available who then tells us 
      * to fetch them.  The point of this is so that the fetch doesn't block the
@@ -137,6 +141,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _log = context.logManager().getLog(I2PSessionImpl.class);
         _handlerMap = new I2PClientMessageHandlerMap(context);
         _closed = true;
+        _opening = false;
         _closing = false;
         _producer = new I2CPMessageProducer(context);
         _availabilityNotifier = new AvailabilityNotifier();
@@ -162,7 +167,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
-        _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
         String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
         try {
             _portNum = Integer.parseInt(portNum);
@@ -213,6 +218,17 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         return _leaseSet;
     }
 
+    void setOpening(boolean ls) {
+        _opening = ls;
+        synchronized (_openingWait) {
+            _openingWait.notifyAll();
+        }
+    }
+
+    boolean getOpening() {
+        return _opening;
+    }
+
     /**
      * Load up the destKeyFile for our Destination, PrivateKey, and SigningPrivateKey
      *
@@ -236,6 +252,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *                             not reachable
      */
     public void connect() throws I2PSessionException {
+        setOpening(true);
         _closed = false;
         _availabilityNotifier.stopNotifying();
         I2PThread notifier = new I2PThread(_availabilityNotifier);
@@ -253,6 +270,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         try {
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "connect begin to " + _hostname + ":" + _portNum);
             _socket = new Socket(_hostname, _portNum);
+            // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
             _out = _socket.getOutputStream();
             synchronized (_out) {
                 _out.write(I2PClient.PROTOCOL_BYTE);
@@ -294,11 +312,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                            + (connected - startConnect)
                            + "ms - ready to participate in the network!");
             startIdleMonitor();
+             setOpening(false);
         } catch (UnknownHostException uhe) {
             _closed = true;
+            setOpening(false);
             throw new I2PSessionException(getPrefix() + "Invalid session configuration", uhe);
         } catch (IOException ioe) {
             _closed = true;
+            setOpening(false);
             throw new I2PSessionException(getPrefix() + "Problem connecting to " + _hostname + " on port " + _portNum, ioe);
         }
     }
@@ -366,14 +387,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
         SimpleScheduler.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
-    private class VerifyUsage implements SimpleTimer.TimedEvent {
+    protected class VerifyUsage implements SimpleTimer.TimedEvent {
         private Long _msgId;
         public VerifyUsage(Long id) { _msgId = id; }
         
         public void timeReached() {
             MessagePayloadMessage removed = _availableMessages.remove(_msgId);
             if (removed != null && !isClosed())
-                _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed);
+                _log.error("Message NOT removed!  id=" + _msgId + ": " + removed);
         }
     }
 
@@ -547,13 +568,28 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     /**
-     * Tear down the session, and do NOT reconnect
+     * Tear down the session, and do NOT reconnect.
+     *
+     * Blocks if session has not been fully started.
      */
     public void destroySession() {
         destroySession(true);
     }
 
+    /**
+     * Tear down the session, and do NOT reconnect.
+     * 
+     * Blocks if session has not been fully started.
+     */
     public void destroySession(boolean sendDisconnect) {
+        while (_opening) {
+            synchronized (_openingWait) {
+                try {
+                    _openingWait.wait(1000);
+                } catch (InterruptedException ie) { // nop
+                }
+            }
+        }
         if (_closed) return;
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
@@ -653,6 +689,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected String getPrefix() { return "[" + (_sessionId == null ? -1 : _sessionId.getSessionId()) + "]: "; }
 
     public Destination lookupDest(Hash h) throws I2PSessionException {
+        return null;
+    }
+
+    public int[] bandwidthLimits() throws I2PSessionException {
         return null;
     }
 

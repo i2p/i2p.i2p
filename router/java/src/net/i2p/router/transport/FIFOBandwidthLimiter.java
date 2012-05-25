@@ -12,8 +12,8 @@ import net.i2p.util.Log;
 public class FIFOBandwidthLimiter {
     private Log _log;
     private I2PAppContext _context;
-    private List _pendingInboundRequests;
-    private List _pendingOutboundRequests;
+    private final List _pendingInboundRequests;
+    private final List _pendingOutboundRequests;
     /** how many bytes we can consume for inbound transmission immediately */
     private volatile int _availableInbound;
     /** how many bytes we can consume for outbound transmission immediately */
@@ -54,7 +54,7 @@ public class FIFOBandwidthLimiter {
     
     private static int __id = 0;
     
-    static long now() { 
+    public /* static */ long now() {
         // dont use the clock().now(), since that may jump
         return System.currentTimeMillis(); 
     }
@@ -199,8 +199,8 @@ public class FIFOBandwidthLimiter {
     void setInboundBurstBytes(int bytes) { _maxInboundBurst = bytes; }
     void setOutboundBurstBytes(int bytes) { _maxOutboundBurst = bytes; }
     
-    StringBuffer getStatus() {
-        StringBuffer rv = new StringBuffer(64);
+    StringBuilder getStatus() {
+        StringBuilder rv = new StringBuilder(64);
         rv.append("Available: ").append(_availableInbound).append('/').append(_availableOutbound).append(' ');
         rv.append("Max: ").append(_maxInbound).append('/').append(_maxOutbound).append(' ');
         rv.append("Burst: ").append(_unavailableInboundBurst).append('/').append(_unavailableOutboundBurst).append(' ');
@@ -618,9 +618,9 @@ public class FIFOBandwidthLimiter {
     
     public void renderStatusHTML(Writer out) throws IOException {
         long now = now();
-        StringBuffer buf = new StringBuffer(4096);
-        buf.append("<br /><i id=\"bwlim\">Limiter status: ").append(getStatus().toString()).append("</i><br />\n");
-        buf.append("<b>Pending bandwidth requests:</b><ul>");
+        StringBuilder buf = new StringBuilder(4096);
+        buf.append("<h3><b id=\"bwlim\">Limiter Status:</b></h3>").append(getStatus().toString()).append("\n");
+        buf.append("<h3>Pending bandwidth requests:</h3><ul>");
         buf.append("<li>Inbound requests: <ol>");
         synchronized (_pendingInboundRequests) {
             for (int i = 0; i < _pendingInboundRequests.size(); i++) {
@@ -643,7 +643,7 @@ public class FIFOBandwidthLimiter {
                 buf.append("ms ago</li>\n");
             }
         }
-        buf.append("</ol></li></ul>\n");
+        buf.append("</ol></li></ul></p><hr>\n");
         out.write(buf.toString());
         out.flush();
     }
@@ -769,6 +769,7 @@ public class FIFOBandwidthLimiter {
         }
         public void attach(Object obj) { _attachment = obj; }
         public Object attachment() { return _attachment; }
+        @Override
         public String toString() { return getRequestName(); }
     }
 

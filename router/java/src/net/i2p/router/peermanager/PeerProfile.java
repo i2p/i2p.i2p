@@ -8,6 +8,21 @@ import net.i2p.router.RouterContext;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
+/**
+ * Copied from http://www.i2p2.i2p/how_peerselection.html
+ *
+ * See also main() below for additional commentary by zzz.
+ *
+ * Currently, there is no 'ejection' strategy to get rid of the profiles for peers that
+ * are no longer active (or when the network consists of thousands of peers, to get rid
+ * of peers that are performing poorly). However, the size of each profile is fairly small,
+ * and is unrelated to how much data is collected about the peer, so that a router can
+ * keep a few thousand active peer profiles before the overhead becomes a serious concern.
+ * Once it becomes necessary, we can simply compact the poorly performing profiles
+ * (keeping only the most basic data) and maintain hundreds of thousands of profiles
+ * in memory. Beyond that size, we can simply eject the peers (e.g. keeping the best 100,000).
+ */
+
 public class PeerProfile {
     private Log _log;
     private RouterContext _context;
@@ -22,25 +37,19 @@ public class PeerProfile {
     private double _tunnelTestResponseTimeAvg;
     // periodic rates
     private RateStat _sendSuccessSize = null;
-    private RateStat _sendFailureSize = null;
     private RateStat _receiveSize = null;
     private RateStat _dbResponseTime = null;
     private RateStat _tunnelCreateResponseTime = null;
     private RateStat _tunnelTestResponseTime = null;
-    private RateStat _tunnelTestResponseTimeSlow = null;
-    private RateStat _commError = null;
     private RateStat _dbIntroduction = null;
     // calculation bonuses
     private long _speedBonus;
-    private long _reliabilityBonus;
     private long _capacityBonus;
     private long _integrationBonus;
     // calculation values
     private double _speedValue;
-    private double _reliabilityValue;
     private double _capacityValue;
     private double _integrationValue;
-    private double _oldSpeedValue;
     private boolean _isFailing;
     // good vs bad behavior
     private TunnelHistory _tunnelHistory;
@@ -57,7 +66,6 @@ public class PeerProfile {
         _log = context.logManager().getLog(PeerProfile.class);
         _expanded = false;
         _speedValue = 0;
-        _reliabilityValue = 0;
         _capacityValue = 0;
         _integrationValue = 0;
         _isFailing = false;
@@ -96,6 +104,11 @@ public class PeerProfile {
      * given period?)
      * Also mark active if it is connected, as this will tend to encourage use
      * of already-connected peers.
+     *
+     * Note: this appears to be the only use for these two RateStats.
+     *
+     * @param period must be one of the periods in the RateStat constructors below
+     *        (5*60*1000 or 60*60*1000)
      */
     public boolean getIsActive(long period) {
         if ( (getSendSuccessSize().getRate(period).getCurrentEventCount() > 0) ||
@@ -139,8 +152,6 @@ public class PeerProfile {
     
     /** how large successfully sent messages are, calculated over a 1 minute, 1 hour, and 1 day period */
     public RateStat getSendSuccessSize() { return _sendSuccessSize; }
-    /** how large messages that could not be sent were, calculated over a 1 minute, 1 hour, and 1 day period */
-    public RateStat getSendFailureSize() { return _sendFailureSize; }
     /** how large received messages are, calculated over a 1 minute, 1 hour, and 1 day period */
     public RateStat getReceiveSize() { return _receiveSize; }
     /** how long it takes to get a db response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period */
@@ -149,10 +160,6 @@ public class PeerProfile {
     public RateStat getTunnelCreateResponseTime() { return _tunnelCreateResponseTime; }
     /** how long it takes to successfully test a tunnel this peer participates in (in milliseconds), calculated over a 10 minute, 1 hour, and 1 day period */
     public RateStat getTunnelTestResponseTime() { return _tunnelTestResponseTime; }
-    /** how long it takes to successfully test the peer (in milliseconds) when the time exceeds 5s */
-    public RateStat getTunnelTestResponseTimeSlow() { return _tunnelTestResponseTimeSlow; }
-    /** how long between communication errors with the peer (disconnection, etc), calculated over a 1 minute, 1 hour, and 1 day period */
-    public RateStat getCommError() { return _commError; }
     /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period */
     public RateStat getDbIntroduction() { return _dbIntroduction; }
     
@@ -163,14 +170,6 @@ public class PeerProfile {
      */
     public long getSpeedBonus() { return _speedBonus; }
     public void setSpeedBonus(long bonus) { _speedBonus = bonus; }
-    
-    /**
-     * extra factor added to the reliability ranking - this can be updated in the profile
-     * written to disk to affect how the algorithm ranks reliability.  Negative values are
-     * penalties
-     */
-    public long getReliabilityBonus() { return _reliabilityBonus; }
-    public void setReliabilityBonus(long bonus) { _reliabilityBonus = bonus; }
     
     /**
      * extra factor added to the capacity ranking - this can be updated in the profile
@@ -195,14 +194,6 @@ public class PeerProfile {
      *
      */
     public double getSpeedValue() { return _speedValue; }
-    public double getOldSpeedValue() { return _oldSpeedValue; }
-    /**
-     * How likely are they to stay up and pass on messages over the next few minutes.
-     * Positive numbers means more likely, negative numbers means its probably not
-     * even worth trying.
-     *
-     */
-    public double getReliabilityValue() { return _reliabilityValue; }
     /**
      * How many tunnels do we think this peer can handle over the next hour? 
      *
@@ -306,7 +297,7 @@ public class PeerProfile {
             }
             
             if (_log.shouldLog(Log.DEBUG) ) {
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("Updating 1m throughput after ").append(size).append(" to ");
                 for (int i = 0; i < THROUGHPUT_COUNT; i++)
                     buf.append(_peakTunnel1mThroughput[i]).append(',');
@@ -315,6 +306,11 @@ public class PeerProfile {
             }
         }
     }
+    /**
+     * @return the average of the three fastest one-minute data transfers, on a per-tunnel basis,
+     *         through this peer. Ever. Except that the peak values are cut in half
+     *         once a day by coalesceThroughput(). This seems way too seldom.
+     */
     public double getPeakTunnel1mThroughputKBps() { 
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
@@ -334,13 +330,10 @@ public class PeerProfile {
      */
     public void shrinkProfile() {
         _sendSuccessSize = null;
-        _sendFailureSize = null;
         _receiveSize = null;
         _dbResponseTime = null;
         _tunnelCreateResponseTime = null;
         _tunnelTestResponseTime = null;
-        _tunnelTestResponseTimeSlow = null;
-        _commError = null;
         _dbIntroduction = null;
         _tunnelHistory = null;
         _dbHistory = null;
@@ -358,21 +351,15 @@ public class PeerProfile {
     public void expandProfile() {
         String group = (null == _peer ? "profileUnknown" : _peer.toBase64().substring(0,6));
         if (_sendSuccessSize == null)
-            _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", group, new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        if (_sendFailureSize == null)
-            _sendFailureSize = new RateStat("sendFailureSize", "How large messages that could not be sent were", group, new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", group, new long[] { 5*60*1000l, 60*60*1000l });
         if (_receiveSize == null)
-            _receiveSize = new RateStat("receiveSize", "How large received messages are", group, new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _receiveSize = new RateStat("receiveSize", "How large received messages are", group, new long[] { 5*60*1000l, 60*60*1000l } );
         if (_dbResponseTime == null)
             _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelCreateResponseTime == null)
             _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelTestResponseTime == null)
             _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 } );
-        if (_tunnelTestResponseTimeSlow == null)
-            _tunnelTestResponseTimeSlow = new RateStat("tunnelTestResponseTimeSlow", "how long it takes to successfully test a peer when the time exceeds 5s", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l, });
-        if (_commError == null)
-            _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", group, new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbIntroduction == null)
             _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", group, new long[] { 60*60*1000l, 6*60*60*1000l, 24*60*60*1000l });
 
@@ -382,18 +369,17 @@ public class PeerProfile {
             _dbHistory = new DBHistory(_context, group);
 
         _sendSuccessSize.setStatLog(_context.statManager().getStatLog());
-        _sendFailureSize.setStatLog(_context.statManager().getStatLog());
         _receiveSize.setStatLog(_context.statManager().getStatLog());
         _dbResponseTime.setStatLog(_context.statManager().getStatLog());
         _tunnelCreateResponseTime.setStatLog(_context.statManager().getStatLog());
         _tunnelTestResponseTime.setStatLog(_context.statManager().getStatLog());
-        _tunnelTestResponseTimeSlow.setStatLog(_context.statManager().getStatLog());
-        _commError.setStatLog(_context.statManager().getStatLog());
         _dbIntroduction.setStatLog(_context.statManager().getStatLog());
         _expanded = true;
     }
     /** once a day, on average, cut the measured throughtput values in half */
-    private static final long DROP_PERIOD_MINUTES = 24*60;
+    /** let's try once an hour times 3/4 */
+    private static final int DROP_PERIOD_MINUTES = 60;
+    private static final double DEGRADE_FACTOR = 0.75;
     private long _lastCoalesceDate = System.currentTimeMillis();
     private void coalesceThroughput() {
         long now = System.currentTimeMillis();
@@ -410,46 +396,19 @@ public class PeerProfile {
                         break;
                     }
                 }
-                
-                if (false && _log.shouldLog(Log.WARN) ) {
-                    StringBuffer buf = new StringBuffer(128);
-                    buf.append("Updating throughput after ").append(tot).append(" to ");
-                    for (int i = 0; i < THROUGHPUT_COUNT; i++)
-                        buf.append(_peakThroughput[i]).append(',');
-                    buf.append(" for ").append(_peer.toBase64());
-                    _log.warn(buf.toString());
-                }
             } else {
-                if (_context.random().nextLong(DROP_PERIOD_MINUTES*2) <= 0) {
-                    for (int i = 0; i < THROUGHPUT_COUNT; i++) 
-                        _peakThroughput[i] /= 2;
-
-                    if (false && _log.shouldLog(Log.WARN) ) {
-                        StringBuffer buf = new StringBuffer(128);
-                        buf.append("Degrading the throughput measurements to ");
-                        for (int i = 0; i < THROUGHPUT_COUNT; i++)
-                            buf.append(_peakThroughput[i]).append(',');
-                        buf.append(" for ").append(_peer.toBase64());
-                        _log.warn(buf.toString());
-                    }
+                if (_context.random().nextInt(DROP_PERIOD_MINUTES*2) <= 0) {
+                    for (int i = 0; i < THROUGHPUT_COUNT; i++)
+                        _peakThroughput[i] *= DEGRADE_FACTOR;
                 }
             }
             
             // we degrade the tunnel throughput here too, regardless of the current
             // activity
-            if (_context.random().nextLong(DROP_PERIOD_MINUTES*2) <= 0) {
+            if (_context.random().nextInt(DROP_PERIOD_MINUTES*2) <= 0) {
                 for (int i = 0; i < THROUGHPUT_COUNT; i++) {
-                    _peakTunnelThroughput[i] /= 2;
-                    _peakTunnel1mThroughput[i] /= 2;
-                }
-
-                if (_log.shouldLog(Log.WARN) ) {
-                    StringBuffer buf = new StringBuffer(128);
-                    buf.append("Degrading the tunnel throughput measurements to ");
-                    for (int i = 0; i < THROUGHPUT_COUNT; i++)
-                        buf.append(_peakTunnel1mThroughput[i]).append(',');
-                    buf.append(" for ").append(_peer.toBase64());
-                    _log.warn(buf.toString());
+                    _peakTunnelThroughput[i] *= DEGRADE_FACTOR;
+                    _peakTunnel1mThroughput[i] *= DEGRADE_FACTOR;
                 }
             }
             _peakThroughputCurrentTotal = 0;
@@ -460,40 +419,35 @@ public class PeerProfile {
     /** update the stats and rates (this should be called once a minute) */
     public void coalesceStats() {
         if (!_expanded) return;
-        _commError.coalesceStats();
         _dbIntroduction.coalesceStats();
         _dbResponseTime.coalesceStats();
         _receiveSize.coalesceStats();
-        _sendFailureSize.coalesceStats();
         _sendSuccessSize.coalesceStats();
         _tunnelCreateResponseTime.coalesceStats();
         _tunnelTestResponseTime.coalesceStats();
-        _tunnelTestResponseTimeSlow.coalesceStats();
         _dbHistory.coalesceStats();
         _tunnelHistory.coalesceStats();
         
         coalesceThroughput();
         
         _speedValue = calculateSpeed();
-        _oldSpeedValue = calculateOldSpeed();
-        _reliabilityValue = calculateReliability();
         _capacityValue = calculateCapacity();
         _integrationValue = calculateIntegration();
         _isFailing = calculateIsFailing();
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Coalesced: speed [" + _speedValue + "] reliability [" + _reliabilityValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
+            _log.debug("Coalesced: speed [" + _speedValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
     }
     
     private double calculateSpeed() { return _context.speedCalculator().calc(this); }
-    private double calculateOldSpeed() { return _context.oldSpeedCalculator().calc(this); }
-    private double calculateReliability() { return _context.reliabilityCalculator().calc(this); }
     private double calculateCapacity() { return _context.capacityCalculator().calc(this); }
     private double calculateIntegration() { return _context.integrationCalculator().calc(this); }
-    private boolean calculateIsFailing() { return _context.isFailingCalculator().calcBoolean(this); }
+    private boolean calculateIsFailing() { return false; }
     void setIsFailing(boolean val) { _isFailing = val; }
     
+    @Override
     public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (obj.getClass() != PeerProfile.class) return false;
@@ -501,15 +455,40 @@ public class PeerProfile {
         PeerProfile prof = (PeerProfile)obj;
         return _peer.equals(prof.getPeer());
     }
+    @Override
     public String toString() { return "Profile: " + getPeer().toBase64(); }
     
     /**
+     * New measurement is 12KB per expanded profile. (2009-03 zzz)
+     * And nowhere in the code is shrinkProfile() called so
+     * the size of compact profiles doesn't matter right now.
+     * This is far bigger than the NetDB entry, which is only about 1.5KB
+     * now that most of the stats have been removed.
+     *
+     * The biggest user in the profile is the Rates. (144 bytes per according to jhat).
+     * PeerProfile:     9 RateStats, 3-5 Rates each - 35 total
+     * DBHistory:       2 RateStats, 3 each -          6 total
+     * TunnelHistory:   4 RateStats, 5 each -         20 total
+     *                ---                            ---------
+     *                 15                             61 total  
+     *                *60 bytes                     *144 bytes
+     *                ---                            ---------
+     *                900 bytes                     8784 bytes
+     *
+     * The RateStat itself is 32 bytes and the Rate[] is 28 so that adds
+     * about 1KB.
+     *
+     * So two obvious things to do are cut out some of the Rates,
+     * and call shrinkProfile().
+     *
+     * Obsolete calculation follows:
+     *
      * Calculate the memory consumption of profiles.  Measured to be ~3739 bytes
      * for an expanded profile, and ~212 bytes for a compacted one.
      *
      */
-    public static void main2(String args[]) {
-        RouterContext ctx = new RouterContext(null);
+    public static void main(String args[]) {
+        RouterContext ctx = new RouterContext(new net.i2p.router.Router());
         testProfileSize(ctx, 100, 0); // 560KB
         testProfileSize(ctx, 1000, 0); // 3.9MB
         testProfileSize(ctx, 10000, 0); // 37MB
@@ -524,13 +503,13 @@ public class PeerProfile {
      *  PeerProfile [filename]*
      * </pre>
      */
-    public static void main(String args[]) {
+    public static void main2(String args[]) {
         RouterContext ctx = new RouterContext(new net.i2p.router.Router());
         DecimalFormat fmt = new DecimalFormat("0,000.0");
         fmt.setPositivePrefix("+");
         ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
         try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         for (int i = 0; i < args.length; i++) {
             PeerProfile profile = helper.readProfile(new File(args[i]));
             if (profile == null) {
@@ -540,7 +519,6 @@ public class PeerProfile {
             //profile.coalesceStats();
             buf.append("Peer " + profile.getPeer().toBase64() 
                        + ":\t Speed:\t" + fmt.format(profile.calculateSpeed())
-                       + " Reliability:\t" + fmt.format(profile.calculateReliability())
                        + " Capacity:\t" + fmt.format(profile.calculateCapacity())
                        + " Integration:\t" + fmt.format(profile.calculateIntegration())
                        + " Active?\t" + profile.getIsActive() 

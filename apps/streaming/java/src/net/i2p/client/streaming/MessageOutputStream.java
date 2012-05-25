@@ -20,7 +20,7 @@ public class MessageOutputStream extends OutputStream {
     private Log _log;
     private byte _buf[];
     private int _valid;
-    private Object _dataLock;
+    private final Object _dataLock;
     private DataReceiver _dataReceiver;
     private IOException _streamError;
     private boolean _closed;
@@ -319,6 +319,7 @@ public class MessageOutputStream extends OutputStream {
         throwAnyError();
     }
     
+    @Override
     public void close() throws IOException {
         if (_closed) {
             synchronized (_dataLock) { _dataLock.notifyAll(); }

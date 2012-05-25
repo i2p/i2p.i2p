@@ -42,7 +42,7 @@ public class PeerSelector {
      *
      * @return ordered list of Hash objects
      */
-    public List selectMostReliablePeers(Hash key, int numClosest, Set alreadyChecked, KBucketSet kbuckets) {
+    public List selectMostReliablePeers(Hash key, int numClosest, Set alreadyChecked, KBucketSet kbuckets) {// LINT -- Exporting non-public type through public API
         // get the peers closest to the key
         List nearest = selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
         return nearest;
@@ -55,13 +55,13 @@ public class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    public List selectNearestExplicit(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    public List selectNearestExplicit(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) {// LINT -- Exporting non-public type through public API
         if (true)
             return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets);
         
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         Set allHashes = kbuckets.getAll(peersToIgnore);
         removeFailingPeers(allHashes);
         Map diffMap = new HashMap(allHashes.size());
@@ -91,10 +91,10 @@ public class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { // LINT -- Exporting non-public type through public API
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         MatchSelectionCollector matches = new MatchSelectionCollector(key, peersToIgnore);
         kbuckets.getAll(matches);
         List rv = matches.get(maxNumRouters);
@@ -195,7 +195,7 @@ public class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    public List selectNearest(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    public List selectNearest(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { // LINT -- Exporting non-public type through public API
         // sure, this may not be exactly correct per kademlia (peers on the border of a kbucket in strict kademlia
         // would behave differently) but I can see no reason to keep around an /additional/ more complicated algorithm.
         // later if/when selectNearestExplicit gets costly, we may revisit this (since kbuckets let us cache the distance()

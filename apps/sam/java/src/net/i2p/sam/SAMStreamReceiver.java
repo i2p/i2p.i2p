@@ -9,6 +9,7 @@ package net.i2p.sam;
  */
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import net.i2p.data.Destination;
 
@@ -53,14 +54,13 @@ public interface SAMStreamReceiver {
     public void notifyStreamOutgoingConnection(int id, String result, String msg) throws IOException;
 
     /**
-     * Send a byte array to a SAM client.
+     * Transmit a byte array from I2P to a SAM client.
      *
      * @param id Connection id
      * @param data Byte array to be received
-     * @param len Number of bytes in data
      * @throws IOException 
      */
-    public void receiveStreamBytes(int id, byte data[], int len) throws IOException;
+    public void receiveStreamBytes(int id, ByteBuffer data) throws IOException;
 
     /**
      * Notify that a connection has been closed

@@ -35,9 +35,9 @@ public class InNetMessagePool implements Service {
     private Log _log;
     private RouterContext _context;
     private HandlerJobBuilder _handlerJobBuilders[];
-    private List _pendingDataMessages;
-    private List _pendingDataMessagesFrom;
-    private List _pendingGatewayMessages;
+    private final List _pendingDataMessages;
+    private final List _pendingDataMessagesFrom;
+    private final List _pendingGatewayMessages;
     private SharedShortCircuitDataJob _shortCircuitDataJob;
     private SharedShortCircuitGatewayJob _shortCircuitGatewayJob;
     private boolean _alive;

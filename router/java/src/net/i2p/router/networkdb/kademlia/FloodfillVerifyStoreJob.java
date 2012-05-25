@@ -5,6 +5,8 @@ import java.util.List;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -29,21 +31,33 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     private FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
     private long _sendTime;
+    private long _published;
+    private boolean _isRouterInfo;
     
     private static final int VERIFY_TIMEOUT = 10*1000;
     
-    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, FloodfillNetworkDatabaseFacade facade) {
+    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         _key = key;
+        _published = published;
+        _isRouterInfo = isRouterInfo;
         _log = ctx.logManager().getLog(getClass());
         _facade = facade;
         // wait 10 seconds before trying to verify the store
         getTiming().setStartAfter(ctx.clock().now() + VERIFY_TIMEOUT);
-        getContext().statManager().createRateStat("netDb.floodfillVerifyOK", "How long a floodfill verify takes when it succeeds", "NetworkDatabase", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        getContext().statManager().createRateStat("netDb.floodfillVerifyFail", "How long a floodfill verify takes when it fails", "NetworkDatabase", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        getContext().statManager().createRateStat("netDb.floodfillVerifyTimeout", "How long a floodfill verify takes when it times out", "NetworkDatabase", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        getContext().statManager().createRateStat("netDb.floodfillVerifyOK", "How long a floodfill verify takes when it succeeds", "NetworkDatabase", new long[] { 60*60*1000 });
+        getContext().statManager().createRateStat("netDb.floodfillVerifyFail", "How long a floodfill verify takes when it fails", "NetworkDatabase", new long[] { 60*60*1000 });
+        getContext().statManager().createRateStat("netDb.floodfillVerifyTimeout", "How long a floodfill verify takes when it times out", "NetworkDatabase", new long[] { 60*60*1000 });
     }
     public String getName() { return "Verify netdb store"; }
+
+    /**
+     *  Wait 10 seconds, then query a random floodfill for the leaseset or routerinfo
+     *  that we just stored to a (hopefully different) floodfill peer.
+     *
+     *  If it fails (after waiting up to another 10 seconds), resend the data.
+     *  If the queried data is older than what we stored, that counts as a fail.
+     **/
     public void runJob() { 
         _target = pickTarget();
         if (_target == null) return;
@@ -100,16 +114,10 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         public boolean isMatch(I2NPMessage message) {
             if (message instanceof DatabaseStoreMessage) {
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
-                if (_key.equals(dsm.getKey()))
-                    return true;
-                else
-                    return false;
+                return _key.equals(dsm.getKey());
             } else if (message instanceof DatabaseSearchReplyMessage) {
                 DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
-                if (_key.equals(dsrm.getSearchKey()))
-                    return true;
-                else
-                    return false;
+                return _key.equals(dsrm.getSearchKey());
             }
             return false;
         }
@@ -124,20 +132,29 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         public void runJob() {
             long delay = getContext().clock().now() - _sendTime;
             if (_message instanceof DatabaseStoreMessage) {
-                // store ok, w00t!
-                // Hmm should we verify it's as recent as the one we sent???
-                getContext().profileManager().dbLookupSuccessful(_target, delay);
-                getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
-            } else {
-                // store failed, boo, hiss!
-                if (_message instanceof DatabaseSearchReplyMessage) {
-                    // assume 0 old, all new, 0 invalid, 0 dup
-                    getContext().profileManager().dbLookupReply(_target,  0,
-                                ((DatabaseSearchReplyMessage)_message).getNumReplies(), 0, 0, delay);
+                // Verify it's as recent as the one we sent
+                boolean success = false;
+                DatabaseStoreMessage dsm = (DatabaseStoreMessage)_message;
+                if (_isRouterInfo && dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO)
+                    success = dsm.getRouterInfo().getPublished() >= _published;
+                else if ((!_isRouterInfo) && dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+                    success = dsm.getLeaseSet().getEarliestLeaseDate() >= _published;
+                if (success) {
+                    // store ok, w00t!
+                    getContext().profileManager().dbLookupSuccessful(_target, delay);
+                    getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
+                    return;
                 }
-                getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
-                resend();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Verify failed - older");
+            } else if (_message instanceof DatabaseSearchReplyMessage) {
+                // assume 0 old, all new, 0 invalid, 0 dup
+                getContext().profileManager().dbLookupReply(_target,  0,
+                                ((DatabaseSearchReplyMessage)_message).getNumReplies(), 0, 0, delay);
             }
+            // store failed, boo, hiss!
+            getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
+            resend();
         }        
         public void setMessage(I2NPMessage message) { _message = message; }
     }

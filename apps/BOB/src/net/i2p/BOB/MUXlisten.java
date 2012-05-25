@@ -28,11 +28,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
+import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.util.Log;
-import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
  *
@@ -48,61 +49,103 @@ public class MUXlisten implements Runnable {
 	private ByteArrayInputStream prikey;
 	private ThreadGroup tg;
 	private String N;
-	private ServerSocket listener;
+	private ServerSocket listener = null;
 	private int backlog = 50; // should this be more? less?
 	boolean go_out;
 	boolean come_in;
+	private AtomicBoolean lock;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor Will fail if INPORT is occupied.
 	 *
-	 * @param info
-	 * @param database
+	 * @param info DB entry for this tunnel
+	 * @param database master database of tunnels
 	 * @param _log
 	 * @throws net.i2p.I2PException
 	 * @throws java.io.IOException
 	 */
-	MUXlisten(NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
-		int port = 0;
-		InetAddress host = null;
-		this.tg = null;
-		this.database = database;
-		this.info = info;
-		this._log = _log;
+	MUXlisten(AtomicBoolean lock, NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
+		try {
+			int port = 0;
+			InetAddress host = null;
+			this.lock = lock;
+			this.tg = null;
+			this.database = database;
+			this.info = info;
+			this._log = _log;
+			lives = new AtomicBoolean(false);
 
-		this.database.getReadLock();
-		this.info.getReadLock();
-		N = this.info.get("NICKNAME").toString();
-		prikey = new ByteArrayInputStream((byte[])info.get("KEYS"));
-		// Make a new copy so that anything else won't muck with our database.
-		Properties R = (Properties)info.get("PROPERTIES");
-		Properties Q = new Properties();
-		Lifted.copyProperties(R, Q);
-		this.database.releaseReadLock();
-		this.info.releaseReadLock();
+			this.database.getWriteLock();
+			this.info.getWriteLock();
+			this.info.add("STARTING", new Boolean(true));
+			this.info.releaseWriteLock();
+			this.database.releaseWriteLock();
+			this.database.getReadLock();
+			this.info.getReadLock();
 
-		this.database.getReadLock();
-		this.info.getReadLock();
-		this.go_out = info.exists("OUTPORT");
-		this.come_in = info.exists("INPORT");
-		if(this.come_in) {
-			port = Integer.parseInt(info.get("INPORT").toString());
-			host = InetAddress.getByName(info.get("INHOST").toString());
+			N = this.info.get("NICKNAME").toString();
+			prikey = new ByteArrayInputStream((byte[]) info.get("KEYS"));
+			// Make a new copy so that anything else won't muck with our database.
+			Properties R = (Properties) info.get("PROPERTIES");
+			Properties Q = new Properties();
+			Lifted.copyProperties(R, Q);
+			this.database.releaseReadLock();
+			this.info.releaseReadLock();
+
+			this.database.getReadLock();
+			this.info.getReadLock();
+			this.go_out = info.exists("OUTPORT");
+			this.come_in = info.exists("INPORT");
+			if (this.come_in) {
+				port = Integer.parseInt(info.get("INPORT").toString());
+				host = InetAddress.getByName(info.get("INHOST").toString());
+			}
+			this.database.releaseReadLock();
+			this.info.releaseReadLock();
+
+			socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
+			if (this.come_in) {
+				this.listener = new ServerSocket(port, backlog, host);
+			}
+		// I2PException, IOException, RuntimeException
+		// To bad we can't just catch and enumerate....
+		// } catch (I2PException e) {
+		// Something went bad.
+		//	this.database.getWriteLock();
+		//	this.info.getWriteLock();
+		//	this.info.add("STARTING", new Boolean(false));
+		//	this.info.releaseWriteLock();
+		//	this.database.releaseWriteLock();
+		//	throw new I2PException(e);
+		} catch (IOException e) {
+			// Something went bad.
+			this.database.getWriteLock();
+			this.info.getWriteLock();
+			this.info.add("STARTING", new Boolean(false));
+			this.info.releaseWriteLock();
+			this.database.releaseWriteLock();
+			throw new IOException(e.toString());
+		} catch (RuntimeException e) {
+			// Something went bad.
+			this.database.getWriteLock();
+			this.info.getWriteLock();
+			this.info.add("STARTING", new Boolean(false));
+			this.info.releaseWriteLock();
+			this.database.releaseWriteLock();
+			throw new RuntimeException(e);
+		} catch (Exception e) {
+			// Something else went bad.
+			this.database.getWriteLock();
+			this.info.getWriteLock();
+			this.info.add("STARTING", new Boolean(false));
+			this.info.releaseWriteLock();
+			this.database.releaseWriteLock();
+			// throw new Exception(e);
+			// Debugging, I guess.
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		this.database.releaseReadLock();
-		this.info.releaseReadLock();
-
-		socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
-		if(this.come_in) {
-			this.listener = new ServerSocket(port, backlog, host);
-		}
-
-		// Everything is OK as far as we can tell.
-		this.database.getWriteLock();
-		this.info.getWriteLock();
-		this.info.add("STARTING", Boolean.TRUE);
-		this.info.releaseWriteLock();
-		this.database.releaseWriteLock();
 	}
 
 	private void rlock() throws Exception {
@@ -130,147 +173,252 @@ public class MUXlisten implements Runnable {
 	 *
 	 */
 	public void run() {
-
+		I2PServerSocket SS = null;
+		Thread t = null;
+		Thread q = null;
 		try {
-			wlock();
 			try {
-				info.add("RUNNING", Boolean.TRUE);
-				info.add("STARTING", Boolean.FALSE);
-			} catch(Exception e) {
-				wunlock();
+				wlock();
+				try {
+					info.add("RUNNING", new Boolean(true));
+				} catch (Exception e) {
+					lock.set(false);
+					wunlock();
+					return;
+				}
+			} catch (Exception e) {
+				lock.set(false);
 				return;
 			}
-		} catch(Exception e) {
-			return;
-		}
-		try {
-			wunlock();
-		} catch(Exception e) {
-			return;
-		}
-
-quit:           {
 			try {
-				tg = new ThreadGroup(N);
-die:                            {
-					// toss the connections to a new threads.
-					// will wrap with TCP and UDP when UDP works
+				wunlock();
+			} catch (Exception e) {
+				lock.set(false);
+				return;
+			}
+//		socketManager.addDisconnectListener(new DisconnectListener());
+			lives.set(true);
+			lock.set(false);
+			quit:
+			{
+				try {
+					tg = new ThreadGroup(N);
+					{
+						// toss the connections to a new threads.
+						// will wrap with TCP and UDP when UDP works
 
-					if(go_out) {
-						// I2P -> TCP
-						I2Plistener conn = new I2Plistener(socketManager, info, database, _log);
-						Thread t = new Thread(tg, conn, "BOBI2Plistener " + N);
-						t.start();
-					}
+						if (go_out) {
+							// I2P -> TCP
+							SS = socketManager.getServerSocket();
+							I2Plistener conn = new I2Plistener(SS, socketManager, info, database, _log, lives);
+							t = new Thread(tg, conn, "BOBI2Plistener " + N);
+							t.start();
+						}
 
-					if(come_in) {
-						// TCP -> I2P
-						TCPlistener conn = new TCPlistener(listener, socketManager, info, database, _log);
-						Thread q = new Thread(tg, conn, "BOBTCPlistener" + N);
-						q.start();
-					}
+						if (come_in) {
+							// TCP -> I2P
+							TCPlistener conn = new TCPlistener(listener, socketManager, info, database, _log, lives);
+							q = new Thread(tg, conn, "BOBTCPlistener " + N);
+							q.start();
+						}
 
-					boolean spin = true;
-					while(spin) {
 						try {
-							Thread.sleep(1000); //sleep for 1000 ms (One second)
-						} catch(InterruptedException e) {
+							wlock();
+							try {
+								info.add("STARTING", new Boolean(false));
+							} catch (Exception e) {
+								wunlock();
+								break quit;
+							}
+						} catch (Exception e) {
+							break quit;
+						}
+						try {
+							wunlock();
+						} catch (Exception e) {
+							break quit;
+						}
+						boolean spin = true;
+						while (spin && lives.get()) {
+							try {
+								Thread.sleep(1000); //sleep for 1 second
+							} catch (InterruptedException e) {
+								break quit;
+							}
+							try {
+								rlock();
+								try {
+									spin = info.get("STOPPING").equals(Boolean.FALSE);
+								} catch (Exception e) {
+									runlock();
+									break quit;
+								}
+							} catch (Exception e) {
+								break quit;
+							}
+							try {
+								runlock();
+							} catch (Exception e) {
+								break quit;
+							}
+						}
+					} // die
+
+				} catch (Exception e) {
+					// System.out.println("MUXlisten: Caught an exception" + e);
+					break quit;
+				}
+			} // quit
+		} finally {
+			lives.set(false);
+			// Some grace time.
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException ex) {
+			}
+			try {
+				wlock();
+				try {
+					info.add("STARTING", new Boolean(false));
+					info.add("STOPPING", new Boolean(true));
+					info.add("RUNNING", new Boolean(false));
+				} catch (Exception e) {
+					lock.set(false);
+					wunlock();
+					return;
+				}
+				wunlock();
+			} catch (Exception e) {
+			}
+			// Start cleanup.
+			while (!lock.compareAndSet(false, true)) {
+				// wait
+			}
+			if (SS != null) {
+				try {
+					SS.close();
+				} catch (I2PException ex) {
+				}
+			}
+			if (listener != null) {
+				try {
+					listener.close();
+				} catch (IOException e) {
+				}
+			}
+
+			// Some grace time.
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException ex) {
+			}
+
+			// zero out everything.
+			try {
+				wlock();
+				try {
+					info.add("STARTING", new Boolean(false));
+					info.add("STOPPING", new Boolean(false));
+					info.add("RUNNING", new Boolean(false));
+				} catch (Exception e) {
+					lock.set(false);
+					wunlock();
+					return;
+				}
+				wunlock();
+			} catch (Exception e) {
+			}
+
+			lock.set(false); // Should we force waiting for all threads??
+
+			// Wait around till all threads are collected.
+			if (tg != null) {
+				String boner = tg.getName();
+				// System.out.println("BOB: MUXlisten: Starting thread collection for: " + boner);
+				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
+				// tg.interrupt(); // give my stuff a small smack again.
+				if (tg.activeCount() + tg.activeGroupCount() != 0) {
+					// visit(tg, 0, boner);
+					int foo = tg.activeCount() + tg.activeGroupCount();
+					// hopefully no longer needed!
+					// int bar = lives;
+					// System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
+					// System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+					// visit(tg, 0, boner);
+					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+					// Happily spin forever :-(
+					while (foo != 0) {
+						foo = tg.activeCount() + tg.activeGroupCount();
+						// if (lives != bar && lives != 0) {
+						// 	System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+						// 	visit(tg, 0, boner);
+						// 	System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+						// }
+						// bar = lives;
+						try {
+							Thread.sleep(100); //sleep for 100 ms (One tenth second)
+						} catch (InterruptedException ex) {
 							// nop
 						}
-						try {
-							rlock();
-							try {
-								spin = info.get("STOPPING").equals(Boolean.FALSE);
-							} catch(Exception e) {
-								runlock();
-								break die;
-							}
-						} catch(Exception e) {
-							break die;
-						}
-						try {
-							runlock();
-						} catch(Exception e) {
-							break die;
-						}
-					}
-
-					try {
-						wlock();
-						try {
-							info.add("RUNNING", Boolean.FALSE);
-						} catch(Exception e) {
-							wunlock();
-							break die;
-						}
-					} catch(Exception e) {
-						break die;
-					}
-					try {
-						wunlock();
-					} catch(Exception e) {
-						break die;
-					}
-				} // die
-
-				// wait for child threads and thread groups to die
-				// System.out.println("MUXlisten: waiting for children");
-				while(tg.activeCount() + tg.activeGroupCount() != 0) {
-					tg.interrupt(); // unwedge any blocking threads.
-					try {
-						Thread.sleep(100); //sleep for 100 ms (One tenth second)
-					} catch(InterruptedException ex) {
-						// nop
 					}
 				}
+				// System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
+				_log.warn("BOB: MUXlisten: Threads went away. Success: " + boner);
 				tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
 				tg = null;
-			} catch(Exception e) {
-				// System.out.println("MUXlisten: Caught an exception" + e);
-				break quit;
 			}
-		} // quit
-		// This is here to catch when something fucks up REALLY bad.
-		if(tg != null) {
-			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
-			System.out.println("BOB: MUXlisten: Please email the following dump to sponge@mail.i2p");
-			WrapperManager.requestThreadDump();
-			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
-			System.out.println("BOB: MUXlisten: Please email the above dump to sponge@mail.i2p");
-		}
-			// zero out everything, just incase.
-		try {
-			socketManager.destroySocketManager();
-		} catch(Exception e) {
-			// nop
-		}
-		try {
-			wlock();
 			try {
-				info.add("STARTING", Boolean.FALSE);
-				info.add("STOPPING", Boolean.FALSE);
-				info.add("RUNNING", Boolean.FALSE);
-			} catch(Exception e) {
-				wunlock();
-				return;
+				socketManager.destroySocketManager();
+			} catch (Exception e) {
+				// nop
 			}
-			wunlock();
-		} catch(Exception e) {
+
 		}
-		// This is here to catch when something fucks up REALLY bad.
-		if(tg != null) {
-			while(tg.activeCount() + tg.activeGroupCount() != 0) {
-					tg.interrupt(); // unwedge any blocking threads.
-					try {
-						Thread.sleep(100); //sleep for 100 ms (One tenth second)
-					} catch(InterruptedException ex) {
-						// nop
-					}
-			}
-			tg.destroy();
-			// Zap reference to the ThreadGroup so the JVM can GC it.
-			tg = null;
+	}
+
+
+	// Debugging... None of this is normally used.
+	/**
+	 *	Find the root thread group and print them all.
+	 *
+	 */
+	private void visitAllThreads() {
+		ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+		while (root.getParent() != null) {
+			root = root.getParent();
+		}
+
+		// Visit each thread group
+		visit(root, 0, root.getName());
+	}
+
+	/**
+	 * Recursively visits all thread groups under `group' and dumps them.
+	 * @param group ThreadGroup to visit
+	 * @param level Current level
+	 */
+	private static void visit(ThreadGroup group, int level, String tn) {
+		// Get threads in `group'
+		int numThreads = group.activeCount();
+		Thread[] threads = new Thread[numThreads * 2];
+		numThreads = group.enumerate(threads, false);
+		String indent = "------------------------------------".substring(0, level) + "-> ";
+		// Enumerate each thread in `group' and print it.
+		for (int i = 0; i < numThreads; i++) {
+			// Get thread
+			Thread thread = threads[i];
+			System.out.println("BOB: MUXlisten: " + tn + ": " + indent + thread.toString());
+		}
+
+		// Get thread subgroups of `group'
+		int numGroups = group.activeGroupCount();
+		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+		numGroups = group.enumerate(groups, false);
+
+		// Recursively visit each subgroup
+		for (int i = 0; i < numGroups; i++) {
+			visit(groups[i], level + 1, groups[i].getName());
 		}
 	}
 }

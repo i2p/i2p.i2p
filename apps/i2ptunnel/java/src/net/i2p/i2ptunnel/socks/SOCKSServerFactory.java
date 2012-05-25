@@ -44,6 +44,10 @@ public class SOCKSServerFactory {
             int socksVer = in.readByte();
 
             switch (socksVer) {
+            case 0x04:
+                // SOCKS version 4/4a
+                serv = new SOCKS4aServer(s);
+                break;
             case 0x05:
                 // SOCKS version 5
                 serv = new SOCKS5Server(s);

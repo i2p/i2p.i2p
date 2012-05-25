@@ -18,6 +18,7 @@ public class SpeedCalculator extends Calculator {
     public SpeedCalculator(RouterContext context) {
     }
     
+    @Override
     public double calc(PeerProfile profile) {
         // measures 1 minute throughput of individual tunnels
         double d = (profile.getPeakTunnel1mThroughputKBps()*1024d) + profile.getSpeedBonus();

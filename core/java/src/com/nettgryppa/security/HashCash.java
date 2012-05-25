@@ -323,7 +323,7 @@ private static long bytesToLong(byte[] b) {
     if(null == extensions || extensions.isEmpty())
       return "";
       
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     List<String> tempList;
     boolean first = true;
     

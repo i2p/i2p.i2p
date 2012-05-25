@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -12,8 +13,14 @@ public class ConfigUpdateHelper extends HelperBase {
     }
     
     public String getNewsURL() {
-        String url = _context.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
-        if (url != null)
+        return getNewsURL(_context);
+    }
+
+    /** hack to replace the old news location with the new one, even if they have saved
+        the update page at some point */
+    public static String getNewsURL(I2PAppContext ctx) {
+        String url = ctx.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
+        if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL))
             return url;
         else
             return ConfigUpdateHandler.DEFAULT_NEWS_URL;
@@ -26,27 +33,26 @@ public class ConfigUpdateHelper extends HelperBase {
             return ConfigUpdateHandler.DEFAULT_UPDATE_URL;
     }
     public String getProxyHost() {
-        String host = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST);
-        if (host != null)
-            return host;
-        else
-            return ConfigUpdateHandler.DEFAULT_PROXY_HOST;
+        return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
     }
     public String getProxyPort() {
-        String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT);
-        if (port != null)
-            return port;
-        else
-            return ConfigUpdateHandler.DEFAULT_PROXY_PORT;
+        return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
     }
     
     public String getUpdateThroughProxy() {
         String proxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
         if (Boolean.valueOf(proxy).booleanValue()) 
-            return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
         else
-            
-            return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
+    }
+    
+    public String getUpdateUnsigned() {
+        String foo = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
+        if (Boolean.valueOf(foo).booleanValue()) 
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"true\" >";
+        else
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
     }
     
     private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l, 48*60*60*1000l, -1l };
@@ -59,7 +65,7 @@ public class ConfigUpdateHelper extends HelperBase {
             ms = Long.parseLong(freq);
         } catch (NumberFormatException nfe) {}
 
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"refreshFrequency\">");
         for (int i = 0; i < PERIODS.length; i++) {
             buf.append("<option value=\"").append(PERIODS[i]);
@@ -76,10 +82,9 @@ public class ConfigUpdateHelper extends HelperBase {
     }
     
     public String getUpdatePolicySelectBox() {
-        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
-        if (policy == null) policy = ConfigUpdateHandler.DEFAULT_UPDATE_POLICY;
+        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY, ConfigUpdateHandler.DEFAULT_UPDATE_POLICY);
         
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"updatePolicy\">");
         
         if ("notify".equals(policy))
@@ -107,11 +112,11 @@ public class ConfigUpdateHelper extends HelperBase {
         return new TrustedUpdate(_context).getTrustedKeysString();
     }
 
-    public String getNewsStatus() { 
-        return NewsFetcher.getInstance(_context).status();
+    public String getZipURL() {
+        return _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL, "");
     }
 
-    public String getUpdateVersion() { 
-        return NewsFetcher.getInstance(_context).updateVersion();
+    public String getNewsStatus() { 
+        return NewsFetcher.getInstance(_context).status();
     }
 }

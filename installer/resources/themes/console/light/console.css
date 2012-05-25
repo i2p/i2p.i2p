@@ -1,0 +1,846 @@
+/* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
+
+body {
+     margin: 25px 10px 0 5px;
+     padding: 0em;
+     text-align: center;
+     background: #eef;
+     color: #000;
+     font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+.hide {
+     display: none;
+}
+
+img {
+     border: none;
+}
+
+pre {
+     width: 98%;
+     overflow: auto;
+     text-align: left;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #333;
+}
+
+div.logo {
+     float: left;
+     padding: 10px;
+     text-align: center;
+     font-color: #fff;
+     margin: 0 20px 0 20px;
+     border: 1px solid #002;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #ddddff url('images/lightbluetile.png');
+     width: 175px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+div.toolbar {
+     margin: 0;
+     padding: 10px;
+     font-weight: bold;
+     background: #eef;
+     border: 1px solid #002;
+     display: none !important;
+}
+
+div.toolbar a:link {
+     border: 1px outset #ddddc0;
+     padding: 0px 5px 1px 5px;
+     line-height: 250%;
+     background: #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     display: none !important;
+}
+
+div.toolbar a:visited {
+     background: #ddf;
+}
+
+div.toolbar a:hover{
+     border: 1px solid #eeeeff;
+     background: #003;
+     color: #f60;
+}
+
+a:active{
+     color: #900;
+}
+
+div.routersummaryouter {
+     float: left;
+     width: 215px;
+     margin: 0 0 10px 20px;
+     padding: 0;
+     border: 0;
+     clear: left;/* fixes a bug in Opera */
+     text-align: center !important;
+     display: block;
+}
+
+div.routersummary {
+/*  margin: 0px 20px 20px 0px; */
+     width: 175px;
+     padding: 10px;
+     text-align: center !important;
+     border: 1px solid #000033;
+     background: #ddf url('images/lightbluetile.png');
+     color: #000;
+     font-size: 8pt;
+     clear: left;/* fixes a bug in Opera */
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+/* 
+     float: left;
+*/     
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #eef;
+     background: #eef;
+     height: 2px;
+     border-bottom: 1px solid #eef;
+     margin: 8px -10px 7px -10px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #001;
+}
+
+div.routersummary h3 {
+     border: 0px solid #f00;
+/*     border-bottom: 1px solid #99f !important;*/
+     font-size: 10pt;
+     letter-spacing: 0.05em;
+     margin: -7px -9px -7px -9px;
+     padding: 5px 0px 5px 0px;
+     background: #c5d5fb;
+     text-transform: uppercase;
+}
+
+div.routersummary h4 {
+     border: 0px solid #f00;
+     border-bottom: 0 !important;
+     font-size: 9pt;
+     letter-spacing: 0.05em;
+     margin: -7px -9px -7px -9px !important;
+     padding: 2px 3px 3px 3px;
+     background: #c1d1f7;
+     text-transform: capitalize;
+     text-decoration: none !important;
+     color: #2b2;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -5px -5px;
+     width: 185px !important;
+     overflow: hidden;
+     font-size: 8pt;
+     padding: 0px -10px;
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+}
+
+div.routersummary form {
+     margin-top: 8px;
+}
+
+div.routersummary p {
+     padding: 0;
+}     
+
+div.routersummary a:link, div.routersummary a:visited {
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+}
+
+div.routersummary a:hover {
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     color: #f60;
+}
+
+div.routersummary td {
+     padding: 2px 4px;
+     background-image: none !important;
+     border: 0 !important;
+}
+
+
+div.routersummary tr:nth-child(even) {
+     background-color: #f60;
+     background-image: none !important;
+}
+
+div.routersummarytr:nth-child(odd) {
+     background-color: #f00;
+     background-image: none !important;
+}
+
+div.warning {
+     margin: 5px 20px 10px 240px;
+     padding: 0px 25px 20px 75px;
+     background: #fff;
+     border: 1px solid #002;
+     text-align: left;
+     color: inherit;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image:url("images/errortriangle.png");
+     background-position:15px center;
+     background-repeat:no-repeat;
+     -moz-box-shadow: inset 0px 0px 1px 0px #d00;
+     word-wrap: break-word;
+}
+
+div.main {
+     margin: 0px 0px 20px 220px;
+     padding: 0 15px 15px 25px;
+     background: #eef;
+     text-align: left;
+     color: #001;
+     width: auto;
+     min-width: 500px;
+}
+
+div.main hr, hr {
+     color: #003;
+     background: #003;
+     height: 1px;
+     border: 0px solid #003;
+     margin: 10px 0;
+}
+
+div.main textarea {
+     background: #eef;
+     color: #001;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+
+div.news {
+     margin: 0px 15px 20px 245px;
+     padding: 20px 30px 20px 30px;
+     border: 1px solid #003;
+     color: #410;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: justify !important;
+     line-height: 140%;
+     background: #fea url('images/sandtile.png');
+     -moz-box-shadow: inset 0px 0px 1px 0px #410;
+}
+
+div.news a:link{
+     color: #630;
+     text-decoration: none;
+}
+
+div.news a:visited{
+     color: #830;
+}
+
+div.news a:hover{
+     color: #a30;
+     text-decoration: underline;
+}
+
+div.news a:active{
+     color: #c30;
+}
+
+div.news hr{
+     color: #410;
+     background: #410;
+     height: 1px;
+     border: 0px solid #410;
+     margin: 10px 0;
+}
+
+div.news li {
+     text-align: justify;
+     list-style: none;
+     margin: 0 0 20px 0 !important;
+     padding: 5px 0;
+     vertical-align: bottom;
+     border: 1px solid #410;
+     border-left: 5px solid #410;
+     padding: 3px 5px 3px 5px;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: #fb1;
+     font-size: 10pt;
+     opacity: 0.8;
+}
+
+div.news h4 {
+     border-bottom: 0px;
+     padding: 0;
+     margin: 0 0 -10px 0;
+     font-size: 11pt;
+}
+
+div.confignav {
+     padding: 15px 10px !important;
+     margin: 0 0 25px 0;
+     background: #ddf url('images/lightbluetile.png');
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #000022;
+     font-size: 10pt !important;
+     font-weight: bold !important;
+     line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     min-width: 400px;
+}
+
+div.configure {
+     padding: 0 15px 15px 15px !important;
+     margin: 10px 0px 25px 0;
+     background: #ddf url('images/lightbluetile.png');
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #000022;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     min-width: 400px;
+}
+
+div.graphspanel {
+     padding: 12px;
+     margin: 10px 0px 25px 0;
+     background: #ddf url('images/lightbluetile.png');
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #000022;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center !important; 
+}
+
+div.graphspanel img {
+     border: 1px solid #003;
+     padding: 2px;
+     margin: 6px;
+     text-align: center !important;
+     background: #001;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+     opacity: 0.8;
+}
+
+div.graphspanel img:hover {
+     border: 1px solid #003;
+     padding: 2px;
+     margin: 6px;
+     text-align: center !important;
+     background: #001;
+     -moz-box-shadow: inset 0px 0px 2px 1px #f60;
+     opacity: 1;
+}
+
+div.graphspanel form {
+     text-align: left;
+}
+
+div.messages {
+     padding: 10px;
+     margin: 10px 0 20px 0;
+     background: #ddf;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #000033;
+     background: #008 url('images/lightbluetile.png');
+     font-weight: bold;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+div.messages span.error {
+     color: #d00000;
+}
+
+div.messages span.notice {
+     font-style: italic;
+}
+
+div.messages li {
+     text-align: justify !important;
+     font-weight: bold;
+     list-style: url(images/warning.png) !important;
+     margin: 0 10px 0 35px !important;
+     padding: 5px 10px !important;
+     border: 0px !important;
+}
+
+table {
+     border-collapse: collapse;
+     width: 100%;
+     border: 1px solid #000022;
+     margin: 5px 0px 5px 0px;
+     cell-padding: 1px;
+     font-size: 7pt;
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     font: 7pt/130% "Lucida Sans Unicode", Verdana, Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+table hr {
+     padding: 0px 0;
+     color: #99f;
+     background: #99f;
+     border: 0px solid #99f;
+     margin: 0px 0px;
+     height: 1px;
+     display: none;
+}
+
+th {
+     padding: 6px 2px;
+     color: #000;
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     text-align: center;
+     font-size: 9pt;
+     line-height: 110%;
+     border-bottom: 1px solid #001 !important;
+     border-top: 1px solid #001 !important;
+}
+
+tr {
+     vertical-align: middle !important;
+     align: center;
+}
+
+tr:nth-child(even) {
+     background: #99f url('images/tabletile.png') !important;
+}
+
+tr:nth-child(odd) {
+     background: #bbf url('images/tabletile_alt.png') !important;
+}
+/*
+tr:last-child {
+     background: #bbf url('images/tabletilelighter.png') !important;
+     font-weight: bold;
+     border: 1px solid #002 !important;
+}
+*/
+td {
+     padding: 5px 3px;
+     color: #000;
+     vertical-align: middle;
+     border-top: 1px inset #001;
+     border-bottom: 1px outset #99f;     
+}
+
+tt {
+     font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #008000;
+     padding: 1px 5px;
+}
+
+div.main li {
+     text-align: left;
+     list-style: square;
+     margin: 2px 5px 0px 20px;
+     padding: 1px 20px 1px 10px;
+     line-height: 150%;
+     word-wrap: break-word;
+}
+
+.tidylist {
+     text-align: justify !important;
+}
+
+ol {
+
+     margin: 1px 0 0 5px;
+     padding: 1px 0 0 20px;
+}
+
+ul {
+     display: inline;
+     margin: 5px 0;
+     padding: 0;
+}
+
+code {
+     text-align: left;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+
+a:link{
+     color: #007;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited{
+     color: #606;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover{
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active{
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+.links {
+     list-style: url(images/link.png);
+     margin: 10px 5px 0 0px;
+     padding: 10px 20px 10px 30px;
+}
+
+p {
+     text-align: justify;
+     line-height: 160%;
+}
+
+h1 {
+     text-align: left;
+     color: #002;
+     padding: 10px 15px;
+     margin: 0 15px 25px 245px;
+     font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     letter-spacing: 0.15em;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 1px rgba(0, 0, 148, 0.9);
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     white-space: normal;
+     background: #ddddff url('images/lightbluetile.png');
+     border: 1px solid #002;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+}
+
+h2 {
+     font-size: 12pt;
+     color: #001;
+     letter-spacing: 0.05em;
+     background: #ddf url('images/titletile.png');
+     text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
+     padding: 7px 10px;
+     wordwrap: none;
+     border: 1px solid #002;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     margin: 25px 0 20px 0 !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     word-wrap: break-word;
+}
+
+h2 a:hover {
+     text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
+     border-bottom: 1px #ff6600;
+     border-bottom-style: solid;
+     border-bottom-color: #002;
+     padding-bottom: 5px;
+}
+
+h3 {
+     border: 1px solid #002;
+     border-left: 5px solid #002;
+     padding: 3px 5px 3px 5px;
+     margin: 20px 0 15px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: #eef;
+}
+
+h4 {
+     border-bottom: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #001;
+     padding: 0 0 10px 0;
+     margin: 5px 0 10px 0;
+     font-size: 11pt;
+}
+
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px outset #999;
+     padding: 1px 3px;
+     background: #ddf !important;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font-size: 8pt;
+     font-weight: bold;
+     margin: 0 1px;
+     text-align: center;
+     min-width: 80px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+}
+
+button:hover{
+     border: 1px solid #f60;
+     background: #f60 !important;
+     color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+}
+
+button:active{
+     border: 1px solid #f60;
+     background: #001 !important;
+     color: #f60;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+.underline {
+     border-bottom: 1px solid #000022;
+     padding: 5px 0px 5px 0px;
+     margin: 0px 0px 10px 0px;
+}
+
+.langbox {
+     margin: 4px 2px 4px 5px;
+     padding: 5px 5px;
+     color: #001;
+     font-size: 7pt;
+     width: 120px;
+     text-align: center;
+     float: right;
+     valign: middle;
+}
+
+input {
+     background: #eef;
+     color: #001;
+     margin: 5px 10px 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #001;
+     text-decoration: none;
+     min-width: 110px;
+}
+
+input, input:visited {
+     border: 1px outset #999;
+     background: #ddf;
+     color: #001;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+     opacity: 0.9;
+}
+
+
+input:hover {
+     background: #f60;
+     color: #fff;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+
+}
+
+input:active {
+     background: #002;
+     color: #f60;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+input[type=text] {
+     background: #eef;
+     color: #001;
+     margin: 5px 10px 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #001;
+     text-decoration: none;
+}
+
+submit {
+     background: #f00;
+     color: #eef;
+     margin: 10px 2px 10px 0;
+     padding: 2px;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #001;
+     text-decoration: none;
+}
+
+input checkbox {
+     border: 0 !important;
+}
+
+select {
+     background: #eef;
+     color: #003;
+     margin: 5px 10px 5px 10px;
+     padding: 4px;
+     border: 1px solid #001;
+     min-width: 110px;
+     font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: left !important;
+}
+
+textarea {
+     padding: 5px;
+     margin: 5px 15px 5px 10px;
+     background: #eef;
+     color: #003;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     min-height: 100px;
+     min-width: 97%;
+     border: 1px solid #001;
+}
+
+form {}
+
+.proxyfooter {
+     margin: 0 20px 10px 240px;
+     padding: 20px 25px 20px 75px;
+     font-color: #f00;
+     font-size: 7pt;
+     text-align: right !important;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 1px solid #001;
+     display: none;
+}    
+
+.statusnotes {
+     font-style: italic;
+     font-size: 8pt;
+     font-color: #001 !important;
+     text-align: center;
+     border: 1px solid #001 !important;
+     border-top: 0 !important;
+     margin: -5px 0 5px 0; 
+     padding: 7px;
+     background: #bcf;
+     -moz-box-shadow: inset 0px 0px 2px 1px #eef;
+}
+
+.joblog {
+     margin: 25px 0 25px 0;
+     padding: 20px 40px 20px 40px !important;
+     border: 1px solid #003;
+     background-color: #004;
+     background: #ddf url('images/lightbluetile.png');
+     color: #001;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: justify;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     overflow: auto;
+ }
+ 
+ div.joblog:li {
+     word-wrap: break-word !important;
+}
+
+ .joblog:ul {
+     word-wrap: break-word !important;
+}
+
+.smallhead {
+     font-size: 7pt
+}
+
+.mediumtags {
+     font-size: 8pt;
+     font-style: italic;
+     font-weight: bold;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.optbox:hover {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.cells {
+     border-left: 1px outset #bbf;
+     border-top: 1px inset #99f !important;
+     border-bottom: 1px inset #99f !important;
+}
+
+.tablefooter {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     border-top: 1px solid #001;
+     border-bottom: 1px solid #001 !important;     
+     padding: 8px 2px !important;
+     font-size: 7pt;
+     line-height: 110%;
+}
+
+.formaction {
+     text-align: right;
+}

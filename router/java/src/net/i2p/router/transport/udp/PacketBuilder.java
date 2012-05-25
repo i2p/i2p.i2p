@@ -39,8 +39,8 @@ public class PacketBuilder {
         _context = ctx;
         _transport = transport;
         _log = ctx.logManager().getLog(PacketBuilder.class);
-        _context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", new long[] { 60*1000 });
-        _context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", UDPTransport.RATES);
     }
     
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer) {
@@ -61,10 +61,10 @@ public class PacketBuilder {
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List ackIdsRemaining, List partialACKsRemaining) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
 
-        StringBuffer msg = null;
+        StringBuilder msg = null;
         boolean acksIncluded = false;
         if (_log.shouldLog(Log.INFO)) {
-            msg = new StringBuffer(128);
+            msg = new StringBuilder(128);
             msg.append("Send to ").append(peer.getRemotePeer().toBase64());
             msg.append(" msg ").append(state.getMessageId()).append(":").append(fragment);
             if (fragment == state.getFragmentCount() - 1)
@@ -219,9 +219,9 @@ public class PacketBuilder {
     public UDPPacket buildACK(PeerState peer, List ackBitfields) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         
-        StringBuffer msg = null;
+        StringBuilder msg = null;
         if (_log.shouldLog(Log.DEBUG)) {
-            msg = new StringBuffer(128);
+            msg = new StringBuilder(128);
             msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
         }
 
@@ -379,7 +379,7 @@ public class PacketBuilder {
         off += 8;
         
         if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Sending sessionCreated:");
             buf.append(" AliceIP: ").append(Base64.encode(sentIP));
             buf.append(" AlicePort: ").append(state.getSentPort());
@@ -786,6 +786,7 @@ public class PacketBuilder {
     private int getOurExplicitPort() { return 0; }
     
     /** build intro packets for each of the published introducers */
+    @SuppressWarnings("static-access")
     public UDPPacket[] buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
@@ -878,7 +879,7 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
     
-    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
+    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {// LINT -- Exporting non-public type through public API
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
@@ -928,7 +929,7 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
     
-    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
+    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {// LINT -- Exporting non-public type through public API
         InetAddress aliceAddr = null;
         try {
             aliceAddr = InetAddress.getByAddress(alice.getIP());

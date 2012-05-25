@@ -147,6 +147,7 @@ public class HTTPServer implements Runnable
 			serverSock = new ServerSocket(bindPort, 0, bindAddr);
 		}
 		catch (IOException e) {
+			Debug.warning("HTTP server open failed " + addr + " " + port, e);
 			return false;
 		}
 		return true;

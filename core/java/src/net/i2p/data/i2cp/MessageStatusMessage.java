@@ -168,7 +168,7 @@ public class MessageStatusMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[MessageStatusMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tNonce: ").append(getNonce());

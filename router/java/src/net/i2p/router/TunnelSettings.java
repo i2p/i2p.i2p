@@ -105,6 +105,7 @@ public class TunnelSettings extends DataStructureImpl {
     }
     
     
+    @Override
     public int hashCode() {
         int rv = 0;
         rv += _includeDummy ? 100 : 0;
@@ -118,6 +119,7 @@ public class TunnelSettings extends DataStructureImpl {
         return rv;
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj != null) && (obj instanceof TunnelSettings) ) {
             TunnelSettings settings = (TunnelSettings)obj;

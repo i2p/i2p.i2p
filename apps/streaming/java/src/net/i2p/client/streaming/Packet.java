@@ -598,12 +598,12 @@ public class Packet {
     
 	@Override
     public String toString() {
-        StringBuffer str = formatAsString();
+        StringBuilder str = formatAsString();
         return str.toString();
     }
     
-    protected StringBuffer formatAsString() {
-        StringBuffer buf = new StringBuffer(64);
+    protected StringBuilder formatAsString() {
+        StringBuilder buf = new StringBuilder(64);
         buf.append(toId(_sendStreamId));
         //buf.append("<-->");
         buf.append(toId(_receiveStreamId)).append(": #").append(_sequenceNum);
@@ -629,7 +629,7 @@ public class Packet {
     }
     
     private final String toFlagString() {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");

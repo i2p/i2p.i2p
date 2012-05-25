@@ -1,4 +1,3 @@
 #!/bin/sh
-#export I2P=~i2p/i2p
-export I2P=`dirname $0`
-java -cp $I2P/lib/i2p.jar net.i2p.util.EepGet $*
+I2P="%INSTALL_PATH"
+java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"

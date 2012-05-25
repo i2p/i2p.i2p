@@ -22,15 +22,29 @@
             </classpath>
         </depend>
     </target>
-    <target name="compile" depends="depend">
+    <target name="dependVersion">
+        <!-- Force the dependency on the RouterVersion as depend doesn't recognize constant changes  -->
+        <dependset>
+             <srcfilelist dir="." files="build/obj/net/i2p/router/RouterVersion.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/Router.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/StatisticsManager.class" />
+        </dependset>
+    </target>
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <target name="compile" depends="depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2p.jar" />
+        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2p.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="compileTest" depends="builddeptest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" />
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/router.jar" basedir="./build/obj" includes="**/*.class" />

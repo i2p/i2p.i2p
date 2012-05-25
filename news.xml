@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2009-01-24 00:00:00 $">
- <i2p.release version="0.7" date="2009/01/24" minVersion="0.6"
+<i2p.news date="$Date: 2009-07-31 00:00:00 $">
+ <i2p.release version="0.7.6" date="2009/07/31" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -10,30 +10,43 @@
             anonlogs="http://i2p/Nf3ab-ZFkmI-LyMt7GjgT-jfvZ3zKDl0L96pmGQXF1B82W2Bfjf0n7~288vafocjFLnQnVcmZd~-p0-Oolfo9aW2Rm-AhyqxnxyLlPBqGxsJBXjPhm1JBT4Ia8FB-VXt0BuY0fMKdAfWwN61-tj4zIcQWRxv3DFquwEf035K~Ra4SWOqiuJgTRJu7~o~DzHVljVgWIzwf8Z84cz0X33pv-mdG~~y0Bsc2qJVnYwjjR178YMcRSmNE0FVMcs6f17c6zqhMw-11qjKpY~EJfHYCx4lBWF37CD0obbWqTNUIbL~78vxqZRT3dgAgnLixog9nqTO-0Rh~NpVUZnoUi7fNR~awW5U3Cf7rU7nNEKKobLue78hjvRcWn7upHUF45QqTDuaM3yZa7OsjbcH-I909DOub2Q0Dno6vIwuA7yrysccN1sbnkwZbKlf4T6~iDdhaSLJd97QCyPOlbyUfYy9QLNExlRqKgNVJcMJRrIual~Lb1CLbnzt0uvobM57UpqSAAAA/meeting141"
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
-&#149;
-2009-01-24: <b>0.7 <a href="http://www.i2p2.i2p/release-0.7.html">Released</a></b>
+<h4><ul><li>2009-07-31: <b>0.7.6 <a href="http://www.i2p2.i2p/release-0.7.6.html">Released</a></b></li></ul></h4>
 </p><p>
-The 0.7 release adds stability and flexibility to I2PSnark,
-which can hopefully be used to distribute I2P updates in future.
+I2P version 0.7.6 contains additional fixes for network stability issues
+related to tunnel building and connection limits.
+While the 0.7.5 release greatly improved the congestion that
+appeared UTC evenings and weekends, it was not eliminated;
+this release should improve the situation further.
 </p><p>
-The I2P router gets fixes and optimizations to various
-transport-level and streaming issues, network exploration,
-NetDB performance and the UDP introducer system.
-Among other features, the new release offers
-better connection limiting, higher tolerance to "out of memory" exceptions
-in helper applications, and an experimental new address system
-using Base32 hashes of destination keys (".b32.i2p" URLs).
+This version also has new console themes by dr|z3d,
+which may be selected on <a href="/configui.jsp">the new UI configuration page</a>.
+Sorry, the new themes are not available for IE browsers.
 </p><p>
-Both the BOB and SAM protocols are improved upon,
-more old components dropped, Router Console features added
-and a possible latency measurement attack mitigated.
-From this release onwards, block lists for misbehaving peers
-are activated by default.
+The default tunnel length variance is changed from 1 to 0.
+This mainly affects exploratory tunnels and iMule.
+<a href="http://zzz.i2p/topics/260">As explained on zzz.i2p</a>,
+a non-zero variance adds very little protection, at great cost
+in resources.
+Should you wish to reconfigure your exploratory settings back to the old variance of 1,
+or change to length 3 variance 0,
+you may do so on <a href="configtunnels.jsp">the config tunnels page</a>.
+iMule settings are best changed within that application.
 </p><p>
-It seems worthwhile to remind that already since
-the last release, I2P requires Java 1.5 or higher.
-If you are uncertain about your Java version, you can verify
-by opening a terminal window or command prompt,
-and entering the command "java -version".
-If you have an older Java installed, please update it first!</p>
+I2P now stores temporary data in the system temp directory
+(generally /var/tmp on Linux and %TEMP% on Windows).
+For new installs only,
+user data is in $HOME/.i2p on Linux/Mac and
+%APPDATA%\I2P on Windows.
+</p><p>
+The release contains several changes to reduce resource usage
+(memory, CPU, and connections) and the usual assortment of bug fixes.
+Upgrading is recommended.
+</p><p>
+This is the first release built and signed by zzz.
+Thanks again to Complication for his many contributions to the project
+over the past five years.
+I2P is undergoing the most rapid development in years. Please give the
+developers feedback on IRC #i2p or <a href="http://forum.i2p">forum.i2p</a>
+and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>!
+</p>
 </i2p.news>

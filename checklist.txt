@@ -12,48 +12,51 @@ Change revision in:
 	installer/install.xml
 	news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
+		(change to BUILD = 0 and EXTRA = "")
 	core/java/src/net/i2p/CoreVersion.java
 
 Review the complete diff from the last release:
-        mtn diff -r t:i2p-0.6.(xx-1) > out.diff
+        mtn diff -r t:i2p-0.7.(xx-1) > out.diff
         vi out.diff
+
+Verify that no untrusted revisions were inadvertently
+blessed by a trusted party:
+        mtn log --brief --no-graph --to t:i2p-0.7.(xx-1) | cut -d ' ' -f 2- | sort
 
 Build and tag:
 	ant pkg
 	mtn ci
-	mtn tag h: i2p-0.6.xx
+	mtn tag h: i2p-0.7.xx
 	Sync with mtn.i2p2.i2p
 
 Create a signed update file with:
 	export I2P=~/i2p
-	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.6.xx
+	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.7.xx
 
 Verify signed update file with:
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate showversion i2pupdate.sud
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate verifysig i2pupdate.sud
 
 Make the source tarball:
-	Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.6.xx
+	Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.7.xx
         Double-check trust list
-	tar cjf i2psource-0.6.xx.tar.bz2 --exclude i2p-0.6.xx/_MTN i2p-0.6.xx	
-	mv i2p-0.6.xx.tar.bz2 i2p.i2p
+	tar cjf i2psource-0.7.xx.tar.bz2 --exclude i2p-0.7.xx/_MTN i2p-0.7.xx	
+	mv i2p-0.7.xx.tar.bz2 i2p.i2p
 
 Until the build script gets this ability, you need to rename some files:
-	mv i2pinstall.exe i2pinstall-0.6.xx.exe
-	mv i2p.tar.bz2 i2pheadless-0.6.xx.tar.bz2
-	mv i2pupdate.zip i2pupdate-0.6.xx.zip
+	mv i2pinstall.exe i2pinstall-0.7.xx.exe
+	mv i2pupdate.zip i2pupdate-0.7.xx.zip
 	you probably don't need to rename i2pupdate.sud
 
 Generate hashes:
-	sha1sum i2p*0.6.xx.*
-	sha1sum i2pupdate.sud
+	sha256sum i2p*0.7.xx.*
+	sha256sum i2pupdate.sud
 	now GPG-sign an announcement with the hashes
 
 Generate PGP signatures:
-	gpg -b i2pinstall-0.6.xx.exe
-	gpg -b i2pheadless-0.6.xx.tar.bz2
-	gpg -b i2psource-0.6.xx.tar.bz2
-	gpg -b i2pupdate-0.6.xx.zip
+	gpg -b i2pinstall-0.7.xx.exe
+	gpg -b i2psource-0.7.xx.tar.bz2
+	gpg -b i2pupdate-0.7.xx.zip
 	gpg -b i2pupdate.sud
 
 Distribute files to download locations and to www.i2p2.i2p
@@ -62,14 +65,12 @@ Website files to change:
 	Sync with mtn.i2p2.i2p
 	announcements.html
 	announcements_de.html
-	download.html (change SHA1s)
-	download_de.html (change SHA1s)
+	download.html (change SHA256s)
+	download_de.html (change SHA256s)
 	index.html
 	index_de.html
 	hosts.txt (copy from mtn)
         release-x.y.z.html (new)
 	Sync with mtn.i2p2.i2p
 
-Copy news.xml to subscription location
-
-Announce on #i2p, forum.i2p, Syndie, freshmeat
+Announce on #i2p, forum.i2p

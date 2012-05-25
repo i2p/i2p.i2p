@@ -75,11 +75,7 @@ public class UDPPacket {
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
 
     private UDPPacket(I2PAppContext ctx, boolean inbound) {
-        ctx.statManager().createRateStat("udp.packetsLiveInbound", "Number of live inbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.packetsLiveOutbound", "Number of live outbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.packetsLivePendingRecvInbound", "Number of live inbound packets not yet handled by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.packetsLivePendingHandleInbound", "Number of live inbound packets not yet handled fully by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", new long[] { 60*1000 });
+        ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _data = new byte[MAX_PACKET_SIZE];
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
@@ -129,7 +125,7 @@ public class UDPPacket {
     int getFragmentCount() { return _fragmentCount; }
     void setFragmentCount(int count) { _fragmentCount = count; }
     
-    public RemoteHostId getRemoteHost() {
+    public RemoteHostId getRemoteHost() {// LINT -- Exporting non-public type through public API
         if (_remoteHost == null) {
             long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
@@ -172,7 +168,7 @@ public class UDPPacket {
             Hash hmac = _context.hmac().calculate(macKey, buf.getData(), 0, off);
 
             if (_log.shouldLog(Log.DEBUG)) {
-                StringBuffer str = new StringBuffer(128);
+                StringBuilder str = new StringBuilder(128);
                 str.append(_packet.getLength()).append(" byte packet received, payload length ");
                 str.append(payloadLength);
                 str.append("\nIV: ").append(Base64.encode(buf.getData(), payloadLength, IV_SIZE));
@@ -238,9 +234,10 @@ public class UDPPacket {
     /** how many times we tried to validate the packet */
     int getValidateCount() { return _validateCount; }
     
+    @Override
     public String toString() {
         verifyNotReleased(); 
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append(_packet.getLength());
         buf.append(" byte packet with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");

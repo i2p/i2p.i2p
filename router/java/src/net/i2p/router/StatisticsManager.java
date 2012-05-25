@@ -29,12 +29,9 @@ public class StatisticsManager implements Service {
     private Log _log;
     private RouterContext _context;
     private boolean _includePeerRankings;
-    private int _publishedStats;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
     public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "true";
-    public final static String PROP_MAX_PUBLISHED_PEERS = "router.publishPeerMax";
-    public final static int DEFAULT_MAX_PUBLISHED_PEERS = 10;
 
     private final DecimalFormat _fmt;
     private final DecimalFormat _pct;
@@ -52,43 +49,8 @@ public class StatisticsManager implements Service {
         startup();
     }
     public void startup() {
-        String val = _context.router().getConfigSetting(PROP_PUBLISH_RANKINGS);
-        try {
-            if (val == null) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Peer publishing setting " + PROP_PUBLISH_RANKINGS 
-                              + " not set - using default " + DEFAULT_PROP_PUBLISH_RANKINGS);
-                val = DEFAULT_PROP_PUBLISH_RANKINGS;
-            } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Peer publishing setting " + PROP_PUBLISH_RANKINGS 
-                              + " set to " + val);
-            }
-            boolean v = Boolean.TRUE.toString().equalsIgnoreCase(val);
-            _includePeerRankings = v;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Setting includePeerRankings = " + v);
-        } catch (Throwable t) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error determining whether to publish rankings [" 
-                           + PROP_PUBLISH_RANKINGS + "=" + val 
-                           + "], so we're defaulting to FALSE"); 
-            _includePeerRankings = false;
-        }
-        val = _context.router().getConfigSetting(PROP_MAX_PUBLISHED_PEERS);
-        if (val == null) {
-            _publishedStats = DEFAULT_MAX_PUBLISHED_PEERS;
-        } else {
-            try {
-                int num = Integer.parseInt(val);
-                _publishedStats = num;
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Invalid max number of peers to publish [" + val 
-                               + "], defaulting to " + DEFAULT_MAX_PUBLISHED_PEERS, nfe);
-                _publishedStats = DEFAULT_MAX_PUBLISHED_PEERS;
-            }
-        }
+        String val = _context.getProperty(PROP_PUBLISH_RANKINGS, DEFAULT_PROP_PUBLISH_RANKINGS);
+        _includePeerRankings = Boolean.valueOf(val);
     }
     
     /** Retrieve a snapshot of the statistics that should be published */
@@ -124,13 +86,10 @@ public class StatisticsManager implements Service {
 ***/
         
         if (_includePeerRankings) {
-            if (false)
-                stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
-
             long publishedUptime = _context.router().getUptime();
             // Don't publish these for first hour
-            if (publishedUptime > 60*60*1000)
-                includeThroughput(stats);
+            if (publishedUptime > 62*60*1000)
+                includeAverageThroughput(stats);
             //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             //includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             //includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
@@ -162,7 +121,9 @@ public class StatisticsManager implements Service {
             //includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
             //includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
             //includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
+            // total event count can be used to track uptime
+            boolean hideTotals = ! RouterVersion.VERSION.equals("0.7.6");
+            includeRate("tunnel.participatingTunnels", stats, new long[] { 60*60*1000 }, hideTotals);
             //includeRate("tunnel.testSuccessTime", stats, new long[] { 10*60*1000l });
             //includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
             //includeRate("udp.sendConfirmTime", stats, new long[] { 10*60*1000 });
@@ -172,12 +133,6 @@ public class StatisticsManager implements Service {
             //includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
 
-            // Round smaller uptimes to 1 hour, to frustrate uptime tracking
-            // Round 2nd hour to 90m since peers use 2h minimum to route
-            if (publishedUptime < 60*60*1000) publishedUptime = 60*60*1000;
-            else if (publishedUptime < 2*60*60*1000) publishedUptime = 90*60*1000;
-
-            stats.setProperty("stat_uptime", DataHelper.formatDuration(publishedUptime));
             //stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             
             //includeRate("tunnel.decryptRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
@@ -185,29 +140,21 @@ public class StatisticsManager implements Service {
             //includeRate("udp.packetVerifyTime", stats, new long[] { 60*1000 });
             
             //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildClientExpire", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildClientReject", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildClientSuccess", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildExploratoryExpire", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildExploratoryReject", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildExploratorySuccess", stats, new long[] { 10*60*1000 });
+            long rate = 60*60*1000;
+            includeTunnelRates("Client", stats, rate);
+            includeTunnelRates("Exploratory", stats, rate);
             //includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });
-            
-            _log.debug("Publishing peer rankings");
-        } else {
-            // So that we will still get build requests
-            stats.setProperty("stat_uptime", "90m");
-            _log.debug("Not publishing peer rankings");
         }
+
+        // So that we will still get build requests
+        stats.setProperty("stat_uptime", "90m");
         if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
             stats.setProperty("netdb.knownRouters", ""+_context.netDb().getKnownRouters());
             stats.setProperty("netdb.knownLeaseSets", ""+_context.netDb().getKnownLeaseSets());
         }
 
-    if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Building status: " + stats);
         return stats;
     }
     
@@ -245,7 +192,7 @@ public class StatisticsManager implements Service {
     }
     
     private String renderRate(Rate rate, boolean fudgeQuantity) {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
         buf.append(pct(rate.getPercentageOfLifetimeValue())).append(';');
@@ -274,41 +221,66 @@ public class StatisticsManager implements Service {
         return buf.toString();
     }
 
-    private void includeThroughput(Properties stats) {
-        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
-        if (sendRate != null) {
-            /****
-            if (_context.router().getUptime() > 5*60*1000) {
-                Rate r = sendRate.getRate(5*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthSendBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
-            ****/
-            if (_context.router().getUptime() > 60*60*1000) { 
-                Rate r = sendRate.getRate(60*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthSendBps.60m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
+    private static final String[] tunnelStats = { "Expire", "Reject", "Success" };
+
+    /**
+     *  Add tunnel build rates with some mods to hide absolute quantities
+     *  In particular, report counts normalized to 100 (i.e. a percentage)
+     */
+    private void includeTunnelRates(String tunnelType, Properties stats, long selectedPeriod) {
+        long totalEvents = 0;
+        for (String tunnelStat : tunnelStats) {
+            String rateName = "tunnel.build" + tunnelType + tunnelStat;
+            RateStat stat = _context.statManager().getRate(rateName);
+            if (stat == null) continue;
+            Rate curRate = stat.getRate(selectedPeriod);
+            if (curRate == null) continue;
+            totalEvents += curRate.getLastEventCount();
         }
-        
-        RateStat recvRate = _context.statManager().getRate("bw.recvRate");
-        if (recvRate != null) {
-            /****
-            if (_context.router().getUptime() > 5*60*1000) {
-                Rate r = recvRate.getRate(5*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthReceiveBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
-            ****/
-            if (_context.router().getUptime() > 60*60*1000) {
-                Rate r = recvRate.getRate(60*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthReceiveBps.60m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
+        if (totalEvents <= 0)
+            return;
+        for (String tunnelStat : tunnelStats) {
+            String rateName = "tunnel.build" + tunnelType + tunnelStat;
+            RateStat stat = _context.statManager().getRate(rateName);
+            if (stat == null) continue;
+            Rate curRate = stat.getRate(selectedPeriod);
+            if (curRate == null) continue;
+            double fudgeQuantity = 100.0d * curRate.getLastEventCount() / totalEvents;
+            stats.setProperty("stat_" + rateName + '.' + getPeriod(curRate), renderRate(curRate, fudgeQuantity));
         }
     }
-
     
+    private String renderRate(Rate rate, double fudgeQuantity) {
+        StringBuilder buf = new StringBuilder(128);
+        buf.append(num(rate.getAverageValue())).append(';');
+        buf.append(num(rate.getExtremeAverageValue())).append(';');
+        buf.append(pct(rate.getPercentageOfLifetimeValue())).append(';');
+        if (rate.getLifetimeTotalEventTime() > 0) {
+            // bah saturation
+            buf.append("0;0;0;0;");
+        }
+        long numPeriods = rate.getLifetimePeriods();
+        buf.append(num(fudgeQuantity)).append(';');
+        return buf.toString();
+    }
+
+    /* report the same data for tx and rx, for enhanced anonymity */
+    private void includeAverageThroughput(Properties stats) {
+        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
+        RateStat recvRate = _context.statManager().getRate("bw.recvRate");
+        if (sendRate == null || recvRate == null)
+            return;
+        Rate s = sendRate.getRate(60*60*1000);
+        Rate r = recvRate.getRate(60*60*1000);
+        if (s == null || r == null)
+            return;
+        double speed = (s.getAverageValue() + r.getAverageValue()) / 2;
+        double max = Math.max(s.getExtremeAverageValue(), r.getExtremeAverageValue());
+        String str = num(speed) + ';' + num(max) + ";0;0;";
+        stats.setProperty("stat_bandwidthSendBps.60m", str);
+        stats.setProperty("stat_bandwidthReceiveBps.60m", str);
+    }
+
     private String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
     private final String num(double num) { 

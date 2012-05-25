@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
+
 /**
  * Main class of addressbook.  Performs updates, and runs the main loop.
  * 
@@ -125,15 +127,17 @@ public class Daemon {
     
     public void run(String[] args) {
         String settingsLocation = "config.txt";
-        String home;
+        File homeFile;
         if (args.length > 0) {
-            home = args[0];
+            homeFile = new File(args[0]);
+            if (!homeFile.isAbsolute())
+                homeFile = new File(I2PAppContext.getGlobalContext().getRouterDir(), args[0]);
         } else {
-            home = ".";
+            homeFile = new File(System.getProperty("user.dir"));
         }
         
         Map defaultSettings = new HashMap();
-        defaultSettings.put("proxy_host", "localhost");
+        defaultSettings.put("proxy_host", "127.0.0.1");
         defaultSettings.put("proxy_port", "4444");
         defaultSettings.put("master_addressbook", "../userhosts.txt");
         defaultSettings.put("router_addressbook", "../hosts.txt");
@@ -145,7 +149,6 @@ public class Daemon {
         defaultSettings.put("last_modified", "last_modified");
         defaultSettings.put("update_delay", "12");
         
-        File homeFile = new File(home);
         if (!homeFile.exists()) {
             boolean created = homeFile.mkdirs();
             if (created)
@@ -169,7 +172,7 @@ public class Daemon {
                 delay = 1;
             }
             
-            update(settings, home);
+            update(settings, homeFile.getAbsolutePath());
             try {
                 synchronized (this) {
                     wait(delay * 60 * 60 * 1000);

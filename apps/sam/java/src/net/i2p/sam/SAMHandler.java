@@ -9,9 +9,8 @@ package net.i2p.sam;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.nio.channels.SocketChannel;
+import java.nio.ByteBuffer;
 import java.util.Properties;
 
 import net.i2p.util.I2PAppThread;
@@ -32,8 +31,7 @@ public abstract class SAMHandler implements Runnable {
     protected SAMBridge bridge = null;
 
     private Object socketWLock = new Object(); // Guards writings on socket
-    private Socket socket = null;
-    private OutputStream socketOS = null; // Stream associated to socket
+    protected SocketChannel socket = null;
 
     protected int verMajor = 0;
     protected int verMinor = 0;
@@ -53,10 +51,9 @@ public abstract class SAMHandler implements Runnable {
      * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
      * @throws IOException 
      */
-    protected SAMHandler(Socket s,
+    protected SAMHandler(SocketChannel s,
                          int verMajor, int verMinor, Properties i2cpProps) throws IOException {
         socket = s;
-        socketOS = socket.getOutputStream();
 
         this.verMajor = verMajor;
         this.verMinor = verMinor;
@@ -86,8 +83,8 @@ public abstract class SAMHandler implements Runnable {
      * @return input stream
      * @throws IOException 
      */
-    protected final InputStream getClientSocketInputStream() throws IOException {
-        return socket.getInputStream();
+    protected final SocketChannel getClientSocket() {
+        return socket ;
     }
 
     /**
@@ -98,11 +95,15 @@ public abstract class SAMHandler implements Runnable {
      * @param data A byte array to be written
      * @throws IOException 
      */
-    protected final void writeBytes(byte[] data) throws IOException {
+    protected final void writeBytes(ByteBuffer data) throws IOException {
         synchronized (socketWLock) {
-            socketOS.write(data);
-            socketOS.flush();
+            writeBytes(data, socket);
         }
+    }
+    
+    static public void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
+    	while (data.hasRemaining()) out.write(data);           
+    	out.socket().getOutputStream().flush();
     }
     
     /** 
@@ -112,7 +113,6 @@ public abstract class SAMHandler implements Runnable {
      * @return socket Write lock object
      */
     protected Object getWriteLock() { return socketWLock; }
-    protected OutputStream getOut() { return socketOS; }
 
     /**
      * Write a string to the handler's socket.  This method must
@@ -121,21 +121,25 @@ public abstract class SAMHandler implements Runnable {
      *
      * @param str A byte array to be written
      *
-     * @return True is the string was successfully written, false otherwise
+     * @return True if the string was successfully written, false otherwise
      */
     protected final boolean writeString(String str) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending the client: [" + str + "]");
-        try {
-            writeBytes(str.getBytes("ISO-8859-1"));
+        return writeString(str, socket);
+    }
+
+    public static boolean writeString(String str, SocketChannel out)
+    {
+    	try {
+            writeBytes(ByteBuffer.wrap(str.getBytes("ISO-8859-1")), out);
         } catch (IOException e) {
             _log.debug("Caught IOException", e);
             return false;
         }
-
-        return true;
+        return true ;
     }
-
+    
     /**
      * Close the socket connected to the SAM client.
      *
@@ -178,8 +182,8 @@ public abstract class SAMHandler implements Runnable {
         return ("SAM handler (class: " + this.getClass().getName()
                 + "; SAM version: " + verMajor + "." + verMinor
                 + "; client: "
-                + this.socket.getInetAddress().toString() + ":"
-                + this.socket.getPort() + ")");
+                + this.socket.socket().getInetAddress().toString() + ":"
+                + this.socket.socket().getPort() + ")");
     }
 
     public final void run() {

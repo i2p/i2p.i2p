@@ -10,7 +10,6 @@ import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
-import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;

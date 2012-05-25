@@ -13,14 +13,13 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.util.HexDump;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -55,22 +54,18 @@ public class Blocklist {
     private RouterContext _context;
     private long _blocklist[];
     private int _blocklistSize;
-    private Object _lock;
+    private final Object _lock = new Object();
     private Entry _wrapSave;
-    private Set _inProcess;
-    private Map _peerBlocklist;
-    private Set _singleIPBlocklist;
+    private final Set<Hash> _inProcess = new HashSet(0);
+    private Map<Hash, String> _peerBlocklist = new HashMap(0);
+    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet(0);
     
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
         _blocklist = null;
         _blocklistSize = 0;
-        _lock = new Object();
         _wrapSave = null;
-        _inProcess = new HashSet(0);
-        _peerBlocklist = new HashMap(0);
-        _singleIPBlocklist = new HashSet(0);
     }
     
     public Blocklist() {
@@ -116,7 +111,7 @@ public class Blocklist {
             }
             for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash) iter.next();
-                String reason = "Blocklisted by router hash";
+                String reason = "Banned by router hash";
                 String comment = (String) _peerBlocklist.get(peer);
                 if (comment != null)
                     reason = reason + ": " + comment;
@@ -171,6 +166,8 @@ public class Blocklist {
     */
     private void readBlocklistFile(String file) {
         File BLFile = new File(file);
+        if (!BLFile.isAbsolute())
+            BLFile = new File(_context.getConfigDir(), file);
         if (BLFile == null || (!BLFile.exists()) || BLFile.length() <= 0) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Blocklist file not found: " + file);
@@ -191,7 +188,7 @@ public class Blocklist {
         FileInputStream in = null;
         try {
             in = new FileInputStream(BLFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf) && count < maxSize) {
                 Entry e = parse(buf, true);
                 buf.setLength(0);
@@ -270,7 +267,7 @@ public class Blocklist {
         }
     }
 
-    private Entry parse(StringBuffer buf, boolean bitch) {
+    private Entry parse(StringBuilder buf, boolean bitch) {
         byte[] ip1;
         byte[] ip2;
         int start1 = 0;
@@ -381,7 +378,7 @@ public class Blocklist {
         FileInputStream in = null;
         try {
             in = new FileInputStream(BLFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf)) {
                 lines++;
                 buf.setLength(0);
@@ -448,15 +445,11 @@ public class Blocklist {
     }
 
     private boolean add(int ip) {
-        synchronized(_singleIPBlocklist) {
-            return _singleIPBlocklist.add(new Integer(ip));
-        }
+        return _singleIPBlocklist.add(Integer.valueOf(ip));
     }
 
     private boolean isOnSingleList(int ip) {
-        synchronized(_singleIPBlocklist) {
-            return _singleIPBlocklist.contains(new Integer(ip));
-        }
+        return _singleIPBlocklist.contains(Integer.valueOf(ip));
     }
 
     /**
@@ -588,11 +581,11 @@ public class Blocklist {
 
     // methods to get and store the from/to values in the array
 
-    private int getFrom(long entry) {
+    private static int getFrom(long entry) {
         return (int) ((entry >> 32) & 0xffffffff);
     }
 
-    private int getTo(long entry) {
+    private static int getTo(long entry) {
         return (int) (entry & 0xffffffff);
     }
 
@@ -604,7 +597,7 @@ public class Blocklist {
      * So the size is (cough) almost 2MB for the 240,000 line splist.txt.
      *
      */
-    private long toEntry(byte ip1[], byte ip2[]) {
+    private static long toEntry(byte ip1[], byte ip2[]) {
         long entry = 0;
         for (int i = 0; i < 4; i++)
             entry |= ((long) (ip2[i] & 0xff)) << ((3-i)*8);
@@ -623,15 +616,19 @@ public class Blocklist {
         _blocklist[idx] = entry;
     }
 
-    private int toInt(byte ip[]) {
+    private static int toInt(byte ip[]) {
         int rv = 0;
         for (int i = 0; i < 4; i++)
             rv |= (ip[i] & 0xff) << ((3-i)*8);
         return rv;
     }
 
-    private String toStr(long entry) {
-        StringBuffer buf = new StringBuffer(32);
+    public static String toStr(byte[] ip) {
+        return toStr(toInt(ip));
+    }
+
+    private static String toStr(long entry) {
+        StringBuilder buf = new StringBuilder(32);
         for (int i = 7; i >= 0; i--) {
             buf.append((entry >> (8*i)) & 0xff);
             if (i == 4)
@@ -642,8 +639,8 @@ public class Blocklist {
         return buf.toString();
     }
 
-    private String toStr(int ip) {
-        StringBuffer buf = new StringBuffer(16);
+    private static String toStr(int ip) {
+        StringBuilder buf = new StringBuilder(16);
         for (int i = 3; i >= 0; i--) {
             buf.append((ip >> (8*i)) & 0xff);
             if (i > 0)
@@ -662,7 +659,7 @@ public class Blocklist {
      */
     public void shitlist(Hash peer) {
         // Temporary reason, until the job finishes
-        _context.shitlist().shitlistRouterForever(peer, "IP Blocklisted");
+        _context.shitlist().shitlistRouterForever(peer, "IP Banned");
         if (! "true".equals( _context.getProperty(PROP_BLOCKLIST_DETAIL, "true")))
             return;
         boolean shouldRunJob;
@@ -685,7 +682,7 @@ public class Blocklist {
             super(_context);
             _peer = p;
         }
-        public String getName() { return "Shitlist Peer Forever"; }
+        public String getName() { return "Ban Peer by IP"; }
         public void runJob() {
             shitlistForever(_peer);
             synchronized (_inProcess) {
@@ -706,6 +703,8 @@ public class Blocklist {
     private synchronized void shitlistForever(Hash peer) {
         String file = _context.getProperty(PROP_BLOCKLIST_FILE, BLOCKLIST_FILE_DEFAULT);
         File BLFile = new File(file);
+        if (!BLFile.isAbsolute())
+            BLFile = new File(_context.getConfigDir(), file);
         if (BLFile == null || (!BLFile.exists()) || BLFile.length() <= 0) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Blocklist file not found: " + file);
@@ -720,7 +719,7 @@ public class Blocklist {
             FileInputStream in = null;
             try {
                 in = new FileInputStream(BLFile);
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 // assume the file is unsorted, so go through the whole thing
                 while (DataHelper.readLine(in, buf)) {
                     Entry e = parse(buf, false);
@@ -736,7 +735,7 @@ public class Blocklist {
                             if (i != 3)
                                 reason = reason + '.';
                         }
-                        reason = reason + " blocklisted by entry \"" + buf + "\"";
+                        reason = reason + " banned by " + BLOCKLIST_FILE_DEFAULT + " entry \"" + buf + "\"";
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Shitlisting " + peer + " " + reason);
                         _context.shitlist().shitlistRouterForever(peer, reason);
@@ -754,37 +753,34 @@ public class Blocklist {
         // We already shitlisted in shitlist(peer), that's good enough
     }
 
+    /** write directly to the stream so we don't OOM on a huge list */
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("<h2>IP Blocklist</h2>");
+        out.write("<h2>Banned IPs</h2>");
         Set singles = new TreeSet();
-        synchronized(_singleIPBlocklist) {
-            singles.addAll(_singleIPBlocklist);
-        }
+        singles.addAll(_singleIPBlocklist);
         if (singles.size() > 0) {
-            buf.append("<table><tr><td><b>Transient IPs</b></td></tr>");
+            out.write("<table><tr><td><b>Transient IPs</b></td></tr>");
             for (Iterator iter = singles.iterator(); iter.hasNext(); ) {
                  int ip = ((Integer) iter.next()).intValue();
-                 buf.append("<tr><td align=right>").append(toStr(ip)).append("</td></tr>\n");
+                 out.write("<tr><td align=right>"); out.write(toStr(ip)); out.write("</td></tr>\n");
             }
-            buf.append("</table>");
+            out.write("</table>");
         }
         if (_blocklistSize > 0) {
-            buf.append("<table><tr><td align=center colspan=2><b>IPs from Blocklist File</b></td></tr><tr><td align=center><b>From</b></td><td align=center><b>To</b></td></tr>");
+            out.write("<table><tr><th align=center colspan=2><b>IPs from Blocklist File</b></th></tr><tr><td align=center width=50%><b>From:</b></td><td align=center width=50%><b>To:</b></td></tr>");
             for (int i = 0; i < _blocklistSize; i++) {
                  int from = getFrom(_blocklist[i]);
-                 buf.append("<tr><td align=right>").append(toStr(from)).append("</td><td align=right>");
+                 out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
                  int to = getTo(_blocklist[i]);
-                 if (to != from)
-                     buf.append(toStr(to)).append("</td></tr>\n");
-                 else
-                     buf.append("&nbsp</td></tr>\n");
+                 if (to != from) {
+                     out.write(toStr(to)); out.write("</td></tr>\n");
+                 } else
+                     out.write("&nbsp</td></tr>\n");
             }
-            buf.append("</table>");
+            out.write("</table>");
         } else {
-            buf.append("<br>No blocklist file entries");
+            out.write("<br><i>No blocklist file entries.</i>");
         }
-        out.write(buf.toString());
         out.flush();
     }
 

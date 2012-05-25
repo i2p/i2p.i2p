@@ -12,11 +12,15 @@ package net.i2p.apps.systray;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.InetSocketAddress;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.ShellCommand;
 
 /**
@@ -32,6 +36,56 @@ import net.i2p.util.ShellCommand;
 public class UrlLauncher {
 
     ShellCommand _shellCommand = new ShellCommand();
+
+    private static final int WAIT_TIME = 5*1000;
+    private static final int MAX_WAIT_TIME = 5*60*1000;
+    private static final int MAX_TRIES = 99;
+
+    /**
+     *  Prevent bad user experience by waiting for the server to be there
+     *  before launching the browser.
+     *  @return success
+     */
+    public boolean waitForServer(String urlString) {
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            return false;
+        }
+        String host = url.getHost();
+        int port = url.getPort();
+        if (port <= 0) {
+            port = url.getDefaultPort();
+            if (port <= 0)
+                return false;
+        }
+        SocketAddress sa;
+        try {
+            sa = new InetSocketAddress(host, port);
+        } catch (IllegalArgumentException iae) {
+            return false;
+        }
+        long done = System.currentTimeMillis() + MAX_WAIT_TIME;
+        for (int i = 0; i < MAX_TRIES; i++) {
+            try {
+                Socket test = new Socket();
+                // this will usually fail right away if it's going to fail since it's local
+                test.connect(sa, WAIT_TIME);
+                // it worked
+                try {
+                   test.close();
+                } catch (IOException ioe) {}
+                return true;
+            } catch (Exception e) {}
+            if (System.currentTimeMillis() > done)
+                break;
+            try {
+                Thread.sleep(WAIT_TIME);
+            } catch (InterruptedException ie) {}
+        }
+        return false;
+    }
 
     /**
      * Discovers the operating system the installer is running under and tries
@@ -49,6 +103,7 @@ public class UrlLauncher {
 
         String osName = System.getProperty("os.name");
 
+        waitForServer(url);
         if (validateUrlFormat(url)) {
             if (osName.toLowerCase().indexOf("mac") > -1) {
                 if (osName.toLowerCase().startsWith("mac os x")) {
@@ -68,10 +123,11 @@ public class UrlLauncher {
                 String         browserString  = "\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" -nohome";
                 BufferedReader bufferedReader = null;
 
-                _shellCommand.executeSilentAndWait("regedit /E browser.reg \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"");
+                File foo = new File(I2PAppContext.getGlobalContext().getTempDir(), "browser.reg");
+                _shellCommand.executeSilentAndWait("regedit /E \"" + foo.getAbsolutePath() + "\" \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"");
 
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("browser.reg"), "UTF-16"));
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(foo), "UTF-16"));
                     for (String line; (line = bufferedReader.readLine()) != null; ) {
                         if (line.startsWith("@=")) {
                             // we should really use the whole line and replace %1 with the url
@@ -86,7 +142,7 @@ public class UrlLauncher {
                     } catch (IOException e) {
                         // No worries.
                     }
-                    new File("browser.reg").delete();
+                    foo.delete();
                 } catch (Exception e) {
                     // Defaults to IE.
                 } finally {
@@ -100,6 +156,20 @@ public class UrlLauncher {
 
                 // fall through
             }
+
+            // This debian script tries everything in $BROWSER, then gnome-www-browser and x-www-browser
+            // if X is running and www-browser otherwise. Those point to the user's preferred
+            // browser using the update-alternatives system.
+            if (_shellCommand.executeSilentAndWaitTimed("sensible-browser " + url, 5))
+                return true;
+
+            // Try x-www-browser directly
+            if (_shellCommand.executeSilentAndWaitTimed("x-www-browser " + url, 5))
+                return true;
+
+            // puppy linux
+            if (_shellCommand.executeSilentAndWaitTimed("defaultbrowser " + url, 5))
+                return true;
 
             if (_shellCommand.executeSilentAndWaitTimed("opera -newpage " + url, 5))
                 return true;
@@ -119,6 +189,10 @@ public class UrlLauncher {
             if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
                 return true;
             
+            // Text Mode Browsers only below here
+            if (_shellCommand.executeSilentAndWaitTimed("www-browser " + url, 5))
+                return true;
+
             if (_shellCommand.executeSilentAndWaitTimed("links " + url, 5))
                 return true;
 
@@ -141,6 +215,7 @@ public class UrlLauncher {
      */
     public boolean openUrl(String url, String browser) throws Exception {
 
+        waitForServer(url);
         if (validateUrlFormat(url))
             if (_shellCommand.executeSilentAndWaitTimed(browser + " " + url, 5))
                 return true;
@@ -163,7 +238,7 @@ public class UrlLauncher {
             if (args.length > 0)
                 launcher.openUrl(args[0]);
             else
-                launcher.openUrl("http://localhost:7657/index.jsp");
+                launcher.openUrl("http://127.0.0.1:7657/index.jsp");
          } catch (Exception e) {}
     }
 }

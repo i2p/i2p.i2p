@@ -26,7 +26,7 @@ import net.i2p.util.SimpleTimer;
 public class FragmentHandler {
     private I2PAppContext _context;
     private Log _log;
-    private Map _fragmentedMessages;
+    private final Map _fragmentedMessages;
     private DefragmentedReceiver _receiver;
     private int _completed;
     private int _failed;
@@ -74,6 +74,12 @@ public class FragmentHandler {
         int padding = 0;
         while (preprocessed[offset] != (byte)0x00) {
             offset++; // skip the padding
+            // AIOOBE http://forum.i2p/viewtopic.php?t=3187
+            if (offset >= TrivialPreprocessor.PREPROCESSED_SIZE) {
+                _cache.release(new ByteArray(preprocessed));
+                _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
+                return;
+            }
             padding++;
         }
         offset++; // skip the final 0x00, terminating the padding
@@ -100,7 +106,18 @@ public class FragmentHandler {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
             _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
-            throw e;
+            // java.lang.IllegalStateException: wtf, don't get the completed size when we're not complete - null fragment i=0 of 1
+            // at net.i2p.router.tunnel.FragmentedMessage.getCompleteSize(FragmentedMessage.java:194)
+            // at net.i2p.router.tunnel.FragmentedMessage.toByteArray(FragmentedMessage.java:223)
+            // at net.i2p.router.tunnel.FragmentHandler.receiveComplete(FragmentHandler.java:380)
+            // at net.i2p.router.tunnel.FragmentHandler.receiveSubsequentFragment(FragmentHandler.java:353)
+            // at net.i2p.router.tunnel.FragmentHandler.receiveFragment(FragmentHandler.java:208)
+            // at net.i2p.router.tunnel.FragmentHandler.receiveTunnelMessage(FragmentHandler.java:92)
+            // ...
+            // still trying to find root cause
+            // let's limit the damage here and skip the:
+            // .transport.udp.MessageReceiver: b0rked receiving a message.. wazza huzza hmm?
+            //throw e;
         } finally {
             // each of the FragmentedMessages populated make a copy out of the
             // payload, which they release separately, so we can release 
@@ -387,8 +404,8 @@ public class FragmentHandler {
                 _log.error("Error receiving fragmented message (corrupt?): " + stringified, ioe);
         } catch (I2NPMessageException ime) {
             if (stringified == null) stringified = msg.toString();
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error receiving fragmented message (corrupt?): " + stringified, ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error receiving fragmented message (corrupt?): " + stringified, ime);
         }
     }
 

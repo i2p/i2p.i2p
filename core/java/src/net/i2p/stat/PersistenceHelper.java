@@ -9,13 +9,13 @@ class PersistenceHelper {
     private final static Log _log = new Log(PersistenceHelper.class);
     private final static String NL = System.getProperty("line.separator");
 
-    public final static void add(StringBuffer buf, String prefix, String name, String description, double value) {
+    public final static void add(StringBuilder buf, String prefix, String name, String description, double value) {
         buf.append("# ").append(prefix).append(name).append(NL);
         buf.append("# ").append(description).append(NL);
         buf.append(prefix).append(name).append('=').append(value).append(NL).append(NL);
     }
 
-    public final static void add(StringBuffer buf, String prefix, String name, String description, long value) {
+    public final static void add(StringBuilder buf, String prefix, String name, String description, long value) {
         buf.append("# ").append(prefix).append(name).append(NL);
         buf.append("# ").append(description).append(NL);
         buf.append(prefix).append(name).append('=').append(value).append(NL).append(NL);

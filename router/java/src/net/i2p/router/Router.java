@@ -9,7 +9,6 @@ package net.i2p.router;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
@@ -36,6 +35,7 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
+import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -53,19 +53,19 @@ import net.i2p.util.SimpleTimer;
 public class Router {
     private Log _log;
     private RouterContext _context;
-    private Properties _config;
+    private final Properties _config;
+    /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
     private long _started;
     private boolean _higherVersionSeen;
-    private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
+    //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     private boolean _killVMOnEnd;
     private boolean _isAlive;
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
-    private I2PThread _gracefulShutdownDetector;
-    private Set _shutdownTasks;
+    private final I2PThread _gracefulShutdownDetector;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -75,7 +75,13 @@ public class Router {
     /** used to differentiate routerInfo files on different networks */
     public static final int NETWORK_ID = 2;
     
+    /** coalesce stats this often - should be a little less than one minute, so the graphs get updated */
+    private static final int COALESCE_TIME = 50*1000;
+
+    /** this puts an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN = "router.hiddenMode";
+    /** this does not put an 'H' in your routerInfo **/
+    public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
     public final static String PROP_INFO_FILENAME = "router.info.location";
     public final static String PROP_INFO_FILENAME_DEFAULT = "router.info";
@@ -91,8 +97,6 @@ public class Router {
         System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
-        // until we handle restricted routes and/or all peers support v6, try v4 first
-        System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("http.agent", "I2P");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
@@ -105,14 +109,6 @@ public class Router {
     public Router(Properties envProps) { this(null, envProps); }
     public Router(String configFilename) { this(configFilename, null); }
     public Router(String configFilename, Properties envProps) {
-        if (!beginMarkingLiveliness(envProps)) {
-            System.err.println("ERROR: There appears to be another router already running!");
-            System.err.println("       Please make sure to shut down old instances before starting up");
-            System.err.println("       a new one.  If you are positive that no other instance is running,");
-            System.err.println("       please delete the file " + getPingFile(envProps));
-            System.exit(-1);
-        }
-
         _gracefulExitCode = -1;
         _config = new Properties();
 
@@ -126,7 +122,42 @@ public class Router {
             _configFilename = configFilename;
         }
                     
+        // we need the user directory figured out by now, so figure it out here rather than
+        // in the RouterContext() constructor.
+        //
+        // We have not read the config file yet. Therefore the base and config locations
+        // are determined solely by properties (first envProps then System), for the purposes
+        // of initializing the user's config directory if it did not exist.
+        // If the base dir and/or config dir are set in the config file,
+        // they wil be used after the initialization of the (possibly different) dirs
+        // determined by WorkingDir.
+        // So for now, it doesn't make much sense to set the base or config dirs in the config file -
+        // use properties instead. If for some reason, distros need this, we can revisit it.
+        //
+        // Then add it to envProps (but not _config, we don't want it in the router.config file)
+        // where it will then be available to all via _context.dir()
+        //
+        // This call also migrates all files to the new working directory,
+        // including router.config
+        //
+
+        // Do we copy all the data files to the new directory? default false
+        String migrate = System.getProperty("i2p.dir.migrate");
+        boolean migrateFiles = Boolean.valueOf(migrate).booleanValue();
+        String userDir = WorkingDir.getWorkingDir(envProps, migrateFiles);
+
+        // Use the router.config file specified in the router.configLocation property
+        // (default "router.config"),
+        // if it is an abolute path, otherwise look in the userDir returned by getWorkingDir
+        // replace relative path with absolute
+        File cf = new File(_configFilename);
+        if (!cf.isAbsolute()) {
+            cf = new File(userDir, _configFilename);
+            _configFilename = cf.getAbsolutePath();
+        }
+
         readConfig();
+
         if (envProps == null) {
             envProps = _config;
         } else {
@@ -136,14 +167,47 @@ public class Router {
                 envProps.setProperty(k, v);
             }
         }
-            
 
+        // This doesn't work, guess it has to be in the static block above?
+        // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
+        //    System.setProperty("java.net.preferIPv4Stack", "true");
+
+        if (envProps.getProperty("i2p.dir.config") == null)
+            envProps.setProperty("i2p.dir.config", userDir);
+
+        // The important thing that happens here is the directory paths are set and created
+        // i2p.dir.router defaults to i2p.dir.config
+        // i2p.dir.app defaults to i2p.dir.router
+        // i2p.dir.log defaults to i2p.dir.router
+        // i2p.dir.pid defaults to i2p.dir.router
+        // i2p.dir.base defaults to user.dir == $CWD
         _context = new RouterContext(this, envProps);
+
+        // This is here so that we can get the directory location from the context
+        // for the ping file
+        if (!beginMarkingLiveliness()) {
+            System.err.println("ERROR: There appears to be another router already running!");
+            System.err.println("       Please make sure to shut down old instances before starting up");
+            System.err.println("       a new one.  If you are positive that no other instance is running,");
+            System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
+            System.exit(-1);
+        }
+
+        // This is here so that we can get the directory location from the context
+        // for the zip file and the base location to unzip to.
+        // If it does an update, it never returns.
+        // I guess it's better to have the other-router check above this, we don't want to
+        // overwrite an existing running router's jar files. Other than ours.
+        installUpdates();
+
+        // NOW we start all the activity
+        _context.initAll();
+
         _routerInfo = null;
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);
         _log.info("New router created with config file " + _configFilename);
-        _sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
+        //_sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
         _killVMOnEnd = true;
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
@@ -171,7 +235,6 @@ public class Router {
         watchdog.setDaemon(true);
         watchdog.start();
         
-        _shutdownTasks = new HashSet(0);
     }
     
     /**
@@ -245,6 +308,7 @@ public class Router {
         
         _context.keyManager().startup();
         
+        // why are we reading this again, it's read in the constructor
         readConfig();
         
         setupHandlers();
@@ -258,10 +322,10 @@ public class Router {
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), 20*1000);
+        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
-        _sessionKeyPersistenceHelper.startup();
+        //_sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
         _context.blocklist().startup();
         
@@ -285,6 +349,7 @@ public class Router {
         }
     }
     
+    /** this does not use ctx.getConfigDir(), must provide a full path in filename */
     private static Properties getConfig(RouterContext ctx, String filename) {
         Log log = null;
         if (ctx != null) {
@@ -426,7 +491,7 @@ public class Router {
         RouterInfo ri = _routerInfo;
         if ( (ri != null) && (ri.isHidden()) )
             return true;
-        return Boolean.valueOf(_context.getProperty("router.isHidden", "false")).booleanValue();
+        return Boolean.valueOf(_context.getProperty(PROP_HIDDEN_HIDDEN)).booleanValue();
     }
     public Certificate createCertificate() {
         Certificate cert = new Certificate();
@@ -446,20 +511,21 @@ public class Router {
      */
     private static final String _rebuildFiles[] = new String[] { "router.info", 
                                                                  "router.keys",
-                                                                 "netDb/my.info",
-                                                                 "connectionTag.keys",
+                                                                 "netDb/my.info",      // no longer used
+                                                                 "connectionTag.keys", // never used?
                                                                  "keyBackup/privateEncryption.key",
                                                                  "keyBackup/privateSigning.key",
                                                                  "keyBackup/publicEncryption.key",
                                                                  "keyBackup/publicSigning.key",
-                                                                 "sessionKeys.dat" };
+                                                                 "sessionKeys.dat"     // no longer used
+                                                               };
 
     static final String IDENTLOG = "identlog.txt";
-    public static void killKeys() {
+    public void killKeys() {
         new Exception("Clearing identity files").printStackTrace();
         int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
-            File f = new File(_rebuildFiles[i]);
+            File f = new File(_context.getRouterDir(),_rebuildFiles[i]);
             if (f.exists()) {
                 boolean removed = f.delete();
                 if (removed) {
@@ -473,7 +539,7 @@ public class Router {
         if (remCount > 0) {
             FileOutputStream log = null;
             try {
-                log = new FileOutputStream(IDENTLOG, true);
+                log = new FileOutputStream(new File(_context.getRouterDir(), IDENTLOG), true);
                 log.write((new Date() + ": Old router identity keys cleared\n").getBytes());
             } catch (IOException ioe) {
                 // ignore
@@ -490,13 +556,12 @@ public class Router {
      */
     public void rebuildNewIdentity() {
         killKeys();
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
+        for (Runnable task : _context.getShutdownTasks()) {
+            try {
                 task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
         // hard and ugly
         finalShutdown(EXIT_HARD_RESTART);
@@ -534,7 +599,7 @@ public class Router {
                    "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
                    "<hr />\n");
 
-        StringBuffer buf = new StringBuffer(32*1024);
+        StringBuilder buf = new StringBuilder(32*1024);
         
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
             buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br />\n");
@@ -688,15 +753,16 @@ public class Router {
         
         out.write("\n<hr /><a name=\"netdb\"> </a>\n");
         
+        _context.netDb().renderLeaseSetHTML(out);
         _context.netDb().renderStatusHTML(out);
         
         buf.setLength(0);
         buf.append("\n<hr /><a name=\"logs\"> </a>\n");	
         List msgs = _context.logManager().getBuffer().getMostRecentMessages();
-        buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
+        buf.append("\n<h2>Most recent console messages:</h2><table>\n");
         for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {
             String msg = (String)iter.next();
-            buf.append("<tr><td valign=\"top\" align=\"left\"><pre>");
+            buf.append("<tr><td align=\"left\"><pre>");
             appendLogMessage(buf, msg);
             buf.append("</pre></td></tr>\n");
         }
@@ -705,14 +771,15 @@ public class Router {
         out.flush();
     }
     
-    private static int MAX_MSG_LENGTH = 120;
-    private static final void appendLogMessage(StringBuffer buf, String msg) {
+    //private static int MAX_MSG_LENGTH = 120;
+    private static final void appendLogMessage(StringBuilder buf, String msg) {
         // disable this code for the moment because i think it
         // looks ugly (on the router console)
-        if (true) {
+        //if (true) {
             buf.append(msg);
             return;
-        }
+        //}
+/******
         if (msg.length() < MAX_MSG_LENGTH) {
             buf.append(msg);
             return;
@@ -744,11 +811,13 @@ public class Router {
             newline = msg.indexOf('\n');
             len = msg.length();
         }
+******/
     }
     
     /** main-ish method for testing appendLogMessage */
+/******
     private static final void testAppendLog() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         Router.appendLogMessage(buf, "hi\nhow are you\nh0h0h0");
         System.out.println("line: [" + buf.toString() + "]");
         buf.setLength(0);
@@ -780,12 +849,7 @@ public class Router {
         System.out.println("line: [" + buf.toString() + "]");
         buf.setLength(0);
     }
-    
-    public void addShutdownTask(Runnable task) {
-        synchronized (_shutdownTasks) {
-            _shutdownTasks.add(task);
-        }
-    }
+******/
     
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
@@ -799,13 +863,12 @@ public class Router {
         I2PThread.removeOOMEventListener(_oomListener);
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
+        for (Runnable task : _context.getShutdownTasks()) {
+            try {
                 task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
@@ -819,9 +882,10 @@ public class Router {
         try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
-        try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        _context.deleteTempDir();
         RouterContext.listContexts().remove(_context);
-        dumpStats();
+        //dumpStats();
         finalShutdown(exitCode);
     }
 
@@ -839,7 +903,7 @@ public class Router {
                 killKeys();
         }
 
-        File f = new File(getPingFile());
+        File f = getPingFile();
         f.delete();
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
@@ -859,6 +923,10 @@ public class Router {
     public void shutdownGracefully() {
         shutdownGracefully(EXIT_GRACEFUL);
     }
+    /**
+     * Call this with EXIT_HARD or EXIT_HARD_RESTART for a non-blocking,
+     * hard, non-graceful shutdown with a brief delay to allow a UI response
+     */
     public void shutdownGracefully(int exitCode) {
         _gracefulExitCode = exitCode;
         _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
@@ -887,7 +955,9 @@ public class Router {
     }
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
-        if (_gracefulExitCode <= 0) return -1;
+        if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
+        if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART)
+            return 0;
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
             return -1;
@@ -906,9 +976,20 @@ public class Router {
             while (true) {
                 boolean shutdown = (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
                 if (shutdown) {
-                    if (_context.tunnelManager().getParticipatingCount() <= 0) {
-                        if (_log.shouldLog(Log.CRIT))
+                    if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART ||
+                        _context.tunnelManager().getParticipatingCount() <= 0) {
+                        if (_gracefulExitCode == EXIT_HARD)
+                            _log.log(Log.CRIT, "Shutting down after a brief delay");
+                        else if (_gracefulExitCode == EXIT_HARD_RESTART)
+                            _log.log(Log.CRIT, "Restarting after a brief delay");
+                        else
                             _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
+                        // Allow time for a UI reponse
+                        try {
+                            synchronized (Thread.currentThread()) {
+                                Thread.currentThread().wait(2*1000);
+                            }
+                        } catch (InterruptedException ie) {}
                         shutdown(_gracefulExitCode);
                         return;
                     } else {
@@ -938,7 +1019,7 @@ public class Router {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_configFilename);
-            StringBuffer buf = new StringBuffer(8*1024);
+            StringBuilder buf = new StringBuilder(8*1024);
             synchronized (_config) {
                 TreeSet ordered = new TreeSet(_config.keySet());
                 for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
@@ -991,10 +1072,10 @@ public class Router {
     }
     
     public static void main(String args[]) {
-        System.out.println("Starting I2P " + RouterVersion.VERSION + "-" + RouterVersion.BUILD);
-        System.out.println(RouterVersion.ID);
-        installUpdates();
-        verifyWrapperConfig();
+        System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
+        // installUpdates() moved to constructor so we can get file locations from the context
+        // installUpdates();
+        //verifyWrapperConfig();
         Router r = new Router();
         if ( (args != null) && (args.length == 1) && ("rebuild".equals(args[0])) ) {
             r.rebuildNewIdentity();
@@ -1005,25 +1086,61 @@ public class Router {
     
     public static final String UPDATE_FILE = "i2pupdate.zip";
     
-    private static void installUpdates() {
-        File updateFile = new File(UPDATE_FILE);
-        if (updateFile.exists()) {
+    /**
+     * Unzip update file found in the router dir OR base dir, to the base dir
+     *
+     * If we can't write to the base dir, complain.
+     * Note: _log not available here.
+     */
+    private void installUpdates() {
+        File updateFile = new File(_context.getRouterDir(), UPDATE_FILE);
+        boolean exists = updateFile.exists();
+        if (!exists) {
+            updateFile = new File(_context.getBaseDir(), UPDATE_FILE);
+            exists = updateFile.exists();
+        }
+        if (exists) {
+            // do a simple permissions test, if it fails leave the file in place and don't restart
+            File test = new File(_context.getBaseDir(), "history.txt");
+            if ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite())) {
+                System.out.println("ERROR: No write permissions on " + _context.getBaseDir() +
+                                   " to extract software update file");
+                // carry on
+                return;
+            }
             System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
-            boolean ok = FileUtil.extractZip(updateFile, new File("."));
+            boolean ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             if (ok)
                 System.out.println("INFO: Update installed");
             else
                 System.out.println("ERROR: Update failed!");
-            boolean deleted = updateFile.delete();
-            if (!deleted) {
-                System.out.println("ERROR: Unable to delete the update file!");
-                updateFile.deleteOnExit();
+            if (!ok) {
+                // we can't leave the file in place or we'll continually restart, so rename it
+                File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
+                boolean renamed = updateFile.renameTo(bad);
+                if (renamed) {
+                    System.out.println("Moved update file to " + bad.getAbsolutePath());
+                } else {
+                    System.out.println("Deleting file " + updateFile.getAbsolutePath());
+                    ok = true;  // so it will be deleted
+                }
             }
-            System.out.println("INFO: Restarting after update");
+            if (ok) {
+                boolean deleted = updateFile.delete();
+                if (!deleted) {
+                    System.out.println("ERROR: Unable to delete the update file!");
+                    updateFile.deleteOnExit();
+                }
+            }
+            if (System.getProperty("wrapper.version") != null)
+                System.out.println("INFO: Restarting after update");
+            else
+                System.out.println("WARNING: Exiting after update, restart I2P");
             System.exit(EXIT_HARD_RESTART);
         }
     }
     
+/*******
     private static void verifyWrapperConfig() {
         File cfgUpdated = new File("wrapper.config.updated");
         if (cfgUpdated.exists()) {
@@ -1033,15 +1150,22 @@ public class Router {
             System.exit(EXIT_HARD);
         }
     }
+*******/
     
+/*
     private static String getPingFile(Properties envProps) {
         if (envProps != null) 
             return envProps.getProperty("router.pingFile", "router.ping");
         else
             return "router.ping";
     }
-    private String getPingFile() {
-        return _context.getProperty("router.pingFile", "router.ping");
+*/
+    private File getPingFile() {
+        String s = _context.getProperty("router.pingFile", "router.ping");
+        File f = new File(s);
+        if (!f.isAbsolute())
+            f = new File(_context.getPIDDir(), s);
+        return f;
     }
     
     static final long LIVELINESS_DELAY = 60*1000;
@@ -1053,9 +1177,8 @@ public class Router {
      * 
      * @return true if the router is the only one running 
      */
-    private boolean beginMarkingLiveliness(Properties envProps) {
-        String filename = getPingFile(envProps);
-        File f = new File(filename);
+    private boolean beginMarkingLiveliness() {
+        File f = getPingFile();
         if (f.exists()) {
             long lastWritten = f.lastModified();
             if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
@@ -1198,13 +1321,13 @@ public class Router {
         return Math.max(send, recv);
     }
     
-}
+/* following classes are now private static inner classes, didn't bother to reindent */
 
 /**
  * coalesce the stats framework every minute
  *
  */
-class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
+private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
     private RouterContext _ctx;
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
@@ -1239,7 +1362,7 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         getContext().statManager().addRateData("router.memoryUsed", used, 0);
 
-        getContext().tunnelDispatcher().updateParticipatingStats();
+        getContext().tunnelDispatcher().updateParticipatingStats(COALESCE_TIME);
 
         getContext().statManager().coalesceStats();
 
@@ -1270,7 +1393,7 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
  * This is done here because we want to make sure the key is updated before anyone
  * uses it.
  */
-class UpdateRoutingKeyModifierJob extends JobImpl {
+private static class UpdateRoutingKeyModifierJob extends JobImpl {
     private Log _log;
     private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
     public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
@@ -1302,7 +1425,7 @@ class UpdateRoutingKeyModifierJob extends JobImpl {
     }
 }
 
-class MarkLiveliness implements Runnable {
+private static class MarkLiveliness implements Runnable {
     private RouterContext _context;
     private Router _router;
     private File _pingFile;
@@ -1334,7 +1457,7 @@ class MarkLiveliness implements Runnable {
     }
 }
 
-class ShutdownHook extends Thread {
+private static class ShutdownHook extends Thread {
     private RouterContext _context;
     private static int __id = 0;
     private int _id;
@@ -1342,6 +1465,7 @@ class ShutdownHook extends Thread {
         _context = ctx;
         _id = ++__id;
     }
+        @Override
     public void run() {
         setName("Router " + _id + " shutdown");
         Log l = _context.logManager().getLog(Router.class);
@@ -1351,7 +1475,7 @@ class ShutdownHook extends Thread {
 }
 
 /** update the router.info file whenever its, er, updated */
-class PersistRouterInfoJob extends JobImpl {
+private static class PersistRouterInfoJob extends JobImpl {
     private Log _log;
     public PersistRouterInfoJob(RouterContext ctx) { 
         super(ctx); 
@@ -1362,15 +1486,14 @@ class PersistRouterInfoJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Persisting updated router info");
 
-        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME);
-        if (infoFilename == null)
-            infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
+        String infoFilename = getContext().getProperty(PROP_INFO_FILENAME, PROP_INFO_FILENAME_DEFAULT);
+        File infoFile = new File(getContext().getRouterDir(), infoFilename);
 
         RouterInfo info = getContext().router().getRouterInfo();
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(infoFilename);
+            fos = new FileOutputStream(infoFile);
             info.writeBytes(fos);
         } catch (DataFormatException dfe) {
             _log.error("Error rebuilding the router information", dfe);
@@ -1380,4 +1503,6 @@ class PersistRouterInfoJob extends JobImpl {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
+}
+
 }

@@ -55,7 +55,7 @@ public class MessageInputStream extends InputStream {
     
     private byte[] _oneByte = new byte[1];
     
-    private Object _dataLock;
+    private final Object _dataLock;
     
     public MessageInputStream(I2PAppContext ctx) {
         _context = ctx;
@@ -174,7 +174,7 @@ public class MessageInputStream extends InputStream {
     public void closeReceived() {
         synchronized (_dataLock) {
             if (_log.shouldLog(Log.DEBUG)) {
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("Close received, ready bytes: ");
                 long available = 0;
                 for (int i = 0; i < _readyDataBlocks.size(); i++) 

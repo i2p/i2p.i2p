@@ -25,10 +25,11 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelPool {
+    private final List _inProgress = new ArrayList();
     private RouterContext _context;
     private Log _log;
     private TunnelPoolSettings _settings;
-    private ArrayList _tunnels;
+    private final ArrayList<TunnelInfo> _tunnels;
     private TunnelPeerSelector _peerSelector;
     private TunnelPoolManager _manager;
     private boolean _alive;
@@ -64,6 +65,9 @@ public class TunnelPool {
     }
     
     public void startup() {
+        synchronized (_inProgress) {
+            _inProgress.clear();
+        }
         _alive = true;
         _started = System.currentTimeMillis();
         _lastRateUpdate = _started;
@@ -90,6 +94,9 @@ public class TunnelPool {
         _lastSelectionPeriod = 0;
         _lastSelected = null;
         _context.statManager().removeRateStat(_rateName);
+        synchronized (_inProgress) {
+            _inProgress.clear();
+        }
     }
 
     TunnelPoolManager getManager() { return _manager; }
@@ -227,7 +234,7 @@ public class TunnelPool {
      *
      * @return list of TunnelInfo objects
      */
-    public List listTunnels() {
+    public List<TunnelInfo> listTunnels() {
         synchronized (_tunnels) {
             return new ArrayList(_tunnels);
         }
@@ -292,7 +299,9 @@ public class TunnelPool {
         int remaining = 0;
         LeaseSet ls = null;
         synchronized (_tunnels) {
-            _tunnels.remove(info);
+            boolean removed = _tunnels.remove(info);
+            if (!removed)
+                return;
             if (_settings.isInbound() && (_settings.getDestination() != null) )
                 ls = locked_buildNewLeaseSet();
             remaining = _tunnels.size();
@@ -333,12 +342,15 @@ public class TunnelPool {
         }
     }
 
+    /** This may be called multiple times from TestJob */
     public void tunnelFailed(PooledTunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.WARN))
             _log.warn(toString() + ": Tunnel failed: " + cfg);
         LeaseSet ls = null;
         synchronized (_tunnels) {
-            _tunnels.remove(cfg);
+            boolean removed = _tunnels.remove(cfg);
+            if (!removed)
+                return;
             if (_settings.isInbound() && (_settings.getDestination() != null) )
                 ls = locked_buildNewLeaseSet();
             if (_lastSelected == cfg) {
@@ -464,7 +476,7 @@ public class TunnelPool {
         if (!_alive)
             return null;
 
-        int wanted = _settings.getQuantity();
+        int wanted = Math.min(_settings.getQuantity(), LeaseSet.MAX_LEASES);
         if (_tunnels.size() < wanted) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": Not enough tunnels (" + _tunnels.size() + ", wanted " + wanted + ")");
@@ -866,13 +878,13 @@ public class TunnelPool {
         return cfg;
     }
     
-    private List _inProgress = new ArrayList();
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         synchronized (_inProgress) { _inProgress.remove(cfg); }
         cfg.setTunnelPool(this);
         //_manager.buildComplete(cfg);
     }
     
+    @Override
     public String toString() {
         if (_settings.isExploratory()) {
             if (_settings.isInbound())
@@ -880,7 +892,7 @@ public class TunnelPool {
             else
                 return "Outbound exploratory pool";
         } else {
-            StringBuffer rv = new StringBuffer(32);
+            StringBuilder rv = new StringBuilder(32);
             if (_settings.isInbound())
                 rv.append("Inbound client pool for ");
             else

@@ -34,6 +34,8 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Send a client message out a random outbound tunnel and into a random inbound
@@ -98,6 +100,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private static final int BUNDLE_PROBABILITY_DEFAULT = 100;
     
+    private static final Object _initializeLock = new Object();
+    private static boolean _initialized = false;
+    private static final int CLEAN_INTERVAL = 5*60*1000;
+    private static final int REPLY_REQUEST_INTERVAL = 60*1000;
+
     /**
      * Send the sucker
      */
@@ -105,20 +112,26 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         super(ctx);
         _log = ctx.logManager().getLog(OutboundClientMessageOneShotJob.class);
         
-        ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.sendAckTime", "Message round trip time", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look for a remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.dispatchNoACK", "Repeated message sends to a peer (no ack required)", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
+        synchronized (_initializeLock) {
+            if (!_initialized) {
+                SimpleScheduler.getInstance().addPeriodicEvent(new OCMOSJCacheCleaner(ctx), CLEAN_INTERVAL, CLEAN_INTERVAL);
+                ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.sendAckTime", "Message round trip time", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look for a remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+                ctx.statManager().createRateStat("client.dispatchNoACK", "Repeated message sends to a peer (no ack required)", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
+                _initialized = true;
+            }
+        }
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
@@ -200,8 +213,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
       *
       * Key the cache on the source+dest pair.
       */
-    private static HashMap _leaseSetCache = new HashMap();
-    private static long _lscleanTime = 0;
+    private static HashMap<String, LeaseSet> _leaseSetCache = new HashMap();
     private LeaseSet getReplyLeaseSet(boolean force) {
         LeaseSet newLS = getContext().netDb().lookupLeaseSetLocally(_from.calculateHash());
         if (newLS == null)
@@ -235,12 +247,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // If the last leaseSet we sent him is still good, don't bother sending again
         long now = getContext().clock().now();
         synchronized (_leaseSetCache) {
-            if (now - _lscleanTime > 5*60*1000) {  // clean out periodically
-                cleanLeaseSetCache(_leaseSetCache);
-                _lscleanTime = now;
-            }
             if (!force) {
-                LeaseSet ls = (LeaseSet) _leaseSetCache.get(hashPair());
+                LeaseSet ls = _leaseSetCache.get(hashPair());
                 if (ls != null) {
                     if (ls.equals(newLS)) {
                         // still good, send it 10% of the time
@@ -305,8 +313,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * lease).
      *
      */
-    private static HashMap _leaseCache = new HashMap();
-    private static long _lcleanTime = 0;
+    private static HashMap<String, Lease> _leaseCache = new HashMap();
     private boolean getNextLease() {
         _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
         if (_leaseSet == null) {
@@ -319,11 +326,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
         synchronized (_leaseCache) {
-            if (now - _lcleanTime > 5*60*1000) {  // clean out periodically
-                cleanLeaseCache(_leaseCache);
-                _lcleanTime = now;
-            }
-            _lease = (Lease) _leaseCache.get(hashPair());
+            _lease = _leaseCache.get(hashPair());
             if (_lease != null) {
                 // if outbound tunnel length == 0 && lease.firsthop.isBacklogged() don't use it ??
                 if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
@@ -445,6 +448,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
     
     /**
+     * This cache is used to ensure that we request a reply every so often.
+     * Hopefully this allows the router to recognize a failed tunnel and switch,
+     * before upper layers like streaming lib fail, even for low-bandwidth
+     * connections like IRC.
+     */
+    private static HashMap<String, Long> _lastReplyRequestCache = new HashMap();
+
+    /**
      * Send the message to the specified tunnel by creating a new garlic message containing
      * the (already created) payload clove as well as a new delivery status message.  This garlic
      * message is sent out one of our tunnels, destined for the lease (tunnel+router) specified, and the delivery
@@ -454,18 +465,27 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private void send() {
         if (_finished) return;
-        if (getContext().clock().now() >= _overallExpiration) {
+        long now = getContext().clock().now();
+        if (now >= _overallExpiration) {
             dieFatal();
             return;
         }
 
-        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
+        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey(), _from);
         _outTunnel = selectOutboundTunnel(_to);
+        // boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
         // what's the point of 5% random? possible improvements or replacements:
-        // - wantACK if we changed their inbound lease (getNextLease() sets _wantACK)
-        // - wantACK if we changed our outbound tunnel (selectOutboundTunnel() sets _wantACK)
-        // - wantACK if we haven't in last 1m (requires a new static cache probably)
-        boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
+        // DONE (getNextLease() is called before this): wantACK if we changed their inbound lease (getNextLease() sets _wantACK)
+        // DONE (selectOutboundTunnel() moved above here): wantACK if we changed our outbound tunnel (selectOutboundTunnel() sets _wantACK)
+        // DONE (added new cache): wantACK if we haven't in last 1m (requires a new static cache probably)
+        boolean wantACK;
+        synchronized (_lastReplyRequestCache) {
+            Long lastSent = _lastReplyRequestCache.get(hashPair());
+            wantACK = _wantACK || existingTags <= 30 ||
+                      lastSent == null || lastSent.longValue() < now - REPLY_REQUEST_INTERVAL;
+            if (wantACK)
+                _lastReplyRequestCache.put(hashPair(), Long.valueOf(now));
+        }
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
@@ -499,7 +519,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             // we dont receive the reply? hmm...)
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": Unable to create the garlic message (no tunnels left or too lagged) to " + _toString);
-            getContext().statManager().addRateData("client.dispatchNoTunnels", getContext().clock().now() - _start, 0);            
+            getContext().statManager().addRateData("client.dispatchNoTunnels", now - _start, 0);            
             dieFatal();
             return;
         }
@@ -537,12 +557,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": Could not find any outbound tunnels to send the payload through... this might take a while");
-            getContext().statManager().addRateData("client.dispatchNoTunnels", getContext().clock().now() - _start, 0);
+            getContext().statManager().addRateData("client.dispatchNoTunnels", now - _start, 0);
             dieFatal();
         }
         _clientMessage = null;
         _clove = null;
-        getContext().statManager().addRateData("client.dispatchPrepareTime", getContext().clock().now() - _start, 0);
+        getContext().statManager().addRateData("client.dispatchPrepareTime", now - _start, 0);
         if (!wantACK)
             getContext().statManager().addRateData("client.dispatchNoACK", 1, 0);
     }
@@ -580,7 +600,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     /**
      * This is the place where we make I2P go fast.
      *
-     * We have four static caches.
+     * We have five static caches.
      * - The LeaseSet cache is used to decide whether to bundle our own leaseset,
      *   which minimizes overhead.
      * - The Lease cache is used to persistently send to the same lease for the destination,
@@ -588,6 +608,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * - The Tunnel and BackloggedTunnel caches are used to persistently use the same outbound tunnel
      *   for the same destination,
      *   which keeps the streaming lib happy by minimizing out-of-order delivery.
+     * - The last reply requested cache ensures that a reply is requested every so often,
+     *   so that failed tunnels are recognized.
      *
      */
 
@@ -607,7 +629,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * (needed for cleanTunnelCache)
      * 44 = 32 * 4 / 3
      */
-    private Hash sourceFromHashPair(String s) {
+    private static Hash sourceFromHashPair(String s) {
         return new Hash(Base64.decode(s.substring(44, 88)));
     }
 
@@ -627,17 +649,17 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         if (_lease != null) {
             synchronized(_leaseCache) {
-                Lease l = (Lease) _leaseCache.get(key);
+                Lease l = _leaseCache.get(key);
                 if (l != null && l.equals(_lease))
                     _leaseCache.remove(key);
             }
         }
         if (_outTunnel != null) {
             synchronized(_tunnelCache) {
-                TunnelInfo t =(TunnelInfo) _backloggedTunnelCache.get(key);
+                TunnelInfo t = _backloggedTunnelCache.get(key);
                 if (t != null && t.equals(_outTunnel))
                     _backloggedTunnelCache.remove(key);
-                t = (TunnelInfo) _tunnelCache.get(key);
+                t = _tunnelCache.get(key);
                 if (t != null && t.equals(_outTunnel))
                     _tunnelCache.remove(key);
             }
@@ -648,19 +670,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Clean out old leaseSets from a set.
      * Caller must synchronize on tc.
      */
-    private void cleanLeaseSetCache(HashMap tc) {
-        long now = getContext().clock().now();
-        List deleteList = new ArrayList();
+    private static void cleanLeaseSetCache(RouterContext ctx, HashMap tc) {
+        long now = ctx.clock().now();
         for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
             String k = (String) entry.getKey();
             LeaseSet l = (LeaseSet) entry.getValue();
             if (l.getEarliestLeaseDate() < now)
-                deleteList.add(k);
-        }
-        for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
-            String k = (String) iter.next();
-            tc.remove(k);
+                iter.remove();
         }
     }
 
@@ -668,18 +685,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Clean out old leases from a set.
      * Caller must synchronize on tc.
      */
-    private void cleanLeaseCache(HashMap tc) {
-        List deleteList = new ArrayList();
+    private static void cleanLeaseCache(HashMap tc) {
         for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
             String k = (String) entry.getKey();
             Lease l = (Lease) entry.getValue();
             if (l.isExpired(Router.CLOCK_FUDGE_FACTOR))
-                deleteList.add(k);
-        }
-        for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
-            String k = (String) iter.next();
-            tc.remove(k);
+                iter.remove();
         }
     }
 
@@ -687,18 +699,48 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Clean out old tunnels from a set.
      * Caller must synchronize on tc.
      */
-    private void cleanTunnelCache(HashMap tc) {
-        List deleteList = new ArrayList();
+    private static void cleanTunnelCache(RouterContext ctx, HashMap tc) {
         for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
             String k = (String) entry.getKey();
             TunnelInfo tunnel = (TunnelInfo) entry.getValue();
-            if (!getContext().tunnelManager().isValidTunnel(sourceFromHashPair(k), tunnel))
-                deleteList.add(k);
+            if (!ctx.tunnelManager().isValidTunnel(sourceFromHashPair(k), tunnel))
+                iter.remove();
         }
-        for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
-            String k = (String) iter.next();
-            tc.remove(k);
+    }
+
+    /**
+     * Clean out old reply times
+     * Caller must synchronize on tc.
+     */
+    private static void cleanReplyCache(RouterContext ctx, HashMap tc) {
+        long now = ctx.clock().now();
+        for (Iterator iter = tc.values().iterator(); iter.hasNext(); ) {
+            Long l = (Long) iter.next();
+            if (l.longValue() < now - CLEAN_INTERVAL)
+                iter.remove();
+        }
+    }
+
+    private static class OCMOSJCacheCleaner implements SimpleTimer.TimedEvent {
+        private RouterContext _ctx;
+        private OCMOSJCacheCleaner(RouterContext ctx) {
+            _ctx = ctx;
+        }
+        public void timeReached() {
+            synchronized(_leaseSetCache) {
+                cleanLeaseSetCache(_ctx, _leaseSetCache);
+            }
+            synchronized(_leaseCache) {
+                cleanLeaseCache(_leaseCache);
+            }
+            synchronized(_tunnelCache) {
+                cleanTunnelCache(_ctx, _tunnelCache);
+                cleanTunnelCache(_ctx, _backloggedTunnelCache);
+            }
+            synchronized(_lastReplyRequestCache) {
+                cleanReplyCache(_ctx, _lastReplyRequestCache);
+            }
         }
     }
 
@@ -710,25 +752,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Key the caches on the source+dest pair.
      *
      */
-    private static HashMap _tunnelCache = new HashMap();
-    private static HashMap _backloggedTunnelCache = new HashMap();
-    private static long _cleanTime = 0;
+    private static HashMap<String, TunnelInfo> _tunnelCache = new HashMap();
+    private static HashMap<String, TunnelInfo> _backloggedTunnelCache = new HashMap();
     private TunnelInfo selectOutboundTunnel(Destination to) {
         TunnelInfo tunnel;
         long now = getContext().clock().now();
         synchronized (_tunnelCache) {
-            if (now - _cleanTime > 5*60*1000) {  // clean out periodically
-                cleanTunnelCache(_tunnelCache);
-                cleanTunnelCache(_backloggedTunnelCache);
-                _cleanTime = now;
-            }
             /**
              * If old tunnel is valid and no longer backlogged, use it.
              * This prevents an active anonymity attack, where a peer could tell
              * if you were the originator by backlogging the tunnel, then removing the
              * backlog and seeing if traffic came back or not.
              */
-            tunnel = (TunnelInfo) _backloggedTunnelCache.get(hashPair());
+            tunnel = _backloggedTunnelCache.get(hashPair());
             if (tunnel != null) {
                 if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel)) {
                     if (!getContext().commSystem().isBacklogged(tunnel.getPeer(1))) {
@@ -743,7 +779,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     _backloggedTunnelCache.remove(hashPair());
             }
             // Use the same tunnel unless backlogged
-            tunnel = (TunnelInfo) _tunnelCache.get(hashPair());
+            tunnel = _tunnelCache.get(hashPair());
             if (tunnel != null) {
                 if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel)) {
                     if (tunnel.getLength() <= 1 || !getContext().commSystem().isBacklogged(tunnel.getPeer(1)))

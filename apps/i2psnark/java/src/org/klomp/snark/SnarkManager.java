@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
-import net.i2p.router.RouterContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -32,7 +31,7 @@ public class SnarkManager implements Snark.CompleteListener {
     /** map of (canonical) filename to Snark instance (unsynchronized) */
     private Map _snarks;
     private Object _addSnarkLock;
-    private String _configFile = "i2psnark.config";
+    private File _configFile;
     private Properties _config;
     private I2PAppContext _context;
     private Log _log;
@@ -52,6 +51,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
 
+    private static final String CONFIG_FILE = "i2psnark.config";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
     public static final String DEFAULT_AUTO_START = "false";
     public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
@@ -67,6 +67,9 @@ public class SnarkManager implements Snark.CompleteListener {
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new ArrayList(16);
         _util = new I2PSnarkUtil(_context);
+        _configFile = new File(CONFIG_FILE);
+        if (!_configFile.isAbsolute())
+            _configFile = new File(_context.getConfigDir(), CONFIG_FILE);
         loadConfig(null);
     }
 
@@ -81,8 +84,7 @@ public class SnarkManager implements Snark.CompleteListener {
         I2PAppThread monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor");
         monitor.setDaemon(true);
         monitor.start();
-        if (_context instanceof RouterContext)
-            ((RouterContext)_context).router().addShutdownTask(new SnarkManagerShutdown());
+        _context.addShutdownTask(new SnarkManagerShutdown());
     }
     
     /** hook to I2PSnarkUtil for the servlet */
@@ -114,10 +116,11 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     private int getStartupDelayMinutes() { return 3; }
     public File getDataDir() { 
-        String dir = _config.getProperty(PROP_DIR);
-        if ( (dir == null) || (dir.trim().length() <= 0) )
-            dir = "i2psnark";
-        return new File(dir); 
+        String dir = _config.getProperty(PROP_DIR, "i2psnark");
+        File f = new File(dir);
+        if (!f.isAbsolute())
+            f = new File(_context.getAppDir(), dir);
+        return f; 
     }
     
     /** null to set initial defaults */
@@ -125,8 +128,10 @@ public class SnarkManager implements Snark.CompleteListener {
         if (_config == null)
             _config = new Properties();
         if (filename != null) {
-            _configFile = filename;
             File cfg = new File(filename);
+            if (!cfg.isAbsolute())
+                cfg = new File(_context.getConfigDir(), filename);
+            _configFile = cfg;
             if (cfg.exists()) {
                 try {
                     DataHelper.loadProps(_config, cfg);
@@ -137,32 +142,31 @@ public class SnarkManager implements Snark.CompleteListener {
         } 
         // now add sane defaults
         if (!_config.containsKey(PROP_I2CP_HOST))
-            _config.setProperty(PROP_I2CP_HOST, "localhost");
+            _config.setProperty(PROP_I2CP_HOST, "127.0.0.1");
         if (!_config.containsKey(PROP_I2CP_PORT))
             _config.setProperty(PROP_I2CP_PORT, "7654");
         if (!_config.containsKey(PROP_I2CP_OPTS))
             _config.setProperty(PROP_I2CP_OPTS, "inbound.length=2 inbound.lengthVariance=0 outbound.length=2 outbound.lengthVariance=0 inbound.quantity=3 outbound.quantity=3");
         if (!_config.containsKey(PROP_EEP_HOST))
-            _config.setProperty(PROP_EEP_HOST, "localhost");
+            _config.setProperty(PROP_EEP_HOST, "127.0.0.1");
         if (!_config.containsKey(PROP_EEP_PORT))
             _config.setProperty(PROP_EEP_PORT, "4444");
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
-        if (!_config.containsKey(PROP_UPBW_MAX)) {
-            try {
-                if (_context instanceof RouterContext)
-                    _config.setProperty(PROP_UPBW_MAX, "" + (((RouterContext)_context).bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
-                else
-                    _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
-            } catch (NoClassDefFoundError ncdfe) {
-                _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
-            }
-        }
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
         updateConfig();
+    }
+
+    /** call from DirMonitor since loadConfig() is called before router I2CP is up */
+    private void getBWLimit() {
+        if (!_config.containsKey(PROP_UPBW_MAX)) {
+            int[] limits = BWLimits.getBWLimits(_util.getI2CPHost(), _util.getI2CPPort());
+            if (limits != null && limits[1] > 0)
+                _util.setMaxUpBW(limits[1]);
+        }
     }
     
     private void updateConfig() {
@@ -335,37 +339,37 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
             _config.setProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS, useOpenTrackers + "");
-            addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect");
+            addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect.");
             changed = true;
         }
         if (openTrackers != null) {
             if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
                 _config.setProperty(I2PSnarkUtil.PROP_OPENTRACKERS, openTrackers.trim());
-                addMessage("Open Tracker list changed - torrent restart required to take effect");
+                addMessage("Open Tracker list changed - torrent restart required to take effect.");
                 changed = true;
             }
         }
         if (changed) {
             saveConfig();
         } else {
-            addMessage("Configuration unchanged");
+            addMessage("Configuration unchanged.");
         }
     }
     
     public void saveConfig() {
         try {
             synchronized (_configFile) {
-                DataHelper.storeProps(_config, new File(_configFile));
+                DataHelper.storeProps(_config, _configFile);
             }
         } catch (IOException ioe) {
-            addMessage("Unable to save the config to '" + _configFile + "'");
+            addMessage("Unable to save the config to '" + _configFile.getAbsolutePath() + "'.");
         }
     }
     
     public Properties getConfig() { return _config; }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    private static final int MAX_FILES_PER_TORRENT = 256;
+    private static final int MAX_FILES_PER_TORRENT = 512;
     
     /** set of filenames that we are dealing with */
     public Set listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
@@ -379,7 +383,7 @@ public class SnarkManager implements Snark.CompleteListener {
             addMessage("Connecting to I2P");
             boolean ok = _util.connect();
             if (!ok) {
-                addMessage("Error connecting to I2P - check your I2CP settings");
+                addMessage("Error connecting to I2P - check your I2CP settings!");
                 return;
             }
         }
@@ -442,9 +446,9 @@ public class SnarkManager implements Snark.CompleteListener {
         File f = new File(filename);
         if (!dontAutoStart && shouldAutoStart()) {
             torrent.startTorrent();
-            addMessage("Torrent added and started: '" + f.getName() + "'");
+            addMessage("Torrent added and started: '" + f.getName() + "'.");
         } else {
-            addMessage("Torrent added: '" + f.getName() + "'");
+            addMessage("Torrent added: '" + f.getName() + "'.");
         }
     }
     
@@ -539,23 +543,25 @@ public class SnarkManager implements Snark.CompleteListener {
         String announce = info.getAnnounce();
         // basic validation of url
         if ((!announce.startsWith("http://")) ||
-            (announce.indexOf(".i2p/") < 0))
-            return "Non-i2p tracker in " + info.getName() + ", deleting it";
+            (announce.indexOf(".i2p/") < 0)) // need to do better than this
+            return "Non-i2p tracker in " + info.getName() + ", deleting it from our list of trackers!";
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
-            return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it";
+            return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it!";
         } else if (info.getPieces() <= 0) {
-            return "No pieces in " + info.getName() + "?  deleting it";
-        } else if (info.getPieceLength(0) > 1*1024*1024) {
-            return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB), deleting it";
-        } else if (info.getTotalLength() > 10*1024*1024*1024l) {
+            return "No pieces in " + info.getName() + "?  deleting it!";
+        } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
+            return "Pieces are too large in " + info.getName() + " (" + DataHelper.formatSize(info.getPieceLength(0)) +
+                   "B), deleting it.";
+        } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
             if (lengths != null)
                 for (int i = 0; i < lengths.size(); i++)
-                    System.out.println("File " + i + " is " + lengths.get(i) + " long");
+                    System.out.println("File " + i + " is " + lengths.get(i) + " long.");
             
-            return "Torrents larger than 10GB are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
+            return "Torrents larger than " + DataHelper.formatSize(Storage.MAX_TOTAL_SIZE) +
+                   "B are not supported yet (because we're paranoid): " + info.getName() + ", deleting it!";
         } else {
             // ok
             return null;
@@ -592,7 +598,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 ////_util.
             }
             if (!wasStopped)
-                addMessage("Torrent stopped: '" + sfile.getName() + "'");
+                addMessage("Torrent stopped: '" + sfile.getName() + "'.");
         }
         return torrent;
     }
@@ -607,7 +613,7 @@ public class SnarkManager implements Snark.CompleteListener {
             torrentFile.delete();
             if (torrent.storage != null)
                 removeTorrentStatus(torrent.storage.getMetaInfo());
-            addMessage("Torrent removed: '" + torrentFile.getName() + "'");
+            addMessage("Torrent removed: '" + torrentFile.getName() + "'.");
         }
     }
     
@@ -620,6 +626,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     _messages.remove(0);
             }
 
+            // here because we need to delay until I2CP is up
+            // although the user will see the default until then
+            getBWLimit();
             while (true) {
                 File dir = getDataDir();
                 _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
@@ -637,8 +646,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void torrentComplete(Snark snark) {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
-        addMessage("Download complete of " + f.getName() 
-                   + (len < 5*1024*1024 ? " (size: " + (len/1024) + "KB)" : " (size: " + (len/(1024*1024l)) + "MB)"));
+        addMessage("Download finished: " + f.getName() + " (size: " + DataHelper.formatSize(len) + "B)");
         updateStatus(snark);
     }
     
@@ -666,7 +674,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 // already known.  noop
             } else {
                 if (shouldAutoStart() && !_util.connect())
-                    addMessage("Unable to connect to I2P");
+                    addMessage("Unable to connect to I2P!");
                 addTorrent((String)foundNames.get(i), !shouldAutoStart());
             }
         }
@@ -683,17 +691,19 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     private static final String DEFAULT_TRACKERS[] = { 
-       "Postman", "http://YRgrgTLGnbTq2aZOZDJQ~o6Uk5k6TK-OZtx0St9pb0G-5EGYURZioxqYG8AQt~LgyyI~NCj6aYWpPO-150RcEvsfgXLR~CxkkZcVpgt6pns8SRc3Bi-QSAkXpJtloapRGcQfzTtwllokbdC-aMGpeDOjYLd8b5V9Im8wdCHYy7LRFxhEtGb~RL55DA8aYOgEXcTpr6RPPywbV~Qf3q5UK55el6Kex-6VCxreUnPEe4hmTAbqZNR7Fm0hpCiHKGoToRcygafpFqDw5frLXToYiqs9d4liyVB-BcOb0ihORbo0nS3CLmAwZGvdAP8BZ7cIYE3Z9IU9D1G8JCMxWarfKX1pix~6pIA-sp1gKlL1HhYhPMxwyxvuSqx34o3BqU7vdTYwWiLpGM~zU1~j9rHL7x60pVuYaXcFQDR4-QVy26b6Pt6BlAZoFmHhPcAuWfu-SFhjyZYsqzmEmHeYdAwa~HojSbofg0TMUgESRXMw6YThK1KXWeeJVeztGTz25sL8AAAA.i2p/announce.php=http://tracker.postman.i2p/"
+//       "Postman", "http://YRgrgTLGnbTq2aZOZDJQ~o6Uk5k6TK-OZtx0St9pb0G-5EGYURZioxqYG8AQt~LgyyI~NCj6aYWpPO-150RcEvsfgXLR~CxkkZcVpgt6pns8SRc3Bi-QSAkXpJtloapRGcQfzTtwllokbdC-aMGpeDOjYLd8b5V9Im8wdCHYy7LRFxhEtGb~RL55DA8aYOgEXcTpr6RPPywbV~Qf3q5UK55el6Kex-6VCxreUnPEe4hmTAbqZNR7Fm0hpCiHKGoToRcygafpFqDw5frLXToYiqs9d4liyVB-BcOb0ihORbo0nS3CLmAwZGvdAP8BZ7cIYE3Z9IU9D1G8JCMxWarfKX1pix~6pIA-sp1gKlL1HhYhPMxwyxvuSqx34o3BqU7vdTYwWiLpGM~zU1~j9rHL7x60pVuYaXcFQDR4-QVy26b6Pt6BlAZoFmHhPcAuWfu-SFhjyZYsqzmEmHeYdAwa~HojSbofg0TMUgESRXMw6YThK1KXWeeJVeztGTz25sL8AAAA.i2p/announce.php=http://tracker.postman.i2p/"
 //       , "eBook", "http://E71FRom6PZNEqTN2Lr8P-sr23b7HJVC32KoGnVQjaX6zJiXwhJy2HsXob36Qmj81TYFZdewFZa9mSJ533UZgGyQkXo2ahctg82JKYZfDe5uDxAn1E9YPjxZCWJaFJh0S~UwSs~9AZ7UcauSJIoNtpxrtbmRNVFLqnkEDdLZi26TeucfOmiFmIWnVblLniWv3tG1boE9Abd-6j3FmYVrRucYuepAILYt6katmVNOk6sXmno1Eynrp~~MBuFq0Ko6~jsc2E2CRVYXDhGHEMdt-j6JUz5D7S2RIVzDRqQyAZLKJ7OdQDmI31przzmne1vOqqqLC~1xUumZVIvF~yOeJUGNjJ1Vx0J8i2BQIusn1pQJ6UCB~ZtZZLQtEb8EPVCfpeRi2ri1M5CyOuxN0V5ekmPHrYIBNevuTCRC26NP7ZS5VDgx1~NaC3A-CzJAE6f1QXi0wMI9aywNG5KGzOPifcsih8eyGyytvgLtrZtV7ykzYpPCS-rDfITncpn5hliPUAAAA.i2p/pub/bt/announce.php=http://de-ebook-archiv.i2p/pub/bt/"
 //       , "Gaytorrents", "http://uxPWHbK1OIj9HxquaXuhMiIvi21iK0~ZiG9d8G0840ZXIg0r6CbiV71xlsqmdnU6wm0T2LySriM0doW2gUigo-5BNkUquHwOjLROiETnB3ZR0Ml4IGa6QBPn1aAq2d9~g1r1nVjLE~pcFnXB~cNNS7kIhX1d6nLgYVZf0C2cZopEow2iWVUggGGnAA9mHjE86zLEnTvAyhbAMTqDQJhEuLa0ZYSORqzJDMkQt90MV4YMjX1ICY6RfUSFmxEqu0yWTrkHsTtRw48l~dz9wpIgc0a0T9C~eeWvmBFTqlJPtQZwntpNeH~jF7nlYzB58olgV2HHFYpVYD87DYNzTnmNWxCJ5AfDorm6AIUCV2qaE7tZtI1h6fbmGpGlPyW~Kw5GXrRfJwNvr6ajwAVi~bPVnrBwDZezHkfW4slOO8FACPR28EQvaTu9nwhAbqESxV2hCTq6vQSGjuxHeOuzBOEvRWkLKOHWTC09t2DbJ94FSqETmZopTB1ukEmaxRWbKSIaAAAA.i2p/announce.php=http://gaytorrents.i2p/"
 //       , "NickyB", "http://9On6d3cZ27JjwYCtyJJbowe054d5tFnfMjv4PHsYs-EQn4Y4mk2zRixatvuAyXz2MmRfXG-NAUfhKr0KCxRNZbvHmlckYfT-WBzwwpiMAl0wDFY~Pl8cqXuhfikSG5WrqdPfDNNIBuuznS0dqaczf~OyVaoEOpvuP3qV6wKqbSSLpjOwwAaQPHjlRtNIW8-EtUZp-I0LT45HSoowp~6b7zYmpIyoATvIP~sT0g0MTrczWhbVTUZnEkZeLhOR0Duw1-IRXI2KHPbA24wLO9LdpKKUXed05RTz0QklW5ROgR6TYv7aXFufX8kC0-DaKvQ5JKG~h8lcoHvm1RCzNqVE-2aiZnO2xH08H-iCWoLNJE-Td2kT-Tsc~3QdQcnEUcL5BF-VT~QYRld2--9r0gfGl-yDrJZrlrihHGr5J7ImahelNn9PpkVp6eIyABRmJHf2iicrk3CtjeG1j9OgTSwaNmEpUpn4aN7Kx0zNLdH7z6uTgCGD9Kmh1MFYrsoNlTp4AAAA.i2p/bittorrent/announce.php=http://nickyb.i2p/bittorrent/"
 //       , "Orion", "http://gKik1lMlRmuroXVGTZ~7v4Vez3L3ZSpddrGZBrxVriosCQf7iHu6CIk8t15BKsj~P0JJpxrofeuxtm7SCUAJEr0AIYSYw8XOmp35UfcRPQWyb1LsxUkMT4WqxAT3s1ClIICWlBu5An~q-Mm0VFlrYLIPBWlUFnfPR7jZ9uP5ZMSzTKSMYUWao3ejiykr~mtEmyls6g-ZbgKZawa9II4zjOy-hdxHgP-eXMDseFsrym4Gpxvy~3Fv9TuiSqhpgm~UeTo5YBfxn6~TahKtE~~sdCiSydqmKBhxAQ7uT9lda7xt96SS09OYMsIWxLeQUWhns-C~FjJPp1D~IuTrUpAFcVEGVL-BRMmdWbfOJEcWPZ~CBCQSO~VkuN1ebvIOr9JBerFMZSxZtFl8JwcrjCIBxeKPBmfh~xYh16BJm1BBBmN1fp2DKmZ2jBNkAmnUbjQOqWvUcehrykWk5lZbE7bjJMDFH48v3SXwRuDBiHZmSbsTY6zhGY~GkMQHNGxPMMSIAAAA.i2p/bt/announce.php=http://orion.i2p/bt/"
 //       , "anonymity", "http://8EoJZIKrWgGuDrxA3nRJs1jsPfiGwmFWL91hBrf0HA7oKhEvAna4Ocx47VLUR9retVEYBAyWFK-eZTPcvhnz9XffBEiJQQ~kFSCqb1fV6IfPiV3HySqi9U5Caf6~hC46fRd~vYnxmaBLICT3N160cxBETqH3v2rdxdJpvYt8q4nMk9LUeVXq7zqCTFLLG5ig1uKgNzBGe58iNcsvTEYlnbYcE930ABmrzj8G1qQSgSwJ6wx3tUQNl1z~4wSOUMan~raZQD60lRK70GISjoX0-D0Po9WmPveN3ES3g72TIET3zc3WPdK2~lgmKGIs8GgNLES1cXTolvbPhdZK1gxddRMbJl6Y6IPFyQ9o4-6Rt3Lp-RMRWZ2TG7j2OMcNSiOmATUhKEFBDfv-~SODDyopGBmfeLw16F4NnYednvn4qP10dyMHcUASU6Zag4mfc2-WivrOqeWhD16fVAh8MoDpIIT~0r9XmwdaVFyLcjbXObabJczxCAW3fodQUnvuSkwzAAAA.i2p/anonymityTracker/announce.php=http://anonymityweb.i2p/anonymityTracker/"
 //       , "The freak's tracker", "http://mHKva9x24E5Ygfey2llR1KyQHv5f8hhMpDMwJDg1U-hABpJ2NrQJd6azirdfaR0OKt4jDlmP2o4Qx0H598~AteyD~RJU~xcWYdcOE0dmJ2e9Y8-HY51ie0B1yD9FtIV72ZI-V3TzFDcs6nkdX9b81DwrAwwFzx0EfNvK1GLVWl59Ow85muoRTBA1q8SsZImxdyZ-TApTVlMYIQbdI4iQRwU9OmmtefrCe~ZOf4UBS9-KvNIqUL0XeBSqm0OU1jq-D10Ykg6KfqvuPnBYT1BYHFDQJXW5DdPKwcaQE4MtAdSGmj1epDoaEBUa9btQlFsM2l9Cyn1hzxqNWXELmx8dRlomQLlV4b586dRzW~fLlOPIGC13ntPXogvYvHVyEyptXkv890jC7DZNHyxZd5cyrKC36r9huKvhQAmNABT2Y~pOGwVrb~RpPwT0tBuPZ3lHYhBFYmD8y~AOhhNHKMLzea1rfwTvovBMByDdFps54gMN1mX4MbCGT4w70vIopS9yAAAA.i2p/bytemonsoon/announce.php"
-       , "welterde", "http://BGKmlDOoH3RzFbPRfRpZV2FjpVj8~3moFftw5-dZfDf2070TOe8Tf2~DAVeaM6ZRLdmFEt~9wyFL8YMLMoLoiwGEH6IGW6rc45tstN68KsBDWZqkTohV1q9XFgK9JnCwE~Oi89xLBHsLMTHOabowWM6dkC8nI6QqJC2JODqLPIRfOVrDdkjLwtCrsckzLybNdFmgfoqF05UITDyczPsFVaHtpF1sRggOVmdvCM66otyonlzNcJbn59PA-R808vUrCPMGU~O9Wys0i-NoqtIbtWfOKnjCRFMNw5ex4n9m5Sxm9e20UkpKG6qzEuvKZWi8vTLe1NW~CBrj~vG7I3Ok4wybUFflBFOaBabxYJLlx4xTE1zJIVxlsekmAjckB4v-cQwulFeikR4LxPQ6mCQknW2HZ4JQIq6hL9AMabxjOlYnzh7kjOfRGkck8YgeozcyTvcDUcUsOuSTk06L4kdrv8h2Cozjbloi5zl6KTbj5ZTciKCxi73Pn9grICn-HQqEAAAA.i2p/a=http://tracker.welterde.i2p/stats?mode=top5"
 //       , "mastertracker", "http://VzXD~stRKbL3MOmeTn1iaCQ0CFyTmuFHiKYyo0Rd~dFPZFCYH-22rT8JD7i-C2xzYFa4jT5U2aqHzHI-Jre4HL3Ri5hFtZrLk2ax3ji7Qfb6qPnuYkuiF2E2UDmKUOppI8d9Ye7tjdhQVCy0izn55tBaB-U7UWdcvSK2i85sauyw3G0Gfads1Rvy5-CAe2paqyYATcDmGjpUNLoxbfv9KH1KmwRTNH6k1v4PyWYYnhbT39WfKMbBjSxVQRdi19cyJrULSWhjxaQfJHeWx5Z8Ev4bSPByBeQBFl2~4vqy0S5RypINsRSa3MZdbiAAyn5tr5slWR6QdoqY3qBQgBJFZppy-3iWkFqqKgSxCPundF8gdDLC5ddizl~KYcYKl42y9SGFHIukH-TZs8~em0~iahzsqWVRks3zRG~tlBcX2U3M2~OJs~C33-NKhyfZT7-XFBREvb8Szmd~p66jDxrwOnKaku-G6DyoQipJqIz4VHmY9-y5T8RrUcJcM-5lVoMpAAAA.i2p/announce.php=http://tracker.mastertracker.i2p/"
 //       , "Galen", "http://5jpwQMI5FT303YwKa5Rd38PYSX04pbIKgTaKQsWbqoWjIfoancFdWCShXHLI5G5ofOb0Xu11vl2VEMyPsg1jUFYSVnu4-VfMe3y4TKTR6DTpetWrnmEK6m2UXh91J5DZJAKlgmO7UdsFlBkQfR2rY853-DfbJtQIFl91tbsmjcA5CGQi4VxMFyIkBzv-pCsuLQiZqOwWasTlnzey8GcDAPG1LDcvfflGV~6F5no9mnuisZPteZKlrv~~TDoXTj74QjByWc4EOYlwqK8sbU9aOvz~s31XzErbPTfwiawiaZ0RUI-IDrKgyvmj0neuFTWgjRGVTH8bz7cBZIc3viy6ioD-eMQOrXaQL0TCWZUelRwHRvgdPiQrxdYQs7ixkajeHzxi-Pq0EMm5Vbh3j3Q9kfUFW3JjFDA-MLB4g6XnjCbM5J1rC0oOBDCIEfhQkszru5cyLjHiZ5yeA0VThgu~c7xKHybv~OMXION7V8pBKOgET7ZgAkw1xgYe3Kkyq5syAAAA.i2p/tr/announce.php=http://galen.i2p/tr/"
-       , "crstrack", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
+       "POSTMAN", "http://tracker2.postman.i2p/announce.php=http://tracker2.postman.i2p/"
+       ,"WELTERDE", "http://BGKmlDOoH3RzFbPRfRpZV2FjpVj8~3moFftw5-dZfDf2070TOe8Tf2~DAVeaM6ZRLdmFEt~9wyFL8YMLMoLoiwGEH6IGW6rc45tstN68KsBDWZqkTohV1q9XFgK9JnCwE~Oi89xLBHsLMTHOabowWM6dkC8nI6QqJC2JODqLPIRfOVrDdkjLwtCrsckzLybNdFmgfoqF05UITDyczPsFVaHtpF1sRggOVmdvCM66otyonlzNcJbn59PA-R808vUrCPMGU~O9Wys0i-NoqtIbtWfOKnjCRFMNw5ex4n9m5Sxm9e20UkpKG6qzEuvKZWi8vTLe1NW~CBrj~vG7I3Ok4wybUFflBFOaBabxYJLlx4xTE1zJIVxlsekmAjckB4v-cQwulFeikR4LxPQ6mCQknW2HZ4JQIq6hL9AMabxjOlYnzh7kjOfRGkck8YgeozcyTvcDUcUsOuSTk06L4kdrv8h2Cozjbloi5zl6KTbj5ZTciKCxi73Pn9grICn-HQqEAAAA.i2p/a=http://tracker.welterde.i2p/stats?mode=top5"
+       , "CRSTRACK", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
+
     };
     
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */

@@ -23,6 +23,10 @@ import freenet.support.CPUInformation.CPUInfo;
 import freenet.support.CPUInformation.IntelCPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.FileUtil;
+import net.i2p.util.Log;
+
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
  * which accounts for a massive segment of the processing cost of asymmetric 
@@ -85,10 +89,15 @@ import freenet.support.CPUInformation.UnknownCPUException;
 public class NativeBigInteger extends BigInteger {
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
+    private static String _loadStatus = "uninitialized";
+    private static String _cpuModel = "uninitialized";
     /** 
      * do we want to dump some basic success/failure info to stderr during 
      * initialization?  this would otherwise use the Log component, but this makes
      * it easier for other systems to reuse this class
+     *
+     * Well, we really want to use Log so if you are one of those "other systems"
+     * then comment out the I2PAppContext usage below.
      */
     private static final boolean _doLog = System.getProperty("jbigi.dontLog") == null;
     
@@ -134,6 +143,9 @@ public class NativeBigInteger extends BigInteger {
         
         try {
             CPUInfo c = CPUID.getInfo();
+            try {
+                _cpuModel = c.getCPUModelString();
+            } catch (UnknownCPUException e) {}
             if (c.IsC3Compatible())
                 return JBIGI_OPTIMIZATION_VIAC3;
             if (c instanceof AMDCPUInfo) {
@@ -248,6 +260,20 @@ public class NativeBigInteger extends BigInteger {
      */
     public static boolean isNative(){
         return _nativeOk;
+    }
+ 
+    public static String loadStatus() {
+        return _loadStatus;
+    }
+ 
+    public static String cpuType() {
+        if (sCPUType != null)
+            return sCPUType;
+        return "unrecognized";
+    }
+ 
+    public static String cpuModel() {
+        return _cpuModel;
     }
  
     /**
@@ -401,38 +427,32 @@ public class NativeBigInteger extends BigInteger {
             boolean loaded = loadGeneric("jbigi");
             if (loaded) {
                 _nativeOk = true;
-                if (_doLog)
-                    System.err.println("INFO: Locally optimized native BigInteger loaded from the library path");
+                info("Locally optimized native BigInteger library loaded from the library path");
             } else {
                 loaded = loadFromResource("jbigi");
                 if (loaded) {
                     _nativeOk = true;
-                    if (_doLog)
-                        System.err.println("INFO: Locally optimized native BigInteger loaded from resource");
+                    info("Locally optimized native BigInteger library loaded from resource");
                 } else {
                     loaded = loadFromResource(true);
                     if (loaded) {
                         _nativeOk = true;
-                        if (_doLog)
-                            System.err.println("INFO: Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
+                        info("Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
                     } else {
                         loaded = loadGeneric(true);
                         if (loaded) {
                             _nativeOk = true;
-                            if (_doLog)
-                                System.err.println("INFO: Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
+                            info("Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
                         } else {
                             loaded = loadFromResource(false);
                             if (loaded) {
                                 _nativeOk = true;
-                                if (_doLog)
-                                    System.err.println("INFO: Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
+                                info("Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
                             } else {
                                 loaded = loadGeneric(false);
                                 if (loaded) {
                                     _nativeOk = true;
-                                    if (_doLog)
-                                        System.err.println("INFO: Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
+                                    info("Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
                                 } else {
                                     _nativeOk = false;          
                                 }
@@ -442,16 +462,29 @@ public class NativeBigInteger extends BigInteger {
                 }
             }
         }
-        if (_doLog && !_nativeOk)
-            System.err.println("INFO: Native BigInteger library jbigi not loaded - using pure java");
+        if (!_nativeOk) {
+            warn("Native BigInteger library jbigi not loaded - using pure Java - " +
+                 "poor performance may result - see http://www.i2p2.i2p/jbigi.html for help");
+        }
         }catch(Exception e){
-            if (_doLog) {
-                System.err.println("INFO: Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
-                e.printStackTrace();
-            }
+            warn("Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
         }
     }
     
+    private static void info(String s) {
+        if(_doLog)
+            System.err.println("INFO: " + s);
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).info(s);
+        _loadStatus = s;
+    }
+
+    private static void warn(String s) {
+        if(_doLog)
+            System.err.println("WARNING: " + s);
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).warn(s);
+        _loadStatus = s;
+    }
+
     /** 
      * <p>Try loading it from an explictly build jbigi.dll / libjbigi.so first, before 
      * looking into a jbigi.jar for any other libraries.</p>
@@ -484,8 +517,11 @@ public class NativeBigInteger extends BigInteger {
      * 
      * <p>This is a pretty ugly hack, using the general technique illustrated by the
      * onion FEC libraries.  It works by pulling the resource, writing out the 
-     * byte stream to a temporary file, loading the native library from that file,
-     * then deleting the file.</p>
+     * byte stream to a temporary file, loading the native library from that file.
+     * We then attempt to copy the file from the temporary dir to the base install dir,
+     * so we don't have to do this next time - but we don't complain if it fails,
+     * so we transparently support read-only base dirs.
+     * </p>
      *
      * @return true if it was loaded successfully, else false
      *
@@ -506,11 +542,13 @@ public class NativeBigInteger extends BigInteger {
 
         File outFile = null;
         FileOutputStream fos = null;
+        String filename =  _libPrefix + "jbigi" + _libSuffix;
         try {
             InputStream libStream = resource.openStream();
-            outFile = new File(_libPrefix + "jbigi" + _libSuffix);
+            outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
-            byte buf[] = new byte[4096*1024];
+            // wtf this was 4096*1024 which is really excessive for a roughly 50KB file
+            byte buf[] = new byte[4096];
             while (true) {
                 int read = libStream.read(buf);
                 if (read < 0) break;
@@ -519,7 +557,6 @@ public class NativeBigInteger extends BigInteger {
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
-            return true;
         } catch (UnsatisfiedLinkError ule) {
             if (_doLog) {
                 System.err.println("ERROR: The resource " + resourceName 
@@ -538,6 +575,10 @@ public class NativeBigInteger extends BigInteger {
                 try { fos.close(); } catch (IOException ioe) {}
             }
         }
+        // copy to install dir, ignore failure
+        File newFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), filename);
+        FileUtil.copy(outFile.getAbsolutePath(), newFile.getAbsolutePath(), false, true);
+        return true;
     }
     
     private static final String getResourceName(boolean optimized) {

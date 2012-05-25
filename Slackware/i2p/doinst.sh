@@ -49,16 +49,21 @@ echo
 echo "FINISHING I2P INSTALLATION. PLEASE WAIT."
 
 cd $INST_DIR
-sh postinstall.sh || (
-  echo "ERROR: failed execution of postinstall.sh. Please"
-  echo "cd into i2p installation directory and run "
-  echo "postinstall.sh manually with ./postinstall.sh"
-  exit 1
-)
 
-sleep 10
 
-sh i2prouter stop || exit 1
+
+OS_ARCH=`uname -m`
+X86_64=`echo "$OS_ARCH" | grep x86_64`
+if [ "X$X86_64" = "X" ]; then
+        wrapperpath="./lib/wrapper/linux"
+else
+        wrapperpath="./lib/wrapper/linux64"
+fi
+cp $wrapperpath/libwrapper.so ./lib/
+cp $wrapperpath/wrapper.jar ./lib/
+cp $wrapperpath/i2psvc .
+rm -rf ./lib/wrapper
+chmod 744 ./i2psvc
 
 echo
 echo "Installation finished."

@@ -37,15 +37,15 @@ public class EstablishmentManager {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** map of RemoteHostId to InboundEstablishState */
-    private Map _inboundStates;
+    private final Map _inboundStates;
     /** map of RemoteHostId to OutboundEstablishState */
-    private Map _outboundStates;
+    private final Map _outboundStates;
     /** map of RemoteHostId to List of OutNetMessage for messages exceeding capacity */
-    private Map _queuedOutbound;
+    private final Map _queuedOutbound;
     /** map of nonce (Long) to OutboundEstablishState */
-    private Map _liveIntroductions;
+    private final Map _liveIntroductions;
     private boolean _alive;
-    private Object _activityLock;
+    private final Object _activityLock;
     private int _activity;
     
     private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 10;
@@ -61,15 +61,15 @@ public class EstablishmentManager {
         _queuedOutbound = new HashMap(32);
         _liveIntroductions = new HashMap(32);
         _activityLock = new Object();
-        _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", new long[] { 60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", new long[] { 60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.inboundEstablishFailedState", "What state a failed inbound establishment request fails in", "udp", new long[] { 60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.outboundEstablishFailedState", "What state a failed outbound establishment request fails in", "udp", new long[] { 60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendIntroRelayRequest", "How often we send a relay request to reach a peer", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendIntroRelayTimeout", "How often a relay request times out before getting a response (due to the target or intro peer being offline)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.receiveIntroRelayResponse", "How long it took to receive a relay response", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.establishRejected", "How many pending outbound connections are there when we refuse to add any more?", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.establishOverflow", "How many messages were queued up on a pending connection when it was too much?", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundEstablishFailedState", "What state a failed inbound establishment request fails in", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.outboundEstablishFailedState", "What state a failed outbound establishment request fails in", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendIntroRelayRequest", "How often we send a relay request to reach a peer", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendIntroRelayTimeout", "How often a relay request times out before getting a response (due to the target or intro peer being offline)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.receiveIntroRelayResponse", "How long it took to receive a relay response", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.establishRejected", "How many pending outbound connections are there when we refuse to add any more?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.establishOverflow", "How many messages were queued up on a pending connection when it was too much?", "udp", UDPTransport.RATES);
     }
     
     public void startup() {
@@ -282,7 +282,10 @@ public class EstablishmentManager {
         }
         if (isNew) {
             // we don't expect inbound connections when hidden, but it could happen
-            if ((!_context.router().isHidden()) && !_transport.introducersRequired()) {
+            // Don't offer if we are approaching max connections. While Relay Intros do not
+            // count as connections, we have to keep the connection to this peer up longer if
+            // we are offering introductions.
+            if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity()) {
                 long tag = _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
                 if (_log.shouldLog(Log.INFO))
@@ -450,6 +453,7 @@ public class EstablishmentManager {
         _transport.addRemotePeerState(peer);
         
         _transport.inboundConnectionReceived();
+        _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
         sendInboundComplete(peer);
@@ -531,6 +535,7 @@ public class EstablishmentManager {
         
         
         _transport.addRemotePeerState(peer);
+        _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
         sendOurInfo(peer, false);
@@ -568,7 +573,8 @@ public class EstablishmentManager {
     
     private void sendCreated(InboundEstablishState state) {
         long now = _context.clock().now();
-        if (!_transport.introducersRequired()) {
+        // don't offer if we are approaching max connections (see comments above)
+        if ((!_transport.introducersRequired()) && _transport.haveCapacity()) {
             // offer to relay
             // (perhaps we should check our bw usage and/or how many peers we are 
             //  already offering introducing?)
@@ -668,7 +674,7 @@ public class EstablishmentManager {
         }
     }
     
-    public void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
+    public void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {// LINT -- Exporting non-public type through public API
         long nonce = reader.getRelayResponseReader().readNonce();
         OutboundEstablishState state = null;
         synchronized (_liveIntroductions) {

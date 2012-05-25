@@ -52,7 +52,7 @@ public class GetDateMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[GetDateMessage]");
         return buf.toString();
     }

@@ -13,10 +13,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -26,6 +26,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -39,6 +40,8 @@ class PersistentDataStore extends TransientDataStore {
     private String _dbDir;
     private KademliaNetworkDatabaseFacade _facade;
     private Writer _writer;
+    private ReadJob _readJob;
+    private boolean _initialized;
     
     private final static int READ_DELAY = 60*1000;
     
@@ -47,40 +50,96 @@ class PersistentDataStore extends TransientDataStore {
         _log = ctx.logManager().getLog(PersistentDataStore.class);
         _dbDir = dbDir;
         _facade = facade;
-        _context.jobQueue().addJob(new ReadJob());
-        ctx.statManager().createRateStat("netDb.writeClobber", "How often we clobber a pending netDb write", "NetworkDatabase", new long[] { 60*1000, 10*60*1000 });
-        ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "NetworkDatabase", new long[] { 60*1000, 10*60*1000 });
+        _readJob = new ReadJob();
+        _context.jobQueue().addJob(_readJob);
+        ctx.statManager().createRateStat("netDb.writeClobber", "How often we clobber a pending netDb write", "NetworkDatabase", new long[] { 20*60*1000 });
+        ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "NetworkDatabase", new long[] { 60*1000 });
+        ctx.statManager().createRateStat("netDb.writeOut", "How many we wrote", "NetworkDatabase", new long[] { 20*60*1000 });
+        ctx.statManager().createRateStat("netDb.writeTime", "How long it took", "NetworkDatabase", new long[] { 20*60*1000 });
         _writer = new Writer();
         I2PThread writer = new I2PThread(_writer, "DBWriter");
-        writer.setDaemon(true);
+        // stop() must be called to flush data to disk
+        //writer.setDaemon(true);
         writer.start();
     }
+
+    public boolean isInitialized() { return _initialized; }
+
+    // this doesn't stop the read job or the writer, maybe it should?
+    @Override
+    public void stop() {
+        super.stop();
+        _writer.flush();
+    }
     
+    @Override
     public void restart() {
+        super.restart();
         _dbDir = _facade.getDbDir();
     }
     
+    public void rescan() {
+        if (_initialized)
+            _readJob.wakeup();
+    }
+
+    @Override
+    public DataStructure get(Hash key) {
+        return get(key, true);
+    }
+
+    /**
+     *  Prepare for having only a partial set in memory and the rest on disk
+     *  @param persist if false, call super only, don't access disk
+     */
+    @Override
+    public DataStructure get(Hash key, boolean persist) {
+        DataStructure rv =  super.get(key);
+/*****
+        if (rv != null || !persist)
+            return rv;
+        rv = _writer.get(key);
+        if (rv != null)
+            return rv;
+        Job rrj = new ReadRouterJob(getRouterInfoName(key), key));
+         run in same thread
+        rrj.runJob();
+*******/    
+        return rv;
+    }
+
+    @Override
     public DataStructure remove(Hash key) {
-        _context.jobQueue().addJob(new RemoveJob(key));
+        return remove(key, true);
+    }
+
+    /*
+     *  @param persist if false, call super only, don't access disk
+     */
+    @Override
+    public DataStructure remove(Hash key, boolean persist) {
+        if (persist) {
+            _writer.remove(key);
+            _context.jobQueue().addJob(new RemoveJob(key));
+        }
         return super.remove(key);
     }
     
+    @Override
     public void put(Hash key, DataStructure data) {
+        put(key, data, true);
+    }
+
+    /*
+     *  @param persist if false, call super only, don't access disk
+     */
+    @Override
+    public void put(Hash key, DataStructure data, boolean persist) {
         if ( (data == null) || (key == null) ) return;
         super.put(key, data);
         // Don't bother writing LeaseSets to disk
-        if (data instanceof RouterInfo)
+        if (persist && data instanceof RouterInfo)
             _writer.queue(key, data);
-    }
-    
-    private void accept(LeaseSet ls) {
-        super.put(ls.getDestination().calculateHash(), ls);
-    }
-    private void accept(RouterInfo ri) {
-        Hash key = ri.getIdentity().getHash();
-        super.put(key, ri);
-        // add recently loaded routers to the routing table
-        _facade.getKBuckets().add(key);
     }
     
     private class RemoveJob extends JobImpl {
@@ -101,56 +160,105 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
+    /** How many files to write every 10 minutes. Doesn't make sense to limit it,
+     *  they just back up in the queue hogging memory.
+     */
+    private static final int WRITE_LIMIT = 10000;
+    private static final long WRITE_DELAY = 10*60*1000;
+
     /*
-     * Queue up writes, write up to 600 files every 10 minutes
+     * Queue up writes, write unlimited files every 10 minutes.
+     * Since we write all we have, don't save the write order.
+     * We store a reference to the data here too,
+     * rather than simply pull it from super.get(), because
+     * we will soon have to implement a scheme for keeping only
+     * a subset of all DataStructures in memory and keeping the rest on disk.
      */
     private class Writer implements Runnable {
-        private Map _keys;
-        private List _keyOrder;
+        private final Map<Hash, DataStructure>_keys;
+        private Object _waitLock;
+        private volatile boolean _quit;
+
         public Writer() { 
-            _keys = new HashMap(64);
-            _keyOrder = new ArrayList(64);
+            _keys = new ConcurrentHashMap(64);
+            _waitLock = new Object();
         }
+
         public void queue(Hash key, DataStructure data) {
-            boolean exists = false;
-            int pending = 0;
-            synchronized (_keys) {
-                pending = _keys.size();
-                exists = (null != _keys.put(key, data));
-                if (!exists)
-                    _keyOrder.add(key);
-                _keys.notifyAll();
-            }
+            int pending = _keys.size();
+            boolean exists = (null != _keys.put(key, data));
             if (exists)
                 _context.statManager().addRateData("netDb.writeClobber", pending, 0);
             _context.statManager().addRateData("netDb.writePending", pending, 0);
         }
+
+        /** check to see if it's in the write queue */
+        public DataStructure get(Hash key) {
+            return _keys.get(key);
+        }
+
+        public void remove(Hash key) {
+            _keys.remove(key);
+        }
+
         public void run() {
+            _quit = false;
             Hash key = null;
             DataStructure data = null;
             int count = 0;
-            while (true) { // hmm, probably want a shutdown handle... though this is a daemon thread
+            int lastCount = 0;
+            long startTime = 0;
+            while (true) {
+                // get a new iterator every time to get a random entry without
+                // having concurrency issues or copying to a List or Array
+                Iterator<Map.Entry<Hash, DataStructure>> iter = _keys.entrySet().iterator();
                 try {
-                    synchronized (_keys) {
-                        if (_keyOrder.size() <= 0) {
-                            count = 0;
-                            _keys.wait();
-                        } else {
-                            count++;
-                            key = (Hash)_keyOrder.remove(0);
-                            data = (DataStructure)_keys.remove(key);
-                        }
-                    }
-                } catch (InterruptedException ie) {}
-                
-                if ( (key != null) && (data != null) )
-                    write(key, data);
-                key = null;
-                data = null;
-                if (count >= 600)
+                    Map.Entry<Hash, DataStructure> entry = iter.next();
+                    key = entry.getKey();
+                    data = entry.getValue();
+                    iter.remove();
+                    count++;
+                } catch (NoSuchElementException nsee) {
+                    lastCount = count;
                     count = 0;
-                if (count == 0)
-                    try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}
+                } catch (IllegalStateException ise) {
+                    lastCount = count;
+                    count = 0;
+                }
+
+                if (key != null) {
+                    if (data != null) {
+                        write(key, data);
+                        data = null;
+                    }
+                    key = null;
+                }
+                if (count >= WRITE_LIMIT)
+                    count = 0;
+                if (count == 0) {
+                    if (lastCount > 0) {
+                        long time = _context.clock().now() - startTime;
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Wrote " + lastCount + " entries to disk in " + time);
+                         _context.statManager().addRateData("netDb.writeOut", lastCount, 0);
+                         _context.statManager().addRateData("netDb.writeTime", time, 0);
+                    }
+                    if (_quit)
+                        break;
+                    synchronized (_waitLock) {
+                        try {
+                            _waitLock.wait(WRITE_DELAY);
+                        } catch (InterruptedException ie) {}
+                    }
+                    startTime = _context.clock().now();
+                }
+            }
+        }
+
+        public void flush() {
+            synchronized(_waitLock) {
+                _quit = true;
+                _waitLock.notifyAll();
             }
         }
     }
@@ -221,6 +329,10 @@ class PersistentDataStore extends TransientDataStore {
             requeue(READ_DELAY);
         }
         
+        public void wakeup() {
+            requeue(0);
+        }
+        
         private void readFiles() {
             int routerCount = 0;
             try {
@@ -240,9 +352,10 @@ class PersistentDataStore extends TransientDataStore {
                 _log.error("Error reading files in the db dir", ioe);
             }
             
-            if ( (routerCount <= 5) && (!_alreadyWarned) ) {
-                _log.error("Very few routerInfo files remaining - please reseed");
+            if (!_alreadyWarned) {
+                ReseedChecker.checkReseed(_context, routerCount);
                 _alreadyWarned = true;
+                _initialized = true;
             }
         }
     }
@@ -258,7 +371,8 @@ class PersistentDataStore extends TransientDataStore {
         public String getName() { return "Read RouterInfo"; }
         
         private boolean shouldRead() {
-            DataStructure data = get(_key);
+            // persist = false to call only super.get()
+            DataStructure data = get(_key, false);
             if (data == null) return true;
             if (data instanceof RouterInfo) {
                 long knownDate = ((RouterInfo)data).getPublished();
@@ -289,7 +403,8 @@ class PersistentDataStore extends TransientDataStore {
                                        + " is from a different network");
                     } else {
                         try {
-                            _facade.store(ri.getIdentity().getHash(), ri);
+                            // persist = false so we don't write what we just read
+                            _facade.store(ri.getIdentity().getHash(), ri, false);
                         } catch (IllegalArgumentException iae) {
                             _log.info("Refused locally loaded routerInfo - deleting");
                             corrupt = true;
@@ -312,7 +427,7 @@ class PersistentDataStore extends TransientDataStore {
     
     
     private File getDbDir() throws IOException {
-        File f = new File(_dbDir);
+        File f = new File(_context.getRouterDir(), _dbDir);
         if (!f.exists()) {
             boolean created = f.mkdirs();
             if (!created)
@@ -332,22 +447,22 @@ class PersistentDataStore extends TransientDataStore {
     private final static String ROUTERINFO_PREFIX = "routerInfo-";
     private final static String ROUTERINFO_SUFFIX = ".dat";
     
-    private String getLeaseSetName(Hash hash) {
+    private static String getLeaseSetName(Hash hash) {
         return LEASESET_PREFIX + hash.toBase64() + LEASESET_SUFFIX;
     }
-    private String getRouterInfoName(Hash hash) {
+    private static String getRouterInfoName(Hash hash) {
         return ROUTERINFO_PREFIX + hash.toBase64() + ROUTERINFO_SUFFIX;
     }
     
-    private Hash getLeaseSetHash(String filename) {
+    private static Hash getLeaseSetHash(String filename) {
         return getHash(filename, LEASESET_PREFIX, LEASESET_SUFFIX);
     }
     
-    private Hash getRouterInfoHash(String filename) {
+    private static Hash getRouterInfoHash(String filename) {
         return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
     
-    private Hash getHash(String filename, String prefix, String suffix) {
+    private static Hash getHash(String filename, String prefix, String suffix) {
         try {
             String key = filename.substring(prefix.length());
             key = key.substring(0, key.length() - suffix.length());
@@ -355,7 +470,8 @@ class PersistentDataStore extends TransientDataStore {
             h.fromBase64(key);
             return h;
         } catch (Exception e) {
-            _log.warn("Unable to fetch the key from [" + filename + "]", e);
+            // static
+            //_log.warn("Unable to fetch the key from [" + filename + "]", e);
             return null;
         }
     }

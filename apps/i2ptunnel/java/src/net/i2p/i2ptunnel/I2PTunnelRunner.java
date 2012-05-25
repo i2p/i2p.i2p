@@ -36,7 +36,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
 
     private Socket s;
     private I2PSocket i2ps;
-    Object slock, finishLock = new Object();
+    final Object slock, finishLock = new Object();
     boolean finished = false;
     HashMap ostreams, sockets;
     byte[] initialI2PData;
@@ -114,6 +114,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     protected InputStream getSocketIn() throws IOException { return s.getInputStream(); }
     protected OutputStream getSocketOut() throws IOException { return s.getOutputStream(); }
     
+    @Override
     public void run() {
         try {
             InputStream in = getSocketIn();
@@ -239,6 +240,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             start();
         }
 
+        @Override
         public void run() {
             String from = i2ps.getThisDestination().calculateHash().toBase64().substring(0,6);
             String to = i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6);

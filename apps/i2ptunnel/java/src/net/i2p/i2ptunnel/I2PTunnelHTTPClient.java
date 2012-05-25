@@ -4,6 +4,7 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,7 +51,7 @@ import net.i2p.util.Log;
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
-    private List proxyList;
+    private final List proxyList;
 
     private HashMap addressHelpers = new HashMap();
 
@@ -136,6 +137,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
+    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
+
+
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -145,14 +149,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
+        proxyList = new ArrayList();
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
             return;
         }
 
-        proxyList = new ArrayList();
         if (wwwProxy != null) {
-            StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
+            StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())
                 proxyList.add(tok.nextToken().trim());
         }
@@ -185,7 +189,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     
     /** 
      * create the default options (using the default timeout, etc)
-     *
+     * unused?
      */
     protected I2PSocketOptions getDefaultOptions() {
         Properties defaultOpts = getTunnel().getClientOptions();
@@ -210,6 +214,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             defaultOpts.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, ""+DEFAULT_READ_TIMEOUT);
         if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
             defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        verifySocketManager();
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
@@ -234,7 +240,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             out = s.getOutputStream();
             InputReader reader = new InputReader(s.getInputStream());
             String line, method = null, protocol = null, host = null, destination = null;
-            StringBuffer newRequest = new StringBuffer();
+            StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
             while ((line = reader.readLine(method)) != null) {
                 line = line.trim();
@@ -285,7 +291,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         break;
                     }
                     host = request.substring(0, pos);
-
+                    
+                    // parse port
+                    int posPort = host.indexOf(":");
+                    int port = 80;
+                    if(posPort != -1) {
+                        String[] parts = host.split(":");
+                        host = parts[0];
+                        try {
+                            port = Integer.parseInt(parts[1]);
+                        } catch(Exception exc) {
+                            // TODO: log this
+                        }
+                    }
+                    
                     // Quick hack for foo.bar.i2p
                     if (host.toLowerCase().endsWith(".i2p")) {
                         // Destination gets the host name
@@ -357,7 +376,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             {
                                 String str;
                                 byte[] header;
-                                str = FileUtil.readTextFile("docs/ahelper-conflict-header.ht", 100, true);
+                                str = FileUtil.readTextFile((new File(_errorDir, "ahelper-conflict-header.ht")).getAbsolutePath(), 100, true);
                                 if (str != null) header = str.getBytes();
                                   else header = ERR_AHELPER_CONFLICT;
 
@@ -367,9 +386,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                     String conflictURL = protocol + alias + ".i2p/?" + initialFragments;
                                     out.write(header);
                                     out.write(("To visit the destination in your host database, click <a href=\"" + trustedURL + "\">here</a>. To visit the conflicting addresshelper link by temporarily giving it a random alias, click <a href=\"" + conflictURL + "\">here</a>.<P/>").getBytes());
-                                    out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
+                                    out.write("</div><div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
                                     out.write(new Date().toString().getBytes());
-                                    out.write("</i></body></html>\n".getBytes());
+                                    out.write("</i></div></body></html>\n".getBytes());
                                     out.flush();
                                 }
                                 s.close();
@@ -385,7 +404,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                         
                         line = method + " " + request.substring(pos);
+                    } else if (host.toLowerCase().equals("localhost") || host.equals("127.0.0.1")) {
+                        if (out != null) {
+                            out.write(ERR_LOCALHOST);
+                            out.write("<p /><i>Generated on: ".getBytes());
+                            out.write(new Date().toString().getBytes());
+                            out.write("</i></body></html>\n".getBytes());
+                            out.flush();
+                        }
+                        s.close();
+                        return;
                     } else if (host.indexOf(".") != -1) {
+                        // rebuild host
+                        host = host + ":" + port;
                         // The request must be forwarded to a WWW proxy
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Before selecting outproxy for " + host);
@@ -410,16 +441,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         usingWWWProxy = true;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(getPrefix(requestId) + "Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
-                    } else if (host.toLowerCase().startsWith("localhost:")) {
-                        if (out != null) {
-                            out.write(ERR_LOCALHOST);
-                            out.write("<p /><i>Generated on: ".getBytes());
-                            out.write(new Date().toString().getBytes());
-                            out.write("</i></body></html>\n".getBytes());
-                            out.flush();
-                        }
-                        s.close();
-                        return;
                     } else {
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");
@@ -532,6 +553,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix(requestId) + "Destination: " + destination);
             
+            // Serve local proxy files (images, css linked from error pages)
+            // Ignore all the headers
+            if (destination.equals("proxy.i2p")) {
+                serveLocalFile(out, method, targetRequest);
+                s.close();
+                return;
+            }
+
             Destination dest = I2PTunnel.destFromName(destination);
             if (dest == null) {
                 //l.log("Could not resolve " + destination + ".");
@@ -541,13 +570,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 byte[] header;
                 boolean showAddrHelper = false;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else if(ahelper != 0)
-                    str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfb-header.ht")).getAbsolutePath(), 100, true);
                 else if (destination.length() == 60 && destination.endsWith(".b32.i2p"))
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
                 else {
-                    str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfh-header.ht")).getAbsolutePath(), 100, true);
                     showAddrHelper = true;
                 }
                 if (str != null)
@@ -698,9 +727,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     }
                 }
             }
-            out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
+            out.write("</div><div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
             out.write(new Date().toString().getBytes());
-            out.write("</i></body></html>\n".getBytes());
+            out.write("</i></div></body></html>\n".getBytes());
             out.flush();
         }
     }
@@ -716,9 +745,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 String str;
                 byte[] header;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
                 if (str != null)
                     header = str.getBytes();
                 else
@@ -756,5 +785,79 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
 
         return protocol.equalsIgnoreCase("http://");
+    }
+
+    private final static byte[] ERR_404 =
+        ("HTTP/1.1 404 Not Found\r\n"+
+         "Content-Type: text/plain\r\n"+
+         "\r\n"+
+         "HTTP Proxy local file not found")
+        .getBytes();
+
+    /**
+     *  Very simple web server.
+     *
+     *  Serve local files in the docs/ directory, for CSS and images in
+     *  error pages, using the reserved address proxy.i2p
+     *  (similar to p.p in privoxy).
+     *  This solves the problems with including links to the router console,
+     *  as assuming the router console is at 127.0.0.1 leads to broken
+     *  links if it isn't.
+     *
+     *  Ignore all request headers (If-Modified-Since, etc.)
+     *
+     *  There is basic protection here -
+     *  FileUtil.readFile() prevents traversal above the base directory -
+     *  but inproxy/gateway ops would be wise to block proxy.i2p to prevent
+     *  exposing the docs/ directory or perhaps other issues through
+     *  uncaught vulnerabilities.
+     *  Restrict to the /themes/ directory for now.
+     *
+     *  @param targetRequest "proxy.i2p/themes/foo.png HTTP/1.1"
+     */
+    private static void serveLocalFile(OutputStream out, String method, String targetRequest) {
+        // a home page message for the curious...
+        if (targetRequest.startsWith("proxy.i2p/ ")) {
+            try {
+                out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes());
+                out.flush();
+            } catch (IOException ioe) {}
+            return;
+        }
+        if ((method.equals("GET") || method.equals("HEAD")) &&
+            targetRequest.startsWith("proxy.i2p/themes/") &&
+            !targetRequest.contains("..")) {
+            int space = targetRequest.indexOf(' ');
+            String filename = null;
+            try {
+                filename = targetRequest.substring(17, space); // "proxy.i2p/themes/".length
+            } catch (IndexOutOfBoundsException ioobe) {}
+            // theme hack
+            if (filename.startsWith("console/default/"))
+                filename = filename.replaceFirst("default", I2PAppContext.getGlobalContext().getProperty("routerconsole.theme", "light"));
+            File themesDir = new File(_errorDir, "themes");
+            File file = new File(themesDir, filename);
+            if (file.exists() && !file.isDirectory()) {
+                String type;
+                if (filename.endsWith(".css"))
+                    type = "text/css";
+                else if (filename.endsWith(".png"))
+                    type = "image/png";
+                else if (filename.endsWith(".jpg"))
+                    type = "image/jpeg";
+                else type = "text/html";
+                try {
+                    out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes());
+                    out.write(type.getBytes());
+                    out.write("\r\nCache-Control: max-age=86400\r\n\r\n".getBytes());
+                    FileUtil.readFile(filename, themesDir.getAbsolutePath(), out);
+                    return;
+                } catch (IOException ioe) {}
+            }
+        }
+        try {
+            out.write(ERR_404);
+            out.flush();
+        } catch (IOException ioe) {}
     }
 }

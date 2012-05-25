@@ -42,7 +42,8 @@ public class NTCPSendFinisher {
     }
 
     public void stop() {
-        _executor.shutdownNow();
+        if (_executor != null)
+            _executor.shutdownNow();
     }
 
     public void add(OutNetMessage msg) {

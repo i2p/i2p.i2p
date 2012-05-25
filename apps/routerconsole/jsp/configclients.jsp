@@ -4,15 +4,19 @@
 
 <html><head>
 <title>I2P Router Console - config clients</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
+<style type='text/css'>
+button span.hide{
+    display:none;
+}
+</style>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
+<h1>I2P Client Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
   
@@ -21,9 +25,8 @@
  <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
- 
+ <jsp:getProperty name="formhandler" property="allMessages" />
+ <div class="configure">
  <form action="configclients.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
@@ -32,14 +35,13 @@
  <h3>Client Configuration</h3>
  <p>
  The Java clients listed below are started by the router and run in the same JVM.
- </p><p>
+ </p><p> <div class="wideload">
  <jsp:getProperty name="clientshelper" property="form1" />
  </p><p>
- <input type="submit" name="action" value="Save Client Configuration" />
- </p><p>
  <i>All changes require restart to take effect. To change other client options, edit the clients.config file.</i>
- </p>
- <hr />
+ </p> <hr /><div class="formaction">
+ <input type="submit" name="action" value="Save Client Configuration" />
+</div></div>
  <h3>WebApp Configuration</h3>
  <p>
  The Java web applications listed below are started by the webConsole client and run in the same JVM as the router.
@@ -51,15 +53,18 @@
  A web app may also be disabled by removing the .war file from the webapps directory;
  however the .war file and web app will reappear when you update your router to a newer version,
  so disabling the web app here is the preferred method.
- </p><p>
+ </p><p><div class="wideload">
  <jsp:getProperty name="clientshelper" property="form2" />
- </p><p>
- <input type="submit" name="action" value="Save WebApp Configuration" />
- </p><p>
+ </p>
+ <p>
  <i>All changes require restart to take effect. To change other webapp options, edit the webapps.config file.</i>
  </p>
+ <hr><div class="formaction">
+ <input type="submit" name="action" value="Save WebApp Configuration" />
+ </div>
  </form>
 </div>
-
+</div>
+</div>
 </body>
 </html>

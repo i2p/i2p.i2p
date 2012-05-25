@@ -9,13 +9,13 @@ import java.util.Properties;
 public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
     private boolean _fullySigned;
+    private boolean _answerPings;
     private volatile int _windowSize;
     private int _receiveWindow;
     private int _profile;
     private int _rtt;
     private int _rttDev;
     private int _rto;
-    private int _trend[];
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
@@ -52,13 +52,19 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_MAX_WINDOW_SIZE = "i2p.streaming.maxWindowSize";
     public static final String PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = "i2p.streaming.congestionAvoidanceGrowthRateFactor";
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
+    public static final String PROP_ANSWER_PINGS = "i2p.streaming.answerPings";
     
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 6;
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
     static final int MIN_WINDOW_SIZE = 1;
-    
+    private static final boolean DEFAULT_ANSWER_PINGS = true;
+
+    // Syncronization fix, but doing it this way causes NPE...
+    // private final int _trend[] = new int[TREND_COUNT];
+    private int _trend[];
+
     /**
      *  OK, here is the calculation on the message size to fit in a single
      *  tunnel message without fragmentation.
@@ -196,6 +202,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setSlowStartGrowthRateFactor(opts.getSlowStartGrowthRateFactor());
             setWriteTimeout(opts.getWriteTimeout());
             setReadTimeout(opts.getReadTimeout());
+            setAnswerPings(opts.getAnswerPings());
         }
     }
     
@@ -203,7 +210,6 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     protected void init(Properties opts) {
         super.init(opts);
         _trend = new int[TREND_COUNT];
-        
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
@@ -220,8 +226,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 1));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
-        
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+        setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
     }
     
 	@Override
@@ -259,9 +265,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 2));
         if (opts.contains(PROP_SLOW_START_GROWTH_RATE_FACTOR))
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 2));
-        
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+        if (opts.containsKey(PROP_ANSWER_PINGS))
+            setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
     }
     
     /** 
@@ -281,10 +288,21 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * or can we deal with signatures on the SYN and FIN packets
      * only?
      *
+     * There is no property name defined for this, so it's safe to
+     * say this is unused and always false.
+     *
      * @return if we want signatures on all packets.
      */
     public boolean getRequireFullySigned() { return _fullySigned; }
     public void setRequireFullySigned(boolean sign) { _fullySigned = sign; }
+    
+    /**
+     * Do we respond to a ping?
+     *
+     * @return if we do
+     */
+    public boolean getAnswerPings() { return _answerPings; }
+    public void setAnswerPings(boolean yes) { _answerPings = yes; }
     
     /** 
      * How many messages will we send before waiting for an ACK?
@@ -474,7 +492,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     
 	@Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("conDelay=").append(_connectDelay);
         buf.append(" maxSize=").append(_maxMessageSize);
         buf.append(" rtt=").append(_rtt);
@@ -491,6 +509,13 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         return buf.toString();
     }
     
+    private static boolean getBool(Properties opts, String name, boolean defaultVal) {
+        if (opts == null) return defaultVal;
+        String val = opts.getProperty(name);
+        if (val == null)  return defaultVal;
+        return Boolean.valueOf(val).booleanValue();
+    }
+
     public static void main(String args[]) {
         Properties p = new Properties();
         

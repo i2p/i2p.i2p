@@ -16,6 +16,7 @@ import java.util.Map;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 /**
@@ -61,6 +62,7 @@ public abstract class NamingService {
      * <code>null</code> if no reverse lookup is possible.
      */
     public abstract String reverseLookup(Destination dest);
+    public String reverseLookup(Hash h) { return null; };
 
     /**
      * Check if host name is valid Base64 encoded dest and return this

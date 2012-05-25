@@ -30,6 +30,16 @@ import net.i2p.util.SimpleTimer;
 /**
  * Manage the current state of the statistics
  *
+ * All the capabilities methods appear to be almost unused -
+ * TunnelPeerSelector just looks for unreachables, and that's it?
+ * If so, a lot of this can go away, including the array of 26 ArrayLists,
+ * and a lot of synchronization on _capabilitiesByPeer.
+ *
+ * We don't trust any published capabilities except for 'K' and 'U'.
+ * This should be cleaned up.
+ *
+ * setCapabilities() and removeCapabilities() can just add/remove the profile and that's it.
+ *
  */
 class PeerManager {
     private Log _log;
@@ -37,7 +47,7 @@ class PeerManager {
     private ProfileOrganizer _organizer;
     private ProfilePersistenceHelper _persistenceHelper;
     private List _peersByCapability[];
-    private Map _capabilitiesByPeer;
+    private final Map _capabilitiesByPeer;
     
     public PeerManager(RouterContext context) {
         _context = context;
@@ -51,7 +61,7 @@ class PeerManager {
             _peersByCapability[i] = new ArrayList(64);
         loadProfiles();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 30*1000);
+        SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 45*1000);
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
     
@@ -106,7 +116,14 @@ class PeerManager {
             case PeerSelectionCriteria.PURPOSE_TEST:
                 // for now, the peers we test will be the reliable ones
                 //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
-                _organizer.selectNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
+
+                // The PeerTestJob does only run every 5 minutes, but
+                // this was helping drive us to connection limits, let's leave the exploration
+                // to the ExploratoryPeerSelector, which will restrict to connected peers
+                // when we get close to the limit. So let's stick with connected peers here.
+                // Todo: what's the point of the PeerTestJob anyway?
+                //_organizer.selectNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
+                _organizer.selectActiveNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
                 break;
             case PeerSelectionCriteria.PURPOSE_TUNNEL:
                 // pull all of the fast ones, regardless of how many we 

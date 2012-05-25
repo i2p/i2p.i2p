@@ -79,7 +79,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
 
         leaseSet.setEncryptionKey(li.getPublicKey());
         leaseSet.setSigningKey(li.getSigningPublicKey());
-        boolean encrypt = Boolean.valueOf(session.getOptions().getProperty("i2cp.encryptLeaseset")).booleanValue();
+        boolean encrypt = Boolean.valueOf(session.getOptions().getProperty("i2cp.encryptLeaseSet")).booleanValue();
         String sk = session.getOptions().getProperty("i2cp.leaseSetKey");
         if (encrypt && sk != null) {
             SessionKey key = new SessionKey();

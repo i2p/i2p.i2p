@@ -107,25 +107,25 @@ public class GarlicClove extends DataStructureImpl {
 
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        StringBuffer error = null; 
+        StringBuilder error = null; 
         if (_instructions == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("No instructions ");
         }
         if (_msg == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("No message ");
         }
         if (_cloveId < 0) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("CloveID < 0 [").append(_cloveId).append("] ");
         }
         if (_expiration == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("Expiration is null ");
         }
         if (_certificate == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("Certificate is null ");
         }
         
@@ -156,6 +156,7 @@ public class GarlicClove extends DataStructureImpl {
             _log.debug("Written cert: " + _certificate);
     }
 
+    @Override
     public byte[] toByteArray() {
         byte rv[] = new byte[estimateSize()];
         int offset = 0;
@@ -186,6 +187,7 @@ public class GarlicClove extends DataStructureImpl {
                + _certificate.size(); // certificate
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof GarlicClove))
             return false;
@@ -197,6 +199,7 @@ public class GarlicClove extends DataStructureImpl {
                DataHelper.eq(getInstructions(),  clove.getInstructions());
     }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getCertificate()) +
                (int)getCloveId() +
@@ -205,8 +208,9 @@ public class GarlicClove extends DataStructureImpl {
                DataHelper.hashCode(getInstructions());
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[GarlicClove: ");
         buf.append("\n\tInstructions: ").append(getInstructions());
         buf.append("\n\tCertificate: ").append(getCertificate());

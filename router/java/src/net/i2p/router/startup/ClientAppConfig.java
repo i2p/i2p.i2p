@@ -43,15 +43,19 @@ public class ClientAppConfig {
         Properties rv = new Properties();
         String clientConfigFile = ctx.getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
         File cfgFile = new File(clientConfigFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(ctx.getConfigDir(), clientConfigFile);
         
         // fall back to use router.config's clientApp.* lines
-        if (!cfgFile.exists()) 
+        if (!cfgFile.exists()) {
+            System.out.println("Warning - No client config file " + cfgFile.getAbsolutePath());
             return ctx.router().getConfigMap();
+        }
         
         try {
             DataHelper.loadProps(rv, cfgFile);
         } catch (IOException ioe) {
-            // _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
+            System.out.println("Error loading the client app properties from " + cfgFile.getAbsolutePath() + ' ' + ioe);
         }
         
         return rv;
@@ -91,10 +95,13 @@ public class ClientAppConfig {
 
     public static void writeClientAppConfig(RouterContext ctx, List apps) {
         String clientConfigFile = ctx.getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
+        File cfgFile = new File(clientConfigFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(ctx.getConfigDir(), clientConfigFile);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(clientConfigFile);
-            StringBuffer buf = new StringBuffer(2048);
+            fos = new FileOutputStream(cfgFile);
+            StringBuilder buf = new StringBuilder(2048);
             for(int i = 0; i < apps.size(); i++) {
                 ClientAppConfig app = (ClientAppConfig) apps.get(i);
                 buf.append(PREFIX).append(i).append(".main=").append(app.className).append("\n");

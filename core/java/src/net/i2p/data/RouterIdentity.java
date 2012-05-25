@@ -109,7 +109,7 @@ public class RouterIdentity extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[RouterIdentity: ");
         buf.append("\n\tHash: ").append(getHash().toBase64());
         buf.append("\n\tCertificate: ").append(getCertificate());

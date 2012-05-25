@@ -77,6 +77,6 @@ class I2PClientImpl implements I2PClient {
      *
      */
     public I2PSession createSession(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {
-        return new I2PSessionImpl2(context, destKeyStream, options); // thread safe
+        return new I2PSessionMuxedImpl(context, destKeyStream, options); // thread safe and muxed
     }
 }

@@ -4,12 +4,11 @@
 
 <html><head>
 <title>I2P Router Console - peer connections</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
+ <h1>I2P Network Peers</h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.PeerHelper" id="peerHelper" scope="request" />
  <jsp:setProperty name="peerHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
