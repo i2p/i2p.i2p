@@ -15,6 +15,7 @@
 
 package org.cybergarage.upnp.ssdp;
 
+import java.net.InetAddress;
 import java.util.*;
 
 import org.cybergarage.net.*;
@@ -27,10 +28,18 @@ public class SSDPNotifySocketList extends Vector
 	//	Constructor
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = -7066290881503106399L;
+	private InetAddress[] binds = null;
 
-	public SSDPNotifySocketList() 
-	{
+	public SSDPNotifySocketList() {
+	}
+	
+	/**
+	 * 
+	 * @param binds The host to bind the service <tt>null</tt> means to bind to default.
+	 * @since 1.8
+	 */
+	public SSDPNotifySocketList(InetAddress[] binds){
+		this.binds=binds;
 	}
 
 	////////////////////////////////////////////////
@@ -59,13 +68,27 @@ public class SSDPNotifySocketList extends Vector
 	//	Methods
 	////////////////////////////////////////////////
 	
-	public boolean open() 
-	{
-		int nHostAddrs = HostInterface.getNHostAddresses();
-		for (int n=0; n<nHostAddrs; n++) {
-			String bindAddr = HostInterface.getHostAddress(n);
-			SSDPNotifySocket ssdpNotifySocket = new SSDPNotifySocket(bindAddr);
-			add(ssdpNotifySocket);
+	public boolean open(){
+		InetAddress[] binds=this.binds ;
+		String[] bindAddresses;
+		if(binds!=null){			
+			bindAddresses = new String[binds.length];
+			for (int i = 0; i < binds.length; i++) {
+				bindAddresses[i] = binds[i].getHostAddress();
+			}
+		}else{
+			int nHostAddrs = HostInterface.getNHostAddresses();
+			bindAddresses = new String[nHostAddrs]; 
+			for (int n=0; n<nHostAddrs; n++) {
+				bindAddresses[n] = HostInterface.getHostAddress(n);
+			}
+		}		
+		
+		for (int i = 0; i < bindAddresses.length; i++) {
+			if(bindAddresses[i]!=null){
+				SSDPNotifySocket ssdpNotifySocket = new SSDPNotifySocket(bindAddresses[i]);
+				add(ssdpNotifySocket);
+			}
 		}
 		return true;
 	}

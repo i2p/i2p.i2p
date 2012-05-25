@@ -18,12 +18,15 @@
 
 package org.cybergarage.http;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.StringReader;
 
-import org.cybergarage.util.*;
+import org.cybergarage.util.Debug;
 
 public class HTTPHeader 
 {
+	private static int MAX_LENGTH = 1024;
 	private String name;
 	private String value;
 
@@ -112,8 +115,9 @@ public class HTTPHeader
 
 	public final static String getValue(String data, String name)
 	{
+		/* Thanks for Stephan Mehlhase (2010-10-26) */
 		StringReader strReader = new StringReader(data);
-		LineNumberReader lineReader = new LineNumberReader(strReader);
+		LineNumberReader lineReader = new LineNumberReader(strReader, Math.min(data.length(), MAX_LENGTH));
 		return getValue(lineReader, name);
 	}
 

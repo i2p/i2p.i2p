@@ -82,26 +82,66 @@
 * 	04/25/05
 *		- Thanks for Mikael Hakman <mhakman@dkab.net>
 *		- Added a new setActionListener() and serQueryListner() to include the sub devices. 
+*	07/24/05
+*		- Thanks for Stefano Lenzi <kismet-sl@users.sourceforge.net>
+*		- Fixed a bug of getParentDevice() to return the parent device normally.
+*	02/21/06
+*		- Changed httpRequestRecieved() not to ignore HEAD requests.
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
+*	03/29/08
+*		- Added isRunning() to know whether the device is running.
 * 
 ******************************************************************/
 
 package org.cybergarage.upnp;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.URL;
+import java.util.Calendar;
 
-import org.cybergarage.net.*;
-import org.cybergarage.http.*;
-import org.cybergarage.util.*;
-import org.cybergarage.xml.*;
-import org.cybergarage.soap.*;
-
-import org.cybergarage.upnp.ssdp.*;
-import org.cybergarage.upnp.device.*;
-import org.cybergarage.upnp.control.*;
-import org.cybergarage.upnp.event.*;
-import org.cybergarage.upnp.xml.*;
+import org.cybergarage.http.HTTP;
+import org.cybergarage.http.HTTPRequest;
+import org.cybergarage.http.HTTPResponse;
+import org.cybergarage.http.HTTPServerList;
+import org.cybergarage.http.HTTPStatus;
+import org.cybergarage.net.HostInterface;
+import org.cybergarage.soap.SOAPResponse;
+import org.cybergarage.upnp.control.ActionListener;
+import org.cybergarage.upnp.control.ActionRequest;
+import org.cybergarage.upnp.control.ActionResponse;
+import org.cybergarage.upnp.control.ControlRequest;
+import org.cybergarage.upnp.control.ControlResponse;
+import org.cybergarage.upnp.control.QueryListener;
+import org.cybergarage.upnp.control.QueryRequest;
+import org.cybergarage.upnp.device.Advertiser;
+import org.cybergarage.upnp.device.Description;
+import org.cybergarage.upnp.device.InvalidDescriptionException;
+import org.cybergarage.upnp.device.NTS;
+import org.cybergarage.upnp.device.ST;
+import org.cybergarage.upnp.device.SearchListener;
+import org.cybergarage.upnp.device.USN;
+import org.cybergarage.upnp.event.Subscriber;
+import org.cybergarage.upnp.event.Subscription;
+import org.cybergarage.upnp.event.SubscriptionRequest;
+import org.cybergarage.upnp.event.SubscriptionResponse;
+import org.cybergarage.upnp.ssdp.SSDPNotifyRequest;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocket;
+import org.cybergarage.upnp.ssdp.SSDPPacket;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponse;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponseSocket;
+import org.cybergarage.upnp.ssdp.SSDPSearchSocketList;
+import org.cybergarage.upnp.xml.DeviceData;
+import org.cybergarage.util.Debug;
+import org.cybergarage.util.FileUtil;
+import org.cybergarage.util.Mutex;
+import org.cybergarage.util.TimerUtil;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.Parser;
+import org.cybergarage.xml.ParserException;
+import org.cybergarage.xml.XML;
 
 public class Device implements org.cybergarage.http.HTTPRequestListener, SearchListener
 {
@@ -188,6 +228,16 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		loadDescription(descriptionFile);
 	}
 
+	/**
+	 * @since 1.8.0
+	 */
+	public Device(InputStream input) throws InvalidDescriptionException
+	{
+		this(null, null);
+		loadDescription(input);
+	}
+
+	
 	public Device(String descriptionFileName) throws InvalidDescriptionException
 	{
 		this(new File(descriptionFileName));
@@ -209,6 +259,47 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		mutex.unlock();
 	}
 	
+	////////////////////////////////////////////////
+	//	getAbsoluteURL
+	////////////////////////////////////////////////
+	
+	public String getAbsoluteURL(String urlString)
+	{
+		try {
+			URL url = new URL(urlString);
+			return url.toString();
+		}
+		catch (Exception e) {}
+		
+		Device rootDev = getRootDevice();
+		String urlBaseStr = rootDev.getURLBase();
+		
+		// Thanks for Steven Yen (2003/09/03)
+		if (urlBaseStr == null || urlBaseStr.length() <= 0) {
+			String location = rootDev.getLocation();
+			String locationHost = HTTP.getHost(location);
+			int locationPort = HTTP.getPort(location);
+			urlBaseStr = HTTP.getRequestHostURL(locationHost, locationPort);
+		}
+
+		urlString = HTTP.toRelativeURL(urlString);
+		String absUrl = urlBaseStr + urlString;
+		try {
+			URL url = new URL(absUrl);
+			return url.toString();
+		}
+		catch (Exception e) {}
+			
+		absUrl = HTTP.getAbsoluteURL(urlBaseStr, urlString);
+		try {
+			URL url = new URL(absUrl);
+			return url.toString();
+		}
+		catch (Exception e) {}
+		
+		return "";
+	}
+
 	////////////////////////////////////////////////
 	//	NMPR
 	////////////////////////////////////////////////
@@ -300,15 +391,71 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	
 	// Thanks for Stefano Lenzi (07/24/04)
 
-	public Device getParentDevice()
-	{ 
+	/**
+	 * 
+	 * @return A Device that contain this object.<br>
+	 * 	Return <code>null</code> if this is a root device.
+	 * @author Stefano "Kismet" Lenzi 
+	 */
+	public Device getParentDevice()	{ 
 		if(isRootDevice())
 			return null;
 		Node devNode = getDeviceNode();
+		Node aux = null;
 		//<device><deviceList><device>
-		devNode = devNode.getParentNode().getParentNode().getNode(Device.ELEM_NAME);
-		return new Device(devNode);
+		aux = devNode.getParentNode().getParentNode();
+		return new Device(aux);
 	}
+	/**
+	 * Add a Service to device without checking for duplicate or syntax error
+	 * 
+	 * @param s Add Service s to the Device
+	 */
+	public void addService(Service s) {
+		Node serviceListNode = getDeviceNode().getNode(ServiceList.ELEM_NAME);
+		if (serviceListNode == null) {
+			serviceListNode = new Node(ServiceList.ELEM_NAME);
+			getDeviceNode().addNode(serviceListNode);
+		}
+		serviceListNode.addNode(s.getServiceNode());
+	}
+
+	/**
+	 * Add a Device to device without checking for duplicate or syntax error.
+	 * This method set or reset the root node of the Device and itself<br>
+	 * <br>
+	 * Note: This method should be used to create a dynamic<br>
+	 * Device withtout writing any XML that describe the device<br>.
+	 * 
+	 * @param d Add Device d to the Device
+	 * 
+	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
+	 * 
+	 */
+	public void addDevice(Device d) {
+		Node deviceListNode = getDeviceNode().getNode(DeviceList.ELEM_NAME);
+		if (deviceListNode == null) {
+			//deviceListNode = new Node(ServiceList.ELEM_NAME); twa wrong ELEM_NAME;
+			deviceListNode = new Node(DeviceList.ELEM_NAME);
+			getDeviceNode().addNode(deviceListNode);
+		}
+		deviceListNode.addNode(d.getDeviceNode());
+		d.setRootNode(null);
+		if(getRootNode()==null){
+			Node root = new Node(RootDescription.ROOT_ELEMENT);
+			root.setNameSpace("",RootDescription.ROOT_ELEMENT_NAMESPACE);
+			Node spec = new Node(RootDescription.SPECVERSION_ELEMENT);
+			Node maj =new Node(RootDescription.MAJOR_ELEMENT);
+			maj.setValue("1");
+			Node min =new Node(RootDescription.MINOR_ELEMENT);
+			min.setValue("0");
+			spec.addNode(maj);
+			spec.addNode(min);
+			root.addNode(spec);		
+			setRootNode(root);
+		}			
+	}	
+	
 
 	////////////////////////////////////////////////
 	//	UserData
@@ -365,6 +512,32 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 			return "";
 		return descriptionFile.getAbsoluteFile().getParent();
 	}
+	
+	/**
+	 * @since 1.8.0
+	 */
+	public boolean loadDescription(InputStream input) throws InvalidDescriptionException
+	{
+		try {
+			Parser parser = UPnP.getXMLParser();
+			rootNode = parser.parse(input);
+			if (rootNode == null)
+				throw new InvalidDescriptionException(Description.NOROOT_EXCEPTION);
+			deviceNode = rootNode.getNode(Device.ELEM_NAME);
+			if (deviceNode == null)
+				throw new InvalidDescriptionException(Description.NOROOTDEVICE_EXCEPTION);
+		}
+		catch (ParserException e) {
+			throw new InvalidDescriptionException(e);
+		}
+		
+		if (initializeLoadedDescription() == false)
+			return false;
+
+		setDescriptionFile(null);
+				
+		return true;
+	}	
 
 	public boolean loadDescription(String descString) throws InvalidDescriptionException
 	{
@@ -438,9 +611,8 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	//	Root Device
 	////////////////////////////////////////////////
 
-	public boolean isRootDevice()
-	{
-		return (getRootNode() != null) ? true : false;
+	public boolean isRootDevice(){
+		return getRootNode().getNode("device").getNodeValue(UDN).equals(getUDN());
 	}
 	
 	////////////////////////////////////////////////
@@ -603,7 +775,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	//	manufacture
 	////////////////////////////////////////////////
 
-	private final static String MANUFACTURE = "manufacture";
+	private final static String MANUFACTURE = "manufacturer";
 	
 	public void setManufacture(String value)
 	{
@@ -619,7 +791,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	//	manufactureURL
 	////////////////////////////////////////////////
 
-	private final static String MANUFACTURE_URL = "manufactureURL";
+	private final static String MANUFACTURE_URL = "manufacturerURL";
 	
 	public void setManufactureURL(String value)
 	{
@@ -1066,6 +1238,24 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		return iconList.getIcon(n);
 	}
 
+	public Icon getSmallestIcon()
+	{
+		Icon smallestIcon = null;		
+		IconList iconList = getIconList();
+		int iconCount = iconList.size();
+		for (int n=0; n < iconCount; n++) {
+			Icon icon = iconList.getIcon(n);
+			if (null == smallestIcon) {
+				smallestIcon = icon;
+				continue;
+			}
+			if (icon.getWidth() < smallestIcon.getWidth())
+				smallestIcon = icon;			
+		}
+		
+		return smallestIcon;
+	}
+	
 	////////////////////////////////////////////////
 	//	Notify
 	////////////////////////////////////////////////
@@ -1103,7 +1293,6 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	{
 		TimerUtil.waitRandom(DEFAULT_DISCOVERY_WAIT_TIME);
 	}
-		
 	public void announce(String bindAddr)
 	{
 		String devLocation = getLocationURL(bindAddr);
@@ -1123,6 +1312,11 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 			ssdpReq.setNT(devNT);
 			ssdpReq.setUSN(devUSN);
 			ssdpSock.post(ssdpReq);
+			 
+			String devUDN = getUDN(); 
+			ssdpReq.setNT(devUDN); 
+			ssdpReq.setUSN(devUDN); 
+			ssdpSock.post(ssdpReq); 			
 		}
 		
 		// uuid:device-UUID::urn:schemas-upnp-org:device:deviceType:v 
@@ -1150,18 +1344,29 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		}
 	}
 
-	public void announce()
-	{
+	public void announce(){
 		notifyWait();
-		
-		int nHostAddrs = HostInterface.getNHostAddresses();
-		for (int n=0; n<nHostAddrs; n++) {
-			String bindAddr = HostInterface.getHostAddress(n);
-			if (bindAddr == null || bindAddr.length() <= 0)
+		InetAddress[] binds = getDeviceData().getHTTPBindAddress();
+		String[] bindAddresses;
+		if(binds!=null){			
+			bindAddresses = new String[binds.length];
+			for (int i = 0; i < binds.length; i++) {
+				bindAddresses[i] = binds[i].getHostAddress();
+			}
+		}else{
+			int nHostAddrs = HostInterface.getNHostAddresses();
+			bindAddresses = new String[nHostAddrs]; 
+			for (int n=0; n<nHostAddrs; n++) {
+				bindAddresses[n] = HostInterface.getHostAddress(n);
+			}
+		}		
+		for (int j = 0; j < bindAddresses.length; j++) {
+			if(bindAddresses[j] == null || bindAddresses[j].length() == 0)
 				continue;
 			int ssdpCount = getSSDPAnnounceCount();
 			for (int i=0; i<ssdpCount; i++)
-				announce(bindAddr);
+				announce(bindAddresses[j]);
+			
 		}
 	}
 	
@@ -1206,24 +1411,38 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		}
 	}
 
-	public void byebye()
-	{
-		int nHostAddrs = HostInterface.getNHostAddresses();
-		for (int n=0; n<nHostAddrs; n++) {
-			String bindAddr = HostInterface.getHostAddress(n);
-			if (bindAddr == null || bindAddr.length() <= 0)
+	public void byebye(){
+
+		InetAddress[] binds = getDeviceData().getHTTPBindAddress();
+		String[] bindAddresses;
+		if(binds!=null){			
+			bindAddresses = new String[binds.length];
+			for (int i = 0; i < binds.length; i++) {
+				bindAddresses[i] = binds[i].getHostAddress();
+			}
+		}else{
+			int nHostAddrs = HostInterface.getNHostAddresses();
+			bindAddresses = new String[nHostAddrs]; 
+			for (int n=0; n<nHostAddrs; n++) {
+				bindAddresses[n] = HostInterface.getHostAddress(n);
+			}
+		}		
+		
+		for (int j = 0; j < bindAddresses.length; j++) {			
+			if (bindAddresses[j] == null || bindAddresses[j].length() <= 0)
 				continue;
 			int ssdpCount = getSSDPAnnounceCount();
 			for (int i=0; i<ssdpCount; i++)
-				byebye(bindAddr);
-		}
+				byebye(bindAddresses[j]);
+		}		
 	}
 
 	////////////////////////////////////////////////
 	//	Search
 	////////////////////////////////////////////////
 
-	public boolean postSearchResponse(SSDPPacket ssdpPacket, String st, String usn)
+    private static Calendar cal = Calendar.getInstance();
+    public boolean postSearchResponse(SSDPPacket ssdpPacket, String st, String usn)
 	{
 		String localAddr = ssdpPacket.getLocalAddress();
 		Device rootDev = getRootDevice();
@@ -1231,7 +1450,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		
 		SSDPSearchResponse ssdpRes = new SSDPSearchResponse();
 		ssdpRes.setLeaseTime(getLeaseTime());
-		ssdpRes.setDate(Calendar.getInstance());
+		ssdpRes.setDate(cal);
 		ssdpRes.setST(st);
 		ssdpRes.setUSN(usn);
 		ssdpRes.setLocation(rootDevLocation);
@@ -1324,12 +1543,56 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		return getDeviceData().getHTTPPort();
 	}
 
+	public void setHTTPBindAddress(InetAddress[] inets){
+		this.getDeviceData().setHTTPBindAddress(inets);
+	}
+	
+	public InetAddress[] getHTTPBindAddress(){
+		return this.getDeviceData().getHTTPBindAddress();
+	}	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.8
+	 */
+	public String getSSDPIPv4MulticastAddress(){
+		return this.getDeviceData().getMulticastIPv4Address();
+	}	
+	
+	/**
+	 * 
+	 * @param ip
+	 * @since 1.8
+	 */
+	public void getSSDPIPv4MulticastAddress(String ip){
+		this.getDeviceData().setMulticastIPv4Address(ip);
+	}	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.8
+	 */
+	public String getSSDPIPv6MulticastAddress(){
+		return this.getDeviceData().getMulticastIPv6Address();
+	}	
+	
+	/**
+	 * 
+	 * @param ip
+	 * @since 1.8
+	 */
+	public void getSSDPIPv6MulticastAddress(String ip){
+		this.getDeviceData().setMulticastIPv6Address(ip);
+	}	
+	
 	public void httpRequestRecieved(HTTPRequest httpReq)
 	{
 		if (Debug.isOn() == true)
 			httpReq.print();
 	
-		if (httpReq.isGetRequest() == true) {
+		if (httpReq.isGetRequest() == true || httpReq.isHeadRequest() == true) {
 			httpGetRequestRecieved(httpReq);
 			return;
 		}
@@ -1377,6 +1640,8 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		byte fileByte[] = new byte[0];
 		if (isDescriptionURI(uri) == true) {
 			String localAddr = httpReq.getLocalAddress();
+			if ((localAddr == null) || (localAddr.length() <= 0))
+				localAddr = HostInterface.getInterface();
 			fileByte = getDescriptionData(localAddr);
 		}
 		else if ((embDev = getDeviceByDescriptionURI(uri)) != null) {
@@ -1452,6 +1717,13 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		ctlReq.post(actRes);
 	}
 
+   private void invalidArgumentsControlRecieved(ControlRequest ctlReq)
+    {
+        ControlResponse actRes = new ActionResponse();
+        actRes.setFaultResponse(UPnPStatus.INVALID_ARGS);
+        ctlReq.post(actRes);
+    }
+
 	private void deviceActionControlRecieved(ActionRequest ctlReq, Service service)
 	{
 		if (Debug.isOn() == true)
@@ -1465,7 +1737,12 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		}
 		ArgumentList actionArgList = action.getArgumentList();
 		ArgumentList reqArgList = ctlReq.getArgumentList();
-		actionArgList.set(reqArgList);
+        try {
+            actionArgList.setReqArgs(reqArgList);
+        } catch (IllegalArgumentException ex){
+            invalidArgumentsControlRecieved(ctlReq);
+            return;
+       }
 		if (action.performActionListener(ctlReq) == false)
 			invalidActionControlRecieved(ctlReq);
 	}
@@ -1615,6 +1892,75 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	{
 		return getDeviceData().getHTTPServerList();
 	}
+	/**
+	 * 
+	 * @param port The port to use for binding the SSDP service
+	 */
+	public void setSSDPPort(int port){
+		this.getDeviceData().setSSDPPort(port);
+	}
+
+	/**
+	 * 
+	 * @return The port to use for binding the SSDP service
+	 */
+	public int getSSDPPort(){
+		return this.getDeviceData().getSSDPPort();
+	}
+	
+	
+
+	/**
+	 * 
+	 * @param inets The IP that will be used for binding the SSDP service.
+	 * 		Use <code>null</code> to get the default beahvior 
+	 */
+	public void setSSDPBindAddress(InetAddress[] inets){
+		this.getDeviceData().setSSDPBindAddress(inets);
+	}
+		
+	
+	/**
+	 * 
+	 * @return inets The IP that will be used for binding the SSDP service.
+	 * 		null means the default setted by the class UPnP
+	 */
+	public InetAddress[] getSSDPBindAddress(){
+		return this.getDeviceData().getSSDPBindAddress();
+	}	
+	
+	/**
+	 * 
+	 * @param ip The IPv4 address used for Multicast comunication
+	 */
+	public void setMulticastIPv4Address(String ip){
+		this.getDeviceData().setMulticastIPv4Address(ip);
+	}
+
+	/**
+	 * 
+	 * @return The IPv4 address used for Multicast comunication
+	 */
+	public String getMulticastIPv4Address(){
+		return this.getDeviceData().getMulticastIPv4Address();
+	}
+	
+	/**
+	 * 
+	 * @param ip The IPv address used for Multicast comunication
+	 */
+	public void setMulticastIPv6Address(String ip){
+		this.getDeviceData().setMulticastIPv6Address(ip);
+	}
+
+	/**
+	 * 
+	 * @return The IPv address used for Multicast comunication
+	 */
+	public String getMulticastIPv6Address(){
+		return this.getDeviceData().getMulticastIPv6Address();
+	}
+	
 
 	private SSDPSearchSocketList getSSDPSearchSocketList() 
 	{
@@ -1708,6 +2054,11 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		return stop(true);
 	}
 
+	public boolean isRunning()
+	{
+		return (getAdvertiser() != null) ? true : false;
+	}
+
 	////////////////////////////////////////////////
 	// Interface Address
 	////////////////////////////////////////////////
@@ -1774,6 +2125,22 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 				dev.setQueryListener(listener, true);
 			}
 		}
+	}
+
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
 	}
 	
 	////////////////////////////////////////////////

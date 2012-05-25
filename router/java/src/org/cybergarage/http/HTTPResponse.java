@@ -19,7 +19,7 @@
 
 package org.cybergarage.http;
 
-import java.io.*;
+import java.io.InputStream;
 
 public class HTTPResponse extends HTTPPacket
 {
@@ -29,6 +29,7 @@ public class HTTPResponse extends HTTPPacket
 	
 	public HTTPResponse()
 	{
+		setVersion(HTTP.VERSION_11);
 		setContentType(HTML.CONTENT_TYPE);
 		setServer(HTTPServer.getName());
 		setContent("");
@@ -84,7 +85,7 @@ public class HTTPResponse extends HTTPPacket
 	
 	public String getHeader()
 	{
-		StringBuilder str = new StringBuilder();
+		StringBuffer str = new StringBuffer();
 	
 		str.append(getStatusLineString());
 		str.append(getHeaderString());
@@ -98,7 +99,7 @@ public class HTTPResponse extends HTTPPacket
 	
 	public String toString()
 	{
-		StringBuilder str = new StringBuilder();
+		StringBuffer str = new StringBuffer();
 
 		str.append(getStatusLineString());
 		str.append(getHeaderString());

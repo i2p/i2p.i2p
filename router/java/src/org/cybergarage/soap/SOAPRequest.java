@@ -20,11 +20,15 @@
 
 package org.cybergarage.soap;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
 
-import org.cybergarage.http.*;
-import org.cybergarage.xml.*;
-import org.cybergarage.util.*;
+import org.cybergarage.http.HTTP;
+import org.cybergarage.http.HTTPRequest;
+import org.cybergarage.http.HTTPResponse;
+import org.cybergarage.util.Debug;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.Parser;
+import org.cybergarage.xml.ParserException;
 
 public class SOAPRequest extends HTTPRequest
 {
@@ -172,12 +176,12 @@ public class SOAPRequest extends HTTPRequest
 	
 	public void print()
 	{
-		System.out.println(toString());
+		Debug.message(toString());
 		if (hasContent() == true)
 			return;
 		Node rootElem = getRootNode();
 		if (rootElem == null)
 			return;
-		System.out.println(rootElem.toString());
+		Debug.message(rootElem.toString());
 	}
 }

@@ -24,6 +24,8 @@
 
 package org.cybergarage.upnp.ssdp;
 
+import java.io.InputStream;
+
 import org.cybergarage.http.*;
 
 public class SSDPResponse extends HTTPResponse
@@ -37,6 +39,11 @@ public class SSDPResponse extends HTTPResponse
 		setVersion(HTTP.VERSION_11);
 	}
 
+	public SSDPResponse(InputStream in)
+	{
+		super(in);
+	}
+	
 	////////////////////////////////////////////////
 	//	ST (SearchTarget)
 	////////////////////////////////////////////////
@@ -114,7 +121,7 @@ public class SSDPResponse extends HTTPResponse
 	
 	public String getHeader()
 	{
-		StringBuilder str = new StringBuilder();
+		StringBuffer str = new StringBuffer();
 	
 		str.append(getStatusLineString());
 		str.append(getHeaderString());

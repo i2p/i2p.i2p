@@ -22,6 +22,10 @@
 *	12/02/04
 *		- Brian Owens <brian@b-owens.com>
 *		- Fixed toXMLString() to convert from "'" to "&apos;" instead of "\".
+*	11/07/05
+*		- Changed toString() to return as utf-8 string.
+*	02/08/08
+*		- Added addValue().
 *
 ******************************************************************/
 
@@ -29,23 +33,29 @@ package org.cybergarage.xml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 
-public class Node
+public class Node 
 {
 
-	public Node()
+	/**
+	 * Create a Node with empty UserData and no Parent Node
+	 *
+	 */
+	public Node() 
 	{
 		setUserData(null);
 		setParentNode(null);
 	}
 
-	public Node(String name)
+	public Node(String name) 
 	{
 		this();
 		setName(name);
 	}
 
-	public Node(String ns, String name)
+	public Node(String ns, String name) 
 	{
 		this();
 		setName(ns, name);
@@ -55,14 +65,14 @@ public class Node
 	//	parent node
 	////////////////////////////////////////////////
 
-	private Node parentNode = null;
+	private Node parentNode = null; 
 	
-	public void setParentNode(Node node)
+	public void setParentNode(Node node) 
 	{
 		parentNode = node;
 	}
 
-	public Node getParentNode()
+	public Node getParentNode() 
 	{
 		return parentNode;
 	}
@@ -71,7 +81,7 @@ public class Node
 	//	root node
 	////////////////////////////////////////////////
 
-	public Node getRootNode()
+	public Node getRootNode() 
 	{
 		Node rootNode = null;
 		Node parentNode = getParentNode();
@@ -86,44 +96,54 @@ public class Node
 	//	name
 	////////////////////////////////////////////////
 
-	private String name = new String();
+	private String name = new String(); 
 	
-	public void setName(String name)
+	public void setName(String name) 
 	{
 		this.name = name;
 	}
 
-	public void setName(String ns, String name)
+	public void setName(String ns, String name) 
 	{
 		this.name = ns + ":" + name;
 	}
 
-	public String getName()
+	public String getName() 
 	{
 		return name;
 	}
 
 	public boolean isName(String value)
 	{
-		return name.equals(value);
+		return name.equals(value);	
 	}
 	
 	////////////////////////////////////////////////
 	//	value
 	////////////////////////////////////////////////
 
-	private String value = "";
+	private String value = new String(); 
 	
-	public void setValue(String value)
+	public void setValue(String value) 
 	{
 		this.value = value;
 	}
 
-	public void setValue(int value)
+	public void setValue(int value) 
 	{
 		setValue(Integer.toString(value));
 	}
 
+	public void addValue(String value) 
+	{
+		if (this.value == null) {
+			this.value = value;
+			return;
+		}
+		if (value != null)
+			this.value += value;
+	}
+	
 	public String getValue()
 	{
 		return value;
@@ -143,7 +163,7 @@ public class Node
 		return attrList.getAttribute(index);
 	}
 
-	public Attribute getAttribute(String name)
+	public Attribute getAttribute(String name) 
 	{
 		return attrList.getAttribute(name);
 	}
@@ -214,7 +234,7 @@ public class Node
 	//	Attribute (xmlns)
 	////////////////////////////////////////////////
 
-	public void setNameSpace(String ns, String value)
+	public void setNameSpace(String ns, String value) 
 	{
 		setAttribute("xmlns:" + ns, value);
 	}
@@ -233,12 +253,12 @@ public class Node
 		return nodeList.getNode(index);
 	}
 
-	public Node getNode(String name)
+	public Node getNode(String name) 
 	{
 		return nodeList.getNode(name);
 	}
 	
-	public Node getNodeEndsWith(String name)
+	public Node getNodeEndsWith(String name) 
 	{
 		return nodeList.getEndsWith(name);
 	}
@@ -251,6 +271,17 @@ public class Node
 	public void insertNode(Node node, int index) {
 		node.setParentNode(this);
 		nodeList.insertElementAt(node, index);
+	}
+
+	public int getIndex(String name){
+		int index = -1;
+		for (Iterator i = nodeList.iterator(); i.hasNext();) {
+			index++;
+			Node n = (Node) i.next();
+			if(n.getName().equals(name))
+				return index;
+		}
+		return index;
 	}
 
 	public boolean removeNode(Node node) {
@@ -300,31 +331,48 @@ public class Node
 	//	userData
 	////////////////////////////////////////////////
 
-	private Object userData = null;
+	private Object userData = null; 
 	
-	public void setUserData(Object data)
+	public void setUserData(Object data) 
 	{
 		userData = data;
 	}
 
-	public Object getUserData()
+	public Object getUserData() 
 	{
 		return userData;
 	}
-
 	
 	////////////////////////////////////////////////
-	//	toString
+	//	toString 
 	////////////////////////////////////////////////
 
-	public String getIndentLevelString(int nIndentLevel)
+	/**
+	 * Inovoke {@link #getIndentLevelString(int, String)} with <code>"   "</code> as String 
+	 * 
+	 * @see #getIndentLevelString(int, String)
+	 */
+	public String getIndentLevelString(int nIndentLevel) 
 	{
-		char indentString[] = new char[nIndentLevel];
-		for (int n=0; n<nIndentLevel; n++)
-			indentString[n] = '\t' ;
-		return new String(indentString);
+		return getIndentLevelString(nIndentLevel,"   ");
 	}
 
+	/**
+	 * 
+	 * @param nIndentLevel the level of indentation to produce 
+	 * @param space the String to use for the intendation 
+	 * @since 1.8.0
+	 * @return an indentation String
+	 */
+	public String getIndentLevelString(int nIndentLevel,String space) 
+	{
+		StringBuffer indentString = new StringBuffer(nIndentLevel*space.length()); 
+		for (int n=0; n<nIndentLevel; n++){
+			indentString.append(space);
+		}
+		return indentString.toString();
+	}	
+	
 	public void outputAttributes(PrintWriter ps)
 	{
 		int nAttributes = getNAttributes();
@@ -334,20 +382,20 @@ public class Node
 		}
 	}
 
-	public void output(PrintWriter ps, int indentLevel, boolean hasChildNode)
+	public void output(PrintWriter ps, int indentLevel, boolean hasChildNode) 
 	{
 		String indentString = getIndentLevelString(indentLevel);
 
 		String name = getName();
 		String value = getValue();
 
-		if (hasNodes() == false || hasChildNode == false) {
+		if (hasNodes() == false || hasChildNode == false) {		
 			ps.print(indentString + "<" + name);
 			outputAttributes(ps);
 			// Thnaks for Tho Beisch (11/09/04)
 			if (value == null || value.length() == 0) {
-				// No value, so use short notation <node />
-				ps.println(" />");
+				// Not using the short notation <node /> because it cause compatibility trouble
+				ps.println("></" + name + ">");
 			} else {
 				ps.println(">" + XML.escapeXMLChars(value) + "</" + name + ">");
 			}
@@ -368,31 +416,36 @@ public class Node
 		ps.println(indentString +"</" + name + ">");
 	}
 
-	public String toString(boolean hasChildNode)
+	public String toString(String enc, boolean hasChildNode)
 	{
 		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 		PrintWriter pr = new PrintWriter(byteOut);
 		output(pr, 0, hasChildNode);
 		pr.flush();
+		try {
+			if (enc != null && 0 < enc.length())
+				return byteOut.toString(enc);
+		}
+		catch (UnsupportedEncodingException e) {
+		}
 		return byteOut.toString();
 	}
 		
-	@Override
-    public String toString()
+	public String toString()
 	{
-		return toString(true);
+		return toString(XML.CHARSET_UTF8, true);
 	}
 	
 	public String toXMLString(boolean hasChildNode)
 	{
 		String xmlStr = toString();
-		xmlStr = xmlStr.replaceAll("<", "&lt;");
-		xmlStr = xmlStr.replaceAll(">", "&gt;");
+		xmlStr = xmlStr.replaceAll("<", "&lt;");	
+		xmlStr = xmlStr.replaceAll(">", "&gt;");	
 		// Thanks for Theo Beisch (11/09/04)
-		xmlStr = xmlStr.replaceAll("&", "&amp;");
-		xmlStr = xmlStr.replaceAll("\"", "&quot;");
+		xmlStr = xmlStr.replaceAll("&", "&amp;");	
+		xmlStr = xmlStr.replaceAll("\"", "&quot;");	
 		// Thanks for Brian Owens (12/02/04)
-		xmlStr = xmlStr.replaceAll("'", "&apos;");
+		xmlStr = xmlStr.replaceAll("'", "&apos;");	
 		return xmlStr;
 	}
 

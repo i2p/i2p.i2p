@@ -10,14 +10,18 @@
 *
 *	05/08/03
 *		- first revision.
+*	24/03/06
+*		- Stefano Lenzi:added debug information as request by Stephen More
 *
 ******************************************************************/
 
 package org.cybergarage.http;
 
-import java.util.*;
+import java.net.InetAddress;
+import java.util.Vector;
 
-import org.cybergarage.net.*;
+import org.cybergarage.net.HostInterface;
+import org.cybergarage.upnp.Device;
 
 public class HTTPServerList extends Vector 
 {
@@ -25,10 +29,15 @@ public class HTTPServerList extends Vector
 	//	Constructor
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = 2379889735659369065L;
-
-	public HTTPServerList() 
-	{
+	private InetAddress[] binds = null;
+	private int port = Device.HTTP_DEFAULT_PORT;
+	
+	public HTTPServerList() {
+	}
+	
+	public HTTPServerList(InetAddress[] list, int port) {
+		this.binds = list;
+		this.port = port;
 	}
 
 	////////////////////////////////////////////////
@@ -62,20 +71,40 @@ public class HTTPServerList extends Vector
 		}
 	}
 
-	public boolean open(int port) 
-	{
-		int nHostAddrs = HostInterface.getNHostAddresses();
-		for (int n=0; n<nHostAddrs; n++) {
-			String bindAddr = HostInterface.getHostAddress(n);
+	public int open(){
+		InetAddress[] binds=this.binds;
+		String[] bindAddresses;
+		if(binds!=null){			
+			bindAddresses = new String[binds.length];
+			for (int i = 0; i < binds.length; i++) {
+				bindAddresses[i] = binds[i].getHostAddress();
+			}
+		}else{
+			int nHostAddrs = HostInterface.getNHostAddresses();
+			bindAddresses = new String[nHostAddrs]; 
+			for (int n=0; n<nHostAddrs; n++) {
+				bindAddresses[n] = HostInterface.getHostAddress(n);
+			}
+		}		
+		int j=0;
+		for (int i = 0; i < bindAddresses.length; i++) {
 			HTTPServer httpServer = new HTTPServer();
-			if (httpServer.open(bindAddr, port) == false) {
+			if((bindAddresses[i]==null) || (httpServer.open(bindAddresses[i], port) == false)) {
 				close();
 				clear();
-				return false;
+			}else{
+				add(httpServer);
+				j++;
 			}
-			add(httpServer);
 		}
-		return true;
+		return j;
+	}
+	
+	
+	public boolean open(int port) 
+	{
+		this.port=port;
+		return open()!=0;
 	}
 	
 	////////////////////////////////////////////////

@@ -17,14 +17,15 @@
 *		- Added getActionNode() and getAction().
 *		- Added getServiceNode() and getService().
 *		- Added the parent service node to the constructor.
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
 *
 ******************************************************************/
 
 package org.cybergarage.upnp;
 
-import org.cybergarage.xml.*;
-
-import org.cybergarage.upnp.xml.*;
+import org.cybergarage.upnp.xml.ArgumentData;
+import org.cybergarage.xml.Node;
 
 public class Argument
 {
@@ -59,6 +60,10 @@ public class Argument
 		return new Service(getServiceNode());
 	}
 	
+	void setService(Service s){
+		s.getServiceNode();
+	}
+	
 	public Node getActionNode()
 	{
 		Node argumentLinstNode = getArgumentNode().getParentNode();
@@ -83,8 +88,13 @@ public class Argument
 
 	public Argument()
 	{
-		argumentNode = new Node();
+		argumentNode = new Node(ELEM_NAME);
 		serviceNode = null;
+	}
+	
+	public Argument(Node servNode){
+		argumentNode = new Node(ELEM_NAME);
+		serviceNode = servNode;		
 	}
 	
 	public Argument(Node servNode, Node argNode)
@@ -226,6 +236,18 @@ public class Argument
 	}
 
 	////////////////////////////////////////////////
-	//	Related
+	//	userData
 	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
+	}
 }

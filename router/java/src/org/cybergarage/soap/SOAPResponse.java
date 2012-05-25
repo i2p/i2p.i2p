@@ -20,8 +20,10 @@
 
 package org.cybergarage.soap;
 
-import org.cybergarage.http.*;
-import org.cybergarage.xml.*;
+import org.cybergarage.http.HTTPResponse;
+import org.cybergarage.util.Debug;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.XML;
 
 public class SOAPResponse extends HTTPResponse
 {
@@ -180,12 +182,12 @@ public class SOAPResponse extends HTTPResponse
 	
 	public void print()
 	{
-		System.out.println(toString());
+		Debug.message(toString());
 		if (hasContent() == true)
 			return;
 		Node rootElem = getRootNode();
 		if (rootElem == null)
 			return;
-		System.out.println(rootElem.toString());
+		Debug.message(rootElem.toString());
 	}
 }

@@ -102,6 +102,11 @@ public class ControlResponse extends SOAPResponse
 		return faultNode;
 	}
 	
+	private Node createFaultResponseNode(int errCode)
+	{
+		return createFaultResponseNode(errCode, UPnPStatus.code2String(errCode));
+	}
+
 	////////////////////////////////////////////////
 	//	UPnP Error
 	////////////////////////////////////////////////

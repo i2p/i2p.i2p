@@ -15,9 +15,32 @@
 
 package org.cybergarage.util;
 
-public final class Debug
-{
+import java.io.PrintStream;
+
+public final class Debug{		
+	
+	public static Debug debug = new Debug();
+	
+	private PrintStream out = System.out;
+	
+	
+	public Debug(){
+		
+	}
+	
+	public synchronized PrintStream getOut() {
+		return out;
+	}
+	public synchronized void setOut(PrintStream out) {
+		this.out = out;
+	}
+	
+	
 	public static boolean enabled = false;
+
+	public static Debug getDebug(){
+		return Debug.debug;
+	}
 	
 	public static final void on() {
 		enabled = true;
@@ -30,22 +53,29 @@ public final class Debug
 	}
 	public static final void message(String s) {
 		if (enabled == true)
-			System.out.println("CyberGarage message : " + s);
+			Debug.debug.getOut().println("CyberGarage message : " + s);
 	}
 	public static final void message(String m1, String m2) {
 		if (enabled == true)
-			System.out.println("CyberGarage message : ");
-			System.out.println(m1);
-			System.out.println(m2);
+			Debug.debug.getOut().println("CyberGarage message : ");
+			Debug.debug.getOut().println(m1);
+			Debug.debug.getOut().println(m2);
 	}
 	public static final void warning(String s) {
-		System.out.println("CyberGarage warning : " + s);
+		Debug.debug.getOut().println("CyberGarage warning : " + s);
 	}
 	public static final void warning(String m, Exception e) {
-		System.out.println("CyberGarage warning : " + m + " (" + e.getMessage() + ")");
+		if(e.getMessage()==null){
+			Debug.debug.getOut().println("CyberGarage warning : " + m + " START");
+			e.printStackTrace(Debug.debug.getOut());
+			Debug.debug.getOut().println("CyberGarage warning : " + m + " END");
+		}else{
+			Debug.debug.getOut().println("CyberGarage warning : " + m + " (" + e.getMessage() + ")");
+			e.printStackTrace(Debug.debug.getOut());
+		}
 	}
 	public static final void warning(Exception e) {
 		warning(e.getMessage());
-		e.printStackTrace();
+		e.printStackTrace(Debug.debug.getOut());
 	}
 }
