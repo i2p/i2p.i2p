@@ -15,12 +15,10 @@
 
 package org.cybergarage.xml;
 
-import java.util.*;
+import java.util.Vector;
 
 public class NodeList extends Vector 
 {
-	private static final long serialVersionUID = 1528884682346143213L;
-
 	public NodeList() 
 	{
 	}

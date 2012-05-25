@@ -54,22 +54,47 @@
 *		  the ControlPoint base class adds/removes a UPnP device
 *	03/30/05
 *		- Changed addDevice() to use Parser::parse(URL).
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
 *
 *******************************************************************/
 
 package org.cybergarage.upnp;
 
-import org.cybergarage.net.*;
-import org.cybergarage.util.*;
-import org.cybergarage.xml.*;
-import org.cybergarage.http.*;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-import org.cybergarage.upnp.control.*;
-import org.cybergarage.upnp.ssdp.*;
-import org.cybergarage.upnp.device.*;
-import org.cybergarage.upnp.event.*;
-
-import java.net.*;
+import org.cybergarage.http.HTTPRequest;
+import org.cybergarage.http.HTTPRequestListener;
+import org.cybergarage.http.HTTPServerList;
+import org.cybergarage.net.HostInterface;
+import org.cybergarage.upnp.control.RenewSubscriber;
+import org.cybergarage.upnp.device.DeviceChangeListener;
+import org.cybergarage.upnp.device.Disposer;
+import org.cybergarage.upnp.device.NotifyListener;
+import org.cybergarage.upnp.device.ST;
+import org.cybergarage.upnp.device.SearchResponseListener;
+import org.cybergarage.upnp.device.USN;
+import org.cybergarage.upnp.event.EventListener;
+import org.cybergarage.upnp.event.NotifyRequest;
+import org.cybergarage.upnp.event.Property;
+import org.cybergarage.upnp.event.PropertyList;
+import org.cybergarage.upnp.event.Subscription;
+import org.cybergarage.upnp.event.SubscriptionRequest;
+import org.cybergarage.upnp.event.SubscriptionResponse;
+import org.cybergarage.upnp.ssdp.SSDP;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocketList;
+import org.cybergarage.upnp.ssdp.SSDPPacket;
+import org.cybergarage.upnp.ssdp.SSDPSearchRequest;
+import org.cybergarage.upnp.ssdp.SSDPSearchResponseSocketList;
+import org.cybergarage.util.Debug;
+import org.cybergarage.util.ListenerList;
+import org.cybergarage.util.Mutex;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.NodeList;
+import org.cybergarage.xml.Parser;
+import org.cybergarage.xml.ParserException;
 
 public class ControlPoint implements HTTPRequestListener
 {
@@ -109,10 +134,9 @@ public class ControlPoint implements HTTPRequestListener
 	//	Constructor
 	////////////////////////////////////////////////
 
-	public ControlPoint(int ssdpPort, int httpPort)
-	{
-		ssdpNotifySocketList = new SSDPNotifySocketList();
-		ssdpSearchResponseSocketList = new SSDPSearchResponseSocketList();
+	public ControlPoint(int ssdpPort, int httpPort,InetAddress[] binds){
+		ssdpNotifySocketList = new SSDPNotifySocketList(binds);
+		ssdpSearchResponseSocketList = new SSDPSearchResponseSocketList(binds);
 		
 		setSSDPPort(ssdpPort);
 		setHTTPPort(httpPort);
@@ -125,13 +149,16 @@ public class ControlPoint implements HTTPRequestListener
 		setNMPRMode(false);
 		setRenewSubscriber(null);
 	}
+	
+	public ControlPoint(int ssdpPort, int httpPort){
+		this(ssdpPort,httpPort,null);
+	}
 
 	public ControlPoint()
 	{
 		this(DEFAULT_SSDP_PORT, DEFAULT_EVENTSUB_PORT);
 	}
 
-    @Override
 	public void finalize()
 	{
 		stop();
@@ -316,14 +343,14 @@ public class ControlPoint implements HTTPRequestListener
 		devNodeList.remove(rootNode);
 	}
 
-	private void removeDevice(Device dev)
+	protected void removeDevice(Device dev)
 	{
 		if (dev == null)
 			return;
 		removeDevice(dev.getRootNode());
 	}
 	
-	private void removeDevice(String name)
+	protected void removeDevice(String name)
 	{
 		Device dev = getDevice(name);
 		removeDevice(dev);
@@ -401,7 +428,11 @@ public class ControlPoint implements HTTPRequestListener
 		int listenerSize = deviceNotifyListenerList.size();
 		for (int n=0; n<listenerSize; n++) {
 			NotifyListener listener = (NotifyListener)deviceNotifyListenerList.get(n);
-			listener.deviceNotifyReceived(ssdpPacket);
+			try{
+				listener.deviceNotifyReceived(ssdpPacket);
+			}catch(Exception e){
+				Debug.warning("NotifyListener returned an error:", e);
+			}
 		}
 	}
 
@@ -426,7 +457,13 @@ public class ControlPoint implements HTTPRequestListener
 		int listenerSize = deviceSearchResponseListenerList.size();
 		for (int n=0; n<listenerSize; n++) {
 			SearchResponseListener listener = (SearchResponseListener)deviceSearchResponseListenerList.get(n);
-			listener.deviceSearchResponseReceived(ssdpPacket);
+			try{
+				listener.deviceSearchResponseReceived(ssdpPacket);
+			}catch(Exception e){
+				Debug.warning("SearchResponseListener returned an error:", e);
+			}
+
+
 		}
 	}
 
@@ -474,10 +511,11 @@ public class ControlPoint implements HTTPRequestListener
 	public void notifyReceived(SSDPPacket packet)
 	{
 		if (packet.isRootDevice() == true) {
-			if (packet.isAlive() == true)
+			if (packet.isAlive() == true){
 				addDevice(packet);
-			if (packet.isByeBye() == true) 
+			}else if (packet.isByeBye() == true){ 
 				removeDevice(packet);
+			}
 		}
 		performNotifyListener(packet);
 	}
@@ -508,8 +546,8 @@ public class ControlPoint implements HTTPRequestListener
 	public void search(String target, int mx)
 	{
 		SSDPSearchRequest msReq = new SSDPSearchRequest(target, mx);
-		SSDPSearchResponseSocketList _ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
-		_ssdpSearchResponseSocketList.post(msReq);
+		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
+		ssdpSearchResponseSocketList.post(msReq);
 	}
 
 	public void search(String target)
@@ -792,8 +830,8 @@ public class ControlPoint implements HTTPRequestListener
 		
 		int retryCnt = 0;
 		int bindPort = getHTTPPort();
-		HTTPServerList _httpServerList = getHTTPServerList();
-		while (_httpServerList.open(bindPort) == false) {
+		HTTPServerList httpServerList = getHTTPServerList();
+		while (httpServerList.open(bindPort) == false) {
 			retryCnt++;
 			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
 				Debug.warning("Failed to open HTTP event listener port " + bindPort);
@@ -804,40 +842,40 @@ public class ControlPoint implements HTTPRequestListener
 			setHTTPPort(bindPort - 1);
 			bindPort = getHTTPPort();
 		}
-		_httpServerList.addRequestListener(this);
-		_httpServerList.start();
+		httpServerList.addRequestListener(this);
+		httpServerList.start();
 		
 		////////////////////////////////////////
 		// Notify Socket
 		////////////////////////////////////////
 		
-		SSDPNotifySocketList _ssdpNotifySocketList = getSSDPNotifySocketList();
-		if (_ssdpNotifySocketList.open() == false) {
+		SSDPNotifySocketList ssdpNotifySocketList = getSSDPNotifySocketList();
+		if (ssdpNotifySocketList.open() == false) {
 			Debug.warning("Failed to open SSDP notify port 1900");
 			return false;
 		}
-		_ssdpNotifySocketList.setControlPoint(this);
-		_ssdpNotifySocketList.start();
+		ssdpNotifySocketList.setControlPoint(this);			
+		ssdpNotifySocketList.start();
 		
 		////////////////////////////////////////
 		// SeachResponse Socket
 		////////////////////////////////////////
 		
-		int _ssdpPort = getSSDPPort();
+		int ssdpPort = getSSDPPort();
 		retryCnt = 0;
-		SSDPSearchResponseSocketList _ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
-		while (_ssdpSearchResponseSocketList.open(_ssdpPort) == false) {
+		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
+		while (ssdpSearchResponseSocketList.open(ssdpPort) == false) {
 			retryCnt++;
 			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
-				Debug.warning("Failed to open SSDP search response port " + _ssdpPort);
+				Debug.warning("Failed to open SSDP search response port " + ssdpPort);
 				return false;
 			}
 			// I2P go down not up so we don't run into other I2P things
-			setSSDPPort(_ssdpPort - 1);
-			_ssdpPort = getSSDPPort();
+			setSSDPPort(ssdpPort - 1);
+			ssdpPort = getSSDPPort();
 		}
-		_ssdpSearchResponseSocketList.setControlPoint(this);
-		_ssdpSearchResponseSocketList.start();
+		ssdpSearchResponseSocketList.setControlPoint(this);
+		ssdpSearchResponseSocketList.start();
 
 		////////////////////////////////////////
 		// search root devices
@@ -880,20 +918,20 @@ public class ControlPoint implements HTTPRequestListener
 	{ 
 		unsubscribe();
 		
-		SSDPNotifySocketList _ssdpNotifySocketList = getSSDPNotifySocketList();
-		_ssdpNotifySocketList.stop();
-		_ssdpNotifySocketList.close();
-		_ssdpNotifySocketList.clear();
+		SSDPNotifySocketList ssdpNotifySocketList = getSSDPNotifySocketList();
+		ssdpNotifySocketList.stop();
+		ssdpNotifySocketList.close();
+		ssdpNotifySocketList.clear();
 		
-		SSDPSearchResponseSocketList _ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
-		_ssdpSearchResponseSocketList.stop();
-		_ssdpSearchResponseSocketList.close();
-		_ssdpSearchResponseSocketList.clear();
+		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
+		ssdpSearchResponseSocketList.stop();
+		ssdpSearchResponseSocketList.close();
+		ssdpSearchResponseSocketList.clear();
 
-		HTTPServerList _httpServerList = getHTTPServerList();
-		_httpServerList.stop();
-		_httpServerList.close();
-		_httpServerList.clear();
+		HTTPServerList httpServerList = getHTTPServerList();
+		httpServerList.stop();
+		httpServerList.close();
+		httpServerList.clear();
 			
 		////////////////////////////////////////
 		// Disposer
@@ -924,6 +962,22 @@ public class ControlPoint implements HTTPRequestListener
 		return true;
 	}
 
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
+	}
+	
 	////////////////////////////////////////////////
 	//	print	
 	////////////////////////////////////////////////

@@ -19,16 +19,32 @@
 *	11/19/04
 *		- Theo Beisch <theo.beisch@gmx.de>
 *		- Changed send() to set the TTL as 4.
+*	08/23/07
+*		- Thanks for Kazuyuki Shudo
+*		- Changed receive() to throw IOException.
+*	01/10/08
+*		- Changed getLocalAddress() to return a brank string when the ssdpMultiGroup or ssdpMultiIf is null on Android m3-rc37a.
 *	
 ******************************************************************/
 
 package org.cybergarage.upnp.ssdp;
 
-import java.net.*;
-import java.util.*;
+import java.net.DatagramPacket;
+import java.net.MulticastSocket;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+import java.io.IOException;
 
-import org.cybergarage.http.*;
-import org.cybergarage.util.*;
+import org.cybergarage.http.HTTPRequest;
+import org.cybergarage.upnp.UPnP;
+import org.cybergarage.util.Debug;
+
+// Dummy Class for Android m3-rc37a
+// import org.cybergarage.android.MulticastSocket;
 
 public class HTTPMUSocket
 {
@@ -39,7 +55,7 @@ public class HTTPMUSocket
 	private InetSocketAddress ssdpMultiGroup = null;
 	private MulticastSocket ssdpMultiSock = null;
 	private NetworkInterface ssdpMultiIf = null;
-		 	
+	
 	////////////////////////////////////////////////
 	//	Constructor
 	////////////////////////////////////////////////
@@ -53,7 +69,6 @@ public class HTTPMUSocket
 		open(addr, port, bindAddr);
 	}
 
-    @Override
 	protected void finalize()
 	{
 		close();
@@ -65,6 +80,8 @@ public class HTTPMUSocket
 
 	public String getLocalAddress()
 	{
+		if (ssdpMultiGroup == null || ssdpMultiIf == null)
+			return "";
 		InetAddress mcastAddr = ssdpMultiGroup.getAddress();
 		Enumeration addrs = ssdpMultiIf.getInetAddresses();
 		while (addrs.hasMoreElements()) {
@@ -77,6 +94,34 @@ public class HTTPMUSocket
 		return "";
 	}
 
+	/**
+	 * 
+	 * @return the destination port for multicast packet
+	 * @since 1.8
+	 */
+	public int getMulticastPort(){
+		return ssdpMultiGroup.getPort();
+	}
+	
+	/**
+	 * 
+	 * @return the source port for multicast packet
+	 * @since 1.8
+	 */
+	public int getLocalPort(){
+		return ssdpMultiSock.getLocalPort();
+	}
+	
+	/**
+	 * 
+	 * @return the opened {@link MulticastSocket}
+	 * @since 1.8 
+	 */
+	public MulticastSocket getSocket(){
+		return ssdpMultiSock;
+	}
+	
+	
 	////////////////////////////////////////////////
 	//	MulticastAddr
 	////////////////////////////////////////////////
@@ -91,19 +136,20 @@ public class HTTPMUSocket
 		return getMulticastInetAddress().getHostAddress();
 	}
 	
-	////////////////////////////////////////////////
-	//	open/close
-	////////////////////////////////////////////////
-
-	public boolean open(String addr, int port, String bindAddr)
-	{
+	/**
+	 * @param addr {@link String} rappresenting the multicast hostname to join into.
+	 * @param port int rappresenting the port to be use poth as source and destination
+	 * @param bindAddr {@link InetAddress} which identify the hostname of the interface 
+	 * 		to use for sending and recieving multicast packet
+	 */
+	public boolean open(String addr,int port, InetAddress bindAddr){
 		try {
 			ssdpMultiSock = new MulticastSocket(null);
 			ssdpMultiSock.setReuseAddress(true);
 			InetSocketAddress bindSockAddr = new InetSocketAddress(port);
 			ssdpMultiSock.bind(bindSockAddr);
 			ssdpMultiGroup = new InetSocketAddress(InetAddress.getByName(addr), port);
-			ssdpMultiIf = NetworkInterface.getByInetAddress(InetAddress.getByName(bindAddr));
+			ssdpMultiIf = NetworkInterface.getByInetAddress(bindAddr);
 			ssdpMultiSock.joinGroup(ssdpMultiGroup, ssdpMultiIf);
 		}
 		catch (Exception e) {
@@ -111,7 +157,17 @@ public class HTTPMUSocket
 			return false;
 		}
 		
-		return true;
+		return true;		
+	}
+	
+	public boolean open(String addr, int port, String bindAddr)
+	{
+		try {
+			return open(addr,port,InetAddress.getByName(bindAddr));
+		}catch (Exception e) {
+			Debug.warning(e);
+			return false;
+		}
 	}
 
 	public boolean close()
@@ -120,9 +176,8 @@ public class HTTPMUSocket
 			return true;
 			
 		try {
-                        // I2P close it instead of leaving group so the thread dies
-			//ssdpMultiSock.leaveGroup(ssdpMultiGroup, ssdpMultiIf);
-			ssdpMultiSock.close();
+			ssdpMultiSock.leaveGroup(ssdpMultiGroup, ssdpMultiIf);
+            ssdpMultiSock.close();
 			ssdpMultiSock = null;
 		}
 		catch (Exception e) {
@@ -144,12 +199,12 @@ public class HTTPMUSocket
 			if ((bindAddr) != null && (0 < bindPort)) {
 				msock = new MulticastSocket(null);
 				msock.bind(new InetSocketAddress(bindAddr, bindPort));
-			}
-			else 
+			}else{ 
 				msock = new MulticastSocket();
+			}
 			DatagramPacket dgmPacket = new DatagramPacket(msg.getBytes(), msg.length(), ssdpMultiGroup);
-			// Thnaks for Tho Beisch (11/09/04)
-			msock.setTimeToLive(4);
+			// Thnaks for Theo Beisch (11/09/04)
+			msock.setTimeToLive(UPnP.getTimeToLive());
 			msock.send(dgmPacket);
 			msock.close();
 		}
@@ -183,20 +238,22 @@ public class HTTPMUSocket
 	//	reveive
 	////////////////////////////////////////////////
 
-	public SSDPPacket receive()
+	public SSDPPacket receive() throws IOException
 	{
 		byte ssdvRecvBuf[] = new byte[SSDP.RECV_MESSAGE_BUFSIZE];
  		SSDPPacket recvPacket = new SSDPPacket(ssdvRecvBuf, ssdvRecvBuf.length);
 		recvPacket.setLocalAddress(getLocalAddress());
- 		try {
-			ssdpMultiSock.receive(recvPacket.getDatagramPacket());
-			recvPacket.setTimeStamp(System.currentTimeMillis());
-			Debug.message("Received SSDP multicast packet on " + getLocalAddress() + " from " + recvPacket.getRemoteAddress());
-		}
-		catch (Exception e) {
-			//Debug.warning(e);
-		}
- 		return recvPacket;
+
+		// Thanks for Kazuyuki Shudo (08/23/07)
+		// Thanks for Stephan Mehlhase (2010-10-26)
+		if (ssdpMultiSock != null)
+			ssdpMultiSock.receive(recvPacket.getDatagramPacket()); // throws IOException
+		else 
+			throw new IOException("Multicast socket has already been closed.");
+		
+		recvPacket.setTimeStamp(System.currentTimeMillis());
+ 		
+		return recvPacket;
 	}
 }
 

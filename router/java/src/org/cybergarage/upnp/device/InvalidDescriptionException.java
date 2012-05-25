@@ -19,8 +19,6 @@ import java.io.*;
 
 public class InvalidDescriptionException extends Exception
 {
-	private static final long serialVersionUID = -3144583349586910509L;
-
 	public InvalidDescriptionException()
 	{
 		super();

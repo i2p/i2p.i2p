@@ -10,6 +10,9 @@
 *
 *	01/05/04
 *		- first revision.
+*	08/23/07
+*		- Thanks for Kazuyuki Shudo
+*		- Changed stop() to stop more safety using Thread::interrupt().
 *	
 ******************************************************************/
 
@@ -43,7 +46,7 @@ public class ThreadCore implements Runnable
 	{
 		java.lang.Thread threadObject = getThreadObject();
 		if (threadObject == null) {
-			threadObject = new java.lang.Thread(this);
+			threadObject = new java.lang.Thread(this,"Cyber.ThreadCore");
 			setThreadObject(threadObject);
 			threadObject.start();
 		}
@@ -64,6 +67,10 @@ public class ThreadCore implements Runnable
 		if (threadObject != null) { 
 			//threadObject.destroy();
 			//threadObject.stop();
+			
+			// Thanks for Kazuyuki Shudo (08/23/07)
+			threadObject.interrupt();
+			
 			setThreadObject(null);
 			// I2P break Disposer out of sleep()
 			threadObject.interrupt();

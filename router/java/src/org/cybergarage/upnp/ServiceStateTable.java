@@ -15,7 +15,7 @@
 
 package org.cybergarage.upnp;
 
-import java.util.*;
+import java.util.Vector;
 
 public class ServiceStateTable extends Vector 
 {
@@ -23,7 +23,6 @@ public class ServiceStateTable extends Vector
 	//	Constants
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = 7626909231678469365L;
 	public final static String ELEM_NAME = "serviceStateTable";
 
 	////////////////////////////////////////////////

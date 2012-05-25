@@ -60,23 +60,42 @@
 * 	04/25/05
 *		- Thanks for Mikael Hakman <mhakman@dkab.net>
 * 		- Changed getSCPDData() to add a XML declaration at first line.
+*	06/21/05
+*		- Changed notify() to continue when the subscriber is null.
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
+*	09/18/2010 Robin V. <robinsp@gmail.com>
+*		- Fixed getSCPDNode() not to occur recursive http get requests.
 *
 ******************************************************************/
 
 package org.cybergarage.upnp;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Iterator;
 
-import org.cybergarage.http.*;
-import org.cybergarage.xml.*;
-import org.cybergarage.util.*;
-
-import org.cybergarage.upnp.ssdp.*;
-import org.cybergarage.upnp.xml.*;
-import org.cybergarage.upnp.device.*;
-import org.cybergarage.upnp.control.*;
-import org.cybergarage.upnp.event.*;
+import org.cybergarage.http.HTTP;
+import org.cybergarage.http.HTTPResponse;
+import org.cybergarage.upnp.control.ActionListener;
+import org.cybergarage.upnp.control.QueryListener;
+import org.cybergarage.upnp.device.InvalidDescriptionException;
+import org.cybergarage.upnp.device.NTS;
+import org.cybergarage.upnp.device.ST;
+import org.cybergarage.upnp.event.NotifyRequest;
+import org.cybergarage.upnp.event.Subscriber;
+import org.cybergarage.upnp.event.SubscriberList;
+import org.cybergarage.upnp.ssdp.SSDPNotifyRequest;
+import org.cybergarage.upnp.ssdp.SSDPNotifySocket;
+import org.cybergarage.upnp.ssdp.SSDPPacket;
+import org.cybergarage.upnp.xml.ServiceData;
+import org.cybergarage.util.Debug;
+import org.cybergarage.util.Mutex;
+import org.cybergarage.util.StringUtil;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.Parser;
+import org.cybergarage.xml.ParserException;
 
 public class Service
 {
@@ -100,6 +119,34 @@ public class Service
 	////////////////////////////////////////////////
 	//	Constructor
 	////////////////////////////////////////////////
+	public static final String SCPD_ROOTNODE="scpd";
+	public static final String SCPD_ROOTNODE_NS="urn:schemas-upnp-org:service-1-0"; 
+	
+	public static final String SPEC_VERSION="specVersion";
+	public static final String MAJOR="major";
+	public static final String MAJOR_VALUE="1";
+	public static final String MINOR="minor";
+	public static final String MINOR_VALUE="0";
+	
+	public Service(){
+		this(new Node(ELEM_NAME));
+		
+		Node sp = new Node(SPEC_VERSION);
+		
+		Node M =new Node(MAJOR);
+		M.setValue(MAJOR_VALUE);
+		sp.addNode(M);
+				
+		Node m =new Node(MINOR);
+		m.setValue(MINOR_VALUE);
+		sp.addNode(m);
+		
+		//Node scpd = new Node(SCPD_ROOTNODE,SCPD_ROOTNODE_NS); wrong!
+		Node scpd = new Node(SCPD_ROOTNODE); 					// better (twa)
+		scpd.addAttribute("xmlns",SCPD_ROOTNODE_NS); 			// better (twa)
+		scpd.addNode(sp);
+		getServiceData().setSCPDNode(scpd);
+	}
 
 	public Service(Node node)
 	{
@@ -306,6 +353,32 @@ public class Service
 		data.setSCPDNode(scpdNode);
 		return true;
 	}
+
+	/**
+	 * @since 1.8.0 
+	 */
+	public boolean loadSCPD(InputStream input) throws ParserException
+	{
+		Parser parser = UPnP.getXMLParser();
+		Node scpdNode = parser.parse(input);
+		if (scpdNode == null)
+			return false;
+		ServiceData data = getServiceData();
+		data.setSCPDNode(scpdNode);
+		return true;
+	}
+	
+	
+    public void setDescriptionURL(String value)
+    {
+            getServiceData().setDescriptionURL(value);
+    }
+
+    public String getDescriptionURL()
+    {
+            return getServiceData().getDescriptionURL();
+    }
+	
 	
 	private Node getSCPDNode(URL scpdUrl) throws ParserException
 	{
@@ -326,48 +399,53 @@ public class Service
 		if (scpdNode != null)
 			return scpdNode;
 		
+		// Thanks for Jaap (Sep 18, 2010)
+		Device rootDev = getRootDevice();
+		if (rootDev == null)
+			return null;
+		
 		String scpdURLStr = getSCPDURL();
-		try {
-			URL scpdUrl = new URL(scpdURLStr);
-			scpdNode = getSCPDNode(scpdUrl);
-		}
-		catch (Exception e1) {
-			Device rootDev = getRootDevice();
-			String urlBaseStr = rootDev.getURLBase();
-			// Thanks for Steven Yen (2003/09/03)
-			if (urlBaseStr == null || urlBaseStr.length() <= 0) {
-				String location = rootDev.getLocation();
-				String locationHost = HTTP.getHost(location);
-				int locationPort = HTTP.getPort(location);
-				urlBaseStr = HTTP.getRequestHostURL(locationHost, locationPort);
-			}
-			scpdURLStr = HTTP.toRelativeURL(scpdURLStr);
-			String newScpdURLStr = urlBaseStr + scpdURLStr;
-			try {
-				URL newScpdURL = new URL(newScpdURLStr);
-				scpdNode = getSCPDNode(newScpdURL);
-			}
-			catch (Exception e2) {
-				newScpdURLStr = HTTP.getAbsoluteURL(urlBaseStr, scpdURLStr);
+
+		// Thanks for Robin V. (Sep 18, 2010)
+		String rootDevPath = rootDev.getDescriptionFilePath();
+		if(rootDevPath!=null) {
+			File f;
+			f = new File(rootDevPath.concat(scpdURLStr));
+		
+			if(f.exists()) {
 				try {
-					URL newScpdURL = new URL(newScpdURLStr);
-					scpdNode = getSCPDNode(newScpdURL);
+					scpdNode = getSCPDNode(f);
+				} catch (ParserException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				catch (Exception e3) {
-					newScpdURLStr = rootDev.getDescriptionFilePath() + scpdURLStr;
-					try {
-						scpdNode = getSCPDNode(new File(newScpdURLStr));
-					}
-					catch (Exception e4) {
-						Debug.warning(e4);
-					}
+				if(scpdNode!=null) {
+					data.setSCPDNode(scpdNode);
+					return scpdNode;
 				}
 			}
 		}
 
-		data.setSCPDNode(scpdNode);
+		try {
+			URL scpdUrl = new URL(rootDev.getAbsoluteURL(scpdURLStr));
+			scpdNode = getSCPDNode(scpdUrl);		
+			if (scpdNode != null) {
+				data.setSCPDNode(scpdNode);
+				return scpdNode;
+			}
+		}
+		catch (Exception e) {}
 		
-		return scpdNode;
+		String newScpdURLStr = rootDev.getDescriptionFilePath() + HTTP.toRelativeURL(scpdURLStr);
+		try {
+			scpdNode = getSCPDNode(new File(newScpdURLStr));
+			return scpdNode;
+		}
+		catch (Exception e) {
+			Debug.warning(e);
+		}
+		
+		return null;
 	}
 
 	public byte[] getSCPDData()
@@ -396,13 +474,12 @@ public class Service
 		Node actionListNode = scdpNode.getNode(ActionList.ELEM_NAME);
 		if (actionListNode == null)
 			return actionList;
-		Node _serviceNode = getServiceNode();
 		int nNode = actionListNode.getNNodes();
 		for (int n=0; n<nNode; n++) {
 			Node node = actionListNode.getNode(n);
 			if (Action.isActionNode(node) == false)
 				continue;
-			Action action = new Action(_serviceNode, node);
+			Action action = new Action(serviceNode, node);
 			actionList.add(action);
 		} 
 		return actionList;
@@ -423,6 +500,22 @@ public class Service
 		return null;
 	}
 	
+	public void addAction(Action a){
+		Iterator i = a.getArgumentList().iterator();
+		while (i.hasNext()) {
+			Argument arg = (Argument) i.next();
+			arg.setService(this);
+		}
+
+		Node scdpNode = getSCPDNode();
+		Node actionListNode = scdpNode.getNode(ActionList.ELEM_NAME);
+		if (actionListNode == null){			
+			actionListNode = new Node(ActionList.ELEM_NAME);
+			scdpNode.addNode(actionListNode);
+		}
+		actionListNode.addNode(a.getActionNode());
+	}
+	
 	////////////////////////////////////////////////
 	//	serviceStateTable
 	////////////////////////////////////////////////
@@ -433,13 +526,13 @@ public class Service
 		Node stateTableNode = getSCPDNode().getNode(ServiceStateTable.ELEM_NAME);
 		if (stateTableNode == null)
 			return stateTable;
-		Node _serviceNode = getServiceNode();
+		Node serviceNode = getServiceNode();
 		int nNode = stateTableNode.getNNodes();
 		for (int n=0; n<nNode; n++) {
 			Node node = stateTableNode.getNode(n);
 			if (StateVariable.isStateVariableNode(node) == false)
 				continue;
-			StateVariable serviceVar = new StateVariable(_serviceNode, node);
+			StateVariable serviceVar = new StateVariable(serviceNode, node);
 			stateTable.add(serviceVar);
 		} 
 		return stateTable;
@@ -657,6 +750,8 @@ public class Service
 			subs[n] = subList.getSubscriber(n);
 		for (int n=0; n<subListCnt; n++) {
 			Subscriber sub = subs[n];
+			if (sub == null)
+				continue;
 			if (sub.isExpired() == true)
 				removeSubscriber(sub);
 		}
@@ -668,6 +763,8 @@ public class Service
 			subs[n] = subList.getSubscriber(n);
 		for (int n=0; n<subListCnt; n++) {
 			Subscriber sub = subs[n];
+			if (sub == null)
+				continue;
 			if (notify(sub, stateVar) == false) {
 				/* Don't remove for NMPR specification.
 				removeSubscriber(sub);
@@ -743,5 +840,48 @@ public class Service
 			Action action = actionList.getAction(n);
 			action.setActionListener(listener);
 		}
+	}
+
+	/**
+	 * Add the StateVariable to the service.<br>
+	 * <br>
+	 * Note: This method should be used to create a dynamic<br>
+	 * Device withtout writing any XML that describe the device<br>.
+	 * <br>
+	 * Note: that no control for duplicate StateVariable is done.
+	 * 
+	 * @param var StateVariable that will be added
+	 * 
+	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
+	 */
+	public void addStateVariable(StateVariable var) {
+		//TODO Some test are done not stable
+		Node stateTableNode = getSCPDNode().getNode(ServiceStateTable.ELEM_NAME);
+		if (stateTableNode == null){
+			stateTableNode = new Node(ServiceStateTable.ELEM_NAME);
+			/*
+			 * Force the node <serviceStateTable> to be the first node inside <scpd>
+			 */
+			//getSCPDNode().insertNode(stateTableNode,0);
+			getSCPDNode().addNode(stateTableNode);		
+		}
+		var.setServiceNode(getServiceNode());
+		stateTableNode.addNode(var.getStateVariableNode());
+	}
+
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
 	}
 }

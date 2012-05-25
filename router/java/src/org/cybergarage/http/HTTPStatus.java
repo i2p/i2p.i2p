@@ -25,9 +25,9 @@
 
 package org.cybergarage.http;
 
-import java.util.*;
+import java.util.StringTokenizer;
 
-import org.cybergarage.util.*;
+import org.cybergarage.util.Debug;
 
 public class HTTPStatus 
 {

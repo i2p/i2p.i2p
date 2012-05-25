@@ -25,8 +25,6 @@ public class SubscriberList extends Vector
 	//	Constructor
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = -648427977601494972L;
-
 	public SubscriberList() 
 	{
 	}

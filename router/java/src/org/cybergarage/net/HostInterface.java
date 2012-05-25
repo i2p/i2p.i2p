@@ -25,8 +25,16 @@
 
 package org.cybergarage.net;
 
-import java.net.*;
-import java.util.*;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import org.cybergarage.util.Debug;
 
 public class HostInterface
 {
@@ -43,6 +51,9 @@ public class HostInterface
 	////////////////////////////////////////////////
 	
 	private static String ifAddress = "";
+	public final static int IPV4_BITMASK =  0x0001;
+	public final static int IPV6_BITMASK =  0x0010;
+	public final static int LOCAL_BITMASK = 0x0100;
 
 	public final static void setInterface(String ifaddr)
 	{
@@ -101,10 +112,62 @@ public class HostInterface
 				}
 			}
 		}
-		catch(Exception e){}
+		catch(Exception e){
+			Debug.warning(e);
+		};
 		return nHostAddrs;
 	}
 
+	/**
+	 * 
+	 * @param ipfilter
+	 * @param interfaces
+	 * @return
+	 * @since 1.8.0
+	 * @author Stefano "Kismet" Lenzi &lt;kismet.sl@gmail.com&gt;
+	 */
+	public final static InetAddress[] getInetAddress(int ipfilter,String[] interfaces){
+		Enumeration nis;
+		if(interfaces!=null){
+			Vector iflist = new Vector();
+			for (int i = 0; i < interfaces.length; i++) {
+				NetworkInterface ni;
+				try {
+					ni = NetworkInterface.getByName(interfaces[i]);
+				} catch (SocketException e) {
+					continue;
+				}
+				if(ni != null) iflist.add(ni);
+
+			}
+			nis = iflist.elements();
+		}else{
+			try {
+				nis = NetworkInterface.getNetworkInterfaces();
+			} catch (SocketException e) {
+				return null;
+			}
+		}		
+		ArrayList addresses = new ArrayList();
+		while (nis.hasMoreElements()){
+			NetworkInterface ni = (NetworkInterface)nis.nextElement();			
+			Enumeration addrs = ni.getInetAddresses();
+			while (addrs.hasMoreElements()) {
+				InetAddress addr = (InetAddress)addrs.nextElement();
+				if(((ipfilter & LOCAL_BITMASK)==0) && addr.isLoopbackAddress())
+					continue;
+				
+				if (((ipfilter & IPV4_BITMASK)!=0) && addr instanceof Inet4Address ) {						
+					addresses.add(addr);
+				}else if (((ipfilter & IPV6_BITMASK)!=0)&& addr instanceof InetAddress) {
+					addresses.add(addr);
+				}
+			}
+		}
+		return (InetAddress[]) addresses.toArray(new InetAddress[]{});
+	}
+	
+	
 	public final static String getHostAddress(int n)
 	{
 		if (hasAssignedInterface() == true)
@@ -131,7 +194,7 @@ public class HostInterface
 				}
 			}
 		}
-		catch(Exception e){}
+		catch(Exception e){};
 		return "";
 	}
 
@@ -143,7 +206,9 @@ public class HostInterface
 	{
 		try {
 			InetAddress addr = InetAddress.getByName(host);
-			return (addr instanceof Inet6Address);
+			if (addr instanceof Inet6Address)
+				return true;
+			return false;
 		}
 		catch (Exception e) {}
 		return false;
@@ -153,7 +218,9 @@ public class HostInterface
 	{
 		try {
 			InetAddress addr = InetAddress.getByName(host);
-			return (addr instanceof Inet4Address);
+			if (addr instanceof Inet4Address)
+				return true;
+			return false;
 		}
 		catch (Exception e) {}
 		return false;
