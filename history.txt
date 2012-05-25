@@ -1,5 +1,5 @@
 2012-05-25 kytv
- * Italian translation updates from tx (thanks colombo-bt!)
+ * German, Italian, Spanish, and Swedish translation updates from Transifex
 
 2012-05-23 zzz
  * i2psnark:
