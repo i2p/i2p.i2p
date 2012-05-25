@@ -16,6 +16,12 @@ body {
      display: none;
 }
 
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
+}
+
 img {
      border: none;
 }
@@ -622,6 +628,7 @@ th {
 
 /* begin home page */
 
+/*
 #appsummary {
      clear: none;
      float: none;
@@ -647,6 +654,7 @@ h2.app {
      border-radius: 8px;
      margin: 1px 10px 15px 0 !important;
 }
+*/
 
 h4.app {
      margin: 0 10px 2px 10px;
