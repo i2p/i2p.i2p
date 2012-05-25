@@ -9,11 +9,18 @@ body {
      text-align: center;
      background: #010 url('images/camotile.png') center bottom;
      color: #EE9;
-     font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 8.5pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     
 }
 
 .hide {
      display: none;
+}
+
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
 }
 
 img {
@@ -24,7 +31,7 @@ pre {
      width: 98%;
      overflow-x: scroll;
      text-align: left;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
      color: #EE9;
 }
 
@@ -77,13 +84,13 @@ div.toolbar a:visited {
      background: #ddf;
 }
 
-div.toolbar a:hover, button:hover {
+div.toolbar a:hover, button:hover{
      border: 1px solid #f60;
      background: #030;
      color: #f60;
 }
 
-a:active {
+a:active{
      color: #900;
 }
 
@@ -119,8 +126,8 @@ div.routersummary {
 div.routersummary input[type=text] {
      text-align: right !important;
      -moz-box-shadow: inset 1px 1px 1px 0px #000;
-     -khtml-box-shadow: inset 1px 1px 1px 0px #000;
-     box-shadow: inset 1px 1px 1px 0px #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0px #000;     
+     box-shadow: inset 1px 1px 1px 0px #000;     
 }
 
 div.routersummary hr {
@@ -151,10 +158,10 @@ div.routersummary h3 {
 div.routersummary h4 {
      border: 0;
      border-bottom: 0 !important;
-     font-size: 8.5pt;
+     font-size: 8pt;
      letter-spacing: 0.02em;
      margin: -7px -9px -10px -9px !important;
-     padding: 6px 3px 9px 3px;
+     padding: 6px 3px 8px 3px;
      background: #000;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -181,14 +188,22 @@ div.routersummary tr {
      border: 0 !important;
 }
 
-div.routersummary p {
-     padding: 0;
+div.routersummary form {
+     margin: -5px 0 -7px;
 }
 
+div.routersummary form:first-child {
+     margin: 6px 0 -5px 0 !important;
+}
+
+div.routersummary p {
+     padding: 0;
+}     
+
 div.refresh {
-     margin-top: 10px !important;
-     margin-bottom: 10px !important;
-     padding: 2px 0 !important;
+     margin-top: -10px !important;
+     margin-bottom: -4px !important;
+     padding: 2px 0 0px 0 !important;
 }
 
 div.routersummary a:link, div.routersummary a:visited {
@@ -257,7 +272,7 @@ div.warning {
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f00;
-     box-shadow: inset 0px 0px 0px 1px #f00;
+     box-shadow: inset 0px 0px 0px 1px #f00;          
      word-wrap: break-word;
 }
 
@@ -308,22 +323,27 @@ div.main {
 div.main textarea {
      background: #000;
      color: #EE9;
-     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
 }
 
 div.news {
      margin: -1px 5px 0px 205px;
-     padding: 5px 30px 5px 30px;
+     padding: 4px 30px 4px 30px;
      border: 1px solid #494;
      background: #000;
      background: #000 url("images/news.png")no-repeat scroll bottom right;
      color: #7b7;
+/*     border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+     -khtml-border-radius: 4px 4px 0 0;*/
      font-size: 7.5pt;
      text-align: right;
      -moz-box-shadow: 0 1px 5px #000;
      -khtml-box-shadow: 0 1px 5px #000;
      box-shadow: 0 1px 5px #000;
-     min-width: 590px;
+     min-width: 580px;
+/*     height: 164px;
+     overflow-y: auto;*/
 }
 
 div.news li {
@@ -343,12 +363,8 @@ div.news li {
 }
 
 div.news h3 {
-     background: none;
-     text-align: left;
-     border: none;
-     padding-left: 0;
-     padding-top: 2px;
-     border-bottom: 1px dotted;
+     text-align: left !important;
+     font-size: 9.5pt;
 }
 
 div.news h4 {
@@ -365,7 +381,7 @@ div.news h4 {
 div.news h4:first-child {
      background: url('../images/itoopbullet.png');
      background-repeat: no-repeat;
-     background-position: right;
+     background-position: right;   
 }
 
 div.news p {
@@ -381,7 +397,7 @@ div.news p:nth-child(n+1) {
 
 div.news hr {
      margin: 8px 0 3px 0;
-}
+}     
 
 div.confignav {
      padding: 15px 10px !important;
@@ -420,11 +436,11 @@ div.messages {
      color: #4f4;
 }
 
-div.error {
+div.messages span.error {
      color: #d90;
 }
 
-div.notice {
+div.messages span.notice {
      font-style: italic;
 }
 
@@ -468,7 +484,7 @@ div.graphspanel img {
      text-align: center !important;
      background: #000;
 
-     opacity: 0.9;
+     opacity: 0.8;
 }
 
 div.graphspanel img:hover {
@@ -488,7 +504,7 @@ table {
      width: 100%;
      border: 1px solid #494;
      cell-padding: 1px;
-     font-size: 7pt;
+     font-size: 8pt;
      background: #030;
      margin: 1px 0;
 }
@@ -511,7 +527,7 @@ th {
      background: #000; /*url('images/tabletitledark.png') repeat-x;*/
      background: #000 url('images/header.png') center center repeat-x ;
      border-top: 1px solid #494;
-     border-bottom: 1px solid #494 !important;
+     border-bottom: 1px solid #494 !important;     
      line-height: 110%;
 }
 
@@ -540,7 +556,7 @@ td {
      color: #EE9;
      vertical-align: middle;
      border-top: 1px inset #494;
-     border-bottom: 1px outset #494;
+     border-bottom: 1px outset #494;   
 }
 
 td img {
@@ -548,7 +564,7 @@ td img {
 }
 
 tt {
-     font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: bold 8pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
      color: #FF0;
      padding: 0 5px 2px 0;
 }
@@ -566,7 +582,7 @@ div.main li {
 div.main li b {
      color: #b70 !important;
      letter-spacing: 0.07em;
-     font-size: 9pt;
+     font-size: 8.5pt;
      text-shadow: 0 1px 1px #700;
 }
 
@@ -585,7 +601,7 @@ div.main li b {
 
 .tidylist code {
      text-align: left;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
      color: #dd0;
      padding: 1px 2px;
      background: #030;
@@ -606,29 +622,29 @@ ul {
 
 code {
      text-align: left;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
      color: #dd0;
-/*     padding: 1px 2px;*/
+     padding: 1px 2px;
 }
 
-a:link, h2 a:link {
+a:link, h2 a:link{
      color: #494;
      text-decoration: none;
-     font-weight: bold;
+     font-weight: bold;     
      word-wrap: break-word;
 }
 
-a:visited {
+a:visited{
      color: #7b7;
      text-decoration: none;
-     font-weight: bold;
+     font-weight: bold;     
      word-wrap: break-word;
 }
 
-a:hover {
+a:hover{
      color: #f60;
      text-decoration: underline;
-     font-weight: bold;
+     font-weight: bold;     
      word-wrap: break-word;
 }
 
@@ -646,7 +662,7 @@ a:hover {
 .links b{
      color: #b70 !important;
      letter-spacing: 0.07em;
-     font-size: 9.5pt;
+     font-size: 8.5pt;
      line-height: 165%;
      text-shadow: 0 1px 1px #700;
 }
@@ -656,10 +672,14 @@ p {
      line-height: 160%;
 }
 
+p img:first-child{
+     display: none !important;
+}
+
 h1 {
      text-align: left;
      color: #EE9;
-     padding: 15px 15px 14px;
+     padding: 14px 15px;
      margin: 0 5px 0px 205px !important;
      font-size: 17pt;
      font-weight: bold;
@@ -715,7 +735,7 @@ h2 a:hover {
 h3 {
      border: 1px solid #494;
      border-left: 5px solid #494;
-     padding: 5px 6px;
+     padding: 5px 6px 7px;
      margin: 12px 0 10px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
@@ -756,75 +776,15 @@ button, button:visited {
      color: #494;
 }
 
-button.accept {
-     background: #ffe url('../images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.add {
-     background: #ffe url('../images/add.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.cancel {
-     background: #ffe url('../images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.check {
-     background: #ffe url('../images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.delete {
-     background: #ffe url('../images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.download {
-     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.go {
-     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.reload {
-     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.search {
-     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.stop {
-     background: #ffe url('../images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
 button:hover {
      border: 1px solid #f60;
      -moz-box-shadow: inset 0px 1px 1px 0px #EE9;
      -khtml-box-shadow: inset 0px 1px 1px 0px #EE9;
      box-shadow: inset 0px 1px 1px 0px #EE9;
-     background-color: #000;
+     background: #000;
      color: #f60;
-}
-
+}     
+          
 button:active {
      border: 1px inset #f60;
      background: #f60;
@@ -841,11 +801,11 @@ button:active {
 }
 
 .langbox {
-     margin: -3px -4px 2px 5px;
-     padding: 7px 10px 5px 10px;
+     margin: 5px 3px 2px 5px;
+     padding: 0;
      color: #EE9;
      font-size: 7pt;
-     width: 220px;
+     width: 260px;
      text-align: right;
      float: right;
      vertical-align: middle;
@@ -889,73 +849,14 @@ input {
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
      text-decoration: none;
+     min-width: 110px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
 }
 
-input.accept {
-     background: #ffe url('../images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.add {
-     background: #ffe url('../images/add.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.cancel {
-     background: #ffe url('../images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.check {
-     background: #ffe url('../images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.delete {
-     background: #ffe url('../images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.download {
-     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.go {
-     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.reload {
-     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.search[type="text"] {
-     background: #001 url('../images/magnifier.png') no-repeat 2px center;
-     padding: 2px 3px 2px 24px;
-     min-height: 22px;
-}
-
-input.stop {
-     background: #ffe url('../images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
 input:hover {
-     background-color: #000;
+     background: #000;
      color: #f60;
      border: 1px solid #f60;
      -moz-box-shadow: inset 0px 1px 1px 0px #9e9;
@@ -964,12 +865,18 @@ input:hover {
 }
 
 input:active {
+     background: #000;
+     color: #f30;
+     border: 1px solid #f30;
+}
+
+input:active {
      border: 1px inset #f60;
      background: #f60;
      color: #EE9;
 }
 
-input[type=text], input[type=password] {
+input[type=text] {
      background: #000;
      color: #EE9;
      margin: 5px 10px;
@@ -983,6 +890,10 @@ input[type=text], input[type=password] {
      -moz-box-shadow: inset 1px 1px 1px 0px #000;
      -khtml-box-shadow: inset 1px 1px 1px 0px #000;
      box-shadow: inset 1px 1px 1px 0px #000;
+}
+
+input[type=text]:active, input[type=text]:hover {
+     background: #000;
 }
 
 fieldset {
@@ -1011,12 +922,14 @@ textarea {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
      min-width: 97%;
      text-align: left;
      border: 1px solid #494;
 }
+
+form {}
 
 .proxyfooter {
      margin: 0 20px 10px 240px;
@@ -1029,7 +942,7 @@ textarea {
      -khtml-border-radius: 4px;
      border: 1px solid #000;
      display: none;
-}
+}        
 
 .statusnotes {
      font-style: italic;
@@ -1038,7 +951,7 @@ textarea {
      text-align: center;
      border: 1px solid #494 !important;
 /*     border-top: 0px !important;*/
-     margin: -3px 0 5px 0;
+     margin: -3px 0 5px 0; 
      padding: 7px;
      background: #010;
      -moz-box-shadow: inset 0px 0px 0px 1px #090;
@@ -1048,7 +961,7 @@ textarea {
 }
 
 div.joblog {
-/*     margin:15px 0 15px 0;
+/*     margin: 	15px 0 15px 0;
      padding: 5px 20px 10px 20px !important;
      border: 1px solid #494;
      background-color: #000;
@@ -1061,6 +974,10 @@ div.joblog {
      overflow-x: auto; /* Opera fix */
  }
 
+div.joblog h3 {
+     margin-top: 10px;
+}
+
 div.main li {
      text-align: left;
      list-style: square;
@@ -1069,9 +986,10 @@ div.main li {
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
-
+ 
 div.joblog li {
      word-wrap: break-word !important;
+     text-align: justify !important;
      line-height: 120% !important;
      margin: 2px 0px 2px 30px;
      padding: 2px 20px 2px 0px;
@@ -1080,7 +998,7 @@ div.joblog li {
 div.joblog ul {
      word-wrap: break-word !important;
      text-align: justify;
-     margin: 0px 0 10px;
+     margin: 0;
 }
 
 div.joblog li:first-child {
@@ -1088,7 +1006,7 @@ div.joblog li:first-child {
 }
 
 div.joblog li:last-child {
-/*     margin-bottom: -25px;*/
+     margin-bottom: -10px;
 }
 
 div.joblog form:first-child {
@@ -1100,7 +1018,7 @@ div.joblog table {
 }
 
 div.joblog p {
-     line-height: 130%;
+     line-height: 140%;
 }
 
 .smallhead {
@@ -1108,15 +1026,15 @@ div.joblog p {
 }
 
 .mediumtags {
-     font-size: 9pt;
+     font-size: 8.5pt;
 }
 
 .optbox {
      min-width: 16px !important;
-     max-width: 16px !important;
+     max-width: 16px !important;     
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;
+     max-height: 16px;     
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1128,10 +1046,10 @@ div.joblog p {
 
 .optbox:hover {
      min-width: 16px !important;
-     max-width: 16px !important;
+     max-width: 16px !important;     
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;
+     max-height: 16px;     
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1141,26 +1059,28 @@ div.joblog p {
 
 .cells {
      border: 1px inset #494;
-     border-left: 1px outset #494;
+     border-left: 1px outset #494;     
 }
 
 .tablefooter tr, .tablefooter td {
      background: #000 url('images/header.png') repeat-x center center !important;
      border-top: 1px solid #494;
-     border-bottom: 1px solid #494 !important;
+     border-bottom: 1px solid #494 !important;     
      font-size: 7pt;
      line-height: 110%;
+     padding: 5px 5px 10px;
 }
 
 .formaction {
      text-align: right;
+     margin-bottom: -5px;
 }
 
 div.footnote {
      text-align: right;
      color: #494;
      font-size: 7pt;
-     margin-bottom: -8px !important;
+     margin-bottom: -8px !important; 
 }
 
 div.footnote hr{
@@ -1181,6 +1101,7 @@ div.footnote hr{
 
 /* begin home page */
 
+/*
 #appsummary {
      clear: none;
      float: none;
@@ -1205,16 +1126,24 @@ h2.app {
      border-radius: 8px;
      margin: 1px 10px 15px 0 !important;
 }
+*/
 
-h4.app {
-     margin: 0 10px 2px 10px;
-     padding: 10px 0 8px 0;
+h4.app, h4.app2 {
+    background: url('images/header.png') center center repeat-x;
+    border: 1px solid #449944;
+    font-size: 10pt;
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    margin: 12px 0 -10px 0;
+    padding: 7px 8px 7px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    text-align: left;
 }
 
 h4.app2 {
      clear: left;
-     margin: 0 4px 2px 0;
-     padding: 16px 0 8px 0;
+     margin-top: 5px !important;
 }
 
 div.ag2 {
@@ -1223,9 +1152,29 @@ div.ag2 {
 
 div.app {
      float: left;
-     padding: 2px;
-     height: 84px;
-     width: 112px;
+     padding: 5px 0 0 !important;
+     width: 137px;
+     border: 1px solid #494;
+     background: #000;
+     background-image: -moz-linear-gradient(center top , #000B00, #000);
+     border-radius: 3px;
+     margin: 5px;
+     height: 72px;
+     text-align: center !important;
+     padding-top: 5px;
+     opacity: 0.9;
+     box-shadow: 0 1px 5px #000000;
+}
+
+div.app:hover {
+    opacity: 1;
+    border: 1px solid #f60;
+    background: #000;
+    box-shadow: none;
+}
+
+div.app:last-child {
+     margin-bottom: 12px;
 }
 
 div.appgroup {
@@ -1251,12 +1200,14 @@ table.search {
 img.app {
      height: 32px;
      width: 32px;
-     padding: 6px;
+     padding: 6px 0 8px 0;
+     margin-bottom: 3px;
 }
 
 img.app2p {
      height: 40px;
-     padding: 3px 6px 0 6px;
+     padding: 5px 6px 0px 6px;
+     margin-bottom: 3px;
 }
 
 table.app {
@@ -1276,19 +1227,20 @@ td.app {
      background: none;
      border: 0;
      margin: 0;
+     padding: 3px 0 0;
 }
 
 div.applabel {
-     background: url('images/header.png') center center repeat-x;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border: 2px #00f;
-     border-radius: 4px;
+     border-radius: 3px;
      border-width: 1px;
-     font-size: 9pt;
+     font-size: 7.5pt;
      margin: 0;
-     padding: 3px 6px 4px 6px;
+     padding: 3px 0;
      text-align: center;
+     vertical-align: bottom;
+     line-height: 95%;
+     text-transform: lowercase;
+     border: none;
 }
 
 /* end home page */
