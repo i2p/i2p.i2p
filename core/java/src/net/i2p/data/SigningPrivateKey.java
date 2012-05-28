@@ -13,7 +13,7 @@ import net.i2p.crypto.KeyGenerator;
 
 /**
  * Defines the SigningPrivateKey as defined by the I2P data structure spec.
- * A private key is 256byte Integer. The private key represents only the 
+ * A signing private key is 20 byte Integer. The private key represents only the 
  * exponent, not the primes, which are constant and defined in the crypto spec.
  * This key varies from the PrivateKey in its usage (signing, not decrypting)
  *

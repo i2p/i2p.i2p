@@ -14,7 +14,7 @@ import java.io.IOException;
 
 /**
  * Defines the SigningPublicKey as defined by the I2P data structure spec.
- * A public key is 256byte Integer. The public key represents only the 
+ * A signing public key is 128 byte Integer. The public key represents only the 
  * exponent, not the primes, which are constant and defined in the crypto spec.
  * This key varies from the PrivateKey in its usage (verifying signatures, not encrypting)
  *
