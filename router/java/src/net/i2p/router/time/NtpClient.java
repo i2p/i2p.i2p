@@ -1,4 +1,4 @@
-package net.i2p.time;
+package net.i2p.router.time;
 /*
  * Copyright (c) 2004, Adam Buckley
  * All rights reserved.
@@ -49,8 +49,9 @@ import java.util.Collections;
  *
  * @author Adam Buckley
  * (minor refactoring by jrandom)
+ * @since 0.9.1 moved from net.i2p.time
  */
-public class NtpClient {
+class NtpClient {
     /** difference between the unix epoch and jan 1 1900 (NTP uses that) */
     private final static double SECONDS_1900_TO_EPOCH = 2208988800.0;
     private final static int NTP_PORT = 123;

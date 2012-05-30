@@ -61,7 +61,6 @@ public class ConfigNetHandler extends FormHandler {
     }
     
     public void setSave(String moo) { _saveRequested = true; }
-    public void setEnabletimesync(String moo) { }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
     public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
@@ -289,10 +288,6 @@ public class ConfigNetHandler extends FormHandler {
                 removes.add(UDPTransport.PROP_FORCE_INTRODUCERS);
             }
 
-            // Time sync enable, means NOT disabled 
-            // Hmm router sets this at startup, not required here
-            //changes.put(Timestamper.PROP_DISABLED, "false");
-            
             // Hidden in the GUI
             //LoadTestManager.setEnableLoadTesting(_context, _enableLoadTesting);
         }

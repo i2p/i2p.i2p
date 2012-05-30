@@ -1,4 +1,4 @@
-package net.i2p.time;
+package net.i2p.router.time;
 /*
  * Copyright (c) 2004, Adam Buckley
  * All rights reserved.
@@ -72,8 +72,9 @@ import net.i2p.util.RandomSource;
  * NTPMessage.java which is copyright (c) 2003 by Juliusz Chroboczek
  *
  * @author Adam Buckley
+ * @since 0.9.1 moved from net.i2p.time
  */
-public class NtpMessage {
+class NtpMessage {
     /**
      * This is a two-bit code warning of an impending leap second to be
      * inserted/deleted in the last minute of the current day.  It's values

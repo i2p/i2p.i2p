@@ -1,6 +1,21 @@
+2012-05-30 zzz
+ * Graphs: Reduce log EOF error to warn
+ * i2psnark:
+   - Increase max upload (ticket #645)
+   - Increase per-minute conn limit from 6 to 8
+   - Improve rarest-first behavior
+   - Handle URI encoding, UTF-8, and multiple trackers in magnet links
+ * Timestamper:
+   - Move from core to router, leave stub in core
+     so it doesn't break compatibility. This removes a
+     thread in app context and prevents any app context from
+     running NTP; external clients must use the time
+     received from the router.
+   - Increase query interval
+
 2012-05-28 kytv
-* i2prouter: Add support so that 'i2prouter install' will work in ArchLinux
-* jbigi/jcpuid scripts: Improve support for ArchLinux
+ * i2prouter: Add support so that 'i2prouter install' will work in ArchLinux
+ * jbigi/jcpuid scripts: Improve support for ArchLinux
 
 2012-05-25 kytv
  * German, Italian, Spanish, and Swedish translation updates from Transifex
