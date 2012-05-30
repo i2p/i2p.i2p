@@ -1521,7 +1521,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                   "<tr><td>");
         out.write(_("Up bandwidth limit"));
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>");
+                  + _manager.util().getMaxUpBW() + "\" size=\"4\" maxlength=\"4\" > KBps <i>");
         out.write(_("Half available bandwidth recommended."));
         out.write("<br><a href=\"/config.jsp\" target=\"blank\">");
         out.write(_("View or change router bandwidth"));
