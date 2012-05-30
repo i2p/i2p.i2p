@@ -1146,10 +1146,18 @@ class PeerCoordinator implements PeerListener
               PartialPiece pp = iter.next();
               int savedPiece = pp.getPiece();
               if (havePieces.get(savedPiece)) {
-                 iter.remove();
                  // this is just a double-check, it should be in there
+                 boolean skipped = false;
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
+                         if (peer.isCompleted() && piece.getPeerCount() > 1) {
+                             // Try to preserve rarest-first when we have only one seeder
+                             // by not preferring a partial piece that others have too
+                             // from a seeder
+                             skipped = true;
+                             break;
+                         }
+                         iter.remove();
                          piece.setRequested(peer, true);
                          if (_log.shouldLog(Log.INFO)) {
                              _log.info("Restoring orphaned partial piece " + pp +
@@ -1158,8 +1166,12 @@ class PeerCoordinator implements PeerListener
                          return pp;
                       }
                   }
-                  if (_log.shouldLog(Log.WARN))
-                      _log.warn("Partial piece " + pp + " NOT in wantedPieces??");
+                  if (_log.shouldLog(Log.WARN)) {
+                      if (skipped)
+                          _log.warn("Partial piece " + pp + " with multiple peers skipped for seeder");
+                      else
+                          _log.warn("Partial piece " + pp + " NOT in wantedPieces??");
+                  }
               }
           }
           if (_log.shouldLog(Log.WARN) && !partialPieces.isEmpty())
