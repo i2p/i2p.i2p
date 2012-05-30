@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -1647,7 +1650,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /**
-     *  @param url in base32 or hex, xt must be first magnet param
+     *  @param url in base32 or hex
      *  @since 0.8.4
      */
     private void addMagnet(String url) {
@@ -1662,7 +1665,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 return;
             }
             ihash = xt.substring("urn:btih:".length());
-            trackerURL = getParam("tr", url);
+            trackerURL = getTrackerParam(url);
             name = "Magnet " + ihash;
             String dn = getParam("dn", url);
             if (dn != null)
@@ -1698,6 +1701,9 @@ public class I2PSnarkServlet extends DefaultServlet {
         _manager.addMagnet(name, ih, trackerURL, true);
     }
 
+    /**
+     *  @return first decoded parameter or null
+     */
     private static String getParam(String key, String uri) {
         int idx = uri.indexOf('?' + key + '=');
         if (idx >= 0) {
@@ -1715,7 +1721,98 @@ public class I2PSnarkServlet extends DefaultServlet {
             rv = rv.substring(0, idx);
         else
             rv = rv.trim();
+        return decode(rv);
+    }
+
+    /**
+     *  @return all decoded parameters or null
+     *  @since 0.9.1
+     */
+    private static List<String> getMultiParam(String key, String uri) {
+        int idx = uri.indexOf('?' + key + '=');
+        if (idx >= 0) {
+            idx += key.length() + 2;
+        } else {
+            idx = uri.indexOf('&' + key + '=');
+            if (idx >= 0)
+                idx += key.length() + 2;
+        }
+        if (idx < 0 || idx > uri.length())
+            return null;
+        List<String> rv = new ArrayList();
+        while (true) {
+            String p = uri.substring(idx);
+            uri = p;
+            idx = p.indexOf('&');
+            if (idx >= 0)
+                p = p.substring(0, idx);
+            else
+                p = p.trim();
+            rv.add(decode(p));
+            idx = uri.indexOf('&' + key + '=');
+            if (idx < 0)
+                break;
+            idx += key.length() + 2;
+        }
         return rv;
+    }
+
+    /**
+     *  @return first valid I2P tracker or null
+     *  @since 0.9.1
+     */
+    private static String getTrackerParam(String uri) {
+        List<String> trackers = getMultiParam("tr", uri);
+        if (trackers == null)
+            return null;
+        for (String t : trackers) {
+            try {
+                URI u = new URI(t);
+                String protocol = u.getScheme();
+                String host = u.getHost();
+                if (protocol == null || host == null ||
+                    !protocol.toLowerCase(Locale.US).equals("http") ||
+                    !host.toLowerCase(Locale.US).endsWith(".i2p"))
+                    continue;
+                return t;
+            } catch(URISyntaxException use) {}
+        }
+        return null;
+    }
+
+    /**
+     *  Decode %xx encoding, convert to UTF-8 if necessary
+     *  Copied from i2ptunnel LocalHTTPServer
+     *  @since 0.9.1
+     */
+    private static String decode(String s) {
+        if (!s.contains("%"))
+            return s;
+        StringBuilder buf = new StringBuilder(s.length());
+        boolean utf8 = false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c != '%') {
+                buf.append(c);
+            } else {
+                try {
+                    int val = Integer.parseInt(s.substring(++i, (++i) + 1), 16);
+                    if ((val & 0x80) != 0)
+                        utf8 = true;
+                    buf.append((char) val);
+                } catch (IndexOutOfBoundsException ioobe) {
+                    break;
+                } catch (NumberFormatException nfe) {
+                    break;
+                }
+            }
+        }
+        if (utf8) {
+            try {
+                return new String(buf.toString().getBytes("ISO-8859-1"), "UTF-8");
+            } catch (UnsupportedEncodingException uee) {}
+        }
+        return buf.toString();
     }
 
     /** copied from ConfigTunnelsHelper */
