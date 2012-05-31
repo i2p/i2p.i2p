@@ -1,3 +1,9 @@
+2012-05-31 zzz
+ * i2psnark:
+   - Add per-hour conn limit
+   - Blacklist peer after two bad handshakes
+   - Reduce connect timeout
+
 2012-05-30 zzz
  * Graphs: Reduce log EOF error to warn
  * i2psnark:

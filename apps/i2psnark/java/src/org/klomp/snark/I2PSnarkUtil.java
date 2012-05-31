@@ -20,6 +20,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketEepGet;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -210,6 +211,8 @@ public class I2PSnarkUtil {
             // we don't need fast handshake for peer connections.
             //if (opts.getProperty("i2p.streaming.connectDelay") == null)
             //    opts.setProperty("i2p.streaming.connectDelay", "500");
+            if (opts.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
+                opts.setProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT, "75000");
             if (opts.getProperty("i2p.streaming.inactivityTimeout") == null)
                 opts.setProperty("i2p.streaming.inactivityTimeout", "240000");
             if (opts.getProperty("i2p.streaming.inactivityAction") == null)
@@ -226,6 +229,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.maxConnsPerMinute", "2");
             if (opts.getProperty("i2p.streaming.maxTotalConnsPerMinute") == null)
                 opts.setProperty("i2p.streaming.maxTotalConnsPerMinute", "8");
+            if (opts.getProperty("i2p.streaming.maxConnsPerHour") == null)
+                opts.setProperty("i2p.streaming.maxConnsPerHour", "20");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         // FIXME this only instantiates krpc once, left stuck with old manager

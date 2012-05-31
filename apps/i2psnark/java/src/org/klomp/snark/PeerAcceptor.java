@@ -143,9 +143,19 @@ public class PeerAcceptor
     byte buf[] = new byte[LOOKAHEAD_SIZE];
     int read = DataHelper.read(in, buf);
     if (read != buf.length)
-        throw new IOException("Unable to read the hash (read " + read + ")");
+        throw new ProtocolException("Unable to read the hash (read " + read + ")");
     byte rv[] = new byte[20];
     System.arraycopy(buf, buf.length-rv.length, rv, 0, rv.length);
     return rv;
   }
+
+    /** 
+     *  A unique exception so we can tell the ConnectionAcceptor about non-BT connections
+     *  @since 0.9.1
+     */
+    public static class ProtocolException extends IOException {
+        public ProtocolException(String s) {
+            super(s);
+        }
+    }
 }
