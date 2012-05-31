@@ -17,6 +17,13 @@
 <h4><a href="/confignet#help" title="<%=intl._("Help with configuring your firewall and router for optimal I2P performance")%>"><%=intl._("Network")%>:
 <jsp:getProperty name="helper" property="reachability" /></a></h4>
 <hr>
+<%
+   if (!newshelper.shouldShowNews()) {
+%>
+<jsp:getProperty name="newshelper" property="newsHeadings" /><hr>
+<%
+   }  // !shouldShowNews()
+%>
 <jsp:getProperty name="helper" property="updateStatus" />
 <jsp:getProperty name="helper" property="restartStatus" />
 <hr>
