@@ -198,14 +198,16 @@ public class ConnectionAcceptor implements Runnable
               // this is for the readahead in PeerAcceptor.connection()
               in = new BufferedInputStream(in);
               if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash().toBase64());
+                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash());
               peeracceptor.connection(_socket, in, out);
           } catch (PeerAcceptor.ProtocolException ihe) {
               _badCounter.increment(_socket.getPeerDestination().calculateHash());
+              if (_log.shouldLog(Log.INFO))
+                  _log.info("Protocol error from " + _socket.getPeerDestination().calculateHash(), ihe);
               try { _socket.close(); } catch (IOException ignored) { }
           } catch (IOException ioe) {
               if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash().toBase64(), ioe);
+                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash(), ioe);
               try { _socket.close(); } catch (IOException ignored) { }
           }
       }

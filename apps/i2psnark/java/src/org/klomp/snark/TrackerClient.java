@@ -298,7 +298,7 @@ public class TrackerClient extends I2PAppThread
                         List<Peer> ordered = new ArrayList(peers);
                         Collections.shuffle(ordered, r);
                         Iterator<Peer> it = ordered.iterator();
-                        while ((!stop) && it.hasNext()) {
+                        while ((!stop) && it.hasNext() && coordinator.needOutboundPeers()) {
                           Peer cur = it.next();
                           // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
@@ -351,7 +351,7 @@ public class TrackerClient extends I2PAppThread
                     }
                     Collections.shuffle(peers, r);
                     Iterator<Peer> it = peers.iterator();
-                    while ((!stop) && it.hasNext()) {
+                    while ((!stop) && it.hasNext() && coordinator.needOutboundPeers()) {
                         Peer cur = it.next();
                         if (coordinator.addPeer(cur) && it.hasNext()) {
                             int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
@@ -387,7 +387,7 @@ public class TrackerClient extends I2PAppThread
                     }
                     Collections.shuffle(peers, r);
                     Iterator<Peer> it = peers.iterator();
-                    while ((!stop) && it.hasNext()) {
+                    while ((!stop) && it.hasNext() && coordinator.needOutboundPeers()) {
                         Peer cur = it.next();
                         if (coordinator.addPeer(cur) && it.hasNext()) {
                             int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;

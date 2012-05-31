@@ -3,6 +3,10 @@
    - Add per-hour conn limit
    - Blacklist peer after two bad handshakes
    - Reduce connect timeout
+   - Close connection immediately if bad protocol
+   - Stop adding peers when we hit the limit
+   - Lower limit for outbound connections so we give
+     new peers a better chance in large swarms
 
 2012-05-30 zzz
  * Graphs: Reduce log EOF error to warn

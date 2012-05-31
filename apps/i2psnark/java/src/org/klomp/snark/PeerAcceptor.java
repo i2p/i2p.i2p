@@ -46,6 +46,10 @@ public class PeerAcceptor
   private final PeerCoordinator coordinator;
   final PeerCoordinatorSet coordinators;
 
+  /** shorten timeout while reading handshake */
+  private static final long HASH_READ_TIMEOUT = 45*1000;
+
+
   public PeerAcceptor(PeerCoordinator coordinator)
   {
     this.coordinator = coordinator;
@@ -69,11 +73,20 @@ public class PeerAcceptor
     // talk about, and we can just look for that in our list of active torrents.
     byte peerInfoHash[] = null;
     if (in instanceof BufferedInputStream) {
+        // multitorrent
         in.mark(LOOKAHEAD_SIZE);
-        peerInfoHash = readHash(in);
+        long timeout = socket.getReadTimeout();
+        socket.setReadTimeout(HASH_READ_TIMEOUT);
+        try {
+            peerInfoHash = readHash(in);
+        } catch (IOException ioe) {
+            // unique exception so ConnectionAcceptor can blame the peer
+            throw new ProtocolException(ioe.toString());
+        }
+        socket.setReadTimeout(timeout);
         in.reset();
     } else {
-        // is this working right?
+        // Single torrent - is this working right?
         try {
           peerInfoHash = readHash(in);
           if (_log.shouldLog(Log.INFO))
@@ -130,23 +143,41 @@ public class PeerAcceptor
     }
   }
 
+  private static final String PROTO_STR = "BitTorrent protocol";
+  private static final int PROTO_STR_LEN = PROTO_STR.length();
+  private static final int PROTO_LEN = PROTO_STR_LEN + 1;
+  private static final int[] PROTO = new int[PROTO_LEN];
+  static {
+      PROTO[0] = PROTO_STR_LEN;
+      for (int i = 0; i < PROTO_STR_LEN; i++) {
+          PROTO[i+1] = PROTO_STR.charAt(i);
+      }
+  }
+
   /** 48 */
-  private static final int LOOKAHEAD_SIZE = 1 + // chr(19)
-                                            "BitTorrent protocol".length() +
+  private static final int LOOKAHEAD_SIZE = PROTO_LEN +
                                             8 + // blank, reserved
                                             20; // infohash
 
   /** 
-   * Read ahead to the infohash, throwing an exception if there isn't enough data
+   * Read ahead to the infohash, throwing an exception if there isn't enough data.
+   * Also check the first 20 bytes for the correct protocol here and throw IOE if bad,
+   * so we don't hang waiting for 48 bytes if it's not a bittorrent client.
+   * The 20 bytes are checked again in Peer.handshake().
    */
-  private byte[] readHash(InputStream in) throws IOException {
-    byte buf[] = new byte[LOOKAHEAD_SIZE];
+  private static byte[] readHash(InputStream in) throws IOException {
+    for (int i = 0; i < PROTO_LEN; i++) {
+        int b = in.read();
+        if (b != PROTO[i])
+            throw new IOException("Bad protocol 0x" + Integer.toHexString(b) + " at byte " + i);
+    }
+    if (in.skip(8) != 8)
+        throw new IOException("EOF before hash");
+    byte buf[] = new byte[20];
     int read = DataHelper.read(in, buf);
     if (read != buf.length)
-        throw new ProtocolException("Unable to read the hash (read " + read + ")");
-    byte rv[] = new byte[20];
-    System.arraycopy(buf, buf.length-rv.length, rv, 0, rv.length);
-    return rv;
+        throw new IOException("Unable to read the hash (read " + read + ")");
+    return buf;
   }
 
     /** 
