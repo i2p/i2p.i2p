@@ -260,7 +260,7 @@ public class TrackerClient extends I2PAppThread
             for (Iterator iter = trackers.iterator(); iter.hasNext(); ) {
               Tracker tr = (Tracker)iter.next();
               if ((!stop) && (!tr.stop) &&
-                  (completed || coordinator.needOutboundPeers()) &&
+                  (completed || coordinator.needOutboundPeers() || !tr.started) &&
                   (event.equals(COMPLETED_EVENT) || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
               {
                 try
