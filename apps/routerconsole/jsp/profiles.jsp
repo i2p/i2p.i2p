@@ -11,9 +11,11 @@
 <div class="main" id="main"><div class="wideload">
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <% profilesHelper.storeWriter(out); %>
+<%
+    profilesHelper.storeWriter(out);
+    if (allowIFrame)
+        profilesHelper.allowGraphical();
+%>
  <jsp:setProperty name="profilesHelper" property="full" value="<%=request.getParameter(\"f\")%>" />
- <jsp:getProperty name="profilesHelper" property="profileSummary" />
- <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>
- <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
+ <jsp:getProperty name="profilesHelper" property="summary" />
 <hr></div></div></body></html>
