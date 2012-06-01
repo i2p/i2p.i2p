@@ -651,7 +651,7 @@ public class SummaryHelper extends HelperBase {
                        .append(_("Download Unsigned<br>Update {0}", getUnsignedUpdateVersion()))
                        .append("</button><br>\n");
                 }
-                buf.append("</form>\n");
+                buf.append("</form><hr>\n");
             }
         }
         return buf.toString();
