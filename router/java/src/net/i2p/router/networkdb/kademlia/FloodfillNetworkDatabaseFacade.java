@@ -156,7 +156,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return _lookupThrottler.shouldThrottle(from, id);
     }
 
-    private static final int MAX_TO_FLOOD = 7;
+    private static final int MAX_TO_FLOOD = 5;
 
     /**
      *  Send to a subset of all floodfill peers.
