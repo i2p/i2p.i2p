@@ -693,11 +693,11 @@ public class I2PSnarkServlet extends DefaultServlet {
             String refreshDel = req.getParameter("refreshDelay");
             String startupDel = req.getParameter("startupDelay");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
-            String openTrackers = req.getParameter("openTrackers");
+            //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
             _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
-                                  upLimit, upBW, useOpenTrackers, openTrackers, theme);
+                                  upLimit, upBW, useOpenTrackers, theme);
         } else if ("Save2".equals(action)) {
             String taction = req.getParameter("taction");
             if (taction != null)
@@ -771,25 +771,34 @@ public class I2PSnarkServlet extends DefaultServlet {
 
     /** @since 0.9 */
     private void processTrackerForm(String action, HttpServletRequest req) {
-        if (action.equals(_("Delete selected"))) {
+        if (action.equals(_("Delete selected")) || action.equals(_("Change open trackers"))) {
             boolean changed = false;
             Map<String, Tracker> trackers = _manager.getTrackerMap();
+            StringBuilder openBuf = new StringBuilder(128);
             Enumeration e = req.getParameterNames();
             while (e.hasMoreElements()) {
                  Object o = e.nextElement();
                  if (!(o instanceof String))
                      continue;
                  String k = (String) o;
-                 if (!k.startsWith("delete_"))
-                     continue;
-                 k = k.substring(7);
-                 if (trackers.remove(k) != null) {
-                    _manager.addMessage(_("Removed") + ": " + k);
-                    changed = true;
+                 if (k.startsWith("delete_")) {
+                     k = k.substring(7);
+                     if (trackers.remove(k) != null) {
+                        _manager.addMessage(_("Removed") + ": " + k);
+                        changed = true;
+                    }
+                } else if (k.startsWith("open_")) {
+                     if (openBuf.length() > 0)
+                         openBuf.append(',');
+                     openBuf.append(k.substring(5));
                 }
             }
             if (changed) {
                 _manager.saveTrackerMap();
+            }
+            String newOpen = openBuf.toString();
+            if (!newOpen.equals(_manager.util().getOpenTrackerString())) {
+                _manager.saveOpenTrackers(newOpen);
             }
         } else if (action.equals(_("Add tracker"))) {
             String name = req.getParameter("tname");
@@ -803,6 +812,11 @@ public class I2PSnarkServlet extends DefaultServlet {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
+                    if (req.getParameter("_add_open_") != null) {
+                        String oldOpen = _manager.util().getOpenTrackerString();
+                        String newOpen = oldOpen.length() <= 0 ? aurl : oldOpen + ',' + aurl;
+                        _manager.saveOpenTrackers(newOpen);
+                    }
                 } else {
                     _manager.addMessage(_("Enter valid tracker name and URLs"));
                 }
@@ -811,6 +825,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             }
         } else if (action.equals(_("Restore defaults"))) {
             _manager.setDefaultTrackerMap();
+            _manager.saveOpenTrackers(null);
             _manager.addMessage(_("Restored default trackers"));
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
@@ -1422,7 +1437,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         boolean filesPublic = _manager.areFilesPublic();
         boolean autoStart = _manager.shouldAutoStart();
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
-        String openTrackers = _manager.util().getOpenTrackerString();
+        //String openTrackers = _manager.util().getOpenTrackerString();
         //int seedPct = 0;
        
         out.write("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
@@ -1536,12 +1551,12 @@ public class I2PSnarkServlet extends DefaultServlet {
                   + (useOpenTrackers ? "checked " : "") 
                   + "title=\"");
         out.write(_("If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"));
-        out.write("\" > " +
+        out.write("\" ></td></tr>\n");
 
-                  "<tr><td>");
-        out.write(_("Open tracker announce URLs"));
-        out.write(": <td><input type=\"text\" name=\"openTrackers\" value=\""
-                  + openTrackers + "\" size=\"50\" ><br>\n");
+        //          "<tr><td>");
+        //out.write(_("Open tracker announce URLs"));
+        //out.write(": <td><input type=\"text\" name=\"openTrackers\" value=\""
+        //          + openTrackers + "\" size=\"50\" ><br>\n");
 
         //out.write("\n");
         //out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
@@ -1613,27 +1628,37 @@ public class I2PSnarkServlet extends DefaultServlet {
            .append("</th><th>")
            .append(_("Website URL"))
            .append("</th><th>")
+           .append(_("Open Tracker?"))
+           .append("</th><th>")
            .append(_("Announce URL"))
            .append("</th></tr>\n");
+        List<String> openTrackers = _manager.util().getOpenTrackers();
         for (Tracker t : _manager.getSortedTrackers()) {
             String name = t.name;
             String homeURL = t.baseURL;
             String announceURL = t.announceURL.replace("&#61;", "=");
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
-               .append(name).append("\">" +
+               .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
                        "</td><td align=\"left\">").append(name)
                .append("</td><td align=\"left\">").append(urlify(homeURL, 35))
-               .append("</td><td align=\"left\">").append(urlify(announceURL, 35))
+               .append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"open_")
+               .append(announceURL).append("\"");
+            if (openTrackers != null && openTrackers.contains(t.announceURL))
+                buf.append(" checked=\"checked\"");
+            buf.append(">" +
+                       "</td><td align=\"left\">").append(urlify(announceURL, 35))
                .append("</td></tr>\n");
         }
         buf.append("<tr><td align=\"center\"><b>")
            .append(_("Add")).append(":</b></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
+                   "<td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
-                   "<tr><td colspan=\"2\"></td><td colspan=\"2\" align=\"left\">\n" +
+                   "<tr><td colspan=\"2\"></td><td colspan=\"3\" align=\"left\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Change open trackers")).append("\">\n" +
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +

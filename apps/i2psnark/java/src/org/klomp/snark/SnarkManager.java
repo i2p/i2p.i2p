@@ -365,7 +365,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
                              String startDelay, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, String openTrackers, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, String theme) {
         boolean changed = false;
         //if (eepHost != null) {
         //    // unused, we use socket eepget
@@ -549,14 +549,6 @@ public class SnarkManager implements Snark.CompleteListener {
             _util.setUseOpenTrackers(useOpenTrackers);
             changed = true;
         }
-        if (openTrackers != null) {
-            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
-                _config.setProperty(PROP_OPENTRACKERS, openTrackers.trim());
-                _util.setOpenTrackerString(openTrackers);
-                addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
-                changed = true;
-            }
-        }
         if (theme != null) {
             if(!theme.equals(_config.getProperty(PROP_THEME))) {
                 _config.setProperty(PROP_THEME, theme);
@@ -571,6 +563,20 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
     
+    /**
+     *  @param ot null to restore default
+     *  @since 0.9.1
+     */
+    public void saveOpenTrackers(String ot) {
+        _util.setOpenTrackerString(ot);
+        if (ot != null)
+            _config.setProperty(PROP_OPENTRACKERS, ot);
+        else
+            _config.remove(PROP_OPENTRACKERS);
+        addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
+        saveConfig();
+    }
+
     public void saveConfig() {
         try {
             synchronized (_configFile) {

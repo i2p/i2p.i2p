@@ -457,14 +457,18 @@ public class I2PSnarkUtil {
         _openTrackerString = ot;
     }
 
+    /** Comma delimited list of open trackers to use as backups
+     *  non-null but possibly empty
+     */
     public String getOpenTrackerString() { 
         if (_openTrackerString == null)
             return DEFAULT_OPENTRACKERS;
         return _openTrackerString;
     }
 
-    /** comma delimited list open trackers to use as backups */
-    /** sorted map of name to announceURL=baseURL */
+    /** List of open trackers to use as backups
+     *  Null if disabled
+     */
     public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
             return null;
