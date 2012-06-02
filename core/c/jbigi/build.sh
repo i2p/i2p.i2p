@@ -25,7 +25,7 @@ mkdir -p lib bin/local
 VER=4.3.2
 
 # If JAVA_HOME isn't set, try to figure it out on our own
-[ -z $JAVA_HOME ] && . ./find-java-home
+[ -z $JAVA_HOME ] && . ../find-java-home
 if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     echo "ERROR: Cannot find jni.h! Looked in \"$JAVA_HOME/include/jni.h\"" >&2
     echo "Please set JAVA_HOME to a java home that has the JNI" >&2

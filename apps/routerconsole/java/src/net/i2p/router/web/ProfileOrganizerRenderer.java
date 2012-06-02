@@ -23,16 +23,21 @@ import net.i2p.stat.RateStat;
  *
  */
 class ProfileOrganizerRenderer {
-    private RouterContext _context;
-    private ProfileOrganizer _organizer;
-    private ProfileComparator _comparator;
+    private final RouterContext _context;
+    private final ProfileOrganizer _organizer;
+    private final ProfileComparator _comparator;
     
     public ProfileOrganizerRenderer(ProfileOrganizer organizer, RouterContext context) {
         _context = context;
         _organizer = organizer;
         _comparator = new ProfileComparator();
     }
-    public void renderStatusHTML(Writer out, boolean full) throws IOException {
+
+    /**
+     *  @param mode 0 = high cap; 1 = all; 2 = floodfill
+     */
+    public void renderStatusHTML(Writer out, int mode) throws IOException {
+        boolean full = mode == 1;
         Set<Hash> peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
@@ -68,7 +73,13 @@ class ProfileOrganizerRenderer {
         int reliable = 0;
         int integrated = 0;
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
+
+      ////
+      //// don't bother reindenting
+      ////
+      if (mode < 2) {
+
+        //buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
         buf.append(ngettext("Showing 1 recent profile.", "Showing {0} recent profiles.", order.size())).append('\n');
         if (older > 0)
             buf.append(ngettext("Hiding 1 older profile.", "Hiding {0} older profiles.", older)).append('\n');
@@ -181,8 +192,13 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<h2><a name=\"flood\"></a>").append(_("Floodfill and Integrated Peers"))
-           .append(" (").append(integratedPeers.size()).append(")</h2>\n");
+      ////
+      //// don't bother reindenting
+      ////
+      } else {
+
+        //buf.append("<h2><a name=\"flood\"></a>").append(_("Floodfill and Integrated Peers"))
+        //   .append(" (").append(integratedPeers.size()).append(")</h2>\n");
         buf.append("<table>");
         buf.append("<tr>");
         buf.append("<th class=\"smallhead\">").append(_("Peer")).append("</th>");
@@ -247,6 +263,12 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
+      ////
+      //// don't bother reindenting
+      ////
+      }
+      if (mode < 2) {
+
         buf.append("<h3>").append(_("Thresholds")).append("</h3>");
         buf.append("<p><b>").append(_("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold()))
            .append(" (").append(fast).append(' ').append(_("fast peers")).append(")<br>");
@@ -262,6 +284,12 @@ class ProfileOrganizerRenderer {
         buf.append("<li><b>").append(_("integration")).append("</b>: ").append(_("how many new peers have they told us about lately?")).append("</li>");
         buf.append("<li><b>").append(_("status")).append("</b>: ").append(_("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
         buf.append("</ul>");
+
+      ////
+      //// don't bother reindenting
+      ////
+      }  // mode < 2
+
         out.write(buf.toString());
         out.flush();
     }

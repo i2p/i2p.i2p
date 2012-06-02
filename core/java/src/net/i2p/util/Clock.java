@@ -19,7 +19,6 @@ import net.i2p.time.Timestamper;
  */
 public class Clock implements Timestamper.UpdateListener {
     protected final I2PAppContext _context;
-    private final Timestamper _timestamper;
     protected long _startedOn;
     protected boolean _statCreated;
     protected volatile long _offset;
@@ -29,7 +28,6 @@ public class Clock implements Timestamper.UpdateListener {
     public Clock(I2PAppContext context) {
         _context = context;
         _listeners = new CopyOnWriteArraySet();
-        _timestamper = new Timestamper(context, this);
         _startedOn = System.currentTimeMillis();
     }
 
@@ -37,7 +35,10 @@ public class Clock implements Timestamper.UpdateListener {
         return I2PAppContext.getGlobalContext().clock();
     }
     
-    public Timestamper getTimestamper() { return _timestamper; }
+    /**
+     *  This is a dummy, see RouterClock and RouterTimestamper for the real thing
+     */
+    public Timestamper getTimestamper() { return new Timestamper(); }
     
     /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
     protected Log getLog() { return _context.logManager().getLog(Clock.class); }

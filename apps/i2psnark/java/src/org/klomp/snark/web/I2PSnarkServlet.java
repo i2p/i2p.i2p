@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -690,11 +693,11 @@ public class I2PSnarkServlet extends DefaultServlet {
             String refreshDel = req.getParameter("refreshDelay");
             String startupDel = req.getParameter("startupDelay");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
-            String openTrackers = req.getParameter("openTrackers");
+            //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
             _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
-                                  upLimit, upBW, useOpenTrackers, openTrackers, theme);
+                                  upLimit, upBW, useOpenTrackers, theme);
         } else if ("Save2".equals(action)) {
             String taction = req.getParameter("taction");
             if (taction != null)
@@ -768,25 +771,34 @@ public class I2PSnarkServlet extends DefaultServlet {
 
     /** @since 0.9 */
     private void processTrackerForm(String action, HttpServletRequest req) {
-        if (action.equals(_("Delete selected"))) {
+        if (action.equals(_("Delete selected")) || action.equals(_("Change open trackers"))) {
             boolean changed = false;
             Map<String, Tracker> trackers = _manager.getTrackerMap();
+            StringBuilder openBuf = new StringBuilder(128);
             Enumeration e = req.getParameterNames();
             while (e.hasMoreElements()) {
                  Object o = e.nextElement();
                  if (!(o instanceof String))
                      continue;
                  String k = (String) o;
-                 if (!k.startsWith("delete_"))
-                     continue;
-                 k = k.substring(7);
-                 if (trackers.remove(k) != null) {
-                    _manager.addMessage(_("Removed") + ": " + k);
-                    changed = true;
+                 if (k.startsWith("delete_")) {
+                     k = k.substring(7);
+                     if (trackers.remove(k) != null) {
+                        _manager.addMessage(_("Removed") + ": " + k);
+                        changed = true;
+                    }
+                } else if (k.startsWith("open_")) {
+                     if (openBuf.length() > 0)
+                         openBuf.append(',');
+                     openBuf.append(k.substring(5));
                 }
             }
             if (changed) {
                 _manager.saveTrackerMap();
+            }
+            String newOpen = openBuf.toString();
+            if (!newOpen.equals(_manager.util().getOpenTrackerString())) {
+                _manager.saveOpenTrackers(newOpen);
             }
         } else if (action.equals(_("Add tracker"))) {
             String name = req.getParameter("tname");
@@ -800,6 +812,11 @@ public class I2PSnarkServlet extends DefaultServlet {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
+                    if (req.getParameter("_add_open_") != null) {
+                        String oldOpen = _manager.util().getOpenTrackerString();
+                        String newOpen = oldOpen.length() <= 0 ? aurl : oldOpen + ',' + aurl;
+                        _manager.saveOpenTrackers(newOpen);
+                    }
                 } else {
                     _manager.addMessage(_("Enter valid tracker name and URLs"));
                 }
@@ -808,6 +825,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             }
         } else if (action.equals(_("Restore defaults"))) {
             _manager.setDefaultTrackerMap();
+            _manager.saveOpenTrackers(null);
             _manager.addMessage(_("Restored default trackers"));
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
@@ -1419,7 +1437,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         boolean filesPublic = _manager.areFilesPublic();
         boolean autoStart = _manager.shouldAutoStart();
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
-        String openTrackers = _manager.util().getOpenTrackerString();
+        //String openTrackers = _manager.util().getOpenTrackerString();
         //int seedPct = 0;
        
         out.write("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
@@ -1521,7 +1539,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                   "<tr><td>");
         out.write(_("Up bandwidth limit"));
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>");
+                  + _manager.util().getMaxUpBW() + "\" size=\"4\" maxlength=\"4\" > KBps <i>");
         out.write(_("Half available bandwidth recommended."));
         out.write("<br><a href=\"/config.jsp\" target=\"blank\">");
         out.write(_("View or change router bandwidth"));
@@ -1533,12 +1551,12 @@ public class I2PSnarkServlet extends DefaultServlet {
                   + (useOpenTrackers ? "checked " : "") 
                   + "title=\"");
         out.write(_("If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"));
-        out.write("\" > " +
+        out.write("\" ></td></tr>\n");
 
-                  "<tr><td>");
-        out.write(_("Open tracker announce URLs"));
-        out.write(": <td><input type=\"text\" name=\"openTrackers\" value=\""
-                  + openTrackers + "\" size=\"50\" ><br>\n");
+        //          "<tr><td>");
+        //out.write(_("Open tracker announce URLs"));
+        //out.write(": <td><input type=\"text\" name=\"openTrackers\" value=\""
+        //          + openTrackers + "\" size=\"50\" ><br>\n");
 
         //out.write("\n");
         //out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
@@ -1610,27 +1628,37 @@ public class I2PSnarkServlet extends DefaultServlet {
            .append("</th><th>")
            .append(_("Website URL"))
            .append("</th><th>")
+           .append(_("Open Tracker?"))
+           .append("</th><th>")
            .append(_("Announce URL"))
            .append("</th></tr>\n");
+        List<String> openTrackers = _manager.util().getOpenTrackers();
         for (Tracker t : _manager.getSortedTrackers()) {
             String name = t.name;
             String homeURL = t.baseURL;
             String announceURL = t.announceURL.replace("&#61;", "=");
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
-               .append(name).append("\">" +
+               .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
                        "</td><td align=\"left\">").append(name)
                .append("</td><td align=\"left\">").append(urlify(homeURL, 35))
-               .append("</td><td align=\"left\">").append(urlify(announceURL, 35))
+               .append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"open_")
+               .append(announceURL).append("\"");
+            if (openTrackers != null && openTrackers.contains(t.announceURL))
+                buf.append(" checked=\"checked\"");
+            buf.append(">" +
+                       "</td><td align=\"left\">").append(urlify(announceURL, 35))
                .append("</td></tr>\n");
         }
         buf.append("<tr><td align=\"center\"><b>")
            .append(_("Add")).append(":</b></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
+                   "<td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
-                   "<tr><td colspan=\"2\"></td><td colspan=\"2\" align=\"left\">\n" +
+                   "<tr><td colspan=\"2\"></td><td colspan=\"3\" align=\"left\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Change open trackers")).append("\">\n" +
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
@@ -1647,7 +1675,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /**
-     *  @param url in base32 or hex, xt must be first magnet param
+     *  @param url in base32 or hex
      *  @since 0.8.4
      */
     private void addMagnet(String url) {
@@ -1662,7 +1690,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 return;
             }
             ihash = xt.substring("urn:btih:".length());
-            trackerURL = getParam("tr", url);
+            trackerURL = getTrackerParam(url);
             name = "Magnet " + ihash;
             String dn = getParam("dn", url);
             if (dn != null)
@@ -1698,6 +1726,9 @@ public class I2PSnarkServlet extends DefaultServlet {
         _manager.addMagnet(name, ih, trackerURL, true);
     }
 
+    /**
+     *  @return first decoded parameter or null
+     */
     private static String getParam(String key, String uri) {
         int idx = uri.indexOf('?' + key + '=');
         if (idx >= 0) {
@@ -1715,7 +1746,98 @@ public class I2PSnarkServlet extends DefaultServlet {
             rv = rv.substring(0, idx);
         else
             rv = rv.trim();
+        return decode(rv);
+    }
+
+    /**
+     *  @return all decoded parameters or null
+     *  @since 0.9.1
+     */
+    private static List<String> getMultiParam(String key, String uri) {
+        int idx = uri.indexOf('?' + key + '=');
+        if (idx >= 0) {
+            idx += key.length() + 2;
+        } else {
+            idx = uri.indexOf('&' + key + '=');
+            if (idx >= 0)
+                idx += key.length() + 2;
+        }
+        if (idx < 0 || idx > uri.length())
+            return null;
+        List<String> rv = new ArrayList();
+        while (true) {
+            String p = uri.substring(idx);
+            uri = p;
+            idx = p.indexOf('&');
+            if (idx >= 0)
+                p = p.substring(0, idx);
+            else
+                p = p.trim();
+            rv.add(decode(p));
+            idx = uri.indexOf('&' + key + '=');
+            if (idx < 0)
+                break;
+            idx += key.length() + 2;
+        }
         return rv;
+    }
+
+    /**
+     *  @return first valid I2P tracker or null
+     *  @since 0.9.1
+     */
+    private static String getTrackerParam(String uri) {
+        List<String> trackers = getMultiParam("tr", uri);
+        if (trackers == null)
+            return null;
+        for (String t : trackers) {
+            try {
+                URI u = new URI(t);
+                String protocol = u.getScheme();
+                String host = u.getHost();
+                if (protocol == null || host == null ||
+                    !protocol.toLowerCase(Locale.US).equals("http") ||
+                    !host.toLowerCase(Locale.US).endsWith(".i2p"))
+                    continue;
+                return t;
+            } catch(URISyntaxException use) {}
+        }
+        return null;
+    }
+
+    /**
+     *  Decode %xx encoding, convert to UTF-8 if necessary
+     *  Copied from i2ptunnel LocalHTTPServer
+     *  @since 0.9.1
+     */
+    private static String decode(String s) {
+        if (!s.contains("%"))
+            return s;
+        StringBuilder buf = new StringBuilder(s.length());
+        boolean utf8 = false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c != '%') {
+                buf.append(c);
+            } else {
+                try {
+                    int val = Integer.parseInt(s.substring(++i, (++i) + 1), 16);
+                    if ((val & 0x80) != 0)
+                        utf8 = true;
+                    buf.append((char) val);
+                } catch (IndexOutOfBoundsException ioobe) {
+                    break;
+                } catch (NumberFormatException nfe) {
+                    break;
+                }
+            }
+        }
+        if (utf8) {
+            try {
+                return new String(buf.toString().getBytes("ISO-8859-1"), "UTF-8");
+            } catch (UnsupportedEncodingException uee) {}
+        }
+        return buf.toString();
     }
 
     /** copied from ConfigTunnelsHelper */

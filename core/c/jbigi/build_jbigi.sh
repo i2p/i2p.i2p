@@ -5,7 +5,7 @@
 CC="gcc"
 
 # If JAVA_HOME isn't set we'll try to figure it out
-[ -z $JAVA_HOME ] && . ./find-java-home
+[ -z $JAVA_HOME ] && . ../find-java-home
 if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     echo "Cannot find jni.h! Looked in '$JAVA_HOME/include/jni.h'"
     echo "Please set JAVA_HOME to a java home that has the JNI"

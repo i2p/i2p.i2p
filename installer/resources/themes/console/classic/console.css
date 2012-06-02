@@ -16,6 +16,12 @@ body {
      display: none;
 }
 
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
+}
+
 img {
      border: none;
 }
@@ -622,6 +628,7 @@ th {
 
 /* begin home page */
 
+/*
 #appsummary {
      clear: none;
      float: none;
@@ -647,16 +654,16 @@ h2.app {
      border-radius: 8px;
      margin: 1px 10px 15px 0 !important;
 }
+*/
 
-h4.app {
+h4.app, h4.app2 {
      margin: 0 10px 2px 10px;
      padding: 10px 0 8px 0;
 }
 
 h4.app2 {
      clear: left;
-     margin: 0 4px 2px 0;
-     padding: 16px 0 8px 0;
+     margin-top: 5px !important;
 }
 
 div.ag2 {
@@ -666,13 +673,14 @@ div.ag2 {
 div.app {
      float: left;
      padding: 2px;
-     height: 84px;
+     /*height: 84px;*/
      width: 112px;
+     text-align: center !important;
 }
 
 div.appgroup {
      margin: 0;
-     padding: 16px 8px;
+     padding: 0 8px;
      width: auto;
 }
 

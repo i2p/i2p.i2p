@@ -41,30 +41,18 @@ case `uname -s` in
         elif [ ${UNIXTYPE} = "kfreebsd" ]; then
             UNIXTYPE="linux"
         fi
-
-        # If JAVA_HOME is set elsewhere, obey it. Otherwise we'll try to
-        # deduce its location ourselves.
-        if [ -z "${JAVA_HOME}" ]; then
-            if [ ${UNIXTYPE} = "freebsd" ]; then
-                if [ -d /usr/local/openjdk6 ]; then
-                    JAVA_HOME="/usr/local/openjdk6"
-                elif [ -d /usr/local/openjdk7 ]; then
-                    JAVA_HOME="/usr/local/openjdk7"
-                fi
-            elif [ ${UNIXTYPE} = "openbsd" ]; then # The default in 4.9
-                if [ -d /usr/local/jdk-1.7.0 ]; then
-                    JAVA_HOME="/usr/local/jdk-1.7.0"
-                fi
-            elif [ ${UNIXTYPE} = "netbsd" ]; then
-                if [ -d /usr/pkg/java/openjdk7 ]; then
-                    JAVA_HOME="/usr/pkg/java/openjdk7"
-                fi
-            elif [ ${UNIXTYPE} = "linux" -a -e /etc/debian_version ]; then
-                if [ -d /usr/lib/jvm/default-java ]; then
-                    JAVA_HOME="/usr/lib/jvm/default-java"
-                fi
-            fi
+        # If JAVA_HOME isn't set, try to figure it out on our own
+        [ -z $JAVA_HOME ] && . ../find-java-home
+        # JAVA_HOME being set doesn't guarantee that it's usable
+        if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
+            echo "Please ensure you have a Java SDK installed" >&2
+            echo "and/or set JAVA_HOME then re-run this script." >&2
+            exit 1
         fi
+
+        # Abort script on uncaught errors
+        set -e
+
         case `uname -m` in
             x86_64*|amd64)
                 ARCH="x86_64";;
@@ -77,12 +65,6 @@ case `uname -s` in
                 exit 1;;
         esac
 
-        # JAVA_HOME being set doesn't guarantee that it's usable
-        if [ ! -r ${JAVA_HOME}/include/jni.h ]; then
-            echo "Please ensure you have a Java SDK installed"
-            echo "and/or set JAVA_HOME then re-run this script."
-            exit 1
-        fi
         LINKFLAGS="-shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
         LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
         COMPILEFLAGS="-fPIC -Wall"

@@ -17,6 +17,12 @@ elif [ $UNIXTYPE = "linux" ] && [ -e /etc/debian_version ]; then
     if [ -d /usr/lib/jvm/default-java ]; then
        JAVA_HOME="/usr/lib/jvm/default-java"
     fi
+elif [ $UNIXTYPE = "linux" ] && [ -e /etc/arch-release ]; then
+    if [ -d /usr/lib/jvm/java-7-openjdk ]; then
+        JAVA_HOME="/usr/lib/jvm/java-7-openjdk"
+    elif [ -d /usr/lib/jvm/java-6-openjdk ]; then
+        JAVA_HOME="/usr/lib/jvm/java-6-openjdk"
+    fi
 elif [ $UNIXTYPE = "darwin" ]; then
     JAVA_HOME=$(/usr/libexec/java_home)
 fi

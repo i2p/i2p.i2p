@@ -23,7 +23,7 @@
      width: 150px;
 }
 
-#tunnelEditPage #targetField label, #tunnelEditPage #accessField label, #tunnelEditPage #tunnelOptionsField label, #tunnelEditPage #optionsField label {
+#tunnelEditPage #targetField label, #tunnelEditPage #accessField label, #tunnelEditPage #tunnelOptionsField label, #tunnelEditPage #optionsField label{
      height: 48px;
      width: 150px;
 }
@@ -129,7 +129,7 @@
      width: 750px;
 }
 
-#tunnelListPage .descriptionField .text, #tunnelListPage .destinationField .text {
+#tunnelListPage .descriptionField .text, #tunnelListPage .destinationField input {
      width: 590px;
 }
 

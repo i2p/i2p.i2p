@@ -75,7 +75,6 @@ public class NetDbRenderer {
 
     public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h2>" + _("Network Database RouterInfo Lookup") + "</h2>\n");
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
@@ -102,12 +101,8 @@ public class NetDbRenderer {
      */
     public void renderLeaseSetHTML(Writer out, boolean debug) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
-        buf.append("<a href=\"netdb\">" + _("View RouterInfo") + "</a>");
-        buf.append("<h3>").append(_("LeaseSets"));
         if (debug)
-            buf.append(" - Debug mode - Sorted by hash distance, closest first");
-        buf.append("</h3>\n");
+            buf.append("<p>Debug mode - Sorted by hash distance, closest first</p>\n");
         Hash ourRKey;
         Set<LeaseSet> leases;
         DecimalFormat fmt;
@@ -233,7 +228,6 @@ public class NetDbRenderer {
      *  @param mode 0: our info and charts only; 1: full routerinfos and charts; 2: abbreviated routerinfos and charts
      */
     public void renderStatusHTML(Writer out, int mode) throws IOException {
-        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb?l=1\">" + _("View LeaseSets") + "</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
             out.write(_("Not initialized"));
             out.flush();
@@ -244,12 +238,6 @@ public class NetDbRenderer {
         boolean shortStats = mode == 2;
         boolean showStats = full || shortStats;
         Hash us = _context.routerHash();
-        out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb");
-        if (full || !showStats)
-            out.write("?f=2#routers\" >" + _("Show all routers"));
-        else
-            out.write("?f=1#routers\" >" + _("Show all routers with full stats"));
-        out.write("</a>)</h3>\n");
         
         StringBuilder buf = new StringBuilder(8192);
         RouterInfo ourInfo = _context.router().getRouterInfo();
@@ -365,11 +353,10 @@ public class NetDbRenderer {
             buf.append("<a name=\"our-info\" ></a><b>" + _("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
             buf.append("<b>" + _("Peer info for") + ":</b> ").append(hash).append("\n");
-            if (full) {
-                buf.append("[<a href=\"netdb\" >Back</a>]</th></tr><tr><td>\n");
-            } else {
-                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><tr><td>\n");
+            if (!full) {
+                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]");
             }
+            buf.append("</th></tr><tr><td>\n");
         }
         
         long age = _context.clock().now() - info.getPublished();

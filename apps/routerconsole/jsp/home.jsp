@@ -23,7 +23,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
-<div class="routersummaryouter" id="appsummary">
+<div class="routersummaryouter">
  <div class="routersummary">
   <div style="height: 36px;">
    <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>"></a>
@@ -44,7 +44,24 @@
  </div>
 </div>
 
-<div id="homemain">
+<h1><%=intl._("I2P Router Console")%></h1>
+
+<%
+   if (newshelper.shouldShowNews()) {
+       java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
+%>
+<div class="news" id="news">
+ <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
+ <jsp:setProperty name="newshelper" property="maxLines" value="300" />
+ <jsp:getProperty name="newshelper" property="content" />
+ <hr>
+ <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
+</div>
+<%
+   }  // shouldShowNews()
+%>
+
+<div class="main" id="main">
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
@@ -69,24 +86,9 @@
     <a href="/home?lang=uk&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=ua" title="Ukrainian" alt="Ukrainian"></a>
     <a href="/home?lang=vi&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=vn" title="Tiếng Việt" alt="Tiếng Việt"></a>
   </div>
-  <h2 class="app"><%=intl._("Welcome to I2P")%></h2>
+  <h2><%=intl._("Welcome to I2P")%></h2>
 </div>
 <% }  // shouldShowWelcome %>
-
-<%
-   if (newshelper.shouldShowNews()) {
-       java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
-%>
-<div class="news" id="homenews">
- <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
- <jsp:setProperty name="newshelper" property="maxLines" value="300" />
- <jsp:getProperty name="newshelper" property="content" />
- <hr>
- <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
-</div>
-<%
-   }  // shouldShowNews()
-%>
 
 <div class="home" id="home">
 <%
@@ -115,6 +117,7 @@
   <div class="ag2">
     <h4 class="app2"><%=intl._("Local Services")%></h4>
     <jsp:getProperty name="homehelper" property="services" /><br>
+    <div class="clearer">&nbsp;</div>
   </div>
 </div>
 </div>

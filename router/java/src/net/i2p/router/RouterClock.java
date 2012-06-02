@@ -4,6 +4,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.data.DataHelper;
+import net.i2p.router.time.RouterTimestamper;
+import net.i2p.time.Timestamper;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
@@ -38,6 +40,7 @@ public class RouterClock extends Clock {
     /** use system time for this */
     private long _lastChanged;
     private int _lastStratum;
+    private final Timestamper _timeStamper;
 
     /**
      *  If the system clock shifts by this much,
@@ -56,7 +59,14 @@ public class RouterClock extends Clock {
         _lastSlewed = System.currentTimeMillis();
         _shiftListeners = new CopyOnWriteArraySet();
         _lastShiftNanos = System.nanoTime();
+        _timeStamper = new RouterTimestamper(context, this);
     }
+
+    /**
+     *  The RouterTimestamper
+     */
+    @Override
+    public Timestamper getTimestamper() { return _timeStamper; }
 
     /**
      * Specify how far away from the "correct" time the computer is - a positive

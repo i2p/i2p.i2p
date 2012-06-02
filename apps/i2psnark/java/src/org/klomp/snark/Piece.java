@@ -57,6 +57,15 @@ class Piece implements Comparable {
     /** caller must synchronize */
     public boolean removePeer(Peer peer) { return this.peers.remove(peer.getPeerID()); }
 
+    /**
+     * How many peers have this piece?
+     * Caller must synchronize
+     * @since 0.9.1
+     */
+    public int getPeerCount() {
+        return this.peers.size();
+    } 
+    
     /** caller must synchronize */
     public boolean isRequested() {
         return this.requests != null && !this.requests.isEmpty();

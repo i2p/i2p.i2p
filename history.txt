@@ -1,8 +1,41 @@
+2012-05-31 zzz
+ * i2psnark:
+   - Add per-hour conn limit
+   - Blacklist peer after two bad handshakes
+   - Reduce connect timeout
+   - Close connection immediately if bad protocol
+   - Stop adding peers when we hit the limit
+   - Lower limit for outbound connections so we give
+     new peers a better chance in large swarms
+
+2012-05-30 zzz
+ * Graphs: Reduce log EOF error to warn
+ * i2psnark:
+   - Increase max upload (ticket #645)
+   - Increase per-minute conn limit from 6 to 8
+   - Improve rarest-first behavior
+   - Handle URI encoding, UTF-8, and multiple trackers in magnet links
+ * Timestamper:
+   - Move from core to router, leave stub in core
+     so it doesn't break compatibility. This removes a
+     thread in app context and prevents any app context from
+     running NTP; external clients must use the time
+     received from the router.
+   - Increase query interval
+
+2012-05-28 kytv
+ * i2prouter: Add support so that 'i2prouter install' will work in ArchLinux
+ * jbigi/jcpuid scripts: Improve support for ArchLinux
+
+2012-05-25 kytv
+ * German, Italian, Spanish, and Swedish translation updates from Transifex
+
 2012-05-23 zzz
  * i2psnark:
    - Fixes when complete except for skipped files
      (ticket #447) status in UI, don't connect outbound,
      disconnect seeds when done
+   - Custom tracker map AIOOBE fix
    - More classes pkg private
  * jobs.jsp: Add more queue diagnostics
 
