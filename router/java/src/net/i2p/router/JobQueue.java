@@ -490,8 +490,8 @@ public class JobQueue {
                                     // failsafe - remove and re-add, peek at the next job,
                                     // break and go around again
                                     if (timeToWait > 10*1000 && iter.hasNext()) {
-                                        if (_log.shouldLog(Log.WARN))
-                                            _log.warn("Failsafe re-sort job " + j +
+                                        if (_log.shouldLog(Log.INFO))
+                                            _log.info("Failsafe re-sort job " + j +
                                                 " with delay " + DataHelper.formatDuration(timeToWait));
                                         iter.remove();
                                         Job nextJob = iter.next();
