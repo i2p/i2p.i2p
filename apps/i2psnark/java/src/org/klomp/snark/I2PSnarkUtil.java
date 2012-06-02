@@ -74,7 +74,7 @@ public class I2PSnarkUtil {
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
-    public static final boolean DEFAULT_USE_DHT = true;
+    public static final boolean DEFAULT_USE_DHT = false;
 
     public I2PSnarkUtil(I2PAppContext ctx) {
         _context = ctx;
