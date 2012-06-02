@@ -769,7 +769,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
         try {
             boolean success = _session.sendMessage(dest, payload, 0, payload.length, null, null, 60*1000,
-                                                   I2PSession.PROTO_DATAGRAM, fromPort, toPort);
+                                                   repliable ? I2PSession.PROTO_DATAGRAM : I2PSession.PROTO_DATAGRAM_RAW,
+                                                   fromPort, toPort);
             if (!success) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("WTF sendMessage fail");
