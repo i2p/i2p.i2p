@@ -151,7 +151,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         NID myNID = new NID(myID);
         _myNodeInfo = new NodeInfo(myNID, session.getMyDestination(), _qPort);
 
-        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _rPort);
+        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
         // can't be stopped
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
@@ -183,10 +183,17 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  @return The UDP port that should be included in a PORT message.
+     *  @return The UDP query port
      */
     public int getPort() {
         return _qPort;
+    }
+
+    /**
+     *  @return The UDP response port
+     */
+    public int getRPort() {
+        return _rPort;
     }
 
     /**
@@ -481,12 +488,19 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  Does nothing yet.
+     *  Stop everything.
      */
     public void stop() {
-        // stop the explore thread
+        // FIXME stop the explore thread
         // unregister port listeners
-        // does not clear the DHT or tracker yet.
+        _session.removeListener(I2PSession.PROTO_DATAGRAM, _qPort);
+        _session.removeListener(I2PSession.PROTO_DATAGRAM_RAW, _rPort);
+        // clear the DHT and tracker
+        _tracker.stop();
+        _knownNodes.clear();
+        _sentQueries.clear();
+        _outgoingTokens.clear();
+        _incomingTokens.clear();
     }
 
     /**

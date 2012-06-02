@@ -36,7 +36,7 @@ import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
-//import org.klomp.snark.dht.KRPC;
+import org.klomp.snark.dht.KRPC;
 
 /**
  * I2P specific helpers for I2PSnark
@@ -63,6 +63,7 @@ public class I2PSnarkUtil {
     private final File _tmpDir;
     private int _startupDelay;
     private boolean _shouldUseOT;
+    private boolean _shouldUseDHT;
     private boolean _areFilesPublic;
     private String _openTrackerString;
     private DHT _dht;
@@ -73,7 +74,7 @@ public class I2PSnarkUtil {
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
-    //private static final boolean ENABLE_DHT = true;
+    public static final boolean DEFAULT_USE_DHT = true;
 
     public I2PSnarkUtil(I2PAppContext ctx) {
         _context = ctx;
@@ -88,6 +89,7 @@ public class I2PSnarkUtil {
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
+        _shouldUseDHT = DEFAULT_USE_DHT;
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -234,8 +236,8 @@ public class I2PSnarkUtil {
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         // FIXME this only instantiates krpc once, left stuck with old manager
-        //if (ENABLE_DHT && _manager != null && _dht == null)
-        //    _dht = new KRPC(_context, _manager.getSession());
+        if (_shouldUseDHT && _manager != null && _dht == null)
+            _dht = new KRPC(_context, _manager.getSession());
         return (_manager != null);
     }
     
@@ -250,7 +252,11 @@ public class I2PSnarkUtil {
     /**
      * Destroy the destination itself
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
+        if (_dht != null) {
+            _dht.stop();
+            _dht = null;
+        }
         I2PSocketManager mgr = _manager;
         // FIXME this can cause race NPEs elsewhere
         _manager = null;
@@ -489,6 +495,22 @@ public class I2PSnarkUtil {
 
     public boolean shouldUseOpenTrackers() {
         return _shouldUseOT;
+    }
+    
+    /** @since DHT */
+    public synchronized void setUseDHT(boolean yes) {
+        _shouldUseDHT = yes;
+        if (yes && _manager != null && _dht == null) {
+            _dht = new KRPC(_context, _manager.getSession());
+        } else if (!yes && _dht != null) {
+            _dht.stop();
+            _dht = null;
+        }
+    }
+
+    /** @since DHT */
+    public boolean shouldUseDHT() {
+        return _shouldUseDHT;
     }
 
     /**
