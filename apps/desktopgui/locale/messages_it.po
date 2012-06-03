@@ -3,15 +3,17 @@
 # This file is distributed under the same license as the desktopgui package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
+# Translators:
+#   <bovas85@gmail.com>, 2012.
 #   <jokjok@hotmail.it>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-03 18:29+0000\n"
-"PO-Revision-Date: 2011-06-09 17:09+0000\n"
-"Last-Translator: mkkid <jokjok@hotmail.it>\n"
-"Language-Team: Italian (http://www.transifex.net/projects/p/I2P/team/it/)\n"
+"PO-Revision-Date: 2012-06-01 12:21+0000\n"
+"Last-Translator: Leelium <bovas85@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.net/projects/p/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -48,10 +50,8 @@ msgstr "Ferma I2P"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
 msgid "Tray icon configuration"
-msgstr "Configurazione dell'icona nell'Area di notifica"
+msgstr "Configurazione dell'icona nell'area di notifica"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
 msgid "Should tray icon be enabled?"
-msgstr "Vuoi che l'icona nell'Area di notifica venga abilitata?"
-
-
+msgstr "Vuoi che l'icona nelll'rea di notifica venga abilitata?"

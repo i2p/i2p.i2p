@@ -1,19 +1,20 @@
-# Hungarian debconf translation
+# Italian debconf translation
 # Copyright (C) 2012 The I2P Project
 # This file is distributed under the same license as the i2p package.
 #
 # Translators:
-# AdminLMH, 2012
+#   <bovas85@gmail.com>, 2012.
+#   <dlditalydownload@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2012-06-01 16:25+0000\n"
-"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
-"Language-Team: Hungarian (http://www.transifex.net/projects/p/I2P/language/"
-"hu/)\n"
-"Language: hu\n"
+"PO-Revision-Date: 2012-06-01 09:49+0000\n"
+"Last-Translator: Leelium <bovas85@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.net/projects/p/I2P/language/"
+"it/)\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,7 +24,7 @@ msgstr ""
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "Az I2P router elinduljon a rendszer betöltésekor?"
+msgstr "Avviare il router I2P all'avvio?"
 
 #. Type: boolean
 #. Description
@@ -32,14 +33,14 @@ msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
 msgstr ""
-"Az I2P router képes háttérszolgáltatásként futni, mely automatikusan elindul "
-"a számítógép indításakor. Ez a javasolt beállítás."
+"Il router I2P può essere eseguito come daemon che si avvia al boot del "
+"computer. Questa è la configurazione raccomandata."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
 msgid "I2P daemon user:"
-msgstr "Az I2P háttérszolgáltatás felhasználója:"
+msgstr "Utente I2P Daemon: "
 
 #. Type: string
 #. Description
@@ -50,10 +51,11 @@ msgid ""
 "account name here. For example, if your previous I2P installation is at /"
 "home/user/i2p, you may enter 'user' here."
 msgstr ""
-"Alapértelmezésben az I2P arra van beállítva, hogy az i2psvc fiók alatt "
-"fusson, mint háttérszolgáltatás. **Létező** I2P profil használatához írj egy "
-"másik fióknevet ide. Például, ha az előzőleg installált I2P-d a /home/"
-"felhasznalo/i2p alatt található, ide a következőt írhatod: 'felhasznalo'."
+"Di Default I2P è configurato in modo da essere eseguito sotto l'account "
+"i2psvc quando eseguito come daemon. Per usare un profilo I2P **esistente** "
+"puoi accedere con un diverso account qui. Per esempio, se la tua precedente "
+"installazione di I2P si trova in /casa/utente/i2p, dovresti inserire \"utente"
+"\" qui."
 
 #. Type: string
 #. Description
@@ -62,20 +64,20 @@ msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
 msgstr ""
-"Nagyon fontos: Ha az alapértelmezett 'i2psvc' helyett más felhasználó kerül "
-"megadásra, a választott felhasználónévnek már léteznie *KELL*."
+"Molto Importante: Se qui è inserito un nome utente diverso da quello base di "
+"\"i2psvc\", l'username scelto *DEVE* essere stato già inserito in precedenza."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr "Memória mennyisége, mely az I2P rendelkezésére áll:"
+msgstr "Memoria che può essere allocata ad I2P:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Alapeseten az I2P számára csak maximum 128MB memória engedélyezett."
+msgstr "Di base I2P è abilitato ad usare fino a 128MB di RAM. "
 
 #. Type: string
 #. Description
@@ -84,6 +86,5 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr ""
-"Lehetséges, hogy nagy szávszélességű routerek, úgyis mint sok aktív "
-"torrenttel vagy kiegészítővel rendelkező routerek számára ezt az értéket "
-"növelni szükséges."
+"Router con connessioni veloci, così come i router con molti torrent/plugin "
+"attivi, potrebbero necessitare l'aumento di questo valore."

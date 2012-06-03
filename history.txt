@@ -1,5 +1,7 @@
 2012-06-03 kytv
-* Add Hungarian language from Transifex (thanks AdminLMH!)
+* Translation updates:
+  - Add Hungarian language from Transifex (thanks AdminLMH!)
+  - Italian language updates from Transifex (thanks ColumboBT)
 
 2012-05-31 zzz
  * i2psnark:

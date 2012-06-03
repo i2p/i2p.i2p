@@ -116,6 +116,7 @@ source_lang = en
 trans.cs = debian/po/cs.po
 trans.de = debian/po/de.po
 trans.es = debian/po/es.po
+trans.it = debian/po/it.po
 trans.hu = debian/po/hu.po
 trans.pl = debian/po/pl.po
 trans.ru = debian/po/ru.po
