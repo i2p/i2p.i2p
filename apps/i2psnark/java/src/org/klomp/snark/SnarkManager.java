@@ -350,7 +350,7 @@ public class SnarkManager implements Snark.CompleteListener {
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
         boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
         _util.setUseOpenTrackers(bOT);
-        _util.setUseDHT(Boolean.valueOf(PROP_USE_DHT).booleanValue());
+        _util.setUseDHT(Boolean.valueOf(_config.getProperty(PROP_USE_DHT)).booleanValue());
         getDataDir().mkdirs();
         initTrackerMap();
     }

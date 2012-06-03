@@ -15,6 +15,7 @@ import net.i2p.data.SimpleDataStructure;
  *
  *  Things are a little tricky in KRPC since we exchange Hashes and don't
  *  always have the Destination.
+ *  The conpact info is immutable. The Destination may be added later.
  *
  * @since 0.8.4
  * @author zzz
@@ -45,7 +46,6 @@ public class NodeInfo extends SimpleDataStructure {
 
     /**
      * No Destination yet available
-     * @deprecated unused
      * @throws IllegalArgumentException
      */
     public NodeInfo(NID nID, Hash hash, int port) {
@@ -138,13 +138,11 @@ public class NodeInfo extends SimpleDataStructure {
      * @throws IllegalArgumentException if hash of dest doesn't match previous hash
      */
     public void setDestination(Destination dest) throws IllegalArgumentException {
+        if (this.dest != null)
+            return;
         if (!dest.calculateHash().equals(this.hash))
             throw new IllegalArgumentException("Hash mismatch, was: " + this.hash + " new: " + dest.calculateHash());
-        if (this.dest == null)
-            this.dest = dest;
-        else if (!this.dest.equals(dest))
-            throw new IllegalArgumentException("Dest mismatch, was: " + this.dest+ " new: " + dest);
-        // else keep the old to reduce object churn
+        this.dest = dest;
     }
 
     public int getPort() {

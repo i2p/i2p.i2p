@@ -3,6 +3,8 @@ package org.klomp.snark.dht;
  *  GPLv2
  */
 
+import java.util.Date;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -24,6 +26,7 @@ public class Token extends ByteArray {
         byte[] data = new byte[MY_TOK_LEN];
         ctx.random().nextBytes(data);
         setData(data);
+        setValid(MY_TOK_LEN);
         lastSeen = ctx.clock().now();
     }
 
@@ -33,7 +36,36 @@ public class Token extends ByteArray {
         lastSeen = ctx.clock().now();
     }
 
+    /** incoming  - for lookup only, not storage, lastSeen is 0 */
+    public Token(byte[] data) {
+        super(data);
+        lastSeen = 0;
+    }
+
     public long lastSeen() {
         return lastSeen;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("[Token: ");
+        byte[] bs = getData();
+        if (bs.length == 0) {
+            buf.append("0 bytes");
+        } else {
+            buf.append(bs.length).append(" bytes: 0x");
+            // backwards, but the same way BEValue does it
+            for (int i = 0; i < bs.length; i++) {
+                int b = bs[i] & 0xff;
+                if (b < 16)
+                    buf.append('0');
+                buf.append(Integer.toHexString(b));
+            }
+        }
+        if (lastSeen > 0)
+            buf.append(" created ").append((new Date(lastSeen)).toString());
+        buf.append(']');
+        return buf.toString();
     }
 }
