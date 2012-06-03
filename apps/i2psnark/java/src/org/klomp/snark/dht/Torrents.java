@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 0.8.4
  * @author zzz
  */
-public class Torrents extends ConcurrentHashMap<InfoHash, Peers> {
+class Torrents extends ConcurrentHashMap<InfoHash, Peers> {
 
     public Torrents() {
         super();

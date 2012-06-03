@@ -11,7 +11,7 @@ import net.i2p.crypto.SHA1Hash;
  * @since 0.8.4
  * @author zzz
  */
-public class InfoHash extends SHA1Hash {
+class InfoHash extends SHA1Hash {
 
     public InfoHash(byte[] data) {
         super(data);

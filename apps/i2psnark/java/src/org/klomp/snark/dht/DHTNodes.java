@@ -28,7 +28,7 @@ import net.i2p.util.SimpleTimer;
  * @since 0.8.4
  * @author zzz
  */
-public class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
+class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
 
     private final I2PAppContext _context;
     private long _expireTime;

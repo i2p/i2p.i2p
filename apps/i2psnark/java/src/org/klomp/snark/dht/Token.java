@@ -15,7 +15,7 @@ import net.i2p.data.DataHelper;
  * @since 0.8.4
  * @author zzz
  */
-public class Token extends ByteArray {
+class Token extends ByteArray {
 
     private static final int MY_TOK_LEN = 8;
     private final long lastSeen;

@@ -21,7 +21,7 @@ import net.i2p.data.SimpleDataStructure;
  * @author zzz
  */
 
-public class NodeInfo extends SimpleDataStructure {
+class NodeInfo extends SimpleDataStructure {
 
     private long lastSeen;
     private NID nID;

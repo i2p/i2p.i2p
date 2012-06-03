@@ -12,7 +12,7 @@ import net.i2p.data.Hash;
  * @since 0.8.4
  * @author zzz
  */
-public class Peer extends Hash {
+class Peer extends Hash {
 
     private long lastSeen;
 

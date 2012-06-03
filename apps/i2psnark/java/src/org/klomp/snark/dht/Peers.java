@@ -13,7 +13,7 @@ import net.i2p.data.Hash;
  * @since 0.8.4
  * @author zzz
  */
-public class Peers extends ConcurrentHashMap<Hash, Peer> {
+class Peers extends ConcurrentHashMap<Hash, Peer> {
 
     public Peers() {
         super();

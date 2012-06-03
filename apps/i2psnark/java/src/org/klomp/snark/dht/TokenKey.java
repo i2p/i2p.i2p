@@ -12,7 +12,7 @@ import net.i2p.data.DataHelper;
  * @since 0.8.4
  * @author zzz
  */
-public class TokenKey extends SHA1Hash {
+class TokenKey extends SHA1Hash {
 
     public TokenKey(NID nID, InfoHash ih) {
         super(DataHelper.xor(nID.getData(), ih.getData()));

@@ -11,7 +11,7 @@ import net.i2p.crypto.SHA1Hash;
  * @since 0.8.4
  * @author zzz
  */
-public class NID extends SHA1Hash {
+class NID extends SHA1Hash {
 
     public NID(byte[] data) {
         super(data);

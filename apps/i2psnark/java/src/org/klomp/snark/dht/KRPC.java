@@ -127,6 +127,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long MAX_NODEINFO_AGE = 60*60*1000;
     /** how long since generated do we delete - BEP 5 says 10 minutes */
     private static final long MAX_TOKEN_AGE = 60*60*1000;
+    private static final long MAX_INBOUND_TOKEN_AGE = MAX_TOKEN_AGE - 5*60*1000;
     /** how long since sent do we wait for a reply */
     private static final long MAX_MSGID_AGE = 2*60*1000;
     /** how long since sent do we wait for a reply */
@@ -679,6 +680,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     // TODO sendQuery with onReply / onTimeout args
 
     /**
+     *  Blocking if repliable and we must lookup b32
      *  @param repliable true for all but announce
      *  @return null on error
      */
@@ -691,11 +693,19 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             NodeInfo newInfo = _knownNodes.get(nInfo.getNID());
             if (newInfo != null && newInfo.getDestination() != null) {
                 nInfo = newInfo;
-            } else {
-                // lookup b32?
+            } else if (!repliable) {
+                // Don't lookup for announce query, we should already have it
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("No destination for: " + nInfo);
+                    _log.warn("Dropping non-repliable query, no dest for " + nInfo);
                 return null;
+            } else {
+                // Lookup the dest for the hash
+                // TODO spin off into thread or queue? We really don't want to block here
+                if (!lookupDest(nInfo)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Dropping repliable query, no dest for " + nInfo);
+                    return null;
+                }
             }
         }
         map.put("y", "q");
@@ -734,7 +744,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             } else {
                 // lookup b32?
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("No destination for: " + nInfo);
+                    _log.warn("Dropping response, no dest for " + nInfo);
                 return false;
             }
         }
@@ -763,13 +773,39 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             } else {
                 // lookup b32?
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("No destination for: " + nInfo);
+                    _log.warn("Dropping sendError, no dest for " + nInfo);
                 return false;
             }
         }
         map.put("y", "e");
         map.put("t", msgID.getData());
         return sendMessage(nInfo.getDestination(), nInfo.getPort() + 1, map, false);
+    }
+
+    /**
+     *  Get the dest for a NodeInfo lacking it, and store it there.
+     *  Blocking.
+     *  @return success
+     */
+    private boolean lookupDest(NodeInfo nInfo) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("looking up dest for " + nInfo);
+        try {
+            // use a short timeout for now
+            Destination dest = _session.lookupDest(nInfo.getHash(), 5*1000);
+            if (dest != null) {
+                nInfo.setDestination(dest);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("lookup success for " + nInfo);
+                return true;
+            }
+        } catch (I2PSessionException ise) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("lookup fail", ise);
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("lookup fail for " + nInfo);
+        return false;
     }
 
     /**
@@ -1345,7 +1381,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
             for (Iterator<Token> iter = _incomingTokens.values().iterator(); iter.hasNext(); ) {
                 Token tok = iter.next();
-                if (tok.lastSeen() < now - MAX_TOKEN_AGE)
+                if (tok.lastSeen() < now - MAX_INBOUND_TOKEN_AGE)
                     iter.remove();
             }
             // TODO sent queries?

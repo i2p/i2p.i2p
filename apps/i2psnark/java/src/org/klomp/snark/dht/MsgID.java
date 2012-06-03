@@ -12,7 +12,7 @@ import net.i2p.data.ByteArray;
  * @since 0.8.4
  * @author zzz
  */
-public class MsgID extends ByteArray {
+class MsgID extends ByteArray {
 
     private static final int MY_TOK_LEN = 8;
 
