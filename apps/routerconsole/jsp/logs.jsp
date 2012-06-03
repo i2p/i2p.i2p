@@ -33,8 +33,10 @@
 <p><%=intl._("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%></p>
 <h3><%=intl._("Critical Logs")%></h3><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
+<hr>
 <h3><%=intl._("Router Logs")%> (<a href="configlogging"><%=intl._("configure")%></a>)</h3>
  <jsp:getProperty name="logsHelper" property="logs" />
+<hr>
 <h3><%=intl._("Service (Wrapper) Logs")%></h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div><hr></div></body></html>
