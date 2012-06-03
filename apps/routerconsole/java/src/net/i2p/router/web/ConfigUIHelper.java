@@ -61,7 +61,7 @@ public class ConfigUIHelper extends HelperBase {
                                            "se", "ua", "vn", "cn"};
     private static final String xlangs[] = {_x("Arabic"), _x("Czech"), _x("Danish"),
                                             _x("German"), _x("Estonian"), _x("English"), _x("Spanish"), _x("Finnish"),
-                                            _x("French"), _X("Hungarian"), _x("Italian"), _x("Dutch"), _x("Polish"),
+                                            _x("French"), _x("Hungarian"), _x("Italian"), _x("Dutch"), _x("Polish"),
                                             _x("Portuguese"), _x("Russian"), _x("Swedish"),
                                             _x("Ukrainian"), _x("Vietnamese"), _x("Chinese")};
 
