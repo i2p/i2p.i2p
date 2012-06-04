@@ -526,10 +526,14 @@ class PeerState implements DataLoader
           setInteresting(true);
   }
 
-  /** @since 0.8.4 */
+  /**
+   *  Unused
+   *  @since 0.8.4
+   */
   void portMessage(int port)
   {
-      listener.gotPort(peer, port);
+      // for compatibility with old DHT PORT message
+      listener.gotPort(peer, port, port + 1);
   }
 
   void unknownMessage(int type, byte[] bs)
