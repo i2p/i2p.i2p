@@ -774,7 +774,8 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (action.equals(_("Delete selected")) || action.equals(_("Change open trackers"))) {
             boolean changed = false;
             Map<String, Tracker> trackers = _manager.getTrackerMap();
-            StringBuilder openBuf = new StringBuilder(128);
+            List<String> removed = new ArrayList();
+            List<String> open = new ArrayList();
             Enumeration e = req.getParameterNames();
             while (e.hasMoreElements()) {
                  Object o = e.nextElement();
@@ -783,18 +784,25 @@ public class I2PSnarkServlet extends DefaultServlet {
                  String k = (String) o;
                  if (k.startsWith("delete_")) {
                      k = k.substring(7);
-                     if (trackers.remove(k) != null) {
+                     Tracker t;
+                     if ((t = trackers.remove(k)) != null) {
+                        removed.add(t.announceURL);
                         _manager.addMessage(_("Removed") + ": " + k);
                         changed = true;
-                    }
+                     }
                 } else if (k.startsWith("open_")) {
-                     if (openBuf.length() > 0)
-                         openBuf.append(',');
-                     openBuf.append(k.substring(5));
+                     open.add(k.substring(5));
                 }
             }
             if (changed) {
                 _manager.saveTrackerMap();
+            }
+            open.removeAll(removed);
+            StringBuilder openBuf = new StringBuilder(128);
+            for (String s : open) {
+                 if (openBuf.length() > 0)
+                     openBuf.append(',');
+                 openBuf.append(s);
             }
             String newOpen = openBuf.toString();
             if (!newOpen.equals(_manager.util().getOpenTrackerString())) {

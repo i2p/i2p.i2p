@@ -1,7 +1,19 @@
+2012-06-04 zzz
+ * i2psnark: Take tracker out of opentracker list when removed
+
 2012-06-03 kytv
 * Translation updates:
   - Add Hungarian language from Transifex (thanks AdminLMH!)
   - Italian language updates from Transifex (thanks ColumboBT)
+
+2012-06-02 zzz
+ * i2psnark: Improve opentracker configuration
+ * Job Queue: Add failsafe check
+
+2012-06-01 zzz
+ * Console: Tab the netdb and profile pages
+ * i2psnark: Fix partially-complete torrent not announcing
+ * NetDB: Reduce flood redundancy from 8x to 6x
 
 2012-05-31 zzz
  * i2psnark:
