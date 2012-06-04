@@ -14,10 +14,20 @@ import net.i2p.router.RouterContext;
 public class SummaryBarRenderer {
     private final RouterContext _context;
     private final SummaryHelper _helper;
+    private final NewsHelper _newshelper;
 
     public SummaryBarRenderer(RouterContext context, SummaryHelper helper) {
+        this(context, helper, null);
+    }
+
+    public SummaryBarRenderer(RouterContext context, NewsHelper newshelper) {
+        this(context, null, newshelper);
+    }
+
+    public SummaryBarRenderer(RouterContext context, SummaryHelper helper, NewsHelper newshelper) {
         _context = context;
         _helper = helper;
+        _newshelper = newshelper;
     }
 
     /**
@@ -83,7 +93,7 @@ public class SummaryBarRenderer {
            .append("<hr>\n")
            .append(renderTunnelStatusHTML())
            .append("<hr>\n")
-           .append(_helper.getDestinations())
+           .append(renderDestinationsHTML())
            .append("<hr>\n");
 
         out.write(buf.toString());
@@ -213,6 +223,7 @@ public class SummaryBarRenderer {
     }
 
     public String renderGeneralHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/help\" target=\"_top\" title=\"")
            .append(_("I2P Router Help"))
@@ -255,6 +266,7 @@ public class SummaryBarRenderer {
     }
 
     public String renderNetworkReachabilityHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
            .append(_("Help with configuring your firewall and router for optimal I2P performance"))
@@ -267,18 +279,21 @@ public class SummaryBarRenderer {
     }
 
     public String renderUpdateStatusHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append(_helper.getUpdateStatus());
         return buf.toString();
     }
 
     public String renderRestartStatusHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append(_helper.getRestartStatus());
         return buf.toString();
     }
 
     public String renderPeersHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/peers\" target=\"_top\" title=\"")
            .append(_("Show all current peer connections"))
@@ -326,12 +341,14 @@ public class SummaryBarRenderer {
     }
 
     public String renderFirewallAndReseedStatusHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append(_helper.getFirewallAndReseedStatus());
         return buf.toString();
     }
 
     public String renderBandwidthHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/config\" title=\"")
            .append(_("Configure router bandwidth allocation"))
@@ -375,6 +392,7 @@ public class SummaryBarRenderer {
     }
 
     public String renderTunnelsHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/tunnels\" target=\"_top\" title=\"")
            .append(_("View existing tunnels and tunnel build status"))
@@ -412,6 +430,7 @@ public class SummaryBarRenderer {
     }
 
     public String renderCongestionHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/jobs\" target=\"_top\" title=\"")
            .append(_("What's in the router's job queue?"))
@@ -451,10 +470,66 @@ public class SummaryBarRenderer {
     }
 
     public String renderTunnelStatusHTML() {
+        if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(50);
         buf.append("<h4>")
            .append(_(_helper.getTunnelStatus()))
            .append("</h4>\n");
+        return buf.toString();
+    }
+
+    public String renderDestinationsHTML() {
+        if (_helper == null) return "";
+        StringBuilder buf = new StringBuilder(512);
+        buf.append(_helper.getDestinations());
+        return buf.toString();
+    }
+
+    /** @since 0.9.1 */
+    public String renderNewsHeadingsHTML() {
+        if (_newshelper == null) return "";
+        StringBuilder buf = new StringBuilder(512);
+        String consoleNonce = System.getProperty("router.consoleNonce");
+        if (consoleNonce != null) {
+            // Set up title and pre-headings stuff.
+            buf.append("<h3><a href=\"/configupdate\">")
+               .append(_("News & Updates"))
+               .append("</a></h3><hr class=\"b\"><div class=\"newsheadings\">\n");
+            // Get news content.
+            String newsContent = _newshelper.getContent();
+            if (newsContent != "") {
+                buf.append("<ul>\n");
+                // Parse news content for headings.
+                int start = newsContent.indexOf("<h3>");
+                while (start >= 0) {
+                    // Add offset to start:
+                    // 4 - gets rid of <h3>
+                    // 16 - gets rid of the date as well (assuming form "<h3>yyyy-mm-dd: Foobarbaz...")
+                    newsContent = newsContent.substring(start+16, newsContent.length());
+                    int end = newsContent.indexOf("</h3>");
+                    if (end >= 0) {
+                        String heading = newsContent.substring(0, end);
+                        buf.append("<li>")
+                           .append(heading)
+                           .append("</li>\n");
+                    }
+                    start = newsContent.indexOf("<h3>");
+                }
+                buf.append("</ul>\n");
+                // Set up string containing <a> to show news.
+                buf.append("<a href=\"/?news=1&amp;consoleNonce=")
+                   .append(consoleNonce)
+                   .append("\">")
+                   .append(_("Show news"))
+                   .append("</a>\n");
+            } else {
+                buf.append("<center><i>")
+                   .append(_("none"))
+                   .append("</i></center>");
+            }
+            // Add post-headings stuff.
+            buf.append("</div>\n");
+        }
         return buf.toString();
     }
 

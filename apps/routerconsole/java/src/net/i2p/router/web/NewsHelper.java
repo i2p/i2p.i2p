@@ -20,41 +20,8 @@ public class NewsHelper extends ContentHelper {
 
     /** @since 0.9.1 */
     public String getNewsHeadings() {
-        StringBuilder buf = new StringBuilder(512);
-        String consoleNonce = System.getProperty("router.consoleNonce");
-        if (consoleNonce != null) {
-            // Set up string containing <a> to show news.
-            String newsUrl = "<a href=\"/?news=1&amp;consoleNonce=" + consoleNonce + "\">";
-            // Set up title and pre-headings stuff.
-            buf.append("<h3><a href=\"/configupdate\">").append(_("News & Updates"))
-            .append("</a></h3><hr class=\"b\"><div class=\"newsheadings\">\n");
-            // Get news content.
-            String newsContent = getContent();
-            if (newsContent != "") {
-                buf.append("<ul>\n");
-                // Parse news content for headings.
-                int start = newsContent.indexOf("<h3>");
-                while (start >= 0) {
-                    // Add offset to start:
-                    // 4 - gets rid of <h3>
-                    // 16 - gets rid of the date as well (assuming form "<h3>yyyy-mm-dd: Foobarbaz...")
-                    newsContent = newsContent.substring(start+16, newsContent.length());
-                    int end = newsContent.indexOf("</h3>");
-                    if (end >= 0) {
-                        String heading = newsContent.substring(0, end);
-                        buf.append("<li>").append(heading).append("</li>\n");
-                    }
-                    start = newsContent.indexOf("<h3>");
-                }
-                buf.append("</ul>\n");
-                buf.append(newsUrl).append(Messages.getString("Show news", _context)).append("</a>\n");
-            } else {
-                buf.append("<center><i>").append(_("none")).append("</i></center>");
-            }
-            // Add post-headings stuff.
-            buf.append("</div>\n");
-        }
-        return buf.toString();
+        SummaryBarRenderer renderer = new SummaryBarRenderer(_context, this);
+        return renderer.renderNewsHeadingsHTML();
     }
 
     /** @since 0.8.12 */
