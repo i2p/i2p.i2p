@@ -39,13 +39,10 @@ public class SummaryBarRenderer {
            .append(_("I2P Router Console"))
            .append("\" title=\"")
            .append(_("I2P Router Console"))
-           .append("\"></a></div><hr>")
-           
-           .append("<h3><a href=\"/help\" target=\"_top\" title=\"")
-           .append(_("I2P Router Help &amp; FAQ"))
-           .append("\">")
-           .append(_("Help &amp; FAQ"))
-           .append("</a></h3><hr>");
+           .append("\"></a></div>\n")
+           .append("<hr>\n")
+           .append(renderHelpAndFAQHTML())
+           .append("<hr>\n");
 
         File lpath = new File(_context.getBaseDir(), "docs/toolbar.html");
         // you better have target="_top" for the links in there...
@@ -55,118 +52,172 @@ public class SummaryBarRenderer {
             linkhelper.setMaxLines("100");
             buf.append(linkhelper.getContent());
         } else {
-            buf.append("<h3><a href=\"/configclients\" target=\"_top\" title=\"")
-               .append(_("Configure startup of clients and webapps (services); manually start dormant services"))
-               .append("\">")
-               .append(_("I2P Services"))
-               .append("</a></h3>\n" +
-
-                       "<hr class=\"b\"><table><tr><td>" +
-
-                       "<a href=\"/susimail/susimail\" target=\"blank\" title=\"")
-               .append(_("Anonymous webmail client"))
-               .append("\">")
-               .append(_("Email"))
-               .append("</a>\n" +
-
-                       "<a href=\"/i2psnark/\" target=\"_blank\" title=\"")
-               .append(_("Built-in anonymous BitTorrent Client"))
-               .append("\">")
-               .append(_("Torrents"))
-               .append("</a>\n" +
-
-                       "<a href=\"http://127.0.0.1:7658/\" target=\"_blank\" title=\"")
-               .append(_("Local web server"))
-               .append("\">")
-               .append(_("Website"))
-               .append("</a>\n")
-
-               .append(NavHelper.getClientAppLinks(_context))
-
-               .append("</td></tr></table>\n" +
-
-                       "<hr><h3><a href=\"/config\" target=\"_top\" title=\"")
-               .append(_("Configure I2P Router"))
-               .append("\">")
-               .append(_("I2P Internals"))
-               .append("</a></h3><hr class=\"b\">\n" +
-
-                       "<table><tr><td>\n" +
-
-                       "<a href=\"/tunnels\" target=\"_top\" title=\"")
-               .append(_("View existing tunnels and tunnel build status"))
-               .append("\">")
-               .append(_("Tunnels"))
-               .append("</a>\n" +
-
-                       "<a href=\"/peers\" target=\"_top\" title=\"")
-               .append(_("Show all current peer connections"))
-               .append("\">")
-               .append(_("Peers"))
-               .append("</a>\n" +
-
-                       "<a href=\"/profiles\" target=\"_top\" title=\"")
-               .append(_("Show recent peer performance profiles"))
-               .append("\">")
-               .append(_("Profiles"))
-               .append("</a>\n" +
-
-                       "<a href=\"/netdb\" target=\"_top\" title=\"")
-               .append(_("Show list of all known I2P routers"))
-               .append("\">")
-               .append(_("NetDB"))
-               .append("</a>\n" +
-
-                       "<a href=\"/logs\" target=\"_top\" title=\"")
-               .append(_("Health Report"))
-               .append("\">")
-               .append(_("Logs"))
-               .append("</a>\n");
-
-           //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
-           //  .append(_("Show the router's workload, and how it's performing"))
-           //  .append("\">")
-           //  .append(_("Jobs"))
-           //  .append("</a>\n" +
-
-            if (!StatSummarizer.isDisabled()) {
-                buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
-               .append(_("Graph router performance"))
-               .append("\">")
-               .append(_("Graphs"))
-               .append("</a>\n");
-            }
-
-            buf.append("<a href=\"/stats\" target=\"_top\" title=\"")
-               .append(_("Textual router performance statistics"))
-               .append("\">")
-               .append(_("Stats"))
-               .append("</a>\n" +
-
-                        "<a href=\"/i2ptunnel/\" target=\"_blank\" title=\"")
-               .append(_("Local Destinations"))
-               .append("\">")
-               .append(_("I2PTunnel"))
-               .append("</a>\n" +
-
-                       "<a href=\"/susidns/index\" target=\"_blank\" title=\"")
-               .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
-               .append("\">")
-               .append(_("Addressbook"))
-               .append("</a>\n");
-
-            File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
-            if (javadoc.exists())
-                buf.append("<a href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");
-            buf.append("</td></tr></table>\n");
+            buf.append(renderI2PServicesHTML())
+               .append("<hr>\n")
+               .append(renderI2PInternalsHTML());
 
             out.write(buf.toString());
             buf.setLength(0);
         }
 
+        buf.append("<hr>\n")
+           .append(renderGeneralHTML())
+           .append("<hr>\n")
+           .append(renderNetworkReachabilityHTML())
+           .append("<hr>\n")
+           .append(_helper.getUpdateStatus())
+           .append(_helper.getRestartStatus())
+           .append("<hr>\n")
+           .append(renderPeersHTML())
+           .append("<hr>\n");
+
+        out.write(buf.toString());
+        buf.setLength(0);
+
+        buf.append(_helper.getFirewallAndReseedStatus());
+
+        buf.append(renderBandwidthHTML())
+           .append("<hr>\n")
+           .append(renderTunnelsHTML())
+           .append("<hr>\n")
+           .append(renderCongestionHTML())
+           .append("<hr>\n")
+           .append(renderTunnelStatusHTML())
+           .append("<hr>\n")
+           .append(_helper.getDestinations())
+           .append("<hr>\n");
 
 
-        buf.append("<hr><h3><a href=\"/help\" target=\"_top\" title=\"")
+
+        out.write(buf.toString());
+    }
+
+    public String renderHelpAndFAQHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/help\" target=\"_top\" title=\"")
+           .append(_("I2P Router Help &amp; FAQ"))
+           .append("\">")
+           .append(_("Help &amp; FAQ"))
+           .append("</a></h3>");
+        return buf.toString();
+    }
+
+    public String renderI2PServicesHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/configclients\" target=\"_top\" title=\"")
+           .append(_("Configure startup of clients and webapps (services); manually start dormant services"))
+           .append("\">")
+           .append(_("I2P Services"))
+           .append("</a></h3>\n" +
+
+                   "<hr class=\"b\"><table><tr><td>" +
+
+                   "<a href=\"/susimail/susimail\" target=\"blank\" title=\"")
+           .append(_("Anonymous webmail client"))
+           .append("\">")
+           .append(_("Email"))
+           .append("</a>\n" +
+
+                   "<a href=\"/i2psnark/\" target=\"_blank\" title=\"")
+           .append(_("Built-in anonymous BitTorrent Client"))
+           .append("\">")
+           .append(_("Torrents"))
+           .append("</a>\n" +
+
+                   "<a href=\"http://127.0.0.1:7658/\" target=\"_blank\" title=\"")
+           .append(_("Local web server"))
+           .append("\">")
+           .append(_("Website"))
+           .append("</a>\n")
+
+           .append(NavHelper.getClientAppLinks(_context))
+
+           .append("</td></tr></table>\n");
+        return buf.toString();
+    }
+
+    public String renderI2PInternalsHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/config\" target=\"_top\" title=\"")
+           .append(_("Configure I2P Router"))
+           .append("\">")
+           .append(_("I2P Internals"))
+           .append("</a></h3><hr class=\"b\">\n" +
+
+                   "<table><tr><td>\n" +
+
+                   "<a href=\"/tunnels\" target=\"_top\" title=\"")
+           .append(_("View existing tunnels and tunnel build status"))
+           .append("\">")
+           .append(_("Tunnels"))
+           .append("</a>\n" +
+
+                   "<a href=\"/peers\" target=\"_top\" title=\"")
+           .append(_("Show all current peer connections"))
+           .append("\">")
+           .append(_("Peers"))
+           .append("</a>\n" +
+
+                   "<a href=\"/profiles\" target=\"_top\" title=\"")
+           .append(_("Show recent peer performance profiles"))
+           .append("\">")
+           .append(_("Profiles"))
+           .append("</a>\n" +
+
+                   "<a href=\"/netdb\" target=\"_top\" title=\"")
+           .append(_("Show list of all known I2P routers"))
+           .append("\">")
+           .append(_("NetDB"))
+           .append("</a>\n" +
+
+                   "<a href=\"/logs\" target=\"_top\" title=\"")
+           .append(_("Health Report"))
+           .append("\">")
+           .append(_("Logs"))
+           .append("</a>\n");
+
+       //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
+       //  .append(_("Show the router's workload, and how it's performing"))
+       //  .append("\">")
+       //  .append(_("Jobs"))
+       //  .append("</a>\n" +
+
+        if (!StatSummarizer.isDisabled()) {
+            buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
+               .append(_("Graph router performance"))
+               .append("\">")
+               .append(_("Graphs"))
+               .append("</a>\n");
+        }
+
+        buf.append("<a href=\"/stats\" target=\"_top\" title=\"")
+           .append(_("Textual router performance statistics"))
+           .append("\">")
+           .append(_("Stats"))
+           .append("</a>\n" +
+
+                    "<a href=\"/i2ptunnel/\" target=\"_blank\" title=\"")
+           .append(_("Local Destinations"))
+           .append("\">")
+           .append(_("I2PTunnel"))
+           .append("</a>\n" +
+
+                   "<a href=\"/susidns/index\" target=\"_blank\" title=\"")
+           .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
+           .append("\">")
+           .append(_("Addressbook"))
+           .append("</a>\n");
+
+        File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
+        if (javadoc.exists())
+            buf.append("<a href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");
+        buf.append("</td></tr></table>\n");
+        return buf.toString();
+    }
+
+    public String renderGeneralHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/help\" target=\"_top\" title=\"")
            .append(_("I2P Router Help"))
            .append("\">")
            .append(_("General"))
@@ -202,24 +253,25 @@ public class SummaryBarRenderer {
            .append(":</b></td>" +
                    "<td align=\"right\">")
            .append(_helper.getUptime())
-           .append("</td></tr></table>\n" +
+           .append("</td></tr></table>\n");
+        return buf.toString();
+    }
 
-                   "<hr><h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
+    public String renderNetworkReachabilityHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
            .append(_("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_("Network"))
            .append(": ")
            .append(_helper.getReachability())
-           .append("</a></h4><hr>\n")
+           .append("</a></h4>\n");
+        return buf.toString();
+    }
 
-
-           .append(_helper.getUpdateStatus())
-
-
-           .append(_helper.getRestartStatus())
-
-
-           .append("<hr><h3><a href=\"/peers\" target=\"_top\" title=\"")
+    public String renderPeersHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/peers\" target=\"_top\" title=\"")
            .append(_("Show all current peer connections"))
            .append("\">")
            .append(_("Peers"))
@@ -260,14 +312,12 @@ public class SummaryBarRenderer {
            .append(_helper.getAllPeers())
            .append("</td></tr>\n" +
 
-                   "</table><hr>\n");
+                   "</table>\n");
+        return buf.toString();
+    }
 
-
-        out.write(buf.toString());
-        buf.setLength(0);
-
-        buf.append(_helper.getFirewallAndReseedStatus());
-
+    public String renderBandwidthHTML() {
+        StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/config\" title=\"")
            .append(_("Configure router bandwidth allocation"))
            .append("\" target=\"_top\">")
@@ -303,9 +353,15 @@ public class SummaryBarRenderer {
            .append(_helper.getInboundTransferred())
            .append(SummaryHelper.THINSP)
            .append(_helper.getOutboundTransferred())
-           .append("</td></tr></table>\n" +
+           .append("</td></tr>\n" +
 
-                   "<hr><h3><a href=\"/tunnels\" target=\"_top\" title=\"")
+                   "</table>\n");
+        return buf.toString();
+    }
+
+    public String renderTunnelsHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/tunnels\" target=\"_top\" title=\"")
            .append(_("View existing tunnels and tunnel build status"))
            .append("\">")
            .append(_("Tunnels"))
@@ -336,7 +392,13 @@ public class SummaryBarRenderer {
            .append(_helper.getShareRatio())
            .append("</td></tr>\n" +
 
-                   "</table><hr><h3><a href=\"/jobs\" target=\"_top\" title=\"")
+                   "</table>\n");
+        return buf.toString();
+    }
+
+    public String renderCongestionHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<h3><a href=\"/jobs\" target=\"_top\" title=\"")
            .append(_("What's in the router's job queue?"))
            .append("\">")
            .append(_("Congestion"))
@@ -369,16 +431,16 @@ public class SummaryBarRenderer {
            .append(_helper.getInboundBacklog())
            .append("</td></tr>\n" +
 
-                   "</table><hr><h4>")
+                   "</table>\n");
+        return buf.toString();
+    }
+
+    public String renderTunnelStatusHTML() {
+        StringBuilder buf = new StringBuilder(50);
+        buf.append("<h4>")
            .append(_(_helper.getTunnelStatus()))
-           .append("</h4><hr>\n")
-
-           .append(_helper.getDestinations())
-           .append("<hr>\n");
-
-
-
-        out.write(buf.toString());
+           .append("</h4>\n");
+        return buf.toString();
     }
 
     /** translate a string */
