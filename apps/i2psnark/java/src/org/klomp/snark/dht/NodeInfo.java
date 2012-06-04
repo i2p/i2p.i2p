@@ -3,6 +3,8 @@ package org.klomp.snark.dht;
  *  From zzzot, modded and relicensed to GPLv2
  */
 
+import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -41,7 +43,7 @@ class NodeInfo extends SimpleDataStructure {
         this.dest = dest;
         this.hash = dest.calculateHash();
         this.port = port;
-        initialize(nID, this.hash, port);
+        initialize();
     }
 
     /**
@@ -53,7 +55,7 @@ class NodeInfo extends SimpleDataStructure {
         this.nID = nID;
         this.hash = hash;
         this.port = port;
-        initialize(nID, hash, port);
+        initialize();
     }
 
     /**
@@ -82,6 +84,36 @@ class NodeInfo extends SimpleDataStructure {
     }
 
     /**
+     * Form persistent storage string.
+     * Format: NID:Hash:Destination:port
+     * First 3 in base 64; Destination may be empty string
+     * @throws IllegalArgumentException
+     */
+    public NodeInfo(String s) throws DataFormatException {
+        super();
+        String[] parts = s.split(":", 4);
+        if (parts.length != 4)
+            throw new DataFormatException("Bad format");
+        byte[] nid = Base64.decode(parts[0]);
+        if (nid == null)
+            throw new DataFormatException("Bad NID");
+        nID = new NID(nid);
+        byte[] h = Base64.decode(parts[1]);
+        if (h == null)
+            throw new DataFormatException("Bad hash");
+        hash = new Hash(h);
+        //hash = Hash.create(h);
+        if (parts[2].length() > 0)
+            dest = new Destination(parts[2]);
+        try {
+            port = Integer.parseInt(parts[3]);
+        } catch (NumberFormatException nfe) {
+            throw new DataFormatException("Bad port", nfe);
+        }
+        initialize();
+    }
+
+    /**
      * Creates data structures from the compact info
      * @throws IllegalArgumentException
      */
@@ -91,18 +123,22 @@ class NodeInfo extends SimpleDataStructure {
         byte[] ndata = new byte[NID.HASH_LENGTH];
         System.arraycopy(compactInfo, 0, ndata, 0, NID.HASH_LENGTH);
         this.nID = new NID(ndata);
+        //3 lines or...
         byte[] hdata = new byte[Hash.HASH_LENGTH];
         System.arraycopy(compactInfo, NID.HASH_LENGTH, hdata, 0, Hash.HASH_LENGTH);
         this.hash = new Hash(hdata);
+        //this.hash = Hash.create(compactInfo, NID.HASH_LENGTH);
         this.port = (int) DataHelper.fromLong(compactInfo, NID.HASH_LENGTH + Hash.HASH_LENGTH, 2);
+        if (port <= 0 || port >= 65535)
+            throw new IllegalArgumentException("Bad port");
     }
 
     /**
      * Creates 54-byte compact info
      * @throws IllegalArgumentException
      */
-    private void initialize(NID nID, Hash hash, int port) {
-        if (port < 0 || port > 65535)
+    private void initialize() {
+        if (port <= 0 || port >= 65535)
             throw new IllegalArgumentException("Bad port");
         byte[] compactInfo = new byte[LENGTH];
         System.arraycopy(nID.getData(), 0, compactInfo, 0, NID.HASH_LENGTH);
@@ -173,7 +209,24 @@ class NodeInfo extends SimpleDataStructure {
         }
     }
 
+    @Override
     public String toString() {
         return "NodeInfo: " + nID + ' ' + hash + " port: " + port;
     }
+
+    /**
+     * To persistent storage string.
+     * Format: NID:Hash:Destination:port
+     * First 3 in base 64; Destination may be empty string
+     */
+    public String toPersistentString() {
+        StringBuilder buf = new StringBuilder(650);
+        buf.append(nID.toBase64()).append(':');
+        buf.append(hash.toBase64()).append(':');
+        if (dest != null)
+            buf.append(dest.toBase64());
+        buf.append(':').append(port);
+        return buf.toString();
+    }
+
 }

@@ -1514,15 +1514,23 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
 
-    public class SnarkManagerShutdown extends I2PAppThread {
+    private class SnarkManagerShutdown extends I2PAppThread {
         @Override
         public void run() {
             Set names = listTorrentFiles();
+            int running = 0;
             for (Iterator iter = names.iterator(); iter.hasNext(); ) {
                 Snark snark = getTorrent((String)iter.next());
-                if ( (snark != null) && (!snark.isStopped()) )
+                if (snark != null && !snark.isStopped()) {
                     snark.stopTorrent();
+                    running++;
+                }
             }
+            _snarks.clear();
+            if (running > 0) {
+                try { sleep(1500); } catch (InterruptedException ie) {};
+            }
+            _util.disconnect();
         }
     }
 

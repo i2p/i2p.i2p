@@ -12,8 +12,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * The tracker stores peers, i.e. Dest hashes (not nodes).
@@ -27,6 +26,7 @@ class DHTTracker {
     private final Torrents _torrents;
     private long _expireTime;
     private final Log _log;
+    private volatile boolean _isRunning;
 
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 199*1000;
@@ -41,12 +41,16 @@ class DHTTracker {
         _torrents = new Torrents();
         _expireTime = MAX_EXPIRE_TIME;
         _log = _context.logManager().getLog(DHTTracker.class);
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+    }
+
+    public void start() {
+        _isRunning = true;
+        new Cleaner();
     }
 
     void stop() {
         _torrents.clear();
-        // no way to stop the cleaner
+        _isRunning = false;
     }
 
     void announce(InfoHash ih, Hash hash) {
@@ -93,9 +97,15 @@ class DHTTracker {
         return rv;
     }
 
-    private class Cleaner implements SimpleTimer.TimedEvent {
+    private class Cleaner extends SimpleTimer2.TimedEvent {
+
+        public Cleaner() {
+            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+        }
 
         public void timeReached() {
+            if (!_isRunning)
+                return;
             long now = _context.clock().now();
             int torrentCount = 0;
             int peerCount = 0;
@@ -122,11 +132,12 @@ class DHTTracker {
             else
                 _expireTime = Math.min(_expireTime + DELTA_EXPIRE_TIME, MAX_EXPIRE_TIME);
 
-            if (_log.shouldLog(Log.INFO))
-                _log.info("DHT tracker cleaner done, now with " +
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("DHT tracker cleaner done, now with " +
                          torrentCount + " torrents, " +
                          peerCount + " peers, " +
                          DataHelper.formatDuration(_expireTime) + " expiration");
+            schedule(CLEAN_TIME);
         }
     }
 }

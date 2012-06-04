@@ -5,6 +5,7 @@ package org.klomp.snark.dht;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,8 +37,6 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 
 import org.klomp.snark.bencode.BDecoder;
@@ -108,6 +107,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private final int _rPort;
     /** signed dgrams */
     private final int _qPort;
+    private final File _dhtFile;
+    private volatile boolean _isRunning;
 
     /** all-zero NID used for pings */
     private static final NID _fakeNID = new NID(new byte[NID.HASH_LENGTH]);
@@ -134,6 +135,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long DEFAULT_QUERY_TIMEOUT = 75*1000;
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 63*1000;
+    private static final String DHT_FILE = "i2psnark.dht.dat";
 
     public KRPC (I2PAppContext ctx, I2PSession session) {
         _context = ctx;
@@ -156,11 +158,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         ctx.random().nextBytes(_myID);
         _myNID = new NID(_myID);
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
+        _dhtFile = new File(ctx.getConfigDir(), DHT_FILE);
 
         session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
-        // can't be stopped
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+        start();
     }
 
     ///////////////// Public methods
@@ -391,6 +393,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public void announce(byte[] ih, byte[] peerHash) {
         InfoHash iHash = new InfoHash(ih);
         _tracker.announce(iHash, new Hash(peerHash));
+//        _tracker.announce(iHash, Hash.create(peerHash));
     }
 
     /**
@@ -506,24 +509,32 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  Does nothing yet, everything is prestarted.
+     *  Loads the DHT from file.
      *  Can't be restarted after stopping?
      */
     public void start() {
+        _knownNodes.start();
+        _tracker.start();
+        PersistDHT.loadDHT(this, _dhtFile);
         // start the explore thread
+        _isRunning = true;
+        // no need to keep ref, it will eventually stop
+        new Cleaner();
     }
 
     /**
      *  Stop everything.
      */
     public void stop() {
+        _isRunning = false;
         // FIXME stop the explore thread
         // unregister port listeners
         _session.removeListener(I2PSession.PROTO_DATAGRAM, _qPort);
         _session.removeListener(I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         // clear the DHT and tracker
         _tracker.stop();
-        _knownNodes.clear();
+        PersistDHT.saveDHT(_knownNodes, _dhtFile);
+        _knownNodes.stop();
         _sentQueries.clear();
         _outgoingTokens.clear();
         _incomingTokens.clear();
@@ -1175,6 +1186,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         for (BEValue bev : peers) {
             byte[] b = bev.getBytes();
             Hash h = new Hash(b);
+            //Hash h = Hash.create(b);
             rv.add(h);
         }
         if (_log.shouldLog(Log.INFO))
@@ -1303,7 +1315,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 if (onTimeout != null)
                     onTimeout.run();
                 if (_log.shouldLog(Log.INFO))
-                    _log.warn("timeout waiting for reply from " + this.toString());
+                    _log.warn("timeout waiting for reply from " + ReplyWaiter.this.toString());
             }
         }
     }
@@ -1370,9 +1382,15 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /**
      * Cleaner-upper
      */
-    private class Cleaner implements SimpleTimer.TimedEvent {
+    private class Cleaner extends SimpleTimer2.TimedEvent {
+
+        public Cleaner() {
+            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+        }
 
         public void timeReached() {
+            if (!_isRunning)
+                return;
             long now = _context.clock().now();
             for (Iterator<Token> iter = _outgoingTokens.keySet().iterator(); iter.hasNext(); ) {
                 Token tok = iter.next();
@@ -1390,12 +1408,13 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 if (ni.lastSeen() < now - MAX_NODEINFO_AGE)
                     iter.remove();
             }
-            if (_log.shouldLog(Log.INFO))
-                _log.info("KRPC cleaner done, now with " +
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("KRPC cleaner done, now with " +
                           _outgoingTokens.size() + " sent Tokens, " +
                           _incomingTokens.size() + " rcvd Tokens, " +
                           _knownNodes.size() + " known peers, " +
                           _sentQueries.size() + " queries awaiting response");
+            schedule(CLEAN_TIME);
         }
     }
 }

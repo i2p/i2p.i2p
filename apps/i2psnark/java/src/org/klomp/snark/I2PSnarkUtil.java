@@ -261,7 +261,8 @@ public class I2PSnarkUtil {
         // FIXME this can cause race NPEs elsewhere
         _manager = null;
         _shitlist.clear();
-        mgr.destroySocketManager();
+        if (mgr != null)
+            mgr.destroySocketManager();
         // this will delete a .torrent file d/l in progress so don't do that...
         FileUtil.rmdir(_tmpDir, false);
         // in case the user will d/l a .torrent file next...
@@ -405,6 +406,7 @@ public class I2PSnarkUtil {
                         byte[] b = Base32.decode(ip.substring(0, BASE32_HASH_LENGTH));
                         if (b != null) {
                             Hash h = new Hash(b);
+                            //Hash h = Hash.create(b);
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Using existing session for lookup of " + ip);
                             try {

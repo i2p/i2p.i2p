@@ -15,8 +15,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  *  All the nodes we know about, stored as a mapping from
@@ -33,6 +32,7 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
     private final I2PAppContext _context;
     private long _expireTime;
     private final Log _log;
+    private volatile boolean _isRunning;
 
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 237*1000;
@@ -46,7 +46,16 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
         _context = ctx;
         _expireTime = MAX_EXPIRE_TIME;
         _log = _context.logManager().getLog(DHTNodes.class);
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+    }
+
+    public void start() {
+        _isRunning = true;
+        new Cleaner();
+    }
+
+    public void stop() {
+        clear();
+        _isRunning = false;
     }
 
     /**
@@ -82,9 +91,15 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
   ****/
 
     /** */
-    private class Cleaner implements SimpleTimer.TimedEvent {
+    private class Cleaner extends SimpleTimer2.TimedEvent {
+
+        public Cleaner() {
+            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+        }
 
         public void timeReached() {
+            if (!_isRunning)
+                return;
             long now = _context.clock().now();
             int peerCount = 0;
             for (Iterator<NodeInfo> iter = DHTNodes.this.values().iterator(); iter.hasNext(); ) {
@@ -100,11 +115,12 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
             else
                 _expireTime = Math.min(_expireTime + DELTA_EXPIRE_TIME, MAX_EXPIRE_TIME);
 
-            if (_log.shouldLog(Log.INFO))
-                _log.info("DHT storage cleaner done, now with " +
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("DHT storage cleaner done, now with " +
                          peerCount + " peers, " +
                          DataHelper.formatDuration(_expireTime) + " expiration");
 
+            schedule(CLEAN_TIME);
         }
     }
 }
