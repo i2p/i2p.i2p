@@ -65,8 +65,8 @@ public class SummaryBarRenderer {
            .append("<hr>\n")
            .append(renderNetworkReachabilityHTML())
            .append("<hr>\n")
-           .append(_helper.getUpdateStatus())
-           .append(_helper.getRestartStatus())
+           .append(renderUpdateStatusHTML())
+           .append(renderRestartStatusHTML())
            .append("<hr>\n")
            .append(renderPeersHTML())
            .append("<hr>\n");
@@ -74,9 +74,8 @@ public class SummaryBarRenderer {
         out.write(buf.toString());
         buf.setLength(0);
 
-        buf.append(_helper.getFirewallAndReseedStatus());
-
-        buf.append(renderBandwidthHTML())
+        buf.append(renderFirewallAndReseedStatusHTML())
+           .append(renderBandwidthHTML())
            .append("<hr>\n")
            .append(renderTunnelsHTML())
            .append("<hr>\n")
@@ -86,8 +85,6 @@ public class SummaryBarRenderer {
            .append("<hr>\n")
            .append(_helper.getDestinations())
            .append("<hr>\n");
-
-
 
         out.write(buf.toString());
     }
@@ -269,6 +266,18 @@ public class SummaryBarRenderer {
         return buf.toString();
     }
 
+    public String renderUpdateStatusHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append(_helper.getUpdateStatus());
+        return buf.toString();
+    }
+
+    public String renderRestartStatusHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append(_helper.getRestartStatus());
+        return buf.toString();
+    }
+
     public String renderPeersHTML() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/peers\" target=\"_top\" title=\"")
@@ -313,6 +322,12 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "</table>\n");
+        return buf.toString();
+    }
+
+    public String renderFirewallAndReseedStatusHTML() {
+        StringBuilder buf = new StringBuilder(512);
+        buf.append(_helper.getFirewallAndReseedStatus());
         return buf.toString();
     }
 
