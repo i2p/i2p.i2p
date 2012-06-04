@@ -34,7 +34,7 @@ class DHTTracker {
     private static final long MAX_EXPIRE_TIME = 95*60*1000;
     private static final long MIN_EXPIRE_TIME = 5*60*1000;
     private static final long DELTA_EXPIRE_TIME = 7*60*1000;
-    private static final int MAX_PEERS = 9999;
+    private static final int MAX_PEERS = 2000;
 
     DHTTracker(I2PAppContext ctx) {
         _context = ctx;

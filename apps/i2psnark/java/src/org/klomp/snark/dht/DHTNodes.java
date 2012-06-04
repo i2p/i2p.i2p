@@ -39,7 +39,7 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
     private static final long MAX_EXPIRE_TIME = 60*60*1000;
     private static final long MIN_EXPIRE_TIME = 5*60*1000;
     private static final long DELTA_EXPIRE_TIME = 7*60*1000;
-    private static final int MAX_PEERS = 9999;
+    private static final int MAX_PEERS = 999;
 
     public DHTNodes(I2PAppContext ctx) {
         super();

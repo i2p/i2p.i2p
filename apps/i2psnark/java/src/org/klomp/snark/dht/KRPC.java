@@ -92,7 +92,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /** index to sent queries awaiting reply */
     private final ConcurrentHashMap<MsgID, ReplyWaiter> _sentQueries;
     /** index to outgoing tokens we generated, sent in reply to a get_peers query */
-    private final ConcurrentHashMap<Token, NID> _outgoingTokens;
+    private final ConcurrentHashMap<Token, NodeInfo> _outgoingTokens;
     /** index to incoming opaque tokens, received in a peers or nodes reply */
     private final ConcurrentHashMap<NID, Token> _incomingTokens;
 
@@ -148,8 +148,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _incomingTokens = new ConcurrentHashMap();
 
         // Construct my NodeInfo
-        // ports can really be fixed, just do this for testing
-        _qPort = 30000 + ctx.random().nextInt(99);
+        // Pick ports over a big range to marginally increase security
+        // If we add a search DHT, adjust to stay out of each other's way
+        _qPort = 2555 + ctx.random().nextInt(61111);
         _rPort = _qPort + 1;
         _myID = new byte[NID.HASH_LENGTH];
         ctx.random().nextBytes(_myID);
@@ -291,6 +292,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
     /**
      *  Get peers for a torrent.
+     *  This is an iterative lookup in the DHT.
      *  Blocking!
      *  Caller should run in a thread.
      *
@@ -404,13 +406,16 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  Announce to the closest DHT peers.
+     *  Announce to the closest peers in the local DHT.
+     *  This is NOT iterative - call getPeers() first to get the closest
+     *  peers into the local DHT.
      *  Blocking unless maxWait <= 0
      *  Caller should run in a thread.
      *  This also automatically announces ourself to our local tracker.
      *  For best results do a getPeers() first so we have tokens.
      *
      *  @param ih the Info Hash (torrent)
+     *  @param max maximum number of peers to announce to
      *  @param maxWait the maximum total time to wait (ms) or 0 to do all in parallel and return immediately.
      *  @return the number of successful announces, not counting ourselves.
      */
@@ -842,6 +847,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         }
 
         try {
+            // TODO I2CP per-packet options
             boolean success = _session.sendMessage(dest, payload, 0, payload.length, null, null, 60*1000,
                                                    repliable ? I2PSession.PROTO_DATAGRAM : I2PSession.PROTO_DATAGRAM_RAW,
                                                    fromPort, toPort);
@@ -1041,7 +1047,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
              _log.info("Rcvd get_peers from: " + nInfo + " for: " + ih);
         // generate and save random token
         Token token = new Token(_context);
-        _outgoingTokens.put(token, nInfo.getNID());
+        _outgoingTokens.put(token, nInfo);
         if (_log.shouldLog(Log.INFO))
              _log.info("Stored new OB token: " + token + " for: " + nInfo);
 
@@ -1074,18 +1080,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      */
     private void receiveAnnouncePeer(MsgID msgID, InfoHash ih, byte[] tok) throws InvalidBEncodingException {
         Token token = new Token(tok);
-        NID nid = _outgoingTokens.get(token);
-        if (nid == null) {
+        NodeInfo nInfo = _outgoingTokens.get(token);
+        if (nInfo == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unknown token in announce_peer: " + token);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Current known tokens: " + _outgoingTokens.keySet());
-            return;
-        }
-        NodeInfo nInfo = _knownNodes.get(nid);
-        if (nInfo == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unknown node in announce_peer for: " + nid);
             return;
         }
         if (_log.shouldLog(Log.INFO))

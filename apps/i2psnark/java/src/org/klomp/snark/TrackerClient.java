@@ -374,7 +374,8 @@ public class TrackerClient extends I2PAppThread
                 // announce  ourselves while the token is still good
                 // FIXME this needs to be in its own thread
                 if (!stop) {
-                    int good = _util.getDHT().announce(snark.getInfoHash(), 8, 5*60*1000);
+                    // announce only to the 1 closest
+                    int good = _util.getDHT().announce(snark.getInfoHash(), 1, 5*60*1000);
                     _util.debug("Sent " + good + " good announces to DHT", Snark.INFO);
                 }
 
