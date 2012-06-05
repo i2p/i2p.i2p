@@ -35,6 +35,35 @@ public class SummaryHelper extends HelperBase {
     // Opera 10.63 doesn't have the char, TODO check UA
     //static final String THINSP = "&thinsp;/&thinsp;";
     static final String THINSP = " / ";
+    private static final char S = ',';
+    static final String PROP_SUMMARYBAR = "routerconsole.summarybar";
+
+    static final String PRESET_FULL =
+        "HelpAndFAQ" + S +
+        "I2PServices" + S +
+        "I2PInternals" + S +
+        "General" + S +
+        "NetworkReachability" + S +
+        "UpdateStatus" + S +
+        "RestartStatus" + S +
+        "Peers" + S +
+        "FirewallAndReseedStatus" + S +
+        "Bandwidth" + S +
+        "Tunnels" + S +
+        "Congestion" + S +
+        "TunnelStatus" + S +
+        "Destinations" + S +
+        "";
+
+    static final String PRESET_SHORT =
+        "ShortGeneral" + S +
+        "NewsHeadings" + S +
+        "UpdateStatus" + S +
+        "NetworkReachability" + S +
+        "FirewallAndReseedStatus" + S +
+        "Destinations" + S +
+        "RestartStatus" + S +
+        "";
 
     /**
      * Retrieve the shortened 4 character ident for the router located within

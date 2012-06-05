@@ -3,6 +3,9 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -12,6 +15,31 @@ import net.i2p.router.RouterContext;
  *
  */
 public class SummaryBarRenderer {
+    static final Map<String, java.lang.reflect.Method> sections;
+    static {
+        Map<String, java.lang.reflect.Method> aMap = new HashMap<String, java.lang.reflect.Method>();;
+        try {
+            aMap.put("HelpAndFAQ", SummaryBarRenderer.class.getMethod("renderHelpAndFAQHTML"));
+            aMap.put("I2PServices", SummaryBarRenderer.class.getMethod("renderI2PServicesHTML"));
+            aMap.put("I2PInternals", SummaryBarRenderer.class.getMethod("renderI2PInternalsHTML"));
+            aMap.put("General", SummaryBarRenderer.class.getMethod("renderGeneralHTML"));
+            aMap.put("ShortGeneral", SummaryBarRenderer.class.getMethod("renderShortGeneralHTML"));
+            aMap.put("NetworkReachability", SummaryBarRenderer.class.getMethod("renderNetworkReachabilityHTML"));
+            aMap.put("UpdateStatus", SummaryBarRenderer.class.getMethod("renderUpdateStatusHTML"));
+            aMap.put("RestartStatus", SummaryBarRenderer.class.getMethod("renderRestartStatusHTMLHTML"));
+            aMap.put("Peers", SummaryBarRenderer.class.getMethod("renderPeersHTML"));
+            aMap.put("FirewallAndReseedStatus", SummaryBarRenderer.class.getMethod("renderFirewallAndReseedStatusHTML"));
+            aMap.put("Bandwidth", SummaryBarRenderer.class.getMethod("renderBandwidthHTML"));
+            aMap.put("Tunnels", SummaryBarRenderer.class.getMethod("renderTunnelsHTML"));
+            aMap.put("Congestion", SummaryBarRenderer.class.getMethod("renderCongestionHTML"));
+            aMap.put("TunnelStatus", SummaryBarRenderer.class.getMethod("renderTunnelStatusHTML"));
+            aMap.put("Destinations", SummaryBarRenderer.class.getMethod("renderDestinationsHTML"));
+            aMap.put("NewsHeadings", SummaryBarRenderer.class.getMethod("renderNewsHeadingsHTML"));
+        } catch (java.lang.NoSuchMethodException e) {
+        }
+        sections = Collections.unmodifiableMap(aMap);
+    }
+
     private final RouterContext _context;
     private final SummaryHelper _helper;
     private final NewsHelper _newshelper;
@@ -265,6 +293,29 @@ public class SummaryBarRenderer {
         return buf.toString();
     }
 
+    public String renderShortGeneralHTML() {
+        if (_helper == null) return "";
+        StringBuilder buf = new StringBuilder(512);
+        buf.append("<table>" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Version"))
+           .append(":</b></td>" +
+                   "<td align=\"right\">")
+           .append(_helper.getVersion())
+           .append("</td></tr>\n" +
+
+                   "<tr title=\"")
+           .append(_("How long we've been running for this session"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
+           .append(_("Uptime"))
+           .append(":</b></td>" +
+                   "<td align=\"right\">")
+           .append(_helper.getUptime())
+           .append("</td></tr></table>\n");
+        return buf.toString();
+    }
+
     public String renderNetworkReachabilityHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
@@ -487,7 +538,7 @@ public class SummaryBarRenderer {
 
     /** @since 0.9.1 */
     public String renderNewsHeadingsHTML() {
-        if (_newshelper == null) return "";
+        if (_newshelper == null || _newshelper.shouldShowNews()) return "";
         StringBuilder buf = new StringBuilder(512);
         String consoleNonce = System.getProperty("router.consoleNonce");
         if (consoleNonce != null) {
