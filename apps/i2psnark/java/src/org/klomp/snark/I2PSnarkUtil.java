@@ -405,8 +405,8 @@ public class I2PSnarkUtil {
                     if (sess != null) {
                         byte[] b = Base32.decode(ip.substring(0, BASE32_HASH_LENGTH));
                         if (b != null) {
-                            Hash h = new Hash(b);
-                            //Hash h = Hash.create(b);
+                            //Hash h = new Hash(b);
+                            Hash h = Hash.create(b);
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Using existing session for lookup of " + ip);
                             try {

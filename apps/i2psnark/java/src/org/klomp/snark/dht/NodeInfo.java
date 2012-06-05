@@ -101,8 +101,8 @@ class NodeInfo extends SimpleDataStructure {
         byte[] h = Base64.decode(parts[1]);
         if (h == null)
             throw new DataFormatException("Bad hash");
-        hash = new Hash(h);
-        //hash = Hash.create(h);
+        //hash = new Hash(h);
+        hash = Hash.create(h);
         if (parts[2].length() > 0)
             dest = new Destination(parts[2]);
         try {
@@ -123,11 +123,10 @@ class NodeInfo extends SimpleDataStructure {
         byte[] ndata = new byte[NID.HASH_LENGTH];
         System.arraycopy(compactInfo, 0, ndata, 0, NID.HASH_LENGTH);
         this.nID = new NID(ndata);
-        //3 lines or...
-        byte[] hdata = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(compactInfo, NID.HASH_LENGTH, hdata, 0, Hash.HASH_LENGTH);
-        this.hash = new Hash(hdata);
-        //this.hash = Hash.create(compactInfo, NID.HASH_LENGTH);
+        //byte[] hdata = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(compactInfo, NID.HASH_LENGTH, hdata, 0, Hash.HASH_LENGTH);
+        //this.hash = new Hash(hdata);
+        this.hash = Hash.create(compactInfo, NID.HASH_LENGTH);
         this.port = (int) DataHelper.fromLong(compactInfo, NID.HASH_LENGTH + Hash.HASH_LENGTH, 2);
         if (port <= 0 || port >= 65535)
             throw new IllegalArgumentException("Bad port");

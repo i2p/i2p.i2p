@@ -393,7 +393,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public void announce(byte[] ih, byte[] peerHash) {
         InfoHash iHash = new InfoHash(ih);
         _tracker.announce(iHash, new Hash(peerHash));
-//        _tracker.announce(iHash, Hash.create(peerHash));
+        // Do NOT do this, corrupts the Hash cache and the Peer ID
+        //_tracker.announce(iHash, Hash.create(peerHash));
     }
 
     /**
@@ -1185,8 +1186,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         List<Hash> rv = new ArrayList(peers.size());
         for (BEValue bev : peers) {
             byte[] b = bev.getBytes();
-            Hash h = new Hash(b);
-            //Hash h = Hash.create(b);
+            //Hash h = new Hash(b);
+            Hash h = Hash.create(b);
             rv.add(h);
         }
         if (_log.shouldLog(Log.INFO))
