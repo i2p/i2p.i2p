@@ -19,7 +19,13 @@
         out.print(graphHelper.getRefreshMeta());
     }
 %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
+  function requestAjax1() { ajax("/xhr1.jsp", "xhr", <%=intl.getRefresh()%>000); }
+  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+</script>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Performance Graphs")%></h1>
 <div class="main" id="main">
