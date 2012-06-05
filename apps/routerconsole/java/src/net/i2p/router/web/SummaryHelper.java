@@ -35,6 +35,35 @@ public class SummaryHelper extends HelperBase {
     // Opera 10.63 doesn't have the char, TODO check UA
     //static final String THINSP = "&thinsp;/&thinsp;";
     static final String THINSP = " / ";
+    private static final char S = ',';
+    static final String PROP_SUMMARYBAR = "routerconsole.summaryBar";
+
+    static final String PRESET_FULL =
+        "HelpAndFAQ" + S +
+        "I2PServices" + S +
+        "I2PInternals" + S +
+        "General" + S +
+        "NetworkReachability" + S +
+        "UpdateStatus" + S +
+        "RestartStatus" + S +
+        "Peers" + S +
+        "FirewallAndReseedStatus" + S +
+        "Bandwidth" + S +
+        "Tunnels" + S +
+        "Congestion" + S +
+        "TunnelStatus" + S +
+        "Destinations" + S +
+        "";
+
+    static final String PRESET_SHORT =
+        "ShortGeneral" + S +
+        "NewsHeadings" + S +
+        "UpdateStatus" + S +
+        "NetworkReachability" + S +
+        "FirewallAndReseedStatus" + S +
+        "Destinations" + S +
+        "RestartStatus" + S +
+        "";
 
     /**
      * Retrieve the shortened 4 character ident for the router located within
@@ -651,7 +680,7 @@ public class SummaryHelper extends HelperBase {
                        .append(_("Download Unsigned<br>Update {0}", getUnsignedUpdateVersion()))
                        .append("</button><br>\n");
                 }
-                buf.append("</form>\n");
+                buf.append("</form><hr>\n");
             }
         }
         return buf.toString();
@@ -708,6 +737,22 @@ public class SummaryHelper extends HelperBase {
             return "";
         buf.append("<hr>");
         return buf.toString();
+    }
+
+    private NewsHelper _newshelper;
+    public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
+    public NewsHelper getNewsHelper() { return _newshelper; }
+
+    public String[] getSummaryBarSections() {
+        String config = _context.getProperty(PROP_SUMMARYBAR, PRESET_FULL);
+        return config.split("" + S);
+    }
+
+    public void saveSummaryBarSections(String[] sections) {
+        StringBuilder buf = new StringBuilder(512);
+        for(int i = 0; i < sections.length; i++)
+            buf.append(sections[i]).append(S);
+        _context.router().saveConfig(PROP_SUMMARYBAR, buf.toString());
     }
 
     /** output the summary bar to _out */

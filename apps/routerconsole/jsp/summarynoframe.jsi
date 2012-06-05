@@ -1,35 +1,17 @@
-<%@page import="net.i2p.router.web.SummaryHelper" %>
 <%
 /*
- * Note:
- * This is included almost 30 times, so keep whitespace etc. to a minimum.
+ * TODO - the bar would render more cleanly if we specified the img height and width here,
+ * but unfortunately the images in the different themes are different sizes.
+ * They range in height from 37 to 43 px. But there's a -2 bottom margin...
+ * So put it in a div.
  */
 %>
-<jsp:useBean class="net.i2p.router.web.SummaryHelper" id="helper" scope="request" />
-<jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
-<jsp:setProperty name="helper" property="action" value="<%=request.getParameter(\"action\")%>" />
-<jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter(\"updateNonce\")%>" />
-<jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter(\"consoleNonce\")%>" />
-<jsp:setProperty name="helper" property="requestURI" value="<%=request.getRequestURI()%>" />
-<% helper.storeWriter(out); %>
-<%
-/*
- * The following is required for the reseed button to work, although we probably
- * only need the reseedNonce property.
- */
-%>
-<jsp:useBean class="net.i2p.router.web.ReseedHandler" id="reseed" scope="request" />
-<jsp:setProperty name="reseed" property="*" />
-<%
-/*
- * The following is required for the update buttons to work, although we probably
- * only need the updateNonce property.
- */
-%>
-<jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
-<jsp:setProperty name="update" property="*" />
-<jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
-<%
-    // moved to java for ease of translation and to avoid 30 copies
-    helper.renderSummaryBar();
-%>
+  <div style="height: 36px;">
+   <a href="/" target="_top">
+    <img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>">
+   </a>
+  </div>
+  <div id="xhr">
+<!-- for non-script -->
+<%@include file="xhr1.jsi" %>
+  </div>

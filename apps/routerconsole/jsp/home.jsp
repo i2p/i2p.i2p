@@ -6,9 +6,9 @@
 <%=intl.title("home")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
-  var failMessage = "<b><%=intl._("Router is down")%><\/b>";
-  function requestAjax1() { ajax("/xhr1.jsp", "xhr", 15000); }
-  function initAjax() { setTimeout(requestAjax1, 15000);  }
+  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
+  function requestAjax1() { ajax("/xhr1.jsp", "xhr", <%=intl.getRefresh()%>000); }
+  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
 </script>
 </head><body onload="initAjax()">
 <%
@@ -20,6 +20,11 @@
 %>
 <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
 <jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<%
+    java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
+%>
+ <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
+ <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
@@ -28,19 +33,10 @@
   <div style="height: 36px;">
    <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>"></a>
   </div>
-  <hr>
   <div id="xhr">
 <!-- for non-script -->
 <%@include file="xhr1.jsi" %>
   </div>
-<%
-   if (!newshelper.shouldShowNews()) {
-%>
-<hr><h3><%=intl._("News")%></h3><hr class="b">
-<jsp:getProperty name="updatehelper" property="newsStatus" />
-<%
-   }  // !shouldShowNews()
-%>
  </div>
 </div>
 
@@ -48,11 +44,8 @@
 
 <%
    if (newshelper.shouldShowNews()) {
-       java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
 %>
 <div class="news" id="news">
- <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
- <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
  <hr>
  <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
