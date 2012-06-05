@@ -739,6 +739,10 @@ public class SummaryHelper extends HelperBase {
         return buf.toString();
     }
 
+    private NewsHelper _newshelper;
+    public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
+    public NewsHelper getNewsHelper() { return _newshelper; }
+
     public String[] getSummaryBarSections() {
         String config = _context.getProperty(PROP_SUMMARYBAR, PRESET_FULL);
         return config.split("" + S);

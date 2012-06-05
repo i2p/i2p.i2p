@@ -18,12 +18,6 @@ public class NewsHelper extends ContentHelper {
         return super.getContent();
     }
 
-    /** @since 0.9.1 */
-    public String getNewsHeadings() {
-        SummaryBarRenderer renderer = new SummaryBarRenderer(_context, this);
-        return renderer.renderNewsHeadingsHTML();
-    }
-
     /** @since 0.8.12 */
     public boolean shouldShowNews() {
         return NewsFetcher.getInstance(_context).shouldShowNews();

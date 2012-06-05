@@ -6,7 +6,7 @@
 <%=intl.title("home")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
-  var failMessage = "<b><%=intl._("Router is down")%><\/b>";
+  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
   function requestAjax1() { ajax("/xhr1.jsp", "xhr", 15000); }
   function initAjax() { setTimeout(requestAjax1, 15000);  }
 </script>
@@ -33,7 +33,6 @@
   <div style="height: 36px;">
    <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>"></a>
   </div>
-  <hr>
   <div id="xhr">
 <!-- for non-script -->
 <%@include file="xhr1.jsi" %>

@@ -15,6 +15,7 @@ import net.i2p.router.RouterContext;
  *
  */
 public class SummaryBarRenderer {
+    // Commented out because broken. Replaced by if-elseif blob below.
     /*static final Map<String, java.lang.reflect.Method> ALL_SECTIONS;
     static {
         Map<String, java.lang.reflect.Method> aMap = new HashMap<String, java.lang.reflect.Method>();;
@@ -42,20 +43,10 @@ public class SummaryBarRenderer {
 
     private final RouterContext _context;
     private final SummaryHelper _helper;
-    private final NewsHelper _newshelper;
 
     public SummaryBarRenderer(RouterContext context, SummaryHelper helper) {
-        this(context, helper, null);
-    }
-
-    public SummaryBarRenderer(RouterContext context, NewsHelper newshelper) {
-        this(context, null, newshelper);
-    }
-
-    public SummaryBarRenderer(RouterContext context, SummaryHelper helper, NewsHelper newshelper) {
         _context = context;
         _helper = helper;
-        _newshelper = newshelper;
     }
 
     /**
@@ -64,25 +55,9 @@ public class SummaryBarRenderer {
      */
     public void renderSummaryHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(8*1024);
-        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
-        
-        // TODO - the bar would render more cleanly if we specified the img height and width here,
-        // but unfortunately the images in the different themes are different sizes.
-        // They range in height from 37 to 43 px. But there's a -2 bottom margin...
-        // So put it in a div.
-        buf.append("<div style=\"height: 36px;\"><a href=\"/\" target=\"_top\"><img src=\"")
-           .append(CSSHelper.BASE_THEME_PATH)
-           .append(theme)
-           .append("/images/i2plogo.png\" alt=\"")
-           .append(_("I2P Router Console"))
-           .append("\" title=\"")
-           .append(_("I2P Router Console"))
-           .append("\"></a></div>\n");
-
-        out.write(buf.toString());
-
         String[] sections = _helper.getSummaryBarSections();
         for (int i = 0; i < sections.length; i++) {
+            // Commented out because broken. Replaced by if-elseif blob below.
             /*try {
                 String section = (String)ALL_SECTIONS.get(sections[i]).invoke(this);
                 if (section != null && section != "") {
@@ -546,7 +521,9 @@ public class SummaryBarRenderer {
 
     /** @since 0.9.1 */
     public String renderNewsHeadingsHTML() {
-        if (_newshelper == null || _newshelper.shouldShowNews()) return "";
+        if (_helper == null) return "";
+        NewsHelper newshelper = _helper.getNewsHelper();
+        if (newshelper == null || newshelper.shouldShowNews()) return "";
         StringBuilder buf = new StringBuilder(512);
         String consoleNonce = System.getProperty("router.consoleNonce");
         if (consoleNonce != null) {
@@ -555,7 +532,7 @@ public class SummaryBarRenderer {
                .append(_("News & Updates"))
                .append("</a></h3><hr class=\"b\"><div class=\"newsheadings\">\n");
             // Get news content.
-            String newsContent = _newshelper.getContent();
+            String newsContent = newshelper.getContent();
             if (newsContent != "") {
                 buf.append("<ul>\n");
                 // Parse news content for headings.
