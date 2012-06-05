@@ -214,7 +214,7 @@ public class SummaryBarRenderer {
            .append(_("Stats"))
            .append("</a>\n" +
 
-                    "<a href=\"/i2ptunnel/\" target=\"_blank\" title=\"")
+                    "<a href=\"/i2ptunnelmanager\" target=\"_top\" title=\"")
            .append(_("Local Destinations"))
            .append("\">")
            .append(_("I2PTunnel"))
