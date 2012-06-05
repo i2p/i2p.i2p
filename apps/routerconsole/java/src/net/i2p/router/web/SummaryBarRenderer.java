@@ -15,7 +15,7 @@ import net.i2p.router.RouterContext;
  *
  */
 public class SummaryBarRenderer {
-    static final Map<String, java.lang.reflect.Method> sections;
+    /*static final Map<String, java.lang.reflect.Method> ALL_SECTIONS;
     static {
         Map<String, java.lang.reflect.Method> aMap = new HashMap<String, java.lang.reflect.Method>();;
         try {
@@ -37,8 +37,8 @@ public class SummaryBarRenderer {
             aMap.put("NewsHeadings", SummaryBarRenderer.class.getMethod("renderNewsHeadingsHTML"));
         } catch (java.lang.NoSuchMethodException e) {
         }
-        sections = Collections.unmodifiableMap(aMap);
-    }
+        ALL_SECTIONS = Collections.unmodifiableMap(aMap);
+    }*/
 
     private final RouterContext _context;
     private final SummaryHelper _helper;
@@ -77,54 +77,62 @@ public class SummaryBarRenderer {
            .append(_("I2P Router Console"))
            .append("\" title=\"")
            .append(_("I2P Router Console"))
-           .append("\"></a></div>\n")
-           .append("<hr>\n")
-           .append(renderHelpAndFAQHTML())
-           .append("<hr>\n");
+           .append("\"></a></div>\n");
 
-        File lpath = new File(_context.getBaseDir(), "docs/toolbar.html");
-        // you better have target="_top" for the links in there...
-        if (lpath.exists()) {
-            ContentHelper linkhelper = new ContentHelper();
-            linkhelper.setPage(lpath.getAbsolutePath());
-            linkhelper.setMaxLines("100");
-            buf.append(linkhelper.getContent());
-        } else {
-            buf.append(renderI2PServicesHTML())
-               .append("<hr>\n")
-               .append(renderI2PInternalsHTML());
+        out.write(buf.toString());
 
-            out.write(buf.toString());
+        String[] sections = _helper.getSummaryBarSections();
+        for (int i = 0; i < sections.length; i++) {
+            /*try {
+                String section = (String)ALL_SECTIONS.get(sections[i]).invoke(this);
+                if (section != null && section != "") {
+                    out.write("<hr>" + i + "<hr>\n" + section);
+                }
+            } catch (Exception e) {
+                out.write("<hr>" +i + " - Exception<hr>\n" + e);
+            }*/
             buf.setLength(0);
+
+            String section = sections[i];
+
+            buf.append("<hr>\n");
+            if ("HelpAndFAQ".equals(section))
+                buf.append(renderHelpAndFAQHTML());
+            else if ("I2PServices".equals(section))
+                buf.append(renderI2PServicesHTML());
+            else if ("I2PInternals".equals(section))
+                buf.append(renderI2PInternalsHTML());
+            else if ("General".equals(section))
+                buf.append(renderGeneralHTML());
+            else if ("ShortGeneral".equals(section))
+                buf.append(renderShortGeneralHTML());
+            else if ("NetworkReachability".equals(section))
+                buf.append(renderNetworkReachabilityHTML());
+            else if ("UpdateStatus".equals(section))
+                buf.append(renderUpdateStatusHTML());
+            else if ("RestartStatus".equals(section))
+                buf.append(renderRestartStatusHTML());
+            else if ("Peers".equals(section))
+                buf.append(renderPeersHTML());
+            else if ("FirewallAndReseedStatus".equals(section))
+                buf.append(renderFirewallAndReseedStatusHTML());
+            else if ("Bandwidth".equals(section))
+                buf.append(renderBandwidthHTML());
+            else if ("Tunnels".equals(section))
+                buf.append(renderTunnelsHTML());
+            else if ("Congestion".equals(section))
+                buf.append(renderCongestionHTML());
+            else if ("TunnelStatus".equals(section))
+                buf.append(renderTunnelStatusHTML());
+            else if ("Destinations".equals(section))
+                buf.append(renderDestinationsHTML());
+            else if ("NewsHeadings".equals(section))
+                buf.append(renderNewsHeadingsHTML());
+
+            // Only output section if there's more than the <hr> to print
+            if (buf.length() > 5)
+                out.write(buf.toString());
         }
-
-        buf.append("<hr>\n")
-           .append(renderGeneralHTML())
-           .append("<hr>\n")
-           .append(renderNetworkReachabilityHTML())
-           .append("<hr>\n")
-           .append(renderUpdateStatusHTML())
-           .append(renderRestartStatusHTML())
-           .append("<hr>\n")
-           .append(renderPeersHTML())
-           .append("<hr>\n");
-
-        out.write(buf.toString());
-        buf.setLength(0);
-
-        buf.append(renderFirewallAndReseedStatusHTML())
-           .append(renderBandwidthHTML())
-           .append("<hr>\n")
-           .append(renderTunnelsHTML())
-           .append("<hr>\n")
-           .append(renderCongestionHTML())
-           .append("<hr>\n")
-           .append(renderTunnelStatusHTML())
-           .append("<hr>\n")
-           .append(renderDestinationsHTML())
-           .append("<hr>\n");
-
-        out.write(buf.toString());
     }
 
     public String renderHelpAndFAQHTML() {

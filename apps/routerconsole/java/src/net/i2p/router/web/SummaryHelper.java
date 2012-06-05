@@ -36,7 +36,7 @@ public class SummaryHelper extends HelperBase {
     //static final String THINSP = "&thinsp;/&thinsp;";
     static final String THINSP = " / ";
     private static final char S = ',';
-    static final String PROP_SUMMARYBAR = "routerconsole.summarybar";
+    static final String PROP_SUMMARYBAR = "routerconsole.summaryBar";
 
     static final String PRESET_FULL =
         "HelpAndFAQ" + S +
@@ -737,6 +737,18 @@ public class SummaryHelper extends HelperBase {
             return "";
         buf.append("<hr>");
         return buf.toString();
+    }
+
+    public String[] getSummaryBarSections() {
+        String config = _context.getProperty(PROP_SUMMARYBAR, PRESET_FULL);
+        return config.split("" + S);
+    }
+
+    public void saveSummaryBarSections(String[] sections) {
+        StringBuilder buf = new StringBuilder(512);
+        for(int i = 0; i < sections.length; i++)
+            buf.append(sections[i]).append(S);
+        _context.router().saveConfig(PROP_SUMMARYBAR, buf.toString());
     }
 
     /** output the summary bar to _out */
