@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -17,6 +18,7 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -748,11 +750,11 @@ public class SummaryHelper extends HelperBase {
         return config.split("" + S);
     }
 
-    public void saveSummaryBarSections(String[] sections) {
+    static void saveSummaryBarSections(RouterContext ctx, Map<Integer, String> sections) {
         StringBuilder buf = new StringBuilder(512);
-        for(int i = 0; i < sections.length; i++)
-            buf.append(sections[i]).append(S);
-        _context.router().saveConfig(PROP_SUMMARYBAR, buf.toString());
+        for(String section : sections.values())
+            buf.append(section).append(S);
+        ctx.router().saveConfig(PROP_SUMMARYBAR, buf.toString());
     }
 
     /** output the summary bar to _out */
@@ -778,4 +780,33 @@ public class SummaryHelper extends HelperBase {
     private String _requestURI;
     public void setRequestURI(String s) { _requestURI = s; }
     public String getRequestURI() { return _requestURI; }
+
+    public String getConfigTable() {
+        String[] sections = getSummaryBarSections();
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<table><tr><th>")
+           .append(_("Remove"))
+           .append("</th><th>")
+           .append(_("Order"))
+           .append("</th><th>")
+           .append(_("Name"))
+           .append("</th></tr>\n");
+        for (int i = 0; i < sections.length; i++) {
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+               .append(i)
+               .append("\"></td><td align=\"center\"><input type=\"text\" name=\"order_")
+               .append(i + "_" + sections[i])
+               .append("\" value=\"")
+               .append(i)
+               .append("\"></td><td align=\"left\">")
+               .append(sections[i])
+               .append("</td></tr>\n");
+        }
+        buf.append("<tr><td align=\"center\"><b>")
+           .append(_("Add")).append(":</b>" +
+                   "</td><td align=\"left\"><input type=\"text\" name=\"order\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" name=\"name\"></td></tr>");
+        buf.append("</table>\n");
+        return buf.toString();
+    }
 }

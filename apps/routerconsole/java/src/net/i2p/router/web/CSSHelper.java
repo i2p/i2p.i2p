@@ -19,6 +19,7 @@ public class CSSHelper extends HelperBase {
     private static final String FORCE = "classic";
     public static final String PROP_REFRESH = "routerconsole.summaryRefresh";
     public static final String DEFAULT_REFRESH = "60";
+    public static final int MIN_REFRESH = 5;
     private static final String PROP_XFRAME = "routerconsole.disableXFrame";
 
     public String getTheme(String userAgent) {
