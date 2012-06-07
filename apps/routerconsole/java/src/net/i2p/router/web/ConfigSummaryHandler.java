@@ -41,11 +41,11 @@ public class ConfigSummaryHandler extends FormHandler {
         } else if ("1".equals(group)) {
             if (_action.equals(_("Use full preset"))) {
                 _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR, SummaryHelper.PRESET_FULL);
-                addFormNotice(_("Full summary bar preset selected.") +
+                addFormNotice(_("Full summary bar preset selected.") + " " +
                               _("Summary bar will refresh shortly."));
             } else if (_action.equals(_("Use reduced preset"))) {
                 _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR, SummaryHelper.PRESET_SHORT);
-                addFormNotice(_("Reduced summary bar preset selected.") +
+                addFormNotice(_("Reduced summary bar preset selected.") + " " +
                               _("Summary bar will refresh shortly."));
             } else {
                 addFormError(_("Unsupported"));
@@ -116,7 +116,7 @@ public class ConfigSummaryHandler extends FormHandler {
                 }
             }
             SummaryHelper.saveSummaryBarSections(_context, sections);
-            addFormError(_("Saved order of sections.") +
+            addFormError(_("Saved order of sections.") + " " +
                          _("Summary bar will refresh shortly."));
         } else {
             addFormError(_("Unsupported"));
