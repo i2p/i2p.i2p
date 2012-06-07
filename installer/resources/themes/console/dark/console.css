@@ -409,14 +409,14 @@ div.news hr {
 }     
 
 div.confignav {
-     padding: 15px 10px !important;
-     margin: 15px 0;
-     background: #000 url('images/header.png') center center repeat-x ;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     background: url('images/header.png') repeat-x scroll center center #000;
+     padding:5px 5px 6px !important;
+     margin: -1px 0 0;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
      border: 1px solid #494;
-     font-size: 9.5pt !important;
+     font-size: 8.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
 
