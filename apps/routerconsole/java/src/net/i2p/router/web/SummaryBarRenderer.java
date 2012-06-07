@@ -246,7 +246,10 @@ public class SummaryBarRenderer {
            .append("</a></h3><hr class=\"b\">\n" +
 
                    "<table><tr>" +
-                   "<td align=\"left\"><b>")
+                   "<td align=\"left\"><b title=\"")
+           .append(_("Your Local Identity is your unique I2P router identity, similar to an ip address but tailored to I2P. "))
+           .append(_("Never disclose this to anyone, as it can reveal your real world ip."))
+           .append("\">")
            .append(_("Local Identity"))
            .append(":</b></td>" +
                    "<td align=\"right\">" +
@@ -260,7 +263,10 @@ public class SummaryBarRenderer {
            .append(_("show"))
            .append("</a></td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The version of the I2P software we are running"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Version"))
            .append(":</b></td>" +
                    "<td align=\"right\">")
@@ -283,7 +289,10 @@ public class SummaryBarRenderer {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<table>" +
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The version of the I2P software we are running"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Version"))
            .append(":</b></td>" +
                    "<td align=\"right\">")
@@ -340,7 +349,10 @@ public class SummaryBarRenderer {
 
                    "<table>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("Peers we've been talking to in the last few minutes/last hour"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Active"))
            .append(":</b></td><td align=\"right\">");
         int active = _helper.getActivePeers();
@@ -349,25 +361,37 @@ public class SummaryBarRenderer {
            .append(Math.max(active, _helper.getActiveProfiles()))
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The number of peers available for building client tunnels (usually between 8 and 30)"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Fast"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getFastPeers())
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The number of peers available for building exploratory tunnels (usually between 8 and 75)"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("High capacity"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getHighCapacityPeers())
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The number of peers available for network database inquries"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Integrated"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getWellIntegratedPeers())
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The total number of peers in our network database"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Known"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getAllPeers())
@@ -438,25 +462,37 @@ public class SummaryBarRenderer {
            .append("</a></h3><hr class=\"b\">" +
                    "<table>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("Used for building and testing tunnels, and communicating with floodfill peers"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Exploratory"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundTunnels() + _helper.getOutboundTunnels())
            .append("</td></tr>\n" +
 
-                  "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("Tunnels we are using to provide or access services on the network"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Client"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundClientTunnels() + _helper.getOutboundClientTunnels())
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("Tunnels we are participating in, directly contributing bandwith to the network"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Participating"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getParticipatingTunnels())
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("The ratio of tunnel hops we provide to tunnel hops we use - a value greater than 1.00 indicates a positive contribution to the network"))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Share ratio"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getShareRatio())
@@ -476,27 +512,43 @@ public class SummaryBarRenderer {
            .append("</a></h3><hr class=\"b\">" +
                    "<table>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("Indicates router performance. "))
+           .append(_("Value should generally be near 0ms - consistently higher values may indicate configuration or system problems."))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Job lag"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getJobLag())
            .append("</td></tr>\n" +
 
-                   "<tr><td align=\"left\"><b>")
+                   "<tr title=\"")
+           .append(_("Indicates how quickly outbound messages to other I2P routers are sent. "))
+           .append(_("If this is more than a few hundred milliseconds, you may have a bandwidth configuration problem."))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Message delay"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getMessageDelay())
            .append("</td></tr>\n");
 
         if (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
-            buf.append("<tr><td align=\"left\"><b>")
+            buf.append("<tr title=\"")
+           .append(_("Round trip time for a tunnel test. "))
+           .append(_("If this is consistently higher than 5 seconds, you may have a network issue."))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Tunnel lag"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getTunnelLag())
            .append("</td></tr>\n");
         }
 
-        buf.append("<tr><td align=\"left\"><b>")
+        buf.append("<tr title=\"")
+           .append(_("Queued requests from other routers to participate in tunnels. "))
+           .append(_("If this is frequently greater than 0, you may have an I2P bandwidth allocation issue."))
+           .append("\">" +
+                   "<td align=\"left\"><b>")
            .append(_("Backlog"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundBacklog())
