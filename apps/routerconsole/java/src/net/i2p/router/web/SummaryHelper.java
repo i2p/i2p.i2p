@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -745,9 +747,9 @@ public class SummaryHelper extends HelperBase {
     public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
     public NewsHelper getNewsHelper() { return _newshelper; }
 
-    public String[] getSummaryBarSections() {
+    public List<String> getSummaryBarSections() {
         String config = _context.getProperty(PROP_SUMMARYBAR, PRESET_FULL);
-        return config.split("" + S);
+        return Arrays.asList(config.split("" + S));
     }
 
     static void saveSummaryBarSections(RouterContext ctx, Map<Integer, String> sections) {
@@ -782,8 +784,17 @@ public class SummaryHelper extends HelperBase {
     public String getRequestURI() { return _requestURI; }
 
     public String getConfigTable() {
-        String[] sections = getSummaryBarSections();
-        StringBuilder buf = new StringBuilder(1024);
+        String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
+        List<String> sections = getSummaryBarSections();
+        TreeSet<String> sortedSections = new TreeSet();
+
+        for (int i = 0; i < allSections.length; i++) {
+            String section = allSections[i];
+            if (!sections.contains(section))
+                sortedSections.add(section);
+        }
+
+        StringBuilder buf = new StringBuilder(2048);
         buf.append("<table><tr><th>")
            .append(_("Remove"))
            .append("</th><th>")
@@ -791,22 +802,34 @@ public class SummaryHelper extends HelperBase {
            .append("</th><th>")
            .append(_("Name"))
            .append("</th></tr>\n");
-        for (int i = 0; i < sections.length; i++) {
+        for (String section : sections) {
+            int i = sections.indexOf(section);
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(i)
                .append("\"></td><td align=\"center\"><input type=\"text\" name=\"order_")
-               .append(i + "_" + sections[i])
+               .append(i + "_" + section)
                .append("\" value=\"")
                .append(i)
                .append("\"></td><td align=\"left\">")
-               .append(sections[i])
+               .append(section)
                .append("</td></tr>\n");
         }
         buf.append("<tr><td align=\"center\"><b>")
            .append(_("Add")).append(":</b>" +
                    "</td><td align=\"left\"><input type=\"text\" name=\"order\"></td>" +
-                   "<td align=\"left\"><input type=\"text\" name=\"name\"></td></tr>");
-        buf.append("</table>\n");
+                   "<td align=\"left\">" +
+                   "<select name=\"name\">\n" +
+                   "<option value=\"\" selected=\"selected\">")
+           .append(_("Select a section to add"))
+           .append("</option>\n");
+
+        for (String s : sortedSections) {
+            buf.append("<option value=\"").append(s).append("\">")
+               .append(s).append("</option>\n");
+        }
+
+        buf.append("</select></td></tr>")
+           .append("</table>\n");
         return buf.toString();
     }
 }

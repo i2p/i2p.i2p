@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.i2p.data.DataHelper;
@@ -40,6 +41,10 @@ public class SummaryBarRenderer {
         }
         ALL_SECTIONS = Collections.unmodifiableMap(aMap);
     }*/
+    static final String ALL_SECTIONS[] =
+        {"HelpAndFAQ", "I2PServices", "I2PInternals", "General", "ShortGeneral", "NetworkReachability",
+        "UpdateStatus", "RestartStatus", "Peers", "FirewallAndReseedStatus", "Bandwidth", "Tunnels",
+        "Congestion", "TunnelStatus", "Destinations", "NewsHeadings" };
 
     private final RouterContext _context;
     private final SummaryHelper _helper;
@@ -55,8 +60,8 @@ public class SummaryBarRenderer {
      */
     public void renderSummaryHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(8*1024);
-        String[] sections = _helper.getSummaryBarSections();
-        for (int i = 0; i < sections.length; i++) {
+        List<String> sections = _helper.getSummaryBarSections();
+        for (String section : sections) {
             // Commented out because broken. Replaced by if-elseif blob below.
             /*try {
                 String section = (String)ALL_SECTIONS.get(sections[i]).invoke(this);
@@ -67,8 +72,6 @@ public class SummaryBarRenderer {
                 out.write("<hr>" +i + " - Exception<hr>\n" + e);
             }*/
             buf.setLength(0);
-
-            String section = sections[i];
 
             buf.append("<hr>\n");
             if ("HelpAndFAQ".equals(section))
