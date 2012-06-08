@@ -1,3 +1,10 @@
+2012-06-08 zzz
+ * i2psnark:
+   - Move private tracker config from create box to torrent config
+   - Refactor private and open tracker configuration
+   - Add private indication on details page
+ * netdb.jsp: Don't show our info on summary page
+
 2012-06-04 zzz
  * i2psnark: Take tracker out of opentracker list when removed
 

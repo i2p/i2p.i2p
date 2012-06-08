@@ -3,6 +3,7 @@ package org.klomp.snark;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +65,7 @@ public class I2PSnarkUtil {
     private int _startupDelay;
     private boolean _shouldUseOT;
     private boolean _areFilesPublic;
-    private String _openTrackerString;
+    private List<String> _openTrackers;
     private DHT _dht;
 
     public static final int DEFAULT_STARTUP_DELAY = 3;
@@ -88,6 +89,8 @@ public class I2PSnarkUtil {
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
+        // FIXME split if default has more than one
+        _openTrackers = Collections.singletonList(DEFAULT_OPENTRACKERS);
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -453,34 +456,17 @@ public class I2PSnarkUtil {
     }
     
     /** @param ot non-null */
-    public void setOpenTrackerString(String ot) { 
-        _openTrackerString = ot;
-    }
-
-    /** Comma delimited list of open trackers to use as backups
-     *  non-null but possibly empty
-     */
-    public String getOpenTrackerString() { 
-        if (_openTrackerString == null)
-            return DEFAULT_OPENTRACKERS;
-        return _openTrackerString;
+    public void setOpenTrackers(List<String> ot) { 
+        _openTrackers = ot;
     }
 
     /** List of open trackers to use as backups
-     *  Null if disabled
+     *  @return non-null, possibly unmodifiable, empty if disabled
      */
     public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
-            return null;
-        List<String> rv = new ArrayList(1);
-        String trackers = getOpenTrackerString();
-        StringTokenizer tok = new StringTokenizer(trackers, ", ");
-        while (tok.hasMoreTokens())
-            rv.add(tok.nextToken());
-        
-        if (rv.isEmpty())
-            return null;
-        return rv;
+            return Collections.EMPTY_LIST;
+        return _openTrackers;
     }
     
     public void setUseOpenTrackers(boolean yes) {

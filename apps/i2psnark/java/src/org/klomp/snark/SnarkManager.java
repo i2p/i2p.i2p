@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -85,6 +86,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String DEFAULT_THEME = "ubergine";
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
+    public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
 
     public static final int MIN_UP_BW = 2;
     public static final int DEFAULT_MAX_UP_BW = 10;
@@ -343,7 +345,7 @@ public class SnarkManager implements Snark.CompleteListener {
         _util.setFilesPublic(areFilesPublic());
         String ot = _config.getProperty(PROP_OPENTRACKERS);
         if (ot != null)
-            _util.setOpenTrackerString(ot);
+            _util.setOpenTrackers(getOpenTrackers());
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
         boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
         _util.setUseOpenTrackers(bOT);
@@ -564,17 +566,81 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     /**
+     *  Others should use the version in I2PSnarkUtil
+     *  @return non-null, empty if disabled
+     *  @since 0.9.1
+     */
+    private List<String> getOpenTrackers() {
+        if (!_util.shouldUseOpenTrackers())
+            return Collections.EMPTY_LIST;
+        return getListConfig(PROP_OPENTRACKERS, I2PSnarkUtil.DEFAULT_OPENTRACKERS);
+    }
+    
+    /**
+     *  @return non-null, fixed size, may be empty or unmodifiable
+     *  @since 0.9.1
+     */
+    public List<String> getPrivateTrackers() {
+        return getListConfig(PROP_PRIVATETRACKERS, null);
+    }
+
+    /**
      *  @param ot null to restore default
      *  @since 0.9.1
      */
-    public void saveOpenTrackers(String ot) {
-        _util.setOpenTrackerString(ot);
-        if (ot != null)
-            _config.setProperty(PROP_OPENTRACKERS, ot);
-        else
-            _config.remove(PROP_OPENTRACKERS);
+    public void saveOpenTrackers(List<String> ot) {
+        String val = setListConfig(PROP_OPENTRACKERS, ot);
+        if (ot == null)
+            ot = Collections.singletonList(I2PSnarkUtil.DEFAULT_OPENTRACKERS);
+        _util.setOpenTrackers(ot);
         addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
         saveConfig();
+    }
+
+    /**
+     *  @param ot null ok, default is none
+     *  @since 0.9.1
+     */
+    public void savePrivateTrackers(List<String> pt) {
+        setListConfig(PROP_PRIVATETRACKERS, pt);
+        addMessage(_("Private tracker list changed - affects newly created torrents only."));
+        saveConfig();
+    }
+
+    /**
+     *  @param dflt default or null
+     *  @return non-null, fixed size
+     *  @since 0.9.1
+     */
+    private List<String> getListConfig(String prop, String dflt) {
+        String val = _config.getProperty(prop);
+        if (val == null)
+            val = dflt;
+        if (val == null)
+            return Collections.EMPTY_LIST;
+        return Arrays.asList(val.split(","));
+    }
+
+    /**
+     *  Sets the config, does NOT save it
+     *  @param values may be null or empty
+     *  @return the comma-separated config string, non-null
+     *  @since 0.9.1
+     */
+    private String setListConfig(String prop, List<String> values) {
+        if (values == null || values.isEmpty()) {
+            _config.remove(prop);
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(64);
+        for (String s : values) {
+             if (buf.length() > 0)
+                 buf.append(',');
+             buf.append(s);
+        }
+        String rv = buf.toString();
+        _config.setProperty(prop, rv);
+        return rv;
     }
 
     public void saveConfig() {
@@ -1449,7 +1515,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 String url = toks[i+1].trim().replace("&#44;", ",");
                 if ( (name.length() > 0) && (url.length() > 0) ) {
                     String urls[] = url.split("=", 2);
-                    String url2 = urls.length > 1 ? urls[1] : null;
+                    String url2 = urls.length > 1 ? urls[1] : "";
                     _trackerMap.put(name, new Tracker(name, urls[0], url2));
                 }
             }

@@ -721,7 +721,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                     try {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, req.getParameter("private") != null, null);
+                        boolean isPrivate = _manager.getPrivateTrackers().contains(announceURL);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, isPrivate, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -729,7 +730,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                         // now add it, but don't automatically start it
                         _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), true);
                         _manager.addMessage(_("Torrent created for \"{0}\"", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
-                        if (announceURL != null)
+                        if (announceURL != null && !_manager.util().getOpenTrackers().contains(announceURL))
                             _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
                     } catch (IOException ioe) {
                         _manager.addMessage(_("Error creating a torrent for \"{0}\"", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
@@ -771,11 +772,12 @@ public class I2PSnarkServlet extends DefaultServlet {
 
     /** @since 0.9 */
     private void processTrackerForm(String action, HttpServletRequest req) {
-        if (action.equals(_("Delete selected")) || action.equals(_("Change open trackers"))) {
+        if (action.equals(_("Delete selected")) || action.equals(_("Save tracker configuration"))) {
             boolean changed = false;
             Map<String, Tracker> trackers = _manager.getTrackerMap();
             List<String> removed = new ArrayList();
             List<String> open = new ArrayList();
+            List<String> priv = new ArrayList();
             Enumeration e = req.getParameterNames();
             while (e.hasMoreElements()) {
                  Object o = e.nextElement();
@@ -792,22 +794,30 @@ public class I2PSnarkServlet extends DefaultServlet {
                      }
                 } else if (k.startsWith("open_")) {
                      open.add(k.substring(5));
+                } else if (k.startsWith("private_")) {
+                     priv.add(k.substring(8));
                 }
             }
             if (changed) {
                 _manager.saveTrackerMap();
             }
+
             open.removeAll(removed);
-            StringBuilder openBuf = new StringBuilder(128);
-            for (String s : open) {
-                 if (openBuf.length() > 0)
-                     openBuf.append(',');
-                 openBuf.append(s);
-            }
-            String newOpen = openBuf.toString();
-            if (!newOpen.equals(_manager.util().getOpenTrackerString())) {
-                _manager.saveOpenTrackers(newOpen);
-            }
+            List<String> oldOpen = new ArrayList(_manager.util().getOpenTrackers());
+            Collections.sort(oldOpen);
+            Collections.sort(open);
+            if (!open.equals(oldOpen))
+                _manager.saveOpenTrackers(open);
+
+            priv.removeAll(removed);
+            // open trumps private
+            priv.removeAll(open);
+            List<String> oldPriv = new ArrayList(_manager.getPrivateTrackers());
+            Collections.sort(oldPriv);
+            Collections.sort(priv);
+            if (!priv.equals(oldPriv))
+                _manager.savePrivateTrackers(priv);
+
         } else if (action.equals(_("Add tracker"))) {
             String name = req.getParameter("tname");
             String hurl = req.getParameter("thurl");
@@ -820,10 +830,15 @@ public class I2PSnarkServlet extends DefaultServlet {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
+                    // open trumps private
                     if (req.getParameter("_add_open_") != null) {
-                        String oldOpen = _manager.util().getOpenTrackerString();
-                        String newOpen = oldOpen.length() <= 0 ? aurl : oldOpen + ',' + aurl;
+                        List newOpen = new ArrayList(_manager.util().getOpenTrackers());
+                        newOpen.add(aurl);
                         _manager.saveOpenTrackers(newOpen);
+                    } else if (req.getParameter("_add_private_") != null) {
+                        List newPriv = new ArrayList(_manager.getPrivateTrackers());
+                        newPriv.add(aurl);
+                        _manager.savePrivateTrackers(newPriv);
                     }
                 } else {
                     _manager.addMessage(_("Enter valid tracker name and URLs"));
@@ -1426,14 +1441,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(" <input type=\"submit\" class=\"create\" value=\"");
         out.write(_("Create torrent"));
         out.write("\" name=\"foo\" >\n" +
-                  "</td></tr><tr><td>");
-        out.write(_("Private?"));
-        out.write(" </td><td> <input type=\"checkbox\" class=\"optbox\" name=\"private\" value=\"true\" title=\"");
-            out.write(_("Use for private trackers"));
-        out.write("\"");
-        if (req.getParameter("private") != null)
-            out.write(" checked");
-        out.write("></td></tr>" +
+                  "</td></tr>" +
                   "</table>\n" +
                   "</form></div></div>");        
     }
@@ -1636,11 +1644,14 @@ public class I2PSnarkServlet extends DefaultServlet {
            .append("</th><th>")
            .append(_("Website URL"))
            .append("</th><th>")
-           .append(_("Open Tracker?"))
+           .append(_("Open"))
+           .append("</th><th>")
+           .append(_("Private"))
            .append("</th><th>")
            .append(_("Announce URL"))
            .append("</th></tr>\n");
         List<String> openTrackers = _manager.util().getOpenTrackers();
+        List<String> privateTrackers = _manager.getPrivateTrackers();
         for (Tracker t : _manager.getSortedTrackers()) {
             String name = t.name;
             String homeURL = t.baseURL;
@@ -1651,7 +1662,12 @@ public class I2PSnarkServlet extends DefaultServlet {
                .append("</td><td align=\"left\">").append(urlify(homeURL, 35))
                .append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"open_")
                .append(announceURL).append("\"");
-            if (openTrackers != null && openTrackers.contains(t.announceURL))
+            if (openTrackers.contains(t.announceURL))
+                buf.append(" checked=\"checked\"");
+            buf.append(">" +
+                       "</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"private_")
+               .append(announceURL).append("\"");
+            if (privateTrackers.contains(t.announceURL))
                 buf.append(" checked=\"checked\"");
             buf.append(">" +
                        "</td><td align=\"left\">").append(urlify(announceURL, 35))
@@ -1662,11 +1678,12 @@ public class I2PSnarkServlet extends DefaultServlet {
                    "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
                    "<td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
+                   "<td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
-                   "<tr><td colspan=\"2\"></td><td colspan=\"3\" align=\"left\">\n" +
+                   "<tr><td colspan=\"2\"></td><td colspan=\"4\" align=\"left\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
-                   "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Change open trackers")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Save tracker configuration")).append("\">\n" +
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
@@ -2067,9 +2084,13 @@ public class I2PSnarkServlet extends DefaultServlet {
             }
 
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
-            buf.append("<br>").append(toImg("magnet", _("Magnet link"))).append(" <a href=\"")
-               .append(MAGNET_FULL).append(hex).append("\">")
-               .append(MAGNET_FULL).append(hex).append("</a>");
+            if (meta == null || !meta.isPrivate()) {
+                buf.append("<br>").append(toImg("magnet", _("Magnet link"))).append(" <a href=\"")
+                   .append(MAGNET_FULL).append(hex).append("\">")
+                   .append(MAGNET_FULL).append(hex).append("</a>");
+            } else {
+                buf.append("<br>").append(_("Private torrent"));
+            }
             // We don't have the hash of the torrent file
             //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
