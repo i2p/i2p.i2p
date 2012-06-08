@@ -225,7 +225,7 @@ public class NetDbRenderer {
     }
 
     /**
-     *  @param mode 0: our info and charts only; 1: full routerinfos and charts; 2: abbreviated routerinfos and charts
+     *  @param mode 0: charts only; 1: full routerinfos; 2: abbreviated routerinfos
      */
     public void renderStatusHTML(Writer out, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
@@ -236,14 +236,16 @@ public class NetDbRenderer {
         
         boolean full = mode == 1;
         boolean shortStats = mode == 2;
-        boolean showStats = full || shortStats;
+        boolean showStats = full || shortStats;  // this means show the router infos
         Hash us = _context.routerHash();
         
         StringBuilder buf = new StringBuilder(8192);
-        RouterInfo ourInfo = _context.router().getRouterInfo();
-        renderRouterInfo(buf, ourInfo, true, true);
-        out.write(buf.toString());
-        buf.setLength(0);
+        if (showStats) {
+            RouterInfo ourInfo = _context.router().getRouterInfo();
+            renderRouterInfo(buf, ourInfo, true, true);
+            out.write(buf.toString());
+            buf.setLength(0);
+        }
         
         ObjectCounter<String> versions = new ObjectCounter();
         ObjectCounter<String> countries = new ObjectCounter();
@@ -271,6 +273,12 @@ public class NetDbRenderer {
             }
         }
             
+     //
+     // don't bother to reindent
+     //
+     if (!showStats) {
+
+        // the summary table
         buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
            .append(_("Network Database Router Statistics"))
            .append("</th></tr><tr><td style=\"vertical-align: top;\">");
@@ -323,6 +331,12 @@ public class NetDbRenderer {
         }
 
         buf.append("</td></tr></table>");
+
+     //
+     // don't bother to reindent
+     //
+     } // if !showStats
+
         out.write(buf.toString());
         out.flush();
     }
