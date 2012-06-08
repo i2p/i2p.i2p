@@ -1667,8 +1667,16 @@ public class I2PSnarkServlet extends DefaultServlet {
             buf.append(">" +
                        "</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"private_")
                .append(announceURL).append("\"");
-            if (privateTrackers.contains(t.announceURL))
+            if (privateTrackers.contains(t.announceURL)) {
                 buf.append(" checked=\"checked\"");
+            } else {
+                for (int i = 1; i < SnarkManager.DEFAULT_TRACKERS.length; i += 2) {
+                    if (SnarkManager.DEFAULT_TRACKERS[i].contains(t.announceURL)) {
+                        buf.append(" disabled=\"disabled\"");
+                        break;
+                    }
+                }
+            }
             buf.append(">" +
                        "</td><td align=\"left\">").append(urlify(announceURL, 35))
                .append("</td></tr>\n");
