@@ -40,7 +40,7 @@ public class SummaryHelper extends HelperBase {
     //static final String THINSP = "&thinsp;/&thinsp;";
     static final String THINSP = " / ";
     private static final char S = ',';
-    static final String PROP_SUMMARYBAR = "routerconsole.summaryBar";
+    static final String PROP_SUMMARYBAR = "routerconsole.summaryBar.";
 
     static final String PRESET_FULL =
         "HelpAndFAQ" + S +
@@ -747,16 +747,18 @@ public class SummaryHelper extends HelperBase {
     public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
     public NewsHelper getNewsHelper() { return _newshelper; }
 
-    public List<String> getSummaryBarSections() {
-        String config = _context.getProperty(PROP_SUMMARYBAR, PRESET_FULL);
+    public List<String> getSummaryBarSections(String page) {
+        String config = _context.getProperty(PROP_SUMMARYBAR + page, null);
+        if (config == null)
+            config = _context.getProperty(PROP_SUMMARYBAR + "default", PRESET_FULL);
         return Arrays.asList(config.split("" + S));
     }
 
-    static void saveSummaryBarSections(RouterContext ctx, Map<Integer, String> sections) {
+    static void saveSummaryBarSections(RouterContext ctx, String page, Map<Integer, String> sections) {
         StringBuilder buf = new StringBuilder(512);
         for(String section : sections.values())
             buf.append(section).append(S);
-        ctx.router().saveConfig(PROP_SUMMARYBAR, buf.toString());
+        ctx.router().saveConfig(PROP_SUMMARYBAR + page, buf.toString());
     }
 
     /** output the summary bar to _out */
@@ -785,7 +787,7 @@ public class SummaryHelper extends HelperBase {
 
     public String getConfigTable() {
         String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
-        List<String> sections = getSummaryBarSections();
+        List<String> sections = getSummaryBarSections("default");
         TreeSet<String> sortedSections = new TreeSet();
 
         for (int i = 0; i < allSections.length; i++) {

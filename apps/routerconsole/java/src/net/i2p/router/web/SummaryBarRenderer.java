@@ -59,8 +59,10 @@ public class SummaryBarRenderer {
      *         on lower-level directory errors.
      */
     public void renderSummaryHTML(Writer out) throws IOException {
+        String requestURI = _helper.getRequestURI();
+        String page = requestURI.replace("/", "").replace(".jsp", "");
+        List<String> sections = _helper.getSummaryBarSections(page);
         StringBuilder buf = new StringBuilder(8*1024);
-        List<String> sections = _helper.getSummaryBarSections();
         for (String section : sections) {
             // Commented out because broken. Replaced by if-elseif blob below.
             /*try {
