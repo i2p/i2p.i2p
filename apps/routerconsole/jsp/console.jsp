@@ -6,7 +6,13 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("home")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
+  function requestAjax1() { ajax("/xhr1.jsp", "xhr", <%=intl.getRefresh()%>000); }
+  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+</script>
+</head><body onload="initAjax()">
 <%
     String consoleNonce = System.getProperty("router.consoleNonce");
     if (consoleNonce == null) {
@@ -15,16 +21,13 @@
     }
 %>
 
-<%@include file="summary.jsi" %><h1><%=intl._("I2P Router Console")%></h1>
+<%@include file="summary.jsi" %>
+
+<h1><%=intl._("I2P Router Console")%></h1>
 <div class="news" id="news">
- <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
- <jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%
    if (newshelper.shouldShowNews()) {
-       java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
 %>
- <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
- <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
  <hr>
 <%
