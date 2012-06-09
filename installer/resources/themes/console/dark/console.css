@@ -103,6 +103,7 @@ div.routersummaryouter {
      clear: left;/* fixes a bug in Opera */
      text-align: center;
      display: block;
+     position: absolute;/* so no interference with /home app icons */
 }
 
 div.routersummary {

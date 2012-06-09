@@ -162,6 +162,7 @@ div.routersummaryouter {
      padding: 0;
      border: 0;
      clear: left; /* fixes a bug in Opera */
+     position: absolute;/* so no interference with /home app icons */
 }
 
 div.routersummary {
