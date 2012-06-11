@@ -87,6 +87,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
+    private static final String PROP_USE_DHT = "i2psnark.enableDHT";
 
     public static final int MIN_UP_BW = 2;
     public static final int DEFAULT_MAX_UP_BW = 10;
@@ -275,6 +276,8 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(DEFAULT_STARTUP_DELAY));
         if (!_config.containsKey(PROP_THEME))
             _config.setProperty(PROP_THEME, DEFAULT_THEME);
+        if (!_config.containsKey(PROP_USE_DHT))
+            _config.setProperty(PROP_USE_DHT, Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT));
         updateConfig();
     }
     /**
@@ -349,6 +352,7 @@ public class SnarkManager implements Snark.CompleteListener {
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
         boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
         _util.setUseOpenTrackers(bOT);
+        _util.setUseDHT(Boolean.valueOf(_config.getProperty(PROP_USE_DHT)).booleanValue());
         getDataDir().mkdirs();
         initTrackerMap();
     }
@@ -367,7 +371,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
                              String startDelay, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
         boolean changed = false;
         //if (eepHost != null) {
         //    // unused, we use socket eepget
@@ -549,6 +553,15 @@ public class SnarkManager implements Snark.CompleteListener {
             else
                 addMessage(_("Disabled open trackers - torrent restart required to take effect."));
             _util.setUseOpenTrackers(useOpenTrackers);
+            changed = true;
+        }
+        if (_util.shouldUseDHT() != useDHT) {
+            _config.setProperty(PROP_USE_DHT, Boolean.toString(useDHT));
+            if (useDHT)
+                addMessage(_("Enabled DHT."));
+            else
+                addMessage(_("Disabled DHT."));
+            _util.setUseDHT(useDHT);
             changed = true;
         }
         if (theme != null) {
@@ -1590,13 +1603,14 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
 
-    public class SnarkManagerShutdown extends I2PAppThread {
+    private class SnarkManagerShutdown extends I2PAppThread {
         @Override
         public void run() {
             Set names = listTorrentFiles();
+            int running = 0;
             for (Iterator iter = names.iterator(); iter.hasNext(); ) {
                 Snark snark = getTorrent((String)iter.next());
-                if ( (snark != null) && (!snark.isStopped()) ) {
+                if (snark != null && !snark.isStopped()) {
                     snark.stopTorrent();
                     try { Thread.sleep(50); } catch (InterruptedException ie) {}
                 }

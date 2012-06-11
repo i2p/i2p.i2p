@@ -1273,6 +1273,7 @@ class PeerCoordinator implements PeerListener
           }
       } else if (id == ExtensionHandler.ID_HANDSHAKE) {
           sendPeers(peer);
+          sendDHT(peer);
       }
   }
 
@@ -1302,6 +1303,26 @@ class PeerCoordinator implements PeerListener
   }
 
   /**
+   *  Send a DHT message to the peer, if we both support DHT.
+   *  @since DHT
+   */
+  void sendDHT(Peer peer) {
+      DHT dht = _util.getDHT();
+      if (dht == null)
+          return;
+      Map<String, BEValue> handshake = peer.getHandshakeMap();
+      if (handshake == null)
+          return;
+      BEValue bev = handshake.get("m");
+      if (bev == null)
+          return;
+      try {
+          if (bev.getMap().get(ExtensionHandler.TYPE_DHT) != null)
+              ExtensionHandler.sendDHT(peer, dht.getPort(), dht.getRPort());
+      } catch (InvalidBEncodingException ibee) {}
+  }
+
+  /**
    *  Sets the storage after transition out of magnet mode
    *  Snark calls this after we call gotMetaInfo()
    *  @since 0.8.4
@@ -1318,11 +1339,13 @@ class PeerCoordinator implements PeerListener
   /**
    *  PeerListener callback
    *  Tell the DHT to ping it, this will get back the node info
+   *  @param rport must be port + 1
    *  @since 0.8.4
    */
-  public void gotPort(Peer peer, int port) {
+  public void gotPort(Peer peer, int port, int rport) {
       DHT dht = _util.getDHT();
-      if (dht != null)
+      if (dht != null &&
+          port > 0 && port < 65535 && rport == port + 1)
           dht.ping(peer.getDestination(), port);
   }
 

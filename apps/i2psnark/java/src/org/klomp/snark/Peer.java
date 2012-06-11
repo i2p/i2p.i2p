@@ -80,7 +80,9 @@ public class Peer implements Comparable
   static final long OPTION_FAST      = 0x0000000000000004l;
   static final long OPTION_DHT       = 0x0000000000000001l;
   /** we use a different bit since the compact format is different */
+/* no, let's use an extension message
   static final long OPTION_I2P_DHT   = 0x0000000040000000l;
+*/
   static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
@@ -269,15 +271,17 @@ public class Peer implements Comparable
                 _log.debug("Peer supports extensions, sending reply message");
             int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata));
+            boolean dht = util.getDHT() != null;
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht));
         }
 
-        if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Peer supports DHT, sending PORT message");
-            int port = util.getDHT().getPort();
-            out.sendPort(port);
-        }
+        // Old DHT PORT message
+        //if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
+        //    if (_log.shouldLog(Log.DEBUG))
+        //        _log.debug("Peer supports DHT, sending PORT message");
+        //    int port = util.getDHT().getPort();
+        //    out.sendPort(port);
+        //}
 
         // Send our bitmap
         if (bitfield != null)

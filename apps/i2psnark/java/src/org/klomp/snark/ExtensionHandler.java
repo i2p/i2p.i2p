@@ -28,6 +28,9 @@ abstract class ExtensionHandler {
     public static final int ID_PEX = 2;
     /** not ut_pex since the compact format is different */
     public static final String TYPE_PEX = "i2p_pex";
+    public static final int ID_DHT = 3;
+    /** not using the option bit since the compact format is different */
+    public static final String TYPE_DHT = "i2p_dht";
     /** Pieces * SHA1 Hash length, + 25% extra for file names, benconding overhead, etc */
     private static final int MAX_METADATA_SIZE = Storage.MAX_PIECES * 20 * 5 / 4;
     private static final int PARALLEL_REQUESTS = 3;
@@ -36,9 +39,10 @@ abstract class ExtensionHandler {
   /**
    *  @param metasize -1 if unknown
    *  @param pexAndMetadata advertise these capabilities
+   *  @param dht advertise DHT capability
    *  @return bencoded outgoing handshake message
    */
-    public static byte[] getHandshake(int metasize, boolean pexAndMetadata) {
+    public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht) {
         Map<String, Object> handshake = new HashMap();
         Map<String, Integer> m = new HashMap();
         if (pexAndMetadata) {
@@ -46,6 +50,9 @@ abstract class ExtensionHandler {
             m.put(TYPE_PEX, Integer.valueOf(ID_PEX));
             if (metasize >= 0)
                 handshake.put("metadata_size", Integer.valueOf(metasize));
+        }
+        if (dht) {
+            m.put(TYPE_DHT, Integer.valueOf(ID_DHT));
         }
         // include the map even if empty so the far-end doesn't NPE
         handshake.put("m", m);
@@ -65,6 +72,8 @@ abstract class ExtensionHandler {
             handleMetadata(peer, listener, bs, log);
         else if (id == ID_PEX)
             handlePEX(peer, listener, bs, log);
+        else if (id == ID_DHT)
+            handleDHT(peer, listener, bs, log);
         else if (log.shouldLog(Log.INFO))
             log.info("Unknown extension msg " + id + " from " + peer);
     }
@@ -85,6 +94,12 @@ abstract class ExtensionHandler {
                 if (log.shouldLog(Log.DEBUG))
                     log.debug("Peer supports PEX extension: " + peer);
                 // peer state calls peer listener calls sendPEX()
+            }
+
+            if (msgmap.get(TYPE_DHT) != null) {
+                if (log.shouldLog(Log.DEBUG))
+                    log.debug("Peer supports DHT extension: " + peer);
+                // peer state calls peer listener calls sendDHT()
             }
 
             MagnetState state = peer.getMagnetState();
@@ -333,6 +348,28 @@ abstract class ExtensionHandler {
     }
 
     /**
+     * Receive the DHT port numbers
+     * @since DHT
+     */
+    private static void handleDHT(Peer peer, PeerListener listener, byte[] bs, Log log) {
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Got DHT msg from " + peer);
+        try {
+            InputStream is = new ByteArrayInputStream(bs);
+            BDecoder dec = new BDecoder(is);
+            BEValue bev = dec.bdecodeMap();
+            Map<String, BEValue> map = bev.getMap();
+            int qport = map.get("port").getInt();
+            int rport = map.get("rport").getInt();
+            listener.gotPort(peer, qport, rport);
+        } catch (Exception e) {
+            if (log.shouldLog(Log.INFO))
+                log.info("DHT msg exception from " + peer, e);
+            //peer.disconnect(false);
+        }
+    }
+
+    /**
      * added.f and dropped unsupported
      * @param pList non-null
      * @since 0.8.4
@@ -359,4 +396,22 @@ abstract class ExtensionHandler {
         }
     }
 
+    /**
+     *  Send the DHT port numbers
+     *  @since DHT
+     */
+    public static void sendDHT(Peer peer, int qport, int rport) {
+        Map<String, Object> map = new HashMap();
+        map.put("port", Integer.valueOf(qport));
+        map.put("rport", Integer.valueOf(rport));
+        byte[] payload = BEncoder.bencode(map);
+        try {
+            int hisMsgCode = peer.getHandshakeMap().get("m").getMap().get(TYPE_DHT).getInt();
+            peer.sendExtension(hisMsgCode, payload);
+        } catch (Exception e) {
+            // NPE, no DHT caps
+            //if (log.shouldLog(Log.INFO))
+            //    log.info("DHT msg exception to " + peer, e);
+        }
+    }
 }
