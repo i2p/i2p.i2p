@@ -775,7 +775,15 @@ public class Router implements RouterClock.ClockShiftListener {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running shutdown task " + task.getClass());
             try {
-                task.run();
+                //task.run();
+                Thread t = new Thread(task, "Shutdown task " + task.getClass().getName());
+                t.setDaemon(true);
+                t.start();
+                try {
+                    t.join(10*1000);
+                } catch (InterruptedException ie) {}
+                if (t.isAlive())
+                    _log.logAlways(Log.WARN, "Shutdown task took more than 10 seconds to run: " + task.getClass());
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }

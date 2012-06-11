@@ -8,6 +8,7 @@
    - Reduce delay between peer adds for faster startup
    - Thread the announces and reduce timeout when stopping
  * NativeBigInteger: Workaround for Raspberry Pi to load the correct lib
+ * Router: Don't let shutdown tasks hang the shutdown
 
 2012-06-08 zzz
  * i2psnark:
