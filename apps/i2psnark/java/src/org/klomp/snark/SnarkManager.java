@@ -1596,8 +1596,10 @@ public class SnarkManager implements Snark.CompleteListener {
             Set names = listTorrentFiles();
             for (Iterator iter = names.iterator(); iter.hasNext(); ) {
                 Snark snark = getTorrent((String)iter.next());
-                if ( (snark != null) && (!snark.isStopped()) )
+                if ( (snark != null) && (!snark.isStopped()) ) {
                     snark.stopTorrent();
+                    try { Thread.sleep(50); } catch (InterruptedException ie) {}
+                }
             }
         }
     }

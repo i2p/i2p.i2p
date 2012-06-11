@@ -4,6 +4,9 @@
    - Sort magnets and downloads first
    - Fix sorting problem when torrent dir is a symlink
    - Reduce max file idle time
+   - Reduce TrackerClient threads
+   - Reduce delay between peer adds for faster startup
+   - Thread the announces and reduce timeout when stopping
  * NativeBigInteger: Workaround for Raspberry Pi to load the correct lib
 
 2012-06-08 zzz

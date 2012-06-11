@@ -68,6 +68,8 @@ public class I2PSnarkUtil {
     private List<String> _openTrackers;
     private DHT _dht;
 
+    private static final int EEPGET_CONNECT_TIMEOUT = 45*1000;
+    private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
@@ -306,11 +308,24 @@ public class I2PSnarkUtil {
     }
     
     /**
-     * fetch the given URL, returning the file it is stored in, or null on error
+     * Fetch the given URL, returning the file it is stored in, or null on error.
+     * No retries.
      */
     public File get(String url) { return get(url, true, 0); }
+
+    /**
+     * @param rewrite if true, convert http://KEY.i2p/foo/announce to http://i2p/KEY/foo/announce
+     */
     public File get(String url, boolean rewrite) { return get(url, rewrite, 0); }
+
+    /**
+     * @param retries if < 0, set timeout to a few seconds
+     */
     public File get(String url, int retries) { return get(url, true, retries); }
+
+    /**
+     * @param retries if < 0, set timeout to a few seconds
+     */
     public File get(String url, boolean rewrite, int retries) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
@@ -331,12 +346,21 @@ public class I2PSnarkUtil {
         //_log.debug("Rewritten url [" + fetchURL + "]");
         //EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, retries, out.getAbsolutePath(), fetchURL);
         // Use our tunnel for announces and .torrent fetches too! Make sure we're connected first...
-        if (!connected()) {
-            if (!connect())
+        int timeout;
+        if (retries < 0) {
+            if (!connected())
                 return null;
+            timeout = EEPGET_CONNECT_TIMEOUT_SHORT;
+            retries = 0;
+        } else {
+            timeout = EEPGET_CONNECT_TIMEOUT;
+            if (!connected()) {
+                if (!connect())
+                    return null;
+            }
         }
         EepGet get = new I2PSocketEepGet(_context, _manager, retries, out.getAbsolutePath(), fetchURL);
-        if (get.fetch()) {
+        if (get.fetch(timeout)) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;

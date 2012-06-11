@@ -231,8 +231,8 @@ class PeerState implements DataLoader
         return;
       }
 
-    if (_log.shouldLog(Log.INFO))
-      _log.info("Queueing (" + piece + ", " + begin + ", "
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Queueing (" + piece + ", " + begin + ", "
                 + length + ")" + " to " + peer);
 
     // don't load the data into mem now, let PeerConnectionOut do it
@@ -267,8 +267,8 @@ class PeerState implements DataLoader
         return null;
       }
 
-    if (_log.shouldLog(Log.INFO))
-      _log.info("Sending (" + piece + ", " + begin + ", "
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Sending (" + piece + ", " + begin + ", "
                 + length + ")" + " to " + peer);
     return pieceBytes;
   }

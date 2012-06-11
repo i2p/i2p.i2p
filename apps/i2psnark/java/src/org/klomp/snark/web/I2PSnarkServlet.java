@@ -743,8 +743,10 @@ public class I2PSnarkServlet extends DefaultServlet {
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
-                if (!snark.isStopped())
+                if (!snark.isStopped()) {
                     _manager.stopTorrent(snark, false);
+                    try { Thread.sleep(50); } catch (InterruptedException ie) {}
+                }
             }
             if (_manager.util().connected()) {
                 // Give the stopped announces time to get out

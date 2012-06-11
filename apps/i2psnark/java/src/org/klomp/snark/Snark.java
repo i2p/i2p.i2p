@@ -567,10 +567,6 @@ public class Snark
                  fatal("Could not reopen storage", ioe);
              }
         }
-        TrackerClient newClient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
-        if (!trackerclient.halted())
-            trackerclient.halt();
-        trackerclient = newClient;
         trackerclient.start();
     } else {
         debug("NOT starting TrackerClient???", NOTICE);
