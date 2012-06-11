@@ -8,18 +8,22 @@ package net.i2p.util;
  *
  */
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 import freenet.support.CPUInformation.AMDCPUInfo;
@@ -627,30 +631,26 @@ public class NativeBigInteger extends BigInteger {
             }
 
             if (_isArm) {
-                InputStream in = null;
-                try {
-                    in = new FileInputStream("/proc/cpuinfo");
-                    while (true) {
-                        String line = DataHelper.readLine(in);
-                        if (line == null)
-                            break;
-                        if (!line.startsWith("CPU architecture"))
-                            continue;
-                        //CPU architecture: 5TEJ
-                        //CPU architecture: 7
-                        int colon = line.indexOf(": ");
-                        String sver = line.substring(colon + 2, colon + 3);
-                        int ver = Integer.parseInt(sver);
-                        // add libjbigi-linux-armv7.so, libjbigi-linux-armv6.so, ...
-                        for (int i = ver; i >= 3; i--) {
-                            rv.add(_libPrefix + getMiddleName1() + primary + 'v' + i + _libSuffix);
-                        }
-                        break;
-                    }
-                } catch (NumberFormatException nfe) {
-                } catch (IOException ioe) {
-                } finally {
-                    if (in != null) try { in.close(); } catch (IOException ioe) {}
+                Map<String, String> cpuinfo = getCPUInfo();
+                int ver = 0;
+                String proc = cpuinfo.get("processor");
+                String arch = cpuinfo.get("cpu architecture");
+                if (proc != null && proc.contains("ARMv6")) {
+                    // Raspberry Pi workaround
+                    // Processor       : ARMv6-compatible processor rev 7 (v6l)
+                    // CPU architecture: 7
+                    ver = 6;
+                } else if (arch != null && arch.length() > 0) {
+                    //CPU architecture: 5TEJ
+                    //CPU architecture: 7
+                    String sver = arch.substring(0, 1);
+                    try {
+                        ver = Integer.parseInt(sver);
+                    } catch (NumberFormatException nfe) {}
+                }
+                // add libjbigi-linux-armv7.so, libjbigi-linux-armv6.so, ...
+                for (int i = ver; i >= 3; i--) {
+                    rv.add(_libPrefix + getMiddleName1() + primary + 'v' + i + _libSuffix);
                 }
             }
 
@@ -686,6 +686,37 @@ public class NativeBigInteger extends BigInteger {
         // Note that libjbigi-osx-none.jnilib is a 'fat binary' with both PPC and x86-32
         if (!_isArm && !_isPPC && !_isMac)
             rv.add(getResourceName(false));
+        return rv;
+    }
+
+    /**
+     *  Return /proc/cpuinfo as a key-value mapping.
+     *  All keys mapped to lower case.
+     *  All keys and values trimmed.
+     *  For dup keys, first one wins.
+     *  Currently used for ARM only.
+     *  @return non-null, empty on failure
+     *  @since 0.9.1
+     */
+    private static Map<String, String> getCPUInfo() {
+        Map<String, String> rv = new HashMap(32);
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/cpuinfo"), "ISO-8859-1"), 4096);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                String[] parts = line.split(":", 2);
+                if (parts.length < 2)
+                    continue;
+                String key = parts[0].trim().toLowerCase(Locale.US);
+                if (!rv.containsKey(key))
+                    rv.put(key, parts[1].trim());
+            }
+        } catch (IOException ioe) {
+            warn("Unable to read /proc/cpuinfo", ioe);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
         return rv;
     }
 
