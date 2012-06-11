@@ -1,3 +1,11 @@
+2012-06-11 zzz
+ * i2psnark:
+   - Display torrent file downloads in torrent area
+   - Sort magnets and downloads first
+   - Fix sorting problem when torrent dir is a symlink
+   - Reduce max file idle time
+ * NativeBigInteger: Workaround for Raspberry Pi to load the correct lib
+
 2012-06-08 zzz
  * i2psnark:
    - Move private tracker config from create box to torrent config

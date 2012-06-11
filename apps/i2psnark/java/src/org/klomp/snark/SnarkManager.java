@@ -598,7 +598,7 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     /**
-     *  @param ot null ok, default is none
+     *  @param pt null ok, default is none
      *  @since 0.9.1
      */
     public void savePrivateTrackers(List<String> pt) {
@@ -880,6 +880,29 @@ public class SnarkManager implements Snark.CompleteListener {
         snark.stopTorrent();
         _magnets.remove(snark.getName());
         removeMagnetStatus(snark.getInfoHash());
+    }
+    
+    /**
+     * Add and start a FetchAndAdd task.
+     * Remove it with deleteMagnet().
+     *
+     * @param torrent must be instanceof FetchAndAdd
+     * @throws RuntimeException via Snark.fatal()?
+     * @since 0.9.1
+     */
+    public void addDownloader(Snark torrent) {
+        synchronized (_snarks) {
+            Snark snark = getTorrentByInfoHash(torrent.getInfoHash());
+            if (snark != null) {
+                addMessage(_("Download already running: {0}", snark.getBaseName()));
+                return;
+            }
+            String name = torrent.getName();
+            // Tell the dir monitor not to delete us
+            _magnets.add(name);
+            _snarks.put(name, torrent);
+        }
+        torrent.startTorrent();
     }
 
     /**
@@ -1399,7 +1422,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 byte[] ih = Base64.decode(b64);
                 // ignore value - TODO put tracker URL in value
                 if (ih != null && ih.length == 20)
-                    addMagnet("Magnet: " + I2PSnarkUtil.toHex(ih), ih, null, false);
+                    addMagnet("* " + _("Magnet") + ' ' + I2PSnarkUtil.toHex(ih), ih, null, false);
                 // else remove from config?
             }
         }

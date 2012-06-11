@@ -251,6 +251,15 @@ public class I2PSnarkUtil {
     public boolean connected() { return _manager != null; }
 
     /**
+     *  For FetchAndAdd
+     *  @return null if not connected
+     *  @since 0.9.1
+     */
+    public I2PSocketManager getSocketManager() {
+        return _manager;
+    }
+
+    /**
      * Destroy the destination itself
      */
     public void disconnect() {
@@ -310,7 +319,7 @@ public class I2PSnarkUtil {
             // we could use the system tmp dir but deleteOnExit() doesn't seem to work on all platforms...
             out = SecureFile.createTempFile("i2psnark", null, _tmpDir);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("temp file error", ioe);
             if (out != null)
                 out.delete();
             return null;

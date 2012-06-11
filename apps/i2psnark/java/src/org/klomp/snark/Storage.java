@@ -1071,7 +1071,7 @@ public class Storage
   /**
    * Close unused RAFs - call periodically
    */
-  private static final long RAFCloseDelay = 7*60*1000;
+  private static final long RAFCloseDelay = 4*60*1000;
   public void cleanRAFs() {
     long cutoff = System.currentTimeMillis() - RAFCloseDelay;
     for (int i = 0; i < RAFlock.length; i++) {

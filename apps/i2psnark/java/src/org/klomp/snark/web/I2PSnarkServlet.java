@@ -540,11 +540,8 @@ public class I2PSnarkServlet extends DefaultServlet {
           *****/
             if (newURL != null) {
                 if (newURL.startsWith("http://")) {
-                    if (!_manager.util().connected())
-                        _manager.addMessage(_("Opening the I2P tunnel"));
-                    _manager.addMessage(_("Fetching {0}", urlify(newURL)));
-                    I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add", true);
-                    fetch.start();
+                    FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL);
+                    _manager.addDownloader(fetch);
                 } else if (newURL.startsWith(MAGNET) || newURL.startsWith(MAGGOT)) {
                     addMagnet(newURL);
                 } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
@@ -880,7 +877,17 @@ public class I2PSnarkServlet extends DefaultServlet {
      */
     private class TorrentNameComparator implements Comparator<String> {
         private final Comparator collator = Collator.getInstance();
-        private final String skip = _manager.getDataDir().getAbsolutePath() + File.separator;
+        private final String skip;
+
+        public TorrentNameComparator() {
+            String s;
+            try {
+                s = _manager.getDataDir().getCanonicalPath();
+            } catch (IOException ioe) {
+                s = _manager.getDataDir().getAbsolutePath();
+            }
+            skip = s + File.separator;
+        }
 
         public int compare(String l, String r) {
             if (l.startsWith(skip))
@@ -916,8 +923,12 @@ public class I2PSnarkServlet extends DefaultServlet {
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
                               boolean isDegraded, boolean noThinsp, boolean showDebug) throws IOException {
         String filename = snark.getName();
-        File f = new File(filename);
-        filename = f.getName(); // the torrent may be the canonical name, so lets just grab the local name
+        if (snark.getMetaInfo() != null) {
+            // Only do this if not a magnet or torrent download
+            // Strip full path down to the local name
+            File f = new File(filename);
+            filename = f.getName();
+        }
         int i = filename.lastIndexOf(".torrent");
         if (i > 0)
             filename = filename.substring(0, i);
@@ -1076,6 +1087,8 @@ public class I2PSnarkServlet extends DefaultServlet {
             icon = "folder";
         else if (isValid)
             icon = toIcon(meta.getName());
+        else if (snark instanceof FetchAndAdd)
+            icon = "arrow_down";
         else
             icon = "magnet";
         if (isValid) {
@@ -1724,7 +1737,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             }
             ihash = xt.substring("urn:btih:".length());
             trackerURL = getTrackerParam(url);
-            name = "Magnet " + ihash;
+            name = "* " + _("Magnet") + ' ' + ihash;
             String dn = getParam("dn", url);
             if (dn != null)
                 name += " (" + Storage.filterName(dn) + ')';
@@ -1734,7 +1747,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             int col = ihash.indexOf(':');
             if (col >= 0)
                 ihash = ihash.substring(0, col);
-            name = "Maggot " + ihash;
+            name = "* " + _("Magnet") + ' ' + ihash;
         } else {
             return;
         }
@@ -1941,7 +1954,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
     
     /** @since 0.7.14 */
-    private static String urlify(String s) {
+    static String urlify(String s) {
         return urlify(s, 100);
     }
     
@@ -2357,83 +2370,4 @@ public class I2PSnarkServlet extends DefaultServlet {
          snark.updatePiecePriorities();
         _manager.saveTorrentStatus(snark.getMetaInfo(), storage.getBitField(), storage.getFilePriorities());
     }
-
-
-/** inner class, don't bother reindenting */
-private static class FetchAndAdd implements Runnable {
-    private SnarkManager _manager;
-    private String _url;
-    public FetchAndAdd(SnarkManager mgr, String url) {
-        _manager = mgr;
-        _url = url;
-    }
-    public void run() {
-        _url = _url.trim();
-        // 3 retries
-        File file = _manager.util().get(_url, false, 3);
-        try {
-            if ( (file != null) && (file.exists()) && (file.length() > 0) ) {
-                _manager.addMessage(_("Torrent fetched from {0}", urlify(_url)));
-                FileInputStream in = null;
-                try {
-                    in = new FileInputStream(file);
-                    byte[] fileInfoHash = new byte[20];
-                    String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
-                    try { in.close(); } catch (IOException ioe) {}
-                    Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
-                    if (snark != null) {
-                        _manager.addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
-                        return;
-                    }
-
-                    name = Storage.filterName(name);
-                    name = name + ".torrent";
-                    File torrentFile = new File(_manager.getDataDir(), name);
-
-                    String canonical = torrentFile.getCanonicalPath();
-
-                    if (torrentFile.exists()) {
-                        if (_manager.getTorrent(canonical) != null)
-                            _manager.addMessage(_("Torrent already running: {0}", name));
-                        else
-                            _manager.addMessage(_("Torrent already in the queue: {0}", name));
-                    } else {
-                        // This may take a LONG time to create the storage.
-                        _manager.copyAndAddTorrent(file, canonical);
-                    }
-                } catch (IOException ioe) {
-                    _manager.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
-                } catch (OutOfMemoryError oom) {
-                    _manager.addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + oom.getMessage());
-                } finally {
-                    try { if (in != null) in.close(); } catch (IOException ioe) {}
-                }
-            } else {
-                // Generate a retry link, but sadly can't have a form inside a table
-                // So make this an ugly GET
-                StringBuilder buf = new StringBuilder(1024);
-                // FIXME don't lose peer setting
-                //String peerParam = req.getParameter("p");
-                //if (peerParam != null)
-                //    buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
-                buf.append(_("Torrent was not retrieved from {0}", urlify(_url)));
-             /**** FIXME ticket #575
-                String link = urlEncode(_url).replace(":", "%3A").replace("/", "%2F");
-                buf.append(" - [<a href=\"/i2psnark/?newURL=").append(link).append("#add\" >");
-                buf.append(_("Retry"));
-                buf.append("</a>]");
-              ****/
-                _manager.addMessage(buf.toString());
-            }
-        } finally {
-            if (file != null) file.delete();
-        }
-    }
-
-    private String _(String s, String o) {
-        return _manager.util().getString(s, o);
-    }
-
-}
-
 }

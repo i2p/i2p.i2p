@@ -346,6 +346,8 @@ public class Snark
           in = new FileInputStream(f);
         else
           {
+         /**** No, we don't ever fetch a torrent file this way
+               and we don't want to block in the constructor
             activity = "Getting torrent";
             File torrentFile = _util.get(torrent, 3);
             if (torrentFile == null) {
@@ -355,6 +357,8 @@ public class Snark
                 torrentFile.deleteOnExit();
                 in = new FileInputStream(torrentFile);
             }
+         *****/
+             throw new IOException("not found");
           }
         meta = new MetaInfo(in);
         infoHash = meta.getInfoHash();
