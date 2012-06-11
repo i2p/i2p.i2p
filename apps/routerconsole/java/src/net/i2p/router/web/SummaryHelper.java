@@ -748,9 +748,13 @@ public class SummaryHelper extends HelperBase {
     public NewsHelper getNewsHelper() { return _newshelper; }
 
     public List<String> getSummaryBarSections(String page) {
-        String config = _context.getProperty(PROP_SUMMARYBAR + page, null);
-        if (config == null)
-            config = _context.getProperty(PROP_SUMMARYBAR + "default", PRESET_FULL);
+        String config = "";
+        if ("home".equals(page))
+            config = _context.getProperty(PROP_SUMMARYBAR + page, PRESET_SHORT);
+        else
+            config = _context.getProperty(PROP_SUMMARYBAR + page, null);
+            if (config == null)
+                config = _context.getProperty(PROP_SUMMARYBAR + "default", PRESET_FULL);
         return Arrays.asList(config.split("" + S));
     }
 
