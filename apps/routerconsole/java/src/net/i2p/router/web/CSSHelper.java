@@ -19,7 +19,7 @@ public class CSSHelper extends HelperBase {
     private static final String FORCE = "classic";
     public static final String PROP_REFRESH = "routerconsole.summaryRefresh";
     public static final String DEFAULT_REFRESH = "60";
-    public static final int MIN_REFRESH = 5;
+    public static final int MIN_REFRESH = 3;
     private static final String PROP_XFRAME = "routerconsole.disableXFrame";
 
     public String getTheme(String userAgent) {
@@ -71,12 +71,23 @@ public class CSSHelper extends HelperBase {
 
     /** change refresh and save it */
     public void setRefresh(String r) {
+        try {
+            if (Integer.parseInt(r) < MIN_REFRESH)
+                r = "" + MIN_REFRESH;
+        } catch (Exception e) {
+        }
         _context.router().saveConfig(PROP_REFRESH, r);
     }
 
     /** @return refresh time in seconds, as a string */
     public String getRefresh() {
-        return _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
+        String r = _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
+        try {
+            if (Integer.parseInt(r) < MIN_REFRESH)
+                r = "" + MIN_REFRESH;
+        } catch (Exception e) {
+        }
+        return r;
     }
 
     /** translate the title and display consistently */
