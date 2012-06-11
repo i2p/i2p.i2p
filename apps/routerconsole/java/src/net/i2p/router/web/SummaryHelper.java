@@ -651,7 +651,7 @@ public class SummaryHelper extends HelperBase {
         // display all the time so we display the final failure message, and plugin update messages too
         String status = UpdateHandler.getStatus();
         if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4><hr>\n");
+            buf.append("<h4>").append(status).append("</h4>\n");
         }
         if (updateAvailable() || unsignedUpdateAvailable()) {
             if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
@@ -684,7 +684,7 @@ public class SummaryHelper extends HelperBase {
                        .append(_("Download Unsigned<br>Update {0}", getUnsignedUpdateVersion()))
                        .append("</button><br>\n");
                 }
-                buf.append("</form><hr>\n");
+                buf.append("</form>\n");
             }
         }
         return buf.toString();
@@ -739,7 +739,6 @@ public class SummaryHelper extends HelperBase {
         }
         if (buf.length() <= 0)
             return "";
-        buf.append("<hr>");
         return buf.toString();
     }
 
