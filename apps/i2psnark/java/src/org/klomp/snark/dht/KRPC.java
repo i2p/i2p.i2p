@@ -124,6 +124,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final int REPLY_PEERS = 2;
     private static final int REPLY_NODES = 3;
 
+    public static final boolean SECURE_NID = true;
+
     /** how long since last heard from do we delete  - BEP 5 says 15 minutes */
     private static final long MAX_NODEINFO_AGE = 60*60*1000;
     /** how long since generated do we delete - BEP 5 says 10 minutes */
@@ -155,7 +157,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _qPort = 2555 + ctx.random().nextInt(61111);
         _rPort = _qPort + 1;
         _myID = new byte[NID.HASH_LENGTH];
-        ctx.random().nextBytes(_myID);
+        if (SECURE_NID)
+            System.arraycopy(session.getMyDestination().calculateHash().getData(), 0, _myID, 0, NID.HASH_LENGTH);
+        else
+            ctx.random().nextBytes(_myID);
         _myNID = new NID(_myID);
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
         _dhtFile = new File(ctx.getConfigDir(), DHT_FILE);
@@ -166,29 +171,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     ///////////////// Public methods
-
-    /**
-     *  For bootstrapping if loaded from config file.
-     *  @param when when did we hear from them
-     */
-    public void addNode(NodeInfo nInfo, long when) {
-        heardFrom(nInfo, when);
-    }
-
-    /**
-     *  NodeInfo heard from
-     */
-    public void addNode(NodeInfo nInfo) {
-        heardFrom(nInfo);
-    }
-
-    /**
-     *  For saving in a config file.
-     *  @return the values, not a copy, could change, use an iterator
-     */
-    public Collection<NodeInfo> getNodes() {
-        return _knownNodes.values();
-    }
 
     /**
      *  @return The UDP query port
@@ -989,14 +971,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @return old NodeInfo or nInfo if none, use this to reduce object churn
      */
     private NodeInfo heardFrom(NodeInfo nInfo) {
-        return heardFrom(nInfo, _context.clock().now());
-   }
-
-    /**
-     *  Used for initialization
-     *  @return old NodeInfo or nInfo if none, use this to reduce object churn
-     */
-    private NodeInfo heardFrom(NodeInfo nInfo, long when) {
         // try to keep ourselves out of the DHT
         if (nInfo.equals(_myNodeInfo))
             return _myNodeInfo;
@@ -1013,9 +987,37 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             if (oldInfo.getDestination() == null && nInfo.getDestination() != null)
                 oldInfo.setDestination(nInfo.getDestination());
         }
-        if (when > oldInfo.lastSeen())
-            oldInfo.setLastSeen(when);
+        oldInfo.getNID().setLastSeen();
         return oldInfo;
+    }
+
+    /**
+     *  Called for bootstrap or for all nodes in a receiveNodes reply.
+     *  Package private for PersistDHT.
+     *  @return non-null nodeInfo from DB if present, otherwise the nInfo parameter is returned
+     */
+    NodeInfo heardAbout(NodeInfo nInfo) {
+        // try to keep ourselves out of the DHT
+        if (nInfo.equals(_myNodeInfo))
+            return _myNodeInfo;
+        NID nID = nInfo.getNID();
+        NodeInfo rv = _knownNodes.putIfAbsent(nID, nInfo);
+        if (rv == null)
+            rv = nInfo;
+        return rv;
+    }
+
+    /**
+     *  Called when a reply times out
+     */
+    private void timeout(NodeInfo nInfo) {
+        boolean remove = nInfo.getNID().timeout();
+        if (remove) {
+            if (_knownNodes.remove(nInfo) != null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Removed after consecutive timeouts: " + nInfo);
+            }
+        }
     }
 
     /**
@@ -1163,12 +1165,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      */
     private List<NodeInfo> receiveNodes(NodeInfo nInfo, byte[] ids) throws InvalidBEncodingException {
         List<NodeInfo> rv = new ArrayList(ids.length / NodeInfo.LENGTH);
-        long fakeTime = _context.clock().now() - (MAX_NODEINFO_AGE * 3 / 4);
         for (int off = 0; off < ids.length; off += NodeInfo.LENGTH) {
             NodeInfo nInf = new NodeInfo(ids, off);
-            // anti-churn
-            // TODO do we need heardAbout too?
-            nInf = heardFrom(nInf, fakeTime);
+            nInf = heardAbout(nInf);
             rv.add(nInf);
         }
         if (_log.shouldLog(Log.INFO))
@@ -1315,6 +1314,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 _sentQueries.remove(mid);
                 if (onTimeout != null)
                     onTimeout.run();
+                timeout(ReplyWaiter.this);
                 if (_log.shouldLog(Log.INFO))
                     _log.warn("timeout waiting for reply from " + ReplyWaiter.this.toString());
             }

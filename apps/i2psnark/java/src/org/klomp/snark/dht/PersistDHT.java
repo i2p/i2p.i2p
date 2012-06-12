@@ -20,6 +20,8 @@ import net.i2p.util.SecureFileOutputStream;
  */
 abstract class PersistDHT {
 
+    private static final long MAX_AGE = 60*60*1000;
+
     public static synchronized void loadDHT(KRPC krpc, File file) {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistDHT.class);
         int count = 0;
@@ -32,7 +34,7 @@ abstract class PersistDHT {
                 if (line.startsWith("#"))
                     continue;
                 try {
-                    krpc.addNode(new NodeInfo(line));
+                    krpc.heardAbout(new NodeInfo(line));
                     count++;
                     // TODO limit number? this will flush the router's SDS caches
                 } catch (IllegalArgumentException iae) {
@@ -56,11 +58,14 @@ abstract class PersistDHT {
     public static synchronized void saveDHT(DHTNodes nodes, File file) {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistDHT.class);
         int count = 0;
+        long maxAge = I2PAppContext.getGlobalContext().clock().now() - MAX_AGE;
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "ISO-8859-1")));
             out.println("# DHT nodes, format is NID:Hash:Destination:port");
             for (NodeInfo ni : nodes.values()) {
+                 if (ni.lastSeen() < maxAge)
+                     continue;
                  // DHTNodes shouldn't contain us, if that changes check here
                  out.println(ni.toPersistentString());
                  count++;

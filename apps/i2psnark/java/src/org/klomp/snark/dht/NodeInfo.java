@@ -25,11 +25,10 @@ import net.i2p.data.SimpleDataStructure;
 
 class NodeInfo extends SimpleDataStructure {
 
-    private long lastSeen;
-    private NID nID;
-    private Hash hash;
+    private final NID nID;
+    private final Hash hash;
     private Destination dest;
-    private int port;
+    private final int port;
 
     public static final int LENGTH = NID.HASH_LENGTH + Hash.HASH_LENGTH + 2;
 
@@ -44,6 +43,7 @@ class NodeInfo extends SimpleDataStructure {
         this.hash = dest.calculateHash();
         this.port = port;
         initialize();
+        verify();
     }
 
     /**
@@ -56,16 +56,7 @@ class NodeInfo extends SimpleDataStructure {
         this.hash = hash;
         this.port = port;
         initialize();
-    }
-
-    /**
-     * No Destination yet available
-     * @param compactInfo 20 byte node ID, 32 byte destHash, 2 byte port
-     * @throws IllegalArgumentException
-     */
-    public NodeInfo(byte[] compactInfo) {
-        super(compactInfo);
-        initialize(compactInfo);
+        verify();
     }
 
     /**
@@ -80,11 +71,18 @@ class NodeInfo extends SimpleDataStructure {
         byte[] d = new byte[LENGTH];
         System.arraycopy(compactInfo, offset, d, 0, LENGTH);
         setData(d);
-        initialize(d);
+        byte[] ndata = new byte[NID.HASH_LENGTH];
+        System.arraycopy(d, 0, ndata, 0, NID.HASH_LENGTH);
+        this.nID = new NID(ndata);
+        this.hash = Hash.create(d, NID.HASH_LENGTH);
+        this.port = (int) DataHelper.fromLong(d, NID.HASH_LENGTH + Hash.HASH_LENGTH, 2);
+        if (port <= 0 || port >= 65535)
+            throw new IllegalArgumentException("Bad port");
+        verify();
     }
 
     /**
-     * Form persistent storage string.
+     * Create from persistent storage string.
      * Format: NID:Hash:Destination:port
      * First 3 in base 64; Destination may be empty string
      * @throws IllegalArgumentException
@@ -113,24 +111,6 @@ class NodeInfo extends SimpleDataStructure {
         initialize();
     }
 
-    /**
-     * Creates data structures from the compact info
-     * @throws IllegalArgumentException
-     */
-    private void initialize(byte[] compactInfo) {
-        if (compactInfo.length != LENGTH)
-            throw new IllegalArgumentException("Bad compact info length");
-        byte[] ndata = new byte[NID.HASH_LENGTH];
-        System.arraycopy(compactInfo, 0, ndata, 0, NID.HASH_LENGTH);
-        this.nID = new NID(ndata);
-        //byte[] hdata = new byte[Hash.HASH_LENGTH];
-        //System.arraycopy(compactInfo, NID.HASH_LENGTH, hdata, 0, Hash.HASH_LENGTH);
-        //this.hash = new Hash(hdata);
-        this.hash = Hash.create(compactInfo, NID.HASH_LENGTH);
-        this.port = (int) DataHelper.fromLong(compactInfo, NID.HASH_LENGTH + Hash.HASH_LENGTH, 2);
-        if (port <= 0 || port >= 65535)
-            throw new IllegalArgumentException("Bad port");
-    }
 
     /**
      * Creates 54-byte compact info
@@ -144,6 +124,17 @@ class NodeInfo extends SimpleDataStructure {
         System.arraycopy(hash.getData(), 0, compactInfo, NID.HASH_LENGTH, Hash.HASH_LENGTH);
         DataHelper.toLong(compactInfo, NID.HASH_LENGTH + Hash.HASH_LENGTH, 2, port);
         setData(compactInfo);
+    }
+
+    /**
+     * Verify the NID matches the Hash
+     * @throws IllegalArgumentException
+     */
+    private void verify() {
+        if (!KRPC.SECURE_NID)
+            return;
+        if (!DataHelper.eq(nID.getData(), 0, hash.getData(), 0, NID.HASH_LENGTH))
+            throw new IllegalArgumentException("NID/Hash mismatch");
     }
 
     public int length() {
@@ -185,11 +176,7 @@ class NodeInfo extends SimpleDataStructure {
     }
 
     public long lastSeen() {
-        return lastSeen;
-    }
-
-    public void setLastSeen(long now) {
-        lastSeen = now;
+        return nID.lastSeen();
     }
 
     @Override
