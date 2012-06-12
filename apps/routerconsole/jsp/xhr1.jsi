@@ -12,8 +12,8 @@
 <jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter(\"consoleNonce\")%>" />
 <%
     String reqURI = request.getRequestURI();
-    if (reqURI != null)
-        reqURI = reqURI.replace("/xhr1.jsp", "/");
+    if (reqURI.contains("/xhr1"))
+        reqURI = request.getParameter("requestURI");
     helper.setRequestURI(reqURI);
 %>
 <% helper.storeWriter(out); %>
