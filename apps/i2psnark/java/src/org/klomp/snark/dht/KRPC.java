@@ -36,6 +36,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -111,7 +112,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private volatile boolean _isRunning;
 
     /** all-zero NID used for pings */
-    private static final NID _fakeNID = new NID(new byte[NID.HASH_LENGTH]);
+    public static final NID FAKE_NID = new NID(new byte[NID.HASH_LENGTH]);
 
     /** Max number of nodes to return. BEP 5 says 8 */
     private static final int K = 8;
@@ -137,6 +138,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long DEFAULT_QUERY_TIMEOUT = 75*1000;
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 63*1000;
+    private static final long EXPLORE_TIME = 877*1000;
     private static final String DHT_FILE = "i2psnark.dht.dat";
 
     public KRPC (I2PAppContext ctx, I2PSession session) {
@@ -156,12 +158,14 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // If we add a search DHT, adjust to stay out of each other's way
         _qPort = 2555 + ctx.random().nextInt(61111);
         _rPort = _qPort + 1;
-        _myID = new byte[NID.HASH_LENGTH];
-        if (SECURE_NID)
-            System.arraycopy(session.getMyDestination().calculateHash().getData(), 0, _myID, 0, NID.HASH_LENGTH);
-        else
+        if (SECURE_NID) {
+            _myNID = NodeInfo.generateNID(session.getMyDestination().calculateHash(), _qPort);
+            _myID = _myNID.getData();
+        } else {
+            _myID = new byte[NID.HASH_LENGTH];
             ctx.random().nextBytes(_myID);
-        _myNID = new NID(_myID);
+            _myNID = new NID(_myID);
+        }
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
         _dhtFile = new File(ctx.getConfigDir(), DHT_FILE);
 
@@ -193,7 +197,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  If and when the pong is received the node will be inserted in our DHT.
      */
     public void ping(Destination dest, int port) {
-        NodeInfo nInfo = new NodeInfo(_fakeNID, dest, port);
+        NodeInfo nInfo = new NodeInfo(dest, port);
         sendPing(nInfo);
     }
 
@@ -222,6 +226,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting explore");
         for (int i = 0; i < maxNodes; i++) {
+            if (!_isRunning)
+                break;
             NodeInfo nInfo;
             try {
                 nInfo = toTry.first();
@@ -302,6 +308,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting getPeers with " + nodes.size() + " to try");
         for (int i = 0; i < max; i++) {
+            if (!_isRunning)
+                break;
             NodeInfo nInfo;
             try {
                 nInfo = toTry.first();
@@ -414,6 +422,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (_log.shouldLog(Log.INFO))
             _log.info("Found " + nodes.size() + " to announce to for " + iHash);
         for (NodeInfo nInfo : nodes) {
+            if (!_isRunning)
+                break;
             if (announce(ih, nInfo, Math.min(maxWait, 60*1000)))
                 rv++;
             maxWait -= _context.clock().now() - start;
@@ -503,6 +513,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _isRunning = true;
         // no need to keep ref, it will eventually stop
         new Cleaner();
+        new Explorer(5*1000);
     }
 
     /**
@@ -1200,7 +1211,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  replace it with the received NID.
      */
     private void receivePong(NodeInfo nInfo, byte[] nid) {
-        if (nInfo.getNID().equals(_fakeNID)) {
+        if (nInfo.getNID().equals(FAKE_NID)) {
             NodeInfo newInfo = new NodeInfo(new NID(nid), nInfo.getHash(), nInfo.getPort());
             Destination dest = nInfo.getDestination();
             if (dest != null)
@@ -1243,8 +1254,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
          *  Either wait on this object with a timeout, or use non-null Runnables.
          *  Any sent data to be remembered may be stored by setSentObject().
          *  Reply object may be in getReplyObject().
-         *  @param onReply must be fast, otherwise set to null and wait on this
-         *  @param onTimeout must be fast, otherwise set to null and wait on this
+         *  @param onReply must be fast, otherwise set to null and wait on this UNUSED
+         *  @param onTimeout must be fast, otherwise set to null and wait on this UNUSED
          */
         public ReplyWaiter(MsgID mID, NodeInfo nInfo, Runnable onReply, Runnable onTimeout) {
             super(SimpleTimer2.getInstance(), DEFAULT_QUERY_TIMEOUT);
@@ -1294,10 +1305,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         public void gotReply(int code, Object o) {
             cancel();
             _sentQueries.remove(mid);
-            replyCode = code;
             replyObject = o;
+            replyCode = code;
             // if it is fake, heardFrom is called by receivePong()
-            if (!sentTo.getNID().equals(_fakeNID))
+            if (!sentTo.getNID().equals(FAKE_NID))
                 heardFrom(sentTo);
             if (onReply != null)
                 onReply.run();
@@ -1314,6 +1325,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             timeout(sentTo);
             if (_log.shouldLog(Log.INFO))
                 _log.warn("timeout waiting for reply from " + sentTo);
+            synchronized(this) {
+                this.notifyAll();
+            }
         }
     }
 
@@ -1412,6 +1426,38 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                           _knownNodes.size() + " known peers, " +
                           _sentQueries.size() + " queries awaiting response");
             schedule(CLEAN_TIME);
+        }
+    }
+
+    /**
+     * Fire off explorer thread
+     */
+    private class Explorer extends SimpleTimer2.TimedEvent {
+
+        public Explorer(long delay) {
+            super(SimpleTimer2.getInstance(), delay);
+        }
+
+        public void timeReached() {
+            if (!_isRunning)
+                return;
+            (new I2PAppThread(new ExplorerThread(), "DHT Explore", true)).start();
+        }
+    }
+
+    /**
+     * explorer thread
+     */
+    private class ExplorerThread implements Runnable {
+
+        public void run() {
+            if (!_isRunning)
+                return;
+            explore(8, 60*1000, 1);
+            // refresh the buckets here too
+            if (!_isRunning)
+                return;
+            new Explorer(EXPLORE_TIME);
         }
     }
 }

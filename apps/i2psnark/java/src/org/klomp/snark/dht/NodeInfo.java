@@ -33,6 +33,18 @@ class NodeInfo extends SimpleDataStructure {
     public static final int LENGTH = NID.HASH_LENGTH + Hash.HASH_LENGTH + 2;
 
     /**
+     * With a fake NID used for pings
+     */
+    public NodeInfo(Destination dest, int port) {
+        super();
+        this.nID = KRPC.FAKE_NID;
+        this.dest = dest;
+        this.hash = dest.calculateHash();
+        this.port = port;
+        initialize();
+    }
+
+    /**
      * Use this if we have the full destination
      * @throws IllegalArgumentException
      */
@@ -127,13 +139,29 @@ class NodeInfo extends SimpleDataStructure {
     }
 
     /**
+     * Generate a secure NID that matches the Hash and port
+     * @throws IllegalArgumentException
+     */
+    public static NID generateNID(Hash h, int p) {
+        byte[] n = new byte[NID.HASH_LENGTH];
+        System.arraycopy(h.getData(), 0, n, 0, NID.HASH_LENGTH);
+        n[0] ^= (byte) (p >> 8);
+        n[1] ^= (byte) p;
+        return new NID(n);
+    }
+
+    /**
      * Verify the NID matches the Hash
      * @throws IllegalArgumentException
      */
     private void verify() {
         if (!KRPC.SECURE_NID)
             return;
-        if (!DataHelper.eq(nID.getData(), 0, hash.getData(), 0, NID.HASH_LENGTH))
+        byte[] nb = nID.getData();
+        byte[] hb = hash.getData();
+        if ((!DataHelper.eq(nb, 2, hb, 2, NID.HASH_LENGTH - 2)) ||
+            ((nb[0] ^ (port >> 8)) & 0xff) != (hb[0] & 0xff) ||
+            ((nb[1] ^ port) & 0xff) != (hb[1] & 0xff))
             throw new IllegalArgumentException("NID/Hash mismatch");
     }
 
