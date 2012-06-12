@@ -703,6 +703,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 if (!lookupDest(nInfo)) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping repliable query, no dest for " + nInfo);
+                    timeout(nInfo);
                     return null;
                 }
             }
@@ -1118,7 +1119,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @throws NPE, IllegalArgumentException, and others too
      */
     private void receiveResponse(ReplyWaiter waiter, Map<String, BEValue> response) throws InvalidBEncodingException {
-        NodeInfo nInfo = waiter;
+        NodeInfo nInfo = waiter.getSentTo();
 
         BEValue nodes = response.get("nodes");
         BEValue values = response.get("values");
@@ -1229,11 +1230,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /**
      * Callback for replies
      */
-    private class ReplyWaiter extends NodeInfo {
+    private class ReplyWaiter extends SimpleTimer2.TimedEvent {
         private final MsgID mid;
+        private final NodeInfo sentTo;
         private final Runnable onReply;
         private final Runnable onTimeout;
-        private final SimpleTimer2.TimedEvent event;
         private int replyCode;
         private Object sentObject;
         private Object replyObject;
@@ -1246,14 +1247,15 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
          *  @param onTimeout must be fast, otherwise set to null and wait on this
          */
         public ReplyWaiter(MsgID mID, NodeInfo nInfo, Runnable onReply, Runnable onTimeout) {
-            super(nInfo.getNID(), nInfo.getHash(), nInfo.getPort());
-            Destination dest = nInfo.getDestination();
-            if (dest != null)
-                setDestination(dest);
+            super(SimpleTimer2.getInstance(), DEFAULT_QUERY_TIMEOUT);
             this.mid = mID;
+            this.sentTo = nInfo;
             this.onReply = onReply;
             this.onTimeout = onTimeout;
-            this.event = new Event();
+        }
+
+        public NodeInfo getSentTo() {
+            return sentTo;
         }
 
         /** only used for get_peers, to save the Info Hash */
@@ -1265,7 +1267,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         public Object getSentObject() {
             return sentObject;
         }
-
 
         /**
          *  Should contain null if getReplyCode is REPLY_PONG.
@@ -1291,13 +1292,13 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
          *  Also removes from _sentQueries and calls heardFrom().
          */
         public void gotReply(int code, Object o) {
+            cancel();
+            _sentQueries.remove(mid);
             replyCode = code;
             replyObject = o;
-            event.cancel();
-            _sentQueries.remove(mid);
             // if it is fake, heardFrom is called by receivePong()
-            if (!getNID().equals(_fakeNID))
-                heardFrom(this);
+            if (!sentTo.getNID().equals(_fakeNID))
+                heardFrom(sentTo);
             if (onReply != null)
                 onReply.run();
             synchronized(this) {
@@ -1305,19 +1306,14 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
         }
 
-        private class Event extends SimpleTimer2.TimedEvent {
-            public Event() {
-                super(SimpleTimer2.getInstance(), DEFAULT_QUERY_TIMEOUT);
-            }
-
-            public void timeReached() {
-                _sentQueries.remove(mid);
-                if (onTimeout != null)
-                    onTimeout.run();
-                timeout(ReplyWaiter.this);
-                if (_log.shouldLog(Log.INFO))
-                    _log.warn("timeout waiting for reply from " + ReplyWaiter.this.toString());
-            }
+        /** timer callback on timeout */
+        public void timeReached() {
+            _sentQueries.remove(mid);
+            if (onTimeout != null)
+                onTimeout.run();
+            timeout(sentTo);
+            if (_log.shouldLog(Log.INFO))
+                _log.warn("timeout waiting for reply from " + sentTo);
         }
     }
 
