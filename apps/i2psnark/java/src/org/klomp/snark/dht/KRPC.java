@@ -980,7 +980,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Adding node: " + nInfo);
             oldInfo = nInfo;
-            NodeInfo nInfo2 = _knownNodes.putIfAbsent(nID, nInfo);
+            NodeInfo nInfo2 = _knownNodes.putIfAbsent(nInfo);
             if (nInfo2 != null)
                 oldInfo = nInfo2;
         } else {
@@ -1000,8 +1000,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // try to keep ourselves out of the DHT
         if (nInfo.equals(_myNodeInfo))
             return _myNodeInfo;
-        NID nID = nInfo.getNID();
-        NodeInfo rv = _knownNodes.putIfAbsent(nID, nInfo);
+        NodeInfo rv = _knownNodes.putIfAbsent(nInfo);
         if (rv == null)
             rv = nInfo;
         return rv;
@@ -1011,9 +1010,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  Called when a reply times out
      */
     private void timeout(NodeInfo nInfo) {
-        boolean remove = nInfo.getNID().timeout();
+        NID nid = nInfo.getNID();
+        boolean remove = nid.timeout();
         if (remove) {
-            if (_knownNodes.remove(nInfo) != null) {
+            if (_knownNodes.remove(nid) != null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Removed after consecutive timeouts: " + nInfo);
             }

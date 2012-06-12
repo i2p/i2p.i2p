@@ -4,6 +4,7 @@ package org.klomp.snark.dht;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -27,11 +28,12 @@ import net.i2p.util.SimpleTimer2;
  * @since 0.8.4
  * @author zzz
  */
-class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
+class DHTNodes {
 
     private final I2PAppContext _context;
     private long _expireTime;
     private final Log _log;
+    private final ConcurrentHashMap<NID, NodeInfo> _nodeMap;
     private volatile boolean _isRunning;
 
     /** stagger with other cleaners */
@@ -42,10 +44,10 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
     private static final int MAX_PEERS = 999;
 
     public DHTNodes(I2PAppContext ctx) {
-        super();
         _context = ctx;
         _expireTime = MAX_EXPIRE_TIME;
         _log = _context.logManager().getLog(DHTNodes.class);
+        _nodeMap = new ConcurrentHashMap();
     }
 
     public void start() {
@@ -58,6 +60,37 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
         _isRunning = false;
     }
 
+    // begin ConcurrentHashMap methods
+
+    public int size() {
+        return _nodeMap.size();
+    }
+
+    public void clear() {
+        _nodeMap.clear();
+    }
+
+    public NodeInfo get(NID nid) {
+        return _nodeMap.get(nid);
+    }
+
+    /**
+     *  @return the old value if present, else nInfo
+     */
+    public NodeInfo putIfAbsent(NodeInfo nInfo) {
+        return _nodeMap.putIfAbsent(nInfo.getNID(), nInfo);
+    }
+
+    public NodeInfo remove(NID nid) {
+        return _nodeMap.remove(nid);
+    }
+
+    public Collection<NodeInfo> values() {
+        return _nodeMap.values();
+    }
+
+    // end ConcurrentHashMap methods
+
     /**
      *  Fake DHT
      *  @param sha1 either a InfoHash or a NID
@@ -65,7 +98,7 @@ class DHTNodes extends ConcurrentHashMap<NID, NodeInfo> {
     List<NodeInfo> findClosest(SHA1Hash h, int numWant) {
         // sort the whole thing
         Set<NID> all = new TreeSet(new SHA1Comparator(h));
-        all.addAll(keySet());
+        all.addAll(_nodeMap.keySet());
         int sz = all.size();
         int max = Math.min(numWant, sz);
 
