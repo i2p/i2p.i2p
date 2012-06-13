@@ -77,7 +77,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     }
 
     private void setupI2PTunnelHTTPServer(String spoofHost) {
-        _spoofHost = spoofHost;
+        _spoofHost = (spoofHost != null && spoofHost.trim().length() > 0) ? spoofHost.trim() : null;
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000 });
     }
@@ -96,6 +96,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      */
     @Override
     protected void blockingHandle(I2PSocket socket) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
+                      " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
         long afterAccept = getTunnel().getContext().clock().now();
         long afterSocket = -1;
         //local is fast, so synchronously. Does not need that many
@@ -115,8 +118,21 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             addEntry(headers, DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p");
             addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
 
-            if ( (_spoofHost != null) && (_spoofHost.trim().length() > 0) )
-                setEntry(headers, "Host", _spoofHost);
+            // Port-specific spoofhost
+            Properties opts = getTunnel().getClientOptions();
+            String spoofHost;
+            int ourPort = socket.getLocalPort();
+            if (ourPort != 80 && ourPort > 0 && ourPort < 65535 && opts != null) {
+                String portSpoof = opts.getProperty("spoofedHost." + ourPort);
+                if (portSpoof != null)
+                    spoofHost = portSpoof.trim();
+                else
+                    spoofHost = _spoofHost;
+            } else {
+                spoofHost = _spoofHost;
+            }
+            if (spoofHost != null)
+                setEntry(headers, "Host", spoofHost);
             setEntry(headers, "Connection", "close");
             // we keep the enc sent by the browser before clobbering it, since it may have 
             // been x-i2p-gzip
@@ -134,7 +150,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // request from the socket, modifies the headers, sends the request to the 
             // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
             // if it was one of the Accept-encoding: values, and gzip the payload       
-            Properties opts = getTunnel().getClientOptions();
             boolean allowGZIP = true;
             if (opts != null) {
                 String val = opts.getProperty("i2ptunnel.gzip");

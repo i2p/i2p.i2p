@@ -111,6 +111,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     
     @Override
     protected void blockingHandle(I2PSocket socket) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
+                      " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
         try {
 			String modifiedRegistration;
 			if(!this.method.equals("webirc")) {

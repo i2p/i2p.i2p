@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -330,6 +331,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *
      * Sets the event "clientoptions_onResult" = "ok" after completion.
      *
+     * Deprecated use setClientOptions()
+     *
      * @param args each args[i] is a key=value pair to add to the options
      * @param l logger to receive events and output
      */
@@ -343,6 +346,22 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 String val = args[i].substring(index+1);
                 _clientOptions.setProperty(key, val);
             }
+        }
+        notifyEvent("clientoptions_onResult", "ok");
+    }
+
+    /**
+     * A more efficient runClientOptions()
+     *
+     * @param opts non-null
+     * @since 0.9.1
+     */
+    public void setClientOptions(Properties opts) {
+        _clientOptions.clear();
+        for (Map.Entry e : opts.entrySet()) {
+             String key = (String) e.getKey();
+             String val = (String) e.getValue();
+             _clientOptions.setProperty(key, val);
         }
         notifyEvent("clientoptions_onResult", "ok");
     }

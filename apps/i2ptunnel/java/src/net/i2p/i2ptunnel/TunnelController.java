@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -385,19 +387,16 @@ public class TunnelController implements Logging {
     }
     
     private void setSessionOptions() {
-        List opts = new ArrayList();
-        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = _config.getProperty(key);
+        Properties opts = new Properties();
+        for (Map.Entry e : _config.entrySet()) {
+            String key = (String) e.getKey();
             if (key.startsWith("option.")) {
                 key = key.substring("option.".length());
-                opts.add(key + "=" + val);
+                String val = (String) e.getValue();
+                opts.setProperty(key, val);
             }
         }
-        String args[] = new String[opts.size()];
-        for (int i = 0; i < opts.size(); i++)
-            args[i] = (String)opts.get(i);
-        _tunnel.runClientOptions(args, this);
+        _tunnel.setClientOptions(opts);
     }
     
     private void setI2CPOptions() {

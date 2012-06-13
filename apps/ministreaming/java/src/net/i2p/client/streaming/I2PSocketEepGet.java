@@ -143,6 +143,8 @@ public class I2PSocketEepGet extends EepGet {
                 // in the SYN packet, saving one RTT.
                 props.setProperty(PROP_CONNECT_DELAY, CONNECT_DELAY);
                 I2PSocketOptions opts = _socketManager.buildOptions(props);
+                // TODO pull port out of URL
+                opts.setPort(80);
                 _socket = _socketManager.connect(dest, opts);
             } else {
                 throw new IOException("Unsupported protocol: " + _actualURL);

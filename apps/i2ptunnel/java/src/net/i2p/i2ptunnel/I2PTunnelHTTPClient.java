@@ -330,6 +330,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             String ahelperKey = null;
             String userAgent = null;
             String authorization = null;
+            int remotePort = 0;
             while((line = reader.readLine(method)) != null) {
                 line = line.trim();
                 if(_log.shouldLog(Log.DEBUG)) {
@@ -486,10 +487,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Host becomes the destination's "{b32}.b32.i2p" string, or "i2p" on lookup failure
                         host = getHostName(destination);
 
-                        if(requestURI.getPort() >= 0) {
-                            // TODO support I2P ports someday
-                            //if (port >= 0)
-                            //    host = host + ':' + port;
+                        int rPort = requestURI.getPort();
+                        if (rPort > 0) {
+                            // Save it to put in the I2PSocketOptions,
+                            // but strip it from the URL
+                            remotePort = rPort;
                             if(_log.shouldLog(Log.WARN)) {
                                 _log.warn(getPrefix(requestId) + "Removing port from [" + request + "]");
                             }
@@ -500,6 +502,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 method = null;
                                 break;
                             }
+                        } else {
+                            remotePort = 80;
                         }
 
                         String query = requestURI.getRawQuery();
@@ -964,7 +968,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
             // dont want to hard link to here
             //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
-            I2PSocket i2ps = createI2PSocket(clientDest, getDefaultOptions(opts));
+            I2PSocketOptions sktOpts = getDefaultOptions(opts);
+            if (remotePort > 0)
+                sktOpts.setPort(remotePort);
+            I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
