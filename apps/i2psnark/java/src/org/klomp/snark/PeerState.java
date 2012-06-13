@@ -39,13 +39,13 @@ class PeerState implements DataLoader
 
   // Interesting and choking describes whether we are interested in or
   // are choking the other side.
-  boolean interesting = false;
-  boolean choking = true;
+  volatile boolean interesting;
+  volatile boolean choking = true;
 
   // Interested and choked describes whether the other side is
   // interested in us or choked us.
-  boolean interested = false;
-  boolean choked = true;
+  volatile boolean interested;
+  volatile boolean choked = true;
 
   /** the pieces the peer has */
   BitField bitfield;
