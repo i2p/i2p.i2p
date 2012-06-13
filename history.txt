@@ -1,3 +1,15 @@
+2012-06-13 zzz
+ * I2PSocketEepGet: Set port to 80
+ * I2PTunnel:
+   - Pass port through HTTP client proxy
+   - HTTP server proxy sets host header to
+     the value of "spoofedhost.xx" option for port xx
+   - Set client options more efficiently
+ * i2psnark: Possible fix for piece-after-choke
+ * Streaming:
+   - Channel cleanups and comments
+   - New I2PSocketAddress
+
 2012-06-11 zzz
  * i2psnark:
    - Display torrent file downloads in torrent area
@@ -8,7 +20,7 @@
    - Reduce delay between peer adds for faster startup
    - Thread the announces and reduce timeout when stopping
  * NativeBigInteger: Workaround for Raspberry Pi to load the correct lib
- * Router: Don't let shutdown tasks hang the shutdown
+ * Router: Don't let shutdown tasks hang the shutdown (tickets #564, #566)
 
 2012-06-08 zzz
  * i2psnark:

@@ -15,18 +15,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *  As this does not (yet) extend SocketChannel it cannot be returned by StandardSocket.getChannel(),
+ *  until we implement an I2P SocketAddress class.		
+ *
+ *  Warning, this interface and implementation is preliminary and subject to change without notice.
+ *
  *  @since 0.8.9
  */
 public class MessageChannel extends SelectableChannel implements ReadableByteChannel, WritableByteChannel {
 
-    final MessageInputStream in;
-    final MessageOutputStream out;
-    boolean _isRegistered = false;
-    SelectionKey whichKey = null;
-    SelectorProvider provider = null;
-    Selector sel = null;
-    Object lock = null;
-    I2PSocket socket;
+    private final MessageInputStream in;
+    private final MessageOutputStream out;
+    private boolean _isRegistered;
+    private SelectionKey whichKey;
+    private SelectorProvider provider;
+    private Selector sel;
+    private Object lock;
+    private final I2PSocket socket;
 
     MessageChannel(I2PSocket socket) {
         try {
@@ -145,10 +150,10 @@ public class MessageChannel extends SelectableChannel implements ReadableByteCha
      * returns 0, which happens when there's
      * no more data available.
      */
-
     public int read(ByteBuffer buf) throws IOException {
         int amount = 0;
         for (;;) {
+            // TODO if buf.hasArray() ... getArray() ... getArrayOffset() ...
             byte[] lbuf = new byte[buf.remaining()];
             int samount = in.read(lbuf);
             if (samount <= 0) {
@@ -167,12 +172,12 @@ public class MessageChannel extends SelectableChannel implements ReadableByteCha
      * already set buffer size. Once it starts to fail
      * (wait timeout is 0) then put the bytes back and return.
      */
-
     public int write(ByteBuffer buf) throws IOException {
         int written = 0;
         for (;;) {
             if(buf.remaining()==0) 
                 return written;
+            // TODO if buf.hasArray() ... getArray() ... getArrayOffset() ...
             byte[] lbuf = new byte[Math.min(buf.remaining(), 0x1000)];
             buf.get(lbuf);
             try {

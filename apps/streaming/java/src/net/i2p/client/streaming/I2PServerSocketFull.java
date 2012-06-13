@@ -9,6 +9,7 @@ import net.i2p.I2PException;
  */
 class I2PServerSocketFull implements I2PServerSocket {
     private final I2PSocketManagerFull _socketManager;
+    private volatile AcceptingChannel _channel;
     
     public I2PServerSocketFull(I2PSocketManagerFull mgr) {
         _socketManager = mgr;
@@ -28,8 +29,10 @@ class I2PServerSocketFull implements I2PServerSocket {
     /**
      *  @since 0.8.11
      */
-    public AcceptingChannel getChannel() {
-        return new AcceptingChannelImpl(_socketManager);
+    public synchronized AcceptingChannel getChannel() {
+        if (_channel == null)
+            _channel = new AcceptingChannelImpl(_socketManager);
+        return _channel;
     }
     
     public long getSoTimeout() {

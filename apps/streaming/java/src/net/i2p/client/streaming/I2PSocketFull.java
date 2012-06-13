@@ -16,6 +16,7 @@ class I2PSocketFull implements I2PSocket {
     private Connection _connection;
     private Destination _remotePeer;
     private Destination _localPeer;
+    private volatile MessageChannel _channel;
     
     public I2PSocketFull(Connection con) {
         _connection = con;
@@ -70,8 +71,10 @@ class I2PSocketFull implements I2PSocket {
     /**
      *  @since 0.8.9
      */
-    public SelectableChannel getChannel() {
-        return new MessageChannel(this);
+    public synchronized SelectableChannel getChannel() {
+        if (_channel == null)
+            _channel = new MessageChannel(this);
+        return _channel;
     }
     
     /**
