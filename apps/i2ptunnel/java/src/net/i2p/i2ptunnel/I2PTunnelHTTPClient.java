@@ -490,8 +490,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         int rPort = requestURI.getPort();
                         if (rPort > 0) {
                             // Save it to put in the I2PSocketOptions,
-                            // but strip it from the URL
                             remotePort = rPort;
+                         /********
+                            // but strip it from the URL
                             if(_log.shouldLog(Log.WARN)) {
                                 _log.warn(getPrefix(requestId) + "Removing port from [" + request + "]");
                             }
@@ -502,6 +503,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 method = null;
                                 break;
                             }
+                          ******/
                         } else {
                             remotePort = 80;
                         }

@@ -111,8 +111,8 @@ public class I2PSocketEepGet extends EepGet {
             if ("http".equals(url.getProtocol())) {
                 String host = url.getHost();
                 int port = url.getPort();
-                if (port != -1)
-                    throw new IOException("Ports not supported in i2p: " + _actualURL);
+                if (port <= 0 || port >= 65535)
+                    port = 80;
 
                 // HTTP Proxy compatibility http://i2p/B64KEY/blah
                 // Rewrite the url to strip out the /i2p/,
@@ -143,8 +143,7 @@ public class I2PSocketEepGet extends EepGet {
                 // in the SYN packet, saving one RTT.
                 props.setProperty(PROP_CONNECT_DELAY, CONNECT_DELAY);
                 I2PSocketOptions opts = _socketManager.buildOptions(props);
-                // TODO pull port out of URL
-                opts.setPort(80);
+                opts.setPort(port);
                 _socket = _socketManager.connect(dest, opts);
             } else {
                 throw new IOException("Unsupported protocol: " + _actualURL);
