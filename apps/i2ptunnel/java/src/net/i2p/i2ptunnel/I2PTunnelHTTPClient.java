@@ -1216,15 +1216,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     StringTokenizer tok = new StringTokenizer(jumpServers, ", ");
                     while(tok.hasMoreTokens()) {
                         String jurl = tok.nextToken();
-                        if(!jurl.startsWith("http://")) {
+                        String jumphost;
+                        try {
+                            URI jURI = new URI(jurl);
+                            String proto = jURI.getScheme();
+                            jumphost = jURI.getHost();
+                            if (proto == null || jumphost == null ||
+                                !proto.toLowerCase(Locale.US).equals("http"))
+                                continue;
+                            jumphost = jumphost.toLowerCase(Locale.US);
+                            if (!jumphost.endsWith(".i2p"))
+                                continue;
+                        } catch(URISyntaxException use) {
                             continue;
                         }
                         // Skip jump servers we don't know
-                        String jumphost = jurl.substring(7);  // "http://"
-                        jumphost = jumphost.substring(0, jumphost.indexOf('/'));
-                        if(!jumphost.endsWith(".i2p")) {
-                            continue;
-                        }
                         if(!jumphost.endsWith(".b32.i2p")) {
                             Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
                             if(dest == null) {
