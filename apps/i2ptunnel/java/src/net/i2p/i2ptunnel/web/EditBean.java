@@ -376,18 +376,6 @@ public class EditBean extends IndexBean {
      */
     private static Properties getOptions(TunnelController controller) {
         if (controller == null) return null;
-        String opts = controller.getClientOptions();
-        StringTokenizer tok = new StringTokenizer(opts);
-        Properties props = new Properties();
-        while (tok.hasMoreTokens()) {
-            String pair = tok.nextToken();
-            int eq = pair.indexOf('=');
-            if ( (eq <= 0) || (eq >= pair.length()) )
-                continue;
-            String key = pair.substring(0, eq);
-            String val = pair.substring(eq+1);
-            props.setProperty(key, val);
-        }
-        return props;
+        return controller.getClientOptionProps();
     }
 }

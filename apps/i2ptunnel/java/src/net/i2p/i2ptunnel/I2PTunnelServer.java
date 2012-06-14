@@ -295,6 +295,19 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
+    /**
+     *  Update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel || sockMgr == null)
+            return;
+        Properties props = tunnel.getClientOptions();
+        sockMgr.setDefaultOptions(sockMgr.buildOptions(props));
+    }
+
     protected int getHandlerCount() { 
         int rv = DEFAULT_HANDLER_COUNT;
         String cnt = getTunnel().getClientOptions().getProperty(PROP_HANDLER_COUNT);

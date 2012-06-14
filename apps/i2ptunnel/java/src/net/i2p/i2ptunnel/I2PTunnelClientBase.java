@@ -496,6 +496,22 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
+     *  Update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel)
+            return;
+        I2PSocketManager sm = _ownDest ? sockMgr : socketManager;
+        if (sm == null)
+            return;
+        Properties props = tunnel.getClientOptions();
+        sm.setDefaultOptions(sockMgr.buildOptions(props));
+    }
+
+    /**
      * Create a new I2PSocket towards to the specified destination,
      * adding it to the list of connections actually managed by this
      * tunnel.

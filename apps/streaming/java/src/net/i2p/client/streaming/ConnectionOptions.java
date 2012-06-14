@@ -237,7 +237,33 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(ConnectionOptions opts) {
         super(opts);
-        if (opts != null) {
+        if (opts != null)
+            update(opts);
+    }
+    
+    /**
+     *  Update everything by copying over from opts
+     *  @param opts non-null
+     *  @since 0.9.1
+     */
+    public void updateAll(ConnectionOptions opts) {
+        // user is unlikely to change these 6 between buildOptions() and setDefaultOptions(),
+        // since they may be updated directly, but just in case...
+        setConnectTimeout(opts.getConnectTimeout());
+        setReadTimeout(opts.getReadTimeout());
+        setWriteTimeout(opts.getWriteTimeout());
+        setMaxBufferSize(opts.getMaxBufferSize());
+        setLocalPort(opts.getLocalPort());
+        setPort(opts.getPort());
+        update(opts);
+    }
+    
+    /**
+     *  Update everything (except super) by copying over from opts
+     *  @param opts non-null
+     *  @since 0.9.1
+     */
+    private void update(ConnectionOptions opts) {
             setMaxWindowSize(opts.getMaxWindowSize());
             setConnectDelay(opts.getConnectDelay());
             setProfile(opts.getProfile());
@@ -265,7 +291,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerMinute = opts.getMaxTotalConnsPerMinute();
             _maxTotalConnsPerHour = opts.getMaxTotalConnsPerHour();
             _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
-        }
     }
     
     @Override
@@ -301,6 +326,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
     
+    /**
+     *  Note: NOT part of the interface
+     */
     @Override
     public void setProperties(Properties opts) {
         super.setProperties(opts);
@@ -611,30 +639,35 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private void initLists(Properties opts) {
         _accessListEnabled = getBool(opts, PROP_ENABLE_ACCESS_LIST, false);
         _blackListEnabled = getBool(opts, PROP_ENABLE_BLACKLIST, false);
+        // Don't think these would ever be accessed simultaneously,
+        // but avoid concurrent modification just in case
+        Set<Hash> accessList, blackList;
         if (_accessListEnabled)
-            _accessList = new HashSet();
+            accessList = new HashSet();
         else
-            _accessList = Collections.EMPTY_SET;
+            accessList = Collections.EMPTY_SET;
         if (_blackListEnabled)
-            _blackList = new HashSet();
+            blackList = new HashSet();
         else
-            _blackList = Collections.EMPTY_SET;
-        if (!(_accessListEnabled || _blackListEnabled))
-            return;
-        String hashes = opts.getProperty(PROP_ACCESS_LIST);
-        if (hashes == null)
-            return;
-        StringTokenizer tok = new StringTokenizer(hashes, ", ");
-        while (tok.hasMoreTokens()) {
-            String hashstr = tok.nextToken();
-            Hash h = ConvertToHash.getHash(hashstr);
-            if (h == null)
-                error("bad list hash: " + hashstr);
-            else if (_blackListEnabled)
-                _blackList.add(h);
-            else
-                _accessList.add(h);
+            blackList = Collections.EMPTY_SET;
+        if (_accessListEnabled || _blackListEnabled) {
+            String hashes = opts.getProperty(PROP_ACCESS_LIST);
+            if (hashes == null)
+                return;
+            StringTokenizer tok = new StringTokenizer(hashes, ", ");
+            while (tok.hasMoreTokens()) {
+                String hashstr = tok.nextToken();
+                Hash h = ConvertToHash.getHash(hashstr);
+                if (h == null)
+                    error("bad list hash: " + hashstr);
+                else if (_blackListEnabled)
+                    blackList.add(h);
+                else
+                    accessList.add(h);
+            }
         }
+        _accessList = accessList;
+        _blackList = blackList;
         if (_accessListEnabled && _accessList.isEmpty())
             error("Connection access list enabled but no valid entries; no peers can connect");
         else if (_blackListEnabled && _blackList.isEmpty())
@@ -647,9 +680,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         log.error(s);
     }
 
-	@Override
+    /** doesn't include everything */
+    @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(128);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("conDelay=").append(_connectDelay);
         buf.append(" maxSize=").append(_maxMessageSize);
         buf.append(" rtt=").append(_rtt);
@@ -663,6 +697,14 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         buf.append(" inactivityTimeout=").append(_inactivityTimeout);
         buf.append(" inboundBuffer=").append(_inboundBufferSize);
         buf.append(" maxWindowSize=").append(_maxWindowSize);
+        buf.append(" blacklistSize=").append(_blackList.size());
+        buf.append(" whitelistSize=").append(_accessList.size());
+        buf.append(" maxConns=").append(_maxConnsPerMinute).append('/')
+                                .append(_maxConnsPerHour).append('/')
+                                .append(_maxConnsPerDay);
+        buf.append(" maxTotalConns=").append(_maxTotalConnsPerMinute).append('/')
+                                .append(_maxTotalConnsPerHour).append('/')
+                                .append(_maxTotalConnsPerDay);
         return buf.toString();
     }
     

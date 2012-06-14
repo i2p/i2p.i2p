@@ -193,7 +193,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         }
     }
 
-    /** @return non-null */
+    /** @return A copy, non-null */
     List<I2PSession> getSessions() { 
             return new ArrayList(_sessions); 
     }
@@ -208,6 +208,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         _sessions.remove(session);
     }
     
+    /**
+     *  Generic options used for clients and servers
+     *  @return not a copy
+     */
     public Properties getClientOptions() { return _clientOptions; }
     
     private void addtask(I2PTunnelTask tsk) {
@@ -327,11 +331,13 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     
     /**
      * Configure the extra I2CP options to use in any subsequent I2CP sessions.
+     * Generic options used for clients and servers
      * Usage: "clientoptions[ key=value]*" .  
      *
      * Sets the event "clientoptions_onResult" = "ok" after completion.
      *
-     * Deprecated use setClientOptions()
+     * Deprecated To be made private, use setClientOptions().
+     * This does NOT update a running TunnelTask.
      *
      * @param args each args[i] is a key=value pair to add to the options
      * @param l logger to receive events and output
@@ -351,17 +357,22 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     }
 
     /**
-     * A more efficient runClientOptions()
+     * Generic options used for clients and servers.
+     * This DOES update a running TunnelTask, but NOT the session.
+     * A more efficient runClientOptions().
      *
      * @param opts non-null
      * @since 0.9.1
      */
     public void setClientOptions(Properties opts) {
-        _clientOptions.clear();
-        for (Map.Entry e : opts.entrySet()) {
-             String key = (String) e.getKey();
-             String val = (String) e.getValue();
-             _clientOptions.setProperty(key, val);
+        for (Iterator iter = _clientOptions.keySet().iterator(); iter.hasNext();) {
+            Object key = iter.next();
+            if (!opts.containsKey(key))
+                iter.remove();
+        }
+        _clientOptions.putAll(opts);
+        for (I2PTunnelTask task : tasks) {
+            task.optionsUpdated(this);
         }
         notifyEvent("clientoptions_onResult", "ok");
     }

@@ -38,11 +38,32 @@ public interface I2PSocketManager {
      */
     public void setAcceptTimeout(long ms);
     public long getAcceptTimeout();
+
+    /**
+     *  Update the options on a running socket manager.
+     *  Parameters in the I2PSocketOptions interface may be changed directly
+     *  with the setters; no need to use this method for those.
+     *  This does NOT update the underlying I2CP or tunnel options; use getSession().updateOptions() for that.
+     *  @param options as created from a call to buildOptions(properties), non-null
+     */
     public void setDefaultOptions(I2PSocketOptions options);
+
+    /**
+     *  Current options, not a copy, setters may be used to make changes.
+     */
     public I2PSocketOptions getDefaultOptions();
+
     public I2PServerSocket getServerSocket();
     
+    /**
+     *  Create a copy of the current options, to be used in a setDefaultOptions() call.
+     */
     public I2PSocketOptions buildOptions();
+
+    /**
+     *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *  @param opts The new options, may be null
+     */
     public I2PSocketOptions buildOptions(Properties opts);
 
     /**
@@ -102,6 +123,10 @@ public interface I2PSocketManager {
     public String getName();
     public void setName(String name);
 
+    /**
+     * Deprecated - Factory will initialize.
+     * @throws UnsupportedOperationException always
+     */
     public void init(I2PAppContext context, I2PSession session, Properties opts, String name);
     
     public void addDisconnectListener(DisconnectListener lsnr);
