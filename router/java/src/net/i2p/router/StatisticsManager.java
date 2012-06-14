@@ -30,6 +30,8 @@ public class StatisticsManager implements Service {
     private final RouterContext _context;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
+    /** enhance anonymity by only including build stats one out of this many times */
+    private static final int RANDOM_INCLUDE_STATS = 4;
 
     private final DecimalFormat _fmt;
     private final DecimalFormat _pct;
@@ -82,11 +84,13 @@ public class StatisticsManager implements Service {
             stats.setProperty("stat_identities", newlines+"");
 ***/
         
-        if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS)) {
+        if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS) &&
+            (CoreVersion.VERSION.equals("0.9") || _context.random().nextInt(RANDOM_INCLUDE_STATS) == 0)) {
             long publishedUptime = _context.router().getUptime();
             // Don't publish these for first hour
-            if (publishedUptime > 62*60*1000 && CoreVersion.VERSION.equals("0.8.13"))
-                includeAverageThroughput(stats);
+            // Disabled in 0.9
+            //if (publishedUptime > 62*60*1000)
+            //    includeAverageThroughput(stats);
             //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             //includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             //includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
