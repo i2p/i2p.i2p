@@ -825,7 +825,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 name = name.trim();
                 hurl = hurl.trim();
                 aurl = aurl.trim().replace("=", "&#61;");
-                if (name.length() > 0 && hurl.startsWith("http://") && aurl.startsWith("http://")) {
+                if (name.length() > 0 && hurl.startsWith("http://") && TrackerClient.isValidAnnounce(aurl)) {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();

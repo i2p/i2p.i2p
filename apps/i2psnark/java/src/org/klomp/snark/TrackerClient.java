@@ -236,7 +236,7 @@ public class TrackerClient implements Runnable {
    *  Do this one time only (not every time it is started).
    *  @since 0.9.1
    */
-  public void setup() {
+  private void setup() {
     // Construct the list of trackers for this torrent,
     // starting with the primary one listed in the metainfo,
     // followed by the secondary open trackers
@@ -670,7 +670,7 @@ public class TrackerClient implements Runnable {
    *  @return true for i2p hosts only
    *  @since 0.7.12
    */
-  static boolean isValidAnnounce(String ann) {
+  public static boolean isValidAnnounce(String ann) {
     URL url;
     try {
        url = new URL(ann);
