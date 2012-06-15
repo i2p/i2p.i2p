@@ -1183,8 +1183,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
     public static final String DEFAULT_JUMP_SERVERS =
                                "http://i2host.i2p/cgi-bin/i2hostjump?," +
-            "http://stats.i2p/cgi-bin/jump.cgi?a=," +
-            "http://i2jump.i2p/";
+            "http://stats.i2p/cgi-bin/jump.cgi?a=";
+            //"http://i2jump.i2p/";
 
     /**
      *  @param jumpServers comma- or space-separated list, or null
@@ -1242,8 +1242,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("\">".getBytes());
-                        out.write(jurl.substring(7).getBytes());
-                        out.write(uri.getBytes());
+                        // Translators: parameter is a host name
+                        out.write(_("{0} jump service", jumphost).getBytes());
                         out.write("</a>\n".getBytes());
                     }
                 }

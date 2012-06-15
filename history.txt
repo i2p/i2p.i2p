@@ -1,3 +1,20 @@
+2012-06-15 zzz
+ * I2PSocketEepGet: Use specified port
+ * I2PTunnel:
+   - Don't strip port from an I2P URL
+   - More client options cleanups
+   - Options changes now propagate to running
+     socket managers and sessions, and through to the router
+   - Better parsing of jump server URLs
+ * NetDB: Only publish stats every so often, to improve
+   anonymity while preserving the ability to monitor
+   the network (effective next release)
+ * SocketManager:
+   - Simplify factory, use 4-arg constructor,
+     make fields final, deprecate 0-arg constructor
+   - Improve how options are updated
+   - Javadocs
+
 2012-06-13 zzz
  * I2PSocketEepGet: Set port to 80
  * I2PTunnel:
