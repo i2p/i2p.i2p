@@ -422,7 +422,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("\">");
             if (isDegraded)
                 out.write("</a>");
-        } else if (!snarks.isEmpty()) {
+        } else if ((!_manager.util().isConnecting()) && !snarks.isEmpty()) {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else
@@ -573,14 +573,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (String name : _manager.listTorrentFiles()) {
-                        Snark snark = _manager.getTorrent(name);
-                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
-                            snark.startTorrent();
-                            _manager.addMessage(_("Starting up torrent {0}", snark.getBaseName()));
-                            break;
-                        }
-                    }
+                    _manager.startTorrent(infoHash);
                 }
             }
         } else if (action.startsWith("Remove_")) {
@@ -747,13 +740,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         } else if ("StopAll".equals(action)) {
             _manager.stopAllTorrents(false);
         } else if ("StartAll".equals(action)) {
-            _manager.addMessage(_("Opening the I2P tunnel and starting all torrents."));
-            List<Snark> snarks = getSortedSnarks(req);
-            for (int i = 0; i < snarks.size(); i++) {
-                Snark snark = snarks.get(i);
-                if (snark.isStopped())
-                    snark.startTorrent();
-            }
+            _manager.startAllTorrents();
         } else if ("Clear".equals(action)) {
             _manager.clearMessages();
         } else {
@@ -989,6 +976,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                 "<br>" + err;
             }
+        } else if (snark.isStarting()) {
+            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Starting");
         } else if (remaining == 0 || needed == 0) {  // < 0 means no meta size yet
             // partial complete or seeding
             if (isRunning) {
@@ -1141,6 +1130,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (showPeers)
             parameters = parameters + "&p=1";
         if (isRunning) {
+            // Stop Button
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
@@ -1151,7 +1141,8 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("\">");
             if (isDegraded)
                 out.write("</a>");
-        } else {
+        } else if (!snark.isStarting()) {
+                // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
@@ -1165,6 +1156,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                     out.write("</a>");
 
             if (isValid) {
+                // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
@@ -1184,6 +1176,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                     out.write("</a>");
             }
 
+            // Delete Button
             // Doesnt work with Opera so use noThinsp instead of isDegraded
             if (noThinsp)
                 out.write("<a href=\"/i2psnark/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");

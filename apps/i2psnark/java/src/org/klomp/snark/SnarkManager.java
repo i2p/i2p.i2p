@@ -867,7 +867,7 @@ public class SnarkManager implements Snark.CompleteListener {
             torrent.startTorrent();
             addMessage(_("Fetching {0}", name));
             boolean haveSavedPeers = false;
-            if ((!util().connected()) && !haveSavedPeers) {
+            if ((_util.connected()) && !haveSavedPeers) {
                 addMessage(_("We have no saved peers and no other torrents are running. " +
                              "Fetch of {0} will not succeed until you start another torrent.", name));
             }
@@ -1600,6 +1600,81 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     /**
+     *  If not connected, thread it, otherwise inline
+     *  @since 0.9.1
+     */
+    public void startTorrent(byte[] infoHash) {
+        for (Snark snark : _snarks.values()) {
+            if (DataHelper.eq(infoHash, snark.getInfoHash())) {
+                if (snark.isStarting() || !snark.isStopped()) {
+                    addMessage("Torrent already started");
+                    return;
+                }
+                boolean connected = _util.connected();
+                if ((!connected) && !_util.isConnecting())
+                    addMessage(_("Opening the I2P tunnel"));
+                addMessage(_("Starting up torrent {0}", snark.getBaseName()));
+                if (connected) {
+                    snark.startTorrent();
+                } else {
+                    // mark it for the UI
+                    snark.setStarting();
+                    (new I2PAppThread(new ThreadedStarter(snark), "TorrentStarter", true)).start();
+                    try { Thread.sleep(200); } catch (InterruptedException ie) {}
+                }
+                return;
+            }
+        }
+        addMessage("Torrent not found?");
+    }
+
+    /**
+     *  If not connected, thread it, otherwise inline
+     *  @since 0.9.1
+     */
+    public void startAllTorrents() {
+        if (_util.connected()) {
+            startAll();
+        } else {
+            addMessage(_("Opening the I2P tunnel and starting all torrents."));
+            for (Snark snark : _snarks.values()) {
+                // mark it for the UI
+                snark.setStarting();
+            }
+            (new I2PAppThread(new ThreadedStarter(null), "TorrentStarterAll", true)).start();
+            try { Thread.sleep(200); } catch (InterruptedException ie) {}
+        }
+    }
+
+    /**
+     *  Use null constructor param for all
+     *  @since 0.9.1
+     */
+    private class ThreadedStarter implements Runnable {
+        private final Snark snark;
+        public ThreadedStarter(Snark s) { snark = s; }
+        public void run() {
+            if (snark != null) {
+                if (snark.isStopped())
+                    snark.startTorrent();
+            } else {
+                startAll();
+            }
+        }
+    }
+
+    /**
+     *  Inline
+     *  @since 0.9.1
+     */
+    private void startAll() {
+        for (Snark snark : _snarks.values()) {
+            if (snark.isStopped())
+                snark.startTorrent();
+        }
+    }
+
+    /**
      * Stop all running torrents, and close the tunnel after a delay
      * to allow for announces.
      * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
@@ -1631,7 +1706,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 // Schedule this even for final shutdown, as there's a chance
                 // that it's just this webapp that is stopping.
                 SimpleScheduler.getInstance().addEvent(new Disconnector(), 60*1000);
-                addMessage(_("Closing I2P tunnel after announces to trackers."));
+                addMessage(_("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
                     try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 }
