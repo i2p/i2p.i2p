@@ -1,3 +1,13 @@
+2012-06-18 zzz
+ * i2psnark:
+   - Improve torrent shutdown handling to maximize chance of
+     announces getting to tracker
+   - Thread task to open tunnel and improve UI feedback while open is pending
+   - Clean up delete-torrent messages
+   - Remove redundant shutdown hook
+   - Avoid NPE in PEX message handling
+   - Log tweaks
+
 2012-06-15 zzz
  * I2PSocketEepGet: Use specified port
  * I2PTunnel:
