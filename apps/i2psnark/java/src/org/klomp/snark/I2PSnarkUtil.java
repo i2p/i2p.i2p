@@ -269,7 +269,11 @@ public class I2PSnarkUtil {
         // FIXME this can cause race NPEs elsewhere
         _manager = null;
         _shitlist.clear();
-        mgr.destroySocketManager();
+        if (mgr != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Disconnecting from I2P", new Exception("I did it"));
+            mgr.destroySocketManager();
+        }
         // this will delete a .torrent file d/l in progress so don't do that...
         FileUtil.rmdir(_tmpDir, false);
         // in case the user will d/l a .torrent file next...

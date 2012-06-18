@@ -572,14 +572,24 @@ public class Snark
         debug("NOT starting TrackerClient???", NOTICE);
     }
   }
+
   /**
    * Stop contacting the tracker and talking with peers
    */
   public void stopTorrent() {
+      stopTorrent(false);
+  }
+
+  /**
+   * Stop contacting the tracker and talking with peers
+   * @param fast if true, limit the life of the unannounce threads
+   * @since 0.9.1
+   */
+  public void stopTorrent(boolean fast) {
     stopped = true;
     TrackerClient tc = trackerclient;
     if (tc != null)
-        tc.halt();
+        tc.halt(fast);
     PeerCoordinator pc = coordinator;
     if (pc != null)
         pc.halt();

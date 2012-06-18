@@ -74,6 +74,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(I2PSnarkServlet.class);
         _nonce = _context.random().nextLong();
+        // FIXME instantiate new one every time
         _manager = SnarkManager.instance();
         String configFile = _context.getProperty(PROP_CONFIG_FILE);
         if ( (configFile == null) || (configFile.trim().length() <= 0) )
@@ -322,7 +323,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         final long stats[] = {0,0,0,0,0,0};
         String peerParam = req.getParameter("p");
 
-        List snarks = getSortedSnarks(req);
+        List<Snark> snarks = getSortedSnarks(req);
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -644,10 +645,11 @@ public class I2PSnarkServlet extends DefaultServlet {
                                 // multifile torrents have the getFiles() return lists of lists of filenames, but
                                 // each of those lists just contain a single file afaict...
                                 File df = Storage.getFileFromNames(f, files.get(i));
-                                if (df.delete())
-                                    _manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
-                                else
+                                if (df.delete()) {
+                                    //_manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
+                                } else {
                                     _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
+                                }
                             }
                             // step 2 make Set of dirs with reverse sort
                             Set<File> dirs = new TreeSet(Collections.reverseOrder());
@@ -659,16 +661,20 @@ public class I2PSnarkServlet extends DefaultServlet {
                             // step 3 delete dirs bottom-up
                             for (File df : dirs) {
                                 if (df.delete()) {
-                                    _manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
-                                } else if (_log.shouldLog(Log.WARN)) {
-                                    _log.warn("Could not delete dir " + df);
+                                    //_manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
+                                } else {
+                                    _manager.addMessage(_("Directory could not be deleted: {0}", df.getAbsolutePath()));
+                                    if (_log.shouldLog(Log.WARN))
+                                        _log.warn("Could not delete dir " + df);
                                 }
                             }
                             // step 4 delete base
                             if (f.delete()) {
-                                _manager.addMessage(_("Data dir deleted: {0}", f.getAbsolutePath()));
-                            } else if (_log.shouldLog(Log.WARN)) {
-                                _log.warn("Could not delete dir " + f);
+                                _manager.addMessage(_("Directory deleted: {0}", f.getAbsolutePath()));
+                            } else {
+                                _manager.addMessage(_("Directory could not be deleted: {0}", f.getAbsolutePath()));
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("Could not delete dir " + f);
                             }
                             break;
                         }
@@ -739,26 +745,12 @@ public class I2PSnarkServlet extends DefaultServlet {
                 _manager.addMessage(_("Error creating torrent - you must enter a file or directory"));
             }
         } else if ("StopAll".equals(action)) {
-            _manager.addMessage(_("Stopping all torrents and closing the I2P tunnel."));
-            List snarks = getSortedSnarks(req);
-            for (int i = 0; i < snarks.size(); i++) {
-                Snark snark = (Snark)snarks.get(i);
-                if (!snark.isStopped()) {
-                    _manager.stopTorrent(snark, false);
-                    try { Thread.sleep(50); } catch (InterruptedException ie) {}
-                }
-            }
-            if (_manager.util().connected()) {
-                // Give the stopped announces time to get out
-                try { Thread.sleep(2000); } catch (InterruptedException ie) {}
-                _manager.util().disconnect();
-                _manager.addMessage(_("I2P tunnel closed."));
-            }
+            _manager.stopAllTorrents(false);
         } else if ("StartAll".equals(action)) {
             _manager.addMessage(_("Opening the I2P tunnel and starting all torrents."));
-            List snarks = getSortedSnarks(req);
+            List<Snark> snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
-                Snark snark = (Snark)snarks.get(i);
+                Snark snark = snarks.get(i);
                 if (snark.isStopped())
                     snark.startTorrent();
             }

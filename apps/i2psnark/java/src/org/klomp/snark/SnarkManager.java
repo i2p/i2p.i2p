@@ -34,6 +34,8 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Manage multiple snarks
@@ -145,14 +147,21 @@ public class SnarkManager implements Snark.CompleteListener {
         _connectionAcceptor = new ConnectionAcceptor(_util);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
-        _context.addShutdownTask(new SnarkManagerShutdown());
+        // Not required, Jetty has a shutdown hook
+        //_context.addShutdownTask(new SnarkManagerShutdown());
     }
 
+    /*
+     *  Called by the webapp at Jetty shutdown.
+     *  Stops all torrents. Does not close the tunnel, so the announces have a chance.
+     *  Fix this so an individual webaapp stop will close the tunnel.
+     *  Runs inline.
+     */
     public void stop() {
         _running = false;
         _monitor.interrupt();
         _connectionAcceptor.halt();
-        (new SnarkManagerShutdown()).run();
+        stopAllTorrents(true);
     }
     
     /** hook to I2PSnarkUtil for the servlet */
@@ -1590,20 +1599,59 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
 
-    public class SnarkManagerShutdown extends I2PAppThread {
-        @Override
-        public void run() {
-            Set names = listTorrentFiles();
-            for (Iterator iter = names.iterator(); iter.hasNext(); ) {
-                Snark snark = getTorrent((String)iter.next());
-                if ( (snark != null) && (!snark.isStopped()) ) {
-                    snark.stopTorrent();
-                    try { Thread.sleep(50); } catch (InterruptedException ie) {}
+    /**
+     * Stop all running torrents, and close the tunnel after a delay
+     * to allow for announces.
+     * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
+     * the tunnel won't actually be closed as the SimpleScheduler is already shutdown
+     * or will be soon, so we delay a few seconds inline.
+     * @param finalShutdown if true, sleep at the end if any torrents were running
+     * @since 0.9.1
+     */
+    public void stopAllTorrents(boolean finalShutdown) {
+        if (finalShutdown && _log.shouldLog(Log.WARN))
+            _log.warn("SnarkManager final shutdown");
+        int count = 0;
+        for (Snark snark : _snarks.values()) {
+            if (!snark.isStopped()) {
+                if (count == 0)
+                    addMessage(_("Stopping all torrents and closing the I2P tunnel."));
+                count++;
+                if (finalShutdown)
+                    snark.stopTorrent(true);
+                else
+                    stopTorrent(snark, false);
+                // Throttle since every unannounce is now threaded.
+                // How to do this without creating a ton of threads?
+                try { Thread.sleep(20); } catch (InterruptedException ie) {}
+            }
+        }
+        if (_util.connected()) {
+            if (count > 0) {
+                // Schedule this even for final shutdown, as there's a chance
+                // that it's just this webapp that is stopping.
+                SimpleScheduler.getInstance().addEvent(new Disconnector(), 60*1000);
+                addMessage(_("Closing I2P tunnel after announces to trackers."));
+                if (finalShutdown) {
+                    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 }
+            } else {
+                _util.disconnect();
+                addMessage(_("I2P tunnel closed."));
             }
         }
     }
 
+    /** @since 0.9.1 */
+    private class Disconnector implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (_util.connected()) {
+                _util.disconnect();
+                addMessage(_("I2P tunnel closed."));
+            }
+        }
+    }
+    
     /**
      *  ignore case, current locale
      *  @since 0.9
