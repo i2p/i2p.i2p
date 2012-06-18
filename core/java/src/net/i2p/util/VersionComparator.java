@@ -22,7 +22,7 @@ public class VersionComparator implements Comparator<String> {
         while (lTokens.hasMoreTokens() && rTokens.hasMoreTokens()) {
             String lNumber = lTokens.nextToken();
             String rNumber = rTokens.nextToken();
-            int diff = intCompare(lNumber, rNumber);
+            int diff = longCompare(lNumber, rNumber);
             if (diff != 0)
                 return diff;
         }
@@ -34,19 +34,24 @@ public class VersionComparator implements Comparator<String> {
         return 0;
     }
 
-    private static final int intCompare(String lop, String rop) {
-        int left, right;
+    private static final int longCompare(String lop, String rop) {
+        long left, right;
         try {
-            left = Integer.parseInt(lop);
+            left = Long.parseLong(lop);
         } catch (NumberFormatException nfe) {
             return -1;
         }
         try {
-            right = Integer.parseInt(rop);
+            right = Long.parseLong(rop);
         } catch (NumberFormatException nfe) {
             return 1;
         }
-        return left - right;
+        long diff = left - right;
+        if (diff < 0)
+            return -1;
+        if (diff > 0)
+            return 1;
+        return 0;
     }
 
     private static final String VALID_SEPARATOR_CHARS = ".-_";

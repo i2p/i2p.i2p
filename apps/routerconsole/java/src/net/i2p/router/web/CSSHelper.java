@@ -56,7 +56,7 @@ public class CSSHelper extends HelperBase {
     public void setNews(String val) {
         // Protected with nonce in css.jsi
         if (val != null)
-            NewsFetcher.getInstance(_context).showNews(val.equals("1"));
+            NewsHelper.showNews(_context, val.equals("1"));
     }
 
     /**

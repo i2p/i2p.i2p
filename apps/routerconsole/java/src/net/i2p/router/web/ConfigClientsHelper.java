@@ -293,7 +293,7 @@ public class ConfigClientsHelper extends HelperBase {
      *  Like in DataHelper but doesn't convert null to ""
      *  There's a lot worse things a plugin could do but...
      */
-    static String stripHTML(Properties props, String key) {
+    public static String stripHTML(Properties props, String key) {
         String orig = props.getProperty(key);
         if (orig == null) return null;
         String t1 = orig.replace('<', ' ');

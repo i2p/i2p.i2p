@@ -1,6 +1,8 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.Set;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
+import net.i2p.router.update.ConsoleUpdateManager;
+import static net.i2p.update.UpdateType.*;
 
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 
@@ -333,7 +337,7 @@ public class ConfigClientsHandler extends FormHandler {
 
     /** @since 0.8.13 */
     private void updateAllPlugins() {
-        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+        if (NewsHelper.isAnyUpdateInProgress()) {
             addFormError(_("Plugin or update download already in progress."));
             return;
         }
@@ -346,17 +350,26 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void installPlugin(String url) {
-        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+        ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
+        if (mgr == null) {
+            addFormError("Update manager not registered, cannot install");
+            return;
+        }
+        if (mgr.isUpdateInProgress()) {
             addFormError(_("Plugin or update download already in progress."));
             return;
         }
-        PluginUpdateHandler puh = PluginUpdateHandler.getInstance(_context);
-        if (puh.isRunning()) {
-            addFormError(_("Plugin or update download already in progress."));
+        URI uri;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException use) {
+            addFormError(_("Bad URL {0}", url));
             return;
         }
-        puh.update(url);
-        addFormNotice(_("Downloading plugin from {0}", url));
+        if (mgr.installPlugin(uri))
+            addFormNotice(_("Downloading plugin from {0}", url));
+        else
+            addFormError("Cannot install, check logs");
         // So that update() will post a status to the summary bar before we reload
         try {
            Thread.sleep(1000);
@@ -364,16 +377,12 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void checkPlugin(String app) {
-        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
-            addFormError(_("Plugin or update download already in progress."));
+        ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
+        if (mgr == null) {
+            addFormError("Update manager not registered, cannot check");
             return;
         }
-        PluginUpdateChecker puc = PluginUpdateChecker.getInstance(_context);
-        if (puc.isRunning()) {
-            addFormError(_("Plugin or update download already in progress."));
-            return;
-        }
-        puc.update(app);
+        mgr.check(PLUGIN, app);
         addFormNotice(_("Checking plugin {0} for updates", app));
         // So that update() will post a status to the summary bar before we reload
         try {
