@@ -250,6 +250,7 @@ public class Snark
   private String rootDataDir = ".";
   private final CompleteListener completeListener;
   private boolean stopped;
+  private boolean starting;
   private byte[] id;
   private byte[] infoHash;
   private String additionalTrackerURL;
@@ -509,9 +510,19 @@ public class Snark
   }
 
   /**
-   * Start up contacting peers and querying the tracker
+   * Start up contacting peers and querying the tracker.
+   * Blocks if tunnel is not yet open.
    */
-  public void startTorrent() {
+  public synchronized void startTorrent() {
+      starting = true;
+      try {
+          x_startTorrent();
+      } finally {
+          starting = false;
+      }
+  }
+
+  private void x_startTorrent() {
     boolean ok = _util.connect();
     if (!ok) fatal("Unable to connect to I2P");
     if (coordinator == null) {
@@ -572,14 +583,24 @@ public class Snark
         debug("NOT starting TrackerClient???", NOTICE);
     }
   }
+
   /**
    * Stop contacting the tracker and talking with peers
    */
   public void stopTorrent() {
+      stopTorrent(false);
+  }
+
+  /**
+   * Stop contacting the tracker and talking with peers
+   * @param fast if true, limit the life of the unannounce threads
+   * @since 0.9.1
+   */
+  public synchronized void stopTorrent(boolean fast) {
     stopped = true;
     TrackerClient tc = trackerclient;
     if (tc != null)
-        tc.halt();
+        tc.halt(fast);
     PeerCoordinator pc = coordinator;
     if (pc != null)
         pc.halt();
@@ -668,6 +689,22 @@ public class Snark
      */
     public boolean isStopped() {
         return stopped;
+    }
+
+    /**
+     *  Startup in progress.
+     *  @since 0.9.1
+     */
+    public boolean isStarting() {
+        return starting && stopped;
+    }
+
+    /**
+     *  Set startup in progress.
+     *  @since 0.9.1
+     */
+    public void setStarting() {
+        starting = true;
     }
 
     /**

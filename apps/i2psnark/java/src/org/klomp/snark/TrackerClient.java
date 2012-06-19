@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -97,6 +98,7 @@ public class TrackerClient implements Runnable {
   // these 2 used in loop()
   private volatile boolean runStarted;
   private volatile  int consecutiveFails;
+  private volatile boolean _fastUnannounce;
 
   private final List<Tracker> trackers;
 
@@ -134,6 +136,7 @@ public class TrackerClient implements Runnable {
       stop = false;
       consecutiveFails = 0;
       runStarted = false;
+      _fastUnannounce = false;
       _thread = new I2PAppThread(this, _threadName + " #" + (++_runCount), true);
       _thread.start();
       started = true;
@@ -144,8 +147,9 @@ public class TrackerClient implements Runnable {
   
   /**
    * Interrupts this Thread to stop it.
+   * @param fast if true, limit the life of the unannounce threads
    */
-  public synchronized void halt() {
+  public synchronized void halt(boolean fast) {
     boolean wasStopped = stop;
     if (wasStopped) {
         if (_log.shouldLog(Log.WARN))
@@ -168,6 +172,7 @@ public class TrackerClient implements Runnable {
             _log.debug("Interrupting " + t.getName());
         t.interrupt();
     }
+    _fastUnannounce = true;
     if (!wasStopped)
         unannounce();
   }
@@ -236,7 +241,7 @@ public class TrackerClient implements Runnable {
    *  Do this one time only (not every time it is started).
    *  @since 0.9.1
    */
-  public void setup() {
+  private void setup() {
     // Construct the list of trackers for this torrent,
     // starting with the primary one listed in the metainfo,
     // followed by the secondary open trackers
@@ -415,6 +420,9 @@ public class TrackerClient implements Runnable {
                             tr.interval = LONG_SLEEP;  // slow down
                     }
                   }
+              } else {
+                  _util.debug("Not announcing to " + tr.announce + " last announce was " +
+                               new Date(tr.lastRequestTime) + " interval is " + DataHelper.formatDuration(tr.interval), Snark.INFO);
               }
               if ((!tr.stop) && maxSeenPeers < tr.seenPeers)
                   maxSeenPeers = tr.seenPeers;
@@ -439,6 +447,8 @@ public class TrackerClient implements Runnable {
                          }
                     }
                 }
+            } else {
+                _util.debug("Not getting PEX peers", Snark.INFO);
             }
 
             // Get peers from DHT
@@ -476,6 +486,8 @@ public class TrackerClient implements Runnable {
                          }
                     }
                 }
+            } else {
+                _util.debug("Not getting DHT peers", Snark.INFO);
             }
 
 
@@ -534,7 +546,7 @@ public class TrackerClient implements Runnable {
           if (_util.connected() &&
               tr.started && (!tr.stop) && tr.trackerProblems == null) {
               try {
-                  (new I2PAppThread(new Unannouncer(tr), _threadName + " Unannounce " + (++i), true)).start();
+                  (new I2PAppThread(new Unannouncer(tr), _threadName + " U" + (++i), true)).start();
               } catch (OutOfMemoryError oom) {
                   // probably ran out of threads, ignore
                   tr.reset();
@@ -611,8 +623,9 @@ public class TrackerClient implements Runnable {
     _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
       
     tr.lastRequestTime = System.currentTimeMillis();
-    // Don't wait for a response to stopped.
-    File fetched = _util.get(s, true, event.equals(STOPPED_EVENT) ? -1 : 0);
+    // Don't wait for a response to stopped when shutting down
+    boolean fast = _fastUnannounce && event.equals(STOPPED_EVENT);
+    File fetched = _util.get(s, true, fast ? -1 : 0);
     if (fetched == null) {
         throw new IOException("Error fetching " + s);
     }
@@ -671,7 +684,7 @@ public class TrackerClient implements Runnable {
    *  @return true for i2p hosts only
    *  @since 0.7.12
    */
-  static boolean isValidAnnounce(String ann) {
+  public static boolean isValidAnnounce(String ann) {
     URL url;
     try {
        url = new URL(ann);

@@ -67,7 +67,10 @@ class ConnectionManager {
         // TODO change proto to PROTO_STREAMING someday.
         // Right now we get everything, and rely on Datagram to specify PROTO_UDP.
         // PacketQueue has sent PROTO_STREAMING since the beginning of mux support (0.7.1)
-        _session.addMuxedSessionListener(_messageHandler, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
+        // As of 0.9.1, new option to enforce streaming protocol, off by default
+        // As of 0.9.1, listen on configured port (default 0 = all)
+        int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
+        _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
         _outboundQueue = new PacketQueue(_context, _session, this);
         /** Socket timeout for accept() */
         _soTimeout = -1;

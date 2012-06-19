@@ -295,6 +295,19 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
+    /**
+     *  Update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel || sockMgr == null)
+            return;
+        Properties props = tunnel.getClientOptions();
+        sockMgr.setDefaultOptions(sockMgr.buildOptions(props));
+    }
+
     protected int getHandlerCount() { 
         int rv = DEFAULT_HANDLER_COUNT;
         String cnt = getTunnel().getClientOptions().getProperty(PROP_HANDLER_COUNT);
@@ -408,7 +421,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     
     protected void blockingHandle(I2PSocket socket) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Incoming connection to '" + toString() + "' from: " + socket.getPeerDestination().calculateHash().toBase64());
+            _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
+                      " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
         long afterAccept = I2PAppContext.getGlobalContext().clock().now();
         long afterSocket = -1;
         //local is fast, so synchronously. Does not need that many

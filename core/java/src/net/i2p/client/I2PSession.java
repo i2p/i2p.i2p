@@ -38,6 +38,9 @@ public interface I2PSession {
     /** Send a new message to the given destination, containing the specified
      * payload, returning true if the router feels confident that the message
      * was delivered.
+     *
+     * WARNING: It is recommended that you use a method that specifies the protocol and ports.
+     *
      * @param dest location to send the message
      * @param payload body of the message to be sent (unencrypted)
      * @return whether it was accepted by the router for delivery or not
@@ -149,6 +152,9 @@ public interface I2PSession {
     public void reportAbuse(int msgId, int severity) throws I2PSessionException;
 
     /** Instruct the I2PSession where it should send event notifications
+     *
+     *  WARNING: It is recommended that you use a method that specifies the protocol and ports.
+     *
      * @param lsnr listener to retrieve events
      */
     public void setSessionListener(I2PSessionListener lsnr);

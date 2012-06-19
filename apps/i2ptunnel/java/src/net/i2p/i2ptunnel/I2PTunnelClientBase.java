@@ -471,8 +471,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /** 
-     * create the default options (using the default timeout, etc)
-     *
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
      */
     protected I2PSocketOptions getDefaultOptions() {
         Properties defaultOpts = getTunnel().getClientOptions();
@@ -483,8 +484,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
     
     /** 
-     * create the default options (using the default timeout, etc)
-     *
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
+     * Do not use overrides for per-socket options.
      */
     protected I2PSocketOptions getDefaultOptions(Properties overrides) {
         Properties defaultOpts = getTunnel().getClientOptions();
@@ -493,6 +496,22 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
         return opts;
+    }
+
+    /**
+     *  Update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel)
+            return;
+        I2PSocketManager sm = _ownDest ? sockMgr : socketManager;
+        if (sm == null)
+            return;
+        Properties props = tunnel.getClientOptions();
+        sm.setDefaultOptions(sockMgr.buildOptions(props));
     }
 
     /**

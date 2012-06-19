@@ -28,28 +28,46 @@ import net.i2p.util.Log;
  * Direct instantiation by others is deprecated.
  */
 public class I2PSocketManagerFull implements I2PSocketManager {
-    private I2PAppContext _context;
-    private Log _log;
-    private I2PSession _session;
-    private I2PServerSocketFull _serverSocket;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final I2PSession _session;
+    private final I2PServerSocketFull _serverSocket;
     private StandardServerSocket _realServerSocket;
-    private ConnectionOptions _defaultOptions;
+    private final ConnectionOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
     private int _maxStreams;
     private static int __managerId = 0;
-    private ConnectionManager _connectionManager;
+    private final ConnectionManager _connectionManager;
     
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
      * This includes the time waiting in the queue.  Currently set to 5 seconds.
      */
     private static final long ACCEPT_TIMEOUT_DEFAULT = 5*1000;
-    
+
+    /**
+     * @deprecated use 4-arg constructor
+     * @throws UnsupportedOperationException always
+     */
     public I2PSocketManagerFull() {
+        throw new UnsupportedOperationException();
+    }
+    
+    /** how many streams will we allow at once?  */
+    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+    
+    /**
+     * @deprecated use 4-arg constructor
+     * @throws UnsupportedOperationException always
+     */
+    public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
+        throw new UnsupportedOperationException();
     }
 
     /**
+     * This is what I2PSocketManagerFactory.createManager() returns.
+     * Direct instantiation by others is deprecated.
      * 
      * @param context
      * @param session
@@ -57,22 +75,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @param name
      */
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
-        this();
-        init(context, session, opts, name);
-    }
-    
-    /** how many streams will we allow at once?  */
-    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
-    
-    /**
-     *
-     * 
-     * @param context
-     * @param session
-     * @param opts
-     * @param name 
-     */
-    public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
         _session = session;
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
@@ -98,7 +100,15 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         }
     }
 
+    /**
+     *  Create a copy of the current options, to be used in a setDefaultOptions() call.
+     */
     public I2PSocketOptions buildOptions() { return buildOptions(null); }
+
+    /**
+     *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *  @param opts The new options, may be null
+     */
     public I2PSocketOptions buildOptions(Properties opts) {
         ConnectionOptions curOpts = new ConnectionOptions(_defaultOptions);
         curOpts.setProperties(opts);
@@ -159,10 +169,24 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public void setAcceptTimeout(long ms) { _acceptTimeout = ms; }
     public long getAcceptTimeout() { return _acceptTimeout; }
 
+    /**
+     *  Update the options on a running socket manager.
+     *  Parameters in the I2PSocketOptions interface may be changed directly
+     *  with the setters; no need to use this method for those.
+     *  This does NOT update the underlying I2CP or tunnel options; use getSession().updateOptions() for that.
+     *  @param options as created from a call to buildOptions(properties), non-null
+     */
     public void setDefaultOptions(I2PSocketOptions options) {
-        _defaultOptions = new ConnectionOptions((ConnectionOptions) options);
+        if (!(options instanceof ConnectionOptions))
+            throw new IllegalArgumentException();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Changing options from:\n " + _defaultOptions + "\nto:\n " + options);
+        _defaultOptions.updateAll((ConnectionOptions) options);
     }
 
+    /**
+     *  Current options, not a copy, setters may be used to make changes.
+     */
     public I2PSocketOptions getDefaultOptions() {
         return _defaultOptions;
     }

@@ -59,6 +59,15 @@ public abstract class I2PTunnelTask extends EventDispatcherImpl {
     public abstract boolean close(boolean forced);
 
     /**
+     *  Notify the task that I2PTunnel's options have been updated.
+     *  Extending classes should override and call I2PTunnel.getClientOptions(),
+     *  then update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    public void optionsUpdated(I2PTunnel tunnel) {}
+
+    /**
      *  For tasks that don't call I2PTunnel.addSession() directly
      *  @since 0.8.13
      */

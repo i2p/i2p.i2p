@@ -1,3 +1,42 @@
+2012-06-18 zzz
+ * i2psnark:
+   - Improve torrent shutdown handling to maximize chance of
+     announces getting to tracker
+   - Thread task to open tunnel and improve UI feedback while open is pending
+   - Clean up delete-torrent messages
+   - Remove redundant shutdown hook
+   - Avoid NPE in PEX message handling
+   - Log tweaks
+
+2012-06-15 zzz
+ * I2PSocketEepGet: Use specified port
+ * I2PTunnel:
+   - Don't strip port from an I2P URL
+   - More client options cleanups
+   - Options changes now propagate to running
+     socket managers and sessions, and through to the router
+   - Better parsing of jump server URLs
+ * NetDB: Only publish stats every so often, to improve
+   anonymity while preserving the ability to monitor
+   the network (effective next release)
+ * SocketManager:
+   - Simplify factory, use 4-arg constructor,
+     make fields final, deprecate 0-arg constructor
+   - Improve how options are updated
+   - Javadocs
+
+2012-06-13 zzz
+ * I2PSocketEepGet: Set port to 80
+ * I2PTunnel:
+   - Pass port through HTTP client proxy
+   - HTTP server proxy sets host header to
+     the value of "spoofedhost.xx" option for port xx
+   - Set client options more efficiently
+ * i2psnark: Possible fix for piece-after-choke
+ * Streaming:
+   - Channel cleanups and comments
+   - New I2PSocketAddress
+
 2012-06-11 zzz
  * i2psnark:
    - Display torrent file downloads in torrent area
@@ -8,7 +47,7 @@
    - Reduce delay between peer adds for faster startup
    - Thread the announces and reduce timeout when stopping
  * NativeBigInteger: Workaround for Raspberry Pi to load the correct lib
- * Router: Don't let shutdown tasks hang the shutdown
+ * Router: Don't let shutdown tasks hang the shutdown (tickets #564, #566)
 
 2012-06-08 zzz
  * i2psnark:

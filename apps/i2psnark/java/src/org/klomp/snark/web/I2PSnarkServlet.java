@@ -74,6 +74,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(I2PSnarkServlet.class);
         _nonce = _context.random().nextLong();
+        // FIXME instantiate new one every time
         _manager = SnarkManager.instance();
         String configFile = _context.getProperty(PROP_CONFIG_FILE);
         if ( (configFile == null) || (configFile.trim().length() <= 0) )
@@ -322,7 +323,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         final long stats[] = {0,0,0,0,0,0};
         String peerParam = req.getParameter("p");
 
-        List snarks = getSortedSnarks(req);
+        List<Snark> snarks = getSortedSnarks(req);
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -407,7 +408,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                                             ua.startsWith("Dillo"));
 
         boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
-        if (_manager.util().connected()) {
+        if (_manager.isStopping()) {
+            out.write("&nbsp;");
+        } else if (_manager.util().connected()) {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else {
@@ -421,7 +424,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("\">");
             if (isDegraded)
                 out.write("</a>");
-        } else if (!snarks.isEmpty()) {
+        } else if ((!_manager.util().isConnecting()) && !snarks.isEmpty()) {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else
@@ -572,14 +575,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (String name : _manager.listTorrentFiles()) {
-                        Snark snark = _manager.getTorrent(name);
-                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
-                            snark.startTorrent();
-                            _manager.addMessage(_("Starting up torrent {0}", snark.getBaseName()));
-                            break;
-                        }
-                    }
+                    _manager.startTorrent(infoHash);
                 }
             }
         } else if (action.startsWith("Remove_")) {
@@ -644,10 +640,11 @@ public class I2PSnarkServlet extends DefaultServlet {
                                 // multifile torrents have the getFiles() return lists of lists of filenames, but
                                 // each of those lists just contain a single file afaict...
                                 File df = Storage.getFileFromNames(f, files.get(i));
-                                if (df.delete())
-                                    _manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
-                                else
+                                if (df.delete()) {
+                                    //_manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
+                                } else {
                                     _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
+                                }
                             }
                             // step 2 make Set of dirs with reverse sort
                             Set<File> dirs = new TreeSet(Collections.reverseOrder());
@@ -659,16 +656,20 @@ public class I2PSnarkServlet extends DefaultServlet {
                             // step 3 delete dirs bottom-up
                             for (File df : dirs) {
                                 if (df.delete()) {
-                                    _manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
-                                } else if (_log.shouldLog(Log.WARN)) {
-                                    _log.warn("Could not delete dir " + df);
+                                    //_manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
+                                } else {
+                                    _manager.addMessage(_("Directory could not be deleted: {0}", df.getAbsolutePath()));
+                                    if (_log.shouldLog(Log.WARN))
+                                        _log.warn("Could not delete dir " + df);
                                 }
                             }
                             // step 4 delete base
                             if (f.delete()) {
-                                _manager.addMessage(_("Data dir deleted: {0}", f.getAbsolutePath()));
-                            } else if (_log.shouldLog(Log.WARN)) {
-                                _log.warn("Could not delete dir " + f);
+                                _manager.addMessage(_("Directory deleted: {0}", f.getAbsolutePath()));
+                            } else {
+                                _manager.addMessage(_("Directory could not be deleted: {0}", f.getAbsolutePath()));
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("Could not delete dir " + f);
                             }
                             break;
                         }
@@ -740,29 +741,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                 _manager.addMessage(_("Error creating torrent - you must enter a file or directory"));
             }
         } else if ("StopAll".equals(action)) {
-            _manager.addMessage(_("Stopping all torrents and closing the I2P tunnel."));
-            List snarks = getSortedSnarks(req);
-            for (int i = 0; i < snarks.size(); i++) {
-                Snark snark = (Snark)snarks.get(i);
-                if (!snark.isStopped()) {
-                    _manager.stopTorrent(snark, false);
-                    try { Thread.sleep(50); } catch (InterruptedException ie) {}
-                }
-            }
-            if (_manager.util().connected()) {
-                // Give the stopped announces time to get out
-                try { Thread.sleep(2000); } catch (InterruptedException ie) {}
-                _manager.util().disconnect();
-                _manager.addMessage(_("I2P tunnel closed."));
-            }
+            _manager.stopAllTorrents(false);
         } else if ("StartAll".equals(action)) {
-            _manager.addMessage(_("Opening the I2P tunnel and starting all torrents."));
-            List snarks = getSortedSnarks(req);
-            for (int i = 0; i < snarks.size(); i++) {
-                Snark snark = (Snark)snarks.get(i);
-                if (snark.isStopped())
-                    snark.startTorrent();
-            }
+            _manager.startAllTorrents();
         } else if ("Clear".equals(action)) {
             _manager.clearMessages();
         } else {
@@ -826,7 +807,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 name = name.trim();
                 hurl = hurl.trim();
                 aurl = aurl.trim().replace("=", "&#61;");
-                if (name.length() > 0 && hurl.startsWith("http://") && aurl.startsWith("http://")) {
+                if (name.length() > 0 && hurl.startsWith("http://") && TrackerClient.isValidAnnounce(aurl)) {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
@@ -998,6 +979,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                 "<br>" + err;
             }
+        } else if (snark.isStarting()) {
+            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Starting");
         } else if (remaining == 0 || needed == 0) {  // < 0 means no meta size yet
             // partial complete or seeding
             if (isRunning) {
@@ -1150,6 +1133,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (showPeers)
             parameters = parameters + "&p=1";
         if (isRunning) {
+            // Stop Button
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
@@ -1160,7 +1144,9 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("\">");
             if (isDegraded)
                 out.write("</a>");
-        } else {
+        } else if (!snark.isStarting()) {
+            if (!_manager.isStopping()) {
+                // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
@@ -1172,8 +1158,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                 out.write("\">");
                 if (isDegraded)
                     out.write("</a>");
-
+            }
             if (isValid) {
+                // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
@@ -1193,6 +1180,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                     out.write("</a>");
             }
 
+            // Delete Button
             // Doesnt work with Opera so use noThinsp instead of isDegraded
             if (noThinsp)
                 out.write("<a href=\"/i2psnark/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");

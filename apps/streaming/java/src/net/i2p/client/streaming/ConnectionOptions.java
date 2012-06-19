@@ -19,6 +19,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
     private boolean _fullySigned;
     private boolean _answerPings;
+    private boolean _enforceProto;
     private volatile int _windowSize;
     private int _receiveWindow;
     private int _profile;
@@ -87,6 +88,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
     public static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
     public static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
+    /** @since 0.9.1 */
+    public static final String PROP_ENFORCE_PROTO = "i2p.streaming.enforceProtocol";
     
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 6;
@@ -95,6 +98,11 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final int DEFAULT_INITIAL_ACK_DELAY = 2*1000;    
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
+    /**
+     *  If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1.
+     *  @since 0.9.1
+     */
+    private static final boolean DEFAULT_ENFORCE_PROTO = true;
 
     // Syncronization fix, but doing it this way causes NPE...
     // FIXME private final int _trend[] = new int[TREND_COUNT]; FIXME
@@ -237,7 +245,33 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(ConnectionOptions opts) {
         super(opts);
-        if (opts != null) {
+        if (opts != null)
+            update(opts);
+    }
+    
+    /**
+     *  Update everything by copying over from opts
+     *  @param opts non-null
+     *  @since 0.9.1
+     */
+    public void updateAll(ConnectionOptions opts) {
+        // user is unlikely to change these 6 between buildOptions() and setDefaultOptions(),
+        // since they may be updated directly, but just in case...
+        setConnectTimeout(opts.getConnectTimeout());
+        setReadTimeout(opts.getReadTimeout());
+        setWriteTimeout(opts.getWriteTimeout());
+        setMaxBufferSize(opts.getMaxBufferSize());
+        setLocalPort(opts.getLocalPort());
+        setPort(opts.getPort());
+        update(opts);
+    }
+    
+    /**
+     *  Update everything (except super) by copying over from opts
+     *  @param opts non-null
+     *  @since 0.9.1
+     */
+    private void update(ConnectionOptions opts) {
             setMaxWindowSize(opts.getMaxWindowSize());
             setConnectDelay(opts.getConnectDelay());
             setProfile(opts.getProfile());
@@ -258,6 +292,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             //setWriteTimeout(opts.getWriteTimeout());
             //setReadTimeout(opts.getReadTimeout());
             setAnswerPings(opts.getAnswerPings());
+            setEnforceProtocol(opts.getEnforceProtocol());
             initLists(opts);
             _maxConnsPerMinute = opts.getMaxConnsPerMinute();
             _maxConnsPerHour = opts.getMaxConnsPerHour();
@@ -265,7 +300,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerMinute = opts.getMaxTotalConnsPerMinute();
             _maxTotalConnsPerHour = opts.getMaxTotalConnsPerHour();
             _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
-        }
     }
     
     @Override
@@ -292,6 +326,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         // overrides default in super()
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
+        setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
         initLists(opts);
         _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
         _maxConnsPerHour = getInt(opts, PROP_MAX_CONNS_HOUR, 0);
@@ -301,6 +336,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
     
+    /**
+     *  Note: NOT part of the interface
+     */
     @Override
     public void setProperties(Properties opts) {
         super.setProperties(opts);
@@ -343,6 +381,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
+        if (opts.containsKey(PROP_ENFORCE_PROTO))
+            setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
         initLists(opts);
         if (opts.containsKey(PROP_MAX_CONNS_MIN))
             _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
@@ -391,6 +431,19 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public boolean getAnswerPings() { return _answerPings; }
     public void setAnswerPings(boolean yes) { _answerPings = yes; }
+    
+    /**
+     * Do we receive all traffic, or only traffic marked with I2PSession.PROTO_STREAMING (6) ?
+     * Default false.
+     * If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1
+     * (released March 2009), which is when streaming started sending the PROTO_STREAMING indication.
+     * Set to true if you are running multiple protocols on a single Destination.
+     *
+     * @return if we do
+     * @since 0.9.1
+     */
+    public boolean getEnforceProtocol() { return _enforceProto; }
+    public void setEnforceProtocol(boolean yes) { _enforceProto = yes; }
     
     /** 
      * How many messages will we send before waiting for an ACK?
@@ -611,30 +664,35 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private void initLists(Properties opts) {
         _accessListEnabled = getBool(opts, PROP_ENABLE_ACCESS_LIST, false);
         _blackListEnabled = getBool(opts, PROP_ENABLE_BLACKLIST, false);
+        // Don't think these would ever be accessed simultaneously,
+        // but avoid concurrent modification just in case
+        Set<Hash> accessList, blackList;
         if (_accessListEnabled)
-            _accessList = new HashSet();
+            accessList = new HashSet();
         else
-            _accessList = Collections.EMPTY_SET;
+            accessList = Collections.EMPTY_SET;
         if (_blackListEnabled)
-            _blackList = new HashSet();
+            blackList = new HashSet();
         else
-            _blackList = Collections.EMPTY_SET;
-        if (!(_accessListEnabled || _blackListEnabled))
-            return;
-        String hashes = opts.getProperty(PROP_ACCESS_LIST);
-        if (hashes == null)
-            return;
-        StringTokenizer tok = new StringTokenizer(hashes, ", ");
-        while (tok.hasMoreTokens()) {
-            String hashstr = tok.nextToken();
-            Hash h = ConvertToHash.getHash(hashstr);
-            if (h == null)
-                error("bad list hash: " + hashstr);
-            else if (_blackListEnabled)
-                _blackList.add(h);
-            else
-                _accessList.add(h);
+            blackList = Collections.EMPTY_SET;
+        if (_accessListEnabled || _blackListEnabled) {
+            String hashes = opts.getProperty(PROP_ACCESS_LIST);
+            if (hashes == null)
+                return;
+            StringTokenizer tok = new StringTokenizer(hashes, ", ");
+            while (tok.hasMoreTokens()) {
+                String hashstr = tok.nextToken();
+                Hash h = ConvertToHash.getHash(hashstr);
+                if (h == null)
+                    error("bad list hash: " + hashstr);
+                else if (_blackListEnabled)
+                    blackList.add(h);
+                else
+                    accessList.add(h);
+            }
         }
+        _accessList = accessList;
+        _blackList = blackList;
         if (_accessListEnabled && _accessList.isEmpty())
             error("Connection access list enabled but no valid entries; no peers can connect");
         else if (_blackListEnabled && _blackList.isEmpty())
@@ -647,9 +705,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         log.error(s);
     }
 
-	@Override
+    /** doesn't include everything */
+    @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(128);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("conDelay=").append(_connectDelay);
         buf.append(" maxSize=").append(_maxMessageSize);
         buf.append(" rtt=").append(_rtt);
@@ -663,6 +722,14 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         buf.append(" inactivityTimeout=").append(_inactivityTimeout);
         buf.append(" inboundBuffer=").append(_inboundBufferSize);
         buf.append(" maxWindowSize=").append(_maxWindowSize);
+        buf.append(" blacklistSize=").append(_blackList.size());
+        buf.append(" whitelistSize=").append(_accessList.size());
+        buf.append(" maxConns=").append(_maxConnsPerMinute).append('/')
+                                .append(_maxConnsPerHour).append('/')
+                                .append(_maxConnsPerDay);
+        buf.append(" maxTotalConns=").append(_maxTotalConnsPerMinute).append('/')
+                                .append(_maxTotalConnsPerHour).append('/')
+                                .append(_maxTotalConnsPerDay);
         return buf.toString();
     }
     

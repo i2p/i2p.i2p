@@ -65,10 +65,11 @@ class StandardSocket extends Socket {
     }
 
     /**
-     *  @return null always
+     *  @return null always, see MessageChannel for more info
      */
     @Override
     public SocketChannel getChannel() {
+        //return _socket.getChannel();
         return null;
     }
 
