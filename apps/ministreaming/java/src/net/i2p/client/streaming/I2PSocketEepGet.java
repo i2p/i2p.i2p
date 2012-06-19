@@ -111,7 +111,7 @@ public class I2PSocketEepGet extends EepGet {
             if ("http".equals(url.getProtocol())) {
                 String host = url.getHost();
                 int port = url.getPort();
-                if (port <= 0 || port >= 65535)
+                if (port <= 0 || port > 65535)
                     port = 80;
 
                 // HTTP Proxy compatibility http://i2p/B64KEY/blah

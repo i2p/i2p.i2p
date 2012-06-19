@@ -122,7 +122,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             Properties opts = getTunnel().getClientOptions();
             String spoofHost;
             int ourPort = socket.getLocalPort();
-            if (ourPort != 80 && ourPort > 0 && ourPort < 65535 && opts != null) {
+            if (ourPort != 80 && ourPort > 0 && ourPort <= 65535 && opts != null) {
                 String portSpoof = opts.getProperty("spoofedHost." + ourPort);
                 if (portSpoof != null)
                     spoofHost = portSpoof.trim();

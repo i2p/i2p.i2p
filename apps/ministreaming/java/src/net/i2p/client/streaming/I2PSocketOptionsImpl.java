@@ -200,6 +200,9 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
 
     /**
      *  The local port.
+     *  Zero (default) means you will receive traffic on all ports.
+     *  Nonzero means you will get traffic ONLY for that port, use with care,
+     *  as most applications do not specify a remote port.
      *  @param port 0 - 65535
      *  @since 0.8.9
      */
