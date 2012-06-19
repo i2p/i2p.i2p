@@ -61,6 +61,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private ConnectionAcceptor _connectionAcceptor;
     private Thread _monitor;
     private volatile boolean _running;
+    private volatile boolean _stopping;
     private final Map<String, Tracker> _trackerMap;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
@@ -164,6 +165,9 @@ public class SnarkManager implements Snark.CompleteListener {
         stopAllTorrents(true);
     }
     
+    /** @since 0.9.1 */
+    public boolean isStopping() { return _stopping; }
+
     /** hook to I2PSnarkUtil for the servlet */
     public I2PSnarkUtil util() { return _util; }
 
@@ -1684,6 +1688,7 @@ public class SnarkManager implements Snark.CompleteListener {
      * @since 0.9.1
      */
     public void stopAllTorrents(boolean finalShutdown) {
+        _stopping = true;
         if (finalShutdown && _log.shouldLog(Log.WARN))
             _log.warn("SnarkManager final shutdown");
         int count = 0;
@@ -1712,6 +1717,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
             } else {
                 _util.disconnect();
+                _stopping = false;
                 addMessage(_("I2P tunnel closed."));
             }
         }
@@ -1722,6 +1728,7 @@ public class SnarkManager implements Snark.CompleteListener {
         public void timeReached() {
             if (_util.connected()) {
                 _util.disconnect();
+                _stopping = false;
                 addMessage(_("I2P tunnel closed."));
             }
         }

@@ -408,7 +408,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                                             ua.startsWith("Dillo"));
 
         boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
-        if (_manager.util().connected()) {
+        if (_manager.isStopping()) {
+            out.write("&nbsp;");
+        } else if (_manager.util().connected()) {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else {
@@ -1142,6 +1144,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             if (isDegraded)
                 out.write("</a>");
         } else if (!snark.isStarting()) {
+            if (!_manager.isStopping()) {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
@@ -1154,7 +1157,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 out.write("\">");
                 if (isDegraded)
                     out.write("</a>");
-
+            }
             if (isValid) {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
