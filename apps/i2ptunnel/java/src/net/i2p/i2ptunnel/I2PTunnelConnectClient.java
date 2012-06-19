@@ -132,8 +132,9 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     }
 
     /** 
-     * create the default options (using the default timeout, etc)
-     *
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
      */
     @Override
     protected I2PSocketOptions getDefaultOptions() {
