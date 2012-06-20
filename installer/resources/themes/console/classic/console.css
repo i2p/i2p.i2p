@@ -216,6 +216,10 @@ div.routersummary h3 a, div.routersummary h4 a {
      text-decoration: none;
 }
 
+div.routersummary ul {
+     text-align: left !important;
+}
+
 div.routersummary table {
      border: 0;
      text-align: center !important;
@@ -232,6 +236,11 @@ div.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 10px;
 }
 
 div.tunnels table {

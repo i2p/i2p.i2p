@@ -226,6 +226,10 @@ div.routersummary h4 {
      line-height: 100% !important;
 }
 
+div.routersummary ul {
+     text-align: left !important;
+}
+
 div.routersummary table {
      border: 0;
      text-align: center !important;
@@ -263,6 +267,11 @@ div.routersummary tr {
 div.routersummary td:first-child {
      max-width: 90px;
      overflow: hidden;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 10px;
 }
 
 div.tunnels table{
