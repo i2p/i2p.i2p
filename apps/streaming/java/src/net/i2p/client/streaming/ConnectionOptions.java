@@ -102,7 +102,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1.
      *  @since 0.9.1
      */
-    private static final boolean DEFAULT_ENFORCE_PROTO = true;
+    private static final boolean DEFAULT_ENFORCE_PROTO = false;
 
     // Syncronization fix, but doing it this way causes NPE...
     // FIXME private final int _trend[] = new int[TREND_COUNT]; FIXME

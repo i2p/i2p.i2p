@@ -238,6 +238,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
         //if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
         //    defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        verifySocketManager();
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if(!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT)) {
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
@@ -969,13 +971,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 return;
             }
 
-            //Properties opts = new Properties();
+            Properties opts = new Properties();
             //opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);
             // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
             // dont want to hard link to here
             //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
-            //I2PSocketOptions sktOpts = getDefaultOptions(opts);
-            I2PSocketOptions sktOpts = getDefaultOptions();
+            I2PSocketOptions sktOpts = getDefaultOptions(opts);
             if (remotePort > 0)
                 sktOpts.setPort(remotePort);
             I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
