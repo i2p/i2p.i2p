@@ -34,15 +34,8 @@ class I2PSimpleSession extends I2PSessionImpl2 {
      * @throws I2PSessionException if there is a problem
      */
     public I2PSimpleSession(I2PAppContext context, Properties options) throws I2PSessionException {
-        // Warning, does not call super()
-        _context = context;
-        _log = context.logManager().getLog(I2PSimpleSession.class);
+        super(context, options);
         _handlerMap = new SimpleMessageHandlerMap(context);
-        _closed = true;
-        _closing = false;
-        if (options == null)
-            options = System.getProperties();
-        loadConfig(options);
     }
 
     /**
@@ -79,6 +72,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                 _reader = new I2CPMessageReader(in, this);
             }
             // we do not receive payload messages, so we do not need an AvailabilityNotifier
+            // ... or an Idle timer, or a VerifyUsage
             _reader.startReading();
 
         } catch (UnknownHostException uhe) {

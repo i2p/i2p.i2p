@@ -64,7 +64,7 @@ import net.i2p.util.SimpleScheduler;
  *
  * @author zzz
  */
-class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
+class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
     private final I2PSessionDemultiplexer _demultiplexer;
 
@@ -233,7 +233,6 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
         }
         ((MuxedAvailabilityNotifier)_availabilityNotifier).available(id, size, getProto(msg),
                                                                      getFromPort(msg), getToPort(msg));
-        SimpleScheduler.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {

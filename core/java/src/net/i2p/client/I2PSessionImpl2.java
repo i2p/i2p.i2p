@@ -28,6 +28,8 @@ import net.i2p.util.Log;
 /**
  * Thread safe implementation of an I2P session running over TCP.  
  *
+ * Unused directly, see I2PSessionMuxedImpl extension.
+ *
  * @author jrandom
  */
 class I2PSessionImpl2 extends I2PSessionImpl {
@@ -43,7 +45,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     private boolean _noEffort;
 
     /** for extension */
-    public I2PSessionImpl2() {}
+    protected I2PSessionImpl2(I2PAppContext context, Properties options) {
+        super(context, options);
+    }
 
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
@@ -56,7 +60,6 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      */
     public I2PSessionImpl2(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
         super(ctx, destKeyStream, options);
-        _log = ctx.logManager().getLog(I2PSessionImpl2.class);
         _sendingStates = new HashSet(32);
         // default is BestEffort
         _noEffort = "none".equals(getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
@@ -296,10 +299,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         **********/
         
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
+        //if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
         
         long nonce = _context.random().nextInt(Integer.MAX_VALUE);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
+        //if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
         MessageState state = new MessageState(_context, nonce, getPrefix());
         //state.setKey(key);
         //state.setTags(sentTags);
@@ -323,7 +326,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         //    }
         //}
 
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
+        //if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
         long beforeSendingSync = _context.clock().now();
         long inSendingSync = 0;
         synchronized (_sendingStates) {
