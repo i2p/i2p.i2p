@@ -1093,7 +1093,7 @@ public class TunnelPool {
             }
             if (peers == null) {
                 setLengthOverride();
-                peers = _peerSelector.selectPeers(_context, settings);
+                peers = _peerSelector.selectPeers(settings);
             }
 
             if ( (peers == null) || (peers.isEmpty()) ) {

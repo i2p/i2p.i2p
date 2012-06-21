@@ -31,6 +31,12 @@ import net.i2p.util.VersionComparator;
  * Todo: there's nothing non-static in here
  */
 public abstract class TunnelPeerSelector {
+    protected final RouterContext ctx;
+
+    protected TunnelPeerSelector(RouterContext context) {
+        ctx = context;
+    }
+
     /**
      * Which peers should go into the next tunnel for the given settings?  
      * 
@@ -40,12 +46,12 @@ public abstract class TunnelPeerSelector {
      *         to build through, and the settings reject 0 hop tunnels, this will
      *         return null.
      */
-    public abstract List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings);
+    public abstract List<Hash> selectPeers(TunnelPoolSettings settings);
     
     /**
      *  @return randomized number of hops 0-7, not including ourselves
      */
-    protected int getLength(RouterContext ctx, TunnelPoolSettings settings) {
+    protected int getLength(TunnelPoolSettings settings) {
         int length = settings.getLength();
         int override = settings.getLengthOverride();
         if (override >= 0) {
@@ -109,7 +115,7 @@ public abstract class TunnelPeerSelector {
      *  Needs analysis and testing
      *  @return should always be false
      */
-    protected List<Hash> selectExplicit(RouterContext ctx, TunnelPoolSettings settings, int length) {
+    protected List<Hash> selectExplicit(TunnelPoolSettings settings, int length) {
         String peers = null;
         Properties opts = settings.getUnknownOptions();
         if (opts != null)
@@ -173,7 +179,7 @@ public abstract class TunnelPeerSelector {
     /** 
      * Pick peers that we want to avoid
      */
-    public Set<Hash> getExclude(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+    public Set<Hash> getExclude(boolean isInbound, boolean isExploratory) {
         // we may want to update this to skip 'hidden' or 'unreachable' peers, but that
         // isn't safe, since they may publish one set of routerInfo to us and another to
         // other peers.  the defaults for filterUnreachable has always been to return false,
@@ -196,7 +202,7 @@ public abstract class TunnelPeerSelector {
         peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
         peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
-        if (filterUnreachable(ctx, isInbound, isExploratory)) {
+        if (filterUnreachable(isInbound, isExploratory)) {
             // NOTE: filterUnreachable returns true for inbound, false for outbound
             // This is the only use for getPeersByCapability? And the whole set of datastructures in PeerManager?
             Collection<Hash> caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
@@ -439,7 +445,7 @@ public abstract class TunnelPeerSelector {
      * do we want to skip peers who haven't been up for long?
      * @return true for inbound, false for outbound, unless configured otherwise
      */
-    protected boolean filterUnreachable(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+    protected boolean filterUnreachable(boolean isInbound, boolean isExploratory) {
         boolean def = false;
         String val = null;
         

@@ -61,7 +61,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
         _clientInboundPools = new ConcurrentHashMap(4);
         _clientOutboundPools = new ConcurrentHashMap(4);
-        _clientPeerSelector = new ClientPeerSelector();
+        _clientPeerSelector = new ClientPeerSelector(ctx);
         
         _executor = new BuildExecutor(ctx, this);
         I2PThread execThread = new I2PThread(_executor, "BuildExecutor", true);
@@ -511,7 +511,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             t.setDaemon(true);
             t.start();
         }
-        ExploratoryPeerSelector selector = new ExploratoryPeerSelector();
+        ExploratoryPeerSelector selector = new ExploratoryPeerSelector(_context);
         
         TunnelPoolSettings inboundSettings = new TunnelPoolSettings();
         inboundSettings.setIsExploratory(true);
