@@ -22,8 +22,11 @@
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
   function resizeFrame(f) { f.style.height = f.contentWindow.document.body.scrollHeight + "px"; }
+  function injectClass(f) { f.contentWindow.document.getElementsByTagName('body')[0].setAttribute('class', 'iframed'); }
   function init() {
-      resizeFrame(document.getElementById("i2ptunnelframe"));
+      f = document.getElementById("i2ptunnelframe");
+      resizeFrame(f);
+      injectClass(f);
       initAjax();
   }
 </script>
@@ -33,7 +36,7 @@
 
 <h1><%=intl._("I2P Tunnel Manager")%></h1>
 <div class="main" id="main">
-<iframe src="/i2ptunnel/" width="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="resizeFrame(document.getElementById('i2ptunnelframe'))">
+<iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="resizeFrame(document.getElementById('i2ptunnelframe'))" allowtransparency="true">
 </iframe>
 </div></body></html>
 <%
