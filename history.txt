@@ -1,3 +1,24 @@
+2012-06-21 zzz
+ * I2CP: Make separate message ID counters per-destination, use atomic,
+         increase max (could have caused "local loopback" problems)
+ * OCMOSJ, ElG, Streaming: log tweaks
+ * TunnelInfo: Change msg counter from long to int
+ * TunnelPoolManager: Use one ClientPeerSelector for all pools
+
+2012-06-20 zzz
+ * I2PSession:
+   - Greatly simplify the VerifyUsage timers
+   - Constructor cleanup
+
+2012-06-19 zzz
+ * i2psnark:
+   - Hide buttons while stopping all
+ * Socks: Pass remote port through
+ * Streaming:
+   - Listen only on local port if set
+   - Listen only for streaming protocol if configured (new option)
+   - Javadocs re: ports
+
 2012-06-18 zzz
  * i2psnark:
    - Improve torrent shutdown handling to maximize chance of
