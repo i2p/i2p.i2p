@@ -68,10 +68,11 @@ public interface TunnelInfo {
      */
     public void testSuccessful(int responseTime);
     
-    public long getProcessedMessagesCount();
+    public int getProcessedMessagesCount();
     
     /** we know for sure that this many bytes travelled through the tunnel in its lifetime */
     public long getVerifiedBytesTransferred();
+
     /** we know for sure that the given number of bytes were sent down the tunnel fully */
     public void incrementVerifiedBytesTransferred(int numBytes);
 
