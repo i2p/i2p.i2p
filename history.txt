@@ -1,6 +1,8 @@
 2012-06-21 zzz
  * I2CP: Make separate message ID counters per-destination, use atomic,
          increase max (could have caused "local loopback" problems)
+ * IRC Client: Don't flush output unless out of input, so the
+               streaming messages don't get split up unnecessarily
  * OCMOSJ, ElG, Streaming: log tweaks
  * TunnelInfo: Change msg counter from long to int
  * TunnelPool: Fix bug where a tunnel was marked as reused when it wasn't
