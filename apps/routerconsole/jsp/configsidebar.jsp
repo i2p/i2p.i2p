@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsi" %>
-<%=intl.title("config home")%>
+<%=intl.title("config summary bar")%>
 <style type='text/css'>
 input.default {
     width: 1px;
@@ -21,11 +21,11 @@ input.default {
 </head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Home Page Configuration")%></h1>
+<h1><%=intl._("I2P Summary Bar Configuration")%></h1>
 <div class="main" id="main">
 <%@include file="confignav.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigHomeHandler" id="formhandler" scope="request" />
+<jsp:useBean class="net.i2p.router.web.ConfigSummaryHandler" id="formhandler" scope="request" />
 <% formhandler.storeMethod(request.getMethod()); %>
 <jsp:setProperty name="formhandler" property="*" />
 <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
@@ -34,62 +34,40 @@ input.default {
 <%
     String pageNonce = formhandler.getNewNonce();
 %>
-<jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
-<jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:useBean class="net.i2p.router.web.SummaryHelper" id="summaryhelper" scope="request" />
+<jsp:setProperty name="summaryhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
-<h3><%=intl._("Default Home Page")%></h3>
+<h3><%=intl._("Refresh Interval")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="0">
- <input type="checkbox" name="oldHome" <jsp:getProperty name="homehelper" property="configHome" /> >
- <%=intl._("Use old home page")%>
+ <input type="text" name="refreshInterval" value="<jsp:getProperty name="intl" property="refresh" />" >
+ <%=intl._("seconds")%>
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>
 
-<%
-   if (homehelper.shouldShowSearch()) {
-%>
-<h3><%=intl._("Search Engines")%></h3>
-<form action="" method="POST">
- <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <input type="hidden" name="group" value="3">
- <jsp:getProperty name="homehelper" property="configSearch" />
- <div class="formaction">
-  <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
-  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
-  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
- </div>
-</form>
-<%
-   }  // shouldShowSearch()
-%>
-
-<h3><%=intl._("Recommended Eepsites")%></h3>
+<h3><%=intl._("Use preset layout")%></h3>
+ <p><%=intl._("Several preset layouts for the summary bar are available.")%> 
+    <%=intl._("Note that choosing one of the presets will cause the current summary bar configuration to be lost.")%></p>
+  <hr><div class="formaction">
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="1">
- <jsp:getProperty name="homehelper" property="configFavorites" />
- <div class="formaction">
-  <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
-  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
-  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
- </div>
+ <input type="submit" class="reload" name="action" value="<%=intl._("Use full preset")%>" >
+ <input type="submit" class="reload" name="action" value="<%=intl._("Use reduced preset")%>" >
 </form>
+ </div>
 
-<h3><%=intl._("Local Services")%></h3>
+<h3><%=intl._("Customise Summary Bar")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
- <jsp:getProperty name="homehelper" property="configServices" />
+ <jsp:getProperty name="summaryhelper" property="configTable" />
  <div class="formaction">
   <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._("Save order")%>" >
   <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>

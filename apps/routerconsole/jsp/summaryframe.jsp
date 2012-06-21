@@ -52,11 +52,18 @@
     }
 %>
 </head><body style="margin: 0;"><div class="routersummary">
+<jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
+<jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<%
+    java.io.File newspath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
+%>
+<jsp:setProperty name="newshelper" property="page" value="<%=newspath.getAbsolutePath()%>" />
+<jsp:setProperty name="newshelper" property="maxLines" value="300" />
 <%@include file="summarynoframe.jsi" %>
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
-        out.print("<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"POST\">\n");
+        out.print("<hr>\n<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"POST\">\n");
         if ("0".equals(d)) {
             out.print("<b>");
             out.print(intl._("Refresh (s)"));

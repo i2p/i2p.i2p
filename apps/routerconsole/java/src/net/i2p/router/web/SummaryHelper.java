@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -17,6 +20,7 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -35,6 +39,35 @@ public class SummaryHelper extends HelperBase {
     // Opera 10.63 doesn't have the char, TODO check UA
     //static final String THINSP = "&thinsp;/&thinsp;";
     static final String THINSP = " / ";
+    private static final char S = ',';
+    static final String PROP_SUMMARYBAR = "routerconsole.summaryBar.";
+
+    static final String PRESET_FULL =
+        "HelpAndFAQ" + S +
+        "I2PServices" + S +
+        "I2PInternals" + S +
+        "General" + S +
+        "NetworkReachability" + S +
+        "UpdateStatus" + S +
+        "RestartStatus" + S +
+        "Peers" + S +
+        "FirewallAndReseedStatus" + S +
+        "Bandwidth" + S +
+        "Tunnels" + S +
+        "Congestion" + S +
+        "TunnelStatus" + S +
+        "Destinations" + S +
+        "";
+
+    static final String PRESET_SHORT =
+        "ShortGeneral" + S +
+        "NewsHeadings" + S +
+        "UpdateStatus" + S +
+        "NetworkReachability" + S +
+        "FirewallAndReseedStatus" + S +
+        "Destinations" + S +
+        "RestartStatus" + S +
+        "";
 
     /**
      * Retrieve the shortened 4 character ident for the router located within
@@ -375,7 +408,7 @@ public class SummaryHelper extends HelperBase {
         List<Destination> clients = new ArrayList(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/i2ptunnel/\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
+        buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table>");
@@ -618,7 +651,7 @@ public class SummaryHelper extends HelperBase {
         // display all the time so we display the final failure message, and plugin update messages too
         String status = UpdateHandler.getStatus();
         if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4><hr>\n");
+            buf.append("<h4>").append(status).append("</h4>\n");
         }
         if (updateAvailable() || unsignedUpdateAvailable()) {
             if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
@@ -706,8 +739,29 @@ public class SummaryHelper extends HelperBase {
         }
         if (buf.length() <= 0)
             return "";
-        buf.append("<hr>");
         return buf.toString();
+    }
+
+    private NewsHelper _newshelper;
+    public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
+    public NewsHelper getNewsHelper() { return _newshelper; }
+
+    public List<String> getSummaryBarSections(String page) {
+        String config = "";
+        if ("home".equals(page))
+            config = _context.getProperty(PROP_SUMMARYBAR + page, PRESET_SHORT);
+        else
+            config = _context.getProperty(PROP_SUMMARYBAR + page, null);
+            if (config == null)
+                config = _context.getProperty(PROP_SUMMARYBAR + "default", PRESET_FULL);
+        return Arrays.asList(config.split("" + S));
+    }
+
+    static void saveSummaryBarSections(RouterContext ctx, String page, Map<Integer, String> sections) {
+        StringBuilder buf = new StringBuilder(512);
+        for(String section : sections.values())
+            buf.append(section).append(S);
+        ctx.router().saveConfig(PROP_SUMMARYBAR + page, buf.toString());
     }
 
     /** output the summary bar to _out */
@@ -733,4 +787,56 @@ public class SummaryHelper extends HelperBase {
     private String _requestURI;
     public void setRequestURI(String s) { _requestURI = s; }
     public String getRequestURI() { return _requestURI; }
+
+    public String getConfigTable() {
+        String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
+        List<String> sections = getSummaryBarSections("default");
+        TreeSet<String> sortedSections = new TreeSet();
+
+        for (int i = 0; i < allSections.length; i++) {
+            String section = allSections[i];
+            if (!sections.contains(section))
+                sortedSections.add(section);
+        }
+
+        StringBuilder buf = new StringBuilder(2048);
+        buf.append("<table><tr><th>")
+           .append(_("Remove"))
+           .append("</th><th>")
+           .append(_("Order"))
+           .append("</th><th>")
+           .append(_("Name"))
+           .append("</th></tr>\n");
+        for (String section : sections) {
+            int i = sections.indexOf(section);
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+               .append(i)
+               .append("\"></td><td align=\"center\"><input type=\"text\" name=\"order_")
+               .append(i + "_" + section)
+               .append("\" value=\"")
+               .append(i)
+               .append("\"></td><td align=\"left\">")
+               .append(section)
+               .append("</td></tr>\n");
+        }
+        buf.append("<tr><td align=\"center\"><b>")
+           .append(_("Add")).append(":</b>" +
+                   "</td><td align=\"center\"><input type=\"text\" name=\"order\" value=\"")
+           .append(sections.size())
+           .append("\"></td>" +
+                   "<td align=\"left\">" +
+                   "<select name=\"name\">\n" +
+                   "<option value=\"\" selected=\"selected\">")
+           .append(_("Select a section to add"))
+           .append("</option>\n");
+
+        for (String s : sortedSections) {
+            buf.append("<option value=\"").append(s).append("\">")
+               .append(s).append("</option>\n");
+        }
+
+        buf.append("</select></td></tr>")
+           .append("</table>\n");
+        return buf.toString();
+    }
 }
