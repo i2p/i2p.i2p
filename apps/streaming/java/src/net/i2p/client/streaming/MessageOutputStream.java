@@ -81,8 +81,8 @@ class MessageOutputStream extends OutputStream {
     }
     
     public void setWriteTimeout(int ms) { 
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Changing write timeout from " + _writeTimeout + " to " + ms);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Changing write timeout from " + _writeTimeout + " to " + ms);
 
         _writeTimeout = ms; 
     }

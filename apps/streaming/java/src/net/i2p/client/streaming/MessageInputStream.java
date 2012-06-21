@@ -157,8 +157,8 @@ class MessageInputStream extends InputStream {
      */
     public int getReadTimeout() { return _readTimeout; }
     public void setReadTimeout(int timeout) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Changing read timeout from " + _readTimeout + " to " + timeout);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Changing read timeout from " + _readTimeout + " to " + timeout);
         _readTimeout = timeout; 
     }
     
@@ -373,7 +373,7 @@ class MessageInputStream extends InputStream {
             }
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("available(): " + numBytes + " " + toString());
+            _log.debug("available(): " + numBytes);
         
         return numBytes;
     }

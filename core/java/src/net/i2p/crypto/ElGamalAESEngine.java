@@ -100,7 +100,7 @@ public class ElGamalAESEngine {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
             long id = _context.random().nextLong();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(id + ": Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes: " + Base64.encode(data, 0, 64));
+                _log.debug(id + ": Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes " /* + Base64.encode(data, 0, 64) */ );
             
             decrypted = decryptExistingSession(data, key, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
@@ -410,7 +410,7 @@ public class ElGamalAESEngine {
         _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
         byte rv[] = encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Existing session encrypted with tag: " + currentTag.toString() + ": " + rv.length + " bytes and key: " + key.toBase64() + ": " + Base64.encode(rv, 0, 64));
+            _log.debug("Existing session encrypted with tag: " + currentTag.toString() + ": " + rv.length + " bytes and key: " + key.toBase64() /* + ": " + Base64.encode(rv, 0, 64) */);
         return rv;
     }
 

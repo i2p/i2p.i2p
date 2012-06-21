@@ -150,8 +150,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 }
             }
             overallExpiration = timeoutMs + _start;
-           if (_log.shouldLog(Log.INFO))
-               _log.info(getJobId() + " Default Expiration (ms): " + timeoutMs);
+           if (_log.shouldLog(Log.DEBUG))
+               _log.debug(getJobId() + " Default Expiration (ms): " + timeoutMs);
         }
         _overallExpiration = overallExpiration;
     }
@@ -182,9 +182,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             dieFatal();
             return;
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Send outbound client message job beginning" +
-                       ": preparing to search for the leaseSet for " + _toString);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug(getJobId() + ": Send outbound client message job beginning" +
+        //               ": preparing to search for the leaseSet for " + _toString);
         long timeoutMs = _overallExpiration - now;
         Hash key = _to.calculateHash();
         SendJob success = new SendJob(getContext());
@@ -474,8 +474,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             dieFatal();
             return;
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Clove built to " + _toString);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug(getJobId() + ": Clove built to " + _toString);
         long msgExpiration = _overallExpiration; // getContext().clock().now() + OVERALL_TIMEOUT_MS_DEFAULT;
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
                                                                                msgExpiration, key, 
@@ -494,8 +494,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return;
         }
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": send() - token expected " + token + " to " + _toString);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug(getJobId() + ": send() - token expected " + token + " to " + _toString);
         
         SendSuccessJob onReply = null;
         SendTimeoutJob onFail = null;
@@ -515,14 +515,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Placing GarlicMessage into the new tunnel message bound for " 
+            _log.debug(getJobId() + ": GarlicMessage in new tunnel msg for " 
                        + _toString + " at "
                        + _lease.getTunnelId() + " on " 
                        + _lease.getGateway());
         
         if (_outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": Sending tunnel message out " + _outTunnel.getSendTunnelId(0) + " to " 
+                _log.debug(getJobId() + ": Sending msg out " + _outTunnel.getSendTunnelId(0) + " to " 
                            + _toString + " at "
                            + _lease.getTunnelId() + " on " 
                            + _lease.getGateway());
@@ -571,9 +571,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             long before = getContext().clock().now();
             getContext().tunnelDispatcher().dispatchOutbound(_msg, _outTunnel.getSendTunnelId(0), _lease.getTunnelId(), _lease.getGateway());
             long dispatchSendTime = getContext().clock().now() - before; 
-            if (_log.shouldLog(Log.INFO))
-                _log.info(OutboundClientMessageOneShotJob.this.getJobId() +
-                          ": Dispatching message to " + _toString + " complete");
+            //if (_log.shouldLog(Log.INFO))
+            //    _log.info(OutboundClientMessageOneShotJob.this.getJobId() +
+            //              ": Dispatching message to " + _toString + " complete");
             getContext().statManager().addRateData("client.dispatchTime", getContext().clock().now() - _start, 0);
             getContext().statManager().addRateData("client.dispatchSendTime", dispatchSendTime, 0);
         }
@@ -728,8 +728,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _clove = clove;
         _cloveId = _clove.getId();
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Built payload clove with id " + clove.getId());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug(getJobId() + ": Built payload clove with id " + clove.getId());
         return true;
     }
     
@@ -858,9 +858,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         public String getName() { return "Outbound client message send timeout"; }
 
         public void runJob() {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(OutboundClientMessageOneShotJob.this.getJobId()
-                           + ": Soft timeout through the lease " + _lease);
+            //if (_log.shouldLog(Log.INFO))
+            //    _log.info(OutboundClientMessageOneShotJob.this.getJobId()
+            //               + ": Soft timeout through the lease " + _lease);
             
             // unused
             //_lease.setNumFailure(_lease.getNumFailure()+1);
