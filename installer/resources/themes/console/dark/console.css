@@ -237,6 +237,11 @@ div.newsheadings {
      margin: 0 0 0 10px;
 }
 
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin-left: 6px;
+}
+
 div.tunnels {
      padding-top: 3px !important;
      margin-left: -4px;
