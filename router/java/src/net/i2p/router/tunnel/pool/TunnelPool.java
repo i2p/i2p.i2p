@@ -1086,6 +1086,7 @@ public class TunnelPool {
                             for (int i = len - 1; i >= 0; i--) {
                                 peers.add(ti.getPeer(i));
                             }
+                            break;
                         }
                     }
                 }
