@@ -16,15 +16,15 @@ import net.i2p.data.DataHelper;
  * @author zzz
  */
 class NodeInfoComparator implements Comparator<NodeInfo> {
-    private final SHA1Hash _base;
+    private final byte[] _base;
 
     public NodeInfoComparator(SHA1Hash h) {
-        _base = h;
+        _base = h.getData();
     }
 
     public int compare(NodeInfo lhs, NodeInfo rhs) {
-        byte lhsDelta[] = DataHelper.xor(lhs.getNID().getData(), _base.getData());
-        byte rhsDelta[] = DataHelper.xor(rhs.getNID().getData(), _base.getData());
+        byte lhsDelta[] = DataHelper.xor(lhs.getNID().getData(), _base);
+        byte rhsDelta[] = DataHelper.xor(rhs.getNID().getData(), _base);
         return DataHelper.compareTo(lhsDelta, rhsDelta);
     }
 
