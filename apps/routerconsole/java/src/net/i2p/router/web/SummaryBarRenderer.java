@@ -364,7 +364,7 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "<tr title=\"")
-           .append(_("The number of peers available for building client tunnels (usually between 8 and 30)"))
+           .append(_("The number of peers available for building client tunnels"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Fast"))
@@ -373,7 +373,7 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "<tr title=\"")
-           .append(_("The number of peers available for building exploratory tunnels (usually between 8 and 75)"))
+           .append(_("The number of peers available for building exploratory tunnels"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("High capacity"))
@@ -515,8 +515,7 @@ public class SummaryBarRenderer {
                    "<table>\n" +
 
                    "<tr title=\"")
-           .append(_("Indicates router performance. "))
-           .append(_("Value should generally be near 0ms - consistently higher values may indicate configuration or system problems."))
+           .append(_("Indicates router performance"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Job lag"))
@@ -525,8 +524,7 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "<tr title=\"")
-           .append(_("Indicates how quickly outbound messages to other I2P routers are sent. "))
-           .append(_("If this is more than a few hundred milliseconds, you may have a bandwidth configuration problem."))
+           .append(_("Indicates how quickly outbound messages to other I2P routers are sent"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Message delay"))
@@ -536,8 +534,7 @@ public class SummaryBarRenderer {
 
         if (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
             buf.append("<tr title=\"")
-           .append(_("Round trip time for a tunnel test. "))
-           .append(_("If this is consistently higher than 5 seconds, you may have a network issue."))
+           .append(_("Round trip time for a tunnel test"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Tunnel lag"))
@@ -547,8 +544,7 @@ public class SummaryBarRenderer {
         }
 
         buf.append("<tr title=\"")
-           .append(_("Queued requests from other routers to participate in tunnels. "))
-           .append(_("If this is frequently greater than 0, you may have an I2P bandwidth allocation issue."))
+           .append(_("Queued requests from other routers to participate in tunnels"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Backlog"))
