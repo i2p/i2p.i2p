@@ -606,11 +606,14 @@ public class SummaryBarRenderer {
                 }
                 buf.append("</ul>\n");
                 // Set up string containing <a> to show news.
-                buf.append("<a href=\"/?news=1&amp;consoleNonce=")
-                   .append(consoleNonce)
-                   .append("\">")
-                   .append(_("Show news"))
-                   .append("</a>\n");
+                String requestURI = _helper.getRequestURI();
+                if (requestURI.contains("/home")) {
+                    buf.append("<a href=\"/?news=1&amp;consoleNonce=")
+                       .append(consoleNonce)
+                       .append("\">")
+                       .append(_("Show news"))
+                       .append("</a>\n");
+                }
             } else {
                 buf.append("<center><i>")
                    .append(_("none"))
