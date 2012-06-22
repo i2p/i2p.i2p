@@ -110,6 +110,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private final int _qPort;
     private final File _dhtFile;
     private volatile boolean _isRunning;
+    private volatile boolean _hasBootstrapped;
 
     /** all-zero NID used for pings */
     public static final NID FAKE_NID = new NID(new byte[NID.HASH_LENGTH]);
@@ -147,8 +148,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _log = ctx.logManager().getLog(KRPC.class);
         _tracker = new DHTTracker(ctx);
 
-        // in place of a DHT, store everybody we hear from for now
-        _knownNodes = new DHTNodes(ctx);
         _sentQueries = new ConcurrentHashMap();
         _outgoingTokens = new ConcurrentHashMap();
         _incomingTokens = new ConcurrentHashMap();
@@ -168,6 +167,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         }
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
         _dhtFile = new File(ctx.getConfigDir(), DHT_FILE);
+        _knownNodes = new DHTNodes(ctx, _myNID);
 
         session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
@@ -206,25 +206,24 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  Blocking!
      *  This is almost the same as getPeers()
      *
+     *  @param target the key we are searching for
      *  @param maxNodes how many to contact
      *  @param maxWait how long to wait for each to reply (not total) must be > 0
      *  @param parallel how many outstanding at once (unimplemented, always 1)
      */
-    public void explore(int maxNodes, long maxWait, int parallel) {
-        // Initial set to try, will get added to as we go
-        NID myNID = _myNodeInfo.getNID();
-        List<NodeInfo> nodes = _knownNodes.findClosest(myNID, maxNodes);
+    private void explore(NID target, int maxNodes, long maxWait, int parallel) {
+        List<NodeInfo> nodes = _knownNodes.findClosest(target, maxNodes);
         if (nodes.isEmpty()) {
             if (_log.shouldLog(Log.WARN))
                 _log.info("DHT is empty, cannot explore");
             return;
         }
-        SortedSet<NodeInfo> toTry = new TreeSet(new NodeInfoComparator(myNID));
+        SortedSet<NodeInfo> toTry = new TreeSet(new NodeInfoComparator(target));
         toTry.addAll(nodes);
         Set<NodeInfo> tried = new HashSet();
 
         if (_log.shouldLog(Log.INFO))
-            _log.info("Starting explore");
+            _log.info("Starting explore of " + target);
         for (int i = 0; i < maxNodes; i++) {
             if (!_isRunning)
                 break;
@@ -237,8 +236,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             toTry.remove(nInfo);
             tried.add(nInfo);
 
-            // this isn't going to work, he will just return our own?
-            ReplyWaiter waiter = sendFindNode(nInfo, _myNID);
+            ReplyWaiter waiter = sendFindNode(nInfo, target);
             if (waiter == null)
                 continue;
             synchronized(waiter) {
@@ -266,7 +264,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Finished explore");
+            _log.info("Finished explore of " + target);
     }
 
     /**
@@ -1441,7 +1439,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         public void timeReached() {
             if (!_isRunning)
                 return;
-            (new I2PAppThread(new ExplorerThread(), "DHT Explore", true)).start();
+            if (_knownNodes.size() > 0)
+                (new I2PAppThread(new ExplorerThread(), "DHT Explore", true)).start();
+            else
+                schedule(60*1000);
         }
     }
 
@@ -1453,10 +1454,24 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         public void run() {
             if (!_isRunning)
                 return;
-            explore(8, 60*1000, 1);
-            // refresh the buckets here too
+            if (!_hasBootstrapped) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Bootstrap start size: " + _knownNodes.size());
+                explore(_myNID, 8, 60*1000, 1);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Bootstrap done size: " + _knownNodes.size());
+                _hasBootstrapped = true;
+            }
             if (!_isRunning)
                 return;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Explore start size: " + _knownNodes.size());
+            List<NID> keys = _knownNodes.getExploreKeys();
+            for (NID nid : keys) {
+                explore(nid, 8, 60*1000, 1);
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Explore done size: " + _knownNodes.size());
             new Explorer(EXPLORE_TIME);
         }
     }

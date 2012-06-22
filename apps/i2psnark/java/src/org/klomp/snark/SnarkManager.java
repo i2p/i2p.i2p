@@ -289,8 +289,9 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(DEFAULT_STARTUP_DELAY));
         if (!_config.containsKey(PROP_THEME))
             _config.setProperty(PROP_THEME, DEFAULT_THEME);
-        if (!_config.containsKey(PROP_USE_DHT))
-            _config.setProperty(PROP_USE_DHT, Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT));
+        // no, so we can switch default to true later
+        //if (!_config.containsKey(PROP_USE_DHT))
+        //    _config.setProperty(PROP_USE_DHT, Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT));
         updateConfig();
     }
     /**
@@ -365,7 +366,9 @@ public class SnarkManager implements Snark.CompleteListener {
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
         boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
         _util.setUseOpenTrackers(bOT);
-        _util.setUseDHT(Boolean.valueOf(_config.getProperty(PROP_USE_DHT)).booleanValue());
+        // careful, so we can switch default to true later
+        _util.setUseDHT(Boolean.valueOf(_config.getProperty(PROP_USE_DHT,
+                                          Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT))).booleanValue());
         getDataDir().mkdirs();
         initTrackerMap();
     }

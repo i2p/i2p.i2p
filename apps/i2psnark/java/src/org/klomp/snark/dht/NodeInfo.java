@@ -225,7 +225,7 @@ class NodeInfo extends SimpleDataStructure {
 
     @Override
     public String toString() {
-        return "NodeInfo: " + nID + ' ' + hash + " port: " + port;
+        return "NodeInfo: " + nID + ' ' + hash + " port: " + port + (dest != null ? " known dest" : " null dest");
     }
 
     /**

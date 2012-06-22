@@ -240,6 +240,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.maxTotalConnsPerMinute", "8");
             if (opts.getProperty("i2p.streaming.maxConnsPerHour") == null)
                 opts.setProperty("i2p.streaming.maxConnsPerHour", "20");
+            if (opts.getProperty("i2p.streaming.enforceProtocol") == null)
+                opts.setProperty("i2p.streaming.enforceProtocol", "true");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             _connecting = false;
         }
