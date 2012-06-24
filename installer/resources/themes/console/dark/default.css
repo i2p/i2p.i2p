@@ -175,7 +175,7 @@ hr {
 }
 
 .control:link {
-     color: #9f9;
+     color: #494 !important;
      text-decoration: none;
 }
 
@@ -192,12 +192,12 @@ hr {
 .control:active {
      border: 1px inset;
      background-color: #f60;
-     color: #fff !important;
+     color: #EE9 !important;
      text-decoration: none;
 }
 
 .control:visited {
-     color: #010;
+     color: #494 !important;
      text-decoration: none;
 }
 
@@ -264,6 +264,15 @@ hr {
 
 #globalOperationsPanel .control {
      width: 120px;
+     color: #494 !important;
+}
+
+#globalOperationsPanel .control:hover {
+     color: #F60 !important;
+}
+
+#globalOperationsPanel .control:active {
+     color: #EE9 !important;
 }
 
 .header {

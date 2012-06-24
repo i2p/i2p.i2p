@@ -92,8 +92,17 @@
 
 #tunnelListPage .footer .control {
      margin-left: 2px;
+     color: #494 !important;
 }
 
+#tunnelListPage .footer .control:hover {
+     color: #F60 !important;
+}
+
+#tunnelListPage .footer .control:active {
+     color: #EE9 !important;
+}
+     
 #tunnelListPage .footer label {
      text-align: right;
      height: 24px;
