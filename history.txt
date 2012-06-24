@@ -1,3 +1,7 @@
+2012-06-24 zzz
+ * I2PTunnel: Fix NPE on shared client creation, thx kytv
+ * Transport: Add Ethiopia to hidden mode list
+
 2012-06-21 zzz
  * I2CP: Make separate message ID counters per-destination, use atomic,
          increase max (could have caused "local loopback" problems)
@@ -5,6 +9,7 @@
                streaming messages don't get split up unnecessarily
  * OCMOSJ, ElG, Streaming: log tweaks
  * TunnelInfo: Change msg counter from long to int
+ * TunnelPeerSelectors: Minor refactoring to store context
  * TunnelPool: Fix bug where a tunnel was marked as reused when it wasn't
  * TunnelPoolManager: Use one ClientPeerSelector for all pools
 
