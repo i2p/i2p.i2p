@@ -1,4 +1,10 @@
 2012-06-24 zzz
+ * ElGamalAESEngine: Fix bad size estimate when tags are included,
+                     resulting in trailing zeros after the padding
+                     in the unencrypted data
+ * i2psnark: Don't create a new PeerCoordinator after restart, as the
+             TrackerClient holds on to the old one and that causes it
+             to not get peers. Possibly fixes ticket #563.
  * I2PTunnel: Fix NPE on shared client creation, thx kytv
  * Transport: Add Ethiopia to hidden mode list
 
