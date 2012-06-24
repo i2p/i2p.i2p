@@ -78,27 +78,38 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private final static long OVERALL_TIMEOUT_MS_MIN = 8*1000;
     
     /**
-     * If the client's config specifies shouldBundleReplyInfo=true, messages sent from
-     * that client to any peers will probabalistically include the sending destination's
-     * current LeaseSet (allowing the recipient to reply without having to do a full
-     * netDb lookup).  This should improve performance during the initial negotiations,
-     * but is not necessary for communication that isn't bidirectional.
+     * NOTE: Changed as of 0.9.1.
      *
+     * Defaults to true.
+     *
+     * If the client's config specifies shouldBundleReplyInfo=true, messages sent from
+     * that client to any peers will periodically include the sending destination's
+     * current LeaseSet (allowing the recipient to reply without having to do a full
+     * netDb lookup).  This should improve performance during the initial negotiations.
+     *
+     * For clients that do not publish their LeaseSet, this option must be true
+     * for any reply to be possible.
+     *
+     * Setting to "false" may save significant outbound bandwidth, especially if
+     * the client is configured with a large number of inbound tunnels (Leases).
+     * If replies are still required, this may shift the bandwidth burden to
+     * the far-end client and the floodfill.
+     *
+     * There are several cases where "false" is may be appropriate:
+     * <ul><li>
+     * Unidirectional communication, no reply required
+     * <li>
+     * LeaseSet is published and higher reply latency is acceptable
+     * <li>
+     * LeaseSet is published, client is a "server", all connections are inbound
+     * so the connecting far-end destination obviously has the leaseset already.
+     * Connections are either short, or it is acceptable for latency on a long-lived
+     * connection to temporarily increase while the other end re-fetches the LeaseSet
+     * after expiration.
+     * HTTP servers may fit these requirements.
+     * </li></ul>
      */
     public static final String BUNDLE_REPLY_LEASESET = "shouldBundleReplyInfo";
-    /**
-     * Allow the override of the frequency of bundling the reply info in with a message.
-     * The client app can specify bundleReplyInfoProbability=80 (for instance) and that
-     * will cause the router to include the sender's leaseSet with 80% of the messages
-     * sent to the peer.
-     *
-     */
-    public static final String BUNDLE_PROBABILITY = "bundleReplyInfoProbability";
-    /** 
-     * How often do messages include the reply leaseSet (out of every 100 tries).  
-     * Including it each time is probably overkill, but who knows.  
-     */
-    private static final int BUNDLE_PROBABILITY_DEFAULT = 100;
     
     private static final int REPLY_REQUEST_INTERVAL = 60*1000;
 
@@ -212,47 +223,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (newLS == null)
             return null;   // punt
 
-        if (!force) {
-            // Don't send it every time unless configured to; default=false
-            Properties opts = _clientMessage.getSenderConfig().getOptions();
-            String wantBundle = opts.getProperty(BUNDLE_REPLY_LEASESET, "false");
-            if ("true".equals(wantBundle)) {
-                int probability = BUNDLE_PROBABILITY_DEFAULT;
-                String str = opts.getProperty(BUNDLE_PROBABILITY);
-                try { 
-                    if (str != null) 
-                        probability = Integer.parseInt(str);
-                } catch (NumberFormatException nfe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn(getJobId() + ": Bundle leaseSet probability overridden incorrectly [" 
-                                  + str + "]", nfe);
-                }
-                if (probability >= 100)
-                    return newLS;  // do this every time so don't worry about cache
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": Bundle leaseSet probability is " + probability);
-                if (probability >= getContext().random().nextInt(100))
-                    force = true;  // just add newLS to cache below and return
-                // fall through to cache check and add
-            }
-        }
-
         // If the last leaseSet we sent him is still good, don't bother sending again
             LeaseSet ls = _cache.leaseSetCache.put(_hashPair, newLS);
             if (!force) {
                 if (ls != null) {
                     if (ls.equals(newLS)) {
-                        // still good, send it 10% of the time
-                        // sendACK does 5% random which forces us, good enough
-                        //if (10 >= getContext().random().nextInt(100)) {
-                        //    if (_log.shouldLog(Log.INFO))
-                        //        _log.info("Found in cache - including reply leaseset for " + _toString); 
-                        //    return ls;
-                        //} else {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info(getJobId() + ": Found in cache - NOT including reply leaseset for " + _toString); 
                             return null;
-                        //}
                     } else {
                         if (_log.shouldLog(Log.INFO))
                             _log.info(getJobId() + ": Expired from cache - reply leaseset for " + _toString); 
@@ -441,35 +419,53 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return;
         }
 
-        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey(),
-                                                                      _from.calculateHash());
         _outTunnel = selectOutboundTunnel(_to);
         // boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
         // what's the point of 5% random? possible improvements or replacements:
         // DONE (getNextLease() is called before this): wantACK if we changed their inbound lease (getNextLease() sets _wantACK)
         // DONE (selectOutboundTunnel() moved above here): wantACK if we changed our outbound tunnel (selectOutboundTunnel() sets _wantACK)
         // DONE (added new cache): wantACK if we haven't in last 1m (requires a new static cache probably)
-        boolean wantACK;
 
-            Long lastSent = _cache.lastReplyRequestCache.get(_hashPair);
-            wantACK = _wantACK || existingTags <= 30 ||
-                      lastSent == null || lastSent.longValue() < now - REPLY_REQUEST_INTERVAL;
-            if (wantACK)
-                _cache.lastReplyRequestCache.put(_hashPair, Long.valueOf(now));
+        Long lastReplyRequestSent = _cache.lastReplyRequestCache.get(_hashPair);
+        boolean shouldRequestReply = lastReplyRequestSent == null ||
+                                     lastReplyRequestSent.longValue() < now - REPLY_REQUEST_INTERVAL;
+
+        boolean wantACK = _wantACK ||
+                          shouldRequestReply ||
+                          // TODO: check the per-message flags also
+                          GarlicMessageBuilder.needsTags(getContext(), _leaseSet.getEncryptionKey(), _from.calculateHash());
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set<SessionTag> tags = new HashSet();
-        // If we want an ack, bundle a leaseSet... (so he can get back to us)
-        LeaseSet replyLeaseSet = getReplyLeaseSet(wantACK);
-        // ... and vice versa  (so we know he got it)
-        if (replyLeaseSet != null)
-            wantACK = true;
-        long token = (wantACK ? getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE) : -1);
-        if (wantACK)
-            _inTunnel = selectInboundTunnel();
 
-        boolean ok = (_clientMessage != null) && buildClove();
+        LeaseSet replyLeaseSet;
+        // TODO: check the per-message flags also
+        String allow = _clientMessage.getSenderConfig().getOptions().getProperty(BUNDLE_REPLY_LEASESET);
+        boolean allowLeaseBundle = allow == null || Boolean.valueOf(allow).booleanValue();
+        if (allowLeaseBundle) {
+            // If we want an ack, bundle a leaseSet...
+            //replyLeaseSet = getReplyLeaseSet(wantACK);
+            // Only when necessary. We don't need to force.
+            // ACKs find their own way back, they don't need a leaseset.
+            replyLeaseSet = getReplyLeaseSet(false);
+            // ... and vice versa  (so we know he got it)
+            if (replyLeaseSet != null)
+                wantACK = true;
+        } else {
+            replyLeaseSet = null;
+        }
+
+        long token;
+        if (wantACK) {
+            _cache.lastReplyRequestCache.put(_hashPair, Long.valueOf(now));
+            token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+            _inTunnel = selectInboundTunnel();
+        } else {
+            token = -1;
+        }
+
+        boolean ok = buildClove();
         if (!ok) {
             dieFatal();
             return;
@@ -502,12 +498,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ReplySelector selector = null;
         if (wantACK) {
             TagSetHandle tsh = null;
-            if ( (sessKey != null) && (tags != null) && (!tags.isEmpty()) ) {
-                if (_leaseSet != null) {
+            if (!tags.isEmpty()) {
                     SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
                     if (skm != null)
                         tsh = skm.tagsDelivered(_leaseSet.getEncryptionKey(), sessKey, tags);
-                }
             }
             onReply = new SendSuccessJob(getContext(), sessKey, tsh);
             onFail = new SendTimeoutJob(getContext(), sessKey, tsh);

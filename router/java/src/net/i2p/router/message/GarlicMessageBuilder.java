@@ -33,52 +33,15 @@ import net.i2p.util.Log;
  */
 public class GarlicMessageBuilder {
 
-    /**
-     *  This was 100 since 0.6.1.10 (50 before that). It's important because:
-     * <pre>
-     *  - Tags are 32 bytes. So it previously added 3200 bytes to an initial message.
-     *  - Too many tags adds a huge overhead to short-duration connections
-     *    (like http, datagrams, etc.)
-     *  - Large messages have a much higher chance of being dropped due to
-     *    one of their 1KB fragments being discarded by a tunnel participant.
-     *  - This reduces the effective maximum datagram size because the client
-     *    doesn't know when tags will be bundled, so the tag size must be
-     *    subtracted from the maximum I2NP size or transport limit.
-     * </pre>
-     *
-     *  Issues with too small a value:
-     * <pre>
-     *  - When tags are sent, a reply leaseset (~1KB) is always bundled.
-     *    Maybe don't need to bundle more than every minute or so
-     *    rather than every time?
-     *  - Does the number of tags (and the threshold of 20) limit the effective
-     *    streaming lib window size? Should the threshold and the number of
-     *    sent tags be variable based on the message rate?
-     * </pre>
-     *
-     *  We have to be very careful if we implement an adaptive scheme,
-     *  since the key manager is per-router, not per-local-dest.
-     *  Or maybe that's a bad idea, and we need to move to a per-dest manager.
-     *  This needs further investigation.
-     *
-     *  So a value somewhat higher than the low threshold
-     *  seems appropriate.
-     *
-     *  Use care when adjusting these values. See ConnectionOptions in streaming,
-     *  and TransientSessionKeyManager in crypto, for more information.
-     */
-    private static final int DEFAULT_TAGS = 40;
-    private static final int LOW_THRESHOLD = 30;
-
     /** @param local non-null; do not use this method for the router's SessionKeyManager */
-    public static int estimateAvailableTags(RouterContext ctx, PublicKey key, Hash local) {
+    public static boolean needsTags(RouterContext ctx, PublicKey key, Hash local) {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
         if (skm == null)
-            return 0;
+            return true;
         SessionKey curKey = skm.getCurrentKey(key);
         if (curKey == null)
-            return 0;
-        return skm.getAvailableTags(key, curKey);
+            return true;
+        return skm.shouldSendTags(key, curKey);
     }
     
     /**
@@ -100,17 +63,19 @@ public class GarlicMessageBuilder {
     }
 
     /**
-     * called by OCMJH
+     * Now unused, since we have to generate a reply token first in OCMOSJ but we don't know if tags are required yet.
      *
      * @param ctx scope
      * @param config how/what to wrap
      * @param wrappedKey output parameter that will be filled with the sessionKey used
-     * @param wrappedTags output parameter that will be filled with the sessionTags used
+     * @param wrappedTags Output parameter that will be filled with the sessionTags used.
+                          If non-empty on return you must call skm.tagsDelivered() when sent
+                          and then call skm.tagsAcked() or skm.failTags() later.
      * @param skm non-null
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              SessionKeyManager skm) {
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, DEFAULT_TAGS, false, skm);
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, skm.getTagsToSend(), skm);
     }
 
     /** unused */
@@ -122,33 +87,42 @@ public class GarlicMessageBuilder {
     ***/
 
     /**
-     * called by above
+     * called by OCMJH
      *
      * @param ctx scope
      * @param config how/what to wrap
      * @param wrappedKey output parameter that will be filled with the sessionKey used
-     * @param wrappedTags output parameter that will be filled with the sessionTags used
-     * @param numTagsToDeliver only if the estimated available tags are below the threshold
+     * @param wrappedTags Output parameter that will be filled with the sessionTags used.
+                          If non-empty on return you must call skm.tagsDelivered() when sent
+                          and then call skm.tagsAcked() or skm.failTags() later.
+     * @param numTagsToDeliver Only if the estimated available tags are below the threshold.
+                               Set to zero to disable tag delivery. You must set to zero if you are not
+                               equipped to confirm delivery and call skm.tagsAcked() or skm.failTags() later.
      * @param skm non-null
      */
-    private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
-                                             int numTagsToDeliver, boolean forceElGamal, SessionKeyManager skm) {
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, LOW_THRESHOLD, false, skm);
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
+                                             int numTagsToDeliver, SessionKeyManager skm) {
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, skm.getLowThreshold(), skm);
     }
 
     /**
-     * called by netdb
+     * called by netdb and above
      *
      * @param ctx scope
      * @param config how/what to wrap
      * @param wrappedKey output parameter that will be filled with the sessionKey used
-     * @param wrappedTags output parameter that will be filled with the sessionTags used
-     * @param numTagsToDeliver only if the estimated available tags are below the threshold
+     * @param wrappedTags Output parameter that will be filled with the sessionTags used.
+                          If non-empty on return you must call skm.tagsDelivered() when sent
+                          and then call skm.tagsAcked() or skm.failTags() later.
+     * @param numTagsToDeliver only if the estimated available tags are below the threshold.
+                               Set to zero to disable tag delivery. You must set to zero if you are not
+                               equipped to confirm delivery and call skm.tagsAcked() or failTags() later.
+                               If this is always 0, it forces ElGamal every time.
      * @param lowTagsThreshold the threshold
      * @param skm non-null
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
-                                             int numTagsToDeliver, int lowTagsThreshold, boolean forceElGamal, SessionKeyManager skm) {
+                                             int numTagsToDeliver, int lowTagsThreshold, SessionKeyManager skm) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
@@ -167,29 +141,19 @@ public class GarlicMessageBuilder {
         
         SessionKey curKey = skm.getCurrentOrNewKey(key);
         SessionTag curTag = null;
-        if (!forceElGamal) {
+
             curTag = skm.consumeNextAvailableTag(key, curKey);
             
             int availTags = skm.getAvailableTags(key, curKey);
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Available tags for encryption to " + key + ": " + availTags);
 
-            if (availTags < lowTagsThreshold) { // arbitrary threshold
+            if (numTagsToDeliver > 0 && skm.shouldSendTags(key, curKey, lowTagsThreshold)) {
                 for (int i = 0; i < numTagsToDeliver; i++)
                     wrappedTags.add(new SessionTag(true));
                 if (log.shouldLog(Log.INFO))
-                    log.info("Too few are available (" + availTags + "), so we're including more");
-            } else if (skm.getAvailableTimeLeft(key, curKey) < 60*1000) {
-                // if we have enough tags, but they expire in under 30 seconds, we want more
-                for (int i = 0; i < numTagsToDeliver; i++)
-                    wrappedTags.add(new SessionTag(true));
-                if (log.shouldLog(Log.INFO))
-                    log.info("Tags are almost expired, adding new ones");
-            } else {
-                // always tack on at least one more - not necessary.
-                //wrappedTags.add(new SessionTag(true));
+                    log.info("Too few tags available so we're including " + numTagsToDeliver);
             }
-        }
 
         wrappedKey.setData(curKey.getData());
         
@@ -202,7 +166,9 @@ public class GarlicMessageBuilder {
      * @param ctx scope
      * @param config how/what to wrap
      * @param wrappedKey unused - why??
-     * @param wrappedTags output parameter that will be filled with the sessionTags used
+     * @param wrappedTags Output parameter that will be filled with the sessionTags used.
+                          If non-empty on return you must call skm.tagsDelivered() when sent
+                          and then call skm.tagsAcked() or skm.failTags() later.
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
      * @param encryptKey sessionKey used to encrypt the current message
@@ -216,7 +182,7 @@ public class GarlicMessageBuilder {
         
         GarlicMessage msg = new GarlicMessage(ctx);
         
-        noteWrap(ctx, msg, config);
+        //noteWrap(ctx, msg, config);
         
         byte cloveSet[] = buildCloveSet(ctx, config);
         
@@ -239,6 +205,7 @@ public class GarlicMessageBuilder {
         return msg;
     }
     
+/****
     private static void noteWrap(RouterContext ctx, GarlicMessage wrapper, GarlicConfig contained) {
         for (int i = 0; i < contained.getCloveCount(); i++) {
             GarlicConfig config = contained.getClove(i);
@@ -249,6 +216,7 @@ public class GarlicMessageBuilder {
             }
         }
     }
+****/
     
     /**
      * Build an unencrypted set of cloves specified by the config.
@@ -303,7 +271,7 @@ public class GarlicMessageBuilder {
     private static byte[] buildClove(RouterContext ctx, PayloadGarlicConfig config) throws DataFormatException, IOException {
         GarlicClove clove = new GarlicClove(ctx);
         clove.setData(config.getPayload());
-        return buildCommonClove(ctx, clove, config);
+        return buildCommonClove(clove, config);
     }
     
     /**
@@ -328,11 +296,10 @@ public class GarlicMessageBuilder {
         if (msg == null)
             throw new DataFormatException("Unable to build message from clove config");
         clove.setData(msg);
-        return buildCommonClove(ctx, clove, config);
+        return buildCommonClove(clove, config);
     }
     
-    
-    private static byte[] buildCommonClove(RouterContext ctx, GarlicClove clove, GarlicConfig config) throws DataFormatException, IOException {
+    private static byte[] buildCommonClove(GarlicClove clove, GarlicConfig config) throws DataFormatException, IOException {
         clove.setCertificate(config.getCertificate());
         clove.setCloveId(config.getId());
         clove.setExpiration(new Date(config.getExpiration()));

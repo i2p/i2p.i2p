@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -94,6 +95,10 @@ class ClientConnectionRunner {
     // If this is too low and wraps around, I2CP VerifyUsage could delete the wrong message,
     // e.g. on local access
     private static final int MAX_MESSAGE_ID = 0x4000000;
+
+    /** @since 0.9.1 */
+    private static final String PROP_TAGS = "crypto.tagsToSend";
+    private static final String PROP_THRESH = "crypto.lowTagThreshold";
 
     /**
      * Create a new runner against the given socket
@@ -200,14 +205,29 @@ class ClientConnectionRunner {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SessionEstablished called for destination " + _destHashCache.toBase64());
         _config = config;
-        // This is the only option that is interpreted here, not at the tunnel manager
-        if (config.getOptions() != null)
+        // We process a few options here, but most are handled by the tunnel manager.
+        // The ones here can't be changed later.
+        Properties opts = config.getOptions();
+        if (opts != null)
             _dontSendMSM = "none".equals(config.getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
         // per-destination session key manager to prevent rather easy correlation
-        if (_sessionKeyManager == null)
-            _sessionKeyManager = new TransientSessionKeyManager(_context);
-        else
+        if (_sessionKeyManager == null) {
+            int tags = TransientSessionKeyManager.DEFAULT_TAGS;
+            int thresh = TransientSessionKeyManager.LOW_THRESHOLD;
+            if (opts != null) {
+                String ptags = opts.getProperty(PROP_TAGS);
+                if (ptags != null) {
+                    try { tags = Integer.parseInt(ptags); } catch (NumberFormatException nfe) {}
+                }
+                String pthresh = opts.getProperty(PROP_THRESH);
+                if (pthresh != null) {
+                    try { thresh = Integer.parseInt(pthresh); } catch (NumberFormatException nfe) {}
+                }
+            }
+            _sessionKeyManager = new TransientSessionKeyManager(_context, tags, thresh);
+        } else {
             _log.error("SessionEstablished called for twice for destination " + _destHashCache.toBase64().substring(0,4));
+        }
         _manager.destinationEstablished(this);
     }
     

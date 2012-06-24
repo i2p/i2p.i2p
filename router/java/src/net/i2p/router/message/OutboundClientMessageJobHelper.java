@@ -50,6 +50,8 @@ class OutboundClientMessageJobHelper {
      *
      * Unused?
      *
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param bundledReplyLeaseSet if specified, the given LeaseSet will be packaged with the message (allowing
      *                             much faster replies, since their netDb search will return almost instantly)
      * @return garlic, or null if no tunnels were found (or other errors)
@@ -68,6 +70,8 @@ class OutboundClientMessageJobHelper {
      *
      * This is called from OCMOSJ
      *
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
@@ -79,8 +83,10 @@ class OutboundClientMessageJobHelper {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
         if (skm == null)
             return null;
+        // no use sending tags unless we have a reply token set up already
+        int tagsToSend = replyToken >= 0 ? skm.getTagsToSend() : 0;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
-                                                              skm);
+                                                              tagsToSend, skm);
         return msg;
     }
     
