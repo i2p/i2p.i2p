@@ -55,6 +55,7 @@ public class GarlicMessageBuilder {
      *
      * @param ctx scope
      * @param config how/what to wrap
+     * @throws IllegalArgumentException on error
      */
     private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
@@ -72,6 +73,7 @@ public class GarlicMessageBuilder {
                           If non-empty on return you must call skm.tagsDelivered() when sent
                           and then call skm.tagsAcked() or skm.failTags() later.
      * @param skm non-null
+     * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              SessionKeyManager skm) {
@@ -99,6 +101,7 @@ public class GarlicMessageBuilder {
                                Set to zero to disable tag delivery. You must set to zero if you are not
                                equipped to confirm delivery and call skm.tagsAcked() or skm.failTags() later.
      * @param skm non-null
+     * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              int numTagsToDeliver, SessionKeyManager skm) {
@@ -120,6 +123,7 @@ public class GarlicMessageBuilder {
                                If this is always 0, it forces ElGamal every time.
      * @param lowTagsThreshold the threshold
      * @param skm non-null
+     * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              int numTagsToDeliver, int lowTagsThreshold, SessionKeyManager skm) {
@@ -173,6 +177,7 @@ public class GarlicMessageBuilder {
      *               know the encryptKey and encryptTag)
      * @param encryptKey sessionKey used to encrypt the current message
      * @param encryptTag sessionTag used to encrypt the current message
+     * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              PublicKey target, SessionKey encryptKey, SessionTag encryptTag) {
@@ -219,8 +224,11 @@ public class GarlicMessageBuilder {
 ****/
     
     /**
-     * Build an unencrypted set of cloves specified by the config.
+     * Build the unencrypted GarlicMessage specified by the config.
+     * It contains the number of cloves, followed by each clove,
+     * followed by a certificate, ID, and expiration date.
      *
+     * @throws IllegalArgumentException on error
      */
     private static byte[] buildCloveSet(RouterContext ctx, GarlicConfig config) {
         ByteArrayOutputStream baos = null;
@@ -243,8 +251,6 @@ public class GarlicMessageBuilder {
                         // See notes below
                         cloves[i] = buildClove(ctx, c);
                     }
-                    if (cloves[i] == null)
-                        throw new DataFormatException("Unable to build clove");
                 }
                 
                 int len = 1;
@@ -255,15 +261,15 @@ public class GarlicMessageBuilder {
                 for (int i = 0; i < cloves.length; i++)
                     baos.write(cloves[i]);
             }
-            if (baos == null)
-                new ByteArrayOutputStream(16);
             config.getCertificate().writeBytes(baos);
             DataHelper.writeLong(baos, 4, config.getId());
             DataHelper.writeLong(baos, DataHelper.DATE_LENGTH, config.getExpiration());
         } catch (IOException ioe) {
             log.error("Error building the clove set", ioe);
+            throw new IllegalArgumentException("Error building the clove set", ioe);
         } catch (DataFormatException dfe) {
             log.error("Error building the clove set", dfe);
+            throw new IllegalArgumentException("Error building the clove set", dfe);
         }
         return baos.toByteArray();
     }

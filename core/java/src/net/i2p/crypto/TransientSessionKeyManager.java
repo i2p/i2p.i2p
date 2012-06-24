@@ -147,7 +147,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *  Use care when adjusting these values. See ConnectionOptions in streaming,
      *  and TransientSessionKeyManager in crypto, for more information.
      *
-     *  @since 0.9.1 moved from GarlicMessageBuilder to per-SKM config
+     *  @since 0.9.2 moved from GarlicMessageBuilder to per-SKM config
      */
     public static final int DEFAULT_TAGS = 40;
     /** ditto */
@@ -166,7 +166,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     /** 
      *  @param tagsToSend how many to send at a time, may be lower or higher than lowThreshold. 1-128
      *  @param lowThreshold below this, send more. 1-128
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     public TransientSessionKeyManager(I2PAppContext context, int tagsToSend, int lowThreshold) {
         super(context);
@@ -354,21 +354,21 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     /**
      *  How many to send, IF we need to.
      *  @return the configured value (not adjusted for current available)
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     @Override
     public int getTagsToSend() { return _tagsToSend; };
 
     /**
      *  @return the configured value
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     @Override
     public int getLowThreshold() { return _lowThreshold; };
 
     /**
      *  @return true if we have less than the threshold or what we have is about to expire
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     @Override
     public boolean shouldSendTags(PublicKey target, SessionKey key, int lowThreshold) {

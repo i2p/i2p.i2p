@@ -78,7 +78,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private final static long OVERALL_TIMEOUT_MS_MIN = 8*1000;
     
     /**
-     * NOTE: Changed as of 0.9.1.
+     * NOTE: Changed as of 0.9.2.
      *
      * Defaults to true.
      *

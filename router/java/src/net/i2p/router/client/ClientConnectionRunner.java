@@ -96,7 +96,7 @@ class ClientConnectionRunner {
     // e.g. on local access
     private static final int MAX_MESSAGE_ID = 0x4000000;
 
-    /** @since 0.9.1 */
+    /** @since 0.9.2 */
     private static final String PROP_TAGS = "crypto.tagsToSend";
     private static final String PROP_THRESH = "crypto.lowTagThreshold";
 

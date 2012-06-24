@@ -36,13 +36,20 @@ public class GarlicMessageReceiver {
         public void handleClove(DeliveryInstructions instructions, I2NPMessage data);
     }
     
+    /**
+     *  @param receiver non-null
+     */
     public GarlicMessageReceiver(RouterContext context, CloveReceiver receiver) {
         this(context, receiver, null);
     }
+
+    /**
+     *  @param receiver non-null
+     */
     public GarlicMessageReceiver(RouterContext context, CloveReceiver receiver, Hash clientDestination) {
         _context = context;
         _log = context.logManager().getLog(GarlicMessageReceiver.class);
-        _context.statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 60*60*1000, 24*60*60*1000 });
         _clientDestination = clientDestination;
         _parser = new GarlicMessageParser(context);
         _receiver = receiver;
@@ -94,8 +101,7 @@ public class GarlicMessageReceiver {
                 _log.warn("Invalid clove " + clove);
             return;
         } 
-        if (_receiver != null)
-            _receiver.handleClove(clove.getInstructions(), clove.getData());
+        _receiver.handleClove(clove.getInstructions(), clove.getData());
     }
     
     private boolean isValid(GarlicClove clove) {

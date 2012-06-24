@@ -88,18 +88,18 @@ public class SessionKeyManager {
 
     /**
      *  How many to send, IF we need to.
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     public int getTagsToSend() { return 0; };
 
     /**
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     public int getLowThreshold() { return 0; };
 
     /**
      *  @return true if we have less than the threshold or what we have is about to expire
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     public boolean shouldSendTags(PublicKey target, SessionKey key) {
         return shouldSendTags(target, key, getLowThreshold());
@@ -107,7 +107,7 @@ public class SessionKeyManager {
 
     /**
      *  @return true if we have less than the threshold or what we have is about to expire
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     public boolean shouldSendTags(PublicKey target, SessionKey key, int lowThreshold) { return false; }
 
