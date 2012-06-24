@@ -553,21 +553,14 @@ public class Snark
     }
 
     stopped = false;
-    boolean coordinatorChanged = false;
     if (coordinator.halted()) {
-        // ok, we have already started and stopped, but the coordinator seems a bit annoying to
-        // restart safely, so lets build a new one to replace the old
+        coordinator.restart();
         if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.remove(coordinator);
-        PeerCoordinator newCoord = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
-        if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.add(newCoord);
-        coordinator = newCoord;
-        coordinatorChanged = true;
+            _peerCoordinatorSet.add(coordinator);
     }
-    if (!trackerclient.started() && !coordinatorChanged) {
+    if (!trackerclient.started()) {
         trackerclient.start();
-    } else if (trackerclient.halted() || coordinatorChanged) {
+    } else if (trackerclient.halted()) {
         if (storage != null) {
             try {
                  storage.reopen(rootDataDir);
