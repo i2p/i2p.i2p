@@ -599,7 +599,6 @@ public class ElGamalAESEngine {
         //_log.debug("Encrypting AES");
         if (tagsForDelivery == null) tagsForDelivery = Collections.EMPTY_SET;
         int size = 2 // sizeof(tags)
-                 + tagsForDelivery.size()
                  + SessionTag.BYTE_LENGTH*tagsForDelivery.size()
                  + 4 // payload length
                  + Hash.HASH_LENGTH

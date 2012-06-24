@@ -511,7 +511,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         if (sm == null)
             return;
         Properties props = tunnel.getClientOptions();
-        sm.setDefaultOptions(sockMgr.buildOptions(props));
+        sm.setDefaultOptions(sm.buildOptions(props));
     }
 
     /**

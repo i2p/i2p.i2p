@@ -125,7 +125,7 @@ class PeerCoordinator implements PeerListener
   /** partial pieces - lock by synching on wantedPieces - TODO store Requests, not PartialPieces */
   private final List<PartialPiece> partialPieces;
 
-  private boolean halted = false;
+  private volatile boolean halted;
 
   private final MagnetState magnetState;
   private final CoordinatorListener listener;
@@ -427,6 +427,14 @@ class PeerCoordinator implements PeerListener
         }
         partialPieces.clear();
     }
+  }
+
+  /**
+   *  @since 0.9.1
+   */
+  public void restart() {
+    halted = false;
+    timer.schedule((CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD));
   }
 
   public void connected(Peer peer)

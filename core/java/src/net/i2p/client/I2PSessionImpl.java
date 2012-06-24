@@ -584,7 +584,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix() + "Message received of type " + message.getType()
-                           + " to be handled by " + handler);
+                           + " to be handled by " + handler.getClass().getSimpleName());
             handler.handleMessage(message, this);
         }
     }
