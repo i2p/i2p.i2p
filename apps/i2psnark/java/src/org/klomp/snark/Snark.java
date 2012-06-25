@@ -252,7 +252,7 @@ public class Snark
   private boolean stopped;
   private boolean starting;
   private byte[] id;
-  private byte[] infoHash;
+  private final byte[] infoHash;
   private String additionalTrackerURL;
   private final I2PSnarkUtil _util;
   private final PeerCoordinatorSet _peerCoordinatorSet;
@@ -340,6 +340,7 @@ public class Snark
     meta = null;
     File f = null;
     InputStream in = null;
+    byte[] x_infoHash = null;
     try
       {
         f = new File(torrent);
@@ -362,7 +363,7 @@ public class Snark
              throw new IOException("not found");
           }
         meta = new MetaInfo(in);
-        infoHash = meta.getInfoHash();
+        x_infoHash = meta.getInfoHash();
       }
     catch(IOException ioe)
       {
@@ -403,6 +404,7 @@ public class Snark
               try { in.close(); } catch (IOException ioe) {}
       }    
 
+    infoHash = x_infoHash;  // final
     debug(meta.toString(), INFO);
     
     // When the metainfo torrent was created from an existing file/dir
@@ -1239,8 +1241,8 @@ public class Snark
     if (_peerCoordinatorSet == null || uploaders <= 0)
       return false;
     int totalUploaders = 0;
-    for (Iterator iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
-      PeerCoordinator c = (PeerCoordinator)iter.next();
+    for (Iterator<PeerCoordinator> iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
+      PeerCoordinator c = iter.next();
       if (!c.halted())
         totalUploaders += c.uploaders;
     }
@@ -1253,8 +1255,8 @@ public class Snark
     if (_peerCoordinatorSet == null)
       return false;
     long total = 0;
-    for (Iterator iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
-      PeerCoordinator c = (PeerCoordinator)iter.next();
+    for (Iterator<PeerCoordinator> iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
+      PeerCoordinator c = iter.next();
       if (!c.halted())
         total += c.getCurrentUploadRate();
     }
