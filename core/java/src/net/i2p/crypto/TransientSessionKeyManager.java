@@ -243,7 +243,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
-     * @deprecated racy
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     @Override
     public void createSession(PublicKey target, SessionKey key) {
