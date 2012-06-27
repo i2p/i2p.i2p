@@ -9,6 +9,10 @@ body {
      background: #000;
 }
 
+body.iframed {
+     background: transparent url('../../console/dark/images/transparent.gif') !important;
+}
+
 .snarkTitle {
      font-size: 12pt;
      font-weight: bold;
