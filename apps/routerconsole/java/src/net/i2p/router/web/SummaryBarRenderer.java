@@ -141,7 +141,7 @@ public class SummaryBarRenderer {
            .append(_("Email"))
            .append("</a>\n" +
 
-                   "<a href=\"/i2psnark/\" target=\"_blank\" title=\"")
+                   "<a href=\"/torrents\" target=\"_top\" title=\"")
            .append(_("Built-in anonymous BitTorrent Client"))
            .append("\">")
            .append(_("Torrents"))
