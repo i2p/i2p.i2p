@@ -23,20 +23,19 @@
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
   function resizeFrame(f) { f.style.height = f.contentWindow.document.body.scrollHeight + "px"; }
   function injectClass(f) { f.contentWindow.document.getElementsByTagName('body')[0].setAttribute('class', 'iframed'); }
-  function init() {
+  function setupFrame() {
       f = document.getElementById("i2ptunnelframe");
       resizeFrame(f);
       injectClass(f);
-      initAjax();
   }
 </script>
-</head><body onload="init()">
+</head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
 
 <h1><%=intl._("I2P Tunnel Manager")%></h1>
 <div class="main" id="main">
-<iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="resizeFrame(document.getElementById('i2ptunnelframe'))" allowtransparency="true">
+<iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="setupFrame()" allowtransparency="true">
 </iframe>
 </div></body></html>
 <%
