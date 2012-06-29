@@ -108,9 +108,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     private static final boolean DEFAULT_ENFORCE_PROTO = false;
 
-    // Syncronization fix, but doing it this way causes NPE...
-    // FIXME private final int _trend[] = new int[TREND_COUNT]; FIXME
-    private int _trend[];
+    private final int _trend[] = new int[TREND_COUNT];
 
     /**
      *  OK, here is the calculation on the message size to fit in a single
@@ -224,6 +222,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions() {
         super();
+        cinit(System.getProperties());
     }
     
     /**
@@ -233,6 +232,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(Properties opts) {
         super(opts);
+        cinit(opts);
     }
     
     /**
@@ -241,6 +241,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(I2PSocketOptions opts) {
         super(opts);
+        cinit(System.getProperties());
     }
     
     /**
@@ -249,6 +250,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(ConnectionOptions opts) {
         super(opts);
+        cinit(System.getProperties());
         if (opts != null)
             update(opts);
     }
@@ -306,11 +308,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
     }
     
-    /** called by super's constructor */
-    @Override
-    protected void init(Properties opts) {
-        super.init(opts);
-        _trend = new int[TREND_COUNT];
+    /**
+     * Initialization
+     */
+    private void cinit(Properties opts) {
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
