@@ -209,7 +209,7 @@ hr {
      font-size: 8.5pt;
      color: #EEEE99;
      background-color: #020;
-     background: #000; /*url(images/camotile2.png);*/
+     background: #000 url(images/camotile2.png);
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -219,6 +219,18 @@ hr {
 
 .iframed .panel {
      margin: 16px auto -8px auto !important;
+}
+
+.panel td:first-child {
+     font-weight: bold;	
+}
+
+.panel td {
+	  padding: 6px 0 8px;
+}
+
+.panel td:last-child {
+     border-bottom: 1px dotted #494;	
 }
 
 .panel .footer {
@@ -285,25 +297,25 @@ hr {
 a:link{
      color: #494;
      text-decoration: none;
-     background: #000;
+     background: none;
 }
 
 a:visited{
      color: #7b7;
      text-decoration: none;
-     background: #000;
+     background: none;
 }
 
 a:hover{
      color: #ff6600;
      text-decoration: underline;
-     background: #000;
+     background: none;
 }
 
 a:active{
      color: #900;
      text-decoration: underline;
-     background: #000;
+     background: none;
 }
 
 input {
