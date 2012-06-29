@@ -15,7 +15,7 @@ class SchedulerChooser {
     private final Log _log;
     private final TaskScheduler _nullScheduler;
     /** list of TaskScheduler objects */
-    private final List _schedulers;
+    private final List<TaskScheduler> _schedulers;
     
     public SchedulerChooser(I2PAppContext context) {
         _context = context;
@@ -26,7 +26,7 @@ class SchedulerChooser {
     
     public TaskScheduler getScheduler(Connection con) {
         for (int i = 0; i < _schedulers.size(); i++) {
-            TaskScheduler scheduler = (TaskScheduler)_schedulers.get(i);
+            TaskScheduler scheduler = _schedulers.get(i);
             if (scheduler.accept(con)) {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Scheduling for " + con + " with " + scheduler.getClass().getName());
@@ -50,11 +50,7 @@ class SchedulerChooser {
     }
 
     private class NullScheduler implements TaskScheduler {
-        private final Log _log;
-        public NullScheduler() {
-            _log = _context.logManager().getLog(NullScheduler.class);
-        }
-        
+
         public void eventOccurred(Connection con) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Yell at jrandom: Event occurred on " + con, new Exception("source"));

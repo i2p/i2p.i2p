@@ -1,3 +1,24 @@
+2012-06-29 zzz
+ * HTTP Proxy: Change the error code for unknown host from 404 to 500
+ * SimpleTimer: Fix logging
+ * Streaming:
+   - Allow at least 3 packets and up to half the window to be active resends
+     instead of just 1, to reduce stall time after a packet drop
+   - Increase fast retransmit threshold back to 3 to reduce retransmissions
+   - Don't fast retransmit if we recently retransmitted it already
+   - Allow double the window as long as gaps are less than the window
+   - Don't set the MSS in a resent packet (saves 2 bytes)
+   - Remove redundant calls to updateAcks()
+   - Update activity timer when resending a packet
+   - Reset unackedPacketsReceived counter at all places where acks are sent
+     so it isn't wrong
+   - Fix some places where the activeResends count could become wrong
+   - Prevent storm of CLOSE packets
+   - Never resend the whole packet in ackImmediately(), just send an ack
+   - Cancel flusher timer in MessageOutputStream when closed
+   - Move some createRateStats to ConnectionManager to reduce repeated calls
+   - Cleanups, javadocs, logging, volatile, finals
+
 2012-06-24 zzz
  * ElGamalAESEngine: Fix bad size estimate when tags are included,
                      resulting in trailing zeros after the padding
