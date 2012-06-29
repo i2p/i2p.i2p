@@ -158,7 +158,7 @@ public class PluginUpdateChecker extends UpdateHandler {
             try {
                 _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, _xpi2pURL, TrustedUpdate.HEADER_BYTES);
                 _get.addStatusListener(PluginUpdateCheckerRunner.this);
-                _get.fetch();
+                _get.fetch(CONNECT_TIMEOUT);
             } catch (Throwable t) {
                 _log.error("Error checking update for plugin", t);
             }

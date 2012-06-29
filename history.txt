@@ -18,6 +18,7 @@
    - Cancel flusher timer in MessageOutputStream when closed
    - Move some createRateStats to ConnectionManager to reduce repeated calls
    - Cleanups, javadocs, logging, volatile, finals
+ * Update: Increase eepget timeouts
 
 2012-06-24 zzz
  * ElGamalAESEngine: Fix bad size estimate when tags are included,

@@ -149,7 +149,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                     else
                         _get = new EepGet(_context, 1, _updateFile, _xpi2pURL, false);
                     _get.addStatusListener(PluginUpdateRunner.this);
-                    _get.fetch();
+                    _get.fetch(CONNECT_TIMEOUT, -1, shouldProxy ? INACTIVITY_TIMEOUT : NOPROXY_INACTIVITY_TIMEOUT);
                 } catch (Throwable t) {
                     _log.error("Error downloading plugin", t);
                 }

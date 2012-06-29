@@ -458,19 +458,32 @@ public class EepGet {
     }
     
     public void stopFetching() { _keepFetching = false; }
+
     /**
-     * Blocking fetch, returning true if the URL was retrieved, false if all retries failed
+     * Blocking fetch, returning true if the URL was retrieved, false if all retries failed.
      *
+     * Header timeout default 45 sec, total timeout default none, inactivity timeout default 60 sec.
      */
     public boolean fetch() { return fetch(_fetchHeaderTimeout); }
+
     /**
      * Blocking fetch, timing out individual attempts if the HTTP response headers
      * don't come back in the time given.  If the timeout is zero or less, this will
      * wait indefinitely.
+     *
+     * Total timeout default none, inactivity timeout default 60 sec.
      */
     public boolean fetch(long fetchHeaderTimeout) {
         return fetch(fetchHeaderTimeout, -1, -1);
     }
+
+    /**
+     * Blocking fetch.
+     *
+     * @param fetchHeaderTimeout <= 0 for none (proxy will timeout if none, none isn't recommended if no proxy)
+     * @param totalTimeout <= 0 for default none
+     * @param inactivityTimeout <= 0 for default 60 sec
+     */
     public boolean fetch(long fetchHeaderTimeout, long totalTimeout, long inactivityTimeout) {
         _fetchHeaderTimeout = fetchHeaderTimeout;
         _fetchEndTime = (totalTimeout > 0 ? System.currentTimeMillis() + totalTimeout : -1);
