@@ -1,3 +1,12 @@
+2012-07-01 zzz
+ * i2psnark:
+   - Don't send a keepalive to a peer we are going to disconnect
+   - Disconnect peer when idle a long time
+   - PeerCheckerTask cleanup
+   - Static ref cleanup
+   - Don't show a downloaded torrent file as "seeding"
+   - Better torrent file download icon
+
 2012-06-29 zzz
  * HTTP Proxy: Change the error code for unknown host from 404 to 500
  * SimpleTimer: Fix logging

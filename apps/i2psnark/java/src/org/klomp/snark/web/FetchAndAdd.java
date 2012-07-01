@@ -243,11 +243,12 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
     }
 
     /**
-     *  @return torrent file bytes remaining or -1
+     *  @return -1 when done so the web will list us as "complete" instead of "seeding"
      */
     @Override
     public long getRemainingLength() {
-        return _remaining;
+        long rv = _remaining;
+        return rv > 0 ? rv : -1;
     }
 
     /**

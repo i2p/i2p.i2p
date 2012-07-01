@@ -1073,7 +1073,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         else if (isValid)
             icon = toIcon(meta.getName());
         else if (snark instanceof FetchAndAdd)
-            icon = "arrow_down";
+            icon = "basket_put";
         else
             icon = "magnet";
         if (isValid) {
@@ -1104,7 +1104,7 @@ public class I2PSnarkServlet extends DefaultServlet {
 
         out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
         if(isRunning && remainingSeconds > 0)
-            out.write(DataHelper.formatDuration2(remainingSeconds*1000)); // (eta 6h)
+            out.write(DataHelper.formatDuration2(Math.max(remainingSeconds, 10) * 1000)); // (eta 6h)
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
