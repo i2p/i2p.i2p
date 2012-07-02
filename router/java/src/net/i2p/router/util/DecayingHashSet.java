@@ -1,9 +1,11 @@
-package net.i2p.util;
+package net.i2p.router.util;
 
 import java.util.Random;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.Log;
 
 
 /**
@@ -53,8 +55,6 @@ import net.i2p.data.DataHelper;
  * This has the same properties.
  *
  * This performs about twice as fast as DBF in the test below.
- *
- * Deprecated for use outside of the router; to be moved to router.jar.
  *
  * @author zzz
  */

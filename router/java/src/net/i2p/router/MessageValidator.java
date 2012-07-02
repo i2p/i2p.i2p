@@ -1,7 +1,7 @@
 package net.i2p.router;
 
-import net.i2p.util.DecayingBloomFilter;
-import net.i2p.util.DecayingHashSet;
+import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**

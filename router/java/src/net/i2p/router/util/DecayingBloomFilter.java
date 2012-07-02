@@ -1,4 +1,4 @@
-package net.i2p.util;
+package net.i2p.router.util;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -6,6 +6,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 import org.xlattice.crypto.filters.BloomSHA1;
 
@@ -17,13 +19,11 @@ import org.xlattice.crypto.filters.BloomSHA1;
  * this may be refactored to allow tighter control of the size necessary for the
  * contained bloom filters.
  *
- * Deprecated for use outside of the router; to be moved to router.jar.
- *
  * See main() for an analysis of false positive rate.
  * See BloomFilterIVValidator for instantiation parameters.
  * See DecayingHashSet for a smaller and simpler version.
  * @see net.i2p.router.tunnel.BloomFilterIVValidator
- * @see net.i2p.util.DecayingHashSet
+ * @see net.i2p.router.util.DecayingHashSet
  */
 public class DecayingBloomFilter {
     protected final I2PAppContext _context;

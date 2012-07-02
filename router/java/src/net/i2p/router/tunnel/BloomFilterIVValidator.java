@@ -3,9 +3,9 @@ package net.i2p.router.tunnel;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.ByteCache;
-import net.i2p.util.DecayingBloomFilter;
-import net.i2p.util.DecayingHashSet;
 
 /**
  * Manage the IV validation for all of the router's tunnels by way of a big
