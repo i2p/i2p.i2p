@@ -21,7 +21,11 @@
   var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
-  function resizeFrame(f) { f.style.height = f.contentWindow.document.body.scrollHeight + "px"; }
+  function resizeFrame(f) {
+      var body = f.contentWindow.document.body,
+          html = f.contentWindow.document.documentElement;
+      f.style.height = body.scrollHeight + "px";
+  }
   function injectClass(f) { f.contentWindow.document.getElementsByTagName('body')[0].setAttribute('class', 'iframed'); }
   function setupFrame() {
       f = document.getElementById("i2ptunnelframe");
