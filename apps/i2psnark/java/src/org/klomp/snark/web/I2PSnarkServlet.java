@@ -2197,7 +2197,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                                     status = toImg("clock_red");
                                 status += " " +
                                          (100 * (length - remaining) / length) + "% " + _("complete") +
-                                         " (" + DataHelper.formatSize2(remaining) + _("bytes remaining") + ")";
+                                         " (" + DataHelper.formatSize2(remaining) + "B " + _("remaining") + ")";
                             }
                         } else {
                             status = "Not a file?";
