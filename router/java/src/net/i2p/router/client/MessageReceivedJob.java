@@ -36,7 +36,7 @@ class MessageReceivedJob extends JobImpl {
     public void runJob() {
         if (_runner.isDead()) return;
         MessageId id = new MessageId();
-        id.setMessageId(ClientConnectionRunner.getNextMessageId());
+        id.setMessageId(_runner.getNextMessageId());
         _runner.setPayload(id, _payload);
         messageAvailable(id, _payload.getSize());
     }

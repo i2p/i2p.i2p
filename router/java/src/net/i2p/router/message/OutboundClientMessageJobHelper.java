@@ -88,7 +88,7 @@ class OutboundClientMessageJobHelper {
                                                    PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel, boolean requireAck,
                                                    LeaseSet bundledReplyLeaseSet) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
-        if (log.shouldLog(Log.DEBUG))
+        if (replyToken >= 0 && log.shouldLog(Log.DEBUG))
             log.debug("Reply token: " + replyToken);
         GarlicConfig config = new GarlicConfig();
         
@@ -136,20 +136,17 @@ class OutboundClientMessageJobHelper {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
         
-        Hash replyToTunnelRouter = null; // inbound tunnel gateway
-        TunnelId replyToTunnelId = null; // tunnel id on that gateway
-        
         if (replyToTunnel == null) {
             if (log.shouldLog(Log.WARN))
                 log.warn("Unable to send client message from " + from.toBase64() 
                          + ", as there are no inbound tunnels available");
             return null;
         }
-        replyToTunnelId = replyToTunnel.getReceiveTunnelId(0);
-        replyToTunnelRouter = replyToTunnel.getPeer(0);
+        TunnelId replyToTunnelId = replyToTunnel.getReceiveTunnelId(0); // tunnel id on that gateway
+        Hash replyToTunnelRouter = replyToTunnel.getPeer(0); // inbound tunnel gateway
         if (log.shouldLog(Log.DEBUG))
             log.debug("Ack for the data message will come back along tunnel " + replyToTunnelId 
-                      + ":\n" + replyToTunnel);
+                      + ": " + replyToTunnel);
         
         DeliveryInstructions ackInstructions = new DeliveryInstructions();
         ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
@@ -163,8 +160,8 @@ class OutboundClientMessageJobHelper {
         DeliveryStatusMessage msg = new DeliveryStatusMessage(ctx);
         msg.setArrival(ctx.clock().now());
         msg.setMessageId(replyToken);
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
+        //if (log.shouldLog(Log.DEBUG))
+        //    log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
         
         ackClove.setCertificate(Certificate.NULL_CERT);
         ackClove.setDeliveryInstructions(ackInstructions);
@@ -175,11 +172,11 @@ class OutboundClientMessageJobHelper {
         // defaults
         //ackClove.setRequestAck(false);
         
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("Delivery status message is targetting us [" 
-                      + ackClove.getRecipient().getIdentity().getHash().toBase64() 
-                      + "] via tunnel " + replyToTunnelId.getTunnelId() + " on " 
-                      + replyToTunnelRouter.toBase64());
+        //if (log.shouldLog(Log.DEBUG))
+        //    log.debug("Delivery status message is targetting us [" 
+        //              + ackClove.getRecipient().getIdentity().getHash().toBase64() 
+        //              + "] via tunnel " + replyToTunnelId.getTunnelId() + " on " 
+        //              + replyToTunnelRouter.toBase64());
         
         return ackClove;
     }

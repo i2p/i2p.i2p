@@ -1,3 +1,69 @@
+2012-07-01 zzz
+ * i2psnark:
+   - Don't send a keepalive to a peer we are going to disconnect
+   - Disconnect peer when idle a long time
+   - PeerCheckerTask cleanup
+   - Static ref cleanup
+   - Don't show a downloaded torrent file as "seeding"
+   - Better torrent file download icon
+
+2012-06-29 zzz
+ * HTTP Proxy: Change the error code for unknown host from 404 to 500
+ * SimpleTimer: Fix logging
+ * Streaming:
+   - Allow at least 3 packets and up to half the window to be active resends
+     instead of just 1, to reduce stall time after a packet drop
+   - Increase fast retransmit threshold back to 3 to reduce retransmissions
+   - Don't fast retransmit if we recently retransmitted it already
+   - Allow double the window as long as gaps are less than the window
+   - Don't set the MSS in a resent packet (saves 2 bytes)
+   - Remove redundant calls to updateAcks()
+   - Update activity timer when resending a packet
+   - Reset unackedPacketsReceived counter at all places where acks are sent
+     so it isn't wrong
+   - Fix some places where the activeResends count could become wrong
+   - Prevent storm of CLOSE packets
+   - Never resend the whole packet in ackImmediately(), just send an ack
+   - Cancel flusher timer in MessageOutputStream when closed
+   - Move some createRateStats to ConnectionManager to reduce repeated calls
+   - Cleanups, javadocs, logging, volatile, finals
+ * Update: Increase eepget timeouts
+
+2012-06-24 zzz
+ * ElGamalAESEngine: Fix bad size estimate when tags are included,
+                     resulting in trailing zeros after the padding
+                     in the unencrypted data
+ * i2psnark: Don't create a new PeerCoordinator after restart, as the
+             TrackerClient holds on to the old one and that causes it
+             to not get peers. Possibly fixes ticket #563.
+ * I2PTunnel: Fix NPE on shared client creation, thx kytv
+ * Transport: Add Ethiopia to hidden mode list
+
+2012-06-21 zzz
+ * I2CP: Make separate message ID counters per-destination, use atomic,
+         increase max (could have caused "local loopback" problems)
+ * IRC Client: Don't flush output unless out of input, so the
+               streaming messages don't get split up unnecessarily
+ * OCMOSJ, ElG, Streaming: log tweaks
+ * TunnelInfo: Change msg counter from long to int
+ * TunnelPeerSelectors: Minor refactoring to store context
+ * TunnelPool: Fix bug where a tunnel was marked as reused when it wasn't
+ * TunnelPoolManager: Use one ClientPeerSelector for all pools
+
+2012-06-20 zzz
+ * I2PSession:
+   - Greatly simplify the VerifyUsage timers
+   - Constructor cleanup
+
+2012-06-19 zzz
+ * i2psnark:
+   - Hide buttons while stopping all
+ * Socks: Pass remote port through
+ * Streaming:
+   - Listen only on local port if set
+   - Listen only for streaming protocol if configured (new option)
+   - Javadocs re: ports
+
 2012-06-18 zzz
  * i2psnark:
    - Improve torrent shutdown handling to maximize chance of

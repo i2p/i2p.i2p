@@ -68,6 +68,7 @@ class PeerCoordinator implements PeerListener
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
   final static int MAX_UPLOADERS = 6;
+  public static final long MAX_INACTIVE = 8*60*1000;
 
   /**
    * Approximation of the number of current uploaders.
@@ -125,12 +126,12 @@ class PeerCoordinator implements PeerListener
   /** partial pieces - lock by synching on wantedPieces - TODO store Requests, not PartialPieces */
   private final List<PartialPiece> partialPieces;
 
-  private boolean halted = false;
+  private volatile boolean halted;
 
   private final MagnetState magnetState;
   private final CoordinatorListener listener;
   private final I2PSnarkUtil _util;
-  private static final Random _random = I2PAppContext.getGlobalContext().random();
+  private final Random _random;
   
   /**
    *  @param metainfo null if in magnet mode
@@ -140,6 +141,7 @@ class PeerCoordinator implements PeerListener
                          CoordinatorListener listener, Snark torrent)
   {
     _util = util;
+    _random = util.getContext().random();
     this.id = id;
     this.infohash = infohash;
     this.metainfo = metainfo;
@@ -377,8 +379,10 @@ class PeerCoordinator implements PeerListener
   }
   
   /**
-   *  Reduce max if huge pieces to keep from ooming when leeching
-   *  @return 512K: 16; 1M: 11; 2M: 6
+   *  Formerly used to
+   *  reduce max if huge pieces to keep from ooming when leeching
+   *  but now we don't
+   *  @return usually 16	
    */
   private int getMaxConnections() {
     if (metainfo == null)
@@ -388,7 +392,7 @@ class PeerCoordinator implements PeerListener
         return 4;
     if (pieces <= 5)
         return 6;
-    int size = metainfo.getPieceLength(0);
+    //int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
     // Now that we use temp files, no memory concern
     //if (size <= 512*1024 || completed())
@@ -429,6 +433,14 @@ class PeerCoordinator implements PeerListener
     }
   }
 
+  /**
+   *  @since 0.9.1
+   */
+  public void restart() {
+    halted = false;
+    timer.schedule((CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD));
+  }
+
   public void connected(Peer peer)
   { 
     if (halted)
@@ -441,7 +453,7 @@ class PeerCoordinator implements PeerListener
     synchronized(peers)
       {
         Peer old = peerIDInList(peer.getPeerID(), peers);
-        if ( (old != null) && (old.getInactiveTime() > 8*60*1000) ) {
+        if ( (old != null) && (old.getInactiveTime() > MAX_INACTIVE) ) {
             // idle for 8 minutes, kill the old con (32KB/8min = 68B/sec minimum for one block)
             if (_log.shouldLog(Log.WARN))
               _log.warn("Remomving old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
@@ -535,7 +547,7 @@ class PeerCoordinator implements PeerListener
         need_more = (!peer.isConnected()) && peersize < getMaxConnections();
         // Check if we already have this peer before we build the connection
         Peer old = peerIDInList(peer.getPeerID(), peers);
-        need_more = need_more && ((old == null) || (old.getInactiveTime() > 8*60*1000));
+        need_more = need_more && ((old == null) || (old.getInactiveTime() > MAX_INACTIVE));
       }
 
     if (need_more)
@@ -966,11 +978,8 @@ class PeerCoordinator implements PeerListener
 
     // Announce to the world we have it!
     // Disconnect from other seeders when we get the last piece
-        List<Peer> toDisconnect = new ArrayList(); 
-        Iterator<Peer> it = peers.iterator();
-        while (it.hasNext())
-          {
-            Peer p = it.next();
+    List<Peer> toDisconnect = done ? new ArrayList() : null; 
+    for (Peer p : peers) {
             if (p.isConnected())
               {
                   if (done && p.isCompleted())
@@ -978,15 +987,13 @@ class PeerCoordinator implements PeerListener
                   else
                       p.have(piece);
               }
-          }
-        it = toDisconnect.iterator();
-        while (it.hasNext())
-          {
-            Peer p = it.next();
-            p.disconnect(true);
-          }
-    
+    }
+
     if (done) {
+        for (Peer p : toDisconnect) {
+            p.disconnect(true);
+        }
+    
         // put msg on the console if partial, since Storage won't do it
         if (!completed())
             snark.storageCompleted(storage);

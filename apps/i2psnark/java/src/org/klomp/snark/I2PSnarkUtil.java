@@ -122,6 +122,9 @@ public class I2PSnarkUtil {
     }
 ******/
     
+    /** @since 0.9.1 */
+    public I2PAppContext getContext() { return _context; }
+    
     public boolean configured() { return _configured; }
     
     public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {

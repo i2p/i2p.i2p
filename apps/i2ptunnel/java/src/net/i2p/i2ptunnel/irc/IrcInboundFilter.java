@@ -79,7 +79,8 @@ public class IrcInboundFilter implements Runnable {
                         outmsg=outmsg+"\r\n";   // rfc1459 sec. 2.3
                         output.write(outmsg.getBytes("ISO-8859-1"));
                         // probably doesn't do much but can't hurt
-                        output.flush();
+                        if (!in.ready())
+                            output.flush();
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("inbound BLOCKED: "+inmsg);

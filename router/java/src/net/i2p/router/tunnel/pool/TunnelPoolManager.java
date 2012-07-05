@@ -41,6 +41,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private TunnelPool _outboundExploratory;
     private final BuildExecutor _executor;
     private final BuildHandler _handler;
+    private final TunnelPeerSelector _clientPeerSelector;
     private boolean _isShutdown;
     private final int _numHandlerThreads;
     private static final long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
@@ -60,6 +61,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
         _clientInboundPools = new ConcurrentHashMap(4);
         _clientOutboundPools = new ConcurrentHashMap(4);
+        _clientPeerSelector = new ClientPeerSelector(ctx);
         
         _executor = new BuildExecutor(ctx, this);
         I2PThread execThread = new I2PThread(_executor, "BuildExecutor", true);
@@ -407,8 +409,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         settings.getOutboundSettings().setDestination(dest);
         TunnelPool inbound = null;
         TunnelPool outbound = null;
-        // should we share the clientPeerSelector across both inbound and outbound?
-        // or just one for all clients? why separate?
 
         boolean delayOutbound = false;
         // synch with removeTunnels() below
@@ -416,7 +416,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             inbound = _clientInboundPools.get(dest);
             if (inbound == null) {
                 inbound = new TunnelPool(_context, this, settings.getInboundSettings(), 
-                                         new ClientPeerSelector());
+                                         _clientPeerSelector);
                 _clientInboundPools.put(dest, inbound);
             } else {
                 inbound.setSettings(settings.getInboundSettings());
@@ -424,7 +424,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             outbound = _clientOutboundPools.get(dest);
             if (outbound == null) {
                 outbound = new TunnelPool(_context, this, settings.getOutboundSettings(), 
-                                          new ClientPeerSelector());
+                                          _clientPeerSelector);
                 _clientOutboundPools.put(dest, outbound);
                 delayOutbound = true;
             } else {
@@ -511,7 +511,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             t.setDaemon(true);
             t.start();
         }
-        ExploratoryPeerSelector selector = new ExploratoryPeerSelector();
+        ExploratoryPeerSelector selector = new ExploratoryPeerSelector(_context);
         
         TunnelPoolSettings inboundSettings = new TunnelPoolSettings();
         inboundSettings.setIsExploratory(true);

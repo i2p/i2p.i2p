@@ -59,7 +59,8 @@ public class SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
-     * @deprecated racy
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     public void createSession(PublicKey target, SessionKey key) { // nop
     }
@@ -67,7 +68,8 @@ public class SessionKeyManager {
     /**
      * Generate a new session key and associate it with the specified target.  
      *
-     * @deprecated racy
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     public SessionKey createSession(PublicKey target) {
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();

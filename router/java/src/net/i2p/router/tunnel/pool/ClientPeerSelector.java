@@ -15,8 +15,13 @@ import net.i2p.router.TunnelPoolSettings;
  *
  */
 class ClientPeerSelector extends TunnelPeerSelector {
-    public List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings) {
-        int length = getLength(ctx, settings);
+
+    public ClientPeerSelector(RouterContext context) {
+        super(context);
+    }
+
+    public List<Hash> selectPeers(TunnelPoolSettings settings) {
+        int length = getLength(settings);
         if (length < 0)
             return null;
         if ( (length == 0) && (settings.getLength()+settings.getLengthVariance() > 0) )
@@ -26,9 +31,9 @@ class ClientPeerSelector extends TunnelPeerSelector {
     
         if (length > 0) {
             if (shouldSelectExplicit(settings))
-                return selectExplicit(ctx, settings, length);
+                return selectExplicit(settings, length);
         
-            Set<Hash> exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
+            Set<Hash> exclude = getExclude(settings.isInbound(), false);
             Set<Hash> matches = new HashSet(length);
             if (length == 1) {
                 ctx.profileOrganizer().selectFastPeers(length, exclude, matches, 0);
@@ -41,6 +46,9 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 rv = new ArrayList(length + 1);
                 // OBEP or IB last hop
                 // group 0 or 1 if two hops, otherwise group 0
+                if (!settings.isInbound()) {
+                    // exclude existing OBEPs to get some diversity
+                }
                 ctx.profileOrganizer().selectFastPeers(1, exclude, matches, settings.getRandomKey(), length == 2 ? 2 : 4);
                 matches.remove(ctx.routerHash());
                 exclude.addAll(matches);
@@ -64,6 +72,9 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 }
                 // IBGW or OB first hop
                 // group 2 or 3 if two hops, otherwise group 1
+                if (settings.isInbound()) {
+                    // exclude existing IBGWs to get some diversity
+                }
                 ctx.profileOrganizer().selectFastPeers(1, exclude, matches, settings.getRandomKey(), length == 2 ? 3 : 5);
                 matches.remove(ctx.routerHash());
                 rv.addAll(matches);

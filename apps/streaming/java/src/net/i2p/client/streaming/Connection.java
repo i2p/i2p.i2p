@@ -34,19 +34,19 @@ class Connection {
     private boolean _resetReceived;
     private boolean _resetSent;
     private long _resetSentOn;
-    private boolean _connected;
+    private volatile boolean _connected;
     private boolean _hardDisconnected;
     private final MessageInputStream _inputStream;
     private final MessageOutputStream _outputStream;
     private final SchedulerChooser _chooser;
-    private long _nextSendTime;
+    private volatile long _nextSendTime;
     private long _ackedPackets;
     private final long _createdOn;
     private long _closeSentOn;
     private long _closeReceivedOn;
     private int _unackedPacketsReceived;
     private long _congestionWindowEnd;
-    private long _highestAckedThrough;
+    private volatile long _highestAckedThrough;
     private boolean _isInbound;
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
@@ -60,11 +60,11 @@ class Connection {
     private String _connectionError;
     private long _disconnectScheduledOn;
     private long _lastReceivedOn;
-    private ActivityTimer _activityTimer;
+    private final ActivityTimer _activityTimer;
     /** window size when we last saw congestion */
     private int _lastCongestionSeenAt;
     private long _lastCongestionTime;
-    private long _lastCongestionHighestUnacked;
+    private volatile long _lastCongestionHighestUnacked;
     private boolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
     private final Object _connectLock;
@@ -96,7 +96,9 @@ class Connection {
     }
 ****/
 
-    /** */
+    /**
+     *  @param opts may be null
+     */
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
                       SimpleTimer2 timer,
                       PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts) {
@@ -138,10 +140,7 @@ class Connection {
         _resetSentOn = -1;
         _connectionEvent = new ConEvent();
         _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
-        _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("stream.fastRetransmit", "How long a packet has been around for if it has been resent per the fast retransmit timer?", "Stream", new long[] { 60*1000, 10*60*1000 });
+        // all createRateStats in ConnectionManager
         if (_log.shouldLog(Log.INFO))
             _log.info("New connection created with options: " + _options);
     }
@@ -169,7 +168,6 @@ class Connection {
      *         will return false after 5 minutes even if timeoutMs is <= 0.
      */
     boolean packetSendChoke(long timeoutMs) {
-        // if (false) return true; // <--- what the fuck??
         long start = _context.clock().now();
         long writeExpire = start + timeoutMs;  // only used if timeoutMs > 0
         boolean started = false;
@@ -187,19 +185,26 @@ class Connection {
                     if (!_connected)
                        return false;
                 started = true;
-                if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ||
-                     (_lastSendId.get() - _highestAckedThrough > _options.getWindowSize()) ) {
+                // Try to keep things moving even during NACKs and retransmissions...
+                // Limit unacked packets to the window
+                // Limit active resends to half the window
+                // Limit (highest-lowest) to twice the window (if far end doesn't like it, it can send a choke)
+                int unacked = _outboundPackets.size();
+                int wsz = _options.getWindowSize();
+                if (unacked >= wsz ||
+                    _activeResends >= (wsz + 1) / 2 ||
+                    _lastSendId.get() - _highestAckedThrough >= Math.max(MAX_WINDOW_SIZE, 2 * wsz)) {
                     if (timeoutMs > 0) {
                         if (timeLeft <= 0) {
                             if (_log.shouldLog(Log.INFO))
-                                _log.info("Outbound window is full of " + _outboundPackets.size() 
-                                          + " with " + _activeResends + " active resends"
+                                _log.info("Outbound window is full " + unacked
+                                          + " unacked with " + _activeResends + " active resends"
                                           + " and we've waited too long (" + (0-(timeLeft - timeoutMs)) + "ms): " 
                                           + toString());
                             return false;
                         }
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "/" 
+                            _log.debug("Outbound window is full (" + unacked + "/" + wsz + "/" 
                                        + _activeResends + "), waiting " + timeLeft);
                         try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) { if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends +")"); return false;}
                     } else {
@@ -223,6 +228,12 @@ class Connection {
     
     void ackImmediately() {
         PacketLocal packet = null;
+/*** why would we do this?
+     was it to force a congestion indication at the other end?
+     an expensive way to do that...
+     One big user was via SchedulerClosing to resend a CLOSE packet,
+     but why do that either...
+
         synchronized (_outboundPackets) {
             if (!_outboundPackets.isEmpty()) {
                 // ordered, so pick the lowest to retransmit
@@ -239,6 +250,7 @@ class Connection {
             }
             ResendPacketEvent evt = (ResendPacketEvent)packet.getResendEvent();
             if (evt != null) {
+                // fixme should we set a flag and reschedule instead? or synch?
                 boolean sent = evt.retransmit(false);
                 if (sent) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -251,7 +263,9 @@ class Connection {
                 }
             }
         }
+***/
         // if we don't have anything to retransmit, send a small ack
+        // this calls sendPacket() below
         packet = _receiver.send(null, 0, 0);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending new ack: " + packet);
@@ -281,11 +295,15 @@ class Connection {
         reply.setReceiveStreamId(_receiveStreamId);
         reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
         // this just sends the packet - no retries or whatnot
-        _outboundQueue.enqueue(reply);
+        if (_outboundQueue.enqueue(reply)) {
+            _unackedPacketsReceived = 0;
+            _lastSendTime = _context.clock().now();
+            resetActivityTimer();
+        }
     }
     
     /**
-     * Flush any data that we can
+     * Flush any data that we can. Non-blocking.
      */
     void sendAvailable() {
         // this grabs the data, builds a packet, and queues it up via sendPacket
@@ -301,7 +319,6 @@ class Connection {
         if (packet == null) return;
         
         setNextSendTime(-1);
-        _unackedPacketsReceived = 0;
         if (_options.getRequireFullySigned()) {
             packet.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
             packet.setFlag(Packet.FLAG_SIGNATURE_REQUESTED);
@@ -328,8 +345,8 @@ class Connection {
                 (packet.getSequenceNum() % 8 == 0)) {
                 packet.setOptionalDelay(0);
                 packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Requesting no ack delay for packet " + packet);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Requesting no ack delay for packet " + packet);
             } else {
                 // This is somewhat of a waste of time, unless the RTT < 4000,
                 // since the other end limits it to getSendAckDelay()
@@ -358,10 +375,12 @@ class Connection {
         // warning, getStatLog() can be null
         //_context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
         
-        _lastSendTime = _context.clock().now();
-        _outboundQueue.enqueue(packet);        
-        resetActivityTimer();
-        
+        if (_outboundQueue.enqueue(packet)) {        
+            _unackedPacketsReceived = 0;
+            _lastSendTime = _context.clock().now();
+            resetActivityTimer();
+        }        
+
         /*
         if (ackOnly) {
             // ACK only, don't schedule this packet for retries
@@ -397,6 +416,7 @@ class Connection {
      *  @return List of packets acked or null
      */
     List<PacketLocal> ackPackets(long ackThrough, long nacks[]) {
+        // FIXME synch this part too?
         if (ackThrough < _highestAckedThrough) {
             // dupack which won't tell us anything
         } else {
@@ -415,16 +435,17 @@ class Connection {
         
         List<PacketLocal> acked = null;
         synchronized (_outboundPackets) {
-            for (Iterator<Long> iter = _outboundPackets.keySet().iterator(); iter.hasNext(); ) {
-                Long id = iter.next();
-                if (id.longValue() <= ackThrough) {
+            for (Map.Entry<Long, PacketLocal> e : _outboundPackets.entrySet()) {
+                long id = e.getKey().longValue();
+                if (id <= ackThrough) {
                     boolean nacked = false;
                     if (nacks != null) {
                         // linear search since its probably really tiny
                         for (int i = 0; i < nacks.length; i++) {
-                            if (nacks[i] == id.longValue()) {
+                            if (nacks[i] == id) {
                                 nacked = true;
-                                PacketLocal nackedPacket = _outboundPackets.get(id);
+                                PacketLocal nackedPacket = e.getValue();
+                                // this will do a fast retransmit if appropriate
                                 nackedPacket.incrementNACKs();
                                 break; // NACKed
                             }
@@ -433,11 +454,27 @@ class Connection {
                     if (!nacked) { // aka ACKed
                         if (acked == null) 
                             acked = new ArrayList(1);
-                        PacketLocal ackedPacket = _outboundPackets.get(id);
+                        PacketLocal ackedPacket = e.getValue();
                         ackedPacket.ackReceived();
                         acked.add(ackedPacket);
                     }
                 } else {
+                    // TODO
+                    // we do not currently do an "implicit nack" of the packets higher
+                    // than ackThrough, so those will not be fast retransmitted
+                    // we could incrementNACK them here... but we may need to set the fastRettransmit
+                    // threshold back to 3 for that.
+                    // this will do a fast retransmit if appropriate
+                    // This doesn't work because every packet has an ACK in it, so we hit the
+                    // FAST_TRANSMIT threshold in a heartbeat and retransmit everything,
+                    // even with the threshold at 3. (we never set the NO_ACK field in the header)
+                    // Also, we may need to track that we
+                    // have the same ackThrough for 3 or 4 consecutive times.
+                    // See https://secure.wikimedia.org/wikipedia/en/wiki/Fast_retransmit
+                    //if (_log.shouldLog(Log.INFO))
+                    //    _log.info("ACK thru " + ackThrough + " implicitly NACKs " + id);
+                    //PacketLocal nackedPacket = e.getValue();
+                    //nackedPacket.incrementNACKs();
                     break; // _outboundPackets is ordered
                 }
             }
@@ -465,31 +502,33 @@ class Connection {
         return acked;
     }
 
-    private long _occurredTime;
-    private long _occurredEventCount;
+    //private long _occurredTime;
+    //private long _occurredEventCount;
+
     void eventOccurred() {
-        long now = System.currentTimeMillis();
+        //long now = System.currentTimeMillis();
         
         TaskScheduler sched = _chooser.getScheduler(this);
         
-        now = now - now % 1000;
-        if (_occurredTime == now) {
-            _occurredEventCount++;
-        } else {
-            _occurredTime = now;
-            if ( (_occurredEventCount > 1000) && (_log.shouldLog(Log.WARN)) ) {
-                _log.warn("More than 1000 events (" + _occurredEventCount + ") in a second on " 
-                          + toString() + ": scheduler = " + sched);
-            }
-            _occurredEventCount = 0;
-        }
+        //now = now - now % 1000;
+        //if (_occurredTime == now) {
+        //    _occurredEventCount++;
+        //} else {
+        //    _occurredTime = now;
+        //    if ( (_occurredEventCount > 1000) && (_log.shouldLog(Log.WARN)) ) {
+        //        _log.warn("More than 1000 events (" + _occurredEventCount + ") in a second on " 
+        //                  + toString() + ": scheduler = " + sched);
+        //    }
+        //    _occurredEventCount = 0;
+        //}
         
         long before = System.currentTimeMillis();
             
         sched.eventOccurred(this);
         long elapsed = System.currentTimeMillis() - before;
-        if ( (elapsed > 1000) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("Took " + elapsed + "ms to pump through " + sched);
+        // 250 and warn for debugging
+        if ( (elapsed > 250) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Took " + elapsed + "ms to pump through " + sched + " on " + toString());
     }
     
     void resetReceived() {
@@ -498,12 +537,8 @@ class Connection {
             SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         _resetReceived = true;
-        MessageOutputStream mos = _outputStream;
-        MessageInputStream mis = _inputStream;
-        if (mos != null)
-            mos.streamErrorOccurred(new IOException("Reset received"));
-        if (mis != null)
-            mis.streamErrorOccurred(new IOException("Reset received"));
+        _outputStream.streamErrorOccurred(new IOException("Reset received"));
+        _inputStream.streamErrorOccurred(new IOException("Reset received"));
         _connectionError = "Connection reset";
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
@@ -556,15 +591,10 @@ class Connection {
             s.destroy2();
             _socket = null;
         }
-        if (_outputStream != null)
-            _outputStream.destroy();
-        if (_receiver != null)
-            _receiver.destroy();
-        if (_activityTimer != null)
-            _activityTimer.cancel();
-        //_activityTimer = null;
-        if (_inputStream != null)
-            _inputStream.streamErrorOccurred(new IOException("disconnected!"));
+        _outputStream.destroy();
+        _receiver.destroy();
+        _activityTimer.cancel();
+        _inputStream.streamErrorOccurred(new IOException("disconnected!"));
         
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
@@ -656,11 +686,7 @@ class Connection {
      * @return Last time we sent data
      */
     public long getLastSendTime() { return _lastSendTime; }
-    /** Set the time we sent data.
-     * @param when The time we sent data
-     */
-    public void setLastSendTime(long when) { _lastSendTime = when; }
-    
+
     /** What was the last packet Id sent to the peer?
      * @return The last sent packet ID
      */
@@ -795,10 +821,9 @@ class Connection {
     
     public long getCongestionWindowEnd() { return _congestionWindowEnd; }
     public void setCongestionWindowEnd(long endMsg) { _congestionWindowEnd = endMsg; }
+
     /** @return the highest outbound packet we have recieved an ack for */
     public long getHighestAckedThrough() { return _highestAckedThrough; }
-    /** @deprecated unused */
-    public void setHighestAckedThrough(long msgNum) { _highestAckedThrough = msgNum; }
     
     public long getLastActivityOn() {
         return (_lastSendTime > _lastReceivedOn ? _lastSendTime : _lastReceivedOn);
@@ -878,17 +903,12 @@ class Connection {
     }
     
     private void resetActivityTimer() {
-        if (_options.getInactivityTimeout() <= 0) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Resetting the inactivity timer, but its gone!", new Exception("where did it go?"));
-            return;
-        }
-        if (_activityTimer == null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Resetting the inactivity timer, but its gone!", new Exception("where did it go?"));
-            return;
-        }
         long howLong = _options.getInactivityTimeout();
+        if (howLong <= 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Resetting the inactivity timer, but its gone!", new Exception("where did it go?"));
+            return;
+        }
         howLong += _randomWait; // randomize it a bit, so both sides don't do it at once
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Resetting the inactivity timer to " + howLong);
@@ -983,12 +1003,12 @@ class Connection {
     }
     
     /** stream that the local peer receives data on
-     * @return the inbound message stream
+     * @return the inbound message stream, non-null
      */
     public MessageInputStream getInputStream() { return _inputStream; }
 
     /** stream that the local peer sends data to the remote peer on
-     * @return the outbound message stream
+     * @return the outbound message stream, non-null
      */
     public MessageOutputStream getOutputStream() { return _outputStream; }
 
@@ -1032,12 +1052,10 @@ class Connection {
          */
         buf.append("unacked in: ").append(getUnackedPacketsReceived());
         int missing = 0;
-        if (_inputStream != null) {
-            long nacks[] = _inputStream.getNacks();
-            if (nacks != null) {
-                missing = nacks.length;
-                buf.append(" [").append(missing).append(" missing]");
-            }
+        long nacks[] = _inputStream.getNacks();
+        if (nacks != null) {
+            missing = nacks.length;
+            buf.append(" [").append(missing).append(" missing]");
         }
         
         if (getResetSent())
@@ -1053,8 +1071,7 @@ class Connection {
         if (getCloseReceivedOn() > 0)
             buf.append(" close received ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
         buf.append(" sent: ").append(1 + _lastSendId.get());
-        if (_inputStream != null)
-            buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
+        buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
         buf.append(" MTU ").append(getOptions().getMaxMessageSize());
@@ -1086,14 +1103,15 @@ class Connection {
      * there are other packets in flight. 3 takes forever, let's try 2.
      *
      */
-    static final int FAST_RETRANSMIT_THRESHOLD = 2;
+    static final int FAST_RETRANSMIT_THRESHOLD = 3;
     
     /**
      * Coordinate the resends of a given packet
      */
     class ResendPacketEvent extends SimpleTimer2.TimedEvent {
-        private PacketLocal _packet;
+        private final PacketLocal _packet;
         private long _nextSendTime;
+
         public ResendPacketEvent(PacketLocal packet, long delay) {
             super(_timer);
             _packet = packet;
@@ -1110,6 +1128,8 @@ class Connection {
          * ackImmediately() above calls directly in here, so
          * we have to use forceReschedule() instead of schedule() below,
          * to prevent duplicates in the timer queue.
+         *
+         * don't synchronize this, deadlock with ackPackets->ackReceived->SimpleTimer2.cancel
          *
          * @param penalize true if this retransmission is caused by a timeout, false if we
          *                 are just sending this packet instead of an ACK
@@ -1131,7 +1151,12 @@ class Connection {
             boolean resend = false;
             boolean isLowest = false;
             synchronized (_outboundPackets) {
-                if (_packet.getSequenceNum() == _highestAckedThrough + 1)
+                // allow appx. half the window to be "lowest" and be active resends, minimum of 3
+                // Note: we should really pick the N lowest, not the lowest one + N more who
+                // happen to get here next, as the timers get out-of-order esp. after fast retx
+                if (_packet.getSequenceNum() == _highestAckedThrough + 1 ||
+                    _packet.getNumSends() > 1 ||
+                    _activeResends < Math.max(3, (_options.getWindowSize() + 1) / 2))
                     isLowest = true;
                 if (_outboundPackets.containsKey(Long.valueOf(_packet.getSequenceNum())))
                     resend = true;
@@ -1145,24 +1170,28 @@ class Connection {
                     // BUG? seq# = 0, activeResends = 0, loop forever - why?
                     // also seen with seq# > 0. Is the _activeResends count reliable?
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Delaying resend of " + _packet + " as there are " 
-                                  + _activeResends + " active resends already in play");
-                    forceReschedule(1000);
-                    _nextSendTime = 1000 + _context.clock().now();
+                        _log.info("Delaying resend of " + _packet + " with " 
+                                  + _activeResends + " active resend, "
+                                  + _outboundPackets.size() + " unacked, window size = " + _options.getWindowSize());
+                    forceReschedule(1333);
+                    _nextSendTime = 1333 + _context.clock().now();
                     return false;
                 }
                 
+                // It's the lowest, or it's fast retransmit time. Resend the packet.
+
                 if (fastRetransmit)
                     _context.statManager().addRateData("stream.fastRetransmit", _packet.getLifetime(), _packet.getLifetime());
                 
                 // revamp various fields, in case we need to ack more, etc
-                _inputStream.updateAcks(_packet);
+                // updateAcks done in enqueue()
+                //_inputStream.updateAcks(_packet);
                 int choke = getOptions().getChoke();
                 _packet.setOptionalDelay(choke);
                 if (choke > 0)
                     _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 // this seems unnecessary to send the MSS again:
-                _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
+                //_packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
                 // bugfix release 0.7.8, we weren't dividing by 1000
                 _packet.setResendDelay(getOptions().getResendDelay() / 1000);
                 if (_packet.getReceiveStreamId() <= 0)
@@ -1186,7 +1215,7 @@ class Connection {
                         getOptions().setWindowSize(newWindowSize);
 
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Congestion resending packet " + _packet.getSequenceNum() + ": new windowSize " + newWindowSize 
+                            _log.warn("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
                                       + "/" + getOptions().getWindowSize() + ") for " + Connection.this.toString());
 
                         windowAdjusted();
@@ -1195,10 +1224,6 @@ class Connection {
                 
                 int numSends = _packet.getNumSends() + 1;
                 
-                if (numSends == 2) {
-                    // first resend for this packet
-                    _activeResends++;
-                }
                 
                 // in case things really suck, the other side may have lost thier
                 // session tags (e.g. they restarted), so jump back to ElGamal.
@@ -1225,27 +1250,34 @@ class Connection {
                     // set this before enqueue() as it passes it on to the router
                     _nextSendTime = timeout + _context.clock().now();
 
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Resend packet " + _packet + " time " + numSends + 
+                    if (_outboundQueue.enqueue(_packet)) {
+                        // first resend for this packet ?
+                        if (numSends == 2)
+                            _activeResends++;
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Resent packet " +
+                                  (fastRetransmit ? "(fast) " : "(timeout) ") +
+                                  _packet +
+                                  " next resend in " + timeout + "ms" +
                                   " activeResends: " + _activeResends + 
                                   " (wsize "
                                   + newWindowSize + " lifetime " 
                                   + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
-                    _outboundQueue.enqueue(_packet);
-                    _lastSendTime = _context.clock().now();
+                        _unackedPacketsReceived = 0;
+                        _lastSendTime = _context.clock().now();
+                        // timer reset added 0.9.1
+                        resetActivityTimer();
+                    }
 
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
                     forceReschedule(timeout);
                 }
                 
-                // acked during resending (... or somethin')
+                // acked during resending (... or somethin') ????????????
                 if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {
                     _activeResends--;
                     synchronized (_outboundPackets) {
                         _outboundPackets.notifyAll();
                     }
-                    return true;
                 }
 
                 return true;

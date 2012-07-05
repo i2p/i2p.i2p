@@ -233,8 +233,8 @@ public class GarlicMessageBuilder {
         }
         
         if (log.shouldLog(Log.DEBUG))
-            log.debug("CloveSet size for message " + msg.getUniqueId() + " is " + cloveSet.length
-                     + " and encrypted message data is " + encData.length);
+            log.debug("CloveSet (" + config.getCloveCount() + " cloves) for message " + msg.getUniqueId() + " is " + cloveSet.length
+                     + " bytes and encrypted message data is " + encData.length + " bytes");
         
         return msg;
     }
@@ -268,7 +268,7 @@ public class GarlicMessageBuilder {
                 for (int i = 0; i < config.getCloveCount(); i++) {
                     GarlicConfig c = config.getClove(i);
                     if (c instanceof PayloadGarlicConfig) {
-                        log.debug("Subclove IS a payload garlic clove");
+                        //log.debug("Subclove IS a payload garlic clove");
                         cloves[i] = buildClove(ctx, (PayloadGarlicConfig)c);
                     } else {
                         log.debug("Subclove IS NOT a payload garlic clove");

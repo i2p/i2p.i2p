@@ -29,7 +29,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private List<Integer> _order;
     private long _replyMessageId;
     private final boolean _isInbound;
-    private long _messagesProcessed;
+    private int _messagesProcessed;
     private volatile long _verifiedBytesTransferred;
     private boolean _failed;
     private int _failures;
@@ -127,7 +127,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
     
     /** take note of a message being pumped through this tunnel */
     public void incrementProcessedMessages() { _messagesProcessed++; }
-    public long getProcessedMessagesCount() { return _messagesProcessed; }
+    public int getProcessedMessagesCount() { return _messagesProcessed; }
 
     public void incrementVerifiedBytesTransferred(int bytes) { 
         _verifiedBytesTransferred += bytes; 
@@ -144,6 +144,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
                     _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
         }
     }
+
     public long getVerifiedBytesTransferred() { return _verifiedBytesTransferred; }
 
     private static final int THROUGHPUT_COUNT = 3;

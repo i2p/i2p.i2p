@@ -12,7 +12,13 @@ import net.i2p.util.SimpleTimer;
 /**
  * Receive a packet for a particular connection - placing the data onto the
  * queue, marking packets as acked, updating various fields, etc.
- *
+ *<p>
+ * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
+ *<p>
+ * One of these is instantiated per-Destination
+ * (i.e. per-ConnectionManager, not per-Connection).
+ * It doesn't store any state.
+
  */
 class ConnectionPacketHandler {
     private final I2PAppContext _context;
@@ -94,19 +100,24 @@ class ConnectionPacketHandler {
             }
         }
         
-        long ready = con.getInputStream().getHighestReadyBockId();
-        int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
-        int allowedBlocks = available/con.getOptions().getMaxMessageSize();
-        if ( (packet.getPayloadSize() > 0) && (packet.getSequenceNum() > ready + allowedBlocks) ) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Inbound buffer exceeded on connection " + con + " (" 
-                          + ready + "/"+ (ready+allowedBlocks) + "/" + available
-                          + ": dropping " + packet);
-            ack(con, packet.getAckThrough(), packet.getNacks(), null, false, choke);
-            con.getOptions().setChoke(61*1000);
-            packet.releasePayload();
-            con.ackImmediately();
-            return;
+        if (packet.getPayloadSize() > 0) {
+            // Here, for the purposes of calculating whether the input stream is full,
+            // we assume all the not-ready blocks are the max message size.
+            // This prevents us from getting DoSed by accepting unlimited out-of-order small messages
+            long ready = con.getInputStream().getHighestReadyBockId();
+            int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
+            int allowedBlocks = available/con.getOptions().getMaxMessageSize();
+            if (packet.getSequenceNum() > ready + allowedBlocks) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Inbound buffer exceeded on connection " + con + " (" 
+                              + ready + "/"+ (ready+allowedBlocks) + "/" + available
+                              + ": dropping " + packet);
+                ack(con, packet.getAckThrough(), packet.getNacks(), null, false, choke);
+                con.getOptions().setChoke(61*1000);
+                packet.releasePayload();
+                con.ackImmediately();
+                return;
+            }
         }
         con.getOptions().setChoke(0);
 
@@ -513,12 +524,14 @@ class ConnectionPacketHandler {
     }    
     
     private class AckDup implements SimpleTimer.TimedEvent {
-        private long _created;
-        private Connection _con;
+        private final long _created;
+        private final Connection _con;
+
         public AckDup(Connection con) {
             _created = _context.clock().now();
             _con = con;
         }
+
         public void timeReached() {
             if (_con.getLastSendTime() <= _created) {
                 if (_con.getResetReceived() || _con.getResetSent()) {

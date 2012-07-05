@@ -130,8 +130,8 @@ class TCBShare {
             super(timer);
         }
         public void timeReached() {
-            for (Iterator iter = _cache.keySet().iterator(); iter.hasNext(); ) {
-                if (_cache.get(iter.next()).isExpired())
+            for (Iterator<Entry> iter = _cache.values().iterator(); iter.hasNext(); ) {
+                if (iter.next().isExpired())
                     iter.remove();
             }
             schedule(CLEAN_TIME);
