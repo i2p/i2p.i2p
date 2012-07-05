@@ -1560,9 +1560,9 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"4\" maxlength=\"4\" > KBps <i>");
         out.write(_("Half available bandwidth recommended."));
-        out.write("<br><a href=\"/config.jsp\" target=\"blank\">");
+        out.write(" [<a href=\"/config.jsp\" target=\"blank\">");
         out.write(_("View or change router bandwidth"));
-        out.write("</a></i><br>\n" +
+        out.write("</a>]</i><br>\n" +
         
                   "<tr><td>");
         out.write(_("Use open trackers also"));
