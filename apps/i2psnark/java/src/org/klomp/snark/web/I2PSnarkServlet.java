@@ -2121,7 +2121,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         }
 
         // second row - dir info
-        buf.append("<tr><th>")
+        buf.append("<tr><th colspan=2>")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
             .append(_("Directory")).append(": ").append(directory).append("</th><th align=\"right\">")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;")
@@ -2134,7 +2134,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "priority.png\" >&nbsp;")
             .append(_("Priority")).append("</th>");
         buf.append("</tr></thead>\n");
-        buf.append("<tr><td colspan=\"" + (showPriority ? '4' : '3') + "\" class=\"ParentDir\"><A HREF=\"");
+        buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         buf.append(URIUtil.addPaths(base,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
             .append(_("Up to higher level directory")).append("</A></td></tr>\n");
@@ -2153,8 +2153,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             Resource item = r.addPath(ls[i]);
             
             String rowClass = (i % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
-            buf.append("<TR class=\"").append(rowClass).append("\"><TD class=\"snarkFileName ")
-               .append(rowClass).append("\">");
+            buf.append("<TR class=\"").append(rowClass).append("\">");
             
             // Get completeness and status string
             boolean complete = false;
@@ -2206,6 +2205,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                 path=URIUtil.addPaths(path,"/");
             String icon = toIcon(item);
 
+            buf.append("<TD class=\"snarkFileIcon ")
+               .append(rowClass).append("\">");
             if (complete) {
                 buf.append("<a href=\"").append(path).append("\">");
                 // thumbnail ?
@@ -2213,16 +2214,17 @@ public class I2PSnarkServlet extends DefaultServlet {
                 if (plc.endsWith(".jpg") || plc.endsWith(".jpeg") || plc.endsWith(".png") ||
                     plc.endsWith(".gif") || plc.endsWith(".ico")) {
                     buf.append("<img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
-                       .append(path).append("\"></a> ");
+                       .append(path).append("\"></a>");
                 } else {
-                    buf.append(toImg(icon, _("Open"))).append("</a> ");
+                    buf.append(toImg(icon, _("Open"))).append("</a>");
                 }
-                buf.append("<A HREF=\"");
-                buf.append(path);
-                buf.append("\">");
             } else {
-                buf.append(toImg(icon)).append(' ');
+                buf.append(toImg(icon));
             }
+            buf.append("</TD><TD class=\"snarkFileName ")
+               .append(rowClass).append("\">");
+            if (complete)
+                buf.append("<a href=\"").append(path).append("\">");
             buf.append(ls[i]);
             if (complete)
                 buf.append("</a>");
