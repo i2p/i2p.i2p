@@ -26,7 +26,7 @@
           html = f.contentWindow.document.documentElement;
       f.style.height = body.scrollHeight + "px";
   }
-  function injectClass(f) { f.contentWindow.document.getElementsByTagName('body')[0].setAttribute('class', 'iframed'); }
+  function injectClass(f) { f.contentWindow.document.body.setAttribute('class', 'iframed'); }
   function setupFrame() {
       f = document.getElementById("i2ptunnelframe");
       resizeFrame(f);

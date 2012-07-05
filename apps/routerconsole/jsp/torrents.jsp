@@ -22,7 +22,7 @@
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
   function resizeFrame(f) { f.style.height = f.contentWindow.document.body.scrollHeight + "px"; }
-  function injectClass(f) { f.contentWindow.document.getElementsByTagName('body')[0].setAttribute('class', 'iframed'); }
+  function injectClass(f) { f.contentWindow.document.body.setAttribute('class', 'iframed'); }
   function setupFrame() {
       f = document.getElementById("i2psnarkframe");
       resizeFrame(f);
