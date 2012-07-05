@@ -2121,23 +2121,31 @@ public class I2PSnarkServlet extends DefaultServlet {
         }
 
         // second row - dir info
-        buf.append("<tr><th colspan=2>")
-            .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
-            .append(_("Directory")).append(": ").append(directory).append("</th><th align=\"right\">")
-            .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;")
-            .append(_("Size"));
-        buf.append("</th><th class=\"headerstatus\">")
-            .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "status.png\" >&nbsp;")
-            .append(_("Status")).append("</th>");
+        buf.append("<tr>\n")
+           .append("<th colspan=2>")
+           .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
+           .append(_("Directory"))
+           .append(": ")
+           .append(directory)
+           .append("</th>\n");
+        buf.append("<th align=\"right\">")
+           .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;")
+           .append(_("Size"))
+           .append("</th>\n");
+        buf.append("<th class=\"headerstatus\">")
+           .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "status.png\" >&nbsp;")
+           .append(_("Status"))
+           .append("</th>\n");
         if (showPriority)
             buf.append("<th class=\"headerpriority\">")
-            .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "priority.png\" >&nbsp;")
-            .append(_("Priority")).append("</th>");
+               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "priority.png\" >&nbsp;")
+               .append(_("Priority")).append("</th>\n");
         buf.append("</tr></thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         buf.append(URIUtil.addPaths(base,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
-            .append(_("Up to higher level directory")).append("</A></td></tr>\n");
+           .append(_("Up to higher level directory"))
+           .append("</A></td></tr>\n");
 
 
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
