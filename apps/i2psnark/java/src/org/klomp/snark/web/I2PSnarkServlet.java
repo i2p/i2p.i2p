@@ -2053,7 +2053,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (snark != null) {
             // first row - torrent info
             // FIXME center
-            buf.append("<tr><th colspan=\"" + (showPriority ? '4' : '3') + "\"><div>")
+            buf.append("<tr><th colspan=\"" + (showPriority ? '5' : '4') + "\"><div>")
                 .append(_("Torrent")).append(": ").append(snark.getBaseName());
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
@@ -2269,7 +2269,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             buf.append("</TR>\n");
         }
         if (showSaveButton) {
-            buf.append("<thead><tr><th colspan=\"3\">&nbsp;</th><th class=\"headerpriority\"><input type=\"submit\" value=\"");
+            buf.append("<thead><tr><th colspan=\"4\">&nbsp;</th><th class=\"headerpriority\"><input type=\"submit\" value=\"");
             buf.append(_("Save priorities"));
             buf.append("\" name=\"foo\" ></th></tr></thead>\n");
         }
