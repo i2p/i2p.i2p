@@ -2049,7 +2049,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         boolean showPriority = ls != null && snark != null && snark.getStorage() != null && !snark.getStorage().complete();
         if (showPriority)
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
-        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" ><thead>");
+        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" ><thead>\n");
         if (snark != null) {
             // first row - torrent info
             // FIXME center
@@ -2106,13 +2106,13 @@ public class I2PSnarkServlet extends DefaultServlet {
             //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
             buf.append("<br>").append(_("Torrent file")).append(": ").append(snark.getName());
-            buf.append("</div></th></tr>");
+            buf.append("</div></th></tr>\n");
         } else {
             // shouldn't happen
             buf.append("<tr><th>Not found<br>resource=\"").append(r.toString())
                .append("\"<br>base=\"").append(base)
                .append("\"<br>torrent=\"").append(torrentName)
-               .append("\"</th></tr>");
+               .append("\"</th></tr>\n");
         }
         if (ls == null) {
             // We are only showing the torrent info section
@@ -2140,7 +2140,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             buf.append("<th class=\"headerpriority\">")
                .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "priority.png\" >&nbsp;")
                .append(_("Priority")).append("</th>\n");
-        buf.append("</tr></thead>\n");
+        buf.append("</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         buf.append(URIUtil.addPaths(base,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
