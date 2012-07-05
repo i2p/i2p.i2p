@@ -589,9 +589,11 @@ input[type=radio] {
 thead input[type=submit], tfoot input[type=submit], .headerpriority {
      text-align: right !important;	
 }
+*/
 
 input.default { width: 1px; height: 1px; visibility: hidden; }
 
+/*
 input.accept, input.accept:selected {
      background: #000;
      padding: 2px 3px 2px 16px !important;
