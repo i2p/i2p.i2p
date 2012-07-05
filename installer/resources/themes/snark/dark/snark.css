@@ -1,8 +1,8 @@
 /* I2PSnark theme "Camo" aka Dark by dr|z3d */
 /* Assange Asylum Edition */
+/* Thanks to http://www.wikistencil.org/?p=55 for the Assange image */
 
 body {
-     background: #101 url("../../console/dark/images/camotile2.png");
      color: #ee9;
      font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      background: url("../../console/dark/images/camotile.png") repeat scroll center bottom #000;
@@ -11,6 +11,7 @@ body {
 
 body.iframed {
      background: transparent url('../../console/dark/images/transparent.gif') !important;
+     margin: 6px 0 !important;
 }
 
 .snarkTitle {
@@ -29,7 +30,6 @@ body.iframed {
      font-size: 9pt;
      color: #f70;
      text-shadow: 1px 1px #420;
-     background: url('/themes/snark/ubergine/images/snarknav_lowlight.png') no-repeat scroll center bottom;
      background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
      -moz-border-radius: 0px;
      -khtml-border-radius: 3px;
@@ -128,7 +128,7 @@ body.iframed {
 .snarkMessages img, .snarkMessages img:hover {
      float: right;
      margin: -4px -5px 4px 4px;
-     opacity: 0.8;
+     opacity: 1;
      border: 1px solid #494;
      border-right: 0 none;
      border-top: 0 none;
@@ -177,12 +177,14 @@ thead {
 }
 
 th {
-     padding: 4px 2px 4px 4px;
+     padding: 3px 2px;
      font-size: 8pt;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494;
      color: #ee9;
-     whitespace: nowrap;
+      whitespace: nowrap;
+     background: #000;
+     background-image: -moz-linear-gradient(center top , #010, #000);
 }
 
 th:first-child {
@@ -196,7 +198,7 @@ tfoot td:first-child {
 }
 
 th:first-child img {
-     margin: 1px 1px 3px 3px !important;
+     margin: 1px -2px 3px 1px !important;
 }
 
 th:nth-child(2) img {
@@ -227,8 +229,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .ParentDir {
-     background: #656;
-     background: #351933;
+     background: #000;
      font-size: 8pt;
      border: 0px inset #101 !important;
      border-left: 0 !important;
@@ -240,18 +241,31 @@ tfoot tr:nth-child(n+1) {
 .priority {
      font-size: 7pt;
      vertical-align: center;
+     min-width: 160px;
 }
 
 .SnarkTorrents {
      margin: 0;
      border: 1px solid #101;
-     background: #010;
+     background: #000;
+}
+
+.SnarkTorrents td {
+     line-height: 90%;
+}
+
+.SnarkTorrents td:nth-child(1) {
+          width: 24px !important;
+}
+
+.SnarkTorrents td:nth-child(3), .SnarkTorrents td:nth-child(4) {
+     width: 20px !important;	
 }
 
 td {
      padding: 1px;
      color: #ee9 !important;
-     opacity: 1;
+      opacity: 1;
      font-size: 8pt;
 }
 
@@ -262,7 +276,6 @@ td {
 td:first-child {
      text-align: right;
      font-size: 8pt;
-     width: 34px;
 }
 
 .center {
@@ -271,13 +284,8 @@ td:first-child {
 
 .snarkTorrentName {
      text-shadow: 1px 1px #550000;
-     padding: 2px 0 0;
-}
-
-.snarkTorrentName img {
-     padding: 1px;
-     text-align: left;
-     vertical-align: middle;
+     padding: 0;
+     line-height: 90%;
 }
 
 .snarkTorrentAction {
@@ -285,12 +293,12 @@ td:first-child {
      padding: 1px 1px 1px 1px !important;
      margin: 0 !important;
      text-align: center;
-     width: 68px;
+     width: 60px; 
 }
 
 .snarkTorrentAction img {
      margin: 0 2px !important;
-     opacity: 0.6;
+     opacity: 1;
 }
 
 .snarkTorrentAction img:hover {
@@ -300,7 +308,7 @@ td:first-child {
 
 .snarkTorrentEven {
      font-size: 8pt;
-     background: #010;
+     background: #000;
 }
 
 .snarkTorrentNoneLoaded {
@@ -313,6 +321,7 @@ td:first-child {
 
 .snarkTorrentStatus {
      padding: 2px 2px 2px 0;
+     line-height: 90%;
 }
 
 .snarkTorrentStatus:first-child {
@@ -332,33 +341,34 @@ td:first-child {
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
      font-size: 8pt;
-     font-weight: bold;
      padding: 0 3px;
+     line-height: 90%;
 }
 
 .snarkTorrentDownloaded {
-     color: #2f6 !important;
+     color: #ee9 !important;
 }
 
 .snarkTorrentUploaded {
-     color: #2f6 !important;
+     color: #ee9 !important;
 }
 
 .snarkTorrentRateUp {
-     color: #2f6 !important;
+     color: #ee9 !important;
 }
 
 .snarkTorrentRateDown {
-     color: #2f6 !important;
+     color: #ee9 !important;
 }
 
 .snarkTorrentOdd {
-     background: #020;
+     background: #000;
      font-size: 8pt;
      border: 0px inset #101 !important;
      border-left: 0 !important;
      border-right: 0 !important;
 }
+
 .snarkTorrentOdd td, .snarkTorrentEven td {
      border-top: 1px dotted #494 !important;
 }
@@ -371,8 +381,8 @@ td:first-child {
 
 .snarkFileSize {
      padding: 4px 2px;
-     font-weight: bold;
-     color: #b6b !important;
+     font-weight: normal;
+     color: #2f6 !important;
 }
 
 .snarkFileStatus {
@@ -381,10 +391,10 @@ td:first-child {
      font-style: italic;
      font-size: 8pt;
      text-align: left;
+     min-width: 230px;
 }
 
 .snarkTorrentETA {
-     font-weight: bold;
      font-style: italic;
      color: #dd7 !important;
 }
@@ -412,23 +422,29 @@ td:first-child {
 }
 
 .snarkConfigTitle {
-     font-size: 11pt;
+     font-size: 10.5pt;
      font-weight: bold;
-     padding: 0 25px 3px 25px;
+     padding: 1px 25px 4px 25px;
      margin: 5px 0 10px 0 !important;
-     letter-spacing: 0.25em;
+     letter-spacing: 0.02em;
      border: 1px solid #494;
-     -moz-border-radius: 0 0 5px 5px;
-     -khtml-border-radius: 0 0 5px 5px;
-     border-radius: 0 0 5px 5px;
+      -moz-border-radius: 0 0 5px 5px;
+      -khtml-border-radius: 0 0 5px 5px;
+      border-radius: 0 0 5px 5px;
      border-top: 0;
      text-shadow: 0px 3px 5px #323;
      background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
      font-variant: small-caps !important;
+     box-shadow: 0 1px 3px #000;
 }
 
-.snarkConfigTitle img{
+div.newtorrentsection .snarkConfigTitle, div.addtorrentsection .snarkConfigTitle {
+     padding-top: 0 !important;	
+}
+
+.snarkConfigTitle img {
 	  margin-right: -3px;
+	  padding-bottom: 3px;
 }
 
 .snarkConfig {
@@ -440,7 +456,7 @@ td:first-child {
      color: #310;
      min-width: 700px !important;
      margin: 5px 0 0 0;
-     padding: 10px 10px 0px 10px;
+     padding: 10px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -452,7 +468,7 @@ td:first-child {
      box-shadow: inset 0px 0px 1px 0px #002;
      text-align: center;
      opacity: 1;
-     background: url("../../console/dark/images/camotile2.png") repeat scroll center bottom #000;
+     background: #000;
 }
 
 form {
@@ -474,7 +490,6 @@ hr {
 }
 
 a:link {	
-
      color: #f70;
      text-decoration: none;
      font-weight: normal;
@@ -492,6 +507,11 @@ a:hover {
      font-weight: normal;
 }
 
+a:active {
+     color: #f90;
+     font-weight: normal;
+}
+
 input {
      font-size: 9pt;
      font-weight: bold;
@@ -502,8 +522,9 @@ input {
      border-radius: 4px;
      border: 1px solid #494;
      background: #000;	 
-     color: #f60;
-     margin: 2px 4px;
+     color: #494;
+     margin: 2px 4px 2px 0;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
 }
 
 input.r {
@@ -520,14 +541,14 @@ input[type=submit] {
      padding: 2px;
      box-shadow: 0 1px 1px 0 #119911 inset;
      font: bold 8pt "Lucida Sans Unicode","Bitstream Vra Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     margin-top: 6px;
 }
 
 input[type=submit]:hover {
      border: 1px outset #f60;
-     background-color: #f60;
-     color: #fff;
-     text-shadow: 0px 1px 5px #f00;
-     box-shadow: 0 0 0 0 #000 inset;
+     background-color: #000;
+     color: #f60;
+     box-shadow: 0 1px 1px 0 #ee9 inset;
 }
 
 input[type=submit]:active {
@@ -543,7 +564,7 @@ input[type=image], thead img {
      border-radius: 0px;
      border: medium none;
      margin: 0 2px;
-     opacity: 0.8;
+     opacity: 1;
 }
 
 input[type=image]:hover, thead img:hover {
@@ -552,7 +573,7 @@ input[type=image]:hover, thead img:hover {
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
      background: #000;
-     color: #fff;
+     color: #ff6;
      border: 1px solid #494;
      box-shadow: none !important;
 }
@@ -563,28 +584,34 @@ input[type=radio] {
      vertical-align: bottom;
 }
 
+
+/*
+thead input[type=submit], tfoot input[type=submit], .headerpriority {
+     text-align: right !important;	
+}
+
 input.default { width: 1px; height: 1px; visibility: hidden; }
 
 input.accept, input.accept:selected {
-     background: #000 url('../../console/images/accept.png') no-repeat 2px center;
+     background: #000;
      padding: 2px 3px 2px 16px !important;
      min-height: 22px;
 }
 
 input.add, input.add:selected {
-     background: #000 url('../../console/images/add.png') no-repeat 2px center;
+     background: #000;
      padding: 2px 3px 2px 16px !important;
      min-height: 22px;
 }
 
 input.create, input.create:selected {
-     background: #000 url('images/create.png') no-repeat 2px center;
+     background: #000;
      padding: 2px 3px 2px 16px !important;
      min-height: 22px;
 }
 
 input.cancel, input.cancel:selected {
-     background: #000 url('../../console/images/cancel.png') no-repeat 2px center;
+     background: #000;
      padding: 2px 3px 2px 16px !important;
      min-height: 22px;
 }
@@ -606,17 +633,19 @@ input.reload, input.reload:selected {
      padding: 2px 3px 2px 16px !important;
      min-height: 22px;
 }
+*/
 
 select {
      background: #000 !important;
-     color: #f60;
-     font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     color: #494;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
      padding: 2px 2px 2px 3px;
      -moz-border-radius: 4px 0 0 4px;
      -khtml-border-radius: 4px 0 0 4px;
      border-radius: 4px 0 0 4px;
      border: 1px solid #494;
+     margin: 2px 4px 2px 0;
 }
 
 select:hover, textarea:hover {
@@ -624,9 +653,13 @@ select:hover, textarea:hover {
      color: #f60 !important;
 }
 
+textarea:hover {
+     color: #ff6 !important;
+}     
+
 textarea {
      background: #000;
-     color: #f60;
+     color: #494;
      font-weight: bold;
      padding: 1px 4px 0px;
      -moz-border-radius: 4px;
@@ -659,7 +692,7 @@ img:hover {
 
 .infoz img {
      border: none;
-     opacity: 0.5 !important;
+     opacity: 1 !important;
 }
 
 .infoz img:hover {
@@ -670,10 +703,16 @@ div.newtorrentsection td:first-child, div.addtorrentsection td:first-child, div.
      width: auto !important;
 }
 
+div.configsectionpanel td:first-child {
+	  padding-right: 5px;
+}
+
 div.section,div.mainsection div.section,div.mainsection {
      margin: 0;
      padding: 0px;
      border: 1px solid #494;
+     border-top: 2px solid #494;
+     border-bottom: 2px solid #494;
      color: #001;
 /*     -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -700,6 +739,13 @@ div.newtorrentsection {
      word-wrap: break-word;
      background: #000 url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url('/themes/snark/ubergine/images/snark_create.png'), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center right, center center;
+     background-repeat: no-repeat, repeat;
 }
 
 div.addtorrentsection {
@@ -715,12 +761,19 @@ div.addtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #101;
      box-shadow: inset 0px 0px 1px 0px #101;
      word-wrap: break-word;
-     background: #000 url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
+     background: #000 url('/themes/snark/dark/images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url('/themes/snark/dark/images/snark_add.png'), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center right, center center;
+     background-repeat: no-repeat, repeat;
 }
 
 div.configsection {
-     margin: 0 0 10px 0;
+     margin: 0;
      padding: 0 10px 15px 10px;
      border: 1px solid #494;
      color: #ee9;
@@ -734,6 +787,13 @@ div.configsection {
      text-align: center;
      background: #000;
      font-weight: bold;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url("../../console/dark/images/camotile2.png"), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center center, center center;
+     background-repeat: repeat, repeat;
 }
 
 div.configsectionpanel {
@@ -749,8 +809,15 @@ div.configsectionpanel {
      box-shadow: inset 0px 0px 1px 0px #101;
      word-wrap: break-word;
      text-align: center;
-     background: #000 url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center;
+     background: #000 url('/themes/snark/dark/images/configuration.png') no-repeat scroll right center;
      font-weight: bold;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url('/themes/snark/dark/images/configuration.png'), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center right, center center;
+     background-repeat: no-repeat, repeat;
 }
 
 .newtorrentsection form, .configsection form, .addtorrentsection form {
@@ -775,14 +842,15 @@ div.configsection a:hover {
 
 code {;
      font-size: 8pt;
-     color: #090;
+     color: #ff6;
      padding: 0 2px;
      font-weight: bold;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
+
 .snarknavbar {
      margin: -10px 0 5px 0 !important;
-     padding: 14px 10px 8px;
+     padding: 14px 10px 7px;
      border: 1px solid #101;
      -moz-border-radius: 0 0 8px 8px;
      -khtml-border-radius: 0 0 8px 8px;
