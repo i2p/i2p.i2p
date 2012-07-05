@@ -232,7 +232,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
                 out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
-                          "var failMessage = \"<b>" + _("Router is down") + "<\\/b>\";\n" +
+                          "var failMessage = \"<div class=\"routerdown\"><b>" + _("Router is down") + "<\\/b></div>\";\n" +
                           "function requestAjax1() { ajax(\"/i2psnark/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
                           "function initAjax(delayMs) { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
                           "</script>\n");
@@ -1640,7 +1640,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                   "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         buf.append(_("Trackers"));
         buf.append("</span><hr>\n"   +
-                   "<table><tr><th>")
+                   "<table class=\"trackerconfig\"><tr><th>")
            //.append(_("Remove"))
            .append("</th><th>")
            .append(_("Name"))
@@ -1659,16 +1659,16 @@ public class I2PSnarkServlet extends DefaultServlet {
             String name = t.name;
             String homeURL = t.baseURL;
             String announceURL = t.announceURL.replace("&#61;", "=");
-            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+            buf.append("<tr><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
-                       "</td><td align=\"left\">").append(name)
-               .append("</td><td align=\"left\">").append(urlify(homeURL, 35))
-               .append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"open_")
+                       "</td><td>").append(name)
+               .append("</td><td>").append(urlify(homeURL, 35))
+               .append("</td><td><input type=\"checkbox\" class=\"optbox\" name=\"open_")
                .append(announceURL).append("\"");
             if (openTrackers.contains(t.announceURL))
                 buf.append(" checked=\"checked\"");
             buf.append(">" +
-                       "</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"private_")
+                       "</td><td><input type=\"checkbox\" class=\"optbox\" name=\"private_")
                .append(announceURL).append("\"");
             if (privateTrackers.contains(t.announceURL)) {
                 buf.append(" checked=\"checked\"");
@@ -1681,17 +1681,17 @@ public class I2PSnarkServlet extends DefaultServlet {
                 }
             }
             buf.append(">" +
-                       "</td><td align=\"left\">").append(urlify(announceURL, 35))
+                       "</td><td>").append(urlify(announceURL, 35))
                .append("</td></tr>\n");
         }
-        buf.append("<tr><td align=\"center\"><b>")
+        buf.append("<tr><td><b>")
            .append(_("Add")).append(":</b></td>" +
-                   "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
-                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
-                   "<td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
-                   "<td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
-                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
-                   "<tr><td colspan=\"2\"></td><td colspan=\"4\" align=\"left\">\n" +
+                   "<td><input type=\"text\" class=\"trackername\" name=\"tname\"></td>" +
+                   "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\"></td>" +
+                   "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
+                   "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
+                   "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\"></td></tr>\n" +
+                   "<tr><td colspan=\"2\"></td><td colspan=\"4\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Save tracker configuration")).append("\">\n" +
