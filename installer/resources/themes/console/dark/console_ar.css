@@ -1,0 +1,84 @@
+/* I2P Theme: Camo aka Dark - Arabic override */
+/* Description: Military Grade. */
+/* Comment: Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
+/* Author: dr|z3d */
+
+body {
+     direction: rtl;
+}
+
+div.main li {
+     margin: 5px 20px;
+     text-align: right;
+     line-height: 150%;
+}
+
+table {
+     direction: rtl;
+}
+
+td {
+    text-align: right;
+}
+
+div.news {
+     margin: -1px 205px 0px 5px;
+     direction: ltr;
+}
+
+div.main {
+     margin: -1px 205px 5px 5px;
+     background: url("images/scarface.jpg") no-repeat scroll left bottom #000000 !important;
+}
+
+h1 {
+     margin: 0 205px 0 5px !important;
+}
+
+h1,h2,h3,h4 {
+     direction: rtl;
+     text-align: right;
+}
+
+div.routersummary h3 {
+     text-align: center;
+}
+
+div.routersummary td:last-child {
+     text-align: left;
+     margin-left: 3px;
+}
+
+div.tunnels {
+     padding: -3px 0 !important;	
+}
+
+div.tunnels table {
+     margin: 0 -7px 0 5px !important; 
+}
+
+.langbox {
+     float: left;
+     text-align: left;‌
+}
+
+.formaction {
+     text-align: left;‌
+}
+
+form {
+    text-align: right;
+}
+
+div.routersummary form {
+    text-align: center;
+}
+
+.cells {
+    text-align: center;
+}
+
+div.joblog li, div.newsheadings li {
+    text-align: left;
+    direction: ltr;
+}
