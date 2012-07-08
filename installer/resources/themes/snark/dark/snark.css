@@ -438,7 +438,7 @@ td:first-child {
      box-shadow: 0 1px 3px #000;
 }
 
-div.newtorrentsection .snarkConfigTitle, div.addtorrentsection .snarkConfigTitle {
+div.newtorrentsection .snarkConfigTitle, div.addtorrentsection .snarkConfigTitle, div.configsectionpanel .snarkConfigTitle {
      padding-top: 0 !important;	
 }
 
@@ -540,7 +540,7 @@ input[type=submit] {
      border: 1px outset #191;
      padding: 2px;
      box-shadow: 0 1px 1px 0 #119911 inset;
-     font: bold 8pt "Lucida Sans Unicode","Bitstream Vra Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      margin-top: 6px;
 }
 
@@ -853,6 +853,7 @@ code {;
 .snarknavbar {
      margin: -10px 0 5px 0 !important;
      padding: 14px 10px 7px;
+/*
      border: 1px solid #101;
      -moz-border-radius: 0 0 8px 8px;
      -khtml-border-radius: 0 0 8px 8px;
@@ -861,6 +862,7 @@ code {;
      -khtml-box-shadow: inset 0px 0px 1px 0px #002;
      box-shadow: inset 0px 0px 1px 0px #002;
      background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
+*/
      background: #000 !important;
      text-transform: uppercase !important;
      letter-spacing: 0em !important;
@@ -872,24 +874,41 @@ code {;
      text-align: center;
  }
 
- .snarknavbar img {
+.snarknavbar img {
      border: 0;
      margin: 1px -8px -1px -2px;
      padding: 1px 0 0px !important;
      vertical-align: top;
 }
 
-div.routerdown {
+.routerdown {
+     color: #ee9;
 }
 
-table.trackerconfig {
+.trackerconfig {
+     text-align: left !important;
+}
+
+.trackerconfig th:nth-child(n+4), .trackerconfig th:nth-child(n+5), .trackerconfig td:nth-child(n+4), .trackerconfig td:nth-child(n+5) {
+     text-align: center !important;
+}
+
+.trackerconfig th, .trackerconfig td, .trackerconfig th:last-child, .trackerconfig td:last-child {
+     text-align: left !important;     
+}
+
+.trackerconfig td:first-child {
+     text-align: right !important;     
 }
 
 input.trackername {
+     width: 100px;
 }
 
 input.trackerhome {
+     width: 200px;
 }
 
 input.trackerannounce {
+     width: 230px;
 }
