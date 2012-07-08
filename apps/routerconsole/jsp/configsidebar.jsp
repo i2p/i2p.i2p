@@ -46,18 +46,6 @@ input.default {
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>
 
-<h3><%=intl._("Use preset layout")%></h3>
- <p><%=intl._("Several preset layouts for the summary bar are available.")%> 
-    <%=intl._("Note that choosing one of the presets will cause the current summary bar configuration to be lost.")%></p>
-  <hr><div class="formaction">
-<form action="" method="POST">
- <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <input type="hidden" name="group" value="1">
- <input type="submit" class="reload" name="action" value="<%=intl._("Use full preset")%>" >
- <input type="submit" class="reload" name="action" value="<%=intl._("Use reduced preset")%>" >
-</form>
- </div>
-
 <h3><%=intl._("Customise Summary Bar")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
@@ -65,6 +53,8 @@ input.default {
  <jsp:getProperty name="summaryhelper" property="configTable" />
  <div class="formaction">
   <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
+  <input type="submit" class="reload" name="action" value="<%=intl._("Restore full default")%>" >
+  <input type="submit" class="reload" name="action" value="<%=intl._("Restore minimal default")%>" >
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
   <input type="submit" name="action" class="reload" value="<%=intl._("Save order")%>" >

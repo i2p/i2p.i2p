@@ -38,18 +38,14 @@ public class ConfigSummaryHandler extends FormHandler {
                 addFormError(_("Refresh interval must be a number"));
                 return;
             }
-        } else if ("1".equals(group)) {
-            if (_action.equals(_("Use full preset"))) {
-                _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.PRESET_FULL);
-                addFormNotice(_("Full summary bar preset selected.") + " " +
-                              _("Summary bar will refresh shortly."));
-            } else if (_action.equals(_("Use reduced preset"))) {
-                _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.PRESET_SHORT);
-                addFormNotice(_("Reduced summary bar preset selected.") + " " +
-                              _("Summary bar will refresh shortly."));
-            } else {
-                addFormError(_("Unsupported"));
-            }
+        } else if (_action.equals(_("Restore full default"))) {
+            _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_FULL);
+            addFormNotice(_("Full summary bar default restored.") + " " +
+                          _("Summary bar will refresh shortly."));
+        } else if (_action.equals(_("Restore minimal default"))) {
+            _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_MINIMAL);
+            addFormNotice(_("Minimal summary bar default restored.") + " " +
+                          _("Summary bar will refresh shortly."));
         } else if (adding || deleting || saving) {
             Map<Integer, String> sections = new TreeMap<Integer, String>();
             for (Object o : _settings.keySet()) {

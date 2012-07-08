@@ -42,7 +42,7 @@ public class SummaryHelper extends HelperBase {
     private static final char S = ',';
     static final String PROP_SUMMARYBAR = "routerconsole.summaryBar.";
 
-    static final String PRESET_FULL =
+    static final String DEFAULT_FULL =
         "HelpAndFAQ" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
@@ -59,7 +59,7 @@ public class SummaryHelper extends HelperBase {
         "Destinations" + S +
         "";
 
-    static final String PRESET_SHORT =
+    static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
         "NewsHeadings" + S +
         "UpdateStatus" + S +
@@ -749,11 +749,11 @@ public class SummaryHelper extends HelperBase {
     public List<String> getSummaryBarSections(String page) {
         String config = "";
         if ("home".equals(page))
-            config = _context.getProperty(PROP_SUMMARYBAR + page, PRESET_SHORT);
+            config = _context.getProperty(PROP_SUMMARYBAR + page, DEFAULT_MINIMAL);
         else
             config = _context.getProperty(PROP_SUMMARYBAR + page, null);
             if (config == null)
-                config = _context.getProperty(PROP_SUMMARYBAR + "default", PRESET_FULL);
+                config = _context.getProperty(PROP_SUMMARYBAR + "default", DEFAULT_FULL);
         return Arrays.asList(config.split("" + S));
     }
 
