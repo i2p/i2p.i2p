@@ -2049,40 +2049,68 @@ public class I2PSnarkServlet extends DefaultServlet {
         boolean showPriority = ls != null && snark != null && snark.getStorage() != null && !snark.getStorage().complete();
         if (showPriority)
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
-        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" ><thead>\n");
         if (snark != null) {
-            // first row - torrent info
-            // FIXME center
-            buf.append("<tr><th colspan=\"" + (showPriority ? '5' : '4') + "\"><div>")
-                .append(_("Torrent")).append(": ").append(snark.getBaseName());
+            // first table - torrent info
+            buf.append("<table class=\"snarkTorrentInfo\">\n");
+            buf.append("<tr><th>")
+               .append(_("Torrent"))
+               .append(":</th><td>")
+               .append(snark.getBaseName())
+               .append("</td></tr>\n");
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
             if (completion < 1.0)
-                buf.append("<br>").append(_("Completion")).append(": ").append((new DecimalFormat("0.00%")).format(completion));
+                buf.append("<tr><th>")
+                   .append(_("Completion"))
+                   .append(":</th><td>")
+                   .append((new DecimalFormat("0.00%")).format(completion))
+                   .append("</td></tr>\n");
             else
-                buf.append("<br>").append(_("Complete"));
+                buf.append("<tr><td colspan=\"2\">")
+                   .append(_("Complete"))
+                   .append("</td></tr>\n");
             // else unknown
             long needed = snark.getNeededLength();
             if (needed > 0)
-                buf.append("<br>").append(_("Remaining")).append(": ").append(formatSize(needed));
-            buf.append("<br>").append(_("Size")).append(": ").append(formatSize(snark.getTotalLength()));
+                buf.append("<tr><th>")
+                   .append(_("Remaining"))
+                   .append(":</th><td>")
+                   .append(formatSize(needed))
+                   .append("</td></tr>\n");
+            buf.append("<tr><th>")
+               .append(_("Size"))
+               .append(":</th><td>")
+               .append(formatSize(snark.getTotalLength()))
+               .append("</td></tr>\n");
             MetaInfo meta = snark.getMetaInfo();
             if (meta != null) {
                 List files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
-                buf.append("<br>").append(_("Files")).append(": ").append(fileCount);
+                buf.append("<tr><th>")
+                   .append(_("Files"))
+                   .append(":</th><td>")
+                   .append(fileCount)
+                   .append("</td></tr>\n");
             }
-            buf.append("<br>").append(_("Pieces")).append(": ").append(pieces);
-            buf.append("<br>").append(_("Piece size")).append(": ").append(formatSize(snark.getPieceLength(0)));
+            buf.append("<tr><th>")
+               .append(_("Pieces"))
+               .append(":</th><td>")
+               .append(pieces)
+               .append("</td></tr>\n");
+            buf.append("<tr><th>")
+               .append(_("Piece size"))
+               .append(":</th><td>")
+               .append(formatSize(snark.getPieceLength(0)))
+               .append("</td></tr>\n");
 
             if (meta != null) {
                 String announce = meta.getAnnounce();
                 if (announce != null) {
-                    buf.append("<br>");
+                    buf.append("<tr><th>");
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
                         buf.append(trackerLink).append(' ');
-                    buf.append(_("Tracker")).append(": ");
+                    buf.append(_("Tracker")).append(":</th><td>");
                     if (announce.startsWith("http://"))
                         announce = announce.substring(7);
                     int slsh = announce.indexOf('/');
@@ -2090,23 +2118,31 @@ public class I2PSnarkServlet extends DefaultServlet {
                         announce = announce.substring(0, slsh);
                     if (announce.length() > 67)
                         announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
-                    buf.append(announce);
+                    buf.append(announce).append("</td></tr>");
                 }
             }
 
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
-                buf.append("<br>").append(toImg("magnet", _("Magnet link"))).append(" <a href=\"")
+                buf.append("<tr><th>")
+                   .append(toImg("magnet", _("Magnet link")))
+                   .append("</th><td><a href=\"")
                    .append(MAGNET_FULL).append(hex).append("\">")
-                   .append(MAGNET_FULL).append(hex).append("</a>");
+                   .append(MAGNET_FULL).append(hex).append("</a>")
+                   .append("</td></tr>\n");
             } else {
-                buf.append("<br>").append(_("Private torrent"));
+                buf.append("<tr><td colspan=\"2\">")
+                   .append(_("Private torrent"))
+                   .append("</td></tr>\n");
             }
             // We don't have the hash of the torrent file
-            //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
-            //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
-            buf.append("<br>").append(_("Torrent file")).append(": ").append(snark.getName());
-            buf.append("</div></th></tr>\n");
+            //buf.append("<tr><th>").append(_("Maggot link")).append(":</th><td><a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
+            //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
+            buf.append("<tr><th>")
+               .append(_("Torrent file"))
+               .append(":</th><td>")
+               .append(snark.getName())
+               .append("</td></tr>\n");
         } else {
             // shouldn't happen
             buf.append("<tr><th>Not found<br>resource=\"").append(r.toString())
@@ -2114,13 +2150,15 @@ public class I2PSnarkServlet extends DefaultServlet {
                .append("\"<br>torrent=\"").append(torrentName)
                .append("\"</th></tr>\n");
         }
+        buf.append("</table>\n");
         if (ls == null) {
             // We are only showing the torrent info section
-            buf.append("</thead></table></div></div></BODY></HTML>");
+            buf.append("</div></div></BODY></HTML>");
             return buf.toString();
         }
 
-        // second row - dir info
+        // second table - dir info
+        buf.append("<table class=\"snarkDirInfo\"><thead>\n");
         buf.append("<tr>\n")
            .append("<th colspan=2>")
            .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
@@ -2273,11 +2311,11 @@ public class I2PSnarkServlet extends DefaultServlet {
             buf.append(_("Save priorities"));
             buf.append("\" name=\"foo\" ></th></tr></thead>\n");
         }
-        buf.append("</TABLE>\n");
+        buf.append("</table>\n");
         if (showPriority)
-	    buf.append("</form>");
-	buf.append("</div></div></BODY></HTML>\n");
-        
+            buf.append("</form>");
+        buf.append("</div></div></BODY></HTML>\n");
+
         return buf.toString();
     }
 
