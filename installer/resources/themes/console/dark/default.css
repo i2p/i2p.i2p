@@ -177,6 +177,7 @@ hr {
 .control:link {
      color: #494 !important;
      text-decoration: none;
+     background: #000 !important;
 }
 
 .control:hover {
