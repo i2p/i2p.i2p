@@ -2054,63 +2054,63 @@ public class I2PSnarkServlet extends DefaultServlet {
             buf.append("<table class=\"snarkTorrentInfo\">\n");
             buf.append("<tr><th>")
                .append(_("Torrent"))
-               .append(":</th><td>")
+               .append(": ")
                .append(snark.getBaseName())
-               .append("</td></tr>\n");
+               .append("</th></tr>\n");
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
             if (completion < 1.0)
-                buf.append("<tr><th>")
+                buf.append("<tr><td>")
                    .append(_("Completion"))
-                   .append(":</th><td>")
+                   .append(": ")
                    .append((new DecimalFormat("0.00%")).format(completion))
                    .append("</td></tr>\n");
             else
-                buf.append("<tr><td colspan=\"2\">")
+                buf.append("<tr><td>")
                    .append(_("Complete"))
                    .append("</td></tr>\n");
             // else unknown
             long needed = snark.getNeededLength();
             if (needed > 0)
-                buf.append("<tr><th>")
+                buf.append("<tr><td>")
                    .append(_("Remaining"))
-                   .append(":</th><td>")
+                   .append(": ")
                    .append(formatSize(needed))
                    .append("</td></tr>\n");
-            buf.append("<tr><th>")
+            buf.append("<tr><td>")
                .append(_("Size"))
-               .append(":</th><td>")
+               .append(": ")
                .append(formatSize(snark.getTotalLength()))
                .append("</td></tr>\n");
             MetaInfo meta = snark.getMetaInfo();
             if (meta != null) {
                 List files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
-                buf.append("<tr><th>")
+                buf.append("<tr><td>")
                    .append(_("Files"))
-                   .append(":</th><td>")
+                   .append(": ")
                    .append(fileCount)
                    .append("</td></tr>\n");
             }
-            buf.append("<tr><th>")
+            buf.append("<tr><td>")
                .append(_("Pieces"))
-               .append(":</th><td>")
+               .append(": ")
                .append(pieces)
                .append("</td></tr>\n");
-            buf.append("<tr><th>")
+            buf.append("<tr><td>")
                .append(_("Piece size"))
-               .append(":</th><td>")
+               .append(": ")
                .append(formatSize(snark.getPieceLength(0)))
                .append("</td></tr>\n");
 
             if (meta != null) {
                 String announce = meta.getAnnounce();
                 if (announce != null) {
-                    buf.append("<tr><th>");
+                    buf.append("<tr><td>");
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
                         buf.append(trackerLink).append(' ');
-                    buf.append(_("Tracker")).append(":</th><td>");
+                    buf.append(_("Tracker")).append(": ");
                     if (announce.startsWith("http://"))
                         announce = announce.substring(7);
                     int slsh = announce.indexOf('/');
@@ -2124,23 +2124,23 @@ public class I2PSnarkServlet extends DefaultServlet {
 
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
-                buf.append("<tr><th>")
+                buf.append("<tr><td>")
                    .append(toImg("magnet", _("Magnet link")))
-                   .append("</th><td><a href=\"")
+                   .append(" <a href=\"")
                    .append(MAGNET_FULL).append(hex).append("\">")
                    .append(MAGNET_FULL).append(hex).append("</a>")
                    .append("</td></tr>\n");
             } else {
-                buf.append("<tr><td colspan=\"2\">")
+                buf.append("<tr><td>")
                    .append(_("Private torrent"))
                    .append("</td></tr>\n");
             }
             // We don't have the hash of the torrent file
-            //buf.append("<tr><th>").append(_("Maggot link")).append(":</th><td><a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
+            //buf.append("<tr><td>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
-            buf.append("<tr><th>")
+            buf.append("<tr><td>")
                .append(_("Torrent file"))
-               .append(":</th><td>")
+               .append(": ")
                .append(snark.getName())
                .append("</td></tr>\n");
         } else {
