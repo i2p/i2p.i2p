@@ -20,8 +20,10 @@
             d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
             // pass the new delay parameter to the iframe
             newDelay = "?refresh=" + d;
+            // update disable boolean
+            intl.setDisableRefresh(d);
         }
-        if (!"0".equals(d))
+        if (!intl.getDisableRefresh())
             out.print("<noscript><iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\"></noscript>\n");
     }
 %>
@@ -40,7 +42,7 @@
     }
 
     // d and allowIFrame defined above
-    if (!"0".equals(d)) {
+    if (!intl.getDisableRefresh()) {
         out.print("</div><noscript></iframe></noscript>\n");
     } else if (allowIFrame) {
         // since we don't have an iframe this will reload the base page, and

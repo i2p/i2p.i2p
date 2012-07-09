@@ -26,10 +26,11 @@
         } else {
             d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
             intl.setRefresh(d);
+            intl.setDisableRefresh(d);
         }
         // we probably don't get here if d == "0" since caught in summary.jsi, but just
         // to be sure...
-        if (!"0".equals(d)) {
+        if (!intl.getDisableRefresh()) {
             // doesn't work for restart or shutdown with no expl. tunnels,
             // since the call to ConfigRestartBean.renderStatus() hasn't happened yet...
             // So we delay slightly
@@ -64,7 +65,7 @@
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
         out.print("<hr>\n<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"POST\">\n");
-        if ("0".equals(d)) {
+        if (intl.getDisableRefresh()) {
             out.print("<b>");
             out.print(intl._("Refresh (s)"));
             out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" >\n");
