@@ -26,6 +26,10 @@ public class ConfigSummaryHandler extends FormHandler {
         boolean deleting = _action.equals(_("Delete selected"));
         boolean adding = _action.equals(_("Add item"));
         boolean saving = _action.equals(_("Save order"));
+        boolean movingTop = _action.substring(_action.indexOf(' ') + 1).equals(_("Top"));
+        boolean movingUp = _action.substring(_action.indexOf(' ') + 1).equals(_("Up"));
+        boolean movingDown = _action.substring(_action.indexOf(' ') + 1).equals(_("Down"));
+        boolean movingBottom = _action.substring(_action.indexOf(' ') + 1).equals(_("Bottom"));
         if (_action.equals(_("Save")) && "0".equals(group)) {
             try {
                 int refreshInterval = Integer.parseInt(getJettyString("refreshInterval"));
@@ -46,7 +50,8 @@ public class ConfigSummaryHandler extends FormHandler {
             _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_MINIMAL);
             addFormNotice(_("Minimal summary bar default restored.") + " " +
                           _("Summary bar will refresh shortly."));
-        } else if (adding || deleting || saving) {
+        } else if (adding || deleting || saving ||
+                   movingTop || movingUp || movingDown || movingBottom) {
             Map<Integer, String> sections = new TreeMap<Integer, String>();
             for (Object o : _settings.keySet()) {
                 if (!(o instanceof String))
@@ -109,6 +114,32 @@ public class ConfigSummaryHandler extends FormHandler {
                         iter.remove();
                         addFormNotice(_("Removed") + ": " + removedName);
                     }
+                }
+            } else if (movingTop || movingUp || movingDown || movingBottom) {
+                int start = _action.indexOf('[');
+                int end = _action.indexOf(']');
+                String fromStr = _action.substring(start + 1, end - start);
+                try {
+                    int from = Integer.parseInt(fromStr);
+                    int to = 0;
+                    if (movingUp)
+                        to = from - 1;
+                    if (movingDown)
+                        to = from + 1;
+                    if (movingBottom)
+                        to = sections.size() - 1;
+                    int n = -1;
+                    if (movingDown || movingBottom)
+                        n = 1;
+                    for (int i = from; n * i < n * to; i += n) {
+                        String temp = sections.get(i + n);
+                        sections.put(i + n, sections.get(i));
+                        sections.put(i, temp);
+                    }
+                    addFormNotice(_("Moved") + ": " + sections.get(to));
+                } catch (java.lang.NumberFormatException e) {
+                    addFormError(_("Order must be an integer"));
+                    return;
                 }
             }
             SummaryHelper.saveSummaryBarSections(_context, "default", sections);

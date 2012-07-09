@@ -811,11 +811,36 @@ public class SummaryHelper extends HelperBase {
             int i = sections.indexOf(section);
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(i)
-               .append("\"></td><td align=\"center\"><input type=\"text\" name=\"order_")
+               .append("\"></td><td align=\"center\"><input type=\"hidden\" name=\"order_")
                .append(i + "_" + section)
                .append("\" value=\"")
                .append(i)
-               .append("\"></td><td align=\"left\">")
+               .append("\">");
+            if (i > 0) {
+                buf.append("<input type=\"submit\" class=\"buttonTop\" name=\"action\" value=\"[")
+                   .append(i)
+                   .append("] ")
+                   .append(_("Top"))
+                   .append("\">");
+                buf.append("<input type=\"submit\" class=\"buttonUp\" name=\"action\" value=\"[")
+                   .append(i)
+                   .append("] ")
+                   .append(_("Up"))
+                   .append("\">");
+            }
+            if (i < sections.size() - 1) {
+                buf.append("<input type=\"submit\" class=\"buttonDown\" name=\"action\" value=\"[")
+                   .append(i)
+                   .append("] ")
+                   .append(_("Down"))
+                   .append("\">");
+                buf.append("<input type=\"submit\" class=\"buttonBottom\" name=\"action\" value=\"[")
+                   .append(i)
+                   .append("] ")
+                   .append(_("Bottom"))
+                   .append("\">");
+            }
+            buf.append("</td><td align=\"left\">")
                .append(section)
                .append("</td></tr>\n");
         }
