@@ -846,7 +846,7 @@ public class SummaryHelper extends HelperBase {
         }
         buf.append("<tr><td align=\"center\"><b>")
            .append(_("Add")).append(":</b>" +
-                   "</td><td align=\"center\"><input type=\"text\" name=\"order\" value=\"")
+                   "</td><td align=\"center\"><input type=\"hidden\" name=\"order\" value=\"")
            .append(sections.size())
            .append("\"></td>" +
                    "<td align=\"left\">" +
