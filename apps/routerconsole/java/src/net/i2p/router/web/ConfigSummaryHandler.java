@@ -26,10 +26,7 @@ public class ConfigSummaryHandler extends FormHandler {
         boolean deleting = _action.equals(_("Delete selected"));
         boolean adding = _action.equals(_("Add item"));
         boolean saving = _action.equals(_("Save order"));
-        boolean movingTop = _action.substring(_action.indexOf(' ') + 1).equals(_("Top"));
-        boolean movingUp = _action.substring(_action.indexOf(' ') + 1).equals(_("Up"));
-        boolean movingDown = _action.substring(_action.indexOf(' ') + 1).equals(_("Down"));
-        boolean movingBottom = _action.substring(_action.indexOf(' ') + 1).equals(_("Bottom"));
+        boolean moving = _action.startsWith("move_");
         if (_action.equals(_("Save")) && "0".equals(group)) {
             try {
                 int refreshInterval = Integer.parseInt(getJettyString("refreshInterval"));
@@ -50,8 +47,7 @@ public class ConfigSummaryHandler extends FormHandler {
             _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_MINIMAL);
             addFormNotice(_("Minimal summary bar default restored.") + " " +
                           _("Summary bar will refresh shortly."));
-        } else if (adding || deleting || saving ||
-                   movingTop || movingUp || movingDown || movingBottom) {
+        } else if (adding || deleting || saving || moving) {
             Map<Integer, String> sections = new TreeMap<Integer, String>();
             for (Object o : _settings.keySet()) {
                 if (!(o instanceof String))
@@ -115,21 +111,19 @@ public class ConfigSummaryHandler extends FormHandler {
                         addFormNotice(_("Removed") + ": " + removedName);
                     }
                 }
-            } else if (movingTop || movingUp || movingDown || movingBottom) {
-                int start = _action.indexOf('[');
-                int end = _action.indexOf(']');
-                String fromStr = _action.substring(start + 1, end - start);
+            } else if (moving) {
+                String parts[] = _action.split("_");
                 try {
-                    int from = Integer.parseInt(fromStr);
+                    int from = Integer.parseInt(parts[1]);
                     int to = 0;
-                    if (movingUp)
+                    if ("up".equals(parts[2]))
                         to = from - 1;
-                    if (movingDown)
+                    if ("down".equals(parts[2]))
                         to = from + 1;
-                    if (movingBottom)
+                    if ("bottom".equals(parts[2]))
                         to = sections.size() - 1;
                     int n = -1;
-                    if (movingDown || movingBottom)
+                    if ("down".equals(parts[2]) || "bottom".equals(parts[2]))
                         n = 1;
                     for (int i = from; n * i < n * to; i += n) {
                         String temp = sections.get(i + n);
@@ -158,5 +152,17 @@ public class ConfigSummaryHandler extends FormHandler {
         if (arr == null)
             return null;
         return arr[0].trim();
+    }
+
+    public void setMovingAction() {
+        for (Object o : _settings.keySet()) {
+            if (!(o instanceof String))
+                continue;
+            String k = (String) o;
+            if (k.startsWith("move_") && k.endsWith(".x") && _settings.get(k) != null) {
+                _action = k.substring(0, k.length() - 2);
+                break;
+            }
+        }
     }
 }

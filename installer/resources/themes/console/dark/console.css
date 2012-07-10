@@ -923,6 +923,10 @@ input[type=text]:active, input[type=text]:hover {
      background: #000;
 }
 
+input[type=image] {
+     min-width: 0;
+}
+
 fieldset {
 overflow: hidden;
 position: relative;

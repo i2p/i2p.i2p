@@ -799,6 +799,9 @@ public class SummaryHelper extends HelperBase {
                 sortedSections.add(section);
         }
 
+        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        String imgPath = CSSHelper.BASE_THEME_PATH + theme + "/images/";
+
         StringBuilder buf = new StringBuilder(2048);
         buf.append("<table><tr><th>")
            .append(_("Remove"))
@@ -817,28 +820,28 @@ public class SummaryHelper extends HelperBase {
                .append(i)
                .append("\">");
             if (i > 0) {
-                buf.append("<input type=\"submit\" class=\"buttonTop\" name=\"action\" value=\"[")
+                buf.append("<input type=\"image\" class=\"buttonTop\" name=\"move_")
                    .append(i)
-                   .append("] ")
+                   .append("_top\" alt=\"")
                    .append(_("Top"))
-                   .append("\">");
-                buf.append("<input type=\"submit\" class=\"buttonUp\" name=\"action\" value=\"[")
+                   .append("\" src=\"" + imgPath + "move_top.png\">");
+                buf.append("<input type=\"image\" class=\"buttonUp\" name=\"move_")
                    .append(i)
-                   .append("] ")
+                   .append("_up\" alt=\"")
                    .append(_("Up"))
-                   .append("\">");
+                   .append("\" src=\"" + imgPath + "move_up.png\">");
             }
             if (i < sections.size() - 1) {
-                buf.append("<input type=\"submit\" class=\"buttonDown\" name=\"action\" value=\"[")
+                buf.append("<input type=\"image\" class=\"buttonDown\" name=\"move_")
                    .append(i)
-                   .append("] ")
+                   .append("_down\" alt=\"")
                    .append(_("Down"))
-                   .append("\">");
-                buf.append("<input type=\"submit\" class=\"buttonBottom\" name=\"action\" value=\"[")
+                   .append("\" src=\"" + imgPath + "move_down.png\">");
+                buf.append("<input type=\"image\" class=\"buttonBottom\" name=\"move_")
                    .append(i)
-                   .append("] ")
+                   .append("_bottom\" alt=\"")
                    .append(_("Bottom"))
-                   .append("\">");
+                   .append("\" src=\"" + imgPath + "move_bottom.png\">");
             }
             buf.append("</td><td align=\"left\">")
                .append(section)

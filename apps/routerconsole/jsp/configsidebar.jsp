@@ -30,6 +30,9 @@ input.default {
 <jsp:setProperty name="formhandler" property="*" />
 <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
+<%
+    formhandler.setMovingAction();
+%>
 <jsp:getProperty name="formhandler" property="allMessages" />
 <%
     String pageNonce = formhandler.getNewNonce();
