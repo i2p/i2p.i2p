@@ -1325,7 +1325,7 @@ public class I2PSnarkServlet extends DefaultServlet {
      *  @return string or null
      *  @since 0.8.4
      */
-    private String getTrackerLink(String announce, byte[] infohash) {
+    private String getTrackerLinkUrl(String announce, byte[] infohash) {
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         if (announce != null && (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
               announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") ||
@@ -1341,11 +1341,25 @@ public class I2PSnarkServlet extends DefaultServlet {
                 StringBuilder buf = new StringBuilder(128);
                 buf.append("<a href=\"").append(baseURL).append("details.php?dllist=1&amp;filelist=1&amp;info_hash=")
                    .append(TrackerClient.urlencode(infohash))
-                   .append("\" title=\"").append(_("Details at {0} tracker", name)).append("\" target=\"_blank\">" +
-                          "<img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
-                   .append(_imgPath).append("details.png\"></a>");
+                   .append("\" title=\"").append(_("Details at {0} tracker", name)).append("\" target=\"_blank\">");
                 return buf.toString();
             }
+        }
+        return null;
+    }
+
+    /**
+     *  @return string or null
+     *  @since 0.8.4
+     */
+    private String getTrackerLink(String announce, byte[] infohash) {
+        String linkUrl = getTrackerLinkUrl(announce, infohash);
+        if (linkUrl != null) {
+            StringBuilder buf = new StringBuilder(128);
+            buf.append(linkUrl)
+               .append("<img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
+               .append(_imgPath).append("details.png\"></a>");
+            return buf.toString();
         }
         return null;
     }
@@ -2074,6 +2088,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                     if (trackerLink != null)
                         buf.append(trackerLink).append(' ');
                     buf.append("<b>").append(_("Tracker")).append(":</b> ");
+                    String trackerLinkUrl = getTrackerLinkUrl(announce, snark.getInfoHash());
+                    if (trackerLinkUrl != null)
+                        buf.append(trackerLinkUrl);
                     if (announce.startsWith("http://"))
                         announce = announce.substring(7);
                     int slsh = announce.indexOf('/');
@@ -2081,15 +2098,19 @@ public class I2PSnarkServlet extends DefaultServlet {
                         announce = announce.substring(0, slsh);
                     if (announce.length() > 67)
                         announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
-                    buf.append(announce).append("</td></tr>");
+                    buf.append(announce);
+                    if (trackerLinkUrl != null)
+                        buf.append("</a>");
+                    buf.append("</td></tr>");
                 }
             }
 
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
-                buf.append("<tr><td>")
+                buf.append("<tr><td><a href=\"")
+                   .append(MAGNET_FULL).append(hex).append("\">")
                    .append(toImg("magnet", _("Magnet link")))
-                   .append(" <b>Magnet:</b> <a href=\"")
+                   .append("</a> <b>Magnet:</b> <a href=\"")
                    .append(MAGNET_FULL).append(hex).append("\">")
                    .append(MAGNET_FULL).append(hex).append("</a>")
                    .append("</td></tr>\n");
