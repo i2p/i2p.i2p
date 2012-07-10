@@ -237,14 +237,17 @@ public class UpdateHandler {
             if (_isPartial)
                 return;
             StringBuilder buf = new StringBuilder(64);
-            buf.append("<b>").append(_("Updating")).append("</b> ");
+            buf.append("<b>").append(_("Updating")).append(":</b><br>\n");
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
                          ((double)alreadyTransferred + (double)currentWrite + bytesRemaining);
             synchronized (_pct) {
-                buf.append(_pct.format(pct));
+                buf.append(_("{0} downloaded", _pct.format(pct)));
             }
-            buf.append(":<br>\n");
-            buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
+            buf.append("<br>\n");
+            buf.append(DataHelper.formatSize2(currentWrite + alreadyTransferred))
+               .append("B / ")
+               .append(DataHelper.formatSize2(currentWrite + alreadyTransferred + bytesRemaining))
+               .append("B");
             updateStatus(buf.toString());
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {

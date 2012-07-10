@@ -328,8 +328,15 @@ public class SummaryBarRenderer {
 
     public String renderUpdateStatusHTML() {
         if (_helper == null) return "";
+        String updateStatus = _helper.getUpdateStatus();
+        if ("".equals(updateStatus)) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append(_helper.getUpdateStatus());
+        buf.append("<h3><a href=\"/configupdate\" target=\"_top\" title=\"")
+           .append(_("Configure I2P Updates"))
+           .append("\">")
+           .append(_("I2P Update"))
+           .append("</a></h3><hr class=\"b\">\n");
+        buf.append(updateStatus);
         return buf.toString();
     }
 
