@@ -805,16 +805,18 @@ public class SummaryHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(2048);
         buf.append("<table class=\"sidebarconf\"><tr><th>")
            .append(_("Remove"))
-           .append("</th><th colspan=\"2\">")
-           .append(_("Order"))
            .append("</th><th>")
            .append(_("Name"))
+           .append("</th><th colspan=\"2\">")
+           .append(_("Order"))
            .append("</th></tr>\n");
         for (String section : sections) {
             int i = sections.indexOf(section);
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(i)
-               .append("\"></td><td align=\"right\"><input type=\"hidden\" name=\"order_")
+               .append("\"></td><td align=\"left\">")
+               .append(section)
+               .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
                .append(i + "_" + section)
                .append("\" value=\"")
                .append(i)
@@ -844,16 +846,11 @@ public class SummaryHelper extends HelperBase {
                    .append(_("Bottom"))
                    .append("\" src=\"" + imgPath + "move_bottom.png\">");
             }
-            buf.append("</td><td align=\"left\">")
-               .append(section)
-               .append("</td></tr>\n");
+            buf.append("</td></tr>\n");
         }
         buf.append("<tr><td align=\"center\"><b>")
            .append(_("Add")).append(":</b>" +
-                   "</td><td align=\"center\" colspan=\"2\"><input type=\"hidden\" name=\"order\" value=\"")
-           .append(sections.size())
-           .append("\"></td>" +
-                   "<td align=\"left\">" +
+                   "</td><td align=\"left\">" +
                    "<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
            .append(_("Select a section to add"))
@@ -864,7 +861,10 @@ public class SummaryHelper extends HelperBase {
                .append(s).append("</option>\n");
         }
 
-        buf.append("</select></td></tr>")
+        buf.append("</select></td>" +
+                   "<td align=\"center\" colspan=\"2\"><input type=\"hidden\" name=\"order\" value=\"")
+           .append(sections.size())
+           .append("\"></td></tr>")
            .append("</table>\n");
         return buf.toString();
     }
