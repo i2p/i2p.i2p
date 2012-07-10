@@ -2052,57 +2052,20 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (snark != null) {
             // first table - torrent info
             buf.append("<table class=\"snarkTorrentInfo\">\n");
-            buf.append("<tr><th>")
+            buf.append("<tr><th><b>")
                .append(_("Torrent"))
-               .append(": ")
+               .append(":</b> ")
                .append(snark.getBaseName())
                .append("</th></tr>\n");
-            int pieces = snark.getPieces();
-            double completion = (pieces - snark.getNeeded()) / (double) pieces;
-            if (completion < 1.0)
-                buf.append("<tr><td>")
-                   .append(_("Completion"))
-                   .append(": ")
-                   .append((new DecimalFormat("0.00%")).format(completion))
-                   .append("</td></tr>\n");
-            else
-                buf.append("<tr><td>")
-                   .append(_("Complete"))
-                   .append("</td></tr>\n");
-            // else unknown
-            long needed = snark.getNeededLength();
-            if (needed > 0)
-                buf.append("<tr><td>")
-                   .append(_("Remaining"))
-                   .append(": ")
-                   .append(formatSize(needed))
-                   .append("</td></tr>\n");
+
             buf.append("<tr><td>")
-               .append(_("Size"))
-               .append(": ")
-               .append(formatSize(snark.getTotalLength()))
-               .append("</td></tr>\n");
-            MetaInfo meta = snark.getMetaInfo();
-            if (meta != null) {
-                List files = meta.getFiles();
-                int fileCount = files != null ? files.size() : 1;
-                buf.append("<tr><td>")
-                   .append(_("Files"))
-                   .append(": ")
-                   .append(fileCount)
-                   .append("</td></tr>\n");
-            }
-            buf.append("<tr><td>")
-               .append(_("Pieces"))
-               .append(": ")
-               .append(pieces)
-               .append("</td></tr>\n");
-            buf.append("<tr><td>")
-               .append(_("Piece size"))
-               .append(": ")
-               .append(formatSize(snark.getPieceLength(0)))
+               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+               .append(_("Torrent file"))
+               .append(":</b> ")
+               .append(snark.getName())
                .append("</td></tr>\n");
 
+            MetaInfo meta = snark.getMetaInfo();
             if (meta != null) {
                 String announce = meta.getAnnounce();
                 if (announce != null) {
@@ -2110,7 +2073,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
                         buf.append(trackerLink).append(' ');
-                    buf.append(_("Tracker")).append(": ");
+                    buf.append("<b>").append(_("Tracker")).append(":</b> ");
                     if (announce.startsWith("http://"))
                         announce = announce.substring(7);
                     int slsh = announce.indexOf('/');
@@ -2126,7 +2089,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td>")
                    .append(toImg("magnet", _("Magnet link")))
-                   .append(" <a href=\"")
+                   .append(" <b>Magnet:</b> <a href=\"")
                    .append(MAGNET_FULL).append(hex).append("\">")
                    .append(MAGNET_FULL).append(hex).append("</a>")
                    .append("</td></tr>\n");
@@ -2138,10 +2101,45 @@ public class I2PSnarkServlet extends DefaultServlet {
             // We don't have the hash of the torrent file
             //buf.append("<tr><td>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
+
             buf.append("<tr><td>")
-               .append(_("Torrent file"))
-               .append(": ")
-               .append(snark.getName())
+               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;<b>")
+               .append(_("Size"))
+               .append(":</b> ")
+               .append(formatSize(snark.getTotalLength()));
+            int pieces = snark.getPieces();
+            double completion = (pieces - snark.getNeeded()) / (double) pieces;
+            if (completion < 1.0)
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;<b>")
+                   .append(_("Completion"))
+                   .append(":</b> ")
+                   .append((new DecimalFormat("0.00%")).format(completion));
+            else
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;")
+                   .append(_("Complete"));
+            // else unknown
+            long needed = snark.getNeededLength();
+            if (needed > 0)
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;<b>")
+                   .append(_("Remaining"))
+                   .append(":</b> ")
+                   .append(formatSize(needed));
+            if (meta != null) {
+                List files = meta.getFiles();
+                int fileCount = files != null ? files.size() : 1;
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+                   .append(_("Files"))
+                   .append(":</b> ")
+                   .append(fileCount);
+            }
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+               .append(_("Pieces"))
+               .append(":</b> ")
+               .append(pieces);
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+               .append(_("Piece size"))
+               .append(":</b> ")
+               .append(formatSize(snark.getPieceLength(0)))
                .append("</td></tr>\n");
         } else {
             // shouldn't happen
