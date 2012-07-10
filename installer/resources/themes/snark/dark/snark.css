@@ -262,6 +262,46 @@ tfoot tr:nth-child(n+1) {
      width: 20px !important;	
 }
 
+.snarkTorrentInfo img {
+     max-height: 16px !important;
+     margin: 1px 0 1px 2px !important;    
+}
+
+.snarkTorrentInfo td {
+     text-align: left !important;
+     padding: 0 1px !important;
+}
+
+table.SnarkTorrentInfo {
+     margin-bottom: 3 !important;
+     background: url("../../console/dark/images/camotile.png") repeat scroll center bottom #001100;
+/*     background-image: url('/themes/snark/dark/images/hat.png'), url("../../console/dark/images/camotile.png");*/
+     background-origin: padding-box;
+     background-position: bottom right, center center;
+     background-repeat: no-repeat, repeat;    
+}
+
+table.SnarkDirInfo {
+     margin-top: -2px !important;     
+}
+
+.snarkDirInfo thead img {
+     margin: 0 -1px 0 0 !important;
+}
+
+.SnarkDirInfo td {
+     min-width: 0px !important;     
+}
+
+.SnarkDirInfo td:nth-child(n+1) {
+}
+
+.SnarkDirInfo .headerpriority {
+     text-align: center !important;
+     vertical-align: middle;    
+}
+
+
 td {
      padding: 1px;
      color: #ee9 !important;
@@ -863,12 +903,12 @@ code {;
      box-shadow: inset 0px 0px 1px 0px #002;
      background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
 */
-     background: #000 !important;
+     background: none !important;
      text-transform: uppercase !important;
      letter-spacing: 0em !important;
      font-weight: bold;
      font-size: 11.5pt;
-     color: #001;
+     color: #000;
      min-width: 600px;
      width: 70%;
      text-align: center;

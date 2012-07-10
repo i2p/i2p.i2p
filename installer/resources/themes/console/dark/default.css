@@ -83,6 +83,9 @@ button {
 
 textarea {
      border: 1px solid #494;
+     background: #000;
+     margin-left: 4px;
+     width: 458px;
 }
 
 br {
@@ -144,7 +147,7 @@ hr {
      border: 1px solid #494;
      padding: 2px;
      margin: 4px 0 2px 4px;
-     background-color: #020;
+     background-color: #000;
      font-size: 8.5pt;
 }
 
@@ -157,7 +160,7 @@ hr {
      font-size: 8pt;
      font-weight: bold;
      background-color: #000;
-     color: #9f9 !important;
+     color: #494 !important;
      border: 1px outset #ddddc0;
      text-align: center;
      white-space: nowrap;
