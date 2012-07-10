@@ -174,7 +174,7 @@ th {
      border-bottom: 1px inset #101;
      color: #ddd;
      whitespace: nowrap;
-     letter-spacing: 0.05em;
+     letter-spacing: 0em;
 }
 
 th:first-child {
@@ -261,6 +261,7 @@ td:first-child {
 }
 
 .snarkTorrentName {
+     line-height: 100%;
      text-shadow:1px 1px #550000;
      padding: 2px 0 0;
 }
@@ -304,6 +305,7 @@ td:first-child {
 
 .snarkTorrentStatus {
      padding: 2px 2px 2px 0;
+     line-height: 100%;
 }
 
 .snarkTorrentStatus:first-child {
@@ -325,6 +327,7 @@ td:first-child {
      font-size: 7.5pt;
      font-weight: bold;
      padding: 0 3px;
+     line-height: 100%;
 }
 
 .snarkTorrentDownloaded {
@@ -403,7 +406,7 @@ table.SnarkDirInfo {
      margin: 0 -1px 0 0 !important;
 }
 
-.SnarkDirInfo td {
+.SnarkDirInfo td, .SnarkDirInfo th {
      min-width: 0px !important;     
 }
 
@@ -461,7 +464,7 @@ table.SnarkDirInfo {
 .page {
      background: #323 url('/themes/snark/ubergine/images/tile2.png');
      color: #310;
-     min-width: 970px !important;
+     min-width: 800px !important;
      margin: 5px 0 0 0;
      padding: 10px 10px 0px 10px;
      -moz-border-radius: 4px;

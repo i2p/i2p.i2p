@@ -187,6 +187,7 @@ th {
      border-top: 1px outset #604;
      border-bottom: 1px inset #604;
      whitespace: nowrap;
+     color: #511;
 }
 
 th:first-child {
@@ -406,10 +407,12 @@ td:first-child {
 
 table.SnarkTorrentInfo {
      margin-bottom: 3 !important;
+     border: 1px solid #604;
 }
 
 table.SnarkDirInfo {
-     margin-top: -2px !important;     
+     margin-top: -3px !important;
+     margin-bottom: 0;   
 }
 
 .snarkDirInfo thead img {
@@ -453,7 +456,7 @@ table.SnarkDirInfo {
 .snarkConfigTitle {
      font-size: 11pt;
      font-weight: bold;
-     padding: 0 25px 3px 25px;
+     padding: 0 15px 3px 12px;
      margin: 5px 0 10px 0 !important;
      letter-spacing: 0.05em;
      border: 1px solid #111;
@@ -461,10 +464,11 @@ table.SnarkDirInfo {
      -khtml-border-radius: 0 0 5px 5px;
      border-radius: 0 0 5px 5px;
      border-top: 0;
-     text-shadow: 0px 1px 1px #fff;
+     text-shadow: 0px 1px 1px #777;
      background: #ffb url('images/bling.png') repeat-x scroll center center !important;
      font-variant: small-caps !important;
      color: #503;
+     box-shadow: 0 1px 1px #777;
 }
 
 .snarkConfigTitle img {
@@ -478,7 +482,7 @@ table.SnarkDirInfo {
 .page {
      background: #fff url('images/tile2.png');
      color: #310;
-     min-width: 970px !important;
+     min-width: 800px !important;
      margin: 5px 0 0 0;
      padding: 10px 10px 0px 10px;
      -moz-border-radius: 4px;
@@ -510,24 +514,6 @@ hr {
      width: 0%;
      margin: 5px 0 7px 0;
      text-align: center;
-}
-
-a:link {
-     color: #742;
-     text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
-}
-
-a:visited {
-     color: #962;
-     text-decoration: none;
-     font-weight: bold;
-}
-
-a:hover {
-     color: #f30;
-     font-weight: bold;
 }
 
 a:link {
@@ -810,7 +796,7 @@ div.configsection table{
 
 div.configsection a {
      color: #f30;
-     text-shadow: 1px 1px #fff;
+     text-shadow: 1px 1px #777;
 }
 
 div.configsection a:hover {
