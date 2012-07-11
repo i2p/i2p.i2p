@@ -90,7 +90,7 @@ body.iframed {
 .snarkMessages {
      font: normal 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
      text-align: left;
-     margin: 0 0 10px 0;
+     margin: 0 0 9px 0;
      padding: 3px 5px 3px 5px;
      border-spacing: 0px;
      overflow: auto;
@@ -202,7 +202,7 @@ th:first-child img {
 }
 
 th:nth-child(2) img {
-     margin: 1px 7px 3px 2px !important;
+     margin: 1px 5px 3px 2px !important;
 }
 
 tfoot th {
@@ -250,6 +250,16 @@ tfoot tr:nth-child(n+1) {
      background: #000;
 }
 
+table.SnarkTorrents {
+     margin-top: -1px !important;
+}
+
+/*
+.SnarkTorrents th img {
+     max-height: 22px;
+}
+*/
+
 .SnarkTorrents td {
      line-height: 90%;
 }
@@ -274,7 +284,7 @@ tfoot tr:nth-child(n+1) {
 
 table.SnarkTorrentInfo {
      margin-bottom: 3 !important;
-     background: url("../../console/dark/images/camotile.png") repeat scroll center bottom #001100;
+     background: url("../../console/dark/images/camotile2.png") repeat scroll center bottom #001100;
 /*     background-image: url('/themes/snark/dark/images/hat.png'), url("../../console/dark/images/camotile.png");
      background-origin: padding-box;
      background-position: bottom right, center center;
@@ -379,10 +389,11 @@ td:first-child {
      margin-left: 6px;
 }
 
-.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+.snarkTorrentStatus, .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
      font-size: 8pt;
      padding: 0 3px;
      line-height: 90%;
+     word-spacing: -0.15em;
 }
 
 .snarkTorrentDownloaded {
@@ -753,8 +764,9 @@ div.section,div.mainsection div.section,div.mainsection {
      margin: 0;
      padding: 0px;
      border: 1px solid #494;
-     border-top: 2px solid #494;
-     border-bottom: 2px solid #494;
+     border-bottom: none;
+/*     border-top: 2px solid #494;
+     border-bottom: 2px solid #494; */
      color: #001;
 /*     -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -839,7 +851,7 @@ div.configsection {
 }
 
 div.configsectionpanel {
-     margin: -2px 0 0 0;
+     margin: 9px 0 0 0;
      padding: 0 10px;
      border: 1px solid #494;
      color: #ee9;
