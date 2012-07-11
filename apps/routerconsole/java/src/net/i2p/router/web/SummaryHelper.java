@@ -848,9 +848,11 @@ public class SummaryHelper extends HelperBase {
             }
             buf.append("</td></tr>\n");
         }
-        buf.append("<tr><td align=\"center\"><b>")
-           .append(_("Add")).append(":</b>" +
-                   "</td><td align=\"left\">" +
+        buf.append("<tr><td align=\"center\">" +
+                   "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
+           .append(_("Delete selected"))
+           .append("\"></td><td align=\"left\"><b>")
+           .append(_("Add")).append(":</b> " +
                    "<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
            .append(_("Select a section to add"))
@@ -861,9 +863,13 @@ public class SummaryHelper extends HelperBase {
                .append(s).append("</option>\n");
         }
 
-        buf.append("</select></td>" +
-                   "<td align=\"center\" colspan=\"2\"><input type=\"hidden\" name=\"order\" value=\"")
+        buf.append("</select>\n" +
+                   "<input type=\"hidden\" name=\"order\" value=\"")
            .append(sections.size())
+           .append("\"></td>" +
+                   "<td align=\"center\" colspan=\"2\">" +
+                   "<input type=\"submit\" name=\"action\" class=\"add\" value=\"")
+           .append(_("Add item"))
            .append("\"></td></tr>")
            .append("</table>\n");
         return buf.toString();

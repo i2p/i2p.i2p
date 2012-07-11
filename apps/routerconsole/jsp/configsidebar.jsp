@@ -55,13 +55,8 @@ input.default {
  <input type="hidden" name="group" value="2">
  <jsp:getProperty name="summaryhelper" property="configTable" />
  <div class="formaction">
-  <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
   <input type="submit" class="reload" name="action" value="<%=intl._("Restore full default")%>" >
   <input type="submit" class="reload" name="action" value="<%=intl._("Restore minimal default")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
-  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Save order")%>" >
-  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>
 </div></body></html>
