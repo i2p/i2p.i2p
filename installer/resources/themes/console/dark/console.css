@@ -450,6 +450,44 @@ div.configure {
      background: none;/* url(images/camotile2.png);*/
 }
 
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td:nth-child(2) {
+     font-weight: bold;     
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
+}
+
 div.messages {
      padding: 10px;
      margin: 10px 0 15px 0;
@@ -550,7 +588,6 @@ th {
      color: #EE9;
      text-align: center;
      font-size: 9pt;
-     background: #000; /*url('images/tabletitledark.png') repeat-x;*/
      background: #000 url('images/header.png') center center repeat-x ;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494 !important;
@@ -562,14 +599,15 @@ tr {
 }
 
 tr:nth-child(even) {
-     background: #010;/* url('images/darkerbluetile.png') !important;*/
+     background: #010;
      vertical-align: middle;
 }
 
 tr:nth-child(odd) {
-     background: #000800;/* url('images/darkbluetile.png') !important;*/
+     background: #000800;
      vertical-align: middle;
 }
+
 /*
 tr:last-child {
      background: #004 url('images/lightbluetile.png') !important;
@@ -577,6 +615,7 @@ tr:last-child {
      border: 1px solid #494 !important;
 }
 */
+
 td {
      padding: 4px 6px;
      color: #EE9;
