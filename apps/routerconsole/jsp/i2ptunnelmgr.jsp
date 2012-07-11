@@ -15,7 +15,7 @@
 
 <html><head>
 <%@include file="css.jsi" %>
-<%=intl.title("home")%>
+<%=intl.title("i2p tunnel manager")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
   var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
