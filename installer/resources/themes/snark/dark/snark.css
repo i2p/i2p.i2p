@@ -275,10 +275,10 @@ tfoot tr:nth-child(n+1) {
 table.SnarkTorrentInfo {
      margin-bottom: 3 !important;
      background: url("../../console/dark/images/camotile.png") repeat scroll center bottom #001100;
-/*     background-image: url('/themes/snark/dark/images/hat.png'), url("../../console/dark/images/camotile.png");*/
+/*     background-image: url('/themes/snark/dark/images/hat.png'), url("../../console/dark/images/camotile.png");
      background-origin: padding-box;
      background-position: bottom right, center center;
-     background-repeat: no-repeat, repeat;    
+     background-repeat: no-repeat, repeat;*/    
 }
 
 table.SnarkDirInfo {
@@ -464,7 +464,7 @@ td:first-child {
 .snarkConfigTitle {
      font-size: 10.5pt;
      font-weight: bold;
-     padding: 1px 25px 4px 25px;
+     padding: 1px 25px 4px 22px;
      margin: 5px 0 10px 0 !important;
      letter-spacing: 0.02em;
      border: 1px solid #494;
@@ -839,7 +839,7 @@ div.configsection {
 }
 
 div.configsectionpanel {
-     margin: -2px 0 10px 0;
+     margin: -2px 0 0 0;
      padding: 0 10px;
      border: 1px solid #494;
      color: #ee9;
