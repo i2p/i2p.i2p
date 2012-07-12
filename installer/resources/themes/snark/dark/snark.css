@@ -269,12 +269,16 @@ table.SnarkTorrents {
 }
 
 .SnarkTorrents td:nth-child(3), .SnarkTorrents td:nth-child(4) {
-     width: 20px !important;	
+     width: 20px !important;
 }
 
 .snarkTorrentInfo img {
      max-height: 16px !important;
-     margin: 1px 0 1px 2px !important;    
+     margin: 1px 0 1px 2px !important;
+}
+
+.snarkTorrentInfo th {
+     padding: 4px !important;
 }
 
 .snarkTorrentInfo td {
@@ -283,16 +287,15 @@ table.SnarkTorrents {
 }
 
 table.SnarkTorrentInfo {
-     margin-bottom: 3 !important;
+     margin-bottom: 1px !important;
      background: url("../../console/dark/images/camotile2.png") repeat scroll center bottom #001100;
-/*     background-image: url('/themes/snark/dark/images/hat.png'), url("../../console/dark/images/camotile.png");
-     background-origin: padding-box;
-     background-position: bottom right, center center;
-     background-repeat: no-repeat, repeat;*/    
+     border-bottom: 1px solid #494;
 }
 
 table.SnarkDirInfo {
-     margin-top: -2px !important;     
+     margin-top: -2px !important;
+     margin-bottom: 0;
+     border-bottom: 1px solid #494;
 }
 
 .snarkDirInfo thead img {
@@ -300,7 +303,7 @@ table.SnarkDirInfo {
 }
 
 .SnarkDirInfo td {
-     min-width: 0px !important;     
+     min-width: 0px !important;
 }
 
 .SnarkDirInfo td:nth-child(n+1) {
@@ -308,7 +311,7 @@ table.SnarkDirInfo {
 
 .SnarkDirInfo .headerpriority {
      text-align: center !important;
-     vertical-align: middle;    
+     vertical-align: middle;
 }
 
 
@@ -946,11 +949,11 @@ code {;
 }
 
 .trackerconfig th, .trackerconfig td, .trackerconfig th:last-child, .trackerconfig td:last-child {
-     text-align: left !important;     
+     text-align: left !important;
 }
 
 .trackerconfig td:first-child {
-     text-align: right !important;     
+     text-align: right !important;
 }
 
 input.trackername {
