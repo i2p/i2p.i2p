@@ -24,8 +24,8 @@
 </script>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=ERROR_CODE%> <%=ERROR_MESSAGE%></h1>
+<h1><%=ERROR_CODE%>&nbsp;<%=ERROR_MESSAGE%></h1>
 <div class="sorry" id="warning">
 <%=intl._("Sorry! You appear to be requesting a non-existent Router Console page or resource.")%><hr>
-<%=intl._("Error 404")%>: <%=ERROR_URI%> <%=intl._("not found")%>.
+<%=intl._("Error 404")%>: <%=ERROR_URI%>&nbsp;<%=intl._("not found")%>.
 </div></body></html>
