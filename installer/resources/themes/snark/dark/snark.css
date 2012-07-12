@@ -11,7 +11,7 @@ body {
 
 body.iframed {
      background: transparent url('../../console/dark/images/transparent.gif') !important;
-     margin: 6px 0 !important;
+     margin: 1px 0 !important;
 }
 
 .snarkTitle {
