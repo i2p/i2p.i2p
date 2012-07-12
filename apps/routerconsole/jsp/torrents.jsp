@@ -27,6 +27,10 @@
       doc.body.className += ' iframed';
   }
   function resizeFrame(f) {
+      // offsetHeight returns the height of the visible area for an object, in pixels.
+      // The value contains the height with the padding, scrollBar, and the border,
+      // but does not include the margin. Therefore, any content within the iframe
+      // should have no margins at the very top or very bottom to avoid a scrollbar.
       var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
       f.style.height = doc.body.offsetHeight + "px";
   }

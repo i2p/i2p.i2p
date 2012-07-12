@@ -225,6 +225,10 @@ hr {
      margin: 16px auto -8px auto !important;
 }
 
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
 .panel td:first-child {
      font-weight: bold;	
 }
