@@ -237,7 +237,6 @@ public class UpdateHandler {
             if (_isPartial)
                 return;
             StringBuilder buf = new StringBuilder(64);
-            buf.append("<b>").append(_("Updating")).append(":</b><br>\n");
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
                          ((double)alreadyTransferred + (double)currentWrite + bytesRemaining);
             synchronized (_pct) {
