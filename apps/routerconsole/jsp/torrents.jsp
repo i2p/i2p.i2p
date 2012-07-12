@@ -21,12 +21,19 @@
   var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
-  function resizeFrame(f) { f.style.height = f.contentWindow.document.body.scrollHeight + "px"; }
-  function injectClass(f) { f.contentWindow.document.body.setAttribute('class', 'iframed'); }
+  function injectClass(f) {
+      f.className += ' iframed';
+      var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
+      doc.body.className += ' iframed';
+  }
+  function resizeFrame(f) {
+      var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
+      f.style.height = doc.body.offsetHeight + "px";
+  }
   function setupFrame() {
       f = document.getElementById("i2psnarkframe");
-      resizeFrame(f);
       injectClass(f);
+      resizeFrame(f);
   }
 </script>
 </head><body onload="initAjax()">

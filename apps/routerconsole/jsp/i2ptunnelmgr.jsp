@@ -21,16 +21,20 @@
   var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
   function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
   function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
-  function resizeFrame(f) {
-      var body = f.contentWindow.document.body,
-          html = f.contentWindow.document.documentElement;
-      f.style.height = body.scrollHeight + "px";
+  function injectClass(f) {
+      f.className += ' iframed';
+      var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
+      doc.body.className += ' iframed';
+      doc.getElementsByClassName('panel')[0].className += ' iframed';
   }
-  function injectClass(f) { f.contentWindow.document.body.setAttribute('class', 'iframed'); }
+  function resizeFrame(f) {
+      var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
+      f.style.height = doc.body.offsetHeight + "px";
+  }
   function setupFrame() {
       f = document.getElementById("i2ptunnelframe");
-      resizeFrame(f);
       injectClass(f);
+      resizeFrame(f);
   }
 </script>
 </head><body onload="initAjax()">
