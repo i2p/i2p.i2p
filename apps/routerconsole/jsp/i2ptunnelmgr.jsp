@@ -24,6 +24,23 @@
   function injectClass(f) {
       f.className += ' iframed';
       var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
+      if (doc.getElementsByClassName == undefined) {
+      doc.getElementsByClassName = function(className)
+      {
+          var hasClassName = new RegExp("(?:^|\\s)" + className + "(?:$|\\s)");
+          var allElements = document.getElementsByTagName("*");
+          var results = [];
+
+          var element;
+          for (var i = 0; (element = allElements[i]) != null; i++) {
+              var elementClass = element.className;
+              if (elementClass && elementClass.indexOf(className) != -1 && hasClassName.test(elementClass))
+                  results.push(element);
+          }
+
+          return results;
+      }
+      }
       doc.body.className += ' iframed';
       doc.getElementsByClassName('panel')[0].className += ' iframed';
   }
