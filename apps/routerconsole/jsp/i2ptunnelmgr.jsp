@@ -37,7 +37,7 @@
 
 <%@include file="summary.jsi" %>
 
-<h1><%=intl._("I2P Tunnel Manager")%></h1>
+<h1><%=intl._("I2P Tunnel Manager")%> <span class="newtab"><a href="/i2ptunnel/" target="_blank" title="<%=intl._("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="main">
 <iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="setupFrame()" allowtransparency="true">
 </iframe>

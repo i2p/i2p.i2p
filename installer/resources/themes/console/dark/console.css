@@ -768,6 +768,13 @@ h1 {
      box-shadow: 0 1px 5px #000;
 }
 
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
 h2 {
      font-size: 12pt;
      color: #EE9;

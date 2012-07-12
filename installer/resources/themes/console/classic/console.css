@@ -598,6 +598,13 @@ h1 {
      border-radius: 0 3px 0 0;
 }
 
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
 h2 {
      font-size: 14pt;
      padding: 10px;

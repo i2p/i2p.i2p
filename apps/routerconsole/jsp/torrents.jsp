@@ -33,7 +33,7 @@
 
 <%@include file="summary.jsi" %>
 
-<h1><%=intl._("I2P Torrent Downloader")%></h1>
+<h1><%=intl._("I2P Torrent Downloader")%> <span class="newtab"><a href="/i2psnark/" target="_blank" title="<%=intl._("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="main">
 <iframe src="/i2psnark/" width="100%" height="100%" frameborder="0" border="0" name="i2psnarkframe" id="i2psnarkframe" onload="setupFrame()" allowtransparency="true">
 </iframe>
