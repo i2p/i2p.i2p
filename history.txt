@@ -1,3 +1,8 @@
+2012-07-12 kytv
+* Translations from Transifex:
+  - Add new Greek translation
+  - Dutch translation update
+
 2012-07-01 zzz
  * i2psnark:
    - Don't send a keepalive to a peer we are going to disconnect
