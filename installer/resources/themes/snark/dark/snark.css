@@ -352,7 +352,9 @@ td:first-child {
      font-size: 8.5pt;
      font-weight: bold;
      text-align: center !important;
-     color: #bbb !important;
+     color: #4f2 !important;
+     padding: 5px;
+     border-bottom: 1px solid #494;
 }
 
 .snarkTorrentStatus {
@@ -570,7 +572,7 @@ input.r {
      border: 1px solid #494;
 }
 
-input[type=submit] {
+input[type=submit], input[type=submit]:visited, input[type=submit]:focus {
      text-shadow: 0px 0px #410;
      color: #494;
      background: #000;
@@ -589,8 +591,9 @@ input[type=submit]:hover {
 }
 
 input[type=submit]:active {
-     background: #000 !important;
-     color: #f60 !important;
+     border: 1px inset #f60;
+     background: #f60;
+     color: #EE9;
      text-shadow: 0 !important;
 }
 
@@ -613,6 +616,10 @@ input[type=text]:active, input[type=text]:hover, input.r:hover {
      color: #ff6;
      border: 1px solid #494;
      box-shadow: none !important;
+}
+
+input[type=text], input.r {
+          min-width: 60px;     
 }
 
 input[type=radio] {
@@ -685,6 +692,7 @@ select {
      border-radius: 4px 0 0 4px;
      border: 1px solid #494;
      margin: 2px 4px 2px 0;
+     min-width: 90px;
 }
 
 select:hover, textarea:hover {
@@ -889,7 +897,7 @@ code {;
 }
 
 .snarknavbar {
-     margin: -10px 0 5px 0 !important;
+     margin: -9px 0 6px 0 !important;
      padding: 12px 10px 10px;
 /*
      border: 1px solid #101;
@@ -911,6 +919,11 @@ code {;
      width: 70%;
      text-align: center;
  }
+
+/* opera targetted hack */
+x:-o-prefocus, .snarknavbar {
+     margin: -7px 0 5px 0 !important;
+}
 
 .snarknavbar img {
      border: 0;
