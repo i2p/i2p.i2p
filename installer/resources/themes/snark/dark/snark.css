@@ -12,6 +12,7 @@ body {
 body.iframed {
      background: transparent url('../../console/dark/images/transparent.gif') !important;
      margin: 1px 0 !important;
+     margin: 1px 0 !important;
 }
 
 .snarkTitle {
@@ -20,11 +21,11 @@ body.iframed {
      text-align: center;
 }
 
-.snarkRefresh:link,.snarkRefresh:visited {
+.snarkRefresh:link, .snarkRefresh:visited {
      text-decoration: none !important;
      text-transform: uppercase !important;
      padding: 4px 16px 5px !important;
-     margin: -5px -8px -5px 0 !important;
+     margin: 0 -8px 0 0 !important;
      letter-spacing: 0em;
      font-weight: bold;
      font-size: 9pt;
@@ -34,57 +35,39 @@ body.iframed {
      -moz-border-radius: 0px;
      -khtml-border-radius: 3px;
      border-radius: 0px;
-/*     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px 0 #f90; */
      border: 1px outset #494;
 }
 
 .snarkRefresh:hover {
      text-decoration: none !important;
      text-transform: uppercase !important;
-     padding: 1px 16px;
      font-weight: bold;
      font-size: 9pt;
      color: #f50;
-     background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
      background: #000 !important;
      -moz-border-radius: 0;
      -khtml-border-radius: 0;
      border-radius: 0;
-/*   -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px  #f90; */
 }
 
 .snarkRefresh:active {
      text-decoration: none !important;
-     text-transform: uppercase !important;
-     padding: 0 16px;
-     font-weight: bold;
-     font-size: 9pt;
      color: #fb0;
-     background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
+     background: #000 !important;
+}
+
+
+.snarkRefresh:first-child {
+     -moz-border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
 }
 
 .snarkRefresh:last-child {
      -moz-border-radius: 0 3px 3px 0px;
      -khtml-border-radius: 0 3px 3px 0;
      border-radius: 0 3px 3px 0;
-/*     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px 0 #f90;*/
-     border: 1px outset #494;
-}
-
-.snarkRefresh:first-child {
-     -moz-border-radius: 3px 0 0 3px;
-     -khtml-border-radius: 3px 0 0 3px;
-     border-radius: 3px 0 0 3px;
-/*     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px 0  #f90; */
-     border: 1px outset #494;
+     margin-top: -5px !important;
 }
 
 .snarkMessages {

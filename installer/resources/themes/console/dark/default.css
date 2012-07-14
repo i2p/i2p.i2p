@@ -20,6 +20,7 @@ body {
 
 body.iframed {
      background: transparent url('images/transparent.gif') !important;
+     padding-top: 5px;
 }
 
 div {
