@@ -243,6 +243,11 @@ div.newsheadings {
      margin: 0 0 0 10px;
 }
 
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
+}
+
 div.tunnels table {
      margin: 0 -7px !important;
      width: 193px;
