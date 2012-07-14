@@ -40,11 +40,10 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.SecureFileOutputStream;
 
-public class AddressbookBean
+public class AddressbookBean extends BaseBean
 {
 	protected String book, action, serial, lastSerial, filter, search, hostname, destination;
 	protected int beginIndex, endIndex;
-	protected final Properties properties;
 	private Properties addressbook;
 	private int trClass;
 	protected final LinkedList<String> deletionMarks;
@@ -82,39 +81,10 @@ public class AddressbookBean
 
 	public AddressbookBean()
 	{
-		properties = new Properties();
+		super();
 		deletionMarks = new LinkedList();
 		beginIndex = 0;
 		endIndex = DISPLAY_SIZE - 1;
-	}
-
-	private long configLastLoaded = 0;
-	private static final String PRIVATE_BOOK = "private_addressbook";
-	private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
-
-	protected void loadConfig()
-	{
-		long currentTime = System.currentTimeMillis();
-		
-		if( !properties.isEmpty() &&  currentTime - configLastLoaded < 10000 )
-			return;
-		
-		FileInputStream fis = null;
-		try {
-			properties.clear();
-			fis = new FileInputStream( ConfigBean.configFileName );
-			properties.load( fis );
-			// added in 0.5, for compatibility with 0.4 config.txt
-			if( properties.getProperty(PRIVATE_BOOK) == null)
-				properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
-			configLastLoaded = currentTime;
-		}
-		catch (Exception e) {
-			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
-		} finally {
-			if (fis != null)
-				try { fis.close(); } catch (IOException ioe) {}
-		}	
 	}
 
 	public String getFileName()

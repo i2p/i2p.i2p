@@ -36,38 +36,10 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.util.SecureFileOutputStream;
 
-public class SubscriptionsBean
+public class SubscriptionsBean extends BaseBean
 {
 	private String action, fileName, content, serial, lastSerial;
 	
-	Properties properties;
-	
-	public SubscriptionsBean()
-	{
-		properties = new Properties();
-	}
-	private long configLastLoaded = 0;
-	private void loadConfig()
-	{
-		long currentTime = System.currentTimeMillis();
-		
-		if( !properties.isEmpty() &&  currentTime - configLastLoaded < 10000 )
-			return;
-		
-		FileInputStream fis = null;
-		try {
-			properties.clear();
-			fis = new FileInputStream( ConfigBean.configFileName );
-			properties.load( fis );
-			configLastLoaded = currentTime;
-		}
-		catch (Exception e) {
-			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
-		} finally {
-			if (fis != null)
-				try { fis.close(); } catch (IOException ioe) {}
-		}	
-	}
 	public String getAction() {
 		return action;
 	}

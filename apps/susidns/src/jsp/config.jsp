@@ -36,6 +36,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application"/>
 <jsp:useBean id="cfg" class="i2p.susi.dns.ConfigBean" scope="session"/>
+<jsp:useBean id="base" class="i2p.susi.dns.BaseBean" scope="session" />
 <jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="cfg" property="*" />
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -43,12 +44,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._("configuration")%> - susidns</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+<link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
 </div><hr>
 <div id="navi">
 <p>
