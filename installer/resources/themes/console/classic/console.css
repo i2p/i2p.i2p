@@ -609,6 +609,10 @@ span.newtab {
      float: right;
      letter-spacing: 0;
 }
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
+}
 
 h2 {
      font-size: 14pt;

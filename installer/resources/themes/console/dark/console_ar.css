@@ -82,3 +82,10 @@ div.joblog li, div.newsheadings li {
     text-align: left;
     direction: ltr;
 }
+
+span.newtab {
+     text-align: left;
+     font-size: 8pt;
+     float: left;
+     letter-spacing: 0;
+}
