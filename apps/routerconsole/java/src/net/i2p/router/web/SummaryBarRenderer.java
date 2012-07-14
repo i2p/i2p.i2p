@@ -135,7 +135,7 @@ public class SummaryBarRenderer {
 
                    "<hr class=\"b\"><table><tr><td>" +
 
-                   "<a href=\"/susimail/susimail\" target=\"blank\" title=\"")
+                   "<a href=\"/webmail\" target=\"_top\" title=\"")
            .append(_("Anonymous webmail client"))
            .append("\">")
            .append(_("Email"))
@@ -225,7 +225,7 @@ public class SummaryBarRenderer {
            .append(_("I2PTunnel"))
            .append("</a>\n" +
 
-                   "<a href=\"/susidns/index\" target=\"_blank\" title=\"")
+                   "<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
            .append(_("Addressbook"))

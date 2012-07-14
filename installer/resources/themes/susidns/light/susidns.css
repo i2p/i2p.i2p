@@ -4,6 +4,11 @@ body {
 	color:#001;
 }
 
+body.iframed {
+	background: transparent !important;
+	margin: 0;
+}
+
 p {
 	color:black;
 	line-height:12pt;
@@ -119,6 +124,10 @@ p.footer {
   font-size: 10pt !important;
   line-height: 160% !important;
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+.iframed .page {
+  margin: 0 20px;
 }
 
 input[type=submit] {
