@@ -86,7 +86,7 @@
 <%=intl._("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
 <%=intl._("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
-<center><img src="<%=base.getTheme()%>images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
+<center><img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
 </div>
 <hr>
 <div id="footer">
