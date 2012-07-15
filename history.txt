@@ -1,3 +1,6 @@
+2012-07-15 zzz
+ * XORComparator: Reduce object churn (Ticket #658)
+
 2012-07-12 kytv
 * Translations from Transifex:
   - Add new Greek translation
