@@ -192,7 +192,7 @@ div.routersummary tr {
 }
 
 div.routersummary form {
-     margin: -5px 0 -7px;
+     margin: -4px 0 -6px;
 }
 
 div.routersummary form:first-child {
@@ -212,6 +212,7 @@ div.refresh {
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 1px 1px 1px rgba(0, 16, 0, 0.8);
      text-shadow: 0px 0px 2px #101 !important;
+     padding: 0 1px;
 }
 
 div.routersummary a:hover {
@@ -841,7 +842,7 @@ button, button:visited {
      margin: 2px 3px;
      text-align: center;
      vertical-align: middle;
-     min-width: 76px;
+     min-width: 70px;
      -moz-box-shadow: inset 0px 1px 1px 0px #494;
      -khtml-box-shadow: inset 0px 1px 1px 0px #191;
      box-shadow: inset 0px 1px 1px 0px #191;
