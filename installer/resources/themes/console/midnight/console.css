@@ -226,6 +226,10 @@ div.routersummary h4 {
      line-height: 100% !important;
 }
 
+div.routersummary ul {
+     text-align: left !important;
+}
+
 div.routersummary table {
      border: 0;
      text-align: center !important;
@@ -263,6 +267,16 @@ div.routersummary tr {
 div.routersummary td:first-child {
      max-width: 90px;
      overflow: hidden;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 10px;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
 }
 
 div.tunnels table{
@@ -511,6 +525,45 @@ div.configure h2:first-child {
      margin-top: 15px;
 }
 
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td {
+     font-weight: bold;
+     font-size: 9pt;  
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
+}
+
 .topshimten {
      margin-top: 15px;
      margin-bottom: 15px;
@@ -562,6 +615,18 @@ h1 {
      min-width: 600px;
      line-height: 100%;
      color: #fff;
+}
+
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
 }
 
 h2 {

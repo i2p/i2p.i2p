@@ -12,7 +12,13 @@ input.default {
     visibility: hidden;
 }
 </style>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
+  function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
+  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+</script>
+</head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Home Page Configuration")%></h1>

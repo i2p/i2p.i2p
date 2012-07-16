@@ -1,0 +1,965 @@
+/* I2PSnark theme "Camo" aka Dark by dr|z3d */
+/* Assange Asylum Edition */
+/* Thanks to http://www.wikistencil.org/?p=55 for the Assange image */
+
+body {
+     color: #ee9;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     background: url("../../console/dark/images/camotile.png") repeat scroll center bottom #000;
+     background: #000;
+}
+
+body.iframed {
+     background: transparent url('../../console/dark/images/transparent.gif') !important;
+     margin: 1px 0 !important;
+     margin: 1px 0 !important;
+}
+
+.snarkTitle {
+     font-size: 12pt;
+     font-weight: bold;
+     text-align: center;
+}
+
+.snarkRefresh:link, .snarkRefresh:visited {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 4px 16px 5px !important;
+     margin: 0 -8px 0 0 !important;
+     letter-spacing: 0em;
+     font-weight: bold;
+     font-size: 9pt;
+     color: #f70;
+     text-shadow: 1px 1px #420;
+     background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
+     -moz-border-radius: 0px;
+     -khtml-border-radius: 3px;
+     border-radius: 0px;
+     border: 1px outset #494;
+}
+
+.snarkRefresh:hover {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     font-weight: bold;
+     font-size: 9pt;
+     color: #f50;
+     background: #000 !important;
+     -moz-border-radius: 0;
+     -khtml-border-radius: 0;
+     border-radius: 0;
+}
+
+.snarkRefresh:active {
+     text-decoration: none !important;
+     color: #fb0;
+     background: #000 !important;
+}
+
+
+.snarkRefresh:first-child {
+     -moz-border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
+}
+
+.snarkRefresh:last-child {
+     -moz-border-radius: 0 3px 3px 0px;
+     -khtml-border-radius: 0 3px 3px 0;
+     border-radius: 0 3px 3px 0;
+     margin-top: -5px !important;
+}
+
+.snarkMessages {
+     font: normal 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     text-align: left;
+     margin: 0 0 9px 0;
+     padding: 3px 5px 3px 5px;
+     border-spacing: 0px;
+     overflow: auto;
+     color: #6f2;
+     max-height: 50px;
+     min-height: 50px;
+     width: auto;
+     background: #000 url('images/assange.png') no-repeat scroll right center;
+     border-bottom: 1px solid #494;
+}
+
+.snarkMessages li {
+     list-style: square;
+}
+
+.snarkMessages a:link, .snarkMessages a:visited {
+     color: #69f !important;
+}
+
+.snarkMessages a:hover {
+     color: #f90 !important;
+}
+
+.snarkMessages ul {
+     margin: 0;
+     padding: 0 0 0 16px;
+}
+
+.snarkMessages p {
+     font-style: italic;
+     margin: 0;
+     text-align: right;
+}
+
+.snarkMessages img, .snarkMessages img:hover {
+     float: right;
+     margin: -4px -5px 4px 4px;
+     opacity: 1;
+     border: 1px solid #494;
+     border-right: 0 none;
+     border-top: 0 none;
+}
+
+.logshim {
+     margin-top: -10px !important;
+}
+
+pre {
+     width: 100%;
+     font: 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     padding: 0;
+     text-align: left !important;
+     height: 8px;
+     color: #35f;
+     font-weight: bold !important; 
+}
+
+table {
+     margin: 0px 0px 10px 0px;
+     border: 0px;
+     padding: 0px;
+     border-spacing: 0px;
+     border-collapse: collapse;
+     color: #323;
+     width: 100%;
+     opacity: 1 !important;
+}
+
+tr { 
+     opacity: 1;
+}
+
+thead, tfoot {
+     text-shadow:0 2px 5px #333333;
+     background: #000;
+}
+
+thead a, tfoot a {
+     text-shadow:1px 1px #550000;
+} 
+
+thead {
+     border-bottom: 1px solid #101;
+}
+
+th {
+     padding: 3px 2px;
+     font-size: 8pt;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494;
+     color: #ee9;
+      whitespace: nowrap;
+     background: #000;
+     background-image: -moz-linear-gradient(center top , #010, #000);
+}
+
+th:first-child {
+     text-align: left !important;
+     padding-left: 2px;
+}
+
+tfoot td:first-child {
+     text-align: left !important;
+     padding-left: 0px;
+}
+
+th:first-child img {
+     margin: 1px -2px 3px 1px !important;
+}
+
+th:nth-child(2) img {
+     margin: 1px 5px 3px 2px !important;
+}
+
+tfoot th {
+     padding-bottom: 4px !important;
+}
+
+tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) img, tfoot:nth-child(4) img {
+     margin: 0px 2px 3px 0px !important;
+     padding-right: 0 !important;
+}
+
+tfoot tr:nth-child(n+1) {
+     text-align: left;
+}
+
+.headerstatus {
+     text-align: left;
+     padding-left: 15px;
+}
+
+.headerpriority {
+     text-align: left;
+     padding-left: 10px;
+}
+
+.ParentDir {
+     background: #000;
+     font-size: 8pt;
+     border: 0px inset #101 !important;
+     border-left: 0 !important;
+     border-right: 0 !important;
+     text-align: left !important;
+     padding: 4px 0;
+}
+
+.priority {
+     font-size: 7pt;
+     vertical-align: center;
+     min-width: 160px;
+}
+
+.SnarkTorrents {
+     margin: 0;
+     border: 1px solid #101;
+     background: #000;
+}
+
+table.SnarkTorrents {
+     margin-top: -1px !important;
+}
+
+/*
+.SnarkTorrents th img {
+     max-height: 22px;
+}
+*/
+
+.SnarkTorrents td {
+     line-height: 90%;
+}
+
+.SnarkTorrents td:nth-child(1) {
+          width: 24px !important;
+}
+
+.SnarkTorrents td:nth-child(3), .SnarkTorrents td:nth-child(4) {
+     width: 20px !important;
+}
+
+.snarkTorrentInfo img {
+     max-height: 16px !important;
+     margin: 1px 0 1px 2px !important;
+}
+
+.snarkTorrentInfo th {
+     padding: 4px !important;
+}
+
+.snarkTorrentInfo td {
+     text-align: left !important;
+     padding: 0 1px !important;
+}
+
+table.SnarkTorrentInfo {
+     margin-bottom: 1px !important;
+     background: url("../../console/dark/images/camotile2.png") repeat scroll center bottom #001100;
+     border-bottom: 1px solid #494;
+}
+
+table.SnarkDirInfo {
+     margin-top: -2px !important;
+     margin-bottom: 0;
+     border-bottom: 1px solid #494;
+}
+
+.snarkDirInfo thead img {
+     margin: 0 -1px 0 0 !important;
+}
+
+.SnarkDirInfo td {
+     min-width: 0px !important;
+}
+
+.SnarkDirInfo td:nth-child(n+1) {
+}
+
+.SnarkDirInfo .headerpriority {
+     text-align: center !important;
+     vertical-align: middle;
+}
+
+
+td {
+     padding: 1px;
+     color: #ee9 !important;
+      opacity: 1;
+     font-size: 8pt;
+}
+
+.mainsection td {
+     color: #111;
+}
+
+td:first-child {
+     text-align: right;
+     font-size: 8pt;
+}
+
+.center {
+     text-align: center !important;
+}
+
+.snarkTorrentName {
+     text-shadow: 1px 1px #550000;
+     padding: 0;
+     line-height: 90%;
+}
+
+.snarkTorrentAction {
+     text-shadow: 1px 1px #550000;
+     padding: 1px 1px 1px 1px !important;
+     margin: 0 !important;
+     text-align: center;
+     width: 60px; 
+}
+
+.snarkTorrentAction img {
+     margin: 0 2px !important;
+     opacity: 1;
+}
+
+.snarkTorrentAction img:hover {
+     -moz-box-shadow: 0 0 1px 1px #f90;
+     opacity: 1;
+}
+
+.snarkTorrentEven {
+     font-size: 8pt;
+     background: #000;
+}
+
+.snarkTorrentNoneLoaded {
+     background: #000;
+     font-size: 8.5pt;
+     font-weight: bold;
+     text-align: center !important;
+     color: #4f2 !important;
+     padding: 5px;
+     border-bottom: 1px solid #494;
+}
+
+.snarkTorrentStatus {
+     padding: 2px 2px 2px 0;
+     line-height: 90%;
+}
+
+.snarkTorrentStatus:first-child {
+     text-align: left !important;
+     padding-left: 0px;
+     min-width: 48px;
+     font-weight: bold;
+     color: #dd9 !important;
+     font-size: 8pt;
+     padding: 1px !important;
+}
+
+.snarkTorrentStatus:first-child img {
+     margin-right: 10px !important;
+     margin-left: 6px;
+}
+
+.snarkTorrentStatus, .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+     font-size: 8pt;
+     padding: 0 3px;
+     line-height: 90%;
+     word-spacing: -0.15em;
+}
+
+.snarkTorrentDownloaded {
+     color: #ee9 !important;
+}
+
+.snarkTorrentUploaded {
+     color: #ee9 !important;
+}
+
+.snarkTorrentRateUp {
+     color: #ee9 !important;
+}
+
+.snarkTorrentRateDown {
+     color: #ee9 !important;
+}
+
+.snarkTorrentOdd {
+     background: #000;
+     font-size: 8pt;
+     border: 0px inset #101 !important;
+     border-left: 0 !important;
+     border-right: 0 !important;
+}
+
+.snarkTorrentOdd td, .snarkTorrentEven td {
+     border-top: 1px dotted #494 !important;
+}
+
+.snarkFileName {
+     padding: 4px 0px !important; 
+     text-align: left !important;
+     font-size: 8pt !important;
+}
+
+.snarkFileSize {
+     padding: 4px 2px;
+     font-weight: normal;
+     color: #2f6 !important;
+}
+
+.snarkFileStatus {
+     padding: 4px 5px 4px 15px;
+     text-align: center;
+     font-style: italic;
+     font-size: 8pt;
+     text-align: left;
+     min-width: 230px;
+}
+
+.snarkTorrentETA {
+     font-style: italic;
+     color: #dd7 !important;
+}
+
+.choked {
+     color: #f00000 !important;
+}
+
+.unchoked {
+     color: #00f000 !important;
+}
+
+.thumb {
+     max-height: 64px;
+     max-width: 96px;
+}
+
+.snarkNewTorrent {
+     font-size: 9pt;
+}
+
+.snarkAddInfo {
+     font-size: 8.5pt;
+     line-height: 130% !important;
+}
+
+.snarkConfigTitle {
+     font-size: 10.5pt;
+     font-weight: bold;
+     padding: 1px 25px 4px 22px;
+     margin: 5px 0 10px 0 !important;
+     letter-spacing: 0.02em;
+     border: 1px solid #494;
+      -moz-border-radius: 0 0 5px 5px;
+      -khtml-border-radius: 0 0 5px 5px;
+      border-radius: 0 0 5px 5px;
+     border-top: 0;
+     text-shadow: 0px 3px 5px #323;
+     background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
+     font-variant: small-caps !important;
+     box-shadow: 0 1px 3px #000;
+}
+
+div.newtorrentsection .snarkConfigTitle, div.addtorrentsection .snarkConfigTitle, div.configsectionpanel .snarkConfigTitle {
+     padding-top: 0 !important;	
+}
+
+.snarkConfigTitle img {
+	  margin-right: -3px;
+	  padding-bottom: 3px;
+}
+
+.snarkConfig {
+     font-size: 10pt;
+     width: 100%;
+}
+
+.page {
+     color: #310;
+     min-width: 700px !important;
+     margin: 5px 0 0 0;
+     padding: 10px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     font-size: 9pt !important;
+     line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center;
+     opacity: 1;
+     background: #000;
+}
+
+form {
+     margin-bottom: 0;
+}
+
+p {
+     line-height: 150%;
+}
+
+hr {
+     color: #444;
+     background: #444;
+     height: 1px;
+     border: 0px solid #444;
+     width: 0%;
+     margin: 5px 0 7px 0;
+     text-align: center;
+}
+
+a:link {	
+     color: #f70;
+     text-decoration: none;
+     font-weight: normal;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #f50;
+     text-decoration: none;
+     font-weight: normal;
+}
+
+a:hover {
+     color: #f90;
+     font-weight: normal;
+}
+
+a:active {
+     color: #f90;
+     font-weight: normal;
+}
+
+input {
+     font-size: 9pt;
+     font-weight: bold;
+     text-align: left;
+     padding: 3px 4px !important;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     background: #000;	 
+     color: #494;
+     margin: 2px 4px 2px 0;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+}
+
+input.r {
+     text-align: right;
+     background: #000;
+     border: 1px solid #494;
+}
+
+input[type=submit], input[type=submit]:visited, input[type=submit]:focus {
+     text-shadow: 0px 0px #410;
+     color: #494;
+     background: #000;
+     border: 1px outset #191;
+     padding: 2px;
+     box-shadow: 0 1px 1px 0 #119911 inset;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     margin-top: 6px;
+}
+
+input[type=submit]:hover {
+     border: 1px outset #f60;
+     background-color: #000;
+     color: #f60;
+     box-shadow: 0 1px 1px 0 #ee9 inset;
+}
+
+input[type=submit]:active {
+     border: 1px inset #f60;
+     background: #f60;
+     color: #EE9;
+     text-shadow: 0 !important;
+}
+
+input[type=image], thead img {
+     padding: 0 !important;
+     -moz-border-radius: 0px;
+     -khtml-border-radius: 0px;
+     border-radius: 0px;
+     border: medium none;
+     margin: 0 2px;
+     opacity: 1;
+}
+
+input[type=image]:hover, thead img:hover {
+     opacity: 1;
+}
+
+input[type=text]:active, input[type=text]:hover, input.r:hover {
+     background: #000;
+     color: #ff6;
+     border: 1px solid #494;
+     box-shadow: none !important;
+}
+
+input[type=text], input.r {
+          min-width: 60px;     
+}
+
+input[type=radio] {
+     padding: 2px;
+     margin: 0 3px 0 8px;
+     vertical-align: bottom;
+}
+
+
+/*
+thead input[type=submit], tfoot input[type=submit], .headerpriority {
+     text-align: right !important;	
+}
+*/
+
+input.default { width: 1px; height: 1px; visibility: hidden; }
+
+/*
+input.accept, input.accept:selected {
+     background: #000;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+
+input.add, input.add:selected {
+     background: #000;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+
+input.create, input.create:selected {
+     background: #000;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+
+input.cancel, input.cancel:selected {
+     background: #000;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+
+input.create, input.create:selected {
+     background: #000 url('images/create.png') no-repeat 2px center;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+
+input.delete, input.delete:selected {
+     background: #000 url('../../console/images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+
+input.reload, input.reload:selected {
+     background: #000 url('../../console/images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 16px !important;
+     min-height: 22px;
+}
+*/
+
+select {
+     background: #000 !important;
+     color: #494;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font-weight: bold;
+     padding: 2px 2px 2px 3px;
+     -moz-border-radius: 4px 0 0 4px;
+     -khtml-border-radius: 4px 0 0 4px;
+     border-radius: 4px 0 0 4px;
+     border: 1px solid #494;
+     margin: 2px 4px 2px 0;
+     min-width: 90px;
+}
+
+select:hover, textarea:hover {
+     background: #000 !important;
+     color: #f60 !important;
+}
+
+textarea:hover {
+     color: #ff6 !important;
+}     
+
+textarea {
+     background: #000;
+     color: #494;
+     font-weight: bold;
+     padding: 1px 4px 0px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     font-size: 8pt;
+}
+
+img {
+     border: none;
+     margin: 0 3px 1px 3px;
+     vertical-align: middle;
+     opacity: 1.0;
+     line-height: 100%;
+}
+
+img:hover {
+     border: none;
+     opacity: 1;
+     line-height: 100%;
+}
+
+.infoz {
+     margin: 0 -1px 0 0 !important;
+     padding: 0 !important;
+     lineheight: 100%;
+     float: left;
+}
+
+.infoz img {
+     border: none;
+     opacity: 1 !important;
+}
+
+.infoz img:hover {
+     opacity: 1 !important;
+}
+
+div.newtorrentsection td:first-child, div.addtorrentsection td:first-child, div.configsectionpanel td:first-child {
+     width: auto !important;
+}
+
+div.configsectionpanel td:first-child {
+	  padding-right: 5px;
+}
+
+div.section,div.mainsection div.section,div.mainsection {
+     margin: 0;
+     padding: 0px;
+     border: 1px solid #494;
+     border-bottom: none;
+/*     border-top: 2px solid #494;
+     border-bottom: 2px solid #494; */
+     color: #001;
+/*     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px; */
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     word-wrap: break-word;
+     text-align: center;
+     background: #000;
+     opacity: 1 !important;
+}
+
+div.newtorrentsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 0px 10px;
+     border: 1px solid #494;
+     text-align: center;
+     color: #ee9;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     background: #000 url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
+     opacity: 1.0;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url('/themes/snark/ubergine/images/snark_create.png'), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center right, center center;
+     background-repeat: no-repeat, repeat;
+}
+
+div.addtorrentsection {
+     margin: 10px 0;
+     padding: 0 10px;
+     border: 1px solid #494;
+     text-align: center;
+     color: #ee9;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     background: #000 url('/themes/snark/dark/images/snark_add.png') no-repeat scroll right center;
+     opacity: 1.0;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url('/themes/snark/dark/images/snark_add.png'), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center right, center center;
+     background-repeat: no-repeat, repeat;
+}
+
+div.configsection {
+     margin: 0;
+     padding: 0 10px 15px 10px;
+     border: 1px solid #494;
+     color: #ee9;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     text-align: center;
+     background: #000;
+     font-weight: bold;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url("../../console/dark/images/camotile2.png"), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center center, center center;
+     background-repeat: repeat, repeat;
+}
+
+div.configsectionpanel {
+     margin: 9px 0 0 0;
+     padding: 0 10px;
+     border: 1px solid #494;
+     color: #ee9;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     text-align: center;
+     background: #000 url('/themes/snark/dark/images/configuration.png') no-repeat scroll right center;
+     font-weight: bold;
+     background-attachment: scroll;
+     background-clip: border-box;
+     background-color: transparent;
+     background-image: url('/themes/snark/dark/images/configuration.png'), url("../../console/dark/images/camotile2.png");
+     background-origin: padding-box;
+     background-position: center right, center center;
+     background-repeat: no-repeat, repeat;
+}
+
+.newtorrentsection form, .configsection form, .addtorrentsection form {
+     color: #ee9 !important;
+}
+
+div.configsection table{
+     color: #ffb;
+     opacity: 1;
+}
+
+div.configsection a {
+     color: #f60;
+     text-shadow: 1px 1px #500;
+     font-weight: bold;
+}
+
+div.configsection a:hover {
+     color: #f90;
+     text-decoration: none;
+}
+
+code {;
+     font-size: 8pt;
+     color: #ff6;
+     padding: 0 2px;
+     font-weight: bold;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+
+.snarknavbar {
+     margin: -9px 0 6px 0 !important;
+     padding: 12px 10px 10px;
+/*
+     border: 1px solid #101;
+     -moz-border-radius: 0 0 8px 8px;
+     -khtml-border-radius: 0 0 8px 8px;
+     border-radius: 0 0 8px 8px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
+     background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
+*/
+     background: none !important;
+     text-transform: uppercase !important;
+     letter-spacing: 0em !important;
+     font-weight: bold;
+     font-size: 11.5pt;
+     color: #000;
+     min-width: 600px;
+     width: 70%;
+     text-align: center;
+ }
+
+/* opera targetted hack */
+x:-o-prefocus, .snarknavbar {
+     margin: -7px 0 5px 0 !important;
+}
+
+.snarknavbar img {
+     border: 0;
+     margin: 1px -8px -1px -2px;
+     padding: 1px 0 0px !important;
+     vertical-align: top;
+}
+
+.routerdown {
+     color: #ee9;
+}
+
+.trackerconfig {
+     text-align: left !important;
+}
+
+.trackerconfig th:nth-child(n+4), .trackerconfig th:nth-child(n+5), .trackerconfig td:nth-child(n+4), .trackerconfig td:nth-child(n+5) {
+     text-align: center !important;
+}
+
+.trackerconfig th, .trackerconfig td, .trackerconfig th:last-child, .trackerconfig td:last-child {
+     text-align: left !important;
+}
+
+.trackerconfig td:first-child {
+     text-align: right !important;
+}
+
+input.trackername {
+     width: 100px;
+}
+
+input.trackerhome {
+     width: 200px;
+}
+
+input.trackerannounce {
+     width: 230px;
+}

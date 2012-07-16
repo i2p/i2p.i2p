@@ -24,7 +24,8 @@
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     
     <% if (indexBean.allowCSS()) {
-  %><link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
+  %><link rel="icon" href="<%=indexBean.getTheme()%>images/favicon.ico">
+    <link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
   %>

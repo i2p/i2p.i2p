@@ -1,3 +1,37 @@
+2012-07-16 str4d
+ * console: work towards better integration
+   - Wrapped the bundled apps in iFrames (with a link in the page header to
+     open the app in a new tab):
+     - i2ptunnel
+     - i2psnark
+     - susimail
+     - susidns
+   - Theme improvements
+     - Added theme support to susimail and susidns
+       - "susimail.theme=foo" in susimail.config
+       - "theme=foo" on susidns config page
+     - Extensive work on dark console theme (dr|z3d)
+       - Improved integration of i2ptunnel in iframe
+       - General improvements
+     - New dark themes for i2psnark, susimail and susidns which integrate well
+       with dark console theme (dr|z3d)
+     - Tweaks to other themes (console and i2psnark) to work with the various
+       structural changes (dr|z3d)
+     - Added per-theme favicons
+     - Updated IE shim to fix some issues
+   - Summary bar improvements
+     - Updated every console page to use Ajax for the summary bar
+       - Falls back to iFrame if JS disabled
+       - Ajax refresh time is adjustable
+     - The summary bar is now customizable; sections can be added, removed and
+       reordered as desired
+     - Added/updated tooltips
+     - Added a new summary bar section to show news headings when the main news
+       display is hidden
+   - Changes to structure of /home to bring it in line with rest of console
+ * i2psnark
+   - Reworked the torrent info/file manager page to improve the layout
+
 2012-07-15 zzz
  * XORComparator: Reduce object churn (Ticket #658)
 

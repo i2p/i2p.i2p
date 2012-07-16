@@ -182,6 +182,10 @@ div.routersummary h4 {
      box-shadow: 0px 0px 1px 1px #bdf;
 }
 
+div.routersummary ul {
+     text-align: left !important;
+}
+
 div.routersummary table {
      border: 0;
      text-align: center !important;
@@ -237,6 +241,16 @@ div.routersummary img:first-child  {
 div.routersummary img:hover:first-child {
      margin-bottom: -2px !important;
      opacity: 1;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 10px;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
 }
 
 div.tunnels {
@@ -493,6 +507,45 @@ div.configure h3, div.graphspanel h3 {
      -khtml-border-radius: 0 4px 4px 0;
      background: #ffe;
      text-align: left;
+}
+
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td {
+     font-weight: bold;
+     font-size: 9pt;  
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
 }
 
 div.graphspanel {
@@ -842,6 +895,18 @@ h1 {
      -moz-border-radius: 8px;
      -khtml-border-radius: 8px;
      min-width: 500px;
+}
+
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
 }
 
 h2 {

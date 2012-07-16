@@ -1,134 +1,142 @@
 body {
-	background-color: #eef;
-	color:#001;
-	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background-color: #eef;
+     color:#001;
+     font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+body.iframed {
+     background: transparent !important;
+     margin: 0;
 }
 
 li {
-
-	color:#001;
-	line-height:12pt;
-	font-size:10pt;
-	margin-left:5mm;
-	margin-right:5mm;
+     color:#001;
+     line-height:12pt;
+     font-size:10pt;
+     margin-left:5mm;
+     margin-right:5mm;
 }
 
 p {
-	color:#001;
-	line-height:12pt;
-	margin-left:5mm;
-	margin-right:5mm;
-	font-size:10pt;
+     color:#001;
+     line-height:12pt;
+     margin-left:5mm;
+     margin-right:5mm;
+     font-size:10pt;
 }
 
 p.hl {
-	font-size:12pt;
-	letter-spacing:2pt;
-	line-height:18pt;
-	font-weight:bold;
+     font-size:12pt;
+     letter-spacing:2pt;
+     line-height:18pt;
+     font-weight:bold;
 }
 
 p.text {
-	margin-left:10mm;
-	margin-right:10mm;
+     margin-left:10mm;
+     margin-right:10mm;
 }
 
 p.error {
-	color:#ff0000;
+     color:#ff0000;
 }
 
 p.info {
-	color:#327BBF;
+     color:#327BBF;
 }
 
 span.coloured {
-	color:#327BBF;
+     color:#327BBF;
 }
 
 p.footer {
-	margin-left:10mm;
-	margin-right:10mm;
-  font-size:8pt;
-  line-height:10pt;
+     margin-left:10mm;
+     margin-right:10mm;
+     font-size:8pt;
+     line-height:10pt;
 }
 
 p.mailbody {
-  font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-	margin-left:1cm;
-	margin-right:1cm;
-   text-align: left;
+     font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     margin-left:1cm;
+     margin-right:1cm;
+      text-align: left;
 }
 
 a {
-	color:#327BBF;
-	text-decoration:none;
+     color:#327BBF;
+     text-decoration:none;
 }
 
 a:hover {
-	text-decoration:underline;
+     text-decoration:underline;
 }
 
 td {
 
-	color:#001;
-	line-height:12pt;
-	margin-left:5mm;
-	margin-right:5mm;
-	font-size:10pt;
+     color:#001;
+     line-height:12pt;
+     margin-left:5mm;
+     margin-right:5mm;
+     font-size:10pt;
 }
 
 tr.list0 {
-	background-color:#e0e0e0;
+     background-color:#e0e0e0;
 }
 
 tr.list1 {
-	background-color:#ffffff;
+     background-color:#ffffff;
 }
 
 table.noborder {
-	margin-left:0mm;
-	margin-top:0mm;
-	margin-right:0mm;
+     margin-left:0mm;
+     margin-top:0mm;
+     margin-right:0mm;
 }
 
 pre {
-  font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-	margin-left:1cm;
-	margin-right:1cm;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     margin-left:1cm;
+     margin-right:1cm;
 }
 
 .page {
-	background-color: #fff;
-	color:#001;
-  margin: 20px;
-  padding: 0 20px;
-  -moz-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
-  border: 1px solid #001;
-  font-size: 10pt !important;
-  line-height: 160% !important;
-  -moz-box-shadow: inset 0px 0px 1px 0px #002;
-  text-align: center;
+     background-color: #fff;
+     color:#001;
+     margin: 20px;
+     padding: 0 20px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #001;
+     font-size: 10pt !important;
+     line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center;
+}
+
+.iframed .page {
+     margin: 0 20px;
 }
 
 table {
-  text-align: justify;
-  width: 100%;
+     text-align: justify;
+     width: 100%;
 }
 
 th {
-  font-size: 10pt;
-  font-weight: bold;
+     font-size: 10pt;
+     font-weight: bold;
 }
 
 form {
-  line-height: 160%
+     line-height: 160%
 }
 
 .mailhead {
-  font-size: 9pt;
-  font-weight: bold;
+     font-size: 9pt;
+     font-weight: bold;
 }
 
 input.cancel, input.clearselection, input.logout {
@@ -190,4 +198,3 @@ input.send, input.setpagesize {
      padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
-

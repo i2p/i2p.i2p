@@ -16,10 +16,16 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("Page Not Found")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
+  function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
+  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
+</script>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=ERROR_CODE%> <%=ERROR_MESSAGE%></h1>
+<h1><%=ERROR_CODE%>&nbsp;<%=ERROR_MESSAGE%></h1>
 <div class="sorry" id="warning">
 <%=intl._("Sorry! You appear to be requesting a non-existent Router Console page or resource.")%><hr>
-<%=intl._("Error 404")%>: <%=ERROR_URI%> <%=intl._("not found")%>.
+<%=intl._("Error 404")%>: <%=ERROR_URI%>&nbsp;<%=intl._("not found")%>.
 </div></body></html>

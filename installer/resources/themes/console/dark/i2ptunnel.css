@@ -92,8 +92,18 @@
 
 #tunnelListPage .footer .control {
      margin-left: 2px;
+     color: #494 !important;
+     background: #000 !important;
 }
 
+#tunnelListPage .footer .control:hover {
+     color: #F60 !important;
+}
+
+#tunnelListPage .footer .control:active {
+     color: #EE9 !important;
+}
+     
 #tunnelListPage .footer label {
      text-align: right;
      height: 24px;
@@ -102,6 +112,7 @@
      margin-top: 6px;
      margin-right: 5px;
 }
+
 /* Use Leary and Langridge content replacement methods (LIR)
 ** to embed accessibility information into the document.
 ** Should allow the lists to be rendered nicely by

@@ -19,9 +19,10 @@
     <title><%=intl._("I2P Tunnel Manager - Edit Client Tunnel")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+    <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 
     <% if (editBean.allowCSS()) {
-  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico">
     <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }

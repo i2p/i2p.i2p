@@ -4,7 +4,12 @@
 body {
      background: #101 url('/themes/snark/ubergine/images/graytile.png');
      color: #001;
-     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font: 7.5pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+}
+
+body.iframed {
+     background: transparent url('../../console/dark/images/transparent.gif') !important;
+     margin: 6px 0 !important;
 }
 
 .snarkTitle {
@@ -18,16 +23,16 @@ body {
      text-transform: uppercase !important;
      padding: 4px 16px 5px !important;
      margin: -5px -8px -5px 0 !important;
-     letter-spacing: 0.05em;
+     letter-spacing: 0.03em;
      font-weight: bold;
-     font-size: 11pt;
+     font-size: 9pt;
      color: #f70;
      text-shadow: 1px 1px #420;
      background: url('/themes/snark/ubergine/images/snarknav_lowlight.png') no-repeat scroll center bottom;
      background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
      -moz-border-radius: 0px;
      -khtml-border-radius: 3px;
-     border-radius: 0px;
+     border-radius: 0px;;
      -moz-box-shadow: inset 0 0 1px 0 #f90;
      -khtml-box-shadow: inset 0 0 1px 0 #f90;
      box-shadow: 0 0 1px 0 #f90;
@@ -38,9 +43,7 @@ body {
      text-decoration: none !important;
      text-transform: uppercase !important;
      padding: 1px 16px;
-     letter-spacing: 0.05em;
      font-weight: bold;
-     font-size: 11pt;
      color: #f50;
      background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
      background: #310 url('/themes/snark/ubergine/images/snarknav_lowlight.png') repeat-x scroll center center;
@@ -56,9 +59,7 @@ body {
      text-decoration: none !important;
      text-transform: uppercase !important;
      padding: 0 16px;
-     letter-spacing: 0.05em;
      font-weight: bold;
-     font-size: 11pt;
      color: #fb0;
      background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
 }
@@ -130,7 +131,7 @@ body {
 
 pre {
      width: 100%;
-     font: 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     font: 7.5pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
      padding: 0;
      text-align: left !important;
      height: 8px;
@@ -162,18 +163,18 @@ thead a, tfoot a {
 text-shadow:1px 1px #550000;
 } 
 
-thead {
+thead {;
      border-bottom: 1px solid #101;
 }
 
 th {
      padding: 4px 2px 4px 4px;
-     font-size: 9pt;
+     font-size: 8pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #101;
      color: #ddd;
      whitespace: nowrap;
-     letter-spacing: 0.05em;
+     letter-spacing: 0em;
 }
 
 th:first-child {
@@ -220,7 +221,7 @@ tfoot tr:nth-child(n+1) {
 .ParentDir {
      background: #656;
      background: #351933;
-     font-size: 8pt;
+     font-size: 7.5pt;
      border: 0px inset #101 !important;
      border-left: 0 !important;
      border-right: 0 !important;
@@ -243,7 +244,7 @@ td {
      padding: 1px;
      color: #ddd !important;
      opacity: 1;
-     font-size: 9.5pt;
+     font-size: 8pt;
 }
 
 .mainsection td {
@@ -252,7 +253,7 @@ td {
 
 td:first-child {
      text-align: right;
-     font-size: 9.5pt;
+     font-size: 8pt;
 }
 
 .center {
@@ -260,6 +261,7 @@ td:first-child {
 }
 
 .snarkTorrentName {
+     line-height: 100%;
      text-shadow:1px 1px #550000;
      padding: 2px 0 0;
 }
@@ -289,7 +291,7 @@ td:first-child {
 }
 
 .snarkTorrentEven {
-     font-size: 8pt;
+     font-size: 7.5pt;
      background: #202;
 }
 
@@ -303,6 +305,7 @@ td:first-child {
 
 .snarkTorrentStatus {
      padding: 2px 2px 2px 0;
+     line-height: 100%;
 }
 
 .snarkTorrentStatus:first-child {
@@ -311,7 +314,7 @@ td:first-child {
      min-width: 48px;
      font-weight: bold;
      color: #dd9 !important;
-     font-size: 8pt;
+     font-size: 7.5pt;
      padding: 1px !important;
 }
 
@@ -321,9 +324,10 @@ td:first-child {
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
-     font-size: 8pt;
+     font-size: 7.5pt;
      font-weight: bold;
      padding: 0 3px;
+     line-height: 100%;
 }
 
 .snarkTorrentDownloaded {
@@ -344,7 +348,7 @@ td:first-child {
 
 .snarkTorrentOdd {
      background: #351933;
-     font-size: 8pt;
+     font-size: 7.5pt;
      border: 0px inset #101 !important;
      border-left: 0 !important;
      border-right: 0 !important;
@@ -356,7 +360,7 @@ td:first-child {
 .snarkFileName {
      padding: 4px 0px !important; 
      text-align: left !important;
-     font-size: 8pt !important;
+     font-size: 7.5pt !important;
 }
 
 .snarkFileSize {
@@ -369,7 +373,7 @@ td:first-child {
      padding: 4px 5px 4px 15px;
      text-align: center;
      font-style: italic;
-     font-size: 8pt;
+     font-size: 7.5pt;
      text-align: left;
 }
 
@@ -377,6 +381,41 @@ td:first-child {
      font-weight: bold;
      font-style: italic;
      color: #dd7 !important;
+}
+
+.snarkTorrentInfo img {
+     max-height: 16px !important;
+     margin: 1px 0 1px 2px !important;    
+}
+
+.snarkTorrentInfo td {
+     text-align: left !important;
+     padding: 0 1px !important;
+}
+
+table.SnarkTorrentInfo {
+     margin-bottom: 3 !important;
+     background: #000;    
+}
+
+table.SnarkDirInfo {
+     margin-top: -2px !important;     
+}
+
+.snarkDirInfo thead img {
+     margin: 0 -1px 0 0 !important;
+}
+
+.SnarkDirInfo td, .SnarkDirInfo th {
+     min-width: 0px !important;     
+}
+
+.SnarkDirInfo td:nth-child(n+1) {
+}
+
+.SnarkDirInfo .headerpriority {
+     text-align: center !important;
+     vertical-align: middle;    
 }
 
 .choked {
@@ -393,11 +432,11 @@ td:first-child {
 }
 
 .snarkNewTorrent {
-     font-size: 9pt;
+     font-size: 8pt;
 }
 
 .snarkAddInfo {
-     font-size: 9pt;
+     font-size: 8pt;
      line-height: 130% !important;
 }
 
@@ -406,7 +445,7 @@ td:first-child {
      font-weight: bold;
      padding: 0 25px 3px 25px;
      margin: 5px 0 10px 0 !important;
-     letter-spacing: 0.25em;
+     letter-spacing: 0.05em;
      border: 1px solid #111;
      -moz-border-radius: 0 0 5px 5px;
      -khtml-border-radius: 0 0 5px 5px;
@@ -425,14 +464,14 @@ td:first-child {
 .page {
      background: #323 url('/themes/snark/ubergine/images/tile2.png');
      color: #310;
-     min-width: 970px !important;
+     min-width: 800px !important;
      margin: 5px 0 0 0;
      padding: 10px 10px 0px 10px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #101;
-     font-size: 9pt !important;
+     font-size: 8pt !important;
      line-height: 160% !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #212;
      -khtml-box-shadow: inset 0px 0px 1px 0px #002;
@@ -478,7 +517,7 @@ a:hover {
 }
 
 input {
-     font-size: 9pt;
+     font-size: 8.5pt;
      font-weight: bold;
      text-align: left;
      padding: 3px 4px !important;
@@ -591,7 +630,7 @@ select {
      background: #333;
      background: url('/themes/snark/ubergine/images/graytile.png') !important;
      color: #f60;
-     font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
      padding: 2px 2px 2px 3px;
      -moz-border-radius: 4px 0 0 4px;
@@ -614,6 +653,7 @@ textarea {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px inset #000;
+     font-size: 8pt;
 }
 
 img {
@@ -750,7 +790,7 @@ div.configsection a:hover {
 }
 
 code {
-     font-size: 9.5pt;
+     font-size: 9pt;
      color: #b8b;
      padding: 0 2px;
      font-weight: bold;
@@ -782,4 +822,36 @@ code {
      margin: 0 -6px 0 -2px;
      padding: 1px 0 0px !important;
      vertical-align: top;
+}
+
+.routerdown {
+     color: #ee9;
+}
+
+.trackerconfig {
+     text-align: left !important;
+}
+
+.trackerconfig th:nth-child(n+4), .trackerconfig th:nth-child(n+5), .trackerconfig td:nth-child(n+4), .trackerconfig td:nth-child(n+5) {
+     text-align: center !important;
+}
+
+.trackerconfig th, .trackerconfig td, .trackerconfig th:last-child, .trackerconfig td:last-child {
+     text-align: left !important;     
+}
+
+.trackerconfig td:first-child {
+     text-align: right !important;     
+}
+
+input.trackername {
+     width: 100px;
+}
+
+input.trackerhome {
+     width: 200px;
+}
+
+input.trackerannounce {
+     width: 230px;
 }
