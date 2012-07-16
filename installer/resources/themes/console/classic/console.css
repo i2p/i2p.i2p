@@ -596,7 +596,7 @@ h1 {
      line-height: 93%;
      text-transform: uppercase;
      letter-spacing: 0.3em;
-     background: #fff;
+     background: #fff url(images/titlebg.png) center right no-repeat !important;
      min-width: 500px;
      -moz-border-radius: 0 3px 0 0;
      -khtml-border-radius: 0 3px 0 0;

@@ -116,6 +116,11 @@ div.news hr {
      margin: 0 -10px 0 -13px !important;
 }
 
+div.routersummaryouter {
+     left: 5px;
+     top: 5px;
+}
+
 div.routersummary {
      color: #001;
      padding-left: 0px;
@@ -173,7 +178,7 @@ div.routersummary table {
      border: 0;
      text-align: center !important;
      margin: -5px 5px !important;
-     width: 192px !important;
+     width: 182px !important;
      overflow: hidden;
      font-size: 8pt;
      padding: 0px -10px;
@@ -235,10 +240,6 @@ div.warning {
      margin: 7px -18px 0px 5px;
 }
 
-td {
-     text-align: left;
-}
-
 th {
      text-align: left;
      padding-left: 3px;
@@ -265,7 +266,7 @@ div.graphspanel hr {
 }
 
 table {
-     width: 100% !important;
+     width: auto !important;
 }
 
 .links li {
@@ -292,10 +293,6 @@ div.news {
      padding-left: 10px;
      padding-right: 10px;
      font-size: 7pt;
-}
-
-h1, h2, h3 {
-     background: #fff url(images/titlebg.png) center right no-repeat !important;
 }
 
 .routersummary h2, .routersummary h3 {
