@@ -165,10 +165,6 @@ input.cancel, input.clearselection, input.logout {
      min-height: 22px;
 }
 
-input.cancel {
-     display: none;
-}
-
 input.delete, input.delete_attachment, input.really_delete {
      background: #000 url('/themes/console/images/delete.png') no-repeat 2px center;
      min-height: 22px;
