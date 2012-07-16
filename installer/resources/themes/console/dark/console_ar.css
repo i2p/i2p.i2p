@@ -50,20 +50,20 @@ div.routersummary td:last-child {
 }
 
 div.tunnels {
-     padding: -3px 0 !important;	
+     padding: -3px 0 !important;
 }
 
 div.tunnels table {
-     margin: 0 -7px 0 5px !important; 
+     margin: 0 -7px 0 5px !important;
 }
 
 .langbox {
      float: left;
-     text-align: left;‌
+     text-align: left;
 }
 
 .formaction {
-     text-align: left;‌
+     text-align: left;
 }
 
 form {
