@@ -1,22 +1,22 @@
 /* Susidns Dark theme by dr|z3d */
 
 body {
-	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-	background-color: #000;
-	color:#ee9;
+     font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background-color: #000;
+     color:#ee9;
 }
 
 body.iframed {
-	background: transparent !important;
-	margin: 0;
+     background: transparent !important;
+     margin: 0;
 }
 
 #logo {
-     display: none;     
+     display: none;
 }
 
 #navi p {
-     text-align: center;     
+     text-align: center;
 }
 
 hr {
@@ -38,15 +38,15 @@ p {
 }
 
 span.addrhlpr {
-	font-size:8pt;
+     font-size:8pt;
 }
-	
+
 h3 {
-	color:#ee9;
-	font-size:10pt;
-	font-weight:bold;
-	border: 1px solid #494;
-	padding: 5px;
+     color:#ee9;
+     font-size:10pt;
+     font-weight:bold;
+     border: 1px solid #494;
+     padding: 5px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -78,43 +78,42 @@ th {
 
 td {
 
-	color:#ee9;
-	line-height:12pt;
-	padding:5px 10px;
-	font-size:8pt;
-	vertical-align:center;
+     color:#ee9;
+     line-height:12pt;
+     padding:5px 10px;
+     font-size:8pt;
+     vertical-align:center;
 }
 
 ol, ul {
-     margin: 0 20px 0 10px;     
+     margin: 0 20px 0 10px;
 }
 
 li {
-
-	color:#ee9;
-	line-height:12pt;
+     color:#ee9;
+     line-height:12pt;
      margin: 0;
-	font-size:8pt;
-	list-style: square;
+     font-size:8pt;
+     list-style: square;
 }
 
 tr.list1 {
-	background-color:#010;
+     background-color:#010;
 }
 
 tr.list0 {
-	background-color:#000;
+     background-color:#000;
 }
 
 p.messages {
-	background-color:#92CAFF;
-	color:#327BBF;
-	color:black;
-	border-style:dotted;
-	padding-top: 5mm;
-	padding-right: 5mm;
-	padding-bottom: 5mm;
-	padding-left: 5mm;
+     background-color:#92CAFF;
+     color:#327BBF;
+     color:black;
+     border-style:dotted;
+     padding-top: 5mm;
+     padding-right: 5mm;
+     padding-bottom: 5mm;
+     padding-left: 5mm;
 }
 
 #help {
@@ -124,33 +123,33 @@ p.messages {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin: 0 0 15px;
-     background: #000;  
+     background: #000;
 }
 
 p.footer {
-	font-size:7pt;
-      text-align: center;
-      display: none;
+     font-size:7pt;
+     text-align: center;
+     display: none;
 }
 
 p.buttons, #buttons {
-     text-align: right;     
+     text-align: right;
 }
 
 .illustrate {
-  margin: 20px 0 15px;
-  padding: 10px;
-  -moz-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
-  border: 1px solid #001;
-  font-size: 10pt;
-  -moz-box-shadow: inset 0px 0px 1px 0px #002;
-  background: #fff;
+     margin: 20px 0 15px;
+     padding: 10px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #001;
+     font-size: 10pt;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     background: #fff;
 }
 
 #book table {
-     width: 100%;     
+     width: 100%;
 }
 
 .destinations textarea {
@@ -167,7 +166,7 @@ p.buttons, #buttons {
 }
 
 .iframed .page {
-  margin: 0;
+     margin: 0;
 }
 
 input[type=submit] {
@@ -187,14 +186,12 @@ input[type=submit] {
      opacity: 0.9;
 }
 
-
 input[type=submit]:hover {
      background: #22a;
      color: #fff;
      border: 1px solid #f60;
      opacity: 1.0;
      -moz-box-shadow: inset 0px 0px 0px 1px #fff;
-
 }
 
 input[type=reset] {
@@ -271,7 +268,7 @@ input {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494;
-     background: #000 none !important;	 
+     background: #000 none !important;      
      color: #494;
      margin: 2px 4px 2px 0;
      font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
