@@ -85,13 +85,17 @@ td {
 	vertical-align:center;
 }
 
+ol, ul {
+     margin: 0 20px 0 10px;     
+}
+
 li {
 
 	color:#ee9;
 	line-height:12pt;
-	margin-left:5mm;
-	margin-right:5mm;
-	font-size:10pt;
+     margin: 0;
+	font-size:8pt;
+	list-style: square;
 }
 
 tr.list1 {
@@ -115,11 +119,12 @@ p.messages {
 
 #help {
      border: 1px solid #494;
-     padding: 20px;
+     padding: 10px 20px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     margin: 0 0 15px;   
+     margin: 0 0 15px;
+     background: #000;  
 }
 
 p.footer {
@@ -295,5 +300,7 @@ textarea {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     width: 100%
+     width: 100%;
+     height: 100px;
+     spell-check: false;
 }
