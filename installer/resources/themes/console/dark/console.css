@@ -153,7 +153,6 @@ div.routersummary h3 {
      -khtml-border-radius: 0;
      border-radius: 0;
      background: #000 url('images/header.png') center center ;
-     background-image: -moz-linear-gradient(top, bottom, from(#050), to(#030), color-stop(7%, #000), color-stop(100%, #050));
 }
 
 div.routersummary h4 {
@@ -167,7 +166,6 @@ div.routersummary h4 {
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#050), color-stop(10%, #050), color-stop(100%, #004));
      line-height: 100%;
 }
 
@@ -182,7 +180,7 @@ div.routersummary table {
      width: 188px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0 -10px;
+/*     padding: 0 -10px; */
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -225,6 +223,7 @@ div.routersummary td {
      padding: 0px 2px 0px 2px;
      background-image: none !important;
      border: 0 !important;
+     word-spacing: -0.1em;
 }
 
 div routersummary hr:last-child {
@@ -235,6 +234,7 @@ div routersummary hr:last-child {
 div.newsheadings {
      text-align: center;
      margin: -3px 0 -5px 10px;
+     word-spacing: 0;
 }
 
 div.newsheadings li {
@@ -495,7 +495,7 @@ div.messages {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494;
-     background: #000  /*url('images/infotile.png') center left no-repeat;*/
+     background: #000;  /*url('images/infotile.png') center left no-repeat;*/
      font-weight: bold;
      font-size: 9pt;
      color: #4f4;
@@ -567,7 +567,7 @@ table {
      border-collapse: collapse;
      width: 100%;
      border: 1px solid #494;
-     cell-padding: 1px;
+     padding: 1px;
      font-size: 8pt;
      background: #030;
      margin: 1px 0;
@@ -714,7 +714,7 @@ a:hover {
 }
 
 .links {
-     padding-bottom: -2px;
+/*     padding-bottom: -2px; */
      text-align: justify;
      margin-top: 10px;
      margin-bottom: -10px;
@@ -724,7 +724,7 @@ a:hover {
      list-style-image: url("images/link.png") !important;
 }
 
-.links b{
+.links b {
      color: #b70 !important;
      letter-spacing: 0.07em;
      font-size: 8.5pt;
@@ -753,10 +753,7 @@ h1 {
      letter-spacing: 0.15em;
      text-shadow: 0px 0px 2px #010;
      white-space: normal;
-     background: #000 url("images/scope.png")no-repeat scroll right top;
-     background: #000 url("images/bg2.png")no-repeat scroll top right;
      background: #000 url('images/header.png') center center;
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
      border: 1px solid #494;
      border-radius: 4px 4px 0 0;
      -moz-border-radius: 4px 4px 0 0;
@@ -786,17 +783,15 @@ h2 {
      text-shadow: 0px 0px 2px #010;
      letter-spacing: 0.05em;
      background: #000 url(images/camotile2.png);
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
      background: #000 url('images/header.png') center center ;
      padding: 10px;
-     wordwrap: none;
      border: 1px solid #494;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      vertical-align: middle;
      margin: 15px 0 12px 0 !important;
-    text-transform: uppercase;
+     text-transform: uppercase;
      word-wrap: break-word;
 }
 
@@ -879,7 +874,7 @@ button:active {
 }
 
 .langbox {
-     margin: 5px 3px 2px 5px;
+     margin: 4px 4px 2px 5px;
      padding: 0;
      color: #EE9;
      font-size: 7pt;
@@ -892,6 +887,7 @@ button:active {
 .langbox img {
      opacity: 0.5;
      -moz-box-shadow: 0 0 1px #000;
+     padding: 1px !important;
 }
 
 .langbox img:hover {
@@ -1016,7 +1012,7 @@ form {}
 .proxyfooter {
      margin: 0 20px 10px 240px;
      padding: 20px 25px 20px 75px;
-     font-color: #f00;
+     color: #f00;
      font-size: 7pt;
      text-align: right !important;
      border-radius: 4px;
@@ -1240,6 +1236,8 @@ div.app {
      background: #000;
      background-image: -moz-linear-gradient(center top , #000B00, #000);
      border-radius: 3px;
+     -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
      margin: 5px;
      height: 72px;
      text-align: center !important;
