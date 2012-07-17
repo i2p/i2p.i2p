@@ -234,7 +234,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\"routerdown\"><b>" + _("Router is down") + "<\\/b></div>\";\n" +
                           "function requestAjax1() { ajax(\"/i2psnark/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
-                          "function initAjax(delayMs) { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
+                          "function initAjax() { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
                           "</script>\n");
             }
         }
