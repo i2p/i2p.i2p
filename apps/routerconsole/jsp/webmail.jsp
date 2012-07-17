@@ -18,10 +18,8 @@
 <%=intl.title("webmail")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script src="/js/iframed.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
 <script type="text/javascript">
-  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
-  function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
-  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
   function setupFrame() {
       f = document.getElementById("susimailframe");
       injectClass(f);

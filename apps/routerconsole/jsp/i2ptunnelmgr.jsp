@@ -18,10 +18,8 @@
 <%=intl.title("i2p tunnel manager")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script src="/js/iframed.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
 <script type="text/javascript">
-  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
-  function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
-  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
   function injectClassSpecific(f) {
       var doc = 'contentDocument' in f? f.contentDocument : f.contentWindow.document;
       if (doc.getElementsByClassName == undefined) {
