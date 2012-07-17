@@ -790,6 +790,7 @@ public class SummaryHelper extends HelperBase {
 
     public String getConfigTable() {
         String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
+        Map<String, String> sectionNames = SummaryBarRenderer.SECTION_NAMES;
         List<String> sections = getSummaryBarSections("default");
         TreeSet<String> sortedSections = new TreeSet();
 
@@ -815,7 +816,7 @@ public class SummaryHelper extends HelperBase {
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(i)
                .append("\"></td><td align=\"left\">")
-               .append(section)
+               .append(_(sectionNames.get(section)))
                .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
                .append(i + "_" + section)
                .append("\" value=\"")
@@ -860,7 +861,7 @@ public class SummaryHelper extends HelperBase {
 
         for (String s : sortedSections) {
             buf.append("<option value=\"").append(s).append("\">")
-               .append(s).append("</option>\n");
+               .append(sectionNames.get(s)).append("</option>\n");
         }
 
         buf.append("</select>\n" +

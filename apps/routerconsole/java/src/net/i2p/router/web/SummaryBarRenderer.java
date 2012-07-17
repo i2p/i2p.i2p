@@ -45,6 +45,27 @@ public class SummaryBarRenderer {
         {"HelpAndFAQ", "I2PServices", "I2PInternals", "General", "ShortGeneral", "NetworkReachability",
         "UpdateStatus", "RestartStatus", "Peers", "FirewallAndReseedStatus", "Bandwidth", "Tunnels",
         "Congestion", "TunnelStatus", "Destinations", "NewsHeadings" };
+    static final Map<String, String> SECTION_NAMES;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();;
+        aMap.put("HelpAndFAQ", "Help &amp; FAQ");
+        aMap.put("I2PServices", "I2P Services");
+        aMap.put("I2PInternals", "I2P Internals");
+        aMap.put("General", "General");
+        aMap.put("ShortGeneral", "Short General");
+        aMap.put("NetworkReachability", "Network Reachability");
+        aMap.put("UpdateStatus", "Update Status");
+        aMap.put("RestartStatus", "Restart Status");
+        aMap.put("Peers", "Peers");
+        aMap.put("FirewallAndReseedStatus", "Firewall &amp; Reseed Status");
+        aMap.put("Bandwidth", "Bandwidth");
+        aMap.put("Tunnels", "Tunnels");
+        aMap.put("Congestion", "Congestion");
+        aMap.put("TunnelStatus", "Tunnel Status");
+        aMap.put("Destinations", "Local Destinations");
+        aMap.put("NewsHeadings", "News &amp; Updates");
+        SECTION_NAMES = Collections.unmodifiableMap(aMap);
+    }
 
     private final RouterContext _context;
     private final SummaryHelper _helper;
@@ -589,7 +610,7 @@ public class SummaryBarRenderer {
         if (consoleNonce != null) {
             // Set up title and pre-headings stuff.
             buf.append("<h3><a href=\"/configupdate\">")
-               .append(_("News & Updates"))
+               .append(_("News &amp; Updates"))
                .append("</a></h3><hr class=\"b\"><div class=\"newsheadings\">\n");
             // Get news content.
             String newsContent = newshelper.getContent();
