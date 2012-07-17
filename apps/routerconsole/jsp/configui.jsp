@@ -7,11 +7,7 @@
 <%@include file="css.jsi" %>
 <%=intl.title("config UI")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
-<script type="text/javascript">
-  var failMessage = "<hr><b><%=intl._("Router is down")%><\/b>";
-  function requestAjax1() { ajax("/xhr1.jsp?requestURI=<%=request.getRequestURI()%>", "xhr", <%=intl.getRefresh()%>000); }
-  function initAjax() { setTimeout(requestAjax1, <%=intl.getRefresh()%>000);  }
-</script>
+<%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
