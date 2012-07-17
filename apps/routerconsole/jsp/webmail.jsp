@@ -33,6 +33,8 @@
 <h1><%=intl._("I2P Webmail")%> <span class="newtab"><a href="/susimail/susimail" target="_blank" title="<%=intl._("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="main">
 <iframe src="/susimail/susimail" width="100%" height="100%" frameborder="0" border="0" name="susimailframe" id="susimailframe" onload="setupFrame()" allowtransparency="true">
+<%=intl._("Your browser does not support iFrames.")%>
+&nbsp;<a href="/susimail/susimail"><%=intl._("Click here to continue.")%></a>
 </iframe>
 </div></body></html>
 <%
