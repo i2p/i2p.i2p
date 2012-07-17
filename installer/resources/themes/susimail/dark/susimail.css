@@ -99,42 +99,43 @@ p.error {
 }
 
 a {
-     color:#f60;
-     text-decoration:none;
+     color: #f60;
+     text-decoration: none;
+     font-weight: bold;
 }
 
 a:hover {
-     text-decoration:underline;
+     text-decoration: underline;
 }
 
 td {
-     color:#ee9;
+     color: #ee9;
      margin: 0 5px;
      font-size: 8pt; 
 }
 
 tr.list0 {
-     background-color:#000;
+     background-color: #000;
 }
 
 tr.list1 {
-     background-color:#010;
+     background-color: #010;
 }
 
 table.noborder {
-     margin-left:0mm;
-     margin-top:0mm;
-     margin-right:0mm;
+     margin-left: 0;
+     margin-top: 0;
+     margin-right: 0;
 }
 
 pre {
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     margin-left:1cm;
-     margin-right:1cm;
+     margin-left: 1cm;
+     margin-right: 1cm;
 }
 
 .page {
-     color:#ee9;
+     color: #ee9;
      margin: 0;
      padding: 0;
      font-size: 9pt !important;
@@ -214,7 +215,7 @@ input {
      font-size: 9pt;
      font-weight: bold;
      text-align: left;
-     padding: 3px 4px !important;
+     padding: 2px 2px 3px !important;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -226,14 +227,34 @@ input {
      min-width: 64px !important;
 }
 
-input[type=submit] {
-     text-shadow: 0px 0px #410;
+input[type=submit], input.cancel {
      color: #494;
      background: #000;
      border: 1px outset #191;
-     padding: 2px !important;
      box-shadow: 0 1px 1px 0 #119911 inset;
      font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      text-align: center;
      min-height: 22px !important;
+}
+
+input[type=submit]:hover, input.cancel:hover {
+     color: #f60;
+     background: #000;
+     border: 1px solid #f60;
+     box-shadow: 0 1px 1px 0 #ee9 inset;
+     -moz-box-shadow: 0 1px 1px 0 #ee9 inset;
+     -khtml-box-shadow: 0 1px 1px 0 #ee9 inset;
+}
+
+input[type=submit]:active, input.cancel:active {
+     border: 1px inset #f60;
+     background: #f60 !important;
+     color: #EE9 !important;
+     -moz-box-shadow: inset 0px 0px 0px 0px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 0px #f60;
+     box-shadow: inset 0px 0px 0px 0px #f60;
+}
+
+input[type=text] {
+     color: #ee9;
 }
