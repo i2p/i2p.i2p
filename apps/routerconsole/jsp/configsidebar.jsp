@@ -45,7 +45,7 @@ input.default {
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>
 
-<h3><%=intl._("Customise Summary Bar")%></h3>
+<h3><%=intl._("Customize Summary Bar")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
