@@ -51,7 +51,16 @@ p.text {
 }
 
 p.error {
-     color:#ff0000;
+     color: #f00;
+     background: url("../../console/images/errortriangle.png") no-repeat scroll 20px center #000;
+     border: 1px solid #f00;
+     border-radius: 4px;
+     font-weight: bold;
+     text-align: justify;
+     word-wrap: break-word;
+     padding: 15px 5px 15px 70px !important;
+     margin: 10px 10px 15px;
+     min-height: 30px;
 }
 
 p.info {
@@ -111,7 +120,8 @@ a:hover {
 td {
      color: #ee9;
      margin: 0 5px;
-     font-size: 8pt; 
+     font-size: 8pt;
+     padding: 2px;
 }
 
 tr.list0 {
@@ -150,6 +160,10 @@ table {
 th {
      font-size: 9pt;
      font-weight: bold;
+     background: url("../../console/dark/images/header.png") repeat scroll center center #000000;
+     padding: 7px;
+     border-bottom: 1px solid #494;
+     border-top: 1px solid #494;
 }
 
 form {
@@ -256,5 +270,15 @@ input[type=submit]:active, input.cancel:active {
 }
 
 input[type=text] {
+     color: #ee9;     
+}
+
+input:disabled, input:disabled:hover, input:disabled:active {
+     border: none;
      color: #ee9;
+     margin-left: -2px;
+     box-shadow: none;
+     -moz-box-shadow: none;
+     -khtml-box-shadow: none;
+     background: #000 !important;
 }
