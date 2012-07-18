@@ -22,6 +22,7 @@ package org.klomp.snark;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -438,6 +439,12 @@ class PeerCoordinator implements PeerListener
    */
   public void restart() {
     halted = false;
+    synchronized (uploaded_old) {
+        Arrays.fill(uploaded_old, 0);
+    }
+    synchronized (downloaded_old) {
+        Arrays.fill(downloaded_old, 0);
+    }
     timer.schedule((CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD));
   }
 
