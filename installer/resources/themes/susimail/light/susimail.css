@@ -6,13 +6,13 @@ body {
 
 body.iframed {
      background: transparent !important;
-     margin: 0;
+     margin: 5px 0 0 0;
 }
 
 li {
      color:#001;
      line-height:12pt;
-     font-size:10pt;
+     font-size: 8.5pt;
      margin-left:5mm;
      margin-right:5mm;
 }
@@ -22,7 +22,7 @@ p {
      line-height:12pt;
      margin-left:5mm;
      margin-right:5mm;
-     font-size:10pt;
+     font-size:8.5pt;
 }
 
 p.hl {
@@ -54,6 +54,7 @@ p.footer {
      margin-right:10mm;
      font-size:8pt;
      line-height:10pt;
+     display: none;
 }
 
 p.mailbody {
@@ -63,9 +64,22 @@ p.mailbody {
       text-align: left;
 }
 
+.iframed p img {
+     display: none;
+}
+
+.iframed p:first-child {
+     display: none;
+}
+
+.mailbody {
+     display: block !important;
+}
+
 a {
      color:#327BBF;
      text-decoration:none;
+     font-weight: bold;
 }
 
 a:hover {
@@ -78,7 +92,8 @@ td {
      line-height:12pt;
      margin-left:5mm;
      margin-right:5mm;
-     font-size:10pt;
+     font-size:9pt;
+     padding: 1px 3px;
 }
 
 tr.list0 {
@@ -89,6 +104,10 @@ tr.list1 {
      background-color:#ffffff;
 }
 
+.iframed tr.list1 {
+     background-color:#f0f0f0;
+}
+
 table.noborder {
      margin-left:0mm;
      margin-top:0mm;
@@ -96,7 +115,7 @@ table.noborder {
 }
 
 pre {
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8.5pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      margin-left:1cm;
      margin-right:1cm;
 }
@@ -104,20 +123,21 @@ pre {
 .page {
      background-color: #fff;
      color:#001;
-     margin: 20px;
-     padding: 0 20px;
+     margin: -20px 0 0 0;
+     padding: 10px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #001;
-     font-size: 10pt !important;
+/*     border: 1px solid #001; */
+     font-size: 8.5pt !important;
      line-height: 160% !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      text-align: center;
 }
 
 .iframed .page {
-     margin: 0 20px;
+     background-color: #f0f0f0;
+     margin: 0;
 }
 
 table {
@@ -135,66 +155,66 @@ form {
 }
 
 .mailhead {
-     font-size: 9pt;
+     font-size: 8.5pt;
      font-weight: bold;
 }
 
 input.cancel, input.clearselection, input.logout {
-     background: #ddf url('/themes/console/images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/cancel.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.delete, input.delete_attachment, input.really_delete {
-     background: #ddf url('/themes/console/images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/delete.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.download, input.lastpage {
-     background: #ddf url('/themes/console/images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/arrow_down.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.firstpage {
-     background: #ddf url('/themes/console/images/arrow_up.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/arrow_up.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.forward, input.login, input.nextpage, input.send {
-     background: #ddf url('/themes/console/images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/arrow_right.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.invertselection, input.reload, input.refresh {
-     background: #ddf url('/themes/console/images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/arrow_refresh.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.markall, input.show {
-     background: #ddf url('/themes/console/images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/tick.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.new, input.reply, input.replyall {
-     background: #ddf url('/themes/console/images/email.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/email.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.prevpage {
-     background: #ddf url('/themes/console/images/arrow_left.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/arrow_left.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
 input.send, input.setpagesize {
-     background: #ddf url('/themes/console/images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
+     background: #ddf url('/themes/console/images/accept.png') no-repeat 4px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
