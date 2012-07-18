@@ -1,3 +1,7 @@
+2012-07-18 zzz
+ * Home page: Add colombo-bt.i2p, remove keys.i2p
+ * i2psnark: Clear rate stats when restarting torrent
+
 2012-07-16 str4d
  * console: work towards better integration
    - Wrapped the bundled apps in iFrames (with a link in the page header to
