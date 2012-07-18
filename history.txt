@@ -1,3 +1,6 @@
+2012-07-18 str4d
+ * Home page: Added id3nt.i2p and git.repo.i2p
+
 2012-07-18 zzz
  * Home page: Add colombo-bt.i2p, remove keys.i2p
  * i2psnark: Clear rate stats when restarting torrent
