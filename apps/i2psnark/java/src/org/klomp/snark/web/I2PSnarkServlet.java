@@ -337,8 +337,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("Status"));
         out.write("\" alt=\"");
         out.write(_("Status"));
-        out.write("\"> ");
-        out.write(_("Status"));
+        out.write("\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"/i2psnark/");
             if (peerParam != null) {
@@ -363,48 +362,49 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("Torrent"));
         out.write("\" alt=\"");
         out.write(_("Torrent"));
-        out.write("\"> ");
-        out.write(_("Torrent"));
+        out.write("\">");
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" alt=\"\" title=\"");
+            out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
             out.write(_("Estimated time remaining"));
-            out.write("\">");
+            out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("ETA"));
+            out.write("\">");
         }
         out.write("</th>\n<th align=\"right\">");
-        out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" alt=\"\" title=\"");
+        out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
         out.write(_("Downloaded"));
-        out.write("\">");
+        out.write("\" alt=\"");
         // Translators: Please keep short or translate as " "
         out.write(_("RX"));
+        out.write("\">");
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" alt=\"\" title=\"");
+            out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
             out.write(_("Uploaded"));
-            out.write("\">");
+            out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX"));
+            out.write("\">");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write("<img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
             out.write(_("Down Rate"));
             out.write("\" alt=\"");
-            out.write(_("RX"));
-            out.write(" \">");
             // Translators: Please keep short or translate as " "
-            out.write(_("Rate"));
+            out.write(_("RX Rate"));
+            out.write(" \">");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write("<img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
             out.write(_("Up Rate"));
             out.write("\" alt=\"");
-            out.write(_("TX"));
+            // Translators: Please keep short or translate as " "
+            out.write(_("TX Rate"));
             out.write(" \">");
-            out.write(_("Rate"));
         }
         out.write("</th>\n<th align=\"center\">");
 
@@ -973,25 +973,24 @@ public class I2PSnarkServlet extends DefaultServlet {
         if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\" alt=\"" + _("Tracker Error") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\" alt=\"" + _("Tracker Error") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                               ": " + curPeers + thinsp(noThinsp) +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\" alt=\"" + _("Tracker Error") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                "<br>" + err;
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">";
             }
         } else if (snark.isStarting()) {
             statusString = "<img border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Starting") + "\" alt=\"" + _("Starting") + "\"></td>" +
-                           "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Starting");
+                           "<td class=\"snarkTorrentStatus " + rowClass + "\">";
         } else if (remaining == 0 || needed == 0) {  // < 0 means no meta size yet
             // partial complete or seeding
             if (isRunning) {
@@ -1007,52 +1006,52 @@ public class I2PSnarkServlet extends DefaultServlet {
                 }
                 if (curPeers > 0 && !showPeers)
                     statusString = "<img border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\" alt=\"" + txt + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + txt +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
                 else
                     statusString = "<img border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\" alt=\"" + txt + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + txt +
-                               ": " + curPeers + thinsp(noThinsp) +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             } else {
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "complete.png\" title=\"" + _("Complete") + "\" alt=\"" + _("Complete") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Complete");
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">";
             }
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\" alt=\"" + _("OK") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\" alt=\"" + _("OK") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
-                               ": " + curPeers + thinsp(noThinsp) +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\" alt=\"" + _("Stalled") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\" alt=\"" + _("Stalled") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
-                               ": " + curPeers + thinsp(noThinsp) +
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && knownPeers > 0)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "nopeers.png\" title=\"" + _("No Peers") + "\" alt=\"" + _("No Peers") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("No Peers") +
-                               ": 0" + thinsp(noThinsp) + knownPeers ;
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" +
+                               "0" + thinsp(noThinsp) + knownPeers ;
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "nopeers.png\" title=\"" + _("No Peers") + "\" alt=\"" + _("No Peers") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("No Peers");
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">";
             else
                 statusString = "<img border=\"0\" src=\"" + _imgPath + "stopped.png\" title=\"" + _("Stopped") + "\" alt=\"" + _("Stopped") + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stopped");
+                               "<td class=\"snarkTorrentStatus " + rowClass + "\">";
         }
         
         out.write("<tr class=\"" + rowClass + "\">");
