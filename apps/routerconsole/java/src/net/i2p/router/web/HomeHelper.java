@@ -38,26 +38,26 @@ public class HomeHelper extends HelperBase {
     static final String DEFAULT_FAVORITES =
         _x("Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
         "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
-        _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "itoopie_sm.png" + S +
-        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "eepsite.png" + S +
+        _x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "eepsite.png" + S +
+        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "eepsite.png" + S +
         _x("FAQ") + S + _x("Frequently Asked Questions") + S + "http://www.i2p2.i2p/faq" + S + I + "help.png" + S +
-        _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "eepsite.png" + S +
         _x("Anonymous Git Hosting") + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         "Ident " + _x("Microblog") + S + _x("Your premier microblogging service on I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
         _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "book.png" + S +
         //_x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "book.png" + S +
-        _x("killyourtv.i2p") + S + _x("Debian and Tahoe-LAFS repositories") + S + "http://killyourtv.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "itoopie_sm.png" + S +
-        "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("killyourtv.i2p") + S + _x("Debian and Tahoe-LAFS repositories") + S + "http://killyourtv.i2p/" + S + I + "eepsite.png" + S +
+        _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "eepsite.png" + S +
+        "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "eepsite.png" + S +
         _x("Plugins") + S + _x("Add-on directory") + S + "http://plugins.i2p/" + S + I + "plugin.png" + S +
-        _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "eepsite.png" + S +
         _x("Project Website") + S + _x("I2P home page") + S + "http://www.i2p2.i2p/" + S + I + "help.png" + S +
-        "stats.i2p" + S + _x("I2P Netowrk Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "itoopie_sm.png" + S +
+        "stats.i2p" + S + _x("I2P Netowrk Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "eepsite.png" + S +
         _x("Technical Docs") + S + _x("Technical documentation") + S + "http://www.i2p2.i2p/how" + S + I + "book.png" + S +
-        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Sponge's main site") + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "eepsite.png" + S +
+        _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "eepsite.png" + S +
+        _x("Sponge's main site") + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "eepsite.png" + S +
         "";
 
 
