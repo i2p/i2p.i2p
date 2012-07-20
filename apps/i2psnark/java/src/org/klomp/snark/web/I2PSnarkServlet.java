@@ -2201,23 +2201,32 @@ public class I2PSnarkServlet extends DefaultServlet {
         buf.append("<table class=\"snarkDirInfo\"><thead>\n");
         buf.append("<tr>\n")
            .append("<th colspan=2>")
-           .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
+           .append("<img border=\"0\" src=\"" + _imgPath + "file.png\" title=\"")
            .append(_("Directory"))
            .append(": ")
            .append(directory)
-           .append("</th>\n");
+           .append("\" alt=\"")
+           .append(_("Directory"))
+           .append("\"></th>\n");
         buf.append("<th align=\"right\">")
-           .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;")
+           .append("<img border=\"0\" src=\"" + _imgPath + "size.png\" title=\"")
            .append(_("Size"))
-           .append("</th>\n");
+           .append("\" alt=\"")
+           .append(_("Size"))
+           .append("\"></th>\n");
         buf.append("<th class=\"headerstatus\">")
-           .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "status.png\" >&nbsp;")
+           .append("<img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"")
            .append(_("Status"))
-           .append("</th>\n");
+           .append("\" alt=\"")
+           .append(_("Status"))
+           .append("\"></th>\n");
         if (showPriority)
             buf.append("<th class=\"headerpriority\">")
-               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "priority.png\" >&nbsp;")
-               .append(_("Priority")).append("</th>\n");
+               .append("<img border=\"0\" src=\"" + _imgPath + "priority.png\" title=\"")
+               .append(_("Priority"))
+               .append("\" alt=\"")
+               .append(_("Priority"))
+               .append("\"></th>\n");
         buf.append("</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         buf.append(URIUtil.addPaths(base,"../"));
