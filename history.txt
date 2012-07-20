@@ -1,3 +1,10 @@
+2012-07-19 str4d
+ * Home page: replaced itoopie with an eepsite icon (c/o dr|z3d) for eepsites
+   with no icon of their own.
+ * i2psnark:
+   - New light theme which integrates with console light theme
+   - Moved table heading text into tooltips to reduce visual clutter
+
 2012-07-18 str4d
  * Home page: Added id3nt.i2p and git.repo.i2p
 
