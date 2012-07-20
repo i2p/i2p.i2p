@@ -1421,3 +1421,7 @@ div.footnote hr{
      margin-bottom: -18px;
      margin-right: 5px;
 }
+
+iframe.iframed {
+     margin: 10px 0 0;
+}
