@@ -337,7 +337,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("Status"));
         out.write("\" alt=\"");
         out.write(_("Status"));
-        out.write("\">");
+        out.write("\"></th>\n<th>");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"/i2psnark/");
             if (peerParam != null) {
@@ -2009,7 +2009,7 @@ public class I2PSnarkServlet extends DefaultServlet {
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" >\n" +
                                                "<thead>\n" +
-                                               "<tr><th colspan=\"2\">";
+                                               "<tr><th>";
 
     private static final String FOOTER = "</div></center></body></html>";
 
