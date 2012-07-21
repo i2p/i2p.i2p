@@ -12,7 +12,8 @@ public class CSSHelper extends HelperBase {
     private static final Map<String, Boolean> _UACache = new ConcurrentHashMap();
 
     public CSSHelper() {}
-    
+
+    public static final String THEME_CONFIG_FILE = "themes.config";
     public static final String PROP_THEME_NAME = "routerconsole.theme";
     public static final String DEFAULT_THEME = "light";
     public static final String BASE_THEME_PATH = "/themes/console/";
@@ -31,7 +32,7 @@ public class CSSHelper extends HelperBase {
             // This is the first thing to use _context on most pages
             if (_context == null)
                 throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
-            String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+            String theme = _context.readConfigFile(THEME_CONFIG_FILE).getProperty(PROP_THEME_NAME, DEFAULT_THEME);
             url += theme + "/";
         }
         return url;

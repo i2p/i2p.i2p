@@ -9,7 +9,7 @@ public class ConfigUIHelper extends HelperBase {
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);
-        String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        String current = _context.readConfigFile(CSSHelper.THEME_CONFIG_FILE).getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         Set<String> themes = themeSet();
         for (String theme : themes) {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");

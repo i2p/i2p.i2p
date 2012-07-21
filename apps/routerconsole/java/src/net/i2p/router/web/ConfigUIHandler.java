@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.util.Properties;
+
 /** set the theme */
 public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
@@ -21,12 +23,14 @@ public class ConfigUIHandler extends FormHandler {
     private void saveChanges() {
         if (_config == null)
             return;
-        String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        Properties props = _context.readConfigFile(CSSHelper.THEME_CONFIG_FILE);
+        String oldTheme = props.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         boolean ok;
         if (_config.equals("default")) // obsolete
-            ok = _context.router().saveConfig(CSSHelper.PROP_THEME_NAME, null);
+            props.put(CSSHelper.PROP_THEME_NAME, null);
         else
-            ok = _context.router().saveConfig(CSSHelper.PROP_THEME_NAME, _config);
+            props.put(CSSHelper.PROP_THEME_NAME, _config);
+        ok = _context.writeConfigFile("themes.config", props);
         if (ok) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
