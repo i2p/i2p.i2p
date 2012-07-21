@@ -58,6 +58,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import net.i2p.I2PAppContext;
+
 /**
  * @author susi23
  */
@@ -164,7 +166,8 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
 
-	private static final String CONFIG_THEME = "theme";
+	private static final String THEME_CONFIG_FILE = "themes.config";
+	private static final String PROP_THEME = "susimail.theme";
 	private static final String DEFAULT_THEME = "light";
 
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
@@ -1206,7 +1209,7 @@ public class WebMail extends HttpServlet
 			sessionObject.info = "";
 			sessionObject.pageChanged = false;
 			sessionObject.showAttachment = null;
-			sessionObject.themePath = "/themes/susimail/" + Config.getProperty(CONFIG_THEME, DEFAULT_THEME) + '/';
+			sessionObject.themePath = "/themes/susimail/" + I2PAppContext.getGlobalContext().readConfigFile(THEME_CONFIG_FILE).getProperty(PROP_THEME, DEFAULT_THEME) + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			
 			processStateChangeButtons( sessionObject, request );
