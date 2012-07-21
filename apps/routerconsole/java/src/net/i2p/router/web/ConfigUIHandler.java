@@ -30,7 +30,7 @@ public class ConfigUIHandler extends FormHandler {
             props.put(CSSHelper.PROP_THEME_NAME, null);
         else
             props.put(CSSHelper.PROP_THEME_NAME, _config);
-        ok = _context.writeConfigFile("themes.config", props);
+        ok = _context.writeConfigFile(CSSHelper.THEME_CONFIG_FILE, props);
         if (ok) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
