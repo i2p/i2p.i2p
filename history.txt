@@ -1,3 +1,7 @@
+2012-07-21 zzz
+ * i2psnark: Remove dark theme
+ * SSU: Remove exception creation (ticket #665)
+
 2012-07-19 str4d
  * Home page: replaced itoopie with an eepsite icon (c/o dr|z3d) for eepsites
    with no icon of their own.
