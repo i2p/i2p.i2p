@@ -28,10 +28,10 @@ public class HomeHelper extends HelperBase {
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "wrench_orange.png" + S +
         _x("Configure Language") + S + _x("Console Language Selection") + S + "/configui" + S + I + "wrench_orange.png" + S +
         _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "wrench_orange.png" + S +
-        _x("Email") + S + _x("Anonymous webmail client") + S + "/webmail" + S + I + "email.png" + S +
+        _x("Email") + S + _x("Anonymous webmail client") + S + "/susimail/susimail" + S + I + "email.png" + S +
         _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "help.png" + S +
         _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "wrench_orange.png" + S +
-        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/torrents" + S + I + "film.png" + S +
+        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/i2psnark/" + S + I + "film.png" + S +
         _x("Website") + S + _x("Local web server") + S + "http://127.0.0.1:7658/" + S + I + "server.png" + S +
         "";
 
