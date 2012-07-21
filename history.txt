@@ -1,5 +1,6 @@
 2012-07-21 zzz
  * i2psnark: Remove dark theme
+ * Reseed: Add new cert for cowpuncher
  * SSU: Remove exception creation (ticket #665)
 
 2012-07-19 str4d
