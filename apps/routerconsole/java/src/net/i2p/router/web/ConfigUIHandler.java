@@ -1,10 +1,12 @@
 package net.i2p.router.web;
 
+import java.util.Iterator;
 import java.util.Properties;
 
 /** set the theme */
 public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
+    private boolean _universalTheming;
     private String _config;
     
     @Override
@@ -14,7 +16,9 @@ public class ConfigUIHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { _shouldSave = true; }
-    
+
+    public void setUniversalTheming(String baa) { _universalTheming = true; }
+
     public void setTheme(String val) {
         _config = val;
     }
@@ -25,12 +29,18 @@ public class ConfigUIHandler extends FormHandler {
             return;
         Properties props = _context.readConfigFile(CSSHelper.THEME_CONFIG_FILE);
         String oldTheme = props.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
-        boolean ok;
-        if (_config.equals("default")) // obsolete
-            props.put(CSSHelper.PROP_THEME_NAME, null);
-        else
-            props.put(CSSHelper.PROP_THEME_NAME, _config);
-        ok = _context.writeConfigFile(CSSHelper.THEME_CONFIG_FILE, props);
+        if (_universalTheming) {
+            for (Iterator it = props.keySet().iterator(); it.hasNext();) {
+                String key = (String) it.next();
+                props.put(key, _config);
+            }
+        } else {
+            if (_config.equals("default")) // obsolete
+                props.put(CSSHelper.PROP_THEME_NAME, null);
+            else
+                props.put(CSSHelper.PROP_THEME_NAME, _config);
+        }
+        boolean ok = _context.writeConfigFile(CSSHelper.THEME_CONFIG_FILE, props);
         if (ok) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
