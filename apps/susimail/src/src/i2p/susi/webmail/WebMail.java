@@ -49,6 +49,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -1190,6 +1191,15 @@ public class WebMail extends HttpServlet
 	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response )
 	throws IOException, ServletException
 	{
+		Properties themeProps = I2PAppContext.getGlobalContext().readConfigFile(THEME_CONFIG_FILE);
+		String theme = themeProps.getProperty(PROP_THEME);
+		// Ensure that theme config line exists in config file
+		if (theme == null) {
+			theme = DEFAULT_THEME;
+			themeProps.put(PROP_THEME, theme);
+			I2PAppContext.getGlobalContext().writeConfigFile(THEME_CONFIG_FILE, themeProps);
+		}
+
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
                 response.setHeader("X-Frame-Options", "SAMEORIGIN");
@@ -1209,7 +1219,7 @@ public class WebMail extends HttpServlet
 			sessionObject.info = "";
 			sessionObject.pageChanged = false;
 			sessionObject.showAttachment = null;
-			sessionObject.themePath = "/themes/susimail/" + I2PAppContext.getGlobalContext().readConfigFile(THEME_CONFIG_FILE).getProperty(PROP_THEME, DEFAULT_THEME) + '/';
+			sessionObject.themePath = "/themes/susimail/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			
 			processStateChangeButtons( sessionObject, request );

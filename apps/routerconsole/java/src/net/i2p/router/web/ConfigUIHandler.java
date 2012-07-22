@@ -29,16 +29,17 @@ public class ConfigUIHandler extends FormHandler {
             return;
         Properties props = _context.readConfigFile(CSSHelper.THEME_CONFIG_FILE);
         String oldTheme = props.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        // Save routerconsole theme first to ensure it is in config file
+        if (_config.equals("default")) // obsolete
+            props.put(CSSHelper.PROP_THEME_NAME, null);
+        else
+            props.put(CSSHelper.PROP_THEME_NAME, _config);
         if (_universalTheming) {
+            // The routerconsole theme gets set again, but oh well
             for (Iterator it = props.keySet().iterator(); it.hasNext();) {
                 String key = (String) it.next();
                 props.put(key, _config);
             }
-        } else {
-            if (_config.equals("default")) // obsolete
-                props.put(CSSHelper.PROP_THEME_NAME, null);
-            else
-                props.put(CSSHelper.PROP_THEME_NAME, _config);
         }
         boolean ok = _context.writeConfigFile(CSSHelper.THEME_CONFIG_FILE, props);
         if (ok) {
