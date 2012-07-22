@@ -293,10 +293,12 @@ public class SnarkManager implements Snark.CompleteListener {
         updateConfig();
     }
     /**
-     * Get current theme.
+     * Get current theme - reads config file on every call.
+     * FIXME: only read in _theme on first call for each page load.
      * @return String -- the current theme
      */
     public String getTheme() {
+        _theme = _context.readConfigFile(THEME_CONFIG_FILE).getProperty(PROP_THEME, DEFAULT_THEME);
         return _theme;
     }
 
