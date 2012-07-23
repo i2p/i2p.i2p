@@ -90,6 +90,8 @@ public class SSLEepGet extends EepGet {
     /** may be null if init failed */
     private SavingTrustManager _stm;
 
+    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+
     /**
      *  A new SSLEepGet with a new SSLState
      */
@@ -192,12 +194,23 @@ public class SSLEepGet extends EepGet {
         String override = System.getProperty("javax.net.ssl.keyStore");
         if (override != null)
             success = loadCerts(new File(override), ks);
-        if (!success)
-            success = loadCerts(new File(System.getProperty("java.home"), "lib/security/jssecacerts"), ks);
-        if (!success)
-            success = loadCerts(new File(System.getProperty("java.home"), "lib/security/cacerts"), ks);
+        if (!success) {
+            if (_isAndroid) {
+                // thru API 13. As of API 14 (ICS), the file is gone, but
+                // ks.load(null, pw) will bring in the default certs?
+                success = loadCerts(new File(System.getProperty("java.home"), "etc/security/cacerts.bks"), ks);
+            } else {
+                success = loadCerts(new File(System.getProperty("java.home"), "lib/security/jssecacerts"), ks);
+                if (!success)
+                    success = loadCerts(new File(System.getProperty("java.home"), "lib/security/cacerts"), ks);
+            }
+        }
 
         if (!success) {
+            try {
+                // must be initted
+                ks.load(null, "changeit".toCharArray());
+            } catch (Exception e) {}
             _log.error("All key store loads failed, will only load local certificates");
         } else if (_log.shouldLog(Log.INFO)) {
             int count = 0;
