@@ -289,14 +289,7 @@ public class SnarkManager implements Snark.CompleteListener {
         if (!_config.containsKey(PROP_STARTUP_DELAY))
             _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(DEFAULT_STARTUP_DELAY));
         // Fetch theme
-        Properties themeProps = _context.readConfigFile(THEME_CONFIG_FILE);
-        _theme = themeProps.getProperty(PROP_THEME);
-        // Ensure that theme config line exists in config file
-        if (_theme == null) {
-            _theme = DEFAULT_THEME;
-            themeProps.put(PROP_THEME, _theme);
-            _context.writeConfigFile(THEME_CONFIG_FILE, themeProps);
-        }
+        _theme = getTheme();
         updateConfig();
     }
     /**
@@ -305,7 +298,20 @@ public class SnarkManager implements Snark.CompleteListener {
      * @return String -- the current theme
      */
     public String getTheme() {
-        _theme = _context.readConfigFile(THEME_CONFIG_FILE).getProperty(PROP_THEME, DEFAULT_THEME);
+        Properties themeProps = _context.readConfigFile(THEME_CONFIG_FILE);
+        _theme = themeProps.getProperty(PROP_THEME);
+        // Ensure that theme config line exists in config file, and theme exists
+        String[] themes = getThemes();
+        boolean themeExists = false;
+        for (int i = 0; i < themes.length; i++) {
+            if (themes[i].equals(_theme))
+                themeExists = true;
+        }
+        if (_theme == null || !themeExists) {
+            _theme = DEFAULT_THEME;
+            themeProps.put(PROP_THEME, _theme);
+            _context.writeConfigFile(THEME_CONFIG_FILE, themeProps);
+        }
         return _theme;
     }
 
