@@ -1,3 +1,7 @@
+2012-07-24 zzz
+ * LookaheadInputStream: Fix bug causing gunzip fails, esp. on Android
+ * SSLEepGet: Fix on Android (ticket #668)
+
 2012-07-21 zzz
  * i2psnark: Remove dark theme
  * Reseed: Add new cert for cowpuncher
