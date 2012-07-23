@@ -1,5 +1,6 @@
 2012-07-24 zzz
  * LookaheadInputStream: Fix bug causing gunzip fails, esp. on Android
+ * Router: Don't create router.ping file on Android
  * SSLEepGet: Fix on Android (ticket #668)
 
 2012-07-21 zzz

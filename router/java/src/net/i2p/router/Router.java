@@ -255,7 +255,8 @@ public class Router implements RouterClock.ClockShiftListener {
         // *********  Start no threads before here ********* //
         //
         // NOW we can start the ping file thread.
-        beginMarkingLiveliness();
+        if (!System.getProperty("java.vendor").contains("Android"))
+            beginMarkingLiveliness();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
         // But context.isRouterContext() is even easier...
