@@ -37,6 +37,8 @@ import i2p.susi.webmail.smtp.SMTPClient;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1193,8 +1195,14 @@ public class WebMail extends HttpServlet
 	{
 		Properties themeProps = I2PAppContext.getGlobalContext().readConfigFile(THEME_CONFIG_FILE);
 		String theme = themeProps.getProperty(PROP_THEME);
-		// Ensure that theme config line exists in config file
-		if (theme == null) {
+		// Ensure that theme config line exists in config file, and theme exists
+		String[] themes = getThemes();
+		boolean themeExists = false;
+		for (int i = 0; i < themes.length; i++) {
+			if (themes[i].equals(theme))
+				themeExists = true;
+		}
+		if (theme == null || !themeExists) {
 			theme = DEFAULT_THEME;
 			themeProps.put(PROP_THEME, theme);
 			I2PAppContext.getGlobalContext().writeConfigFile(THEME_CONFIG_FILE, themeProps);
@@ -1744,5 +1752,26 @@ public class WebMail extends HttpServlet
 	/** translate */
     private static String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p);
+    }
+
+    /**
+     * Get all themes
+     * @return String[] -- Array of all the themes found.
+     */
+    public String[] getThemes() {
+            String[] themes = null;
+            // "docs/themes/susimail/"
+            File dir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs/themes/susimail");
+            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
+            // Walk the themes dir, collecting the theme names, and append them to the map
+            File[] dirnames = dir.listFiles(fileFilter);
+            if (dirnames != null) {
+                themes = new String[dirnames.length];
+                for(int i = 0; i < dirnames.length; i++) {
+                    themes[i] = dirnames[i].getName();
+                }
+            }
+            // return the map.
+            return themes;
     }
 }
