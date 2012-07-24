@@ -260,6 +260,7 @@ public class BOB {
 
 			i = 0;
 			boolean g = false;
+			spin.set(true);
 			try {
 				info("BOB is now running.");
 				listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));

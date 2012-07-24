@@ -1,3 +1,6 @@
+2012-07-24 sponge
+ * BOB reset spin flag to enable restart from zap command
+
 2012-07-24 str4d
  * Summary bar: disable fallback iframe in summary.jsi (so when JS is disabled
    the summary bar will not refresh at all)
