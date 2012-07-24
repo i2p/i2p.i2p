@@ -2,6 +2,7 @@
  * Home page:
    - Replaced 16x16 icons with 32x32 ones
    - Updated icon for git.repo.i2p
+   - Moved RestartStatus back above LocalDestinations
 
 2012-07-24 zzz
  * LookaheadInputStream: Fix bug causing gunzip fails, esp. on Android
@@ -13,11 +14,16 @@
  * Reseed: Add new cert for cowpuncher
  * SSU: Remove exception creation (ticket #665)
 
+2012-07-21 str4d
+ * Home page: unlinked the iframed pages for i2psnark and susimail (the pages
+   /webmail and /torrents still exist, but the console links to the apps
+   directly instead for now)
+
 2012-07-19 str4d
  * Home page: replaced itoopie with an eepsite icon (c/o dr|z3d) for eepsites
    with no icon of their own.
  * i2psnark:
-   - New light theme which integrates with console light theme
+   - New light theme (c/o dr|z3d) which integrates with console light theme
    - Moved table heading text into tooltips to reduce visual clutter
 
 2012-07-18 str4d
