@@ -197,6 +197,7 @@ Applications:
          - Guernsey and Isle of Man flags from the Open Clip Art Library, released into the public domain
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        Silk icons: See licenses/LICENSE-SilkIcons.txt
+       FatCow icons: See licenses/LICENSE-FatCowIcons.txt
 
        GeoIP Data:
        Copyright (c) 2008 MaxMind, Inc.  All Rights Reserved.

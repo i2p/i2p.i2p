@@ -1,3 +1,8 @@
+2012-07-24 str4d
+ * Home page:
+   - Replaced 16x16 icons with 32x32 ones
+   - Updated icon for git.repo.i2p
+
 2012-07-24 zzz
  * LookaheadInputStream: Fix bug causing gunzip fails, esp. on Android
  * Router: Don't create router.ping file on Android
