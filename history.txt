@@ -1,4 +1,6 @@
 2012-07-24 str4d
+ * Summary bar: disable fallback iframe in summary.jsi (so when JS is disabled
+   the summary bar will not refresh at all)
  * Home page:
    - Replaced 16x16 icons with 32x32 ones
    - Updated icon for git.repo.i2p
