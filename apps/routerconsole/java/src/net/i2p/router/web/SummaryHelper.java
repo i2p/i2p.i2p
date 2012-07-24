@@ -64,9 +64,9 @@ public class SummaryHelper extends HelperBase {
         "NewsHeadings" + S +
         "UpdateStatus" + S +
         "NetworkReachability" + S +
+        "RestartStatus" + S +
         "FirewallAndReseedStatus" + S +
         "Destinations" + S +
-        "RestartStatus" + S +
         "";
 
     /**
