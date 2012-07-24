@@ -207,6 +207,10 @@ Applications:
    "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
    Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
 
+   I2PSnark light theme:
+   "Creative Commons Cat" licensed under a Creative Commons Attribution 3.0 Unported License.
+   Original photo by Boaz Arad. http://www.luxphile.com/2011/01/creative-commons-cat.html
+
    SAM:
    Public domain.
 
