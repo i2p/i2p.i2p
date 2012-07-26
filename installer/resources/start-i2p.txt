@@ -1,8 +1,8 @@
-To start I2P, run:
+On most systems, I2P can be started with:
 
 $INSTALL_PATH/i2prouter start
 
 
-On non-x86, run:
+If I2P does not start, please try:
 
 $INSTALL_PATH/runplain.sh
