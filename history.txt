@@ -1,3 +1,6 @@
+2012-07-26 kytv
+* Finnish, French, German, Spanish and Swedish translation updates from TX
+
 2012-07-24 sponge
  * BOB reset spin flag to enable restart from zap command
 
