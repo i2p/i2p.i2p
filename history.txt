@@ -1,4 +1,5 @@
 2012-07-26 kytv
+* Update geoip.txt based on Maxmind GeoLite Country database from 2012-07-04
 * Finnish, French, German, Spanish and Swedish translation updates from TX
 
 2012-07-24 sponge
