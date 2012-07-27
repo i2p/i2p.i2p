@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project basedir="." default="all" name="i2p">
 
-    <!-- Things you might want to change -->
-    <!-- This keeps gcj a lot quieter -->
-    <!--
-        <property name="javac.compilerargs" value="-warn:-unchecked,raw,unused,serial" />
-    -->
-    <!-- Additional classpath. No longer required; we find pack200 classes at runtime.
-         See core/java/src/net/i2p/util/FileUtil.java for more info.
-    -->
-    <!--
-        <property name="javac.classpath" value="/PATH/TO/pack200.jar" />
-    -->
-
-    <!-- change this to false if you don't have gettext -->
-    <property name="require.gettext" value="true" />
-    <!-- Include property files so that values can be easily overridden. Currently just useful for javadoc hosters -->
+    <!-- Include property files so that values can be easily overridden.
+         Users should create an override.properties file to make changes.
+     -->
     <property file="override.properties"/>
     <property file="build.properties"/>
 
