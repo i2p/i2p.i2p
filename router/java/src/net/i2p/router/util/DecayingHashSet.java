@@ -253,14 +253,16 @@ public class DecayingHashSet extends DecayingBloomFilter {
     /**
      *  vs. DBF, this measures 1.93x faster for testByLong and 2.46x faster for testByBytes.
      */
+/*****
     public static void main(String args[]) {
-        /** KBytes per sec, 1 message per KByte */
+        // KBytes per sec, 1 message per KByte
         int kbps = 256;
         int iterations = 10;
         //testSize();
         testByLong(kbps, iterations);
         testByBytes(kbps, iterations);
     }
+*****/
 
     /** and the answer is: 49.9 bytes. The ArrayWrapper alone measured 16, so that's 34 for the HashSet entry. */
 /*****
@@ -280,6 +282,7 @@ public class DecayingHashSet extends DecayingBloomFilter {
 *****/
 
     /** 8 bytes, simulate the router message validator */
+/*****
     private static void testByLong(int kbps, int numRuns) {
         int messages = 60 * 10 * kbps;
         Random r = new Random();
@@ -304,8 +307,10 @@ public class DecayingHashSet extends DecayingBloomFilter {
                            + falsePositives + " false positives");
 
     }
+*****/
 
     /** 16 bytes, simulate the tunnel IV validator */
+/*****
     private static void testByBytes(int kbps, int numRuns) {
         byte iv[][] = new byte[60*10*kbps][16];
         Random r = new Random();
@@ -332,4 +337,5 @@ public class DecayingHashSet extends DecayingBloomFilter {
                            + DataHelper.formatDuration(totalTime/numRuns) + " per run, there were "
                            + falsePositives + " false positives");
     }
+*****/
 }

@@ -371,6 +371,7 @@ public class DecayingBloomFilter {
      *  1792 2.4E-6; 4096 0.14%; 5120 0.6%; 6144 1.7%; 8192 6.8%; 10240 15%
      *</pre>
      */
+/*****
     public static void main(String args[]) {
         System.out.println("Usage: DecayingBloomFilter [kbps [m [iterations]]] (default 256 23 10)");
         int kbps = 256;
@@ -452,4 +453,5 @@ public class DecayingBloomFilter {
         //System.out.println("inserted: " + bloom.size() + " with " + bloom.capacity() 
         //                   + " (" + bloom.falsePositives()*100.0d + "% false positive)");
     }
+*****/
 }
