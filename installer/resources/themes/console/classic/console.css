@@ -1116,3 +1116,23 @@ input.search[type="text"] {
      margin-bottom: -5px;
      margin-right: 5px;
 }
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 1px 0 0 !important;
+}
+
+.iframed div.sorry {
+     margin: -1px 1px 0 0 !important;
+}
+
+/* end iframed console fixes */

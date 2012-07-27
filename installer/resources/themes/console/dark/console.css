@@ -1329,3 +1329,23 @@ div.applabel {
 iframe.iframed {
      margin: 10px 0 0;
 }
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 5px 0 5px !important;
+}
+
+.iframed div.sorry {
+     margin: -1px 5px 10px 5px !important;
+}
+
+/* end iframed console fixes */

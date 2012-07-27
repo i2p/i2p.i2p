@@ -1425,3 +1425,23 @@ div.footnote hr{
 iframe.iframed {
      margin: 10px 0 0;
 }
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 10px 10px 7px !important;
+}
+
+.iframed div.sorry {
+     margin: 5px 10px 10px 7px !important;
+}
+
+/* end iframed console fixes */
