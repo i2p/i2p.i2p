@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-26 19:45+0000\n"
-"PO-Revision-Date: 2012-07-22 01:50+0000\n"
+"POT-Creation-Date: 2012-07-28 21:17+0000\n"
+"PO-Revision-Date: 2012-07-27 23:19+0000\n"
 "Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/"
 "es/)\n"
@@ -2723,7 +2723,7 @@ msgstr "Deshechar threads"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:213
 #, java-format
 msgid "Threads dumped to {0}"
-msgstr ""
+msgstr "hilos desechados a {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:214
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:463
@@ -2803,40 +2803,40 @@ msgstr "El intervalo de recarga tiene que ser un número."
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:42
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:417
 msgid "Restore full default"
-msgstr ""
+msgstr "Restablecer todos los valores por defecto"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:44
 msgid "Full summary bar default restored."
-msgstr ""
+msgstr "todos los valores por defecto de la barra de resumen restablecidos"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:45
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:49
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:141
 msgid "Summary bar will refresh shortly."
-msgstr ""
+msgstr "La barra de resumen recargará dentro de poco."
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:46
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:419
 msgid "Restore minimal default"
-msgstr ""
+msgstr "restablecer valores por defecto mínimales"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:48
 msgid "Minimal summary bar default restored."
-msgstr ""
+msgstr " valores por defecto mínimales restablecidos"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:65
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:87
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:135
 msgid "Order must be an integer"
-msgstr ""
+msgstr "scuesión tiene que ser un número natural"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:72
 msgid "No section selected"
-msgstr ""
+msgstr "no sección elegida"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:77
 msgid "No order entered"
-msgstr ""
+msgstr "no orden entrado"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:133
 msgid "Moved"
@@ -2844,7 +2844,7 @@ msgstr "movido"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:140
 msgid "Saved order of sections."
-msgstr ""
+msgstr "sucesión de secciones guardada"
 
 #. the count isn't really correct anyway, since we don't check for actual changes
 #. addFormNotice("Updated settings for " + updated + " pools.");
@@ -3364,18 +3364,20 @@ msgid ""
 "A public anonymous Git hosting site - supports pulling via Git and HTTP and "
 "pushing via SSH"
 msgstr ""
+"un sitio anfitrión git anónimo y público - soporta halar a través de Git y "
+"HTTP, y empujar a través de SSH"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:46
 msgid "Anonymous Git Hosting"
-msgstr ""
+msgstr "anfitrión git anónimo"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:47
 msgid "Microblog"
-msgstr ""
+msgstr "microblog"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:47
 msgid "Your premier microblogging service on I2P"
-msgstr ""
+msgstr "servicio mircroblog en I2P"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:48
 msgid "Javadocs"
@@ -3501,7 +3503,7 @@ msgstr "Router local"
 #. 1
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:21
 msgid "Router Lookup"
-msgstr ""
+msgstr "búsqueda de router"
 
 #. 2
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:22
@@ -4106,7 +4108,7 @@ msgstr "estado"
 #. 0
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:12
 msgid "Floodfill "
-msgstr ""
+msgstr "'floodfill'"
 
 #. 2
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:14
@@ -4374,10 +4376,12 @@ msgid ""
 "Your Local Identity is your unique I2P router identity, similar to an ip "
 "address but tailored to I2P. "
 msgstr ""
+"La identidad local es la identidad única de tu router, similar a una "
+"dirección ip, pero en el ámbito de i2p."
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:274
 msgid "Never disclose this to anyone, as it can reveal your real world ip."
-msgstr ""
+msgstr "Nunca la digas a nadie, dado que puede revelar tu dirección ip real."
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:276
 msgid "Local Identity"
@@ -4398,7 +4402,7 @@ msgstr "mostrar"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:290
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:316
 msgid "The version of the I2P software we are running"
-msgstr ""
+msgstr "la versión de I2P que estás usando"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:300
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:326
@@ -4419,7 +4423,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:356
 msgid "Configure I2P Updates"
-msgstr ""
+msgstr "configurar la actualización de I2P"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:358
 msgid "I2P Update"
@@ -4428,6 +4432,7 @@ msgstr "Actualización de I2P"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:383
 msgid "Peers we've been talking to in the last few minutes/last hour"
 msgstr ""
+"pares con los que hemos comunicado en los últimos minutos / la última hora"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:386
 msgid "Active"
@@ -4435,7 +4440,7 @@ msgstr "Activos"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:395
 msgid "The number of peers available for building client tunnels"
-msgstr ""
+msgstr "cantidad de pares disponibles para crear túneles clientes"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Fast"
@@ -4443,7 +4448,7 @@ msgstr "Rápidos"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:404
 msgid "The number of peers available for building exploratory tunnels"
-msgstr ""
+msgstr "cantidad de pares disponibles para crear túneles exploratorios"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:407
 msgid "High capacity"
@@ -4452,10 +4457,11 @@ msgstr "Alta capacidad"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:413
 msgid "The number of peers available for network database inquries"
 msgstr ""
+"cantidad de pares disponibles para consultas a la base de datos sobre la red"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:422
 msgid "The total number of peers in our network database"
-msgstr ""
+msgstr "cantidad total de routers en nuestra base de datos sobre la red"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:425
 msgid "Known"
@@ -4480,7 +4486,7 @@ msgstr "Usado"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:496
 msgid ""
 "Used for building and testing tunnels, and communicating with floodfill peers"
-msgstr ""
+msgstr "para crear y probar túneles, y para comunicar con los pares floodfill"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:499
 msgid "Exploratory"
@@ -4488,13 +4494,15 @@ msgstr "Exploratorios"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:505
 msgid "Tunnels we are using to provide or access services on the network"
-msgstr ""
+msgstr "túneles que usas para acceder o provisionar servicios en la red"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:514
 msgid ""
 "Tunnels we are participating in, directly contributing bandwith to the "
 "network"
 msgstr ""
+"Túneles en los que tomamos parte, así aportando de forma directa ancho de "
+"banda a la red. "
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:517
 msgid "Participating"
@@ -4505,6 +4513,8 @@ msgid ""
 "The ratio of tunnel hops we provide to tunnel hops we use - a value greater "
 "than 1.00 indicates a positive contribution to the network"
 msgstr ""
+"La relación de saltos de túnel que proporcionamos y los que usamos - un "
+"valor mayor de 1,00 indica una aportación positiva a la red."
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:526
 msgid "Share ratio"
@@ -4536,7 +4546,7 @@ msgstr "Demora - mensajes"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:565
 msgid "Round trip time for a tunnel test"
-msgstr ""
+msgstr "Tiempo de ida y vuelta de un test de túnel"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:568
 msgid "Tunnel lag"
@@ -4544,7 +4554,7 @@ msgstr "Demora - túneles"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:575
 msgid "Queued requests from other routers to participate in tunnels"
-msgstr ""
+msgstr "encoladas peticiones de otros routers para participar en túneles"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:578
 msgid "Backlog"
@@ -4696,23 +4706,23 @@ msgstr "Resembrar"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:812
 msgid "Order"
-msgstr ""
+msgstr "orden"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:829
 msgid "Top"
-msgstr ""
+msgstr "cabeza"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:842
 msgid "Down"
-msgstr ""
+msgstr "abajo"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:847
 msgid "Bottom"
-msgstr ""
+msgstr "fondo"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:859
 msgid "Select a section to add"
-msgstr ""
+msgstr "elegir una sección a añadir"
 
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:118
 #, java-format
@@ -6601,11 +6611,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:139
 msgid "config summary bar"
-msgstr ""
+msgstr "configurar barra del resumen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:330
 msgid "I2P Summary Bar Configuration"
-msgstr ""
+msgstr "Configuración de la barra del resumen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:401
 msgid "Refresh Interval"
@@ -6617,7 +6627,7 @@ msgstr "segundos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:411
 msgid "Customize Summary Bar"
-msgstr ""
+msgstr "Modificar barra del resumen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:137
 msgid "config stats"
@@ -6981,11 +6991,11 @@ msgstr "Sitios de interés"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:154
 msgid "i2p tunnel manager"
-msgstr ""
+msgstr "gestionador de túneles i2p"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:322
 msgid "I2P Tunnel Manager"
-msgstr ""
+msgstr "Gestionador de Túneles I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jars_jsp.java:138
 msgid "Jar File Dump"
@@ -7021,11 +7031,11 @@ msgstr "Registros de servicio (Wrapper)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:136
 msgid "network database"
-msgstr ""
+msgstr "base de datos de la red"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:303
 msgid "I2P Network Database"
-msgstr ""
+msgstr "Base de datos de la Red I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:142
 msgid "WebApp Not Found"
@@ -7078,11 +7088,11 @@ msgstr "Deshabilitar la recarga de cada {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:154
 msgid "torrents"
-msgstr ""
+msgstr "torrents"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:321
 msgid "I2P Torrent Downloader"
-msgstr ""
+msgstr "Descargador de Torrents I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:136
 msgid "tunnel summary"
@@ -7104,8 +7114,8 @@ msgstr "Perfil del par {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:154
 msgid "webmail"
-msgstr ""
+msgstr "correo"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:321
 msgid "I2P Webmail"
-msgstr ""
+msgstr "Correo I2P"

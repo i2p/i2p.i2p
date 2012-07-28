@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-26 19:55+0000\n"
-"PO-Revision-Date: 2012-07-26 13:52+0000\n"
-"Last-Translator: D.A. Loader <>\n"
+"POT-Creation-Date: 2012-07-28 21:16+0000\n"
+"PO-Revision-Date: 2012-07-27 23:35+0000\n"
+"Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -2804,13 +2804,13 @@ msgstr "Standardeinstellungen wiederherstellen"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:44
 msgid "Full summary bar default restored."
-msgstr "Vollständige Zusammenfassungsleiste wiederhergestellt."
+msgstr "Vollständige Schnellübersicht wiederhergestellt."
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:45
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:49
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:141
 msgid "Summary bar will refresh shortly."
-msgstr "Die Zusammenfassungsleiste wird neu geladen."
+msgstr "Die Schnellübersicht wird neu geladen."
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:46
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:419
@@ -2819,7 +2819,7 @@ msgstr "Minimale Standard Version wiederherstellen"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:48
 msgid "Minimal summary bar default restored."
-msgstr "Minimale Zusammenfassungsleiste wiederhergestellt."
+msgstr "Minimale Schnellübersicht wiederhergestellt."
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:65
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:87
@@ -3371,7 +3371,7 @@ msgstr "Mikroblog"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:47
 msgid "Your premier microblogging service on I2P"
-msgstr ""
+msgstr "Microblogging-Service in I2P"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:48
 msgid "Javadocs"
@@ -4521,6 +4521,9 @@ msgid ""
 "The ratio of tunnel hops we provide to tunnel hops we use - a value greater "
 "than 1.00 indicates a positive contribution to the network"
 msgstr ""
+" Verhältnis der Tunnelsprünge, die wir dem Netz zur Verfügugn stellen, zu "
+"denen, die wir selbst benutzen - ein Wert größer als 1,00 bedeutet einen "
+"positiven Beitrag zum I2P-Netzwerk"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:526
 msgid "Share ratio"
@@ -4552,7 +4555,7 @@ msgstr "Nachrichtenverzug"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:565
 msgid "Round trip time for a tunnel test"
-msgstr ""
+msgstr "Hin- und Rücklaufzeit für einen Tunneltest"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:568
 msgid "Tunnel lag"
@@ -4560,7 +4563,7 @@ msgstr "Tunnelverzug"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:575
 msgid "Queued requests from other routers to participate in tunnels"
-msgstr ""
+msgstr "wartende Anfragen anderer Router zur Teilnahme  in deren Tunneln"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:578
 msgid "Backlog"
@@ -6644,11 +6647,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:139
 msgid "config summary bar"
-msgstr "Konfiguriere Zusammenfassungsleiste"
+msgstr "Konfiguriere Schnellübersicht"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:330
 msgid "I2P Summary Bar Configuration"
-msgstr ""
+msgstr "Einstellungen zur I2P-Schnellübersicht"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:401
 msgid "Refresh Interval"
@@ -6660,7 +6663,7 @@ msgstr "Sekunden"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:411
 msgid "Customize Summary Bar"
-msgstr ""
+msgstr "Schnellübersicht anpassen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:137
 msgid "config stats"
@@ -6804,7 +6807,7 @@ msgid ""
 "Please contribute to the router console translation project! Contact the "
 "developers in #i2p-dev on IRC to help."
 msgstr ""
-"Bitte hilf bei der Übersetzung der Routerkonsole mit und kontaktiere dazu "
+"Bitte hilf bei der Übersetzung der Routerkonsole mit, und kontaktiere dazu "
 "die Entwickler im IRC-Kanal #i2p-dev!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:389
