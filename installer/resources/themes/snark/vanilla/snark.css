@@ -369,6 +369,10 @@ td:first-child {
      border-top: 1px dotted #313 !important;
 }
 
+.snarkFileIcon {
+     width: 16px;
+}
+
 .snarkFileName {
      padding: 4px 0px !important; 
      text-align: left !important;
