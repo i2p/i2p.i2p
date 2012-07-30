@@ -539,7 +539,7 @@
             <arg value="-f1" />
             <arg value="-d;" />
         </exec>
-        <exec executable="awk" outputproperty="build.extra" failifexecutionfails="false">
+        <exec executable="awk" osfamily="unix" outputproperty="build.extra" failifexecutionfails="false">
             <arg value="-F&quot;" />
             <arg value="/public final static String EXTRA/{print $2}" />
             <arg value="router/java/src/net/i2p/router/RouterVersion.java" />

@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.RandomSource;
 
 import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEValue;
@@ -27,7 +27,6 @@ import org.klomp.snark.bencode.BEValue;
  */
 class MagnetState {
     public static final int CHUNK_SIZE = 16*1024;
-    private static final Random random = I2PAppContext.getGlobalContext().random();
 
     private final byte[] infohash;
     private boolean complete;
@@ -129,7 +128,7 @@ class MagnetState {
             throw new IllegalArgumentException("not initialized");
         if (complete)
             throw new IllegalArgumentException("complete");
-        int rand = random.nextInt(totalChunks);
+        int rand = RandomSource.getInstance().nextInt(totalChunks);
         for (int i = 0; i < totalChunks; i++) {
             int chk = (i + rand) % totalChunks; 
             if (!(have.get(chk) || requested.get(chk))) {

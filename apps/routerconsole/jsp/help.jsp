@@ -9,7 +9,9 @@
 %>
 <html><head><title>I2P Router Console - help</title>
 <%@include file="css.jsi" %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P Router Help &amp; Support</h1>
 <div class="main" id="main"><p>

@@ -1,124 +1,147 @@
 body {
-	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-	background-color: #eef;
-	color:#001;
+     font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background-color: #f0f0f0;
+     color:#001;
+}
+
+body.iframed {
+     background: transparent !important;
+     margin: 0;
+}
+
+.iframed #logo {
+     display: none;
+}
+
+#navi p{
+     text-align: center !important;
+     text-transform: capitalize;
+     font-weight: bold;
 }
 
 p {
-	color:black;
-	line-height:12pt;
-	margin-left:5mm;
-	margin-right:5mm;
-	font-size:10pt;
-  text-align: justify;
+     color:black;
+     line-height:12pt;
+     margin-left:5mm;
+     margin-right:5mm;
+     font-size:9pt;
+     text-align: justify;
 }
 
 span.addrhlpr {
-	font-size:8pt;
+     font-size:8pt;
 }
-	
-h3 {
 
-	color:black;
-	font-size:12pt;
-	letter-spacing:2pt;
-	line-height:18pt;
-	font-weight:bold;
+h3 {
+     color:black;
+     font-size:12pt;
+     letter-spacing:2pt;
+     line-height:18pt;
+     font-weight:bold;
 }
 
 a {
-	color:#327BBF;
-	text-decoration:none;
-  font-weight: bold;
+     color:#327BBF;
+     text-decoration:none;
+     font-weight: bold;
 }
 
 a:hover {
-	text-decoration:underline;
-  font-weight: bold;
+     text-decoration:underline;
+     font-weight: bold;
 }
 
 th {
-
-	color:black;
-	line-height:12pt;
-	padding:5px 10px;
-	font-size:10pt;
+     color:black;
+     line-height:12pt;
+     padding:5px 10px;
+     font-size:10pt;
 }
 
 td {
-
-	color:black;
-	line-height:12pt;
-	padding:5px 10px;
-	font-size:10pt;
-	vertical-align:center;
+     color:black;
+     line-height:12pt;
+     padding:5px 10px;
+     font-size:9pt;
+     vertical-align:center;
 }
 
 li {
-
-	color:black;
-	line-height:12pt;
-	margin-left:5mm;
-	margin-right:5mm;
-	font-size:10pt;
+     color:black;
+     line-height:12pt;
+     margin-left:5mm;
+     margin-right:5mm;
+     font-size:9pt;
 }
 
 tr.list1 {
-	background-color:#E8E8EC;
+     background-color:#E8E8EC;
 }
 
 tr.list0 {
-	background-color:#F0F0F4;
+     background-color:#F0F0F4;
 }
 
 p.messages {
-	background-color:#92CAFF;
-	color:#327BBF;
-	color:black;
-	border-style:dotted;
-	padding-top: 5mm;
-	padding-right: 5mm;
-	padding-bottom: 5mm;
-	padding-left: 5mm;
+     background-color:#92CAFF;
+     color:#327BBF;
+     color:black;
+     border-style:dotted;
+     padding-top: 5mm;
+     padding-right: 5mm;
+     padding-bottom: 5mm;
+     padding-left: 5mm;
 }
 
 #help {
-	border-style:dotted;
-	padding-top: 5mm;
-	padding-right: 5mm;
-	padding-bottom: 5mm;
-	padding-left: 5mm;
+     border: 1px solid;
+     padding: 10px;
+     border-radius: 4px;
 }
 
 p.footer {
-	font-size:7pt;
-  text-align: center;
+     font-size:7pt;
+     text-align: center;
+     display: none;
 }
 
 .illustrate {
-  margin: 10px;
-  padding: 10px;
-  -moz-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
-  border: 1px solid #001;
-  font-size: 10pt;
-  -moz-box-shadow: inset 0px 0px 1px 0px #002;
-  background: #fff;
+     margin: 10px;
+     padding: 10px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #001;
+     font-size: 10pt;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     background: #fff;
 }
 
 .page {
-	background-color: #fff;
-	color:#001;
-  margin: 20px;
-  padding: 10px 20px 20px 20px;
-  -moz-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
-  border: 1px solid #001;
-  font-size: 10pt !important;
-  line-height: 160% !important;
-  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     background-color: #fff;
+     color:#001;
+     margin: 0;
+     padding: 10px;
+/*     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #001; */
+     font-size: 9pt !important;
+     line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+.iframed .page {
+     background-color: #f0f0f0;
+     margin: 0;
+}
+
+textarea {
+     width: 100%;
+}
+
+#buttons, .buttons {
+     text-align: right;
 }
 
 input[type=submit] {
@@ -145,7 +168,6 @@ input[type=submit]:hover {
      border: 1px solid #f60;
      opacity: 1.0;
      -moz-box-shadow: inset 0px 0px 0px 1px #fff;
-
 }
 
 input[type=reset] {

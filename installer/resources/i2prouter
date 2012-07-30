@@ -209,14 +209,6 @@ failed() {
         esac
 }
 
-if [ ! -r "${WRAPPER_CMD}" ]; then
-    echo "Unable to locate ${WRAPPER_CMD} in ${I2P}!"
-    echo
-    unsupported
-    echo
-    exit 1
-fi
-
 if [ -n "$FIXED_COMMAND" ]
 then
     COMMAND="$FIXED_COMMAND"
@@ -559,6 +551,13 @@ then
     exit 1
 fi
 
+if [ ! -r "${WRAPPER_CMD}" ]; then
+    echo "Unable to locate ${WRAPPER_CMD} in ${I2P}!"
+    echo
+    unsupported
+    echo
+    exit 1
+fi
 
 # Build the nice clause
 if [ "X$PRIORITY" = "X" ]

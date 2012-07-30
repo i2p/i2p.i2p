@@ -98,15 +98,17 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final int DEFAULT_INITIAL_ACK_DELAY = 2*1000;    
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
+    private static final int DEFAULT_INACTIVITY_TIMEOUT = 90*1000;
+    private static final int DEFAULT_INACTIVITY_ACTION = INACTIVITY_ACTION_SEND;
+
+
     /**
      *  If PROTO is enforced, we cannot communicate with destinations earlier than version 0.7.1.
      *  @since 0.9.1
      */
     private static final boolean DEFAULT_ENFORCE_PROTO = false;
 
-    // Syncronization fix, but doing it this way causes NPE...
-    // FIXME private final int _trend[] = new int[TREND_COUNT]; FIXME
-    private int _trend[];
+    private final int _trend[] = new int[TREND_COUNT];
 
     /**
      *  OK, here is the calculation on the message size to fit in a single
@@ -220,6 +222,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions() {
         super();
+        cinit(System.getProperties());
     }
     
     /**
@@ -229,6 +232,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(Properties opts) {
         super(opts);
+        cinit(opts);
     }
     
     /**
@@ -237,6 +241,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(I2PSocketOptions opts) {
         super(opts);
+        cinit(System.getProperties());
     }
     
     /**
@@ -245,6 +250,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public ConnectionOptions(ConnectionOptions opts) {
         super(opts);
+        cinit(System.getProperties());
         if (opts != null)
             update(opts);
     }
@@ -302,10 +308,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
     }
     
-    @Override
-    protected void init(Properties opts) {
-        super.init(opts);
-        _trend = new int[TREND_COUNT];
+    /**
+     * Initialization
+     */
+    private void cinit(Properties opts) {
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
@@ -318,8 +324,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
         // handled in super()
         //setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
-        setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 90*1000));
-        setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_SEND));
+        setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
+        setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 1));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
@@ -367,9 +373,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         //if (opts.containsKey(PROP_WRITE_TIMEOUT))
         //    setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
-            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 90*1000));
+            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
         if (opts.containsKey(PROP_INACTIVITY_ACTION))
-            setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_SEND));
+            setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         if (opts.contains(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR))
             setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 2));

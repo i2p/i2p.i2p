@@ -61,7 +61,8 @@ public class ElGamalAESEngine {
     }
 
     /**
-     * Decrypt the message using the given private key using tags from the default key manager.
+     * Decrypt the message using the given private key using tags from the default key manager,
+     * which is the router's key manager. Use extreme care if you aren't the router.
      *
      * @deprecated specify the key manager!
      */
@@ -74,6 +75,10 @@ public class ElGamalAESEngine {
      * and using tags from the specified key manager.
      * This works according to the
      * ElGamal+AES algorithm in the data structure spec.
+     *
+     * Warning - use the correct SessionKeyManager. Clients should instantiate their own.
+     * Clients using I2PAppContext.sessionKeyManager() may be correlated with the router,
+     * unless you are careful to use different keys.
      *
      * @return decrypted data or null on failure
      */

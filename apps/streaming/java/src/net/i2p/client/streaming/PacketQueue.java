@@ -12,7 +12,8 @@ import net.i2p.util.Log;
  * Well, thats the theory at least... in practice we just
  * send them immediately with no blocking, since the 
  * mode=bestEffort doesnt block in the SDK.
- *
+ *<p>
+ * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
 class PacketQueue {
     private final I2PAppContext _context;
@@ -26,16 +27,17 @@ class PacketQueue {
         _session = session;
         _connectionManager = mgr;
         _log = context.logManager().getLog(PacketQueue.class);
-        _context.statManager().createRateStat("stream.con.sendMessageSize", "Size of a message sent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("stream.con.sendDuplicateSize", "Size of a message resent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        // all createRateStats in ConnectionManager
     }
     
     /**
      * Add a new packet to be sent out ASAP
      *
      * keys and tags disabled since dropped in I2PSession
+     * @return true if sent
      */
-    public void enqueue(PacketLocal packet) {
+    public boolean enqueue(PacketLocal packet) {
+        // this updates the ack/nack field
         packet.prepare();
         
         //SessionKey keyUsed = packet.getKeyUsed();
@@ -52,7 +54,7 @@ class PacketQueue {
         if (packet.getAckTime() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Not resending " + packet);
-            return;
+            return false;
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending... " + packet);
@@ -76,7 +78,7 @@ class PacketQueue {
                 _log.warn("took " + writeTime + "ms to write the packet: " + packet);
 
             // last chance to short circuit...
-            if (packet.getAckTime() > 0) return;
+            if (packet.getAckTime() > 0) return false;
             
             // this should not block!
             begin = _context.clock().now();
@@ -158,6 +160,7 @@ class PacketQueue {
             // reset
             packet.releasePayload();
         }
+        return sent;
     }
     
 }

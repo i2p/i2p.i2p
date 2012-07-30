@@ -2,18 +2,52 @@
 /* Description: RTL Light blue highlights for Arabic locale. */
 /* Author: dr|z3d */
 
+body {
+     direction: rtl;
+}
+
 pre {
      text-align: right;
+}
+
+table {
+     direction: rtl;
+}
+
+td {
+     text-align: right;
+}
+
+h1,h2,h3,h4 {
+     direction: rtl;
+     text-align: right;
+}
+
+h1 {
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
+}
+
+form {
+    text-align: right;
+}
+
+div.routersummary form {
+    text-align: center;
+}
+
+div.routersummary h3 {
+     text-align: center;
+}
+
+div.routersummary td:last-child {
+     text-align: left;
+     margin-left: 3px;
 }
 
 div.logo {
      float:right;
 }
-
-div.routersummaryouter {
-     float: right;
-}
-
 
 div.tunnels td:first-child {
      text-align: right;
@@ -28,25 +62,29 @@ div.warning {
 div.main {
      margin: 10px 210px 0px 10px;
      padding: 7px 0px 30px 20px;
+}
+
+div.main li {
      text-align: right;
-     }
+}
 
 div.news {
      margin: 10px 210px 0px 10px;
      padding: 7px 0px 30px 20px;
-     text-align: right !important;
-}
-
-div.news h3 {
-     text-align: right;
+     direction: ltr;
 }
 
 div.graphspanel form {
      text-align: right;
 }
 
-div.main li {
-     text-align: right;
+.langbox {
+     float: left;
+     text-align: left;
+}
+
+.formaction {
+     text-align: left;
 }
 
 .tidylist code {
@@ -57,9 +95,14 @@ code {
      text-align: right;
 }
 
+div.joblog li, div.newsheadings li {
+    text-align: left;
+    direction: ltr;
+}
 
-h1 {
-     text-align: right;
-     margin: 10px 210px 0px 10px;
-     padding: 7px 0px 30px 20px;
+span.newtab {
+     text-align: left;
+     font-size: 8pt;
+     float: left;
+     letter-spacing: 0;
 }

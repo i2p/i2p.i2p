@@ -2,7 +2,6 @@ package net.i2p.client.streaming;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -13,7 +12,8 @@ import net.i2p.util.Log;
 /**
  * receive a packet and dispatch it correctly to the connection specified,
  * the server socket, or queue a reply RST packet.
- *
+ *<p>
+ * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
  */
 class PacketHandler {
     private final ConnectionManager _manager;
@@ -86,6 +86,7 @@ class PacketHandler {
     }
 *****/
     
+    /** */
     void receivePacket(Packet packet) {
         //boolean ok = choke(packet);
         //if (ok)
@@ -202,15 +203,13 @@ class PacketHandler {
                         // someone is sending us a packet on the wrong stream 
                         // It isn't a SYN so it isn't likely to have a FROM to send a reset back to
                         if (_log.shouldLog(Log.ERROR)) {
-                            Set cons = _manager.listConnections();
                             StringBuilder buf = new StringBuilder(512);
                             buf.append("Received a packet on the wrong stream: ");
                             buf.append(packet);
                             buf.append("\nthis connection:\n");
                             buf.append(con);
                             buf.append("\nall connections:");
-                            for (Iterator iter = cons.iterator(); iter.hasNext();) {
-                                Connection cur = (Connection)iter.next();
+                            for (Connection cur : _manager.listConnections()) {
                                 buf.append('\n').append(cur);
                             }
                             _log.error(buf.toString(), new Exception("Wrong stream"));
@@ -299,9 +298,7 @@ class PacketHandler {
                 }
                 if (_log.shouldLog(Log.DEBUG)) {
                     StringBuilder buf = new StringBuilder(128);
-                    Set cons = _manager.listConnections();
-                    for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
-                        Connection con = (Connection)iter.next();
+                    for (Connection con : _manager.listConnections()) {
                         buf.append(con.toString()).append(" ");
                     }
                     _log.debug("connections: " + buf.toString() + " sendId: " 

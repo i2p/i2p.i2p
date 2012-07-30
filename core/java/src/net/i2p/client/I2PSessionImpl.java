@@ -110,10 +110,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private final Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
-    protected boolean _closed;
+    protected volatile boolean _closed;
 
     /** whether the session connection is in the process of being closed */
-    protected boolean _closing;
+    protected volatile boolean _closing;
 
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
@@ -121,7 +121,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private final Object _dateReceivedLock = new Object();
 
     /** whether the session connection is in the process of being opened */
-    protected boolean _opening;
+    protected volatile boolean _opening;
 
     /** monitor for waiting until opened */
     private final Object _openingWait = new Object();

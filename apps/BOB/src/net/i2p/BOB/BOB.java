@@ -115,7 +115,6 @@ import net.i2p.util.SimpleTimer2;
  */
 public class BOB {
 
-	private final static Log _log = new Log(BOB.class);
 	public final static String PROP_CONFIG_LOCATION = "BOB.config";
 	public final static String PROP_BOB_PORT = "BOB.port";
 	public final static String PROP_BOB_HOST = "BOB.host";
@@ -137,7 +136,7 @@ public class BOB {
 	 */
 	public static void info(String arg) {
 		System.out.println("INFO:" + arg);
-		_log.info(arg);
+		(new Log(BOB.class)).info(arg);
 	}
 
 	/**
@@ -147,7 +146,7 @@ public class BOB {
 	 */
 	public static void warn(String arg) {
 		System.out.println("WARNING:" + arg);
-		_log.warn(arg);
+		(new Log(BOB.class)).warn(arg);
 	}
 
 	/**
@@ -157,7 +156,7 @@ public class BOB {
 	 */
 	public static void error(String arg) {
 		System.out.println("ERROR: " + arg);
-		_log.error(arg);
+		(new Log(BOB.class)).error(arg);
 	}
 
 	/**
@@ -185,6 +184,7 @@ public class BOB {
 		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
 		i = Y1.hashCode();
 		i = Y2.hashCode();
+		Log _log = new Log(BOB.class);
 		try {
 			{
 				File cfg = new File(configLocation);
@@ -260,6 +260,7 @@ public class BOB {
 
 			i = 0;
 			boolean g = false;
+			spin.set(true);
 			try {
 				info("BOB is now running.");
 				listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Random;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 
 /**
  * TimerTask that checks for good/bad up/downloader. Works together
@@ -36,15 +38,17 @@ class PeerCheckerTask implements Runnable
 
   private final PeerCoordinator coordinator;
   private final I2PSnarkUtil _util;
+  private final Log _log;
+  private final Random random;
   private int _runCount;
 
   PeerCheckerTask(I2PSnarkUtil util, PeerCoordinator coordinator)
   {
     _util = util;
+    _log = util.getContext().logManager().getLog(PeerCheckerTask.class);
+    random = util.getContext().random();
     this.coordinator = coordinator;
   }
-
-  private static final Random random = I2PAppContext.getGlobalContext().random();
 
   public void run()
   {
@@ -82,6 +86,14 @@ class PeerCheckerTask implements Runnable
                 continue;
               }
 
+            if (peer.getInactiveTime() > PeerCoordinator.MAX_INACTIVE) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Disconnecting peer idle " +
+                              DataHelper.formatDuration(peer.getInactiveTime()) + ": " + peer);
+                peer.disconnect();
+                continue;
+            }
+
             if (!peer.isChoking())
               uploaders++;
 
@@ -92,14 +104,15 @@ class PeerCheckerTask implements Runnable
 	    peer.setRateHistory(upload, download);
             peer.resetCounters();
 
-            _util.debug(peer + ":", Snark.DEBUG);
-            _util.debug(" ul: " + upload*1024/KILOPERSECOND
+            if (_log.shouldLog(Log.DEBUG)) {
+                _log.debug(peer + ":"
+                        + " ul: " + upload*1024/KILOPERSECOND
                         + " dl: " + download*1024/KILOPERSECOND
                         + " i: " + peer.isInterested()
                         + " I: " + peer.isInteresting()
                         + " c: " + peer.isChoking()
-                        + " C: " + peer.isChoked(),
-                        Snark.DEBUG);
+                        + " C: " + peer.isChoked());
+            }
 
             // Choke a percentage of them rather than all so it isn't so drastic...
             // unless this torrent is over the limit all by itself.
@@ -120,8 +133,8 @@ class PeerCheckerTask implements Runnable
                 // Check if it still wants pieces from us.
                 if (!peer.isInterested())
                   {
-                    _util.debug("Choke uninterested peer: " + peer,
-                                Snark.INFO);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Choke uninterested peer: " + peer);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -131,8 +144,8 @@ class PeerCheckerTask implements Runnable
                   }
                 else if (overBWLimitChoke)
                   {
-                    _util.debug("BW limit (" + upload + "/" + uploaded + "), choke peer: " + peer,
-                                Snark.INFO);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("BW limit (" + upload + "/" + uploaded + "), choke peer: " + peer);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -144,7 +157,8 @@ class PeerCheckerTask implements Runnable
                 else if (peer.isInteresting() && peer.isChoked())
                   {
                     // If they are choking us make someone else a downloader
-                    _util.debug("Choke choking peer: " + peer, Snark.DEBUG);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Choke choking peer: " + peer);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -156,7 +170,8 @@ class PeerCheckerTask implements Runnable
                 else if (!peer.isInteresting() && !coordinator.completed())
                   {
                     // If they aren't interesting make someone else a downloader
-                    _util.debug("Choke uninteresting peer: " + peer, Snark.DEBUG);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Choke uninteresting peer: " + peer);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -170,8 +185,8 @@ class PeerCheckerTask implements Runnable
                          && download == 0)
                   {
                     // We are downloading but didn't receive anything...
-                    _util.debug("Choke downloader that doesn't deliver:"
-                                + peer, Snark.DEBUG);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Choke downloader that doesn't deliver: " + peer);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -198,7 +213,10 @@ class PeerCheckerTask implements Runnable
             // send PEX
             if ((_runCount % 17) == 0 && !peer.isCompleted())
                 coordinator.sendPeers(peer);
-            peer.keepAlive();
+            // cheap failsafe for seeds connected to seeds, stop pinging and hopefully
+            // the inactive checker (above) will eventually disconnect it
+            if (coordinator.getNeededLength() > 0 || !peer.isCompleted())
+                peer.keepAlive();
             // announce them to local tracker (TrackerClient does this too)
             if (_util.getDHT() != null && (_runCount % 5) == 0) {
                 _util.getDHT().announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
@@ -215,8 +233,8 @@ class PeerCheckerTask implements Runnable
             || uploaders > uploadLimit)
             && worstDownloader != null)
           {
-            _util.debug("Choke worst downloader: " + worstDownloader,
-                        Snark.DEBUG);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Choke worst downloader: " + worstDownloader);
 
             worstDownloader.setChoking(true);
             coordinator.uploaders--;

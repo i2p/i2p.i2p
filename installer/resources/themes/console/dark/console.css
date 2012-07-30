@@ -1,16 +1,15 @@
 /* I2P Theme: Camo aka Dark */
 /* Description: Military Grade. */
-/* Comment: Thanks to Florian Kuhlmann for the hatface images. [ http://www.flickr.com/photos/floriankuhlmann/]
+/* Comment: Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
 /* Author: dr|z3d */
 
 body {
-     margin: 5px 0px 0 0px;
+     margin: 5px 0 0 0;
      padding: 0;
      text-align: center;
      background: #010 url('images/camotile.png') center bottom;
      color: #EE9;
      font: 8.5pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     
 }
 
 .hide {
@@ -21,6 +20,7 @@ div.clearer {
      clear: left;
      height: 0;
      line-height: 0;
+     margin-bottom: -16px;
 }
 
 img {
@@ -39,7 +39,7 @@ div.logo {
      float: left;
      padding: 10px;
      text-align: center;
-     font-color: #EE9;
+     color: #EE9;
      margin: 0 20px 0 20px;
      border: 1px solid #494;
      -moz-border-radius: 4px;
@@ -47,16 +47,16 @@ div.logo {
      border-radius: 4px;
      background: #000; /*url("images/camotile2.png");*/
      width: 185px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #009;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #009;
-     box-shadow: inset 0px 0px 1px 0px #009;
+     -moz-box-shadow: inset 0 0 1px 0 #009;
+     -khtml-box-shadow: inset 0 0 1px 0 #009;
+     box-shadow: inset 0 0 1px 0 #009;
 }
 
 div.logo hr {
      color: #494;
      background: #494;
      height: 1px;
-     border: 0px solid #494;
+     border: 0 solid #494;
      margin: 10px 0 5px;
 }
 
@@ -71,7 +71,7 @@ div.toolbar {
 
 div.toolbar a:link {
      border: 1px outset #ddddc0;
-     padding: 0px 5px 1px 5px;
+     padding: 0 5px 1px 5px;
      background: #bbf;
      text-decoration: none;
      border-radius: 4px;
@@ -84,13 +84,13 @@ div.toolbar a:visited {
      background: #ddf;
 }
 
-div.toolbar a:hover, button:hover{
+div.toolbar a:hover, button:hover {
      border: 1px solid #f60;
      background: #030;
      color: #f60;
 }
 
-a:active{
+a:active {
      color: #900;
 }
 
@@ -108,7 +108,7 @@ div.routersummaryouter {
 
 div.routersummary {
      width: 173px;
-     padding: 10px;
+     padding: 10px 10px 8px;
      text-align: center;
      border: 1px solid #494;
      background: #000 url(images/camotile2.png);
@@ -122,13 +122,14 @@ div.routersummary {
      -moz-box-shadow: 0 1px 5px #000;
      -khtml-box-shadow: 0 1px 5px #000;
      box-shadow: 0 1px 5px #000;
+     margin-bottom: 7px !important;
 }
 
 div.routersummary input[type=text] {
      text-align: right !important;
-     -moz-box-shadow: inset 1px 1px 1px 0px #000;
-     -khtml-box-shadow: inset 1px 1px 1px 0px #000;     
-     box-shadow: inset 1px 1px 1px 0px #000;     
+     -moz-box-shadow: inset 1px 1px 1px 0 #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0 #000;
+     box-shadow: inset 1px 1px 1px 0 #000;
 }
 
 div.routersummary hr {
@@ -137,9 +138,9 @@ div.routersummary hr {
      height: 2px;
      border-bottom: 1px solid #494;
      margin: 8px -10px 7px -10px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #000;
-     -khtml-box-shadow: inset 0px 1px 1px 1px #000;
-     box-shadow: inset 0px 1px 1px 1px #000;
+     -moz-box-shadow: inset 0 1px 1px 1px #000;
+     -khtml-box-shadow: inset 0 1px 1px 1px #000;
+     box-shadow: inset 0 1px 1px 1px #000;
 }
 
 div.routersummary h3 {
@@ -153,7 +154,6 @@ div.routersummary h3 {
      -khtml-border-radius: 0;
      border-radius: 0;
      background: #000 url('images/header.png') center center ;
-     background-image: -moz-linear-gradient(top, bottom, from(#050), to(#030), color-stop(7%, #000), color-stop(100%, #050));
 }
 
 div.routersummary h4 {
@@ -167,8 +167,11 @@ div.routersummary h4 {
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#050), color-stop(10%, #050), color-stop(100%, #004));
      line-height: 100%;
+}
+
+div.routersummary ul {
+     text-align: left !important;
 }
 
 div.routersummary table {
@@ -178,7 +181,7 @@ div.routersummary table {
      width: 188px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0 -10px;
+/*     padding: 0 -10px; */
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -190,7 +193,7 @@ div.routersummary tr {
 }
 
 div.routersummary form {
-     margin: -5px 0 -7px;
+     margin: -4px 0 -6px;
 }
 
 div.routersummary form:first-child {
@@ -199,33 +202,57 @@ div.routersummary form:first-child {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.refresh {
      margin-top: -10px !important;
      margin-bottom: -4px !important;
-     padding: 2px 0 0px 0 !important;
+     padding: 2px 0 0 0 !important;
 }
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 1px 1px 1px rgba(0, 16, 0, 0.8);
-     text-shadow: 0px 0px 2px #101 !important;
+     text-shadow: 0 0 2px #101 !important;
+     padding: 0 1px;
 }
 
 div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 0 0 1px rgba(255, 96, 0, 0.7);
      color: #f60;
 }
 
 div.routersummary td {
-     padding: 0px 2px 0px 2px;
+     padding: 0 2px 0 2px;
      background-image: none !important;
      border: 0 !important;
+     word-spacing: -0.1em;
 }
 
 div routersummary hr:last-child {
      margin-top: 5px;
      margin-bottom: -5px !important;
+}
+
+div.newsheadings {
+     text-align: center;
+     margin: -3px 0 -5px 10px;
+     word-spacing: 0;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
+     line-height: 110%;
+     text-transform: capitalize;
+}
+
+div.newsheadings li b {
+     font-weight: normal !important;
+}
+
+
+div.newsheadings button {
+     margin: 4px 0 2px;
 }
 
 div.tunnels {
@@ -239,7 +266,7 @@ div.tunnels table {
 }
 
 div.tunnels td {
-     padding: 1px 0px 1px 0px;
+     padding: 1px 0 1px 0;
 }
 
 div.tunnels td:first-child {
@@ -271,9 +298,9 @@ div.warning {
      background-image:url("../images/itoopie_sm.png");
      background-position:10px center;
      background-repeat:no-repeat;
-     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #f00;
-     box-shadow: inset 0px 0px 0px 1px #f00;          
+     -moz-box-shadow: inset 0 0 0 1px #f00;
+     -khtml-box-shadow: inset 0 0 0 1px #f00;
+     box-shadow: inset 0 0 0 1px #f00;
      word-wrap: break-word;
 }
 
@@ -291,7 +318,7 @@ div.sorry {
      background-image:url("images/errortriangle.png");
      background-position:15px center;
      background-repeat:no-repeat;
-     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     -moz-box-shadow: inset 0 0 0 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
      color: #EE9;
@@ -328,7 +355,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: -1px 5px 0px 205px;
+     margin: -1px 5px 0 205px;
      padding: 4px 30px 4px 30px;
      border: 1px solid #494;
      background: #000;
@@ -366,13 +393,14 @@ div.news li {
 div.news h3 {
      text-align: left !important;
      font-size: 9.5pt;
+     letter-spacing: 0.03em;
 }
 
 div.news h4 {
      border-bottom: 1px;
      border-bottom-style: dotted;
      border-bottom-color: #494;
-     padding: 0 0 0px 0;
+     padding: 0 0 0 0;
      margin: 5px 0 10px 0;
      font-size: 10pt;
      opacity: 1;
@@ -382,7 +410,7 @@ div.news h4 {
 div.news h4:first-child {
      background: url('../images/itoopbullet.png');
      background-repeat: no-repeat;
-     background-position: right;   
+     background-position: right;
 }
 
 div.news p {
@@ -398,17 +426,17 @@ div.news p:nth-child(n+1) {
 
 div.news hr {
      margin: 8px 0 3px 0;
-}     
+}
 
 div.confignav {
-     padding: 15px 10px !important;
-     margin: 15px 0;
-     background: #000 url('images/header.png') center center repeat-x ;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     background: url('images/header.png') repeat-x scroll center center #000;
+     padding:5px 5px 6px !important;
+     margin: -1px 0 15px;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
      border: 1px solid #494;
-     font-size: 9.5pt !important;
+     font-size: 8.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
 
@@ -416,12 +444,50 @@ div.confignav {
 
 div.configure {
 /*     padding: 5px 15px 0 15px;
-     margin: 10px 0px;
+     margin: 10px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494; */
      background: none;/* url(images/camotile2.png);*/
+}
+
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td:nth-child(2) {
+     font-weight: bold;     
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
 }
 
 div.messages {
@@ -431,7 +497,7 @@ div.messages {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494;
-     background: #000  /*url('images/infotile.png') center left no-repeat;*/
+     background: #000;  /*url('images/infotile.png') center left no-repeat;*/
      font-weight: bold;
      font-size: 9pt;
      color: #4f4;
@@ -451,12 +517,12 @@ div.messages li {
      list-style: url(images/warning_dark.png) !important;
      margin: 0 5px 0 50px !important;
      padding: 0 10px 0 0 !important;
-     border: 0px !important;
+     border: 0 !important;
 }
 
 div.graphspanel {
      padding: 0;
-     margin: 15px 0px -15px 0;
+     margin: 15px 0 -15px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -471,7 +537,7 @@ div.widepanel h3 {
 
 div.graphspanel form {
      text-align: left;
-     padding: 0 15px 0px 15px;
+     padding: 0 15px 0 15px;
 }
 
 div.graphspanel hr {
@@ -484,7 +550,6 @@ div.graphspanel img {
      margin: 5px;
      text-align: center !important;
      background: #000;
-
      opacity: 0.8;
 }
 
@@ -494,9 +559,9 @@ div.graphspanel img:hover {
      margin: 5px;
      text-align: center !important;
      background: #000;
-     -moz-box-shadow: inset 0px 0px 1px 1px #f60;
-     -khtml-box-shadow: inset 0px 0px 1px 1px #f60;
-     box-shadow: inset 0px 0px 1px 1px #f60;
+     -moz-box-shadow: inset 0 0 1px 1px #f60;
+     -khtml-box-shadow: inset 0 0 1px 1px #f60;
+     box-shadow: inset 0 0 1px 1px #f60;
      opacity: 1;
 }
 
@@ -504,18 +569,18 @@ table {
      border-collapse: collapse;
      width: 100%;
      border: 1px solid #494;
-     cell-padding: 1px;
+     padding: 1px;
      font-size: 8pt;
      background: #030;
      margin: 1px 0;
 }
 
 table hr {
-     padding: 0px 0;
+     padding: 0 0;
      color: #494;
      background: #494;
-     border: 0px solid #494;
-     margin: 0px 0px;
+     border: 0 solid #494;
+     margin: 0 0;
      height: 1px;
      display: none;
 }
@@ -525,10 +590,9 @@ th {
      color: #EE9;
      text-align: center;
      font-size: 9pt;
-     background: #000; /*url('images/tabletitledark.png') repeat-x;*/
      background: #000 url('images/header.png') center center repeat-x ;
      border-top: 1px solid #494;
-     border-bottom: 1px solid #494 !important;     
+     border-bottom: 1px solid #494 !important;
      line-height: 110%;
 }
 
@@ -537,14 +601,15 @@ tr {
 }
 
 tr:nth-child(even) {
-     background: #010;/* url('images/darkerbluetile.png') !important;*/
+     background: #010;
      vertical-align: middle;
 }
 
 tr:nth-child(odd) {
-     background: #000800;/* url('images/darkbluetile.png') !important;*/
+     background: #000800;
      vertical-align: middle;
 }
+
 /*
 tr:last-child {
      background: #004 url('images/lightbluetile.png') !important;
@@ -552,12 +617,13 @@ tr:last-child {
      border: 1px solid #494 !important;
 }
 */
+
 td {
      padding: 4px 6px;
      color: #EE9;
      vertical-align: middle;
      border-top: 1px inset #494;
-     border-bottom: 1px outset #494;   
+     border-bottom: 1px outset #494;
 }
 
 td img {
@@ -573,8 +639,8 @@ tt {
 div.main li {
      text-align: left;
      list-style: square;
-     margin: 2px 0px 2px 30px;
-     padding: 2px 20px 2px 0px;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
@@ -628,29 +694,29 @@ code {
      padding: 1px 2px;
 }
 
-a:link, h2 a:link{
+a:link, h2 a:link {
      color: #494;
      text-decoration: none;
-     font-weight: bold;     
+     font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #7b7;
      text-decoration: none;
-     font-weight: bold;     
+     font-weight: bold;
      word-wrap: break-word;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
-     font-weight: bold;     
+     font-weight: bold;
      word-wrap: break-word;
 }
 
 .links {
-     padding-bottom: -2px;
+/*     padding-bottom: -2px; */
      text-align: justify;
      margin-top: 10px;
      margin-bottom: -10px;
@@ -660,7 +726,7 @@ a:hover{
      list-style-image: url("images/link.png") !important;
 }
 
-.links b{
+.links b {
      color: #b70 !important;
      letter-spacing: 0.07em;
      font-size: 8.5pt;
@@ -673,7 +739,7 @@ p {
      line-height: 160%;
 }
 
-p img:first-child{
+p img:first-child {
      display: none !important;
 }
 
@@ -681,18 +747,15 @@ h1 {
      text-align: left;
      color: #EE9;
      padding: 14px 15px;
-     margin: 0 5px 0px 205px !important;
+     margin: 0 5px 0 205px !important;
      font-size: 17pt;
      font-weight: bold;
      font-style: normal;
      text-transform: uppercase;
      letter-spacing: 0.15em;
-     text-shadow: 0px 0px 2px #010;
+     text-shadow: 0 0 2px #010;
      white-space: normal;
-     background: #000 url("images/scope.png")no-repeat scroll right top;
-     background: #000 url("images/bg2.png")no-repeat scroll top right;
      background: #000 url('images/header.png') center center;
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
      border: 1px solid #494;
      border-radius: 4px 4px 0 0;
      -moz-border-radius: 4px 4px 0 0;
@@ -704,23 +767,33 @@ h1 {
      box-shadow: 0 1px 5px #000;
 }
 
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
+}
+
 h2 {
      font-size: 12pt;
      color: #EE9;
-     text-shadow: 0px 0px 2px #010;
+     text-shadow: 0 0 2px #010;
      letter-spacing: 0.05em;
      background: #000 url(images/camotile2.png);
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
      background: #000 url('images/header.png') center center ;
      padding: 10px;
-     wordwrap: none;
      border: 1px solid #494;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      vertical-align: middle;
      margin: 15px 0 12px 0 !important;
-    text-transform: uppercase;
+     text-transform: uppercase;
      word-wrap: break-word;
 }
 
@@ -730,13 +803,13 @@ h2 a:visited {
 
 h2 a:hover {
      color: #f60;
-     text-shadow: 0px 0px 1px rgba(255, 64, 0, 0.7);
+     text-shadow: 0 0 1px rgba(255, 64, 0, 0.7);
 }
 
 h3 {
      border: 1px solid #494;
      border-left: 5px solid #494;
-     padding: 5px 6px 7px;
+     padding: 6px;
      margin: 12px 0 10px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
@@ -744,7 +817,8 @@ h3 {
      background: #000 url(images/camotile.png);
      background: #000 url('images/header.png') center center ;
      text-transform: uppercase;
-     text-shadow: 0px 0px 2px #010;
+     text-shadow: 0 0 2px #010;
+     letter-spacing: 0.08em;
 }
 
 h4 {
@@ -769,40 +843,40 @@ button, button:visited {
      margin: 2px 3px;
      text-align: center;
      vertical-align: middle;
-     min-width: 76px;
-     -moz-box-shadow: inset 0px 1px 1px 0px #494;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #191;
-     box-shadow: inset 0px 1px 1px 0px #191;
+     min-width: 70px;
+     -moz-box-shadow: inset 0 1px 1px 0 #494;
+     -khtml-box-shadow: inset 0 1px 1px 0 #191;
+     box-shadow: inset 0 1px 1px 0 #191;
      background: #000;
      color: #494;
 }
 
 button:hover {
      border: 1px solid #f60;
-     -moz-box-shadow: inset 0px 1px 1px 0px #EE9;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #EE9;
-     box-shadow: inset 0px 1px 1px 0px #EE9;
+     -moz-box-shadow: inset 0 1px 1px 0 #EE9;
+     -khtml-box-shadow: inset 0 1px 1px 0 #EE9;
+     box-shadow: inset 0 1px 1px 0 #EE9;
      background: #000;
      color: #f60;
-}     
-          
+}
+
 button:active {
      border: 1px inset #f60;
      background: #f60;
      color: #EE9;
-     -moz-box-shadow: inset 0px 0px 0px 0px #f60;
-     -khtml-box-shadow: inset 0px 0px 0px 0px #f60;
-     box-shadow: inset 0px 0px 0px 0px #f60;
+     -moz-box-shadow: inset 0 0 0 0 #f60;
+     -khtml-box-shadow: inset 0 0 0 0 #f60;
+     box-shadow: inset 0 0 0 0 #f60;
 }
 
 .underline {
      border-bottom: 1px solid #eeeeff;
-     padding: 5px 0px 5px 0px;
-     margin: 0px 0px 10px 0px;
+     padding: 5px 0 5px 0;
+     margin: 0 0 10px 0;
 }
 
 .langbox {
-     margin: 5px 3px 2px 5px;
+     margin: 4px 4px 2px 5px;
      padding: 0;
      color: #EE9;
      font-size: 7pt;
@@ -815,6 +889,7 @@ button:active {
 .langbox img {
      opacity: 0.5;
      -moz-box-shadow: 0 0 1px #000;
+     padding: 1px !important;
 }
 
 .langbox img:hover {
@@ -826,7 +901,7 @@ hr {
      color: #494;
      background: #494;
      height: 1px;
-     border: 0px solid #494;
+     border: 0 solid #494;
      margin: 20px 0 10px;
 }
 
@@ -835,15 +910,15 @@ hr:last-child {
      margin-bottom: 20px;
 }
 
-sidebarlogo {
+.sidebarlogo {
      text-align: center;
 }
 
 input {
      border: 1px outset #5f5;
-     -moz-box-shadow: inset 0px 1px 1px 0px #373;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #373;
-     box-shadow: inset 0px 1px 1px 0px #373;
+     -moz-box-shadow: inset 0 1px 1px 0 #373;
+     -khtml-box-shadow: inset 0 1px 1px 0 #373;
+     box-shadow: inset 0 1px 1px 0 #373;
      background: #000;
      color: #494;
      margin: 5px;
@@ -860,9 +935,9 @@ input:hover {
      background: #000;
      color: #f60;
      border: 1px solid #f60;
-     -moz-box-shadow: inset 0px 1px 1px 0px #9e9;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #9e9;
-     box-shadow: inset 0px 1px 1px 0px #9e9;
+     -moz-box-shadow: inset 0 1px 1px 0 #9e9;
+     -khtml-box-shadow: inset 0 1px 1px 0 #9e9;
+     box-shadow: inset 0 1px 1px 0 #9e9;
 }
 
 input:active {
@@ -877,7 +952,7 @@ input:active {
      color: #EE9;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
      background: #000;
      color: #EE9;
      margin: 5px 10px;
@@ -888,13 +963,17 @@ input[type=text] {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     -moz-box-shadow: inset 1px 1px 1px 0px #000;
-     -khtml-box-shadow: inset 1px 1px 1px 0px #000;
-     box-shadow: inset 1px 1px 1px 0px #000;
+     -moz-box-shadow: inset 1px 1px 1px 0 #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0 #000;
+     box-shadow: inset 1px 1px 1px 0 #000;
 }
 
 input[type=text]:active, input[type=text]:hover {
      background: #000;
+}
+
+input[type=image] {
+     min-width: 0;
 }
 
 fieldset {
@@ -935,7 +1014,7 @@ form {}
 .proxyfooter {
      margin: 0 20px 10px 240px;
      padding: 20px 25px 20px 75px;
-     font-color: #f00;
+     color: #f00;
      font-size: 7pt;
      text-align: right !important;
      border-radius: 4px;
@@ -943,7 +1022,7 @@ form {}
      -khtml-border-radius: 4px;
      border: 1px solid #000;
      display: none;
-}        
+}
 
 .statusnotes {
      font-style: italic;
@@ -951,13 +1030,13 @@ form {}
      color: #EE9;
      text-align: center;
      border: 1px solid #494 !important;
-/*     border-top: 0px !important;*/
-     margin: -3px 0 5px 0; 
+/*     border-top: 0 !important;*/
+     margin: -3px 0 5px 0;
      padding: 7px;
      background: #010;
-     -moz-box-shadow: inset 0px 0px 0px 1px #090;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #090;
-     box-shadow: inset 0px 0px 0px 1px #090;
+     -moz-box-shadow: inset 0 0 0 1px #090;
+     -khtml-box-shadow: inset 0 0 0 1px #090;
+     box-shadow: inset 0 0 0 1px #090;
 /*     background: #000 url('images/header.png') repeat-x center center !important;*/
 }
 
@@ -982,18 +1061,18 @@ div.joblog h3 {
 div.main li {
      text-align: left;
      list-style: square;
-     margin: 2px 0px 2px 30px;
-     padding: 2px 20px 2px 0px;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
- 
+
 div.joblog li {
      word-wrap: break-word !important;
      text-align: justify !important;
      line-height: 120% !important;
-     margin: 2px 0px 2px 30px;
-     padding: 2px 20px 2px 0px;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
 }
 
 div.joblog ul {
@@ -1003,7 +1082,7 @@ div.joblog ul {
 }
 
 div.joblog li:first-child {
-     margin-top: 0px;
+     margin-top: 0;
 }
 
 div.joblog li:last-child {
@@ -1032,10 +1111,10 @@ div.joblog p {
 
 .optbox {
      min-width: 16px !important;
-     max-width: 16px !important;     
+     max-width: 16px !important;
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;     
+     max-height: 16px;
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1047,10 +1126,10 @@ div.joblog p {
 
 .optbox:hover {
      min-width: 16px !important;
-     max-width: 16px !important;     
+     max-width: 16px !important;
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;     
+     max-height: 16px;
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1060,13 +1139,13 @@ div.joblog p {
 
 .cells {
      border: 1px inset #494;
-     border-left: 1px outset #494;     
+     border-left: 1px outset #494;
 }
 
 .tablefooter tr, .tablefooter td {
      background: #000 url('images/header.png') repeat-x center center !important;
      border-top: 1px solid #494;
-     border-bottom: 1px solid #494 !important;     
+     border-bottom: 1px solid #494 !important;
      font-size: 7pt;
      line-height: 110%;
      padding: 5px 5px 10px;
@@ -1081,7 +1160,7 @@ div.footnote {
      text-align: right;
      color: #494;
      font-size: 7pt;
-     margin-bottom: -8px !important; 
+     margin-bottom: -8px !important;
 }
 
 div.footnote hr{
@@ -1089,7 +1168,7 @@ div.footnote hr{
      color: #494;
      background: #494;
      height: 1px;
-     border: 0px solid #494;
+     border: 0 solid #494;
 }
 
 .topness {
@@ -1135,7 +1214,7 @@ h4.app, h4.app2 {
     font-size: 10pt;
     font-variant: small-caps;
     letter-spacing: 2px;
-    margin: 12px 0 -10px 0;
+    margin: 12px 0 -9px 0;
     padding: 7px 8px 7px;
     text-transform: uppercase;
     border-radius: 4px;
@@ -1149,6 +1228,7 @@ h4.app2 {
 
 div.ag2 {
      margin: 0;
+     padding: 0;
 }
 
 div.app {
@@ -1159,10 +1239,12 @@ div.app {
      background: #000;
      background-image: -moz-linear-gradient(center top , #000B00, #000);
      border-radius: 3px;
-     margin: 5px;
-     height: 72px;
+     -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     margin: 3px;
+     height: 60px;
      text-align: center !important;
-     padding-top: 5px;
+     padding-top: 3px;
      opacity: 0.9;
      box-shadow: 0 1px 5px #000000;
 }
@@ -1180,7 +1262,7 @@ div.app:last-child {
 
 div.appgroup {
      margin: 0;
-     padding: 16px 8px;
+     padding: 16px 3px;
      width: auto;
 }
 
@@ -1201,13 +1283,13 @@ table.search {
 img.app {
      height: 32px;
      width: 32px;
-     padding: 6px 0 8px 0;
-     margin-bottom: 3px;
+     padding: 2px 0 0 0;
+     margin-bottom: 2px;
 }
 
 img.app2p {
      height: 40px;
-     padding: 5px 6px 0px 6px;
+     padding: 5px 6px 0 6px;
      margin-bottom: 3px;
 }
 
@@ -1232,11 +1314,9 @@ td.app {
 }
 
 div.applabel {
-     border-radius: 3px;
-     border-width: 1px;
      font-size: 7.5pt;
      margin: 0;
-     padding: 3px 0;
+     padding: 1px 0 0 0;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
@@ -1245,3 +1325,27 @@ div.applabel {
 }
 
 /* end home page */
+
+iframe.iframed {
+     margin: 10px 0 0;
+}
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 5px 0 5px !important;
+}
+
+.iframed div.sorry {
+     margin: -1px 5px 10px 5px !important;
+}
+
+/* end iframed console fixes */

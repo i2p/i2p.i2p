@@ -7,6 +7,11 @@ body {
      font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
 }
 
+body.iframed {
+     background: transparent url('../../console/dark/images/transparent.gif') !important;
+     margin: 6px 0 !important;
+}
+
 .snarkTitle {
      font-size: 12pt;
      font-weight: bold;
@@ -80,6 +85,9 @@ body {
      box-shadow: 0 0 1px 0  #330;
 }
 
+.snarkRefresh img {
+     margin-right: -10px !important;
+}
 .snarkMessages {
      font: bold 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
      text-align: left;
@@ -91,7 +99,7 @@ body {
      border-radius: 4px 0 0 0;
      border: 1px solid #000;
      overflow: auto;
-     color: #26f;
+     color: #500;
      max-height: 76px;
      min-height: 45px;
      width: auto;
@@ -150,7 +158,7 @@ table {
      color: #323;
      width: 100%;
      opacity: 1 !important;
-     font-weight: bold;
+     font-size: 8.5pt !important;
 }
 
 tr { 
@@ -175,11 +183,11 @@ thead {
 
 th {
      padding: 4px 2px 4px 4px;
-     font-size: 9pt;
+     font-size: 8pt;
      border-top: 1px outset #604;
      border-bottom: 1px inset #604;
      whitespace: nowrap;
-     letter-spacing: 0.05em;
+     color: #511;
 }
 
 th:first-child {
@@ -249,7 +257,7 @@ td {
      padding: 2px 1px;
      color: #501 !important;
      opacity: 1;
-     font-size: 9.5pt;
+     font-size: 8pt;
 }
 
 .mainsection td {
@@ -258,7 +266,7 @@ td {
 
 td:first-child {
      text-align: right;
-     font-size: 9.5pt;
+     font-size: 8pt;
 }
 
 .center {
@@ -268,6 +276,7 @@ td:first-child {
 .snarkTorrentName {
 /*     text-shadow:1px 1px #540;*/
      padding: 3px 0 0;
+     line-height: 100%;
 }
 
 .snarkTorrentName img {
@@ -307,6 +316,8 @@ td:first-child {
      padding: -1px 0 2px;
      font-size: 8pt !important;
      letter-spacing: -0.05em;
+     font-weight: bold;
+     line-height: 100%;
 }
 
 .snarkTorrentStatus:first-child {
@@ -358,6 +369,10 @@ td:first-child {
      border-top: 1px dotted #313 !important;
 }
 
+.snarkFileIcon {
+     width: 16px;
+}
+
 .snarkFileName {
      padding: 4px 0px !important; 
      text-align: left !important;
@@ -384,6 +399,42 @@ td:first-child {
      color: #505 !important;
 }
 
+.snarkTorrentInfo img {
+     max-height: 16px !important;
+     margin: 1px 0 1px 2px !important;    
+}
+
+.snarkTorrentInfo td {
+     text-align: left !important;
+     padding: 0 1px !important;
+}
+
+table.SnarkTorrentInfo {
+     margin-bottom: 3 !important;
+     border: 1px solid #604;
+}
+
+table.SnarkDirInfo {
+     margin-top: -3px !important;
+     margin-bottom: 0;   
+}
+
+.snarkDirInfo thead img {
+     margin: 0 -1px 0 0 !important;
+}
+
+.SnarkDirInfo td {
+     min-width: 0px !important;     
+}
+
+.SnarkDirInfo td:nth-child(n+1) {
+}
+
+.SnarkDirInfo .headerpriority {
+     text-align: center !important;
+     vertical-align: middle;    
+}
+
 .choked {
      color: #a00000 !important;
 }
@@ -402,36 +453,40 @@ td:first-child {
 }
 
 .snarkAddInfo {
-     font-size: 9pt;
+     font-size: 8pt;
      line-height: 130% !important;
 }
 
 .snarkConfigTitle {
      font-size: 11pt;
      font-weight: bold;
-     padding: 0 25px 3px 25px;
+     padding: 0 15px 3px 12px;
      margin: 5px 0 10px 0 !important;
-     letter-spacing: 0.25em;
+     letter-spacing: 0.05em;
      border: 1px solid #111;
      -moz-border-radius: 0 0 5px 5px;
      -khtml-border-radius: 0 0 5px 5px;
      border-radius: 0 0 5px 5px;
      border-top: 0;
-     text-shadow: 0px 1px 1px #300;
+     text-shadow: 0px 1px 1px #777;
      background: #ffb url('images/bling.png') repeat-x scroll center center !important;
      font-variant: small-caps !important;
      color: #503;
+     box-shadow: 0 1px 1px #777;
 }
 
+.snarkConfigTitle img {
+     margin-right: -3px;    
+} 
 .snarkConfig {
-     font-size: 10pt;
+     font-size: 8pt;
      width: 100%;
 }
 
 .page {
      background: #fff url('images/tile2.png');
      color: #310;
-     min-width: 970px !important;
+     min-width: 800px !important;
      margin: 5px 0 0 0;
      padding: 10px 10px 0px 10px;
      -moz-border-radius: 4px;
@@ -463,24 +518,6 @@ hr {
      width: 0%;
      margin: 5px 0 7px 0;
      text-align: center;
-}
-
-a:link {
-     color: #742;
-     text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
-}
-
-a:visited {
-     color: #962;
-     text-decoration: none;
-     font-weight: bold;
-}
-
-a:hover {
-     color: #f30;
-     font-weight: bold;
 }
 
 a:link {
@@ -577,7 +614,7 @@ input.accept {
 }
 
 input.add {
-     background: #f3efc7 url('../../console/images/add.png') no-repeat 2px center;
+     background: #f3efc7 url('../../console/images/add.png') no-repeat 2px center !important;
      padding: 2px 3px 2px 20px !important;
      min-height: 22px;
 }
@@ -610,13 +647,14 @@ select {
      background: #fff;
 /*     background: url('/themes/snark/ubergine/images/graytile.png') !important;*/
      color: #101;
-     font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
      padding: 2px 2px 2px 3px;
      -moz-border-radius: 4px 0 0 4px;
      -khtml-border-radius: 4px 0 0 4px;
      border-radius: 4px 0 0 4px;
      border: 1px solid #000;
+     margin-left: 5px;
 }
 
 select:hover, textarea:hover {
@@ -633,6 +671,8 @@ textarea {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px inset #000;
+     font-size: 8pt;
+     margin-left: 5px;
 }
 
 img {
@@ -760,7 +800,7 @@ div.configsection table{
 
 div.configsection a {
      color: #f30;
-     text-shadow: 1px 1px #500;
+     text-shadow: 1px 1px #777;
 }
 
 div.configsection a:hover {
@@ -801,4 +841,37 @@ code {
      margin: 0 -6px 0 -2px;
      padding: 1px 0 0px !important;
      vertical-align: top;
+}
+
+
+.routerdown {
+     color: #900;
+}
+
+.trackerconfig {
+     text-align: left !important;
+}
+
+.trackerconfig th:nth-child(n+4), .trackerconfig th:nth-child(n+5), .trackerconfig td:nth-child(n+4), .trackerconfig td:nth-child(n+5) {
+     text-align: center !important;
+}
+
+.trackerconfig th, .trackerconfig td, .trackerconfig th:last-child, .trackerconfig td:last-child {
+     text-align: left !important;     
+}
+
+.trackerconfig td:first-child {
+     text-align: right !important;     
+}
+
+input.trackername {
+     width: 100px;
+}
+
+input.trackerhome {
+     width: 200px;
+}
+
+input.trackerannounce {
+     width: 230px;
 }

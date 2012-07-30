@@ -16,6 +16,11 @@ import net.i2p.util.Log;
 /**
  * Stream that can be given messages out of order 
  * yet present them in order.
+ *<p>
+ * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
+ *<p>
+ * This buffers unlimited data via messageReceived() -
+ * limiting / blocking is done in ConnectionPacketHandler.receivePacket().
  *
  */
 class MessageInputStream extends InputStream {
@@ -113,6 +118,9 @@ class MessageInputStream extends InputStream {
         }
     }
     
+    /**
+     *  Adds the ack-through and nack fields to a packet we are building for transmission
+     */
     public void updateAcks(PacketLocal packet) {
         synchronized (_dataLock) {
             packet.setAckThrough(_highestBlockId);
@@ -126,6 +134,7 @@ class MessageInputStream extends InputStream {
      *
      * @return block IDs greater than the highest ready block ID, or null if there aren't any.
      */
+/***
     public long[] getOutOfOrderBlocks() {
         long blocks[] = null;
         synchronized (_dataLock) {
@@ -140,15 +149,18 @@ class MessageInputStream extends InputStream {
         Arrays.sort(blocks);
         return blocks;
     }
+***/
     
     /** how many blocks have we received that we still have holes before?
      * @return Count of blocks received that still have holes
      */
+/***
     public int getOutOfOrderBlockCount() { 
         synchronized (_dataLock) { 
             return _notYetReadyBlocks.size(); 
         }
     }
+***/
   
     /** 
      * how long a read() call should block (if less than 0, block indefinitely,
@@ -205,9 +217,9 @@ class MessageInputStream extends InputStream {
      * @return true if this is a new packet, false if it is a dup
      */
     public boolean messageReceived(long messageId, ByteArray payload) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("received " + messageId + " with " + (payload != null ? payload.getValid()+"" : "no payload"));
         synchronized (_dataLock) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("received " + messageId + " with " + (payload != null ? payload.getValid()+"" : "no payload"));
             if (messageId <= _highestReadyBlockId) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ignoring dup message " + messageId);
@@ -237,7 +249,6 @@ class MessageInputStream extends InputStream {
                     cur++;
                     _highestReadyBlockId++;
                 }
-                _dataLock.notifyAll();
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("message is out of order: " + messageId);
@@ -245,8 +256,8 @@ class MessageInputStream extends InputStream {
                     _notYetReadyBlocks.put(Long.valueOf(messageId), new ByteArray(null));
                 else
                     _notYetReadyBlocks.put(Long.valueOf(messageId), payload);
-                _dataLock.notifyAll();
             }
+            _dataLock.notifyAll();
         }
         return true;
     }
@@ -278,7 +289,7 @@ class MessageInputStream extends InputStream {
                     
                     while (_readyDataBlocks.isEmpty()) {
                         if (_locallyClosed)
-                            throw new IOException("Already closed, you wanker");
+                            throw new IOException("Already closed");
                         
                         if ( (_notYetReadyBlocks.isEmpty()) && (_closeReceived) ) {
                             if (_log.shouldLog(Log.INFO))
@@ -360,7 +371,7 @@ class MessageInputStream extends InputStream {
     
 	@Override
     public int available() throws IOException {
-        if (_locallyClosed) throw new IOException("Already closed, you wanker");
+        if (_locallyClosed) throw new IOException("Already closed");
         throwAnyError();
         int numBytes = 0;
         synchronized (_dataLock) {
@@ -384,6 +395,7 @@ class MessageInputStream extends InputStream {
      *
      * @return Count of bytes waiting to be read
      */
+/***
     public int getTotalQueuedSize() {
         synchronized (_dataLock) {
             if (_locallyClosed) return 0;
@@ -401,7 +413,11 @@ class MessageInputStream extends InputStream {
             return numBytes;
         }
     }
+***/
     
+    /**
+     *  Same as available() but doesn't throw IOE
+     */
     public int getTotalReadySize() {
         synchronized (_dataLock) {
             if (_locallyClosed) return 0;

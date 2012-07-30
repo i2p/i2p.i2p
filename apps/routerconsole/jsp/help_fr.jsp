@@ -9,7 +9,9 @@
 %>
 <html><head><title>Console du routeur I2P - Aide</title>
 <%@include file="css.jsi" %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 Traduction de mars 2011 (magma@mail.i2p)
 <h1>Aide et assistance du routeur I2P</h1>
