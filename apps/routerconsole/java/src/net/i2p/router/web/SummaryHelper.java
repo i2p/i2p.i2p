@@ -748,12 +748,13 @@ public class SummaryHelper extends HelperBase {
 
     public List<String> getSummaryBarSections(String page) {
         String config = "";
-        if ("home".equals(page))
+        if ("home".equals(page)) {
             config = _context.getProperty(PROP_SUMMARYBAR + page, DEFAULT_MINIMAL);
-        else
-            config = _context.getProperty(PROP_SUMMARYBAR + page, null);
+        } else {
+            config = _context.getProperty(PROP_SUMMARYBAR + page);
             if (config == null)
                 config = _context.getProperty(PROP_SUMMARYBAR + "default", DEFAULT_FULL);
+        }
         return Arrays.asList(config.split("" + S));
     }
 

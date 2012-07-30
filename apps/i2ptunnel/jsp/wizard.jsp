@@ -57,7 +57,7 @@
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 
     <% if (editBean.allowCSS()) {
-  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico">
+  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico" />
     <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" />
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }

@@ -133,7 +133,7 @@ class PeerCheckerTask implements Runnable
                 // Check if it still wants pieces from us.
                 if (!peer.isInterested())
                   {
-                    if (_log.shouldLog(Log.INFO))
+                    if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Choke uninterested peer: " + peer);
                     peer.setChoking(true);
                     uploaders--;
@@ -144,7 +144,7 @@ class PeerCheckerTask implements Runnable
                   }
                 else if (overBWLimitChoke)
                   {
-                    if (_log.shouldLog(Log.INFO))
+                    if (_log.shouldLog(Log.DEBUG))
                         _log.debug("BW limit (" + upload + "/" + uploaded + "), choke peer: " + peer);
                     peer.setChoking(true);
                     uploaders--;

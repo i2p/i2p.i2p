@@ -249,8 +249,8 @@ public class Snark
   private TrackerClient trackerclient;
   private String rootDataDir = ".";
   private final CompleteListener completeListener;
-  private boolean stopped;
-  private boolean starting;
+  private volatile boolean stopped;
+  private volatile boolean starting;
   private byte[] id;
   private byte[] infoHash;
   private String additionalTrackerURL;
