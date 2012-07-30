@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data
 
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -11,7 +11,7 @@ class HashSpec extends FunSpec with ShouldMatchers {
 
     describe("A Hash") {
         it("should be 32 bytes long") {
-            hash.length should be (32)
+            hash should have length (32)
         }
     }
 }
