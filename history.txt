@@ -1,3 +1,27 @@
+2012-07-30 zzz
+ * build.xml: Move more default properties to build.properties
+ * DecayingBloomFilter, DecayingHashSet, xlattice filters:
+   - Move from core to router
+   - Comment out tests
+ * ElGamal/AES/SessionTag:
+   - Increase TX expire from 10 to 12 min, while keeping RX expire at 15 min.
+     3 minutes should be plenty of clock skew + delay.
+   - Move tags-to-send and low-threshold values to be per-SKM
+   - New session config options crypto.tagsToSend and crypto.lowTagThreshold
+   - Prep for per-packet override of tags and thresholds
+   - Cleanups and Javadocs
+ * GarlicMessageBuilder:
+   - Put data clove last to speed acks and leaseset store on far end
+ * I2PTunnel: Add some defaults for the new session config options
+ * OCMOSJ:
+   - Don't bundle LeaseSet just because we're requesting an ACK
+   - Changed session config option shouldBundleReplyInfo to default to true
+     and be used to disable bundling altogether when set to false.
+     Was previously an undocumented option to force bundling with a certain probability.
+   - Don't send tags unless we've already generated a reply token (race)
+   - Cleanups and Javadocs
+ * RoutingKeyGenerator: Cleanups (ticket #672)
+
 * 2012-07-30 0.9.1 released
 
 2012-07-28 str4d
