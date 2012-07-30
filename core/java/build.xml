@@ -136,7 +136,7 @@
                 <pathelement location="${with.cobertura}" />
             </classpath>
             <batchtest todir="../../reports/core/junit/">
-                <fileset dir="./test/">
+                <fileset dir="./junittest/">
                     <include name="**/*Test.java" />
                     <exclude name="**/ElGamalAESEngineTest.java" />
                     <exclude name="**/StructureTest.java" />
