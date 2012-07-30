@@ -95,9 +95,15 @@
         <cobertura-instrument todir="./build/obj_cobertura">
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
+                <!-- exclude Test classes -->
                 <exclude name="**/*Test.class" />
                 <exclude name="**/*TestSuite.class" />
+                <!-- specific excludes -->
                 <exclude name="**/AllCoreTests.class" />
+                <exclude name="**/stat/SimpleStatDumper.class" />
+                <exclude name="**/stat/SizeMeasure.class" />
+                <exclude name="**/stat/StatLogSplitter.class" />
+                <!-- exclude anything not in net.i2p.* -->
                 <exclude name="com/nettgryppa/**/*.class" />
                 <exclude name="freenet/**/*.class" />
                 <exclude name="gnu/**/*.class" />
