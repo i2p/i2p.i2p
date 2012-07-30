@@ -16,7 +16,7 @@ package net.i2p;
 public class CoreVersion {
     /** deprecated */
     public final static String ID = "Monotone";
-    public final static String VERSION = "0.9";
+    public final static String VERSION = "0.9.1";
 
     public static void main(String args[]) {
         System.out.println("I2P Core version: " + VERSION);

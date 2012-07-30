@@ -4,6 +4,7 @@ Release checklist
 Ensure all translation updates are imported from Transifex
 Sync with mtn.i2p2.i2p
 Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p
+Copy over override.properties to set build.built-by
 Double-check trust list
 Deploy the Jetty archive, a clean checkout lacks it
 
@@ -16,12 +17,12 @@ Change revision in:
 		(change to BUILD = 0 and EXTRA = "")
 
 Review the complete diff from the last release:
-        mtn diff -r t:i2p-0.x.(xx-1) > out.diff
+        mtn diff -r t:i2p-0.9.(xx-1) > out.diff
         vi out.diff
 
 Verify that no untrusted revisions were inadvertently
 blessed by a trusted party:
-        mtn log --brief --no-graph --to t:i2p-0.8.(xx-1) | cut -d ' ' -f 2 | sort | uniq -c
+        mtn log --brief --no-graph --to t:i2p-0.9.(xx-1) | cut -d ' ' -f 2 | sort | uniq -c
 
 =========================================
 NOTE: These tasks are now automated by 'ant release'
@@ -58,7 +59,7 @@ Generate hashes:
 	sha256sum i2pupdate.su2
 
 Generate PGP signatures:
-	gpg -b i2pinstall-0..x xx.exe
+	gpg -b i2pinstall-0.x xx.exe
 	gpg -b i2psource-0.x.xx.tar.bz2
 	gpg -b i2pupdate-0.x.xx.zip
 	gpg -b i2pupdate.sud
