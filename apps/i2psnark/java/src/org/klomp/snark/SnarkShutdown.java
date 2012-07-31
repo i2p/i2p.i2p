@@ -26,6 +26,7 @@ import net.i2p.util.I2PAppThread;
 
 /**
  * Makes sure everything ends correctly when shutting down.
+ * @deprecated unused
  */
 public class SnarkShutdown extends I2PAppThread
 {
@@ -61,7 +62,7 @@ public class SnarkShutdown extends I2PAppThread
 
     //Snark.debug("Halting TrackerClient...", Snark.INFO);
     if (trackerclient != null)
-      trackerclient.halt();
+      trackerclient.halt(true);
 
     //Snark.debug("Halting PeerCoordinator...", Snark.INFO);
     if (coordinator != null)

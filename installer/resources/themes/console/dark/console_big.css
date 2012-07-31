@@ -16,7 +16,7 @@ div.routersummary table {
 }
 
 div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
-     text-shadow: 0 0 0 #fff !important;
+     text-shadow: 0 0 0 0 !important;
 }
 
 div.routersummary h4 {
@@ -38,6 +38,16 @@ b, a, a:link, a:hover, a:visited {
      font-weight: normal;
 }
 
+h2 {
+     font-size: 15pt;
+     text-shadow: none;
+     font-weight: normal;
+}
+
+p {
+     font-size: 9.5pt;
+}
+
 button, button:visited {
     font: normal 10pt Verdana,"Bitstream Vera Sans",Tahoma,Helvetica,sans-serif !important;
 }
@@ -54,4 +64,8 @@ code, pre, tt {
 
 table {
      font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+div.applabel {
+     font-size: 8.5pt;
 }

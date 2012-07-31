@@ -18,9 +18,14 @@ import net.i2p.util.Log;
  *
  */
 class ExploratoryPeerSelector extends TunnelPeerSelector {
-    public List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings) {
+
+    public ExploratoryPeerSelector(RouterContext context) {
+        super(context);
+    }
+
+    public List<Hash> selectPeers(TunnelPoolSettings settings) {
         Log l = ctx.logManager().getLog(getClass());
-        int length = getLength(ctx, settings);
+        int length = getLength(settings);
         if (length < 0) { 
             if (l.shouldLog(Log.DEBUG))
                 l.debug("Length requested is zero: " + settings);
@@ -28,13 +33,13 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         }
         
         if (false && shouldSelectExplicit(settings)) {
-            List rv = selectExplicit(ctx, settings, length);
+            List rv = selectExplicit(settings, length);
             if (l.shouldLog(Log.DEBUG))
                 l.debug("Explicit peers selected: " + rv);
             return rv;
         }
         
-        Set<Hash> exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
+        Set<Hash> exclude = getExclude(settings.isInbound(), true);
         exclude.add(ctx.routerHash());
         // Don't use ff peers for exploratory tunnels to lessen exposure to netDb searches and stores
         // Hmm if they don't get explored they don't get a speed/capacity rating
@@ -42,7 +47,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
         // exclude.addAll(fac.getFloodfillPeers());
         HashSet matches = new HashSet(length);
-        boolean exploreHighCap = shouldPickHighCap(ctx);
+        boolean exploreHighCap = shouldPickHighCap();
 
         //
         // We don't honor IP Restriction here, to be fixed
@@ -84,7 +89,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
      *  build success rate is much worse, return true so that reliability
      *  is maintained.
      */
-    private static boolean shouldPickHighCap(RouterContext ctx) {
+    private boolean shouldPickHighCap() {
         if (ctx.getBooleanProperty("router.exploreHighCapacity"))
             return true;
 
@@ -118,7 +123,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         if (ctx.router().getUptime() <= 11*60*1000) {
             failPct = 100 - MIN_NONFAILING_PCT;
         } else {
-            failPct = getExploratoryFailPercentage(ctx);
+            failPct = getExploratoryFailPercentage();
             //Log l = ctx.logManager().getLog(getClass());
             //if (l.shouldLog(Log.DEBUG))
             //    l.debug("Normalized Fail pct: " + failPct);
@@ -140,9 +145,9 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
      * Even this isn't the "true" rate for the NonFailingPeers pool, since we
      * are often building exploratory tunnels using the HighCapacity pool.
      */
-    private static int getExploratoryFailPercentage(RouterContext ctx) {
-        int c = getFailPercentage(ctx, "Client");
-        int e = getFailPercentage(ctx, "Exploratory");
+    private int getExploratoryFailPercentage() {
+        int c = getFailPercentage("Client");
+        int e = getFailPercentage("Exploratory");
         //Log l = ctx.logManager().getLog(getClass());
         //if (l.shouldLog(Log.DEBUG))
         //    l.debug("Client, Expl. Fail pct: " + c + ", " + e);
@@ -154,11 +159,11 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         return (100 * (e-c)) / (100-c);
     }
 
-    private static int getFailPercentage(RouterContext ctx, String t) {
+    private int getFailPercentage(String t) {
         String pfx = "tunnel.build" + t;
-        int timeout = getEvents(ctx, pfx + "Expire", 10*60*1000);
-        int reject = getEvents(ctx, pfx + "Reject", 10*60*1000);
-        int accept = getEvents(ctx, pfx + "Success", 10*60*1000);
+        int timeout = getEvents(pfx + "Expire", 10*60*1000);
+        int reject = getEvents(pfx + "Reject", 10*60*1000);
+        int accept = getEvents(pfx + "Success", 10*60*1000);
         if (accept + reject + timeout <= 0)
             return 0;
         double pct = (double)(reject + timeout) / (accept + reject + timeout);
@@ -166,7 +171,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
     }
     
     /** Use current + last to get more recent and smoother data */
-    private static int getEvents(RouterContext ctx, String stat, long period) {
+    private int getEvents(String stat, long period) {
         RateStat rs = ctx.statManager().getRate(stat);
         if (rs == null) 
             return 0;

@@ -57,7 +57,7 @@
     <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class">
+        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/FetchAndAdd*.class **/messages_*.class">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
@@ -72,7 +72,7 @@
     
     <target name="jarUpToDate">
         <uptodate property="jar.uptodate" targetfile="build/i2psnark.jar" >
-            <srcfiles dir= "build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class" />
+            <srcfiles dir= "build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/FetchAndAdd*.class **/messages_*.class" />
         </uptodate>
         <condition property="shouldListChanges" >
             <and>

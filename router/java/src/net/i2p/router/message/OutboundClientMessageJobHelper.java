@@ -50,6 +50,8 @@ class OutboundClientMessageJobHelper {
      *
      * Unused?
      *
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param bundledReplyLeaseSet if specified, the given LeaseSet will be packaged with the message (allowing
      *                             much faster replies, since their netDb search will return almost instantly)
      * @return garlic, or null if no tunnels were found (or other errors)
@@ -68,6 +70,8 @@ class OutboundClientMessageJobHelper {
      *
      * This is called from OCMOSJ
      *
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
@@ -79,20 +83,23 @@ class OutboundClientMessageJobHelper {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
         if (skm == null)
             return null;
+        // no use sending tags unless we have a reply token set up already
+        int tagsToSend = replyToken >= 0 ? skm.getTagsToSend() : 0;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
-                                                              skm);
+                                                              tagsToSend, skm);
         return msg;
     }
     
+    /**
+     * @return null on error
+     */
     private static GarlicConfig createGarlicConfig(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
                                                    PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel, boolean requireAck,
                                                    LeaseSet bundledReplyLeaseSet) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
-        if (log.shouldLog(Log.DEBUG))
+        if (replyToken >= 0 && log.shouldLog(Log.DEBUG))
             log.debug("Reply token: " + replyToken);
         GarlicConfig config = new GarlicConfig();
-        
-        config.addClove(dataClove);
         
         if (requireAck) {
             PayloadGarlicConfig ackClove = buildAckClove(ctx, from, replyTunnel, replyToken, expiration);
@@ -106,6 +113,11 @@ class OutboundClientMessageJobHelper {
             config.addClove(leaseSetClove);
         }
         
+        // As of 0.9.2, since the receiver processes them in-order,
+        // put data clove last to speed up the ack,
+        // and get the leaseset stored before handling the data
+        config.addClove(dataClove);
+
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
         // defaults
@@ -131,13 +143,11 @@ class OutboundClientMessageJobHelper {
     
     /**
      * Build a clove that sends a DeliveryStatusMessage to us
+     * @return null on error
      */
     private static PayloadGarlicConfig buildAckClove(RouterContext ctx, Hash from, TunnelInfo replyToTunnel, long replyToken, long expiration) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
-        
-        Hash replyToTunnelRouter = null; // inbound tunnel gateway
-        TunnelId replyToTunnelId = null; // tunnel id on that gateway
         
         if (replyToTunnel == null) {
             if (log.shouldLog(Log.WARN))
@@ -145,11 +155,11 @@ class OutboundClientMessageJobHelper {
                          + ", as there are no inbound tunnels available");
             return null;
         }
-        replyToTunnelId = replyToTunnel.getReceiveTunnelId(0);
-        replyToTunnelRouter = replyToTunnel.getPeer(0);
+        TunnelId replyToTunnelId = replyToTunnel.getReceiveTunnelId(0); // tunnel id on that gateway
+        Hash replyToTunnelRouter = replyToTunnel.getPeer(0); // inbound tunnel gateway
         if (log.shouldLog(Log.DEBUG))
             log.debug("Ack for the data message will come back along tunnel " + replyToTunnelId 
-                      + ":\n" + replyToTunnel);
+                      + ": " + replyToTunnel);
         
         DeliveryInstructions ackInstructions = new DeliveryInstructions();
         ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
@@ -163,8 +173,8 @@ class OutboundClientMessageJobHelper {
         DeliveryStatusMessage msg = new DeliveryStatusMessage(ctx);
         msg.setArrival(ctx.clock().now());
         msg.setMessageId(replyToken);
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
+        //if (log.shouldLog(Log.DEBUG))
+        //    log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
         
         ackClove.setCertificate(Certificate.NULL_CERT);
         ackClove.setDeliveryInstructions(ackInstructions);
@@ -175,11 +185,11 @@ class OutboundClientMessageJobHelper {
         // defaults
         //ackClove.setRequestAck(false);
         
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("Delivery status message is targetting us [" 
-                      + ackClove.getRecipient().getIdentity().getHash().toBase64() 
-                      + "] via tunnel " + replyToTunnelId.getTunnelId() + " on " 
-                      + replyToTunnelRouter.toBase64());
+        //if (log.shouldLog(Log.DEBUG))
+        //    log.debug("Delivery status message is targetting us [" 
+        //              + ackClove.getRecipient().getIdentity().getHash().toBase64() 
+        //              + "] via tunnel " + replyToTunnelId.getTunnelId() + " on " 
+        //              + replyToTunnelRouter.toBase64());
         
         return ackClove;
     }

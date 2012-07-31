@@ -8,10 +8,10 @@ Subject: rename jcpuid
 
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
-@@ -83,8 +83,8 @@
-             echo "and/or set JAVA_HOME then re-run this script."
-             exit 1
-         fi
+@@ -65,8 +65,8 @@
+                 exit 1;;
+         esac
+ 
 -        LINKFLAGS="-shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
 -        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
 +        LINKFLAGS="-shared -Wl,-soname,libjcpuid.so"

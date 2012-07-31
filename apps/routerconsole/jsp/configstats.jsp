@@ -6,10 +6,13 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config stats")%>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
 <script type="text/javascript">
 function init()
 {
 	checkAll = false;
+	initAjax();
 }
 function toggleAll(category)
 {

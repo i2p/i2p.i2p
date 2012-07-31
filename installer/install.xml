@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.8.13</appversion>
+        <appversion>0.9.1</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -132,10 +132,10 @@
               and the izpack docs for some guidance.
              -->
             <parsable targetfile="$INSTALL_PATH/wrapper.config" type="plain" />
-            <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
-            <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell"> <os family="unix" /> </parsable>
+            <parsable targetfile="$INSTALL_PATH/eepget" type="shell"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/eepget.bat" type="shell" os="windows" />
-            <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/Start I2P Router.app/Contents/MacOS/i2prouter" type="shell" os="mac" />
             
 	    <conditions>

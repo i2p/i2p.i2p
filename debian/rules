@@ -31,7 +31,7 @@ ROUTERVERSION=$(CURDIR)/router/java/src/net/i2p/router/RouterVersion.java
 # I2P's version will be displayed in the router console as "$I2PVERSION-$EXTRAPREFIX$DEBIANVERSION", eg. 0.8.12-0-deb1
 export EXTRAPREFIX := deb
 export JAVA_HOME I2P
-export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/Version/{print $$2}' |sed 's/.*-\([[:digit:]]\{1,\}\).*$$/\1/')
+export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{print $$2}' |sed 's/.*-\([0-9A-Za-z~]\{1,\}\)$$/\1/')
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
@@ -43,8 +43,8 @@ override_dh_auto_clean:
 	-[ -r $(CURDIR)/debian/routerversion.java.bak ] && mv -f $(CURDIR)/debian/routerversion.java.bak $(ROUTERVERSION)
 	dh_auto_clean
 	ant distclean
-	rm -f core/c/jbigi/*.[s]o
-	rm -rf core/c/jcpuid/lib/
+	find $(CURDIR)/core -name '*\.[s]o' -exec rm -f {} \;
+	rm -rf $(CURDIR)/core/c/jcpuid/lib/
 	#rm -f $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	debconf-updatepo
 
@@ -53,12 +53,16 @@ override_dh_auto_build:
 binary-indep: build-indep
 build-indep:
 	dh_prep
-	cp -f $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak
+	if [ ! -e $(CURDIR)/debian/routerversion.java.bak ]; then \
+		cp $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak; \
+	fi
+ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 	sed -e "s/\(.*EXTRA\ =\ \)[^ ]*\"\(.*\)\"/\1\"\2-$$EXTRAPREFIX$$DEBIANVERSION\"/" < $(ROUTERVERSION) > $(ROUTERVERSION).tmp
 	mv -f $(ROUTERVERSION).tmp $(ROUTERVERSION)
-	# The next line is used by KYTV when building from source packages
-	#[ -r jetty/jetty-5.1.15.tgz ] && ln -sf $(CURDIR)/jetty/jetty-5.1.15.tgz $(CURDIR)/apps/jetty/jetty-5.1.15.tgz
-	ant preppkg-unix javadoc
+else
+	@echo "Already found deb in version, not doing anything"
+endif
+	TZ=UTC ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
 	

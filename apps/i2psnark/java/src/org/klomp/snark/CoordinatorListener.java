@@ -24,7 +24,7 @@ package org.klomp.snark;
 /**
  * Callback used when some peer changes state.
  */
-public interface CoordinatorListener
+interface CoordinatorListener
 {
   /**
    * Called when the PeerCoordinator notices a change in the state of a peer.

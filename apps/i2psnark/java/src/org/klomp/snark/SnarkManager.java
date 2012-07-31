@@ -8,6 +8,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,8 +20,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -31,6 +34,8 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Manage multiple snarks
@@ -50,13 +55,14 @@ public class SnarkManager implements Snark.CompleteListener {
     private Properties _config;
     private final I2PAppContext _context;
     private final Log _log;
-    private final List<String> _messages;
+    private final Queue<String> _messages;
     private final I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
     private Thread _monitor;
     private volatile boolean _running;
-    private final Map<String, String> _trackerMap;
+    private volatile boolean _stopping;
+    private final Map<String, Tracker> _trackerMap;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -83,6 +89,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String DEFAULT_THEME = "ubergine";
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
+    public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
 
     public static final int MIN_UP_BW = 2;
     public static final int DEFAULT_MAX_UP_BW = 10;
@@ -93,7 +100,7 @@ public class SnarkManager implements Snark.CompleteListener {
      *  "name", "announceURL=websiteURL" pairs
      *  '=' in announceURL must be escaped as &#44;
      */
-    private static final String DEFAULT_TRACKERS[] = { 
+    public static final String DEFAULT_TRACKERS[] = { 
 //       "Postman", "http://YRgrgTLGnbTq2aZOZDJQ~o6Uk5k6TK-OZtx0St9pb0G-5EGYURZioxqYG8AQt~LgyyI~NCj6aYWpPO-150RcEvsfgXLR~CxkkZcVpgt6pns8SRc3Bi-QSAkXpJtloapRGcQfzTtwllokbdC-aMGpeDOjYLd8b5V9Im8wdCHYy7LRFxhEtGb~RL55DA8aYOgEXcTpr6RPPywbV~Qf3q5UK55el6Kex-6VCxreUnPEe4hmTAbqZNR7Fm0hpCiHKGoToRcygafpFqDw5frLXToYiqs9d4liyVB-BcOb0ihORbo0nS3CLmAwZGvdAP8BZ7cIYE3Z9IU9D1G8JCMxWarfKX1pix~6pIA-sp1gKlL1HhYhPMxwyxvuSqx34o3BqU7vdTYwWiLpGM~zU1~j9rHL7x60pVuYaXcFQDR4-QVy26b6Pt6BlAZoFmHhPcAuWfu-SFhjyZYsqzmEmHeYdAwa~HojSbofg0TMUgESRXMw6YThK1KXWeeJVeztGTz25sL8AAAA.i2p/announce.php=http://tracker.postman.i2p/"
 //       , "eBook", "http://E71FRom6PZNEqTN2Lr8P-sr23b7HJVC32KoGnVQjaX6zJiXwhJy2HsXob36Qmj81TYFZdewFZa9mSJ533UZgGyQkXo2ahctg82JKYZfDe5uDxAn1E9YPjxZCWJaFJh0S~UwSs~9AZ7UcauSJIoNtpxrtbmRNVFLqnkEDdLZi26TeucfOmiFmIWnVblLniWv3tG1boE9Abd-6j3FmYVrRucYuepAILYt6katmVNOk6sXmno1Eynrp~~MBuFq0Ko6~jsc2E2CRVYXDhGHEMdt-j6JUz5D7S2RIVzDRqQyAZLKJ7OdQDmI31przzmne1vOqqqLC~1xUumZVIvF~yOeJUGNjJ1Vx0J8i2BQIusn1pQJ6UCB~ZtZZLQtEb8EPVCfpeRi2ri1M5CyOuxN0V5ekmPHrYIBNevuTCRC26NP7ZS5VDgx1~NaC3A-CzJAE6f1QXi0wMI9aywNG5KGzOPifcsih8eyGyytvgLtrZtV7ykzYpPCS-rDfITncpn5hliPUAAAA.i2p/pub/bt/announce.php=http://de-ebook-archiv.i2p/pub/bt/"
 //       , "Gaytorrents", "http://uxPWHbK1OIj9HxquaXuhMiIvi21iK0~ZiG9d8G0840ZXIg0r6CbiV71xlsqmdnU6wm0T2LySriM0doW2gUigo-5BNkUquHwOjLROiETnB3ZR0Ml4IGa6QBPn1aAq2d9~g1r1nVjLE~pcFnXB~cNNS7kIhX1d6nLgYVZf0C2cZopEow2iWVUggGGnAA9mHjE86zLEnTvAyhbAMTqDQJhEuLa0ZYSORqzJDMkQt90MV4YMjX1ICY6RfUSFmxEqu0yWTrkHsTtRw48l~dz9wpIgc0a0T9C~eeWvmBFTqlJPtQZwntpNeH~jF7nlYzB58olgV2HHFYpVYD87DYNzTnmNWxCJ5AfDorm6AIUCV2qaE7tZtI1h6fbmGpGlPyW~Kw5GXrRfJwNvr6ajwAVi~bPVnrBwDZezHkfW4slOO8FACPR28EQvaTu9nwhAbqESxV2hCTq6vQSGjuxHeOuzBOEvRWkLKOHWTC09t2DbJ94FSqETmZopTB1ukEmaxRWbKSIaAAAA.i2p/announce.php=http://gaytorrents.i2p/"
@@ -123,12 +130,12 @@ public class SnarkManager implements Snark.CompleteListener {
         _addSnarkLock = new Object();
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SnarkManager.class);
-        _messages = new ArrayList(16);
+        _messages = new LinkedBlockingQueue();
         _util = new I2PSnarkUtil(_context);
         _configFile = new File(CONFIG_FILE);
         if (!_configFile.isAbsolute())
             _configFile = new File(_context.getConfigDir(), CONFIG_FILE);
-        _trackerMap = Collections.synchronizedMap(new TreeMap(new IgnoreCaseComparator()));
+        _trackerMap = new ConcurrentHashMap(4);
         loadConfig(null);
     }
 
@@ -141,26 +148,35 @@ public class SnarkManager implements Snark.CompleteListener {
         _connectionAcceptor = new ConnectionAcceptor(_util);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
-        _context.addShutdownTask(new SnarkManagerShutdown());
+        // Not required, Jetty has a shutdown hook
+        //_context.addShutdownTask(new SnarkManagerShutdown());
     }
 
+    /*
+     *  Called by the webapp at Jetty shutdown.
+     *  Stops all torrents. Does not close the tunnel, so the announces have a chance.
+     *  Fix this so an individual webaapp stop will close the tunnel.
+     *  Runs inline.
+     */
     public void stop() {
         _running = false;
         _monitor.interrupt();
         _connectionAcceptor.halt();
-        (new SnarkManagerShutdown()).run();
+        stopAllTorrents(true);
     }
     
+    /** @since 0.9.1 */
+    public boolean isStopping() { return _stopping; }
+
     /** hook to I2PSnarkUtil for the servlet */
     public I2PSnarkUtil util() { return _util; }
 
-    private static final int MAX_MESSAGES = 5;
+    private static final int MAX_MESSAGES = 100;
 
     public void addMessage(String message) {
-        synchronized (_messages) {
-            _messages.add(message);
-            while (_messages.size() > MAX_MESSAGES)
-                _messages.remove(0);
+        _messages.offer(message);
+        while (_messages.size() > MAX_MESSAGES) {
+            _messages.poll();
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("MSG: " + message);
@@ -168,16 +184,14 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** newest last */
     public List<String> getMessages() {
-        synchronized (_messages) {
-            return new ArrayList(_messages);
-        }
+        if (_messages.isEmpty())
+            return Collections.EMPTY_LIST;
+        return new ArrayList(_messages);
     }
     
     /** @since 0.9 */
     public void clearMessages() {
-        synchronized (_messages) {
             _messages.clear();
-        }
     }
     
     /**
@@ -344,7 +358,7 @@ public class SnarkManager implements Snark.CompleteListener {
         _util.setFilesPublic(areFilesPublic());
         String ot = _config.getProperty(PROP_OPENTRACKERS);
         if (ot != null)
-            _util.setOpenTrackerString(ot);
+            _util.setOpenTrackers(getOpenTrackers());
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
         boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
         _util.setUseOpenTrackers(bOT);
@@ -366,7 +380,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
                              String startDelay, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, String openTrackers, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, String theme) {
         boolean changed = false;
         //if (eepHost != null) {
         //    // unused, we use socket eepget
@@ -550,14 +564,6 @@ public class SnarkManager implements Snark.CompleteListener {
             _util.setUseOpenTrackers(useOpenTrackers);
             changed = true;
         }
-        if (openTrackers != null) {
-            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
-                _config.setProperty(PROP_OPENTRACKERS, openTrackers.trim());
-                _util.setOpenTrackerString(openTrackers);
-                addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
-                changed = true;
-            }
-        }
         if (theme != null) {
             if(!theme.equals(_config.getProperty(PROP_THEME))) {
                 _config.setProperty(PROP_THEME, theme);
@@ -572,6 +578,84 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
     
+    /**
+     *  Others should use the version in I2PSnarkUtil
+     *  @return non-null, empty if disabled
+     *  @since 0.9.1
+     */
+    private List<String> getOpenTrackers() {
+        if (!_util.shouldUseOpenTrackers())
+            return Collections.EMPTY_LIST;
+        return getListConfig(PROP_OPENTRACKERS, I2PSnarkUtil.DEFAULT_OPENTRACKERS);
+    }
+    
+    /**
+     *  @return non-null, fixed size, may be empty or unmodifiable
+     *  @since 0.9.1
+     */
+    public List<String> getPrivateTrackers() {
+        return getListConfig(PROP_PRIVATETRACKERS, null);
+    }
+
+    /**
+     *  @param ot null to restore default
+     *  @since 0.9.1
+     */
+    public void saveOpenTrackers(List<String> ot) {
+        String val = setListConfig(PROP_OPENTRACKERS, ot);
+        if (ot == null)
+            ot = Collections.singletonList(I2PSnarkUtil.DEFAULT_OPENTRACKERS);
+        _util.setOpenTrackers(ot);
+        addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
+        saveConfig();
+    }
+
+    /**
+     *  @param pt null ok, default is none
+     *  @since 0.9.1
+     */
+    public void savePrivateTrackers(List<String> pt) {
+        setListConfig(PROP_PRIVATETRACKERS, pt);
+        addMessage(_("Private tracker list changed - affects newly created torrents only."));
+        saveConfig();
+    }
+
+    /**
+     *  @param dflt default or null
+     *  @return non-null, fixed size
+     *  @since 0.9.1
+     */
+    private List<String> getListConfig(String prop, String dflt) {
+        String val = _config.getProperty(prop);
+        if (val == null)
+            val = dflt;
+        if (val == null)
+            return Collections.EMPTY_LIST;
+        return Arrays.asList(val.split(","));
+    }
+
+    /**
+     *  Sets the config, does NOT save it
+     *  @param values may be null or empty
+     *  @return the comma-separated config string, non-null
+     *  @since 0.9.1
+     */
+    private String setListConfig(String prop, List<String> values) {
+        if (values == null || values.isEmpty()) {
+            _config.remove(prop);
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(64);
+        for (String s : values) {
+             if (buf.length() > 0)
+                 buf.append(',');
+             buf.append(s);
+        }
+        String rv = buf.toString();
+        _config.setProperty(prop, rv);
+        return rv;
+    }
+
     public void saveConfig() {
         try {
             synchronized (_configFile) {
@@ -787,7 +871,7 @@ public class SnarkManager implements Snark.CompleteListener {
             torrent.startTorrent();
             addMessage(_("Fetching {0}", name));
             boolean haveSavedPeers = false;
-            if ((!util().connected()) && !haveSavedPeers) {
+            if ((_util.connected()) && !haveSavedPeers) {
                 addMessage(_("We have no saved peers and no other torrents are running. " +
                              "Fetch of {0} will not succeed until you start another torrent.", name));
             }
@@ -809,6 +893,29 @@ public class SnarkManager implements Snark.CompleteListener {
         snark.stopTorrent();
         _magnets.remove(snark.getName());
         removeMagnetStatus(snark.getInfoHash());
+    }
+    
+    /**
+     * Add and start a FetchAndAdd task.
+     * Remove it with deleteMagnet().
+     *
+     * @param torrent must be instanceof FetchAndAdd
+     * @throws RuntimeException via Snark.fatal()?
+     * @since 0.9.1
+     */
+    public void addDownloader(Snark torrent) {
+        synchronized (_snarks) {
+            Snark snark = getTorrentByInfoHash(torrent.getInfoHash());
+            if (snark != null) {
+                addMessage(_("Download already running: {0}", snark.getBaseName()));
+                return;
+            }
+            String name = torrent.getName();
+            // Tell the dir monitor not to delete us
+            _magnets.add(name);
+            _snarks.put(name, torrent);
+        }
+        torrent.startTorrent();
     }
 
     /**
@@ -1192,13 +1299,11 @@ public class SnarkManager implements Snark.CompleteListener {
             // don't bother delaying if auto start is false
             long delay = 60 * 1000 * getStartupDelayMinutes();
             if (delay > 0 && shouldAutoStart()) {
-                _messages.add(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
+                addMessage(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
-                // the first message was a "We are starting up in 1m" 
-                synchronized (_messages) { 
-                    if (_messages.size() == 1)
-                        _messages.remove(0);
-                }
+                // Remove that first message
+                if (_messages.size() == 1)
+                    _messages.poll();
             }
 
             // here because we need to delay until I2CP is up
@@ -1330,7 +1435,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 byte[] ih = Base64.decode(b64);
                 // ignore value - TODO put tracker URL in value
                 if (ih != null && ih.length == 20)
-                    addMagnet("Magnet: " + I2PSnarkUtil.toHex(ih), ih, null, false);
+                    addMagnet("* " + _("Magnet") + ' ' + I2PSnarkUtil.toHex(ih), ih, null, false);
                 // else remove from config?
             }
         }
@@ -1407,11 +1512,29 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     /**
-     *  Sorted map of name to announceURL=baseURL
+     *  Unsorted map of name to Tracker object
      *  Modifiable, not a copy
+     *  @since 0.9.1
      */
-    public Map<String, String> getTrackers() { 
+    public Map<String, Tracker> getTrackerMap() { 
         return _trackerMap;
+    }
+
+    /**
+     *  Unsorted, do not modify
+     */
+    public Collection<Tracker> getTrackers() { 
+        return _trackerMap.values();
+    }
+
+    /**
+     *  Sorted copy
+     *  @since 0.9.1
+     */
+    public List<Tracker> getSortedTrackers() { 
+        List<Tracker> rv = new ArrayList(_trackerMap.values());
+        Collections.sort(rv, new IgnoreCaseComparator());
+        return rv;
     }
 
     /** @since 0.9 */
@@ -1419,28 +1542,37 @@ public class SnarkManager implements Snark.CompleteListener {
         String trackers = _config.getProperty(PROP_TRACKERS);
         if ( (trackers == null) || (trackers.trim().length() <= 0) )
             trackers = _context.getProperty(PROP_TRACKERS);
-        _trackerMap.clear();
         if ( (trackers == null) || (trackers.trim().length() <= 0) ) {
-            for (int i = 0; i < DEFAULT_TRACKERS.length; i += 2)
-                _trackerMap.put(DEFAULT_TRACKERS[i], DEFAULT_TRACKERS[i+1]);
+            setDefaultTrackerMap(true);
         } else {
             String[] toks = trackers.split(",");
             for (int i = 0; i < toks.length; i += 2) {
                 String name = toks[i].trim().replace("&#44;", ",");
                 String url = toks[i+1].trim().replace("&#44;", ",");
-                if ( (name.length() > 0) && (url.length() > 0) )
-                    _trackerMap.put(name, url);
+                if ( (name.length() > 0) && (url.length() > 0) ) {
+                    String urls[] = url.split("=", 2);
+                    String url2 = urls.length > 1 ? urls[1] : "";
+                    _trackerMap.put(name, new Tracker(name, urls[0], url2));
+                }
             }
         }
     }
 
     /** @since 0.9 */
     public void setDefaultTrackerMap() {
+        setDefaultTrackerMap(true);
+    }
+
+    /** @since 0.9.1 */
+    private void setDefaultTrackerMap(boolean save) {
         _trackerMap.clear();
         for (int i = 0; i < DEFAULT_TRACKERS.length; i += 2) {
-            _trackerMap.put(DEFAULT_TRACKERS[i], DEFAULT_TRACKERS[i+1]);
+            String name = DEFAULT_TRACKERS[i];
+            String urls[] = DEFAULT_TRACKERS[i+1].split("=", 2);
+            String url2 = urls.length > 1 ? urls[1] : null;
+            _trackerMap.put(name, new Tracker(name, urls[0], url2));
         }
-        if (_config.remove(PROP_TRACKERS) != null) {
+        if (save && _config.remove(PROP_TRACKERS) != null) {
             saveConfig();
         }
     }
@@ -1449,12 +1581,15 @@ public class SnarkManager implements Snark.CompleteListener {
     public void saveTrackerMap() {
         StringBuilder buf = new StringBuilder(2048);
         boolean comma = false;
-        for (Map.Entry<String, String> e : _trackerMap.entrySet()) {
+        for (Map.Entry<String, Tracker> e : _trackerMap.entrySet()) {
             if (comma)
                 buf.append(',');
             else
                 comma = true;
-            buf.append(e.getKey().replace(",", "&#44;")).append(',').append(e.getValue().replace(",", "&#44;"));
+            Tracker t = e.getValue();
+            buf.append(e.getKey().replace(",", "&#44;")).append(',').append(t.announceURL.replace(",", "&#44;"));
+            if (t.baseURL != null)
+                buf.append('=').append(t.baseURL);
         }
         _config.setProperty(PROP_TRACKERS, buf.toString());
         saveConfig();
@@ -1468,25 +1603,144 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
 
-    public class SnarkManagerShutdown extends I2PAppThread {
-        @Override
+    /**
+     *  If not connected, thread it, otherwise inline
+     *  @since 0.9.1
+     */
+    public void startTorrent(byte[] infoHash) {
+        for (Snark snark : _snarks.values()) {
+            if (DataHelper.eq(infoHash, snark.getInfoHash())) {
+                if (snark.isStarting() || !snark.isStopped()) {
+                    addMessage("Torrent already started");
+                    return;
+                }
+                boolean connected = _util.connected();
+                if ((!connected) && !_util.isConnecting())
+                    addMessage(_("Opening the I2P tunnel"));
+                addMessage(_("Starting up torrent {0}", snark.getBaseName()));
+                if (connected) {
+                    snark.startTorrent();
+                } else {
+                    // mark it for the UI
+                    snark.setStarting();
+                    (new I2PAppThread(new ThreadedStarter(snark), "TorrentStarter", true)).start();
+                    try { Thread.sleep(200); } catch (InterruptedException ie) {}
+                }
+                return;
+            }
+        }
+        addMessage("Torrent not found?");
+    }
+
+    /**
+     *  If not connected, thread it, otherwise inline
+     *  @since 0.9.1
+     */
+    public void startAllTorrents() {
+        if (_util.connected()) {
+            startAll();
+        } else {
+            addMessage(_("Opening the I2P tunnel and starting all torrents."));
+            for (Snark snark : _snarks.values()) {
+                // mark it for the UI
+                snark.setStarting();
+            }
+            (new I2PAppThread(new ThreadedStarter(null), "TorrentStarterAll", true)).start();
+            try { Thread.sleep(200); } catch (InterruptedException ie) {}
+        }
+    }
+
+    /**
+     *  Use null constructor param for all
+     *  @since 0.9.1
+     */
+    private class ThreadedStarter implements Runnable {
+        private final Snark snark;
+        public ThreadedStarter(Snark s) { snark = s; }
         public void run() {
-            Set names = listTorrentFiles();
-            for (Iterator iter = names.iterator(); iter.hasNext(); ) {
-                Snark snark = getTorrent((String)iter.next());
-                if ( (snark != null) && (!snark.isStopped()) )
-                    snark.stopTorrent();
+            if (snark != null) {
+                if (snark.isStopped())
+                    snark.startTorrent();
+            } else {
+                startAll();
             }
         }
     }
 
     /**
+     *  Inline
+     *  @since 0.9.1
+     */
+    private void startAll() {
+        for (Snark snark : _snarks.values()) {
+            if (snark.isStopped())
+                snark.startTorrent();
+        }
+    }
+
+    /**
+     * Stop all running torrents, and close the tunnel after a delay
+     * to allow for announces.
+     * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
+     * the tunnel won't actually be closed as the SimpleScheduler is already shutdown
+     * or will be soon, so we delay a few seconds inline.
+     * @param finalShutdown if true, sleep at the end if any torrents were running
+     * @since 0.9.1
+     */
+    public void stopAllTorrents(boolean finalShutdown) {
+        _stopping = true;
+        if (finalShutdown && _log.shouldLog(Log.WARN))
+            _log.warn("SnarkManager final shutdown");
+        int count = 0;
+        for (Snark snark : _snarks.values()) {
+            if (!snark.isStopped()) {
+                if (count == 0)
+                    addMessage(_("Stopping all torrents and closing the I2P tunnel."));
+                count++;
+                if (finalShutdown)
+                    snark.stopTorrent(true);
+                else
+                    stopTorrent(snark, false);
+                // Throttle since every unannounce is now threaded.
+                // How to do this without creating a ton of threads?
+                try { Thread.sleep(20); } catch (InterruptedException ie) {}
+            }
+        }
+        if (_util.connected()) {
+            if (count > 0) {
+                // Schedule this even for final shutdown, as there's a chance
+                // that it's just this webapp that is stopping.
+                SimpleScheduler.getInstance().addEvent(new Disconnector(), 60*1000);
+                addMessage(_("Closing I2P tunnel after notifying trackers."));
+                if (finalShutdown) {
+                    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                }
+            } else {
+                _util.disconnect();
+                _stopping = false;
+                addMessage(_("I2P tunnel closed."));
+            }
+        }
+    }
+
+    /** @since 0.9.1 */
+    private class Disconnector implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (_util.connected()) {
+                _util.disconnect();
+                _stopping = false;
+                addMessage(_("I2P tunnel closed."));
+            }
+        }
+    }
+    
+    /**
      *  ignore case, current locale
      *  @since 0.9
      */
-    private static class IgnoreCaseComparator implements Comparator<String> {
-        public int compare(String l, String r) {
-            return l.toLowerCase().compareTo(r.toLowerCase());
+    private static class IgnoreCaseComparator implements Comparator<Tracker> {
+        public int compare(Tracker l, Tracker r) {
+            return l.name.toLowerCase().compareTo(r.name.toLowerCase());
         }
     }
 }

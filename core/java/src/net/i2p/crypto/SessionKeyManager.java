@@ -24,14 +24,14 @@ import net.i2p.data.SessionTag;
  * unknown (and hence always forces a full ElGamal encryption for each message).
  * A more intelligent subclass should manage and persist keys and tags.
  *
+ * TODO if we aren't going to use this for testing, make it abstract.
  */
 public class SessionKeyManager {
-    /** session key managers must be created through an app context */
-    protected SessionKeyManager(I2PAppContext context) { // nop
-    }
 
-    /** see above */
-    private SessionKeyManager() { // nop
+    /**
+     *  Make this public if you need a dummy SessionKeyManager for testing
+     */
+    protected SessionKeyManager(I2PAppContext context) { // nop
     }
     
     /**
@@ -59,7 +59,8 @@ public class SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
-     * @deprecated racy
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     public void createSession(PublicKey target, SessionKey key) { // nop
     }
@@ -67,7 +68,8 @@ public class SessionKeyManager {
     /**
      * Generate a new session key and associate it with the specified target.  
      *
-     * @deprecated racy
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     public SessionKey createSession(PublicKey target) {
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();
@@ -85,6 +87,31 @@ public class SessionKeyManager {
     public SessionTag consumeNextAvailableTag(PublicKey target, SessionKey key) {
         return null;
     }
+
+    /**
+     *  How many to send, IF we need to.
+     *  @since 0.9.2
+     */
+    public int getTagsToSend() { return 0; };
+
+    /**
+     *  @since 0.9.2
+     */
+    public int getLowThreshold() { return 0; };
+
+    /**
+     *  @return true if we have less than the threshold or what we have is about to expire
+     *  @since 0.9.2
+     */
+    public boolean shouldSendTags(PublicKey target, SessionKey key) {
+        return shouldSendTags(target, key, getLowThreshold());
+    }
+
+    /**
+     *  @return true if we have less than the threshold or what we have is about to expire
+     *  @since 0.9.2
+     */
+    public boolean shouldSendTags(PublicKey target, SessionKey key, int lowThreshold) { return false; }
 
     /**
      * Determine (approximately) how many available session tags for the current target

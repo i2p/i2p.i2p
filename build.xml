@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project basedir="." default="all" name="i2p">
 
-    <!-- Things you might want to change -->
-    <!-- This keeps gcj a lot quieter -->
-    <!--
-        <property name="javac.compilerargs" value="-warn:-unchecked,raw,unused,serial" />
-    -->
-    <!-- Additional classpath. No longer required; we find pack200 classes at runtime.
-         See core/java/src/net/i2p/util/FileUtil.java for more info.
-    -->
-    <!--
-        <property name="javac.classpath" value="/PATH/TO/pack200.jar" />
-    -->
-
-    <!-- change this to false if you don't have gettext -->
-    <property name="require.gettext" value="true" />
-    <!-- Include property files so that values can be easily overridden. Currently just useful for javadoc hosters -->
+    <!-- Include property files so that values can be easily overridden.
+         Users should create an override.properties file to make changes.
+     -->
     <property file="override.properties"/>
     <property file="build.properties"/>
 
@@ -240,7 +228,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar lib/desktopgui.jar" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar lib/desktopgui.jar lib/i2psnark.jar lib/jrobin.jar lib/jstl.jar lib/standard.jar lib/jetty-i2p.jar lib/jetty-java5-threadpool.jar lib/jetty-rewrite-handler.jar lib/jetty-sslengine.jar lib/jetty-start.jar lib/jetty-util.jar" />
              <attribute name="Built-By" value="${build.built-by}" />
              <attribute name="Build-Date" value="${build.timestamp}" />
              <attribute name="Base-Revision" value="${workspace.version}" />
@@ -420,9 +408,9 @@
             splitindex="true"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <group title="Router Console" packages="net.i2p.router.web" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
@@ -489,8 +477,8 @@
             splitindex="true"
             doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
+            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <sourcepath>
                 <pathelement location="core/java/test/junit" />
                 <pathelement location="router/java/test/junit" />
@@ -551,7 +539,7 @@
             <arg value="-f1" />
             <arg value="-d;" />
         </exec>
-        <exec executable="awk" outputproperty="build.extra" failifexecutionfails="false">
+        <exec executable="awk" osfamily="unix" outputproperty="build.extra" failifexecutionfails="false">
             <arg value="-F&quot;" />
             <arg value="/public final static String EXTRA/{print $2}" />
             <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
@@ -691,15 +679,16 @@
     <target name="preppkg" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
+            <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
+            <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
+        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkgRepack" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
@@ -707,16 +696,16 @@
         <!-- no use doing repack200 on jbigi.jar -->
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
+            <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-freebsd" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
-            <fileset dir="installer/lib/wrapper/freebsd/" />
+            <fileset dir="installer/lib/wrapper/freebsd/" excludes="*.txt" />
         </copy>
         <copy todir="pkg-temp/lib/wrapper/freebsd64/">
-            <fileset dir="installer/lib/wrapper/freebsd64" />
+            <fileset dir="installer/lib/wrapper/freebsd64" excludes="*.txt" />
         </copy>
     </target>
 
@@ -747,22 +736,22 @@
 
     <target name="preppkg-linux-x86" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/linux/">
-            <fileset dir="installer/lib/wrapper/linux/" />
+            <fileset dir="installer/lib/wrapper/linux/" excludes="*.txt" />
         </copy>
         <copy todir="pkg-temp/lib/wrapper/linux64/">
-            <fileset dir="installer/lib/wrapper/linux64/" />
+            <fileset dir="installer/lib/wrapper/linux64/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-linux-nonx86" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
-            <fileset dir="installer/lib/wrapper/linux-armv7/" />
+            <fileset dir="installer/lib/wrapper/linux-armv7/" excludes="*.txt" />
         </copy>
 	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
-	    <fileset dir="installer/lib/wrapper/linux-ppc/" />
+	    <fileset dir="installer/lib/wrapper/linux-ppc/" excludes="*.txt" />
 	</copy>
         <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
-            <fileset dir="installer/lib/wrapper/linux-armv5/" />
+            <fileset dir="installer/lib/wrapper/linux-armv5/" excludes="*.txt" />
         </copy>
     </target>
 
@@ -772,7 +761,7 @@
 	    <fileset dir="installer/resources/Start I2P Router.app" />
 	</copy>
         <copy todir="pkg-temp/lib/wrapper/macosx/">
-            <fileset dir="installer/lib/wrapper/macosx/" />
+            <fileset dir="installer/lib/wrapper/macosx/" excludes="*.txt" />
         </copy>
     </target>
 
@@ -795,10 +784,10 @@
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/win32/">
-            <fileset dir="installer/lib/wrapper/win32/" />
+            <fileset dir="installer/lib/wrapper/win32/" excludes="*.txt" />
         </copy>
 	<copy todir="pkg-temp/lib/wrapper/win64/">
-	    <fileset dir="installer/lib/wrapper/win64/" />
+	    <fileset dir="installer/lib/wrapper/win64/" excludes="*.txt" />
         </copy>
     </target>
 
@@ -1110,6 +1099,10 @@
         </copy>
     </target>
 
+    <target name="delete-j6-update">
+        <delete dir="pkg-temp/eepsite-jetty6" />
+    </target>
+
     <!-- Jetty 6 I2P logging addons, not really fixes -->
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
@@ -1260,6 +1253,15 @@
 	</exec>
     </target>
 
+    <!-- call between installer-xxx and installer-windows -->
+    <target name="delete-nonwindows">
+        <delete dir="pkg-temp/lib/wrapper/" />
+        <delete dir="pkg-temp/locale/" />
+        <delete dir="pkg-temp/man/" />
+        <delete dir="pkg-temp/Start I2P Router.app/" />
+        <delete dir="pkg-temp" includes="eepget i2prouter INSTALL-headless.txt osid postinstall.sh runplain.sh" />
+    </target>
+
     <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches, utility-jars" >
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
@@ -1267,6 +1269,7 @@
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows-only.exe" />
     </target>
 
+    <!-- this is broken as installer-xxx targets may delete (or not delete) things in pkg-temp -->
     <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer-nowindows, installer" >
     </target>
     <!-- end custom installers -->
@@ -1364,7 +1367,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, preppkgRepack, installer-nowindows, installer-windows" >
+    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
@@ -1383,7 +1386,7 @@
 
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
-        <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}.exe" />
+        <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}_windows.exe" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
         <delete file="i2pupdate.sud" />
         <delete file="i2pupdate.su2" />
@@ -1482,13 +1485,13 @@
             <arg value="i2p-${release.number}/" />
         </exec>
         <echo message="Sign the files:" />
-        <delete file="i2pinstall_${release.number}.exe.sig" />
+        <delete file="i2pinstall_${release.number}_windows.exe.sig" />
         <delete file="i2pinstall_${release.number}.jar.sig" />
         <delete file="i2psource_${release.number}.tar.bz2.sig" />
         <delete file="i2pupdate_${release.number}.zip.sig" />
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
         </exec>
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
@@ -1504,13 +1507,13 @@
         </exec>
         <exec executable="chmod" failonerror="true">
             <arg value="444" />
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
-            <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2pinstall_${release.number}_windows.exe.sig" />
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
@@ -1518,20 +1521,20 @@
         <echo message="File sizes:" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
-            <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2pinstall_${release.number}_windows.exe.sig" />
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
         <echo message="SHA256 sums:" />
         <exec executable="sha256sum" failonerror="true">
-            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}_windows.exe" />
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />

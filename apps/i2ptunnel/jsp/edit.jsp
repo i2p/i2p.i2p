@@ -1,6 +1,8 @@
 <%
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %><%@page pageEncoding="UTF-8"
 %><%@page trimDirectiveWhitespaces="true"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"

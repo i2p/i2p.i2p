@@ -50,6 +50,8 @@ public class Storage
   private File[] RAFfile;    // File to make it easier to reopen
   /** priorities by file; default 0; may be null. @since 0.8.1 */
   private int[] priorities;
+  /** is the file empty and sparse? */
+  private boolean[] isSparse;
 
   private final StorageListener listener;
   private final I2PSnarkUtil _util;
@@ -72,6 +74,8 @@ public class Storage
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
 
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap();
+
+  private static final boolean _isWindows = System.getProperty("os.name").startsWith("Win");
 
   /**
    * Creates a new storage based on the supplied MetaInfo.  This will
@@ -202,7 +206,7 @@ public class Storage
     RAFtime = new long[size];
     RAFfile = new File[size];
     priorities = new int[size];
-
+    isSparse = new boolean[size];
 
     int i = 0;
     Iterator it = files.iterator();
@@ -334,7 +338,8 @@ public class Storage
   }
 
   /**
-   *  Must call setPiecePriorities() after calling this
+   *  Must call Snark.updatePiecePriorities()
+   *  (which calls getPiecePriorities()) after calling this.
    *  @param file canonical path (non-directory)
    *  @param pri default 0; <0 to disable
    *  @since 0.8.1
@@ -462,6 +467,7 @@ public class Storage
         RAFlock = new Object[1];
         RAFtime = new long[1];
         RAFfile = new File[1];
+        isSparse = new boolean[1];
         lengths[0] = metainfo.getTotalLength();
         RAFlock[0] = new Object();
         RAFfile[0] = base;
@@ -488,6 +494,7 @@ public class Storage
         RAFlock = new Object[size];
         RAFtime = new long[size];
         RAFfile = new File[size];
+        isSparse = new boolean[size];
         for (int i = 0; i < size; i++)
           {
             List<String> path = files.get(i);
@@ -701,6 +708,7 @@ public class Storage
     }
 
     // Make sure all files are available and of correct length
+    // The files should all exist as they have been created with zero length by createFilesFromNames()
     for (int i = 0; i < rafs.length; i++)
       {
         long length = RAFfile[i].length();
@@ -725,6 +733,7 @@ public class Storage
           SnarkManager.instance().addMessage(msg);
           _util.debug(msg, Snark.ERROR);
           changed = true;
+          resume = true;
           _probablyComplete = false; // to force RW
           synchronized(RAFlock[i]) {
               checkRAF(i);
@@ -798,26 +807,54 @@ public class Storage
     }
   }
 
-  /** this calls openRAF(); caller must synnchronize and call closeRAF() */
+  /**
+   *  This creates a (presumably) sparse file so that reads won't fail with IOE.
+   *  Sets isSparse[nr] = true. balloonFile(nr) should be called later to
+   *  defrag the file.
+   *
+   *  This calls openRAF(); caller must synchronize and call closeRAF().
+   */
   private void allocateFile(int nr) throws IOException
   {
     // caller synchronized
     openRAF(nr, false);  // RW
-    // XXX - Is this the best way to make sure we have enough space for
-    // the whole file?
     long remaining = lengths[nr];
     if (listener != null)
         listener.storageCreateFile(this, names[nr], remaining);
+    rafs[nr].setLength(remaining);
+    // don't bother ballooning later on Windows since there is no sparse file support
+    // until JDK7 using the JSR-203 interface.
+    // RAF seeks/writes do not create sparse files.
+    // Windows will zero-fill up to the point of the write, which
+    // will make the file fairly unfragmented, on average, at least until
+    // near the end where it will get exponentially more fragmented.
+    if (!_isWindows)
+        isSparse[nr] = true;
+    // caller will close rafs[nr]
+    if (listener != null)
+      listener.storageAllocated(this, lengths[nr]);
+  }
+
+  /**
+   *  This "balloons" the file with zeros to eliminate disk fragmentation.,
+   *  Overwrites the entire file with zeros. Sets isSparse[nr] = false.
+   *
+   *  Caller must synchronize and call checkRAF() or openRAF().
+   *  @since 0.9.1
+   */
+  private void balloonFile(int nr) throws IOException
+  {
+    _util.debug("Ballooning " + nr + ": " + RAFfile[nr], Snark.INFO);
+    long remaining = lengths[nr];
     final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
     byte[] zeros = new byte[ZEROBLOCKSIZE];
+    rafs[nr].seek(0);
     while (remaining > 0) {
         int size = (int) Math.min(remaining, ZEROBLOCKSIZE);
         rafs[nr].write(zeros, 0, size);
         remaining -= size;
     }
-    // caller will close rafs[nr]
-    if (listener != null)
-      listener.storageAllocated(this, lengths[nr]);
+    isSparse[nr] = false;
   }
 
 
@@ -873,54 +910,66 @@ public class Storage
    * matches), otherwise false.
    * @exception IOException when some storage related error occurs.
    */
-  public boolean putPiece(int piece, byte[] ba) throws IOException
+  public boolean putPiece(PartialPiece pp) throws IOException
   {
-    // First check if the piece is correct.
-    // Copy the array first to be paranoid.
-    byte[] bs = ba.clone();
-    int length = bs.length;
-    boolean correctHash = metainfo.checkPiece(piece, bs, 0, length);
-    if (listener != null)
-      listener.storageChecked(this, piece, correctHash);
-    if (!correctHash)
-      return false;
+      int piece = pp.getPiece();
+      try {
+          synchronized(bitfield) {
+              if (bitfield.get(piece))
+                  return true; // No need to store twice.
+          }
 
-    synchronized(bitfield)
-      {
-        if (bitfield.get(piece))
-          return true; // No need to store twice.
-      }
+          // TODO alternative - check hash on the fly as we write to the file,
+          // to save another I/O pass
+          boolean correctHash = metainfo.checkPiece(pp);
+          if (listener != null)
+            listener.storageChecked(this, piece, correctHash);
+          if (!correctHash) {
+              return false;
+          }
 
-    // Early typecast, avoid possibly overflowing a temp integer
-    long start = (long) piece * (long) piece_size;
-    int i = 0;
-    long raflen = lengths[i];
-    while (start > raflen)
-      {
-        i++;
-        start -= raflen;
-        raflen = lengths[i];
-      }
+          // Early typecast, avoid possibly overflowing a temp integer
+          long start = (long) piece * (long) piece_size;
+          int i = 0;
+          long raflen = lengths[i];
+          while (start > raflen) {
+              i++;
+              start -= raflen;
+              raflen = lengths[i];
+          }
     
-    int written = 0;
-    int off = 0;
-    while (written < length)
-      {
-        int need = length - written;
-        int len = (start + need < raflen) ? need : (int)(raflen - start);
-        synchronized(RAFlock[i])
-          {
-            checkRAF(i);
-            rafs[i].seek(start);
-            rafs[i].write(bs, off + written, len);
+          int written = 0;
+          int off = 0;
+          int length = metainfo.getPieceLength(piece);
+          while (written < length) {
+              int need = length - written;
+              int len = (start + need < raflen) ? need : (int)(raflen - start);
+              synchronized(RAFlock[i]) {
+                  checkRAF(i);
+                  if (isSparse[i]) {
+                      // If the file is a newly created sparse file,
+                      // AND we aren't skipping it, balloon it with all
+                      // zeros to un-sparse it by allocating the space.
+                      // Obviously this could take a while.
+                      // Once we have written to it, it isn't empty/sparse any more.
+                      if (priorities == null || priorities[i] >= 0)
+                          balloonFile(i);
+                      else
+                          isSparse[i] = false;
+                  }
+                  rafs[i].seek(start);
+                  //rafs[i].write(bs, off + written, len);
+                  pp.write(rafs[i], off + written, len);
+              }
+              written += len;
+              if (need - len > 0) {
+                  i++;
+                  raflen = lengths[i];
+                  start = 0;
+              }
           }
-        written += len;
-        if (need - len > 0)
-          {
-            i++;
-            raflen = lengths[i];
-            start = 0;
-          }
+      } finally {
+          pp.release();
       }
 
     changed = true;
@@ -957,7 +1006,7 @@ public class Storage
     }
 
     return true;
-  }
+ }
 
   /**
    *  This is a dup of MetaInfo.getPieceLength() but we need it
@@ -1022,7 +1071,7 @@ public class Storage
   /**
    * Close unused RAFs - call periodically
    */
-  private static final long RAFCloseDelay = 7*60*1000;
+  private static final long RAFCloseDelay = 4*60*1000;
   public void cleanRAFs() {
     long cutoff = System.currentTimeMillis() - RAFCloseDelay;
     for (int i = 0; i < RAFlock.length; i++) {

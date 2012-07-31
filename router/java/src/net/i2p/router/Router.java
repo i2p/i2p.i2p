@@ -255,7 +255,8 @@ public class Router implements RouterClock.ClockShiftListener {
         // *********  Start no threads before here ********* //
         //
         // NOW we can start the ping file thread.
-        beginMarkingLiveliness();
+        if (!System.getProperty("java.vendor").contains("Android"))
+            beginMarkingLiveliness();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
         // But context.isRouterContext() is even easier...
@@ -360,6 +361,9 @@ public class Router implements RouterClock.ClockShiftListener {
         return Collections.unmodifiableMap(_config); 
     }
     
+    /**
+     *  Warning, may be null if called very early
+     */
     public RouterInfo getRouterInfo() { return _routerInfo; }
 
     /**
@@ -772,7 +776,15 @@ public class Router implements RouterClock.ClockShiftListener {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running shutdown task " + task.getClass());
             try {
-                task.run();
+                //task.run();
+                Thread t = new Thread(task, "Shutdown task " + task.getClass().getName());
+                t.setDaemon(true);
+                t.start();
+                try {
+                    t.join(10*1000);
+                } catch (InterruptedException ie) {}
+                if (t.isAlive())
+                    _log.logAlways(Log.WARN, "Shutdown task took more than 10 seconds to run: " + task.getClass());
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }
@@ -1033,6 +1045,8 @@ public class Router implements RouterClock.ClockShiftListener {
             return;
         if (delta > -60*1000 && delta < 60*1000)
             return;
+        // update the routing key modifier
+        _context.routingKeyGenerator().generateDateBasedModData();
         if (_context.commSystem().countActivePeers() <= 0)
             return;
         if (delta > 0)

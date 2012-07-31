@@ -95,12 +95,11 @@ interface PeerListener
    * will be closed.
    *
    * @param peer the Peer that got the piece.
-   * @param piece the piece number received.
-   * @param bs the byte array containing the piece.
+   * @param piece the piece received.
    *
    * @return true when the bytes represent the piece, false otherwise.
    */
-  boolean gotPiece(Peer peer, int piece, byte[] bs);
+  boolean gotPiece(Peer peer, PartialPiece piece);
 
   /**
    * Called when the peer wants (part of) a piece from us. Only called
@@ -167,7 +166,7 @@ interface PeerListener
    * @param peer the peer
    * @since 0.8.2
    */
-  void savePartialPieces(Peer peer, List<PartialPiece> pcs);
+  void savePartialPieces(Peer peer, List<Request> pcs);
 
   /**
    * Called when a peer has connected and there may be a partially

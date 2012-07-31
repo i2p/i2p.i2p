@@ -15,10 +15,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
@@ -203,7 +205,10 @@ public class SOCKS4aServer extends SOCKSServer {
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
-                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName));
+                Properties overrides = new Properties();
+                I2PSocketOptions sktOpts = t.buildOptions(overrides);
+                sktOpts.setPort(connPort);
+                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName), sktOpts);
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);

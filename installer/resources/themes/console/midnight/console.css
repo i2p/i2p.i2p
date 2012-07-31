@@ -16,6 +16,12 @@ body {
      display: none;
 }
 
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
+}
+
 img {
      border: none;
 }
@@ -156,6 +162,7 @@ div.routersummaryouter {
      padding: 0;
      border: 0;
      clear: left; /* fixes a bug in Opera */
+     position: absolute;/* so no interference with /home app icons */
 }
 
 div.routersummary {
@@ -219,6 +226,10 @@ div.routersummary h4 {
      line-height: 100% !important;
 }
 
+div.routersummary ul {
+     text-align: left !important;
+}
+
 div.routersummary table {
      border: 0;
      text-align: center !important;
@@ -256,6 +267,16 @@ div.routersummary tr {
 div.routersummary td:first-child {
      max-width: 90px;
      overflow: hidden;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 -20px;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
 }
 
 div.tunnels table{
@@ -504,6 +525,45 @@ div.configure h2:first-child {
      margin-top: 15px;
 }
 
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td {
+     font-weight: bold;
+     font-size: 9pt;  
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
+}
+
 .topshimten {
      margin-top: 15px;
      margin-bottom: 15px;
@@ -555,6 +615,18 @@ h1 {
      min-width: 600px;
      line-height: 100%;
      color: #fff;
+}
+
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
 }
 
 h2 {
@@ -628,61 +700,87 @@ th {
      font-size: 8pt !important;
 }
 
-/***********************************************************************************/
+/* begin home page */
 
+/*
 #appsummary {
-     margin-top: 53px;
+     clear: none;
+     float: none;
+     left: 10px;
+     margin: 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homemain {
+     left: 217px;
+     margin: 0 10px 10px 0;
+     position: absolute;
+     text-align: center;
+     top: 10px;
+}
+
+#homenews {
+     margin: 0 10px 5px 0;
 }
 
 h2.app {
-     margin: 15px 10px 15px 0 !important;
+     border-radius: 8px;
+     margin: 1px 10px 15px 0 !important;
+}
+*/
+
+h4.app, h4.app2 {
+     margin: 0 10px 2px 10px;
+     padding: 10px 0 8px 0;
 }
 
-h4.app {
+h4.app2 {
      clear: left;
-     margin: 12px 4px;
-     padding: 20px 0 8px 0;
-     text-align:center;
+     margin-top: 5px !important;
+}
+
+div.ag2 {
+     margin: 0;
 }
 
 div.app {
      float: left;
-     padding: 8px;
-     height: 100px;
+     padding: 2px;
+     height: 90px;
      width: 112px;
-     text-align:center;
+     text-align: center !important;
 }
 
 div.appgroup {
-     clear: left;
-     margin: 4px 20px;
-     padding: 16px 8px;
+     margin: 0;
+     padding: 0 8px;
      width: auto;
 }
 
 div.search {
-     margin: 20px 20px 20px 240px;
-     padding: 8px;
+     margin: 10px 10px 0 0;
+     padding: 8px 8px 0 8px;
      width: auto;
 }
 
 table.search {
      background: none;
-     margin-left: auto;
+     margin-left:auto;
      margin-right:auto;
      padding: 8px;
      width: auto;
 }
 
 img.app {
-     height: 40px;
-     width: 40px;
-     padding: 8px;
+     height: 32px;
+     width: 32px;
+     padding: 6px;
 }
 
 img.app2p {
-     height: 48px;
-     padding: 3px 8px;
+     height: 40px;
+     padding: 3px 6px 0 6px;
 }
 
 table.app {
@@ -717,21 +815,7 @@ div.applabel {
      text-align: center;
 }
 
-
-button.search {
-     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-
-input.search[type="text"] {
-     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
-     padding: 2px 3px 2px 24px;
-     min-height: 22px;
-}
-
-/***********************************************************************************/
+/* end home page */
 
 tt {
      font-size: 8pt;
@@ -834,9 +918,176 @@ div.joblog ol {
      margin-bottom: 0px;
 }
 
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px outset #66a;
+     padding: 1px 3px;
+     background: #ffe;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font-size: 8pt;
+     font-weight: bold;
+     margin: 2px;
+     text-align: center;
+     min-width: 60px;
+     -moz-box-shadow: inset 0px 0px 2px 1px #fff;
+     -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
+     box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #316;
+}
+
+button.accept {
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.add {
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.check {
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.delete {
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.search {
+     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.stop {
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button:hover {
+     border: 1px solid #f60;
+     background-color: #f60 !important;
+     color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #fff;
+     box-shadow: inset 0px 0px 0px 1px #fff;
+}
+
+button:active {
+     border: 1px solid #f60;
+     background: #202 !important;
+     color: #f60;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
 input {
      margin: 3px 5px 3px 0;
      vertical-align: middle;
+}
+
+input.accept {
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.add {
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.check {
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.search[type="text"] {
+     background: #001 url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
+input.stop {
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input:hover {
+     background-color: #f60;
+     color: #fff;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+
 }
 
 input[type=text], input[type=password] {
@@ -1049,3 +1300,23 @@ div.footnote hr{
      margin-bottom: -10px;
      margin-right: 5px;
 }
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 5px 5px 0 0 !important;
+}
+
+.iframed div.sorry {
+     margin: 0 5px 0 0 !important;
+}
+
+/* end iframed console fixes */

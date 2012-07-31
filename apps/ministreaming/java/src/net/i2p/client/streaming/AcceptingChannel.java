@@ -7,11 +7,19 @@ import java.net.ConnectException;
 import java.nio.channels.SelectableChannel;
 
 /**
+ *  As this does not (yet) extend ServerSocketChannel it cannot be returned by StandardServerSocket.getChannel(),
+ *  until we implement an I2P SocketAddress class.		
+ *
+ *  Warning, this interface and implementation is preliminary and subject to change without notice.
+ *
  *  @since 0.8.11
  */
 public abstract class AcceptingChannel extends SelectableChannel {
+
     abstract I2PSocket accept() throws I2PException, ConnectException;
-    I2PSocketManager _socketManager;
+
+    protected final I2PSocketManager _socketManager;
+
     AcceptingChannel(I2PSocketManager manager) {
         this._socketManager = manager;
     }

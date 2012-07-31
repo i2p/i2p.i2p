@@ -6,7 +6,9 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("Peer Profile")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._("Peer Profile")%></h1>
 <div class="main" id="main"><div class="wideload">

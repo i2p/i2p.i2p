@@ -74,6 +74,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected int localPort = DEFAULT_LOCALPORT;
 
     /**
+     * Warning, blocks in constructor while connecting to router and building tunnels;
+     * TODO move that to startRunning()
+     *
      * @param privData Base64-encoded private key data,
      *                 format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
@@ -87,6 +90,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
+     * Warning, blocks in constructor while connecting to router and building tunnels;
+     * TODO move that to startRunning()
+     *
      * @param privkey file containing the private key data,
      *                format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param privkeyname the name of the privKey file, not clear why we need this too
@@ -111,6 +117,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
+     * Warning, blocks in constructor while connecting to router and building tunnels;
+     * TODO move that to startRunning()
+     *
      * @param privData stream containing the private key data,
      *                 format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param privkeyname the name of the privKey file, not clear why we need this too
@@ -124,6 +133,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
+     *  Non-blocking
+     *
      *  @param sktMgr the existing socket manager
      *  @since 0.8.9
      */
@@ -142,6 +153,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     private static final int MAX_RETRIES = 4;
 
     /**
+     * Warning, blocks while connecting to router and building tunnels;
+     * TODO move that to startRunning()
+     *
      * @param privData stream containing the private key data,
      *                 format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param privkeyname the name of the privKey file, not clear why we need this too
@@ -236,6 +250,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     /**
      * Start running the I2PTunnelServer.
      *
+     * TODO: Wait to connect to router until here.
      */
     public void startRunning() {
         // prevent JVM exit when running outside the router
@@ -293,6 +308,19 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             }
             return true;
         }
+    }
+
+    /**
+     *  Update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel || sockMgr == null)
+            return;
+        Properties props = tunnel.getClientOptions();
+        sockMgr.setDefaultOptions(sockMgr.buildOptions(props));
     }
 
     protected int getHandlerCount() { 
@@ -408,7 +436,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     
     protected void blockingHandle(I2PSocket socket) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Incoming connection to '" + toString() + "' from: " + socket.getPeerDestination().calculateHash().toBase64());
+            _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
+                      " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
         long afterAccept = I2PAppContext.getGlobalContext().clock().now();
         long afterSocket = -1;
         //local is fast, so synchronously. Does not need that many

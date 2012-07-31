@@ -10,11 +10,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  debconf,
  default-jdk,
  gettext,
- libcommons-el-java,
- libcommons-logging-java,
  libgmp3-dev,
- libjetty-extra-java,
- libjetty-java,
  po-debconf
 
 Package: i2p
@@ -69,11 +65,7 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- default-jre-headless | java5-runtime-headless | java6-runtime-headless,
- glassfish-javaee,
- libcommons-logging-java,
- libjetty-java,
- libtomcat6-java
+ default-jre-headless | java5-runtime-headless | java6-runtime-headless, libecj-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~), ttf-dejavu

@@ -16,11 +16,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private final I2PAppContext _context;
     private final Log _log;
     private final Connection _connection;
-    private Destination _to;
+    private final Destination _to;
     private SessionKey _keyUsed;
     private Set _tagsSent;
     private final long _createdOn;
-    private int _numSends;
+    private volatile int _numSends;
     private long _lastSend;
     private long _acceptedOn;
     private long _ackOn;
@@ -45,7 +45,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     }
     
     public Destination getTo() { return _to; }
-    public void setTo(Destination to) { _to = to; }
     
     /**
      * @deprecated should always return null
@@ -72,6 +71,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public void setTagsSent(Set tags) { 
         if (tags != null && !tags.isEmpty())
             _log.error("Who is sending tags thru the streaming lib? " + tags.size());
+      /****
         if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) && (!tags.isEmpty()) ) {
             //int old = _tagsSent.size();
             //_tagsSent.addAll(tags);
@@ -80,6 +80,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         } else {
             _tagsSent = tags;
         }
+      ****/
     }
     
     public boolean shouldSign() { 
@@ -142,10 +143,15 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /** @return null if not bound */
     public Connection getConnection() { return _connection; }
 
+    /**
+     *  Will force a fast restransmit on the 3rd call (FAST_RETRANSMIT_THRESHOLD)
+     *  but only if it's the lowest unacked (see Connection.ResendPacketEvent)
+     */
     public void incrementNACKs() { 
         int cnt = ++_nackCount;
         SimpleTimer2.TimedEvent evt = _resendEvent;
-        if ( (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD) && (evt != null) && (!_retransmitted)) {
+        if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && evt != null && (!_retransmitted) &&
+            (_numSends == 1 || _lastSend < _context.clock().now() + 4*1000)) {  // Don't fast retx if we recently resent it
             _retransmitted = true;
             evt.reschedule(0);
         }
@@ -162,8 +168,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         if (con != null)
             buf.append(" rtt ").append(con.getOptions().getRTT());
         
-        if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) ) 
-            buf.append(" with tags");
+        //if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) ) 
+        //    buf.append(" with tags");
+
+        if (_nackCount > 0)
+            buf.append(" nacked ").append(_nackCount).append(" times");
 
         if (_ackOn > 0)
             buf.append(" ack after ").append(getAckTime());
@@ -200,8 +209,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
      * @param maxWaitMs MessageOutputStream is the only caller, generally with -1
      */
     public void waitForAccept(int maxWaitMs) {
-        if (_connection == null) 
-            throw new IllegalStateException("Cannot wait for accept with no connection");
         long before = _context.clock().now();
         int queued = _connection.getUnackedPacketsSent();
         int window = _connection.getOptions().getWindowSize();
@@ -216,7 +223,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         int afterQueued = _connection.getUnackedPacketsSent();
         if ( (after - before > 1000) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("Took " + (after-before) + "ms to get " 
-                       + (accepted ? " accepted" : " rejected")
+                       + (accepted ? "accepted" : "rejected")
                        + (_cancelledOn > 0 ? " and CANCELLED" : "")
                        + ", queued behind " + queued +" with a window size of " + window 
                        + ", finally accepted with " + afterQueued + " queued: " 

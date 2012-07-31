@@ -9,6 +9,11 @@ body {
      box-sizing: border-box;
 }
 
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+     padding-top: 5px;
+}
+
 div {
      -moz-box-sizing: border-box;
      box-sizing: border-box;
@@ -156,6 +161,14 @@ hr {
      background: #eef;
      border: 4px solid #77f;
      -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
 }
 
 .panel .footer {

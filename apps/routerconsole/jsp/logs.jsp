@@ -1,12 +1,13 @@
 <%@page contentType="text/html"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("logs")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Router Logs")%></h1>
 <div class="main" id="main">
@@ -34,8 +35,10 @@
 <p><%=intl._("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%></p>
 <h3><%=intl._("Critical Logs")%></h3><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
+<hr>
 <h3><%=intl._("Router Logs")%> (<a href="configlogging"><%=intl._("configure")%></a>)</h3>
  <jsp:getProperty name="logsHelper" property="logs" />
+<hr>
 <h3><%=intl._("Service (Wrapper) Logs")%></h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div><hr></div></body></html>

@@ -25,19 +25,24 @@ import net.i2p.util.Log;
  * @since 0.8.12 moved from Router.java
  */
 public class UpdateRoutingKeyModifierJob extends JobImpl {
-    private Log _log;
-    private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+    private final Log _log;
+    private final Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+    // Run every 15 minutes in case of time zone change, clock skew, etc.
+    private static final long MAX_DELAY_FAILSAFE = 15*60*1000;
 
     public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
         super(ctx);
+        _log = ctx.logManager().getLog(getClass());
     }
 
     public String getName() { return "Update Routing Key Modifier"; }
 
     public void runJob() {
-        _log = getContext().logManager().getLog(getClass());
+        // make sure we requeue quickly if just before midnight
+        long delay = Math.min(MAX_DELAY_FAILSAFE, getTimeTillMidnight());
+        // TODO tell netdb if mod data changed?
         getContext().routingKeyGenerator().generateDateBasedModData();
-        requeue(getTimeTillMidnight());
+        requeue(delay);
     }
 
     private long getTimeTillMidnight() {

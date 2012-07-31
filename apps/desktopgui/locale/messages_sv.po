@@ -3,7 +3,8 @@
 # This file is distributed under the same license as the desktopgui package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
-# 123hund123 <M8R-ra4r1r@mailinator.com>, 2011
+# Translators:
+# 123hund123 <M8R-ra4r1r@mailinator.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
@@ -11,7 +12,7 @@ msgstr ""
 "POT-Creation-Date: 2011-03-03 18:29+0000\n"
 "PO-Revision-Date: 2011-03-22 15:49+0000\n"
 "Last-Translator: 123hund123 <M8R-ra4r1r@mailinator.com>\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/team/sv_SE/)\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -53,5 +54,3 @@ msgstr "Ikonpanelskonfiguration"
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
 msgid "Should tray icon be enabled?"
 msgstr "Ska ikonpanelen vara aktiverad?"
-
-

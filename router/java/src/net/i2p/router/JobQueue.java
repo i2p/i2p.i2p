@@ -486,7 +486,24 @@ public class JobQueue {
                                     // Hopefully nobody does that, and as a backup, we hope
                                     // that the TreeSet will eventually resort it from other addJob() calls.
                                         timeToWait = timeLeft;
-                                        break;
+
+                                    // failsafe - remove and re-add, peek at the next job,
+                                    // break and go around again
+                                    if (timeToWait > 10*1000 && iter.hasNext()) {
+                                        if (_log.shouldLog(Log.INFO))
+                                            _log.info("Failsafe re-sort job " + j +
+                                                " with delay " + DataHelper.formatDuration(timeToWait));
+                                        iter.remove();
+                                        Job nextJob = iter.next();
+                                        _timedJobs.add(j);
+                                        long nextTimeLeft = nextJob.getTiming().getStartAfter() - now;
+                                        if (timeToWait > nextTimeLeft) {
+                                            _log.error("Job " + j + " out of order with job " + nextJob +
+                                                " difference of " + DataHelper.formatDuration(timeToWait - nextTimeLeft));
+                                            timeToWait = Math.max(10, nextTimeLeft);
+                                        }
+                                    }
+                                    break;
                                 }
                             }
                                 if (timeToWait < 0)

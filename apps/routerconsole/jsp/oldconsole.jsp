@@ -9,7 +9,9 @@
 %>
 <html><head><title>I2P Router Console - internals</title>
 <%@include file="css.jsi" %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="conhelper" scope="request" />
 <jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

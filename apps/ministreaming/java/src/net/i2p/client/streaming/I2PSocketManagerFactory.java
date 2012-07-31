@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -161,40 +162,19 @@ public class I2PSocketManagerFactory {
     }
 
     private static I2PSocketManager createManager(I2PSession session, Properties opts, String name) {
-        //if (false) {
-            //I2PSocketManagerImpl mgr = new I2PSocketManagerImpl();
-            //mgr.setSession(session);
-            //mgr.setDefaultOptions(new I2PSocketOptions());
-            //return mgr;
-        //} else {
-            String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
-            if (classname != null) {
-                try {
-                    Class cls = Class.forName(classname);
-                    Object obj = cls.newInstance();
-                    if (obj instanceof I2PSocketManager) {
-                        I2PSocketManager mgr = (I2PSocketManager)obj;
-                        I2PAppContext context = I2PAppContext.getGlobalContext();
-                        mgr.init(context, session, opts, name);
-                        return mgr;
-                    } else {
-                        throw new IllegalStateException("Invalid manager class [" + classname + "]");
-                    }
-                } catch (ClassNotFoundException cnfe) {
-                    _log.error("Error loading " + classname, cnfe);
-                    throw new IllegalStateException("Invalid manager class [" + classname + "] - not found");
-                } catch (InstantiationException ie) {
-                    _log.error("Error loading " + classname, ie);
-                    throw new IllegalStateException("Invalid manager class [" + classname + "] - unable to instantiate");
-                } catch (IllegalAccessException iae) {
-                    _log.error("Error loading " + classname, iae);
-                    throw new IllegalStateException("Invalid manager class [" + classname + "] - illegal access");
-                }
-            } else {
-                throw new IllegalStateException("No manager class specified");
-            }
-        //}
-        
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
+        try {
+            Class cls = Class.forName(classname);
+            Constructor<I2PSocketManager> con = (Constructor<I2PSocketManager>)
+                  cls.getConstructor(new Class[] {I2PAppContext.class, I2PSession.class, Properties.class, String.class});
+            I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
+            return mgr;
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Error loading " + classname, t);
+            throw new IllegalStateException(t);
+        }
+
     }
 
     private static String getHost() {

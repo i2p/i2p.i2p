@@ -11,12 +11,12 @@ public class ConfigNavHelper extends HelperBase {
 
     /** configX.jsp */
     private static final String pages[] =
-                                          {"", "net", "ui", "home", "service", "update", "tunnels",
+                                          {"", "net", "ui", "sidebar", "home", "service", "update", "tunnels",
                                            "clients", "peer", "keyring", "logging", "stats",
                                            "reseed", "advanced" };
 
     private static final String titles[] =
-                                          {_x("Bandwidth"), _x("Network"), _x("UI"), _x("Home Page"),
+                                          {_x("Bandwidth"), _x("Network"), _x("UI"), _x("Summary Bar"), _x("Home Page"),
                                            _x("Service"), _x("Update"), _x("Tunnels"),
                                            _x("Clients"), _x("Peers"), _x("Keyring"), _x("Logging"), _x("Stats"),
                                            _x("Reseeding"), _x("Advanced") };

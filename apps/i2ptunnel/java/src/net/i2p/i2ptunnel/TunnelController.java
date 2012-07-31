@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -29,6 +31,8 @@ import net.i2p.util.SecureFileOutputStream;
  * These objects are bundled together under a TunnelControllerGroup where the
  * entire group is stored / loaded from a single config file.
  *
+ * This is the class used by several plugins to create tunnels, so
+ * take care to maintain the public methods as a stable API.
  */
 public class TunnelController implements Logging {
     private final Log _log;
@@ -152,8 +156,8 @@ public class TunnelController implements Logging {
         }
         String type = getType(); 
         if ( (type == null) || (type.length() <= 0) ) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Cannot start the tunnel - no type specified");
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Cannot start the tunnel - no type specified");
             return;
         }
         // Config options may have changed since instantiation, so do this again.
@@ -324,6 +328,7 @@ public class TunnelController implements Logging {
                     _log.info("Releasing session " + s);
                 TunnelControllerGroup.getInstance().release(this, s);
             }
+            // _sessions.clear() ????
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No sessions to release? for " + getName());
@@ -382,20 +387,27 @@ public class TunnelController implements Logging {
         }
     }
     
-    private void setSessionOptions() {
-        List opts = new ArrayList();
-        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = _config.getProperty(key);
+    /**
+     *  These are the ones stored with a prefix of "option."
+     *
+     *  @return keys with the "option." prefix stripped
+     *  @since 0.9.1 Much better than getClientOptions()
+     */
+    public Properties getClientOptionProps() {
+        Properties opts = new Properties();
+        for (Map.Entry e : _config.entrySet()) {
+            String key = (String) e.getKey();
             if (key.startsWith("option.")) {
                 key = key.substring("option.".length());
-                opts.add(key + "=" + val);
+                String val = (String) e.getValue();
+                opts.setProperty(key, val);
             }
         }
-        String args[] = new String[opts.size()];
-        for (int i = 0; i < opts.size(); i++)
-            args[i] = (String)opts.get(i);
-        _tunnel.runClientOptions(args, this);
+        return opts;
+    }
+
+    private void setSessionOptions() {
+        _tunnel.setClientOptions(getClientOptionProps());
     }
     
     private void setI2CPOptions() {
@@ -429,25 +441,59 @@ public class TunnelController implements Logging {
         startTunnel();
     }
     
+    /**
+     *  As of 0.9.1, updates the options on an existing session
+     */
     public void setConfig(Properties config, String prefix) {
         Properties props = new Properties();
-        for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = config.getProperty(key);
+        for (Map.Entry e : config.entrySet()) {
+            String key = (String) e.getKey();
             if (key.startsWith(prefix)) {
                 key = key.substring(prefix.length());
+                String val = (String) e.getValue();
                 props.setProperty(key, val);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Set prop [" + key + "] to [" + val + "]");
             }
         }
         _config = props;
+
+        // Set up some per-type defaults
+        // This really isn't the best spot to do this but for servers in particular,
+        // it's hard to override settings in the subclass since the session connect
+        // is done in the I2PTunnelServer constructor.
+        String type = getType();
+        if (type != null) {
+            if (type.equals("httpserver") || type.equals("streamrserver")) {
+                if (!_config.containsKey("option.shouldBundleReplyInfo"))
+                    _config.setProperty("option.shouldBundleReplyInfo", "false");
+            } else if (type.contains("irc") || type.equals("streamrclient")) {
+                // maybe a bad idea for ircclient if DCC is enabled
+                if (!_config.containsKey("option.crypto.tagsToSend"))
+                    _config.setProperty("option.crypto.tagsToSend", "20");
+                if (!_config.containsKey("option.crypto.lowTagThreshold"))
+                    _config.setProperty("option.crypto.lowTagThreshold", "14");
+            }
+        }
+
+        // tell i2ptunnel, who will tell the TunnelTask, who will tell the SocketManager
+        setSessionOptions();
+        if (_running && _sessions != null) {
+            for (I2PSession s : _sessions) {
+                // tell the router via the session
+                if (!s.isClosed()) {
+                    s.updateOptions(_tunnel.getClientOptions());
+                }
+            }
+        }
     }
+
+    /**
+     *  @return a copy
+     */
     public Properties getConfig(String prefix) { 
         Properties rv = new Properties();
-        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = _config.getProperty(key);
+        for (Map.Entry e : _config.entrySet()) {
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
             rv.setProperty(prefix + key, val);
         }
         return rv;
@@ -458,19 +504,27 @@ public class TunnelController implements Logging {
     public String getDescription() { return _config.getProperty("description"); }
     public String getI2CPHost() { return _config.getProperty("i2cpHost"); }
     public String getI2CPPort() { return _config.getProperty("i2cpPort"); }
+
+    /**
+     *  These are the ones with a prefix of "option."
+     *
+     *  @return one big string of "key=val key=val ..."
+     *  @deprecated why would you want this? Use getClientOptionProps() instead
+     */
     public String getClientOptions() {
         StringBuilder opts = new StringBuilder(64);
-        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = _config.getProperty(key);
+        for (Map.Entry e : _config.entrySet()) {
+            String key = (String) e.getKey();
             if (key.startsWith("option.")) {
                 key = key.substring("option.".length());
+                String val = (String) e.getValue();
                 if (opts.length() > 0) opts.append(' ');
                 opts.append(key).append('=').append(val);
             }
         }
         return opts.toString();
     }
+
     public String getListenOnInterface() { return _config.getProperty("interface"); }
     public String getTargetHost() { return _config.getProperty("targetHost"); }
     public String getTargetPort() { return _config.getProperty("targetPort"); }
@@ -484,6 +538,7 @@ public class TunnelController implements Logging {
     /** default true */
     public boolean getStartOnLoad() { return Boolean.valueOf(_config.getProperty("startOnLoad", "true")).booleanValue(); }
     public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
+
     public String getMyDestination() {
         if (_tunnel != null) {
             List<I2PSession> sessions = _tunnel.getSessions();
@@ -523,8 +578,14 @@ public class TunnelController implements Logging {
         return true;
     }
     
+    /**
+     *  A text description of the tunnel.
+     *  @deprecated unused
+     */
     public void getSummary(StringBuilder buf) {
         String type = getType();
+        buf.append(type);
+      /****
         if ("httpclient".equals(type))
             getHttpClientSummary(buf);
         else if ("client".equals(type))
@@ -535,8 +596,10 @@ public class TunnelController implements Logging {
             getHttpServerSummary(buf);
         else
             buf.append("Unknown type ").append(type);
+       ****/
     }
     
+  /****
     private void getHttpClientSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
@@ -628,7 +691,11 @@ public class TunnelController implements Logging {
             }
         }
     }
+  ****/
     
+    /**
+     *
+     */
     public void log(String s) {
         synchronized (this) {
             _messages.add(s);

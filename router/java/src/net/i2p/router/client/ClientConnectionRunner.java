@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SessionKeyManager;
@@ -86,7 +88,18 @@ class ClientConnectionRunner {
     private boolean _dead;
     /** For outbound traffic. true if i2cp.messageReliability = "none"; @since 0.8.1 */
     private boolean _dontSendMSM;
+    private final AtomicInteger _messageId; // messageId counter
     
+    // Was 32767 since the beginning (04-2004).
+    // But it's 4 bytes in the I2CP spec and stored as a long in MessageID....
+    // If this is too low and wraps around, I2CP VerifyUsage could delete the wrong message,
+    // e.g. on local access
+    private static final int MAX_MESSAGE_ID = 0x4000000;
+
+    /** @since 0.9.2 */
+    private static final String PROP_TAGS = "crypto.tagsToSend";
+    private static final String PROP_THRESH = "crypto.lowTagThreshold";
+
     /**
      * Create a new runner against the given socket
      *
@@ -99,6 +112,7 @@ class ClientConnectionRunner {
         _messages = new ConcurrentHashMap();
         _alreadyProcessed = new ArrayList();
         _acceptedPending = new ConcurrentHashSet();
+        _messageId = new AtomicInteger(_context.random().nextInt());
     }
     
     private static volatile int __id = 0;
@@ -191,14 +205,29 @@ class ClientConnectionRunner {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SessionEstablished called for destination " + _destHashCache.toBase64());
         _config = config;
-        // This is the only option that is interpreted here, not at the tunnel manager
-        if (config.getOptions() != null)
+        // We process a few options here, but most are handled by the tunnel manager.
+        // The ones here can't be changed later.
+        Properties opts = config.getOptions();
+        if (opts != null)
             _dontSendMSM = "none".equals(config.getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
         // per-destination session key manager to prevent rather easy correlation
-        if (_sessionKeyManager == null)
-            _sessionKeyManager = new TransientSessionKeyManager(_context);
-        else
+        if (_sessionKeyManager == null) {
+            int tags = TransientSessionKeyManager.DEFAULT_TAGS;
+            int thresh = TransientSessionKeyManager.LOW_THRESHOLD;
+            if (opts != null) {
+                String ptags = opts.getProperty(PROP_TAGS);
+                if (ptags != null) {
+                    try { tags = Integer.parseInt(ptags); } catch (NumberFormatException nfe) {}
+                }
+                String pthresh = opts.getProperty(PROP_THRESH);
+                if (pthresh != null) {
+                    try { thresh = Integer.parseInt(pthresh); } catch (NumberFormatException nfe) {}
+                }
+            }
+            _sessionKeyManager = new TransientSessionKeyManager(_context, tags, thresh);
+        } else {
             _log.error("SessionEstablished called for twice for destination " + _destHashCache.toBase64().substring(0,4));
+        }
         _manager.destinationEstablished(this);
     }
     
@@ -520,18 +549,9 @@ class ClientConnectionRunner {
         }
     }
     
-    // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME
-    private final static int MAX_MESSAGE_ID = 32767;
-    private static volatile int _messageId = RandomSource.getInstance().nextInt(MAX_MESSAGE_ID); // messageId counter
-    private final static Object _messageIdLock = new Object();
-    
-    static int getNextMessageId() { 
-        synchronized (_messageIdLock) {
-            int messageId = (++_messageId)%MAX_MESSAGE_ID;
-            if (_messageId >= MAX_MESSAGE_ID)
-                _messageId = 0;
-            return messageId; 
-        }
+    public int getNextMessageId() { 
+        // Don't % so we don't get negative IDs
+        return _messageId.incrementAndGet() & (MAX_MESSAGE_ID - 1);
     }
     
     /**

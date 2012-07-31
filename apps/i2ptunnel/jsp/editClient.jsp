@@ -19,9 +19,10 @@
     <title><%=intl._("I2P Tunnel Manager - Edit Client Tunnel")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+    <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 
     <% if (editBean.allowCSS()) {
-  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico" />
     <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
@@ -497,8 +498,6 @@
             <div class="header"></div>
             <div class="footer">
                 <div class="toolbox">
-                    <span class="comment"><%=intl._("NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted.")%></span>
-                     <div class="separator"><hr /></div>
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
                     <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><%=intl._("Delete")%>(<span class="accessKey">D</span>)</button>

@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.io.File;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.VersionComparator;
 
@@ -32,9 +33,13 @@ public class LogsHelper extends HelperBase {
         return formatMessages(_context.logManager().getBuffer().getMostRecentCriticalMessages());
     }
     
-    public String getServiceLogs() {
+    /**
+     *  Does not necessarily exist.
+     *  @since 0.9.1
+     */
+    static File wrapperLogFile(I2PAppContext ctx) {
         File f = null;
-        if (_context.hasWrapper()) {
+        if (ctx.hasWrapper()) {
             String wv = System.getProperty("wrapper.version");
             if (wv != null && (new VersionComparator()).compare(wv, LOCATION_AVAILABLE) >= 0) {
                 try {
@@ -51,9 +56,14 @@ public class LogsHelper extends HelperBase {
                 // look in new and old places
                 f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
                 if (!f.exists())
-                    f = new File(_context.getBaseDir(), "wrapper.log");
+                    f = new File(ctx.getBaseDir(), "wrapper.log");
             }
         }
+        return f;
+    }
+
+    public String getServiceLogs() {
+        File f = wrapperLogFile(_context);
         String str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
         if (str == null) 
             return _("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b>";

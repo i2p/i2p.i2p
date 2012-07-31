@@ -395,6 +395,7 @@ class Packet {
         DataHelper.toLong(buffer, cur, 4, _ackThrough > 0 ? _ackThrough : 0);
         cur += 4;
         if (_nacks != null) {
+            // if max win is ever > 255, limit to 255
             DataHelper.toLong(buffer, cur, 1, _nacks.length);
             cur++;
             for (int i = 0; i < _nacks.length; i++) {
@@ -461,7 +462,7 @@ class Packet {
      * @return How large the current packet would be
      * @throws IllegalStateException 
      */
-    public int writtenSize() throws IllegalStateException {
+    private int writtenSize() {
         int size = 0;
         size += 4; // _sendStreamId.length;
         size += 4; // _receiveStreamId.length;
@@ -469,6 +470,7 @@ class Packet {
         size += 4; // ackThrough
         if (_nacks != null) {
             size++; // nacks length
+            // if max win is ever > 255, limit to 255
             size += 4 * _nacks.length;
         } else {
             size++; // nacks length
@@ -671,10 +673,11 @@ class Packet {
         buf.append(toId(_sendStreamId));
         //buf.append("<-->");
         buf.append(toId(_receiveStreamId)).append(": #").append(_sequenceNum);
-        if (_sequenceNum < 10) 
-            buf.append(" \t"); // so the tab lines up right
-        else
-            buf.append('\t');
+        //if (_sequenceNum < 10) 
+        //    buf.append(" \t"); // so the tab lines up right
+        //else
+        //    buf.append('\t');
+        buf.append(' ');
         buf.append(toFlagString());
         buf.append(" ACK ").append(getAckThrough());
         if (_nacks != null) {

@@ -196,7 +196,9 @@ class SummaryRenderer {
             _log.error("Error rendering", re);
             throw new IOException("Error plotting: " + re.getMessage());
         } catch (IOException ioe) {
-            _log.error("Error rendering", ioe);
+            // typically org.mortbay.jetty.EofException extends java.io.EOFException
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error rendering", ioe);
             throw ioe;
         } catch (OutOfMemoryError oom) {
             _log.error("Error rendering", oom);

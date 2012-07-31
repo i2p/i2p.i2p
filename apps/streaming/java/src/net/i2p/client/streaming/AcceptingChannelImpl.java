@@ -13,16 +13,21 @@ import java.nio.channels.spi.AbstractSelectionKey;
 import java.nio.channels.spi.SelectorProvider;
 
 /**
+ *  As this does not (yet) extend ServerSocketChannel it cannot be returned by StandardServerSocket.getChannel(),
+ *  until we implement an I2P SocketAddress class.		
+ *
+ *  Warning, this interface and implementation is preliminary and subject to change without notice.
+ *
  *  @since 0.8.11
  */
-public class AcceptingChannelImpl extends AcceptingChannel {
-    boolean _isRegistered = false;
-    SelectionKey whichKey = null;
-    SelectorProvider provider = null;
-    Selector sel = null;
-    Object lock = null;
-    I2PSocket next = null;
-    I2PServerSocket socket;
+class AcceptingChannelImpl extends AcceptingChannel {
+    private boolean _isRegistered;
+    private SelectionKey whichKey;
+    private SelectorProvider provider;
+    private Selector sel;
+    private Object lock;
+    private volatile I2PSocket next;
+    private final I2PServerSocket socket;
 
     I2PSocket accept() throws I2PException, ConnectException {
         I2PSocket sock;
@@ -31,9 +36,11 @@ public class AcceptingChannelImpl extends AcceptingChannel {
         } catch(SocketTimeoutException ex) {
             return null;
         }
-        I2PSocket temp = next;
-        next = sock;
-        return temp;
+        synchronized (this) {
+            I2PSocket temp = next;
+            next = sock;
+            return temp;
+        }
     }
 
     AcceptingChannelImpl(I2PSocketManager manager) {
@@ -96,7 +103,7 @@ public class AcceptingChannelImpl extends AcceptingChannel {
 
             @Override
             public int readyOps() {
-                if((operations & OP_ACCEPT) != 0)
+                if((operations & OP_ACCEPT) != 0) {
                     if(next != null) {
                         return OP_ACCEPT;
                     } else {
@@ -107,6 +114,7 @@ public class AcceptingChannelImpl extends AcceptingChannel {
                         if(next != null)
                             return OP_ACCEPT;
                     }
+                }
                 return 0;
             }
         };
@@ -136,8 +144,9 @@ public class AcceptingChannelImpl extends AcceptingChannel {
 
     @Override
     protected void implCloseChannel() throws IOException {
-        if(next != null) {
-            next.close();
+        I2PSocket nxt = next;
+        if(nxt != null) {
+            nxt.close();
         }
         _socketManager.destroySocketManager();
     }

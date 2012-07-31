@@ -21,6 +21,13 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
+/**
+ *  Send a message directly to another router, i.e. not through a tunnel.
+ *  This is safe to run inline via runJob().
+ *  If the RouterInfo for the Hash is not found locally, it will
+ *  queue a lookup and register itself to be run again when the lookup
+ *  succeeds or times out.
+ */
 public class SendMessageDirectJob extends JobImpl {
     private final Log _log;
     private final I2NPMessage _message;
@@ -39,9 +46,11 @@ public class SendMessageDirectJob extends JobImpl {
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, int timeoutMs, int priority) {
         this(ctx, message, toPeer, null, null, null, null, timeoutMs, priority);
     }
+
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         this(ctx, message, toPeer, null, onSuccess, onFail, selector, timeoutMs, priority);
     }
+
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         super(ctx);
         _log = getContext().logManager().getLog(SendMessageDirectJob.class);
@@ -66,6 +75,7 @@ public class SendMessageDirectJob extends JobImpl {
     }
     
     public String getName() { return "Send Message Direct"; }
+
     public void runJob() { 
         long now = getContext().clock().now();
 

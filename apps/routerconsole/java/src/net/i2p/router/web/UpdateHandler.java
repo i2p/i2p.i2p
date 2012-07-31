@@ -45,6 +45,10 @@ public class UpdateHandler {
     static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
     protected static final String PROP_LAST_UPDATE_TIME = "router.updateLastDownloaded";
 
+    protected static final long CONNECT_TIMEOUT = 55*1000;
+    protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
+    protected static final long NOPROXY_INACTIVITY_TIMEOUT = 60*1000;
+
     public UpdateHandler() {
         this(ContextHelper.getContext(null));
     }
@@ -193,7 +197,7 @@ public class UpdateHandler {
                         // no retries
                         _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, updateURL, TrustedUpdate.HEADER_BYTES);
                         _get.addStatusListener(UpdateRunner.this);
-                        _get.fetch();
+                        _get.fetch(CONNECT_TIMEOUT);
                     } catch (Throwable t) {
                         _isNewer = false;
                     }
@@ -210,7 +214,7 @@ public class UpdateHandler {
                     else
                         _get = new EepGet(_context, 1, _updateFile, updateURL, false);
                     _get.addStatusListener(UpdateRunner.this);
-                    _get.fetch();
+                    _get.fetch(CONNECT_TIMEOUT, -1, shouldProxy ? INACTIVITY_TIMEOUT : NOPROXY_INACTIVITY_TIMEOUT);
                 } catch (Throwable t) {
                     _log.error("Error updating", t);
                 }
@@ -233,14 +237,16 @@ public class UpdateHandler {
             if (_isPartial)
                 return;
             StringBuilder buf = new StringBuilder(64);
-            buf.append("<b>").append(_("Updating")).append("</b> ");
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
                          ((double)alreadyTransferred + (double)currentWrite + bytesRemaining);
             synchronized (_pct) {
-                buf.append(_pct.format(pct));
+                buf.append(_("{0} downloaded", _pct.format(pct)));
             }
-            buf.append(":<br>\n");
-            buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
+            buf.append("<br>\n");
+            buf.append(DataHelper.formatSize2(currentWrite + alreadyTransferred))
+               .append("B / ")
+               .append(DataHelper.formatSize2(currentWrite + alreadyTransferred + bytesRemaining))
+               .append("B");
             updateStatus(buf.toString());
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {

@@ -34,8 +34,8 @@ For linux-ppc, we don't use the Tanuki binaires because they're (mistakenly)
 ppc64 compiles (TODO: File bug with Tanuki). Compile the arch-dependent bits
 with "ant -Dbits=32 compile-c-unix".
 
-For macosx, combine the universal-32 and universal-64 files
-from the delta pack (each a 2-architecture fat file)
+For macosx, combine (if possible) the universal-32 and universal-64 files
+from the delta pack (each is a 2-architecture fat file)
 into a "quad-fat" binary. Instructions can be found in
 macos/README.txt
 

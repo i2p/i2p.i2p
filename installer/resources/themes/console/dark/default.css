@@ -4,18 +4,23 @@ body {
      margin: 0px;
      padding: 0px;
      text-align: center;
-     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      background: #010 url('images/camotile.png') center bottom;
      color: #000000;
-     font-size: 9pt;
-/* we've avoided Tantek Hacks so far,
-    ** but we can't avoid using the non-w3c method of
+     font-size: 8.5pt;
+    /* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of 
     ** box rendering. (and therefore one of mozilla's
     ** proprietry -moz properties (which hopefully they'll
     ** drop soon).
     */
      -moz-box-sizing: border-box;
      box-sizing: border-box;
+}
+
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+     padding-top: 5px;
 }
 
 div {
@@ -40,7 +45,7 @@ label {
 h4 {
      font-size: 14px;
      font-weight: bold !important;
-     text-align: center;
+     text-align: left;
      border: 1px solid #494;
      margin: 5px 0 15px 0;
      padding: 5px 10px;
@@ -63,11 +68,14 @@ form {
 }
 
 textarea, input, select, button, a {
-     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
-     font-size: 9pt;
+     font-size: 8.5pt;
      float: left;
+     background: #020;
+     border-radius: 4px;
+     color: #EEEE99;
 }
 
 button {
@@ -76,10 +84,9 @@ button {
 
 textarea {
      border: 1px solid #494;
-     color: #fff;
-     background: #020;
+     background: #000;
      margin-left: 4px;
-     margin-right: 5px !important;
+     width: 458px;
 }
 
 br {
@@ -137,12 +144,12 @@ hr {
 
 .freetext {
      width: 150px;
-     height: 22px;
+     height : 22px; 
      border: 1px solid #494;
      padding: 2px;
      margin: 4px 0 2px 4px;
-     background-color: #020;
-     font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     background-color: #000;
+     font-size: 8.5pt;
 }
 
 .control {
@@ -151,10 +158,10 @@ hr {
      overflow: hidden;
      min-width: 60px;
      max-height: 24px;
-     font-size: 9pt;
+     font-size: 8pt;
      font-weight: bold;
      background-color: #000;
-     color: #9f9 !important;
+     color: #494 !important;
      border: 1px outset #ddddc0;
      text-align: center;
      white-space: nowrap;
@@ -172,8 +179,9 @@ hr {
 }
 
 .control:link {
-     color: #9f9;
+     color: #494 !important;
      text-decoration: none;
+     background: #000 !important;
 }
 
 .control:hover {
@@ -188,13 +196,13 @@ hr {
 
 .control:active {
      border: 1px inset;
-     background-color: #f60;
-     color: #fff !important;
+     background-color: #f60 !important;
+     color: #EE9 !important;
      text-decoration: none;
 }
 
 .control:visited {
-     color: #010;
+     color: #494 !important;
      text-decoration: none;
 }
 
@@ -203,15 +211,35 @@ hr {
      margin: 16px auto 16px auto;
      overflow: hidden;
      text-align: left;
-     font-size: 9pt;
-     color: white;
+     font-size: 8.5pt;
+     color: #EEEE99;
      background-color: #020;
-     background: #000; /*url(images/camotile2.png);*/
+     background: #000 url(images/camotile2.png);
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494;
      padding: 10px 20px;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
+.panel td:first-child {
+     font-weight: bold;	
+}
+
+.panel td {
+	  padding: 6px 0 8px;
+}
+
+.panel td:last-child {
+     border-bottom: 1px dotted #494;	
 }
 
 .panel .footer {
@@ -239,7 +267,7 @@ hr {
      padding: 4px 0 0 2px;
      float: left;
      margin: 0;
-     font-size: 9pt !important;
+     font-size: 8pt !important;
      font-weight: bold;
 }
 
@@ -257,6 +285,15 @@ hr {
 
 #globalOperationsPanel .control {
      width: 120px;
+     color: #494 !important;
+}
+
+#globalOperationsPanel .control:hover {
+     color: #F60 !important;
+}
+
+#globalOperationsPanel .control:active {
+     color: #EE9 !important;
 }
 
 .header {
@@ -266,32 +303,35 @@ hr {
      border: 0;
 }
 
-a:link {
+a:link{
      color: #494;
      text-decoration: none;
+     background: none;
 }
 
-a:visited {
+a:visited{
      color: #7b7;
      text-decoration: none;
+     background: none;
 }
 
-a:hover {
+a:hover{
      color: #ff6600;
      text-decoration: underline;
+     background: none;
 }
 
-a:active {
+a:active{
      color: #900;
      text-decoration: underline;
+     background: none;
 }
 
 input {
      background-color: #020;
-     color: #eef;
+     color: #EEEE99;
      margin: 0 2px 0 2px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
-     font-weight: bold;
      border: 1px solid #494;
 /*
      padding: 0px 2px 1px 2px;
@@ -301,7 +341,7 @@ input {
 
 input hover {
      background-color: #f00;
-     color: #eef;
+     color: #EEEE99;
      margin: 0 2px 0 2px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
@@ -312,12 +352,14 @@ input hover {
 
 select {
      background-color: #020;
-     color: #eef;
+     color: #EEEE99;
      margin: 6px 2px 0 2px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px solid #494;
      padding: 2px 2px 2px 4px;
      max-height: 24px;
+     background: #000;
+     border-radius: 4px;
 }
 
 form {}

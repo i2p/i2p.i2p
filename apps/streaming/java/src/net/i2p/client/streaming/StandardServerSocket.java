@@ -72,10 +72,11 @@ class StandardServerSocket extends ServerSocket {
     }
 
     /**
-     *  @return null always
+     *  @return null always, see AcceptingChannelImpl for more info
      */
     @Override
     public ServerSocketChannel getChannel() {
+        //return _socket.getChannel();
         return null;
     }
 

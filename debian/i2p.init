@@ -43,6 +43,10 @@ I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.pidfile=$JVMPIDFILE \
  wrapper.daemonize=TRUE"
 
+[ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
+[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
+
+
 for ENV_FILE in /etc/environment /etc/default/locale; do
 [ -r "$ENV_FILE" ] || continue
 [ -s "$ENV_FILE" ] || continue
@@ -51,17 +55,21 @@ for ENV_FILE in /etc/environment /etc/default/locale; do
      value=`egrep "^${var}=" "$ENV_FILE" | tail -n1 | cut -d= -f2`
      [ -n "$value" ] && eval export $var=$value
 
-     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
-         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
-     fi
+# This is commented out for Ubuntu: Ubuntu still creates
+# /etc/environment in the most recent release
+# (currently 'Precise').
+#
+# TODO Add logic to automatically handle this
+#
+# Commented for Ubuntu since PPA packages 0.9-1$DISTRO1.
+# Packages for Debian systems will have this stanza uncommented.
+#
+#     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
+#         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
+#     fi
+
  done
 done
-
-# this isn't really needed since we depend on lsb-base (>= 3.2-14)
-## Actually, we *do* need this since the versioned dependency has been dropped
-## the I2P packages can be installed in GnewSense.
-[ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
-[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
 
 # read config file
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
@@ -79,11 +87,11 @@ case "$RUN_DAEMON" in
 esac
 
 # We need the wrapper. If it's not found, abort.
-[ -x $DAEMON ] || exit 0
+[ -x $DAEMON ] || exit 1
 
 # Even though this script doesn't call it, check for i2prouter.  If it's not
 # found, it probably means that the package isn't installed anymore.
-[ -x /usr/bin/i2prouter ] || exit 0
+[ -x /usr/bin/i2prouter ] || exit 1
 
 do_start()
 {
@@ -126,6 +134,12 @@ do_dump()
     [ "$RETVAL" = 2 ] && return 2
 }
 
+do_graceful()
+{
+    start-stop-daemon --stop --quiet -s HUP --pidfile $PIDFILE -u $I2PUSER
+    [ "$RETVAL" = 2 ] && return 2
+}
+
 case "$1" in
   start)
         log_daemon_msg "Starting $DESC" "$NAME"
@@ -138,6 +152,15 @@ case "$1" in
   dump)
         log_daemon_msg "Dumping $DESC" "$NAME"
         do_dump
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
+  graceful)
+        log_daemon_msg "Attempting graceful shutdown of $DESC" "$NAME"
+        log_daemon_msg "(could take up to 11 minutes)"
+        do_graceful
         case "$?" in
                 0|1) log_end_msg 0 ;;
                 2) log_end_msg 1 ;;
@@ -174,7 +197,7 @@ case "$1" in
         ;;
 *)
     N=/etc/init.d/$NAME
-    echo "Usage: $N {start|stop|dump|status|restart|force-reload}" >&2
+    echo "Usage: $N {start|stop|dump|graceful|status|restart|force-reload}" >&2
     exit 3
     ;;
 

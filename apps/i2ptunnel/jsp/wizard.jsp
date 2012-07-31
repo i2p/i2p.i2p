@@ -5,6 +5,8 @@
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
 
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
 %><?xml version="1.0" encoding="UTF-8"?>
@@ -55,7 +57,8 @@
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 
     <% if (editBean.allowCSS()) {
-  %><link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" />
+  %><link rel="icon" href="<%=editBean.getTheme()%>images/favicon.ico" />
+    <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" />
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
   %>
@@ -501,7 +504,8 @@ http://stats.i2p/cgi-bin/jump.cgi?a=
 http://i2jump.i2p/" /><%
                 } /* httpclient */
               } else { /* Server-only defaults */
-            %><input type="hidden" name="encrypt" value="" />
+            %><input type="hidden" name="privKeyFile" value="<%=editBean.getPrivateKeyFile(-1)%>" />
+            <input type="hidden" name="encrypt" value="" />
             <input type="hidden" name="encryptKey" value="" />
             <input type="hidden" name="accessMode" value="0" />
             <input type="hidden" name="accessList" value="" />

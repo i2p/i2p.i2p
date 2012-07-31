@@ -12,7 +12,9 @@ input.default {
     visibility: hidden;
 }
 </style>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Home Page Configuration")%></h1>
@@ -40,6 +42,9 @@ input.default {
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>
 
+<%
+   if (homehelper.shouldShowSearch()) {
+%>
 <h3><%=intl._("Search Engines")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
@@ -53,6 +58,9 @@ input.default {
   <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>
+<%
+   }  // shouldShowSearch()
+%>
 
 <h3><%=intl._("Recommended Eepsites")%></h3>
 <form action="" method="POST">

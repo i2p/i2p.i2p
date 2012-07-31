@@ -1,3 +1,15 @@
+i2p (0.9-1) stable; urgency=low
+
+  * New Upstream Version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 02 May 2012 16:33:11 +0000
+
+i2p (0.8.13-2) stable; urgency=low
+
+  * Fix bug in postinst in Debian Sid caused by changes to adduser's behaviour.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 09 Apr 2012 16:25:19 +0000
+
 i2p (0.8.13-1) stable; urgency=low
 
   * New upstream version 0.8.13

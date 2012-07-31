@@ -71,13 +71,13 @@ class GarlicMessageParser {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("# cloves to read: " + numCloves);
         for (int i = 0; i < numCloves; i++) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Reading clove " + i);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Reading clove " + i);
                 GarlicClove clove = new GarlicClove(_context);
                 offset += clove.readBytes(data, offset);
                 set.addClove(clove);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("After reading clove " + i);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("After reading clove " + i);
         }
         //Certificate cert = new Certificate();
         //offset += cert.readBytes(data, offset);

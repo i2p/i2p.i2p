@@ -27,6 +27,8 @@
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
 
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %>
 <%@page pageEncoding="UTF-8"%>
 <%@page trimDirectiveWhitespaces="true"%>
@@ -45,12 +47,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>${book.book} <%=intl._("address book")%> - susidns</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+<link rel="stylesheet" type="text/css" href="<%=book.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="<%=book.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
 </div>
 <hr>
 <div id="navi">

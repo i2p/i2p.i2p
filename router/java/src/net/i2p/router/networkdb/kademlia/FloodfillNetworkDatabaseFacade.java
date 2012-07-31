@@ -156,7 +156,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return _lookupThrottler.shouldThrottle(from, id);
     }
 
-    private static final int MAX_TO_FLOOD = 7;
+    private static final int MAX_TO_FLOOD = 5;
 
     /**
      *  Send to a subset of all floodfill peers.
@@ -308,9 +308,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             _context.jobQueue().addJob(searchJob);
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Deferring flood search for " + key.toBase64() + " with " + onFindJob);
+                _log.info("Deferring flood search for " + key.toBase64() + " with " + _activeFloodQueries.size() + " in progress");
             searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
-            _context.statManager().addRateData("netDb.lookupLeaseSetDeferred", 1, searchJob.getExpiration()-_context.clock().now());
+            // not necessarily LS
+            _context.statManager().addRateData("netDb.lookupDeferred", 1, searchJob.getExpiration()-_context.clock().now());
         }
         return null;
     }

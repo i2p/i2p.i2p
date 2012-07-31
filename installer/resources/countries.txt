@@ -193,7 +193,7 @@ PT,Portugal
 PW,Palau
 PY,Paraguay
 QA,Qatar
-RE,Reunion
+RE,Réunion
 RO,Romania
 RS,Serbia
 RU,Russian Federation

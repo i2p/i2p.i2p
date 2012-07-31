@@ -225,7 +225,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /**
-     * create the default options (using the default timeout, etc)
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
      * unused?
      */
     @Override
@@ -236,6 +238,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
         //if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
         //    defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        verifySocketManager();
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if(!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT)) {
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
@@ -244,8 +248,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /**
-     * create the default options (using the default timeout, etc)
-     *
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
+     * Do not use overrides for per-socket options.
      */
     @Override
     protected I2PSocketOptions getDefaultOptions(Properties overrides) {
@@ -330,6 +336,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             String ahelperKey = null;
             String userAgent = null;
             String authorization = null;
+            int remotePort = 0;
             while((line = reader.readLine(method)) != null) {
                 line = line.trim();
                 if(_log.shouldLog(Log.DEBUG)) {
@@ -486,10 +493,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Host becomes the destination's "{b32}.b32.i2p" string, or "i2p" on lookup failure
                         host = getHostName(destination);
 
-                        if(requestURI.getPort() >= 0) {
-                            // TODO support I2P ports someday
-                            //if (port >= 0)
-                            //    host = host + ':' + port;
+                        int rPort = requestURI.getPort();
+                        if (rPort > 0) {
+                            // Save it to put in the I2PSocketOptions,
+                            remotePort = rPort;
+                         /********
+                            // but strip it from the URL
                             if(_log.shouldLog(Log.WARN)) {
                                 _log.warn(getPrefix(requestId) + "Removing port from [" + request + "]");
                             }
@@ -500,6 +509,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 method = null;
                                 break;
                             }
+                          ******/
+                        } else {
+                            remotePort = 80;
                         }
 
                         String query = requestURI.getRawQuery();
@@ -964,7 +976,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
             // dont want to hard link to here
             //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
-            I2PSocket i2ps = createI2PSocket(clientDest, getDefaultOptions(opts));
+            I2PSocketOptions sktOpts = getDefaultOptions(opts);
+            if (remotePort > 0)
+                sktOpts.setPort(remotePort);
+            I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
@@ -1174,8 +1189,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
     public static final String DEFAULT_JUMP_SERVERS =
                                "http://i2host.i2p/cgi-bin/i2hostjump?," +
-            "http://stats.i2p/cgi-bin/jump.cgi?a=," +
-            "http://i2jump.i2p/";
+            "http://stats.i2p/cgi-bin/jump.cgi?a=";
+            //"http://i2jump.i2p/";
 
     /**
      *  @param jumpServers comma- or space-separated list, or null
@@ -1207,15 +1222,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     StringTokenizer tok = new StringTokenizer(jumpServers, ", ");
                     while(tok.hasMoreTokens()) {
                         String jurl = tok.nextToken();
-                        if(!jurl.startsWith("http://")) {
+                        String jumphost;
+                        try {
+                            URI jURI = new URI(jurl);
+                            String proto = jURI.getScheme();
+                            jumphost = jURI.getHost();
+                            if (proto == null || jumphost == null ||
+                                !proto.toLowerCase(Locale.US).equals("http"))
+                                continue;
+                            jumphost = jumphost.toLowerCase(Locale.US);
+                            if (!jumphost.endsWith(".i2p"))
+                                continue;
+                        } catch(URISyntaxException use) {
                             continue;
                         }
                         // Skip jump servers we don't know
-                        String jumphost = jurl.substring(7);  // "http://"
-                        jumphost = jumphost.substring(0, jumphost.indexOf('/'));
-                        if(!jumphost.endsWith(".i2p")) {
-                            continue;
-                        }
                         if(!jumphost.endsWith(".b32.i2p")) {
                             Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
                             if(dest == null) {
@@ -1227,8 +1248,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("\">".getBytes());
-                        out.write(jurl.substring(7).getBytes());
-                        out.write(uri.getBytes());
+                        // Translators: parameter is a host name
+                        out.write(_("{0} jump service", jumphost).getBytes());
                         out.write("</a>\n".getBytes());
                     }
                 }

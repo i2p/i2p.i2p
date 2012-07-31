@@ -27,24 +27,27 @@
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
 
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %>
 <%@page pageEncoding="UTF-8"%>
 <%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
+<jsp:useBean id="base" class="i2p.susi.dns.BaseBean" scope="session" />
 <jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._("Introduction")%> - SusiDNS</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+<link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<img src="images/logo.png" alt="susidns logo" border="0">
+<img src="<%=base.getTheme()%>images/logo.png" alt="susidns logo" border="0">
 </div>
 <hr>
 <div id="navi">
@@ -83,7 +86,7 @@
 <%=intl._("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
 <%=intl._("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
-<center><img src="images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
+<center><img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
 </div>
 <hr>
 <div id="footer">

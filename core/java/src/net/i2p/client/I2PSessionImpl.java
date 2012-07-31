@@ -54,7 +54,7 @@ import net.i2p.util.SimpleTimer;
  * @author jrandom
  */
 abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
-    protected Log _log;
+    protected final Log _log;
     /** who we are */
     private Destination _myDestination;
     /** private key for decryption */
@@ -104,16 +104,16 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2PClientMessageHandlerMap _handlerMap;
     
     /** used to seperate things out so we can get rid of singletons */
-    protected I2PAppContext _context;
+    protected final I2PAppContext _context;
 
     /** monitor for waiting until a lease set has been granted */
     private final Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
-    protected boolean _closed;
+    protected volatile boolean _closed;
 
     /** whether the session connection is in the process of being closed */
-    protected boolean _closing;
+    protected volatile boolean _closing;
 
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
@@ -121,7 +121,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private final Object _dateReceivedLock = new Object();
 
     /** whether the session connection is in the process of being opened */
-    protected boolean _opening;
+    protected volatile boolean _opening;
 
     /** monitor for waiting until opened */
     private final Object _openingWait = new Object();
@@ -144,6 +144,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
 
+    private static final long VERIFY_USAGE_TIME = 60*1000;
+
     void dateUpdated() {
         _dateReceived = true;
         synchronized (_dateReceivedLock) {
@@ -154,7 +156,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     public static final int LISTEN_PORT = 7654;
     
     /** for extension */
-    public I2PSessionImpl() {}
+    protected I2PSessionImpl(I2PAppContext context, Properties options) {
+        _context = context;
+        _log = context.logManager().getLog(getClass());
+        _closed = true;
+        if (options == null)
+            options = System.getProperties();
+        loadConfig(options);
+    }
 
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
@@ -166,12 +175,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */
     public I2PSessionImpl(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {
-        _context = context;
-        _log = context.logManager().getLog(I2PSessionImpl.class);
+        this(context, options);
         _handlerMap = new I2PClientMessageHandlerMap(context);
-        _closed = true;
-        _opening = false;
-        _closing = false;
         _producer = new I2CPMessageProducer(context);
         _availabilityNotifier = new AvailabilityNotifier();
         _availableMessages = new ConcurrentHashMap();
@@ -182,18 +187,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } catch (IOException ioe) {
             throw new I2PSessionException("Error reading the destination key stream", ioe);
         }
-        if (options == null)
-            options = System.getProperties();
-        loadConfig(options);
-        _sessionId = null;
-        _leaseSet = null;
     }
 
     /**
      * Parse the config for anything we know about.
      * Also fill in the authorization properties if missing.
      */
-    protected void loadConfig(Properties options) {
+    private void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
         if (_context.isRouterContext()) {
@@ -405,6 +405,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                            + (connected - startConnect)
                            + "ms - ready to participate in the network!");
             startIdleMonitor();
+            startVerifyUsage();
              setOpening(false);
         } catch (UnknownHostException uhe) {
             _closed = true;
@@ -469,16 +470,38 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Notified availability for session " + _sessionId + ", message " + id);
         }
-        SimpleScheduler.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
-    protected class VerifyUsage implements SimpleTimer.TimedEvent {
-        private Long _msgId;
-        public VerifyUsage(Long id) { _msgId = id; }
+
+    /**
+     *  Fire up a periodic task to check for unclamed messages
+     *  @since 0.9.1
+     */
+    private void startVerifyUsage() {
+        SimpleScheduler.getInstance().addEvent(new VerifyUsage(), VERIFY_USAGE_TIME);
+    }
+
+    /**
+     *  Check for unclaimed messages, without wastefully setting a timer for each
+     *  message. Just copy all unclaimed ones and check 30 seconds later.
+     */
+    private class VerifyUsage implements SimpleTimer.TimedEvent {
+        private final List<Long> toCheck = new ArrayList();
         
         public void timeReached() {
-            MessagePayloadMessage removed = _availableMessages.remove(_msgId);
-            if (removed != null && !isClosed())
-                _log.error("Message NOT removed!  id=" + _msgId + ": " + removed);
+            if (isClosed())
+                return;
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug(getPrefix() + " VerifyUsage of " + toCheck.size());
+            if (!toCheck.isEmpty()) {
+                for (Long msgId : toCheck) {
+                    MessagePayloadMessage removed = _availableMessages.remove(msgId);
+                    if (removed != null)
+                        _log.error("Message NOT removed!  id=" + msgId + ": " + removed);
+                }
+                toCheck.clear();
+            }
+            toCheck.addAll(_availableMessages.keySet());
+            SimpleScheduler.getInstance().addEvent(this, VERIFY_USAGE_TIME);
         }
     }
 
@@ -561,7 +584,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix() + "Message received of type " + message.getType()
-                           + " to be handled by " + handler);
+                           + " to be handled by " + handler.getClass().getSimpleName());
             handler.handleMessage(message, this);
         }
     }

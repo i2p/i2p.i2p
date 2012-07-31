@@ -1,5 +1,4 @@
 <%@page contentType="text/html"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
@@ -8,7 +7,9 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("WebApp Not Found")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._("Web Application Not Running")%></h1>
 <div class="sorry" id="warning">

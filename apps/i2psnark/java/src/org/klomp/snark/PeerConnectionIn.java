@@ -148,11 +148,9 @@ class PeerConnectionIn implements Runnable
                 begin = din.readInt();
                 len = i-9;
                 Request req = ps.getOutstandingRequest(piece, begin, len);
-                byte[] piece_bytes;
                 if (req != null)
                   {
-                    piece_bytes = req.bs;
-                    din.readFully(piece_bytes, begin, len);
+                    req.read(din);
                     ps.pieceMessage(req);
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("Received data(" + piece + "," + begin + ") from " + peer);
@@ -160,8 +158,9 @@ class PeerConnectionIn implements Runnable
                 else
                   {
                     // XXX - Consume but throw away afterwards.
-                    piece_bytes = new byte[len];
-                    din.readFully(piece_bytes);
+                    int rcvd = din.skipBytes(len);
+                    if (rcvd != len)
+                        throw new IOException("EOF reading unwanted data");
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("Received UNWANTED data(" + piece + "," + begin + ") from " + peer);
                   }

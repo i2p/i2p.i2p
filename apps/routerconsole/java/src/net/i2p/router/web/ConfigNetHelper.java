@@ -9,7 +9,6 @@ import net.i2p.router.Router;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.time.Timestamper;
 import net.i2p.util.Addresses;
 
 public class ConfigNetHelper extends HelperBase {
@@ -65,14 +64,6 @@ public class ConfigNetHelper extends HelperBase {
         return "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
     }
 
-    public String getEnableTimeSyncChecked() {
-        boolean disabled = _context.getBooleanProperty(Timestamper.PROP_DISABLED);
-        if (disabled)
-            return "";
-        else
-            return CHECKED;
-    }
-    
     /** @param prop must default to false */
     public String getChecked(String prop) {
         if (_context.getBooleanProperty(prop))

@@ -61,6 +61,10 @@ case "$1" in
             < /etc/i2p/wrapper.config > /etc/i2p/wrapper.config.tmp
         mv -f /etc/i2p/wrapper.config.tmp /etc/i2p/wrapper.config
 
+    # Older versions of adduser created the home directory.
+    # The version of adduser in Debian unstable does not.
+    [ -d $I2PHOME ] || mkdir -m0750 $I2PHOME
+
     # Create user and group as a system user.
     if getent passwd i2psvc > /dev/null 2>&1 ; then
         groupadd -f $I2PSYSUSER || true

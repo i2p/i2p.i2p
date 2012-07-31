@@ -16,7 +16,7 @@ abstract class BadCountries {
     // zzz.i2p/topics/969
     // List created based on the Press Freedom Index. Those countries with a score of higher than 50 are included:
     // http://en.wikipedia.org/wiki/Press_Freedom_Index
-    // Except:
+    // Except (quote):
     // I don't really think that is usage of I2P is dangerous in countries from CIS
     // General situation is really bad (like in Russia) but people here doesn't have problems with Ecnryption usage.
 
@@ -32,6 +32,7 @@ abstract class BadCountries {
             /* Democratic Republic of the Congo */ "CD",
             /* Equatorial Guinea */ "GQ",
             /* Eritrea */ "ER",
+            /* Ethiopia */ "ET",
             /* Fiji */ "FJ",
             /* Honduras */ "HN",
             /* Iran */ "IR",

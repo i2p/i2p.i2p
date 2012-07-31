@@ -4,18 +4,23 @@ import java.io.IOException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -34,6 +39,35 @@ public class SummaryHelper extends HelperBase {
     // Opera 10.63 doesn't have the char, TODO check UA
     //static final String THINSP = "&thinsp;/&thinsp;";
     static final String THINSP = " / ";
+    private static final char S = ',';
+    static final String PROP_SUMMARYBAR = "routerconsole.summaryBar.";
+
+    static final String DEFAULT_FULL =
+        "HelpAndFAQ" + S +
+        "I2PServices" + S +
+        "I2PInternals" + S +
+        "General" + S +
+        "NetworkReachability" + S +
+        "UpdateStatus" + S +
+        "RestartStatus" + S +
+        "Peers" + S +
+        "FirewallAndReseedStatus" + S +
+        "Bandwidth" + S +
+        "Tunnels" + S +
+        "Congestion" + S +
+        "TunnelStatus" + S +
+        "Destinations" + S +
+        "";
+
+    static final String DEFAULT_MINIMAL =
+        "ShortGeneral" + S +
+        "NewsHeadings" + S +
+        "UpdateStatus" + S +
+        "NetworkReachability" + S +
+        "RestartStatus" + S +
+        "FirewallAndReseedStatus" + S +
+        "Destinations" + S +
+        "";
 
     /**
      * Retrieve the shortened 4 character ident for the router located within
@@ -116,18 +150,21 @@ public class SummaryHelper extends HelperBase {
             return _("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)));
         if (_context.router().isHidden())
             return _("Hidden");
+        RouterInfo routerInfo = _context.router().getRouterInfo();
+        if (routerInfo == null)
+            return _("Testing");
 
         int status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
-                RouterAddress ra = _context.router().getRouterInfo().getTargetAddress("NTCP");
+                RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null || (new NTCPAddress(ra)).isPubliclyRoutable())
                     return _("OK");
                 return _("ERR-Private TCP Address");
             case CommSystemFacade.STATUS_DIFFERENT:
                 return _("ERR-SymmetricNAT");
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
+                if (routerInfo.getTargetAddress("NTCP") != null)
                     return _("WARN-Firewalled with Inbound TCP Enabled");
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                     return _("WARN-Firewalled and Floodfill");
@@ -138,7 +175,7 @@ public class SummaryHelper extends HelperBase {
                 return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
-                ra = _context.router().getRouterInfo().getTargetAddress("SSU");
+                ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
                         return _("ERR-No Active Peers, Check Network Connection and Firewall");
@@ -371,7 +408,7 @@ public class SummaryHelper extends HelperBase {
         List<Destination> clients = new ArrayList(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/i2ptunnel/\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
+        buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table>");
@@ -614,7 +651,7 @@ public class SummaryHelper extends HelperBase {
         // display all the time so we display the final failure message, and plugin update messages too
         String status = UpdateHandler.getStatus();
         if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4><hr>\n");
+            buf.append("<h4>").append(status).append("</h4>\n");
         }
         if (updateAvailable() || unsignedUpdateAvailable()) {
             if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
@@ -702,8 +739,30 @@ public class SummaryHelper extends HelperBase {
         }
         if (buf.length() <= 0)
             return "";
-        buf.append("<hr>");
         return buf.toString();
+    }
+
+    private NewsHelper _newshelper;
+    public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
+    public NewsHelper getNewsHelper() { return _newshelper; }
+
+    public List<String> getSummaryBarSections(String page) {
+        String config = "";
+        if ("home".equals(page)) {
+            config = _context.getProperty(PROP_SUMMARYBAR + page, DEFAULT_MINIMAL);
+        } else {
+            config = _context.getProperty(PROP_SUMMARYBAR + page);
+            if (config == null)
+                config = _context.getProperty(PROP_SUMMARYBAR + "default", DEFAULT_FULL);
+        }
+        return Arrays.asList(config.split("" + S));
+    }
+
+    static void saveSummaryBarSections(RouterContext ctx, String page, Map<Integer, String> sections) {
+        StringBuilder buf = new StringBuilder(512);
+        for(String section : sections.values())
+            buf.append(section).append(S);
+        ctx.router().saveConfig(PROP_SUMMARYBAR + page, buf.toString());
     }
 
     /** output the summary bar to _out */
@@ -729,4 +788,92 @@ public class SummaryHelper extends HelperBase {
     private String _requestURI;
     public void setRequestURI(String s) { _requestURI = s; }
     public String getRequestURI() { return _requestURI; }
+
+    public String getConfigTable() {
+        String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
+        Map<String, String> sectionNames = SummaryBarRenderer.SECTION_NAMES;
+        List<String> sections = getSummaryBarSections("default");
+        TreeSet<String> sortedSections = new TreeSet();
+
+        for (int i = 0; i < allSections.length; i++) {
+            String section = allSections[i];
+            if (!sections.contains(section))
+                sortedSections.add(section);
+        }
+
+        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        String imgPath = CSSHelper.BASE_THEME_PATH + theme + "/images/";
+
+        StringBuilder buf = new StringBuilder(2048);
+        buf.append("<table class=\"sidebarconf\"><tr><th>")
+           .append(_("Remove"))
+           .append("</th><th>")
+           .append(_("Name"))
+           .append("</th><th colspan=\"2\">")
+           .append(_("Order"))
+           .append("</th></tr>\n");
+        for (String section : sections) {
+            int i = sections.indexOf(section);
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+               .append(i)
+               .append("\"></td><td align=\"left\">")
+               .append(_(sectionNames.get(section)))
+               .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
+               .append(i + "_" + section)
+               .append("\" value=\"")
+               .append(i)
+               .append("\">");
+            if (i > 0) {
+                buf.append("<input type=\"image\" class=\"buttonTop\" name=\"move_")
+                   .append(i)
+                   .append("_top\" alt=\"")
+                   .append(_("Top"))
+                   .append("\" src=\"" + imgPath + "move_top.png\">");
+                buf.append("<input type=\"image\" class=\"buttonUp\" name=\"move_")
+                   .append(i)
+                   .append("_up\" alt=\"")
+                   .append(_("Up"))
+                   .append("\" src=\"" + imgPath + "move_up.png\">");
+            }
+            buf.append("</td><td align=\"left\">");
+            if (i < sections.size() - 1) {
+                buf.append("<input type=\"image\" class=\"buttonDown\" name=\"move_")
+                   .append(i)
+                   .append("_down\" alt=\"")
+                   .append(_("Down"))
+                   .append("\" src=\"" + imgPath + "move_down.png\">");
+                buf.append("<input type=\"image\" class=\"buttonBottom\" name=\"move_")
+                   .append(i)
+                   .append("_bottom\" alt=\"")
+                   .append(_("Bottom"))
+                   .append("\" src=\"" + imgPath + "move_bottom.png\">");
+            }
+            buf.append("</td></tr>\n");
+        }
+        buf.append("<tr><td align=\"center\">" +
+                   "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
+           .append(_("Delete selected"))
+           .append("\"></td><td align=\"left\"><b>")
+           .append(_("Add")).append(":</b> " +
+                   "<select name=\"name\">\n" +
+                   "<option value=\"\" selected=\"selected\">")
+           .append(_("Select a section to add"))
+           .append("</option>\n");
+
+        for (String s : sortedSections) {
+            buf.append("<option value=\"").append(s).append("\">")
+               .append(sectionNames.get(s)).append("</option>\n");
+        }
+
+        buf.append("</select>\n" +
+                   "<input type=\"hidden\" name=\"order\" value=\"")
+           .append(sections.size())
+           .append("\"></td>" +
+                   "<td align=\"center\" colspan=\"2\">" +
+                   "<input type=\"submit\" name=\"action\" class=\"add\" value=\"")
+           .append(_("Add item"))
+           .append("\"></td></tr>")
+           .append("</table>\n");
+        return buf.toString();
+    }
 }

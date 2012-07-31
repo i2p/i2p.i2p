@@ -38,7 +38,7 @@ then
 	mkdir -p build
         echo '// Automatically generated pseudo-java for xgettext - do not edit' > $JFILE
 	echo '// Translators may wish to translate a few of these, do not bother to translate all of them!!' >> $JFILE
-	sed 's/..,\(..*\)/_("\1");/' $CFILE >> $JFILE
+	sed -e '/^#/d' -e 's/..,\(..*\)/_("\1");/' $CFILE >> $JFILE
 fi
 
 # list specific files in core/ and router/ here, so we don't scan the whole tree

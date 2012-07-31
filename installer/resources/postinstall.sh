@@ -72,7 +72,7 @@ case $HOST_OS in
         ;;
     osx )
         wrapperpath="./lib/wrapper/macosx"
-        cp ${wrapperpath}/libwrapper.jnilib ./lib/
+        cp ${wrapperpath}/libwrapper*.jnilib ./lib/
         chmod 755 ./Start\ I2P\ Router.app/Contents/MacOS/i2prouter
         ;;
     solaris )
@@ -99,8 +99,8 @@ case $HOST_OS in
 esac
 
 if [ ! "X$wrapperpath" = "x" ]; then
-    cp $wrapperpath/i2psvc .
-    chmod 755 ./i2psvc
+    cp $wrapperpath/i2psvc* .
+    chmod 755 ./i2psvc*
 fi
 
 chmod 755 ./eepget

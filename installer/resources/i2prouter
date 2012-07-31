@@ -209,14 +209,6 @@ failed() {
         esac
 }
 
-if [ ! -r "${WRAPPER_CMD}" ]; then
-    echo "Unable to locate i2psvc in ${I2P}!"
-    echo
-    unsupported
-    echo
-    exit 1
-fi
-
 if [ -n "$FIXED_COMMAND" ]
 then
     COMMAND="$FIXED_COMMAND"
@@ -559,6 +551,13 @@ then
     exit 1
 fi
 
+if [ ! -r "${WRAPPER_CMD}" ]; then
+    echo "Unable to locate ${WRAPPER_CMD} in ${I2P}!"
+    echo
+    unsupported
+    echo
+    exit 1
+fi
 
 # Build the nice clause
 if [ "X$PRIORITY" = "X" ]
@@ -1220,9 +1219,65 @@ installdaemon() {
                     fi
                 fi
             elif [ -f /etc/arch-release ]; then
-                eval echo `gettext 'Detected Arch Linux:'`
-                eval echo `gettext 'Installing as a daemon is not yet supported in Arch Linux.'`
-                exit 1
+            eval echo `gettext 'Detected Arch Linux:'`
+                if [ -f /etc/rc.d/i2prouter ]; then
+                    eval echo `gettext 'Initscript from AUR package found. Refusing to continue.'`
+                    exit 1
+                elif [ -f /etc/rc.d/i2p ]; then
+                    eval echo `gettext ' The $APP_LONG_NAME daemon is already installed.'`
+                    exit 1
+                else
+                    echo "#!/bin/bash"  >> /etc/rc.d/${APP_NAME}
+                    echo   >> /etc/rc.d/${APP_NAME}
+                    echo ". /etc/rc.conf"  >> /etc/rc.d/${APP_NAME}
+                    echo ". /etc/rc.d/functions"  >> /etc/rc.d/${APP_NAME}
+                    echo   >> /etc/rc.d/${APP_NAME}
+                    echo "case "\$1" in"  >> /etc/rc.d/${APP_NAME}
+                    echo "  start)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    stat_busy \"Starting i2p-Router\""  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router start >/dev/null 2>&1"  >> /etc/rc.d/${APP_NAME}
+                    echo "    if [ \$? -gt 0 ]; then"  >> /etc/rc.d/${APP_NAME}
+                    echo "      stat_fail"  >> /etc/rc.d/${APP_NAME}
+                    echo "    else"  >> /etc/rc.d/${APP_NAME}
+                    echo "      stat_done"  >> /etc/rc.d/${APP_NAME}
+                    echo "      add_daemon i2prouter"  >> /etc/rc.d/${APP_NAME}
+                    echo "    fi"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  stop)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    stat_busy "Stopping i2p-Router""  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router stop > /dev/null 2>&1"  >> /etc/rc.d/${APP_NAME}
+                    echo "    if [ \$? -gt 0 ]; then"  >> /etc/rc.d/${APP_NAME}
+                    echo "      stat_fail"  >> /etc/rc.d/${APP_NAME}
+                    echo "    else"  >> /etc/rc.d/${APP_NAME}
+                    echo "      stat_done"  >> /etc/rc.d/${APP_NAME}
+                    echo "      rm_daemon i2prouter"  >> /etc/rc.d/${APP_NAME}
+                    echo "    fi"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  restart)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router restart"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  console)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router console"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  status)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router status"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  dump)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router dump"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  graceful)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ${REALDIR}/${APP_NAME}router graceful"  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "  *)"  >> /etc/rc.d/${APP_NAME}
+                    echo "    echo \"usage: \$0 {start|stop|restart|console|status|dump}\""  >> /etc/rc.d/${APP_NAME}
+                    echo "    ;;"  >> /etc/rc.d/${APP_NAME}
+                    echo "esac"  >> /etc/rc.d/${APP_NAME}
+                    chmod 755 /etc/rc.d/${APP_NAME}
+                    chown root:root /etc/rc.d/${APP_NAME}
+                    eval echo `gettext ' The $APP_LONG_NAME daemon has been installed.'`
+                    eval echo `gettext ' Add \"i2p\" to the DAEMONS variable in /etc/rc.conf to enable.'`
+
+                fi
             elif [ -f /etc/SuSE-release ] ; then
                 eval echo `gettext 'Detected SuSE or SLES:'`
                 if [ -f "/etc/init.d/$APP_NAME" ] ; then
@@ -1412,6 +1467,15 @@ removedaemon() {
                 elif [ -f "/etc/init/${APP_NAME}.conf" ] ; then
                     eval echo `gettext ' Removing $APP_LONG_NAME daemon from upstart...'`
                     rm "/etc/init/${APP_NAME}.conf"
+                else
+                    eval echo `gettext ' The $APP_LONG_NAME daemon is not currently installed.'`
+                    exit 1
+                fi
+            elif [ -f /etc/arch-release ] ; then
+                eval echo `gettext 'Detected Arch Linux:'`
+                if [ -f "/etc/rc.d/$APP_NAME" ] ; then
+                    eval echo `gettext ' Removing $APP_LONG_NAME daemon...'`
+                    rm -f "/etc/rc.d/$APP_NAME"
                 else
                     eval echo `gettext ' The $APP_LONG_NAME daemon is not currently installed.'`
                     exit 1

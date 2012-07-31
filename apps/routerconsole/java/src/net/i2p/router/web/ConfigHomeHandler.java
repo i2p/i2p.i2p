@@ -72,7 +72,13 @@ public class ConfigHomeHandler extends FormHandler {
                 }
                 name = DataHelper.escapeHTML(name).replace(",", "&#44;");   // HomeHelper.S
                 url = DataHelper.escapeHTML(url).replace(",", "&#44;");
-                HomeHelper.App app = new HomeHelper.App(name, "", url, "/themes/console/images/itoopie_sm.png");
+                HomeHelper.App app = null;
+                if ("1".equals(group))
+                    app = new HomeHelper.App(name, "", url, "/themes/console/images/eepsite.png");
+                else if ("2".equals(group))
+                    app = new HomeHelper.App(name, "", url, "/themes/console/images/title_window.png");
+                else
+                    app = new HomeHelper.App(name, "", url, "/themes/console/images/question.png");
                 apps.add(app);
                 addFormNotice(_("Added") + ": " + app.name);
             } else {

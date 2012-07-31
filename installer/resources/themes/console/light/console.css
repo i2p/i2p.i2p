@@ -14,6 +14,12 @@ body {
      display: none;
 }
 
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
+}
+
 img {
      border: none;
 }
@@ -86,6 +92,7 @@ div.routersummaryouter {
      clear: left;/* fixes a bug in Opera */
      text-align: center !important;
      display: block;
+     position: absolute;/* so no interference with /home app icons */
 }
 
 div.routersummary {
@@ -175,6 +182,10 @@ div.routersummary h4 {
      box-shadow: 0px 0px 1px 1px #bdf;
 }
 
+div.routersummary ul {
+     text-align: left !important;
+}
+
 div.routersummary table {
      border: 0;
      text-align: center !important;
@@ -230,6 +241,16 @@ div.routersummary img:first-child  {
 div.routersummary img:hover:first-child {
      margin-bottom: -2px !important;
      opacity: 1;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 10px;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
 }
 
 div.tunnels {
@@ -488,6 +509,45 @@ div.configure h3, div.graphspanel h3 {
      text-align: left;
 }
 
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td {
+     font-weight: bold;
+     font-size: 9pt;  
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
+}
+
 div.graphspanel {
      text-align: center !important;
      margin: 15px 0px -15px;
@@ -594,6 +654,7 @@ td {
 
 /* begin home page */
 
+/*
 #appsummary {
      clear: none;
      float: none;
@@ -618,16 +679,16 @@ h2.app {
      border-radius: 8px;
      margin: 1px 10px 15px 0 !important;
 }
+*/
 
-h4.app {
+h4.app, h4.app2 {
      margin: 0 10px 2px 10px;
      padding: 10px 0 8px 0;
 }
 
 h4.app2 {
      clear: left;
-     margin: 0 4px 2px 0;
-     padding: 16px 0 8px 0;
+     margin-top: 5px !important;
 }
 
 div.ag2 {
@@ -639,6 +700,7 @@ div.app {
      padding: 2px;
      height: 84px;
      width: 112px;
+     text-align: center !important;
 }
 
 div.appgroup {
@@ -833,6 +895,18 @@ h1 {
      -moz-border-radius: 8px;
      -khtml-border-radius: 8px;
      min-width: 500px;
+}
+
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
 }
 
 h2 {
@@ -1347,3 +1421,27 @@ div.footnote hr{
      margin-bottom: -18px;
      margin-right: 5px;
 }
+
+iframe.iframed {
+     margin: 10px 0 0;
+}
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 10px 10px 7px !important;
+}
+
+.iframed div.sorry {
+     margin: 5px 10px 10px 7px !important;
+}
+
+/* end iframed console fixes */

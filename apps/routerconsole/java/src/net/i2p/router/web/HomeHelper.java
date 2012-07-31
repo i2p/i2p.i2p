@@ -21,44 +21,52 @@ public class HomeHelper extends HelperBase {
     static final String PROP_SERVICES = "routerconsole.services";
     static final String PROP_FAVORITES = "routerconsole.favorites";
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
+    private static final String PROP_SEARCH = "routerconsole.showSearch";
 
     static final String DEFAULT_SERVICES =
-        _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/susidns/index" + S + I + "book_addresses.png" + S +
-        _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "wrench_orange.png" + S +
+        _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
+        _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "action_log.png" + S +
         _x("Configure Language") + S + _x("Console Language Selection") + S + "/configui" + S + I + "wrench_orange.png" + S +
-        _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "wrench_orange.png" + S +
+        _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "home_page.png" + S +
         _x("Email") + S + _x("Anonymous webmail client") + S + "/susimail/susimail" + S + I + "email.png" + S +
-        _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "help.png" + S +
-        _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "wrench_orange.png" + S +
-        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/i2psnark/" + S + I + "film.png" + S +
-        _x("Website") + S + _x("Local web server") + S + "http://127.0.0.1:7658/" + S + I + "server.png" + S +
+        _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "support.png" + S +
+        _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "toolbox.png" + S +
+        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/i2psnark/" + S + I + "magnet.png" + S +
+        _x("Website") + S + _x("Local web server") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         "";
 
     static final String DEFAULT_FAVORITES =
         _x("Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
-        _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "itoopie_sm.png" + S +
-        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("FAQ") + S + _x("Frequently Asked Questions") + S + "http://www.i2p2.i2p/faq" + S + I + "help.png" + S +
-        _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "itoopie_sm.png" + S +
-        //"ident.i2p" + S + _x("Short message service") + S + "http://ident.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "book.png" + S +
-        _x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "book.png" + S +
-        _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "itoopie_sm.png" + S +
-        "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "itoopie_sm.png" + S +
+        "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
+        _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "eepsite.png" + S +
+        _x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "eepsite.png" + S +
+        "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "eepsite.png" + S +
+        _x("FAQ") + S + _x("Frequently Asked Questions") + S + "http://www.i2p2.i2p/faq" + S + I + "question.png" + S +
+        _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "eepsite.png" + S +
+        _x("Anonymous Git Hosting") + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
+        "Ident " + _x("Microblog") + S + _x("Your premier microblogging service on I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
+        _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "education.png" + S +
+        //_x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "education.png" + S +
+        _x("killyourtv.i2p") + S + _x("Debian and Tahoe-LAFS repositories") + S + "http://killyourtv.i2p/" + S + I + "eepsite.png" + S +
+        _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "eepsite.png" + S +
+        "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "eepsite.png" + S +
         _x("Plugins") + S + _x("Add-on directory") + S + "http://plugins.i2p/" + S + I + "plugin.png" + S +
-        _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Project Website") + S + _x("I2P home page") + S + "http://www.i2p2.i2p/" + S + I + "help.png" + S +
-        "stats.i2p" + S + _x("I2P Netowrk Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "itoopie_sm.png" + S +
-        _x("Technical Docs") + S + _x("Technical documentation") + S + "http://www.i2p2.i2p/how" + S + I + "book.png" + S +
-        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Sponge's main site") + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "eepsite.png" + S +
+        _x("Project Website") + S + _x("I2P home page") + S + "http://www.i2p2.i2p/" + S + I + "info_rhombus.png" + S +
+        "stats.i2p" + S + _x("I2P Netowrk Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "eepsite.png" + S +
+        _x("Technical Docs") + S + _x("Technical documentation") + S + "http://www.i2p2.i2p/how" + S + I + "education.png" + S +
+        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "eepsite.png" + S +
+        _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "eepsite.png" + S +
+        _x("Sponge's main site") + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "eepsite.png" + S +
         "";
 
 
     public boolean shouldShowWelcome() {
         return _context.getProperty(Messages.PROP_LANG) == null;
+    }
+
+    public boolean shouldShowSearch() {
+        return _context.getBooleanProperty(PROP_SEARCH);
     }
 
     public String getServices() {

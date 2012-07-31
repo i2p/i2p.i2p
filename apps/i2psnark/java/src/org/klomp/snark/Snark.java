@@ -249,7 +249,8 @@ public class Snark
   private TrackerClient trackerclient;
   private String rootDataDir = ".";
   private final CompleteListener completeListener;
-  private boolean stopped;
+  private volatile boolean stopped;
+  private volatile boolean starting;
   private byte[] id;
   private byte[] infoHash;
   private String additionalTrackerURL;
@@ -346,6 +347,8 @@ public class Snark
           in = new FileInputStream(f);
         else
           {
+         /**** No, we don't ever fetch a torrent file this way
+               and we don't want to block in the constructor
             activity = "Getting torrent";
             File torrentFile = _util.get(torrent, 3);
             if (torrentFile == null) {
@@ -355,6 +358,8 @@ public class Snark
                 torrentFile.deleteOnExit();
                 in = new FileInputStream(torrentFile);
             }
+         *****/
+             throw new IOException("not found");
           }
         meta = new MetaInfo(in);
         infoHash = meta.getInfoHash();
@@ -505,9 +510,19 @@ public class Snark
   }
 
   /**
-   * Start up contacting peers and querying the tracker
+   * Start up contacting peers and querying the tracker.
+   * Blocks if tunnel is not yet open.
    */
-  public void startTorrent() {
+  public synchronized void startTorrent() {
+      starting = true;
+      try {
+          x_startTorrent();
+      } finally {
+          starting = false;
+      }
+  }
+
+  private void x_startTorrent() {
     boolean ok = _util.connect();
     if (!ok) fatal("Unable to connect to I2P");
     if (coordinator == null) {
@@ -538,21 +553,14 @@ public class Snark
     }
 
     stopped = false;
-    boolean coordinatorChanged = false;
     if (coordinator.halted()) {
-        // ok, we have already started and stopped, but the coordinator seems a bit annoying to
-        // restart safely, so lets build a new one to replace the old
+        coordinator.restart();
         if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.remove(coordinator);
-        PeerCoordinator newCoord = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
-        if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.add(newCoord);
-        coordinator = newCoord;
-        coordinatorChanged = true;
+            _peerCoordinatorSet.add(coordinator);
     }
-    if (!trackerclient.started() && !coordinatorChanged) {
+    if (!trackerclient.started()) {
         trackerclient.start();
-    } else if (trackerclient.halted() || coordinatorChanged) {
+    } else if (trackerclient.halted()) {
         if (storage != null) {
             try {
                  storage.reopen(rootDataDir);
@@ -563,23 +571,29 @@ public class Snark
                  fatal("Could not reopen storage", ioe);
              }
         }
-        TrackerClient newClient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
-        if (!trackerclient.halted())
-            trackerclient.halt();
-        trackerclient = newClient;
         trackerclient.start();
     } else {
         debug("NOT starting TrackerClient???", NOTICE);
     }
   }
+
   /**
    * Stop contacting the tracker and talking with peers
    */
   public void stopTorrent() {
+      stopTorrent(false);
+  }
+
+  /**
+   * Stop contacting the tracker and talking with peers
+   * @param fast if true, limit the life of the unannounce threads
+   * @since 0.9.1
+   */
+  public synchronized void stopTorrent(boolean fast) {
     stopped = true;
     TrackerClient tc = trackerclient;
     if (tc != null)
-        tc.halt();
+        tc.halt(fast);
     PeerCoordinator pc = coordinator;
     if (pc != null)
         pc.halt();
@@ -668,6 +682,22 @@ public class Snark
      */
     public boolean isStopped() {
         return stopped;
+    }
+
+    /**
+     *  Startup in progress.
+     *  @since 0.9.1
+     */
+    public boolean isStarting() {
+        return starting && stopped;
+    }
+
+    /**
+     *  Set startup in progress.
+     *  @since 0.9.1
+     */
+    public void setStarting() {
+        starting = true;
     }
 
     /**
@@ -782,6 +812,7 @@ public class Snark
     }
 
     /**
+     *  Bytes not yet in storage. Does NOT account for skipped files.
      *  @return exact value. or -1 if no storage yet.
      *          getNeeded() * pieceLength(0) isn't accurate if last piece
      *          is still needed.
@@ -802,6 +833,20 @@ public class Snark
     }
 
     /**
+     *  Bytes still wanted. DOES account for skipped files.
+     *  FIXME -1 when not running.
+     *  @return exact value. or -1 if no storage yet or when not running.
+     *  @since 0.9.1
+     */
+    public long getNeededLength() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getNeededLength();
+        return -1;
+    }
+
+    /**
+     *  Does not account for skipped files.
      *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
      *  @since 0.8.4
      */
@@ -1214,7 +1259,7 @@ public class Snark
         total += c.getCurrentUploadRate();
     }
     long limit = 1024l * _util.getMaxUpBW();
-    debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
+    debug("Total up bw: " + total + " Limit: " + limit, Snark.NOTICE);
     return total > limit;
   }
 

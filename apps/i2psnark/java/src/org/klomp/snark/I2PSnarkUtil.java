@@ -3,6 +3,7 @@ package org.klomp.snark;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +21,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketEepGet;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -53,8 +55,9 @@ public class I2PSnarkUtil {
     private String _i2cpHost;
     private int _i2cpPort;
     private final Map<String, String> _opts;
-    private I2PSocketManager _manager;
+    private volatile I2PSocketManager _manager;
     private boolean _configured;
+    private volatile boolean _connecting;
     private final Set<Hash> _shitlist;
     private int _maxUploaders;
     private int _maxUpBW;
@@ -63,9 +66,11 @@ public class I2PSnarkUtil {
     private int _startupDelay;
     private boolean _shouldUseOT;
     private boolean _areFilesPublic;
-    private String _openTrackerString;
+    private List<String> _openTrackers;
     private DHT _dht;
 
+    private static final int EEPGET_CONNECT_TIMEOUT = 45*1000;
+    private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
@@ -87,6 +92,8 @@ public class I2PSnarkUtil {
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
+        // FIXME split if default has more than one
+        _openTrackers = Collections.singletonList(DEFAULT_OPENTRACKERS);
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -114,6 +121,9 @@ public class I2PSnarkUtil {
         _configured = true;
     }
 ******/
+    
+    /** @since 0.9.1 */
+    public I2PAppContext getContext() { return _context; }
     
     public boolean configured() { return _configured; }
     
@@ -184,11 +194,15 @@ public class I2PSnarkUtil {
     /** @since 0.8.9 */
     public void setFilesPublic(boolean yes) { _areFilesPublic = yes; }
 
+    /** @since 0.9.1 */
+    public File getTempDir() { return _tmpDir; }
+
     /**
      * Connect to the router, if we aren't already
      */
     synchronized public boolean connect() {
         if (_manager == null) {
+            _connecting = true;
             // try to find why reconnecting after stop
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connecting to I2P", new Exception("I did it"));
@@ -207,6 +221,8 @@ public class I2PSnarkUtil {
             // we don't need fast handshake for peer connections.
             //if (opts.getProperty("i2p.streaming.connectDelay") == null)
             //    opts.setProperty("i2p.streaming.connectDelay", "500");
+            if (opts.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
+                opts.setProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT, "75000");
             if (opts.getProperty("i2p.streaming.inactivityTimeout") == null)
                 opts.setProperty("i2p.streaming.inactivityTimeout", "240000");
             if (opts.getProperty("i2p.streaming.inactivityAction") == null)
@@ -222,8 +238,11 @@ public class I2PSnarkUtil {
             if (opts.getProperty("i2p.streaming.maxConnsPerMinute") == null)
                 opts.setProperty("i2p.streaming.maxConnsPerMinute", "2");
             if (opts.getProperty("i2p.streaming.maxTotalConnsPerMinute") == null)
-                opts.setProperty("i2p.streaming.maxTotalConnsPerMinute", "6");
+                opts.setProperty("i2p.streaming.maxTotalConnsPerMinute", "8");
+            if (opts.getProperty("i2p.streaming.maxConnsPerHour") == null)
+                opts.setProperty("i2p.streaming.maxConnsPerHour", "20");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
+            _connecting = false;
         }
         // FIXME this only instantiates krpc once, left stuck with old manager
         //if (ENABLE_DHT && _manager != null && _dht == null)
@@ -239,6 +258,18 @@ public class I2PSnarkUtil {
 
     public boolean connected() { return _manager != null; }
 
+    /** @since 0.9.1 */
+    public boolean isConnecting() { return _manager == null && _connecting; }
+
+    /**
+     *  For FetchAndAdd
+     *  @return null if not connected
+     *  @since 0.9.1
+     */
+    public I2PSocketManager getSocketManager() {
+        return _manager;
+    }
+
     /**
      * Destroy the destination itself
      */
@@ -247,7 +278,11 @@ public class I2PSnarkUtil {
         // FIXME this can cause race NPEs elsewhere
         _manager = null;
         _shitlist.clear();
-        mgr.destroySocketManager();
+        if (mgr != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Disconnecting from I2P", new Exception("I did it"));
+            mgr.destroySocketManager();
+        }
         // this will delete a .torrent file d/l in progress so don't do that...
         FileUtil.rmdir(_tmpDir, false);
         // in case the user will d/l a .torrent file next...
@@ -286,11 +321,24 @@ public class I2PSnarkUtil {
     }
     
     /**
-     * fetch the given URL, returning the file it is stored in, or null on error
+     * Fetch the given URL, returning the file it is stored in, or null on error.
+     * No retries.
      */
     public File get(String url) { return get(url, true, 0); }
+
+    /**
+     * @param rewrite if true, convert http://KEY.i2p/foo/announce to http://i2p/KEY/foo/announce
+     */
     public File get(String url, boolean rewrite) { return get(url, rewrite, 0); }
+
+    /**
+     * @param retries if < 0, set timeout to a few seconds
+     */
     public File get(String url, int retries) { return get(url, true, retries); }
+
+    /**
+     * @param retries if < 0, set timeout to a few seconds
+     */
     public File get(String url, boolean rewrite, int retries) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
@@ -299,7 +347,7 @@ public class I2PSnarkUtil {
             // we could use the system tmp dir but deleteOnExit() doesn't seem to work on all platforms...
             out = SecureFile.createTempFile("i2psnark", null, _tmpDir);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("temp file error", ioe);
             if (out != null)
                 out.delete();
             return null;
@@ -311,12 +359,21 @@ public class I2PSnarkUtil {
         //_log.debug("Rewritten url [" + fetchURL + "]");
         //EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, retries, out.getAbsolutePath(), fetchURL);
         // Use our tunnel for announces and .torrent fetches too! Make sure we're connected first...
-        if (!connected()) {
-            if (!connect())
+        int timeout;
+        if (retries < 0) {
+            if (!connected())
                 return null;
+            timeout = EEPGET_CONNECT_TIMEOUT_SHORT;
+            retries = 0;
+        } else {
+            timeout = EEPGET_CONNECT_TIMEOUT;
+            if (!connected()) {
+                if (!connect())
+                    return null;
+            }
         }
         EepGet get = new I2PSocketEepGet(_context, _manager, retries, out.getAbsolutePath(), fetchURL);
-        if (get.fetch()) {
+        if (get.fetch(timeout)) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;
@@ -445,30 +502,17 @@ public class I2PSnarkUtil {
     }
     
     /** @param ot non-null */
-    public void setOpenTrackerString(String ot) { 
-        _openTrackerString = ot;
+    public void setOpenTrackers(List<String> ot) { 
+        _openTrackers = ot;
     }
 
-    public String getOpenTrackerString() { 
-        if (_openTrackerString == null)
-            return DEFAULT_OPENTRACKERS;
-        return _openTrackerString;
-    }
-
-    /** comma delimited list open trackers to use as backups */
-    /** sorted map of name to announceURL=baseURL */
+    /** List of open trackers to use as backups
+     *  @return non-null, possibly unmodifiable, empty if disabled
+     */
     public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
-            return null;
-        List<String> rv = new ArrayList(1);
-        String trackers = getOpenTrackerString();
-        StringTokenizer tok = new StringTokenizer(trackers, ", ");
-        while (tok.hasMoreTokens())
-            rv.add(tok.nextToken());
-        
-        if (rv.isEmpty())
-            return null;
-        return rv;
+            return Collections.EMPTY_LIST;
+        return _openTrackers;
     }
     
     public void setUseOpenTrackers(boolean yes) {

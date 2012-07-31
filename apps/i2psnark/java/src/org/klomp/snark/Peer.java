@@ -460,7 +460,7 @@ public class Peer implements Comparable
         if (this.deregister) {
           PeerListener p = s.listener;
           if (p != null) {
-            List<PartialPiece> pcs = s.returnPartialPieces();
+            List<Request> pcs = s.returnPartialPieces();
             if (!pcs.isEmpty())
                 p.savePartialPieces(this, pcs);
             // now covered by savePartialPieces

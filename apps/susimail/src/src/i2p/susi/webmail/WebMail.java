@@ -164,6 +164,9 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
 
+	private static final String CONFIG_THEME = "theme";
+	private static final String DEFAULT_THEME = "light";
+
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
 	/**
@@ -314,6 +317,7 @@ public class WebMail extends HttpServlet
 		public String sentMail;
 		public ArrayList attachments;
 		public boolean reallyDelete;
+		String themePath, imgPath;
 		
 		
 		SessionObject()
@@ -357,9 +361,9 @@ public class WebMail extends HttpServlet
 	 * @param label
 	 * @return
 	 */
-	private static String sortHeader( String name, String label )
+	private static String sortHeader( String name, String label, String imgPath )
 	{
-		return "" + label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself + "?" + name + "=down\"><img src=\"3down.png\" border=\"0\" alt=\"v\"></a>";
+		return "" + label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"" + imgPath + "3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself + "?" + name + "=down\"><img src=\"" + imgPath + "3down.png\" border=\"0\" alt=\"v\"></a>";
 	}
 	/**
 	 * check, if a given button "was pressed" in the received http request
@@ -1185,6 +1189,7 @@ public class WebMail extends HttpServlet
 	{
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+                response.setHeader("X-Frame-Options", "SAMEORIGIN");
 		RequestWrapper request = new RequestWrapper( httpRequest );
 		
 		SessionObject sessionObject = null;
@@ -1201,6 +1206,8 @@ public class WebMail extends HttpServlet
 			sessionObject.info = "";
 			sessionObject.pageChanged = false;
 			sessionObject.showAttachment = null;
+			sessionObject.themePath = "/themes/susimail/" + Config.getProperty(CONFIG_THEME, DEFAULT_THEME) + '/';
+			sessionObject.imgPath = sessionObject.themePath + "images/";
 			
 			processStateChangeButtons( sessionObject, request );
 			
@@ -1259,9 +1266,9 @@ public class WebMail extends HttpServlet
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
 					"<title>susimail - " + subtitle + "</title>\n" +
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"css.css\">\n" +
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css\">\n" +
 					"</head>\n<body>\n" +
-					"<div class=\"page\"><p><img src=\"susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
+					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
@@ -1606,10 +1613,10 @@ public class WebMail extends HttpServlet
 			button( RELOAD, _("Reload Config") ) + spacer +
 			button( LOGOUT, _("Logout") ) + "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"8\"><hr></td></tr>\n<tr>" +
-			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("Sender") ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject") ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date") ) + sortHeader( SORT_ID, "" ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size") ) + "</th></tr>" );
+			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("Sender"), sessionObject.imgPath ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath ) + sortHeader( SORT_ID, "", sessionObject.imgPath ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size"), sessionObject.imgPath ) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for( Iterator it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
