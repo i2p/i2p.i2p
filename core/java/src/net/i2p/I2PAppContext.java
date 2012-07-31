@@ -444,7 +444,7 @@ public class I2PAppContext {
      */
     public Properties readConfigFile(String configFilename) {
         Log log = logManager().getLog(I2PAppContext.class);
-        if (log.shouldLog(Log.DEBUG))
+        if (log != null && log.shouldLog(Log.DEBUG))
             log.debug("Config file: " + configFilename, new Exception("location"));
         Properties props = new Properties();
         try {
@@ -459,10 +459,12 @@ public class I2PAppContext {
                     log.warn("Configuration file " + configFilename + " does not exist");
             }
         } catch (Exception ioe) {
-            if (log != null)
-                log.error("Error loading the router configuration from " + configFilename, ioe);
-            else
-                System.err.println("Error loading the router configuration from " + configFilename + ": " + ioe);
+            if (log.shouldLog(Log.ERROR)) {
+                if (log != null)
+                    log.error("Error loading the router configuration from " + configFilename, ioe);
+                else
+                    System.err.println("Error loading the router configuration from " + configFilename + ": " + ioe);
+            }
         }
         return props;
     }
@@ -474,36 +476,27 @@ public class I2PAppContext {
      */
     public boolean writeConfigFile(String configFilename, Properties props) {
         synchronized (this) {
-            FileOutputStream fos = null;
-            String filename = configFilename;
+            Log log = logManager().getLog(I2PAppContext.class);
             try {
                 File f = new File(configFilename);
                 if (!f.isAbsolute()) {
                     f = new File(this.getConfigDir(), configFilename);
-                    filename = f.getAbsolutePath();
                 }
-                fos = new SecureFileOutputStream(filename);
-                StringBuilder buf = new StringBuilder(8*1024);
-                buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
-                TreeSet ordered = new TreeSet(props.keySet());
-                for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
-                    String key = (String)iter.next();
-                    String val = props.getProperty(key);
-                        // Escape line breaks before saving.
-                        // Remember: "\" needs escaping both for regex and string.
-                        // NOOO - see comments in DataHelper
-                        //val = val.replaceAll("\\r","\\\\r");
-                        //val = val.replaceAll("\\n","\\\\n");
-                    buf.append(key).append('=').append(val).append('\n');
+                if (f.canWrite()) {
+                    DataHelper.storeProps(props, f);
+                } else {
+                    if (log != null && log.shouldLog(Log.WARN))
+                        log.warn("Configuration file " + configFilename + " cannot be written");
+                    return false;
                 }
-                fos.write(buf.toString().getBytes("UTF-8"));
             } catch (IOException ioe) {
-                Log log = logManager().getLog(I2PAppContext.class);
-                if (log.shouldLog(Log.ERROR))
-                    log.error("Error saving the config to " + filename, ioe);
+                if (log.shouldLog(Log.ERROR)) {
+                    if (log != null)
+                        log.error("Error saving the config to " + filename, ioe);
+                    else
+                        System.err.println("Error saving the config to " + filename, ioe);
+                }
                 return false;
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
             }
         }
 
