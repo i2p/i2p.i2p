@@ -79,7 +79,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="./src:./test:../../core/java/src:../../core/java/test" destdir="./build/javadoc" 
+            sourcepath="./src:./test/junit:../../core/java/src:../../core/java/test/junit" destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 

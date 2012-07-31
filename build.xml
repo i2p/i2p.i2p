@@ -492,8 +492,8 @@
             <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
             <sourcepath>
-                <pathelement location="core/java/test" />
-                <pathelement location="router/java/test" />
+                <pathelement location="core/java/test/junit" />
+                <pathelement location="router/java/test/junit" />
             </sourcepath>
             <classpath>
                 <pathelement location="build/i2p.jar" />
