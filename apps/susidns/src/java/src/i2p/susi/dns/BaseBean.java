@@ -49,8 +49,14 @@ public class BaseBean
             // Fetch theme
             Properties themeProps = _context.readConfigFile(THEME_CONFIG_FILE);
             _theme = themeProps.getProperty(PROP_THEME_NAME);
-            // Ensure that theme config line exists in config file
-            if (_theme == null) {
+            // Ensure that theme config line exists in config file, and theme exists
+            String[] themes = getThemes();
+            boolean themeExists = false;
+            for (int i = 0; i < themes.length; i++) {
+                if (themes[i].equals(_theme))
+                    themeExists = true;
+            }
+            if (_theme == null || !themeExists) {
                _theme = DEFAULT_THEME;
                 themeProps.put(PROP_THEME_NAME, _theme);
                 _context.writeConfigFile(THEME_CONFIG_FILE, themeProps);
@@ -74,5 +80,27 @@ public class BaseBean
         String url = BASE_THEME_PATH;
         url += _theme + "/";
         return url;
+    }
+
+    /**
+     * Get all themes
+     * @return String[] -- Array of all the themes found.
+     * @since 0.9.2
+     */
+    public String[] getThemes() {
+            String[] themes = null;
+            // "docs/themes/susidns/"
+            File dir = new File(_context.getBaseDir(), "docs/themes/susidns");
+            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
+            // Walk the themes dir, collecting the theme names, and append them to the map
+            File[] dirnames = dir.listFiles(fileFilter);
+            if (dirnames != null) {
+                themes = new String[dirnames.length];
+                for(int i = 0; i < dirnames.length; i++) {
+                    themes[i] = dirnames[i].getName();
+                }
+            }
+            // return the map.
+            return themes;
     }
 }
