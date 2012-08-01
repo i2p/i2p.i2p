@@ -9,7 +9,7 @@ public class ConfigUIHelper extends HelperBase {
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);
-        String current = _context.readConfigFile(CSSHelper.THEME_CONFIG_FILE).getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         Set<String> themes = themeSet();
         for (String theme : themes) {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
@@ -17,7 +17,11 @@ public class ConfigUIHelper extends HelperBase {
                 buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(theme).append("\">").append(_(theme)).append("<br>\n");
         }
-        buf.append("<input type=\"checkbox\" name=\"universalTheming\" value=\"1\">")
+        boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
+        buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
+        if (universalTheming)
+            buf.append("checked=\"checked\" ");
+        buf.append("value=\"1\">")
            .append(_("Set theme universally across all apps"))
            .append("<br>\n");
         return buf.toString();

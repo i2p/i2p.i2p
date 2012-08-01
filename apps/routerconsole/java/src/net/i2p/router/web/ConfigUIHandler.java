@@ -1,8 +1,5 @@
 package net.i2p.router.web;
 
-import java.util.Iterator;
-import java.util.Properties;
-
 /** set the theme */
 public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
@@ -27,21 +24,18 @@ public class ConfigUIHandler extends FormHandler {
     private void saveChanges() {
         if (_config == null)
             return;
-        Properties props = _context.readConfigFile(CSSHelper.THEME_CONFIG_FILE);
-        String oldTheme = props.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
-        // Save routerconsole theme first to ensure it is in config file
+        String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        boolean ok;
         if (_config.equals("default")) // obsolete
-            props.put(CSSHelper.PROP_THEME_NAME, null);
+            ok = _context.router().saveConfig(CSSHelper.PROP_THEME_NAME, null);
         else
-            props.put(CSSHelper.PROP_THEME_NAME, _config);
-        if (_universalTheming) {
-            // The routerconsole theme gets set again, but oh well
-            for (Iterator it = props.keySet().iterator(); it.hasNext();) {
-                String key = (String) it.next();
-                props.put(key, _config);
-            }
+            ok = _context.router().saveConfig(CSSHelper.PROP_THEME_NAME, _config);
+        if (ok) {
+            if (_universalTheming)
+                ok = _context.router().saveConfig(CSSHelper.PROP_UNIVERSAL_THEMING, "true");
+            else
+                ok = _context.router().saveConfig(CSSHelper.PROP_UNIVERSAL_THEMING, null);
         }
-        boolean ok = _context.writeConfigFile(CSSHelper.THEME_CONFIG_FILE, props);
         if (ok) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
