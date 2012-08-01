@@ -53,7 +53,6 @@ public class SnarkManager implements Snark.CompleteListener {
     private final Object _addSnarkLock;
     private /* FIXME final FIXME */ File _configFile;
     private Properties _config;
-    private String _theme;
     private final I2PAppContext _context;
     private final Log _log;
     private final Queue<String> _messages;
@@ -86,7 +85,8 @@ public class SnarkManager implements Snark.CompleteListener {
     //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
     public static final String PROP_REFRESH_DELAY = "i2psnark.refreshSeconds";
-    public static final String THEME_CONFIG_FILE = "themes.config";
+    public static final String RC_PROP_THEME = "routerconsole.theme";
+    public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
@@ -288,31 +288,33 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(DEFAULT_REFRESH_DELAY_SECS));
         if (!_config.containsKey(PROP_STARTUP_DELAY))
             _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(DEFAULT_STARTUP_DELAY));
-        // Fetch theme
-        _theme = getTheme();
+        if (!_config.containsKey(PROP_THEME))
+            _config.setProperty(PROP_THEME, DEFAULT_THEME);
         updateConfig();
     }
     /**
-     * Get current theme - reads config file on every call.
-     * FIXME: only read in _theme on first call for each page load.
+     * Get current theme.
      * @return String -- the current theme
      */
     public String getTheme() {
-        Properties themeProps = _context.readConfigFile(THEME_CONFIG_FILE);
-        _theme = themeProps.getProperty(PROP_THEME);
-        // Ensure that theme config line exists in config file, and theme exists
-        String[] themes = getThemes();
-        boolean themeExists = false;
-        for (int i = 0; i < themes.length; i++) {
-            if (themes[i].equals(_theme))
-                themeExists = true;
+        String theme = _config.getProperty(PROP_THEME);
+        boolean universalTheming = _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
+        if (universalTheming) {
+            // Fetch routerconsole theme (or use our default if it doesn't exist)
+            theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
+            // Ensure that theme exists
+            String[] themes = getThemes();
+            boolean themeExists = false;
+            for (int i = 0; i < themes.length; i++) {
+                if (themes[i].equals(_theme))
+                    themeExists = true;
+            }
+            if (!themeExists) {
+                theme = DEFAULT_THEME;
+                _config.setProperty(PROP_THEME, DEFAULT_THEME);
+            }
         }
-        if (_theme == null || !themeExists) {
-            _theme = DEFAULT_THEME;
-            themeProps.put(PROP_THEME, _theme);
-            _context.writeConfigFile(THEME_CONFIG_FILE, themeProps);
-        }
-        return _theme;
+        return theme;
     }
 
     /**
@@ -581,8 +583,8 @@ public class SnarkManager implements Snark.CompleteListener {
             changed = true;
         }
         if (theme != null) {
-            if(!theme.equals(_theme)) {
-                _theme = theme;
+            if(!theme.equals(_config.getProperty(PROP_THEME))) {
+                _config.setProperty(PROP_THEME, theme);
                 addMessage(_("{0} theme loaded, return to main i2psnark page to view.", theme));
                 changed = true;
             }
@@ -677,9 +679,6 @@ public class SnarkManager implements Snark.CompleteListener {
             synchronized (_configFile) {
                 DataHelper.storeProps(_config, _configFile);
             }
-            Properties props = _context.readConfigFile(THEME_CONFIG_FILE);
-            props.put(PROP_THEME, _theme);
-            _context.writeConfigFile(THEME_CONFIG_FILE, props);
         } catch (IOException ioe) {
             addMessage(_("Unable to save the config to {0}", _configFile.getAbsolutePath()));
         }
