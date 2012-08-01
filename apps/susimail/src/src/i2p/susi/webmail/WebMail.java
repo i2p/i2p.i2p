@@ -51,7 +51,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -169,8 +168,9 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
 
-	private static final String THEME_CONFIG_FILE = "themes.config";
-	private static final String PROP_THEME = "susimail.theme";
+	private static final String RC_PROP_THEME = "routerconsole.theme";
+	private static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
+	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
 
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
@@ -1193,19 +1193,22 @@ public class WebMail extends HttpServlet
 	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response )
 	throws IOException, ServletException
 	{
-		Properties themeProps = I2PAppContext.getGlobalContext().readConfigFile(THEME_CONFIG_FILE);
-		String theme = themeProps.getProperty(PROP_THEME);
-		// Ensure that theme config line exists in config file, and theme exists
-		String[] themes = getThemes();
-		boolean themeExists = false;
-		for (int i = 0; i < themes.length; i++) {
-			if (themes[i].equals(theme))
-				themeExists = true;
-		}
-		if (theme == null || !themeExists) {
-			theme = DEFAULT_THEME;
-			themeProps.put(PROP_THEME, theme);
-			I2PAppContext.getGlobalContext().writeConfigFile(THEME_CONFIG_FILE, themeProps);
+		String theme = Config.getProperty(CONFIG_THEME, DEFAULT_THEME);
+		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		boolean universalTheming = ctx.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
+		if (universalTheming) {
+			// Fetch routerconsole theme (or use our default if it doesn't exist)
+			theme = ctx.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
+			// Ensure that theme exists
+			String[] themes = getThemes();
+			boolean themeExists = false;
+			for (int i = 0; i < themes.length; i++) {
+				if (themes[i].equals(theme))
+					themeExists = true;
+			}
+			if (!themeExists) {
+				theme = DEFAULT_THEME;
+			}
 		}
 
 		httpRequest.setCharacterEncoding("UTF-8");
