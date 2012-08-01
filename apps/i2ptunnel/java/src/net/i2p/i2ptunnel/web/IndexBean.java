@@ -45,7 +45,6 @@ import net.i2p.util.Log;
  */
 public class IndexBean {
     protected final I2PAppContext _context;
-    private String _theme;
     protected final Log _log;
     protected final TunnelControllerGroup _group;
     private String _action;
@@ -100,8 +99,7 @@ public class IndexBean {
     private static final List<String> _nonces = new ArrayList(MAX_NONCES + 1);
 
     static final String CLIENT_NICKNAME = "shared clients";
-    public static final String THEME_CONFIG_FILE = "themes.config";
-    public static final String PROP_THEME = "routerconsole.theme";
+    public static final String PROP_THEME_NAME = "routerconsole.theme";
     public static final String DEFAULT_THEME = "light";
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
@@ -115,7 +113,6 @@ public class IndexBean {
         addNonce();
         _booleanOptions = new ConcurrentHashSet(4);
         _otherOptions = new ConcurrentHashMap(4);
-        _theme = _context.readConfigFile(THEME_CONFIG_FILE).getProperty(PROP_THEME, DEFAULT_THEME);
     }
     
     public static String getNextNonce() {
@@ -396,7 +393,8 @@ public class IndexBean {
     ////
     
     public String getTheme() {
-        return "/themes/console/" + _theme + "/";
+        String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+        return "/themes/console/" + theme + "/";
     }
 
     public boolean allowCSS() {
