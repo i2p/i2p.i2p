@@ -1198,7 +1198,7 @@ public class WebMail extends HttpServlet
 		boolean universalTheming = ctx.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
 		if (universalTheming) {
 			// Fetch routerconsole theme (or use our default if it doesn't exist)
-			theme = ctx.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
+			theme = ctx.getProperty(RC_PROP_THEME, DEFAULT_THEME);
 			// Ensure that theme exists
 			String[] themes = getThemes();
 			boolean themeExists = false;

@@ -301,12 +301,12 @@ public class SnarkManager implements Snark.CompleteListener {
         boolean universalTheming = _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
         if (universalTheming) {
             // Fetch routerconsole theme (or use our default if it doesn't exist)
-            theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
+            theme = _context.getProperty(RC_PROP_THEME, DEFAULT_THEME);
             // Ensure that theme exists
             String[] themes = getThemes();
             boolean themeExists = false;
             for (int i = 0; i < themes.length; i++) {
-                if (themes[i].equals(_theme))
+                if (themes[i].equals(theme))
                     themeExists = true;
             }
             if (!themeExists) {
