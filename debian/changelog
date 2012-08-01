@@ -1,12 +1,27 @@
-i2p (0.9-1) stable; urgency=low
+i2p (0.9.1-1) unstable; urgency=low
+
+  * New upstream version 0.9.1
+  * Don't depend on Debian's/Ubuntu's version of Jetty. Jetty6 is going away
+    in the next Debian stable, so we'll switch to our libs sooner than later.
+  * Debconf
+    - New Greek translation
+    - New Italian translation
+    - New Hungarian translation
+  * Initscript
+    - Add graceful option
+    - Change exit statuses
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 30 Jul 2012 17:41:04 +0000
+
+i2p (0.9-1) unstable; urgency=low
 
   * New Upstream Version
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 02 May 2012 16:33:11 +0000
 
-i2p (0.8.13-2) stable; urgency=low
+i2p (0.8.13-2) unstable; urgency=low
 
-  * Fix bug in postinst in Debian Sid caused by changes to adduser's behaviour.
+  * Fix bug in postinst cause by changes to adduser's behaviour.
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 09 Apr 2012 16:25:19 +0000
 
@@ -51,38 +66,38 @@ i2p (0.8.12-1) stable; urgency=low
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 06 Jan 2012 02:49:03 +0000
 
-i2p (0.8.11-2) stable; urgency=medium
+i2p (0.8.11+repack-2) stable; urgency=medium
 
   * Fix STUPID bug running I2P with i2prouter. Thanks soundwave.
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 08 Nov 2011 20:02:05 +0000
 
-i2p (0.8.11-1) stable; urgency=low
+i2p (0.8.11+repack-1) stable; urgency=low
 
   * New Upstream Version
   * sv and uk debconf translation updates
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 07 Nov 2011 19:20:15 +0000
 
-i2p (0.8.10-1) stable; urgency=medium
+i2p (0.8.10+repack-1) stable; urgency=medium
 
   * New upstream version
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 20 Oct 2011 05:25:04 +0000
 
-i2p (0.8.9-1) stable; urgency=medium
+i2p (0.8.9+repack-1) stable; urgency=medium
 
   * New upstream version
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 11 Oct 2011 19:55:08 +0000
 
-i2p (0.8.8-3) UNRELEASED; urgency=low
+i2p (0.8.8+repack-3) UNRELEASED; urgency=low
 
   * Add dump option to initscript
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 06 Sep 2011 12:42:22 +0000
 
-i2p (0.8.8-2) stable; urgency=medium
+i2p (0.8.8+repack-2) stable; urgency=medium
 
   * Backport patch from mtn 04ec606 to fix trac #515
   * Fix trac ticket #514 ("debconf values are overwritten upon
@@ -92,7 +107,7 @@ i2p (0.8.8-2) stable; urgency=medium
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 02 Sep 2011 23:32:32 +0000
 
-i2p (0.8.8-1) stable; urgency=low
+i2p (0.8.8+repack-1) stable; urgency=low
 
   * New Upstream Version
 
