@@ -1,15 +1,11 @@
 package net.i2p;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
@@ -27,7 +23,6 @@ import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Base64;
-import net.i2p.data.DataHelper;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.stat.StatManager;
@@ -37,13 +32,11 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PProperties;
 import net.i2p.util.KeyRing;
-import net.i2p.util.Log;
 import net.i2p.util.LogManager;
 //import net.i2p.util.PooledRandomSource;
 import net.i2p.util.PortMapper;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
-import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
@@ -435,72 +428,6 @@ public class I2PAppContext {
                 _tmpDir = null;
             }
         }
-    }
-
-    /**
-     * Read config properties from a file
-     * @return the config properties
-     * @since 0.9.2
-     */
-    public Properties readConfigFile(String configFilename) {
-        Log log = logManager().getLog(I2PAppContext.class);
-        if (log != null && log.shouldLog(Log.DEBUG))
-            log.debug("Config file: " + configFilename, new Exception("location"));
-        Properties props = new Properties();
-        try {
-            File f = new File(configFilename);
-            if (!f.isAbsolute()) {
-                f = new File(this.getConfigDir(), configFilename);
-            }
-            if (f.canRead()) {
-                DataHelper.loadProps(props, f);
-            } else {
-                if (log != null)
-                    log.warn("Configuration file " + configFilename + " does not exist");
-            }
-        } catch (Exception ioe) {
-            if (log.shouldLog(Log.ERROR)) {
-                if (log != null)
-                    log.error("Error loading the router configuration from " + configFilename, ioe);
-                else
-                    System.err.println("Error loading the router configuration from " + configFilename + ": " + ioe);
-            }
-        }
-        return props;
-    }
-
-    /**
-     * Write config properties to a file
-     * @return true if the write is successful, false otherwise
-     * @since 0.9.2
-     */
-    public boolean writeConfigFile(String configFilename, Properties props) {
-        synchronized (this) {
-            Log log = logManager().getLog(I2PAppContext.class);
-            try {
-                File f = new File(configFilename);
-                if (!f.isAbsolute()) {
-                    f = new File(this.getConfigDir(), configFilename);
-                }
-                if (f.canWrite()) {
-                    DataHelper.storeProps(props, f);
-                } else {
-                    if (log != null && log.shouldLog(Log.WARN))
-                        log.warn("Configuration file " + configFilename + " cannot be written");
-                    return false;
-                }
-            } catch (IOException ioe) {
-                if (log.shouldLog(Log.ERROR)) {
-                    if (log != null)
-                        log.error("Error saving the config to " + filename, ioe);
-                    else
-                        System.err.println("Error saving the config to " + filename, ioe);
-                }
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
