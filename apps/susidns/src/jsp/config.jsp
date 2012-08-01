@@ -130,6 +130,9 @@
 <li><b>log</b> -
 <%=intl._("File to log activity to (change to /dev/null if you like)")%>
 </li>
+<li><b>theme</b> -
+<%=intl._("Name of the theme to use (defaults to 'light')")%>
+</li>
 </ul>
 </div><hr>
 <div id="footer">
