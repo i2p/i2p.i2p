@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -53,6 +54,10 @@ public class LogManager {
     public final static String PROP_CONSOLEBUFFERSIZE = "logger.consoleBufferSize";
     public final static String PROP_DISPLAYONSCREENLEVEL = "logger.minimumOnScreenLevel";
     public final static String PROP_DEFAULTLEVEL = "logger.defaultLevel";
+    /** @since 0.9.2 */
+    private static final String PROP_LOG_BUFFER_SIZE = "logger.logBufferSize";
+    /** @since 0.9.2 */
+    private static final String PROP_DROP = "logger.dropOnOverflow";
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
     public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
@@ -110,16 +115,18 @@ public class LogManager {
     /** whether or not we even want to display anything on stdout */
     private boolean _displayOnScreen;
     /** how many records we want to buffer in the "recent logs" list */
-    private int _consoleBufferSize;
+    private int _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
     /** the actual "recent logs" list */
     private final LogConsoleBuffer _consoleBuffer;
+    private int _logBufferSize = MAX_BUFFER;
+    private boolean _dropOnOverflow;
+    private final AtomicLong _droppedRecords = new AtomicLong();
     
     private boolean _alreadyNoticedMissingConfig;
 
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
         _alreadyNoticedMissingConfig = false;
-        _records = new LinkedBlockingQueue(MAX_BUFFER);
         _limits = new ConcurrentHashSet();
         _logs = new ConcurrentHashMap(128);
         _defaultLimit = Log.ERROR;
@@ -127,6 +134,7 @@ public class LogManager {
         _log = getLog(LogManager.class);
         String location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         setConfig(location);
+        _records = new LinkedBlockingQueue(_logBufferSize);
         _consoleBuffer = new LogConsoleBuffer(_consoleBufferSize);
         // If we aren't in the router context, delay creating the LogWriter until required,
         // so it doesn't create a log directory and log files unless there is output.
@@ -243,6 +251,11 @@ public class LogManager {
 
         boolean success = _records.offer(record);
         if (!success) {
+            if (_dropOnOverflow) {
+                // TODO use the counter in a periodic drop msg
+                _droppedRecords.incrementAndGet();
+                return;
+            }
             // the writer waits 10 seconds *or* until we tell them to wake up
             // before rereading the config and writing out any log messages
             synchronized (_writer) {
@@ -345,15 +358,17 @@ public class LogManager {
 
         try {
             String str = config.getProperty(PROP_CONSOLEBUFFERSIZE);
-            if (str == null)
-                _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
-            else
+            if (str != null)
                 _consoleBufferSize = Integer.parseInt(str);
-        } catch (NumberFormatException nfe) {
-            System.err.println("Invalid console buffer size");
-            nfe.printStackTrace();
-            _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
-        }
+        } catch (NumberFormatException nfe) {}
+
+        try {
+            String str = config.getProperty(PROP_LOG_BUFFER_SIZE);
+            if (str != null)
+                _logBufferSize = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {}
+
+        _dropOnOverflow = Boolean.valueOf(config.getProperty(PROP_DROP)).booleanValue();
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Log set to use the base log file as " + _baseLogfilename);
