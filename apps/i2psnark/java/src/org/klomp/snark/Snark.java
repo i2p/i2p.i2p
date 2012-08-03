@@ -385,6 +385,7 @@ public class Snark
               try { in.close(); } catch (IOException ioe) {}
       }    
 
+    infoHash = x_infoHash;  // final
     if (_log.shouldLog(Log.INFO))
         _log.info(meta.toString());
     
