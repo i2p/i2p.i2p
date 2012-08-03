@@ -45,6 +45,10 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
 
     private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
+    protected static final long CONNECT_TIMEOUT = 55*1000;
+    protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
+    protected static final long NOPROXY_INACTIVITY_TIMEOUT = 60*1000;
+
     public UpdateRunner(RouterContext ctx, List<URI> uris) { 
         super("Update Runner");
         setDaemon(true);
@@ -127,7 +131,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
                     // no retries
                     _get = new PartialEepGet(_context, proxyHost, proxyPort, baos, updateURL, TrustedUpdate.HEADER_BYTES);
                     _get.addStatusListener(UpdateRunner.this);
-                    _get.fetch();
+                    _get.fetch(CONNECT_TIMEOUT);
                 } catch (Throwable t) {
                 }
                 _isPartial = false;
@@ -143,7 +147,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
                 else
                     _get = new EepGet(_context, 1, _updateFile, updateURL, false);
                 _get.addStatusListener(UpdateRunner.this);
-                _get.fetch();
+                _get.fetch(CONNECT_TIMEOUT, -1, shouldProxy ? INACTIVITY_TIMEOUT : NOPROXY_INACTIVITY_TIMEOUT);
             } catch (Throwable t) {
                 _log.error("Error updating", t);
             }
