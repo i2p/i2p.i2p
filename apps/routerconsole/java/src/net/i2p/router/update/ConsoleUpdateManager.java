@@ -434,14 +434,20 @@ public class ConsoleUpdateManager implements UpdateManager {
     /////////// start UpdateManager interface
 
     /**
-     *  Call multiple times for each type/method pair.
+     *  Call multiple times, one for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority) {
-        _registered.add(new RegisteredUpdater(updater, type, method, priority));
+        RegisteredUpdater ru = new RegisteredUpdater(updater, type, method, priority);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Registering " + ru);
+        _registered.add(ru);
     }
 
     public void unregister(Updater updater, UpdateType type, UpdateMethod method) {
-        _registered.remove(new RegisteredUpdater(updater, type, method, 0));
+        RegisteredUpdater ru = new RegisteredUpdater(updater, type, method, 0);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Unregistering " + ru);
+        _registered.remove(ru);
     }
     
     /**
@@ -466,6 +472,8 @@ public class ConsoleUpdateManager implements UpdateManager {
         UpdateItem ui = new UpdateItem(type, id);
         VersionAvailable newVA = new VersionAvailable(newVersion, minVersion, method, updateSources);
         Version old = _installed.get(ui);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("notifyVersionAvailable " + ui + ' ' + newVA + " old: " + old);
         if (old != null && old.compareTo(newVA) >= 0) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(ui.toString() + ' ' + old + " already installed");
@@ -573,12 +581,12 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     public void notifyProgress(UpdateTask task, String status, long downloaded, long totalSize) {
         StringBuilder buf = new StringBuilder(64);
-        buf.append(status);
+        buf.append(status).append(' ');
         double pct = ((double)downloaded) / ((double)totalSize);
         synchronized (_pct) {
             buf.append(_pct.format(pct));
         }
-        buf.append(":<br>\n");
+        buf.append("<br>\n");
         buf.append(_("{0}B transferred", DataHelper.formatSize2(downloaded)));
         updateStatus(buf.toString());
     }
@@ -974,7 +982,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredUpdater " + updater + ' ' + type + ' ' + method + ' ' + priority;
+            return "RegisteredUpdater " + updater + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
