@@ -247,6 +247,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_flooder != null)
             _flooder.shutdown();
         _introManager.reset();
+        UDPPacket.clearCache();
         
         _introKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
@@ -379,6 +380,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent.clear();
         _dropList.clear();
         _introManager.reset();
+        UDPPacket.clearCache();
     }
     
     /**
@@ -421,9 +423,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     @Override
     public void externalAddressReceived(String source, byte[] ip, int port) {
-        String s = RemoteHostId.toString(ip);
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Received address: " + s + " port: " + port + " from: " + source);
+            _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
         if (explicitAddressSpecified())
             return;
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);

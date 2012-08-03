@@ -13,6 +13,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -446,7 +447,7 @@ class PeerTestManager {
                     // initiated test
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We are charlie, as the testIP/port is " + RemoteHostId.toString(testIP) + ":" + testPort + " and the state is unknown for " + nonce);
+                        _log.debug("We are charlie, as the testIP/port is " + Addresses.toString(testIP, testPort) + " and the state is unknown for " + nonce);
                     // we are charlie, since alice never sends us her IP and port, only bob does (and,
                     // erm, we're not alice, since it isn't our nonce)
                     receiveFromBobAsCharlie(from, testInfo, nonce, null);

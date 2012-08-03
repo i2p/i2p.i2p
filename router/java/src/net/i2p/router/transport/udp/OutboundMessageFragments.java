@@ -51,9 +51,8 @@ class OutboundMessageFragments {
      */
     private boolean _isWaiting;
 
-    private boolean _alive;
+    private volatile boolean _alive;
     private final PacketBuilder _builder;
-    private long _lastCycleTime = System.currentTimeMillis();
 
     /** if we can handle more messages explicitly, set this to true */
     // private boolean _allowExcess; // LINT not used??
@@ -205,8 +204,6 @@ class OutboundMessageFragments {
         if (added) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add a new message to a new peer " + peer.getRemotePeer().toBase64());
-            if (wasEmpty)
-                _lastCycleTime = System.currentTimeMillis();
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add a new message to an existing peer " + peer.getRemotePeer().toBase64());

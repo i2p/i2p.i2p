@@ -751,7 +751,7 @@ class EstablishmentManager {
         int port = reader.getRelayResponseReader().readCharliePort();
         if (_log.shouldLog(Log.INFO))
             _log.info("Received relay intro for " + state.getRemoteIdentity().calculateHash().toBase64() + " - they are on " 
-                      + addr.toString() + ":" + port + " (according to " + bob.toString(true) + ")");
+                      + addr.toString() + ":" + port + " (according to " + bob + ")");
         RemoteHostId oldId = state.getRemoteHostId();
         state.introduced(addr, ip, port);
         _outboundStates.remove(oldId);
