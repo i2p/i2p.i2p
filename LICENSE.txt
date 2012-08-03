@@ -197,6 +197,7 @@ Applications:
          - Guernsey and Isle of Man flags from the Open Clip Art Library, released into the public domain
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        Silk icons: See licenses/LICENSE-SilkIcons.txt
+       FatCow icons: See licenses/LICENSE-FatCowIcons.txt
 
        GeoIP Data:
        Copyright (c) 2008 MaxMind, Inc.  All Rights Reserved.
@@ -205,6 +206,10 @@ Applications:
    Router Console and I2PSnark themes:
    "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
    Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
+
+   I2PSnark light theme:
+   "Creative Commons Cat" licensed under a Creative Commons Attribution 3.0 Unported License.
+   Original photo by Boaz Arad. http://www.luxphile.com/2011/01/creative-commons-cat.html
 
    SAM:
    Public domain.

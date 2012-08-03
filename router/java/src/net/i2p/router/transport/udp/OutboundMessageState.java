@@ -138,7 +138,8 @@ class OutboundMessageState {
         if (_messageBuf != null && !_released) {
             _cache.release(_messageBuf);
             _released = true;
-            _releasedBy = new Exception ("Released on " + new Date() + " by:");
+            if (_log.shouldLog(Log.WARN))
+                _releasedBy = new Exception ("Released on " + new Date() + " by:");
         }
         //_messageBuf = null;
     }

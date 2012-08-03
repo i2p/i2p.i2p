@@ -279,7 +279,7 @@ class Connection {
     void sendReset() {
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         long now = _context.clock().now();
         if (_resetSentOn + 10*1000 > now) return; // don't send resets too fast
@@ -534,7 +534,7 @@ class Connection {
     void resetReceived() {
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         _resetReceived = true;
         _outputStream.streamErrorOccurred(new IOException("Reset received"));
@@ -578,7 +578,7 @@ class Connection {
         if (removeFromConMgr) {
             if (_disconnectScheduledOn < 0) {
                 _disconnectScheduledOn = _context.clock().now();
-                SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+                _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
             }
         }
         _connected = false;
@@ -796,7 +796,7 @@ class Connection {
         _closeSentOn = when;
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
     }
     public long getCloseReceivedOn() { return _closeReceivedOn; }

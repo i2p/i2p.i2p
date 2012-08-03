@@ -160,7 +160,7 @@ class PeerCoordinator implements PeerListener
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
     // this will help the behavior with global limits
-    timer = new CheckEvent(new PeerCheckerTask(_util, this));
+    timer = new CheckEvent(_util.getContext(), new PeerCheckerTask(_util, this));
     timer.schedule((CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD));
   }
   
@@ -170,8 +170,8 @@ class PeerCoordinator implements PeerListener
    */
   private static class CheckEvent extends SimpleTimer2.TimedEvent {
       private final PeerCheckerTask _task;
-      public CheckEvent(PeerCheckerTask task) {
-          super(SimpleTimer2.getInstance());
+      public CheckEvent(I2PAppContext ctx, PeerCheckerTask task) {
+          super(ctx.simpleTimer2());
           _task = task;
       }
       public void timeReached() {

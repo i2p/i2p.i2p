@@ -4,7 +4,7 @@
 /* Author: dr|z3d */
 
 body {
-     margin: 5px 0px 0 0px;
+     margin: 5px 0 0 0;
      padding: 0;
      text-align: center;
      background: #010 url('images/camotile.png') center bottom;
@@ -20,6 +20,7 @@ div.clearer {
      clear: left;
      height: 0;
      line-height: 0;
+     margin-bottom: -16px;
 }
 
 img {
@@ -46,16 +47,16 @@ div.logo {
      border-radius: 4px;
      background: #000; /*url("images/camotile2.png");*/
      width: 185px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #009;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #009;
-     box-shadow: inset 0px 0px 1px 0px #009;
+     -moz-box-shadow: inset 0 0 1px 0 #009;
+     -khtml-box-shadow: inset 0 0 1px 0 #009;
+     box-shadow: inset 0 0 1px 0 #009;
 }
 
 div.logo hr {
      color: #494;
      background: #494;
      height: 1px;
-     border: 0px solid #494;
+     border: 0 solid #494;
      margin: 10px 0 5px;
 }
 
@@ -70,7 +71,7 @@ div.toolbar {
 
 div.toolbar a:link {
      border: 1px outset #ddddc0;
-     padding: 0px 5px 1px 5px;
+     padding: 0 5px 1px 5px;
      background: #bbf;
      text-decoration: none;
      border-radius: 4px;
@@ -126,9 +127,9 @@ div.routersummary {
 
 div.routersummary input[type=text] {
      text-align: right !important;
-     -moz-box-shadow: inset 1px 1px 1px 0px #000;
-     -khtml-box-shadow: inset 1px 1px 1px 0px #000;
-     box-shadow: inset 1px 1px 1px 0px #000;
+     -moz-box-shadow: inset 1px 1px 1px 0 #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0 #000;
+     box-shadow: inset 1px 1px 1px 0 #000;
 }
 
 div.routersummary hr {
@@ -137,9 +138,9 @@ div.routersummary hr {
      height: 2px;
      border-bottom: 1px solid #494;
      margin: 8px -10px 7px -10px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #000;
-     -khtml-box-shadow: inset 0px 1px 1px 1px #000;
-     box-shadow: inset 0px 1px 1px 1px #000;
+     -moz-box-shadow: inset 0 1px 1px 1px #000;
+     -khtml-box-shadow: inset 0 1px 1px 1px #000;
+     box-shadow: inset 0 1px 1px 1px #000;
 }
 
 div.routersummary h3 {
@@ -206,22 +207,22 @@ div.routersummary p {
 div.refresh {
      margin-top: -10px !important;
      margin-bottom: -4px !important;
-     padding: 2px 0 0px 0 !important;
+     padding: 2px 0 0 0 !important;
 }
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 1px 1px 1px rgba(0, 16, 0, 0.8);
-     text-shadow: 0px 0px 2px #101 !important;
+     text-shadow: 0 0 2px #101 !important;
      padding: 0 1px;
 }
 
 div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 0 0 1px rgba(255, 96, 0, 0.7);
      color: #f60;
 }
 
 div.routersummary td {
-     padding: 0px 2px 0px 2px;
+     padding: 0 2px 0 2px;
      background-image: none !important;
      border: 0 !important;
      word-spacing: -0.1em;
@@ -265,7 +266,7 @@ div.tunnels table {
 }
 
 div.tunnels td {
-     padding: 1px 0px 1px 0px;
+     padding: 1px 0 1px 0;
 }
 
 div.tunnels td:first-child {
@@ -297,9 +298,9 @@ div.warning {
      background-image:url("../images/itoopie_sm.png");
      background-position:10px center;
      background-repeat:no-repeat;
-     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #f00;
-     box-shadow: inset 0px 0px 0px 1px #f00;
+     -moz-box-shadow: inset 0 0 0 1px #f00;
+     -khtml-box-shadow: inset 0 0 0 1px #f00;
+     box-shadow: inset 0 0 0 1px #f00;
      word-wrap: break-word;
 }
 
@@ -317,7 +318,7 @@ div.sorry {
      background-image:url("images/errortriangle.png");
      background-position:15px center;
      background-repeat:no-repeat;
-     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     -moz-box-shadow: inset 0 0 0 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
      color: #EE9;
@@ -354,7 +355,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: -1px 5px 0px 205px;
+     margin: -1px 5px 0 205px;
      padding: 4px 30px 4px 30px;
      border: 1px solid #494;
      background: #000;
@@ -399,7 +400,7 @@ div.news h4 {
      border-bottom: 1px;
      border-bottom-style: dotted;
      border-bottom-color: #494;
-     padding: 0 0 0px 0;
+     padding: 0 0 0 0;
      margin: 5px 0 10px 0;
      font-size: 10pt;
      opacity: 1;
@@ -443,7 +444,7 @@ div.confignav {
 
 div.configure {
 /*     padding: 5px 15px 0 15px;
-     margin: 10px 0px;
+     margin: 10px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -516,12 +517,12 @@ div.messages li {
      list-style: url(images/warning_dark.png) !important;
      margin: 0 5px 0 50px !important;
      padding: 0 10px 0 0 !important;
-     border: 0px !important;
+     border: 0 !important;
 }
 
 div.graphspanel {
      padding: 0;
-     margin: 15px 0px -15px 0;
+     margin: 15px 0 -15px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -536,7 +537,7 @@ div.widepanel h3 {
 
 div.graphspanel form {
      text-align: left;
-     padding: 0 15px 0px 15px;
+     padding: 0 15px 0 15px;
 }
 
 div.graphspanel hr {
@@ -558,9 +559,9 @@ div.graphspanel img:hover {
      margin: 5px;
      text-align: center !important;
      background: #000;
-     -moz-box-shadow: inset 0px 0px 1px 1px #f60;
-     -khtml-box-shadow: inset 0px 0px 1px 1px #f60;
-     box-shadow: inset 0px 0px 1px 1px #f60;
+     -moz-box-shadow: inset 0 0 1px 1px #f60;
+     -khtml-box-shadow: inset 0 0 1px 1px #f60;
+     box-shadow: inset 0 0 1px 1px #f60;
      opacity: 1;
 }
 
@@ -575,11 +576,11 @@ table {
 }
 
 table hr {
-     padding: 0px 0;
+     padding: 0 0;
      color: #494;
      background: #494;
-     border: 0px solid #494;
-     margin: 0px 0px;
+     border: 0 solid #494;
+     margin: 0 0;
      height: 1px;
      display: none;
 }
@@ -638,8 +639,8 @@ tt {
 div.main li {
      text-align: left;
      list-style: square;
-     margin: 2px 0px 2px 30px;
-     padding: 2px 20px 2px 0px;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
@@ -746,13 +747,13 @@ h1 {
      text-align: left;
      color: #EE9;
      padding: 14px 15px;
-     margin: 0 5px 0px 205px !important;
+     margin: 0 5px 0 205px !important;
      font-size: 17pt;
      font-weight: bold;
      font-style: normal;
      text-transform: uppercase;
      letter-spacing: 0.15em;
-     text-shadow: 0px 0px 2px #010;
+     text-shadow: 0 0 2px #010;
      white-space: normal;
      background: #000 url('images/header.png') center center;
      border: 1px solid #494;
@@ -781,7 +782,7 @@ x:-o-prefocus, span.newtab {
 h2 {
      font-size: 12pt;
      color: #EE9;
-     text-shadow: 0px 0px 2px #010;
+     text-shadow: 0 0 2px #010;
      letter-spacing: 0.05em;
      background: #000 url(images/camotile2.png);
      background: #000 url('images/header.png') center center ;
@@ -802,7 +803,7 @@ h2 a:visited {
 
 h2 a:hover {
      color: #f60;
-     text-shadow: 0px 0px 1px rgba(255, 64, 0, 0.7);
+     text-shadow: 0 0 1px rgba(255, 64, 0, 0.7);
 }
 
 h3 {
@@ -816,7 +817,7 @@ h3 {
      background: #000 url(images/camotile.png);
      background: #000 url('images/header.png') center center ;
      text-transform: uppercase;
-     text-shadow: 0px 0px 2px #010;
+     text-shadow: 0 0 2px #010;
      letter-spacing: 0.08em;
 }
 
@@ -843,18 +844,18 @@ button, button:visited {
      text-align: center;
      vertical-align: middle;
      min-width: 70px;
-     -moz-box-shadow: inset 0px 1px 1px 0px #494;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #191;
-     box-shadow: inset 0px 1px 1px 0px #191;
+     -moz-box-shadow: inset 0 1px 1px 0 #494;
+     -khtml-box-shadow: inset 0 1px 1px 0 #191;
+     box-shadow: inset 0 1px 1px 0 #191;
      background: #000;
      color: #494;
 }
 
 button:hover {
      border: 1px solid #f60;
-     -moz-box-shadow: inset 0px 1px 1px 0px #EE9;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #EE9;
-     box-shadow: inset 0px 1px 1px 0px #EE9;
+     -moz-box-shadow: inset 0 1px 1px 0 #EE9;
+     -khtml-box-shadow: inset 0 1px 1px 0 #EE9;
+     box-shadow: inset 0 1px 1px 0 #EE9;
      background: #000;
      color: #f60;
 }
@@ -863,15 +864,15 @@ button:active {
      border: 1px inset #f60;
      background: #f60;
      color: #EE9;
-     -moz-box-shadow: inset 0px 0px 0px 0px #f60;
-     -khtml-box-shadow: inset 0px 0px 0px 0px #f60;
-     box-shadow: inset 0px 0px 0px 0px #f60;
+     -moz-box-shadow: inset 0 0 0 0 #f60;
+     -khtml-box-shadow: inset 0 0 0 0 #f60;
+     box-shadow: inset 0 0 0 0 #f60;
 }
 
 .underline {
      border-bottom: 1px solid #eeeeff;
-     padding: 5px 0px 5px 0px;
-     margin: 0px 0px 10px 0px;
+     padding: 5px 0 5px 0;
+     margin: 0 0 10px 0;
 }
 
 .langbox {
@@ -900,7 +901,7 @@ hr {
      color: #494;
      background: #494;
      height: 1px;
-     border: 0px solid #494;
+     border: 0 solid #494;
      margin: 20px 0 10px;
 }
 
@@ -909,15 +910,15 @@ hr:last-child {
      margin-bottom: 20px;
 }
 
-sidebarlogo {
+.sidebarlogo {
      text-align: center;
 }
 
 input {
      border: 1px outset #5f5;
-     -moz-box-shadow: inset 0px 1px 1px 0px #373;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #373;
-     box-shadow: inset 0px 1px 1px 0px #373;
+     -moz-box-shadow: inset 0 1px 1px 0 #373;
+     -khtml-box-shadow: inset 0 1px 1px 0 #373;
+     box-shadow: inset 0 1px 1px 0 #373;
      background: #000;
      color: #494;
      margin: 5px;
@@ -934,9 +935,9 @@ input:hover {
      background: #000;
      color: #f60;
      border: 1px solid #f60;
-     -moz-box-shadow: inset 0px 1px 1px 0px #9e9;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #9e9;
-     box-shadow: inset 0px 1px 1px 0px #9e9;
+     -moz-box-shadow: inset 0 1px 1px 0 #9e9;
+     -khtml-box-shadow: inset 0 1px 1px 0 #9e9;
+     box-shadow: inset 0 1px 1px 0 #9e9;
 }
 
 input:active {
@@ -962,9 +963,9 @@ input[type=text], input[type=password] {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     -moz-box-shadow: inset 1px 1px 1px 0px #000;
-     -khtml-box-shadow: inset 1px 1px 1px 0px #000;
-     box-shadow: inset 1px 1px 1px 0px #000;
+     -moz-box-shadow: inset 1px 1px 1px 0 #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0 #000;
+     box-shadow: inset 1px 1px 1px 0 #000;
 }
 
 input[type=text]:active, input[type=text]:hover {
@@ -1029,13 +1030,13 @@ form {}
      color: #EE9;
      text-align: center;
      border: 1px solid #494 !important;
-/*     border-top: 0px !important;*/
+/*     border-top: 0 !important;*/
      margin: -3px 0 5px 0;
      padding: 7px;
      background: #010;
-     -moz-box-shadow: inset 0px 0px 0px 1px #090;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #090;
-     box-shadow: inset 0px 0px 0px 1px #090;
+     -moz-box-shadow: inset 0 0 0 1px #090;
+     -khtml-box-shadow: inset 0 0 0 1px #090;
+     box-shadow: inset 0 0 0 1px #090;
 /*     background: #000 url('images/header.png') repeat-x center center !important;*/
 }
 
@@ -1060,8 +1061,8 @@ div.joblog h3 {
 div.main li {
      text-align: left;
      list-style: square;
-     margin: 2px 0px 2px 30px;
-     padding: 2px 20px 2px 0px;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
@@ -1070,8 +1071,8 @@ div.joblog li {
      word-wrap: break-word !important;
      text-align: justify !important;
      line-height: 120% !important;
-     margin: 2px 0px 2px 30px;
-     padding: 2px 20px 2px 0px;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
 }
 
 div.joblog ul {
@@ -1081,7 +1082,7 @@ div.joblog ul {
 }
 
 div.joblog li:first-child {
-     margin-top: 0px;
+     margin-top: 0;
 }
 
 div.joblog li:last-child {
@@ -1167,7 +1168,7 @@ div.footnote hr{
      color: #494;
      background: #494;
      height: 1px;
-     border: 0px solid #494;
+     border: 0 solid #494;
 }
 
 .topness {
@@ -1213,7 +1214,7 @@ h4.app, h4.app2 {
     font-size: 10pt;
     font-variant: small-caps;
     letter-spacing: 2px;
-    margin: 12px 0 -10px 0;
+    margin: 12px 0 -9px 0;
     padding: 7px 8px 7px;
     text-transform: uppercase;
     border-radius: 4px;
@@ -1227,6 +1228,7 @@ h4.app2 {
 
 div.ag2 {
      margin: 0;
+     padding: 0;
 }
 
 div.app {
@@ -1239,10 +1241,10 @@ div.app {
      border-radius: 3px;
      -moz-border-radius: 3px;
      -khtml-border-radius: 3px;
-     margin: 5px;
-     height: 72px;
+     margin: 3px;
+     height: 60px;
      text-align: center !important;
-     padding-top: 5px;
+     padding-top: 3px;
      opacity: 0.9;
      box-shadow: 0 1px 5px #000000;
 }
@@ -1260,7 +1262,7 @@ div.app:last-child {
 
 div.appgroup {
      margin: 0;
-     padding: 16px 8px;
+     padding: 16px 3px;
      width: auto;
 }
 
@@ -1281,13 +1283,13 @@ table.search {
 img.app {
      height: 32px;
      width: 32px;
-     padding: 6px 0 8px 0;
-     margin-bottom: 3px;
+     padding: 2px 0 0 0;
+     margin-bottom: 2px;
 }
 
 img.app2p {
      height: 40px;
-     padding: 5px 6px 0px 6px;
+     padding: 5px 6px 0 6px;
      margin-bottom: 3px;
 }
 
@@ -1312,11 +1314,9 @@ td.app {
 }
 
 div.applabel {
-     border-radius: 3px;
-     border-width: 1px;
      font-size: 7.5pt;
      margin: 0;
-     padding: 3px 0;
+     padding: 1px 0 0 0;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
@@ -1329,3 +1329,23 @@ div.applabel {
 iframe.iframed {
      margin: 10px 0 0;
 }
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 5px 0 5px !important;
+}
+
+.iframed div.sorry {
+     margin: -1px 5px 10px 5px !important;
+}
+
+/* end iframed console fixes */

@@ -44,7 +44,7 @@ public class LookaheadInputStream extends FilterInputStream {
         Arrays.fill(_footerLookahead, (byte)0x00);
         int footerRead = 0;
         while (footerRead < _footerLookahead.length) {
-            int read = in.read(_footerLookahead);
+            int read = in.read(_footerLookahead, footerRead, _footerLookahead.length - footerRead);
             if (read == -1) throw new IOException("EOF reading the footer lookahead");
             footerRead += read;
         }

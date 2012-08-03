@@ -356,6 +356,10 @@ td:first-child {
      border-top: 1px dotted #66f !important;
 }
 
+.snarkFileIcon {
+     width: 16px;
+}
+
 .snarkFileName {
      padding: 4px 0px !important; 
      text-align: left !important;
@@ -760,7 +764,7 @@ div.configsection a:hover {
      text-decoration: none;
 }
 
-code {;
+code {
      font-size: 8pt;
      color: #009;
      padding: 0 2px;

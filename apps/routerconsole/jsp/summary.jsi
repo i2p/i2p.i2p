@@ -23,7 +23,7 @@
             // update disable boolean
             intl.setDisableRefresh(d);
         }
-        if (!intl.getDisableRefresh())
+        if (false && !intl.getDisableRefresh())
             out.print("<noscript><iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\"></noscript>\n");
     }
 %>
@@ -42,9 +42,9 @@
     }
 
     // d and allowIFrame defined above
-    if (!intl.getDisableRefresh()) {
+    if (false && !intl.getDisableRefresh()) {
         out.print("</div><noscript></iframe></noscript>\n");
-    } else if (allowIFrame) {
+    } else if (false && allowIFrame) {
         // since we don't have an iframe this will reload the base page, and
         // the new delay will be passed to the iframe above
         out.print("<noscript><div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"POST\">\n" +

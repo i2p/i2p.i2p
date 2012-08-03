@@ -62,7 +62,7 @@ class MessageWrapper {
         SessionKey sentKey = new SessionKey();
         Set<SessionTag> sentTags = new HashSet();
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, sentKey, sentTags, 
-                                                              NETDB_TAGS_TO_DELIVER, NETDB_LOW_THRESHOLD, false, skm);
+                                                              NETDB_TAGS_TO_DELIVER, NETDB_LOW_THRESHOLD, skm);
         if (msg == null)
             return null;
         TagSetHandle tsh = null;

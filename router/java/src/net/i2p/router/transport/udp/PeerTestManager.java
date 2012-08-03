@@ -13,6 +13,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -157,7 +158,7 @@ class PeerTestManager {
         
         sendTestToBob();
         
-        SimpleScheduler.getInstance().addEvent(new ContinueTest(), RESEND_TIMEOUT);
+        _context.simpleScheduler().addEvent(new ContinueTest(), RESEND_TIMEOUT);
     }
     
     private class ContinueTest implements SimpleTimer.TimedEvent {
@@ -182,7 +183,7 @@ class PeerTestManager {
                         // second message from Charlie yet
                         sendTestToCharlie();
                     }
-                    SimpleScheduler.getInstance().addEvent(ContinueTest.this, RESEND_TIMEOUT);
+                    _context.simpleScheduler().addEvent(ContinueTest.this, RESEND_TIMEOUT);
                 }
             }
         }
@@ -446,7 +447,7 @@ class PeerTestManager {
                     // initiated test
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We are charlie, as the testIP/port is " + RemoteHostId.toString(testIP) + ":" + testPort + " and the state is unknown for " + nonce);
+                        _log.debug("We are charlie, as the testIP/port is " + Addresses.toString(testIP, testPort) + " and the state is unknown for " + nonce);
                     // we are charlie, since alice never sends us her IP and port, only bob does (and,
                     // erm, we're not alice, since it isn't our nonce)
                     receiveFromBobAsCharlie(from, testInfo, nonce, null);
@@ -537,7 +538,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
             UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort, aliceIntroKey, nonce, state.getBobCipherKey(), state.getBobMACKey());
@@ -616,7 +617,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
             UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 

@@ -9,8 +9,8 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
-import net.i2p.util.DecayingBloomFilter;
-import net.i2p.util.DecayingHashSet;
+import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**

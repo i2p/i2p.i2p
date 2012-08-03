@@ -57,7 +57,9 @@ public class RoutingKeyGenerator {
     private volatile long _lastChanged;
 
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-    private final static SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd");
+    private static final String FORMAT = "yyyyMMdd";
+    private static final int LENGTH = FORMAT.length();
+    private final static SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT);
 
     public byte[] getModData() {
         return _currentModData;
@@ -74,9 +76,7 @@ public class RoutingKeyGenerator {
      * @return true if changed
      */
     public synchronized boolean generateDateBasedModData() {
-        Date today = null;
         long now = _context.clock().now();
-        synchronized (_cal) {
             _cal.setTime(new Date(now));
             _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
             _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
@@ -84,12 +84,13 @@ public class RoutingKeyGenerator {
             _cal.set(Calendar.MINUTE, 0);
             _cal.set(Calendar.SECOND, 0);
             _cal.set(Calendar.MILLISECOND, 0);
-            today = _cal.getTime();
-        }
+        Date today = _cal.getTime();
         
         String modVal = _fmt.format(today);
-        byte[] mod = new byte[modVal.length()];
-        for (int i = 0; i < modVal.length(); i++)
+        if (modVal.length() != LENGTH)
+            throw new IllegalStateException();
+        byte[] mod = new byte[LENGTH];
+        for (int i = 0; i < LENGTH; i++)
             mod[i] = (byte)(modVal.charAt(i) & 0xFF);
         boolean changed = !DataHelper.eq(_currentModData, mod);
         if (changed) {
@@ -112,9 +113,9 @@ public class RoutingKeyGenerator {
      */
     public Hash getRoutingKey(Hash origKey) {
         if (origKey == null) throw new IllegalArgumentException("Original key is null");
-        byte modVal[] = new byte[Hash.HASH_LENGTH + _currentModData.length];
+        byte modVal[] = new byte[Hash.HASH_LENGTH + LENGTH];
         System.arraycopy(origKey.getData(), 0, modVal, 0, Hash.HASH_LENGTH);
-        System.arraycopy(_currentModData, 0, modVal, Hash.HASH_LENGTH, _currentModData.length);
+        System.arraycopy(_currentModData, 0, modVal, Hash.HASH_LENGTH, LENGTH);
         return SHA256Generator.getInstance().calculateHash(modVal);
     }
 

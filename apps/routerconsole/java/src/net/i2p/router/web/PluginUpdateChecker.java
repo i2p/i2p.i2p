@@ -123,7 +123,7 @@ public class PluginUpdateChecker extends UpdateHandler {
     }
 
     private void scheduleStatusClean(String msg) {
-        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 20*60*1000);
+        _context.simpleScheduler().addEvent(new Cleaner(msg), 20*60*1000);
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {

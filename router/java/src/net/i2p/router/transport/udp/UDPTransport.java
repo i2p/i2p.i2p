@@ -228,7 +228,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
 
-        SimpleScheduler.getInstance().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
+        _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
     public void startup() {
@@ -247,6 +247,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_flooder != null)
             _flooder.shutdown();
         _introManager.reset();
+        UDPPacket.clearCache();
         
         _introKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
@@ -379,6 +380,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent.clear();
         _dropList.clear();
         _introManager.reset();
+        UDPPacket.clearCache();
     }
     
     /**
@@ -421,9 +423,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     @Override
     public void externalAddressReceived(String source, byte[] ip, int port) {
-        String s = RemoteHostId.toString(ip);
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Received address: " + s + " port: " + port + " from: " + source);
+            _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
         if (explicitAddressSpecified())
             return;
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
@@ -831,7 +832,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     RemoteHostId remote = peer.getRemoteHostId();
                     _dropList.add(remote);
                     _context.statManager().addRateData("udp.dropPeerDroplist", 1, 0);
-                    SimpleScheduler.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                    _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
                 _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getOption("router.version"));

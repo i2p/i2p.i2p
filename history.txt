@@ -1,8 +1,86 @@
+2012-08-03 zzz
+ * build.xml: Add buildI2PTunnelJar target for Android
+ * i2psnark: Finish migration to I2P logging to reduce object churn (ticket #673)
+ * LogManager: Add logger.logBufferSize and logger.dropOnOverflow options (ticket #662)
+ * JobQueue: Synch fix (ticket #670)
+ * OutNetMessage: Fix NPE when log level = INFO (ticket #676)
+ * SimpleScheduler, SimpleTimer2: Replace getInstance() calls
+ * UDP:
+   - Catch some cases where UDPPackets were not returned to the cache (ticket #675)
+   - Fix inverted logging logic (ticket #663)
+   - Remove check in UDPPacket.getLifetime() (ticket #664)
+   - RemoteHostID cleanup, cache hashcode
+   - Remove udp.fetchRemoteSlow stat
+   - Remove some time stamping in UDPPacket
+   - Other cleanups - see http://zzz.i2p/topics/1198
+
+2012-07-30 zzz
+ * build.xml: Move more default properties to build.properties
+ * DecayingBloomFilter, DecayingHashSet, xlattice filters:
+   - Move from core to router
+   - Comment out tests
+ * ElGamal/AES/SessionTag:
+   - Increase TX expire from 10 to 12 min, while keeping RX expire at 15 min.
+     3 minutes should be plenty of clock skew + delay.
+   - Move tags-to-send and low-threshold values to be per-SKM
+   - New session config options crypto.tagsToSend and crypto.lowTagThreshold
+   - Prep for per-packet override of tags and thresholds
+   - Cleanups and Javadocs
+ * GarlicMessageBuilder:
+   - Put data clove last to speed acks and leaseset store on far end
+ * I2PTunnel: Add some defaults for the new session config options
+ * OCMOSJ:
+   - Don't bundle LeaseSet just because we're requesting an ACK
+   - Changed session config option shouldBundleReplyInfo to default to true
+     and be used to disable bundling altogether when set to false.
+     Was previously an undocumented option to force bundling with a certain probability.
+   - Don't send tags unless we've already generated a reply token (race)
+   - Cleanups and Javadocs
+ * RoutingKeyGenerator: Cleanups (ticket #672)
+
+* 2012-07-30 0.9.1 released
+
+2012-07-28 str4d
+ * Console: theme fixes
+
+2012-07-26 kytv
+* Update geoip.txt based on Maxmind GeoLite Country database from 2012-07-04
+* Finnish, French, German, Spanish and Swedish translation updates from TX
+
+2012-07-26 sponge
+* BOB Fix static references to Log
+
+2012-07-24 sponge
+ * BOB reset spin flag to enable restart from zap command
+
+2012-07-24 str4d
+ * Summary bar: disable fallback iframe in summary.jsi (so when JS is disabled
+   the summary bar will not refresh at all)
+ * Home page:
+   - Replaced 16x16 icons with 32x32 ones
+   - Updated icon for git.repo.i2p
+   - Moved RestartStatus back above LocalDestinations
+
+2012-07-24 zzz
+ * LookaheadInputStream: Fix bug causing gunzip fails, esp. on Android
+ * Router: Don't create router.ping file on Android
+ * SSLEepGet: Fix on Android (ticket #668)
+
+2012-07-21 zzz
+ * i2psnark: Remove dark theme
+ * Reseed: Add new cert for cowpuncher
+ * SSU: Remove exception creation (ticket #665)
+
+2012-07-21 str4d
+ * Home page: unlinked the iframed pages for i2psnark and susimail (the pages
+   /webmail and /torrents still exist, but the console links to the apps
+   directly instead for now)
+
 2012-07-19 str4d
  * Home page: replaced itoopie with an eepsite icon (c/o dr|z3d) for eepsites
    with no icon of their own.
  * i2psnark:
-   - New light theme which integrates with console light theme
+   - New light theme (c/o dr|z3d) which integrates with console light theme
    - Moved table heading text into tooltips to reduce visual clutter
 
 2012-07-18 str4d

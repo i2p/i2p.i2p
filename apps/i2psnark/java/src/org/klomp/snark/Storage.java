@@ -34,6 +34,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SHA1;
+import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 
 /**
@@ -55,6 +56,7 @@ public class Storage
 
   private final StorageListener listener;
   private final I2PSnarkUtil _util;
+  private final Log _log;
 
   private /* FIXME final FIXME */ BitField bitfield; // BitField to represent the pieces
   private int needed; // Number of pieces needed
@@ -87,6 +89,7 @@ public class Storage
     throws IOException
   {
     _util = util;
+    _log = util.getContext().logManager().getLog(Storage.class);
     this.metainfo = metainfo;
     this.listener = listener;
     needed = metainfo.getPieces();
@@ -110,6 +113,7 @@ public class Storage
     throws IOException
   {
     _util = util;
+    _log = util.getContext().logManager().getLog(Storage.class);
     this.listener = listener;
     // Create names, rafs and lengths arrays.
     getFiles(baseFile);
@@ -232,8 +236,9 @@ public class Storage
         File[] files = f.listFiles();
         if (files == null)
           {
-            _util.debug("WARNING: Skipping '" + f 
-                        + "' not a normal file.", Snark.WARNING);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("WARNING: Skipping '" + f 
+                        + "' not a normal file.");
             return;
           }
         for (int i = 0; i < files.length; i++)
@@ -457,7 +462,8 @@ public class Storage
     if (files == null)
       {
         // Create base as file.
-        _util.debug("Creating/Checking file: " + base, Snark.NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Creating/Checking file: " + base);
         if (!base.createNewFile() && !base.exists())
           throw new IOException("Could not create file " + base);
 
@@ -481,7 +487,8 @@ public class Storage
     else
       {
         // Create base as dir.
-        _util.debug("Creating/Checking directory: " + base, Snark.NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Creating/Checking directory: " + base);
         if (!base.mkdir() && !base.isDirectory())
           throw new IOException("Could not create directory " + base);
 
@@ -540,19 +547,22 @@ public class Storage
       bitfield = savedBitField;
       needed = metainfo.getPieces() - bitfield.count();
       _probablyComplete = complete();
-      _util.debug("Found saved state and files unchanged, skipping check", Snark.NOTICE);
+      if (_log.shouldLog(Log.INFO))
+          _log.info("Found saved state and files unchanged, skipping check");
     } else {
       // the following sets the needed variable
       changed = true;
       checkCreateFiles(false);
     }
     if (complete()) {
-        _util.debug("Torrent is complete", Snark.NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Torrent is complete");
     } else {
         // fixme saved priorities
         if (files != null)
             priorities = new int[files.size()];
-        _util.debug("Still need " + needed + " out of " + metainfo.getPieces() + " pieces", Snark.NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Still need " + needed + " out of " + metainfo.getPieces() + " pieces");
     }
   }
 
@@ -731,7 +741,7 @@ public class Storage
           String msg = "File '" + names[i] + "' exists, but has wrong length (expected " +
                        lengths[i] + " but found " + length + ") - repairing corruption";
           SnarkManager.instance().addMessage(msg);
-          _util.debug(msg, Snark.ERROR);
+          _log.error(msg);
           changed = true;
           resume = true;
           _probablyComplete = false; // to force RW
@@ -844,7 +854,8 @@ public class Storage
    */
   private void balloonFile(int nr) throws IOException
   {
-    _util.debug("Ballooning " + nr + ": " + RAFfile[nr], Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Ballooning " + nr + ": " + RAFfile[nr]);
     long remaining = lengths[nr];
     final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
     byte[] zeros = new byte[ZEROBLOCKSIZE];
@@ -875,7 +886,7 @@ public class Storage
             closeRAF(i);
           }
         } catch (IOException ioe) {
-            _util.debug("Error closing " + RAFfile[i], Snark.ERROR, ioe);
+            _log.error("Error closing " + RAFfile[i], ioe);
             // gobble gobble
         }
       }
@@ -896,7 +907,8 @@ public class Storage
     try {
       bs = new byte[len];
     } catch (OutOfMemoryError oom) {
-      _util.debug("Out of memory, can't honor request for piece " + piece, Snark.WARNING, oom);
+      if (_log.shouldLog(Log.WARN))
+          _log.warn("Out of memory, can't honor request for piece " + piece, oom);
       return null;
     }
     getUncheckedPiece(piece, bs, off, len);
@@ -1000,8 +1012,9 @@ public class Storage
       if (needed > 0) {
         if (listener != null)
             listener.setWantedPieces(this);
-        _util.debug("WARNING: Not really done, missing " + needed
-                    + " pieces", Snark.WARNING);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("WARNING: Not really done, missing " + needed
+                    + " pieces");
       }
     }
 

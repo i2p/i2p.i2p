@@ -196,7 +196,7 @@ hr {
 
 .control:active {
      border: 1px inset;
-     background-color: #f60;
+     background-color: #f60 !important;
      color: #EE9 !important;
      text-decoration: none;
 }

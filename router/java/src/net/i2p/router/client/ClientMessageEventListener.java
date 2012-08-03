@@ -298,6 +298,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * Message's Session ID ignored. This doesn't support removing previously set options.
      * Nor do we bother with message.getSessionConfig().verifySignature() ... should we?
      * Nor is the Date checked.
+     *
+     * Note that this does NOT update the few options handled in
+     * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
      */
     private void handleReconfigureSession(I2CPMessageReader reader, ReconfigureSessionMessage message) {
         if (_log.shouldLog(Log.INFO))

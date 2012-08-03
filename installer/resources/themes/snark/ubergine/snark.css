@@ -163,7 +163,7 @@ thead a, tfoot a {
 text-shadow:1px 1px #550000;
 } 
 
-thead {;
+thead {
      border-bottom: 1px solid #101;
 }
 
@@ -355,6 +355,10 @@ td:first-child {
 }
 .snarkTorrentOdd td, .snarkTorrentEven td {
      border-top: 1px dotted #313 !important;
+}
+
+.snarkFileIcon {
+     width: 16px;
 }
 
 .snarkFileName {

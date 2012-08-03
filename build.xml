@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project basedir="." default="all" name="i2p">
 
-    <!-- Things you might want to change -->
-    <!-- This keeps gcj a lot quieter -->
-    <!--
-        <property name="javac.compilerargs" value="-warn:-unchecked,raw,unused,serial" />
-    -->
-    <!-- Additional classpath. No longer required; we find pack200 classes at runtime.
-         See core/java/src/net/i2p/util/FileUtil.java for more info.
-    -->
-    <!--
-        <property name="javac.classpath" value="/PATH/TO/pack200.jar" />
-    -->
-
-    <!-- change this to false if you don't have gettext -->
-    <property name="require.gettext" value="true" />
-    <!-- Include property files so that values can be easily overridden. Currently just useful for javadoc hosters -->
+    <!-- Include property files so that values can be easily overridden.
+         Users should create an override.properties file to make changes.
+     -->
     <property file="override.properties"/>
     <property file="build.properties"/>
 
@@ -123,6 +111,11 @@
 
     <target name="buildAddressbook" depends="buildCore, buildJetty" >
         <ant dir="apps/addressbook/" target="war" />
+    </target>
+
+    <!-- jar only (no war) for Android -->
+    <target name="buildI2PTunnelJar" depends="buildStreaming" >
+        <ant dir="apps/i2ptunnel/java/" target="jar" />
     </target>
 
     <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
@@ -420,9 +413,9 @@
             splitindex="true"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <group title="Router Console" packages="net.i2p.router.web" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
@@ -489,11 +482,11 @@
             splitindex="true"
             doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
+            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <sourcepath>
-                <pathelement location="core/java/test" />
-                <pathelement location="router/java/test" />
+                <pathelement location="core/java/test/junit" />
+                <pathelement location="router/java/test/junit" />
             </sourcepath>
             <classpath>
                 <pathelement location="build/i2p.jar" />
@@ -1028,12 +1021,6 @@
         </exec>
     </target>
 
-    <target name="updateTest" depends="prepupdate">
-        <ant dir="core/java/" target="jarTest" />
-        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
-    </target>
-
     <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
@@ -1292,25 +1279,30 @@
     </target>
     <!-- end custom installers -->
 
+    <!-- unit tests -->
+    <target name="updateTest" depends="prepupdate">
+        <ant dir="core/java/" target="jarTest" />
+        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
     <target name="test" depends="buildProperties, jbigi" >
-        <mkdir dir="reports/core/junit/" />
         <ant dir="core/java/" target="test" />
     </target>
     <target name="junit.report" depends="buildProperties" >
         <ant dir="core/java/" target="junit.report" />
     </target>
-    <target name="clover.report" depends="buildProperties" >
+    <target name="clover.report" depends="buildProperties" if="with.clover">
         <ant dir="core/java/" target="clover.report" />
     </target>
-    <target name="test.report" depends="junit.report, clover.report"/>
+    <target name="cobertura.report" depends="buildProperties" if="with.cobertura">
+        <ant dir="core/java/" target="cobertura.report" />
+    </target>
+    <target name="test.report" depends="junit.report, clover.report, cobertura.report"/>
     <target name="fulltest" depends="buildProperties" >
 		<ant dir="core/java/" target="fulltest" />
 		<ant dir="router/java/" target="fulltest" />
     </target>
-    <target name="fullclovertest" depends="buildProperties" >
-		<ant dir="core/java/" target="fullclovertest" />
-		<ant dir="router/java/" target="fullclovertest" />
-    </target>
+    <!-- end unit tests -->
 
     <target name="testscripts" >
         <exec executable="tests/scripts/checkcerts.sh" failonerror="true" />

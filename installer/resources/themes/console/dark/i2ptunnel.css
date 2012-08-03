@@ -102,6 +102,7 @@
 
 #tunnelListPage .footer .control:active {
      color: #EE9 !important;
+     background: #F60 !important;
 }
      
 #tunnelListPage .footer label {
