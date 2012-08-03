@@ -397,9 +397,10 @@ public class TrackerClient implements Runnable {
                 catch (IOException ioe)
                   {
                     // Probably not fatal (if it doesn't last to long...)
-                    _util.debug
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn
                       ("WARNING: Could not contact tracker at '"
-                       + tr.announce + "': " + ioe, Snark.WARNING);
+                       + tr.announce + "': " + ioe);
                     tr.trackerProblems = ioe.getMessage();
                     // don't show secondary tracker problems to the user
                     if (tr.isPrimary)
@@ -421,8 +422,9 @@ public class TrackerClient implements Runnable {
                     }
                   }
               } else {
-                  _util.debug("Not announcing to " + tr.announce + " last announce was " +
-                               new Date(tr.lastRequestTime) + " interval is " + DataHelper.formatDuration(tr.interval), Snark.INFO);
+                  if (_log.shouldLog(Log.INFO))
+                      _log.info("Not announcing to " + tr.announce + " last announce was " +
+                               new Date(tr.lastRequestTime) + " interval is " + DataHelper.formatDuration(tr.interval));
               }
               if ((!tr.stop) && maxSeenPeers < tr.seenPeers)
                   maxSeenPeers = tr.seenPeers;
@@ -432,7 +434,8 @@ public class TrackerClient implements Runnable {
             if (coordinator.needOutboundPeers() && (meta == null || !meta.isPrivate()) && !stop) {
                 Set<PeerID> pids = coordinator.getPEXPeers();
                 if (!pids.isEmpty()) {
-                    _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Got " + pids.size() + " from PEX");
                     List<Peer> peers = new ArrayList(pids.size());
                     for (PeerID pID : pids) {
                         peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
@@ -448,7 +451,8 @@ public class TrackerClient implements Runnable {
                     }
                 }
             } else {
-                _util.debug("Not getting PEX peers", Snark.INFO);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Not getting PEX peers");
             }
 
             // Get peers from DHT
@@ -460,12 +464,14 @@ public class TrackerClient implements Runnable {
                 else
                     numwant = _util.getMaxConnections();
                 List<Hash> hashes = _util.getDHT().getPeers(snark.getInfoHash(), numwant, 2*60*1000);
-                _util.debug("Got " + hashes + " from DHT", Snark.INFO);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Got " + hashes + " from DHT");
                 // announce  ourselves while the token is still good
                 // FIXME this needs to be in its own thread
                 if (!stop) {
                     int good = _util.getDHT().announce(snark.getInfoHash(), 8, 5*60*1000);
-                    _util.debug("Sent " + good + " good announces to DHT", Snark.INFO);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Sent " + good + " good announces to DHT");
                 }
 
                 // now try these peers
@@ -486,7 +492,8 @@ public class TrackerClient implements Runnable {
                     }
                 }
             } else {
-                _util.debug("Not getting DHT peers", Snark.INFO);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Not getting DHT peers");
             }
 
 
@@ -497,7 +504,8 @@ public class TrackerClient implements Runnable {
                 return;
 
             if (!runStarted)
-                _util.debug("         Retrying in one minute...", Snark.DEBUG);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("         Retrying in one minute...");
 
             try {
                 // Sleep some minutes...
@@ -526,7 +534,7 @@ public class TrackerClient implements Runnable {
       } // try
     catch (Throwable t)
       {
-        _util.debug("TrackerClient: " + t, Snark.ERROR, t);
+        _log.error("TrackerClient: " + t, t);
         if (t instanceof OutOfMemoryError)
             throw (OutOfMemoryError)t;
       }
@@ -619,7 +627,8 @@ public class TrackerClient implements Runnable {
     else
         buf.append(_util.getMaxConnections());
     String s = buf.toString();
-    _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Sending TrackerClient request: " + s);
       
     tr.lastRequestTime = System.currentTimeMillis();
     // Don't wait for a response to stopped when shutting down
@@ -635,7 +644,8 @@ public class TrackerClient implements Runnable {
 
         TrackerInfo info = new TrackerInfo(in, snark.getID(),
                                            snark.getInfoHash(), snark.getMetaInfo());
-        _util.debug("TrackerClient response: " + info, Snark.INFO);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("TrackerClient response: " + info);
 
         String failure = info.getFailureReason();
         if (failure != null)

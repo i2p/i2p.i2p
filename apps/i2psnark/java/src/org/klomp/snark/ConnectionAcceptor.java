@@ -146,7 +146,7 @@ public class ConnectionAcceptor implements Runnable
                 }
             } else {
                 if (socket.getPeerDestination().equals(_util.getMyDestination())) {
-                    _util.debug("Incoming connection from myself", Snark.ERROR);
+                    _log.error("Incoming connection from myself");
                     try { socket.close(); } catch (IOException ioe) {}
                     continue;
                 }
@@ -163,13 +163,13 @@ public class ConnectionAcceptor implements Runnable
         catch (I2PException ioe)
           {
             if (!socketChanged) {
-                _util.debug("Error while accepting: " + ioe, Snark.ERROR);
+                _log.error("Error while accepting", ioe);
                 stop = true;
             }
           }
         catch (IOException ioe)
           {
-            _util.debug("Error while accepting: " + ioe, Snark.ERROR);
+            _log.error("Error while accepting", ioe);
             stop = true;
           }
         // catch oom?

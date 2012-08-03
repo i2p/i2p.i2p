@@ -538,40 +538,6 @@ public class I2PSnarkUtil {
         return buf.toString();
     }
 
-    /** hook between snark's logger and an i2p log */
-    void debug(String msg, int snarkDebugLevel) {
-        debug(msg, snarkDebugLevel, null);
-    }
-    void debug(String msg, int snarkDebugLevel, Throwable t) {
-        if (t instanceof OutOfMemoryError) {
-            try { Thread.sleep(100); } catch (InterruptedException ie) {}
-            try {
-                t.printStackTrace();
-            } catch (Throwable tt) {}
-            try {
-                System.out.println("OOM thread: " + Thread.currentThread().getName());
-            } catch (Throwable tt) {}
-        }
-        switch (snarkDebugLevel) {
-            case 0:
-            case 1:
-                _log.error(msg, t);
-                break;
-            case 2:
-                _log.warn(msg, t);
-                break;
-            case 3:
-            case 4:
-                _log.info(msg, t);
-                break;
-            case 5:
-            case 6:
-            default:
-                _log.debug(msg, t);
-                break;
-        }
-    }
-
     private static final String BUNDLE_NAME = "org.klomp.snark.web.messages";
 
     /** lang in routerconsole.lang property, else current locale */
