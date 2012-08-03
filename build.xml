@@ -113,6 +113,11 @@
         <ant dir="apps/addressbook/" target="war" />
     </target>
 
+    <!-- jar only (no war) for Android -->
+    <target name="buildI2PTunnelJar" depends="buildStreaming" >
+        <ant dir="apps/i2ptunnel/java/" target="jar" />
+    </target>
+
     <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
     </target>
