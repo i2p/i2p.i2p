@@ -62,7 +62,7 @@ import net.i2p.util.SimpleTimer2;
  * @author Mark Wielaard (mark@klomp.org)
  */
 public class TrackerClient implements Runnable {
-  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(TrackerClient.class);
+  private final Log _log;
   private static final String NO_EVENT = "";
   private static final String STARTED_EVENT = "started";
   private static final String COMPLETED_EVENT = "completed";
@@ -116,6 +116,7 @@ public class TrackerClient implements Runnable {
     String id = urlencode(snark.getID());
     _threadName = "TrackerClient " + id.substring(id.length() - 12);
     _util = util;
+    _log = util.getContext().logManager().getLog(TrackerClient.class);
     this.meta = meta;
     this.additionalTrackerURL = additionalTrackerURL;
     this.coordinator = coordinator;
@@ -183,7 +184,7 @@ public class TrackerClient implements Runnable {
 
   private class Runner extends SimpleTimer2.TimedEvent {
       public Runner(long delay) {
-          super(SimpleTimer2.getInstance(), delay);
+          super(_util.getContext().simpleTimer2(), delay);
       }
 
       public void timeReached() {

@@ -86,7 +86,7 @@ class PeerManager {
     
     private class Reorg extends SimpleTimer2.TimedEvent {
         public Reorg() {
-            super(SimpleTimer2.getInstance(), REORGANIZE_TIME);
+            super(_context.simpleTimer2(), REORGANIZE_TIME);
         }
         public void timeReached() {
             try {
