@@ -15,14 +15,14 @@ import net.i2p.util.Log;
  *
  */
 class SearchMessageSelector implements MessageSelector {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private static int __searchSelectorId = 0;
-    private Hash _peer;
+    private final Hash _peer;
     private boolean _found;
-    private int _id;
-    private long _exp;
-    private SearchState _state;
+    private final int _id;
+    private final long _exp;
+    private final SearchState _state;
     
     public SearchMessageSelector(RouterContext context, RouterInfo peer, long expiration, SearchState state) {
         _context = context;
