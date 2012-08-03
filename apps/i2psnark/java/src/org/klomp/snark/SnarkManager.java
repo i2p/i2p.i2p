@@ -1726,7 +1726,7 @@ public class SnarkManager implements Snark.CompleteListener {
             if (count > 0) {
                 // Schedule this even for final shutdown, as there's a chance
                 // that it's just this webapp that is stopping.
-                SimpleScheduler.getInstance().addEvent(new Disconnector(), 60*1000);
+                _context.simpleScheduler().addEvent(new Disconnector(), 60*1000);
                 addMessage(_("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
                     try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}

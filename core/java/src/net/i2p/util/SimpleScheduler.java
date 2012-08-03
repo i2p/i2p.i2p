@@ -146,7 +146,7 @@ public class SimpleScheduler {
      * Same as SimpleTimer.TimedEvent but use run() instead of timeReached(), and remembers the time
      */
     private class RunnableEvent implements Runnable {
-        protected SimpleTimer.TimedEvent _timedEvent;
+        protected final SimpleTimer.TimedEvent _timedEvent;
         protected long _scheduled;
 
         public RunnableEvent(SimpleTimer.TimedEvent t, long timeoutMs) {

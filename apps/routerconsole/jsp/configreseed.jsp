@@ -5,7 +5,9 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config reseeding")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
 

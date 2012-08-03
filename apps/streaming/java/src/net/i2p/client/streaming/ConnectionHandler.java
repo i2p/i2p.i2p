@@ -78,7 +78,7 @@ class ConnectionHandler {
         // also check if expiration of the head is long past for overload detection with peek() ?
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
-            SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+            _context.simpleScheduler().addEvent(new TimeoutSyn(packet), _acceptTimeout);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");

@@ -9,7 +9,9 @@
 %>
 <html><head><title>I2P مساعدة لوحة التحكم</title>
 <%@include file="css.jsi" %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P مساعدة لوحة التحكم</h1>
 <div class="main" id="main" dir="rtl" lang="ar"><p>

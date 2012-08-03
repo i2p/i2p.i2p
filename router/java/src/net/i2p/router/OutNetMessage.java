@@ -325,7 +325,7 @@ public class OutNetMessage {
             buf.append(" with onFailedReply job: ").append(_onFailedReply);
         if (_onFailedSend != null)
             buf.append(" with onFailedSend job: ").append(_onFailedSend);
-        if (_log.shouldLog(Log.INFO)) {
+        if (_timestamps != null && _timestampOrder != null && _log.shouldLog(Log.INFO)) {
             buf.append(" {timestamps: \n");
             renderTimestamps(buf);
             buf.append("}");
@@ -335,7 +335,8 @@ public class OutNetMessage {
     }
     
     /**
-     *  Only useful if log level is INFO or DEBUG
+     *  Only useful if log level is INFO or DEBUG;
+     *  locked_initTimestamps() must have been called previously
      */
     private void renderTimestamps(StringBuilder buf) {
             synchronized (this) {

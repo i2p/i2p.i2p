@@ -35,6 +35,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Main Snark program startup class.
@@ -46,29 +47,6 @@ public class Snark
 {
   private final static int MIN_PORT = 6881;
   private final static int MAX_PORT = 6889;
-
-  // Error messages (non-fatal)
-  public final static int ERROR   = 1;
-
-  // Warning messages
-  public final static int WARNING = 2;
-
-  // Notices (peer level)
-  public final static int NOTICE  = 3;
-
-  // Info messages (protocol policy level)
-  public final static int INFO    = 4;
-
-  // Debug info (protocol level)
-  public final static int DEBUG   = 5;
-
-  // Very low level stuff (network level)
-  public final static int ALL     = 6;
-
-  /**
-   * What level of debug info to show.
-   */
-  //public static int debug = NOTICE;
 
   // Whether or not to ask the user for commands while sharing
   //private static boolean command_interpreter = true;
@@ -249,12 +227,13 @@ public class Snark
   private TrackerClient trackerclient;
   private String rootDataDir = ".";
   private final CompleteListener completeListener;
-  private boolean stopped;
-  private boolean starting;
+  private volatile boolean stopped;
+  private volatile boolean starting;
   private byte[] id;
   private final byte[] infoHash;
   private String additionalTrackerURL;
   private final I2PSnarkUtil _util;
+  private final Log _log;
   private final PeerCoordinatorSet _peerCoordinatorSet;
   private String trackerProblems;
   private int trackerSeenPeers;
@@ -308,6 +287,7 @@ public class Snark
 
     completeListener = complistener;
     _util = util;
+    _log = util.getContext().logManager().getLog(Snark.class);
     _peerCoordinatorSet = peerCoordinatorSet;
     acceptor = connectionAcceptor;
 
@@ -318,7 +298,8 @@ public class Snark
     activity = "Network setup";
 
     id = generateID();
-    debug("My peer id: " + PeerID.idencode(id), Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("My peer id: " + PeerID.idencode(id));
 
 /*
  * Don't start a tunnel if the torrent isn't going to be started.
@@ -404,8 +385,8 @@ public class Snark
               try { in.close(); } catch (IOException ioe) {}
       }    
 
-    infoHash = x_infoHash;  // final
-    debug(meta.toString(), INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info(meta.toString());
     
     // When the metainfo torrent was created from an existing file/dir
     // it already exists.
@@ -466,6 +447,7 @@ public class Snark
   {
     completeListener = complistener;
     _util = util;
+    _log = util.getContext().logManager().getLog(Snark.class);
     _peerCoordinatorSet = peerCoordinatorSet;
     acceptor = connectionAcceptor;
     this.torrent = torrent;
@@ -533,9 +515,11 @@ public class Snark
             fatal("Unable to listen for I2P connections");
         else {
             Destination d = serversocket.getManager().getSession().getMyDestination();
-            debug("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64(), NOTICE);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64());
         }
-        debug("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient", NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient");
         activity = "Collecting pieces";
         coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
         if (_peerCoordinatorSet != null) {
@@ -575,7 +559,8 @@ public class Snark
         }
         trackerclient.start();
     } else {
-        debug("NOT starting TrackerClient???", NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("NOT starting TrackerClient???");
     }
   }
 
@@ -1019,22 +1004,13 @@ public class Snark
   private static void usage()
   {
     System.out.println
-      ("Usage: snark [--debug [level]] [--no-commands] [--port <port>]");
+      ("Usage: snark [--no-commands] [--port <port>]");
     System.out.println
       ("             [--eepproxy hostname portnum]");
     System.out.println
       ("             [--i2cp routerHost routerPort ['name=val name=val name=val']]");
     System.out.println
       ("             (<url>|<file>)");
-    System.out.println
-      ("  --debug\tShows some extra info and stacktraces");
-    System.out.println
-      ("    level\tHow much debug details to show");
-    System.out.println
-      ("         \t(defaults to "
-       + NOTICE + ", with --debug to "
-       + INFO + ", highest level is "
-       + ALL + ").");
     System.out.println
       ("  --no-commands\tDon't read interactive commands or show usage info.");
     System.out.println
@@ -1073,7 +1049,7 @@ public class Snark
    */
   private void fatal(String s, Throwable t)
   {
-    _util.debug(s, ERROR, t);
+    _log.error(s, t);
     //System.err.println("snark: " + s + ((t == null) ? "" : (": " + t)));
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
@@ -1083,14 +1059,6 @@ public class Snark
     if (completeListener != null)
         completeListener.fatal(this, s);
     throw new RuntimeException(s, t);
-  }
-
-  /**
-   * Show debug info if debug is true.
-   */
-  private void debug(String s, int level)
-  {
-    _util.debug(s, level, null);
   }
 
   /** CoordinatorListener - this does nothing */
@@ -1170,9 +1138,10 @@ public class Snark
         //                   + " pieces: ");
         checking = true;
       }
-    if (!checking)
-      debug("Got " + (checked ? "" : "BAD ") + "piece: " + num,
-                  Snark.INFO);
+    if (!checking) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Got " + (checked ? "" : "BAD ") + "piece: " + num);
+    }
   }
 
   public void storageAllChecked(Storage storage)
@@ -1188,7 +1157,8 @@ public class Snark
   
   public void storageCompleted(Storage storage)
   {
-    debug("Completely received " + torrent, Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Completely received " + torrent);
     //storage.close();
     //System.out.println("Completely received: " + torrent);
     if (completeListener != null)
@@ -1261,7 +1231,8 @@ public class Snark
         total += c.getCurrentUploadRate();
     }
     long limit = 1024l * _util.getMaxUpBW();
-    debug("Total up bw: " + total + " Limit: " + limit, Snark.NOTICE);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Total up bw: " + total + " Limit: " + limit);
     return total > limit;
   }
 

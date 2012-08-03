@@ -124,6 +124,9 @@ public class I2PSnarkUtil {
     }
 ******/
     
+    /** @since 0.9.1 */
+    public I2PAppContext getContext() { return _context; }
+    
     public boolean configured() { return _configured; }
     
     public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {
@@ -314,7 +317,7 @@ public class I2PSnarkUtil {
             return rv;
         } catch (I2PException ie) {
             _shitlist.add(dest);
-            SimpleScheduler.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
+            _context.simpleScheduler().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
     }
@@ -558,40 +561,6 @@ public class I2PSnarkUtil {
             buf.append(Integer.toHexString(bi));
         }
         return buf.toString();
-    }
-
-    /** hook between snark's logger and an i2p log */
-    void debug(String msg, int snarkDebugLevel) {
-        debug(msg, snarkDebugLevel, null);
-    }
-    void debug(String msg, int snarkDebugLevel, Throwable t) {
-        if (t instanceof OutOfMemoryError) {
-            try { Thread.sleep(100); } catch (InterruptedException ie) {}
-            try {
-                t.printStackTrace();
-            } catch (Throwable tt) {}
-            try {
-                System.out.println("OOM thread: " + Thread.currentThread().getName());
-            } catch (Throwable tt) {}
-        }
-        switch (snarkDebugLevel) {
-            case 0:
-            case 1:
-                _log.error(msg, t);
-                break;
-            case 2:
-                _log.warn(msg, t);
-                break;
-            case 3:
-            case 4:
-                _log.info(msg, t);
-                break;
-            case 5:
-            case 6:
-            default:
-                _log.debug(msg, t);
-                break;
-        }
     }
 
     private static final String BUNDLE_NAME = "org.klomp.snark.web.messages";

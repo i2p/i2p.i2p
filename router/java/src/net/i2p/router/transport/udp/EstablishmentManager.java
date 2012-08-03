@@ -217,7 +217,7 @@ class EstablishmentManager {
                         // whoops, somebody beat us to it, throw out the state we just created
                         state = oldState;
                     else
-                        SimpleScheduler.getInstance().addEvent(new Expire(to, state), 10*1000);
+                        _context.simpleScheduler().addEvent(new Expire(to, state), 10*1000);
                 }
             }
             if (state != null) {
@@ -465,7 +465,7 @@ class EstablishmentManager {
                                                msg.getTarget().getIdentity(), 
                                                new SessionKey(addr.getIntroKey()), addr);
             _outboundStates.put(to, qstate);
-            SimpleScheduler.getInstance().addEvent(new Expire(to, qstate), 10*1000);
+            _context.simpleScheduler().addEvent(new Expire(to, qstate), 10*1000);
 
             for (int i = 0; i < queued.size(); i++) {
                 OutNetMessage m = (OutNetMessage)queued.get(i);
@@ -544,7 +544,7 @@ class EstablishmentManager {
         dsm.setMessageExpiration(_context.clock().now()+10*1000);
         dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         _transport.send(dsm, peer);
-        SimpleScheduler.getInstance().addEvent(new PublishToNewInbound(peer), 0);
+        _context.simpleScheduler().addEvent(new PublishToNewInbound(peer), 0);
     }
     private class PublishToNewInbound implements SimpleTimer.TimedEvent {
         private PeerState _peer;
@@ -696,7 +696,7 @@ class EstablishmentManager {
                     break;
                 }
         }
-        SimpleScheduler.getInstance().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
+        _context.simpleScheduler().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
         state.setIntroNonce(nonce);
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
         UDPPacket requests[] = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());
@@ -751,7 +751,7 @@ class EstablishmentManager {
         int port = reader.getRelayResponseReader().readCharliePort();
         if (_log.shouldLog(Log.INFO))
             _log.info("Received relay intro for " + state.getRemoteIdentity().calculateHash().toBase64() + " - they are on " 
-                      + addr.toString() + ":" + port + " (according to " + bob.toString(true) + ")");
+                      + addr.toString() + ":" + port + " (according to " + bob + ")");
         RemoteHostId oldId = state.getRemoteHostId();
         state.introduced(addr, ip, port);
         _outboundStates.remove(oldId);

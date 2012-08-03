@@ -22,10 +22,10 @@ import net.i2p.util.SimpleTimer;
 class UDPReceiver {
     private final RouterContext _context;
     private final Log _log;
-    private DatagramSocket _socket;
+    private final DatagramSocket _socket;
     private String _name;
     private final BlockingQueue<UDPPacket> _inboundQueue;
-    private boolean _keepRunning;
+    private volatile boolean _keepRunning;
     private final Runner _runner;
     private final UDPTransport _transport;
     private static int __id;
@@ -90,9 +90,11 @@ class UDPReceiver {
      * NOTE: this closes the old socket so that blocking calls unblock!
      *
      */
+/*********
     public DatagramSocket updateListeningPort(DatagramSocket socket, int newPort) {
         return _runner.updateListeningPort(socket, newPort);
     }
+**********/
 
     /** if a packet been sitting in the queue for a full second (meaning the handlers are overwhelmed), drop subsequent packets */
     private static final long MAX_QUEUE_PERIOD = 2*1000;
@@ -215,26 +217,27 @@ class UDPReceiver {
     }
     
     private class Runner implements Runnable {
-        private boolean _socketChanged;
+        //private volatile boolean _socketChanged;
+
         public void run() {
-            _socketChanged = false;
+            //_socketChanged = false;
             FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().createRequest();
             while (_keepRunning) {
-                if (_socketChanged) {
-                    Thread.currentThread().setName(_name + "." + _id);
-                    _socketChanged = false;
-                }
+                //if (_socketChanged) {
+                //    Thread.currentThread().setName(_name + "." + _id);
+                //    _socketChanged = false;
+                //}
                 UDPPacket packet = UDPPacket.acquire(_context, true);
                 
                 // block before we read...
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Before throttling receive");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Before throttling receive");
                 while (!_context.throttle().acceptNetworkMessage())
                     try { Thread.sleep(10); } catch (InterruptedException ie) {}
                 
                 try {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Before blocking socket.receive on " + System.identityHashCode(packet));
+                    //if (_log.shouldLog(Log.INFO))
+                    //    _log.info("Before blocking socket.receive on " + System.identityHashCode(packet));
                     synchronized (Runner.this) {
                         _socket.receive(packet.getPacket());
                     }
@@ -263,15 +266,16 @@ class UDPReceiver {
                         // nat hole punch packets are 0 bytes
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Received a 0 byte udp packet from " + packet.getPacket().getAddress() + ":" + packet.getPacket().getPort());
+                        packet.release();
                     }
                 } catch (IOException ioe) {
-                    if (_socketChanged) {
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Changing ports...");
-                    } else {
+                    //if (_socketChanged) {
+                    //    if (_log.shouldLog(Log.INFO))
+                    //        _log.info("Changing ports...");
+                    //} else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Error receiving", ioe);
-                    }
+                    //}
                     packet.release();
                 }
             }
@@ -279,6 +283,7 @@ class UDPReceiver {
                 _log.debug("Stop receiving...");
         }
         
+     /******
         public DatagramSocket updateListeningPort(DatagramSocket socket, int newPort) {
             _name = "UDPReceive on " + newPort;
             DatagramSocket old = null;
@@ -291,6 +296,6 @@ class UDPReceiver {
             old.close();
             return old;
         }
+      *****/
     }
-    
 }

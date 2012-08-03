@@ -4,8 +4,8 @@ import java.util.Map;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
-import net.i2p.util.DecayingBloomFilter;
-import net.i2p.util.DecayingHashSet;
+import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**

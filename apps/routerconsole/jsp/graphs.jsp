@@ -19,7 +19,9 @@
         out.print(graphHelper.getRefreshMeta());
     }
 %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Performance Graphs")%></h1>
 <div class="main" id="main">

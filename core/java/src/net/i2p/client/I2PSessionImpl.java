@@ -110,10 +110,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private final Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
-    protected boolean _closed;
+    protected volatile boolean _closed;
 
     /** whether the session connection is in the process of being closed */
-    protected boolean _closing;
+    protected volatile boolean _closing;
 
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
@@ -121,7 +121,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private final Object _dateReceivedLock = new Object();
 
     /** whether the session connection is in the process of being opened */
-    protected boolean _opening;
+    protected volatile boolean _opening;
 
     /** monitor for waiting until opened */
     private final Object _openingWait = new Object();
@@ -477,7 +477,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @since 0.9.1
      */
     private void startVerifyUsage() {
-        SimpleScheduler.getInstance().addEvent(new VerifyUsage(), VERIFY_USAGE_TIME);
+        _context.simpleScheduler().addEvent(new VerifyUsage(), VERIFY_USAGE_TIME);
     }
 
     /**
@@ -501,7 +501,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 toCheck.clear();
             }
             toCheck.addAll(_availableMessages.keySet());
-            SimpleScheduler.getInstance().addEvent(this, VERIFY_USAGE_TIME);
+            _context.simpleScheduler().addEvent(this, VERIFY_USAGE_TIME);
         }
     }
 
@@ -967,7 +967,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         boolean close = Boolean.valueOf(_options.getProperty("i2cp.closeOnIdle")).booleanValue();
         if (reduce || close) {
             updateActivity();
-            SimpleScheduler.getInstance().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
+            _context.simpleScheduler().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
         }
     }
 

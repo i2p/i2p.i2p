@@ -123,7 +123,7 @@ public class PluginUpdateChecker extends UpdateHandler {
     }
 
     private void scheduleStatusClean(String msg) {
-        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 20*60*1000);
+        _context.simpleScheduler().addEvent(new Cleaner(msg), 20*60*1000);
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {
@@ -158,7 +158,7 @@ public class PluginUpdateChecker extends UpdateHandler {
             try {
                 _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, _xpi2pURL, TrustedUpdate.HEADER_BYTES);
                 _get.addStatusListener(PluginUpdateCheckerRunner.this);
-                _get.fetch();
+                _get.fetch(CONNECT_TIMEOUT);
             } catch (Throwable t) {
                 _log.error("Error checking update for plugin", t);
             }

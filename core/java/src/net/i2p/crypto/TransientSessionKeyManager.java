@@ -85,26 +85,73 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     /** for debugging */
     private final AtomicInteger _rcvTagSetID = new AtomicInteger();
     private final AtomicInteger _sentTagSetID = new AtomicInteger();
+    private final int _tagsToSend;
+    private final int _lowThreshold;
 
     /** 
-     * Let session tags sit around for 10 minutes before expiring them.  We can now have such a large
+     * Let session tags sit around for this long before expiring them.  We can now have such a large
      * value since there is the persistent session key manager.  This value is for outbound tags - 
      * inbound tags are managed by SESSION_LIFETIME_MAX_MS
-     *
      */
-    public final static long SESSION_TAG_DURATION_MS = 10 * 60 * 1000;
+    private final static long SESSION_TAG_DURATION_MS = 12 * 60 * 1000;
+
     /**
-     * Keep unused inbound session tags around for up to 12 minutes (2 minutes longer than
+     * Keep unused inbound session tags around for this long (a few minutes longer than
      * session tags are used on the outbound side so that no reasonable network lag 
      * can cause failed decrypts)
-     *
      */
-    public final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 5 * 60 * 1000;
+    private final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 3 * 60 * 1000;
+
+    /**
+     * Time to send more if we are this close to expiration
+     */
+    private static final long SESSION_TAG_EXPIRATION_WINDOW = 90 * 1000;
+
     /**
      * a few MB? how about 16MB!
      * This is the max size of _inboundTagSets.
      */
     public final static int MAX_INBOUND_SESSION_TAGS = 500 * 1000; // this will consume at most a few MB
+
+    /**
+     *  This was 100 since 0.6.1.10 (50 before that). It's important because:
+     * <pre>
+     *  - Tags are 32 bytes. So it previously added 3200 bytes to an initial message.
+     *  - Too many tags adds a huge overhead to short-duration connections
+     *    (like http, datagrams, etc.)
+     *  - Large messages have a much higher chance of being dropped due to
+     *    one of their 1KB fragments being discarded by a tunnel participant.
+     *  - This reduces the effective maximum datagram size because the client
+     *    doesn't know when tags will be bundled, so the tag size must be
+     *    subtracted from the maximum I2NP size or transport limit.
+     * </pre>
+     *
+     *  Issues with too small a value:
+     * <pre>
+     *  - When tags are sent, a reply leaseset (~1KB) is always bundled.
+     *    Maybe don't need to bundle more than every minute or so
+     *    rather than every time?
+     *  - Does the number of tags (and the threshold of 20) limit the effective
+     *    streaming lib window size? Should the threshold and the number of
+     *    sent tags be variable based on the message rate?
+     * </pre>
+     *
+     *  We have to be very careful if we implement an adaptive scheme,
+     *  since the key manager is per-router, not per-local-dest.
+     *  Or maybe that's a bad idea, and we need to move to a per-dest manager.
+     *  This needs further investigation.
+     *
+     *  So a value somewhat higher than the low threshold
+     *  seems appropriate.
+     *
+     *  Use care when adjusting these values. See ConnectionOptions in streaming,
+     *  and TransientSessionKeyManager in crypto, for more information.
+     *
+     *  @since 0.9.2 moved from GarlicMessageBuilder to per-SKM config
+     */
+    public static final int DEFAULT_TAGS = 40;
+    /** ditto */
+    public static final int LOW_THRESHOLD = 30;
 
     /** 
      * The session key manager should only be constructed and accessed through the 
@@ -113,15 +160,28 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     public TransientSessionKeyManager(I2PAppContext context) {
+        this(context, DEFAULT_TAGS, LOW_THRESHOLD);
+    }
+
+    /** 
+     *  @param tagsToSend how many to send at a time, may be lower or higher than lowThreshold. 1-128
+     *  @param lowThreshold below this, send more. 1-128
+     *  @since 0.9.2
+     */
+    public TransientSessionKeyManager(I2PAppContext context, int tagsToSend, int lowThreshold) {
         super(context);
+        if (tagsToSend <= 0 || tagsToSend > 128 || lowThreshold <= 0 || lowThreshold > 128)
+            throw new IllegalArgumentException();
+        _tagsToSend = tagsToSend;
+        _lowThreshold = lowThreshold;
         _log = context.logManager().getLog(TransientSessionKeyManager.class);
         _context = context;
         _outboundSessions = new HashMap(64);
-        _inboundTagSets = new HashMap(1024);
+        _inboundTagSets = new HashMap(128);
         context.statManager().createRateStat("crypto.sessionTagsExpired", "How many tags/sessions are expired?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
         context.statManager().createRateStat("crypto.sessionTagsRemaining", "How many tags/sessions are remaining after a cleanup?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
          _alive = true;
-        SimpleScheduler.getInstance().addEvent(new CleanupEvent(), 60*1000);
+        _context.simpleScheduler().addEvent(new CleanupEvent(), 60*1000);
     }
     
     @Override
@@ -143,7 +203,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             int expired = aggressiveExpire();
             long expireTime = _context.clock().now() - beforeExpire;
             _context.statManager().addRateData("crypto.sessionTagsExpired", expired, expireTime);
-            SimpleScheduler.getInstance().addEvent(this, 60*1000);
+            _context.simpleScheduler().addEvent(this, 60*1000);
         }
     }
 
@@ -243,7 +303,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
-     * @deprecated racy
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     @Override
     public void createSession(PublicKey target, SessionKey key) {
@@ -289,6 +350,31 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Key does not match existing key, no tag");
         return null;
+    }
+
+    /**
+     *  How many to send, IF we need to.
+     *  @return the configured value (not adjusted for current available)
+     *  @since 0.9.2
+     */
+    @Override
+    public int getTagsToSend() { return _tagsToSend; };
+
+    /**
+     *  @return the configured value
+     *  @since 0.9.2
+     */
+    @Override
+    public int getLowThreshold() { return _lowThreshold; };
+
+    /**
+     *  @return true if we have less than the threshold or what we have is about to expire
+     *  @since 0.9.2
+     */
+    @Override
+    public boolean shouldSendTags(PublicKey target, SessionKey key, int lowThreshold) {
+        return getAvailableTags(target, key) < lowThreshold ||
+               getAvailableTimeLeft(target, key) < SESSION_TAG_EXPIRATION_WINDOW;
     }
 
     /**

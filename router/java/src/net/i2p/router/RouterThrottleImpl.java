@@ -45,7 +45,7 @@ class RouterThrottleImpl implements RouterThrottle {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
         setTunnelStatus();
-        SimpleScheduler.getInstance().addEvent(new ResetStatus(), REJECT_STARTUP_TIME + 120*1000);
+        _context.simpleScheduler().addEvent(new ResetStatus(), REJECT_STARTUP_TIME + 120*1000);
         _context.statManager().createRateStat("router.throttleNetworkCause", "How lagged the jobQueue was when an I2NP was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleNetDbCause", "How lagged the jobQueue was when a networkDb request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });

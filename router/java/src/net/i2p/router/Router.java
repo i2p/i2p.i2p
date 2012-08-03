@@ -255,7 +255,8 @@ public class Router implements RouterClock.ClockShiftListener {
         // *********  Start no threads before here ********* //
         //
         // NOW we can start the ping file thread.
-        beginMarkingLiveliness();
+        if (!System.getProperty("java.vendor").contains("Android"))
+            beginMarkingLiveliness();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
         // But context.isRouterContext() is even easier...
@@ -430,7 +431,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
+        _context.simpleScheduler().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
         //_sessionKeyPersistenceHelper.startup();
@@ -537,7 +538,7 @@ public class Router implements RouterClock.ClockShiftListener {
             if (blockingRebuild)
                 r.timeReached();
             else
-                SimpleScheduler.getInstance().addEvent(r, 0);
+                _context.simpleScheduler().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
@@ -1347,7 +1348,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void beginMarkingLiveliness() {
         File f = getPingFile();
-        SimpleScheduler.getInstance().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
+        _context.simpleScheduler().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";

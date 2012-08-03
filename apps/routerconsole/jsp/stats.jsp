@@ -6,7 +6,9 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("statistics")%>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="oldhelper" scope="request" />
 <jsp:setProperty name="oldhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

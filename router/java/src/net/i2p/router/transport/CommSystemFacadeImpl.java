@@ -416,7 +416,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private static final int LOOKUP_TIME = 30*60*1000;
     private void startGeoIP() {
         _geoIP = new GeoIP(_context);
-        SimpleScheduler.getInstance().addEvent(new QueueAll(), START_DELAY);
+        _context.simpleScheduler().addEvent(new QueueAll(), START_DELAY);
     }
 
     /**
@@ -434,7 +434,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                     continue;
                 _geoIP.add(host);
             }
-            SimpleScheduler.getInstance().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
+            _context.simpleScheduler().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
         }
     }
 
@@ -556,7 +556,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private static final int TIME_REPEAT_DELAY = 10*60*1000;
     /** @since 0.7.12 */
     private void startTimestamper() {
-        SimpleScheduler.getInstance().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
+        _context.simpleScheduler().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
     }
 
     /**

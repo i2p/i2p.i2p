@@ -191,7 +191,8 @@ public class GraphHelper extends FormHandler {
             }
 
             // FIXME jrobin doesn't support setting the timezone, will have to mod TimeAxis.java
-            _out.write("<p><i>" + _("All times are UTC.") + "</i></p>\n");
+            // 0.9.1 - all graphs currently state UTC on them, so this text blurb is unnecessary,
+            //_out.write("<p><i>" + _("All times are UTC.") + "</i></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

@@ -12,14 +12,14 @@ import net.i2p.util.Log;
  * UDPReceiver
  */
 class UDPEndpoint {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private int _listenPort;
-    private UDPTransport _transport;
+    private final UDPTransport _transport;
     private UDPSender _sender;
     private UDPReceiver _receiver;
     private DatagramSocket _socket;
-    private InetAddress _bindAddress;
+    private final InetAddress _bindAddress;
     
     /**
      *  @param listenPort -1 or the requested port, may not be honored
@@ -34,7 +34,7 @@ class UDPEndpoint {
     }
     
     /** caller should call getListenPort() after this to get the actual bound port and determine success */
-    public void startup() {
+    public synchronized void startup() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up the UDP endpoint");
         shutdown();
@@ -49,7 +49,7 @@ class UDPEndpoint {
         _receiver.startup();
     }
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (_sender != null) {
             _sender.shutdown();
             _receiver.shutdown();
