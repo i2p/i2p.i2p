@@ -1,4 +1,4 @@
-HTTP/1.1 404 Domaine non trouvé
+HTTP/1.1 500 Domaine non trouvé
 Content-Type: text/html; charset=UTF-8
 Cache-control: no-cache
 Connection: close

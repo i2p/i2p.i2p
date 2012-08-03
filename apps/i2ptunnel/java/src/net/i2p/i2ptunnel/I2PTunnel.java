@@ -209,8 +209,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     }
     
     /**
-     *  Generic options used for clients and servers
-     *  @return not a copy
+     *  Generic options used for clients and servers.
+     *  NOT a copy, Do NOT modify for per-connection options, make a copy.
+     *  @return NOT a copy, do NOT modify for per-connection options
      */
     public Properties getClientOptions() { return _clientOptions; }
     

@@ -11,7 +11,7 @@ div.routersummary a {
 }
 
 div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
-     text-shadow: 0 0 0 #fff !important;
+     text-shadow: 0 0 0 0 !important;
 }
 
 

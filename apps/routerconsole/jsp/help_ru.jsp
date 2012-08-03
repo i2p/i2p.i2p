@@ -9,7 +9,9 @@
 %>
 <html><head><title>Консоль маршрутизатора I2P - справка</title>
 <%@include file="css.jsi" %>
-</head><body>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 
 <h1>Справка маршрутизатора I2P</h1>

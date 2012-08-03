@@ -14,6 +14,8 @@ import net.i2p.util.SimpleTimer2;
  * A stream that we can shove data into that fires off those bytes
  * on flush or when the buffer is full.  It also blocks according
  * to the data receiver's needs.
+ *<p>
+ * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
 class MessageOutputStream extends OutputStream {
     private final I2PAppContext _context;
@@ -21,17 +23,17 @@ class MessageOutputStream extends OutputStream {
     private byte _buf[];
     private int _valid;
     private final Object _dataLock;
-    private DataReceiver _dataReceiver;
+    private final DataReceiver _dataReceiver;
     private IOException _streamError;
-    private boolean _closed;
+    private volatile boolean _closed;
     private long _written;
     private int _writeTimeout;
     private ByteCache _dataCache;
     private final Flusher _flusher;
     private long _lastFlushed;
-    private long _lastBuffered;
+    private volatile long _lastBuffered;
     /** if we enqueue data but don't flush it in this period, flush it passively */
-    private int _passiveFlushDelay;
+    private final int _passiveFlushDelay;
     /** 
      * if we are changing the buffer size during operation, set this to the new 
      * buffer size, and next time we are flushing, update the _buf array to the new 
@@ -39,9 +41,9 @@ class MessageOutputStream extends OutputStream {
      */
     private volatile int _nextBufferSize;
     // rate calc helpers
-    private long _sendPeriodBeginTime;
-    private long _sendPeriodBytes;
-    private int _sendBps;
+    //private long _sendPeriodBeginTime;
+    //private long _sendPeriodBytes;
+    //private int _sendBps;
     
     /**
      *  Since this is less than i2ptunnel's i2p.streaming.connectDelay default of 1000,
@@ -73,16 +75,16 @@ class MessageOutputStream extends OutputStream {
         _writeTimeout = -1;
         _passiveFlushDelay = passiveFlushDelay;
         _nextBufferSize = -1;
-        _sendPeriodBeginTime = ctx.clock().now();
-        _context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        //_sendPeriodBeginTime = ctx.clock().now();
+        //_context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _flusher = new Flusher(timer);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("MessageOutputStream created");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("MessageOutputStream created");
     }
     
     public void setWriteTimeout(int ms) { 
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Changing write timeout from " + _writeTimeout + " to " + ms);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Changing write timeout from " + _writeTimeout + " to " + ms);
 
         _writeTimeout = ms; 
     }
@@ -131,15 +133,9 @@ class MessageOutputStream extends OutputStream {
                     remaining -= toWrite;
                     cur += toWrite;
                     _valid = _buf.length;
-                    // avoid NPE from race with destroy()
-                    DataReceiver rcvr = _dataReceiver;
-                    if (rcvr == null) {
-                        throwAnyError();
-                        return;
-                    }
                     if (_log.shouldLog(Log.INFO))
                         _log.info("write() direct valid = " + _valid);
-                    ws = rcvr.writeData(_buf, 0, _valid);
+                    ws = _dataReceiver.writeData(_buf, 0, _valid);
                     _written += _valid;
                     _valid = 0;                       
                     throwAnyError();
@@ -167,17 +163,18 @@ class MessageOutputStream extends OutputStream {
                         _log.info("After waitForAccept of " + ws);
                 }
             } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Queued " + len + " without sending to the receiver");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Queued " + len + " without sending to the receiver");
             }
         }
         long elapsed = _context.clock().now() - begin;
         if ( (elapsed > 10*1000) && (_log.shouldLog(Log.INFO)) )
             _log.info("wtf, took " + elapsed + "ms to write to the stream?", new Exception("foo"));
         throwAnyError();
-        updateBps(len);
+        //updateBps(len);
     }
     
+/****
     private void updateBps(int len) {
         long now = _context.clock().now();
         int periods = (int)Math.floor((now - _sendPeriodBeginTime) / 1000d);
@@ -191,7 +188,9 @@ class MessageOutputStream extends OutputStream {
             _sendPeriodBytes += len;
         }
     }
+****/
     
+    /** */
     public void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
         throwAnyError();
@@ -240,14 +239,15 @@ class MessageOutputStream extends OutputStream {
             _enqueued = true;
         }
         public void timeReached() {
+            if (_closed)
+                return;
             _enqueued = false;
-            DataReceiver rec = _dataReceiver;
             long timeLeft = (_lastBuffered + _passiveFlushDelay - _context.clock().now());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("flusher time reached: left = " + timeLeft);
             if (timeLeft > 0)
                 enqueue();
-            else if ( (rec != null) && (rec.writeInProcess()) )
+            else if (_dataReceiver.writeInProcess())
                 enqueue(); // don't passive flush if there is a write being done (unacked outbound)
             else
                 doFlush();
@@ -261,10 +261,8 @@ class MessageOutputStream extends OutputStream {
                 if ( (_valid > 0) && (flushTime <= _context.clock().now()) ) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("doFlush() valid = " + _valid);
-                    // avoid NPE from race with destroy()
-                    DataReceiver rcvr = _dataReceiver;
-                    if ( (_buf != null) && (rcvr != null) ) {
-                        ws = rcvr.writeData(_buf, 0, _valid);
+                    if (_buf != null) {
+                        ws = _dataReceiver.writeData(_buf, 0, _valid);
                         _written += _valid;
                         _valid = 0;
                         _lastFlushed = _context.clock().now();
@@ -317,25 +315,18 @@ class MessageOutputStream extends OutputStream {
         if (_log.shouldLog(Log.INFO) && _valid > 0)
             _log.info("flush() valid = " + _valid);
 
-        // avoid NPE from race with destroy()
-        DataReceiver rcvr = _dataReceiver;
         synchronized (_dataLock) {
             if (_buf == null) {
                 _dataLock.notifyAll();
                 throw new IOException("closed (buffer went away)");
             }
 
-            if (rcvr == null) {
-                _dataLock.notifyAll();
-                throwAnyError();
-                return;
-            }
             // if valid == 0 return ??? - no, this could flush a CLOSE packet too.
 
             // Yes, flush here, inside the data lock, and do all the waitForCompletion() stuff below
             // (disabled)
             if (!wait_for_accept_only) {
-                ws = rcvr.writeData(_buf, 0, _valid);
+                ws = _dataReceiver.writeData(_buf, 0, _valid);
                 _written += _valid;
                 _valid = 0;
                 locked_updateBufferSize();
@@ -347,7 +338,7 @@ class MessageOutputStream extends OutputStream {
         // Skip all the waitForCompletion() stuff below, which is insanity, as of 0.8.1
         // must do this outside the data lock
         if (wait_for_accept_only) {
-            flushAvailable(rcvr, true);
+            flushAvailable(_dataReceiver, true);
             return;
         }
 
@@ -387,6 +378,7 @@ class MessageOutputStream extends OutputStream {
         }
         // setting _closed before flush() will force flush() to send a CLOSE packet
         _closed = true;
+        _flusher.cancel();
 
         // In 0.8.1 we rewrote flush() to only wait for accept into the window,
         // not "completion" (i.e. ack from the far end).
@@ -415,10 +407,11 @@ class MessageOutputStream extends OutputStream {
 
     /**
      *  nonblocking close -
-     *  Use outside of this package is deprecated, should be made package local
+     *  Only for use inside package
      */
     public void closeInternal() {
         _closed = true;
+        _flusher.cancel();
         if (_streamError == null)
             _streamError = new IOException("Closed internally");
         clearData(true);
@@ -429,12 +422,10 @@ class MessageOutputStream extends OutputStream {
         if (_log.shouldLog(Log.INFO) && _valid > 0)
             _log.info("clearData() valid = " + _valid);
 
-        // avoid NPE from race with destroy()
-        DataReceiver rcvr = _dataReceiver;
         synchronized (_dataLock) {
             // flush any data, but don't wait for it
-            if ( (rcvr != null) && (_valid > 0) && shouldFlush)
-                rcvr.writeData(_buf, 0, _valid);
+            if (_valid > 0 && shouldFlush)
+                _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
             
@@ -503,15 +494,15 @@ class MessageOutputStream extends OutputStream {
                 throw new InterruptedIOException("Flush available timed out (" + _writeTimeout + "ms)");
         }
         long afterAccept = System.currentTimeMillis();
-        if ( (afterAccept - afterBuild > 1000) && (_log.shouldLog(Log.DEBUG)) )
-            _log.debug("Took " + (afterAccept-afterBuild) + "ms to accept a packet? " + ws);
+        if ( (afterAccept - afterBuild > 1000) && (_log.shouldLog(Log.INFO)) )
+            _log.info("Took " + (afterAccept-afterBuild) + "ms to accept a packet? " + ws);
         return;
     }
     
     void destroy() {
-        _dataReceiver = null;
+        _closed = true;
+        _flusher.cancel();
         synchronized (_dataLock) {
-            _closed = true;
             _dataLock.notifyAll();
         }
     }

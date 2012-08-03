@@ -1,43 +1,14 @@
 <!--
-<i2p.news date="$Date: 2012-01-06 00:00:00 $">
-<i2p.release version="0.9" date="2012/05/02" minVersion="0.6" />
+<i2p.news date="$Date: 2012-07-30 00:00:00 $">
+<i2p.release version="0.9.1" date="2012/07/30" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2012-05-02: <b>0.9 <a href="http://www.i2p2.i2p/release-0.9.html">Released</a></b></h3>
+<h3>2012-07-30: <b>0.9.1 <a href="http://www.i2p2.i2p/release-0.9.1.html">Released</a></b></h3>
 
 <p>
-In the 0.9 release we migrate to Jetty 6 for the console and eepsite web server,
-and introduce a simplified router console home page.
-This release is network-compatible with prior releases, however see below for important
-information on compatibility with existing eepsites, plugins, and webapps.
+0.9.1 includes a large number of bug fixes and improvements in i2psnark, streaming, and elsewhere.
+There are also home page changes, new themes, and translation updates.
 Upgrading is recommended.
-</p>
-
-<p><strong>Update info</strong></p>
-
-<p>  In-network updates and new installs will include Jetty 6, Tomcat, and JSTL.
- PPA (Ubuntu/Debian) updates will have new dependencies for these packages.</p>
-
-<p> If you have not enabled or modified your eepsite settings, the update should automatically migrate you to Jetty 6.
-If you do not use Jetty for your eepsite, the update will not affect it.
-</p>
-
-<p> If you have more than one Jetty eepsite or you have changed the local port (7658 by default) or otherwise edited jetty.xml,
- you must manually edit the new jetty configuration files after updating, and then restart. </p>
-
-<p>For those with Jetty-based eepsites, we recommend that you verify that the upgrade
-was successful and the eepsites are operational after the router restarts.
-
-<p>   Plugin information:
-<br />     Plugins not listed below should continue to work under Jetty 6.
-<br />     The following plugins require updates for Jetty 6. The router will download and install them a few minutes
-      after upgrading: i2pbote, pebble, zzzot
-<br />     The following plugins have been renamed and for Jetty 6. Users must manually remove them and download the new versions
-      after upgrading: neodatis, seedless
-</p>
-
-<p>   Other non-standard console and eepsite webapps not packaged by the I2P development team may or may not
-      require modifications.
 </p><p>
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
 <a href="http://www.i2p2.i2p/getinvolved.html">Get involved</a>,

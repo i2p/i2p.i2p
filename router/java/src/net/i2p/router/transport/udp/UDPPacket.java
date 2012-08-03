@@ -32,13 +32,14 @@ class UDPPacket {
     private volatile Exception _acquiredBy;
     private long _enqueueTime;
     private long _receivedTime;
-    private long _beforeValidate;
-    private long _afterValidate;
-    private long _beforeReceiveFragments;
-    private long _afterHandlingTime;
+    //private long _beforeValidate;
+    //private long _afterValidate;
+    //private long _beforeReceiveFragments;
+    //private long _afterHandlingTime;
     private int _validateCount;
     // private boolean _isInbound;
   
+    //  Warning - this mixes contexts in a multi-router JVM
     private static final Queue<UDPPacket> _packetCache;
     private static final boolean CACHE = true;
     private static final int CACHE_SIZE = 64;
@@ -92,7 +93,7 @@ class UDPPacket {
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
 
     private UDPPacket(I2PAppContext ctx) {
-        ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
+        //ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _data = new byte[MAX_PACKET_SIZE];
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
@@ -134,7 +135,7 @@ class UDPPacket {
     public short getPriority() { verifyNotReleased(); return _priority; }
     public long getExpiration() { verifyNotReleased(); return _expiration; }
     public long getBegin() { verifyNotReleased(); return _initializeTime; }
-    public long getLifetime() { verifyNotReleased(); return _context.clock().now() - _initializeTime; }
+    public long getLifetime() { /** verifyNotReleased(); */ return _context.clock().now() - _initializeTime; }
     public void resetBegin() { _initializeTime = _context.clock().now(); }
     /** flag this packet as a particular type for accounting purposes */
     public void markType(int type) { verifyNotReleased(); _markedType = type; }
@@ -156,14 +157,14 @@ class UDPPacket {
 
     RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
-            long before = System.currentTimeMillis();
+            //long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
             byte ip[] = addr.getAddress();
             int port = _packet.getPort();
             _remoteHost = new RemoteHostId(ip, port);
-            long timeToFetch = System.currentTimeMillis() - before;
-            if (timeToFetch > 50)
-                _context.statManager().addRateData("udp.fetchRemoteSlow", timeToFetch, getLifetime());
+            //long timeToFetch = System.currentTimeMillis() - before;
+            //if (timeToFetch > 50)
+            //    _context.statManager().addRateData("udp.fetchRemoteSlow", timeToFetch, getLifetime());
         }
         return _remoteHost;
     }
@@ -175,7 +176,7 @@ class UDPPacket {
      */
     public boolean validate(SessionKey macKey) {
         verifyNotReleased(); 
-        _beforeValidate = _context.clock().now();
+        //_beforeValidate = _context.clock().now();
         boolean eq = false;
         Arrays.fill(_validateBuf, (byte)0);
         
@@ -216,7 +217,7 @@ class UDPPacket {
             //    _log.warn("Payload length is " + payloadLength);
         }
         
-        _afterValidate = _context.clock().now();
+        //_afterValidate = _context.clock().now();
         _validateCount++;
         return eq;
     }
@@ -238,30 +239,35 @@ class UDPPacket {
     void enqueue() { _enqueueTime = _context.clock().now(); }
     /** a packet handler has pulled it off the inbound queue */
     void received() { _receivedTime = _context.clock().now(); }
+
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
-    void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
+    //void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
     /** a packet handler has finished parsing out the good bits */
-    void afterHandling() { _afterHandlingTime = _context.clock().now(); } 
+    //void afterHandling() { _afterHandlingTime = _context.clock().now(); } 
       
     /** the UDPReceiver has tossed it onto the inbound queue */
-    long getTimeSinceEnqueue() { return (_enqueueTime > 0 ? _context.clock().now() - _enqueueTime : 0); }
+    //long getTimeSinceEnqueue() { return (_enqueueTime > 0 ? _context.clock().now() - _enqueueTime : 0); }
+
     /** a packet handler has pulled it off the inbound queue */
     long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
+
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
-    long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
+    //long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
     /** a packet handler has finished parsing out the good bits */
-    long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
+    //long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
     
+    // Following 5: All used only for stats in PacketHandler, commented out
+
     /** when it was added to the endpoint's receive queue */
-    long getEnqueueTime() { return _enqueueTime; }
+    //long getEnqueueTime() { return _enqueueTime; }
     /** when it was pulled off the endpoint receive queue */
-    long getReceivedTime() { return _receivedTime; }
+    //long getReceivedTime() { return _receivedTime; }
     /** when we began validate() */
-    long getBeforeValidate() { return _beforeValidate; }
+    //long getBeforeValidate() { return _beforeValidate; }
     /** when we finished validate() */
-    long getAfterValidate() { return _afterValidate; }
+    //long getAfterValidate() { return _afterValidate; }
     /** how many times we tried to validate the packet */
-    int getValidateCount() { return _validateCount; }
+    //int getValidateCount() { return _validateCount; }
     
     @Override
     public String toString() {
@@ -278,8 +284,8 @@ class UDPPacket {
 
         buf.append(" sinceEnqueued=").append((_enqueueTime > 0 ? _context.clock().now()-_enqueueTime : -1));
         buf.append(" sinceReceived=").append((_receivedTime > 0 ? _context.clock().now()-_receivedTime : -1));
-        buf.append(" beforeReceiveFragments=").append((_beforeReceiveFragments > 0 ? _context.clock().now()-_beforeReceiveFragments : -1));
-        buf.append(" sinceHandled=").append((_afterHandlingTime > 0 ? _context.clock().now()-_afterHandlingTime : -1));
+        //buf.append(" beforeReceiveFragments=").append((_beforeReceiveFragments > 0 ? _context.clock().now()-_beforeReceiveFragments : -1));
+        //buf.append(" sinceHandled=").append((_afterHandlingTime > 0 ? _context.clock().now()-_afterHandlingTime : -1));
         //buf.append("\ndata=").append(Base64.encode(_packet.getData(), _packet.getOffset(), _packet.getLength()));
         return buf.toString();
     }
@@ -316,13 +322,22 @@ class UDPPacket {
         _packetCache.offer(this);
     }
     
+    /**
+     *  Call at shutdown/startup to not hold ctx refs
+     *  @since 0.9.2
+     */
+    public static void clearCache() {
+        if (CACHE)
+            _packetCache.clear();
+    }
+
     private void verifyNotReleased() {
-        if (CACHE) return;
+        if (!CACHE) return;
         if (_released) {
-            Log log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
-            log.log(Log.CRIT, "Already released.  current stack trace is:", new Exception());
-            log.log(Log.CRIT, "Released by: ", _releasedBy);
-            log.log(Log.CRIT, "Acquired by: ", _acquiredBy);
+            Log log = _context.logManager().getLog(UDPPacket.class);
+            log.error("Already released", new Exception());
+            //log.log(Log.CRIT, "Released by: ", _releasedBy);
+            //log.log(Log.CRIT, "Acquired by: ", _acquiredBy);
         }
     }
 }

@@ -156,8 +156,8 @@ public class TunnelController implements Logging {
         }
         String type = getType(); 
         if ( (type == null) || (type.length() <= 0) ) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Cannot start the tunnel - no type specified");
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Cannot start the tunnel - no type specified");
             return;
         }
         // Config options may have changed since instantiation, so do this again.
@@ -455,6 +455,25 @@ public class TunnelController implements Logging {
             }
         }
         _config = props;
+
+        // Set up some per-type defaults
+        // This really isn't the best spot to do this but for servers in particular,
+        // it's hard to override settings in the subclass since the session connect
+        // is done in the I2PTunnelServer constructor.
+        String type = getType();
+        if (type != null) {
+            if (type.equals("httpserver") || type.equals("streamrserver")) {
+                if (!_config.containsKey("option.shouldBundleReplyInfo"))
+                    _config.setProperty("option.shouldBundleReplyInfo", "false");
+            } else if (type.contains("irc") || type.equals("streamrclient")) {
+                // maybe a bad idea for ircclient if DCC is enabled
+                if (!_config.containsKey("option.crypto.tagsToSend"))
+                    _config.setProperty("option.crypto.tagsToSend", "20");
+                if (!_config.containsKey("option.crypto.lowTagThreshold"))
+                    _config.setProperty("option.crypto.lowTagThreshold", "14");
+            }
+        }
+
         // tell i2ptunnel, who will tell the TunnelTask, who will tell the SocketManager
         setSessionOptions();
         if (_running && _sessions != null) {
@@ -467,6 +486,9 @@ public class TunnelController implements Logging {
         }
     }
 
+    /**
+     *  @return a copy
+     */
     public Properties getConfig(String prefix) { 
         Properties rv = new Properties();
         for (Map.Entry e : _config.entrySet()) {

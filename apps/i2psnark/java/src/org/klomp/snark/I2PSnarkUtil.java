@@ -55,8 +55,9 @@ public class I2PSnarkUtil {
     private String _i2cpHost;
     private int _i2cpPort;
     private final Map<String, String> _opts;
-    private I2PSocketManager _manager;
+    private volatile I2PSocketManager _manager;
     private boolean _configured;
+    private volatile boolean _connecting;
     private final Set<Hash> _shitlist;
     private int _maxUploaders;
     private int _maxUpBW;
@@ -120,6 +121,9 @@ public class I2PSnarkUtil {
         _configured = true;
     }
 ******/
+    
+    /** @since 0.9.1 */
+    public I2PAppContext getContext() { return _context; }
     
     public boolean configured() { return _configured; }
     
@@ -198,6 +202,7 @@ public class I2PSnarkUtil {
      */
     synchronized public boolean connect() {
         if (_manager == null) {
+            _connecting = true;
             // try to find why reconnecting after stop
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connecting to I2P", new Exception("I did it"));
@@ -237,6 +242,7 @@ public class I2PSnarkUtil {
             if (opts.getProperty("i2p.streaming.maxConnsPerHour") == null)
                 opts.setProperty("i2p.streaming.maxConnsPerHour", "20");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
+            _connecting = false;
         }
         // FIXME this only instantiates krpc once, left stuck with old manager
         //if (ENABLE_DHT && _manager != null && _dht == null)
@@ -251,6 +257,9 @@ public class I2PSnarkUtil {
     public DHT getDHT() { return _dht; }
 
     public boolean connected() { return _manager != null; }
+
+    /** @since 0.9.1 */
+    public boolean isConnecting() { return _manager == null && _connecting; }
 
     /**
      *  For FetchAndAdd
@@ -269,7 +278,11 @@ public class I2PSnarkUtil {
         // FIXME this can cause race NPEs elsewhere
         _manager = null;
         _shitlist.clear();
-        mgr.destroySocketManager();
+        if (mgr != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Disconnecting from I2P", new Exception("I did it"));
+            mgr.destroySocketManager();
+        }
         // this will delete a .torrent file d/l in progress so don't do that...
         FileUtil.rmdir(_tmpDir, false);
         // in case the user will d/l a .torrent file next...
@@ -296,7 +309,7 @@ public class I2PSnarkUtil {
             return rv;
         } catch (I2PException ie) {
             _shitlist.add(dest);
-            SimpleScheduler.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
+            _context.simpleScheduler().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
     }
@@ -523,40 +536,6 @@ public class I2PSnarkUtil {
             buf.append(Integer.toHexString(bi));
         }
         return buf.toString();
-    }
-
-    /** hook between snark's logger and an i2p log */
-    void debug(String msg, int snarkDebugLevel) {
-        debug(msg, snarkDebugLevel, null);
-    }
-    void debug(String msg, int snarkDebugLevel, Throwable t) {
-        if (t instanceof OutOfMemoryError) {
-            try { Thread.sleep(100); } catch (InterruptedException ie) {}
-            try {
-                t.printStackTrace();
-            } catch (Throwable tt) {}
-            try {
-                System.out.println("OOM thread: " + Thread.currentThread().getName());
-            } catch (Throwable tt) {}
-        }
-        switch (snarkDebugLevel) {
-            case 0:
-            case 1:
-                _log.error(msg, t);
-                break;
-            case 2:
-                _log.warn(msg, t);
-                break;
-            case 3:
-            case 4:
-                _log.info(msg, t);
-                break;
-            case 5:
-            case 6:
-            default:
-                _log.debug(msg, t);
-                break;
-        }
     }
 
     private static final String BUNDLE_NAME = "org.klomp.snark.web.messages";

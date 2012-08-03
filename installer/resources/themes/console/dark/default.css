@@ -18,6 +18,11 @@ body {
      box-sizing: border-box;
 }
 
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+     padding-top: 5px;
+}
+
 div {
      -moz-box-sizing: border-box;
      box-sizing: border-box;
@@ -79,6 +84,9 @@ button {
 
 textarea {
      border: 1px solid #494;
+     background: #000;
+     margin-left: 4px;
+     width: 458px;
 }
 
 br {
@@ -140,7 +148,7 @@ hr {
      border: 1px solid #494;
      padding: 2px;
      margin: 4px 0 2px 4px;
-     background-color: #020;
+     background-color: #000;
      font-size: 8.5pt;
 }
 
@@ -153,7 +161,7 @@ hr {
      font-size: 8pt;
      font-weight: bold;
      background-color: #000;
-     color: #9f9 !important;
+     color: #494 !important;
      border: 1px outset #ddddc0;
      text-align: center;
      white-space: nowrap;
@@ -171,8 +179,9 @@ hr {
 }
 
 .control:link {
-     color: #9f9;
+     color: #494 !important;
      text-decoration: none;
+     background: #000 !important;
 }
 
 .control:hover {
@@ -187,13 +196,13 @@ hr {
 
 .control:active {
      border: 1px inset;
-     background-color: #f60;
-     color: #fff !important;
+     background-color: #f60 !important;
+     color: #EE9 !important;
      text-decoration: none;
 }
 
 .control:visited {
-     color: #010;
+     color: #494 !important;
      text-decoration: none;
 }
 
@@ -205,12 +214,32 @@ hr {
      font-size: 8.5pt;
      color: #EEEE99;
      background-color: #020;
-     background: #000; /*url(images/camotile2.png);*/
+     background: #000 url(images/camotile2.png);
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494;
      padding: 10px 20px;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
+.panel td:first-child {
+     font-weight: bold;	
+}
+
+.panel td {
+	  padding: 6px 0 8px;
+}
+
+.panel td:last-child {
+     border-bottom: 1px dotted #494;	
 }
 
 .panel .footer {
@@ -256,6 +285,15 @@ hr {
 
 #globalOperationsPanel .control {
      width: 120px;
+     color: #494 !important;
+}
+
+#globalOperationsPanel .control:hover {
+     color: #F60 !important;
+}
+
+#globalOperationsPanel .control:active {
+     color: #EE9 !important;
 }
 
 .header {
@@ -268,25 +306,25 @@ hr {
 a:link{
      color: #494;
      text-decoration: none;
-     background: #000;
+     background: none;
 }
 
 a:visited{
      color: #7b7;
      text-decoration: none;
-     background: #000;
+     background: none;
 }
 
 a:hover{
      color: #ff6600;
      text-decoration: underline;
-     background: #000;
+     background: none;
 }
 
 a:active{
      color: #900;
      text-decoration: underline;
-     background: #000;
+     background: none;
 }
 
 input {

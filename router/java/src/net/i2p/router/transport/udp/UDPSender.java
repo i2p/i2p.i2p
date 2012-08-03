@@ -18,10 +18,10 @@ import net.i2p.util.Log;
 class UDPSender {
     private final RouterContext _context;
     private final Log _log;
-    private DatagramSocket _socket;
+    private final DatagramSocket _socket;
     private String _name;
     private final BlockingQueue<UDPPacket> _outboundQueue;
-    private boolean _keepRunning;
+    private volatile boolean _keepRunning;
     private final Runner _runner;
     private static final int TYPE_POISON = 99999;
     
@@ -81,9 +81,11 @@ class UDPSender {
         _outboundQueue.clear();
     }
     
+/*********
     public DatagramSocket updateListeningPort(DatagramSocket socket, int newPort) {
         return _runner.updateListeningPort(socket, newPort);
     }
+**********/
 
     
     /**
@@ -172,17 +174,18 @@ class UDPSender {
     }
     
     private class Runner implements Runnable {
-        private boolean _socketChanged;
+        //private volatile boolean _socketChanged;
+
         FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().createRequest();
         public void run() {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Running the UDP sender");
-            _socketChanged = false;
+            //_socketChanged = false;
             while (_keepRunning) {
-                if (_socketChanged) {
-                    Thread.currentThread().setName(_name);
-                    _socketChanged = false;
-                }
+                //if (_socketChanged) {
+                //    Thread.currentThread().setName(_name);
+                //    _socketChanged = false;
+                //}
                 
                 UDPPacket packet = getNextPacket();
                 if (packet != null) {
@@ -200,11 +203,11 @@ class UDPSender {
                     
                     long afterBW = _context.clock().now();
                     
-                    if (_log.shouldLog(Log.DEBUG)) {
+                    //if (_log.shouldLog(Log.DEBUG)) {
                         //if (len > 128)
                         //    len = 128;
                         //_log.debug("Sending packet: (size="+size + "/"+size2 +")\nraw: " + Base64.encode(packet.getPacket().getData(), 0, size));
-                    }
+                    //}
                     
                     if (packet.getMessageType() >= PacketBuilder.TYPE_FIRST)
                         _context.statManager().addRateData("udp.sendPacketSize." + packet.getMessageType(), size, packet.getFragmentCount());
@@ -216,11 +219,11 @@ class UDPSender {
                             // synchronization lets us update safely
                             //_log.debug("Break out datagram for " + packet);
                             DatagramPacket dp = packet.getPacket();
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Just before socket.send of " + packet);
+                            //if (_log.shouldLog(Log.DEBUG))
+                            //    _log.debug("Just before socket.send of " + packet);
                             _socket.send(dp);
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Just after socket.send of " + packet);
+                            //if (_log.shouldLog(Log.DEBUG))
+                            //    _log.debug("Just after socket.send of " + packet);
                         }
                         long sendTime = _context.clock().now() - before;
                         _context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
@@ -251,8 +254,10 @@ class UDPSender {
         private UDPPacket getNextPacket() {
             UDPPacket packet = null;
             while ( (_keepRunning) && (packet == null || packet.getLifetime() > MAX_HEAD_LIFETIME) ) {
-                if (packet != null)
+                if (packet != null) {
                     _context.statManager().addRateData("udp.sendQueueTrimmed", 1, 0);
+                    packet.release();
+                }
                 try {
                     packet = _outboundQueue.take();
                 } catch (InterruptedException ie) {}
@@ -261,6 +266,8 @@ class UDPSender {
             }
             return packet;
         }
+
+     /******
         public DatagramSocket updateListeningPort(DatagramSocket socket, int newPort) {
             _name = "UDPSend on " + newPort;
             DatagramSocket old = null;
@@ -271,5 +278,6 @@ class UDPSender {
             _socketChanged = true;
             return old;
         }
+      *****/
     }
 }

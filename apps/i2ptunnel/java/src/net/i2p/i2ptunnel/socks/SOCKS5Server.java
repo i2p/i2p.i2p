@@ -366,7 +366,10 @@ public class SOCKS5Server extends SOCKSServer {
                     } catch (IOException ioe) {}
                     throw new SOCKSException("Host not found");
                 }
-                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName));
+                Properties overrides = new Properties();
+                I2PSocketOptions sktOpts = t.buildOptions(overrides);
+                sktOpts.setPort(connPort);
+                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName), sktOpts);
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);

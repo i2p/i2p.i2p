@@ -49,7 +49,7 @@ class UnsignedUpdateRunner extends UpdateRunner {
                 // 40 retries!!
                 _get = new EepGet(_context, proxyHost, proxyPort, 40, _updateFile, zipURL, false);
                 _get.addStatusListener(UnsignedUpdateRunner.this);
-                _get.fetch();
+                _get.fetch(CONNECT_TIMEOUT, -1, INACTIVITY_TIMEOUT);
             } catch (Throwable t) {
                 _log.error("Error updating", t);
             }

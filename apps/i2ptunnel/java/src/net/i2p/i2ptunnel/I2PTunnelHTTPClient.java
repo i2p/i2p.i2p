@@ -225,7 +225,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /**
-     * create the default options (using the default timeout, etc)
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
      * unused?
      */
     @Override
@@ -236,6 +238,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
         //if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
         //    defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        verifySocketManager();
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if(!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT)) {
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
@@ -244,8 +248,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /**
-     * create the default options (using the default timeout, etc)
-     *
+     * Create the default options (using the default timeout, etc).
+     * Warning, this does not make a copy of I2PTunnel's client options,
+     * it modifies them directly.
+     * Do not use overrides for per-socket options.
      */
     @Override
     protected I2PSocketOptions getDefaultOptions(Properties overrides) {

@@ -3,24 +3,4 @@ usr/share/common-licenses/LGPL-2.1 usr/share/doc/i2p-router/licenses/LICENSE-LGP
 usr/share/common-licenses/Apache-2.0 usr/share/doc/i2p-router/licenses/LICENSE-Apache2.0.txt
 usr/share/common-licenses/BSD usr/share/doc/i2p-router/licenses/LICENSE-BSD.txt
 
-# From libcommons-logging-java
-usr/share/java/commons-logging.jar usr/share/i2p/lib/commons-logging.jar
-
-# From libtomcat6-java
-usr/share/java/jasper.jar usr/share/i2p/lib/jasper-runtime.jar
-usr/share/java/jasper-el.jar usr/share/i2p/lib/jasper-el.jar
-usr/share/java/tomcat-juli.jar usr/share/i2p/lib/tomcat-juli.jar
-## Used by some plugins, such as Pebble. Might be good to include it
-## since we use libtomcat6-java anyway
 usr/share/java/eclipse-ecj.jar usr/share/i2p/lib/eclipse-ecj.jar
-
-# From libjetty-java
-usr/share/java/jetty.jar usr/share/i2p/lib/org.mortbay.jetty.jar
-usr/share/java/jetty-util.jar usr/share/i2p/lib/jetty-util.jar
-usr/share/java/jetty-sslengine.jar usr/share/i2p/lib/jetty-sslengine.jar
-usr/share/java/jetty-start.jar usr/share/i2p/lib/jetty-start.jar
-
-# From libservlet2.5-java
-usr/share/java/servlet-api-2.5.jar usr/share/i2p/lib/servlet-api.jar
-usr/share/java/jsp-api-2.1.jar usr/share/i2p/lib/jsp-api.jar
-usr/share/java/el-api-2.1.jar usr/share/i2p/lib/el-api.jar

@@ -20,6 +20,11 @@ body {
     background: #99f url(images/snowcamo.png);
 }
 
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+     padding-top: 5px;
+}
+
 div {
      -moz-box-sizing: border-box;
      -webkit-box-sizing: border-box;
@@ -251,6 +256,14 @@ hr {
     background: #fff url(images/magic.png);
     border: 1px solid #444477;
     color: #000011;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
 }
 
 .panel .footer {

@@ -45,18 +45,25 @@ class SchedulerClosing extends SchedulerImpl {
     }
     
     public void eventOccurred(Connection con) {
-        if (con.getNextSendTime() <= 0)
-            con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
-        long remaining = con.getNextSendTime() - _context.clock().now();
+        long nextSend = con.getNextSendTime();
+        long now = _context.clock().now();
+        long remaining;
+        if (nextSend <= 0) {
+            remaining = con.getOptions().getSendAckDelay();
+            nextSend = now + remaining;
+            con.setNextSendTime(nextSend);
+        } else {
+            remaining = nextSend - now;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Event occurred w/ remaining: " + remaining + " on " + con);
         if (remaining <= 0) {
             if (con.getCloseSentOn() <= 0) {
                 con.sendAvailable();
-                con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
             } else {
-                con.ackImmediately();
+                //con.ackImmediately();
             }
+            con.setNextSendTime(now + con.getOptions().getSendAckDelay());
         } else {
             //if (remaining < 5*1000)
             //    remaining = 5*1000;

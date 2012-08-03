@@ -310,7 +310,10 @@ abstract class ExtensionHandler {
             BDecoder dec = new BDecoder(is);
             BEValue bev = dec.bdecodeMap();
             Map<String, BEValue> map = bev.getMap();
-            byte[] ids = map.get("added").getBytes();
+            bev = map.get("added");
+            if (bev == null)
+                return;
+            byte[] ids = bev.getBytes();
             if (ids.length < HASH_LENGTH)
                 return;
             int len = Math.min(ids.length, (I2PSnarkUtil.MAX_CONNECTIONS - 1) * HASH_LENGTH);

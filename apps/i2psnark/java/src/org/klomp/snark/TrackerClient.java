@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +62,7 @@ import net.i2p.util.SimpleTimer2;
  * @author Mark Wielaard (mark@klomp.org)
  */
 public class TrackerClient implements Runnable {
-  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(TrackerClient.class);
+  private final Log _log;
   private static final String NO_EVENT = "";
   private static final String STARTED_EVENT = "started";
   private static final String COMPLETED_EVENT = "completed";
@@ -97,6 +98,7 @@ public class TrackerClient implements Runnable {
   // these 2 used in loop()
   private volatile boolean runStarted;
   private volatile  int consecutiveFails;
+  private volatile boolean _fastUnannounce;
 
   private final List<Tracker> trackers;
 
@@ -114,6 +116,7 @@ public class TrackerClient implements Runnable {
     String id = urlencode(snark.getID());
     _threadName = "TrackerClient " + id.substring(id.length() - 12);
     _util = util;
+    _log = util.getContext().logManager().getLog(TrackerClient.class);
     this.meta = meta;
     this.additionalTrackerURL = additionalTrackerURL;
     this.coordinator = coordinator;
@@ -134,6 +137,7 @@ public class TrackerClient implements Runnable {
       stop = false;
       consecutiveFails = 0;
       runStarted = false;
+      _fastUnannounce = false;
       _thread = new I2PAppThread(this, _threadName + " #" + (++_runCount), true);
       _thread.start();
       started = true;
@@ -144,8 +148,9 @@ public class TrackerClient implements Runnable {
   
   /**
    * Interrupts this Thread to stop it.
+   * @param fast if true, limit the life of the unannounce threads
    */
-  public synchronized void halt() {
+  public synchronized void halt(boolean fast) {
     boolean wasStopped = stop;
     if (wasStopped) {
         if (_log.shouldLog(Log.WARN))
@@ -168,6 +173,7 @@ public class TrackerClient implements Runnable {
             _log.debug("Interrupting " + t.getName());
         t.interrupt();
     }
+    _fastUnannounce = true;
     if (!wasStopped)
         unannounce();
   }
@@ -178,7 +184,7 @@ public class TrackerClient implements Runnable {
 
   private class Runner extends SimpleTimer2.TimedEvent {
       public Runner(long delay) {
-          super(SimpleTimer2.getInstance(), delay);
+          super(_util.getContext().simpleTimer2(), delay);
       }
 
       public void timeReached() {
@@ -392,9 +398,10 @@ public class TrackerClient implements Runnable {
                 catch (IOException ioe)
                   {
                     // Probably not fatal (if it doesn't last to long...)
-                    _util.debug
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn
                       ("WARNING: Could not contact tracker at '"
-                       + tr.announce + "': " + ioe, Snark.WARNING);
+                       + tr.announce + "': " + ioe);
                     tr.trackerProblems = ioe.getMessage();
                     // don't show secondary tracker problems to the user
                     if (tr.isPrimary)
@@ -415,6 +422,10 @@ public class TrackerClient implements Runnable {
                             tr.interval = LONG_SLEEP;  // slow down
                     }
                   }
+              } else {
+                  if (_log.shouldLog(Log.INFO))
+                      _log.info("Not announcing to " + tr.announce + " last announce was " +
+                               new Date(tr.lastRequestTime) + " interval is " + DataHelper.formatDuration(tr.interval));
               }
               if ((!tr.stop) && maxSeenPeers < tr.seenPeers)
                   maxSeenPeers = tr.seenPeers;
@@ -424,7 +435,8 @@ public class TrackerClient implements Runnable {
             if (coordinator.needOutboundPeers() && (meta == null || !meta.isPrivate()) && !stop) {
                 Set<PeerID> pids = coordinator.getPEXPeers();
                 if (!pids.isEmpty()) {
-                    _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Got " + pids.size() + " from PEX");
                     List<Peer> peers = new ArrayList(pids.size());
                     for (PeerID pID : pids) {
                         peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
@@ -439,6 +451,9 @@ public class TrackerClient implements Runnable {
                          }
                     }
                 }
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Not getting PEX peers");
             }
 
             // Get peers from DHT
@@ -450,12 +465,14 @@ public class TrackerClient implements Runnable {
                 else
                     numwant = _util.getMaxConnections();
                 List<Hash> hashes = _util.getDHT().getPeers(snark.getInfoHash(), numwant, 2*60*1000);
-                _util.debug("Got " + hashes + " from DHT", Snark.INFO);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Got " + hashes + " from DHT");
                 // announce  ourselves while the token is still good
                 // FIXME this needs to be in its own thread
                 if (!stop) {
                     int good = _util.getDHT().announce(snark.getInfoHash(), 8, 5*60*1000);
-                    _util.debug("Sent " + good + " good announces to DHT", Snark.INFO);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Sent " + good + " good announces to DHT");
                 }
 
                 // now try these peers
@@ -475,6 +492,9 @@ public class TrackerClient implements Runnable {
                          }
                     }
                 }
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Not getting DHT peers");
             }
 
 
@@ -485,7 +505,8 @@ public class TrackerClient implements Runnable {
                 return;
 
             if (!runStarted)
-                _util.debug("         Retrying in one minute...", Snark.DEBUG);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("         Retrying in one minute...");
 
             try {
                 // Sleep some minutes...
@@ -514,7 +535,7 @@ public class TrackerClient implements Runnable {
       } // try
     catch (Throwable t)
       {
-        _util.debug("TrackerClient: " + t, Snark.ERROR, t);
+        _log.error("TrackerClient: " + t, t);
         if (t instanceof OutOfMemoryError)
             throw (OutOfMemoryError)t;
       }
@@ -533,7 +554,7 @@ public class TrackerClient implements Runnable {
           if (_util.connected() &&
               tr.started && (!tr.stop) && tr.trackerProblems == null) {
               try {
-                  (new I2PAppThread(new Unannouncer(tr), _threadName + " Unannounce " + (++i), true)).start();
+                  (new I2PAppThread(new Unannouncer(tr), _threadName + " U" + (++i), true)).start();
               } catch (OutOfMemoryError oom) {
                   // probably ran out of threads, ignore
                   tr.reset();
@@ -607,11 +628,13 @@ public class TrackerClient implements Runnable {
     else
         buf.append(_util.getMaxConnections());
     String s = buf.toString();
-    _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Sending TrackerClient request: " + s);
       
     tr.lastRequestTime = System.currentTimeMillis();
-    // Don't wait for a response to stopped.
-    File fetched = _util.get(s, true, event.equals(STOPPED_EVENT) ? -1 : 0);
+    // Don't wait for a response to stopped when shutting down
+    boolean fast = _fastUnannounce && event.equals(STOPPED_EVENT);
+    File fetched = _util.get(s, true, fast ? -1 : 0);
     if (fetched == null) {
         throw new IOException("Error fetching " + s);
     }
@@ -622,7 +645,8 @@ public class TrackerClient implements Runnable {
 
         TrackerInfo info = new TrackerInfo(in, snark.getID(),
                                            snark.getInfoHash(), snark.getMetaInfo());
-        _util.debug("TrackerClient response: " + info, Snark.INFO);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("TrackerClient response: " + info);
 
         String failure = info.getFailureReason();
         if (failure != null)

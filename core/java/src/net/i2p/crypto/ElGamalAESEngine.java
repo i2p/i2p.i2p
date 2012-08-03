@@ -61,7 +61,8 @@ public class ElGamalAESEngine {
     }
 
     /**
-     * Decrypt the message using the given private key using tags from the default key manager.
+     * Decrypt the message using the given private key using tags from the default key manager,
+     * which is the router's key manager. Use extreme care if you aren't the router.
      *
      * @deprecated specify the key manager!
      */
@@ -74,6 +75,10 @@ public class ElGamalAESEngine {
      * and using tags from the specified key manager.
      * This works according to the
      * ElGamal+AES algorithm in the data structure spec.
+     *
+     * Warning - use the correct SessionKeyManager. Clients should instantiate their own.
+     * Clients using I2PAppContext.sessionKeyManager() may be correlated with the router,
+     * unless you are careful to use different keys.
      *
      * @return decrypted data or null on failure
      */
@@ -100,7 +105,7 @@ public class ElGamalAESEngine {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
             long id = _context.random().nextLong();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(id + ": Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes: " + Base64.encode(data, 0, 64));
+                _log.debug(id + ": Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes " /* + Base64.encode(data, 0, 64) */ );
             
             decrypted = decryptExistingSession(data, key, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
@@ -389,7 +394,8 @@ public class ElGamalAESEngine {
      *
      * @param target public key to which the data should be encrypted. 
      * @param key session key to use during encryption
-     * @param tagsForDelivery session tags to be associated with the key (or newKey if specified), or null
+     * @param tagsForDelivery session tags to be associated with the key (or newKey if specified), or null;
+     *                        200 max enforced at receiver
      * @param currentTag sessionTag to use, or null if it should use ElG (i.e. new session)
      * @param newKey key to be delivered to the target, with which the tagsForDelivery should be associated, or null
      * @param paddedSize minimum size in bytes of the body after padding it (if less than the
@@ -410,7 +416,7 @@ public class ElGamalAESEngine {
         _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
         byte rv[] = encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Existing session encrypted with tag: " + currentTag.toString() + ": " + rv.length + " bytes and key: " + key.toBase64() + ": " + Base64.encode(rv, 0, 64));
+            _log.debug("Existing session encrypted with tag: " + currentTag.toString() + ": " + rv.length + " bytes and key: " + key.toBase64() /* + ": " + Base64.encode(rv, 0, 64) */);
         return rv;
     }
 
@@ -418,6 +424,30 @@ public class ElGamalAESEngine {
      * Encrypt the data to the target using the given key and deliver the specified tags
      * No new session key
      * This is the one called from GarlicMessageBuilder and is the primary entry point.
+     *
+     * Re: padded size: The AES block adds at least 39 bytes of overhead to the data, and
+     * that is included in the minimum size calculation.
+     *
+     * In the router, we always use garlic messages. A garlic message with a single
+     * clove and zero data is about 84 bytes, so that's 123 bytes minimum. So any paddingSize
+     * <= 128 is a no-op as every message will be at least 128 bytes
+     * (Streaming, if used, adds more overhead).
+     *
+     * Outside the router, with a client using its own message format, the minimum size
+     * is 48, so any paddingSize <= 48 is a no-op.
+     *
+     * Not included in the minimum is a 32-byte session tag for an existing session,
+     * or a 514-byte ElGamal block and several 32-byte session tags for a new session.
+     * So the returned encrypted data will be at least 32 bytes larger than paddedSize.
+     *
+     * @param target public key to which the data should be encrypted. 
+     * @param key session key to use during encryption
+     * @param tagsForDelivery session tags to be associated with the key or null;
+     *                        200 max enforced at receiver
+     * @param currentTag sessionTag to use, or null if it should use ElG (i.e. new session)
+     * @param paddedSize minimum size in bytes of the body after padding it (if less than the
+     *          body's real size, no bytes are appended but the body is not truncated)
+     *
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                  SessionTag currentTag, long paddedSize) {
@@ -599,7 +629,6 @@ public class ElGamalAESEngine {
         //_log.debug("Encrypting AES");
         if (tagsForDelivery == null) tagsForDelivery = Collections.EMPTY_SET;
         int size = 2 // sizeof(tags)
-                 + tagsForDelivery.size()
                  + SessionTag.BYTE_LENGTH*tagsForDelivery.size()
                  + 4 // payload length
                  + Hash.HASH_LENGTH

@@ -24,7 +24,8 @@
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     
     <% if (indexBean.allowCSS()) {
-  %><link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
+  %><link rel="icon" href="<%=indexBean.getTheme()%>images/favicon.ico" />
+    <link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
   %>
@@ -115,7 +116,7 @@
             <%
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label><%=intl._("Preview")%>:</label>    
-            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p"><%=intl._("Preview")%></a>
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p" target="_parent"><%=intl._("Preview")%></a>
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><span class="text"><%=intl._("Base32 Address")%>:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>

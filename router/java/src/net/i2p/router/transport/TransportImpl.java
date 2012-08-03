@@ -74,7 +74,7 @@ public abstract class TransportImpl implements Transport {
         _sendPool = new ArrayList(16);
         _unreachableEntries = new HashMap(16);
         _wasUnreachableEntries = new ConcurrentHashSet(16);
-        SimpleScheduler.getInstance().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
+        _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
     /**

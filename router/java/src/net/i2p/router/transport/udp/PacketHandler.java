@@ -28,7 +28,7 @@ class PacketHandler {
     private final InboundMessageFragments _inbound;
     private final PeerTestManager _testManager;
     private final IntroductionManager _introManager;
-    private boolean _keepReading;
+    private volatile boolean _keepReading;
     private final Handler[] _handlers;
     
     private static final int MIN_NUM_HANDLERS = 2;  // unless < 32MB
@@ -73,11 +73,11 @@ class PacketHandler {
         _context.statManager().createRateStat("udp.droppedInvalidEstablish.new", "How old the packet we dropped due to invalidity (even though we do not have any active establishment with the peer) was", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.droppedInvalidInboundEstablish", "How old the packet we dropped due to invalidity (inbound establishment, bad key) was", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.droppedInvalidSkew", "How skewed the packet we dropped due to invalidity (valid except bad skew) was", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (period is dequeue time)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.packetValidateMultipleCount", "How many times we validate a packet, if done more than once (period = afterValidate-enqueue)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.packetNoValidationLifetime", "How long packets that are never validated are around for", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (period is dequeue time)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.packetValidateMultipleCount", "How many times we validate a packet, if done more than once (period = afterValidate-enqueue)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.packetNoValidationLifetime", "How long packets that are never validated are around for", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.sessionRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.sessionConfirmed", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.sessionCreated", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
@@ -158,7 +158,7 @@ class PacketHandler {
                         _log.error("Crazy error handling a packet: " + packet, e);
                 }
                 long handleTime = _context.clock().now() - handleStart;
-                packet.afterHandling();
+                //packet.afterHandling();
                 _context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
                 _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
                 _state = 8;
@@ -166,6 +166,7 @@ class PacketHandler {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Done receiving the packet " + packet);
                 
+           /********
                 if (handleTime > 1000) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Took " + handleTime + " to process the packet " 
@@ -198,6 +199,7 @@ class PacketHandler {
                     _context.statManager().addRateData("udp.packetValidateMultipleCount", validateCount, timeToValidate);
                 else if (validateCount <= 0)
                     _context.statManager().addRateData("udp.packetNoValidationLifetime", packet.getLifetime(), 0);
+            ********/
                 
                 // back to the cache with thee!
                 packet.release();
@@ -211,7 +213,6 @@ class PacketHandler {
          * Find the state and call the correct receivePacket() variant
          */
         private void handlePacket(UDPPacketReader reader, UDPPacket packet) {
-            if (packet == null) return;
 
             _state = 10;
             
@@ -538,7 +539,7 @@ class PacketHandler {
                             msg.append(": ").append(dr.toString());
                             _log.info(msg.toString());
                         }
-                        packet.beforeReceiveFragments();
+                        //packet.beforeReceiveFragments();
                         _inbound.receiveData(state, dr);
                         _context.statManager().addRateData("udp.receivePacketSize.dataKnown", packet.getPacket().getLength(), packet.getLifetime());
                         if (dr.readFragmentCount() <= 0)

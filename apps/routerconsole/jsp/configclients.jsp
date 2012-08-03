@@ -10,7 +10,10 @@ button span.hide{
     display:none;
 }
 input.default { width: 1px; height: 1px; visibility: hidden; }
-</style></head><body>
+</style>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
 

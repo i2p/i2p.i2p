@@ -101,7 +101,7 @@ public class NewsHelper extends ContentHelper {
         if (!news.exists())
             _page = (new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml")).getAbsolutePath();
         return super.getContent();
-    } 
+    }
 
     /**
      *  Is the news newer than the last time it was hidden?
