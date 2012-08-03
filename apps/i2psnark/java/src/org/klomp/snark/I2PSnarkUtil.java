@@ -309,7 +309,7 @@ public class I2PSnarkUtil {
             return rv;
         } catch (I2PException ie) {
             _shitlist.add(dest);
-            SimpleScheduler.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
+            _context.simpleScheduler().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
     }

@@ -158,7 +158,7 @@ class PeerTestManager {
         
         sendTestToBob();
         
-        SimpleScheduler.getInstance().addEvent(new ContinueTest(), RESEND_TIMEOUT);
+        _context.simpleScheduler().addEvent(new ContinueTest(), RESEND_TIMEOUT);
     }
     
     private class ContinueTest implements SimpleTimer.TimedEvent {
@@ -183,7 +183,7 @@ class PeerTestManager {
                         // second message from Charlie yet
                         sendTestToCharlie();
                     }
-                    SimpleScheduler.getInstance().addEvent(ContinueTest.this, RESEND_TIMEOUT);
+                    _context.simpleScheduler().addEvent(ContinueTest.this, RESEND_TIMEOUT);
                 }
             }
         }
@@ -538,7 +538,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
             UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort, aliceIntroKey, nonce, state.getBobCipherKey(), state.getBobMACKey());
@@ -617,7 +617,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
             UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 

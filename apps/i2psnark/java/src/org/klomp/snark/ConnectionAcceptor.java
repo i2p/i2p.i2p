@@ -67,7 +67,7 @@ public class ConnectionAcceptor implements Runnable
           thread = new I2PAppThread(this, "I2PSnark acceptor");
           thread.setDaemon(true);
           thread.start();
-          SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
+          _util.getContext().simpleScheduler().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
       }
     }
   }
@@ -82,7 +82,7 @@ public class ConnectionAcceptor implements Runnable
     thread = new I2PAppThread(this, "I2PSnark acceptor");
     thread.setDaemon(true);
     thread.start();
-    SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
+    _util.getContext().simpleScheduler().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
   }
 
   public void halt()

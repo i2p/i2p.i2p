@@ -477,7 +477,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @since 0.9.1
      */
     private void startVerifyUsage() {
-        SimpleScheduler.getInstance().addEvent(new VerifyUsage(), VERIFY_USAGE_TIME);
+        _context.simpleScheduler().addEvent(new VerifyUsage(), VERIFY_USAGE_TIME);
     }
 
     /**
@@ -501,7 +501,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 toCheck.clear();
             }
             toCheck.addAll(_availableMessages.keySet());
-            SimpleScheduler.getInstance().addEvent(this, VERIFY_USAGE_TIME);
+            _context.simpleScheduler().addEvent(this, VERIFY_USAGE_TIME);
         }
     }
 
@@ -967,7 +967,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         boolean close = Boolean.valueOf(_options.getProperty("i2cp.closeOnIdle")).booleanValue();
         if (reduce || close) {
             updateActivity();
-            SimpleScheduler.getInstance().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
+            _context.simpleScheduler().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
         }
     }
 

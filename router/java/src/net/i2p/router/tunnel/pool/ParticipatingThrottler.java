@@ -42,7 +42,7 @@ class ParticipatingThrottler {
     ParticipatingThrottler(RouterContext ctx) {
         this.context = ctx;
         this.counter = new ObjectCounter();
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+        ctx.simpleScheduler().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
     /** increments before checking */

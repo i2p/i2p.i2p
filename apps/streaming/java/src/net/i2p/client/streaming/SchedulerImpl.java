@@ -17,7 +17,7 @@ abstract class SchedulerImpl implements TaskScheduler {
     }
     
     protected void reschedule(long msToWait, Connection con) {
-        SimpleScheduler.getInstance().addEvent(con.getConnectionEvent(), msToWait);
+        _context.simpleScheduler().addEvent(con.getConnectionEvent(), msToWait);
     }
 
     @Override

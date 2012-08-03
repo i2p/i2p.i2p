@@ -112,6 +112,6 @@ class SessionIdleTimer implements SimpleTimer.TimedEvent {
         } else {
             nextDelay = _minimumTime - (now - lastActivity);
         }
-        SimpleScheduler.getInstance().addEvent(this, nextDelay);
+        _context.simpleScheduler().addEvent(this, nextDelay);
     }
 }

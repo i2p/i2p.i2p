@@ -181,7 +181,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         context.statManager().createRateStat("crypto.sessionTagsExpired", "How many tags/sessions are expired?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
         context.statManager().createRateStat("crypto.sessionTagsRemaining", "How many tags/sessions are remaining after a cleanup?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
          _alive = true;
-        SimpleScheduler.getInstance().addEvent(new CleanupEvent(), 60*1000);
+        _context.simpleScheduler().addEvent(new CleanupEvent(), 60*1000);
     }
     
     @Override
@@ -203,7 +203,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             int expired = aggressiveExpire();
             long expireTime = _context.clock().now() - beforeExpire;
             _context.statManager().addRateData("crypto.sessionTagsExpired", expired, expireTime);
-            SimpleScheduler.getInstance().addEvent(this, 60*1000);
+            _context.simpleScheduler().addEvent(this, 60*1000);
         }
     }
 

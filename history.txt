@@ -1,3 +1,19 @@
+2012-08-03 zzz
+ * build.xml: Add buildI2PTunnelJar target for Android
+ * i2psnark: Finish migration to I2P logging to reduce object churn (ticket #673)
+ * LogManager: Add logger.logBufferSize and logger.dropOnOverflow options (ticket #662)
+ * JobQueue: Synch fix (ticket #670)
+ * OutNetMessage: Fix NPE when log level = INFO (ticket #676)
+ * SimpleScheduler, SimpleTimer2: Replace getInstance() calls
+ * UDP:
+   - Catch some cases where UDPPackets were not returned to the cache (ticket #675)
+   - Fix inverted logging logic (ticket #663)
+   - Remove check in UDPPacket.getLifetime() (ticket #664)
+   - RemoteHostID cleanup, cache hashcode
+   - Remove udp.fetchRemoteSlow stat
+   - Remove some time stamping in UDPPacket
+   - Other cleanups - see http://zzz.i2p/topics/1198
+
 2012-07-30 zzz
  * build.xml: Move more default properties to build.properties
  * DecayingBloomFilter, DecayingHashSet, xlattice filters:
