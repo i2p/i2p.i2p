@@ -22,14 +22,14 @@
 #
 #-----------------------------------------------------------------------------
 # These settings can be modified to fit the needs of your application
-# Optimized for use with version 3.5.12 of the Wrapper.
+# Optimized for use with version 3.5.14 of the Wrapper.
 
 # Paths
-# Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
+# Note that (percent)INSTALL_PATH, (percent)USER_HOME,  and (percent)SYSTEM_java_io_tmpdir
 # should have been replaced by the izpack installer.
-# If you did not run the installer, replace them with the appropriate path.
+# If you did not run the installer, replace them with the appropriate paths.
 I2P="%INSTALL_PATH"
-I2P_CONFIG_DIR="$HOME/.i2p"
+I2P_CONFIG_DIR="%USER_HOME/.i2p"
 I2PTEMP="%SYSTEM_java_io_tmpdir"
 # PORTABLE installation:
 # Use the following instead.
