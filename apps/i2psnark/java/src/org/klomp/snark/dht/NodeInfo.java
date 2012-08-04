@@ -9,6 +9,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.RandomSource;
 
 /*
  *  A Node ID, Hash, and port, and an optional Destination.
@@ -139,29 +140,35 @@ class NodeInfo extends SimpleDataStructure {
     }
 
     /**
-     * Generate a secure NID that matches the Hash and port
+     * Generate a secure NID that matches the Hash and port.
+     * Rules: First 4 bytes must match Hash.
+     * Next 2 bytes must match Hash ^ port.
+     * Remaining bytes may be random.
+     *
      * @throws IllegalArgumentException
      */
-    public static NID generateNID(Hash h, int p) {
+    public static NID generateNID(Hash h, int p, RandomSource random) {
         byte[] n = new byte[NID.HASH_LENGTH];
-        System.arraycopy(h.getData(), 0, n, 0, NID.HASH_LENGTH);
-        n[0] ^= (byte) (p >> 8);
-        n[1] ^= (byte) p;
+        System.arraycopy(h.getData(), 0, n, 0, 6);
+        n[4] ^= (byte) (p >> 8);
+        n[5] ^= (byte) p;
+        random.nextBytes(n, 6, NID.HASH_LENGTH - 6);
         return new NID(n);
     }
 
     /**
-     * Verify the NID matches the Hash
-     * @throws IllegalArgumentException
+     * Verify the NID matches the Hash.
+     * See generateNID() for requirements.
+     * @throws IllegalArgumentException on mismatch
      */
     private void verify() {
         if (!KRPC.SECURE_NID)
             return;
         byte[] nb = nID.getData();
         byte[] hb = hash.getData();
-        if ((!DataHelper.eq(nb, 2, hb, 2, NID.HASH_LENGTH - 2)) ||
-            ((nb[0] ^ (port >> 8)) & 0xff) != (hb[0] & 0xff) ||
-            ((nb[1] ^ port) & 0xff) != (hb[1] & 0xff))
+        if ((!DataHelper.eq(nb, 0, hb, 0, 4)) ||
+            ((nb[4] ^ (port >> 8)) & 0xff) != (hb[4] & 0xff) ||
+            ((nb[5] ^ port) & 0xff) != (hb[5] & 0xff))
             throw new IllegalArgumentException("NID/Hash mismatch");
     }
 

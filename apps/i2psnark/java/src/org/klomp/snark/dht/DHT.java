@@ -89,4 +89,9 @@ public interface DHT {
      * Stop everything.
      */
     public void stop();
+
+    /**
+     * Known nodes, not estimated total network size.
+     */
+    public int size();
 }

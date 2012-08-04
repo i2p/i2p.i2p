@@ -158,7 +158,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _qPort = 2555 + ctx.random().nextInt(61111);
         _rPort = _qPort + 1;
         if (SECURE_NID) {
-            _myNID = NodeInfo.generateNID(session.getMyDestination().calculateHash(), _qPort);
+            _myNID = NodeInfo.generateNID(session.getMyDestination().calculateHash(), _qPort, _context.random());
             _myID = _myNID.getData();
         } else {
             _myID = new byte[NID.HASH_LENGTH];
@@ -175,6 +175,13 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     ///////////////// Public methods
+
+    /**
+     * Known nodes, not estimated total network size.
+     */
+    public int size() {
+        return _knownNodes.size();
+    }
 
     /**
      *  @return The UDP query port

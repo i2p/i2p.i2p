@@ -28,6 +28,8 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
+import org.klomp.snark.dht.DHT;
+
 /**
  * TimerTask that checks for good/bad up/downloader. Works together
  * with the PeerCoordinator to select which Peers get (un)choked.
@@ -74,6 +76,7 @@ class PeerCheckerTask implements Runnable
         List<Peer> removed = new ArrayList();
         int uploadLimit = coordinator.allowedUploaders();
         boolean overBWLimit = coordinator.overUpBWLimit();
+        DHT dht = _util.getDHT();
         for (Peer peer : peerList) {
 
             // Remove dying peers
@@ -218,8 +221,8 @@ class PeerCheckerTask implements Runnable
             if (coordinator.getNeededLength() > 0 || !peer.isCompleted())
                 peer.keepAlive();
             // announce them to local tracker (TrackerClient does this too)
-            if (_util.getDHT() != null && (_runCount % 5) == 0) {
-                _util.getDHT().announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
+            if (dht != null && (_runCount % 5) == 0) {
+                dht.announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
             }
           }
 
@@ -267,8 +270,8 @@ class PeerCheckerTask implements Runnable
         }
 
         // announce ourselves to local tracker (TrackerClient does this too)
-        if (_util.getDHT() != null && (_runCount % 16) == 0) {
-            _util.getDHT().announce(coordinator.getInfoHash());
+        if (dht != null && (_runCount % 16) == 0) {
+            dht.announce(coordinator.getInfoHash());
         }
   }
 }

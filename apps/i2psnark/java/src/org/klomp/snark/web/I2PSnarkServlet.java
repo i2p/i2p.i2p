@@ -42,6 +42,7 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
+import org.klomp.snark.dht.DHT;
 
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.resource.Resource;
@@ -470,6 +471,14 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write(", ");
             out.write(DataHelper.formatSize2(stats[5]) + "B, ");
             out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
+            DHT dht = _manager.util().getDHT();
+            if (dht != null) {
+                int dhts = dht.size();
+                if (dhts > 0) {
+                    out.write(", ");
+                    out.write(ngettext("1 DHT peer", "{0} DHT peers", dhts));
+                }
+            }
             out.write("</th>\n");
             if (_manager.util().connected()) {
                 out.write("    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +

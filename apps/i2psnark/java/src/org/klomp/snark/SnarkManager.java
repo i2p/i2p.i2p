@@ -577,6 +577,8 @@ public class SnarkManager implements Snark.CompleteListener {
                 addMessage(_("Enabled DHT."));
             else
                 addMessage(_("Disabled DHT."));
+            if (_util.connected())
+                addMessage(_("DHT change requires tunnel shutdown and reopen"));
             _util.setUseDHT(useDHT);
             changed = true;
         }
