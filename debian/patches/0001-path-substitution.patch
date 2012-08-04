@@ -8,11 +8,6 @@ the Izpack based installer.
 Non-applicable sections (e.g., portable & windows) are also removed for the
 Debian wrapper.config to try to prevent confusion.
 ---
- installer/resources/eepget         |    2 +-
- installer/resources/i2prouter      |    8 ++++----
- installer/resources/runplain.sh    |    6 +++---
- installer/resources/wrapper.config |   17 ++++++++---------
- 4 files changed, 16 insertions(+), 17 deletions(-)
 
 --- a/installer/resources/eepget
 +++ b/installer/resources/eepget
@@ -23,7 +18,36 @@ Debian wrapper.config to try to prevent confusion.
  java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
 --- a/installer/resources/i2prouter
 +++ b/installer/resources/i2prouter
-@@ -55,8 +55,8 @@
+@@ -10,7 +10,7 @@
+ # wrapper configuration file.
+ #
+ # If this script fails to successfully invoke i2psvc on your platform,
+-# try the runplain.sh script instead.
++# try the i2prouter-nowrapper script instead.
+ #
+ # This software is the proprietary information of Tanuki Software.
+ # You shall use it only in accordance with the terms of the
+@@ -24,16 +24,9 @@
+ # These settings can be modified to fit the needs of your application
+ # Optimized for use with version 3.5.14 of the Wrapper.
+ 
+-# Paths
+-# Note that (percent)INSTALL_PATH, (percent)USER_HOME,  and (percent)SYSTEM_java_io_tmpdir
+-# should have been replaced by the izpack installer.
+-# If you did not run the installer, replace them with the appropriate paths.
+-I2P="%INSTALL_PATH"
+-I2P_CONFIG_DIR="%USER_HOME/.i2p"
+-I2PTEMP="%SYSTEM_java_io_tmpdir"
+-# PORTABLE installation:
+-# Use the following instead.
+-#I2PTEMP="%INSTALL_PATH"
++I2P="/usr/share/i2p"
++I2P_CONFIG_DIR="$HOME/.i2p"
++I2PTEMP="/tmp"
+ 
+ # Application
+ APP_NAME="i2p"
+@@ -55,8 +48,8 @@
  #RUN_AS_USER=
  
  # Wrapper
@@ -34,6 +58,94 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
+@@ -167,48 +160,6 @@
+ # Workaround for Gentoo
+ JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
+ 
+-if [ -e /etc/gentoo-release ]; then
+-    if [ $JAVABINARY = java ]; then
+-        if [ -x /etc/java-config-2/current-system-vm/bin/java ]; then
+-            JAVABINARY="/etc/java-config-2/current-system-vm/bin/java"
+-        else
+-            echo "Please set wrapper.java.command in $WRAPPER_CONF"
+-            exit 1
+-        fi
+-    fi
+-fi
+-
+-WRAPPER_URL="http://www.i2p2.de/manualwrapper"
+-unsupported() {
+-    echo "The most likely reason is that a supported version of the java"
+-    echo "wrapper is not available in the I2P installation package for your"
+-    echo "platform. It may be possible to manually download and install"
+-    echo "a compatible wrapper for your system."
+-    echo "See ${WRAPPER_URL} for hints."
+-    echo
+-    echo "In the meantime, you may start I2P by running the script"
+-    echo "${I2P}/runplain.sh"
+-    echo
+-}
+-
+-failed() {
+-        echo "**Failed to load the wrapper**"
+-        case `uname -s` in
+-             FreeBSD)
+-                echo
+-                echo "The wrapper requires libiconv to be on your system."
+-                echo "It can be installed with pkg_add -r libiconv"
+-                echo
+-                exit 1
+-                ;;
+-             *)
+-                echo
+-                unsupported
+-                exit 1
+-                ;;
+-        esac
+-}
+-
+ if [ -n "$FIXED_COMMAND" ]
+ then
+     COMMAND="$FIXED_COMMAND"
+@@ -899,9 +850,6 @@
+         # The string passed to eval must handles spaces in paths correctly.
+         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
+         eval $COMMAND_LINE
+-        if [ "$?" -ne "0" ]; then
+-                failed
+-        fi
+     else
+         eval echo `gettext '$APP_LONG_NAME is already running.'`
+         exit 1
+@@ -1025,9 +973,6 @@
+         # The string passed to eval must handles spaces in paths correctly.
+         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
+         eval $COMMAND_LINE
+-        if [ "$?" -ne "0" ]; then
+-                failed
+-        fi
+     else
+         eval echo `gettext '$APP_LONG_NAME is already running.'`
+         exit 1
+@@ -1798,16 +1743,8 @@
+             status
+             ;;
+ 
+-        'install')
+-            installdaemon
+-            if [ ! `grep ^RUN_AS_USER $0` ]; then
+-                 showsetusermesg
+-            fi
+-
+-            ;;
+-
+-        'remove' | 'uninstall')
+-            removedaemon
++        'install' | 'remove' | 'uninstall')
++            echo "Use \"dpkg-reconfigure i2p\" to configure the initscript."
+             ;;
+ 
+         'dump')
 --- a/installer/resources/runplain.sh
 +++ b/installer/resources/runplain.sh
 @@ -11,8 +11,8 @@
