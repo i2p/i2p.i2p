@@ -393,8 +393,8 @@ public class IndexBean {
     ////
     
     public String getTheme() {
-    	String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
-	return "/themes/console/" + theme + "/";
+        String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+        return "/themes/console/" + theme + "/";
     }
 
     public boolean allowCSS() {

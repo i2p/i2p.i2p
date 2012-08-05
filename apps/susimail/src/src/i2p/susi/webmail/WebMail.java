@@ -37,6 +37,8 @@ import i2p.susi.webmail.smtp.SMTPClient;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -57,6 +59,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import net.i2p.I2PAppContext;
 
 /**
  * @author susi23
@@ -164,6 +168,8 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
 
+	private static final String RC_PROP_THEME = "routerconsole.theme";
+	private static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
 	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
 
@@ -1187,6 +1193,24 @@ public class WebMail extends HttpServlet
 	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response )
 	throws IOException, ServletException
 	{
+		String theme = Config.getProperty(CONFIG_THEME, DEFAULT_THEME);
+		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		boolean universalTheming = ctx.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
+		if (universalTheming) {
+			// Fetch routerconsole theme (or use our default if it doesn't exist)
+			theme = ctx.getProperty(RC_PROP_THEME, DEFAULT_THEME);
+			// Ensure that theme exists
+			String[] themes = getThemes();
+			boolean themeExists = false;
+			for (int i = 0; i < themes.length; i++) {
+				if (themes[i].equals(theme))
+					themeExists = true;
+			}
+			if (!themeExists) {
+				theme = DEFAULT_THEME;
+			}
+		}
+
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
                 response.setHeader("X-Frame-Options", "SAMEORIGIN");
@@ -1206,7 +1230,7 @@ public class WebMail extends HttpServlet
 			sessionObject.info = "";
 			sessionObject.pageChanged = false;
 			sessionObject.showAttachment = null;
-			sessionObject.themePath = "/themes/susimail/" + Config.getProperty(CONFIG_THEME, DEFAULT_THEME) + '/';
+			sessionObject.themePath = "/themes/susimail/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			
 			processStateChangeButtons( sessionObject, request );
@@ -1731,5 +1755,26 @@ public class WebMail extends HttpServlet
 	/** translate */
     private static String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p);
+    }
+
+    /**
+     * Get all themes
+     * @return String[] -- Array of all the themes found.
+     */
+    public String[] getThemes() {
+            String[] themes = null;
+            // "docs/themes/susimail/"
+            File dir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs/themes/susimail");
+            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
+            // Walk the themes dir, collecting the theme names, and append them to the map
+            File[] dirnames = dir.listFiles(fileFilter);
+            if (dirnames != null) {
+                themes = new String[dirnames.length];
+                for(int i = 0; i < dirnames.length; i++) {
+                    themes[i] = dirnames[i].getName();
+                }
+            }
+            // return the map.
+            return themes;
     }
 }

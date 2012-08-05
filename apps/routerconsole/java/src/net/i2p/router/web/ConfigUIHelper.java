@@ -17,6 +17,13 @@ public class ConfigUIHelper extends HelperBase {
                 buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(theme).append("\">").append(_(theme)).append("<br>\n");
         }
+        boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
+        buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
+        if (universalTheming)
+            buf.append("checked=\"checked\" ");
+        buf.append("value=\"1\">")
+           .append(_("Set theme universally across all apps"))
+           .append("<br>\n");
         return buf.toString();
     }
 

@@ -85,6 +85,8 @@ public class SnarkManager implements Snark.CompleteListener {
     //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
     public static final String PROP_REFRESH_DELAY = "i2psnark.refreshSeconds";
+    public static final String RC_PROP_THEME = "routerconsole.theme";
+    public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
@@ -296,6 +298,22 @@ public class SnarkManager implements Snark.CompleteListener {
      */
     public String getTheme() {
         String theme = _config.getProperty(PROP_THEME);
+        boolean universalTheming = _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
+        if (universalTheming) {
+            // Fetch routerconsole theme (or use our default if it doesn't exist)
+            theme = _context.getProperty(RC_PROP_THEME, DEFAULT_THEME);
+            // Ensure that theme exists
+            String[] themes = getThemes();
+            boolean themeExists = false;
+            for (int i = 0; i < themes.length; i++) {
+                if (themes[i].equals(theme))
+                    themeExists = true;
+            }
+            if (!themeExists) {
+                theme = DEFAULT_THEME;
+                _config.setProperty(PROP_THEME, DEFAULT_THEME);
+            }
+        }
         return theme;
     }
 
