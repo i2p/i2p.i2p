@@ -30,14 +30,21 @@ class UDPReceiver {
     private final UDPTransport _transport;
     private static int __id;
     private final int _id;
+
     private static final int TYPE_POISON = -99999;
+    private static final int MIN_QUEUE_SIZE = 16;
+    private static final int MAX_QUEUE_SIZE = 192;
     
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
         _id = ++__id;
         _name = name;
-        _inboundQueue = new LinkedBlockingQueue();
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
+        _inboundQueue = new LinkedBlockingQueue(qsize);
         _socket = socket;
         _transport = transport;
         _runner = new Runner();
@@ -138,7 +145,11 @@ class UDPReceiver {
         return doReceive(packet);
     }
 
-    /** @return zero (was queue size) */
+    /**
+     * BLOCKING if queue between here and PacketHandler is full.
+     *
+     * @return zero (was queue size)
+     */
     private final int doReceive(UDPPacket packet) {
         if (!_keepRunning)
             return 0;
@@ -168,7 +179,12 @@ class UDPReceiver {
                 }
             }
             if (!rejected) {
-                _inboundQueue.offer(packet);
+                try {
+                    _inboundQueue.put(packet);
+                } catch (InterruptedException ie) {
+                    packet.release();
+                    _keepRunning = false;
+                }
                 //return queueSize + 1;
                 return 0;
             }

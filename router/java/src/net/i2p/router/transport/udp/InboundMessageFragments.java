@@ -43,8 +43,8 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         _context.statManager().createRateStat("udp.receivedCompleteFragments", "How many fragments go in a fully received message", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivedACKs", "How many messages were ACKed at a time", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.ignoreRecentDuplicate", "Take note that we received a packet for a recently completed message", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receiveMessagePeriod", "How long it takes to pull the message fragments out of a packet", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receiveACKPeriod", "How long it takes to pull the ACKs out of a packet", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receiveMessagePeriod", "How long it takes to pull the message fragments out of a packet", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receiveACKPeriod", "How long it takes to pull the ACKs out of a packet", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePiggyback", "How many acks were included in a packet with data fragments (time == # data fragments)", "udp", UDPTransport.RATES);
     }
     
@@ -71,15 +71,16 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
      * Pull the fragments and ACKs out of the authenticated data packet
      */
     public void receiveData(PeerState from, UDPPacketReader.DataReader data) {
-        long beforeMsgs = _context.clock().now();
+        //long beforeMsgs = _context.clock().now();
         int fragmentsIncluded = receiveMessages(from, data);
-        long afterMsgs = _context.clock().now();
+        //long afterMsgs = _context.clock().now();
         int acksIncluded = receiveACKs(from, data);
-        long afterACKs = _context.clock().now();
+        //long afterACKs = _context.clock().now();
         
         from.packetReceived(data.getPacketSize());
-        _context.statManager().addRateData("udp.receiveMessagePeriod", afterMsgs-beforeMsgs, afterACKs-beforeMsgs);
-        _context.statManager().addRateData("udp.receiveACKPeriod", afterACKs-afterMsgs, afterACKs-beforeMsgs);
+        // each of these was less than 0.1 ms
+        //_context.statManager().addRateData("udp.receiveMessagePeriod", afterMsgs-beforeMsgs, afterACKs-beforeMsgs);
+        //_context.statManager().addRateData("udp.receiveACKPeriod", afterACKs-afterMsgs, afterACKs-beforeMsgs);
         if ( (fragmentsIncluded > 0) && (acksIncluded > 0) )
             _context.statManager().addRateData("udp.receivePiggyback", acksIncluded, fragmentsIncluded);
     }

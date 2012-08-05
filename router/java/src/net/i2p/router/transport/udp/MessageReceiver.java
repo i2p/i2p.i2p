@@ -28,8 +28,11 @@ class MessageReceiver {
     private final BlockingQueue<InboundMessageState> _completeMessages;
     private boolean _alive;
     //private ByteCache _cache;
+
     private static final int MIN_THREADS = 2;  // unless < 32MB
     private static final int MAX_THREADS = 5;
+    private static final int MIN_QUEUE_SIZE = 32;  // unless < 32MB
+    private static final int MAX_QUEUE_SIZE = 128;
     private final int _threadCount;
     private static final long POISON_IMS = -99999999999l;
     
@@ -37,17 +40,22 @@ class MessageReceiver {
         _context = ctx;
         _log = ctx.logManager().getLog(MessageReceiver.class);
         _transport = transport;
-        _completeMessages = new LinkedBlockingQueue();
 
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
-        if (maxMemory < 32*1024*1024)
+        int qsize;
+        if (maxMemory < 32*1024*1024) {
             _threadCount = 1;
-        else if (maxMemory < 64*1024*1024)
+            qsize = 16;
+        } else if (maxMemory < 64*1024*1024) {
             _threadCount = 2;
-        else
+            qsize = 32;
+        } else {
             _threadCount = Math.max(MIN_THREADS, Math.min(MAX_THREADS, ctx.bandwidthLimiter().getInboundKBytesPerSecond() / 20));
+            qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
+        }
+        _completeMessages = new LinkedBlockingQueue(qsize);
 
         // the runners run forever, no need to have a cache
         //_cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
@@ -56,7 +64,7 @@ class MessageReceiver {
         _context.statManager().createRateStat("udp.inboundReady", "How many messages were ready when a message is added to the complete queue?", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.inboundReadTime", "How long it takes to parse in the completed fragments into a message?", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.inboundReceiveProcessTime", "How long it takes to add the message to the transport?", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.inboundLag", "How long the olded ready message has been sitting on the queue (period is the queue size)?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.inboundLag", "How long the oldest ready message has been sitting on the queue (period is the queue size)?", "udp", UDPTransport.RATES);
         
         _alive = true;
     }
@@ -93,12 +101,18 @@ class MessageReceiver {
     /**
      *  This queues the message for processing.
      *  Processing will call state.releaseResources(), do not access state after calling this.
+     *  BLOCKING if queue is full.
      */
     public void receiveMessage(InboundMessageState state) {
         //int total = 0;
         //long lag = -1;
-        if (_alive)
-            _completeMessages.offer(state);
+        if (_alive) {
+            try {
+                _completeMessages.put(state);
+            } catch (InterruptedException ie) {
+                _alive = false;
+            }
+        }
         //total = _completeMessages.size();
         //if (total > 1)
         //    lag = ((InboundMessageState)_completeMessages.get(0)).getLifetime();

@@ -27,7 +27,7 @@ public class InternalServerSocket extends ServerSocket {
     private static final ConcurrentHashMap<Integer, InternalServerSocket> _sockets = new ConcurrentHashMap(4);
     private final BlockingQueue<InternalSocket> _acceptQueue;
     private final Integer _port;
-    private boolean _running;
+    private volatile boolean _running;
     //private static Log _log = I2PAppContext.getGlobalContext().logManager().getLog(InternalServerSocket.class);
 
     /**

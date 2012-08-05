@@ -1,3 +1,14 @@
+2012-08-05 zzz
+ * I2PSessionImpl: One more volatile (ticket #659)
+ * i2ptunnel, I2CP, EepGet: Buffer socket input streams (ticket #666)
+ * UDP:
+   - Limit PacketHandler threads to 1 (ticket #660)
+   - Limit queue sizes between UDPReceiver and PacketHandler,
+     and between PacketHandler and MessageReceiver, to prevent OOMs
+     and/or excessive queue delays
+   - Increase UDPPacket cache size based on max mem
+   - Remove more stats
+
 2012-08-03 zzz
  * build.xml: Add buildI2PTunnelJar target for Android
  * i2psnark: Finish migration to I2P logging to reduce object churn (ticket #673)

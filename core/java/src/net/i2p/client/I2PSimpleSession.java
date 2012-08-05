@@ -5,6 +5,7 @@ package net.i2p.client;
  * with no warranty of any kind, either expressed or implied.  
  */
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -27,6 +28,8 @@ import net.i2p.internal.QueuedI2CPMessageReader;
  * @author zzz
  */
 class I2PSimpleSession extends I2PSessionImpl2 {
+
+    private static final int BUF_SIZE = 1024;
 
     /**
      * Create a new session for doing naming and bandwidth queries only. Do not create a destination.
@@ -68,7 +71,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                 _out.write(I2PClient.PROTOCOL_BYTE);
                 _out.flush();
                 _writer = new ClientWriterRunner(_out, this);
-                InputStream in = _socket.getInputStream();
+                InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
                 _reader = new I2CPMessageReader(in, this);
             }
             // we do not receive payload messages, so we do not need an AvailabilityNotifier
