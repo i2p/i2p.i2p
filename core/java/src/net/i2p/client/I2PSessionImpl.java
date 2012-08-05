@@ -9,6 +9,7 @@ package net.i2p.client;
  *
  */
 
+import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,7 +117,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected volatile boolean _closing;
 
     /** have we received the current date from the router yet? */
-    private boolean _dateReceived;
+    private volatile boolean _dateReceived;
     /** lock that we wait upon, that the SetDateMessageHandler notifies */
     private final Object _dateReceivedLock = new Object();
 
@@ -154,6 +155,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     public static final int LISTEN_PORT = 7654;
+
+    private static final int BUF_SIZE = 32*1024;
     
     /** for extension */
     protected I2PSessionImpl(I2PAppContext context, Properties options) {
@@ -353,7 +356,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _out.write(I2PClient.PROTOCOL_BYTE);
                 _out.flush();
                 _writer = new ClientWriterRunner(_out, this);
-                InputStream in = _socket.getInputStream();
+                InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
                 _reader = new I2CPMessageReader(in, this);
             }
             Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);

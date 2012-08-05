@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -17,6 +18,7 @@ import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 
 public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErrorListener {
@@ -167,6 +169,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 _log.debug("Initial data " + (initialI2PData != null ? initialI2PData.length : 0) 
                            + " written to I2P, " + (initialSocketData != null ? initialSocketData.length : 0)
                            + " written to the socket, starting forwarders");
+            if (!(s instanceof InternalSocket))
+                in = new BufferedInputStream(in, 2*NETWORK_BUFFER_SIZE);
             Thread t1 = new StreamForwarder(in, i2pout, true);
             Thread t2 = new StreamForwarder(i2pin, out, false);
             synchronized (finishLock) {

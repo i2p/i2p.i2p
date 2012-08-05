@@ -1,5 +1,6 @@
 package net.i2p.util;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -1057,6 +1058,8 @@ public class EepGet {
             //}
         }
         _proxyIn = _proxy.getInputStream();
+        if (!(_proxy instanceof InternalSocket))
+              _proxyIn = new BufferedInputStream(_proxyIn);
         _proxyOut = _proxy.getOutputStream();
         
         if (timeout != null)

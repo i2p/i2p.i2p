@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -219,6 +220,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         // shadows _log in super()
         private final Log _log;
 
+        private static final int BUF_SIZE = 16*1024;
+
         public CompressedRequestor(Socket webserver, I2PSocket browser, String headers, I2PAppContext ctx, Log log) {
             _webserver = webserver;
             _browser = browser;
@@ -259,7 +262,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 //     at java.lang.Thread.run(Thread.java:619)
                 //     at net.i2p.util.I2PThread.run(I2PThread.java:71)
                 try {
-                    serverin = _webserver.getInputStream();
+                    serverin = new BufferedInputStream(_webserver.getInputStream(), BUF_SIZE);
                 } catch (NullPointerException npe) {
                     throw new IOException("getInputStream NPE");
                 }

@@ -8,6 +8,7 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -96,6 +97,8 @@ class ClientConnectionRunner {
     // e.g. on local access
     private static final int MAX_MESSAGE_ID = 0x4000000;
 
+    private static final int BUF_SIZE = 32*1024;
+
     /** @since 0.9.2 */
     private static final String PROP_TAGS = "crypto.tagsToSend";
     private static final String PROP_THRESH = "crypto.lowTagThreshold";
@@ -124,7 +127,8 @@ class ClientConnectionRunner {
      */
     public void startRunning() {
         try {
-            _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this, true));
+            _reader = new I2CPMessageReader(new BufferedInputStream(_socket.getInputStream(), BUF_SIZE),
+                                            new ClientMessageEventListener(_context, this, true));
             _writer = new ClientWriterRunner(_context, this);
             I2PThread t = new I2PThread(_writer);
             t.setName("I2CP Writer " + ++__id);

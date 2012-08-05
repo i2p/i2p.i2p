@@ -37,6 +37,7 @@ package net.i2p.util;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -675,6 +676,8 @@ public class SSLEepGet extends EepGet {
             // this is an IOE
             throw sslhe;
         }
+
+        _proxyIn = new BufferedInputStream(_proxyIn);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request flushed");
