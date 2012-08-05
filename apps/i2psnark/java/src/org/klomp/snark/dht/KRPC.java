@@ -383,7 +383,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  Non-blocking.
      *
      *  @param ih the Info Hash (torrent)
-     *  @param peer the peer's Hash
+     *  @param peerHash the peer's Hash
      */
     public void announce(byte[] ih, byte[] peerHash) {
         InfoHash iHash = new InfoHash(ih);

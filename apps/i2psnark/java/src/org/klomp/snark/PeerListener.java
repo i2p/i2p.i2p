@@ -194,10 +194,10 @@ interface PeerListener
    *
    * @param peer the Peer that got the message.
    * @param port the query port
-   * @param port the response port
+   * @param rport the response port
    * @since 0.8.4
    */
-  void gotPort(Peer peer, int port, int qport);
+  void gotPort(Peer peer, int port, int rport);
 
   /**
    * Called when peers are received via PEX

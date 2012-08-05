@@ -98,7 +98,7 @@ class DHTNodes {
 
     /**
      *  DHT
-     *  @param sha1 either a InfoHash or a NID
+     *  @param h either a InfoHash or a NID
      */
     public List<NodeInfo> findClosest(SHA1Hash h, int numWant) {
         NID key;

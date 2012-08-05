@@ -778,7 +778,6 @@ public class KBucketSet<T extends SimpleDataStructure> {
          *  To always discard a newer entry, always return false.
          *
          *  @param kbucket the kbucket that is now too big
-         *  @param justAdded the entry that was just added, causing it to be too big
          *  @return true to actually add the entry.
          */
         public boolean trim(KBucket<K> kbucket, K toAdd);
