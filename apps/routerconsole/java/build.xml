@@ -330,6 +330,114 @@
             splitindex="true" 
             windowtitle="Router Console" />
     </target>
+
+    <!-- scala paths -->
+    <target name="scala.init">
+        <property name="scala-library.jar" value="${scalatest.libs}/scala-library.jar" />
+        <property name="scalatest.jar" value="${scalatest.libs}/scalatest.jar" />
+        <taskdef resource="scala/tools/ant/antlib.xml">
+            <classpath>
+                <pathelement location="${scalatest.libs}/scala-compiler.jar" />
+                <pathelement location="${scala-library.jar}" />
+            </classpath>
+        </taskdef>
+    </target>
+
+    <!-- unit tests -->
+    <target name="scalatest.compileTest" depends="compile, scala.init">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj_scala" />
+        <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
+            <classpath>
+                <pathelement location="${classpath}" />
+                <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scalatest.jar}" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../../router/java/build/router.jar" />
+                <pathelement location="./build/obj" />
+            </classpath>
+        </scalac>
+    </target>
+    <!-- preparation of code coverage tool of choice -->
+    <target name="prepareClover" depends="compile" if="with.clover">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../../reports/apps/routerconsole/clover" />
+        <clover-setup initString="../../../reports/apps/routerconsole/clover/coverage.db"/>
+    </target>
+    <target name="prepareCobertura" depends="compile" if="with.cobertura">
+        <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
+        <mkdir dir="./build/obj_cobertura" />
+        <delete file="./cobertura.ser" />
+        <cobertura-instrument todir="./build/obj_cobertura">
+            <fileset dir="./build/obj">
+                <include name="**/*.class"/>
+                <exclude name="**/*Test.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
+    <target name="prepareTest" depends="prepareClover, prepareCobertura" />
+    <!-- end preparation of code coverage tool -->
+    <target name="scalatest.test" depends="clean, scalatest.compileTest, prepareTest">
+        <mkdir dir="../../../reports/apps/routerconsole/scalatest/" />
+        <delete>
+            <fileset dir="../../../reports/apps/routerconsole/scalatest">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+        <taskdef name="scalatest" classname="org.scalatest.tools.ScalaTestAntTask">
+            <classpath>
+                <pathelement location="${classpath}" />
+                <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scalatest.jar}" />
+                <pathelement location="./build/obj_cobertura" />
+                <pathelement location="./build/obj" />
+                <pathelement location="${with.clover}" />
+                <pathelement location="${with.cobertura}" />
+            </classpath>
+        </taskdef>
+        <scalatest runpath="./build/obj_scala" fork="yes" maxmemory="384M">
+            <tagsToExclude>
+                SlowTests
+            </tagsToExclude>
+            <reporter type="stdout" />
+            <reporter type="junitxml" directory="../../../reports/apps/routerconsole/scalatest/" />
+        </scalatest>
+        <!-- fetch the real hostname of this machine -->
+        <exec executable="hostname" outputproperty="host.name"/>
+        <!-- set if unset -->
+        <property name="host.fakename" value="i2ptester" />
+        <!-- replace hostname that junit inserts into reports with fake one -->
+        <replace dir="../../../reports/apps/routerconsole/scalatest/" token="${host.name}" value="${host.fakename}"/>
+    </target>
+    <target name="test" depends="scalatest.test"/>
+    <!-- test reports -->
+    <target name="scalatest.report">
+        <junitreport todir="../../../reports/apps/routerconsole/scalatest">
+            <fileset dir="../../../reports/apps/routerconsole/scalatest">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="../../../reports/apps/routerconsole/html/scalatest"/>
+        </junitreport>
+    </target>
+    <target name="clover.report" depends="test" if="with.clover">
+        <clover-report>
+            <current outfile="../../../reports/apps/routerconsole/html/clover">
+                <format type="html"/>
+            </current>
+        </clover-report>
+    </target>
+    <target name="cobertura.report" depends="test" if="with.cobertura">
+        <mkdir dir="../../../reports/apps/routerconsole/cobertura" />
+        <cobertura-report format="xml" srcdir="./src" destdir="../../../reports/apps/routerconsole/cobertura" />
+        <mkdir dir="../../../reports/apps/routerconsole/html/cobertura" />
+        <cobertura-report format="html" srcdir="./src" destdir="../../../reports/apps/routerconsole/html/cobertura" />
+        <delete file="./cobertura.ser" />
+    </target>
+    <target name="test.report" depends="scalatest.report, clover.report, cobertura.report"/>
+    <!-- end test reports -->
+    <target name="fulltest" depends="cleandep, test, test.report" />
+    <!-- end unit tests -->
+
     <target name="clean">
         <delete dir="./build" />
         <delete dir="../jsp/WEB-INF/" />
