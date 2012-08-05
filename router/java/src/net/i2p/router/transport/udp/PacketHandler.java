@@ -31,8 +31,8 @@ class PacketHandler {
     private volatile boolean _keepReading;
     private final Handler[] _handlers;
     
-    private static final int MIN_NUM_HANDLERS = 2;  // unless < 32MB
-    private static final int MAX_NUM_HANDLERS = 5;
+    private static final int MIN_NUM_HANDLERS = 1;  // unless < 32MB
+    private static final int MAX_NUM_HANDLERS = 1;
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     

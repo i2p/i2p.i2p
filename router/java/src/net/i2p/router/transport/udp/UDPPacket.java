@@ -42,12 +42,18 @@ class UDPPacket {
     //  Warning - this mixes contexts in a multi-router JVM
     private static final Queue<UDPPacket> _packetCache;
     private static final boolean CACHE = true;
-    private static final int CACHE_SIZE = 64;
+    private static final int MIN_CACHE_SIZE = 64;
+    private static final int MAX_CACHE_SIZE = 256;
     static {
-        if (CACHE)
-            _packetCache = new LinkedBlockingQueue(CACHE_SIZE);
-        else
+        if (CACHE) {
+            long maxMemory = Runtime.getRuntime().maxMemory();
+            if (maxMemory == Long.MAX_VALUE)
+                maxMemory = 96*1024*1024l;
+            int csize = (int) Math.max(MIN_CACHE_SIZE, Math.min(MAX_CACHE_SIZE, maxMemory / (1024*1024)));
+            _packetCache = new LinkedBlockingQueue(csize);
+        } else {
             _packetCache = null;
+        }
     }
     
     /**
