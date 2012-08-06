@@ -124,8 +124,7 @@ public class SAMStreamSession {
 
         _log.debug("SAM STREAM session instantiated");
 
-        Properties allprops = new Properties();
-        allprops.putAll(System.getProperties());
+        Properties allprops = (Properties) System.getProperties().clone();
         allprops.putAll(props);
 
         String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");

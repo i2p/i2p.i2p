@@ -85,8 +85,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 
 	    	_log.debug("SAM STREAM session instantiated");
 
-	    	Properties allprops = new Properties();
-	    	allprops.putAll(System.getProperties());
+	        Properties allprops = (Properties) System.getProperties().clone();
 	    	allprops.putAll(rec.getProps());
 	    	
 	    	String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
