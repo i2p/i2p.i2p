@@ -117,9 +117,8 @@ public class PeerAcceptor
         }
     } else {
         // multitorrent capable, so lets see what we can handle
-        for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
-            PeerCoordinator cur = (PeerCoordinator)iter.next();
-
+        PeerCoordinator cur = coordinators.get(peerInfoHash);
+        if (cur != null) {
             if (DataHelper.eq(cur.getInfoHash(), peerInfoHash)) {
                 if (cur.needPeers())
                   {

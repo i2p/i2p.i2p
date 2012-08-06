@@ -17,9 +17,14 @@ public interface DHT {
 
 
     /**
-     *  @return The UDP port that should be included in a PORT message.
+     *  @return The UDP query port
      */
     public int getPort();
+
+    /**
+     *  @return The UDP response port
+     */
+    public int getRPort();
 
     /**
      *  Ping. We don't have a NID yet so the node is presumed
@@ -79,4 +84,14 @@ public interface DHT {
      *  @return the number of successful announces, not counting ourselves.
      */
     public int announce(byte[] ih, int max, long maxWait);
+
+    /**
+     * Stop everything.
+     */
+    public void stop();
+
+    /**
+     * Known nodes, not estimated total network size.
+     */
+    public int size();
 }

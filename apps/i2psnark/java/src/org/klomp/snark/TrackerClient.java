@@ -43,6 +43,8 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.dht.DHT;
+
 /**
  * Informs metainfo tracker of events and gets new peers for peer
  * coordinator.
@@ -323,8 +325,9 @@ public class TrackerClient implements Runnable {
             }
 
             // Local DHT tracker announce
-            if (_util.getDHT() != null)
-                _util.getDHT().announce(snark.getInfoHash());
+            DHT dht = _util.getDHT();
+            if (dht != null)
+                dht.announce(snark.getInfoHash());
 
             long uploaded = coordinator.getUploaded();
             long downloaded = coordinator.getDownloaded();
@@ -372,9 +375,10 @@ public class TrackerClient implements Runnable {
                         snark.setTrackerSeenPeers(tr.seenPeers);
 
                     // pass everybody over to our tracker
-                    if (_util.getDHT() != null) {
+                    dht = _util.getDHT();
+                    if (dht != null) {
                         for (Peer peer : peers) {
-                            _util.getDHT().announce(snark.getInfoHash(), peer.getPeerID().getDestHash());
+                            dht.announce(snark.getInfoHash(), peer.getPeerID().getDestHash());
                         }
                     }
 
@@ -458,19 +462,21 @@ public class TrackerClient implements Runnable {
 
             // Get peers from DHT
             // FIXME this needs to be in its own thread
-            if (_util.getDHT() != null && (meta == null || !meta.isPrivate()) && !stop) {
+            dht = _util.getDHT();
+            if (dht != null && (meta == null || !meta.isPrivate()) && !stop) {
                 int numwant;
                 if (event.equals(STOPPED_EVENT) || !coordinator.needOutboundPeers())
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
-                List<Hash> hashes = _util.getDHT().getPeers(snark.getInfoHash(), numwant, 2*60*1000);
+                List<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 2*60*1000);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Got " + hashes + " from DHT");
                 // announce  ourselves while the token is still good
                 // FIXME this needs to be in its own thread
                 if (!stop) {
-                    int good = _util.getDHT().announce(snark.getInfoHash(), 8, 5*60*1000);
+                    // announce only to the 1 closest
+                    int good = dht.announce(snark.getInfoHash(), 1, 5*60*1000);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sent " + good + " good announces to DHT");
                 }
@@ -547,8 +553,9 @@ public class TrackerClient implements Runnable {
    */
   private void unannounce() {
       // Local DHT tracker unannounce
-      if (_util.getDHT() != null)
-          _util.getDHT().unannounce(snark.getInfoHash());
+      DHT dht = _util.getDHT();
+      if (dht != null)
+          dht.unannounce(snark.getInfoHash());
       int i = 0;
       for (Tracker tr : trackers) {
           if (_util.connected() &&
