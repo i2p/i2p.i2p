@@ -25,6 +25,16 @@
    - Remove some time stamping in UDPPacket
    - Other cleanups - see http://zzz.i2p/topics/1198
 
+2012-08-03 str4d
+ * Console: universal theming support - packaged apps will try and use the routerconsole
+   theme if universal theming is enabled there and the same theme exists for the app.
+
+2012-07-31 str4d
+ * core, router:
+   - Existing JUnit test framework fixed up and running.
+   - Code coverage tools (Clover and Cobertura) integrated into unit test targets.
+   - Implemented new test-related targets to provide a ScalaTest test framework.
+
 2012-07-30 zzz
  * build.xml: Move more default properties to build.properties
  * DecayingBloomFilter, DecayingHashSet, xlattice filters:
