@@ -22,7 +22,7 @@ public class BaseBean
     private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
 
     public static final String RC_PROP_THEME_NAME = "routerconsole.theme";
-    public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
+    public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME_NAME = "theme";
     public static final String DEFAULT_THEME = "light";
     public static final String BASE_THEME_PATH = "/themes/susidns/";

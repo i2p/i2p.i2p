@@ -169,7 +169,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
 
 	private static final String RC_PROP_THEME = "routerconsole.theme";
-	private static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
+	private static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
 	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
 
