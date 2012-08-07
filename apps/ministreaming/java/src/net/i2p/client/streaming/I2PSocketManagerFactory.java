@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -36,7 +37,7 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager() {
-        return createManager(getHost(), getPort(), System.getProperties());
+        return createManager(getHost(), getPort(), (Properties) System.getProperties().clone());
     }
     
     /**
@@ -59,7 +60,7 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String host, int port) {
-        return createManager(host, port, System.getProperties());
+        return createManager(host, port, (Properties) System.getProperties().clone());
     }
 
     /**
@@ -95,7 +96,7 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream) {
-        return createManager(myPrivateKeyStream, getHost(), getPort(), System.getProperties());
+        return createManager(myPrivateKeyStream, getHost(), getPort(), (Properties) System.getProperties().clone());
     }
     
     /**
@@ -126,10 +127,11 @@ public class I2PSocketManagerFactory {
         I2PClient client = I2PClientFactory.createClient();
         if (opts == null)
             opts = new Properties();
-        for (Iterator iter = System.getProperties().keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        Properties syscopy = (Properties) System.getProperties().clone();
+        for (Map.Entry e : syscopy.entrySet()) {
+            String name = (String) e.getKey();
             if (!opts.containsKey(name))
-                opts.setProperty(name, System.getProperty(name));
+                opts.setProperty(name, (String) e.getValue());
         }
         //boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
         //if (oldLib && false) {

@@ -190,13 +190,14 @@ interface PeerListener
   void gotExtension(Peer peer, int id, byte[] bs);
 
   /**
-   * Called when a port message is received.
+   * Called when a DHT port message is received.
    *
    * @param peer the Peer that got the message.
-   * @param port the port
+   * @param port the query port
+   * @param rport the response port
    * @since 0.8.4
    */
-  void gotPort(Peer peer, int port);
+  void gotPort(Peer peer, int port, int rport);
 
   /**
    * Called when peers are received via PEX

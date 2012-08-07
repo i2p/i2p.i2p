@@ -164,7 +164,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _log = context.logManager().getLog(getClass());
         _closed = true;
         if (options == null)
-            options = System.getProperties();
+            options = (Properties) System.getProperties().clone();
         loadConfig(options);
     }
 

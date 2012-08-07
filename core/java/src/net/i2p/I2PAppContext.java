@@ -516,7 +516,8 @@ public class I2PAppContext {
      * @return set of Strings containing the names of defined system properties
      */
     public Set getPropertyNames() { 
-        Set names = new HashSet(System.getProperties().keySet());
+        // clone to avoid ConcurrentModificationException
+        Set names = new HashSet(((Properties) System.getProperties().clone()).keySet());
         if (_overrideProps != null)
             names.addAll(_overrideProps.keySet());
         return names;
@@ -531,8 +532,8 @@ public class I2PAppContext {
      * @since 0.8.4
      */
     public Properties getProperties() { 
-        Properties rv = new Properties();
-        rv.putAll(System.getProperties());
+        // clone to avoid ConcurrentModificationException
+        Properties rv = (Properties) System.getProperties().clone();
         rv.putAll(_overrideProps);
         return rv;
     }

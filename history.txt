@@ -1,3 +1,10 @@
+2012-08-06 zzz
+ * Clone System properties before iterating to avoid
+   ConcurrentModificationException (ticket #680)
+ * Console: Fix flag links on /console to return to same page
+ * i2psnark: Add support for DHT (disabled by default)
+ * jbigi: Add ARMv6 libjbigi.so for Raspberry Pi
+
 2012-08-05 zzz
  * I2PSessionImpl: One more volatile (ticket #659)
  * i2ptunnel, I2CP, EepGet: Buffer socket input streams (ticket #666)

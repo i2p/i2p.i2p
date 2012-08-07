@@ -258,5 +258,16 @@ public interface I2PSession {
     public static final int PROTO_ANY = 0;
     public static final int PROTO_UNSPECIFIED = 0;
     public static final int PROTO_STREAMING = 6;
+
+    /**
+     *  Generally a signed datagram, but could
+     *  also be a raw datagram, depending on the application
+     */
     public static final int PROTO_DATAGRAM = 17;
+
+    /**
+     *  A raw (unsigned) datagram
+     *  @since 0.9.1
+     */
+    public static final int PROTO_DATAGRAM_RAW = 18;
 }

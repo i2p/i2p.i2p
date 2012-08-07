@@ -1,9 +1,10 @@
 package org.klomp.snark;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.i2p.crypto.SHA1Hash;
 
 /**
  * Hmm, any guesses as to what this is?  Used by the multitorrent functionality
@@ -12,26 +13,28 @@ import java.util.Set;
  * from it there too)
  */
 public class PeerCoordinatorSet {
-    private final Set _coordinators;
+    private final Map<SHA1Hash, PeerCoordinator> _coordinators;
     
     public PeerCoordinatorSet() {
-        _coordinators = new HashSet();
+        _coordinators = new ConcurrentHashMap();
     }
-    
-    public Iterator iterator() {
-        synchronized (_coordinators) {
-            return new ArrayList(_coordinators).iterator();
-        }
+     
+    public Iterator<PeerCoordinator> iterator() {
+        return _coordinators.values().iterator();
     }
-    
+
     public void add(PeerCoordinator coordinator) {
-        synchronized (_coordinators) {
-            _coordinators.add(coordinator);
-        }
+        _coordinators.put(new SHA1Hash(coordinator.getInfoHash()), coordinator);
     }
+
     public void remove(PeerCoordinator coordinator) {
-        synchronized (_coordinators) {
-            _coordinators.remove(coordinator);
-        }
+        _coordinators.remove(new SHA1Hash(coordinator.getInfoHash()));
+    }
+
+    /**
+     *  @since 0.9.2
+     */
+    public PeerCoordinator get(byte[] infoHash) {
+        return _coordinators.get(new SHA1Hash(infoHash));
     }
 }
