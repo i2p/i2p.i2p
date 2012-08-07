@@ -369,7 +369,6 @@ div.main textarea {
 }
 
 div.main h2 {
-     margin-top: 0;
      margin-bottom: 10px !important;
      -moz-border-radius: 0 3px 0 0;
      -khtml-border-radius: 0 3px 0 0;
@@ -494,9 +493,9 @@ div.news hr:last-child {
 
 div.confignav {
      padding: 15px 0;
-     margin: -16px -16px 0 -16px;
+     margin: -16px -16px 5px -16px;
      border: 1px solid #89f;
-     font-size: 9.5pt;
+     font-size: 8.5pt;
 }
 
 div.confignav a {
@@ -581,11 +580,11 @@ div.configure h2:first-child {
 }
 
 div.messages {
-     padding: 0px 10px;
+     padding: 10px 10px;
      background: #fff;
      border: 1px solid #89f;
      border-right: 0;
-     margin: -1px -15px 10px -16px;
+     margin: -6px -15px 10px -16px;
      text-align: center;
      font-size: 9pt;
      font-weight: bold;
@@ -593,12 +592,19 @@ div.messages {
 }
 
 div.messages li, div.messages ul {
-     padding: 10px 0 0 5px;
-     margin: -10px 0 0 0;
+     padding: 10px 0 0 5px !important;
+     margin: -10px 0 0 25px !important;
+     list-style: none;
+     text-align: left;
 }
 
 div.error {
      color: #d00000;
+     background-image: url("../images/errortriangle.png");
+     background-position: 10px center;
+     background-repeat: no-repeat;
+     padding: 10px 0;
+     margin-left: -5px;
 }
 
 div.notice {
@@ -888,9 +894,9 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -5px 0 7px 0;
+     margin: -8px 0 7px 0;
      background: #fff;
-     border: 1px solid #bbf;
+     border: 1px solid #89f !important;
      border-top: 0;
      padding: 4px 0 2px 0;
      background-image: url("images/tinytitle.png") !important;
