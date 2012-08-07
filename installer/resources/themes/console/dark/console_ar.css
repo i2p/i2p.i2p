@@ -44,9 +44,17 @@ div.routersummary h3 {
      text-align: center;
 }
 
+div.routersummary td {
+     text-align: right;
+}
+
 div.routersummary td:last-child {
      text-align: left;
      margin-left: 3px;
+}
+
+div.routersummary td:first-child {
+     text-align: right;
 }
 
 div.tunnels {

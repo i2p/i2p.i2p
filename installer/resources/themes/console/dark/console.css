@@ -108,7 +108,7 @@ div.routersummaryouter {
 
 div.routersummary {
      width: 173px;
-     padding: 10px 10px 8px;
+     padding: 8px 10px 8px;
      text-align: center;
      border: 1px solid #494;
      background: #000 url(images/camotile2.png);
@@ -746,7 +746,7 @@ p img:first-child {
 h1 {
      text-align: left;
      color: #EE9;
-     padding: 14px 15px;
+     padding: 13px 15px;
      margin: 0 5px 0 205px !important;
      font-size: 17pt;
      font-weight: bold;
@@ -1233,8 +1233,9 @@ div.ag2 {
 
 div.app {
      float: left;
-     padding: 5px 0 0 !important;
-     width: 137px;
+     padding: 2px 0 0 !important;
+/*     width: 137px; */
+     min-width: 70px;
      border: 1px solid #494;
      background: #000;
      background-image: -moz-linear-gradient(center top , #000B00, #000);
@@ -1242,7 +1243,7 @@ div.app {
      -moz-border-radius: 3px;
      -khtml-border-radius: 3px;
      margin: 3px;
-     height: 60px;
+     height: 53px;
      text-align: center !important;
      padding-top: 3px;
      opacity: 0.9;
@@ -1280,10 +1281,14 @@ table.search {
      margin-right:auto;
 }
 
+.appimg {
+     height: 35px;
+}
+
 img.app {
      height: 32px;
      width: 32px;
-     padding: 2px 0 0 0;
+     padding: 2px 0 0;
      margin-bottom: 2px;
 }
 
@@ -1316,13 +1321,29 @@ td.app {
 div.applabel {
      font-size: 7.5pt;
      margin: 0;
-     padding: 1px 0 0 0;
+     padding: 2px;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
      text-transform: lowercase;
      border: none;
+/*     width: 131px; */
+     min-width: 72px;
+     background: #010;
+     border-radius: 0 0 2px 2px;
+     border-top: 1px solid #494;
 }
+
+div.applabel:hover {
+     background: #000;
+     border-top: 1px solid #f60;
+}
+
+div.applabel a, div.applabel a:hover {
+     text-decoration: none !important;
+     outline: none;
+}
+
 
 /* end home page */
 
