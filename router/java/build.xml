@@ -99,18 +99,23 @@
     </target>
 
     <!-- unit tests -->
+    <target name="builddepscalatest">
+        <ant dir="../../core/java/" target="jar" />
+        <ant dir="../../core/java/" target="jarScalaTest" />
+    </target>
     <target name="builddeptest">
         <ant dir="../../core/java/" target="jarTest" />
     </target>
-    <target name="scalatest.compileTest" depends="jar, scala.init">
+    <target name="scalatest.compileTest" depends="builddepscalatest, compile, scala.init">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
+                <pathelement location="${classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
-                <pathelement location="../../core/java/build/i2p.jar" />
-                <pathelement location="./build/router.jar" />
+                <pathelement location="../../core/java/build/i2pscalatest.jar" />
+                <pathelement location="./build/obj" />
             </classpath>
         </scalac>
     </target>
@@ -123,6 +128,10 @@
                destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
+    </target>
+    <!-- jars with tests -->
+    <target name="jarScalaTest" depends="scalatest.compileTest">
+        <jar destfile="./build/routerscalatest.jar" basedir="./build/obj" includes="**/*.class ../obj_scala/**/*.class" />
     </target>
     <target name="jarTest" depends="junit.compileTest">
         <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
