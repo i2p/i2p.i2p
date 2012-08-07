@@ -17,10 +17,10 @@ _jsp\.java$
 \.war$
 \.zip$
 ^\.
-^build/
+^build
 ^pkg-temp/
 ~$
-/build/
+/build
 /classes/
 ^debian/copyright
 override.properties
