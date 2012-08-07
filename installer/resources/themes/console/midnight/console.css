@@ -46,6 +46,7 @@ div.logo {
      background-color: #00000A;
      -moz-box-shadow: inset 0 0 0 2px #00000A;
      -khtml-box-shadow: inset 0 0 0 2px #00000A;
+     border-radius: 3px;
 }
 
 div.logo hr {
@@ -84,6 +85,7 @@ div.warning {
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0 0 0 1px #f60;
      -khtml-box-shadow: inset 0 0 0 1px #f60;
+     border-radius: 3px 3px 0 0;
 }
 
 div.warning a:link {
@@ -105,24 +107,50 @@ div.warning a:active {
 }
 
 div.warning hr {
-     color: #fb7;
-     background: #fb7;
+     color: #99f;
+     background: #99f;
      height: 1px;
-     border: 0 solid #fb7;
+     border: 0 solid #99f;
      margin: 10px 0;
 }
 
 div.warning h3 {
      border: 0;
-     border-bottom: 1px solid #fb7;
+     border-bottom: 1px solid #99f;
      padding-bottom: 10px;
      padding-left: 0;
-     font-variant: small-caps;
      text-transform: capitalize;
-     font-size: 12.5pt;
+     font-size: 11pt;
      background: none !important;
+     border-radius: 0 !important;
 }
 
+.warning p {
+     padding: 0;     
+}
+
+.warning b {
+     font-size: 8.5pt;
+}
+
+.proxyfooter {
+     border: 1px solid #99f;
+     margin: -16px 25px 20px 260px;
+     border-radius: 0 0 3px 3px;
+     background: #002;  
+}
+
+.proxyfooter p {
+     font-size: 7pt;
+     text-align: right;
+     padding: 0 5px;
+     margin: 3px 3px 5px 3px;
+     line-height: 110%;
+}
+
+.proxyfooter i {
+     font-style: normal !important;     
+}
 /* console error messages */
 
 div.sorry {
@@ -139,6 +167,7 @@ div.sorry {
      background-image: url("../images/errortriangle.png");
      background-position: 15px center;
      background-repeat: no-repeat;
+     border-radius: 0 0 3px 3px;
 }
 
 div.sorry hr {
@@ -201,7 +230,7 @@ div.routersummary h3 {
      font-size: 8.5pt;
      letter-spacing: 0.01em;
      margin: -6px 0 -6px 0;
-     padding: 3px 0;
+     padding: 3px 0 2px;
      background: #002;
      text-transform: uppercase;
      background: #002 url("images/titles.png") repeat-x !important;
@@ -272,7 +301,9 @@ div.routersummary td:first-child {
 .routersummary form {
      margin: 0;
 }
-
+     
+     
+     
 div.newsheadings {
      text-align: right;
      margin: 0 7px 0 -20px;
@@ -528,6 +559,7 @@ div.configure tr {
 
 div.configure li:first-child, div.main li:first-child {
      margin-top: 0;
+     padding-top: 0;
 }
 
 div.configure li:last-child {
@@ -539,12 +571,11 @@ div.configure h2:first-child {
 }
 
 .configure form {
-     margin: 20px 15px;
+     margin: 20px 15px;     
 }
-
 .sidebarconf input[type="image"] {
      margin: 2px;
-     padding: 1px;
+     padding: 1px;     
 }
 
 .sidebarconf th:nth-child(1) {
@@ -591,17 +622,19 @@ div.messages {
      background: #000;
      border: 1px solid #99f;
      border-right: 0;
-     margin: -1px -15px 10px -16px;
+     margin: -6px -15px 10px -16px;
      text-align: center;
      font-size: 9pt;
      font-weight: bold;
      color: #474;
      -moz-box-shadow: inset 0 0 4px 2px #00000A;
+     background: url("../images/info_rhombus.png") no-repeat scroll 18px center #000;
 }
 
 div.messages li, div.messages ul {
      padding: 10px 0 0 5px;
      margin: -10px 0 0 0;
+     list-style: none;
 }
 
 div.main li b{
@@ -611,7 +644,10 @@ div.main li b{
 }
 
 div.error {
-     color: #d00000;
+     color: #d00;
+     background: url("../images/errortriangle.png") no-repeat scroll 5px center #000;
+     padding: 10px 10px 10px 45px;
+     text-align: left;
 }
 
 div.notice {
@@ -660,6 +696,7 @@ h2 {
      background: #000008;
      text-transform: uppercase;
      letter-spacing: 0.07em;
+     
 }
 
 h3 {
@@ -684,11 +721,6 @@ h2, h3, .confignav {
 
 thead, tfoot, th {
      background: #002 url("images/titles.png") repeat-x center center !important;
-}
-
-.proxyfooter{
-     font-size: 7pt;
-     display: none !important;
 }
 
 table {
@@ -780,20 +812,29 @@ div.ag2 {
 div.app {
      float: left;
      padding: 0;
-     min-width: 80px;
+     min-width: 60px;
      text-align: center !important;
-     border: 1px solid #339;
+     border: 1px solid #55a;
+     border-top: 1px solid #77b;
+     border-left: 1px solid #77b;
      margin: 3px;
      border-radius: 3px;
+     background: -moz-linear-gradient(top, #001, #000);
+}
+
+div.app:hover {
+     border: 1px solid #f60;
+     background: #000;
 }
 
 div.app:last-child {
      margin-bottom: 10px;
 }
 
-div.app a:link {
+div.app a:link, div.app a:link:hover, div.app a:link:visited, div.app a:link:active {
      font-size: 8pt !important;
      text-transform: lowercase;
+     text-decoration: none;
 }
 
 div.appgroup {
@@ -819,7 +860,7 @@ table.search {
 img.app {
      height: 32px;
      width: 32px;
-     padding: 6px;
+     padding: 6px 15px 0;
 }
 
 img.app2p {
@@ -847,19 +888,26 @@ td.app {
 }
 
 .applabel {
-     background: #003;
+     background: #001;
      font-size: 8pt;
      margin: -5px -3px -3px;
      padding: 2px 5px;
      text-align: center;
-     min-width: 80px;
-     border-top: 1px solid #003;
+     min-width: 60px;
+     border-top: 1px solid #000;
      border-radius: 0 0 2px 2px;
+     background: -moz-linear-gradient(top, #000, #001);
 }
 
-.applabel:hover, .appimg {
+.applabel:hover {
+     border-top: 1px solid #000;     
+}
+
+.applabel:hover {
      background: #000;
 }
+
+.appimg {}
 
 /* end home page */
 
@@ -1190,6 +1238,11 @@ p img:first-child {
 .langbox img {
      padding: 0 2px; /* Ignored by IE8 */
      opacity: 0.7;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, .langbox img {
+     margin-bottom: 4px;
 }
 
 .langbox img:hover {

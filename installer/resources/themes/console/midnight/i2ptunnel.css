@@ -111,10 +111,10 @@
 
 #tunnelListPage textarea {
     width: 100%;
-    height: 88px;
+    height: 60px;
     padding: 0 0 0 4px;
     color: green;
-    margin-bottom: 7px;
+    margin: 5px 0 10px;
 }
 
 #tunnelListPage .footer .control {

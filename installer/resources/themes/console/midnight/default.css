@@ -15,7 +15,7 @@ body {
 
 body.iframed {
      background: transparent url('../dark/images/transparent.gif') !important;
-     padding-top: 5px;
+     padding: 15px 0 0;
 }
 
 div {
@@ -72,6 +72,7 @@ textarea, input, select, button, a {
      margin: 2px 0 5px 0;
      background: #001;
      color: #eef;
+     border-radius: 3px;
 }
 
 button {
@@ -150,8 +151,8 @@ hr {
 }
 
 .control:hover {
-     background: #229;
-     color: #fff;
+     background: #77f;
+     color: #fff !important;
      text-decoration: none;
 }
 
@@ -222,7 +223,7 @@ hr {
 }
 
 #globalOperationsPanel .control {
-     width: 100px !important;
+     min-width: 100px !important;
      margin-top: 3px;
      float: right;
 }
