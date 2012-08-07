@@ -81,14 +81,15 @@
     </target>
 
     <!-- unit tests -->
-    <target name="scalatest.compileTest" depends="jar, scala.init">
+    <target name="scalatest.compileTest" depends="compile, scala.init">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
+                <pathelement location="${classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
-                <pathelement location="./build/i2p.jar" />
+                <pathelement location="./build/obj" />
             </classpath>
         </scalac>
     </target>
@@ -101,6 +102,10 @@
                destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
+    </target>
+    <!-- jars with tests -->
+    <target name="jarScalaTest" depends="scalatest.compileTest">
+        <jar destfile="./build/i2pscalatest.jar" basedir="./build/obj" includes="**/*.class ../obj_scala/**/*.class" />
     </target>
     <target name="jarTest" depends="junit.compileTest">
         <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
