@@ -344,7 +344,11 @@
     </target>
 
     <!-- unit tests -->
-    <target name="scalatest.compileTest" depends="compile, scala.init">
+    <target name="builddepscalatest">
+        <ant dir="../../../router/java/" target="jar" />
+        <ant dir="../../../router/java/" target="jarScalaTest" />
+    </target>
+    <target name="scalatest.compileTest" depends="builddepscalatest, compile, scala.init">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
@@ -352,8 +356,8 @@
                 <pathelement location="${classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
-                <pathelement location="../../../core/java/build/i2p.jar" />
-                <pathelement location="../../../router/java/build/router.jar" />
+                <pathelement location="../../../core/java/build/i2pscalatest.jar" />
+                <pathelement location="../../../router/java/build/routerscalatest.jar" />
                 <pathelement location="./build/obj" />
             </classpath>
         </scalac>
