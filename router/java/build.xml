@@ -131,7 +131,20 @@
     </target>
     <!-- jars with tests -->
     <target name="jarScalaTest" depends="scalatest.compileTest">
-        <jar destfile="./build/routerscalatest.jar" basedir="./build/obj" includes="**/*.class ../obj_scala/**/*.class" />
+        <mkdir dir="./build/obj_scala_jar" />
+        <copy todir="./build/obj_scala_jar">
+            <fileset dir="./build/">
+                <include name="obj/**/*.class"/>
+            </fileset>
+            <mapper type="glob" from="obj/*" to="*" />
+        </copy>
+        <copy todir="./build/obj_scala_jar">
+            <fileset dir="./build/">
+                <include name="obj_scala/**/*.class"/>
+            </fileset>
+            <mapper type="glob" from="obj_scala/*" to="*" />
+        </copy>
+        <jar destfile="./build/routerscalatest.jar" basedir="./build/obj_scala_jar" includes="**/*.class" />
     </target>
     <target name="jarTest" depends="junit.compileTest">
         <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
