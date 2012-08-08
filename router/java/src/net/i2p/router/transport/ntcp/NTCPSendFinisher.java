@@ -43,7 +43,7 @@ class NTCPSendFinisher {
         _context = context;
         _log = _context.logManager().getLog(NTCPSendFinisher.class);
         _transport = transport;
-        _context.statManager().createRateStat("ntcp.sendFinishTime", "How long to queue and excecute msg.afterSend()", "ntcp", new long[] {5*1000});
+        //_context.statManager().createRateStat("ntcp.sendFinishTime", "How long to queue and excecute msg.afterSend()", "ntcp", new long[] {5*1000});
     }
     
     public void start() {
@@ -88,17 +88,18 @@ class NTCPSendFinisher {
      */
     private class RunnableEvent implements Runnable {
         private final OutNetMessage _msg;
-        private final long _queued;
+        //private final long _queued;
 
         public RunnableEvent(OutNetMessage msg) {
             _msg = msg;
-            _queued = _context.clock().now();
+            //_queued = _context.clock().now();
         }
 
         public void run() {
             try {
                 _transport.afterSend(_msg, true, false, _msg.getSendTime());
-                _context.statManager().addRateData("ntcp.sendFinishTime", _context.clock().now() - _queued, 0);
+                // appx 0.1 ms
+                //_context.statManager().addRateData("ntcp.sendFinishTime", _context.clock().now() - _queued, 0);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, " wtf, afterSend borked", t);
             }

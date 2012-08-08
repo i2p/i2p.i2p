@@ -98,7 +98,7 @@ class EventPumper implements Runnable {
         _transport = transport;
         _expireIdleWriteTime = MAX_EXPIRE_IDLE_TIME;
         _context.statManager().createRateStat("ntcp.pumperKeySetSize", "", "ntcp", new long[] {10*60*1000} );
-        _context.statManager().createRateStat("ntcp.pumperKeysPerLoop", "", "ntcp", new long[] {10*60*1000} );
+        //_context.statManager().createRateStat("ntcp.pumperKeysPerLoop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.pumperLoopsPerSecond", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroRead", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.zeroReadDrop", "", "ntcp", new long[] {10*60*1000} );
@@ -175,7 +175,7 @@ class EventPumper implements Runnable {
                         //if (_log.shouldLog(Log.DEBUG))
                         //    _log.debug("select returned " + count);
                         Set<SelectionKey> selected = _selector.selectedKeys();
-                        _context.statManager().addRateData("ntcp.pumperKeysPerLoop", selected.size());
+                        //_context.statManager().addRateData("ntcp.pumperKeysPerLoop", selected.size());
                         processKeys(selected);
                         // does clear() do anything useful?
                         selected.clear();
