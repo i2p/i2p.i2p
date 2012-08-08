@@ -297,12 +297,11 @@ public class TrackerClient implements Runnable {
         }
     }
 
-    if (trackers.isEmpty()) {
+    if (trackers.isEmpty() && _util.getDHT() == null) {
         stop = true;
-        // FIXME translate
-        SnarkManager.instance().addMessage("No valid trackers for " + this.snark.getBaseName() + " - enable opentrackers?");
+        this.snark.addMessage(_util.getString("No valid trackers for {0} - enable opentrackers or DHT?",
+                                              this.snark.getBaseName()));
         _log.error("No valid trackers for " + this.snark.getBaseName());
-        // FIXME keep going if DHT enabled
         this.snark.stopTorrent();
         return;
     }

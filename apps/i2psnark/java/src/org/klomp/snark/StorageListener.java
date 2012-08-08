@@ -61,4 +61,6 @@ interface StorageListener
    *
    */
   void setWantedPieces(Storage storage);
+
+  void addMessage(String message);
 }

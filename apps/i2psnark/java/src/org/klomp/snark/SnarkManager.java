@@ -123,15 +123,11 @@ public class SnarkManager implements Snark.CompleteListener {
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */
     public static final String PROP_TRACKERS = "i2psnark.trackers";
 
-    private static final SnarkManager _instance = new SnarkManager();
-
-    public static SnarkManager instance() { return _instance; }
-
-    private SnarkManager() {
+    public SnarkManager(I2PAppContext ctx) {
         _snarks = new ConcurrentHashMap();
         _magnets = new ConcurrentHashSet();
         _addSnarkLock = new Object();
-        _context = I2PAppContext.getGlobalContext();
+        _context = ctx;
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new LinkedBlockingQueue();
         _util = new I2PSnarkUtil(_context);
@@ -824,13 +820,13 @@ public class SnarkManager implements Snark.CompleteListener {
                         if (info.isPrivate()) {
                             addMessage(_("ERROR - No I2P trackers in private torrent \"{0}\"", info.getName()));
                         } else if (_util.shouldUseOpenTrackers() && _util.getOpenTrackers() != null) {
-                            //addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
-                            addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers only.", info.getName()));
-                        //} else if (_util.getDHT() != null) {
-                        //    addMessage(_("Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will announce to DHT only.", info.getName()));
+                            addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
+                            //addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers only.", info.getName()));
+                        } else if (_util.getDHT() != null) {
+                            addMessage(_("Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will announce to DHT only.", info.getName()));
                         } else {
-                            //addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
-                            addMessage(_("Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is enabled before starting this torrent.", info.getName()));
+                            addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
+                            //addMessage(_("Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is enabled before starting this torrent.", info.getName()));
                             dontAutoStart = true;
                         }
                     }
@@ -1456,6 +1452,14 @@ public class SnarkManager implements Snark.CompleteListener {
         addMessage(_("Error on torrent {0}", snark.getName()) + ": " + error);
     }
     
+    /**
+     * A Snark.CompleteListener method.
+     * @since 0.9.2
+     */
+    public void addMessage(Snark snark, String message) {
+        addMessage(message);
+    }
+
     // End Snark.CompleteListeners
 
     /**

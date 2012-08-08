@@ -740,7 +740,8 @@ public class Storage
         } else {
           String msg = "File '" + names[i] + "' exists, but has wrong length (expected " +
                        lengths[i] + " but found " + length + ") - repairing corruption";
-          SnarkManager.instance().addMessage(msg);
+          if (listener != null)
+              listener.addMessage(msg);
           _log.error(msg);
           changed = true;
           resume = true;

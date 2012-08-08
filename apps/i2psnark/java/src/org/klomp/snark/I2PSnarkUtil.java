@@ -87,7 +87,6 @@ public class I2PSnarkUtil {
         //setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", 7654, null);
         _shitlist = new ConcurrentHashSet();
-        _configured = false;
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
@@ -248,7 +247,6 @@ public class I2PSnarkUtil {
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             _connecting = false;
         }
-        // FIXME this only instantiates krpc once, left stuck with old manager
         if (_shouldUseDHT && _manager != null && _dht == null)
             _dht = new KRPC(_context, _manager.getSession());
         return (_manager != null);

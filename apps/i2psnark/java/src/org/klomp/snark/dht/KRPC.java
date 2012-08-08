@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
@@ -111,6 +112,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private final File _dhtFile;
     private volatile boolean _isRunning;
     private volatile boolean _hasBootstrapped;
+    /** stats */
+    private final AtomicLong _rxPkts = new AtomicLong();
+    private final AtomicLong _txPkts = new AtomicLong();
+    private final AtomicLong _rxBytes = new AtomicLong();
+    private final AtomicLong _txBytes = new AtomicLong();
+    private long _started;
 
     /** all-zero NID used for pings */
     public static final NID FAKE_NID = new NID(new byte[NID.HASH_LENGTH]);
@@ -519,6 +526,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // no need to keep ref, it will eventually stop
         new Cleaner();
         new Explorer(5*1000);
+        _txPkts.set(0);
+        _rxPkts.set(0);
+        _txBytes.set(0);
+        _rxBytes.set(0);
+        _started = _context.clock().now();
     }
 
     /**
@@ -546,6 +558,26 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public void clear() {
         _tracker.stop();
         _knownNodes.clear();
+    }
+
+    /**
+     * Debug info, HTML formatted
+     */
+    public String renderStatusHTML() {
+        long uptime = Math.max(1000, _context.clock().now() - _started);
+        StringBuilder buf = new StringBuilder();
+        buf.append("<br><b>DHT DEBUG</b><br>TX: ").append(_txPkts.get()).append(" pkts / ")
+           .append(DataHelper.formatSize2(_txBytes.get())).append("B / ")
+           .append(DataHelper.formatSize2(_txBytes.get() * 1000 / uptime)).append("Bps<br>" +
+                   "RX: ").append(_rxPkts.get()).append(" pkts / ")
+           .append(DataHelper.formatSize2(_rxBytes.get())).append("B / ")
+           .append(DataHelper.formatSize2(_rxBytes.get() * 1000 / uptime)).append("Bps<br>" +
+                   "DHT Peers: ").append( _knownNodes.size()).append("<br>" +
+                   "Sent tokens: ").append(_outgoingTokens.size()).append("<br>" +
+                   "Rcvd tokens: ").append(_incomingTokens.size()).append("<br>" +
+                   "Pending queries: ").append(_sentQueries.size()).append("<br>");
+        _tracker.renderStatusHTML(buf);
+        return buf.toString();
     }
 
     ////////// All private below here /////////////////////////////////////
@@ -862,7 +894,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             boolean success = _session.sendMessage(dest, payload, 0, payload.length, null, null, 60*1000,
                                                    repliable ? I2PSession.PROTO_DATAGRAM : I2PSession.PROTO_DATAGRAM_RAW,
                                                    fromPort, toPort);
-            if (!success) {
+            if (success) {
+                _txPkts.incrementAndGet();
+                _txBytes.addAndGet(payload.length);
+            } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("WTF sendMessage fail");
             }
@@ -880,7 +915,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param from dest or null if it didn't come in on signed port
      */
     private void receiveMessage(Destination from, int fromPort, byte[] payload) {
-
         try {
             InputStream is = new ByteArrayInputStream(payload);
             BDecoder dec = new BDecoder(is);
@@ -1352,14 +1386,18 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      * @param toPort 1-65535 or 0 for unspecified
      */
     public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromPort, int toPort) {
+        // TODO throttle
         try {
             byte[] payload = session.receiveMessage(msgId);
+            _rxPkts.incrementAndGet();
+            _rxBytes.addAndGet(payload.length);
             if (toPort == _qPort) {
                 // repliable
                 I2PDatagramDissector dgDiss = new I2PDatagramDissector();
                 dgDiss.loadI2PDatagram(payload);
                 payload = dgDiss.getPayload();
                 Destination from = dgDiss.getSender();
+                // TODO per-dest throttle
                 receiveMessage(from, fromPort, payload);
             } else if (toPort == _rPort) {
                 // raw

@@ -40,4 +40,5 @@ interface CoordinatorListener
   public boolean overUploadLimit(int uploaders);
   public boolean overUpBWLimit();
   public boolean overUpBWLimit(long total);
+  public void addMessage(String message);
 }

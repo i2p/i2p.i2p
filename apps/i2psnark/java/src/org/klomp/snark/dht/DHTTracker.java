@@ -27,6 +27,10 @@ class DHTTracker {
     private long _expireTime;
     private final Log _log;
     private volatile boolean _isRunning;
+    /** not current, updated by cleaner */
+    private int _peerCount;
+    /** not current, updated by cleaner */
+    private int _torrentCount;
 
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 199*1000;
@@ -97,6 +101,15 @@ class DHTTracker {
         return rv;
     }
 
+    /**
+     * Debug info, HTML formatted
+     */
+    public void renderStatusHTML(StringBuilder buf) {
+        buf.append("DHT tracker: ").append(_torrentCount).append(" torrents ")
+           .append(_peerCount).append(" peers ")
+           .append(DataHelper.formatDuration(_expireTime)).append(" expiration<br>");
+    }
+
     private class Cleaner extends SimpleTimer2.TimedEvent {
 
         public Cleaner() {
@@ -137,6 +150,8 @@ class DHTTracker {
                          torrentCount + " torrents, " +
                          peerCount + " peers, " +
                          DataHelper.formatDuration(_expireTime) + " expiration");
+            _peerCount = peerCount;
+            _torrentCount = torrentCount;
             schedule(CLEAN_TIME);
         }
     }

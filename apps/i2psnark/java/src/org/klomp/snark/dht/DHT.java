@@ -94,4 +94,9 @@ public interface DHT {
      * Known nodes, not estimated total network size.
      */
     public int size();
+
+    /**
+     * Debug info, HTML formatted
+     */
+    public String renderStatusHTML();
 }

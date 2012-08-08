@@ -75,8 +75,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(I2PSnarkServlet.class);
         _nonce = _context.random().nextLong();
-        // FIXME instantiate new one every time
-        _manager = SnarkManager.instance();
+        _manager = new SnarkManager(_context);
         String configFile = _context.getProperty(PROP_CONFIG_FILE);
         if ( (configFile == null) || (configFile.trim().length() <= 0) )
             configFile = "i2psnark.config";
@@ -449,9 +448,9 @@ public class I2PSnarkServlet extends DefaultServlet {
         }
         out.write("</th></tr></thead>\n");
         String uri = "/i2psnark/";
+        boolean showDebug = "2".equals(peerParam);
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
-            boolean showDebug = "2".equals(peerParam);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug);
         }
@@ -478,6 +477,8 @@ public class I2PSnarkServlet extends DefaultServlet {
                     out.write(", ");
                     out.write(ngettext("1 DHT peer", "{0} DHT peers", dhts));
                 }
+                if (showDebug)
+                    out.write(dht.renderStatusHTML());
             }
             out.write("</th>\n");
             if (_manager.util().connected()) {

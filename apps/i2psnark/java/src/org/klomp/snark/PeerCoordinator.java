@@ -890,8 +890,10 @@ class PeerCoordinator implements PeerListener
         snark.stopTorrent();
         String msg = "Error reading the storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
         _log.error(msg, ioe);
-        SnarkManager.instance().addMessage(msg);
-        SnarkManager.instance().addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
+        if (listener != null) {
+            listener.addMessage(msg);
+            listener.addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
+        }
         throw new RuntimeException(msg, ioe);
       }
   }
@@ -970,8 +972,10 @@ class PeerCoordinator implements PeerListener
             snark.stopTorrent();
             String msg = "Error writing storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
             _log.error(msg, ioe);
-            SnarkManager.instance().addMessage(msg);
-            SnarkManager.instance().addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
+            if (listener != null) {
+                listener.addMessage(msg);
+                listener.addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
+            }
             throw new RuntimeException(msg, ioe);
           }
         wantedPieces.remove(p);

@@ -1179,6 +1179,15 @@ public class Snark
     //System.exit(0);
   }
   
+  /**
+   * StorageListener and CoordinatorListener callback
+   * @since 0.9.2
+   */
+  public void addMessage(String message) {
+      if (completeListener != null)
+          completeListener.addMessage(this, message);
+  }
+
   public interface CompleteListener {
     public void torrentComplete(Snark snark);
     public void updateStatus(Snark snark);
@@ -1197,6 +1206,11 @@ public class Snark
      * @since 0.9
      */
     public void fatal(Snark snark, String error);
+
+    /**
+     * @since 0.9.2
+     */
+    public void addMessage(Snark snark, String message);
 
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);
