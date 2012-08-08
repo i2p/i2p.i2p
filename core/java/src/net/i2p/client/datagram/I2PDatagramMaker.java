@@ -11,6 +11,7 @@ package net.i2p.client.datagram;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA256Generator;
@@ -26,15 +27,13 @@ import net.i2p.util.Log;
  */
 public final class I2PDatagramMaker {
 
-    private static Log _log = new Log(I2PDatagramMaker.class);
-
     private static final int DGRAM_BUFSIZE = 32768;
 
     private final SHA256Generator hashGen = SHA256Generator.getInstance();
     private final DSAEngine dsaEng = DSAEngine.getInstance();
 
-    private SigningPrivateKey sxPrivKey = null;
-    private byte[] sxDestBytes = null;
+    private SigningPrivateKey sxPrivKey;
+    private byte[] sxDestBytes;
 
     private final ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
 
@@ -78,10 +77,12 @@ public final class I2PDatagramMaker {
             
             return sxDGram.toByteArray();
         } catch (IOException e) {
-            _log.error("Caught IOException", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramMaker.class);
+            log.error("Caught IOException", e);
             return null;
         } catch (DataFormatException e) {
-            _log.error("Caught DataFormatException", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramMaker.class);
+            log.error("Caught DataFormatException", e);
             return null;
         }
     }

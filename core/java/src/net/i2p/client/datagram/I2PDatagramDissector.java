@@ -11,6 +11,7 @@ package net.i2p.client.datagram;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataFormatException;
@@ -27,14 +28,12 @@ import net.i2p.util.Log;
  */
 public final class I2PDatagramDissector {
 
-    private static Log _log = new Log(I2PDatagramDissector.class);
-
     private static final int DGRAM_BUFSIZE = 32768;
 
     private final DSAEngine dsaEng = DSAEngine.getInstance();
     private final SHA256Generator hashGen = SHA256Generator.getInstance();
 
-    private Hash rxHash = null;
+    private Hash rxHash;
 
     private Signature rxSign;
 
@@ -42,9 +41,9 @@ public final class I2PDatagramDissector {
 
     private final byte[] rxPayload = new byte[DGRAM_BUFSIZE];
 
-    private int rxPayloadLen = 0;
+    private int rxPayloadLen;
     
-    private boolean valid = false;
+    private boolean valid;
 
     /**
      * Crate a new I2P repliable datagram dissector.
@@ -54,6 +53,7 @@ public final class I2PDatagramDissector {
 
     /**
      * Load an I2P repliable datagram into the dissector.
+     * Does NOT verify the signature.
      *
      * @param dgram I2P repliable datagram to be loader
      *
@@ -81,9 +81,11 @@ public final class I2PDatagramDissector {
             this.rxHash = hashGen.calculateHash(rxPayload, 0, rxPayloadLen);
             assert this.hashGen.calculateHash(this.extractPayload()).equals(this.rxHash);
         } catch (IOException e) {
-            _log.error("Caught IOException - INCONSISTENT STATE!", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramDissector.class);
+            log.error("Caught IOException - INCONSISTENT STATE!", e);
         } catch(AssertionError e) {
-            _log.error("Assertion failed!", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramDissector.class);
+            log.error("Assertion failed!", e);
         }
         
         //_log.debug("Datagram payload size: " + rxPayloadLen + "; content:\n"
@@ -159,7 +161,8 @@ public final class I2PDatagramDissector {
         try {
             retDest.fromByteArray(this.rxDest.toByteArray());
         } catch (DataFormatException e) {
-            _log.error("Caught DataFormatException", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramDissector.class);
+            log.error("Caught DataFormatException", e);
             return null;
         }
         
