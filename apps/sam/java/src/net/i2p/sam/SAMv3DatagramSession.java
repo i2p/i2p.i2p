@@ -21,10 +21,10 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
 	
 	private final static Log _log = new Log ( SAMv3DatagramSession.class );
 
-	SAMv3Handler handler = null ;
-	SAMv3Handler.DatagramServer server = null ;
-	String nick = null ;
-	SocketAddress clientAddress = null ;
+	final SAMv3Handler handler;
+	final SAMv3Handler.DatagramServer server;
+	final String nick;
+	final SocketAddress clientAddress;
 	
 	public String getNick() { return nick; }
 
@@ -41,10 +41,10 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
 		
 		super(SAMv3Handler.sSessionsHash.get(nick).getDest(),
 				SAMv3Handler.sSessionsHash.get(nick).getProps(),
-				null
+				null  // to be replaced by this
 				);
 		this.nick = nick ;
-		this.recv = this ;
+		this.recv = this ;  // replacement
 		this.server = SAMv3Handler.DatagramServer.getInstance() ;
 
 		SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
@@ -56,6 +56,7 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
     	String portStr = props.getProperty("PORT") ;
     	if ( portStr==null ) {
     		_log.debug("receiver port not specified. Current socket will be used.");
+    		this.clientAddress = null;
     	}
     	else {
     		int port = Integer.parseInt(portStr);

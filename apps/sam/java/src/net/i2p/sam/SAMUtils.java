@@ -206,6 +206,7 @@ public class SAMUtils {
         return msg;
     }
     
+/****
     public static void main(String args[]) {
         try {
             test("a=b c=d e=\"f g h\"");
@@ -220,4 +221,5 @@ public class SAMUtils {
         Properties p = parseParams(tok);
         System.out.println(p);
     }
+****/
 }

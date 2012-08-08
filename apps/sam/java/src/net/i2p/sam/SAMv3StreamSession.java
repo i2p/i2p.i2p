@@ -45,10 +45,10 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 		
 		protected final int BUFFER_SIZE = 1024 ;
 		
-		protected Object socketServerLock = new Object();
+		protected final Object socketServerLock = new Object();
 		protected I2PServerSocket socketServer = null;
 	
-		protected String nick ;
+		protected final String nick ;
 		
 		public String getNick() {
 			return nick ;
@@ -62,52 +62,20 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	     * @throws IOException
 	     * @throws DataFormatException
 	     * @throws SAMException 
+	     * @throws NPE if login nickname is not registered
 	     */
 	    public SAMv3StreamSession(String login)
 	    		throws IOException, DataFormatException, SAMException
 	    {
-	    	initSAMStreamSession(login);
+                super(getDB().get(login).getDest(), "CREATE",
+                      getDB().get(login).getProps(),
+                      getDB().get(login).getHandler());
+	    	this.nick = login ;
 	    }
 
 	    public static SAMv3Handler.SessionsDB getDB()
 	    {
 	    	return SAMv3Handler.sSessionsHash ;
-	    }
-
-	    private void initSAMStreamSession(String login)
-	    	throws IOException, DataFormatException, SAMException {
-
-	        SAMv3Handler.SessionRecord rec = getDB().get(login);
-	        String dest = rec.getDest() ;
-	        ByteArrayInputStream ba_dest = new ByteArrayInputStream(Base64.decode(dest));
-
-	        this.recv = rec.getHandler();
-
-	    	_log.debug("SAM STREAM session instantiated");
-
-	        Properties allprops = (Properties) System.getProperties().clone();
-	    	allprops.putAll(rec.getProps());
-	    	
-	    	String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
-	    	int i2cpPort ;
-	    	String port = allprops.getProperty(I2PClient.PROP_TCP_PORT, "7654");
-	    	try {
-	    		i2cpPort = Integer.parseInt(port);
-	    	} catch (NumberFormatException nfe) {
-	    		throw new SAMException("Invalid I2CP port specified [" + port + "]");
-	    	}
-
-	    	_log.debug("Creating I2PSocketManager...");
-	    	socketMgr = I2PSocketManagerFactory.createManager(ba_dest,
-	    			i2cpHost,
-	    			i2cpPort, 
-	    			allprops);
-	    	if (socketMgr == null) {
-	    		throw new SAMException("Error creating I2PSocketManager towards "+i2cpHost+":"+i2cpPort);
-	    	}
-
-	    	socketMgr.addDisconnectListener(new DisconnectListener());
-	    	this.nick = login ;
 	    }
 
 	    /**
@@ -248,10 +216,10 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    
 	    public class SocketForwarder extends Thread
 	    {
-	    	String host = null ;
-	    	int port = 0 ;
-	    	SAMv3StreamSession session;
-	    	boolean verbose;
+	    	final String host;
+	    	final int port;
+	    	final SAMv3StreamSession session;
+	    	final boolean verbose;
 	    	
 	    	SocketForwarder(String host, int port, SAMv3StreamSession session, boolean verbose) {
 	    		this.host = host ;
@@ -317,9 +285,9 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    }
 	    public class Pipe extends Thread
 	    {
-	    	ReadableByteChannel in  ;
-	    	WritableByteChannel out ;
-	    	ByteBuffer buf ;
+	    	final ReadableByteChannel in  ;
+	    	final WritableByteChannel out ;
+	    	final ByteBuffer buf ;
 	    	
 	    	public Pipe(ReadableByteChannel in, WritableByteChannel out, String name)
 	    	{

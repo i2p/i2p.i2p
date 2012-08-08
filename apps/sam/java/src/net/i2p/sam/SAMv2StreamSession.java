@@ -244,14 +244,14 @@ public class SAMv2StreamSession extends SAMStreamSession
 		protected class v2StreamSender extends StreamSender
 
 		{
-				private List<ByteArray> _data;
+				private final List<ByteArray> _data;
 				private int _dataSize;
-				private int _id;
-				private ByteCache _cache;
-				private OutputStream _out = null;
-				private boolean _stillRunning, _shuttingDownGracefully;
-				private Object runningLock = new Object();
-				private I2PSocket i2pSocket = null;
+				private final int _id;
+				private final ByteCache _cache;
+				private final OutputStream _out;
+				private volatile boolean _stillRunning, _shuttingDownGracefully;
+				private final Object runningLock = new Object();
+				private final I2PSocket i2pSocket;
 
 				public v2StreamSender ( I2PSocket s, int id ) throws IOException
 				{

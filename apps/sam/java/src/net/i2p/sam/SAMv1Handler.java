@@ -46,7 +46,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     protected SAMDatagramSession getDatagramSession() {return datagramSession ;}	
     protected SAMStreamSession getStreamSession() {return streamSession ;}
 
-    protected long _id;
+    protected final long _id;
     protected static volatile long __id = 0;
     
     /**

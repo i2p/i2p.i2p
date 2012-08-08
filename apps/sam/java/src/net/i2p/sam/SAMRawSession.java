@@ -26,7 +26,9 @@ public class SAMRawSession extends SAMMessageSession {
     private final static Log _log = new Log(SAMRawSession.class);
     public static final int RAW_SIZE_MAX = 32*1024;
 
-    protected SAMRawReceiver recv = null;
+    // FIXME make final after fixing SAMv3DatagramSession override
+    protected SAMRawReceiver recv;
+
     /**
      * Create a new SAM RAW session.
      *

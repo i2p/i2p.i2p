@@ -30,17 +30,17 @@ public abstract class SAMHandler implements Runnable {
     protected I2PAppThread thread = null;
     protected SAMBridge bridge = null;
 
-    private Object socketWLock = new Object(); // Guards writings on socket
-    protected SocketChannel socket = null;
+    private final Object socketWLock = new Object(); // Guards writings on socket
+    protected final SocketChannel socket;
 
-    protected int verMajor = 0;
-    protected int verMinor = 0;
+    protected final int verMajor;
+    protected final int verMinor;
     
     /** I2CP options configuring the I2CP connection (port, host, numHops, etc) */
-    protected Properties i2cpProps = null;
+    protected final Properties i2cpProps;
 
-    private Object  stopLock = new Object();
-    private boolean stopHandler = false;
+    private final Object stopLock = new Object();
+    private volatile boolean stopHandler;
 
     /**
      * SAMHandler constructor (to be called by subclasses)
@@ -148,9 +148,7 @@ public abstract class SAMHandler implements Runnable {
      * @throws IOException 
      */
     protected final void closeClientSocket() throws IOException {
-        if (socket != null)
             socket.close();
-        socket = null;
     }
 
     /**

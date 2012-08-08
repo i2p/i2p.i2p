@@ -159,8 +159,8 @@ public abstract class SAMMessageSession {
      */
     public class SAMMessageSessionHandler implements Runnable, I2PSessionListener {
 
-        private Object runningLock = new Object();
-        private boolean stillRunning = true;
+        private final Object runningLock = new Object();
+        private volatile boolean stillRunning = true;
                 
         /**
          * Create a new SAM message-based session handler

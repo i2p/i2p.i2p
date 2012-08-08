@@ -35,20 +35,20 @@ import net.i2p.util.Log;
  */
 public class SAMBridge implements Runnable {
     private final static Log _log = new Log(SAMBridge.class);
-    private ServerSocketChannel serverSocket;
-    private Properties i2cpProps;
+    private final ServerSocketChannel serverSocket;
+    private final Properties i2cpProps;
     /** 
      * filename in which the name to private key mapping should 
      * be stored (and loaded from) 
      */
-    private String persistFilename;
+    private final String persistFilename;
     /** 
      * app designated destination name to the base64 of the I2P formatted 
      * destination keys (Destination+PrivateKey+SigningPrivateKey)
      */
-    private Map<String,String> nameToPrivKeys;
+    private final Map<String,String> nameToPrivKeys;
 
-    private boolean acceptConnections = true;
+    private volatile boolean acceptConnections = true;
 
     private static final int SAM_LISTENPORT = 7656;
     
@@ -64,8 +64,6 @@ public class SAMBridge implements Runnable {
     protected static final String DEFAULT_DATAGRAM_PORT = "7655";
 
     
-    private SAMBridge() {}
-    
     /**
      * Build a new SAM bridge.
      *
@@ -73,6 +71,7 @@ public class SAMBridge implements Runnable {
      * @param listenPort port number to listen for SAM connections on
      * @param i2cpProps set of I2CP properties for finding and communicating with the router
      * @param persistFile location to store/load named keys to/from
+     * @throws RuntimeException if a server socket can't be opened
      */
     public SAMBridge(String listenHost, int listenPort, Properties i2cpProps, String persistFile) {
         persistFilename = persistFile;
@@ -96,6 +95,7 @@ public class SAMBridge implements Runnable {
                 _log.error("Error starting SAM bridge on "
                            + (listenHost == null ? "0.0.0.0" : listenHost)
                            + ":" + listenPort, e);
+            throw new RuntimeException(e);
         }
         
         this.i2cpProps = i2cpProps;

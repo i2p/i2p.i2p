@@ -51,19 +51,19 @@ public class SAMStreamSession {
 
     protected final static int SOCKET_HANDLER_BUF_SIZE = 32768;
 
-    protected SAMStreamReceiver recv = null;
+    protected final SAMStreamReceiver recv;
 
-    protected SAMStreamSessionServer server = null;
+    protected final SAMStreamSessionServer server;
 
-    protected I2PSocketManager socketMgr = null;
+    protected final I2PSocketManager socketMgr;
 
-    private Object handlersMapLock = new Object();
+    private final Object handlersMapLock = new Object();
     /** stream id (Long) to SAMStreamSessionSocketReader */
-    private HashMap<Integer,SAMStreamSessionSocketReader> handlersMap = new HashMap<Integer,SAMStreamSessionSocketReader>();
+    private final HashMap<Integer,SAMStreamSessionSocketReader> handlersMap = new HashMap<Integer,SAMStreamSessionSocketReader>();
     /** stream id (Long) to StreamSender */
-    private HashMap<Integer,StreamSender> sendersMap = new HashMap<Integer,StreamSender>();
+    private final HashMap<Integer,StreamSender> sendersMap = new HashMap<Integer,StreamSender>();
 
-    private Object idLock = new Object();
+    private final Object idLock = new Object();
     private int lastNegativeId = 0;
 
     // Can we create outgoing connections?
@@ -73,14 +73,10 @@ public class SAMStreamSession {
      * should we flush every time we get a STREAM SEND, or leave that up to
      * the streaming lib to decide? 
      */
-    protected boolean forceFlush = false;
+    protected final boolean forceFlush;
 
     public static String PROP_FORCE_FLUSH = "sam.forceFlush";
     public static String DEFAULT_FORCE_FLUSH = "false";
-    
-    public SAMStreamSession() {
-    	
-    }
     
     /**
      * Create a new SAM STREAM session.
@@ -95,11 +91,7 @@ public class SAMStreamSession {
      */
     public SAMStreamSession(String dest, String dir, Properties props,
                             SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
-        ByteArrayInputStream bais;
-
-        bais = new ByteArrayInputStream(Base64.decode(dest));
-
-        initSAMStreamSession(bais, dir, props, recv);
+        this(new ByteArrayInputStream(Base64.decode(dest)), dir, props, recv);
     }
 
     /**
@@ -115,11 +107,6 @@ public class SAMStreamSession {
      */
     public SAMStreamSession(InputStream destStream, String dir,
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
-        initSAMStreamSession(destStream, dir, props, recv);
-    }
-
-    private void initSAMStreamSession(InputStream destStream, String dir,
-                                      Properties props, SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException{
         this.recv = recv;
 
         _log.debug("SAM STREAM session instantiated");
@@ -168,6 +155,8 @@ public class SAMStreamSession {
             Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
 
             t.start();
+        } else {
+            server = null;
         }
     }
     
@@ -417,10 +406,10 @@ public class SAMStreamSession {
      */
     public class SAMStreamSessionServer implements Runnable {
 
-        private Object runningLock = new Object();
-        private boolean stillRunning = true;
+        private final Object runningLock = new Object();
+        private volatile boolean stillRunning = true;
 
-        private I2PServerSocket serverSocket = null;
+        private final I2PServerSocket serverSocket;
 
         /**
          * Create a new SAM STREAM session server
@@ -511,9 +500,9 @@ public class SAMStreamSession {
         
         protected I2PSocket i2pSocket = null;
 
-        protected Object runningLock = new Object();
+        protected final Object runningLock = new Object();
 
-        protected boolean stillRunning = true;
+        protected volatile boolean stillRunning = true;
 
         protected int id;
 
@@ -660,8 +649,8 @@ public class SAMStreamSession {
         private int _id;
         private ByteCache _cache;
         private OutputStream _out = null;
-        private boolean _stillRunning, _shuttingDownGracefully;
-        private Object runningLock = new Object();
+        private volatile boolean _stillRunning, _shuttingDownGracefully;
+        private final Object runningLock = new Object();
         private I2PSocket i2pSocket = null;
         
 	public v1StreamSender ( I2PSocket s, int id ) throws IOException {

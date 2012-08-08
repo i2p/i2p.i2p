@@ -142,7 +142,7 @@ public class SAMv3Handler extends SAMv1Handler
 		
 		class Listener implements Runnable {
 			
-			DatagramChannel server = null;
+			final DatagramChannel server;
 			
 			public Listener(DatagramChannel server)
 			{
@@ -172,7 +172,7 @@ public class SAMv3Handler extends SAMv1Handler
 
 	public static class MessageDispatcher implements Runnable
 	{
-		ByteArrayInputStream is = null ;
+		final ByteArrayInputStream is;
 		
 		public MessageDispatcher(byte[] buf)
 		{
@@ -210,10 +210,10 @@ public class SAMv3Handler extends SAMv1Handler
 	
 	public class SessionRecord
 	{
-		protected String m_dest ;
-		protected Properties m_props ;
+		protected final String m_dest ;
+		protected final Properties m_props ;
 		protected ThreadGroup m_threadgroup ;
-		protected SAMv3Handler m_handler ;
+		protected final SAMv3Handler m_handler ;
 
 		public SessionRecord( String dest, Properties props, SAMv3Handler handler )
 		{
@@ -268,7 +268,7 @@ public class SAMv3Handler extends SAMv1Handler
 			static final long serialVersionUID = 0x1 ;
 		}
 		
-		HashMap<String, SessionRecord> map ;
+		final HashMap<String, SessionRecord> map;
 
 		public SessionsDB() {
 			map = new HashMap<String, SessionRecord>() ;
@@ -578,6 +578,9 @@ public class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
+	/**
+	 * @throws NPE if login nickname is not registered
+	 */
 	SAMv3StreamSession newSAMStreamSession(String login )
 	throws IOException, DataFormatException, SAMException
 	{
