@@ -39,7 +39,7 @@ class UDPSender {
         _context.statManager().createRateStat("udp.sendQueueFailed", "How often it was unable to add a new packet to the queue", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendQueueTrimmed", "How many packets were removed from the queue for being too old (duration == remaining)", "udp", UDPTransport.RATES);
         _context.statManager().createRequiredRateStat("udp.sendPacketSize", "Size of sent packets (bytes)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", UDPTransport.RATES);
         // used in RouterWatchdog
@@ -161,8 +161,10 @@ class UDPSender {
         if (packet == null || !_keepRunning) return 0;
         int size = 0;
         int psz = packet.getPacket().getLength();
-        if (psz > PeerState.LARGE_MTU)
-            _log.error("Sending large UDP packet " + psz + " bytes: " + packet);
+        if (psz > PeerState.LARGE_MTU) {
+            _log.error("Dropping large UDP packet " + psz + " bytes: " + packet);
+            return 0;
+        }
         _outboundQueue.offer(packet);
         //size = _outboundQueue.size();
         //_context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
@@ -214,8 +216,8 @@ class UDPSender {
                     
                     //packet.getPacket().setLength(size);
                     try {
-                        long before = _context.clock().now();
-                        synchronized (Runner.this) {
+                        //long before = _context.clock().now();
+                        //synchronized (Runner.this) {
                             // synchronization lets us update safely
                             //_log.debug("Break out datagram for " + packet);
                             DatagramPacket dp = packet.getPacket();
@@ -224,11 +226,12 @@ class UDPSender {
                             _socket.send(dp);
                             //if (_log.shouldLog(Log.DEBUG))
                             //    _log.debug("Just after socket.send of " + packet);
-                        }
-                        long sendTime = _context.clock().now() - before;
-                        _context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Sent the packet " + packet);
+                        //}
+                        //long sendTime = _context.clock().now() - before;
+                        // less than 50 microsec
+                        //_context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Sent the packet " + packet);
                         long throttleTime = afterBW - acquireTime;
                         if (throttleTime > 10)
                             _context.statManager().addRateData("udp.sendBWThrottleTime", throttleTime, acquireTime - packet.getBegin());

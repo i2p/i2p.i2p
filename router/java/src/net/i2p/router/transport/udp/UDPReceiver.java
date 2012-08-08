@@ -254,9 +254,9 @@ class UDPReceiver {
                 try {
                     //if (_log.shouldLog(Log.INFO))
                     //    _log.info("Before blocking socket.receive on " + System.identityHashCode(packet));
-                    synchronized (Runner.this) {
+                    //synchronized (Runner.this) {
                         _socket.receive(packet.getPacket());
-                    }
+                    //}
                     int size = packet.getPacket().getLength();
                     if (_log.shouldLog(Log.INFO))
                         _log.info("After blocking socket.receive: packet is " + size + " bytes on " + System.identityHashCode(packet));
