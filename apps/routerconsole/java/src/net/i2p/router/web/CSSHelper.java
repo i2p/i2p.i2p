@@ -13,7 +13,7 @@ public class CSSHelper extends HelperBase {
 
     public CSSHelper() {}
 
-    public static final String PROP_UNIVERSAL_THEMING = "routerconsole.theme.universal";
+    public static final String PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME_NAME = "routerconsole.theme";
     public static final String DEFAULT_THEME = "light";
     public static final String BASE_THEME_PATH = "/themes/console/";

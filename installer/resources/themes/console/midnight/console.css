@@ -9,7 +9,7 @@ body {
      text-align: left;
      background: #000;
      color: #eef;
-     font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 8pt/137% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
@@ -44,29 +44,30 @@ div.logo {
      text-align: center;
      border: 1px solid #99f;
      background-color: #00000A;
-     -moz-box-shadow: inset 0px 0px 0px 2px #00000A;
-     -khtml-box-shadow: inset 0px 0px 0px 2px #00000A;
+     -moz-box-shadow: inset 0 0 0 2px #00000A;
+     -khtml-box-shadow: inset 0 0 0 2px #00000A;
+     border-radius: 3px;
 }
 
 div.logo hr {
      color: #99f;
      background: #99f;
      height: 1px;
-     border: 0px solid #99f;
+     border: 0 solid #99f;
      margin: 8px -5px;
 }
 
 div.logo a:link, div.logo a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+     text-shadow: 0 0 1px rgba(0, 0, 32, 0.3);
 }
 
 div.logo a:active {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.5);
+     text-shadow: 0 0 1px rgba(255, 96, 0, 0.5);
      color: #f60;
 }
 
 div.logo a:hover {
-     text-shadow: 0px 0px 1px rgba(128, 0, 0, 0.5);
+     text-shadow: 0 0 1px rgba(128, 0, 0, 0.5);
      color: #f90;
 }
 
@@ -74,7 +75,7 @@ div.logo a:hover {
 
 div.warning {
      margin: 25px 25px 15px 260px;
-     padding: 0px 20px 20px 75px;
+     padding: 0 20px 20px 75px;
      background: #001;
      border: 1px solid #99f;
      text-align: left;
@@ -82,13 +83,14 @@ div.warning {
      background-image:url("../images/itoopie_sm.png");
      background-position: 12px center;
      background-repeat:no-repeat;
-     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     -moz-box-shadow: inset 0 0 0 1px #f60;
+     -khtml-box-shadow: inset 0 0 0 1px #f60;
+     border-radius: 3px 3px 0 0;
 }
 
 div.warning a:link {
      color: #f60;
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.3);
+     text-shadow: 0 0 1px rgba(255, 96, 0, 0.3);
 }
 
 div.warning a:visited {
@@ -97,7 +99,7 @@ div.warning a:visited {
 
 div.warning a:hover {
      color: #f90;
-  text-shadow: 0px 0px 1px rgba(255, 128, 0, 0.5);
+  text-shadow: 0 0 1px rgba(255, 128, 0, 0.5);
 }
 
 div.warning a:active {
@@ -105,24 +107,50 @@ div.warning a:active {
 }
 
 div.warning hr {
-     color: #fb7;
-     background: #fb7;
+     color: #99f;
+     background: #99f;
      height: 1px;
-     border: 0px solid #fb7;
+     border: 0 solid #99f;
      margin: 10px 0;
 }
 
 div.warning h3 {
      border: 0;
-     border-bottom: 1px solid #fb7;
+     border-bottom: 1px solid #99f;
      padding-bottom: 10px;
      padding-left: 0;
-     font-variant: small-caps;
      text-transform: capitalize;
-     font-size: 12.5pt;
+     font-size: 11pt;
      background: none !important;
+     border-radius: 0 !important;
 }
 
+.warning p {
+     padding: 0;     
+}
+
+.warning b {
+     font-size: 8.5pt;
+}
+
+.proxyfooter {
+     border: 1px solid #99f;
+     margin: -16px 25px 20px 260px;
+     border-radius: 0 0 3px 3px;
+     background: #002;  
+}
+
+.proxyfooter p {
+     font-size: 7pt;
+     text-align: right;
+     padding: 0 5px;
+     margin: 3px 3px 5px 3px;
+     line-height: 110%;
+}
+
+.proxyfooter i {
+     font-style: normal !important;     
+}
 /* console error messages */
 
 div.sorry {
@@ -132,13 +160,14 @@ div.sorry {
      border: 1px solid #99f;
      border-top: 0;
      text-align: justify;
-     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     -moz-box-shadow: inset 0 0 0 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
      color: #eef;
      background-image: url("../images/errortriangle.png");
      background-position: 15px center;
      background-repeat: no-repeat;
+     border-radius: 0 0 3px 3px;
 }
 
 div.sorry hr {
@@ -158,7 +187,7 @@ div.toolbar {
 div.routersummaryouter {
      float: left;
      width: 200px;
-     margin: 0 0 5px 0px;
+     margin: 0 0 5px 0;
      padding: 0;
      border: 0;
      clear: left; /* fixes a bug in Opera */
@@ -170,13 +199,14 @@ div.routersummary {
      width: 190px;
      color: inherit;
      margin: 0;
-     padding: 8px 1px 4px 1px;
+     padding: 6px 1px 8px 1px;
      text-align: center !important;
      border: 1px solid #99f;
-     font-size: 9pt;
+     font-size: 8pt;
      word-wrap: break-word;
      font: 9pt/125%;
-     -moz-box-shadow: inset 0px 0px 0px 1px #00000A;
+     -moz-box-shadow: inset 0 0 0 1px #00000A;
+     border-radius: 3px;
 }
 
 div.routersummary input[type=text] {
@@ -187,7 +217,7 @@ div.routersummary hr {
      color: #99f;
      background: #99f;
      height: 1px;
-     border-bottom: 0px solid #99f;
+     border-bottom: 0 solid #99f;
      margin: 8px -1px 7px -1px;
 }
 
@@ -196,11 +226,11 @@ div.routersummary hr:last-child {
 }
 
 div.routersummary h3 {
-     border: 0px solid #f00;
-     font-size: 9.5pt;
-     letter-spacing: 0.05em;
-     margin: -6px 0px -6px 0px;
-     padding: 3px 0;
+     border: 0 solid #f00;
+     font-size: 8.5pt;
+     letter-spacing: 0.01em;
+     margin: -6px 0 -6px 0;
+     padding: 3px 0 2px;
      background: #002;
      text-transform: uppercase;
      background: #002 url("images/titles.png") repeat-x !important;
@@ -213,11 +243,11 @@ div.routersummary h3 a, div.routersummary h4 a {
 }
 
 div.routersummary h4 {
-     border: 0px solid #f00;
+     border: 0 solid #f00;
      border-bottom: 0 !important;
-     font-size: 8.5pt;
+     font-size: 7.5pt;
      letter-spacing: 0.05em;
-     margin: -6px 0px -6px 0px !important;
+     margin: -6px 0 -6px 0 !important;
      padding: 5px 2px;
      background: #000;
      text-transform: capitalize;
@@ -233,10 +263,9 @@ div.routersummary ul {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 0px -5px 2px;
+     margin: -5px 0 -5px 2px;
      width: 186px !important;
      overflow: hidden;
-     font-size: 8pt;
      padding: 0 -12px;
      background-image: none !important;
      background-color: transparent !important;
@@ -269,18 +298,27 @@ div.routersummary td:first-child {
      overflow: hidden;
 }
 
+.routersummary form {
+     margin: 0;
+}
+     
+     
+     
 div.newsheadings {
      text-align: right;
-     margin: 0 0 0 -20px;
+     margin: 0 7px 0 -20px;
+     line-height: 110%;
 }
 
 div.newsheadings li {
      list-style: none outside url('images/newsbullet_mini.png');
      margin: 0 -4px 2px 8px;
+     line-height: 115%;
+     font-weight: normal !important;
 }
 
 div.tunnels table{
-     margin: -2px 0px -4px 2px !important;
+     margin: -2px 0 -4px 2px !important;
      text-align: center !important;
      width: 186px;
 }
@@ -315,11 +353,11 @@ div.routersummary a {
 }
 
 div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+     text-shadow: 0 0 1px rgba(0, 0, 32, 0.3);
 }
 
 div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 0 0 1px rgba(255, 96, 0, 0.7);
      color: #f60;
 }
 
@@ -330,8 +368,8 @@ div.routersummary td {
 }
 
 div.main {
-     margin: 0px 5px 5px 200px;
-     padding: 15px 15px 10px 15px;
+     margin: 0 5px 5px 200px;
+     padding: 5px 15px 10px 15px;
      background: #00000A;
      border: 1px solid #99f;
      border-top: 0;
@@ -339,6 +377,7 @@ div.main {
      color: #eef;
      min-width: 590px;
      background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
+     border-radius: 0 0 3px 3px;
 }
 
 div.main ul {
@@ -369,10 +408,15 @@ div.main textarea {
 }
 
 div.main h2 {
-     margin-top: 20px;
-     margin-bottom: -5px;
+     margin-bottom: 5px;
      padding-bottom: 10px !important;
 }
+
+/*
+div.main h2:last-child {
+     margin: 20px 0 0 !important;     
+} 
+*/
 
 table h2 {
      padding-bottom: 15px;
@@ -383,12 +427,11 @@ div.welcome {
 }
 
 div.main h2:first-child, div.main h3:first-child {
-     margin-top: 0px;
-     margin-bottom: -5px;
+/*     margin: 5px 10px -10px; */
 }
 
 div.wideload h2 {
-     margin-bottom: 0px !important;
+     margin-bottom: 10px !important;
 }
 
 div.wideload h3:first-child {
@@ -397,26 +440,27 @@ div.wideload h3:first-child {
 
 div.wideload h3 {
      margin-top: 15px !important;
-     margin-bottom: 0px !important;
+     margin-bottom: 10px !important;
 }
 
-div.wideload p !important {
+div.wideload p {
      margin-top: 5px;
+}
+
+div.wideload table {
+     margin-top: 5px !important;     
 }
 
 div.news {
      margin: -1px 5px 0 200px;
-     padding: -10px 0px 8px 0px;
      background: #001;
      border: 1px solid #99f;
      text-align: right;
      color: #99f;
      min-width: 600px;
-     padding-bottom: 8px;
-     padding-left: 10px;
-     padding-right: 10px;
-     -moz-box-shadow: inset 0px 0px 4px 2px #00000A;
-     font-size: 7pt;
+     padding: 3px 8px 3px;
+     -moz-box-shadow: inset 0 0 4px 2px #00000A;
+     font-size: 8pt;
      background: #001 url("images/planet.png")no-repeat scroll bottom right;
 }
 
@@ -426,9 +470,9 @@ div.news li {
      text-align: justify;
      list-style: none;
      margin: 15px 15px -10px -20px;
-     padding: 0px 0 15px 0;
+     padding: 0 0 15px 0;
      border-bottom: 1px dotted #99f;
-     border-top: 0px solid #99f;
+     border-top: 0 solid #99f;
      padding: 3px 5px 5px 0;
      font-size: 10pt;
      color: #eef;
@@ -441,7 +485,7 @@ div.news h3 {
      text-align: left;
      border: none !important;
      padding-left: 0;
-     padding-top: 0px;
+     padding-top: 0;
      border-bottom: 1px dotted !important;
      -moz-box-shadow: none;
      -hktml-box-shadow: none;
@@ -455,7 +499,7 @@ div.news h3 {
 
 div.news p {
      color: #eef;
-     font-size: 9pt;
+     font-size: 8pt;
      margin-bottom: -10px;
      margin-top: 10px;
 }
@@ -466,33 +510,33 @@ div.news p:last-child {
 
 div.news a:link {
      color: #aaf;
-     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+     text-shadow: 0 0 1px rgba(128, 128, 48, 0.3);
 }
 
 div.news a:visited {
      color: #99f !important;
-     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+     text-shadow: 0 0 1px rgba(128, 128, 48, 0.3);
 }
 
 div.news hr {
      color: #99f;
      background: #99f;
      height: 1px;
-     border: 0px solid #99f;
+     border: 0 solid #99f;
      margin: 10px 0 2px 0;
 }
 
 div.confignav {
      padding: 14px 0 15px;
      background: #000018;
-     margin: -16px -16px 0 -16px;
+     margin: -6px -16px 5px -16px;
      border: 1px solid #99f;
-     -moz-box-shadow: inset 0px 0px 4px 2px #00000A;
+     -moz-box-shadow: inset 0 0 4px 2px #00000A;
 }
 
 div.configure {
-     margin: 1px -20px 0 -20px;
-     padding: 0px 20px 0px 20px;
+     margin: 15px -20px;
+     padding: 0 20px 0 20px;
 }
 
 div.configure hr {
@@ -500,21 +544,22 @@ div.configure hr {
 }
 
 div.configure table {
-     font-size: 9pt;
+     font-size: 8pt;
      font-weight: bold;
      border: 1px solid #99f;
 }
 
 div.configure tr, div.configure td {
-     padding: 10px 2px;
+     padding: 5px;
 }
 
 div.configure tr {
-     -moz-box-shadow: inset 0px 0px 1px 0px #000;
+     -moz-box-shadow: inset 0 0 1px 0 #000;
 }
 
 div.configure li:first-child, div.main li:first-child {
-     margin-top: -10px;
+     margin-top: 0;
+     padding-top: 0;
 }
 
 div.configure li:last-child {
@@ -525,6 +570,9 @@ div.configure h2:first-child {
      margin-top: 15px;
 }
 
+.configure form {
+     margin: 20px 15px;     
+}
 .sidebarconf input[type="image"] {
      margin: 2px;
      padding: 1px;     
@@ -570,43 +618,52 @@ div.configure h2:first-child {
 }
 
 div.messages {
-     padding: 0px 10px;
-     background: #001;
+     padding: 10px;
+     background: #000;
      border: 1px solid #99f;
      border-right: 0;
-     margin: -1px -15px 10px -16px;
+     margin: -6px -15px 10px -16px;
      text-align: center;
      font-size: 9pt;
      font-weight: bold;
      color: #474;
-     -moz-box-shadow: inset 0px 0px 4px 2px #00000A;
+     -moz-box-shadow: inset 0 0 4px 2px #00000A;
+     background: url("../images/info_rhombus.png") no-repeat scroll 18px center #000;
 }
 
 div.messages li, div.messages ul {
      padding: 10px 0 0 5px;
      margin: -10px 0 0 0;
+     list-style: none;
 }
 
 div.main li b{
      color: #bb7 !important;
      letter-spacing: 0.07em;
-     font-size: 9.5pt;
+     font-size: 9pt;
 }
 
 div.error {
-     color: #d00000;
+     color: #d00;
+     background: url("../images/errortriangle.png") no-repeat scroll 5px center #000;
+     padding: 10px 10px 10px 45px;
+     text-align: left;
 }
 
 div.notice {
      font-style: italic;
 }
 
+h1,h2,h3 {
+     border-radius: 3px;     
+}
+
 h1 {
      font-size: 18pt;
-     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.4);
-     text-align: center;
+     text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
+     text-align: left;
      border: 1px solid #99f;
-     padding: 15px 10px;
+     padding: 13px;
      margin: 5px 5px 0 200px;
      line-height: 93%;
      text-transform: uppercase;
@@ -615,6 +672,7 @@ h1 {
      min-width: 600px;
      line-height: 100%;
      color: #fff;
+     border-radius: 3px 3px 0 0;
 }
 
 span.newtab {
@@ -630,7 +688,7 @@ x:-o-prefocus, span.newtab {
 }
 
 h2 {
-     font-size: 13pt;
+     font-size: 12pt;
      padding: 10px 10px 10px 10px;
      border: 1px solid #77f;
      border-top: 1px solid #99f;
@@ -638,16 +696,16 @@ h2 {
      background: #000008;
      text-transform: uppercase;
      letter-spacing: 0.07em;
+     
 }
 
 h3 {
-     font-size: 11pt;
-     padding: 6px 10px;
+     font-size: 10pt;
+     padding: 7px 10px;
      border: 1px solid #99f;
      border-right: 1px solid #77f;
      border-bottom: 1px solid #77f;
      letter-spacing: 0.05em;
-     margin-bottom: 10px;
      font-weight: bold !important;
      text-transform: uppercase;
 }
@@ -658,38 +716,34 @@ h3 a {
 
 h2, h3, .confignav {
      background: #002 url("images/tinytitles.png") center center repeat-x !important;
+     margin-bottom: 10px;
 }
 
 thead, tfoot, th {
      background: #002 url("images/titles.png") repeat-x center center !important;
 }
 
-.proxyfooter{
-     font-size: 7pt;
-     display: none !important;
-}
-
 table {
      border-collapse: collapse;
      border: 1px solid #99f;
-     margin: 0 0 5px 0;
+     margin: 15px 0 5px 0;
      cell-padding: 1px;
-     font-size: 7.5pt;
+     font-size: 8pt;
      background: #000;
      width: 100%;
 }
 
 table hr {
-     padding: 0px 0;
+     padding: 0 0;
      color: #000;
      background: #000;
-     border: 0px solid #99f;
-     margin: 0px -5px;
+     border: 0 solid #99f;
+     margin: 0 -5px;
      height: 1px;
 }
 
 table tt {
-     font-size: 7.5pt;
+     font-size: 8pt;
 }
 
 th {
@@ -731,25 +785,56 @@ h2.app {
 */
 
 h4.app, h4.app2 {
-     margin: 0 10px 2px 10px;
-     padding: 10px 0 8px 0;
+     font-size: 11pt;
+     padding: 5px;
+     border: 1px solid #99f;
+     border-right: 1px solid #99f;
+     border-bottom: 1px solid #99f;
+     letter-spacing: 0.04em;
+     font-weight: bold !important;
+     text-transform: uppercase;
+     margin: 5px 10px 5px;
+     color: #fff;
+     background: #022;
+     background: url("images/tinytitles.png") repeat-x scroll center center #000022 !important;
+     border-radius: 3px;
 }
 
 h4.app2 {
      clear: left;
-     margin-top: 5px !important;
+     margin-top: 0 !important;
 }
 
 div.ag2 {
-     margin: 0;
+     margin: 5px -15px -10px;
 }
 
 div.app {
      float: left;
-     padding: 2px;
-     height: 90px;
-     width: 112px;
+     padding: 0;
+     min-width: 60px;
      text-align: center !important;
+     border: 1px solid #55a;
+     border-top: 1px solid #77b;
+     border-left: 1px solid #77b;
+     margin: 3px;
+     border-radius: 3px;
+     background: -moz-linear-gradient(top, #001, #000);
+}
+
+div.app:hover {
+     border: 1px solid #f60;
+     background: #000;
+}
+
+div.app:last-child {
+     margin-bottom: 10px;
+}
+
+div.app a:link, div.app a:link:hover, div.app a:link:visited, div.app a:link:active {
+     font-size: 8pt !important;
+     text-transform: lowercase;
+     text-decoration: none;
 }
 
 div.appgroup {
@@ -775,12 +860,12 @@ table.search {
 img.app {
      height: 32px;
      width: 32px;
-     padding: 6px;
+     padding: 6px 15px 0;
 }
 
 img.app2p {
-     height: 40px;
-     padding: 3px 6px 0 6px;
+     height: 32px;
+     padding: 6px;
 }
 
 table.app {
@@ -802,18 +887,27 @@ td.app {
      margin: 0;
 }
 
-div.applabel {
-     background: url('images/header.png') center center repeat-x;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border: 2px #00f;
-     border-radius: 4px;
-     border-width: 1px;
-     font-size: 9pt;
-     margin: 0;
-     padding: 3px 6px 4px 6px;
+.applabel {
+     background: #001;
+     font-size: 8pt;
+     margin: -5px -3px -3px;
+     padding: 2px 5px;
      text-align: center;
+     min-width: 60px;
+     border-top: 1px solid #000;
+     border-radius: 0 0 2px 2px;
+     background: -moz-linear-gradient(top, #000, #001);
 }
+
+.applabel:hover {
+     border-top: 1px solid #000;     
+}
+
+.applabel:hover {
+     background: #000;
+}
+
+.appimg {}
 
 /* end home page */
 
@@ -841,7 +935,7 @@ hr {
      color: #99f;
      background: #99f;
      height: 1px;
-     border: 0px solid #99f;
+     border: 0 solid #99f;
      margin: 3px 0;
 }
 
@@ -859,8 +953,7 @@ hr {
 
 div.joblog {
      margin: 10px 0;
-     line-height: 130% !important;
-     font-size: 90%;
+     line-height: 140% !important;
 }
 
 div.joblog li {
@@ -915,9 +1008,9 @@ div.joblog hr {
 }
 
 div.joblog ol {
-     margin-bottom: 0px;
+     margin-bottom: 0;
 }
-
+/*
 button, button:visited {
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #66a;
@@ -932,9 +1025,9 @@ button, button:visited {
      margin: 2px;
      text-align: center;
      min-width: 60px;
-     -moz-box-shadow: inset 0px 0px 2px 1px #fff;
-     -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
-     box-shadow: inset 0px 2px 8px 0px #fff;
+     -moz-box-shadow: inset 0 0 2px 1px #fff;
+     -khtml-box-shadow: inset 0 2px 8px 0 #fff;
+     box-shadow: inset 0 2px 8px 0 #fff;
      color: #316;
 }
 
@@ -1002,25 +1095,26 @@ button:hover {
      border: 1px solid #f60;
      background-color: #f60 !important;
      color: #fff;
-     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #fff;
-     box-shadow: inset 0px 0px 0px 1px #fff;
+     -moz-box-shadow: inset 0 0 0 1px #fff;
+     -khtml-box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 button:active {
      border: 1px solid #f60;
      background: #202 !important;
      color: #f60;
-     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
-     box-shadow: inset 0px 0px 0px 1px #f60;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     -moz-box-shadow: inset 0 0 0 1px #f60;
+     box-shadow: inset 0 0 0 1px #f60;
+     -khtml-box-shadow: inset 0 0 0 1px #f60;
 }
-
+*/
 input {
      margin: 3px 5px 3px 0;
      vertical-align: middle;
 }
 
+/*
 input.accept {
      background: #ffe url('../images/accept.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px;
@@ -1086,7 +1180,7 @@ input:hover {
      color: #fff;
      border: 1px solid #f60;
      opacity: 1.0;
-     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+     -moz-box-shadow: inset 0 0 0 1px #fff;
 
 }
 
@@ -1094,17 +1188,24 @@ input[type=text], input[type=password] {
      margin: 3px 5px 3px 5px;
      vertical-align: middle;
 }
+*/
 
 select {
-     margin: 3px 5px 3px 5px;
+     margin: 3px 5px 3px 0;
      vertical-align: middle;
+     min-width: 90px;
 }
 
-input[type=text], input[type=password] select {
+input {
+     border-radius: 3px;
+}
+
+input[type=text], input[type=password] {
      background: #001;
      color: #eef;
      border: 1px solid #99f;
 }
+
 submit {
      margin: 3px 5px 3px 5px;
      padding: 2px 0;
@@ -1112,27 +1213,40 @@ submit {
 }
 
 p {
-     padding: 5px 20px 0px 20px;
+     padding: 5px 20px 0 20px;
      text-align: justify;
+}
+
+p img:first-child {
+     display: none !important;     
 }
 
 .formaction {
      text-align: right;
-     margin: -10px -5px;
 }
 
 .langbox {
-     margin: 4px 5px 0px 5px;
+     margin: 5px 3px 0;
      color: #eef;
      font-size: 7pt;
      width: auto;
-     text-align: center;
+     text-align: right;
      float: right;
      vertical-align: middle;
 }
 
 .langbox img {
      padding: 0 2px; /* Ignored by IE8 */
+     opacity: 0.7;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, .langbox img {
+     margin-bottom: 4px;
+}
+
+.langbox img:hover {
+     opacity: 1;
 }
 
 .links {
@@ -1153,6 +1267,7 @@ p {
 
 .links li:last-child {
      padding-bottom: 10px !important;
+     margin-bottom: 20px;
 }
 
 .links b {
@@ -1187,7 +1302,7 @@ a:active {
 
 pre {
      font-size: 9pt;
-     margin: 0px 20px;
+     margin: 0 20px;
 }
 
 tt {
@@ -1217,7 +1332,7 @@ tt {
 }
 
 div.graphspanel {
-     padding: 10px 0px 20px 0px;
+     padding: 10px 0 20px 0;
      margin: -16px -16px -11px -16px;
      background: #000012;
      -moz-border-radius: 4px;
@@ -1290,18 +1405,18 @@ div.footnote hr{
      color: #99f;
      background: #99f;
      height: 1px;
-     border: 0px solid #99f;
+     border: 0 solid #99f;
 }
 
 .topness {
-     font-size: 7.5pt;
+     font-size: 8pt;
      text-align: right;
      margin-top: -5px;
      margin-bottom: -10px;
      margin-right: 5px;
 }
 
-/* Fixes for when app is not started and console error loads inside iframe */
+/* Fixes for when app is not started and console loads inside iframe */
 
 body.iframed {
      background: transparent url('../dark/images/transparent.gif') !important;
@@ -1309,14 +1424,6 @@ body.iframed {
 
 .iframed div.routersummaryouter {
      display: none !important;
-}
-
-.iframed h1 {
-     margin: 5px 5px 0 0 !important;
-}
-
-.iframed div.sorry {
-     margin: 0 5px 0 0 !important;
 }
 
 /* end iframed console fixes */

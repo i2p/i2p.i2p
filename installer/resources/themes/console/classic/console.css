@@ -180,6 +180,10 @@ div.routersummary input[type=text] {
      text-align: right !important;
 }
 
+#xhr {
+     margin-top: 15px;     
+}
+
 div.routersummary hr {
      color: #89f;
      background: #89f;
@@ -238,14 +242,25 @@ div.routersummary tr {
      border: 0 !important;
 }
 
+div.routersummary form {
+     margin: 0;     
+}
+
 div.newsheadings {
      text-align: right;
-     margin: 0 0 0 -20px;
+     margin: 0 5px 0 -20px;
+     padding: 0;
+     font-size: 8pt;
 }
 
 div.newsheadings li {
      list-style: none outside url('images/newsbullet_mini.png');
      margin: 0 -4px 2px 8px;
+}
+
+div.newsheadings ul {
+     margin: 0 5px -3px 38px;
+     padding: 0;
 }
 
 div.tunnels table {
@@ -354,7 +369,6 @@ div.main textarea {
 }
 
 div.main h2 {
-     margin-top: 20px;
      margin-bottom: 10px !important;
      -moz-border-radius: 0 3px 0 0;
      -khtml-border-radius: 0 3px 0 0;
@@ -368,6 +382,11 @@ div.welcome {
 div.main h2:first-child, div.main h3:first-child {
      margin-top: 0px;
      margin-bottom: -5px;
+}
+
+.topness {
+     text-align: right;
+     font-size: 8pt;  
 }
 
 div.wideload h2 {
@@ -396,11 +415,8 @@ div.news {
      text-align: right;
      color: #770;
      min-width: 500px;
-     padding-bottom: 8px;
-     padding-left: 10px;
-     padding-right: 10px;
-     padding: 0 10px 3px 10px;
-     font-size: 7pt;
+     padding: 3px 10px 3px 10px;
+     font-size: 8pt;
 }
 
 /* convert the list entry to our title */
@@ -471,11 +487,15 @@ div.news hr {
      margin: 10px 0 2px 0;
 }
 
+div.news hr:last-child {
+     margin-bottom: 10px !important;
+}
+
 div.confignav {
      padding: 15px 0;
-     margin: -16px -16px 0 -16px;
+     margin: -16px -16px 5px -16px;
      border: 1px solid #89f;
-     font-size: 9.5pt;
+     font-size: 8.5pt;
 }
 
 div.confignav a {
@@ -560,11 +580,11 @@ div.configure h2:first-child {
 }
 
 div.messages {
-     padding: 0px 10px;
+     padding: 10px 10px;
      background: #fff;
      border: 1px solid #89f;
      border-right: 0;
-     margin: -1px -15px 10px -16px;
+     margin: -6px -15px 10px -16px;
      text-align: center;
      font-size: 9pt;
      font-weight: bold;
@@ -572,12 +592,19 @@ div.messages {
 }
 
 div.messages li, div.messages ul {
-     padding: 10px 0 0 5px;
-     margin: -10px 0 0 0;
+     padding: 10px 0 0 5px !important;
+     margin: -10px 0 0 25px !important;
+     list-style: none;
+     text-align: left;
 }
 
 div.error {
      color: #d00000;
+     background-image: url("../images/errortriangle.png");
+     background-position: 10px center;
+     background-repeat: no-repeat;
+     padding: 10px 0;
+     margin-left: -5px;
 }
 
 div.notice {
@@ -662,7 +689,7 @@ table {
      border: 1px solid #89f;
      margin: 0 0 5px 0;
      cell-padding: 1px;
-     font-size: 7.5pt;
+     font-size: 8pt;
      background: #fff;
      width: 100%;
 }
@@ -677,7 +704,7 @@ table hr {
 }
 
 table tt {
-     font-size: 7.5pt;
+     font-size: 8pt;
 }
 
 table code {
@@ -722,8 +749,16 @@ h2.app {
 */
 
 h4.app, h4.app2 {
-     margin: 0 10px 2px 10px;
+     margin: 0 10px 5px 10px;
      padding: 10px 0 8px 0;
+     font-size: 12pt;
+     padding: 6px 10px 8px;
+     border: 1px solid #89f;
+     letter-spacing: 0.04em;
+     background: #fff;
+     text-transform: uppercase;
+     text-shadow: 0px 1px 1px #99f;
+     background: url('images/tinytitle.png') center center repeat-x;
 }
 
 h4.app2 {
@@ -732,15 +767,24 @@ h4.app2 {
 }
 
 div.ag2 {
-     margin: 0;
+     margin: 0 -10px -5px;
 }
 
 div.app {
      float: left;
      padding: 2px;
-     height: 90px;
-     width: 112px;
+     min-width: 60px;
      text-align: center !important;
+     border: none;
+     margin: 0 2px 2px;
+}
+
+div.app:last-child {
+     margin-bottom: 10px;
+}
+
+div.app a:link, div.app a:visited, div.app a:hover, div.app a:active {
+     text-decoration: none;
 }
 
 div.appgroup {
@@ -766,44 +810,53 @@ table.search {
 img.app {
      height: 32px;
      width: 32px;
-     padding: 6px;
+     padding: 5px 15px;
 }
 
-img.app2p {
+img.app2 {
      height: 40px;
      padding: 3px 6px 0 6px;
 }
 
-table.app {
+.app table {
      background: none;
      border: 0;
      margin: auto;
      width: auto;
 }
 
-tr.app {
+.app tr {
      background: none;
      border: 0;
      margin: 0;
 }
 
-td.app {
+.app td {
      background: none;
      border: 0;
      margin: 0;
+     padding: 0;
 }
 
 div.applabel {
-     background: url('images/header.png') center center repeat-x;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border: 2px #00f;
-     border-radius: 4px;
-     border-width: 1px;
+     background: url('images/tinytitle.png') center center repeat-x;
+     -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     border-radius: 3px;
      font-size: 9pt;
      margin: 0;
-     padding: 3px 6px 4px 6px;
+     padding: 4px;
      text-align: center;
+     min-width: 60px;
+     line-height: 110%;
+     text-transform: lowercase;
+     font-size: 8pt;
+     border: 1px solid #89f;
+     box-shadow: 0 1px 1px #bbb;
+}
+
+div.applabel:hover {
+     box-shadow: none;
 }
 
 /* end home page */
@@ -841,9 +894,9 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -5px 0 7px 0;
+     margin: -8px 0 7px 0;
      background: #fff;
-     border: 1px solid #bbf;
+     border: 1px solid #89f !important;
      border-top: 0;
      padding: 4px 0 2px 0;
      background-image: url("images/tinytitle.png") !important;
@@ -927,19 +980,29 @@ p {
      text-align: justify;
 }
 
+p img:first-child {
+     display: none;     
+}
+
 .formaction {
      text-align: right;
      margin: -10px -5px;
 }
 
 .langbox {
-     margin: 5px -20px 0px 5px;
+     margin: 5px 5px 0 5px;
      color: #001;
      font-size: 7pt;
      width: 280px;
-     text-align: center;
+     text-align: right;
      float: right;
      valign: middle;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, .langbox img {
+     margin-bottom: 2px;
+     margin-top: 2px;
 }
 
 .langbox img {
@@ -989,7 +1052,6 @@ a:hover {
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
 }
 
 a:active {
