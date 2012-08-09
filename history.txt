@@ -1,3 +1,14 @@
+2012-08-07 str4d
+ * Console:
+   - Theme updates from dr|z3d
+   - Changed universal theming key so it is not mistaken as a theme
+     name by the routerconsole
+ * i2psnark:
+   - Theme updates from dr|z3d
+   - If universal theming is set and routerconsole theme is classic,
+     use light theme explicitly
+ * susidns: new midnight theme from dr|z3d
+
 2012-08-06 zzz
  * Clone System properties before iterating to avoid
    ConcurrentModificationException (ticket #680)
