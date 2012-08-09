@@ -315,7 +315,7 @@ public class SnarkManager implements Snark.CompleteListener {
             }
             if (!themeExists) {
                 // Since the default is not "light", explicitly check if universal theme is "classic"
-                if (theme.equals("classic")
+                if (theme.equals("classic"))
                     theme = "light";
                 else
                     theme = DEFAULT_THEME;
