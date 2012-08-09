@@ -566,7 +566,7 @@ public class SAMStreamSession {
             _log.debug("run() called for socket reader " + id);
 
             int read = -1;
-            ByteBuffer data = ByteBuffer.allocateDirect(SOCKET_HANDLER_BUF_SIZE);
+            ByteBuffer data = ByteBuffer.allocate(SOCKET_HANDLER_BUF_SIZE);
 
             try {
                 InputStream in = i2pSocket.getInputStream();

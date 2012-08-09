@@ -1,3 +1,18 @@
+2012-08-09 zzz
+ * Datagrams: Remove static logs
+ * i2psnark:
+   - Remove static SnarkManager instance
+   - Allow DHT-only torrents
+   - DHT debugging
+ * NTCP: Stat cleanup
+ * SAM:
+   - Don't use direct byte buffers that may be leaking (ticket #679)
+   - Volatiles and finals
+ * SSU:
+   - Don't send a packet that exceeds the MTU
+   - Stub out local MTU detection (ticket #682)
+   - More cleanups
+
 2012-08-07 str4d
  * Console:
    - Theme updates from dr|z3d

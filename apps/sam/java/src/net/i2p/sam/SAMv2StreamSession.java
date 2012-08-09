@@ -510,7 +510,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 					_log.debug ( "run() called for socket reader " + id );
 
 					int read = -1;
-					ByteBuffer data = ByteBuffer.allocateDirect(SOCKET_HANDLER_BUF_SIZE);
+					ByteBuffer data = ByteBuffer.allocate(SOCKET_HANDLER_BUF_SIZE);
 
 					try
 					{
