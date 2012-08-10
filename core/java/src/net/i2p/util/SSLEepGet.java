@@ -388,8 +388,8 @@ public class SSLEepGet extends EepGet {
 	}
 
 	public X509Certificate[] getAcceptedIssuers() {
-	    throw new UnsupportedOperationException();
-	}
+	    return new X509Certificate[0];
+    }
 
 	public void checkClientTrusted(X509Certificate[] chain, String authType)
 		throws CertificateException {
