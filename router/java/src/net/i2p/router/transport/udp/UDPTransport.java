@@ -71,6 +71,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _introducersSelectedOn;
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
+    private int _mtu;
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
@@ -141,6 +142,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_ALLOW_DIRECT = "i2np.udp.allowDirect";
     /** this is rarely if ever used, default is to bind to wildcard address */
     public static final String PROP_BIND_INTERFACE = "i2np.udp.bindInterface";
+    /** override the "large" (max) MTU, default is PeerState.LARGE_MTU */
+    private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
         
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
@@ -213,6 +216,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
+        _mtu = PeerState.LARGE_MTU;
         _needsRebuild = true;
         
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", RATES);
@@ -307,6 +311,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // todo, set bind address too
             _endpoint.setListenPort(port);
         }
+        setMTU(bindToAddr);
         
         if (_establisher == null)
             _establisher = new EstablishmentManager(_context, this);
@@ -401,6 +406,35 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_externalListenPort > 0)
             return _externalListenPort;
         return _context.getProperty(PROP_INTERNAL_PORT, -1);
+    }
+
+    /**
+     *  Set the MTU for the socket interface at addr.
+     *  @param addr null ok
+     *  @since 0.9.2
+     */
+    private void setMTU(InetAddress addr) {
+        String p = _context.getProperty(PROP_DEFAULT_MTU);
+        if (p != null) {
+            try {
+                _mtu = MTU.rectify(Integer.parseInt(p));
+                return;
+            } catch (NumberFormatException nfe) {}
+        }
+        int mtu = MTU.getMTU(addr);
+        if (mtu <= 0)
+            mtu = PeerState.LARGE_MTU;
+        _mtu = mtu;
+    }
+
+    /**
+     * The MTU for the socket interface.
+     * To be used as the "large" MTU.
+     * @return limited to range PeerState.MIN_MTU to PeerState.LARGE_MTU.
+     * @since 0.9.2
+     */
+    public int getMTU() {
+        return _mtu;
     }
 
     /**
@@ -1331,6 +1365,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         else
             options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
 
+        // MTU since 0.9.2
+        if (_mtu < PeerState.LARGE_MTU)
+            options.setProperty(UDPAddress.PROP_MTU, Integer.toString(_mtu));
+
         if (directIncluded || introducersIncluded) {
             // This is called via TransportManager.configTransports() before startup(), prevent NPE
             if (_introKey != null)
@@ -2171,7 +2209,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-        buf.append("<tr class=\"tablefooter\"> <td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
+        buf.append("<tr class=\"tablefooter\"><td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
         buf.append(formatKBps(bpsIn)).append(THINSP).append(formatKBps(bpsOut));
         long x = numPeers > 0 ? uptimeMsTotal/numPeers : 0;
@@ -2184,10 +2222,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</b></td><td>&nbsp;</td>\n" +
                    "<td align=\"center\"><b>");
         buf.append(numPeers > 0 ? DataHelper.formatDuration2(rttTotal/numPeers) : '0');
-        buf.append("</b></td><td>&nbsp;</td> <td align=\"center\"><b>");
+        buf.append("</b></td><td>&nbsp;</td><td align=\"center\"><b>");
         buf.append(numPeers > 0 ? DataHelper.formatDuration2(rtoTotal/numPeers) : '0');
-        buf.append("</b></td><td>&nbsp;</td> <td align=\"center\"><b>");
-        buf.append(sendTotal).append("</b></td> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n" +
+        buf.append("</b></td><td align=\"center\"><b>").append(_mtu).append("</b></td><td align=\"center\"><b>");
+        buf.append(sendTotal).append("</b></td><td align=\"center\"><b>").append(recvTotal).append("</b></td>\n" +
                    "<td align=\"center\"><b>").append(resentTotal);
         buf.append("</b></td><td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n" +
                    "</tr></table>\n");

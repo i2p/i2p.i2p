@@ -21,10 +21,12 @@ public class UDPAddress {
     private int _introPorts[];
     private byte[] _introKeys[];
     private long _introTags[];
+    private int _mtu;
     
     public static final String PROP_PORT = "port";
     public static final String PROP_HOST = "host";
     public static final String PROP_INTRO_KEY = "key";
+    public static final String PROP_MTU = "mtu";
     
     public static final String PROP_CAPACITY = "caps";
     public static final char CAPACITY_TESTING = 'B';
@@ -72,6 +74,11 @@ public class UDPAddress {
         } catch (NumberFormatException nfe) {
             _port = -1;
         }
+        try { 
+            String mtu = addr.getOption(PROP_MTU);
+            if (mtu != null)
+                _mtu = MTU.rectify(Integer.parseInt(mtu));
+        } catch (NumberFormatException nfe) {}
         String key = addr.getOption(PROP_INTRO_KEY);
         if (key != null)
             _introKey = Base64.decode(key.trim());
@@ -91,7 +98,7 @@ public class UDPAddress {
             int p = -1;
             try { 
                 p = Integer.parseInt(port); 
-                if (p <= 0) continue;
+                if (p <= 0 || p > 65535) continue;
             } catch (NumberFormatException nfe) {
                 continue;
             }
@@ -161,7 +168,12 @@ public class UDPAddress {
         }
         return _hostAddress;
     }
+
+    /**
+     *  @return 0 if unset; -1 if invalid
+     */
     public int getPort() { return _port; }
+
     byte[] getIntroKey() { return _introKey; }
     
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
@@ -179,4 +191,11 @@ public class UDPAddress {
     byte[] getIntroducerKey(int i) { return _introKeys[i]; }
     long getIntroducerTag(int i) { return _introTags[i]; }
         
+    /**
+     *  @return 0 if unset or invalid; recitified via MTU.rectify()
+     *  @since 0.9.2
+     */
+    int getMTU() {
+        return _introPorts[i];
+    }
 }

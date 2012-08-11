@@ -257,7 +257,12 @@ class UDPPacketReader {
     
     /** parse out the data message */
     public class DataReader {
+
+        /**
+         *  @return the data size, NOT including IP header, UDP header, IV, or MAC
+         */
         public int getPacketSize() { return _payloadLength; }
+
         public boolean readACKsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXPLICIT_ACK);
         }

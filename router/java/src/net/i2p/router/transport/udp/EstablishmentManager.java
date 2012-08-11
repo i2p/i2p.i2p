@@ -146,7 +146,7 @@ class EstablishmentManager {
         RemoteHostId to = null;
         InetAddress remAddr = addr.getHostAddress();
         int port = addr.getPort();
-        if ( (remAddr != null) && (port > 0) ) {
+        if (remAddr != null && port > 0 && port <= 65535) {
             to = new RemoteHostId(remAddr.getAddress(), port);
 
             if (!_transport.isValid(to.getIP())) {

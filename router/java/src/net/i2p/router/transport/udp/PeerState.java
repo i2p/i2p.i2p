@@ -152,9 +152,11 @@ class PeerState {
      * we can use to publish that fact.
      */
     private long _theyRelayToUsAs;
-    /** what is the largest packet we can send to the peer? */
+    /** what is the largest packet we can currently send to the peer? */
     private int _mtu;
     private int _mtuReceive;
+    /** what is the largest packet we will ever send to the peer? */
+    private final int _largeMTU;
     /* how many consecutive packets at or under the min MTU have been received */
     private long _consecutiveSmall;
     /** when did we last check the MTU? */
@@ -259,8 +261,6 @@ class PeerState {
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 3000; // 5000;
-    /** override the default MTU */
-    private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     
     public PeerState(RouterContext ctx, UDPTransport transport,
                      byte[] remoteIP, int remotePort, Hash remotePeer, boolean isInbound) {
@@ -281,8 +281,9 @@ class PeerState {
         _receivePeriodBegin = now;
         _lastCongestionOccurred = -1;
         _remotePort = remotePort;
-        _mtu = getDefaultMTU();
+        _mtu = DEFAULT_MTU;
         _mtuReceive = _mtu;
+        _largeMTU = transport.getMTU();
         //_mtuLastChecked = -1;
         _lastACKSend = -1;
         _rto = MIN_RTO;
@@ -295,10 +296,6 @@ class PeerState {
         _remotePeer = remotePeer;
         _isInbound = isInbound;
         _remoteHostId = new RemoteHostId(remoteIP, remotePort);
-    }
-    
-    private int getDefaultMTU() {
-        return _context.getProperty(PROP_DEFAULT_MTU, DEFAULT_MTU);
     }
     
     /**
@@ -1025,13 +1022,13 @@ class PeerState {
         if (_packetsTransmitted > 10) {
             retransPct = (double)_packetsRetransmitted/(double)_packetsTransmitted;
             boolean wantLarge = retransPct < .30d; // heuristic to allow fairly lossy links to use large MTUs
-            if (wantLarge && _mtu != LARGE_MTU) {
+            if (wantLarge && _mtu != _largeMTU) {
                 if (_context.random().nextLong(_mtuDecreases) <= 0) {
-                    _mtu = LARGE_MTU;
+                    _mtu = _largeMTU;
                     _mtuIncreases++;
                     _context.statManager().addRateData("udp.mtuIncrease", _mtuIncreases, _mtuDecreases);
 		}
-	    } else if (!wantLarge && _mtu == LARGE_MTU) {
+	    } else if (!wantLarge && _mtu == _largeMTU) {
                 _mtu = MIN_MTU;
                 _mtuDecreases++;
                 _context.statManager().addRateData("udp.mtuDecrease", _mtuDecreases, _mtuIncreases);
@@ -1060,6 +1057,7 @@ class PeerState {
         adjustMTU();
         //_rto *= 2; 
     }
+
     public void packetsTransmitted(int packets) { 
         //long now = _context.clock().now();
         _packetsTransmitted += packets; 
@@ -1073,6 +1071,7 @@ class PeerState {
         }
         *****/
     }
+
     /** how long does it usually take to get a message ACKed? */
     public int getRTT() { return _rtt; }
     /** how soon should we retransmit an unacked packet? */
@@ -1092,23 +1091,25 @@ class PeerState {
     public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
 
     private static final int MTU_RCV_DISPLAY_THRESHOLD = 20;
+    /** 60 */
+    private static final int OVERHEAD_SIZE = PacketBuilder.IP_HEADER_SIZE + PacketBuilder.UDP_HEADER_SIZE +
+                                             UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
 
+    /** 
+     *  @param size not including IP header, UDP header, MAC or IV
+     */
     public void packetReceived(int size) { 
         _packetsReceived++; 
+        size += OVERHEAD_SIZE;
         if (size <= MIN_MTU) {
             _consecutiveSmall++;
+            if (_consecutiveSmall >= MTU_RCV_DISPLAY_THRESHOLD)
+                _mtuReceive = MIN_MTU;
         } else {
             _consecutiveSmall = 0;
-            _mtuReceive = LARGE_MTU;
-            return;
+            if (size > _mtuReceive)
+                _mtuReceive = size;
         }
-        
-	if (_packetsReceived > MTU_RCV_DISPLAY_THRESHOLD) {
-            if (_consecutiveSmall < MTU_RCV_DISPLAY_THRESHOLD)
-                _mtuReceive = LARGE_MTU;
-            else
-                _mtuReceive = MIN_MTU;
-	}
     }
     
     /** 

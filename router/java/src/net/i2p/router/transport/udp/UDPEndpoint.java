@@ -154,15 +154,4 @@ class UDPEndpoint {
             return null;
         return _receiver.receiveNext(); 
     }
-    
-    /**
-     * The MTU for the socket interface, if available.
-     * Not available for Java 5.
-     * @return 0 if Java 5, or if bound to an address;
-     *         limited to range MIN_MTU to LARGE_MTU.
-     * @since 0.9.2
-     */
-    public int getMTU() {
-        return MTU.getMTU(_bindAddress);
-    }
 }
