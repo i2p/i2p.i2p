@@ -196,6 +196,6 @@ public class UDPAddress {
      *  @since 0.9.2
      */
     int getMTU() {
-        return _introPorts[i];
+        return _mtu;
     }
 }
