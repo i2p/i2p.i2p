@@ -176,8 +176,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _dhtFile = new File(ctx.getConfigDir(), DHT_FILE);
         _knownNodes = new DHTNodes(ctx, _myNID);
 
-        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
-        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
         start();
     }
 
@@ -517,7 +515,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  Loads the DHT from file.
      *  Can't be restarted after stopping?
      */
-    public void start() {
+    public synchronized void start() {
+        if (_isRunning)
+            return;
+        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
+        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
         _knownNodes.start();
         _tracker.start();
         PersistDHT.loadDHT(this, _dhtFile);
@@ -536,7 +538,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /**
      *  Stop everything.
      */
-    public void stop() {
+    public synchronized void stop() {
+        if (!_isRunning)
+            return;
         _isRunning = false;
         // FIXME stop the explore thread
         // unregister port listeners

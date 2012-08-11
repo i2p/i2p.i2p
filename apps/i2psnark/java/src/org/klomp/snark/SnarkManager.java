@@ -37,6 +37,8 @@ import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
+import org.klomp.snark.dht.DHT;
+
 /**
  * Manage multiple snarks
  */
@@ -1752,6 +1754,9 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (_util.connected()) {
             if (count > 0) {
+                DHT dht = _util.getDHT();
+                if (dht != null)
+                    dht.stop();
                 // Schedule this even for final shutdown, as there's a chance
                 // that it's just this webapp that is stopping.
                 _context.simpleScheduler().addEvent(new Disconnector(), 60*1000);
