@@ -393,7 +393,7 @@ public class SSLEepGet extends EepGet {
 
 	public void checkClientTrusted(X509Certificate[] chain, String authType)
 		throws CertificateException {
-	    throw new UnsupportedOperationException();
+	    throw new CertificateException();
 	}
 
 	public void checkServerTrusted(X509Certificate[] chain, String authType)
