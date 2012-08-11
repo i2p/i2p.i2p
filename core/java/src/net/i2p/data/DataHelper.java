@@ -71,7 +71,7 @@ public class DataHelper {
             // NTCP/SSU RouterAddress options
             "cost", "host", "port",
             // SSU RouterAddress options
-            "key",
+            "key", "mtu",
             "ihost0", "iport0", "ikey0", "itag0",
             "ihost1", "iport1", "ikey1", "itag1",
             "ihost2", "iport2", "ikey2", "itag2",
@@ -473,6 +473,12 @@ public class DataHelper {
         return buf.toString();
     }
 
+    /**
+     *  Hex with leading zeros.
+     *  Use toHexString(byte[]) to not get leading zeros
+     *  @param buf may be null (returns "")
+     *  @return String of length 2*buf.length
+     */
     public static String toString(byte buf[]) {
         if (buf == null) return "";
 
@@ -481,6 +487,13 @@ public class DataHelper {
 
     private static final byte[] EMPTY_BUFFER = "".getBytes();
     
+    /**
+     *  Hex with leading zeros.
+     *  Use toHexString(byte[]) to not get leading zeros
+     *  @param buf may be null
+     *  @param len number of bytes. If greater than buf.length, additional zeros will be prepended
+     *  @return String of length 2*len
+     */
     public static String toString(byte buf[], int len) {
         if (buf == null) buf = EMPTY_BUFFER;
         StringBuilder out = new StringBuilder();
@@ -488,13 +501,12 @@ public class DataHelper {
             for (int i = 0; i < len - buf.length; i++)
                 out.append("00");
         }
-        for (int i = 0; i < buf.length && i < len; i++) {
-            StringBuilder temp = new StringBuilder(Integer.toHexString(buf[i]));
-            while (temp.length() < 2) {
-                temp.insert(0, '0');
-            }
-            temp = new StringBuilder(temp.substring(temp.length() - 2));
-            out.append(temp.toString());
+        int min = Math.min(buf.length, len);
+        for (int i = 0; i < min; i++) {
+            int bi = buf[i] & 0xff;
+            if (bi < 16)
+                out.append('0');
+            out.append(Integer.toHexString(bi));
         }
         return out.toString();
     }
@@ -505,6 +517,11 @@ public class DataHelper {
         return val.toString(10);
     }
 
+    /**
+     *  Hex without leading zeros.
+     *  Use toString(byte[] to get leading zeros
+     *  @param buf may be null (returns "00")
+     */
     public final static String toHexString(byte data[]) {
         if ((data == null) || (data.length <= 0)) return "00";
         BigInteger bi = new BigInteger(1, data);
