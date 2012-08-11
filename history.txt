@@ -1,3 +1,6 @@
+2012-08-10 kytv
+* German and Greek translation updates from Transifex
+
 2012-08-09 zzz
  * Datagrams: Remove static logs
  * i2psnark:
