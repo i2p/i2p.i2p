@@ -1,3 +1,17 @@
+2012-08-11 zzz
+ * DataHelper: toString(byte[]) cleanup
+ * i2psnark:
+   - Fix DHT nodes not being saved at shutdown
+ * RouterContext: Make the contexts list concurrent
+ * SSLEepGet: Don't throw UOE in TrustManager
+ * SSU MTU (ticket #682):
+   - Use local MTU detection
+   - i2np.udp.mtu now sets max MTU, not initial MTU
+   - Put local MTU in netDb 
+   - Fix receive MTU calculations
+   - Track remote MTU based on actual received packet size
+   - Display local MTU on peers page
+
 2012-08-10 kytv
 * German and Greek translation updates from Transifex
 
