@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -61,9 +62,10 @@ public class RouterContext extends I2PAppContext {
     // split up big lock on this to avoid deadlocks
     private final Object _lock1 = new Object(), _lock2 = new Object();
 
-    private static List<RouterContext> _contexts = new ArrayList(1);
+    private static final List<RouterContext> _contexts = new CopyOnWriteArrayList();
     
     public RouterContext(Router router) { this(router, null); }
+
     public RouterContext(Router router, Properties envProps) { 
         super(filterProps(envProps));
         _router = router;
@@ -74,8 +76,8 @@ public class RouterContext extends I2PAppContext {
         //initAll();
         if (!_contexts.isEmpty())
             System.err.println("Warning - More than one router in this JVM");
-        _contexts.add(this);
         _finalShutdownTasks = new CopyOnWriteArraySet();
+        _contexts.add(this);
     }
 
     /**
@@ -187,7 +189,7 @@ public class RouterContext extends I2PAppContext {
      * This will always contain only one item (except when a simulation per the
      * MultiRouter is going on).
      *
-     * @return an unmodifiable list (as of 0.8.8). May be null or empty.
+     * @return an unmodifiable list (as of 0.8.8). May be empty.
      */
     public static List<RouterContext> listContexts() {
         return Collections.unmodifiableList(_contexts);
