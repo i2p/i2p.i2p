@@ -359,7 +359,7 @@ esac
 # Resolve the architecture
 if [ "$DIST_OS" = "macosx" ]
 then
-    OS_VER=`sw_vers | grep 'ProductVersion:' | grep -o '[0-9]*\.[0-9]*\.[0-9]*'`
+    OS_VER=`sw_vers | grep ProductVersion | cut -d: -f2 | sed -e 's/[^0-9]*//'`
     DIST_ARCH="universal"
     if [ $(sysctl -n hw.cpu64bit_capable) -eq 1 ]; then
         DIST_BITS="64"
