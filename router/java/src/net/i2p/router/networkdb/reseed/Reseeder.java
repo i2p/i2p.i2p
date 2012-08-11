@@ -68,7 +68,7 @@ public class Reseeder {
               "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://75.145.125.59/netDb/" + "," +
               "http://i2p.mooo.com/netDb/" + "," +
-              "http://193.150.121.66/";
+              "http://193.150.121.66/netDb/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
@@ -80,7 +80,7 @@ public class Reseeder {
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://75.145.125.59/netDb/" + "," +
               "https://i2p.mooo.com/netDb/" + "," +
-              "https://193.150.121.66/";
+              "https://193.150.121.66/netDb/";
 
     public static final String PROP_PROXY_HOST = "router.reseedProxyHost";
     public static final String PROP_PROXY_PORT = "router.reseedProxyPort";
