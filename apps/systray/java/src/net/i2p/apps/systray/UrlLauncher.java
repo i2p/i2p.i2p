@@ -114,7 +114,7 @@ public class UrlLauncher {
             if (osName.toLowerCase(Locale.US).indexOf("mac") > -1) {
                 if (osName.toLowerCase(Locale.US).startsWith("mac os x")) {
 
-                    if (_shellCommand.executeSilentAndWaitTimed("safari " + url, 5))
+                    if (_shellCommand.executeSilentAndWaitTimed("open " + url, 5))
                         return true;
 
                 } else {
