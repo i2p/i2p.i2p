@@ -518,8 +518,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public synchronized void start() {
         if (_isRunning)
             return;
-        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
-        session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
+        _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM_RAW, _rPort);
+        _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
         _knownNodes.start();
         _tracker.start();
         PersistDHT.loadDHT(this, _dhtFile);
