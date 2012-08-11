@@ -67,7 +67,8 @@ public class Reseeder {
           //  "http://r31453.ovh.net/static_media/files/netDb/" + "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://75.145.125.59/netDb/" + "," +
-              "http://i2p.mooo.com/netDb/";
+              "http://i2p.mooo.com/netDb/" + "," +
+              "http://193.150.121.66/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
@@ -78,7 +79,8 @@ public class Reseeder {
           //  "https://r31453.ovh.net/static_media/files/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://75.145.125.59/netDb/" + "," +
-              "https://i2p.mooo.com/netDb/";
+              "https://i2p.mooo.com/netDb/" + "," +
+              "https://193.150.121.66/";
 
     public static final String PROP_PROXY_HOST = "router.reseedProxyHost";
     public static final String PROP_PROXY_PORT = "router.reseedProxyPort";
