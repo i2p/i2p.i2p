@@ -56,7 +56,7 @@ abstract class PersistDHT {
     }
 
     public static synchronized void saveDHT(DHTNodes nodes, File file) {
-        if (nodes.isEmpty())
+        if (nodes.size() <= 0)
             return;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistDHT.class);
         int count = 0;
