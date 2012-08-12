@@ -339,6 +339,7 @@ public class RouterConsoleRunner {
                         lsnr.setPort(lport);
                         lsnr.setMaxIdleTime(90*1000);  // default 10 sec
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
+                        lsnr.setUseDirectBuffers(false);  // default true seems to be leaky
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
@@ -398,6 +399,7 @@ public class RouterConsoleRunner {
                             ssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                             ssll.setMaxIdleTime(90*1000);  // default 10 sec
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
+                            ssll.setUseDirectBuffers(false);  // default true seems to be leaky
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;

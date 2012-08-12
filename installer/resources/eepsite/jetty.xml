@@ -101,6 +101,7 @@
             <Set name="confidentialPort">8443</Set>
 	    <Set name="lowResourcesConnections">5000</Set>
 	    <Set name="lowResourcesMaxIdleTime">5000</Set>
+            <Set name="useDirectBuffers">false</Set>
           </New>
       </Arg>
     </Call>

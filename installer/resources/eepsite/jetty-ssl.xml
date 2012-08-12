@@ -16,6 +16,7 @@
       <New class="org.mortbay.jetty.security.SslSocketConnector">
         <Set name="Port">8443</Set>
         <Set name="maxIdleTime">30000</Set>
+        <Set name="useDirectBuffers">false</Set>
         <Set name="handshakeTimeout">2000</Set>
         <Set name="keystore">./eepsite/etc/keystore.ks</Set>
         <Set name="password">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
