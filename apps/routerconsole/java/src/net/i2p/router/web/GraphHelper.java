@@ -222,7 +222,7 @@ public class GraphHelper extends FormHandler {
             if (_end > 0)
                 _out.write(' ' + _("ending {0} ago", DataHelper.formatDuration2(_end * r.getPeriod())));
 
-            _out.write("</h3><p><img class=\"statimage\" border=\"0\""
+            _out.write("</h3><img class=\"statimage\" border=\"0\""
                        + " src=\"viewstat.jsp?stat="
                        + r.getRateStat().getName() 
                        + "&amp;showEvents=" + _showEvents
@@ -231,7 +231,7 @@ public class GraphHelper extends FormHandler {
                        + "&amp;end=" + _end 
                        + "&amp;width=" + _width
                        + "&amp;height=" + _height
-                       + "\"></p><p>\n");
+                       + "\"><p>\n");
 
             if (_width < MAX_X && _height < MAX_Y) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 3 / 2, _height * 3 / 2));
