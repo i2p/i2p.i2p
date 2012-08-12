@@ -1167,7 +1167,7 @@ class PeerState {
 	}
         state.setPeer(this);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Adding to " + _remotePeer.toBase64() + ": " + state.getMessageId());
+            _log.debug("Adding to " + _remotePeer + ": " + state.getMessageId());
         int rv = 0;
         boolean fail = false;
         synchronized (_outboundMessages) {
@@ -1338,7 +1338,7 @@ class PeerState {
             for (OutboundMessageState state : _outboundMessages) {
                 if (locked_shouldSend(state)) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Allocate sending to " + _remotePeer.toBase64() + ": " + state.getMessageId());
+                        _log.debug("Allocate sending to " + _remotePeer + ": " + state.getMessageId());
                     /*
                     while (iter.hasNext()) {
                         OutboundMessageState later = (OutboundMessageState)iter.next();
@@ -1356,7 +1356,7 @@ class PeerState {
             }
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Nothing to send to " + _remotePeer.toBase64() + ", with " + _outboundMessages.size() + " remaining");
+            _log.debug("Nothing to send to " + _remotePeer + ", with " + _outboundMessages.size() + " remaining");
         return null;
     }
     
@@ -1529,7 +1529,7 @@ class PeerState {
             //}
 
             if (_log.shouldLog(Log.INFO))
-                _log.info("Received ack of " + messageId + " by " + _remotePeer.toBase64() 
+                _log.info("Received ack of " + messageId + " by " + _remotePeer
                           + " after " + state.getLifetime() + " and " + numSends + " sends");
             _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
             if (state.getFragmentCount() > 1)
@@ -1597,7 +1597,7 @@ class PeerState {
             _context.statManager().addRateData("udp.partialACKReceived", numACKed, state.getLifetime());
             
             if (_log.shouldLog(Log.INFO))
-                _log.info("Received partial ack of " + state.getMessageId() + " by " + _remotePeer.toBase64() 
+                _log.info("Received partial ack of " + state.getMessageId() + " by " + _remotePeer
                           + " after " + state.getLifetime() + " and " + numSends + " sends: " + bitfield + ": completely removed? " 
                           + isComplete + ": " + state);
             
@@ -1714,7 +1714,7 @@ class PeerState {
     
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(_remoteHostId.toString());
         if (_remotePeer != null)
             buf.append(" ").append(_remotePeer.toBase64().substring(0,6));

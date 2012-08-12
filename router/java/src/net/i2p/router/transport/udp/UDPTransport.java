@@ -60,7 +60,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private OutboundRefiller _refiller;
     private PacketPusher _pusher;
     private final InboundMessageFragments _inboundFragments;
-    private UDPFlooder _flooder;
+    //private UDPFlooder _flooder;
     private PeerTestManager _testManager;
     private final IntroductionManager _introManager;
     private final ExpirePeerEvent _expireEvent;
@@ -156,7 +156,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
 
     /** should we flood all UDP peers with the configured rate? This is for testing only! */
-    private static final boolean SHOULD_FLOOD_PEERS = false;
+    //private static final boolean SHOULD_FLOOD_PEERS = false;
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
@@ -207,8 +207,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _destroyBuilder = new PacketBuilder(_context, this);
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
-        if (SHOULD_FLOOD_PEERS)
-            _flooder = new UDPFlooder(_context, this);
+        //if (SHOULD_FLOOD_PEERS)
+        //    _flooder = new UDPFlooder(_context, this);
         _expireTimeout = EXPIRE_TIMEOUT;
         _expireEvent = new ExpirePeerEvent();
         _testEvent = new PeerTestEvent();
@@ -248,8 +248,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_refiller != null)
             _refiller.shutdown();
         _inboundFragments.shutdown();
-        if (_flooder != null)
-            _flooder.shutdown();
+        //if (_flooder != null)
+        //    _flooder.shutdown();
         _introManager.reset();
         UDPPacket.clearCache();
         
@@ -326,8 +326,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (USE_PRIORITY && _refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
         
-        if (SHOULD_FLOOD_PEERS && _flooder == null)
-            _flooder = new UDPFlooder(_context, this);
+        //if (SHOULD_FLOOD_PEERS && _flooder == null)
+        //    _flooder = new UDPFlooder(_context, this);
         
         // Startup the endpoint with the requested port, check the actual port, and
         // take action if it failed or was different than requested or it needs to be saved
@@ -343,8 +343,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // attempt to use it as our external port - this will be overridden by
             // externalAddressReceived(...)
             Map<String, String> changes = new HashMap();
-            changes.put(PROP_INTERNAL_PORT, newPort+"");
-            changes.put(PROP_EXTERNAL_PORT, newPort+"");
+            changes.put(PROP_INTERNAL_PORT, Integer.toString(newPort));
+            changes.put(PROP_EXTERNAL_PORT, Integer.toString(newPort));
             _context.router().saveConfig(changes, null);
         }
 
@@ -356,8 +356,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _pusher.startup();
         if (USE_PRIORITY)
             _refiller.startup();
-        if (SHOULD_FLOOD_PEERS)
-            _flooder.startup();
+        //if (SHOULD_FLOOD_PEERS)
+        //    _flooder.startup();
         _expireEvent.setIsAlive(true);
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
         SimpleTimer.getInstance().addEvent(_testEvent, 10*1000); // lets requeue it for Real Soon
@@ -367,8 +367,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         destroyAll();
         if (_endpoint != null)
             _endpoint.shutdown();
-        if (_flooder != null)
-            _flooder.shutdown();
+        //if (_flooder != null)
+        //    _flooder.shutdown();
         if (_refiller != null)
             _refiller.shutdown();
         if (_handler != null)
@@ -392,7 +392,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Introduction key that people should use to contact us
      *
      */
-    public SessionKey getIntroKey() { return _introKey; }
+    SessionKey getIntroKey() { return _introKey; }
+
     public int getLocalPort() { return _externalListenPort; }
     public InetAddress getLocalAddress() { return _externalListenHost; }
     public int getExternalPort() { return _externalListenPort; }
@@ -433,7 +434,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @return limited to range PeerState.MIN_MTU to PeerState.LARGE_MTU.
      * @since 0.9.2
      */
-    public int getMTU() {
+    int getMTU() {
         return _mtu;
     }
 
@@ -512,7 +513,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
             _log.info("External address received: " + Addresses.toString(ourIP, ourPort) + " from " 
-                      + from.toBase64() + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
+                      + from + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
                       + ", receivedInboundRecent? " + inboundRecent + " status " + _reachabilityStatus);
         
         if (explicitSpecified) 
@@ -524,7 +525,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (!isValid) {
             // ignore them 
             if (_log.shouldLog(Log.ERROR))
-                _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
+                _log.error("The router " + from + " told us we have an invalid IP - " 
                            + Addresses.toString(ourIP, ourPort) + ".  Lets throw tomatoes at them");
             markUnreachable(from);
             //_context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
@@ -541,11 +542,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _lastOurIP = ourIP;
             _lastOurPort = ourPort;
             if (_log.shouldLog(Log.INFO))
-                _log.info("The router " + from.toBase64() + " told us we have a new IP - " 
+                _log.info("The router " + from + " told us we have a new IP - " 
                            + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info(from.toBase64() + " and " + _lastFrom.toBase64() + " agree we have a new IP - " 
+                _log.info(from + " and " + _lastFrom + " agree we have a new IP - " 
                            + Addresses.toString(ourIP, ourPort) + ".  Changing address.");
             _lastFrom = from;
             _lastOurIP = ourIP;
@@ -617,7 +618,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.statManager().addRateData("udp.addressUpdated", 1, 0);
             Map<String, String> changes = new HashMap();
             if (!fixedPort)
-                changes.put(PROP_EXTERNAL_PORT, ourPort+"");
+                changes.put(PROP_EXTERNAL_PORT, Integer.toString(ourPort));
             // queue a country code lookup of the new IP
             _context.commSystem().queueLookup(ourIP);
             // store these for laptop-mode (change ident on restart... or every time... when IP changes)
@@ -633,7 +634,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
 
                 changes.put(PROP_IP, _externalListenHost.getHostAddress());
-                changes.put(PROP_IP_CHANGE, "" + now);
+                changes.put(PROP_IP_CHANGE, Long.toString(now));
                 _context.router().saveConfig(changes, null);
 
                 // laptop mode
@@ -678,6 +679,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private boolean getIsPortFixed() {
         return DEFAULT_FIXED_PORT.equals(_context.getProperty(PROP_FIXED_PORT, DEFAULT_FIXED_PORT));
     }
+
     /** 
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
@@ -690,7 +692,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer with the given ident, or null 
      * if no state exists
      */
-    public PeerState getPeerState(Hash remotePeer) { 
+    PeerState getPeerState(Hash remotePeer) { 
             return _peersByIdent.get(remotePeer);
     }
     
@@ -698,7 +700,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer being introduced, or null if we aren't
      * offering to introduce anyone with that tag.
      */
-    public PeerState getPeerState(long relayTag) {
+    PeerState getPeerState(long relayTag) {
         return _introManager.get(relayTag);
     }
     
@@ -785,7 +787,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (remoteId == null) return false;
-        
+        if (remoteId.getIP() == null && _log.shouldLog(Log.WARN))
+            _log.warn("Add indirect: " + peer);
+
         oldPeer = _peersByRemoteHost.put(remoteId, peer);
         if ( (oldPeer != null) && (oldPeer != peer) ) {
             // transfer over the old state/inbound message fragments/etc
@@ -806,8 +810,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         markReachable(peer.getRemotePeer(), peer.isInbound());
         //_context.shitlist().unshitlistRouter(peer.getRemotePeer(), STYLE);
 
-        if (SHOULD_FLOOD_PEERS)
-            _flooder.addPeer(peer);
+        //if (SHOULD_FLOOD_PEERS)
+        //    _flooder.addPeer(peer);
         
         _expireEvent.add(peer);
         
@@ -873,7 +877,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //_context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net: " + entry);
+                    _log.warn("Dropping the peer " + peerHash + " because they are in the wrong net: " + entry);
                 return;
             } else {
                 if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
@@ -986,8 +990,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // unchoke 'em, but just because we'll never talk again...
         _activeThrottle.unchoke(peer.getRemotePeer());
         
-        if (SHOULD_FLOOD_PEERS)
-            _flooder.removePeer(peer);
+        //if (SHOULD_FLOOD_PEERS)
+        //    _flooder.removePeer(peer);
         _expireEvent.remove(peer);
         
         if (needsRebuild())
@@ -1045,7 +1049,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         _log.info("Our direct SSU info is initialized, but not used in our address yet");
                         rv = true;
                     } else {
-                        _log.info("Our direct SSU info is initialized");
+                        //_log.info("Our direct SSU info is initialized");
                     }
                 }
             }
@@ -1173,7 +1177,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return _cachedBid[TRANSIENT_FAIL_BID];
 
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
+                _log.debug("bidding on a message to an unestablished peer: " + to);
 
             // Try to maintain at least 3 peers so we can determine our IP address and
             // we have a selection to run peer tests with.
@@ -1235,7 +1239,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         Hash to = msg.getTarget().getIdentity().calculateHash();
         PeerState peer = getPeerState(to);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending to " + (to != null ? to.toBase64() : ""));
+            _log.debug("Sending to " + (to != null ? to.toString() : ""));
         if (peer != null) {
             long lastSend = peer.getLastSendFullyTime();
             long lastRecv = peer.getLastReceiveTime();
@@ -1250,7 +1254,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     dropPeer(peer, false, "proactive reconnection");
                     msg.timestamp("peer is really idle, dropping con and reestablishing");
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Proactive reestablish to " + to.toBase64());
+                        _log.debug("Proactive reestablish to " + to);
                     _establisher.establish(msg);
                     _context.statManager().addRateData("udp.proactiveReestablish", now-lastSend, now-peer.getKeyEstablishedTime());
                     return;
@@ -1258,7 +1262,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             msg.timestamp("enqueueing for an already established peer");
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Add to fragments for " + to.toBase64());
+                _log.debug("Add to fragments for " + to);
 
             // See comments in DummyThrottle.java
             if (USE_PRIORITY)
@@ -1267,7 +1271,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _fragments.add(msg);
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Establish new connection to " + to.toBase64());
+                _log.debug("Establish new connection to " + to);
             msg.timestamp("establishing a new connection");
             _establisher.establish(msg);
         }
@@ -1494,6 +1498,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     public void failed(OutboundMessageState msg) { failed(msg, true); }
+
     void failed(OutboundMessageState msg, boolean allowPeerFailure) {
         if (msg == null) return;
         int consecutive = 0;
@@ -1677,8 +1682,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int FLAG_RESEND = 14;
     private static final int FLAG_DUP = 15;
     private static final int FLAG_UPTIME = 16;
+    private static final int FLAG_DEBUG = 99;
     
-    private Comparator getComparator(int sortFlags) {
+    private static Comparator getComparator(int sortFlags) {
         Comparator rv = null;
         switch (Math.abs(sortFlags)) {
             case FLAG_IDLE_IN:
@@ -1738,6 +1744,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             rv = new InverseComparator(rv);
         return rv;
     }
+
     private static class AlphaComparator extends PeerComparator {
         private static final AlphaComparator _instance = new AlphaComparator();
         public static final AlphaComparator instance() { return _instance; }
@@ -1942,7 +1949,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     private static class InverseComparator implements Comparator {
-        private Comparator _comp;
+        private final Comparator _comp;
         public InverseComparator(Comparator comp) { _comp = comp; }
         public int compare(Object lhs, Object rhs) {
             return -1 * _comp.compare(lhs, rhs);
@@ -1968,8 +1975,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    //public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, 0); }
-    public void renderStatusHTML(Writer out, int sortFlags) throws IOException {}
     @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         TreeSet<PeerState> peers = new TreeSet(getComparator(sortFlags));
@@ -2227,8 +2232,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</b></td><td align=\"center\"><b>").append(_mtu).append("</b></td><td align=\"center\"><b>");
         buf.append(sendTotal).append("</b></td><td align=\"center\"><b>").append(recvTotal).append("</b></td>\n" +
                    "<td align=\"center\"><b>").append(resentTotal);
-        buf.append("</b></td><td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n" +
-                   "</tr></table>\n");
+        buf.append("</b></td><td align=\"center\"><b>").append(dupRecvTotal).append("</b></td></tr>\n");
+        if (sortFlags == FLAG_DEBUG) {
+            buf.append("<tr><td colspan=\"16\">");
+            buf.append("peersByIdent: ").append(_peersByIdent.size());
+            buf.append(" peersByRemoteHost: ").append(_peersByRemoteHost.size());
+            int dir = 0;
+            int indir = 0;
+            for (RemoteHostId rhi : _peersByRemoteHost.keySet()) {
+                 if (rhi.getIP() != null)
+                     dir++;
+                 else
+                     indir++;
+            }
+            buf.append(" pBRH direct: ").append(dir).append(" indirect: ").append(indir);
+            buf.append("</td></tr>");
+        }
+        buf.append("</table>\n");
 
       /*****
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
@@ -2283,11 +2303,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
         private final Set<PeerState> _expirePeers;
         private final List<PeerState> _expireBuffer;
-        private boolean _alive;
+        private volatile boolean _alive;
+
         public ExpirePeerEvent() {
             _expirePeers = new ConcurrentHashSet(128);
             _expireBuffer = new ArrayList();
         }
+
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
             if (haveCapacity())
@@ -2385,6 +2407,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";
+
     @Override
     public short getReachabilityStatus() { 
         String override = _context.getProperty(PROP_REACHABILITY_STATUS_OVERRIDE);
@@ -2428,7 +2451,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private class PeerTestEvent implements SimpleTimer.TimedEvent {
-        private boolean _alive;
+        private volatile boolean _alive;
         /** when did we last test our reachability */
         private long _lastTested;
         private boolean _forceRun;

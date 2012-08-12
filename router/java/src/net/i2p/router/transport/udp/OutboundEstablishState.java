@@ -58,6 +58,10 @@ class OutboundEstablishState {
     // intro
     private final UDPAddress _remoteAddress;
     private boolean _complete;
+    // counts for backoff
+    private int _confirmedSentCount;
+    private int _requestSentCount;
+    private int _introSentCount;
     
     /** nothin sent yet */
     public static final int STATE_UNKNOWN = 0;
@@ -72,6 +76,12 @@ class OutboundEstablishState {
     /** we need to have someone introduce us to the peer, but haven't received a RelayResponse yet */
     public static final int STATE_PENDING_INTRO = 5;
     
+    /** basic delay before backoff */
+    private static final long RETRANSMIT_DELAY = 1500;
+
+    /** max delay including backoff */
+    private static final long MAX_DELAY = 15*1000;
+
     public OutboundEstablishState(RouterContext ctx, InetAddress remoteHost, int remotePort, 
                                   RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
                                   DHSessionKeyBuilder dh) {
@@ -98,7 +108,7 @@ class OutboundEstablishState {
         prepareSessionRequest();
         if ( (addr != null) && (addr.getIntroducerCount() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("new outbound establish to " + remotePeer.calculateHash().toBase64() + ", with address: " + addr);
+                _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
             _currentState = STATE_PENDING_INTRO;
         }
     }
@@ -355,29 +365,36 @@ class OutboundEstablishState {
     /** note that we just sent the SessionConfirmed packet */
     public synchronized void confirmedPacketsSent() {
         _lastSend = _context.clock().now();
-        _nextSend = _lastSend + 1000;
+        long delay = Math.min(RETRANSMIT_DELAY << (_confirmedSentCount++), MAX_DELAY);
+        _nextSend = _lastSend + delay;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send confirm packets, nextSend = 1s");
+            _log.debug("Send confirm packets, nextSend in " + delay);
         if ( (_currentState == STATE_UNKNOWN) || 
              (_currentState == STATE_REQUEST_SENT) ||
              (_currentState == STATE_CREATED_RECEIVED) )
             _currentState = STATE_CONFIRMED_PARTIALLY;
     }
+
     /** note that we just sent the SessionRequest packet */
     public synchronized void requestSent() {
         _lastSend = _context.clock().now();
-        _nextSend = _lastSend + 1000;
+        long delay = Math.min(RETRANSMIT_DELAY << (_requestSentCount++), MAX_DELAY);
+        _nextSend = _lastSend + delay;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send a request packet, nextSend = 1s");
+            _log.debug("Send a request packet, nextSend in " + delay);
         if (_currentState == STATE_UNKNOWN)
             _currentState = STATE_REQUEST_SENT;
     }
+
+    /** note that we just sent the RelayRequest packet */
     public synchronized void introSent() {
         _lastSend = _context.clock().now();
-        _nextSend = _lastSend + 1000;
+        long delay = Math.min(RETRANSMIT_DELAY << (_introSentCount++), MAX_DELAY);
+        _nextSend = _lastSend + delay;
         if (_currentState == STATE_UNKNOWN)
             _currentState = STATE_PENDING_INTRO;
     }
+
     public synchronized void introductionFailed() {
         _nextSend = _context.clock().now();
         // keep the state as STATE_PENDING_INTRO, so next time the EstablishmentManager asks us

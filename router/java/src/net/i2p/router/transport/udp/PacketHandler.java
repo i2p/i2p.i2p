@@ -78,17 +78,17 @@ class PacketHandler {
         //_context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.packetValidateMultipleCount", "How many times we validate a packet, if done more than once (period = afterValidate-enqueue)", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.packetNoValidationLifetime", "How long packets that are never validated are around for", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.sessionRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.sessionConfirmed", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.sessionCreated", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.sessionRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.sessionConfirmed", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.sessionCreated", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.dataKnown", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.dataKnownAck", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.dataUnknown", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSize.dataUnknownAck", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.test", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.relayRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.relayIntro", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receivePacketSize.relayResponse", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.test", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.relayRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.relayIntro", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize.relayResponse", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
     }
     
     public void startup() { 
@@ -144,7 +144,7 @@ class PacketHandler {
 
                 packet.received();
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Received the packet " + packet);
+                    _log.info("Received: " + packet);
                 _state = 4;
                 long queueTime = packet.getLifetime();
                 long handleStart = _context.clock().now();
@@ -163,8 +163,8 @@ class PacketHandler {
                 _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
                 _state = 8;
 
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Done receiving the packet " + packet);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Done receiving: " + packet);
                 
            /********
                 if (handleTime > 1000) {
@@ -219,8 +219,8 @@ class PacketHandler {
             RemoteHostId rem = packet.getRemoteHost();
             PeerState state = _transport.getPeerState(rem);
             if (state == null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Packet received is not for a connected peer");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Packet received is not for a connected peer");
                 _state = 11;
                 InboundEstablishState est = _establisher.getInboundState(rem);
                 if (est != null) {
@@ -229,8 +229,8 @@ class PacketHandler {
                     _state = 12;
                     receivePacket(reader, packet, est);
                 } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Packet received is not for an inbound establishment");
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Packet received is not for an inbound establishment");
                     _state = 13;
                     OutboundEstablishState oest = _establisher.getOutboundState(rem);
                     if (oest != null) {
@@ -242,6 +242,7 @@ class PacketHandler {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Packet received is not for an inbound or outbound establishment");
                         // ok, not already known establishment, try as a new one
+                        // Last chance for success, using our intro key
                         _state = 15;
                         receivePacket(reader, packet, NEW_PEER);
                     }
@@ -260,6 +261,7 @@ class PacketHandler {
          */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, PeerState state) {
             _state = 17;
+            boolean isStray = false;
             boolean isValid = packet.validate(state.getCurrentMACKey());
             if (!isValid) {
                 _state = 18;
@@ -277,9 +279,11 @@ class PacketHandler {
                         // process, so try our intro key
                         // (after an outbound establishment process, there wouldn't
                         //  be any stray packets)
+                        // These are generally PeerTest packets
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Validation with existing con failed, but validation as reestablish/stray passed");
                         packet.decrypt(_transport.getIntroKey());
+                        isStray = true;
                     } else {
                         _state = 21;
                         InboundEstablishState est = _establisher.getInboundState(packet.getRemoteHost());
@@ -305,13 +309,15 @@ class PacketHandler {
             }
 
             _state = 25;
-            handlePacket(reader, packet, state, null, null);
+            handlePacket(reader, packet, state, null, null, !isStray);
             _state = 26;
         }
 
         /**
-         * New conn or failed validation
-         * Decrypt and validate the packet then call handlePacket()
+         * New conn or failed validation - we have no Session Key.
+         * Here we attempt to validate the packet with our intro key,
+         * then decrypt the packet with our intro key,
+         * then call handlePacket().
          *
          * @param peerType OUTBOUND_FALLBACK, INBOUND_FALLBACK, or NEW_PEER
          */
@@ -319,6 +325,8 @@ class PacketHandler {
             _state = 27;
             boolean isValid = packet.validate(_transport.getIntroKey());
             if (!isValid) {
+                // Note that the vast majority of these are NOT corrupted packets, but
+                // packets for which we don't have the PeerState (i.e. SessionKey)
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid introduction packet received: " + packet, new Exception("path"));
                 _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
@@ -340,9 +348,14 @@ class PacketHandler {
                     _log.debug("Valid introduction packet received: " + packet);
             }
 
+            // Packets that get here are probably one of:
+            //  304 byte Session Request
+            //  96 byte Relay Request
+            //  60 byte Relay Response
+            //  80 byte Peer Test
             _state = 29;
             packet.decrypt(_transport.getIntroKey());
-            handlePacket(reader, packet, null, null, null);
+            handlePacket(reader, packet, null, null, null, false);
             _state = 30;
         }
 
@@ -379,7 +392,7 @@ class PacketHandler {
 
                     _state = 32;
                     packet.decrypt(state.getCipherKey());
-                    handlePacket(reader, packet, null, null, null);
+                    handlePacket(reader, packet, null, null, null, true);
                     return;
                 } else {
                     if (_log.shouldLog(Log.WARN))
@@ -423,7 +436,7 @@ class PacketHandler {
                         _log.info("Valid introduction packet received for outbound established con: " + packet);
                     _state = 37;
                     packet.decrypt(state.getCipherKey());
-                    handlePacket(reader, packet, null, state, null);
+                    handlePacket(reader, packet, null, state, null, true);
                     _state = 38;
                     return;
                 }
@@ -436,7 +449,7 @@ class PacketHandler {
                     _log.info("Valid introduction packet received for outbound established con with old intro key: " + packet);
                 _state = 39;
                 packet.decrypt(state.getIntroKey());
-                handlePacket(reader, packet, null, state, null);
+                handlePacket(reader, packet, null, state, null, true);
                 _state = 40;
                 return;
             } else {
@@ -457,8 +470,11 @@ class PacketHandler {
          * @param state non-null if fully established
          * @param outState non-null if outbound establishing in process
          * @param inState unused always null
+         * @param isAuthenticated true if a state key was used, false if our own intro key was used
          */
-        private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state, OutboundEstablishState outState, InboundEstablishState inState) {
+        private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state,
+                                  OutboundEstablishState outState, InboundEstablishState inState,
+                                  boolean isAuthenticated) {
             _state = 43;
             reader.initialize(packet);
             _state = 44;
@@ -470,7 +486,8 @@ class PacketHandler {
             if (state != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
-                state.adjustClockSkew(skew);
+                if (isAuthenticated)
+                    state.adjustClockSkew(skew);
             }
             _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
 
@@ -502,24 +519,40 @@ class PacketHandler {
             RemoteHostId from = packet.getRemoteHost();
             _state = 46;
             
-            switch (reader.readPayloadType()) {
+            int type = reader.readPayloadType();
+            switch (type) {
                 case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                     _state = 47;
                     _establisher.receiveSessionRequest(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.sessionRequest", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.sessionRequest", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
                     _state = 48;
+                    if (!isAuthenticated) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                        break;
+                    }
                     _establisher.receiveSessionConfirmed(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.sessionConfirmed", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.sessionConfirmed", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CREATED:
                     _state = 49;
+                    if (!isAuthenticated) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                        break;
+                    }
                     _establisher.receiveSessionCreated(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.sessionCreated", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.sessionCreated", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_DATA:
                     _state = 50;
+                    if (!isAuthenticated) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                        break;
+                    }
                     if (outState != null)
                         state = _establisher.receiveData(outState);
                     if (_log.shouldLog(Log.DEBUG))
@@ -545,6 +578,7 @@ class PacketHandler {
                         if (dr.readFragmentCount() <= 0)
                             _context.statManager().addRateData("udp.receivePacketSize.dataKnownAck", packet.getPacket().getLength(), packet.getLifetime());
                     } else {
+                        // doesn't happen
                         _context.statManager().addRateData("udp.receivePacketSize.dataUnknown", packet.getPacket().getLength(), packet.getLifetime());
                         UDPPacketReader.DataReader dr = reader.getDataReader();
                         if (dr.readFragmentCount() <= 0)
@@ -556,39 +590,46 @@ class PacketHandler {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received test packet: " + reader + " from " + from);
                     _testManager.receiveTest(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.test", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.test", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST:
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay request packet: " + reader + " from " + from);
                     _introManager.receiveRelayRequest(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.relayRequest", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.relayRequest", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_INTRO:
+                    if (!isAuthenticated) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                        break;
+                    }
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay intro packet: " + reader + " from " + from);
                     _introManager.receiveRelayIntro(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.relayIntro", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.relayIntro", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay response packet: " + reader + " from " + from);
                     _establisher.receiveRelayResponse(from, reader);
-                    _context.statManager().addRateData("udp.receivePacketSize.relayResponse", packet.getPacket().getLength(), packet.getLifetime());
+                    //_context.statManager().addRateData("udp.receivePacketSize.relayResponse", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
                     _state = 53;
-                    if (outState != null)
+                    if (!isAuthenticated)
+                        _establisher.receiveSessionDestroy(from);  // drops
+                    else if (outState != null)
                         _establisher.receiveSessionDestroy(from, outState);
                     else if (state != null)
                         _establisher.receiveSessionDestroy(from, state);
                     else
-                        _establisher.receiveSessionDestroy(from);
+                        _establisher.receiveSessionDestroy(from);  // drops
                     break;
                 default:
                     _state = 52;
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unknown payload type: " + reader.readPayloadType());
+                        _log.warn("Unknown payload type: " + type);
                     _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime(), packet.getExpiration());
                     return;
             }

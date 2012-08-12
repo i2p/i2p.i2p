@@ -999,7 +999,7 @@ class PacketBuilder {
             long tag = addr.getIntroducerTag(i);
             if ( (ikey == null) || (iport <= 0) || (iaddr == null) || (tag <= 0) ) {
                 if (_log.shouldLog(_log.WARN))
-                    _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash().toBase64() 
+                    _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
                 continue;
             }
@@ -1126,7 +1126,7 @@ class PacketBuilder {
         int off = HEADER_SIZE;
         
         if (_log.shouldLog(Log.INFO))
-            _log.info("Sending relay response to " + alice + " for " + charlie + " with alice's intro key " + aliceIntroKey.toBase64());
+            _log.info("Sending relay response to " + alice + " for " + charlie + " with alice's intro key " + aliceIntroKey);
 
         // now for the body
         byte charlieIP[] = charlie.getRemoteIP();
@@ -1277,7 +1277,7 @@ class PacketBuilder {
             _log.debug("Authenticating " + packet.getPacket().getLength() +
                        "\nIV: " + Base64.encode(iv.getData()) +
                        "\nraw mac: " + Base64.encode(ba.getData()) +
-                       "\nMAC key: " + macKey.toBase64());
+                       "\nMAC key: " + macKey);
         // ok, now lets put it back where it belongs...
         System.arraycopy(data, hmacOff, data, encryptOffset, encryptSize);
         //System.arraycopy(hmac.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);

@@ -24,7 +24,7 @@ class ACKSender implements Runnable {
     private final PacketBuilder _builder;
     /** list of peers (PeerState) who we have received data from but not yet ACKed to */
     private final BlockingQueue<PeerState> _peersToACK;
-    private boolean _alive;
+    private volatile boolean _alive;
     private static final long POISON_PS = -9999999999l;
     
     /** how frequently do we want to send ACKs to a peer? */

@@ -1,3 +1,13 @@
+2012-08-12 zzz
+ * Jetty: Don't use direct byte buffers that may be leaking (ticket #679)
+ * PeerManager: Fix NPE on Android (ticket #687)
+ * SSU:
+   - Reject some packet types if they came in via fallback introKey
+   - Increase retransmission timeout for SessionRequest, SessionConfirm,
+     and RelayRequest; implement backoff
+   - Move UDPFlooder to test
+   - More volatiles, finals, cleanups, stat removals, log tweaks
+
 2012-08-11 zzz
  * DataHelper: toString(byte[]) cleanup
  * i2psnark:

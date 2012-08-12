@@ -280,13 +280,13 @@ class UDPPacket {
         verifyNotReleased(); 
         StringBuilder buf = new StringBuilder(256);
         buf.append(_packet.getLength());
-        buf.append(" byte packet with ");
+        buf.append(" byte pkt with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");
         buf.append(_packet.getPort());
         //buf.append(" id=").append(System.identityHashCode(this));
-        buf.append(" msg type=").append(_messageType);
-        buf.append(" mark type=").append(_markedType);
-        buf.append(" frag count=").append(_fragmentCount);
+        buf.append(" msgType=").append(_messageType);
+        buf.append(" markType=").append(_markedType);
+        buf.append(" fragCount=").append(_fragmentCount);
 
         buf.append(" sinceEnqueued=").append((_enqueueTime > 0 ? _context.clock().now()-_enqueueTime : -1));
         buf.append(" sinceReceived=").append((_receivedTime > 0 ? _context.clock().now()-_receivedTime : -1));

@@ -26,7 +26,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
     private final UDPTransport _transport;
     private final ACKSender _ackSender;
     private final MessageReceiver _messageReceiver;
-    private boolean _alive;
+    private volatile boolean _alive;
     
     /** decay the recently completed every 20 seconds */
     private static final int DECAY_PERIOD = 10*1000;

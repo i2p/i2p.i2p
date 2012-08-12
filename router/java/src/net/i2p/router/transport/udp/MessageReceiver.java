@@ -26,7 +26,7 @@ class MessageReceiver {
     private final UDPTransport _transport;
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
     private final BlockingQueue<InboundMessageState> _completeMessages;
-    private boolean _alive;
+    private volatile boolean _alive;
     //private ByteCache _cache;
 
     private static final int MIN_THREADS = 2;  // unless < 32MB
@@ -78,7 +78,7 @@ class MessageReceiver {
     }
     
     private class Runner implements Runnable {
-        private I2NPMessageHandler _handler;
+        private final I2NPMessageHandler _handler;
         public Runner() { _handler = new I2NPMessageHandler(_context); }
         public void run() { loop(_handler); }
     }

@@ -59,7 +59,7 @@ abstract class MTU {
 
     /**
      * @return min of PeerState.MIN_MTU, max of PeerState.LARGE_MTU,
-     *         rectifyed so rv % 16 == 12
+     *         rectified so rv % 16 == 12
      */
     public static int rectify(int mtu) {
         int rv = mtu;

@@ -104,7 +104,7 @@ class OutboundMessageFragments {
 
     void dropPeer(PeerState peer) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Dropping peer " + peer.getRemotePeer().toBase64());
+            _log.info("Dropping peer " + peer.getRemotePeer());
         peer.dropOutbound();
         _activePeers.remove(peer);
     }
@@ -203,10 +203,10 @@ class OutboundMessageFragments {
         boolean added = _activePeers.add(peer);
         if (added) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Add a new message to a new peer " + peer.getRemotePeer().toBase64());
+                _log.debug("Add a new message to a new peer " + peer.getRemotePeer());
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Add a new message to an existing peer " + peer.getRemotePeer().toBase64());
+                _log.debug("Add a new message to an existing peer " + peer.getRemotePeer());
         }
         _context.statManager().addRateData("udp.outboundActivePeers", _activePeers.size(), 0);
 
@@ -280,7 +280,7 @@ class OutboundMessageFragments {
                             // race with add()
                             _iterator.remove();
                             if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("No more pending messages for " + peer.getRemotePeer().toBase64());
+                                _log.debug("No more pending messages for " + peer.getRemotePeer());
                             continue;
                         }
                         peersProcessed++;
@@ -303,7 +303,7 @@ class OutboundMessageFragments {
 
                     if (peer != null && _log.shouldLog(Log.DEBUG))
                         _log.debug("Done looping, next peer we are sending for: " +
-                                   peer.getRemotePeer().toBase64());
+                                   peer.getRemotePeer());
 
                     // if we've gone all the way through the loop, wait
                     // ... unless nextSendDelay says we have more ready now
