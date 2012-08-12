@@ -8,7 +8,6 @@ import net.i2p.stat.RateStat;
  * Estimate how many of our tunnels the peer can join per hour.
  */
 class CapacityCalculator {
-    private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
     
     public static final String PROP_COUNTRY_BONUS = "profileOrganizer.sameCountryBonus";
 
@@ -54,11 +53,12 @@ class CapacityCalculator {
         
         // now take into account non-rejection tunnel rejections (which haven't 
         // incremented the rejection counter, since they were only temporary)
-        long now = _context.clock().now();
+        I2PAppContext context = profile.getContext();
+        long now = context.clock().now();
         if (profile.getTunnelHistory().getLastRejectedTransient() > now - 5*60*1000)
             capacity = 1;
         else if (profile.getTunnelHistory().getLastRejectedProbabalistic() > now - 5*60*1000)
-            capacity -= _context.random().nextInt(5);
+            capacity -= context.random().nextInt(5);
 
         // boost new profiles
         if (now - profile.getFirstHeardAbout() < 45*60*1000)
@@ -69,7 +69,7 @@ class CapacityCalculator {
         // boost same country
         if (profile.isSameCountry()) {
             double bonus = BONUS_SAME_COUNTRY;
-            String b = _context.getProperty(PROP_COUNTRY_BONUS);
+            String b = context.getProperty(PROP_COUNTRY_BONUS);
             if (b != null) {
                 try {
                     bonus = Double.parseDouble(b);

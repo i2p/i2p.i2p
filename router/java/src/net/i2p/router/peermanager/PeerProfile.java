@@ -530,6 +530,14 @@ public class PeerProfile {
     /** deprecated - unused - always false */
     void setIsFailing(boolean val) { _isFailing = val; }
     
+    /**
+     *  Helper for calculators
+     *  @since 0.9.2
+     */
+    RouterContext getContext() {
+        return _context;
+    }
+
     @Override
     public int hashCode() { return _peer.hashCode(); }
 
@@ -574,6 +582,7 @@ public class PeerProfile {
      * for an expanded profile, and ~212 bytes for a compacted one.
      *
      */
+/****
     public static void main(String args[]) {
         RouterContext ctx = new RouterContext(new net.i2p.router.Router());
         testProfileSize(ctx, 100, 0); // 560KB
@@ -583,6 +592,7 @@ public class PeerProfile {
         testProfileSize(ctx, 0, 100000); // 21MB
         testProfileSize(ctx, 0, 300000);  // 63MB
     }
+****/
     
     /**
      * Read in all of the profiles specified and print out 
@@ -590,6 +600,7 @@ public class PeerProfile {
      *  PeerProfile [filename]*
      * </pre>
      */
+/****
     public static void main2(String args[]) {
         RouterContext ctx = new RouterContext(new net.i2p.router.Router());
         DecimalFormat fmt = new DecimalFormat("0,000.0");
@@ -654,4 +665,5 @@ public class PeerProfile {
         profsCompact = null;
         Runtime.getRuntime().gc();
     }
+****/
 }
