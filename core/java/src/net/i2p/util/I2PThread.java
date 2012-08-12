@@ -100,11 +100,13 @@ public class I2PThread extends Thread {
         //log(Log.INFO, "Thread finished normally: " + _name);
     }
     
+/****
     @Override
     protected void finalize() throws Throwable {
         //log(Log.DEBUG, "Thread finalized: " + _name);
         super.finalize();
     }
+****/
     
     protected void fireOOM(OutOfMemoryError oom) {
         for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
