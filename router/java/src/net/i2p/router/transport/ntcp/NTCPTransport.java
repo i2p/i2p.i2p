@@ -8,6 +8,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -848,20 +849,15 @@ public class NTCPTransport extends TransportImpl {
                 rv = AlphaComparator.instance();
         }
         if (sortFlags < 0)
-            rv = new InverseComparator(rv);
+            rv = Collections.reverseOrder(rv);
         return rv;
     }
+
     private static class AlphaComparator extends PeerComparator {
         private static final AlphaComparator _instance = new AlphaComparator();
         public static final AlphaComparator instance() { return _instance; }
     }
-    private static class InverseComparator implements Comparator {
-        private Comparator _comp;
-        public InverseComparator(Comparator comp) { _comp = comp; }
-        public int compare(Object lhs, Object rhs) {
-            return -1 * _comp.compare(lhs, rhs);
-        }
-    }
+
     private static class PeerComparator implements Comparator {
         public int compare(Object lhs, Object rhs) {
             if ( (lhs == null) || (rhs == null) || !(lhs instanceof NTCPConnection) || !(rhs instanceof NTCPConnection))
