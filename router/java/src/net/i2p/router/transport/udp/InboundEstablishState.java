@@ -370,7 +370,7 @@ class InboundEstablishState {
     @Override
     public String toString() {            
         StringBuilder buf = new StringBuilder(128);
-        buf.append(super.toString());
+        buf.append("IES ").append(super.toString());
         if (_receivedX != null)
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
         if (_sentY != null)
@@ -379,7 +379,7 @@ class InboundEstablishState {
         buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
         buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(" SignedOn: ").append(_sentSignedOnTime);
-        buf.append(" state: ").append(_currentState);
+        buf.append(' ').append(_currentState);
         return buf.toString();
     }
 }

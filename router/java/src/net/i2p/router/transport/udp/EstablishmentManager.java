@@ -778,12 +778,17 @@ class EstablishmentManager {
         _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime(), 0);
         int port = reader.getRelayResponseReader().readCharliePort();
         if (_log.shouldLog(Log.INFO))
-            _log.info("Received relay intro for " + state.getRemoteIdentity().calculateHash() + " - they are on " 
+            _log.info("Received RelayResponse for " + state.getRemoteIdentity().calculateHash() + " - they are on " 
                       + addr.toString() + ":" + port + " (according to " + bob + ")");
         RemoteHostId oldId = state.getRemoteHostId();
         state.introduced(addr, ip, port);
-        _outboundStates.remove(oldId);
-        _outboundStates.put(state.getRemoteHostId(), state);
+        RemoteHostId newId = state.getRemoteHostId();
+        // Swap out the RemoteHostId the state is indexed under
+        // TODO only if !oldId.equals(newId) ? synch?
+        OutboundEstablishState oldState = _outboundStates.remove(oldId);
+        _outboundStates.put(newId, state);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("RR replaced " + oldId + " -> " + oldState + " with " + newId + " -> " + state);
         notifyActivity();
     }
     
@@ -1035,7 +1040,8 @@ class EstablishmentManager {
             synchronized (outboundState) {
                 boolean expired = outboundState.getLifetime() > MAX_OB_ESTABLISH_TIME;
                 switch (outboundState.getState()) {
-                    case OB_STATE_UNKNOWN:
+                    case OB_STATE_UNKNOWN:  // fall thru
+                    case OB_STATE_INTRODUCED:
                         if (expired)
                             processExpired(outboundState);
                         else

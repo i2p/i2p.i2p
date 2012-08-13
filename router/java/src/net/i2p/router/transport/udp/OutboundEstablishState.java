@@ -79,7 +79,9 @@ class OutboundEstablishState {
         /** we have received a data packet */
         OB_STATE_CONFIRMED_COMPLETELY,
         /** we need to have someone introduce us to the peer, but haven't received a RelayResponse yet */
-        OB_STATE_PENDING_INTRO
+        OB_STATE_PENDING_INTRO,
+        /** RelayResponse received */
+        OB_STATE_INTRODUCED
     }
     
     /** basic delay before backoff */
@@ -105,7 +107,6 @@ class OutboundEstablishState {
         _remotePeer = remotePeer;
         _introKey = introKey;
         _queuedMessages = new LinkedBlockingQueue();
-        _currentState = OutboundState.OB_STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;
@@ -116,6 +117,8 @@ class OutboundEstablishState {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
             _currentState = OutboundState.OB_STATE_PENDING_INTRO;
+        } else {
+            _currentState = OutboundState.OB_STATE_UNKNOWN;
         }
     }
     
@@ -194,7 +197,10 @@ class OutboundEstablishState {
                        + " SignedOn: " + _receivedSignedOnTime
                        + "\nthis: " + this.toString());
         
-        if ( (_currentState == OutboundState.OB_STATE_UNKNOWN) || (_currentState == OutboundState.OB_STATE_REQUEST_SENT) )
+        if (_currentState == OutboundState.OB_STATE_UNKNOWN ||
+            _currentState == OutboundState.OB_STATE_REQUEST_SENT ||
+            _currentState == OutboundState.OB_STATE_INTRODUCED ||
+            _currentState == OutboundState.OB_STATE_PENDING_INTRO)
             _currentState = OutboundState.OB_STATE_CREATED_RECEIVED;
         packetReceived();
     }
@@ -400,9 +406,11 @@ class OutboundEstablishState {
         _nextSend = _lastSend + delay;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send confirm packets, nextSend in " + delay);
-        if ( (_currentState == OutboundState.OB_STATE_UNKNOWN) || 
-             (_currentState == OutboundState.OB_STATE_REQUEST_SENT) ||
-             (_currentState == OutboundState.OB_STATE_CREATED_RECEIVED) )
+        if (_currentState == OutboundState.OB_STATE_UNKNOWN || 
+            _currentState == OutboundState.OB_STATE_PENDING_INTRO ||
+            _currentState == OutboundState.OB_STATE_INTRODUCED ||
+            _currentState == OutboundState.OB_STATE_REQUEST_SENT ||
+            _currentState == OutboundState.OB_STATE_CREATED_RECEIVED)
             _currentState = OutboundState.OB_STATE_CONFIRMED_PARTIALLY;
     }
 
@@ -426,7 +434,8 @@ class OutboundEstablishState {
         _nextSend = _lastSend + delay;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send a request packet, nextSend in " + delay);
-        if (_currentState == OutboundState.OB_STATE_UNKNOWN)
+        if (_currentState == OutboundState.OB_STATE_UNKNOWN ||
+            _currentState == OutboundState.OB_STATE_INTRODUCED)
             _currentState = OutboundState.OB_STATE_REQUEST_SENT;
     }
 
@@ -472,11 +481,7 @@ class OutboundEstablishState {
         if (_currentState != OutboundState.OB_STATE_PENDING_INTRO)
             return; // we've already successfully been introduced, so don't overwrite old settings
         _nextSend = _context.clock().now() + 500; // wait briefly for the hole punching
-        if (_currentState == OutboundState.OB_STATE_PENDING_INTRO) {
-            // OB_STATE_UNKNOWN will probe the EstablishmentManager to send a new
-            // session request to this newly known address
-            _currentState = OutboundState.OB_STATE_UNKNOWN; 
-        }
+        _currentState = OutboundState.OB_STATE_INTRODUCED;
         _bobIP = bobIP;
         _bobPort = bobPort;
         _remoteHostId = new RemoteHostId(bobIP, bobPort);
@@ -507,6 +512,6 @@ class OutboundEstablishState {
     /** @since 0.8.9 */
     @Override
     public String toString() {
-        return "OES " + _remoteHostId;
+        return "OES " + _remoteHostId + ' ' + _currentState;
     }
 }
