@@ -1,3 +1,18 @@
+2012-08-13 zzz
+ * SSU EstablishmentManager:
+   - Remove use of outbound timers in EstablishmentManager; drive all events in Establisher thread
+   - Don't change nonces when retransmitting intro packets
+   - More synchronization in EstablishmentManager
+   - Increase establishment timeouts and implement timeouts for individual phases (ticket #669)
+   - Fix bug where InboundEstablishState.createdPacketSent() wasn't being called,
+     so SessionCreated packets weren't retransmitted
+   - Increase retransmission timeout for SessionCreated and implement backoff
+   - Send destroy if establishment times out in the middle
+   - Fix code that pulls outbound states off a deferred queue
+   - Improve UDPPacket.toString() for debugging
+   - More logging of packets dropped in EstablishmentManager
+   - Change establish states to enums
+
 2012-08-12 zzz
  * Jetty: Don't use direct byte buffers that may be leaking (ticket #679)
  * PeerManager: Fix NPE on Android (ticket #687)

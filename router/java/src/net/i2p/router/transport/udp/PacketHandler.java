@@ -328,7 +328,7 @@ class PacketHandler {
                 // Note that the vast majority of these are NOT corrupted packets, but
                 // packets for which we don't have the PeerState (i.e. SessionKey)
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid introduction packet received: " + packet, new Exception("path"));
+                    _log.warn("Cannot validate rcvd pkt (path): " + packet);
                 _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
                 switch (peerType) {
                     case INBOUND_FALLBACK:
@@ -465,11 +465,13 @@ class PacketHandler {
         }
 
         /**
-         * Parse out the interesting bits and honor what it says
+         * The last step. The packet was decrypted with some key. Now get the message type
+         * and send it to one of four places: The EstablishmentManager, IntroductionManager,
+         * PeerTestManager, or InboundMessageFragments.
          *
          * @param state non-null if fully established
          * @param outState non-null if outbound establishing in process
-         * @param inState unused always null
+         * @param inState unused always null, TODO use for 48-byte destroys during inbound establishment
          * @param isAuthenticated true if a state key was used, false if our own intro key was used
          */
         private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state,

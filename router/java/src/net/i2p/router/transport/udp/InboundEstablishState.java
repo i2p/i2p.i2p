@@ -39,7 +39,7 @@ class InboundEstablishState {
     private SessionKey _sessionKey;
     private SessionKey _macKey;
     private Signature _sentSignature;
-    // SessionConfirmed messages
+    // SessionConfirmed messages - fragmented in theory but not in practice - see below
     private byte _receivedIdentity[][];
     private long _receivedSignedOnTime;
     private byte _receivedSignature[];
@@ -48,25 +48,36 @@ class InboundEstablishState {
     // general status 
     private final long _establishBegin;
     //private long _lastReceive;
-    // private long _lastSend;
+    private long _lastSend;
     private long _nextSend;
     private final RemoteHostId _remoteHostId;
-    private int _currentState;
+    private InboundState _currentState;
     private boolean _complete;
+    // count for backoff
+    private int _createdSentCount;
     
-    /** nothin known yet */
-    public static final int STATE_UNKNOWN = 0;
-    /** we have received an initial request */
-    public static final int STATE_REQUEST_RECEIVED = 1;
-    /** we have sent a signed creation packet */
-    public static final int STATE_CREATED_SENT = 2;
-    /** we have received one or more confirmation packets */
-    public static final int STATE_CONFIRMED_PARTIALLY = 3;
-    /** we have completely received all of the confirmation packets */
-    public static final int STATE_CONFIRMED_COMPLETELY = 4;
-    /** we are explicitly failing it */
-    public static final int STATE_FAILED = 5;
+    public enum InboundState {
+        /** nothin known yet */
+        IB_STATE_UNKNOWN,
+        /** we have received an initial request */
+        IB_STATE_REQUEST_RECEIVED,
+        /** we have sent a signed creation packet */
+        IB_STATE_CREATED_SENT,
+        /** we have received one but not all the confirmation packets
+          * This never happens in practice - see below. */
+        IB_STATE_CONFIRMED_PARTIALLY,
+        /** we have all the confirmation packets */
+        IB_STATE_CONFIRMED_COMPLETELY,
+        /** we are explicitly failing it */
+        IB_STATE_FAILED
+    }
     
+    /** basic delay before backoff */
+    private static final long RETRANSMIT_DELAY = 1500;
+
+    /** max delay including backoff */
+    private static final long MAX_DELAY = 15*1000;
+
     public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
                                  DHSessionKeyBuilder dh) {
         _context = ctx;
@@ -75,12 +86,14 @@ class InboundEstablishState {
         _alicePort = remotePort;
         _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
         _bobPort = localPort;
-        _currentState = STATE_UNKNOWN;
+        _currentState = InboundState.IB_STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
         _keyBuilder = dh;
     }
     
-    public synchronized int getState() { return _currentState; }
+    public synchronized InboundState getState() { return _currentState; }
+
+    /** @return if previously complete */
     public synchronized boolean complete() { 
         boolean already = _complete; 
         _complete = true; 
@@ -96,8 +109,8 @@ class InboundEstablishState {
         req.readIP(_bobIP, 0);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive sessionRequest, BobIP = " + Addresses.toString(_bobIP));
-        if (_currentState == STATE_UNKNOWN)
-            _currentState = STATE_REQUEST_RECEIVED;
+        if (_currentState == InboundState.IB_STATE_UNKNOWN)
+            _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         packetReceived();
     }
     
@@ -105,6 +118,9 @@ class InboundEstablishState {
     public synchronized byte[] getReceivedX() { return _receivedX; }
     public synchronized byte[] getReceivedOurIP() { return _bobIP; }
     
+    /**
+     *  Generates session key and mac key.
+     */
     public synchronized void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
         _keyBuilder.setPeerPublicValue(_receivedX);
@@ -135,7 +151,7 @@ class InboundEstablishState {
     }
     
     public synchronized void fail() {
-        _currentState = STATE_FAILED;
+        _currentState = InboundState.IB_STATE_FAILED;
     }
     
     public synchronized long getSentRelayTag() { return _sentRelayTag; }
@@ -197,20 +213,32 @@ class InboundEstablishState {
     
     /** note that we just sent a SessionCreated packet */
     public synchronized void createdPacketSent() {
-        // _lastSend = _context.clock().now();
-        if ( (_currentState == STATE_UNKNOWN) || (_currentState == STATE_REQUEST_RECEIVED) )
-            _currentState = STATE_CREATED_SENT;
+        _lastSend = _context.clock().now();
+        long delay;
+        if (_createdSentCount == 0) {
+            delay = RETRANSMIT_DELAY;
+        } else {
+            delay = Math.min(RETRANSMIT_DELAY << _createdSentCount, MAX_DELAY);
+        }
+        _createdSentCount++;
+        _nextSend = _lastSend + delay;
+        if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || (_currentState == InboundState.IB_STATE_REQUEST_RECEIVED) )
+            _currentState = InboundState.IB_STATE_CREATED_SENT;
     }
-    
+
     /** how long have we been trying to establish this session? */
     public long getLifetime() { return _context.clock().now() - _establishBegin; }
     public long getEstablishBeginTime() { return _establishBegin; }
     public synchronized long getNextSendTime() { return _nextSend; }
-    public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
     /** RemoteHostId, uniquely identifies an attempt */
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
+    /**
+     *  Note that while a SessionConfirmed could in theory be fragmented,
+     *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
+     *  so it will never be fragmented.
+     */
     public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
         if (_receivedIdentity == null)
             _receivedIdentity = new byte[conf.readTotalFragmentNum()][];
@@ -235,20 +263,23 @@ class InboundEstablishState {
             conf.readFinalSignature(_receivedSignature, 0);
         }
         
-        if ( (_currentState == STATE_UNKNOWN) || 
-             (_currentState == STATE_REQUEST_RECEIVED) ||
-             (_currentState == STATE_CREATED_SENT) ) {
+        if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || 
+             (_currentState == InboundState.IB_STATE_REQUEST_RECEIVED) ||
+             (_currentState == InboundState.IB_STATE_CREATED_SENT) ) {
             if (confirmedFullyReceived())
-                _currentState = STATE_CONFIRMED_COMPLETELY;
+                _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
             else
-                _currentState = STATE_CONFIRMED_PARTIALLY;
+                _currentState = InboundState.IB_STATE_CONFIRMED_PARTIALLY;
         }
         
         packetReceived();
     }
     
-    /** have we fully received the SessionConfirmed messages from Alice? */
-    public synchronized boolean confirmedFullyReceived() {
+    /**
+     *  Have we fully received the SessionConfirmed messages from Alice?
+     *  Caller must synch on this.
+     */
+    private boolean confirmedFullyReceived() {
         if (_receivedIdentity != null) {
             for (int i = 0; i < _receivedIdentity.length; i++)
                 if (_receivedIdentity[i] == null)

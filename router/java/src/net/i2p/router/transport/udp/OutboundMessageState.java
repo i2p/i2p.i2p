@@ -64,6 +64,7 @@ class OutboundMessageState {
     
     /**
      *  Called from UDPTransport
+     *  @return success
      */
     public boolean initialize(I2NPMessage msg, PeerState peer) {
         if (msg == null) 
@@ -81,6 +82,7 @@ class OutboundMessageState {
     
     /**
      *  Called from OutboundMessageFragments
+     *  @return success
      */
     public boolean initialize(OutNetMessage m, I2NPMessage msg) {
         if ( (m == null) || (msg == null) ) 
@@ -96,6 +98,10 @@ class OutboundMessageState {
         }
     }
     
+    /**
+     *  Called from OutboundMessageFragments
+     *  @return success
+     */
     private boolean initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
         _message = m;
         _peer = peer;

@@ -685,12 +685,16 @@ class PacketBuilder {
     /**
      * Build a new series of SessionConfirmed packets for the given peer, 
      * encrypting it as necessary.
+     *
+     * Note that while a SessionConfirmed could in theory be fragmented,
+     * in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
+     * so it will never be fragmented.
      * 
      * @return ready to send packets, or null if there was a problem
      * 
      * TODO: doesn't really return null, and caller doesn't handle null return
      * (null SigningPrivateKey should cause this?)
-     * Should probably return null if buildSessionConfirmedPacket() turns null for any fragment
+     * Should probably return null if buildSessionConfirmedPacket() returns null for any fragment
      */
     public UDPPacket[] buildSessionConfirmedPackets(OutboundEstablishState state, RouterIdentity ourIdentity) {
         byte identity[] = ourIdentity.toByteArray();
@@ -793,26 +797,88 @@ class PacketBuilder {
      *  @since 0.8.1
      */
     public UDPPacket buildSessionDestroyPacket(PeerState peer) {
+        if (_log.shouldLog(Log.DEBUG)) {
+            _log.debug("building session destroy packet to " + peer.getRemotePeer());
+        }
+        return buildSessionDestroyPacket(peer.getCurrentCipherKey(), peer.getCurrentMACKey(),
+                                         peer.getRemoteIPAddress(), peer.getRemotePort());
+    }
+
+    /**
+     *  Build a destroy packet, which contains a header but no body.
+     *  If the keys and ip/port are not yet set, this will return null.
+     *
+     *  @return packet or null
+     *  @since 0.9.2
+     */
+    public UDPPacket buildSessionDestroyPacket(OutboundEstablishState peer) {
+        SessionKey cipherKey = peer.getCipherKey();
+        SessionKey macKey = peer.getMACKey();
+        byte[] ip = peer.getSentIP();
+        int port = peer.getSentPort();
+        if (cipherKey == null || macKey == null || ip == null || port <= 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Cannot send destroy, incomplete " + peer);
+            return null;
+        }
+        InetAddress addr;
+        try {
+            addr = InetAddress.getByAddress(ip);
+        } catch (UnknownHostException uhe) {
+            return null;
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("building session destroy packet to " + peer);
+        return buildSessionDestroyPacket(cipherKey, macKey, addr, port);
+    }
+
+
+    /**
+     *  Build a destroy packet, which contains a header but no body.
+     *  If the keys and ip/port are not yet set, this will return null.
+     *
+     *  @return packet or null
+     *  @since 0.9.2
+     */
+    public UDPPacket buildSessionDestroyPacket(InboundEstablishState peer) {
+        SessionKey cipherKey = peer.getCipherKey();
+        SessionKey macKey = peer.getMACKey();
+        byte[] ip = peer.getSentIP();
+        int port = peer.getSentPort();
+        if (cipherKey == null || macKey == null || ip == null || port <= 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Cannot send destroy, incomplete " + peer);
+            return null;
+        }
+        InetAddress addr;
+        try {
+            addr = InetAddress.getByAddress(ip);
+        } catch (UnknownHostException uhe) {
+            return null;
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("building session destroy packet to " + peer);
+        return buildSessionDestroyPacket(cipherKey, macKey, addr, port);
+    }
+
+    /**
+     *  Build a destroy packet, which contains a header but no body.
+     *  @param cipherKey non-null
+     *  @param macKey non-null
+     *  @since 0.9.2
+     */
+    private UDPPacket buildSessionDestroyPacket(SessionKey cipherKey, SessionKey macKey, InetAddress addr, int port) {
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4));
         int off = HEADER_SIZE;
         
-        StringBuilder msg = null;
-        if (_log.shouldLog(Log.DEBUG)) {
-            msg = new StringBuilder(128);
-            msg.append("building session destroy packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
-        }
-
         // no body in this message
-
-        if (msg != null)
-            _log.debug(msg.toString());
         
         // pad up so we're on the encryption boundary
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
-        authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
-        setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
+        authenticate(packet, cipherKey, macKey);
+        setTo(packet, addr, port);
         return packet;
     }
     
