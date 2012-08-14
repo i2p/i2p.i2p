@@ -68,6 +68,20 @@ public class ServiceData extends NodeData
 	// SID
 	////////////////////////////////////////////////
 
+    private String descriptionURL = "";
+
+    public String getDescriptionURL() {
+            return descriptionURL;
+    }
+
+    public void setDescriptionURL(String descriptionURL) {
+            this.descriptionURL = descriptionURL;
+    }
+	
+	////////////////////////////////////////////////
+	// SID
+	////////////////////////////////////////////////
+
 	private String sid = "";
 	
 	public String getSID() {

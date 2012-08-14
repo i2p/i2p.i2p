@@ -19,8 +19,6 @@ package org.cybergarage.xml;
 
 public class ParserException extends Exception 
 {
-	private static final long serialVersionUID = 7443033796560597360L;
-
 	public ParserException(Exception e)
 	{
 		super(e);

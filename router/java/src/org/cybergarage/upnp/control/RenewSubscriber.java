@@ -51,7 +51,6 @@ public class RenewSubscriber extends ThreadCore
 	//	Thread
 	////////////////////////////////////////////////
 	
-    @Override
 	public void run() 
 	{
 		ControlPoint ctrlp = getControlPoint();

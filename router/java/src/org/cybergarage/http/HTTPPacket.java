@@ -59,17 +59,35 @@
 *		  hasTransferEncoding(), setTransferEncoding(), getTransferEncoding(), isChunked().
 *	03/02/05
 *		- Changed post() to suppot chunked stream.
+*	06/11/05
+*		- Added setHost().
+*	07/07/05
+*		- Lee Peik Feng <pflee@users.sourceforge.net>
+*		- Andrey Ovchar <AOvchar@consultitnow.com>
+*		- Fixed set() to parse the chunk size as a hex string.
+*	11/02/05
+*		- Changed set() to use BufferedInputStream instead of BufferedReader to
+*		  get the content as a byte stream.
+*	11/06/05
+*		- Added getCharSet().
+*		- Changed getContentString() to return the content string using the charset.
 *
 *******************************************************************/
 
 package org.cybergarage.http;
 
-import java.io.*;
-import java.util.*;
-
-import org.cybergarage.net.*;
-import org.cybergarage.util.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.Calendar;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.cybergarage.net.HostInterface;
+import org.cybergarage.util.Debug;
+import org.cybergarage.util.StringUtil;
 
 public class HTTPPacket 
 {
@@ -129,18 +147,44 @@ public class HTTPPacket
 	//	set
 	////////////////////////////////////////////////
 	
+	private String readLine(BufferedInputStream in)
+	{
+		ByteArrayOutputStream lineBuf = new ByteArrayOutputStream();
+		byte readBuf[] = new byte[1];
+		
+ 		try {
+ 			int	readLen = in.read(readBuf);
+ 			while (0 < readLen) {
+ 				if (readBuf[0] == HTTP.LF)
+ 					break;
+ 				if (readBuf[0] != HTTP.CR) 
+ 					lineBuf.write(readBuf[0]);
+ 	 			readLen = in.read(readBuf);
+			}
+ 		}
+ 		catch (InterruptedIOException e) {
+ 			//Ignoring warning because it's a way to break the HTTP connecttion
+ 			//TODO Create a new level of Logging and log the event
+		}
+		catch (IOException e) {
+			Debug.warning(e);
+		}
+
+		return lineBuf.toString();
+	}
+	
 	protected boolean set(InputStream in, boolean onlyHeaders)
 	{
  		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+ 			BufferedInputStream reader = new BufferedInputStream(in);
 			
-			String _firstLine = reader.readLine();
-			if (_firstLine == null || _firstLine.length() <= 0)
+			String firstLine = readLine(reader);
+			if (firstLine == null || firstLine.length() <= 0)
 				return false;
-			setFirstLine(_firstLine);
+			setFirstLine(firstLine);
 			
 			// Thanks for Giordano Sassaroli <sassarol@cefriel.it> (09/03/03)
-			HTTPStatus httpStatus = new HTTPStatus(_firstLine);
+			HTTPStatus httpStatus = new HTTPStatus(firstLine);
 			int statCode = httpStatus.getStatusCode();
 			if (statCode == HTTPStatus.CONTINUE){
 				//ad hoc code for managing iis non-standard behaviour
@@ -148,15 +192,15 @@ public class HTTPPacket
 				//stream, so the code should check the presence of the actual
 				//response in the stream.
 				//skip all header lines
-				String headerLine = reader.readLine();
+				String headerLine = readLine(reader);
 				while ((headerLine != null) && (0 < headerLine.length()) ) {
 					HTTPHeader header = new HTTPHeader(headerLine);
 					if (header.hasName() == true)
 						setHeader(header);
-					headerLine = reader.readLine();
+					headerLine = readLine(reader);
 				}
 				//look forward another first line
-				String actualFirstLine = reader.readLine();
+				String actualFirstLine = readLine(reader);
 				if ((actualFirstLine != null) && (0 < actualFirstLine.length()) ) {
 					//this is the actual first line
 					setFirstLine(actualFirstLine);
@@ -165,12 +209,12 @@ public class HTTPPacket
 				}
 			}
 				
-			String headerLine = reader.readLine();
+			String headerLine = readLine(reader);
 			while ((headerLine != null) && (0 < headerLine.length()) ) {
 				HTTPHeader header = new HTTPHeader(headerLine);
 				if (header.hasName() == true)
 					setHeader(header);
-				headerLine = reader.readLine();
+				headerLine = readLine(reader);
 			}
 				
 			if (onlyHeaders == true) {
@@ -183,19 +227,24 @@ public class HTTPPacket
 			long contentLen = 0;
 			if (isChunkedRequest == true) {
 				try {
-					String chunkSizeLine = reader.readLine();
-					contentLen = Long.parseLong(new String(chunkSizeLine.getBytes(), 0, chunkSizeLine.length()-2));
+					String chunkSizeLine = readLine(reader);
+					// Thanks for Lee Peik Feng <pflee@users.sourceforge.net> (07/07/05)
+					//contentLen = Long.parseLong(new String(chunkSizeLine.getBytes(), 0, chunkSizeLine.length()-2), 16);
+					contentLen = (chunkSizeLine != null) ? Long.parseLong(chunkSizeLine.trim(), 16) : 0;
 				}
-				catch (Exception e) {}
+				catch (Exception e) {};
 			}
 			else
 				contentLen = getContentLength();
 						
-			StringBuilder contentBuf = new StringBuilder();
+			ByteArrayOutputStream contentBuf = new ByteArrayOutputStream();
 			
 			while (0 < contentLen) {
 				int chunkSize = HTTP.getChunkSize();
-				char readBuf[] = new char[chunkSize];
+				
+				/* Thanks for Stephan Mehlhase (2010-10-26) */
+				byte readBuf[] = new byte[(int) (contentLen > chunkSize ? chunkSize : contentLen)];
+				
 				long readCnt = 0;
 				while (readCnt < contentLen) {
 					try {
@@ -206,7 +255,7 @@ public class HTTPPacket
 						int readLen = reader.read(readBuf, 0, (int)bufReadLen);
 						if (readLen < 0)
 							break;
-						contentBuf.append(new String(readBuf, 0, readLen));
+						contentBuf.write(readBuf, 0, readLen);
 						readCnt += readLen;
 					}
 					catch (Exception e)
@@ -226,20 +275,19 @@ public class HTTPPacket
 					} while (skipLen < HTTP.CRLF.length());
 					// read next chunk size
 					try {
-						String chunkSizeLine = reader.readLine();
-						contentLen = Long.parseLong(new String(chunkSizeLine.getBytes(), 0, chunkSizeLine.length()-2));
+						String chunkSizeLine = readLine(reader);
+						// Thanks for Lee Peik Feng <pflee@users.sourceforge.net> (07/07/05)
+						contentLen = Long.parseLong(new String(chunkSizeLine.getBytes(), 0, chunkSizeLine.length()-2), 16);
 					}
 					catch (Exception e) {
 						contentLen = 0;
-					}
+					};
 				}
 				else
 					contentLen = 0;
 			}
 
-			// Thanks for Ralf G. R. Bergs (02/09/04)
-			String contentStr = contentBuf.toString();
-			setContent(contentStr.getBytes(), false);
+			setContent(contentBuf.toByteArray(), false);
  		}
 		catch (Exception e) {
 			Debug.warning(e);
@@ -464,7 +512,7 @@ public class HTTPPacket
 	
 	public String getHeaderString()
 	{
-		StringBuilder str = new StringBuilder();
+		StringBuffer str = new StringBuffer();
 	
 		int nHeaders = getNHeaders();
 		for (int n=0; n<nHeaders; n++) {
@@ -510,6 +558,15 @@ public class HTTPPacket
 
 	public  String getContentString()
 	{
+		String charSet = getCharSet();
+		if (charSet == null || charSet.length() <= 0)
+			return new String(content);
+		try {
+			return new String(content, charSet);
+		}
+		catch (Exception e) {
+			Debug.warning(e);
+		}
 		return new String(content);
 	}
 	
@@ -551,6 +608,32 @@ public class HTTPPacket
 	public String getContentType()
 	{
 		return getHeaderValue(HTTP.CONTENT_TYPE);
+	}
+
+	////////////////////////////////////////////////
+	//	Charset
+	////////////////////////////////////////////////
+
+	public String getCharSet()
+	{
+		String contentType = getContentType();
+		if (contentType == null)
+			return "";
+		contentType = contentType.toLowerCase();
+		int charSetIdx = contentType.indexOf(HTTP.CHARSET);
+		if (charSetIdx < 0)
+			return "";
+		int charSetEndIdx = charSetIdx + HTTP.CHARSET.length() + 1; 
+		String charSet = new String(contentType.getBytes(), charSetEndIdx, (contentType.length() - charSetEndIdx));
+		if (charSet.length() < 0)
+			return "";
+		if (charSet.charAt(0) == '\"')
+			charSet = charSet.substring(1, (charSet.length() - 1));
+		if (charSet.length() < 0)
+			return "";
+		if (charSet.charAt((charSet.length()-1)) == '\"')
+			charSet = charSet.substring(0, (charSet.length() - 1));
+		return charSet;
 	}
 
 	////////////////////////////////////////////////
@@ -642,7 +725,7 @@ public class HTTPPacket
 		// Skip bytes
 		if (strToken.hasMoreTokens() == false)
 			return range;
-		strToken.nextToken(" ");
+		String bytesStr = strToken.nextToken(" ");
 		// Get first-byte-pos
 		if (strToken.hasMoreTokens() == false)
 			return range;
@@ -650,21 +733,21 @@ public class HTTPPacket
 		try {
 			range[0] = Long.parseLong(firstPosStr);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException e) {};
 		if (strToken.hasMoreTokens() == false)
 			return range;
 		String lastPosStr = strToken.nextToken("-/");
 		try {
 			range[1] = Long.parseLong(lastPosStr);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException e) {};
 		if (strToken.hasMoreTokens() == false)
 			return range;
 		String lengthStr = strToken.nextToken("/");
 		try {
 			range[2] = Long.parseLong(lengthStr);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException e) {};
 		return range;
 	}
 	
@@ -737,6 +820,14 @@ public class HTTPPacket
 		setHeader(HTTP.HOST, hostAddr + ":" + Integer.toString(port));
 	}
 
+	public void setHost(String host)
+	{
+		String hostAddr = host;
+		if (HostInterface.isIPv6Address(host) == true)
+			hostAddr = "[" + host + "]";
+		setHeader(HTTP.HOST, hostAddr);
+	}
+	
 	public String getHost()
 	{
 		return getHeaderValue(HTTP.HOST);

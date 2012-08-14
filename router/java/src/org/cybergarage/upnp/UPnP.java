@@ -16,17 +16,20 @@
 *		- Added support for XML Parser
 *	06/18/03
 *		- Added INMPR03 and INMPR03_VERSION.
+*	04/14/06
+*		- Added some functios about time-to-live, and the default value is 4.
+*	05/11/09
+*		- Changed loadDefaultXMLParser() to load org.cybergarage.xml.parser.XmlPullParser at first.
 *	
 ******************************************************************/
 
 package org.cybergarage.upnp;
 
-import org.cybergarage.upnp.ssdp.*;
-//import org.cybergarage.util.*;
-import org.cybergarage.xml.*;
-import org.cybergarage.xml.parser.*;
-import org.cybergarage.soap.*;
-import org.cybergarage.net.*;
+import org.cybergarage.net.HostInterface;
+import org.cybergarage.soap.SOAP;
+import org.cybergarage.upnp.ssdp.SSDP;
+import org.cybergarage.util.Debug;
+import org.cybergarage.xml.Parser;
 
 public class UPnP
 {
@@ -34,8 +37,15 @@ public class UPnP
 	//	Constants
 	////////////////////////////////////////////////
 	
-	public final static String NAME = "CyberLink";
-	public final static String VERSION = "1.7";
+	/**
+	 * Name of the system properties used to identifies the default XML Parser.<br>
+	 * The value of the properties MUST BE the fully qualified class name of<br>
+	 * XML Parser which CyberLink should use. 
+	 */
+	public final static String XML_CLASS_PROPERTTY="cyberlink.upnp.xml.parser";
+	
+	public final static String NAME = "CyberLinkJava";
+	public final static String VERSION = "1.8";
 
 	// I2P was 100
 	public final static int SERVER_RETRY_COUNT = 4;
@@ -52,7 +62,7 @@ public class UPnP
 	public final static String INMPR03_VERSION = "1.0";
 	public final static int INMPR03_DISCOVERY_OVER_WIRELESS_COUNT = 4;
 
-	public final static String XML_DECLARATION = "<?xml version=\"1.0\"?>";
+	public final static String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"; 
 	
 	////////////////////////////////////////////////
 	//	Enable / Disable
@@ -194,7 +204,66 @@ public class UPnP
 	
 	public final static Parser getXMLParser()
 	{
+		if(xmlParser == null){
+			xmlParser = loadDefaultXMLParser();
+			if(xmlParser == null)
+				throw new RuntimeException("No XML parser defined. And unable to laod any. \n" +
+						"Try to invoke UPnP.setXMLParser before UPnP.getXMLParser");			
+			SOAP.setXMLParser(xmlParser);
+		}
 		return xmlParser;
+	}
+
+	/**
+	 * This method loads the default XML Parser using the following behavior:
+	 *  - First if present loads the parsers specified by the system property {@link UPnP#XML_CLASS_PROPERTTY}<br>
+	 *  - Second by a fall-back technique, it tries to load the XMLParser from one<br>
+	 *  of the following classes: {@link JaxpParser}, {@link kXML2Parser}, {@link XercesParser}
+	 * 
+	 * @return {@link Parser} which has been loaded successuflly or null otherwise
+	 * 
+	 * @since 1.8.0
+	 */
+	private static Parser loadDefaultXMLParser() {
+		Parser parser = null;
+		
+		String[] parserClass = new String[]{
+				System.getProperty(XML_CLASS_PROPERTTY),
+				"org.cybergarage.xml.parser.XmlPullParser",
+				"org.cybergarage.xml.parser.JaxpParser",
+				"org.cybergarage.xml.parser.kXML2Parser",
+				"org.cybergarage.xml.parser.XercesParser"
+		};
+		
+		for (int i = 0; i < parserClass.length; i++) {
+			if(parserClass[i]==null)
+				continue;
+			try {
+				parser = (Parser) Class.forName(parserClass[i]).newInstance();
+				return parser;
+			} catch (Throwable e) {
+				Debug.warning("Unable to load "+parserClass[i]+" as XMLParser due to "+e);
+			}
+		}
+		return null;
+	}
+	
+	////////////////////////////////////////////////
+	//	TTL
+	////////////////////////////////////////////////	
+
+	public final static int DEFAULT_TTL = 4;
+
+	private static int timeToLive = DEFAULT_TTL;
+	
+	public final static void setTimeToLive(int value)
+	{
+		timeToLive = value;
+	}
+	
+	public final static int getTimeToLive()
+	{
+		return timeToLive;
 	}
 	
 	////////////////////////////////////////////////
@@ -207,16 +276,14 @@ public class UPnP
 		// Interface Option
 		////////////////////////////
 		
-		setXMLParser(new JaxpParser());
 		//setXMLParser(new kXML2Parser());
 		
+		
 		////////////////////////////
-		// Interface Option
+		// TimeToLive
 		////////////////////////////
-		/*
-		if (HostInterface.hasIPv6Addresses() == true)
-			setEnable(USE_ONLY_IPV6_ADDR);
-		*/
+		
+		setTimeToLive(DEFAULT_TTL);
 		
 		////////////////////////////
 		// Debug Option

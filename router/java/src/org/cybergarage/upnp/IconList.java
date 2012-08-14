@@ -15,7 +15,7 @@
 
 package org.cybergarage.upnp;
 
-import java.util.*;
+import java.util.Vector;
 
 public class IconList extends Vector 
 {
@@ -23,7 +23,6 @@ public class IconList extends Vector
 	//	Constants
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = -1097238335037012991L;
 	public final static String ELEM_NAME = "iconList";
 
 	////////////////////////////////////////////////

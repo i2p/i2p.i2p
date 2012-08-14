@@ -16,6 +16,7 @@
 ******************************************************************/
 
 package org.cybergarage.upnp;
+import org.cybergarage.http.HTTPStatus;
 
 public class UPnPStatus
 {
@@ -39,8 +40,8 @@ public class UPnPStatus
 		case INVALID_VAR: return "Invalid Var";
 		case PRECONDITION_FAILED: return "Precondition Failed";
 		case ACTION_FAILED: return "Action Failed";
+	        default: return HTTPStatus.code2String(code);
 		}
-		return "";
 	}
 	
 	////////////////////////////////////////////////

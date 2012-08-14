@@ -43,12 +43,12 @@ public class SubscriptionRequest extends HTTPRequest
 	//	Constructor
 	////////////////////////////////////////////////
 
-	public SubscriptionRequest()
-	{
+	public SubscriptionRequest(){
+		setContentLength(0);
 	}
 
-	public SubscriptionRequest(HTTPRequest httpReq)
-	{
+	public SubscriptionRequest(HTTPRequest httpReq){
+		this();
 		set(httpReq);
 	}
 	

@@ -74,6 +74,8 @@ public class QueryRequest extends ControlRequest
 	{
 		Service service = stateVar.getService();		
 		
+		String ctrlURL = service.getControlURL();
+
 		setRequestHost(service);
 
 		setEnvelopeNode(SOAP.createEnvelopeBodyNode());

@@ -18,6 +18,8 @@
 
 package org.cybergarage.upnp.ssdp;
 
+import java.io.InputStream;
+
 import org.cybergarage.http.*;
 
 public class SSDPRequest extends HTTPRequest
@@ -31,6 +33,11 @@ public class SSDPRequest extends HTTPRequest
 		setVersion(HTTP.VERSION_11);
 	}
 
+	public SSDPRequest(InputStream in)
+	{
+		super(in);
+	}
+	
 	////////////////////////////////////////////////
 	//	NT
 	////////////////////////////////////////////////
