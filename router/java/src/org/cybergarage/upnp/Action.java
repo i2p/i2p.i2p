@@ -22,16 +22,22 @@
 *	07/09/04
 *		- Thanks for Dimas <cyberrate@users.sourceforge.net> and Stefano Lenzi <kismet-sl@users.sourceforge.net>
 *		- Changed postControlAction() to set the status code to the UPnPStatus.
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
 *
 ******************************************************************/
 
 package org.cybergarage.upnp;
+import java.util.Iterator;
 
-import org.cybergarage.xml.*;
-import org.cybergarage.util.*;
-
-import org.cybergarage.upnp.xml.*;
-import org.cybergarage.upnp.control.*;
+import org.cybergarage.upnp.control.ActionListener;
+import org.cybergarage.upnp.control.ActionRequest;
+import org.cybergarage.upnp.control.ActionResponse;
+import org.cybergarage.upnp.control.ControlResponse;
+import org.cybergarage.upnp.xml.ActionData;
+import org.cybergarage.util.Debug;
+import org.cybergarage.util.Mutex;
+import org.cybergarage.xml.Node;
 
 public class Action
 {
@@ -58,6 +64,16 @@ public class Action
 		return new Service(getServiceNode());
 	}
 	
+	void setService(Service s){
+		serviceNode=s.getServiceNode();
+		/*To ensure integrity of the XML structure*/
+		Iterator i = getArgumentList().iterator();
+		while (i.hasNext()) {
+			Argument arg = (Argument) i.next();
+			arg.setService(s);
+		}		
+	}
+	
 	public Node getActionNode()
 	{
 		return actionNode;
@@ -66,6 +82,11 @@ public class Action
 	////////////////////////////////////////////////
 	//	Constructor
 	////////////////////////////////////////////////
+	public Action(Node serviceNode){
+		//TODO Test
+		this.serviceNode = serviceNode;
+		this.actionNode = new Node(Action.ELEM_NAME);		
+	}
 
 	public Action(Node serviceNode, Node actionNode)
 	{
@@ -139,6 +160,23 @@ public class Action
 			argumentList.add(argument);
 		} 
 		return argumentList;
+	}	
+	
+	public void setArgumentList(ArgumentList al){
+		Node argumentListNode = getActionNode().getNode(ArgumentList.ELEM_NAME);
+		if (argumentListNode == null){
+			argumentListNode = new Node(ArgumentList.ELEM_NAME);
+			getActionNode().addNode(argumentListNode);
+		}else{
+			argumentListNode.removeAllNodes();
+		}
+		Iterator i = al.iterator();
+		while (i.hasNext()) {
+			Argument a = (Argument) i.next();
+			a.setService(getService());
+			argumentListNode.addNode(a.getArgumentNode());
+		}
+		
 	}
 
 	public ArgumentList getInputArgumentList()
@@ -184,9 +222,34 @@ public class Action
 		return null;
 	}
 
+	/**
+	 * @deprecated You should use one of the following methods instead:<br />
+	 *  - {@link #setInArgumentValues(ArgumentList)} <br/>
+	 *  - {@link #setOutArgumentValues(ArgumentList)} 
+	 */
 	public void setArgumentValues(ArgumentList argList)
 	{
 		getArgumentList().set(argList);
+	}
+
+	/**
+	 * 
+	 * @param argList
+	 * @since 1.8.0
+	 */
+	public void setInArgumentValues(ArgumentList argList)
+	{
+		getArgumentList().setReqArgs(argList); 
+	}
+	
+	/**
+	 * 
+	 * @param argList
+	 * @since 1.8.0
+	 */
+	public void setOutArgumentValues(ArgumentList argList)
+	{
+		getArgumentList().setResArgs(argList);
 	}
 	
 	public void setArgumentValue(String name, String value)
@@ -272,8 +335,8 @@ public class Action
 			actionRes.setResponse(this);
 		}
 		else {
-			UPnPStatus _upnpStatus = getStatus();
-			actionRes.setFaultResponse(_upnpStatus.getCode(), _upnpStatus.getDescription());
+			UPnPStatus upnpStatus = getStatus();
+			actionRes.setFaultResponse(upnpStatus.getCode(), upnpStatus.getDescription());
 		}
 		if (Debug.isOn() == true)
 			actionRes.print();
@@ -323,7 +386,12 @@ public class Action
 		if (ctrlRes.isSuccessful() == false)
 			return false;
 		ArgumentList outArgList = ctrlRes.getResponse();
-		actionArgList.set(outArgList);
+        try {
+            actionArgList.setResArgs(outArgList);
+        } catch (IllegalArgumentException ex){
+            setStatus(UPnPStatus.INVALID_ARGS,"Action succesfully delivered but invalid arguments returned.");
+            return false;
+        }
 		return true;
 	}
 
@@ -367,4 +435,19 @@ public class Action
 		return upnpStatus;
 	}
 	
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
+	}
 }

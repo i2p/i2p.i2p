@@ -17,7 +17,7 @@
 
 package org.cybergarage.upnp;
 
-import java.util.*;
+import java.util.Vector;
 
 public class ServiceList extends Vector 
 {
@@ -25,7 +25,6 @@ public class ServiceList extends Vector
 	//	Constants
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = 6372904993975135597L;
 	public final static String ELEM_NAME = "serviceList";
 
 	////////////////////////////////////////////////
@@ -46,7 +45,7 @@ public class ServiceList extends Vector
 		try {
 			obj = get(n);
 		}
-		catch (Exception e) {}
+		catch (Exception e) {};
 		return (Service)obj;
 	}
 }

@@ -136,15 +136,15 @@ public class Date
 	public String getDateString()
 	{
 		// Thanks for Theo Beisch (10/20/04)
-		Calendar _cal = getCalendar();
+		Calendar cal = getCalendar();
 		return
-			toWeekString(_cal.get(Calendar.DAY_OF_WEEK)) +", " +
-			toTimeString(_cal.get(Calendar.DATE)) + " " +
-			toMonthString(_cal.get(Calendar.MONTH)) + " " +
-			Integer.toString(_cal.get(Calendar.YEAR)) + " " +
-			toTimeString(_cal.get(Calendar.HOUR_OF_DAY)) + ":" +
-			toTimeString(_cal.get(Calendar.MINUTE)) + ":" +
-			toTimeString(_cal.get(Calendar.SECOND)) + " GMT";
+			toWeekString(cal.get(Calendar.DAY_OF_WEEK)) +", " + 
+			toTimeString(cal.get(Calendar.DATE)) + " " +
+			toMonthString(cal.get(Calendar.MONTH)) + " " +
+			Integer.toString(cal.get(Calendar.YEAR)) + " " +
+			toTimeString(cal.get(Calendar.HOUR_OF_DAY)) + ":" +
+			toTimeString(cal.get(Calendar.MINUTE)) + ":" +
+			toTimeString(cal.get(Calendar.SECOND)) + " GMT";
 	}
 
 	////////////////////////////////////////////////
@@ -154,11 +154,11 @@ public class Date
 	public String getTimeString()
 	{
 		// Thanks for Theo Beisch (10/20/04)
-		Calendar _cal = getCalendar();
+		Calendar cal = getCalendar();
 		return
-			toDateString(_cal.get(Calendar.HOUR_OF_DAY)) +
-			(((_cal.get(Calendar.SECOND) % 2) == 0) ? ":" : " ") +
-			toDateString(_cal.get(Calendar.MINUTE));
+			toDateString(cal.get(Calendar.HOUR_OF_DAY)) +
+			(((cal.get(Calendar.SECOND) % 2) == 0) ? ":" : " ") +
+			toDateString(cal.get(Calendar.MINUTE));
 	}
 		
 }

@@ -17,12 +17,12 @@
 
 package org.cybergarage.upnp.ssdp;
 
+import java.net.InetAddress;
 import java.util.*;
 
 import org.cybergarage.net.*;
 
 import org.cybergarage.upnp.*;
-import org.cybergarage.util.Debug;
 
 public class SSDPSearchResponseSocketList extends Vector 
 {
@@ -30,11 +30,22 @@ public class SSDPSearchResponseSocketList extends Vector
 	//	Constructor
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = 4509857798038125744L;
-
-	public SSDPSearchResponseSocketList() 
-	{
+	private InetAddress[] binds = null;
+	
+	public SSDPSearchResponseSocketList() {
 	}
+	/**
+	 * 
+	 * @param binds The host to bind.Use <tt>null</tt> for the default behavior
+	 */
+	public SSDPSearchResponseSocketList(InetAddress[] binds) {
+		this.binds = binds;
+	}
+
+	
+	
+	////////////////////////////////////////////////
+	//	ControlPoint
 
 	////////////////////////////////////////////////
 	//	ControlPoint
@@ -62,18 +73,27 @@ public class SSDPSearchResponseSocketList extends Vector
 	//	Methods
 	////////////////////////////////////////////////
 	
-	public boolean open(int port)
-	{
-		try {
+	public boolean open(int port){
+		InetAddress[] binds=this.binds ;
+		String[] bindAddresses;
+		if(binds!=null){			
+			bindAddresses = new String[binds.length];
+			for (int i = 0; i < binds.length; i++) {
+				bindAddresses[i] = binds[i].getHostAddress();
+			}
+		}else{
 			int nHostAddrs = HostInterface.getNHostAddresses();
+			bindAddresses = new String[nHostAddrs]; 
 			for (int n=0; n<nHostAddrs; n++) {
-				String bindAddr = HostInterface.getHostAddress(n);
-				SSDPSearchResponseSocket socket = new SSDPSearchResponseSocket(bindAddr, port);
-				Debug.message("Opened SSDP search response socket at " + bindAddr + ':' + port);
+				bindAddresses[n] = HostInterface.getHostAddress(n);
+			}
+		}		
+		try {
+			for (int j = 0; j < bindAddresses.length; j++) {				
+				SSDPSearchResponseSocket socket = new SSDPSearchResponseSocket(bindAddresses[j], port);
 				add(socket);
 			}
-		}
-		catch (Exception e) {
+		}catch (Exception e) {
 			stop();
 			close();
 			clear();

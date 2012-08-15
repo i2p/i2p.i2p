@@ -12,10 +12,15 @@
 *		- first revision.
 *	05/28/03
 *		- Added post() to send a SSDPSearchRequest.
+*	01/31/08
+*		- Changed start() not to abort when the interface infomation is null on Android m3-rc37a.
 *	
 ******************************************************************/
 
 package org.cybergarage.upnp.ssdp;
+
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 import org.cybergarage.upnp.*;
 
@@ -74,11 +79,19 @@ public class SSDPSearchResponseSocket extends HTTPUSocket implements Runnable
 		}
 	}
 	
-	public void start()
-	{
-		deviceSearchResponseThread = new Thread(this, "UPnP-SSDPSearchResponseSocket");
-		deviceSearchResponseThread.setDaemon(true);
-		deviceSearchResponseThread.start();
+	public void start()	{
+
+		StringBuffer name = new StringBuffer("Cyber.SSDPSearchResponseSocket/");
+		DatagramSocket s = getDatagramSocket();
+		// localAddr is null on Android m3-rc37a (01/30/08)
+		// I2P hide address from thread dumps
+		//InetAddress localAddr = s.getLocalAddress();
+		//if (localAddr != null) {
+		//	name.append(s.getLocalAddress()).append(':');
+		//	name.append(s.getLocalPort());
+		//}
+		deviceSearchResponseThread = new Thread(this,name.toString());
+		deviceSearchResponseThread.start();		
 	}
 	
 	public void stop()

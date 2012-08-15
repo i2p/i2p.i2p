@@ -39,16 +39,21 @@
 *		- Fixed setValue() to compare only when the current value is not null.
 *	02/28/05
 *		- Changed getAllowedValueList() to use AllowedValue instead of String as the member.
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
 *	
 ******************************************************************/
 
 package org.cybergarage.upnp;
+import java.util.Iterator;
 
-import org.cybergarage.xml.*;
-import org.cybergarage.util.*;
-
-import org.cybergarage.upnp.control.*;
-import org.cybergarage.upnp.xml.*;
+import org.cybergarage.upnp.control.QueryListener;
+import org.cybergarage.upnp.control.QueryRequest;
+import org.cybergarage.upnp.control.QueryResponse;
+import org.cybergarage.upnp.xml.NodeData;
+import org.cybergarage.upnp.xml.StateVariableData;
+import org.cybergarage.util.Debug;
+import org.cybergarage.xml.Node;
 
 public class StateVariable extends NodeData
 {
@@ -69,13 +74,17 @@ public class StateVariable extends NodeData
 	{
 		return serviceNode;
 	}
+	
+	void setServiceNode(Node n){
+		serviceNode=n;
+	}
 
 	public Service getService()
 	{
-		Node _serviceNode = getServiceNode();
-		if (_serviceNode == null)
+		Node serviceNode = getServiceNode();
+		if (serviceNode == null)
 			return null;
-		return new Service(_serviceNode);
+		return new Service(serviceNode);
 	}
 
 	public Node getStateVariableNode()
@@ -90,7 +99,7 @@ public class StateVariable extends NodeData
 	public StateVariable()
 	{
 		this.serviceNode = null;
-		this.stateVariableNode = new Node();
+		this.stateVariableNode = new Node(ELEM_NAME);
 	}
 	
 	public StateVariable(Node serviceNode, Node stateVarNode)
@@ -238,7 +247,7 @@ public class StateVariable extends NodeData
 		AllowedValueList valueList= new AllowedValueList();
 		Node valueListNode = getStateVariableNode().getNode(AllowedValueList.ELEM_NAME);
 		if (valueListNode == null)
-			return valueList;
+			return null;
 		int nNode = valueListNode.getNNodes();
 		for (int n=0; n<nNode; n++) {
 			Node node = valueListNode.getNode(n);
@@ -250,10 +259,41 @@ public class StateVariable extends NodeData
 		return valueList;
 	}
 
+	/**
+	 * This method ovverride the value of the AllowedValueList Node<br>
+	 * of this object. <br>
+	 * <br>
+	 * Note: This method should be used to create a dynamic<br>
+	 * Device withtout writing any XML that describe the device<br>.
+	 * <br>
+	 * Note2: The enforce the constraint of the SCPD rule the<br>
+	 * AllowedValueList and AllowedValueRange are mutal exclusive<br>
+	 * the last set will be the only present<br>
+	 * 
+	 * @param avl The new AllowedValueList
+	 * 
+	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
+	 */
+	public void setAllowedValueList(AllowedValueList avl) {
+		//TODO Some test done not stable 	
+		getStateVariableNode().removeNode(AllowedValueList.ELEM_NAME);
+		getStateVariableNode().removeNode(AllowedValueRange.ELEM_NAME);
+		Node n = new Node(AllowedValueList.ELEM_NAME);
+		Iterator i=avl.iterator();
+		while (i.hasNext()) {
+			AllowedValue av = (AllowedValue) i.next();
+			//n.addNode(new Node(AllowedValue.ELEM_NAME,av.getValue())); wrong!
+			n.addNode(av.getAllowedValueNode());						//better (twa)
+		}
+		getStateVariableNode().addNode(n);		
+		
+	}
+
+	
 	public boolean hasAllowedValueList()
 	{
 		AllowedValueList valueList = getAllowedValueList();
-		return (0 < valueList.size()) ? true : false;
+		return (valueList != null) ? true : false;
 	}
 	
 	////////////////////////////////////////////////
@@ -266,6 +306,29 @@ public class StateVariable extends NodeData
 		if (valueRangeNode == null)
 			return null;
 		return new AllowedValueRange(valueRangeNode);
+	}
+	
+	/**
+	 * This method ovverride the value of the AllowedValueRange Node<br>
+	 * of this object. <br>
+	 * <br>
+	 * Note: This method should be used to create a dynamic<br>
+	 * Device withtout writing any XML that describe the device<br>.
+	 * <br>
+	 * Note2: The enforce the constraint of the SCPD rule the<br>
+	 * AllowedValueList and AllowedValueRange are mutal exclusive<br>
+	 * the last set will be the only present<br>
+	 * 
+	 * @param avr The new AllowedValueRange
+	 * 
+	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
+	 */	
+	public void setAllowedValueRange(AllowedValueRange avr){
+		//TODO Some test done not stable
+		getStateVariableNode().removeNode(AllowedValueList.ELEM_NAME);
+		getStateVariableNode().removeNode(AllowedValueRange.ELEM_NAME);
+		getStateVariableNode().addNode(avr.getAllowedValueRangeNode());
+		
 	}
 
 	public boolean hasAllowedValueRange()
@@ -301,8 +364,8 @@ public class StateVariable extends NodeData
 			queryRes.setResponse(retVar);
 		}
 		else {
-			UPnPStatus _upnpStatus = retVar.getStatus();
-			queryRes.setFaultResponse(_upnpStatus.getCode(), _upnpStatus.getDescription());
+			UPnPStatus upnpStatus = retVar.getStatus();
+			queryRes.setFaultResponse(upnpStatus.getCode(), upnpStatus.getDescription());
 		}
 		queryReq.post(queryRes);
 		return true;
@@ -370,5 +433,45 @@ public class StateVariable extends NodeData
 	public UPnPStatus getStatus()
 	{
 		return upnpStatus;
+	}
+
+	private static final String DEFAULT_VALUE = "defaultValue";
+	////////////////////////////////////////////////
+	/**
+	 * Get the value of DefaultValue of this StateVariable
+	 * 
+	 * @author Stefano Lenzi kismet-sl@users.sourceforge.net
+	 */
+	public String getDefaultValue() {
+		return getStateVariableNode().getNodeValue(DEFAULT_VALUE);
+	}
+
+	/**
+	 * This method ovverride the value of the DefaultValue of this object. <br>
+	 * <br>
+	 * Note: This method should be used to create a dynamic<br>
+	 * Device withtout writing any XML that describe the device<br>.
+	 * 
+	 * @param value The new String value
+	 * 
+	 * @author Stefano Lenzi kismet-sl@users.sourceforge.net
+	 */	
+	public void setDefaultValue(String value){
+		getStateVariableNode().setNode(DEFAULT_VALUE,value);
+	}
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
 	}
 }

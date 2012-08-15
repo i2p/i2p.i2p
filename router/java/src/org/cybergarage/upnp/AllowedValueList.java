@@ -17,7 +17,8 @@
 
 package org.cybergarage.upnp;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class AllowedValueList extends Vector
 {
@@ -25,7 +26,6 @@ public class AllowedValueList extends Vector
 	//	Constants
 	////////////////////////////////////////////////
 	
-	private static final long serialVersionUID = 5740394642751180992L;
 	public final static String ELEM_NAME = "allowedValueList";
 
 
@@ -36,6 +36,14 @@ public class AllowedValueList extends Vector
 	public AllowedValueList() 
 	{
 	}
+
+	public AllowedValueList(String[] values) {
+		for (int i = 0; i < values.length; i++) {
+			add(new AllowedValue(values[i]));
+		};
+		
+	}
+
 	
 	////////////////////////////////////////////////
 	//	Methods
@@ -46,4 +54,12 @@ public class AllowedValueList extends Vector
 		return (AllowedValue)get(n);
 	}
 
+	public boolean isAllowed(String v){
+		for (Iterator i = this.iterator(); i.hasNext();) {
+			AllowedValue av = (AllowedValue) i.next();
+			if(av.getValue().equals(v))
+				return true;
+		}
+		return false;
+	}
 }

@@ -10,12 +10,14 @@
 *
 *	11/28/02
 *		- first revision.
+*	04/12/06
+*		- Added setUserData() and getUserData() to set a user original data object.
 *	
 ******************************************************************/
 
 package org.cybergarage.upnp;
 
-import org.cybergarage.xml.*;
+import org.cybergarage.xml.Node;
 
 public class Icon
 {
@@ -81,9 +83,21 @@ public class Icon
 		getIconNode().setNode(WIDTH, value);
 	}
 
-	public String getWidth()
+	public void setWidth(int value)
 	{
-		return getIconNode().getNodeValue(WIDTH);
+		try {
+			setWidth(Integer.toString(value));
+		}
+		catch (Exception e) {};
+	}
+	
+	public int getWidth()
+	{
+		try {
+			return Integer.parseInt(getIconNode().getNodeValue(WIDTH));
+		}
+		catch (Exception e) {};
+		return 0;
 	}
 
 	////////////////////////////////////////////////
@@ -97,9 +111,21 @@ public class Icon
 		getIconNode().setNode(HEIGHT, value);
 	}
 
-	public String getHeight()
+	public void setHeight(int value)
 	{
-		return getIconNode().getNodeValue(HEIGHT);
+		try {
+			setHeight(Integer.toString(value));
+		}
+		catch (Exception e) {};
+	}
+	
+	public int getHeight()
+	{
+		try {
+			return Integer.parseInt(getIconNode().getNodeValue(HEIGHT));
+		}
+		catch (Exception e) {};
+		return 0;
 	}
 
 	////////////////////////////////////////////////
@@ -132,5 +158,21 @@ public class Icon
 	public String getURL()
 	{
 		return getIconNode().getNodeValue(URL);
+	}
+	
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null; 
+	
+	public void setUserData(Object data) 
+	{
+		userData = data;
+	}
+
+	public Object getUserData() 
+	{
+		return userData;
 	}
 }

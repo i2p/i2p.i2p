@@ -20,9 +20,10 @@
 
 package org.cybergarage.soap;
 
-import org.cybergarage.http.*;
+import org.cybergarage.http.HTTPResponse;
 import org.cybergarage.util.Debug;
-import org.cybergarage.xml.*;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.XML;
 
 public class SOAPResponse extends HTTPResponse
 {
@@ -179,7 +180,6 @@ public class SOAPResponse extends HTTPResponse
 	//	print
 	////////////////////////////////////////////////
 	
-    @Override
 	public void print()
 	{
 		Debug.message(toString());
