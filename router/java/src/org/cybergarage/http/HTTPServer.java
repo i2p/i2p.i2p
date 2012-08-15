@@ -54,7 +54,9 @@ public class HTTPServer implements Runnable
 	 * Default timeout connection for HTTP comunication
 	 * @since 1.8
 	 */
-	public final static int DEFAULT_TIMEOUT = DEFAULT_PORT * 1000;
+        // I2P fix
+	//public final static int DEFAULT_TIMEOUT = DEFAULT_PORT * 1000;
+	public final static int DEFAULT_TIMEOUT = 10 * 1000;
 	
 	public static String getName()
 	{
@@ -248,7 +250,8 @@ public class HTTPServer implements Runnable
 	
 	public boolean start(){
 		StringBuffer name = new StringBuffer("Cyber.HTTPServer/");
-		name.append(serverSock.getLocalSocketAddress());
+		// I2P hide address from thread dumps
+		//name.append(serverSock.getLocalSocketAddress());
 		httpServerThread = new Thread(this,name.toString());
 		httpServerThread.start();
 		return true;

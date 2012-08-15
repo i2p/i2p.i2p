@@ -61,6 +61,13 @@ public abstract class Parser
 		
 		try {
 	 		HttpURLConnection urlCon = (HttpURLConnection)locationURL.openConnection();
+			// I2P mods to prevent hangs (see HTTPRequest for more info)
+			// this seems to work, getInputStream actually does the connect(),
+			// (as shown by a thread dump)
+			// so we can set these after openConnection()
+			// Alternative would be foo = new HttpURLConnection(locationURL); foo.set timeouts; foo.connect()
+			urlCon.setConnectTimeout(2*1000);
+			urlCon.setReadTimeout(1000);
 			urlCon.setRequestMethod("GET");
 			urlCon.setRequestProperty(HTTP.CONTENT_LENGTH,"0");
 			if (host != null)

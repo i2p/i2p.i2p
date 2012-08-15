@@ -79,8 +79,8 @@ Public domain except as listed below:
    From freenet
    See licenses/LICENSE-GPLv2.txt
 
-   UPnP subsystem 1.7:
-   Copyright (C) 2003-2006 Satoshi Konno
+   UPnP subsystem (CyberLink) 2.1:
+   Copyright (C) 2003-2010 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
    GeoIP data free to use, courtesy http://www.maxmind.com/

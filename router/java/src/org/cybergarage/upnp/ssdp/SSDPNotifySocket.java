@@ -147,8 +147,9 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 		String localAddr = this.getLocalAddress();
 		// localAddr is null on Android m3-rc37a (01/30/08)
 		if (localAddr != null && 0 < localAddr.length()) {
-			name.append(this.getLocalAddress()).append(':');
-			name.append(this.getLocalPort()).append(" -> ");
+			// I2P hide address from thread dumps
+			//name.append(this.getLocalAddress()).append(':');
+			//name.append(this.getLocalPort()).append(" -> ");
 			name.append(this.getMulticastAddress()).append(':');
 			name.append(this.getMulticastPort());
 		}
