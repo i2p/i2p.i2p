@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -100,6 +101,7 @@ public class TrackerClient implements Runnable {
   // these 2 used in loop()
   private volatile boolean runStarted;
   private volatile  int consecutiveFails;
+  private boolean completed;
   private volatile boolean _fastUnannounce;
 
   private final List<Tracker> trackers;
@@ -218,11 +220,16 @@ public class TrackerClient implements Runnable {
       try {
           if (!_initialized) {
               setup();
-              // FIXME dht
-              if (trackers.isEmpty()) {
-                  stop = true;
-                  return;
-              }
+          }
+          if (trackers.isEmpty() && _util.getDHT() == null) {
+              stop = true;
+              this.snark.addMessage(_util.getString("No valid trackers for {0} - enable opentrackers or DHT?",
+                                              this.snark.getBaseName()));
+              _log.error("No valid trackers for " + this.snark.getBaseName());
+              this.snark.stopTorrent();
+              return;
+          }
+          if (!_initialized) {
               _initialized = true;
               // FIXME only when starting everybody at once, not for a single torrent
               long delay = I2PAppContext.getGlobalContext().random().nextInt(30*1000);
@@ -296,15 +303,7 @@ public class TrackerClient implements Runnable {
              _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
     }
-
-    if (trackers.isEmpty() && _util.getDHT() == null) {
-        stop = true;
-        this.snark.addMessage(_util.getString("No valid trackers for {0} - enable opentrackers or DHT?",
-                                              this.snark.getBaseName()));
-        _log.error("No valid trackers for " + this.snark.getBaseName());
-        this.snark.stopTorrent();
-        return;
-    }
+    this.completed = coordinator.getLeft() == 0;
   }
 
   /**
@@ -331,7 +330,6 @@ public class TrackerClient implements Runnable {
             long uploaded = coordinator.getUploaded();
             long downloaded = coordinator.getDownloaded();
             long left = coordinator.getLeft();   // -1 in magnet mode
-            boolean completed = (left == 0);
             
             // First time we got a complete download?
             String event;
@@ -345,8 +343,7 @@ public class TrackerClient implements Runnable {
             
             // *** loop once for each tracker
             int maxSeenPeers = 0;
-            for (Iterator iter = trackers.iterator(); iter.hasNext(); ) {
-              Tracker tr = (Tracker)iter.next();
+            for (Tracker tr : trackers) {
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needOutboundPeers() || !tr.started) &&
                   (event.equals(COMPLETED_EVENT) || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
@@ -468,7 +465,9 @@ public class TrackerClient implements Runnable {
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
-                List<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 2*60*1000);
+                Collection<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 2*60*1000);
+                if (!hashes.isEmpty())
+                    runStarted = true;
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Got " + hashes + " from DHT");
                 // announce  ourselves while the token is still good
@@ -509,10 +508,6 @@ public class TrackerClient implements Runnable {
             if (stop)
                 return;
 
-            if (!runStarted)
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("         Retrying in one minute...");
-
             try {
                 // Sleep some minutes...
                 // Sleep the minimum interval for all the trackers, but 60s minimum
@@ -521,6 +516,8 @@ public class TrackerClient implements Runnable {
                 if (completed && runStarted)
                   delay = 3*SLEEP*60*1000 + random;
                 else if (snark.getTrackerProblems() != null && ++consecutiveFails < MAX_CONSEC_FAILS)
+                  delay = INITIAL_SLEEP;
+                else if ((!runStarted) && _runCount < MAX_CONSEC_FAILS)
                   delay = INITIAL_SLEEP;
                 else
                   // sleep a while, when we wake up we will contact only the trackers whose intervals have passed

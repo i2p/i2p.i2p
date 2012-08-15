@@ -4,7 +4,7 @@ package org.klomp.snark.dht;
  *  GPLv2
  */
 
-import java.util.List;
+import java.util.Collection;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -42,9 +42,9 @@ public interface DHT {
      *  @param ih the Info Hash (torrent)
      *  @param max maximum number of peers to return
      *  @param maxWait the maximum time to wait (ms) must be > 0
-     *  @return list or empty list (never null)
+     *  @return possibly empty (never null)
      */
-    public List<Hash> getPeers(byte[] ih, int max, long maxWait);
+    public Collection<Hash> getPeers(byte[] ih, int max, long maxWait);
 
     /**
      *  Announce to ourselves.
