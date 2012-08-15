@@ -520,7 +520,7 @@ public class DataHelper {
     /**
      *  Hex without leading zeros.
      *  Use toString(byte[] to get leading zeros
-     *  @param buf may be null (returns "00")
+     *  @param data may be null (returns "00")
      */
     public final static String toHexString(byte data[]) {
         if ((data == null) || (data.length <= 0)) return "00";

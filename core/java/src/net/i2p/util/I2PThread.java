@@ -101,7 +101,6 @@ public class I2PThread extends Thread {
     }
     
 /****
-    @Override
     protected void finalize() throws Throwable {
         //log(Log.DEBUG, "Thread finalized: " + _name);
         super.finalize();

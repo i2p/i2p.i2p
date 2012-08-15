@@ -4,6 +4,7 @@
    - Fix setting short retry time after initial announce failure
    - Fix DHT announce and getPeers
    - Fix DHT warning message
+ * UPnP: Update to CyberLink 2.1 (ticket #427, possibly others)
 
 2012-08-13 zzz
  * SSU EstablishmentManager:
