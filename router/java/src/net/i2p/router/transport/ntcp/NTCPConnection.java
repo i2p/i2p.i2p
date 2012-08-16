@@ -76,7 +76,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private EstablishState _establishState;
     private final NTCPTransport _transport;
     private final boolean _isInbound;
-    private boolean _closed;
+    private volatile boolean _closed;
     private NTCPAddress _remAddr;
     private RouterIdentity _remotePeer;
     private long _clockSkew; // in seconds

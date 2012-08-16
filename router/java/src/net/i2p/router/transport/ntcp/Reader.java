@@ -78,7 +78,7 @@ class Reader {
     }
     
     private class Runner implements Runnable {
-        private boolean _stop;
+        private volatile boolean _stop;
 
         public Runner() {}
 

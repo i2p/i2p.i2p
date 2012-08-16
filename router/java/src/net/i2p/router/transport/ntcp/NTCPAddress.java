@@ -21,8 +21,8 @@ import net.i2p.util.Log;
  * Wrap up an address 
  */
 public class NTCPAddress {
-    private int _port;
-    private String _host;
+    private final int _port;
+    private final String _host;
     //private InetAddress _addr;
     /** Port number used in RouterAddress definitions */
     public final static String PROP_PORT = "port";
@@ -33,16 +33,18 @@ public class NTCPAddress {
     public NTCPAddress(String host, int port) {
         if (host != null)
             _host = host.trim();
+        else
+            _host = null;
         _port = port;
     }
     
+    /*
     public NTCPAddress() {
         _host = null;
         _port = -1;
        // _addr = null;
     }
     
-    /*
     public NTCPAddress(InetAddress addr, int port) {
         if (addr != null)
             _host = addr.getHostAddress();
@@ -58,24 +60,22 @@ public class NTCPAddress {
             return;
         }
         String host = addr.getOption(PROP_HOST);
+        int iport = -1;
         if (host == null) {
             _host = null;
-            _port = -1;
         } else { 
             _host = host.trim();
             String port = addr.getOption(PROP_PORT);
             if ( (port != null) && (port.trim().length() > 0) && !("null".equals(port)) ) {
                 try {
-                    _port = Integer.parseInt(port.trim());
+                    iport = Integer.parseInt(port.trim());
                 } catch (NumberFormatException nfe) {
                     Log log = I2PAppContext.getGlobalContext().logManager().getLog(NTCPAddress.class);
                     log.error("Invalid port [" + port + "]", nfe);
-                    _port = -1;
                 }
-            } else {
-                _port = -1;
             }
         }
+        _port = iport;
     }
     
     public RouterAddress toRouterAddress() {
@@ -97,11 +97,11 @@ public class NTCPAddress {
     }
     
     public String getHost() { return _host; }
-    public void setHost(String host) { _host = host; }
+    //public void setHost(String host) { _host = host; }
     //public InetAddress getAddress() { return _addr; }
     //public void setAddress(InetAddress addr) { _addr = addr; }
     public int getPort() { return _port; }
-    public void setPort(int port) { _port = port; }
+    //public void setPort(int port) { _port = port; }
     
     public boolean isPubliclyRoutable() {
         return isPubliclyRoutable(_host);
@@ -131,12 +131,11 @@ public class NTCPAddress {
     
     @Override
     public int hashCode() {
-        int rv = 0;
-        rv += _port;
+        int rv = _port;
         //if (_addr != null) 
         //    rv += _addr.getHostAddress().hashCode();
         //else
-            if (_host != null) rv += _host.trim().hashCode();
+            if (_host != null) rv ^= _host.hashCode();
         return rv;
     }
     
