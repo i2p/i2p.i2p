@@ -253,7 +253,7 @@ public class SSLEepGet extends EepGet {
             TrustManagerFactory tmf =   TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(ks);
             X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
-	    _stm = new SavingTrustManager(defaultTrustManager);
+            _stm = new SavingTrustManager(defaultTrustManager);
             sslc.init(null, new TrustManager[] {_stm}, null);
             return sslc;
         } catch (GeneralSecurityException gse) {
@@ -380,27 +380,27 @@ public class SSLEepGet extends EepGet {
      *  @since 0.8.2
      */
     private static class SavingTrustManager implements X509TrustManager {
-	private final X509TrustManager tm;
-	private X509Certificate[] chain;
+        private final X509TrustManager tm;
+        private X509Certificate[] chain;
 
-	SavingTrustManager(X509TrustManager tm) {
-	    this.tm = tm;
-	}
+        SavingTrustManager(X509TrustManager tm) {
+            this.tm = tm;
+        }
 
-	public X509Certificate[] getAcceptedIssuers() {
-	    return new X509Certificate[0];
-    }
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
 
-	public void checkClientTrusted(X509Certificate[] chain, String authType)
-		throws CertificateException {
-	    throw new CertificateException();
-	}
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            throw new CertificateException();
+        }
 
-	public void checkServerTrusted(X509Certificate[] chain, String authType)
-		throws CertificateException {
-	    this.chain = chain;
-	    tm.checkServerTrusted(chain, authType);
-	}
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            this.chain = chain;
+            tm.checkServerTrusted(chain, authType);
+        }
     }
 
     /**
@@ -412,7 +412,7 @@ public class SSLEepGet extends EepGet {
         if (chain == null) {
             System.out.println("Could not obtain server certificate chain");
             return;
-	}
+        }
         for (int k = 0; k < chain.length; k++) {
             X509Certificate cert = chain[k];
             String name = host + '-' + (k + 1) + ".crt";
@@ -468,7 +468,7 @@ public class SSLEepGet extends EepGet {
      *  @since 0.8.2
      */
     public static class SSLState {
-        private SSLContext context;
+        private final SSLContext context;
 
         private SSLState(SSLContext ctx) {
              context = ctx;
@@ -627,7 +627,7 @@ public class SSLEepGet extends EepGet {
             // for which we cannot easily determine how much we've written.
             // Assume that _alreadyTransferred holds the right value
             // (we should never be restarted to work on an old stream).
-	} else {
+        } else {
             File outFile = new File(_outputFile);
             if (outFile.exists())
                 _alreadyTransferred = outFile.length();
