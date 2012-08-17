@@ -34,11 +34,11 @@ class DHTTracker {
 
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 199*1000;
-    /** make this longer than postman's tracker */
-    private static final long MAX_EXPIRE_TIME = 95*60*1000;
-    private static final long MIN_EXPIRE_TIME = 5*60*1000;
-    private static final long DELTA_EXPIRE_TIME = 7*60*1000;
+    private static final long MAX_EXPIRE_TIME = 45*60*1000;
+    private static final long MIN_EXPIRE_TIME = 15*60*1000;
+    private static final long DELTA_EXPIRE_TIME = 3*60*1000;
     private static final int MAX_PEERS = 2000;
+    private static final int MAX_PEERS_PER_TORRENT = 150;
 
     DHTTracker(I2PAppContext ctx) {
         _context = ctx;
@@ -134,10 +134,20 @@ class DHTTracker {
                          peerCount++;
                      }
                 }
-                if (recent <= 0)
-                    iter.remove();
-                else
+                if (recent > MAX_PEERS_PER_TORRENT) {
+                    // too many, delete at random
+                    // TODO per-torrent adjustable expiration?
+                    for (Iterator<Peer> iterp = p.values().iterator(); iterp.hasNext() && p.size() > MAX_PEERS_PER_TORRENT; ) {
+                         iterp.next();
+                         iterp.remove();
+                         peerCount--;
+                    }
                     torrentCount++;
+                } else if (recent <= 0) {
+                    iter.remove();
+                } else {
+                    torrentCount++;
+                }
             }
 
             if (peerCount > MAX_PEERS)

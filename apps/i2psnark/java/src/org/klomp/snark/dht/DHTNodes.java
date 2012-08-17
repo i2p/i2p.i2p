@@ -38,11 +38,12 @@ class DHTNodes {
     private volatile boolean _isRunning;
 
     /** stagger with other cleaners */
-    private static final long CLEAN_TIME = 237*1000;
-    private static final long MAX_EXPIRE_TIME = 60*60*1000;
-    private static final long MIN_EXPIRE_TIME = 5*60*1000;
-    private static final long DELTA_EXPIRE_TIME = 7*60*1000;
-    private static final int MAX_PEERS = 999;
+    private static final long CLEAN_TIME = 187*1000;
+    /** how long since last heard from do we delete  - BEP 5 says 15 minutes */
+    private static final long MAX_EXPIRE_TIME = 30*60*1000;
+    private static final long MIN_EXPIRE_TIME = 10*60*1000;
+    private static final long DELTA_EXPIRE_TIME = 3*60*1000;
+    private static final int MAX_PEERS = 799;
 
     public DHTNodes(I2PAppContext ctx, NID me) {
         _context = ctx;

@@ -825,7 +825,7 @@ public class SnarkManager implements Snark.CompleteListener {
                     if (!TrackerClient.isValidAnnounce(info.getAnnounce())) {
                         if (info.isPrivate()) {
                             addMessage(_("ERROR - No I2P trackers in private torrent \"{0}\"", info.getName()));
-                        } else if (_util.shouldUseOpenTrackers() && _util.getOpenTrackers() != null) {
+                        } else if (!_util.getOpenTrackers().isEmpty()) {
                             addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
                             //addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers only.", info.getName()));
                         } else if (_util.shouldUseDHT()) {
@@ -908,10 +908,13 @@ public class SnarkManager implements Snark.CompleteListener {
         if (shouldAutoStart()) {
             torrent.startTorrent();
             addMessage(_("Fetching {0}", name));
-            boolean haveSavedPeers = false;
-            if ((_util.connected()) && !haveSavedPeers) {
-                addMessage(_("We have no saved peers and no other torrents are running. " +
-                             "Fetch of {0} will not succeed until you start another torrent.", name));
+            DHT dht = _util.getDHT();
+            boolean shouldWarn = _util.connected() &&
+                                 _util.getOpenTrackers().isEmpty() &&
+                                 ((!_util.shouldUseDHT()) || dht == null || dht.size() <= 0);
+            if (shouldWarn) {
+                addMessage(_("Open trackers are disabled and we have no DHT peers. " +
+                             "Fetch of {0} may not succeed until you start another torrent, enable open trackers, or enable DHT.", name));
             }
         } else {
             addMessage(_("Adding {0}", name));

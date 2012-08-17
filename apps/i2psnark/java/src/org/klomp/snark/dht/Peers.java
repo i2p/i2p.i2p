@@ -16,6 +16,6 @@ import net.i2p.data.Hash;
 class Peers extends ConcurrentHashMap<Hash, Peer> {
 
     public Peers() {
-        super();
+        super(8);
     }
 }

@@ -135,10 +135,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
     public static final boolean SECURE_NID = true;
 
-    /** how long since last heard from do we delete  - BEP 5 says 15 minutes */
-    private static final long MAX_NODEINFO_AGE = 60*60*1000;
     /** how long since generated do we delete - BEP 5 says 10 minutes */
-    private static final long MAX_TOKEN_AGE = 60*60*1000;
+    private static final long MAX_TOKEN_AGE = 15*60*1000;
     private static final long MAX_INBOUND_TOKEN_AGE = MAX_TOKEN_AGE - 5*60*1000;
     /** how long since sent do we wait for a reply */
     private static final long MAX_MSGID_AGE = 2*60*1000;
@@ -1469,11 +1467,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                     iter.remove();
             }
             // TODO sent queries?
-            for (Iterator<NodeInfo> iter = _knownNodes.values().iterator(); iter.hasNext(); ) {
-                NodeInfo ni = iter.next();
-                if (ni.lastSeen() < now - MAX_NODEINFO_AGE)
-                    iter.remove();
-            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("KRPC cleaner done, now with " +
                           _outgoingTokens.size() + " sent Tokens, " +
