@@ -81,7 +81,7 @@ class IntroductionManager {
         }
     }
     
-    public PeerState get(long id) {
+    private PeerState get(long id) {
         return _outbound.get(Long.valueOf(id));
     }
     
@@ -187,28 +187,54 @@ class IntroductionManager {
             return _inbound.size();
     }
 
+    /**
+     *  We are Charlie and we got this from Bob.
+     *  Send a HolePunch to Alice, who will soon be sending us a RelayRequest.
+     *  We should already have a session with Bob, but probably not with Alice.
+     *
+     *  We do some throttling here.
+     */
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
         if (_log.shouldLog(Log.INFO))
             _log.info("Receive relay intro from " + bob);
         _context.statManager().addRateData("udp.receiveRelayIntro", 1, 0);
+
+        if (!_transport.allowConnection())
+            return;
+
+        // TODO throttle
+        // TODO IB req limits
+        // TODO check if already have a session or in progress state.
+
         _transport.send(_builder.buildHolePunch(reader));
     }
     
+    /**
+     *  We are Bob and we got this from Alice.
+     *  Send a RelayIntro to Charlie and a RelayResponse to Alice.
+     *  We should already have a session with Charlie, but not necessarily with Alice.
+     */
     void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
         long tag = reader.getRelayRequestReader().readTag();
-        PeerState charlie = _transport.getPeerState(tag);
+        PeerState charlie = get(tag);
+        if (charlie == null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Receive relay request from " + alice 
+                      + " with unknown tag");
+            _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1, 0);
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Receive relay request from " + alice 
                       + " for tag " + tag
                       + " and relaying with " + charlie);
-        if (charlie == null) {
-            _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1, 0);
-            return;
-        }
+
+        // TODO throttle based on alice identity and/or intro tag?
+
         _context.statManager().addRateData("udp.receiveRelayRequest", 1, 0);
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
         reader.getRelayRequestReader().readAliceIntroKey(key, 0);

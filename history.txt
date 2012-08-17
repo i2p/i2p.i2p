@@ -1,6 +1,22 @@
+2012-08-17 zzz
+ * i2psnark:
+   - Adjust DHT timeouts
+   - Add max peers per-torrent in tracker
+   - Remove duplicate clean task for nodes
+   - Fix another DHT warning message
+ * SSU:
+   - Use remote MTU when published (ticket #687)
+   - Queue outbound msgs during inbound establish
+   - IntroManager cleanups
+   - More synchronization
+
 2012-08-17 sponge
  * BOB: just some cleanup of old, dead meaningless commentedout code
         and a little reformatting.
+
+2012-08-16 zzz
+ * Utils: Drop unused BufferedRandomSource, PooledRandomSource,
+   EepGetScheduler, EepPost and HTTPSendData, moved to i2p.scripts
 
 2012-08-15 zzz
  * i2psnark:

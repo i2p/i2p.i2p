@@ -12,6 +12,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
@@ -191,9 +192,39 @@ class EstablishmentManager {
                 //_context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
                 return;
             }
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Add outbound establish state to: " + to);
+
+            InboundEstablishState inState = _inboundStates.get(to);
+            if (inState != null) {
+                // we have an inbound establishment in progress, queue it there instead
+                synchronized (inState) {
+                    switch (inState.getState()) {
+                      case IB_STATE_UNKNOWN:
+                      case IB_STATE_REQUEST_RECEIVED:
+                      case IB_STATE_CREATED_SENT:
+                      case IB_STATE_CONFIRMED_PARTIALLY:
+                      case IB_STATE_CONFIRMED_COMPLETELY:
+                        // queue it
+                        inState.addMessage(msg);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.debug("OB msg queued to IES");
+                        break;
+
+                      case IB_STATE_COMPLETE:
+                        // race, send it out (but don't call _transport.send() again and risk a loop)
+                        _transport.sendIfEstablished(msg);
+                        break;
+
+                      case IB_STATE_FAILED:
+                        // race, failed
+                        _transport.failed(msg, "OB msg failed during IB establish");
+                        break;
+                    }
+                }
+                return;
+            }
+
+
+
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add indirect outbound establish state to: " + addr);
@@ -251,9 +282,13 @@ class EstablishmentManager {
                                                        sessionKey, addr, _transport.getDHBuilder());
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
-                    if (!isNew)
+                    if (isNew) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Adding new " + state);
+                    } else {
                         // whoops, somebody beat us to it, throw out the state we just created
                         state = oldState;
+                    }
                 }
             }
             if (state != null) {
@@ -548,7 +583,7 @@ class EstablishmentManager {
      *
      */
     private void handleCompletelyEstablished(InboundEstablishState state) {
-        if (state.complete()) return;
+        if (state.isComplete()) return;
         
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer = new PeerState(_context, _transport,
@@ -556,6 +591,22 @@ class EstablishmentManager {
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
         peer.setWeRelayToThemAs(state.getSentRelayTag());
+        // Lookup the peer's MTU from the netdb, since it isn't included in the protocol setup (yet)
+        // TODO if we don't have RI then we will get it shortly, but too late.
+        // Perhaps netdb should notify transport when it gets a new RI...
+        RouterInfo info = _context.netDb().lookupRouterInfoLocally(remote.calculateHash());
+        if (info != null) {
+            RouterAddress addr = info.getTargetAddress(UDPTransport.STYLE);
+            if (addr != null) {
+                String smtu = addr.getOption(UDPAddress.PROP_MTU);
+                if (smtu != null) {
+                    try { 
+                        int mtu = MTU.rectify(Integer.parseInt(smtu));
+                        peer.setHisMTU(mtu);
+                    } catch (NumberFormatException nfe) {}
+                }
+            }
+        }
         // 0 is the default
         //peer.setTheyRelayToUsAs(0);
         
@@ -573,6 +624,17 @@ class EstablishmentManager {
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
         sendInboundComplete(peer);
+        OutNetMessage msg;
+        while ((msg = state.getNextQueuedMessage()) != null) {
+            if (_context.clock().now() - Router.CLOCK_FUDGE_FACTOR > msg.getExpiration()) {
+                msg.timestamp("took too long but established...");
+                _transport.failed(msg, "Took too long to establish, but it was established");
+            } else {
+                msg.timestamp("session fully established and sent");
+                _transport.send(msg);
+            }
+        }
+        state.complete();
     }
 
     /**
@@ -634,6 +696,9 @@ class EstablishmentManager {
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
         peer.setTheyRelayToUsAs(state.getReceivedRelayTag());
+        int mtu = state.getRemoteAddress().getMTU();
+        if (mtu > 0)
+            peer.setHisMTU(mtu);
         // 0 is the default
         //peer.setWeRelayToThemAs(0);
         
@@ -780,15 +845,22 @@ class EstablishmentManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Received RelayResponse for " + state.getRemoteIdentity().calculateHash() + " - they are on " 
                       + addr.toString() + ":" + port + " (according to " + bob + ")");
-        RemoteHostId oldId = state.getRemoteHostId();
-        state.introduced(addr, ip, port);
-        RemoteHostId newId = state.getRemoteHostId();
-        // Swap out the RemoteHostId the state is indexed under
-        // TODO only if !oldId.equals(newId) ? synch?
-        OutboundEstablishState oldState = _outboundStates.remove(oldId);
-        _outboundStates.put(newId, state);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("RR replaced " + oldId + " -> " + oldState + " with " + newId + " -> " + state);
+        synchronized (state) {
+            RemoteHostId oldId = state.getRemoteHostId();
+            state.introduced(addr, ip, port);
+            RemoteHostId newId = state.getRemoteHostId();
+            // Swap out the RemoteHostId the state is indexed under
+            // TODO only if !oldId.equals(newId) ? synch?
+            // FIXME if the RemoteHostIDs aren't the same we have problems
+            // FIXME if the RemoteHostIDs aren't the same the SessionCreated signature is probably going to fail
+            // Common occurrence - port changes
+            if (!oldId.equals(newId)) {
+                _outboundStates.remove(oldId);
+                _outboundStates.put(newId, state);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("RR replaced " + oldId + " with " + newId + " -> " + state);
+            }
+        }
         notifyActivity();
     }
     
@@ -923,7 +995,9 @@ class EstablishmentManager {
             synchronized (inboundState) {
                 switch (inboundState.getState()) {
                   case IB_STATE_REQUEST_RECEIVED:
-                    if (!expired)
+                    if (expired)
+                        processExpired(inboundState);
+                    else
                         sendCreated(inboundState);
                     break;
 
@@ -931,6 +1005,7 @@ class EstablishmentManager {
                   case IB_STATE_CONFIRMED_PARTIALLY:
                     if (expired) {
                         sendDestroy(inboundState);
+                        processExpired(inboundState);
                     } else if (inboundState.getNextSendTime() <= now) {
                         sendCreated(inboundState);
                     }
@@ -945,6 +1020,7 @@ class EstablishmentManager {
                             // So next time we will not accept the con, rather than doing the whole handshake
                             _context.blocklist().add(inboundState.getSentIP());
                             inboundState.fail();
+                            processExpired(inboundState);
                         } else {
                             handleCompletelyEstablished(inboundState);
                         }
@@ -952,9 +1028,11 @@ class EstablishmentManager {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("confirmed with invalid? " + inboundState);
                         inboundState.fail();
+                        processExpired(inboundState);
                     }
                     break;
 
+                  case IB_STATE_COMPLETE:  // fall through
                   case IB_STATE_FAILED:
                     break; // already removed;
 
@@ -1118,10 +1196,8 @@ class EstablishmentManager {
         if (outboundState.getState() != OB_STATE_CONFIRMED_COMPLETELY) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Lifetime of expired outbound establish: " + outboundState.getLifetime());
-            while (true) {
-                OutNetMessage msg = outboundState.getNextQueuedMessage();
-                if (msg == null)
-                    break;
+            OutNetMessage msg;
+            while ((msg = outboundState.getNextQueuedMessage()) != null) {
                 _transport.failed(msg, "Expired during failed establish");
             }
             String err = "Took too long to establish OB connection, state = " + outboundState.getState();
@@ -1131,12 +1207,22 @@ class EstablishmentManager {
             _transport.dropPeer(peer, false, err);
             //_context.profileManager().commErrorOccurred(peer);
         } else {
-            while (true) {
-                OutNetMessage msg = outboundState.getNextQueuedMessage();
-                if (msg == null)
-                    break;
+            OutNetMessage msg;
+            while ((msg = outboundState.getNextQueuedMessage()) != null) {
                 _transport.send(msg);
             }
+        }
+    }
+
+    
+    /**
+     *  Caller should probably synch on inboundState
+     *  @since 0.9.2
+     */
+    private void processExpired(InboundEstablishState inboundState) {
+        OutNetMessage msg;
+        while ((msg = inboundState.getNextQueuedMessage()) != null) {
+            _transport.failed(msg, "Expired during failed establish");
         }
     }
 

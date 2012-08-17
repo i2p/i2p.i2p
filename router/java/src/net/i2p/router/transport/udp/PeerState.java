@@ -156,7 +156,7 @@ class PeerState {
     private int _mtu;
     private int _mtuReceive;
     /** what is the largest packet we will ever send to the peer? */
-    private final int _largeMTU;
+    private int _largeMTU;
     /* how many consecutive packets at or under the min MTU have been received */
     private long _consecutiveSmall;
     /** when did we last check the MTU? */
@@ -987,8 +987,10 @@ class PeerState {
         
         _messagesSent++;
         if (numSends < 2) {
-            recalculateTimeouts(lifetime);
-            adjustMTU();
+            synchronized (this) {
+                recalculateTimeouts(lifetime);
+                adjustMTU();
+            }
         }
         else if (_log.shouldLog(Log.INFO))
             _log.info("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
@@ -996,7 +998,10 @@ class PeerState {
         _context.statManager().addRateData("udp.sendBps", _sendBps, lifetime);
     }
 
-    /** adjust the tcp-esque timeouts */
+    /**
+     *  Adjust the tcp-esque timeouts.
+     *  Caller should synch on this
+     */
     private void recalculateTimeouts(long lifetime) {
         _rttDeviation = _rttDeviation + (int)(0.25d*(Math.abs(lifetime-_rtt)-_rttDeviation));
         
@@ -1017,6 +1022,9 @@ class PeerState {
             _rto = MAX_RTO;
     }
     
+    /**
+     *  Caller should synch on this
+     */
     private void adjustMTU() {
         double retransPct = 0;
         if (_packetsTransmitted > 10) {
@@ -1037,6 +1045,17 @@ class PeerState {
             _mtu = DEFAULT_MTU;
         }
     }
+
+    /**
+     *  @since 0.9.2
+     */
+    public synchronized void setHisMTU(int mtu) {
+        if (mtu <= MIN_MTU || mtu >= _largeMTU)
+            return;
+        _largeMTU = mtu;
+        if (mtu < _mtu)
+            _mtu = mtu;
+    }
     
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted(int packets) { 
@@ -1054,7 +1073,9 @@ class PeerState {
         *****/
         congestionOccurred();
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
-        adjustMTU();
+        synchronized (this) {
+            adjustMTU();
+        }
         //_rto *= 2; 
     }
 

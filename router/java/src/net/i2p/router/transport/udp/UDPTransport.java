@@ -698,14 +698,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     * get the state for the peer being introduced, or null if we aren't
-     * offering to introduce anyone with that tag.
-     */
-    PeerState getPeerState(long relayTag) {
-        return _introManager.get(relayTag);
-    }
-    
-    /**
      * Intercept RouterInfo entries received directly from a peer to inject them into
      * the PeersByCapacity listing.
      *
@@ -1276,6 +1268,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             msg.timestamp("establishing a new connection");
             _establisher.establish(msg);
         }
+    }
+
+    /**
+     *  Send only if established, otherwise fail immediately.
+     *  Never queue with the establisher.
+     *  @since 0.9.2
+     */
+    void sendIfEstablished(OutNetMessage msg) { 
+        _fragments.add(msg);
     }
 
     void send(I2NPMessage msg, PeerState peer) {

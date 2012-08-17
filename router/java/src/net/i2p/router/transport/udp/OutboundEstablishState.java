@@ -90,6 +90,9 @@ class OutboundEstablishState {
     /** max delay including backoff */
     private static final long MAX_DELAY = 15*1000;
 
+    /**
+     *  @param addr non-null
+     */
     public OutboundEstablishState(RouterContext ctx, InetAddress remoteHost, int remotePort, 
                                   RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
                                   DHSessionKeyBuilder dh) {
@@ -113,7 +116,7 @@ class OutboundEstablishState {
         _keyBuilder = dh;
         _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
         prepareSessionRequest();
-        if ( (addr != null) && (addr.getIntroducerCount() > 0) ) {
+        if (addr.getIntroducerCount() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
             _currentState = OutboundState.OB_STATE_PENDING_INTRO;
@@ -131,12 +134,17 @@ class OutboundEstablishState {
         return already; 
     }
 
+    /** @return non-null */
     public UDPAddress getRemoteAddress() { return _remoteAddress; }
+
     public void setIntroNonce(long nonce) { _introductionNonce = nonce; }
 
     /** @return -1 if unset */
     public long getIntroNonce() { return _introductionNonce; }
     
+    /**
+     *  Queue a message to be sent after the session is established.
+     */
     public void addMessage(OutNetMessage msg) {
         // chance of a duplicate here in a race, that's ok
         if (!_queuedMessages.contains(msg))
@@ -190,12 +198,12 @@ class OutboundEstablishState {
         reader.readIV(_receivedIV, 0);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive session created:\neSig: " + Base64.encode(_receivedEncryptedSignature)
-                       + "\nreceivedIV: " + Base64.encode(_receivedIV)
-                       + "\nAliceIP: " + Addresses.toString(_aliceIP)
+            _log.debug("Receive session created:Sig: " + Base64.encode(_receivedEncryptedSignature)
+                       + "receivedIV: " + Base64.encode(_receivedIV)
+                       + "AliceIP: " + Addresses.toString(_aliceIP)
                        + " RelayTag: " + _receivedRelayTag
                        + " SignedOn: " + _receivedSignedOnTime
-                       + "\nthis: " + this.toString());
+                       + ' ' + this.toString());
         
         if (_currentState == OutboundState.OB_STATE_UNKNOWN ||
             _currentState == OutboundState.OB_STATE_REQUEST_SENT ||
@@ -212,6 +220,8 @@ class OutboundEstablishState {
      * receive another one
      *
      *  Generates session key and mac key.
+     *
+     * @return true if valid
      */
     public synchronized boolean validateSessionCreated() {
         if (_receivedSignature != null) {
@@ -253,7 +263,6 @@ class OutboundEstablishState {
         _receivedSignature = null;
 
         if ( (_currentState == OutboundState.OB_STATE_UNKNOWN) || 
-             (_currentState == OutboundState.OB_STATE_REQUEST_SENT) || 
              (_currentState == OutboundState.OB_STATE_CREATED_RECEIVED) )
             _currentState = OutboundState.OB_STATE_REQUEST_SENT;
 
@@ -292,7 +301,7 @@ class OutboundEstablishState {
         System.arraycopy(_receivedEncryptedSignature, 0, signatureBytes, 0, Signature.SIGNATURE_BYTES);
         _receivedSignature = new Signature(signatureBytes);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Decrypted received signature: \n" + Base64.encode(signatureBytes));
+            _log.debug("Decrypted received signature: " + Base64.encode(signatureBytes));
     }
 
     /**
@@ -475,7 +484,8 @@ class OutboundEstablishState {
     }
     
     /**
-     *  This changes the remoteHostId from a hash-based one to a IP/Port one
+     *  This changes the remoteHostId from a hash-based one to a IP/Port one,
+     *  OR the IP or port could change.
      */
     public synchronized void introduced(InetAddress bob, byte bobIP[], int bobPort) {
         if (_currentState != OutboundState.OB_STATE_PENDING_INTRO)

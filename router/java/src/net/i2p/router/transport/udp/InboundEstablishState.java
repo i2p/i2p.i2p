@@ -2,6 +2,8 @@ package net.i2p.router.transport.udp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -10,6 +12,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Addresses;
@@ -52,7 +55,7 @@ class InboundEstablishState {
     private long _nextSend;
     private final RemoteHostId _remoteHostId;
     private InboundState _currentState;
-    private boolean _complete;
+    private final Queue<OutNetMessage> _queuedMessages;
     // count for backoff
     private int _createdSentCount;
     
@@ -69,7 +72,9 @@ class InboundEstablishState {
         /** we have all the confirmation packets */
         IB_STATE_CONFIRMED_COMPLETELY,
         /** we are explicitly failing it */
-        IB_STATE_FAILED
+        IB_STATE_FAILED,
+        /** Successful completion, PeerState created and added to transport */
+        IB_STATE_COMPLETE
     }
     
     /** basic delay before backoff */
@@ -89,17 +94,44 @@ class InboundEstablishState {
         _currentState = InboundState.IB_STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
         _keyBuilder = dh;
+        _queuedMessages = new LinkedBlockingQueue();
     }
     
     public synchronized InboundState getState() { return _currentState; }
 
     /** @return if previously complete */
-    public synchronized boolean complete() { 
-        boolean already = _complete; 
-        _complete = true; 
-        return already; 
+    public synchronized boolean isComplete() { 
+        return _currentState == InboundState.IB_STATE_COMPLETE ||
+               _currentState == InboundState.IB_STATE_FAILED;
+    }
+
+    /** Notify successful completion */
+    public synchronized void complete() { 
+        _currentState = InboundState.IB_STATE_COMPLETE;
     }
     
+    /**
+     *  Queue a message to be sent after the session is established.
+     *  This will only happen if we decide to send something during establishment
+     *  @since 0.9.2
+     */
+    public void addMessage(OutNetMessage msg) {
+        // chance of a duplicate here in a race, that's ok
+        if (!_queuedMessages.contains(msg))
+            _queuedMessages.offer(msg);
+        else if (_log.shouldLog(Log.WARN))
+             _log.warn("attempt to add duplicate msg to queue: " + msg);
+    }
+
+    /**
+     *  Pull from the message queue
+     *  @return null if none
+     *  @since 0.9.2
+     */
+    public OutNetMessage getNextQueuedMessage() { 
+        return _queuedMessages.poll();
+    }
+
     public synchronized void receiveSessionRequest(UDPPacketReader.SessionRequestReader req) {
         if (_receivedX == null)
             _receivedX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
@@ -200,8 +232,8 @@ class InboundEstablishState {
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuilder buf = new StringBuilder(128);
             buf.append("Signing sessionCreated:");
-            buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
-            buf.append(" SentY: ").append(Base64.encode(_sentY));
+            //buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
+            //buf.append(" SentY: ").append(Base64.encode(_sentY));
             buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
             buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
             buf.append(" RelayTag: ").append(_sentRelayTag);
@@ -370,15 +402,15 @@ class InboundEstablishState {
     @Override
     public String toString() {            
         StringBuilder buf = new StringBuilder(128);
-        buf.append("IES ").append(super.toString());
+        buf.append("IES ");
+        buf.append(Addresses.toString(_aliceIP, _alicePort));
         if (_receivedX != null)
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
         if (_sentY != null)
             buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
-        buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
-        buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
+        //buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
         buf.append(" RelayTag: ").append(_sentRelayTag);
-        buf.append(" SignedOn: ").append(_sentSignedOnTime);
+        //buf.append(" SignedOn: ").append(_sentSignedOnTime);
         buf.append(' ').append(_currentState);
         return buf.toString();
     }
