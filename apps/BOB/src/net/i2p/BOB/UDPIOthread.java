@@ -111,7 +111,7 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 	 * @param size
 	 */
 	public void messageAvailable(I2PSession session, int msgId, long size) {
-//		_log.debug("Message available: id = " + msgId + " size = " + size);
+		//		_log.debug("Message available: id = " + msgId + " size = " + size);
 		try {
 			byte msg[] = session.receiveMessage(msgId);
 			out.write(msg);

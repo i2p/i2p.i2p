@@ -108,16 +108,6 @@ public class MUXlisten implements Runnable {
 				this.listener = new ServerSocket(port, backlog, host);
 			}
 			socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
-		// I2PException, IOException, RuntimeException
-		// To bad we can't just catch and enumerate....
-		// } catch (I2PException e) {
-		// Something went bad.
-		//	this.database.getWriteLock();
-		//	this.info.getWriteLock();
-		//	this.info.add("STARTING", new Boolean(false));
-		//	this.info.releaseWriteLock();
-		//	this.database.releaseWriteLock();
-		//	throw new I2PException(e);
 		} catch (IOException e) {
 			// Something went bad.
 			this.database.getWriteLock();
@@ -194,7 +184,6 @@ public class MUXlisten implements Runnable {
 				lock.set(false);
 				return;
 			}
-//		socketManager.addDisconnectListener(new DisconnectListener());
 			lives.set(true);
 			lock.set(false);
 			quit:
@@ -347,7 +336,6 @@ public class MUXlisten implements Runnable {
 				String boner = tg.getName();
 				// System.out.println("BOB: MUXlisten: Starting thread collection for: " + boner);
 				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
-				// tg.interrupt(); // give my stuff a small smack again.
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
 					// visit(tg, 0, boner);
 					int foo = tg.activeCount() + tg.activeGroupCount();

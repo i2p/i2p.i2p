@@ -41,7 +41,6 @@ public class I2Plistener implements Runnable {
 
 	private NamedDB info,  database;
 	private Log _log;
-//	private int tgwatch;
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
 	private AtomicBoolean lives;
@@ -103,7 +102,7 @@ public class I2Plistener implements Runnable {
 				serverSocket.close();
 			} catch (I2PException ex) {
 			}
-		// System.out.println("I2Plistener: Close");
+			// System.out.println("I2Plistener: Close");
 		}
 	}
 }

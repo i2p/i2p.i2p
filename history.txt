@@ -1,3 +1,7 @@
+2012-08-17 sponge
+ * BOB: just some cleanup of old, dead meaningless commentedout code
+        and a little reformatting.
+
 2012-08-15 zzz
  * i2psnark:
    - Fix bug preventing completion announcement, broken in 0.9.1

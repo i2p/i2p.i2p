@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-// import net.i2p.client.I2PSession;
-// import net.i2p.client.I2PSessionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;

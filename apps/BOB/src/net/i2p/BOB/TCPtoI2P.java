@@ -108,20 +108,18 @@ public class TCPtoI2P implements Runnable {
 	 * @throws java.io.IOException
 	 */
 	private void Emsg(String e, OutputStream out) throws IOException {
-// Debugging		System.out.println("ERROR TCPtoI2P: " + e);
+		// Debugging		System.out.println("ERROR TCPtoI2P: " + e);
 		out.write("ERROR ".concat(e).getBytes());
 		out.write(13);
 		out.write(10);
 		out.flush();
 	}
 
-//	private void rlock() throws Exception {
 	private void rlock() {
 		database.getReadLock();
 		info.getReadLock();
 	}
 
-//	private void runlock() throws Exception {
 	private void runlock() {
 		info.releaseReadLock();
 		database.releaseReadLock();
