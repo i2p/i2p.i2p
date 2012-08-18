@@ -15,7 +15,7 @@ rem
 
 rem -----------------------------------------------------------------------------
 rem These settings can be modified to fit the needs of your application
-rem Optimized for use with version 3.5.9 of the Wrapper.
+rem Optimized for use with version 3.5.14 of the Wrapper.
 
 rem The base name for the Wrapper binary.
 set _WRAPPER_BASE=i2psvc
@@ -87,10 +87,7 @@ set _WRAPPER_CONF="%_WRAPPER_CONF_DEFAULT%"
 :: isn't installed there isn't anything for us to do
 :: other than exit.
 "%_WRAPPER_EXE%" -qs %_WRAPPER_CONF%
-if %errorlevel%==0 (
-     echo The I2P Service service was not installed.
-     goto eof
-)
+if %errorlevel%==0 goto eof
 
 call "%_REALPATH%"\set_config_dir_for_nt_service.bat uninstall
 rem
@@ -99,7 +96,5 @@ rem
 :startup
 "%_WRAPPER_EXE%" -r %_WRAPPER_CONF%
 if not errorlevel 1 goto :eof
-if "%2"=="--nopause" goto :eof
-pause
 
 :eof

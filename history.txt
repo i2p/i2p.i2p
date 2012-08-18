@@ -1,3 +1,6 @@
+2012-08-18 kytv
+ * Fix hang during uninstallation experienced by some users in Windows
+
 2012-08-17 zzz
  * i2psnark:
    - Adjust DHT timeouts
