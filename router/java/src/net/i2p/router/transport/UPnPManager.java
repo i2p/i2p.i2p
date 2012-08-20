@@ -152,7 +152,7 @@ class UPnPManager {
                 else
                     continue;
                 boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
-                _manager.forwardPortStatus(style, fp.portNumber, success, fps.reasonString);
+                _manager.forwardPortStatus(style, fp.portNumber, fps.externalPort, success, fps.reasonString);
             }
         }
     }

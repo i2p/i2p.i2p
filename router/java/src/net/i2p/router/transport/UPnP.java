@@ -7,9 +7,10 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -25,6 +26,7 @@ import org.cybergarage.upnp.Device;
 import org.cybergarage.upnp.DeviceList;
 import org.cybergarage.upnp.Service;
 import org.cybergarage.upnp.ServiceList;
+import org.cybergarage.upnp.UPnPStatus;
 import org.cybergarage.upnp.device.DeviceChangeListener;
 import org.cybergarage.upnp.event.EventListener;
 import org.freenetproject.DetectedIP;
@@ -161,6 +163,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 	}
 	
+	/**
+	 *  DeviceChangeListener
+	 */
 	public void deviceAdded(Device dev) {
 		synchronized (lock) {
 			if(isDisabled) {
@@ -279,6 +284,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		this.unregisterPorts(ports);
 	}
 	
+	/**
+	 *  DeviceChangeListener
+	 */
 	public void deviceRemoved(Device dev ){
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
@@ -298,7 +306,10 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 	}
 	
-	/** event callback - unused for now - how many devices support events? */
+	/**
+	 *  EventListener callback -
+	 *  unused for now - how many devices support events?
+	 */
 	public void eventNotifyReceived(String uuid, long seq, String varName, String value) {
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
@@ -535,7 +546,10 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		return sb.toString();
 	}
 	
-	/** blocking */
+	/**
+	 *  This always requests that the external port == the internal port, for now.
+	 *  Blocking!
+	 */
 	private boolean addMapping(String protocol, int port, String description, ForwardPort fp) {
 		if(isDisabled || !isNATPresent() || _router == null) {
                         _log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
@@ -568,12 +582,42 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		add.setArgumentValue("NewEnabled","1");
 		add.setArgumentValue("NewLeaseDuration", 0);
 		
-		if(add.postControlAction()) {
+		boolean rv = add.postControlAction();
+		if(rv) {
 			synchronized(lock) {
 				portsForwarded.add(fp);
 			}
-			return true;
-		} else return false;
+		}
+
+		int level = rv ? Log.INFO : Log.WARN;
+		if (_log.shouldLog(level)) {
+			StringBuilder buf = new StringBuilder();
+			buf.append("AddPortMapping result for ").append(protocol).append(" port ").append(port);
+			// Not sure which of these has the good info
+			UPnPStatus status = add.getStatus();
+			if (status != null)
+			    buf.append(" Status: ").append(status.getCode()).append(' ').append(status.getDescription());
+			status = add.getControlStatus();
+			if (status != null)
+			    buf.append(" ControlStatus: ").append(status.getCode()).append(' ').append(status.getDescription());
+			_log.log(level, buf.toString());
+		}
+
+		// TODO if port is busy, retry with wildcard external port ??
+		// from spec:
+		// 402 Invalid Args See UPnP Device Architecture section on Control.
+		// 501 Action Failed See UPnP Device Architecture section on Control.
+		// 715 WildCardNotPermittedInSrcIP The source IP address cannot be wild-carded
+		// 716 WildCardNotPermittedInExtPort The external port cannot be wild-carded
+		// 718 ConflictInMappingEntry The port mapping entry specified conflicts with a mapping assigned previously to another client
+		// 724 SamePortValuesRequired Internal and External port values must be the same
+		// 725 OnlyPermanentLeasesSupported The NAT implementation only supports permanent lease times on port mappings
+		// 726 RemoteHostOnlySupportsWildcard RemoteHost must be a wildcard and cannot be a specific IP address or DNS name
+		// 727 ExternalPortOnlySupportsWildcard ExternalPort must be a wildcard and cannot be a specific port value
+
+		// TODO return error code and description for display
+
+		return rv;
 	}
 
 	/**
@@ -667,8 +711,10 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	}
 
 	/**
+	 *  Registers a callback when the given ports change.
 	 *  non-blocking
 	 *  @param ports non-null
+	 *  @param cb in UPnPManager
 	 */
 	public void onChangePublicPorts(Set<ForwardPort> ports, ForwardPortCallback cb) {
 		Set<ForwardPort> portsToDumpNow = null;
@@ -760,10 +806,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 
 		public void run() {
-			HashMap<ForwardPort, ForwardPortStatus> map = new HashMap(1);
 			for(ForwardPort port : portsToForwardNow) {
 				String proto = protoToString(port.protocol);
-				map.clear();
 				ForwardPortStatus fps;
 				if (proto.length() <= 1) {
 					fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber);
@@ -772,7 +816,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				} else {
 					fps = new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber);
 				}
-				map.put(port, fps);
+				Map map = Collections.singletonMap(port, fps);
 				forwardCallback.portForwardStatus(map);
 			}
 		}

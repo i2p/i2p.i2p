@@ -102,11 +102,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int DROPLIST_PERIOD = 10*60*1000;
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
-    /** now unused, we pick a random port */
+
+    /** now unused, we pick a random port
+     *  @deprecated unused
+     */
     public static final int DEFAULT_INTERNAL_PORT = 8887;
-    /** since fixed port defaults to true, this doesnt do anything at the moment.
-     *  We should have an exception if it matches the existing low port. */
+
+    /** Limits on port told to us by others,
+     *  We should have an exception if it matches the existing low port.
+     */
     private static final int MIN_EXTERNAL_PORT = 1024;
+    private static final int MAX_EXTERNAL_PORT = 65535;
 
     /** define this to explicitly set an external IP address */
     public static final String PROP_EXTERNAL_HOST = "i2np.udp.host";
@@ -125,9 +131,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_PREFER_UDP = "i2np.udp.preferred";
     private static final String DEFAULT_PREFER_UDP = "false";
     
-    /** if true (default), we don't change our advertised port no matter what our peers tell us */
-    public static final String PROP_FIXED_PORT = "i2np.udp.fixedPort";
-    private static final String DEFAULT_FIXED_PORT = "true";
+    /** Override whether we will change our advertised port no matter what our peers tell us
+     *  See getIsPortFixed() for default behaviour.
+     */
+    private static final String PROP_FIXED_PORT = "i2np.udp.fixedPort";
 
     /** allowed sources of address updates */
     public static final String PROP_SOURCES = "i2np.udp.addressSources";
@@ -480,10 +487,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Don't do anything if UPnP claims failure.
      */
     @Override
-    public void forwardPortStatus(int port, boolean success, String reason) {
+    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {
             if (success)
-                _log.warn("UPnP has opened the SSU port: " + port);
+                _log.warn("UPnP has opened the SSU port: " + port + " via external port: " + externalPort);
             else
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
@@ -509,7 +516,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
         boolean isValid = isValid(ourIP) &&
-                          (ourPort >= MIN_EXTERNAL_PORT || ourPort == _externalListenPort || _externalListenPort <= 0);
+                          ((ourPort >= MIN_EXTERNAL_PORT && ourPort <= MAX_EXTERNAL_PORT) ||
+                           ourPort == _externalListenPort || _externalListenPort <= 0);
         boolean explicitSpecified = explicitAddressSpecified();
         boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
@@ -561,7 +569,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ourPort >= 1024 or 0 for no change
      */
     private boolean changeAddress(byte ourIP[], int ourPort) {
-        /** this defaults to true, which means we never change our external port based on what somebody tells us */
+        // this defaults to true when we are firewalled and false otherwise.
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         boolean fireTest = false;
@@ -583,7 +591,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
                             // fixed port defaults to true so we never do this
-                            if (ourPort >= MIN_EXTERNAL_PORT && !fixedPort)
+                            if (ourPort >= MIN_EXTERNAL_PORT && ourPort <= MAX_EXTERNAL_PORT && !fixedPort)
                                 _externalListenPort = ourPort;
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Trying to change our external address to " +
@@ -614,9 +622,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
         if (fireTest) {
-            _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1, 0);
+            _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1);
         } else if (updated) {
-            _context.statManager().addRateData("udp.addressUpdated", 1, 0);
+            _context.statManager().addRateData("udp.addressUpdated", 1);
             Map<String, String> changes = new HashMap();
             if (!fixedPort)
                 changes.put(PROP_EXTERNAL_PORT, Integer.toString(ourPort));
@@ -669,16 +677,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (rport == lport) && DataHelper.eq(laddr, raddr);
     }
     
+    /** @param addr may be null */
     public final boolean isValid(byte addr[]) {
         if (addr == null) return false;
-        if (addr.length < 4) return false;
         if (isPubliclyRoutable(addr)) 
             return true;
         return _context.getBooleanProperty("i2np.udp.allowLocal");
     }
     
+    /**
+     *  Was true before 0.9.2
+     *  Now false if we need introducers (as perhaps that's why we need them,
+     *  our firewall is changing our port), unless overridden by the property.
+     */
     private boolean getIsPortFixed() {
-        return DEFAULT_FIXED_PORT.equals(_context.getProperty(PROP_FIXED_PORT, DEFAULT_FIXED_PORT));
+        String prop = _context.getProperty(PROP_FIXED_PORT);
+        if (prop != null)
+            return Boolean.valueOf(prop).booleanValue();
+        int status = getReachabilityStatus();
+        return status != CommSystemFacade.STATUS_REJECT_UNSOLICITED;
     }
 
     /** 
@@ -862,7 +879,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (peer != null) {
                     RemoteHostId remote = peer.getRemoteHostId();
                     _dropList.add(remote);
-                    _context.statManager().addRateData("udp.dropPeerDroplist", 1, 0);
+                    _context.statManager().addRateData("udp.dropPeerDroplist", 1);
                     _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
@@ -2360,17 +2377,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         long now = _context.clock().now();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
-                _context.statManager().addRateData("udp.statusOK", 1, 0);
+                // TODO if OK but internal port != external port, should we have
+                // a different status state? ...as we don't know if the TCP
+                // port will be mapped the same way or not...
+                // Right now, we assume it is and hope for the best for TCP.
+                _context.statManager().addRateData("udp.statusOK", 1);
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
                 break;
             case CommSystemFacade.STATUS_DIFFERENT:
-                _context.statManager().addRateData("udp.statusDifferent", 1, 0);
+                _context.statManager().addRateData("udp.statusDifferent", 1);
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
                 break;
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                _context.statManager().addRateData("udp.statusReject", 1, 0);
+                _context.statManager().addRateData("udp.statusReject", 1);
 // if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
 //
                 // fall through...
@@ -2380,7 +2401,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
             case CommSystemFacade.STATUS_UNKNOWN:
             default:
-                _context.statManager().addRateData("udp.statusUnknown", 1, 0);
+                _context.statManager().addRateData("udp.statusUnknown", 1);
                 //if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
                 //    _testEvent.forceRun();
                 //    SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);

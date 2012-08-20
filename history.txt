@@ -1,3 +1,13 @@
+2012-08-20 zzz
+ * I2CP: MessageStatus cleanup
+ * i2psnark: Add minimum tracker and DHT announce intervals
+ * I2PTunnelRunner: Remove unnecessary lock (ticket #690)
+ * SSU: Allow port change if firewalled
+ * Streaming: Increase max connection timeout
+ * UPnP:
+   - Prep for UPnP returning different external port
+   - Better logging of errors
+
 2012-08-18 kytv
  * Fix hang during uninstallation experienced by some users in Windows
 
@@ -8,7 +18,7 @@
    - Remove duplicate clean task for nodes
    - Fix another DHT warning message
  * SSU:
-   - Use remote MTU when published (ticket #687)
+   - Use remote MTU when published (ticket #682)
    - Queue outbound msgs during inbound establish
    - IntroManager cleanups
    - More synchronization

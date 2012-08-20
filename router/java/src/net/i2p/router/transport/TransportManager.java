@@ -130,10 +130,10 @@ public class TransportManager implements TransportEventListener {
      * callback from UPnP
      *
      */
-    public void forwardPortStatus(String style, int port, boolean success, String reason) {
+    public void forwardPortStatus(String style, int port, int externalPort, boolean success, String reason) {
         Transport t = getTransport(style);
         if (t != null)
-            t.forwardPortStatus(port, success, reason);
+            t.forwardPortStatus(port, externalPort, success, reason);
     }
 
     public void startListening() {

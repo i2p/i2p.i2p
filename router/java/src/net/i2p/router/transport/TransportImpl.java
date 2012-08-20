@@ -477,9 +477,12 @@ public abstract class TransportImpl implements Transport {
     public void externalAddressReceived(String source, byte[] ip, int port) {}
 
     /**
-     *  Notify a transport of the results of trying to forward a port
+     *  Notify a transport of the results of trying to forward a port.
+     *  @param port the internal port
+     *  @param externalPort the external port, which for now should always be the same as
+     *                      the internal port if the forwarding was successful.
      */
-    public void forwardPortStatus(int port, boolean success, String reason) {}
+    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {}
 
     /**
      * What port would the transport like to have forwarded by UPnP.
@@ -583,15 +586,18 @@ public abstract class TransportImpl implements Transport {
         return _IPMap.get(peer);
     }
 
+    /** @param addr non-null */
     public static boolean isPubliclyRoutable(byte addr[]) {
         if (addr.length == 4) {
-            if ((addr[0]&0xFF) == 127) return false;
-            if ((addr[0]&0xFF) == 10) return false;
-            if ( ((addr[0]&0xFF) == 172) && ((addr[1]&0xFF) >= 16) && ((addr[1]&0xFF) <= 31) ) return false;
-            if ( ((addr[0]&0xFF) == 192) && ((addr[1]&0xFF) == 168) ) return false;
-            if ((addr[0]&0xFF) >= 224) return false; // no multicast
-            if ((addr[0]&0xFF) == 0) return false;
-            if ( ((addr[0]&0xFF) == 169) && ((addr[1]&0xFF) == 254) ) return false;
+            int a0 = addr[0] & 0xFF;
+            if (a0 == 127) return false;
+            if (a0 == 10) return false;
+            int a1 = addr[1] & 0xFF;
+            if (a0 == 172 && a1 >= 16 && a1 <= 31) return false;
+            if (a0 == 192 && a1 == 168) return false;
+            if (a0 >= 224) return false; // no multicast
+            if (a0 == 0) return false;
+            if (a0 == 169 && a1 == 254) return false;
             // 5/8 allocated to RIPE (30 November 2010)
             //if ((addr[0]&0xFF) == 5) return false;  // Hamachi
             return true; // or at least possible to be true

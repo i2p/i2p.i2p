@@ -664,7 +664,7 @@ public class NTCPTransport extends TransportImpl {
      *  NTCP address when it transitions to OK.
      */
     @Override
-    public void forwardPortStatus(int port, boolean success, String reason) {
+    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {
             if (success)
                 _log.warn("UPnP has opened the NTCP port: " + port);
