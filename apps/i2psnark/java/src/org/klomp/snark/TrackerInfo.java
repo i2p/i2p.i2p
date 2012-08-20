@@ -38,7 +38,7 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
  *  Compact format 1 - a list of hashes - early format for testing
  *  Compact format 2 - One big string of concatenated hashes - official format
  */
-public class TrackerInfo
+class TrackerInfo
 {
   private final String failure_reason;
   private final int interval;
@@ -195,6 +195,7 @@ public class TrackerInfo
     return failure_reason;
   }
 
+  /** in seconds */
   public int getInterval()
   {
     return interval;

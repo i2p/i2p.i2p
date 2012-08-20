@@ -39,7 +39,6 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.util.Clock;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
@@ -79,6 +78,8 @@ public class TrackerClient implements Runnable {
   private final static int INITIAL_SLEEP = 90*1000;
   private final static int MAX_CONSEC_FAILS = 5;    // slow down after this
   private final static int LONG_SLEEP = 30*60*1000; // sleep a while after lots of fails
+  private final static long MIN_TRACKER_ANNOUNCE_INTERVAL = 10*60*1000;
+  private final static long MIN_DHT_ANNOUNCE_INTERVAL = 10*60*1000;
 
   private final I2PSnarkUtil _util;
   private final MetaInfo meta;
@@ -103,7 +104,7 @@ public class TrackerClient implements Runnable {
   private volatile  int consecutiveFails;
   private boolean completed;
   private volatile boolean _fastUnannounce;
-
+  private long lastDHTAnnounce;
   private final List<Tracker> trackers;
 
   /**
@@ -214,7 +215,7 @@ public class TrackerClient implements Runnable {
    *  This will take several seconds to several minutes.
    */
   public void run() {
-      long begin = Clock.getInstance().now();
+      long begin = _util.getContext().clock().now();
       if (_log.shouldLog(Log.DEBUG))
           _log.debug("Start " + Thread.currentThread().getName());
       try {
@@ -243,7 +244,7 @@ public class TrackerClient implements Runnable {
           _thread = null;
           if (_log.shouldLog(Log.DEBUG))
               _log.debug("Finish " + Thread.currentThread().getName() +
-                         " after " + DataHelper.formatDuration(Clock.getInstance().now() - begin));
+                         " after " + DataHelper.formatDuration(_util.getContext().clock().now() - begin));
       }
   }
 
@@ -459,15 +460,18 @@ public class TrackerClient implements Runnable {
             // Get peers from DHT
             // FIXME this needs to be in its own thread
             dht = _util.getDHT();
-            if (dht != null && (meta == null || !meta.isPrivate()) && !stop) {
+            if (dht != null && (meta == null || !meta.isPrivate()) && (!stop) &&
+                _util.getContext().clock().now() >  lastDHTAnnounce + MIN_DHT_ANNOUNCE_INTERVAL) {
                 int numwant;
                 if (event.equals(STOPPED_EVENT) || !coordinator.needOutboundPeers())
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
                 Collection<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 2*60*1000);
-                if (!hashes.isEmpty())
+                if (!hashes.isEmpty()) {
                     runStarted = true;
+                    lastDHTAnnounce = _util.getContext().clock().now();
+                }
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Got " + hashes + " from DHT");
                 // announce  ourselves while the token is still good
@@ -655,7 +659,7 @@ public class TrackerClient implements Runnable {
         if (failure != null)
           throw new IOException(failure);
 
-        tr.interval = info.getInterval() * 1000;
+        tr.interval = Math.max(MIN_TRACKER_ANNOUNCE_INTERVAL, info.getInterval() * 1000l);
         return info;
     } finally {
         if (in != null) try { in.close(); } catch (IOException ioe) {}
