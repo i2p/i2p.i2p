@@ -87,6 +87,9 @@ class Connection {
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static final int DISCONNECT_TIMEOUT = 5*60*1000;
     
+    private static final long DEFAULT_CONNECT_TIMEOUT = 60*1000;
+    private static final long MAX_CONNECT_TIMEOUT = 2*60*1000;
+
     public static final int MAX_WINDOW_SIZE = 128;
     
 /****
@@ -883,10 +886,10 @@ class Connection {
                     _log.debug("waitForConnect(): timed out: " + _connectionError);
                 return;
             }
-            if (timeLeft > 60*1000)
-                timeLeft = 60*1000;
-            if (_options.getConnectTimeout() <= 0)
-                timeLeft = 60*1000;
+            if (timeLeft > MAX_CONNECT_TIMEOUT)
+                timeLeft = MAX_CONNECT_TIMEOUT;
+            else if (_options.getConnectTimeout() <= 0)
+                timeLeft = DEFAULT_CONNECT_TIMEOUT;
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("waitForConnect(): wait " + timeLeft);
