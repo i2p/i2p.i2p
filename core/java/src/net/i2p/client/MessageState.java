@@ -12,22 +12,24 @@ import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.util.Log;
 
 /**
- * Contains the state of a payload message being sent to a peer
+ * Contains the state of a payload message being sent to a peer.
  *
+ * This is mostly unused. See sendNoEffort vs. sendBestEffort in I2PSessionImpl2.
+ * TODO delete altogether? This is really bad.
  */
 class MessageState {
-    private I2PAppContext _context;
-    private final static Log _log = new Log(MessageState.class);
-    private long _nonce;
-    private String _prefix;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final long _nonce;
+    private final String _prefix;
     private MessageId _id;
-    private final Set _receivedStatus;
+    private final Set<Integer> _receivedStatus;
     private SessionKey _key;
     private SessionKey _newKey;
     private Set _tags;
     private Destination _to;
     private boolean _cancelled;
-    private long _created;
+    private final long _created;
 
     private static long __stateId = 0;
     private long _stateId;
@@ -35,6 +37,7 @@ class MessageState {
     public MessageState(I2PAppContext ctx, long nonce, String prefix) {
         _stateId = ++__stateId;
         _context = ctx;
+        _log = ctx.logManager().getLog(MessageState.class);
         _nonce = nonce;
         _prefix = prefix + "[" + _stateId + "]: ";
         _receivedStatus = new HashSet();
@@ -61,28 +64,34 @@ class MessageState {
         return _nonce;
     }
 
+    /** @deprecated unused */
     public void setKey(SessionKey key) {
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug(_prefix + "Setting key [" + _key + "] to [" + key + "]");
         _key = key;
     }
 
+    /** @deprecated unused */
     public SessionKey getKey() {
         return _key;
     }
 
+    /** @deprecated unused */
     public void setNewKey(SessionKey key) {
         _newKey = key;
     }
 
+    /** @deprecated unused */
     public SessionKey getNewKey() {
         return _newKey;
     }
 
+    /** @deprecated unused */
     public void setTags(Set tags) {
         _tags = tags;
     }
 
+    /** @deprecated unused */
     public Set getTags() {
         return _tags;
     }
@@ -91,6 +100,7 @@ class MessageState {
         _to = dest;
     }
 
+    /** @deprecated unused */
     public Destination getTo() {
         return _to;
     }
@@ -256,7 +266,7 @@ class MessageState {
         return rv;
     }
 
-    /** true if the given status (or an equivilant) was received */
+    /** #return true if the given status (or an equivalent) was received */
     public boolean received(int status) {
         synchronized (_receivedStatus) {
             return locked_isSuccess(status);
