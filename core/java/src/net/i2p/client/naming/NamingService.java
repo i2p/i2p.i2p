@@ -31,8 +31,6 @@ public abstract class NamingService {
     protected final Set<NamingServiceListener> _listeners;
     protected final Set<NamingServiceUpdater> _updaters;
 
-    private static NamingService instance;
-
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";
     private static final String DEFAULT_IMPL = "net.i2p.client.naming.BlockfileNamingService";
@@ -453,27 +451,26 @@ public abstract class NamingService {
      * choose the implementation from the "i2p.naming.impl" system
      * property.
      *
+     * FIXME Actually, it doesn't ensure that. Only call this once!!!
      */
     public static final synchronized NamingService createInstance(I2PAppContext context) {
-        if (instance instanceof NamingService) {
-            return instance;
-        }
-        String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL); 
+        NamingService instance = null;
+        String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL);
         try {
             Class cls = Class.forName(impl);
             Constructor con = cls.getConstructor(new Class[] { I2PAppContext.class });
             instance = (NamingService)con.newInstance(new Object[] { context });
-        } catch (Exception ex) { 
-            Log log = context.logManager().getLog(NamingService.class); 
-            // Blockfile may throw RuntimeException but HostsTxt won't 
-            if (!impl.equals(BACKUP_IMPL)) { 
-                log.error("Cannot load naming service " + impl + ", using HostsTxtNamingService", ex); 
-                instance = new HostsTxtNamingService(context); 
-            } else { 
-                log.error("Cannot load naming service " + impl + ", only .b32.i2p lookups will succeed", ex); 
-                instance = new DummyNamingService(context); 
-            } 
-        } 
+        } catch (Exception ex) {
+            Log log = context.logManager().getLog(NamingService.class);
+            // Blockfile may throw RuntimeException but HostsTxt won't
+            if (!impl.equals(BACKUP_IMPL)) {
+                log.error("Cannot load naming service " + impl + ", using HostsTxtNamingService", ex);
+                instance = new HostsTxtNamingService(context);
+            } else {
+                log.error("Cannot load naming service " + impl + ", only .b32.i2p lookups will succeed", ex);
+                instance = new DummyNamingService(context);
+            }
+        }
         return instance;
     }
 
