@@ -145,7 +145,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialI2PData != null) {
                 // why synchronize this? we could be in here a LONG time for large initial data
-                synchronized (slock) {
+                //synchronized (slock) {
                     // this does not increment totalSent
                     i2pout.write(initialI2PData);
                     // do NOT flush here, it will block and then onTimeout.run() won't happen on fail.
@@ -159,7 +159,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // only flush if it fits in one message.
                     if (initialI2PData.length <= 1730)   // ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE
                         i2pout.flush();
-                }
+                //}
             }
             if (initialSocketData != null) {
                 // this does not increment totalReceived
