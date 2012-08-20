@@ -61,7 +61,7 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getConfiguredUdpPort() {
-        return "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
+        return _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
     }
 
     /** @param prop must default to false */

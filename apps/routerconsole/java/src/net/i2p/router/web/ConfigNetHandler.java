@@ -224,7 +224,7 @@ public class ConfigNetHandler extends FormHandler {
 
             // UDP Settings
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
-                String oldPort = "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
+                String oldPort = _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
                 if (!oldPort.equals(_udpPort)) {
                     changes.put(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
                     changes.put(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
