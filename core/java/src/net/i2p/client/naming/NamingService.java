@@ -155,6 +155,7 @@ public abstract class NamingService {
     /**
      * Only for chaining-capable NamingServices. Add to end of the list.
      * @return success
+     * @since 0.8.7
      */
     public boolean addNamingService(NamingService ns) {
         return addNamingService(ns, false);
@@ -165,6 +166,7 @@ public abstract class NamingService {
      * Only for chaining-capable NamingServices
      * @param head or tail
      * @return success
+     * @since 0.8.7
      */
     public boolean addNamingService(NamingService ns, boolean head) {
         return false;
@@ -446,6 +448,9 @@ public abstract class NamingService {
     //// End New API
 
     /**
+     * WARNING - for use by I2PAppContext only - others must use
+     * I2PAppContext.namingService()
+     *
      * Get a naming service instance. This method ensures that there
      * will be only one naming service instance (singleton) as well as
      * choose the implementation from the "i2p.naming.impl" system
