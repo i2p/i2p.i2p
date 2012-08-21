@@ -719,8 +719,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	public void onChangePublicPorts(Set<ForwardPort> ports, ForwardPortCallback cb) {
 		Set<ForwardPort> portsToDumpNow = null;
 		Set<ForwardPort> portsToForwardNow = null;
-		if (_log.shouldLog(Log.WARN))
-			_log.warn("UP&P Forwarding "+ports.size()+" ports...");
+		if (_log.shouldLog(Log.INFO))
+			_log.info("UP&P Forwarding "+ports.size()+" ports...");
 		synchronized(lock) {
 			if(forwardCallback != null && forwardCallback != cb && cb != null) {
 				_log.error("ForwardPortCallback changed from "+forwardCallback+" to "+cb+" - using new value, but this is very strange!");
