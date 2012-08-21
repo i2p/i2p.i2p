@@ -1,3 +1,16 @@
+2012-08-21 zzz
+ * NetDB: Decrease stat publish probability
+ * SSU:
+   - Use external, not internal port to sign SessionCreated message.
+     Together with previous fix to allow external port change, this
+     should fix session establish fails when NAT changes our port
+   - Track outbound establishments by both Hash and IP/port,
+     to improve lookups of establishments in progress
+   - Fix expiration of outbound establishments
+   - Validate address/port in RelayResponse messages
+   - Change RemoteHostID to store Hash instead of byte[] for the peer hash
+   - Log tweaks
+
 2012-08-20 zzz
  * I2CP: MessageStatus cleanup
  * i2psnark: Add minimum tracker and DHT announce intervals

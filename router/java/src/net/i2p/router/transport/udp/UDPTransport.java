@@ -689,6 +689,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Was true before 0.9.2
      *  Now false if we need introducers (as perhaps that's why we need them,
      *  our firewall is changing our port), unless overridden by the property.
+     *  We must have an accurate external port when firewalled, or else
+     *  our signature of the SessionCreated packet will be invalid.
      */
     private boolean getIsPortFixed() {
         String prop = _context.getProperty(PROP_FIXED_PORT);
@@ -797,6 +799,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (remoteId == null) return false;
+        // Should always be direct... except maybe for hidden mode?
+        // or do we always know the IP by now?
         if (remoteId.getIP() == null && _log.shouldLog(Log.WARN))
             _log.warn("Add indirect: " + peer);
 
@@ -1114,8 +1118,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (peer.getCurrentCipherKey() == null)
             return;
         UDPPacket pkt = _destroyBuilder.buildSessionDestroyPacket(peer);
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Sending destroy to : " + peer);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending destroy to : " + peer);
         send(pkt);
     }
 

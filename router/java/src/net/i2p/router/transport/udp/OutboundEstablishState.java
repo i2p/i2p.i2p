@@ -50,6 +50,7 @@ class OutboundEstablishState {
     private long _lastSend;
     private long _nextSend;
     private RemoteHostId _remoteHostId;
+    private final RemoteHostId _claimedAddress;
     private final RouterIdentity _remotePeer;
     private final SessionKey _introKey;
     private final Queue<OutNetMessage> _queuedMessages;
@@ -91,22 +92,25 @@ class OutboundEstablishState {
     private static final long MAX_DELAY = 15*1000;
 
     /**
+     *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
+     *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
      *  @param addr non-null
      */
-    public OutboundEstablishState(RouterContext ctx, InetAddress remoteHost, int remotePort, 
+    public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
+                                  RemoteHostId remoteHostId,
                                   RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
                                   DHSessionKeyBuilder dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
-        if ( (remoteHost != null) && (remotePort > 0) ) {
-            _bobIP = remoteHost.getAddress();
-            _bobPort = remotePort;
-            _remoteHostId = new RemoteHostId(_bobIP, _bobPort);
+        if (claimedAddress != null) {
+            _bobIP = claimedAddress.getIP();
+            _bobPort = claimedAddress.getPort();
         } else {
-            _bobIP = null;
+            //_bobIP = null;
             _bobPort = -1;
-            _remoteHostId = new RemoteHostId(remotePeer.calculateHash().getData());
         }
+        _claimedAddress = claimedAddress;
+        _remoteHostId = remoteHostId;
         _remotePeer = remotePeer;
         _introKey = introKey;
         _queuedMessages = new LinkedBlockingQueue();
@@ -173,9 +177,17 @@ class OutboundEstablishState {
     }
 
     public byte[] getSentX() { return _sentX; }
-    /** the remote side (Bob) */
+
+    /**
+     * The remote side (Bob) - note that in some places he's called Charlie.
+     * Warning - may change after introduction. May be null before introduction.
+     */
     public synchronized byte[] getSentIP() { return _bobIP; }
-    /** the remote side (Bob) */
+
+    /**
+     * The remote side (Bob) - note that in some places he's called Charlie.
+     * Warning - may change after introduction. May be -1 before introduction.
+     */
     public synchronized int getSentPort() { return _bobPort; }
 
     public synchronized void receiveSessionCreated(UDPPacketReader.SessionCreatedReader reader) {
@@ -409,7 +421,8 @@ class OutboundEstablishState {
             delay = RETRANSMIT_DELAY;
             _confirmedSentTime = _lastSend;
         } else {
-            delay = Math.min(RETRANSMIT_DELAY << _confirmedSentCount, MAX_DELAY);
+            delay = Math.min(RETRANSMIT_DELAY << _confirmedSentCount,
+                             _confirmedSentTime + EstablishmentManager.OB_MESSAGE_TIMEOUT - _lastSend);
         }
         _confirmedSentCount++;
         _nextSend = _lastSend + delay;
@@ -437,7 +450,8 @@ class OutboundEstablishState {
             delay = RETRANSMIT_DELAY;
             _requestSentTime = _lastSend;
         } else {
-            delay = Math.min(RETRANSMIT_DELAY << _requestSentCount, MAX_DELAY);
+            delay = Math.min(RETRANSMIT_DELAY << _requestSentCount,
+                             _requestSentTime + EstablishmentManager.OB_MESSAGE_TIMEOUT - _lastSend);
         }
         _requestSentCount++;
         _nextSend = _lastSend + delay;
@@ -463,7 +477,8 @@ class OutboundEstablishState {
             delay = RETRANSMIT_DELAY;
             _introSentTime = _lastSend;
         } else {
-            delay = Math.min(RETRANSMIT_DELAY << _introSentCount, MAX_DELAY);
+            delay = Math.min(RETRANSMIT_DELAY << _introSentCount,
+                             _introSentTime + EstablishmentManager.OB_MESSAGE_TIMEOUT - _lastSend);
         }
         _introSentCount++;
         _nextSend = _lastSend + delay;
@@ -484,17 +499,24 @@ class OutboundEstablishState {
     }
     
     /**
-     *  This changes the remoteHostId from a hash-based one to a IP/Port one,
-     *  OR the IP or port could change.
+     *  This changes the remoteHostId from a hash-based one or possibly
+     *  incorrect IP/port to what the introducer told us.
+     *  All params are for the remote end (NOT the introducer) and must have been validated already.
      */
-    public synchronized void introduced(InetAddress bob, byte bobIP[], int bobPort) {
+    public synchronized void introduced(byte bobIP[], int bobPort) {
         if (_currentState != OutboundState.OB_STATE_PENDING_INTRO)
             return; // we've already successfully been introduced, so don't overwrite old settings
         _nextSend = _context.clock().now() + 500; // wait briefly for the hole punching
         _currentState = OutboundState.OB_STATE_INTRODUCED;
-        _bobIP = bobIP;
-        _bobPort = bobPort;
-        _remoteHostId = new RemoteHostId(bobIP, bobPort);
+        if (_claimedAddress != null && bobPort == _bobPort && DataHelper.eq(bobIP, _bobIP)) {
+            // he's who he said he was
+            _remoteHostId = _claimedAddress;
+        } else {
+            // no IP/port or wrong IP/port in RI
+            _bobIP = bobIP;
+            _bobPort = bobPort;
+            _remoteHostId = new RemoteHostId(bobIP, bobPort);
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Introduced to " + _remoteHostId + ", now lets get on with establishing");
     }
@@ -504,8 +526,22 @@ class OutboundEstablishState {
     public long getEstablishBeginTime() { return _establishBegin; }
     public synchronized long getNextSendTime() { return _nextSend; }
 
-    /** uniquely identifies an attempt */
+    /**
+     *  This should be what the state is currently indexed by in the _outboundStates table.
+     *  Beware -
+     *  During introduction, this is a router hash.
+     *  After introduced() is called, this is set to the IP/port the introducer told us.
+     *  @return non-null
+     */
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
+
+    /**
+     *  This will never be a hash-based address.
+     *  This is the 'claimed' (unverified) address from the netdb, or null.
+     *  It is not changed after introduction. Use getRemoteHostId() for the verified address.
+     *  @return may be null
+     */
+    RemoteHostId getClaimedAddress() { return _claimedAddress; }
 
     /** we have received a real data packet, so we're done establishing */
     public synchronized void dataReceived() {

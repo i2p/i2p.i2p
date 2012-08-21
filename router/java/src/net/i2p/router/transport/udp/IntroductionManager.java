@@ -12,6 +12,8 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.TransportImpl;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
@@ -141,12 +143,16 @@ class IntroductionManager {
                     _log.info("Peer is idle too long: " + cur);
                 continue;
             }
+            byte[] ip = cur.getRemoteIP();
+            int port = cur.getRemotePort();
+            if (ip == null || !TransportImpl.isPubliclyRoutable(ip) || port <= 0 || port > 65535)
+                continue;
             if (_log.shouldLog(Log.INFO))
                 _log.info("Picking introducer: " + cur);
             cur.setIntroducerTime();
             UDPAddress ura = new UDPAddress(ra);
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + found, cur.getRemoteHostId().toHostString());
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + found, String.valueOf(cur.getRemotePort()));
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + found, Addresses.toString(ip));
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + found, String.valueOf(port));
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + found, Base64.encode(ura.getIntroKey()));
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + found, String.valueOf(cur.getTheyRelayToUsAs()));
             found++;

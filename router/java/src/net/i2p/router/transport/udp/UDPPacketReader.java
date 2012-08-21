@@ -490,22 +490,26 @@ class UDPPacketReader {
      * Helper class to fetch the particular bitfields from the raw packet
      */   
     private class PacketACKBitfield implements ACKBitfield {
-        private int _start;
-        private int _bitfieldStart;
-        private int _bitfieldSize;
+        private final int _start;
+        private final int _bitfieldStart;
+        private final int _bitfieldSize;
+
         public PacketACKBitfield(int start) {
             _start = start;
             _bitfieldStart = start + 4;
-            _bitfieldSize = 1;
+            int bfsz = 1;
             // bitfield is an array of bytes where the high bit is 1 if 
             // further bytes in the bitfield follow
-            while ((_message[_bitfieldStart + _bitfieldSize - 1] & UDPPacket.BITFIELD_CONTINUATION) != 0x0)
-                _bitfieldSize++;
+            while ((_message[_bitfieldStart + bfsz - 1] & UDPPacket.BITFIELD_CONTINUATION) != 0x0)
+                bfsz++;
+            _bitfieldSize = bfsz;
         }
+
         public long getMessageId() { return DataHelper.fromLong(_message, _start, 4); }
         public int getByteLength() { return 4 + _bitfieldSize; }
         public int fragmentCount() { return _bitfieldSize * 7; }
         public boolean receivedComplete() { return false; }
+
         public boolean received(int fragmentNum) {
             if ( (fragmentNum < 0) || (fragmentNum >= _bitfieldSize*7) )
                 return false;
@@ -514,6 +518,7 @@ class UDPPacketReader {
             int flagNum = fragmentNum % 7;
             return (_message[byteNum] & (1 << flagNum)) != 0x0;
         }
+
         @Override
         public String toString() { 
             StringBuilder buf = new StringBuilder(64);

@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.util.Addresses;
 
 /**
@@ -13,7 +14,7 @@ import net.i2p.util.Addresses;
 final class RemoteHostId {
     private final byte _ip[];
     private final int _port;
-    private final byte _peerHash[];
+    private final Hash _peerHash;
     private final int _hashCode;
     
     /** direct */
@@ -22,11 +23,11 @@ final class RemoteHostId {
     }
 
     /** indirect */
-    public RemoteHostId(byte peerHash[]) {
+    public RemoteHostId(Hash peerHash) {
         this(null, 0, peerHash);
     }
     
-    private RemoteHostId(byte ip[], int port, byte peerHash[]) {
+    private RemoteHostId(byte ip[], int port, Hash peerHash) {
         _ip = ip;
         _port = port;
         _peerHash = peerHash;
@@ -40,7 +41,7 @@ final class RemoteHostId {
     public int getPort() { return _port; }
 
     /** @return null if direct */
-    public byte[] getPeerHash() { return _peerHash; }
+    public Hash getPeerHash() { return _peerHash; }
     
     @Override
     public int hashCode() {
@@ -58,18 +59,11 @@ final class RemoteHostId {
     }
     
     @Override
-    public String toString() { return toString(true); }
-
-    private String toString(boolean includePort) {
+    public String toString() {
         if (_ip != null) {
-            if (includePort)
-                return Addresses.toString(_ip, _port);
-            else
-                return Addresses.toString(_ip);
+            return Addresses.toString(_ip, _port);
         } else {
-            return Base64.encode(_peerHash);
+            return _peerHash.toString();
         }
     }
-
-    public String toHostString() { return toString(false); }
 }

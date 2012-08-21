@@ -39,31 +39,7 @@ public class UDPAddress {
     static final int MAX_INTRODUCERS = 3;
 
     public UDPAddress(RouterAddress addr) {
-        parse(addr);
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder rv = new StringBuilder(64);
-        if (_introHosts != null) {
-            for (int i = 0; i < _introHosts.length; i++) {
-                rv.append("ssu://");
-                rv.append(_introTags[i]).append('@');
-                rv.append(_introHosts[i]).append(':').append(_introPorts[i]);
-                //rv.append('/').append(Base64.encode(_introKeys[i]));
-                if (i + 1 < _introKeys.length)
-                    rv.append(", ");
-            }
-        } else {
-            if ( (_host != null) && (_port > 0) )
-                rv.append("ssu://").append(_host).append(':').append(_port);//.append('/').append(Base64.encode(_introKey));
-            else
-                rv.append("ssu://autodetect.not.yet.complete:").append(_port);
-        }
-        return rv.toString();
-    }
-   
-    private void parse(RouterAddress addr) {
+        // TODO make everything final
         if (addr == null) return;
         _host = addr.getOption(PROP_HOST);
         if (_host != null) _host = _host.trim();
@@ -197,5 +173,26 @@ public class UDPAddress {
      */
     int getMTU() {
         return _mtu;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder rv = new StringBuilder(64);
+        if (_introHosts != null) {
+            for (int i = 0; i < _introHosts.length; i++) {
+                rv.append("ssu://");
+                rv.append(_introTags[i]).append('@');
+                rv.append(_introHosts[i]).append(':').append(_introPorts[i]);
+                //rv.append('/').append(Base64.encode(_introKeys[i]));
+                if (i + 1 < _introKeys.length)
+                    rv.append(", ");
+            }
+        } else {
+            if ( (_host != null) && (_port > 0) )
+                rv.append("ssu://").append(_host).append(':').append(_port);//.append('/').append(Base64.encode(_introKey));
+            else
+                rv.append("ssu://autodetect.not.yet.complete:").append(_port);
+        }
+        return rv.toString();
     }
 }

@@ -83,6 +83,10 @@ class InboundEstablishState {
     /** max delay including backoff */
     private static final long MAX_DELAY = 15*1000;
 
+    /**
+     *  @param localPort Must be our external port, otherwise the signature of the
+     &                   SessionCreated message will be bad if the external port != the internal port.
+     */
     public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
                                  DHSessionKeyBuilder dh) {
         _context = ctx;
