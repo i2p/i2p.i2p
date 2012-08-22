@@ -38,7 +38,7 @@ public class SimpleTimer2 {
     private static final int MAX_THREADS = 4;
     private final ScheduledThreadPoolExecutor _executor;
     private final String _name;
-    private int _count;
+    private volatile int _count;
     private final int _threads;
 
     /**
@@ -64,7 +64,6 @@ public class SimpleTimer2 {
      */
     protected SimpleTimer2(I2PAppContext context, String name, boolean prestartAllThreads) {
         _name = name;
-        _count = 0;
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
@@ -127,6 +126,22 @@ public class SimpleTimer2 {
         return _executor.schedule(t, timeoutMs, TimeUnit.MILLISECONDS);
     }
 
+    /** 
+     * state of a given TimedEvent
+     * 
+     * valid transitions:
+     * {IDLE,CANCELLED,RUNNING} -> SCHEDULED [ -> SCHEDULED ]* -> RUNNING -> {IDLE,CANCELLED,SCHEDULED}
+     * {IDLE,CANCELLED,RUNNING} -> SCHEDULED [ -> SCHEDULED ]* -> CANCELLED
+     * 
+     * anything else is invalid.
+     */
+    private enum TimedEventState {
+        IDLE,
+        SCHEDULED,
+        RUNNING,
+        CANCELLED
+    };
+    
     /**
      * Similar to SimpleTimer.TimedEvent but users must extend instead of implement,
      * and all schedule and cancel methods are through this class rather than SimpleTimer2.
@@ -152,17 +167,25 @@ public class SimpleTimer2 {
      */
     public static abstract class TimedEvent implements Runnable {
         private final Log _log;
-        private SimpleTimer2 _pool;
+        private final SimpleTimer2 _pool;
         private int _fuzz;
         protected static final int DEFAULT_FUZZ = 3;
         private ScheduledFuture _future; // _executor.remove() doesn't work so we have to use this
                                          // ... and I expect cancelling this way is more efficient
 
+        /** state of the current event.  All access should be under lock. */
+        private TimedEventState _state;
+        /** absolute time this event should run next time. LOCKING: this */
+        private long _nextRun;
+        /** whether this was scheduled during RUNNING state.  LOCKING: this */
+        private boolean _rescheduleAfterRun;
+        
         /** must call schedule() later */
         public TimedEvent(SimpleTimer2 pool) {
             _pool = pool;
             _fuzz = DEFAULT_FUZZ;
             _log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer2.class);
+            _state = TimedEventState.IDLE;
         }
 
         /** automatically schedules, don't use this one if you have other things to do first */
@@ -177,7 +200,7 @@ public class SimpleTimer2 {
          * an inactivity timer.
          * Default 3 ms.
          */
-        public void setFuzz(int fuzz) {
+        public synchronized void setFuzz(int fuzz) {
             _fuzz = fuzz;
         }
 
@@ -189,11 +212,26 @@ public class SimpleTimer2 {
          */
         public synchronized void schedule(long timeoutMs) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Scheduling: " + this + " timeout = " + timeoutMs);
+                _log.debug("Scheduling: " + this + " timeout = " + timeoutMs + " state: " + _state);
             if (timeoutMs <= 0 && _log.shouldLog(Log.WARN))
                 timeoutMs = 1; // otherwise we may execute before _future is updated, which is fine
                                // except it triggers 'early execution' warning logging
-            _future = _pool.schedule(this, timeoutMs);
+
+            // always set absolute time of execution
+            _nextRun = timeoutMs + System.currentTimeMillis();
+            
+            switch(_state) {
+              case RUNNING:
+                _rescheduleAfterRun = true;  // signal that we need rescheduling.
+                break;
+              case IDLE:  // fall through
+              case CANCELLED:
+                _future = _pool.schedule(this, timeoutMs); 
+                _state = TimedEventState.SCHEDULED;
+                break;
+              case SCHEDULED: // nothing
+            }
+            
         }
 
         /**
@@ -215,19 +253,21 @@ public class SimpleTimer2 {
          *                        two timeouts, else use the later
          */
         public synchronized void reschedule(long timeoutMs, boolean useEarliestTime) {
+            final long now = System.currentTimeMillis();
             long oldTimeout;
-            boolean scheduled = _future != null && !_future.isDone();
+            boolean scheduled = _state == TimedEventState.SCHEDULED;
             if (scheduled)
-                oldTimeout = _future.getDelay(TimeUnit.MILLISECONDS);
+                oldTimeout = _nextRun - now;
             else
                 oldTimeout = timeoutMs;
+            
             // don't bother rescheduling if within _fuzz ms
             if ((oldTimeout - _fuzz > timeoutMs && useEarliestTime) ||
                 (oldTimeout + _fuzz < timeoutMs && !useEarliestTime)||
                 (!scheduled)) {
-                if (scheduled) {
+                if (scheduled && (now + timeoutMs) < _nextRun) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Re-scheduling: " + this + " timeout = " + timeoutMs + " old timeout was " + oldTimeout);
+                        _log.info("Re-scheduling: " + this + " timeout = " + timeoutMs + " old timeout was " + oldTimeout + " state: " + _state);
                     cancel();
                 }
                 schedule(timeoutMs);
@@ -245,9 +285,23 @@ public class SimpleTimer2 {
 
         /** returns true if cancelled */
         public synchronized boolean cancel() {
-            if (_future == null)
-                return false;
-            return _future.cancel(false);
+            // always clear
+            _rescheduleAfterRun = false;
+            
+            switch(_state) {
+              case CANCELLED:  // fall through
+              case IDLE: 
+                break; // my preference is to throw IllegalState here, but let it be.
+              case RUNNING:    // fall through
+              case SCHEDULED:
+                boolean cancelled = _future.cancel(false);
+                if (cancelled)
+                    _state = TimedEventState.CANCELLED;
+                else {} // log something as this could be serious, we remain RUNNING otherwise
+                return cancelled;
+            }
+            return false;
+            
         }
 
         public void run() {
@@ -255,6 +309,32 @@ public class SimpleTimer2 {
                 _log.debug("Running: " + this);
             long before = System.currentTimeMillis();
             long delay = 0;
+            synchronized(this) {
+                if (_rescheduleAfterRun)
+                    throw new IllegalStateException("rescheduleAfterRun cannot be true here");
+                
+                switch(_state) {
+                  case CANCELLED: 
+                    return; // goodbye
+                  case IDLE:  // fall through
+                  case RUNNING:
+                    throw new IllegalStateException("not possible to be in " + _state);
+                  case SCHEDULED: // proceed, switch to IDLE in case I need to reschedule
+                    _state = TimedEventState.IDLE;
+                }
+                                               
+                // if I was rescheduled by the user, re-submit myself to the executor.
+                int difference = (int)(_nextRun - before); // careful with long uptimes
+                if (difference > _fuzz) {
+                    schedule(difference); 
+                    return;
+                }
+                
+                // else proceed to run
+                _state = TimedEventState.RUNNING;
+            }
+            // cancel()-ing after this point only works if the event supports it explicitly
+            // none of these _future checks should be necessary anymore
             if (_future != null)
                 delay = _future.getDelay(TimeUnit.MILLISECONDS);
             else if (_log.shouldLog(Log.WARN))
@@ -268,6 +348,23 @@ public class SimpleTimer2 {
                 timeReached();
             } catch (Throwable t) {
                 _log.log(Log.CRIT, _pool + ": Timed task " + this + " exited unexpectedly, please report", t);
+            } finally { // must be in finally
+                synchronized(this) {
+                    switch(_state) {
+                      case SCHEDULED:  // fall through
+                      case IDLE:
+                        throw new IllegalStateException("can't be " + _state);
+                      case CANCELLED:
+                        break; // nothing
+                      case RUNNING: 
+                        _state = TimedEventState.IDLE; 
+                        // do we need to reschedule?
+                        if (_rescheduleAfterRun) {
+                            _rescheduleAfterRun = false;
+                            schedule(_nextRun - System.currentTimeMillis());
+                        }
+                    }
+                }
             }
             long time = System.currentTimeMillis() - before;
             if (time > 500 && _log.shouldLog(Log.WARN))
