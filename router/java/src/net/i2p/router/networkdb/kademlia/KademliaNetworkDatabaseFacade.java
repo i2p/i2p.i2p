@@ -676,6 +676,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             throw new IllegalArgumentException("Attempt to replace RI with " + leaseSet);
         }
         
+        // spoof / hash collision detection
+        if (rv != null && !leaseSet.getDestination().equals(rv.getDestination()))
+            throw new IllegalArgumentException("LS Hash collision");
+
         String err = validate(key, leaseSet);
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
@@ -815,6 +819,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             throw new IllegalArgumentException("Attempt to replace LS with " + routerInfo);
         }
         
+        // spoof / hash collision detection
+        if (rv != null && !routerInfo.getIdentity().equals(rv.getIdentity()))
+            throw new IllegalArgumentException("RI Hash collision");
+
         String err = validate(key, routerInfo);
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
