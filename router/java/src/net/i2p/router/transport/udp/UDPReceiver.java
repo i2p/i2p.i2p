@@ -31,10 +31,12 @@ class UDPReceiver {
     private static int __id;
     private final int _id;
 
+    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+
     private static final int TYPE_POISON = -99999;
     private static final int MIN_QUEUE_SIZE = 16;
     private static final int MAX_QUEUE_SIZE = 192;
-    
+
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
@@ -244,6 +246,11 @@ class UDPReceiver {
                 //    _socketChanged = false;
                 //}
                 UDPPacket packet = UDPPacket.acquire(_context, true);
+
+                // Android ICS bug
+                // http://code.google.com/p/android/issues/detail?id=24748
+                if (_isAndroid)
+                    packet.getPacket().setLength(UDPPacket.MAX_PACKET_SIZE);
                 
                 // block before we read...
                 //if (_log.shouldLog(Log.DEBUG))
