@@ -1,6 +1,9 @@
 package net.i2p.router.transport.udp;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -18,7 +21,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
- *
+ *  Keep track of inbound and outbound introductions.
  */
 class IntroductionManager {
     private final RouterContext _context;
@@ -29,6 +32,8 @@ class IntroductionManager {
     private final Map<Long, PeerState> _outbound;
     /** list of peers (PeerState) who have given us introduction tags */
     private final Set<PeerState> _inbound;
+    private final Set<InetAddress> _recentHolePunches;
+    private long _lastHolePunchClean;
 
     /**
      * Limit since we ping to keep the conn open
@@ -42,6 +47,11 @@ class IntroductionManager {
      */
     private static final int MAX_OUTBOUND = 100;
 
+    /** Max one per target in this time */
+    private static final long PUNCH_CLEAN_TIME = 5*1000;
+    /** Max for all targets per PUNCH_CLEAN_TIME */
+    private static final int MAX_PUNCHES = 8;
+
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(IntroductionManager.class);
@@ -49,6 +59,7 @@ class IntroductionManager {
         _builder = new PacketBuilder(ctx, transport);
         _outbound = new ConcurrentHashMap(MAX_OUTBOUND);
         _inbound = new ConcurrentHashSet(MAX_INBOUND);
+        _recentHolePunches = new HashSet(16);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
@@ -203,18 +214,87 @@ class IntroductionManager {
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Receive relay intro from " + bob);
         _context.statManager().addRateData("udp.receiveRelayIntro", 1, 0);
 
-        if (!_transport.allowConnection())
+        if (!_transport.allowConnection()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping RelayIntro, over conn limit");
             return;
+        }
+        
+        int ipSize = reader.getRelayIntroReader().readIPSize();
+        byte ip[] = new byte[ipSize];
+        reader.getRelayIntroReader().readIP(ip, 0);
+        int port = reader.getRelayIntroReader().readPort();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Receive relay intro from " + bob + " for " + Addresses.toString(ip, port));
+        
+        InetAddress to = null;
+        try {
+            if (!_transport.isValid(ip))
+                throw new UnknownHostException("non-public IP");
+            if (port <= 0 || port > 65535)
+                throw new UnknownHostException("bad port " + port);
+            to = InetAddress.getByAddress(ip);
+        } catch (UnknownHostException uhe) {
+            // shitlist Bob?
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("IP for alice to hole punch to is invalid", uhe);
+            return;
+        }
+        
+        RemoteHostId alice = new RemoteHostId(ip, port);
+        if (_transport.getPeerState(alice) != null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Ignoring RelayIntro, already have a session to " + to);
+            return;
+        }
+        EstablishmentManager establisher = _transport.getEstablisher();
+        if (establisher != null) {
+            if (establisher.getInboundState(alice) != null) {
+                // This check may be common, as Alice sends RelayRequests to
+                // several introducers at once.
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Ignoring RelayIntro, establishment in progress to " + to);
+                return;
+            }
+            if (!establisher.shouldAllowInboundEstablishment()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping RelayIntro, too many establishments in progress - for " + to);
+                return;
+            }
+        }
 
-        // TODO throttle
-        // TODO IB req limits
-        // TODO check if already have a session or in progress state.
+        // basic throttle, don't bother saving per-peer send times
+        // we throttle on IP only, ignoring port
+        boolean tooMany = false;
+        boolean already = false;
+        synchronized (_recentHolePunches) {
+            long now = _context.clock().now();
+            if (now > _lastHolePunchClean + PUNCH_CLEAN_TIME) {
+                _recentHolePunches.clear();
+                _lastHolePunchClean = now;
+                _recentHolePunches.add(to);
+            } else {
+                tooMany = _recentHolePunches.size() >= MAX_PUNCHES;
+                if (!tooMany)
+                    already = !_recentHolePunches.add(to);
+            }
+        }
+        if (tooMany) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping - too many - RelayIntro for " + to);
+            return;
+        }
+        if (already) {
+            // This check will trigger a lot, as Alice sends RelayRequests to
+            // several introducers at once.
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Ignoring dup RelayIntro for " + to);
+            return;
+        }
 
-        _transport.send(_builder.buildHolePunch(reader));
+        _transport.send(_builder.buildHolePunch(to, port));
     }
     
     /**

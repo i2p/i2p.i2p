@@ -717,6 +717,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
+     *  For IntroductionManager
+     *  @return may be null if not started
+     *  @since 0.9.2
+     */
+    EstablishmentManager getEstablisher() {
+        return _establisher;
+    }
+    /**
      * Intercept RouterInfo entries received directly from a peer to inject them into
      * the PeersByCapacity listing.
      *
@@ -1682,10 +1690,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
+     *  @return a new DHSessionKeyBuilder
      *  @since 0.9
      */
     DHSessionKeyBuilder getDHBuilder() {
         return _dhFactory.getBuilder();
+    }
+    
+    /**
+     *  @return the factory
+     *  @since 0.9.2
+     */
+    DHSessionKeyBuilder.Factory getDHFactory() {
+        return _dhFactory;
     }
 
     private static final int FLAG_ALPHA = 0;

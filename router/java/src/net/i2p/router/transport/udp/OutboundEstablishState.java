@@ -26,10 +26,11 @@ class OutboundEstablishState {
     private final RouterContext _context;
     private final Log _log;
     // SessionRequest message
-    private final byte _sentX[];
+    private byte _sentX[];
     private byte _bobIP[];
     private int _bobPort;
-    private final DHSessionKeyBuilder _keyBuilder;
+    private final DHSessionKeyBuilder.Factory _keyFactory;
+    private DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _receivedY[];
     private byte _aliceIP[];
@@ -82,7 +83,9 @@ class OutboundEstablishState {
         /** we need to have someone introduce us to the peer, but haven't received a RelayResponse yet */
         OB_STATE_PENDING_INTRO,
         /** RelayResponse received */
-        OB_STATE_INTRODUCED
+        OB_STATE_INTRODUCED,
+        /** SessionConfirmed failed validation */
+        OB_STATE_VALIDATION_FAILED
     }
     
     /** basic delay before backoff */
@@ -99,7 +102,7 @@ class OutboundEstablishState {
     public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
                                   RemoteHostId remoteHostId,
                                   RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
-                                  DHSessionKeyBuilder dh) {
+                                  DHSessionKeyBuilder.Factory dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
         if (claimedAddress != null) {
@@ -117,9 +120,7 @@ class OutboundEstablishState {
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;
-        _keyBuilder = dh;
-        _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
-        prepareSessionRequest();
+        _keyFactory = dh;
         if (addr.getIntroducerCount() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("new outbound establish to " + remotePeer.calculateHash() + ", with address: " + addr);
@@ -165,8 +166,10 @@ class OutboundEstablishState {
     public RouterIdentity getRemoteIdentity() { return _remotePeer; }
     public SessionKey getIntroKey() { return _introKey; }
     
-    /** called from constructor, no need to synch */
+    /** caller must synch - only call once */
     private void prepareSessionRequest() {
+        _keyBuilder = _keyFactory.getBuilder();
+        _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
         byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
         if (X.length == 257)
             System.arraycopy(X, 1, _sentX, 0, _sentX.length);
@@ -176,7 +179,13 @@ class OutboundEstablishState {
             System.arraycopy(X, 0, _sentX, _sentX.length - X.length, X.length);
     }
 
-    public byte[] getSentX() { return _sentX; }
+    public synchronized byte[] getSentX() {
+        // We defer keygen until now so that it gets done in the Establisher loop,
+        // and so that we don't waste entropy on failed introductions
+        if (_sentX == null)
+            prepareSessionRequest();
+        return _sentX;
+    }
 
     /**
      * The remote side (Bob) - note that in some places he's called Charlie.
@@ -191,6 +200,11 @@ class OutboundEstablishState {
     public synchronized int getSentPort() { return _bobPort; }
 
     public synchronized void receiveSessionCreated(UDPPacketReader.SessionCreatedReader reader) {
+        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Session created already failed");
+            return;
+        }
         if (_receivedY != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Session created already received, ignoring");
@@ -236,6 +250,11 @@ class OutboundEstablishState {
      * @return true if valid
      */
     public synchronized boolean validateSessionCreated() {
+        if (_currentState == OutboundState.OB_STATE_VALIDATION_FAILED) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Session created already failed");
+            return false;
+        }
         if (_receivedSignature != null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Session created already validated");
@@ -265,6 +284,9 @@ class OutboundEstablishState {
         }
     }
     
+    /**
+     *  The SessionCreated validation failed
+     */
     public synchronized void fail() {
         _receivedY = null;
         _aliceIP = null;
@@ -273,10 +295,9 @@ class OutboundEstablishState {
         _receivedEncryptedSignature = null;
         _receivedIV = null;
         _receivedSignature = null;
-
-        if ( (_currentState == OutboundState.OB_STATE_UNKNOWN) || 
-             (_currentState == OutboundState.OB_STATE_CREATED_RECEIVED) )
-            _currentState = OutboundState.OB_STATE_REQUEST_SENT;
+        // sure, there's a chance the packet was corrupted, but in practice
+        // this means that Bob doesn't know his external port, so give up.
+        _currentState = OutboundState.OB_STATE_VALIDATION_FAILED;
 
         _nextSend = _context.clock().now();
     }
@@ -287,6 +308,8 @@ class OutboundEstablishState {
      */
     private void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
+        if (_keyBuilder == null)
+            throw new DHSessionKeyBuilder.InvalidPublicParameterException("Illegal state - never generated a key builder");
         _keyBuilder.setPeerPublicValue(_receivedY);
         _sessionKey = _keyBuilder.getSessionKey();
         ByteArray extra = _keyBuilder.getExtraBytes();

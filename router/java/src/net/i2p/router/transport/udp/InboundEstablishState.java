@@ -178,8 +178,6 @@ class InboundEstablishState {
     /** what port number do they appear to be coming from? */
     public int getSentPort() { return _alicePort; }
     
-    public synchronized byte[] getBobIP() { return _bobIP; }
-    
     public synchronized byte[] getSentY() {
         if (_sentY == null)
             _sentY = _keyBuilder.getMyPublicValueBytes();
@@ -328,6 +326,8 @@ class InboundEstablishState {
     
     /**
      * Who is Alice (null if forged/unknown)
+     *
+     * Note that this isn't really confirmed - see below.
      */
     public synchronized RouterIdentity getConfirmedIdentity() {
         if (!_verificationAttempted) {
@@ -341,8 +341,13 @@ class InboundEstablishState {
      * Determine if Alice sent us a valid confirmation packet.  The 
      * identity signs: Alice's IP + Alice's port + Bob's IP + Bob's port
      * + Alice's new relay key + Alice's signed on time
+     *
+     * Note that the protocol does not include a signature of the RouterIdentity,
+     * which could be a problem?
+     *
+     * Caller must synch on this.
      */
-    private synchronized void verifyIdentity() {
+    private void verifyIdentity() {
         int identSize = 0;
         for (int i = 0; i < _receivedIdentity.length; i++)
             identSize += _receivedIdentity[i].length;
@@ -385,6 +390,8 @@ class InboundEstablishState {
             Signature sig = new Signature(_receivedSignature);
             boolean ok = _context.dsa().verifySignature(sig, signed, peer.getSigningPublicKey());
             if (ok) {
+                // todo partial spoof detection - get peer.calculateHash(),
+                // lookup in netdb locally, if not equal, fail?
                 _receivedConfirmedIdentity = peer;
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -408,10 +415,10 @@ class InboundEstablishState {
         StringBuilder buf = new StringBuilder(128);
         buf.append("IES ");
         buf.append(Addresses.toString(_aliceIP, _alicePort));
-        if (_receivedX != null)
-            buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
-        if (_sentY != null)
-            buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
+        //if (_receivedX != null)
+        //    buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
+        //if (_sentY != null)
+        //    buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
         //buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
         buf.append(" RelayTag: ").append(_sentRelayTag);
         //buf.append(" SignedOn: ").append(_sentSignedOnTime);

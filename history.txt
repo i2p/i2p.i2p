@@ -1,3 +1,15 @@
+2012-08-22 zzz
+ * NetDB: Add hash collision detection
+ * SimpleTimer2: Synchronization improvements (ticket #653)
+ * SSU:
+   - Fail establishment immediately on SessionCreated
+     validation fail
+   - Defer outbound DH generation until required
+   - Validate address/port in RelayIntro messages
+   - Throttle hole punches
+   - Workaround for Android ICS bug
+   - More cleanups
+
 2012-08-21 zzz
  * NetDB: Decrease stat publish probability
  * SSU:

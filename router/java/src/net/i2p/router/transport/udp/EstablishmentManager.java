@@ -340,7 +340,7 @@ class EstablishmentManager {
                     }
                     state = new OutboundEstablishState(_context, maybeTo, to,
                                                        toIdentity,
-                                                       sessionKey, addr, _transport.getDHBuilder());
+                                                       sessionKey, addr, _transport.getDHFactory());
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
                     if (isNew) {
@@ -395,6 +395,15 @@ class EstablishmentManager {
     }
     
     /**
+     * Should we allow another inbound establishment?
+     * Used to throttle outbound hole punches.
+     * @since 0.9.2
+     */
+    public boolean shouldAllowInboundEstablishment() {
+        return _inboundStates.size() < getMaxInboundEstablishers(); 
+    }
+    
+    /**
      * Got a SessionRequest (initiates an inbound establishment)
      *
      */
@@ -405,15 +414,13 @@ class EstablishmentManager {
             return;
         }
         
-        int maxInbound = getMaxInboundEstablishers();
-        
         boolean isNew = false;
 
             InboundEstablishState state = _inboundStates.get(from);
             if (state == null) {
                 // TODO this is insufficient to prevent DoSing, especially if
                 // IP spoofing is used. For further study.
-                if (_inboundStates.size() >= maxInbound) {
+                if (!shouldAllowInboundEstablishment()) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping inbound establish, increase " + PROP_MAX_CONCURRENT_ESTABLISH);
                     _context.statManager().addRateData("udp.establishDropped", 1);
@@ -861,10 +868,15 @@ class EstablishmentManager {
             state.setIntroNonce(nonce);
         }
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
-        UDPPacket requests[] = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());
-        for (int i = 0; i < requests.length; i++) {
-            if (requests[i] != null)
-                _transport.send(requests[i]);
+        List<UDPPacket> requests = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());
+        if (requests.isEmpty()) {
+            // FIXME need a failed OB state
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No valid introducers! " + state);
+            // set failed state, remove nonce, and return
+        }
+        for (UDPPacket req : requests) {
+            _transport.send(req);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send intro for " + state + " with our intro key as " + _transport.getIntroKey());
@@ -895,8 +907,9 @@ class EstablishmentManager {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Introducer for " + state + " (" + bob + ") sent us an invalid address for our target: " + Addresses.toString(ip, port), uhe);
             // these two cause this peer to requeue for a new intro peer
-            state.introductionFailed();
-            notifyActivity();
+            // FIXME no it doesn't, we send to all at once
+            //state.introductionFailed();
+            //notifyActivity();
             return;
         }
         _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime(), 0);
@@ -936,7 +949,7 @@ class EstablishmentManager {
         boolean valid = state.validateSessionCreated();
         if (!valid) {
             // validate clears fields on failure
-            // TODO - send destroy? shitlist?
+            // sendDestroy(state) won't work as we haven't sent the confirmed...
             if (_log.shouldLog(Log.WARN))
                 _log.warn("SessionCreated validate failed: " + state);
             return;
@@ -1018,16 +1031,16 @@ class EstablishmentManager {
                     // completely received (though the signature may be invalid)
                     iter.remove();
                     inboundState = cur;
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Removing completely confirmed inbound state");
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Removing completely confirmed inbound state");
                     break;
                 } else if (cur.getLifetime() > MAX_IB_ESTABLISH_TIME) {
                     // took too long
                     iter.remove();
                     inboundState = cur;
                     //_context.statManager().addRateData("udp.inboundEstablishFailedState", cur.getState(), cur.getLifetime());
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Removing expired inbound state");
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Removing expired inbound state");
                     expired = true;
                     break;
                 } else if (cur.getState() == IB_STATE_FAILED) {
@@ -1133,20 +1146,19 @@ class EstablishmentManager {
 
             for (Iterator<OutboundEstablishState> iter = _outboundStates.values().iterator(); iter.hasNext(); ) {
                 OutboundEstablishState cur = iter.next();
-                if (cur.getState() == OB_STATE_CONFIRMED_COMPLETELY) {
-                    // completely received
+                OutboundEstablishState.OutboundState state = cur.getState();
+                if (state == OB_STATE_CONFIRMED_COMPLETELY ||
+                    state == OB_STATE_VALIDATION_FAILED) {
                     iter.remove();
                     outboundState = cur;
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Removing confirmed outbound: " + cur);
                     break;
                 } else if (cur.getLifetime() >= MAX_OB_ESTABLISH_TIME) {
                     // took too long
                     iter.remove();
                     outboundState = cur;
                     //_context.statManager().addRateData("udp.outboundEstablishFailedState", cur.getState(), cur.getLifetime());
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Removing expired outbound: " + cur);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Removing expired outbound: " + cur);
                     break;
                 } else {
                     if (cur.getNextSendTime() <= now) {
@@ -1232,6 +1244,10 @@ class EstablishmentManager {
                             processExpired(outboundState);
                         else if (outboundState.getNextSendTime() <= now)
                             handlePendingIntro(outboundState);
+                        break;
+
+                    case OB_STATE_VALIDATION_FAILED:
+                        processExpired(outboundState);
                         break;
                 }
             }

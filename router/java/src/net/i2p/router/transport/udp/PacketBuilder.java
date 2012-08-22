@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -659,13 +660,15 @@ class PacketBuilder {
             _log.debug("Sending request");
         
         // now for the body
-        System.arraycopy(state.getSentX(), 0, data, off, state.getSentX().length);
-        off += state.getSentX().length;
-        DataHelper.toLong(data, off, 1, state.getSentIP().length);
+        byte[] x = state.getSentX();
+        System.arraycopy(x, 0, data, off, x.length);
+        off += x.length;
+        DataHelper.toLong(data, off, 1, toIP.length);
         off += 1;
-        System.arraycopy(toIP, 0, data, off, state.getSentIP().length);
+        System.arraycopy(toIP, 0, data, off, toIP.length);
         off += toIP.length;
-        DataHelper.toLong(data, off, 2, state.getSentPort());
+        int port = state.getSentPort();
+        DataHelper.toLong(data, off, 2, port);
         off += 2;
         
         // we can pad here if we want, maybe randomized?
@@ -675,7 +678,7 @@ class PacketBuilder {
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
-        setTo(packet, to, state.getSentPort());
+        setTo(packet, to, port);
         packet.setMessageType(TYPE_SREQ);
         return packet;
     }
@@ -1050,14 +1053,14 @@ class PacketBuilder {
     private byte[] getOurExplicitIP() { return null; }
     private int getOurExplicitPort() { return 0; }
     
-    /** build intro packets for each of the published introducers */
-    @SuppressWarnings("static-access")
-    public UDPPacket[] buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
+    /**
+     *  build intro packets for each of the published introducers
+     *  @return empty list on failure
+     */
+    public List<UDPPacket> buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
-        if (count <= 0)
-            return new UDPPacket[0];
-        UDPPacket rv[] = new UDPPacket[count];
+        List<UDPPacket> rv = new ArrayList(count);
         for (int i = 0; i < count; i++) {
             InetAddress iaddr = addr.getIntroducerHost(i);
             int iport = addr.getIntroducerPort(i);
@@ -1069,8 +1072,9 @@ class PacketBuilder {
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
                 continue;
             }
+            // TODO implement some sort of introducer shitlist
             if (transport.isValid(iaddr.getAddress()))
-                rv[i] = buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true);
+                rv.add(buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true));
         }
         return rv;
     }
@@ -1227,28 +1231,11 @@ class PacketBuilder {
     }
     
     /**
-     *  Sends an empty unauthenticated packet for hole punching
+     *  Sends an empty unauthenticated packet for hole punching.
+     *  Parameters must be validated previously.
      */
-    public UDPPacket buildHolePunch(UDPPacketReader reader) {
+    public UDPPacket buildHolePunch(InetAddress to, int port) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
-        byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        
-        int ipSize = reader.getRelayIntroReader().readIPSize();
-        byte ip[] = new byte[ipSize];
-        reader.getRelayIntroReader().readIP(ip, 0);
-        int port = reader.getRelayIntroReader().readPort();
-        
-        InetAddress to = null;
-        try {
-            to = InetAddress.getByAddress(ip);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("IP for alice to hole punch to is invalid", uhe);
-            packet.release();
-            return null;
-        }
-        
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending relay hole punch to " + to + ":" + port);
 
