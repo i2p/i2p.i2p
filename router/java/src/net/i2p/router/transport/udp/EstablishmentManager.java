@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -241,7 +242,8 @@ class EstablishmentManager {
         if (remAddr != null && port > 0 && port <= 65535) {
             maybeTo = new RemoteHostId(remAddr.getAddress(), port);
 
-            if (!_transport.isValid(maybeTo.getIP())) {
+            if ((!_transport.isValid(maybeTo.getIP())) ||
+                Arrays.equals(maybeTo.getIP(), _transport.getExternalIP())) {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
                 _transport.markUnreachable(toHash);
                 //_context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
@@ -449,18 +451,18 @@ class EstablishmentManager {
             // Don't offer if we are approaching max connections. While Relay Intros do not
             // count as connections, we have to keep the connection to this peer up longer if
             // we are offering introductions.
+            // Don't offer to relay to privileged ports.
             if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
+                state.getSentPort() >= 1024 &&
                 !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Received NEW session request from " + from + ", sending relay tag " + tag);
             } else {
                 // we got an IB even though we were firewalled, hidden, not high cap, etc.
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Received session request, but our status is " + _transport.getReachabilityStatus());
             }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Received NEW session request " + state);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive DUP session request from: " + state);
@@ -900,16 +902,16 @@ class EstablishmentManager {
         try {
             if (!_transport.isValid(ip))
                 throw new UnknownHostException("non-public IP");
-            if (port <= 0 || port > 65535)
+            // let's not relay to a privileged port, sounds like trouble
+            if (port < 1024 || port > 65535)
                 throw new UnknownHostException("bad port " + port);
+            if (Arrays.equals(ip, _transport.getExternalIP()))
+                throw new UnknownHostException("relay myself");
             addr = InetAddress.getByAddress(ip);
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Introducer for " + state + " (" + bob + ") sent us an invalid address for our target: " + Addresses.toString(ip, port), uhe);
-            // these two cause this peer to requeue for a new intro peer
-            // FIXME no it doesn't, we send to all at once
-            //state.introductionFailed();
-            //notifyActivity();
+            // TODO either put the nonce back in liveintroductions, or fail
             return;
         }
         _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime(), 0);

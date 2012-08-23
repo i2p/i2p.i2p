@@ -1066,15 +1066,18 @@ class PacketBuilder {
             int iport = addr.getIntroducerPort(i);
             byte ikey[] = addr.getIntroducerKey(i);
             long tag = addr.getIntroducerTag(i);
-            if ( (ikey == null) || (iport <= 0) || (iaddr == null) || (tag <= 0) ) {
+            // let's not use an introducer on a privileged port, sounds like trouble
+            if (ikey == null || iport < 1024 || iport > 65535 ||
+                iaddr == null || tag <= 0 ||
+                (!_transport.isValid(iaddr.getAddress())) ||
+                Arrays.equals(iaddr.getAddress(), _transport.getExternalIP())) {
                 if (_log.shouldLog(_log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
+                // TODO implement some sort of introducer shitlist
                 continue;
             }
-            // TODO implement some sort of introducer shitlist
-            if (transport.isValid(iaddr.getAddress()))
-                rv.add(buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true));
+            rv.add(buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true));
         }
         return rv;
     }

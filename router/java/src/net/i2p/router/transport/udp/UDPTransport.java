@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -405,6 +406,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int getLocalPort() { return _externalListenPort; }
     public InetAddress getLocalAddress() { return _externalListenHost; }
     public int getExternalPort() { return _externalListenPort; }
+
+    /**
+     *  @return IP or null
+     *  @since 0.9.2
+     */
+    byte[] getExternalIP() {
+       InetAddress ia = _externalListenHost;
+       if (ia == null)
+           return null;
+       return ia.getAddress();
+    }
 
     /**
      *  _externalListenPort should always be set (by startup()) before this is called,
@@ -1183,14 +1195,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 markUnreachable(to);
                 return null;
             }
+
             UDPAddress ua = new UDPAddress(addr);
-            if (ua == null) {
-                markUnreachable(to);
-                return null;
-            }
             if (ua.getIntroducerCount() <= 0) {
                 InetAddress ia = ua.getHostAddress();
-                if (ua.getPort() <= 0 || ia == null || !isValid(ia.getAddress())) {
+                if (ua.getPort() <= 0 || ia == null || !isValid(ia.getAddress()) ||
+                    Arrays.equals(ia.getAddress(), getExternalIP())) {
                     markUnreachable(to);
                     return null;
                 }

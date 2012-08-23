@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,9 @@ class IntroductionManager {
     
     public void add(PeerState peer) {
         if (peer == null) return;
+        // let's not use an introducer on a privileged port, sounds like trouble
+        if (peer.getRemotePort() < 1024)
+            return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
@@ -156,7 +160,7 @@ class IntroductionManager {
             }
             byte[] ip = cur.getRemoteIP();
             int port = cur.getRemotePort();
-            if (ip == null || !TransportImpl.isPubliclyRoutable(ip) || port <= 0 || port > 65535)
+            if (ip == null || !TransportImpl.isPubliclyRoutable(ip) || port < 1024 || port > 65535)
                 continue;
             if (_log.shouldLog(Log.INFO))
                 _log.info("Picking introducer: " + cur);
@@ -233,8 +237,11 @@ class IntroductionManager {
         try {
             if (!_transport.isValid(ip))
                 throw new UnknownHostException("non-public IP");
-            if (port <= 0 || port > 65535)
+            // let's not punch to a privileged port, sounds like trouble
+            if (port < 1024 || port > 65535)
                 throw new UnknownHostException("bad port " + port);
+            if (Arrays.equals(ip, _transport.getExternalIP()))
+                throw new UnknownHostException("punch myself");
             to = InetAddress.getByAddress(ip);
         } catch (UnknownHostException uhe) {
             // shitlist Bob?

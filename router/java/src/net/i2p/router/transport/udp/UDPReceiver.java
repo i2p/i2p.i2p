@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -164,6 +165,14 @@ class UDPReceiver {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Ignoring packet from the drop-listed peer: " + from);
             _context.statManager().addRateData("udp.ignorePacketFromDroplist", packet.getLifetime(), 0);
+            packet.release();
+            return 0;
+        }
+
+        // drop anything apparently from our IP (any port)
+        if (Arrays.equals(from.getIP(), _transport.getExternalIP())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping (spoofed?) packet from ourselves");
             packet.release();
             return 0;
         }
