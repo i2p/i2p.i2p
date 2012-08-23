@@ -3,6 +3,8 @@ package net.i2p.router.transport.ntcp;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +22,7 @@ class Reader {
     private final RouterContext _context;
     private final Log _log;
     // TODO change to LBQ ??
-    private final List<NTCPConnection> _pendingConnections;
+    private final Set<NTCPConnection> _pendingConnections;
     private final Set<NTCPConnection> _liveReads;
     private final Set<NTCPConnection> _readAfterLive;
     private final List<Runner> _runners;
@@ -28,7 +30,7 @@ class Reader {
     public Reader(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
-        _pendingConnections = new ArrayList(16);
+        _pendingConnections = new LinkedHashSet(16);
         _runners = new ArrayList(8);
         _liveReads = new HashSet(8);
         _readAfterLive = new HashSet(8);
@@ -60,7 +62,7 @@ class Reader {
             if (_liveReads.contains(con)) {
                 _readAfterLive.add(con);
                 already = true;
-            } else if (!_pendingConnections.contains(con)) {
+            } else {
                 _pendingConnections.add(con);
             }
             _pendingConnections.notifyAll();
@@ -99,7 +101,9 @@ class Reader {
                             if (_pendingConnections.isEmpty()) {
                                 _pendingConnections.wait();
                             } else {
-                                con = _pendingConnections.remove(0);
+                                Iterator<NTCPConnection> iter = _pendingConnections.iterator();
+                                con = iter.next();
+                                iter.remove();
                                 _liveReads.add(con);
                             }
                         }
