@@ -16,13 +16,13 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.SimpleByteCache;
 
-import org.bouncycastle.crypto.digests.MD5Digest;
-import org.bouncycastle.crypto.macs.I2PHMac;
+import org.bouncycastle.oldcrypto.digests.MD5Digest;
+import org.bouncycastle.oldcrypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-MD5-128 of a key+message.  All the good stuff occurs
- * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
- * {@link org.bouncycastle.crypto.digests.MD5Digest}.
+ * in {@link org.bouncycastle.oldcrypto.macs.I2PHMac} and 
+ * {@link org.bouncycastle.oldcrypto.digests.MD5Digest}.
  *
  * Keys are always 32 bytes.
  * This is used only by UDP.

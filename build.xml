@@ -413,7 +413,7 @@
             splitindex="true"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <group title="Router Console" packages="net.i2p.router.web" />
@@ -482,7 +482,7 @@
             splitindex="true"
             doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.gettext:org:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <sourcepath>
                 <pathelement location="core/java/test/junit" />

@@ -1,4 +1,4 @@
-package org.bouncycastle.crypto.digests;
+package org.bouncycastle.oldcrypto.digests;
 
 
 /**

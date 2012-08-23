@@ -1,4 +1,4 @@
-package org.bouncycastle.crypto.digests;
+package org.bouncycastle.oldcrypto.digests;
 /*
  * Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
  * (http://www.bouncycastle.org)
@@ -26,7 +26,7 @@ package org.bouncycastle.crypto.digests;
  *
  */
 
-import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.oldcrypto.Digest;
 
 /**
  * base implementation of MD4 family style digest as outlined in

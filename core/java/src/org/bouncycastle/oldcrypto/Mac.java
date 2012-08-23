@@ -1,4 +1,4 @@
-package org.bouncycastle.crypto;
+package org.bouncycastle.oldcrypto;
 /*
  * Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
  * (http://www.bouncycastle.org)

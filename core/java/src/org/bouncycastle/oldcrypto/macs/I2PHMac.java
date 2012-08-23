@@ -1,4 +1,4 @@
-package org.bouncycastle.crypto.macs;
+package org.bouncycastle.oldcrypto.macs;
 /*
  * Copyright (c) 2000 - 2004 The Legion Of The Bouncy Castle
  * (http://www.bouncycastle.org)
@@ -31,8 +31,8 @@ import java.util.Arrays;
 
 import net.i2p.util.SimpleByteCache;
 
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.Mac;
+import org.bouncycastle.oldcrypto.Digest;
+import org.bouncycastle.oldcrypto.Mac;
 
 /**
  * HMAC implementation based on RFC2104

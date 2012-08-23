@@ -1,3 +1,11 @@
+2012-08-23 zzz
+ * Crypto: Rename bouncycastle HMAC libs so they don't conflict
+   with older Android versions which bundle them
+ * NTCP: Reduce lock contention
+ * SSU:
+   - Don't relay or introduce to/from privileged ports
+   - Various spoof detections
+
 2012-08-22 zzz
  * NetDB: Add hash collision detection
  * SimpleTimer2: Synchronization improvements (ticket #653)

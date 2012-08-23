@@ -4,12 +4,12 @@ import gnu.crypto.hash.Sha256Standalone;
 
 import net.i2p.I2PAppContext;
 
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.macs.I2PHMac;
+import org.bouncycastle.oldcrypto.Digest;
+import org.bouncycastle.oldcrypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
- * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
+ * in {@link org.bouncycastle.oldcrypto.macs.I2PHMac} and 
  * {@link gnu.crypto.hash.Sha256Standalone}.
  *
  * This should be compatible with javax.crypto.Mac.getInstance("HmacSHA256")
