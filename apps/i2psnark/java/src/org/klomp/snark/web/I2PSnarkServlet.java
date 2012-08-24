@@ -461,7 +461,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                       " colspan=\"11\"><i>");
             out.write(_("No torrents loaded."));
             out.write("</i></td></tr>\n");
-        } else if (snarks.size() > 1) {
+        } else /** if (snarks.size() > 1) */ {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
             out.write(_("Totals"));
@@ -2113,12 +2113,14 @@ public class I2PSnarkServlet extends DefaultServlet {
                .append(snark.getBaseName())
                .append("</th></tr>\n");
 
+            String fullPath = snark.getName();
+            String baseName = urlEncode((new File(fullPath)).getName());
             buf.append("<tr><td>")
                .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
                .append(_("Torrent file"))
-               .append(":</b> ")
-               .append(snark.getName())
-               .append("</td></tr>\n");
+               .append(":</b> <a href=\"/i2psnark/").append(baseName).append("\">")
+               .append(fullPath)
+               .append("</a></td></tr>\n");
 
             MetaInfo meta = snark.getMetaInfo();
             if (meta != null) {
