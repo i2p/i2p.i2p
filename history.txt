@@ -1,7 +1,25 @@
+2012-08-24 zzz
+ * I2CP:
+   - Add methods for sending a message with extended options
+   - Fix cases where the efficient sendNoEffort() wasn't being used
+ * i2psnark:
+   - Use extended I2CP options for datagrams
+   - Fix timeout for sent datagrams
+   - Add link for local torrent file on details page
+   - Show totals line even if only one torrent
+   - Reduce token timeout
+   - Check token age before use
+   - Limit incoming token size
+ * OCMOSJ:
+   - Implement per-message overrides for tag threshold,
+     tags to send, and bundle leaseset
+   - Fix bug adjusting timeouts
+   - Warn on client expiration time bugs
+
 2012-08-23 zzz
  * Crypto: Rename bouncycastle HMAC libs so they don't conflict
    with older Android versions which bundle them
- * NTCP: Reduce lock contention
+ * NTCP: Reduce lock contention (ticket #697)
  * SSU:
    - Don't relay or introduce to/from privileged ports
    - Various spoof detections

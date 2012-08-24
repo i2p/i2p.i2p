@@ -18,6 +18,7 @@ import net.i2p.data.DataHelper;
 class Token extends ByteArray {
 
     private static final int MY_TOK_LEN = 8;
+    private static final int MAX_TOK_LEN = 64;
     private final long lastSeen;
 
     /** outgoing - generate a random token */
@@ -33,6 +34,9 @@ class Token extends ByteArray {
     /** incoming  - save the token (arbitrary length) */
     public Token(I2PAppContext ctx, byte[] data) {
         super(data);
+        // lets not get carried away
+        if (data.length > MAX_TOK_LEN)
+            throw new IllegalArgumentException();
         lastSeen = ctx.clock().now();
     }
 

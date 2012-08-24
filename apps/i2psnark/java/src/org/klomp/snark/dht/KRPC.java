@@ -28,6 +28,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.SendMessageOptions;
 import net.i2p.client.datagram.I2PDatagramDissector;
 import net.i2p.client.datagram.I2PDatagramMaker;
 import net.i2p.client.datagram.I2PInvalidDatagramException;
@@ -136,8 +137,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public static final boolean SECURE_NID = true;
 
     /** how long since generated do we delete - BEP 5 says 10 minutes */
-    private static final long MAX_TOKEN_AGE = 15*60*1000;
-    private static final long MAX_INBOUND_TOKEN_AGE = MAX_TOKEN_AGE - 5*60*1000;
+    private static final long MAX_TOKEN_AGE = 10*60*1000;
+    private static final long MAX_INBOUND_TOKEN_AGE = MAX_TOKEN_AGE - 2*60*1000;
     /** how long since sent do we wait for a reply */
     private static final long MAX_MSGID_AGE = 2*60*1000;
     /** how long since sent do we wait for a reply */
@@ -146,6 +147,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long CLEAN_TIME = 63*1000;
     private static final long EXPLORE_TIME = 877*1000;
     private static final String DHT_FILE = "i2psnark.dht.dat";
+
+    private static final int SEND_CRYPTO_TAGS = 8;
+    private static final int LOW_CRYPTO_TAGS = 4;
 
     public KRPC (I2PAppContext ctx, I2PSession session) {
         _context = ctx;
@@ -466,6 +470,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // for now, just bind to the NID
         //TokenKey tokenKey = new TokenKey(nInfo.getNID(), iHash);
         Token token = _incomingTokens.get(nInfo.getNID());
+        if (token != null && token.lastSeen() < _context.clock().now() - MAX_INBOUND_TOKEN_AGE) {
+            // too old, cleaner will get it soon
+            token = null;
+        }
         if (token == null) {
             // we have no token, have to do a getPeers first to get a token
             if (maxWait <= 0)
@@ -489,7 +497,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
             // we should have a token now
             token = _incomingTokens.get(nInfo.getNID());
-            if (token == null) {
+            if (token == null || token.lastSeen() < _context.clock().now() - MAX_INBOUND_TOKEN_AGE) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Huh? no token after get_peers in announce() succeeded to " + nInfo);
                 return false;
@@ -599,6 +607,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     // Announces use the response port.
 
     /**
+     *  Blocking if we have to look up the dest for the nodeinfo
+     *
      *  @param nInfo who to send it to
      *  @return null on error
      */
@@ -613,6 +623,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
+     *  Blocking if we have to look up the dest for the nodeinfo
+     *
      *  @param nInfo who to send it to
      *  @param tID target ID we are looking for
      *  @return null on error
@@ -629,6 +641,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
+     *  Blocking if we have to look up the dest for the nodeinfo
+     *
      *  @param nInfo who to send it to
      *  @return null on error
      */
@@ -648,6 +662,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
+     *  Non-blocking, will fail if we don't have the dest for the nodeinfo
+     *
      *  @param nInfo who to send it to
      *  @return null on error
      */
@@ -896,14 +912,20 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             if (payload == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("WTF DGM fail");
+                return false;
             }
         }
 
+        SendMessageOptions opts = new SendMessageOptions();
+        opts.setDate(_context.clock().now() + 60*1000);
+        opts.setTagsToSend(SEND_CRYPTO_TAGS);
+        opts.setTagThreshold(LOW_CRYPTO_TAGS);
+        if (!repliable)
+            opts.setSendLeaseSet(false);
         try {
-            // TODO I2CP per-packet options
-            boolean success = _session.sendMessage(dest, payload, 0, payload.length, null, null, 60*1000,
+            boolean success = _session.sendMessage(dest, payload, 0, payload.length,
                                                    repliable ? I2PSession.PROTO_DATAGRAM : I2PSession.PROTO_DATAGRAM_RAW,
-                                                   fromPort, toPort);
+                                                   fromPort, toPort, opts);
             if (success) {
                 _txPkts.incrementAndGet();
                 _txBytes.addAndGet(payload.length);
@@ -1456,6 +1478,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             if (!_isRunning)
                 return;
             long now = _context.clock().now();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("KRPC cleaner starting with " +
+                          _outgoingTokens.size() + " sent Tokens, " +
+                          _incomingTokens.size() + " rcvd Tokens");
             for (Iterator<Token> iter = _outgoingTokens.keySet().iterator(); iter.hasNext(); ) {
                 Token tok = iter.next();
                 if (tok.lastSeen() < now - MAX_TOKEN_AGE)
