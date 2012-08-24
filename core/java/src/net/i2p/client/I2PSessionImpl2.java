@@ -42,7 +42,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     private final static boolean SHOULD_COMPRESS = true;
     private final static boolean SHOULD_DECOMPRESS = true;
     /** Don't expect any MSMs from the router for outbound traffic @since 0.8.1 */
-    private boolean _noEffort;
+    protected boolean _noEffort;
 
     /** for extension */
     protected I2PSessionImpl2(I2PAppContext context, Properties options) {
@@ -139,11 +139,17 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                                int proto, int fromport, int toport, int flags) throws I2PSessionException {
         throw new IllegalArgumentException("Use MuxedImpl");
     }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
+                               int proto, int fromport, int toport, SendMessageOptions options) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
 
+    /** unused, see MuxedImpl override */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length);
     }
+
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
         // we don't do end-to-end crypto any more
         //return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64), 0);
@@ -169,6 +175,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     /**
+     * Unused? see MuxedImpl override
+     *
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto
      */
@@ -202,7 +210,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         _context.statManager().addRateData("i2cp.tx.msgCompressed", compressed, 0);
         _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
         if (_noEffort)
-            return sendNoEffort(dest, payload, expires);
+            return sendNoEffort(dest, payload, expires, 0);
         else
             return sendBestEffort(dest, payload, keyUsed, tagsSent, expires);
     }
@@ -407,10 +415,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * @return true always
      * @since 0.8.1
      */
-    protected boolean sendNoEffort(Destination dest, byte payload[], long expires)
+    protected boolean sendNoEffort(Destination dest, byte payload[], long expires, int flags)
                     throws I2PSessionException {
         // nonce always 0
-        _producer.sendMessage(this, dest, 0, payload, null, null, null, null, expires);
+        _producer.sendMessage(this, dest, 0, payload, expires, flags);
         return true;
     }
     

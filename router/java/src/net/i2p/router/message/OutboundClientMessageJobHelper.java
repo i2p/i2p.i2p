@@ -61,8 +61,8 @@ class OutboundClientMessageJobHelper {
                                              SessionKey wrappedKey, Set<SessionTag> wrappedTags, 
                                              boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         PayloadGarlicConfig dataClove = buildDataClove(ctx, data, dest, expiration);
-        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, wrappedKey, 
-                                   wrappedTags, requireAck, bundledReplyLeaseSet);
+        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel,
+                                   0, 0, wrappedKey, wrappedTags, requireAck, bundledReplyLeaseSet);
     }
     /**
      * Allow the app to specify the data clove directly, which enables OutboundClientMessage to resend the
@@ -70,12 +70,15 @@ class OutboundClientMessageJobHelper {
      *
      * This is called from OCMOSJ
      *
+     * @param tagsToSendOverride if > 0, use this instead of skm's default
+     * @param lowTagsOverride if > 0, use this instead of skm's default
      * @param wrappedKey output parameter that will be filled with the sessionKey used
      * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                             PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel, SessionKey wrappedKey, 
+                                             PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel,
+                                             int tagsToSendOverride, int lowTagsOverride, SessionKey wrappedKey, 
                                              Set<SessionTag> wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, requireAck, bundledReplyLeaseSet);
         if (config == null)
@@ -84,9 +87,10 @@ class OutboundClientMessageJobHelper {
         if (skm == null)
             return null;
         // no use sending tags unless we have a reply token set up already
-        int tagsToSend = replyToken >= 0 ? skm.getTagsToSend() : 0;
+        int tagsToSend = replyToken >= 0 ? (tagsToSendOverride > 0 ? tagsToSendOverride : skm.getTagsToSend()) : 0;
+        int lowThreshold = lowTagsOverride > 0 ? lowTagsOverride : skm.getLowThreshold();
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
-                                                              tagsToSend, skm);
+                                                              tagsToSend, lowThreshold, skm);
         return msg;
     }
     

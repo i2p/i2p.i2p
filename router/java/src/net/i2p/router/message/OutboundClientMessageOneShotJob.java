@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.client.SendMessageOptions;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
@@ -135,8 +136,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // otherwise router config, otherwise default
         long overallExpiration = msg.getExpiration();
         if (overallExpiration > 0) {
+            if (overallExpiration < 24*60*60*1000l) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Client bug - interval instead of timestamp " + overallExpiration);
+                overallExpiration += _start;
+            }
             // Unless it's already expired, set a min and max expiration
-            if (overallExpiration <= _start) {
+            if (overallExpiration > _start) {
                 overallExpiration = Math.max(overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
                 overallExpiration = Math.min(overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
                 if (_log.shouldLog(Log.INFO))
@@ -430,19 +436,23 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         boolean shouldRequestReply = lastReplyRequestSent == null ||
                                      lastReplyRequestSent.longValue() < now - REPLY_REQUEST_INTERVAL;
 
+        int sendFlags = _clientMessage.getFlags();
+        // Per-message flag > 0 overrides per-session option
+        int tagsRequired = SendMessageOptions.getTagThreshold(sendFlags);
         boolean wantACK = _wantACK ||
                           shouldRequestReply ||
-                          // TODO: check the per-message flags also
-                          GarlicMessageBuilder.needsTags(getContext(), _leaseSet.getEncryptionKey(), _from.calculateHash());
+                          GarlicMessageBuilder.needsTags(getContext(), _leaseSet.getEncryptionKey(),
+                                                         _from.calculateHash(), tagsRequired);
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set<SessionTag> tags = new HashSet();
 
         LeaseSet replyLeaseSet;
-        // TODO: check the per-message flags also
+        // Per-message flag == false overrides session option which is default true
         String allow = _clientMessage.getSenderConfig().getOptions().getProperty(BUNDLE_REPLY_LEASESET);
-        boolean allowLeaseBundle = allow == null || Boolean.valueOf(allow).booleanValue();
+        boolean allowLeaseBundle = SendMessageOptions.getSendLeaseSet(sendFlags) &&
+                                   (allow == null || Boolean.valueOf(allow).booleanValue());
         if (allowLeaseBundle) {
             // If we want an ack, bundle a leaseSet...
             //replyLeaseSet = getReplyLeaseSet(wantACK);
@@ -473,11 +483,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Clove built to " + _toString);
         long msgExpiration = _overallExpiration; // getContext().clock().now() + OVERALL_TIMEOUT_MS_DEFAULT;
+        // Per-message flag > 0 overrides per-session option
+        int tagsToSend = SendMessageOptions.getTagsToSend(sendFlags);
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
                                                                                msgExpiration, key, 
                                                                                _clove, _from.calculateHash(), 
-                                                                               _to, _inTunnel,
-                                                                               sessKey, tags, 
+                                                                               _to, _inTunnel, tagsToSend,
+                                                                               tagsRequired, sessKey, tags, 
                                                                                wantACK, replyLeaseSet);
         if (msg == null) {
             // set to null if there are no tunnels to ack the reply back through

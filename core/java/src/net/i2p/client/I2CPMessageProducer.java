@@ -159,6 +159,26 @@ class I2CPMessageProducer {
     }
 
     /**
+     * Package up and send the payload to the router for delivery
+     * @since 0.9.2
+     */
+    public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload,
+                            SendMessageOptions options) throws I2PSessionException {
+
+        long expires = options.getTime();
+        if (!updateBps(payload.length, expires))
+            // drop the message... send fail notification?
+            return;
+        SendMessageMessage msg = new SendMessageExpiresMessage(options);
+        msg.setDestination(dest);
+        msg.setSessionId(session.getSessionId());
+        msg.setNonce(nonce);
+        Payload data = createPayload(dest, payload, null, null, null, null);
+        msg.setPayload(data);
+        session.sendMessage(msg);
+    }
+
+    /**
      *  Super-simple bandwidth throttler.
      *  We only calculate on a one-second basis, so large messages
      *  (compared to the one-second limit) may exceed the limits.

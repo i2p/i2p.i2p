@@ -63,6 +63,7 @@ import net.i2p.util.SimpleScheduler;
  *        Needs some streaming lib hacking
  *
  * @author zzz
+ * @since 0.7.1
  */
 class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
@@ -208,7 +209,64 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
         _context.statManager().addRateData("i2cp.tx.msgCompressed", payload.length, 0);
         _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
-        return sendBestEffort(dest, payload, expires, flags);
+        if (_noEffort)
+            return sendNoEffort(dest, payload, expires, flags);
+        else
+            return sendBestEffort(dest, payload, expires, flags);
+    }
+
+    /**
+     *  See SendMessageOptions for option details.
+     *
+     *  Always uses sendNoEffort for now. These are presumed to be datagrams.
+     *  SendMessageOptions 16-bit flag field is currently undefined, so
+     *  serialization won't work; therefore this only makes sense in RouterContext,
+     *  for now.
+     *
+     *  @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     *  @param fromPort 1-65535 or 0 for unset
+     *  @param toPort 1-65535 or 0 for unset
+     *  @param options to be passed to the router
+     *  @since 0.9.2
+     */
+    @Override
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
+                               int proto, int fromPort, int toPort, SendMessageOptions options) throws I2PSessionException {
+        if (isClosed()) throw new I2PSessionException("Already closed");
+        updateActivity();
+
+        boolean sc = shouldCompress(size);
+        if (sc)
+            payload = DataHelper.compress(payload, offset, size);
+        else
+            payload = DataHelper.compress(payload, offset, size, DataHelper.NO_COMPRESSION);
+
+        setProto(payload, proto);
+        setFromPort(payload, fromPort);
+        setToPort(payload, toPort);
+
+        _context.statManager().addRateData("i2cp.tx.msgCompressed", payload.length, 0);
+        _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
+        //if (_noEffort) {
+            sendNoEffort(dest, payload, options);
+            return true;
+        //} else {
+            // unimplemented
+            //return sendBestEffort(dest, payload, options);
+        //}
+    }
+
+    /**
+     * @since 0.9.2
+     */
+    private void sendNoEffort(Destination dest, byte payload[], SendMessageOptions options)
+                    throws I2PSessionException {
+        // nonce always 0
+        _producer.sendMessage(this, dest, 0, payload, options);
     }
 
     /**

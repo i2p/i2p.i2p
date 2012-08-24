@@ -28,7 +28,7 @@ import java.util.Date;
  * @since 0.8.4
  */
 public class DateAndFlags extends DataStructureImpl {
-    private int _flags;
+    protected int _flags;
     private long _date;
 
     public DateAndFlags() {}

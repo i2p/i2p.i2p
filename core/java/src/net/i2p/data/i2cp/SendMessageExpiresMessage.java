@@ -31,8 +31,13 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
     private final DateAndFlags _daf;
 
     public SendMessageExpiresMessage() {
+        this(new DateAndFlags());
+    }
+
+    /** @since 0.9.2 */
+    public SendMessageExpiresMessage(DateAndFlags options) {
         super();
-        _daf = new DateAndFlags();
+        _daf = options;
     }
 
     /**

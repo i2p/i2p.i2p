@@ -97,6 +97,7 @@ public interface I2PSession {
      * End-to-End Crypto is disabled, tags and keys are ignored.
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
+     * @param expire absolute expiration timestamp, NOT interval from now
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire) throws I2PSessionException;
@@ -116,6 +117,7 @@ public interface I2PSession {
      * End-to-End Crypto is disabled, tags and keys are ignored.
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
+     * @param expire absolute expiration timestamp, NOT interval from now
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
@@ -126,10 +128,19 @@ public interface I2PSession {
      * End-to-End Crypto is disabled, tags and keys are ignored.
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
+     * @param expire absolute expiration timestamp, NOT interval from now
      * @since 0.8.4
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
                                int proto, int fromport, int toport, int flags) throws I2PSessionException;
+
+    /**
+     * See I2PSessionMuxedImpl for proto/port details.
+     * See SendMessageOptions for option details.
+     * @since 0.9.2
+     */
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
+                               int proto, int fromport, int toport, SendMessageOptions options) throws I2PSessionException;
 
     /** Receive a message that the router has notified the client about, returning
      * the payload.

@@ -33,14 +33,19 @@ import net.i2p.util.Log;
  */
 public class GarlicMessageBuilder {
 
-    /** @param local non-null; do not use this method for the router's SessionKeyManager */
-    public static boolean needsTags(RouterContext ctx, PublicKey key, Hash local) {
+    /**
+     *  @param local non-null; do not use this method for the router's SessionKeyManager
+     *  @param minTagOverride 0 for no override, > 0 to override SKM's settings
+     */
+    static boolean needsTags(RouterContext ctx, PublicKey key, Hash local, int minTagOverride) {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
         if (skm == null)
             return true;
         SessionKey curKey = skm.getCurrentKey(key);
         if (curKey == null)
             return true;
+        if (minTagOverride > 0)
+            return skm.shouldSendTags(key, curKey, minTagOverride);
         return skm.shouldSendTags(key, curKey);
     }
     
@@ -141,16 +146,17 @@ public class GarlicMessageBuilder {
         }
         
         if (log.shouldLog(Log.INFO))
-            log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
+            log.info("Encrypted with public key to expire on " + new Date(config.getExpiration()));
         
         SessionKey curKey = skm.getCurrentOrNewKey(key);
         SessionTag curTag = null;
 
             curTag = skm.consumeNextAvailableTag(key, curKey);
             
-            int availTags = skm.getAvailableTags(key, curKey);
-            if (log.shouldLog(Log.DEBUG))
-                log.debug("Available tags for encryption to " + key + ": " + availTags);
+            if (log.shouldLog(Log.DEBUG)) {
+                int availTags = skm.getAvailableTags(key, curKey);
+                log.debug("Available tags for encryption: " + availTags + " low threshold: " + lowTagsThreshold);
+            }
 
             if (numTagsToDeliver > 0 && skm.shouldSendTags(key, curKey, lowTagsThreshold)) {
                 for (int i = 0; i < numTagsToDeliver; i++)
