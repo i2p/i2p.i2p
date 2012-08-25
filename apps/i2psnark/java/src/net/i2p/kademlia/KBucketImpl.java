@@ -41,6 +41,7 @@ import net.i2p.util.ConcurrentHashSet;
  *  removing entries, this KBucket will exceed the max size.
  *
  *  Refactored from net.i2p.router.networkdb.kademlia
+ *  @since 0.9.2
  */
 class KBucketImpl<T extends SimpleDataStructure> implements KBucket<T> {
     /**

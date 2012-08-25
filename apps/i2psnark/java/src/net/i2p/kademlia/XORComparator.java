@@ -8,6 +8,7 @@ import net.i2p.data.SimpleDataStructure;
 /**
  * Help sort Hashes in relation to a base key using the XOR metric
  *
+ * @since 0.9.2
  */
 class XORComparator<T extends SimpleDataStructure> implements Comparator<T> {
     private final byte[] _base;
