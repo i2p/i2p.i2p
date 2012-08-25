@@ -58,9 +58,7 @@ class Writer {
         boolean pending = false;
         synchronized (_pendingConnections) {
             if (_liveWrites.contains(con)) {
-                if (!_writeAfterLive.contains(con)) {
-                    _writeAfterLive.add(con);
-                }
+                _writeAfterLive.add(con);
                 already = true;
             } else {
                 pending = _pendingConnections.add(con);
