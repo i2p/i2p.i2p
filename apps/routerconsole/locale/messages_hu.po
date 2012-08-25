@@ -3197,7 +3197,7 @@ msgid "Project Website"
 msgstr "Projekt weboldala"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:54
-msgid "I2P Netowrk Statistics"
+msgid "I2P Network Statistics"
 msgstr "I2P Hálózati Statisztika"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:55

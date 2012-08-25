@@ -3444,7 +3444,7 @@ msgstr "Site web"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:56
 #, fuzzy
-msgid "I2P Netowrk Statistics"
+msgid "I2P Network Statistics"
 msgstr "Statistiques du routeur I2P"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:57
@@ -4474,7 +4474,7 @@ msgid "High capacity"
 msgstr "Hautes capacités"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:413
-msgid "The number of peers available for network database inquries"
+msgid "The number of peers available for network database inquiries"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:422

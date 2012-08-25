@@ -53,7 +53,7 @@ public class HomeHelper extends HelperBase {
         _x("Plugins") + S + _x("Add-on directory") + S + "http://plugins.i2p/" + S + I + "plugin.png" + S +
         _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "eepsite.png" + S +
         _x("Project Website") + S + _x("I2P home page") + S + "http://www.i2p2.i2p/" + S + I + "info_rhombus.png" + S +
-        "stats.i2p" + S + _x("I2P Netowrk Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "eepsite.png" + S +
+        "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "eepsite.png" + S +
         _x("Technical Docs") + S + _x("Technical documentation") + S + "http://www.i2p2.i2p/how" + S + I + "education.png" + S +
         _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "eepsite.png" + S +
         _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "eepsite.png" + S +

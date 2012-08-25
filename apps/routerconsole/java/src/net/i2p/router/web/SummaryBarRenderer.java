@@ -410,7 +410,7 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "<tr title=\"")
-           .append(_("The number of peers available for network database inquries"))
+           .append(_("The number of peers available for network database inquiries"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Integrated"))
