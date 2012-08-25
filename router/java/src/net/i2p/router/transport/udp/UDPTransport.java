@@ -1196,13 +1196,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return null;
             }
 
-            UDPAddress ua = new UDPAddress(addr);
-            if (ua.getIntroducerCount() <= 0) {
-                InetAddress ia = ua.getHostAddress();
-                if (ua.getPort() <= 0 || ia == null || !isValid(ia.getAddress()) ||
-                    Arrays.equals(ia.getAddress(), getExternalIP())) {
+            // don't do this - object churn parsing the whole thing
+            //UDPAddress ua = new UDPAddress(addr);
+            //if (ua.getIntroducerCount() <= 0) {
+            if (addr.getOption("ihost0") == null) {
+                String host = addr.getOption(UDPAddress.PROP_HOST);
+                String port = addr.getOption(UDPAddress.PROP_PORT);
+                if (host == null || port == null) {
                     markUnreachable(to);
                     return null;
+                }
+                try {
+                    InetAddress ia = InetAddress.getByName(host);
+                    int iport = Integer.parseInt(port);
+                    if (iport <= 0 || iport > 65535 || (!isValid(ia.getAddress())) ||
+                        Arrays.equals(ia.getAddress(), getExternalIP())) {
+                        markUnreachable(to);
+                        return null;
+                    }
+                } catch (UnknownHostException uhe) {
+                        markUnreachable(to);
+                        return null;
+                } catch (NumberFormatException nfe) {
+                        markUnreachable(to);
+                        return null;
                 }
             }
             if (!allowConnection())

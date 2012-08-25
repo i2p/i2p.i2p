@@ -758,6 +758,11 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                        + " sz=" +sz + " rem=" + rem + " padding=" + padding);
         
         DataHelper.toLong(buf.unencrypted, buf.unencryptedLength-4, 4, val);
+        // TODO object churn
+        // 1) store the length only
+        // 2) in prepareNextWriteFast(), pull a byte buffer off a queue and encrypt to that
+        // 3) change EventPumper.wantsWrite() to take a ByteBuffer arg
+        // 4) in EventPumper.processWrite(), release the byte buffer
         buf.encrypted = new byte[buf.unencryptedLength];
         
         //long crced = System.currentTimeMillis();
@@ -767,11 +772,20 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         //               + " serialize=" + (serialized-alloc) + " crc=" + (crced-serialized));
     }
     
-    private static int NUM_PREP_BUFS = 6;
+    private static final int MIN_BUFS = 4;
+    private static final int MAX_BUFS = 16;
+    private static int NUM_PREP_BUFS;
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        NUM_PREP_BUFS = (int) Math.max(MIN_BUFS, Math.min(MAX_BUFS, 1 + (maxMemory / (16*1024*1024))));
+    }
 
     private final static LinkedBlockingQueue<PrepBuffer> _bufs = new LinkedBlockingQueue(NUM_PREP_BUFS);
 
     /**
+     *  32KB each
      *  @return initialized buffer
      */
     private static PrepBuffer acquireBuf() {

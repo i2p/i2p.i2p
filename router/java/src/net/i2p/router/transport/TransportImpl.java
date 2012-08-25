@@ -69,7 +69,7 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.receiveMessageTime", "How long it takes to read a message?", "Transport", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.receiveMessageTimeSlow", "How long it takes to read a message (when it takes more than a second)?", "Transport", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
+        //_context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
         _unreachableEntries = new HashMap(16);
@@ -103,10 +103,14 @@ public abstract class TransportImpl implements Transport {
     /** Per-transport connection limit */
     public int getMaxConnections() {
         String style = getStyle();
+        // object churn
+        String maxProp;
         if (style.equals("SSU"))
-            style = "udp";
-        else
-            style = style.toLowerCase(Locale.US);
+            maxProp = "i2np.udp.maxConnections";
+        else if (style.equals("NTCP"))
+            maxProp = "i2np.ntcp.maxConnections";
+        else // shouldn't happen
+            maxProp = "i2np." + style.toLowerCase(Locale.US) + ".maxConnections";
         int def = DEFAULT_MAX_CONNECTIONS;
         RouterInfo ri = _context.router().getRouterInfo();
         if (ri != null) {
@@ -119,7 +123,7 @@ public abstract class TransportImpl implements Transport {
         if (style.equals("udp"))
             //def = def * 3 / 2;
             def *= 3;
-        return _context.getProperty("i2np." + style + ".maxConnections", def);
+        return _context.getProperty(maxProp, def);
     }
 
     private static final int DEFAULT_CAPACITY_PCT = 75;
@@ -325,8 +329,11 @@ public abstract class TransportImpl implements Transport {
 
 
         if (sendSuccessful) {
+            // TODO fix this stat for SSU ticket #698
             _context.statManager().addRateData("transport.sendProcessingTime", lifetime, lifetime);
-            _context.statManager().addRateData("transport.sendProcessingTime." + getStyle(), lifetime, 0);
+            // object churn. 33 ms for NTCP and 788 for SSU, but meaningless due to
+            // differences in how it's computed (immediate vs. round trip)
+            //_context.statManager().addRateData("transport.sendProcessingTime." + getStyle(), lifetime, 0);
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), getStyle(), sendTime, msg.getMessageSize());
             _context.statManager().addRateData("transport.sendMessageSize", msg.getMessageSize(), sendTime);
         } else {

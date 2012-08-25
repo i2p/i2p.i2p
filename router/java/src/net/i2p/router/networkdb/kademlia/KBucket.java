@@ -57,11 +57,14 @@ interface KBucket {
      * @return set of Hash structures
      */
     public Set<Hash> getEntries();
+
     /**
      * Retrieve hashes stored in the bucket, excluding the ones specified 
      * @return set of Hash structures
+     * @deprecated makes a copy, remove toIgnore in KBS instead
      */
     public Set<Hash> getEntries(Set<Hash> toIgnoreHashes);
+
     public void getEntries(SelectionCollector collector);
     
     /**

@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -208,10 +209,16 @@ class KBucketImpl implements KBucket {
         return true;
     }
     
+    /**
+     *  @return unmodifiable view
+     */
     public Set<Hash> getEntries() {
-        Set<Hash> entries = new HashSet(_entries);
-        return entries;
+        return Collections.unmodifiableSet(_entries);
     }
+
+    /**
+     *  @deprecated makes a copy, remove toIgnore in KBS instead
+     */
     public Set<Hash> getEntries(Set toIgnoreHashes) {
         Set<Hash> entries = new HashSet(_entries);
         entries.removeAll(toIgnoreHashes);
@@ -219,8 +226,7 @@ class KBucketImpl implements KBucket {
     }
     
     public void getEntries(SelectionCollector collector) {
-        Set<Hash> entries = new HashSet(_entries);
-        for (Hash h : entries) {
+        for (Hash h : _entries) {
                 collector.add(h);
         }
     }

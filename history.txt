@@ -1,3 +1,8 @@
+2012-08-25 zzz
+ * SDSCache: Reduce min and increase max size
+ * SimpleByteCache: Change from LBQ to ABQ to reduce object churn
+ * Other object churn cleanups (ticket #699)
+
 2012-08-24 zzz
  * I2CP:
    - Add methods for sending a message with extended options
