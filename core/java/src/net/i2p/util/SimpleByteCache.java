@@ -2,6 +2,7 @@ package net.i2p.util;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,6 +19,9 @@ public final class SimpleByteCache {
     private static final Map<Integer, SimpleByteCache> _caches = new ConcurrentHashMap(8);
 
     private static final int DEFAULT_SIZE = 16;
+
+    /** up to this, use ABQ to minimize object churn and for performance; above this, use LBQ for two locks */
+    private static final int MAX_FOR_ABQ = 64;
 
     /**
      * Get a cache responsible for arrays of the given size
@@ -58,11 +62,11 @@ public final class SimpleByteCache {
     /** list of available and available entries */
     private Queue<byte[]> _available;
     private int _maxCached;
-    private int _entrySize;
+    private final int _entrySize;
     
     private SimpleByteCache(int maxCachedEntries, int entrySize) {
-        _available = new LinkedBlockingQueue(maxCachedEntries);
         _maxCached = maxCachedEntries;
+        _available = createQueue();
         _entrySize = entrySize;
     }
     
@@ -70,13 +74,23 @@ public final class SimpleByteCache {
         if (_maxCached >= maxCachedEntries) return;
         _maxCached = maxCachedEntries;
         // make a bigger one, move the cached items over
-        Queue<byte[]> newLBQ = new LinkedBlockingQueue(maxCachedEntries);
+        Queue<byte[]> newLBQ = createQueue();
         byte[] ba;
         while ((ba = _available.poll()) != null)
             newLBQ.offer(ba);
         _available = newLBQ;
     }
     
+    /**
+     *  @return LBQ or ABQ
+     *  @since 0.9.2
+     */
+    private Queue<byte[]> createQueue() {
+        if (_maxCached <= MAX_FOR_ABQ)
+            return new ArrayBlockingQueue(_maxCached);
+        return new LinkedBlockingQueue(_maxCached);
+    }
+
     /**
      * Get the next available array, either from the cache or a brand new one
      */

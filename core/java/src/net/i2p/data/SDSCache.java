@@ -45,8 +45,8 @@ public class SDSCache<V extends SimpleDataStructure> {
     //private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(SDSCache.class);
 
     private static final Class[] conArg = new Class[] { byte[].class };
-    private static final double MIN_FACTOR = 0.25;
-    private static final double MAX_FACTOR = 3.0;
+    private static final double MIN_FACTOR = 0.20;
+    private static final double MAX_FACTOR = 5.0;
     private static final double FACTOR;
     static {
         long maxMemory = Runtime.getRuntime().maxMemory();
