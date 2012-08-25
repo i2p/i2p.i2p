@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-02 22:46+0000\n"
+"POT-Creation-Date: 2012-08-25 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,228 +17,237 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../i2prouter:320
+#: ../i2prouter:316
 msgid "Unable to locate \"ps\"."
 msgstr ""
 
-#: ../i2prouter:321 ../i2prouter:334 ../i2prouter:639
+#: ../i2prouter:317 ../i2prouter:330 ../i2prouter:645
 msgid ""
 "Please report this message along with the location of the command on your "
 "system."
 msgstr ""
 
-#: ../i2prouter:333
+#: ../i2prouter:329
 msgid "Unable to locate \"tr\"."
 msgstr ""
 
-#: ../i2prouter:488
+#: ../i2prouter:484
 msgid "  $1  Found but not executable."
 msgstr ""
 
-#: ../i2prouter:547
+#: ../i2prouter:543
 msgid "Unable to locate any of the following binaries:"
 msgstr ""
 
-#: ../i2prouter:638
+#: ../i2prouter:644
 msgid "Unable to locate \"id\"."
 msgstr ""
 
-#: ../i2prouter:778
+#: ../i2prouter:784
 #, sh-format
 msgid "Removed stale pid file: $PIDFILE"
 msgstr ""
 
-#: ../i2prouter:783
+#: ../i2prouter:789
 #, sh-format
 msgid "Cannot read $PIDFILE."
 msgstr ""
 
-#: ../i2prouter:872 ../i2prouter:898 ../i2prouter:972 ../i2prouter:1000
-#: ../i2prouter:1023
+#: ../i2prouter:879 ../i2prouter:906 ../i2prouter:980 ../i2prouter:1008
+#: ../i2prouter:1032
 #, sh-format
 msgid "$APP_LONG_NAME is already running."
 msgstr ""
 
-#: ../i2prouter:883
+#: ../i2prouter:890
 #, sh-format
 msgid "Running $APP_LONG_NAME..."
 msgstr ""
 
-#: ../i2prouter:905
+#: ../i2prouter:913
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME..."
 msgstr ""
 
-#: ../i2prouter:952
+#: ../i2prouter:960
 #, sh-format
 msgid " WARNING: $APP_LONG_NAME may have failed to start."
 msgstr ""
 
-#: ../i2prouter:955
+#: ../i2prouter:963
 #, sh-format
 msgid " running: PID:$pid"
 msgstr ""
 
-#: ../i2prouter:964
+#: ../i2prouter:972
 #, sh-format
 msgid ""
 "Starting $APP_LONG_NAME.  Detected Mac OSX and installed launchd daemon."
 msgstr ""
 
-#: ../i2prouter:966 ../i2prouter:994 ../i2prouter:1181 ../i2prouter:1377
+#: ../i2prouter:974 ../i2prouter:1002 ../i2prouter:1190 ../i2prouter:1442
 msgid "Must be root to perform this action."
 msgstr ""
 
-#: ../i2prouter:992
+#: ../i2prouter:1000
 #, sh-format
 msgid "Starting $APP_LONG_NAME.  Detected Linux and installed upstart."
 msgstr ""
 
-#: ../i2prouter:1010
+#: ../i2prouter:1018
 #, sh-format
 msgid "Starting $APP_LONG_NAME..."
 msgstr ""
 
-#: ../i2prouter:1034
+#: ../i2prouter:1043
 #, sh-format
 msgid "Stopping $APP_LONG_NAME..."
 msgstr ""
 
-#: ../i2prouter:1038 ../i2prouter:1106 ../i2prouter:1525
+#: ../i2prouter:1047 ../i2prouter:1115 ../i2prouter:1599
 #, sh-format
 msgid "$APP_LONG_NAME was not running."
 msgstr ""
 
-#: ../i2prouter:1051 ../i2prouter:1059 ../i2prouter:1121 ../i2prouter:1129
+#: ../i2prouter:1060 ../i2prouter:1068 ../i2prouter:1130 ../i2prouter:1138
 #, sh-format
 msgid "Unable to stop $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1077
+#: ../i2prouter:1086
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME to exit..."
 msgstr ""
 
-#: ../i2prouter:1091
+#: ../i2prouter:1100
 #, sh-format
 msgid "Failed to stop $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1094
+#: ../i2prouter:1103
 #, sh-format
 msgid "Stopped $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1102
+#: ../i2prouter:1111
 #, sh-format
 msgid "Stopping $APP_LONG_NAME gracefully..."
 msgstr ""
 
-#: ../i2prouter:1137
+#: ../i2prouter:1146
 #, sh-format
 msgid "Pausing $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1141
+#: ../i2prouter:1150
 #, sh-format
 msgid "Resuming $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1148
+#: ../i2prouter:1157
 #, sh-format
 msgid "$APP_LONG_NAME is not running."
 msgstr ""
 
-#: ../i2prouter:1153
+#: ../i2prouter:1162
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid"
 msgstr ""
 
-#: ../i2prouter:1156
+#: ../i2prouter:1165
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
 msgstr ""
 
-#: ../i2prouter:1163
+#: ../i2prouter:1172
 #, sh-format
 msgid " Installing the $APP_LONG_NAME daemon using upstart.."
 msgstr ""
 
-#: ../i2prouter:1165
+#: ../i2prouter:1174
 #, sh-format
 msgid " a custom upstart conf file ${APP_NAME}.conf found"
 msgstr ""
 
-#: ../i2prouter:1168
+#: ../i2prouter:1177
 msgid " creating default upstart conf file.."
 msgstr ""
 
-#: ../i2prouter:1186 ../i2prouter:1383
+#: ../i2prouter:1195 ../i2prouter:1448
 msgid "Detected Solaris:"
 msgstr ""
 
-#: ../i2prouter:1188 ../i2prouter:1200 ../i2prouter:1219 ../i2prouter:1230
-#: ../i2prouter:1244 ../i2prouter:1258 ../i2prouter:1286 ../i2prouter:1324
-#: ../i2prouter:1359
+#: ../i2prouter:1197 ../i2prouter:1209 ../i2prouter:1227 ../i2prouter:1284
+#: ../i2prouter:1295 ../i2prouter:1309 ../i2prouter:1323 ../i2prouter:1351
+#: ../i2prouter:1389 ../i2prouter:1424
 #, sh-format
 msgid " The $APP_LONG_NAME daemon is already installed."
 msgstr ""
 
-#: ../i2prouter:1191 ../i2prouter:1206 ../i2prouter:1222 ../i2prouter:1247
-#: ../i2prouter:1261 ../i2prouter:1275 ../i2prouter:1289 ../i2prouter:1327
-#: ../i2prouter:1362
+#: ../i2prouter:1200 ../i2prouter:1215 ../i2prouter:1287 ../i2prouter:1312
+#: ../i2prouter:1326 ../i2prouter:1340 ../i2prouter:1354 ../i2prouter:1392
+#: ../i2prouter:1427
 #, sh-format
 msgid " Installing the $APP_LONG_NAME daemon.."
 msgstr ""
 
-#: ../i2prouter:1198 ../i2prouter:1396
+#: ../i2prouter:1207 ../i2prouter:1461
 msgid "Detected RHEL or Fedora:"
 msgstr ""
 
-#: ../i2prouter:1213
+#: ../i2prouter:1222 ../i2prouter:1475
 msgid "Detected Arch Linux:"
 msgstr ""
 
-#: ../i2prouter:1214
-msgid "Installing as a daemon is not yet supported in Arch Linux."
+#: ../i2prouter:1224
+msgid "Initscript from AUR package found. Refusing to continue."
 msgstr ""
 
-#: ../i2prouter:1217 ../i2prouter:1410
+#: ../i2prouter:1277
+#, sh-format
+msgid " The $APP_LONG_NAME daemon has been installed."
+msgstr ""
+
+#: ../i2prouter:1278
+msgid " Add \\\"i2p\\\" to the DAEMONS variable in /etc/rc.conf to enable."
+msgstr ""
+
+#: ../i2prouter:1282 ../i2prouter:1484
 msgid "Detected SuSE or SLES:"
 msgstr ""
 
-#: ../i2prouter:1228 ../i2prouter:1420
+#: ../i2prouter:1293 ../i2prouter:1494
 msgid "Detected Debian-based distribution:"
 msgstr ""
 
-#: ../i2prouter:1236
+#: ../i2prouter:1301
 #, sh-format
 msgid " Installing the $APP_LONG_NAME daemon using init.d.."
 msgstr ""
 
-#: ../i2prouter:1242 ../i2prouter:1433
+#: ../i2prouter:1307 ../i2prouter:1507
 msgid "Detected Linux:"
 msgstr ""
 
-#: ../i2prouter:1256 ../i2prouter:1446
+#: ../i2prouter:1321 ../i2prouter:1520
 msgid "Detected HP-UX:"
 msgstr ""
 
-#: ../i2prouter:1267 ../i2prouter:1458
+#: ../i2prouter:1332 ../i2prouter:1532
 msgid "Detected AIX:"
 msgstr ""
 
-#: ../i2prouter:1269
+#: ../i2prouter:1334
 #, sh-format
 msgid " The $APP_LONG_NAME daemon is already installed as rc.d script."
 msgstr ""
 
-#: ../i2prouter:1272
+#: ../i2prouter:1337
 #, sh-format
 msgid " The $APP_LONG_NAME daemon is already installed as SRC service."
 msgstr ""
 
-#: ../i2prouter:1277
+#: ../i2prouter:1342
 msgid ""
 " The task /usr/sbin/install_assist was found in the inittab, this might "
 "cause problems for all subsequent tasks to launch at this process is known "
@@ -246,158 +255,158 @@ msgid ""
 "remove/deactivate it."
 msgstr ""
 
-#: ../i2prouter:1284 ../i2prouter:1476
+#: ../i2prouter:1349 ../i2prouter:1550
 msgid "Detected FreeBSD:"
 msgstr ""
 
-#: ../i2prouter:1322 ../i2prouter:1489
+#: ../i2prouter:1387 ../i2prouter:1563
 msgid "Detected Mac OSX:"
 msgstr ""
 
-#: ../i2prouter:1357 ../i2prouter:1503
+#: ../i2prouter:1422 ../i2prouter:1577
 msgid "Detected z/OS:"
 msgstr ""
 
-#: ../i2prouter:1369
+#: ../i2prouter:1434
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
 msgstr ""
 
-#: ../i2prouter:1385 ../i2prouter:1398 ../i2prouter:1412 ../i2prouter:1435
-#: ../i2prouter:1448 ../i2prouter:1460 ../i2prouter:1478 ../i2prouter:1491
-#: ../i2prouter:1505
+#: ../i2prouter:1450 ../i2prouter:1463 ../i2prouter:1477 ../i2prouter:1486
+#: ../i2prouter:1509 ../i2prouter:1522 ../i2prouter:1534 ../i2prouter:1552
+#: ../i2prouter:1565 ../i2prouter:1579
 #, sh-format
 msgid " Removing $APP_LONG_NAME daemon..."
 msgstr ""
 
-#: ../i2prouter:1391 ../i2prouter:1406 ../i2prouter:1416 ../i2prouter:1429
-#: ../i2prouter:1441 ../i2prouter:1454 ../i2prouter:1472 ../i2prouter:1485
-#: ../i2prouter:1499 ../i2prouter:1510
+#: ../i2prouter:1456 ../i2prouter:1471 ../i2prouter:1480 ../i2prouter:1490
+#: ../i2prouter:1503 ../i2prouter:1515 ../i2prouter:1528 ../i2prouter:1546
+#: ../i2prouter:1559 ../i2prouter:1573 ../i2prouter:1584
 #, sh-format
 msgid " The $APP_LONG_NAME daemon is not currently installed."
 msgstr ""
 
-#: ../i2prouter:1403 ../i2prouter:1426
+#: ../i2prouter:1468 ../i2prouter:1500
 #, sh-format
 msgid " Removing $APP_LONG_NAME daemon from upstart..."
 msgstr ""
 
-#: ../i2prouter:1422
+#: ../i2prouter:1496
 #, sh-format
 msgid " Removing $APP_LONG_NAME daemon from init.d..."
 msgstr ""
 
-#: ../i2prouter:1514
+#: ../i2prouter:1588
 #, sh-format
 msgid "Remove not currently supported for $DIST_OS"
 msgstr ""
 
-#: ../i2prouter:1521
+#: ../i2prouter:1595
 #, sh-format
 msgid "Dumping $APP_LONG_NAME..."
 msgstr ""
 
-#: ../i2prouter:1531
+#: ../i2prouter:1605
 #, sh-format
 msgid "Failed to dump $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1534
+#: ../i2prouter:1608
 #, sh-format
 msgid "Dumped $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1544
+#: ../i2prouter:1618
 #, sh-format
 msgid "Starting $APP_LONG_NAME...  Wrapper:Stopped"
 msgstr ""
 
-#: ../i2prouter:1548
+#: ../i2prouter:1622
 #, sh-format
 msgid "Starting $APP_LONG_NAME...  Wrapper:Running"
 msgstr ""
 
-#: ../i2prouter:1551
+#: ../i2prouter:1625
 #, sh-format
 msgid "Starting $APP_LONG_NAME...  Wrapper:$STATUS, Java:$JAVASTATUS"
 msgstr ""
 
-#: ../i2prouter:1561
+#: ../i2prouter:1635
 #, sh-format
 msgid "Stopping $APP_LONG_NAME...  Wrapper:Stopped"
 msgstr ""
 
-#: ../i2prouter:1565
+#: ../i2prouter:1639
 #, sh-format
 msgid "Stopping $APP_LONG_NAME...  Wrapper:Running"
 msgstr ""
 
-#: ../i2prouter:1568
+#: ../i2prouter:1642
 #, sh-format
 msgid "Stopping $APP_LONG_NAME...  Wrapper:$STATUS, Java:$JAVASTATUS"
 msgstr ""
 
-#: ../i2prouter:1578
+#: ../i2prouter:1652
 msgid "Unexpected command: $1"
 msgstr ""
 
-#: ../i2prouter:1582
+#: ../i2prouter:1656
 msgid "Usage: "
 msgstr ""
 
-#: ../i2prouter:1609
+#: ../i2prouter:1683
 msgid "Commands:"
 msgstr ""
 
-#: ../i2prouter:1610
+#: ../i2prouter:1684
 msgid "  console      Launch in the current console."
 msgstr ""
 
-#: ../i2prouter:1611
+#: ../i2prouter:1685
 msgid "  start        Start in the background as a daemon process."
 msgstr ""
 
-#: ../i2prouter:1612
+#: ../i2prouter:1686
 msgid "  stop         Stop if running as a daemon or in another console."
 msgstr ""
 
-#: ../i2prouter:1613
+#: ../i2prouter:1687
 msgid "  graceful     Stop gracefully, may take up to 11 minutes."
 msgstr ""
 
-#: ../i2prouter:1614
+#: ../i2prouter:1688
 msgid "  restart      Stop if running and then start."
 msgstr ""
 
-#: ../i2prouter:1615
+#: ../i2prouter:1689
 msgid "  condrestart  Restart only if already running."
 msgstr ""
 
-#: ../i2prouter:1617
+#: ../i2prouter:1691
 msgid "  pause        Pause if running."
 msgstr ""
 
-#: ../i2prouter:1618
+#: ../i2prouter:1692
 msgid "  resume       Resume if paused."
 msgstr ""
 
-#: ../i2prouter:1620
+#: ../i2prouter:1694
 msgid "  status       Query the current status."
 msgstr ""
 
-#: ../i2prouter:1621
+#: ../i2prouter:1695
 msgid "  install      Install to start automatically when system boots."
 msgstr ""
 
-#: ../i2prouter:1622
+#: ../i2prouter:1696
 msgid "  remove       Uninstall."
 msgstr ""
 
-#: ../i2prouter:1623
+#: ../i2prouter:1697
 msgid "  dump         Request a Java thread dump if running."
 msgstr ""
 
-#: ../i2prouter:1627
+#: ../i2prouter:1701
 msgid ""
 "JavaAppArgs: Zero or more arguments which will be passed to the Java "
 "application."

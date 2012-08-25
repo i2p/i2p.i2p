@@ -1,3 +1,7 @@
+2012-08-25 kytv
+ * Dutch and German translation updates from Transifex
+ * Router console typo fixes (#701)
+
 2012-08-25 zzz
  * SDSCache: Reduce min and increase max size
  * SimpleByteCache: Change from LBQ to ABQ to reduce object churn
