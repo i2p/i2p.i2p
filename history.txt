@@ -1,3 +1,12 @@
+2012-08-26 zzz
+ * DataHelper: Trim trailing whitespace when loading properties
+ * NetDB: Increase floodfills, decrease flood redundancy
+ * SendMessageOptions: Increase tag fields to 4 bits and use
+                       table lookup for more flexibility
+ * Streaming: Use packet type and current window size to adjust
+              number of tags sent and tag threshold, to improve
+              efficiency and reliability
+
 2012-08-25 kytv
  * Dutch and German translation updates from Transifex
  * Router console typo fixes (#701)

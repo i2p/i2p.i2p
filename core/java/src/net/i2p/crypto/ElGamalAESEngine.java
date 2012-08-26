@@ -38,6 +38,8 @@ public class ElGamalAESEngine {
     private final Log _log;
     private final static int MIN_ENCRYPTED_SIZE = 80; // smallest possible resulting size
     private final I2PAppContext _context;
+    /** enforced since release 0.6 */
+    public static final int MAX_TAGS_RECEIVED = 200;
 
     public ElGamalAESEngine(I2PAppContext ctx) {
         _context = ctx;
@@ -328,7 +330,7 @@ public class ElGamalAESEngine {
             //ByteArrayInputStream bais = new ByteArrayInputStream(decrypted);
             int cur = 0;
             long numTags = DataHelper.fromLong(decrypted, cur, 2);
-            if ((numTags < 0) || (numTags > 200)) throw new Exception("Invalid number of session tags");
+            if ((numTags < 0) || (numTags > MAX_TAGS_RECEIVED)) throw new Exception("Invalid number of session tags");
             if (numTags > 0) tags = new ArrayList((int)numTags);
             cur += 2;
             //_log.debug("# tags: " + numTags);
