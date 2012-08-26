@@ -394,12 +394,21 @@ public class DataHelper {
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);
     }
+
+    /**
+     *  @param forceLowerCase if true forces the keys to lower case (not the values)
+     */
     public static void loadProps(Properties props, File file, boolean forceLowerCase) throws IOException {
         loadProps(props, new FileInputStream(file), forceLowerCase);
     }
+
     public static void loadProps(Properties props, InputStream inStr) throws IOException {
         loadProps(props, inStr, false);
     }
+
+    /**
+     *  @param forceLowerCase if true forces the keys to lower case (not the values)
+     */
     public static void loadProps(Properties props, InputStream inStr, boolean forceLowerCase) throws IOException {
         BufferedReader in = null;
         try {
@@ -414,7 +423,7 @@ public class DataHelper {
                 int split = line.indexOf('=');
                 if (split <= 0) continue;
                 String key = line.substring(0, split);
-                String val = line.substring(split+1);   //.trim() ??????????????
+                String val = line.substring(split+1).trim();
                 // Unescape line breaks after loading.
                 // Remember: "\" needs escaping both for regex and string.
 
