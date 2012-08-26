@@ -33,6 +33,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
+
+    /**
+     *  This is the flood redundancy. Entries are
+     *  sent to this many other floodfills.
+     *  Was 7 through release 0.9; 5 for 0.9.1.
+     */
+    private static final int MAX_TO_FLOOD = 4;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
@@ -155,8 +162,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     boolean shouldThrottleLookup(Hash from, TunnelId id) {
         return _lookupThrottler.shouldThrottle(from, id);
     }
-
-    private static final int MAX_TO_FLOOD = 5;
 
     /**
      *  Send to a subset of all floodfill peers.
