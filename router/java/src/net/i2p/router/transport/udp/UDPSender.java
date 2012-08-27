@@ -25,12 +25,17 @@ class UDPSender {
     private final Runner _runner;
     private static final int TYPE_POISON = 99999;
     
-    //private static final int MAX_QUEUED = 4;
+    private static final int MIN_QUEUE_SIZE = 64;
+    private static final int MAX_QUEUE_SIZE = 384;
     
     public UDPSender(RouterContext ctx, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPSender.class);
-        _outboundQueue = new LinkedBlockingQueue();
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (1024*1024)));
+        _outboundQueue = new LinkedBlockingQueue(qsize);
         _socket = socket;
         _runner = new Runner();
         _name = name;
@@ -81,6 +86,14 @@ class UDPSender {
         _outboundQueue.clear();
     }
     
+    /**
+     *  Clear outbound queue, probably in preparation for sending destroy() to everybody.
+     *  @since 0.9.2
+     */
+    public void clear() {
+        _outboundQueue.clear();
+    }
+    
 /*********
     public DatagramSocket updateListeningPort(DatagramSocket socket, int newPort) {
         return _runner.updateListeningPort(socket, newPort);
@@ -93,10 +106,9 @@ class UDPSender {
      * available, if requested, otherwise it returns immediately
      *
      * @param blockTime how long to block IGNORED
-     * @return ZERO (used to be number of packets in the queue)
      * @deprecated use add(packet)
      */
-    public int add(UDPPacket packet, int blockTime) {
+    public void add(UDPPacket packet, int blockTime) {
      /********
         //long expiration = _context.clock().now() + blockTime;
         int remaining = -1;
@@ -148,31 +160,32 @@ class UDPSender {
             _log.debug("Added the packet onto the queue with " + remaining + " remaining and a lifetime of " + lifetime);
         return remaining;
      ********/
-        return add(packet);
+        add(packet);
     }
     
-    private static final int MAX_HEAD_LIFETIME = 1000;
+    private static final int MAX_HEAD_LIFETIME = 3*1000;
     
     /**
-     * Put it on the queue
-     * @return ZERO (used to be number of packets in the queue)
+     * Put it on the queue.
+     * BLOCKING if queue is full (backs up PacketPusher thread)
      */
-    public int add(UDPPacket packet) {
-        if (packet == null || !_keepRunning) return 0;
-        int size = 0;
+    public void add(UDPPacket packet) {
+        if (packet == null || !_keepRunning) return;
         int psz = packet.getPacket().getLength();
         if (psz > PeerState.LARGE_MTU) {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet);
-            return 0;
+            return;
         }
-        _outboundQueue.offer(packet);
+        try {
+            _outboundQueue.put(packet);
+        } catch (InterruptedException ie) {
+            return;
+        }
         //size = _outboundQueue.size();
         //_context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
         if (_log.shouldLog(Log.DEBUG)) {
-            size = _outboundQueue.size();
-            _log.debug("Added the packet onto the queue with " + size + " remaining and a lifetime of " + packet.getLifetime());
+            _log.debug("Added the packet onto the queue with a lifetime of " + packet.getLifetime());
         }
-        return size;
     }
     
     private class Runner implements Runnable {

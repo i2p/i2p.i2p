@@ -136,13 +136,10 @@ class UDPEndpoint {
     /**
      * Add the packet to the outobund queue to be sent ASAP (as allowed by
      * the bandwidth limiter)
-     *
-     * @return ZERO (used to be number of packets in the queue)
+     * BLOCKING if queue is full.
      */
-    public int send(UDPPacket packet) { 
-        if (_sender == null)
-            return 0;
-        return _sender.add(packet); 
+    public void send(UDPPacket packet) { 
+        _sender.add(packet); 
     }
     
     /**
@@ -153,5 +150,13 @@ class UDPEndpoint {
         if (_receiver == null)
             return null;
         return _receiver.receiveNext(); 
+    }
+    
+    /**
+     *  Clear outbound queue, probably in preparation for sending destroy() to everybody.
+     *  @since 0.9.2
+     */
+    public void clearOutbound() {
+        _sender.clear();
     }
 }

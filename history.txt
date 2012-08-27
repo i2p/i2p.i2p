@@ -1,3 +1,17 @@
+2012-08-27 zzz
+ * i2psnark: Notify threads awaiting DHT replies at shutdown
+ * Reseed: Remove forum.i2p2.de
+ * Streaming: Limit amount of slow-start exponential growth
+ * SSU:
+   - Limit UDPSender queue size
+   - Increase UDPSender max packet lifetime
+   - Clear UDPSender queue before sending destroys to all
+   - Increase PeerState queue size so large streaming windows
+     don't get dropped right away, especially at slow start
+   - Various improvements on iterating over pending outbound
+     messages in PeerState
+ * Wrapper: Update armv7 to 3.5.15
+
 2012-08-27 kytv
  * Update Java Service Wrapper to v3.5.15.
     - Windows: Self-compiled with VS2010 in Windows 7. The icon has been

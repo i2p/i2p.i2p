@@ -42,6 +42,8 @@ class OutboundMessageState {
     private static final int MAX_ENTRIES = 64;
     /** would two caches, one for small and one for large messages, be better? */
     private static final ByteCache _cache = ByteCache.getInstance(MAX_ENTRIES, MAX_MSG_SIZE);
+
+    private static final long EXPIRATION = 10*1000;
     
     public OutboundMessageState(I2PAppContext context) {
         _context = context;
@@ -64,6 +66,7 @@ class OutboundMessageState {
     
     /**
      *  Called from UDPTransport
+     *  TODO make two constructors, remove this, and make more things final
      *  @return success
      */
     public boolean initialize(I2NPMessage msg, PeerState peer) {
@@ -82,6 +85,7 @@ class OutboundMessageState {
     
     /**
      *  Called from OutboundMessageFragments
+     *  TODO make two constructors, remove this, and make more things final
      *  @return success
      */
     public boolean initialize(OutNetMessage m, I2NPMessage msg) {
@@ -121,7 +125,7 @@ class OutboundMessageState {
 
             _startedOn = _context.clock().now();
             _nextSendTime = _startedOn;
-            _expiration = _startedOn + 10*1000;
+            _expiration = _startedOn + EXPIRATION;
             //_expiration = msg.getExpiration();
 
             if (_log.shouldLog(Log.DEBUG))

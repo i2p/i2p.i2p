@@ -38,7 +38,7 @@ class PacketPusher implements Runnable {
                 if (packets != null) {
                     for (int i = 0; i < packets.length; i++) {
                         if (packets[i] != null) // null for ACKed fragments
-                            //_sender.add(packets[i], 0); // 0 does not block //100); // blocks for up to 100ms
+                            // BLOCKING if queue is full
                             _sender.add(packets[i]);
                     }
                 }
