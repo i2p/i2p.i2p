@@ -133,6 +133,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final int REPLY_PONG = 1;
     private static final int REPLY_PEERS = 2;
     private static final int REPLY_NODES = 3;
+    private static final int REPLY_NETWORK_FAIL = 4;
 
     public static final boolean SECURE_NID = true;
 
@@ -272,6 +273,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                      if (! (ni.equals(_myNodeInfo) || (toTry.contains(ni) && tried.contains(ni))))
                          toTry.add(ni);
                  }
+            } else if (replyType == REPLY_NETWORK_FAIL) {
+                 break;
             } else {
                  if (_log.shouldLog(Log.INFO))
                      _log.info("Got unexpected reply " + replyType + ": " + waiter.getReplyObject());
@@ -370,6 +373,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                      if (! (ni.equals(_myNodeInfo) || tried.contains(ni) || toTry.contains(ni)))
                          toTry.add(ni);
                  }
+            } else if (replyType == REPLY_NETWORK_FAIL) {
+                 break;
             } else {
                  if (_log.shouldLog(Log.INFO))
                      _log.info("Got unexpected reply " + replyType + ": " + waiter.getReplyObject());
@@ -564,7 +569,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _tracker.stop();
         PersistDHT.saveDHT(_knownNodes, _dhtFile);
         _knownNodes.stop();
-        _sentQueries.clear();
+        for (Iterator<ReplyWaiter> iter = _sentQueries.values().iterator(); iter.hasNext(); ) {
+            ReplyWaiter waiter = iter.next();
+            iter.remove();
+            waiter.networkFail();
+        }
         _outgoingTokens.clear();
         _incomingTokens.clear();
     }
@@ -1317,7 +1326,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         private final NodeInfo sentTo;
         private final Runnable onReply;
         private final Runnable onTimeout;
-        private int replyCode;
+        private volatile int replyCode;
         private Object sentObject;
         private Object replyObject;
 
@@ -1396,6 +1405,18 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             timeout(sentTo);
             if (_log.shouldLog(Log.INFO))
                 _log.warn("timeout waiting for reply from " + sentTo);
+            synchronized(this) {
+                this.notifyAll();
+            }
+        }
+
+        /**
+         *  Will notify this but not run onReply or onTimeout,
+         *  or remove from _sentQueries, or call heardFrom().
+         */
+        public void networkFail() {
+            cancel();
+            replyCode = REPLY_NETWORK_FAIL;
             synchronized(this) {
                 this.notifyAll();
             }
@@ -1532,22 +1553,24 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 return;
             if (!_hasBootstrapped) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Bootstrap start size: " + _knownNodes.size());
+                    _log.info("Bootstrap start, size: " + _knownNodes.size());
                 explore(_myNID, 8, 60*1000, 1);
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Bootstrap done size: " + _knownNodes.size());
+                    _log.info("Bootstrap done, size: " + _knownNodes.size());
                 _hasBootstrapped = true;
             }
             if (!_isRunning)
                 return;
             if (_log.shouldLog(Log.INFO))
-                _log.info("Explore start size: " + _knownNodes.size());
+                _log.info("Explore start. size: " + _knownNodes.size());
             List<NID> keys = _knownNodes.getExploreKeys();
             for (NID nid : keys) {
                 explore(nid, 8, 60*1000, 1);
+                if (!_isRunning)
+                    return;
             }
             if (_log.shouldLog(Log.INFO))
-                _log.info("Explore done size: " + _knownNodes.size());
+                _log.info("Explore of " + keys.size() + " buckets done, new size: " + _knownNodes.size());
             new Explorer(EXPLORE_TIME);
         }
     }

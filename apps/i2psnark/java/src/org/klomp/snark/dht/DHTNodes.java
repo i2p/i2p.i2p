@@ -44,6 +44,8 @@ class DHTNodes {
     private static final long MIN_EXPIRE_TIME = 10*60*1000;
     private static final long DELTA_EXPIRE_TIME = 3*60*1000;
     private static final int MAX_PEERS = 799;
+    /** Buckets older than this are refreshed - BEP 5 says 15 minutes */
+    private static final long MAX_BUCKET_AGE = 15*60*1000;
 
     public DHTNodes(I2PAppContext ctx, NID me) {
         _context = ctx;
@@ -121,7 +123,7 @@ class DHTNodes {
      *  DHT - get random keys to explore
      */
     public List<NID> getExploreKeys() {
-        return _kad.getExploreKeys(15*60*1000);
+        return _kad.getExploreKeys(MAX_BUCKET_AGE);
     }
 
     /** */
