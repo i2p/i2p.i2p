@@ -1,5 +1,7 @@
 2012-08-27 zzz
- * i2psnark: Notify threads awaiting DHT replies at shutdown
+ * i2psnark:
+   - Notify threads awaiting DHT replies at shutdown
+   - Fix cases where we weren't using the session for b32 lookup
  * Reseed: Remove forum.i2p2.de
  * Streaming: Limit amount of slow-start exponential growth
  * SSU:

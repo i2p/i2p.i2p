@@ -487,7 +487,7 @@ public class TrackerClient implements Runnable {
                 if ((!stop) && !hashes.isEmpty()) {
                     List<Peer> peers = new ArrayList(hashes.size());
                     for (Hash h : hashes) {
-                        PeerID pID = new PeerID(h.getData());
+                        PeerID pID = new PeerID(h.getData(), _util);
                         peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
                     }
                     Collections.shuffle(peers, r);
@@ -651,7 +651,7 @@ public class TrackerClient implements Runnable {
         in = new FileInputStream(fetched);
 
         TrackerInfo info = new TrackerInfo(in, snark.getID(),
-                                           snark.getInfoHash(), snark.getMetaInfo());
+                                           snark.getInfoHash(), snark.getMetaInfo(), _util);
         if (_log.shouldLog(Log.INFO))
             _log.info("TrackerClient response: " + info);
 

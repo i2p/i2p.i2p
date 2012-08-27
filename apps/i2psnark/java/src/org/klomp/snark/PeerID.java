@@ -52,6 +52,7 @@ public class PeerID implements Comparable
   /** whether we have tried to get the dest from the hash - only do once */
   private boolean triedDestLookup;
   private final int hash;
+  private final I2PSnarkUtil util;
 
   public PeerID(byte[] id, Destination address)
   {
@@ -60,6 +61,7 @@ public class PeerID implements Comparable
     this.port = 6881;
     this.destHash = address.calculateHash().getData();
     hash = calculateHash();
+    util = null;
   }
 
   /**
@@ -93,13 +95,15 @@ public class PeerID implements Comparable
     port = 6881;
     this.destHash = address.calculateHash().getData();
     hash = calculateHash();
+    util = null;
   }
 
   /**
    * Creates a PeerID from a destHash
+   * @param util for eventual destination lookup
    * @since 0.8.1
    */
-  public PeerID(byte[] dest_hash) throws InvalidBEncodingException
+  public PeerID(byte[] dest_hash, I2PSnarkUtil util) throws InvalidBEncodingException
   {
     // id and address remain null
     port = 6881;
@@ -107,6 +111,7 @@ public class PeerID implements Comparable
         throw new InvalidBEncodingException("bad hash length");
     destHash = dest_hash;
     hash = DataHelper.hashCode(dest_hash);
+    this.util = util;
   }
 
   public byte[] getID()
@@ -131,7 +136,7 @@ public class PeerID implements Comparable
   {
     if (address == null && destHash != null && !triedDestLookup) {
         String b32 = Base32.encode(destHash) + ".b32.i2p";
-        address = I2PAppContext.getGlobalContext().namingService().lookup(b32);
+        address = util.getDestination(b32);
         triedDestLookup = true;
     }
     return address;

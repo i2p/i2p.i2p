@@ -207,4 +207,10 @@ interface PeerListener
    * @since 0.8.4
    */
   void gotPeers(Peer peer, List<PeerID> pIDList);
+
+  /**
+   *  Convenience
+   *  @since 0.9.2
+   */
+  public I2PSnarkUtil getUtil();
 }

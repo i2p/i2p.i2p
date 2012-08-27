@@ -1435,5 +1435,13 @@ class PeerCoordinator implements PeerListener
         return listener.overUpBWLimit(total * 1000 / CHECK_PERIOD);
     return false;
   }
+
+  /**
+   *  Convenience
+   *  @since 0.9.2
+   */
+  public I2PSnarkUtil getUtil() {
+      return _util;
+  }
 }
 
