@@ -31,7 +31,7 @@ class TCBShare {
     private static final double RTT_DAMPENING = 0.75;
     private static final double WDW_DAMPENING = 0.75;
     private static final int MAX_RTT = ((int) Connection.MAX_RESEND_DELAY) / 2;
-    private static final int MAX_WINDOW_SIZE = Connection.MAX_WINDOW_SIZE / 4;
+    private static final int MAX_WINDOW_SIZE = ConnectionPacketHandler.MAX_SLOW_START_WINDOW;
     
     public TCBShare(I2PAppContext ctx, SimpleTimer2 timer) {
         _context = ctx;
@@ -45,6 +45,7 @@ class TCBShare {
         _cleaner.cancel();
     }
 
+    /** retrieve from cache */
     public void updateOptsFromShare(Connection con) {
         Destination dest = con.getRemotePeer();
         if (dest == null)
@@ -65,6 +66,7 @@ class TCBShare {
         opts.setWindowSize(e.getWindowSize());
     }
 
+    /** store to cache */
     public void updateShareOpts(Connection con) {
         Destination dest = con.getRemotePeer();
         if (dest == null)

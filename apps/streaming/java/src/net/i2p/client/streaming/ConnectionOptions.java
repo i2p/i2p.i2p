@@ -100,6 +100,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final boolean DEFAULT_ANSWER_PINGS = true;
     private static final int DEFAULT_INACTIVITY_TIMEOUT = 90*1000;
     private static final int DEFAULT_INACTIVITY_ACTION = INACTIVITY_ACTION_SEND;
+    private static final int DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = 1;
+    private static final int DEFAULT_SLOW_START_GROWTH_RATE_FACTOR = 1;
 
 
     /**
@@ -327,8 +329,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
         setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
-        setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 1));
-        setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
+        setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR,
+                                                      DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
+        setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
+                                            DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
         // overrides default in super()
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
@@ -378,9 +382,11 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         if (opts.contains(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR))
-            setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 2));
+            setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR,
+                                                          DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
         if (opts.contains(PROP_SLOW_START_GROWTH_RATE_FACTOR))
-            setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 2));
+            setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
+                                                DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
             // wow 5 minutes!!! FIXME!!
             // overrides default in super()
