@@ -1,3 +1,14 @@
+2012-08-27 kytv
+ * Update Java Service Wrapper to v3.5.15.
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
+      compat6x port.
+    - Linux ARMv5, Linux PPC32: Self-compiled in Debian Squeeze
+    - Linux x86, Linux x64, MacOSX & Solaris: Binares are from the "community
+      edition" deltapack offered by Tanuki. The x86 and x64 binaries for Linux
+      have been stripped.
+
 2012-08-26 zzz
  * DataHelper: Trim trailing whitespace when loading properties
  * NetDB: Increase floodfills, decrease flood redundancy
