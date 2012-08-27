@@ -62,7 +62,7 @@ public class Reseeder {
     public static final String DEFAULT_SEED_URL =
               "http://netdb.i2p2.de/" + "," +
               "http://reseed.i2p-projekt.de/" + "," +
-              "http://forum.i2p2.de/netdb/" + "," +
+          //  "http://forum.i2p2.de/netdb/" + "," +
               "http://euve5653.vserver.de/netDb/" +  "," +
           //  "http://r31453.ovh.net/static_media/files/netDb/" + "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
@@ -73,7 +73,7 @@ public class Reseeder {
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
               "https://netdb.i2p2.de/" + "," +
-              "https://forum.i2p2.de/netdb/" + "," +
+          //  "https://forum.i2p2.de/netdb/" + "," +
               "https://euve5653.vserver.de/netDb/" +  "," +
               "https://reseed.i2p-projekt.de/" + "," +
           //  "https://r31453.ovh.net/static_media/files/netDb/" + "," +
