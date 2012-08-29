@@ -6,7 +6,7 @@ package net.i2p.router.util;
  * No license, free to use
  */
 
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Iterator;
@@ -89,6 +89,13 @@ public class RandomIterator<E> implements Iterator<E> {
     /** Used to narrow the range to take random indexes from */
     private int lower, upper;
 
+    private static final boolean isAndroid = System.getProperty("java.vendor").contains("Android");
+
+    static {
+        if (isAndroid)
+            testAndroid();
+    }
+
     public RandomIterator(List<E> list){
         this.list = list;
         LIST_SIZE = list.size();
@@ -129,7 +136,8 @@ public class RandomIterator<E> implements Iterator<E> {
         // I2P - ensure lower and upper are always clear
         if (hasNext()) {
             if (index == lower)
-                lower = served.nextClearBit(lower);
+                // workaround for Android ICS bug - see below
+                lower = isAndroid ? nextClearBit(lower) : served.nextClearBit(lower);
             else if (index == upper)
                 upper = previousClearBit(upper - 1);
         }
@@ -147,25 +155,36 @@ public class RandomIterator<E> implements Iterator<E> {
     }
 
     /**
+     *  Workaround for bug in Android (ICS only?)
+     *  http://code.google.com/p/android/issues/detail?id=31036
+     *  @since 0.9.2
+     */
+    private int nextClearBit(int n) {
+        for (int i = n; i <= upper; i++) {
+            if (!served.get(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      *  @throws UnsupportedOperationException always
      */
     public void remove() {
         throw new UnsupportedOperationException();
     }
 
-/*****
     public static void main(String[] args) {
-        System.out.println("\n testing with 0");
+        testAndroid();
         test(0);
-        System.out.println("\n testing with 1");
         test(1);
-        System.out.println("\n testing with 2");
         test(2);
-        System.out.println("\n testing with 1000");
         test(1000);
     }
 
-    public static void test(int n) {
+    private static void test(int n) {
+        System.out.println("testing with " + n);
         List<Integer> l = new ArrayList(n);
         for (int i = 0; i < n; i++) {
             l.add(Integer.valueOf(i));
@@ -174,5 +193,22 @@ public class RandomIterator<E> implements Iterator<E> {
             System.out.println(iter.next().toString());
         }
     }
-*****/
+
+    /**
+     *  Test case from android ticket above
+     *  @since 0.9.2
+     */
+    private static void testAndroid() {
+        System.out.println("checking for Android bug");
+        BitSet theBitSet = new BitSet(864);
+        for (int exp =0; exp < 864; exp++) {
+            int act = theBitSet.nextClearBit(0);
+            if (exp != act) {
+                System.out.println("Has Android bug!");
+                System.out.println(String.format("Test failed for: exp=%d, act=%d", exp, act));
+                return;
+            }
+            theBitSet.set(exp);
+        }
+    }
 }
