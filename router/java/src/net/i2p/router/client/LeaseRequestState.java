@@ -20,12 +20,12 @@ import net.i2p.router.Job;
  */
 class LeaseRequestState {
     private LeaseSet _grantedLeaseSet;
-    private LeaseSet _requestedLeaseSet;
-    private PrivateKey _leaseSetPrivateKey;
-    private SigningPrivateKey _leaseSetSigningPrivateKey;
-    private Job _onGranted;
-    private Job _onFailed;
-    private long _expiration;
+    private final LeaseSet _requestedLeaseSet;
+    //private PrivateKey _leaseSetPrivateKey;
+    //private SigningPrivateKey _leaseSetSigningPrivateKey;
+    private final Job _onGranted;
+    private final Job _onFailed;
+    private final long _expiration;
     private boolean _successful;
 
     public LeaseRequestState(Job onGranted, Job onFailed, long expiration, LeaseSet requested) {
@@ -35,26 +35,34 @@ class LeaseRequestState {
         _requestedLeaseSet = requested;
     }
     
-    /** created lease set from client */
+    /** created lease set from client - FIXME always null */
     public LeaseSet getGranted() { return _grantedLeaseSet; }
+    /** FIXME unused - why? */
     public void setGranted(LeaseSet ls) { _grantedLeaseSet = ls; }
+
     /** lease set that is being requested */
     public LeaseSet getRequested() { return _requestedLeaseSet; }
-    public void setRequested(LeaseSet ls) { _requestedLeaseSet = ls; }
+    //public void setRequested(LeaseSet ls) { _requestedLeaseSet = ls; }
+
     /** the private encryption key received regarding the lease set */
-    public PrivateKey getPrivateKey() { return _leaseSetPrivateKey; }
-    public void getPrivateKey(PrivateKey pk) { _leaseSetPrivateKey = pk; }
+    //public PrivateKey getPrivateKey() { return _leaseSetPrivateKey; }
+    //public void setPrivateKey(PrivateKey pk) { _leaseSetPrivateKey = pk; }
+
     /** the private signing key received regarding the lease set (for revocation) */
-    public SigningPrivateKey getSigningPrivateKey() { return _leaseSetSigningPrivateKey; }
-    public void getSigningPrivateKey(SigningPrivateKey spk) { _leaseSetSigningPrivateKey = spk; }
+    //public SigningPrivateKey getSigningPrivateKey() { return _leaseSetSigningPrivateKey; }
+    //public void setSigningPrivateKey(SigningPrivateKey spk) { _leaseSetSigningPrivateKey = spk; }
+
     /** what to do once the lease set is created */    
     public Job getOnGranted() { return _onGranted; }
-    public void setOnGranted(Job jb) { _onGranted = jb; }
+    //public void setOnGranted(Job jb) { _onGranted = jb; }
+
     /** what to do if the lease set create fails / times out */
     public Job getOnFailed() { return _onFailed; }
-    public void setOnFailed(Job jb) { _onFailed = jb; }
+    //public void setOnFailed(Job jb) { _onFailed = jb; }
+
     /** when the request for the lease set expires */
     public long getExpiration() { return _expiration; }
+
     /** whether the request was successful in the time allotted */
     public boolean getIsSuccessful() { return _successful; }
     public void setIsSuccessful(boolean is) { _successful = is; }

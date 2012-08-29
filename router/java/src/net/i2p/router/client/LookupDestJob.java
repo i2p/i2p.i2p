@@ -16,8 +16,8 @@ import net.i2p.router.RouterContext;
  * Look up the lease of a hash, to convert it to a Destination for the client
  */
 class LookupDestJob extends JobImpl {
-    private ClientConnectionRunner _runner;
-    private Hash _hash;
+    private final ClientConnectionRunner _runner;
+    private final Hash _hash;
 
     public LookupDestJob(RouterContext context, ClientConnectionRunner runner, Hash h) {
         super(context);

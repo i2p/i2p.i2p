@@ -45,7 +45,7 @@ class ClientManager {
     private final HashMap<Destination, ClientConnectionRunner>  _runners;        // Destination --> ClientConnectionRunner
     private final Set<ClientConnectionRunner> _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
     private final RouterContext _ctx;
-    private boolean _isStarted;
+    private volatile boolean _isStarted;
 
     /** Disable external interface, allow internal clients only @since 0.8.3 */
     private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
