@@ -89,7 +89,8 @@ public class I2PSnarkServlet extends DefaultServlet {
     
     @Override
     public void destroy() {
-        _manager.stop();
+        if (_manager != null)
+            _manager.stop();
         super.destroy();
     }
 
