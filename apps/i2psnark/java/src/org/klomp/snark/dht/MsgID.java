@@ -14,7 +14,9 @@ import net.i2p.data.ByteArray;
  */
 class MsgID extends ByteArray {
 
+    /** BEP 5: 2 bytes, incremented */
     private static final int MY_TOK_LEN = 8;
+    private static final int MAX_TOK_LEN = 16;
 
     /** outgoing - generate a random ID */
     public MsgID(I2PAppContext ctx) {
@@ -28,5 +30,8 @@ class MsgID extends ByteArray {
     /** incoming  - save the ID (arbitrary length) */
     public MsgID(byte[] data) {
         super(data);
+        // lets not get carried away
+        if (data.length > MAX_TOK_LEN)
+            throw new IllegalArgumentException();
     }
 }

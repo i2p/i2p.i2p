@@ -46,13 +46,15 @@ class DHTNodes {
     private static final int MAX_PEERS = 799;
     /** Buckets older than this are refreshed - BEP 5 says 15 minutes */
     private static final long MAX_BUCKET_AGE = 15*60*1000;
+    private static final int KAD_K = 8;
+    private static final int KAD_B = 1;
 
     public DHTNodes(I2PAppContext ctx, NID me) {
         _context = ctx;
         _expireTime = MAX_EXPIRE_TIME;
         _log = _context.logManager().getLog(DHTNodes.class);
         _nodeMap = new ConcurrentHashMap();
-        _kad = new KBucketSet(ctx, me, 8, 1);
+        _kad = new KBucketSet(ctx, me, KAD_K, KAD_B, new KBTrimmer(ctx, KAD_K));
     }
 
     public void start() {
