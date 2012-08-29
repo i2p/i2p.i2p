@@ -204,8 +204,8 @@ public class RandomIterator<E> implements Iterator<E> {
         for (int exp =0; exp < 864; exp++) {
             int act = theBitSet.nextClearBit(0);
             if (exp != act) {
-                System.out.println("Has Android bug!");
-                System.out.println(String.format("Test failed for: exp=%d, act=%d", exp, act));
+                System.err.println(String.format("Test failed for: exp=%d, act=%d", exp, act));
+                System.err.println("Android BitSet bug detected, workaround implemented!");
                 return;
             }
             theBitSet.set(exp);
