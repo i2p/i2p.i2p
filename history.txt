@@ -1,3 +1,12 @@
+2012-08-297 zzz
+ * ClientManager: Cleanups
+ * i2psnark:
+   - Fix NPE on destroy() if init() failed
+   - Add new flood-resistant KBucket trim policy
+   - Limit received MsgID size
+ * NTCP: Reduce lock contention (ticket #697)
+ * RandomIterator: Workaround for Android bug (ticket #703)
+
 2012-08-27 zzz
  * i2psnark:
    - Notify threads awaiting DHT replies at shutdown

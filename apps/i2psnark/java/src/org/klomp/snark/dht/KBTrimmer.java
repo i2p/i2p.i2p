@@ -4,12 +4,12 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.kademlia.KBucket;
-import net.i2p.kademlia.KBucketSet;
+import net.i2p.kademlia.KBucketTrimmer;
 
 /**
  *  Removes an element older than 15 minutes, but only if the bucket hasn't changed in 5 minutes.
  */
-class KBTrimmer implements KBucketSet.KBucketTrimmer<NID> {
+class KBTrimmer implements KBucketTrimmer<NID> {
     private final I2PAppContext _ctx;
     private final int _max;
 
