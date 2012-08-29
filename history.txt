@@ -1,4 +1,4 @@
-2012-08-297 zzz
+2012-08-29 zzz
  * ClientManager: Cleanups
  * i2psnark:
    - Fix NPE on destroy() if init() failed
