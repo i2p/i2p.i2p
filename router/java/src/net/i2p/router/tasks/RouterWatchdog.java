@@ -6,6 +6,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.ShellCommand;
@@ -107,6 +108,7 @@ public class RouterWatchdog implements Runnable {
             _log.error("Memory: " + DataHelper.formatSize(used) + '/' + DataHelper.formatSize(max));
             if (_consecutiveErrors == 1) {
                 _log.log(Log.CRIT, "Router appears hung, or there is severe network congestion.  Watchdog starts barking!");
+                 _context.router().eventLog().addEvent(EventLog.WATCHDOG);
                 // This works on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
