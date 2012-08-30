@@ -415,6 +415,11 @@ public class Router implements RouterClock.ClockShiftListener {
     public void runRouter() {
         if (_isAlive)
             throw new IllegalStateException();
+        String last = _config.get("router.previousFullVersion");
+        if (last != null) {
+            _eventLog.addEvent(EventLog.UPDATED, "from " + last + " to " + RouterVersion.FULL_VERSION);
+            saveConfig("router.previousFullVersion", null);
+        }
         _eventLog.addEvent(EventLog.STARTED, RouterVersion.FULL_VERSION);
         startupStuff();
         _isAlive = true;
@@ -840,6 +845,7 @@ public class Router implements RouterClock.ClockShiftListener {
         // logManager shut down in finalShutdown()
         _watchdog.shutdown();
         _watchdogThread.interrupt();
+        _eventLog.addEvent(EventLog.STOPPED, Integer.toString(exitCode));
         finalShutdown(exitCode);
     }
 
@@ -876,7 +882,6 @@ public class Router implements RouterClock.ClockShiftListener {
             }
         }
         _context.getFinalShutdownTasks().clear();
-        _eventLog.addEvent(EventLog.STOPPED, Integer.toString(exitCode));
 
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
@@ -1144,8 +1149,8 @@ public class Router implements RouterClock.ClockShiftListener {
                 _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
                 // Set the last version to the current version, since 0.8.13
                 _config.put("router.previousVersion", RouterVersion.VERSION);
+                _config.put("router.previousFullVersion", RouterVersion.FULL_VERSION);
                 saveConfig();
-                _eventLog.addEvent(EventLog.UPDATED);
                 ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             }
 
