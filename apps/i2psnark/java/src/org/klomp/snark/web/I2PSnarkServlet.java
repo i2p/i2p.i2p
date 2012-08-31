@@ -912,11 +912,17 @@ public class I2PSnarkServlet extends DefaultServlet {
         TreeSet<String> fileNames = new TreeSet(new TorrentNameComparator());
         fileNames.addAll(files);
         ArrayList<Snark> rv = new ArrayList(fileNames.size());
+        int magnet = 0;
         for (Iterator iter = fileNames.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             Snark snark = _manager.getTorrent(name);
-            if (snark != null)
-                rv.add(snark);
+            if (snark != null) {
+                // put downloads and magnets first
+                if (snark.getStorage() == null)
+                    rv.add(magnet++, snark);
+                else
+                    rv.add(snark);
+            }
         }
         return rv;
     }
@@ -1783,7 +1789,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             }
             ihash = xt.substring("urn:btih:".length());
             trackerURL = getTrackerParam(url);
-            name = "* " + _("Magnet") + ' ' + ihash;
+            name = _("Magnet") + ' ' + ihash;
             String dn = getParam("dn", url);
             if (dn != null)
                 name += " (" + Storage.filterName(dn) + ')';
@@ -1793,7 +1799,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             int col = ihash.indexOf(':');
             if (col >= 0)
                 ihash = ihash.substring(0, col);
-            name = "* " + _("Magnet") + ' ' + ihash;
+            name = _("Magnet") + ' ' + ihash;
         } else {
             return;
         }

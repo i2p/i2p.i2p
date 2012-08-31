@@ -1,3 +1,8 @@
+2012-08-31 zzz
+ * i2psnark: Remove * from magnet and download names
+ * Router: Lengthen shutdown spinner life
+ * Startup: Don't complain about clients.config missing on Android
+
 2012-08-29 zzz
  * ClientManager: Cleanups
  * i2psnark:
