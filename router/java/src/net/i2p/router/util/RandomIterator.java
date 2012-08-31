@@ -137,9 +137,9 @@ public class RandomIterator<E> implements Iterator<E> {
         if (hasNext()) {
             if (index == lower)
                 // workaround for Android ICS bug - see below
-                lower = isAndroid ? nextClearBit(lower) : served.nextClearBit(lower);
+                lower = isAndroid ? nextClearBit(index) : served.nextClearBit(index);
             else if (index == upper)
-                upper = previousClearBit(upper - 1);
+                upper = previousClearBit(index - 1);
         }
         return list.get(index);
     }
