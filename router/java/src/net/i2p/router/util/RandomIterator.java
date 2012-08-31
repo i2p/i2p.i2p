@@ -210,5 +210,6 @@ public class RandomIterator<E> implements Iterator<E> {
             }
             theBitSet.set(exp);
         }
+        System.err.println("Android BitSet bug NOT detected, no workaround needed!");
     }
 }
