@@ -1,3 +1,44 @@
+2012-08-31 zzz
+ * i2psnark: Remove * from magnet and download names
+ * Router: Lengthen shutdown spinner life
+ * Startup: Don't complain about clients.config missing on Android
+
+2012-08-29 zzz
+ * ClientManager: Cleanups
+ * i2psnark:
+   - Fix NPE on destroy() if init() failed
+   - Add new flood-resistant KBucket trim policy
+   - Limit received MsgID size
+ * NTCP: Reduce lock contention (ticket #697)
+ * RandomIterator: Workaround for Android bug (ticket #703)
+
+2012-08-27 zzz
+ * i2psnark:
+   - Notify threads awaiting DHT replies at shutdown
+   - Fix cases where we weren't using the session for b32 lookup
+ * Reseed: Remove forum.i2p2.de
+ * Streaming: Limit amount of slow-start exponential growth
+ * SSU:
+   - Limit UDPSender queue size
+   - Increase UDPSender max packet lifetime
+   - Clear UDPSender queue before sending destroys to all
+   - Increase PeerState queue size so large streaming windows
+     don't get dropped right away, especially at slow start
+   - Various improvements on iterating over pending outbound
+     messages in PeerState
+ * Wrapper: Update armv7 to 3.5.15
+
+2012-08-27 kytv
+ * Update Java Service Wrapper to v3.5.15.
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
+      compat6x port.
+    - Linux ARMv5, Linux PPC32: Self-compiled in Debian Squeeze
+    - Linux x86, Linux x64, MacOSX & Solaris: Binares are from the "community
+      edition" deltapack offered by Tanuki. The x86 and x64 binaries for Linux
+      have been stripped.
+
 2012-08-26 zzz
  * DataHelper: Trim trailing whitespace when loading properties
  * NetDB: Increase floodfills, decrease flood redundancy

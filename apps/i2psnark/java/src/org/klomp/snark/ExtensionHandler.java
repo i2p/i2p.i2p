@@ -338,7 +338,7 @@ abstract class ExtensionHandler {
                 System.arraycopy(ids, off, hash, 0, HASH_LENGTH);
                 if (DataHelper.eq(hash, peer.getPeerID().getDestHash()))
                     continue;
-                PeerID pID = new PeerID(hash);
+                PeerID pID = new PeerID(hash, listener.getUtil());
                 peers.add(pID);
             }
             // could include ourselves, listener must remove

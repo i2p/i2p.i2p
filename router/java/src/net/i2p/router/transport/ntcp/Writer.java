@@ -62,8 +62,9 @@ class Writer {
                 already = true;
             } else {
                 pending = _pendingConnections.add(con);
+                // only notify here if added?
             }
-            _pendingConnections.notifyAll();
+            _pendingConnections.notify();
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("wantsWrite: " + con + " already live? " + already + " added to pending? " + pending + ": " + source);
@@ -73,7 +74,8 @@ class Writer {
         synchronized (_pendingConnections) {
             _writeAfterLive.remove(con);
             _pendingConnections.remove(con);
-            _pendingConnections.notifyAll();
+            // necessary?
+            _pendingConnections.notify();
         }
     }
     

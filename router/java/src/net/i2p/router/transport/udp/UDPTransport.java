@@ -1119,17 +1119,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  This sends it directly out, bypassing OutboundMessageFragments
      *  and the PacketPusher. The only queueing is for the bandwidth limiter.
-     *
-     *  @return ZERO (used to be number of packets in the queue)
+     *  BLOCKING if OB queue is full.
      */
-    int send(UDPPacket packet) { 
+    void send(UDPPacket packet) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending packet " + packet);
-        return _endpoint.send(packet); 
+        _endpoint.send(packet); 
     }
     
     /**
      *  Send a session destroy message, bypassing OMF and PacketPusher.
+     *  BLOCKING if OB queue is full.
      *
      *  @since 0.8.9
      */
@@ -1145,10 +1145,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      *  Send a session destroy message to everybody
+     *  BLOCKING if OB queue is full.
      *
      *  @since 0.8.9
      */
     private void destroyAll() {
+        _endpoint.clearOutbound();
         int howMany = _peersByIdent.size();
         if (_log.shouldLog(Log.WARN))
             _log.warn("Sending destroy to : " + howMany + " peers");

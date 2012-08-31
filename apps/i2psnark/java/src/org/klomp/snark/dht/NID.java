@@ -10,7 +10,7 @@ import net.i2p.util.Clock;
  *  A 20-byte peer ID, used as a Map key in lots of places.
  *  Must be public for constructor in KBucketSet.generateRandomKey()
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 public class NID extends SHA1Hash {

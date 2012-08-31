@@ -17,10 +17,10 @@ import net.i2p.util.Log;
  * @author zzz modded to use concurrent
  */
 class ClientWriterRunner implements Runnable {
-    private BlockingQueue<I2CPMessage> _messagesToWrite;
-    private ClientConnectionRunner _runner;
-    private Log _log;
-    private long _id;
+    private final BlockingQueue<I2CPMessage> _messagesToWrite;
+    private final ClientConnectionRunner _runner;
+    private final Log _log;
+    private final long _id;
     private static long __id = 0;
     
     public ClientWriterRunner(RouterContext context, ClientConnectionRunner runner) {

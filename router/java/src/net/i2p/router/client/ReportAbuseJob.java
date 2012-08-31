@@ -21,10 +21,10 @@ import net.i2p.util.Log;
  *
  */
 class ReportAbuseJob extends JobImpl {
-    private Log _log;
-    private ClientConnectionRunner _runner;
-    private String _reason;
-    private int _severity;
+    private final Log _log;
+    private final ClientConnectionRunner _runner;
+    private final String _reason;
+    private final int _severity;
     public ReportAbuseJob(RouterContext context, ClientConnectionRunner runner, String reason, int severity) {
         super(context);
         _log = context.logManager().getLog(ReportAbuseJob.class);

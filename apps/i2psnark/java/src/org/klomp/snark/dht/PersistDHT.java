@@ -17,6 +17,7 @@ import net.i2p.util.SecureFileOutputStream;
 /**
  *  Retrieve / Store the local DHT in a file
  *
+ *  @since 0.9.2
  */
 abstract class PersistDHT {
 

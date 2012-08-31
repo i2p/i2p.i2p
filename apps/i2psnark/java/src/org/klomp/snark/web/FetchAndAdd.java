@@ -72,7 +72,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
         _log = ctx.logManager().getLog(FetchAndAdd.class);
         _mgr = mgr;
         _url = url;
-        _name = "* " + _("Download torrent file from {0}", url);
+        _name = _("Download torrent file from {0}", url);
         byte[] fake = null;
         try {
             fake = SHA1.getInstance().digest(url.getBytes("ISO-8859-1"));

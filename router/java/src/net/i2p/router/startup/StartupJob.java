@@ -33,7 +33,8 @@ public class StartupJob extends JobImpl {
 
     public String getName() { return "Startup Router"; }
     public void runJob() {
-        getContext().jobQueue().addJob(new LoadClientAppsJob(getContext()));
+        if (!System.getProperty("java.vendor").contains("Android"))
+            getContext().jobQueue().addJob(new LoadClientAppsJob(getContext()));
         getContext().statPublisher().startup();
         getContext().jobQueue().addJob(new LoadRouterInfoJob(getContext()));
     }

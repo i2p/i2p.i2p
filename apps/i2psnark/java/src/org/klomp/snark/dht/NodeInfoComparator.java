@@ -12,7 +12,7 @@ import net.i2p.data.DataHelper;
  *  Closest to a InfoHash or NID key.
  *  Use for NodeInfos.
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class NodeInfoComparator implements Comparator<NodeInfo> {

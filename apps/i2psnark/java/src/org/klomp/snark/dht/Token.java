@@ -12,7 +12,7 @@ import net.i2p.data.DataHelper;
 /**
  *  Used for Both outgoing and incoming tokens
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class Token extends ByteArray {

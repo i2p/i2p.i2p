@@ -31,8 +31,8 @@ class ClientListenerRunner implements Runnable {
     protected ServerSocket _socket;
     protected final int _port;
     protected final boolean _bindAllInterfaces;
-    protected boolean _running;
-    protected boolean _listening;
+    protected volatile boolean _running;
+    protected volatile boolean _listening;
     
     public static final String BIND_ALL_INTERFACES = "i2cp.tcp.bindAllInterfaces";
 

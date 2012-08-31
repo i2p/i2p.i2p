@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  *  All the torrents
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class Torrents extends ConcurrentHashMap<InfoHash, Peers> {

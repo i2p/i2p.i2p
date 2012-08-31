@@ -9,7 +9,7 @@ import org.klomp.snark.I2PSnarkUtil;
 /**
  *  A 20-byte SHA1 info hash
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class InfoHash extends SHA1Hash {

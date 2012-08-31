@@ -217,6 +217,13 @@ class PeerState {
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
 
+    /**
+     *  Was 32 before 0.9.2, but since the streaming lib goes up to 128,
+     *  we would just drop our own msgs right away during slow start.
+     *  May need to adjust based on memory.
+     */
+    private static final int MAX_SEND_MSGS_PENDING = 128;
+
     /*
      * 596 gives us 588 IP byes, 568 UDP bytes, and with an SSU data message, 
      * 522 fragment bytes, which is enough to send a tunnel data message in 2 
@@ -1181,6 +1188,14 @@ class PeerState {
     
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
+    /**
+     *  TODO should this use a queue, separate from the list of msgs pending an ack?
+     *  TODO bring back tail drop?
+     *  TODO priority queue? (we don't implement priorities in SSU now)
+     *  TODO backlog / pushback / block instead of dropping? Can't really block here.
+     *  TODO SSU does not support isBacklogged() now
+     *  @return total pending messages
+     */
     public int add(OutboundMessageState state) {
         if (_dead) { 
             _transport.failed(state, false);
@@ -1193,8 +1208,8 @@ class PeerState {
         boolean fail = false;
         synchronized (_outboundMessages) {
             rv = _outboundMessages.size() + 1;
-            if (rv > 32) { 
-                // 32 queued messages?  to *one* peer?  nuh uh.
+            if (rv > MAX_SEND_MSGS_PENDING) { 
+                // too many queued messages to one peer?  nuh uh.
                 fail = true;
                 rv--;
 
@@ -1240,8 +1255,11 @@ class PeerState {
                 _outboundMessages.add(state);
             }
         }
-        if (fail)
+        if (fail) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping msg, OB queue full for " + toString());
             _transport.failed(state, false);
+        }
         return rv;
     }
 
@@ -1278,6 +1296,10 @@ class PeerState {
     
     /**
      * Expire / complete any outbound messages
+     * High usage -
+     * OutboundMessageFragments.getNextVolley() calls this 1st.
+     * TODO combine finishMessages(), allocateSend(), and getNextDelay() so we don't iterate 3 times.
+     *
      * @return number of active outbound messages remaining
      */
     public int finishMessages() {
@@ -1350,14 +1372,20 @@ class PeerState {
     
     /**
      * Pick a message we want to send and allocate it out of our window
-     * @return allocated message to send, or null if no messages or no resources
+     * High usage -
+     * OutboundMessageFragments.getNextVolley() calls this 2nd, if finishMessages() returned > 0.
+     * TODO combine finishMessages(), allocateSend(), and getNextDelay() so we don't iterate 3 times.
      *
+     * @return allocated message to send, or null if no messages or no resources
      */
     public OutboundMessageState allocateSend() {
         if (_dead) return null;
         synchronized (_outboundMessages) {
             for (OutboundMessageState state : _outboundMessages) {
-                if (locked_shouldSend(state)) {
+                // We have 3 return values, because if allocateSendingBytes() returns false,
+                // then we can stop iterating.
+                ShouldSend should = locked_shouldSend(state);
+                if (should == ShouldSend.YES) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Allocate sending to " + _remotePeer + ": " + state.getMessageId());
                     /*
@@ -1369,6 +1397,12 @@ class PeerState {
                     }
                      */
                     return state;
+                } else if (should == ShouldSend.NO_BW) {
+                    // no more bandwidth available
+                    // we don't bother looking for a smaller msg that would fit.
+                    // By not looking further, we keep strict sending order, and that allows
+                    // some efficiency in acked() below.
+                    break;
                 } /* else {
                     OutNetMessage msg = state.getMessage();
                     if (msg != null)
@@ -1382,6 +1416,10 @@ class PeerState {
     }
     
     /**
+     * High usage -
+     * OutboundMessageFragments.getNextVolley() calls this 3rd, if allocateSend() returned null.
+     * TODO combine finishMessages(), allocateSend(), and getNextDelay() so we don't iterate 3 times.
+     *
      * @return how long to wait before sending, or Integer.MAX_VALUE if we have nothing to send.
      *         If ready now, will return 0 or a negative value.
      */
@@ -1396,6 +1434,9 @@ class PeerState {
             }
             for (OutboundMessageState state : _outboundMessages) {
                 int delay = (int)(state.getNextSendTime() - now);
+                // short circuit once we hit something ready to go
+                if (delay <= 0)
+                    return delay;
                 if (delay < rv)
                     rv = delay;
             }
@@ -1435,7 +1476,13 @@ class PeerState {
         return mtu - (PacketBuilder.MIN_DATA_PACKET_OVERHEAD + MIN_ACK_SIZE);
     }
     
-    private boolean locked_shouldSend(OutboundMessageState state) {
+    private enum ShouldSend { YES, NO, NO_BW };
+
+    /**
+     *  Have 3 return values, because if allocateSendingBytes() returns false,
+     *  then allocateSend() can stop iterating
+     */
+    private ShouldSend locked_shouldSend(OutboundMessageState state) {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
             if (!state.isFragmented()) {
@@ -1465,7 +1512,7 @@ class PeerState {
                 } else if ( (max <= 0) || (THROTTLE_RESENDS) ) {
                     //if (state.getMessage() != null)
                     //    state.getMessage().timestamp("choked, with another message retransmitting");
-                    return false;
+                    return ShouldSend.NO;
                 } else {
                     //if (state.getMessage() != null)
                     //    state.getMessage().timestamp("another message is retransmitting, but since we've already begun sending...");                    
@@ -1491,7 +1538,7 @@ class PeerState {
 
                 //if (peer.getSendWindowBytesRemaining() > 0)
                 //    _throttle.unchoke(peer.getRemotePeer());
-                return true;
+                return ShouldSend.YES;
             } else {
                 _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
                 //if (state.getMessage() != null)
@@ -1510,15 +1557,16 @@ class PeerState {
                 //    state.getMessage().timestamp("choked, not enough available, wsize=" 
                 //                                 + getSendWindowBytes() + " available="
                 //                                 + getSendWindowBytesRemaining());
-                return false;
+                return ShouldSend.NO_BW;
             }
         } // nextTime <= now 
 
-        return false;
+        return ShouldSend.NO;
     }
     
     /**
      *  A full ACK was received.
+     *  TODO if messages awaiting ack were a HashSet this would be faster.
      *
      *  @return true if the message was acked for the first time
      */
@@ -1530,6 +1578,11 @@ class PeerState {
                 state = iter.next();
                 if (state.getMessageId() == messageId) {
                     iter.remove();
+                    break;
+                } else if (state.getPushCount() <= 0) {
+                    // _outboundMessages is ordered, so once we get to a msg that
+                    // hasn't been transmitted yet, we can stop
+                    state = null;
                     break;
                 } else {
                     state = null;
@@ -1599,6 +1652,11 @@ class PeerState {
                         if (state == _retransmitter)
                             _retransmitter = null;
                     }
+                    break;
+                } else if (state.getPushCount() <= 0) {
+                    // _outboundMessages is ordered, so once we get to a msg that
+                    // hasn't been transmitted yet, we can stop
+                    state = null;
                     break;
                 } else {
                     state = null;

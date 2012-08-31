@@ -20,7 +20,7 @@ import net.i2p.util.RandomSource;
  *  always have the Destination.
  *  The conpact info is immutable. The Destination may be added later.
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 

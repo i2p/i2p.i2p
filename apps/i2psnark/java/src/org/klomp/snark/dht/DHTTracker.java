@@ -17,7 +17,7 @@ import net.i2p.util.SimpleTimer2;
 /**
  * The tracker stores peers, i.e. Dest hashes (not nodes).
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class DHTTracker {

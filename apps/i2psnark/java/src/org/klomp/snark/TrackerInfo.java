@@ -47,19 +47,19 @@ class TrackerInfo
   private int incomplete;
 
   /** @param metainfo may be null */
-  public TrackerInfo(InputStream in, byte[] my_id, byte[] infohash, MetaInfo metainfo)
+  public TrackerInfo(InputStream in, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
-    this(new BDecoder(in), my_id, infohash, metainfo);
+    this(new BDecoder(in), my_id, infohash, metainfo, util);
   }
 
-  private TrackerInfo(BDecoder be, byte[] my_id, byte[] infohash, MetaInfo metainfo)
+  private TrackerInfo(BDecoder be, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
-    this(be.bdecodeMap().getMap(), my_id, infohash, metainfo);
+    this(be.bdecodeMap().getMap(), my_id, infohash, metainfo, util);
   }
 
-  private TrackerInfo(Map m, byte[] my_id, byte[] infohash, MetaInfo metainfo)
+  private TrackerInfo(Map m, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
     BEValue reason = (BEValue)m.get("failure reason");
@@ -85,10 +85,10 @@ class TrackerInfo
             Set<Peer> p;
             try {
               // One big string (the official compact format)
-              p = getPeers(bePeers.getBytes(), my_id, infohash, metainfo);
+              p = getPeers(bePeers.getBytes(), my_id, infohash, metainfo, util);
             } catch (InvalidBEncodingException ibe) {
               // List of Dictionaries or List of Strings
-              p = getPeers(bePeers.getList(), my_id, infohash, metainfo);
+              p = getPeers(bePeers.getList(), my_id, infohash, metainfo, util);
             }
             peers = p;
         }
@@ -124,7 +124,7 @@ class TrackerInfo
 ******/
 
   /** List of Dictionaries or List of Strings */
-  private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, byte[] infohash, MetaInfo metainfo)
+  private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
     Set<Peer> peers = new HashSet(l.size());
@@ -138,7 +138,7 @@ class TrackerInfo
             try {
                 // Case 2 - compact - A list of 32-byte binary strings (hashes)
                 // This was just for testing and is not the official format
-                peerID = new PeerID(bev.getBytes());
+                peerID = new PeerID(bev.getBytes(), util);
             } catch (InvalidBEncodingException ibe2) {
                 // don't let one bad entry spoil the whole list
                 //Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
@@ -157,7 +157,7 @@ class TrackerInfo
    *  One big string of concatenated 32-byte hashes
    *  @since 0.8.1
    */
-  private static Set<Peer> getPeers(byte[] l, byte[] my_id, byte[] infohash, MetaInfo metainfo)
+  private static Set<Peer> getPeers(byte[] l, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
     int count = l.length / HASH_LENGTH;
@@ -168,7 +168,7 @@ class TrackerInfo
         byte[] hash = new byte[HASH_LENGTH];
         System.arraycopy(l, i * HASH_LENGTH, hash, 0, HASH_LENGTH);
         try {
-            peerID = new PeerID(hash);
+            peerID = new PeerID(hash, util);
         } catch (InvalidBEncodingException ibe) {
             // won't happen
             continue;

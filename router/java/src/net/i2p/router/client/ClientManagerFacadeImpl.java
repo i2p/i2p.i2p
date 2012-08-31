@@ -38,7 +38,7 @@ import net.i2p.util.Log;
 public class ClientManagerFacadeImpl extends ClientManagerFacade implements InternalClientManager {
     private final Log _log;
     private ClientManager _manager; 
-    private RouterContext _context;
+    private final RouterContext _context;
     /** note that this is different than the property the client side uses, i2cp.tcp.port */
     public final static String PROP_CLIENT_PORT = "i2cp.port";
     public final static int DEFAULT_PORT = 7654;

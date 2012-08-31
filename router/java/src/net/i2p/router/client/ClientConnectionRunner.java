@@ -86,7 +86,7 @@ class ClientConnectionRunner {
     private ClientWriterRunner _writer;
     private Hash _destHashCache;
     /** are we, uh, dead */
-    private boolean _dead;
+    private volatile boolean _dead;
     /** For outbound traffic. true if i2cp.messageReliability = "none"; @since 0.8.1 */
     private boolean _dontSendMSM;
     private final AtomicInteger _messageId; // messageId counter
@@ -463,10 +463,10 @@ class ClientConnectionRunner {
     }
 
     private class Rerequest implements SimpleTimer.TimedEvent {
-        private LeaseSet _ls;
-        private long _expirationTime;
-        private Job _onCreate;
-        private Job _onFailed;
+        private final LeaseSet _ls;
+        private final long _expirationTime;
+        private final Job _onCreate;
+        private final Job _onFailed;
         public Rerequest(LeaseSet ls, long expirationTime, Job onCreate, Job onFailed) {
             _ls = ls;
             _expirationTime = expirationTime;

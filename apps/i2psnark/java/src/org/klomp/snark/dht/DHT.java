@@ -12,6 +12,7 @@ import net.i2p.data.Hash;
 
 /**
  * Stub for KRPC
+ * @since 0.8.4
  */
 public interface DHT {
 

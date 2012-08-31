@@ -23,6 +23,8 @@ import net.i2p.util.SimpleTimer;
 class ConnectionPacketHandler {
     private final I2PAppContext _context;
     private final Log _log;
+
+    public static final int MAX_SLOW_START_WINDOW = 24;
     
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
@@ -367,9 +369,16 @@ class ConnectionPacketHandler {
                     // grow acked/N times (where N = the slow start factor)
                     // always grow at least 1
                     int factor = con.getOptions().getSlowStartGrowthRateFactor();
-                    if (factor <= 1)
-                        newWindowSize += acked;
-                    else if (acked < factor)
+                    if (factor <= 1) {
+                        // above a certain point, don't grow exponentially
+                        // as it often leads to a big packet loss (30-50) all at once that
+                        // takes quite a while (a minute or more) to recover from,
+                        // especially if crypto tags are lost
+                        if (newWindowSize >= MAX_SLOW_START_WINDOW)
+                            newWindowSize++;
+                        else
+                            newWindowSize = Math.min(MAX_SLOW_START_WINDOW, newWindowSize + acked);
+                    } else if (acked < factor)
                         newWindowSize++;
                     else
                         newWindowSize += acked / factor;

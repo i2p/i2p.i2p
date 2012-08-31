@@ -24,8 +24,8 @@ import net.i2p.util.Log;
  *
  */
 class CreateSessionJob extends JobImpl {
-    private Log _log;
-    private ClientConnectionRunner _runner;
+    private final Log _log;
+    private final ClientConnectionRunner _runner;
     
     public CreateSessionJob(RouterContext context, ClientConnectionRunner runner) {
         super(context);

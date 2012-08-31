@@ -1484,7 +1484,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 byte[] ih = Base64.decode(b64);
                 // ignore value - TODO put tracker URL in value
                 if (ih != null && ih.length == 20)
-                    addMagnet("* " + _("Magnet") + ' ' + I2PSnarkUtil.toHex(ih), ih, null, false);
+                    addMagnet(_("Magnet") + ' ' + I2PSnarkUtil.toHex(ih), ih, null, false);
                 // else remove from config?
             }
         }
