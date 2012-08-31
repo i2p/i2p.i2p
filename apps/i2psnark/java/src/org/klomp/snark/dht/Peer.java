@@ -9,7 +9,7 @@ import net.i2p.data.Hash;
  *  A single peer for a single torrent.
  *  This is what the DHT tracker remembers.
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class Peer extends Hash {

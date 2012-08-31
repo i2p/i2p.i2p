@@ -10,7 +10,7 @@ import net.i2p.data.Hash;
 /**
  *  All the peers for a single torrent
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class Peers extends ConcurrentHashMap<Hash, Peer> {

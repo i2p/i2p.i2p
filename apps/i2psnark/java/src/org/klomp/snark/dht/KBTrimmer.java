@@ -8,6 +8,7 @@ import net.i2p.kademlia.KBucketTrimmer;
 
 /**
  *  Removes an element older than 15 minutes, but only if the bucket hasn't changed in 5 minutes.
+ *  @since 0.9.2
  */
 class KBTrimmer implements KBucketTrimmer<NID> {
     private final I2PAppContext _ctx;

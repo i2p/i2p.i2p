@@ -79,7 +79,7 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
  *   - nodes (in the find_node and get_peers response) is one concatenated string, not a list of strings, right?
  *   - Node ID enforcement, keyspace rotation?
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 public class KRPC implements I2PSessionMuxedListener, DHT {

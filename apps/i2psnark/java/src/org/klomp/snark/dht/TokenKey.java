@@ -9,7 +9,7 @@ import net.i2p.data.DataHelper;
 /**
  *  Used to index incoming Tokens
  *
- * @since 0.8.4
+ * @since 0.9.2
  * @author zzz
  */
 class TokenKey extends SHA1Hash {
