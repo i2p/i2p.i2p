@@ -38,6 +38,10 @@ class PumpedTunnelGateway extends TunnelGateway {
     private final BlockingQueue<Pending> _prequeue;
     private final TunnelGatewayPumper _pumper;
     
+    private static final int MAX_MSGS_PER_PUMP = 16;
+    private static final int MAX_OB_QUEUE = 2048;
+    private static final int MAX_IB_QUEUE = 1024;
+
     /**
      * @param preprocessor this pulls Pending messages off a list, builds some
      *                     full preprocessed messages, and pumps those into the sender
@@ -48,7 +52,10 @@ class PumpedTunnelGateway extends TunnelGateway {
      */
     public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
         super(context, preprocessor, sender, receiver);
-        _prequeue = new LinkedBlockingQueue();
+        if (getClass() == PumpedTunnelGateway.class)
+            _prequeue = new LinkedBlockingQueue(MAX_OB_QUEUE);
+        else  // extended by ThrottledPTG for IB
+            _prequeue = new LinkedBlockingQueue(MAX_IB_QUEUE);
         _pumper = pumper;
     }
     
@@ -65,8 +72,10 @@ class PumpedTunnelGateway extends TunnelGateway {
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);
-        _prequeue.offer(cur);
-        _pumper.wantsPumping(this);
+        if (_prequeue.offer(cur))
+            _pumper.wantsPumping(this);
+        else
+            _context.statManager().addRateData("tunnel.dropGatewayOverflow", 1);
     }
 
     /**
@@ -80,7 +89,7 @@ class PumpedTunnelGateway extends TunnelGateway {
      *                 Must be empty when called; will always be emptied before return.
      */
     void pump(List<Pending> queueBuf) {
-        _prequeue.drainTo(queueBuf);
+        _prequeue.drainTo(queueBuf, MAX_MSGS_PER_PUMP);
         if (queueBuf.isEmpty())
             return;
 
@@ -122,16 +131,19 @@ class PumpedTunnelGateway extends TunnelGateway {
         if (delayedFlush) {
             _delayedFlush.reschedule(delayAmount);
         }
-        _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
-        long complete = System.currentTimeMillis();
-        if (_log.shouldLog(Log.DEBUG))
+        //_context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
+        if (_log.shouldLog(Log.DEBUG)) {
+            long complete = System.currentTimeMillis();
             _log.debug("Time to add " + queueBuf.size() + " messages to " + toString() + ": " + (complete-startAdd)
                        + " delayed? " + delayedFlush + " remaining: " + remaining
                        + " add: " + (afterAdded-beforeLock)
                        + " preprocess: " + (afterPreprocess-afterAdded)
                        + " expire: " + (afterExpire-afterPreprocess)
                        + " queue flush: " + (complete-afterExpire));
+        }
         queueBuf.clear();
+        if (!_prequeue.isEmpty())
+            _pumper.wantsPumping(this);
     }
     
 }

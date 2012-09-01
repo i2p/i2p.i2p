@@ -32,6 +32,7 @@ import net.i2p.util.SimpleTimer2;
  *     or if debugging, verify that it can be decrypted properly)</li>
  * </ol>
  *
+ * Unused directly - see PumpedTunnelGateway, ThrottledPumpedTunnelGateway, and TunnelGatewayZeroHop overrides.
  */
 class TunnelGateway {
     protected final RouterContext _context;
@@ -63,8 +64,8 @@ class TunnelGateway {
         //_flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
-        _context.statManager().createRateStat("tunnel.lockedGatewayAdd", "How long do we block when adding a message to a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.lockedGatewayCheck", "How long do we block when flushing a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        //_context.statManager().createRateStat("tunnel.lockedGatewayAdd", "How long do we block when adding a message to a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        //_context.statManager().createRateStat("tunnel.lockedGatewayCheck", "How long do we block when flushing a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
     }
     
     /**
@@ -81,11 +82,15 @@ class TunnelGateway {
      * coallesced with other pending messages) or after a brief pause (_flushFrequency).
      * If it is queued up past its expiration, it is silently dropped
      *
+     * UNUSED - see overrides
+     *
      * @param msg message to be sent through the tunnel
      * @param toRouter router to send to after the endpoint (or null for endpoint processing)
      * @param toTunnel tunnel to send to after the endpoint (or null for endpoint or router processing)
      */
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
+        throw new UnsupportedOperationException("unused, right?");
+/****
         _messagesSent++;
         long startAdd = System.currentTimeMillis();
         boolean delayedFlush = false;
@@ -137,6 +142,7 @@ class TunnelGateway {
                        + " expire: " + (afterExpire-afterPreprocess)
                        + " queue flush: " + (complete-afterExpire));
         }
+****/
     }
     
     public int getMessagesSent() { return _messagesSent; }
@@ -312,7 +318,7 @@ class TunnelGateway {
             else
                 _lastFlush = _context.clock().now();
             
-            _context.statManager().addRateData("tunnel.lockedGatewayCheck", afterChecked-beforeLock, remaining);
+            //_context.statManager().addRateData("tunnel.lockedGatewayCheck", afterChecked-beforeLock, remaining);
         }
     }
 }
