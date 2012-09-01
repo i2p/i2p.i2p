@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  *  CoDel implementation of Active Queue Management.
@@ -24,6 +25,8 @@ import net.i2p.I2PAppContext;
 public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<E> {
 
     private final I2PAppContext _context;
+    private final Log _log;
+    private final String _name;
 
     // following 4 are state variables defined by sample code, locked by this
     /** Time when we'll declare we're above target (0 if below) */
@@ -66,9 +69,11 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     public CoDelBlockingQueue(I2PAppContext ctx, String name, int capacity) {
         super(capacity);
         _context = ctx;
+        _log = ctx.logManager().getLog(CoDelBlockingQueue.class);
+        _name = name;
         STAT_DROP = "codel." + name + ".drop";
         STAT_DELAY = "codel." + name + ".delay";
-        ctx.statManager().createRequiredRateStat(STAT_DROP, "AQM drop events", "Router", RATES);
+        ctx.statManager().createRequiredRateStat(STAT_DROP, "queue delay of dropped items", "Router", RATES);
         ctx.statManager().createRequiredRateStat(STAT_DELAY, "average queue delay", "Router", RATES);
     }
 
@@ -254,7 +259,11 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     }
 
     private void drop(E entry) {
-        _context.statManager().addRateData(STAT_DROP, 1);
+        long delay = _context.clock().now() - entry.getEnqueueTime();
+        _context.statManager().addRateData(STAT_DROP, delay);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(_name + " dropped item with delay " + delay + ", " +
+                      size() + " remaining in queue: " + entry);
         entry.drop();
     }
 
