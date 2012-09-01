@@ -120,7 +120,7 @@ class PumpedTunnelGateway extends TunnelGateway {
         }
         
         if (delayedFlush) {
-            _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
+            _delayedFlush.reschedule(delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
         long complete = System.currentTimeMillis();
