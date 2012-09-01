@@ -1,8 +1,10 @@
 package net.i2p.router.util;
 
 import java.util.Collection;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Comparator;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 
@@ -21,9 +23,10 @@ import net.i2p.I2PAppContext;
  *
  *  @since 0.9.3
  */
-public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<E> {
+public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlockingQueue<E> {
 
     private final I2PAppContext _context;
+    private final AtomicLong _seqNum = new AtomicLong();
 
     // following 4 are state variables defined by sample code, locked by this
     /** Time when we'll declare we're above target (0 if below) */
@@ -37,6 +40,8 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
 
     /** following is a per-request global for ease of use, locked by this */
     private long _now;
+
+    private int _lastDroppedPriority;
 
     /**
      *  Quote:
@@ -59,39 +64,46 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     private final String STAT_DROP;
     private final String STAT_DELAY;
     private static final long[] RATES = {5*60*1000};
+    private static final int[] PRIORITIES = {100, 200, 300, 400, 500};
 
     /**
      *  @param name for stats
      */
-    public CoDelBlockingQueue(I2PAppContext ctx, String name, int capacity) {
-        super(capacity);
+    public CoDelPriorityBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
+        super(initialCapacity, new PriorityComparator());
         _context = ctx;
-        STAT_DROP = "codel." + name + ".drop";
+        STAT_DROP = "codel." + name + ".drop.";
         STAT_DELAY = "codel." + name + ".delay";
-        ctx.statManager().createRequiredRateStat(STAT_DROP, "AQM drop events", "Router", RATES);
+        for (int i = 0; i < PRIORITIES.length; i++) {
+            ctx.statManager().createRequiredRateStat(STAT_DROP + PRIORITIES[i], "AQM drop events by priority", "Router", RATES);
+        }
         ctx.statManager().createRequiredRateStat(STAT_DELAY, "average queue delay", "Router", RATES);
     }
 
     @Override
     public boolean add(E o) {
+        o.setSeqNum(_seqNum.incrementAndGet());
         o.setEnqueueTime(_context.clock().now());
         return super.add(o);
     }
 
     @Override
     public boolean offer(E o) {
+        o.setSeqNum(_seqNum.incrementAndGet());
         o.setEnqueueTime(_context.clock().now());
         return super.offer(o);
     }
 
     @Override
-    public boolean offer(E o, long timeout, TimeUnit unit) throws InterruptedException {
+    public boolean offer(E o, long timeout, TimeUnit unit) {
+        o.setSeqNum(_seqNum.incrementAndGet());
         o.setEnqueueTime(_context.clock().now());
         return super.offer(o, timeout, unit);
     }
 
     @Override
-    public void put(E o) throws InterruptedException {
+    public void put(E o) {
+        o.setSeqNum(_seqNum.incrementAndGet());
         o.setEnqueueTime(_context.clock().now());
         super.put(o);
     }
@@ -185,7 +197,6 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
         return codel(rv);
     }
 
-
     /**
      *  @param rv may be null
      *  @return rv or a subequent entry or null if dropped
@@ -209,7 +220,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
                     // The dequeue might take us out of dropping state. If not, schedule the next drop.
                     // A large backlog might result in drop rates so high that the next drop should happen now;
                     // hence, the while loop.
-                    while (_now >= _drop_next && _dropping) {
+                    while (_now >= _drop_next && _dropping && rv.getPriority() <= _lastDroppedPriority) {
                         drop(rv);
                         _count++;
                         // I2P - we poll here instead of lock so we don't get stuck
@@ -236,6 +247,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
                 // dropping recently, the "long time above" check adds some hysteresis to the state entry
                 // so we don't drop on a slightly bigger-than-normal traffic pulse into an otherwise quiet queue.
                 drop(rv);
+                _lastDroppedPriority = rv.getPriority();
                 // I2P - we poll here instead of lock so we don't get stuck
                 // inside the lock. If empty, deque() will be called again.
                 rv = super.poll();
@@ -254,7 +266,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     }
 
     private void drop(E entry) {
-        _context.statManager().addRateData(STAT_DROP, 1);
+        _context.statManager().addRateData(STAT_DROP + entry.getPriority(), 1);
         entry.drop();
     }
 
@@ -263,5 +275,18 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
      */
     private void control_law(long t) {
         _drop_next = t + (long) (INTERVAL / Math.sqrt(_count));
+    }
+
+    /**
+     *  highest priority first, then lowest sequence number first
+     */
+    private static class PriorityComparator<E extends CDPQEntry> implements Comparator<E> {
+        public int compare(E l, E r) {
+            int d = r.getPriority() - l.getPriority();
+            if (d != 0)
+                return d;
+            long ld = l.getSeqNum() - r.getSeqNum();
+            return ld > 0 ? 1 : -1;
+        }
     }
 }
