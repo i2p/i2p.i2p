@@ -500,8 +500,7 @@
                 }
                 if ("httpclient".equals(tunnelType)) {
             %><input type="hidden" name="jumpList" value="http://i2host.i2p/cgi-bin/i2hostjump?
-http://stats.i2p/cgi-bin/jump.cgi?a=
-http://i2jump.i2p/" /><%
+http://stats.i2p/cgi-bin/jump.cgi?a=" /><%
                 } /* httpclient */
               } else { /* Server-only defaults */
             %><input type="hidden" name="privKeyFile" value="<%=editBean.getPrivateKeyFile(-1)%>" />
