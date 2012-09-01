@@ -35,7 +35,7 @@ import net.i2p.util.Log;
  *
  */
 class PumpedTunnelGateway extends TunnelGateway {
-    private final BlockingQueue<Pending> _prequeue;
+    private final BlockingQueue<PendingGatewayMessage> _prequeue;
     private final TunnelGatewayPumper _pumper;
     
     private static final int MAX_MSGS_PER_PUMP = 16;
@@ -71,7 +71,7 @@ class PumpedTunnelGateway extends TunnelGateway {
     @Override
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
-        Pending cur = new PendingImpl(msg, toRouter, toTunnel);
+        PendingGatewayMessage cur = new PendingGatewayMessage(msg, toRouter, toTunnel);
         if (_prequeue.offer(cur))
             _pumper.wantsPumping(this);
         else
@@ -88,7 +88,7 @@ class PumpedTunnelGateway extends TunnelGateway {
      * @param queueBuf Empty list for convenience, to use as a temporary buffer.
      *                 Must be empty when called; will always be emptied before return.
      */
-    void pump(List<Pending> queueBuf) {
+    void pump(List<PendingGatewayMessage> queueBuf) {
         _prequeue.drainTo(queueBuf, MAX_MSGS_PER_PUMP);
         if (queueBuf.isEmpty())
             return;
@@ -114,7 +114,7 @@ class PumpedTunnelGateway extends TunnelGateway {
             
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
-                Pending m = _queue.get(i);
+                PendingGatewayMessage m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);

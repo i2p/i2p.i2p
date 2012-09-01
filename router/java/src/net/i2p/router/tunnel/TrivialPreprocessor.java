@@ -50,7 +50,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      *
      * NOTE: Unused here, see BatchedPreprocessor override, super is not called.
      */
-    public boolean preprocessQueue(List<TunnelGateway.Pending> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+    public boolean preprocessQueue(List<PendingGatewayMessage> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
         throw new IllegalArgumentException("unused, right?");
     }
     
@@ -155,7 +155,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     private static final byte MASK_TUNNEL = (byte)(FragmentHandler.TYPE_TUNNEL << 5);
     private static final byte MASK_ROUTER = (byte)(FragmentHandler.TYPE_ROUTER << 5);
 
-    protected int writeFirstFragment(TunnelGateway.Pending msg, byte target[], int offset) {
+    protected int writeFirstFragment(PendingGatewayMessage msg, byte target[], int offset) {
         boolean fragmented = false;
         int instructionsLength = getInstructionsSize(msg);
         int payloadLength = msg.getData().length - msg.getOffset();
@@ -221,7 +221,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         return offset;
     }
     
-    protected int writeSubsequentFragment(TunnelGateway.Pending msg, byte target[], int offset) {
+    protected int writeSubsequentFragment(PendingGatewayMessage msg, byte target[], int offset) {
         boolean isLast = true;
         
         int instructionsLength = getInstructionsSize(msg);
@@ -269,7 +269,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      *  Does NOT include 4 for the message ID if the message will be fragmented;
      *  call getInstructionAugmentationSize() for that.
      */
-    protected int getInstructionsSize(TunnelGateway.Pending msg) {
+    protected int getInstructionsSize(PendingGatewayMessage msg) {
         if (msg.getFragmentNumber() > 0) 
             return 7;
         // control byte
@@ -287,7 +287,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     }
     
     /** @return 0 or 4 */
-    protected int getInstructionAugmentationSize(TunnelGateway.Pending msg, int offset, int instructionsSize) {
+    protected int getInstructionAugmentationSize(PendingGatewayMessage msg, int offset, int instructionsSize) {
         int payloadLength = msg.getData().length - msg.getOffset();
         if (offset + payloadLength + instructionsSize + IV_SIZE + 1 + 4 > PREPROCESSED_SIZE) {
             // requires fragmentation, so include the messageId

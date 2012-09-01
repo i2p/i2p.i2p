@@ -65,7 +65,7 @@ class TunnelGatewayPumper implements Runnable {
     
     public void run() {
         PumpedTunnelGateway gw = null;
-        List<TunnelGateway.Pending> queueBuf = new ArrayList(32);
+        List<PendingGatewayMessage> queueBuf = new ArrayList(32);
         while (!_stop) {
             try {
                 synchronized (_wantsPumping) {
