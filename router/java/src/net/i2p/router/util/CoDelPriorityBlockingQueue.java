@@ -67,7 +67,8 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
     private final String STAT_DROP;
     private final String STAT_DELAY;
     private static final long[] RATES = {5*60*1000};
-    private static final int[] PRIORITIES = {100, 200, 300, 400, 500};
+    public static final int MIN_PRIORITY = 100;
+    private static final int[] PRIORITIES = {MIN_PRIORITY, 200, 300, 400, 500};
     /** if priority is >= this, never drop */
     public static final int DONT_DROP_PRIORITY = 1000;
 
@@ -89,29 +90,25 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
 
     @Override
     public boolean add(E o) {
-        o.setSeqNum(_seqNum.incrementAndGet());
-        o.setEnqueueTime(_context.clock().now());
+        timestamp(o);
         return super.add(o);
     }
 
     @Override
     public boolean offer(E o) {
-        o.setSeqNum(_seqNum.incrementAndGet());
-        o.setEnqueueTime(_context.clock().now());
+        timestamp(o);
         return super.offer(o);
     }
 
     @Override
     public boolean offer(E o, long timeout, TimeUnit unit) {
-        o.setSeqNum(_seqNum.incrementAndGet());
-        o.setEnqueueTime(_context.clock().now());
+        timestamp(o);
         return super.offer(o, timeout, unit);
     }
 
     @Override
     public void put(E o) {
-        o.setSeqNum(_seqNum.incrementAndGet());
-        o.setEnqueueTime(_context.clock().now());
+        timestamp(o);
         super.put(o);
     }
 
@@ -163,6 +160,14 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
     }
 
     /////// private below here
+
+    private void timestamp(E o) {
+        o.setSeqNum(_seqNum.incrementAndGet());
+        o.setEnqueueTime(_context.clock().now());
+        if (o.getPriority() < MIN_PRIORITY && _log.shouldLog(Log.WARN))
+            _log.warn(_name + " added item with low priority " + o.getPriority() +
+                      ": " + o);
+    }
 
     /**
      *  Caller must synch on this
