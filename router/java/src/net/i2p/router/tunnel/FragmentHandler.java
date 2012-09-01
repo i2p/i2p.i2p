@@ -16,7 +16,7 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Handle fragments at the endpoint of a tunnel, peeling off fully completed 
@@ -369,7 +369,7 @@ class FragmentHandler {
                         _fragmentedMessages.remove(Long.valueOf(messageId));
                     }
                     if (msg.getExpireEvent() != null)
-                        SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
+                        msg.getExpireEvent().cancel();
                     receiveComplete(msg);
                 } else {
                     noteReception(msg.getMessageId(), 0, msg);
@@ -378,7 +378,7 @@ class FragmentHandler {
                         msg.setExpireEvent(evt);
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("In " + MAX_DEFRAGMENT_TIME + " dropping " + messageId);
-                        SimpleTimer.getInstance().addEvent(evt, MAX_DEFRAGMENT_TIME);
+                        evt.schedule(MAX_DEFRAGMENT_TIME);
                     }
                 }
             }
@@ -437,7 +437,7 @@ class FragmentHandler {
                     _fragmentedMessages.remove(Long.valueOf(messageId));
                 }
                 if (msg.getExpireEvent() != null)
-                    SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
+                    msg.getExpireEvent().cancel();
                 _context.statManager().addRateData("tunnel.fragmentedComplete", msg.getFragmentCount(), msg.getLifetime());
                 receiveComplete(msg);
             } else {
@@ -447,7 +447,7 @@ class FragmentHandler {
                     msg.setExpireEvent(evt);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("In " + MAX_DEFRAGMENT_TIME + " dropping " + msg.getMessageId() + "/" + fragmentNum);
-                    SimpleTimer.getInstance().addEvent(evt, MAX_DEFRAGMENT_TIME);
+                    evt.schedule(MAX_DEFRAGMENT_TIME);
                 }
             }
         }
@@ -548,10 +548,11 @@ class FragmentHandler {
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel);
     }
     
-    private class RemoveFailed implements SimpleTimer.TimedEvent {
+    private class RemoveFailed extends SimpleTimer2.TimedEvent {
         private final FragmentedMessage _msg;
 
         public RemoveFailed(FragmentedMessage msg) {
+            super(_context.simpleTimer2());
             _msg = msg;
         }
 

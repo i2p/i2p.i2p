@@ -7,7 +7,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Gather fragments of I2NPMessages at a tunnel endpoint, making them available 
@@ -28,7 +28,7 @@ class FragmentedMessage {
     private final long _createdOn;
     private boolean _completed;
     private long _releasedAfter;
-    private SimpleTimer.TimedEvent _expireEvent;
+    private SimpleTimer2.TimedEvent _expireEvent;
     
     private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
     // 64 is pretty absurd, 32 is too, most likely
@@ -160,9 +160,11 @@ class FragmentedMessage {
                 found++;
         return found;
     }
+
     /** used in the fragment handler so we can cancel the expire event on success */
-    SimpleTimer.TimedEvent getExpireEvent() { return _expireEvent; }
-    void setExpireEvent(SimpleTimer.TimedEvent evt) { _expireEvent = evt; }
+    public SimpleTimer2.TimedEvent getExpireEvent() { return _expireEvent; }
+
+    public void setExpireEvent(SimpleTimer2.TimedEvent evt) { _expireEvent = evt; }
     
     /** have we received all of the fragments? */
     public boolean isComplete() {

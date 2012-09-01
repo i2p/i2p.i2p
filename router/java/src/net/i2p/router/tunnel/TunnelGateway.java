@@ -10,7 +10,7 @@ import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Serve as the gatekeeper for a tunnel, accepting messages, coallescing and/or
@@ -124,7 +124,7 @@ class TunnelGateway {
         }
         
         if (delayedFlush) {
-            _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
+            _delayedFlush.reschedule(delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
         if (_log.shouldLog(Log.DEBUG)) {
@@ -278,7 +278,11 @@ class TunnelGateway {
         public long getLifetime() { return _context.clock().now()-_created; }
     }
     
-    private class DelayedFlush implements SimpleTimer.TimedEvent {
+    protected class DelayedFlush extends SimpleTimer2.TimedEvent {
+    	DelayedFlush() {
+            super(_context.simpleTimer2());
+    	}
+
         public void timeReached() {
             boolean wantRequeue = false;
             int remaining = 0;
@@ -304,7 +308,7 @@ class TunnelGateway {
             }
             
             if (wantRequeue)
-                _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
+                schedule(delayAmount);
             else
                 _lastFlush = _context.clock().now();
             

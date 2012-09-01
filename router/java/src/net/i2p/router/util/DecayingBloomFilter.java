@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 import org.xlattice.crypto.filters.BloomSHA1;
 
@@ -38,7 +38,7 @@ public class DecayingBloomFilter {
     private final long _longToEntryMask;
     protected long _currentDuplicates;
     protected volatile boolean _keepDecaying;
-    protected final SimpleTimer.TimedEvent _decayEvent;
+    protected final SimpleTimer2.TimedEvent _decayEvent;
     /** just for logging */
     protected final String _name;
     /** synchronize against this lock when switching double buffers */
@@ -64,7 +64,7 @@ public class DecayingBloomFilter {
         context.addShutdownTask(new Shutdown());
         _decayEvent = new DecayEvent();
         _keepDecaying = true;
-        SimpleTimer.getInstance().addEvent(_decayEvent, _durationMs);
+        _decayEvent.schedule(_durationMs);
     }
 
     /**
@@ -118,7 +118,7 @@ public class DecayingBloomFilter {
         }
         _decayEvent = new DecayEvent();
         _keepDecaying = true;
-        SimpleTimer.getInstance().addEvent(_decayEvent, _durationMs);
+        _decayEvent.schedule(_durationMs);
         if (_log.shouldLog(Log.WARN))
            _log.warn("New DBF " + name + " m = " + m + " k = " + k + " entryBytes = " + entryBytes +
                      " numExtenders = " + numExtenders + " cycle (s) = " + (durationMs / 1000));
@@ -274,7 +274,7 @@ public class DecayingBloomFilter {
     
     public void stopDecaying() {
         _keepDecaying = false;
-        SimpleTimer.getInstance().removeEvent(_decayEvent);
+        _decayEvent.cancel();
     }
     
     protected void decay() {
@@ -310,11 +310,15 @@ public class DecayingBloomFilter {
         }
     }
     
-    private class DecayEvent implements SimpleTimer.TimedEvent {
+    private class DecayEvent extends SimpleTimer2.TimedEvent {
+        DecayEvent() {
+            super(_context.simpleTimer2());
+        }
+    	
         public void timeReached() {
             if (_keepDecaying) {
                 decay();
-                SimpleTimer.getInstance().addEvent(DecayEvent.this, _durationMs);
+                schedule(_durationMs);
             }
         }
     }

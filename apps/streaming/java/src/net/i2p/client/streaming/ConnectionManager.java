@@ -13,7 +13,6 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 
 /**
@@ -494,7 +493,8 @@ class ConnectionManager {
             }
             _pendingPings.remove(id);
         } else {
-            SimpleTimer.getInstance().addEvent(new PingFailed(id, notifier), timeoutMs);
+            PingFailed pf = new PingFailed(id, notifier);
+            pf.schedule(timeoutMs);
         }
         
         boolean ok = req.pongReceived();
@@ -505,11 +505,12 @@ class ConnectionManager {
         public void pingComplete(boolean ok);
     }
     
-    private class PingFailed implements SimpleTimer.TimedEvent {
+    private class PingFailed extends SimpleTimer2.TimedEvent {
         private final Long _id;
         private final PingNotifier _notifier;
 
         public PingFailed(Long id, PingNotifier notifier) { 
+            super(_context.simpleTimer2());
             _id = id;
             _notifier = notifier;
         }

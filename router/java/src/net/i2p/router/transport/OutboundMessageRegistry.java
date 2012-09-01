@@ -25,7 +25,7 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  *  Tracks outbound messages.
@@ -254,10 +254,11 @@ public class OutboundMessageRegistry {
     /** @deprecated unused */
     public void renderStatusHTML(Writer out) throws IOException {}
     
-    private class CleanupTask implements SimpleTimer.TimedEvent {
+    private class CleanupTask extends SimpleTimer2.TimedEvent {
         private long _nextExpire;
 
         public CleanupTask() {
+            super(_context.simpleTimer2());
             _nextExpire = -1;
         }
 
@@ -312,14 +313,14 @@ public class OutboundMessageRegistry {
 
             if (_nextExpire <= now)
                 _nextExpire = now + 10*1000;
-            SimpleTimer.getInstance().addEvent(CleanupTask.this, _nextExpire - now);
+            schedule(_nextExpire - now);
         }
 
         public void scheduleExpiration(MessageSelector sel) {
             long now = _context.clock().now();
             if ( (_nextExpire <= now) || (sel.getExpiration() < _nextExpire) ) {
                 _nextExpire = sel.getExpiration();
-                SimpleTimer.getInstance().addEvent(CleanupTask.this, _nextExpire - now);
+                reschedule(_nextExpire - now);
             }
         }
     }
