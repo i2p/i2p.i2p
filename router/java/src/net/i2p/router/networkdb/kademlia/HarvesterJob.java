@@ -11,6 +11,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.SendMessageDirectJob;
@@ -39,7 +40,7 @@ class HarvesterJob extends JobImpl {
     /** don't try to update more than 5 peers during each run */
     private static final int MAX_PER_RUN = 5;
     /** background job, who cares */
-    private static final int PRIORITY = 100;
+    private static final int PRIORITY = OutNetMessage.PRIORITY_NETDB_HARVEST;
     
     public static final String PROP_ENABLED = "netDb.shouldHarvest";
 

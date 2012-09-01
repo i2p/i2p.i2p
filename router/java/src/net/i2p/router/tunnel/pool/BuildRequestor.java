@@ -29,7 +29,9 @@ abstract class BuildRequestor {
         for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
             ORDER.add(Integer.valueOf(i));
     }
-    private static final int PRIORITY = 500;
+
+    private static final int PRIORITY = OutNetMessage.PRIORITY_MY_BUILD_REQUEST;
+
     /**
      *  At 10 seconds, we were receiving about 20% of replies after expiration
      *  Todo: make this variable on a per-request basis, to account for tunnel length,

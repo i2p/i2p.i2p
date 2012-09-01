@@ -15,6 +15,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
     private RouterInfo _target;
     
     private static final long MAX_LOOKUP_TIME = 15*1000;
+    private static final int PRIORITY = OutNetMessage.PRIORITY_PARTICIPATING;
 
     public InboundGatewayReceiver(RouterContext ctx, HopConfig cfg) {
         _context = ctx;
@@ -58,7 +59,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
         out.setMessage(msg);
         out.setTarget(_target);
         out.setExpiration(msg.getMessageExpiration());
-        out.setPriority(200);
+        out.setPriority(PRIORITY);
         _context.outNetMessagePool().add(out);
         return msg.getUniqueId();
     }

@@ -43,7 +43,7 @@ class StoreJob extends JobImpl {
 
     private final static int PARALLELIZATION = 4; // how many sent at a time
     private final static int REDUNDANCY = 4; // we want the data sent to 6 peers
-    private final static int STORE_PRIORITY = 100;
+    private final static int STORE_PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_STORE;
     
     /**
      * Send a data structure to the floodfills

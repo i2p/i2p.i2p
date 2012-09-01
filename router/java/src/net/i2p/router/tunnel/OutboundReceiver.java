@@ -20,6 +20,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
     private RouterInfo _nextHopCache;
     
     private static final long MAX_LOOKUP_TIME = 15*1000;
+    private static final int PRIORITY = OutNetMessage.PRIORITY_MY_DATA;
 
     public OutboundReceiver(RouterContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
@@ -61,7 +62,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         m.setMessage(msg);
         m.setExpiration(msg.getMessageExpiration());
         m.setTarget(ri);
-        m.setPriority(400);
+        m.setPriority(PRIORITY);
         _context.outNetMessagePool().add(m);
         _config.incrementProcessedMessages();
     }

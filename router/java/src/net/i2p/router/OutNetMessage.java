@@ -58,6 +58,26 @@ public class OutNetMessage {
     private List<String> _timestampOrder;
     private Object _preparationBuf;
     
+    /**
+     *  Priorities, higher is higher priority.
+     *  @since 0.9.3
+     */
+    public static final int PRIORITY_HIGHEST = 1000;
+    public static final int PRIORITY_MY_BUILD_REQUEST = 500;
+    public static final int PRIORITY_MY_NETDB_LOOKUP = 500;
+    public static final int PRIORITY_MY_NETDB_STORE = 400;
+    public static final int PRIORITY_MY_DATA = 400;
+    public static final int PRIORITY_MY_NETDB_STORE_LOW = 300;
+    public static final int PRIORITY_HIS_BUILD_REQUEST = 300;
+    public static final int PRIORITY_BUILD_REPLY = 300;
+    public static final int PRIORITY_NETDB_REPLY = 300;
+    public static final int PRIORITY_HIS_NETDB_STORE = 200;
+    public static final int PRIORITY_NETDB_FLOOD = 200;
+    public static final int PRIORITY_PARTICIPATING = 200;
+    public static final int PRIORITY_NETDB_EXPLORE = 100;
+    public static final int PRIORITY_NETDB_HARVEST = 100;
+    public static final int PRIORITY_LOWEST = 100;
+
     public OutNetMessage(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(OutNetMessage.class);

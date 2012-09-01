@@ -97,10 +97,12 @@ public class GarlicMessageReceiver {
      */
     private void handleClove(GarlicClove clove) {
         if (!isValid(clove)) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.warn("Invalid clove " + clove);
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Invalid clove " + clove);
             return;
         } 
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("valid clove " + clove);
         _receiver.handleClove(clove.getInstructions(), clove.getData());
     }
     

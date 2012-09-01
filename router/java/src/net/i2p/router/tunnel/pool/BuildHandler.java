@@ -61,6 +61,7 @@ class BuildHandler implements Runnable {
     private static final int MAX_QUEUE = 192;
 
     private static final int NEXT_HOP_LOOKUP_TIMEOUT = 15*1000;
+    private static final int PRIORITY = OutNetMessage.PRIORITY_BUILD_REPLY;
     
     /**
      *  This must be high, as if we timeout the send we remove the tunnel from
@@ -689,7 +690,7 @@ class BuildHandler implements Runnable {
             OutNetMessage msg = new OutNetMessage(_context);
             msg.setMessage(state.msg);
             msg.setExpiration(state.msg.getMessageExpiration());
-            msg.setPriority(300);
+            msg.setPriority(PRIORITY);
             msg.setTarget(nextPeerInfo);
             if (response == 0)
                 msg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
@@ -722,7 +723,7 @@ class BuildHandler implements Runnable {
                 OutNetMessage outMsg = new OutNetMessage(_context);
                 outMsg.setExpiration(m.getMessageExpiration());
                 outMsg.setMessage(m);
-                outMsg.setPriority(300);
+                outMsg.setPriority(PRIORITY);
                 outMsg.setTarget(nextPeerInfo);
                 if (response == 0)
                     outMsg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));

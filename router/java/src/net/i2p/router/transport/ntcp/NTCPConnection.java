@@ -137,6 +137,8 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /** 2 bytes for length and 4 for CRC */
     public static final int MAX_MSG_SIZE = BUFFER_SIZE - (2 + 4);
     
+    private static final int PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_STORE_LOW;
+
     /**
      * Create an inbound connected (though not established) NTCP connection
      *
@@ -397,7 +399,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
         dsm.setEntry(_context.router().getRouterInfo());
         infoMsg.setMessage(dsm);
-        infoMsg.setPriority(100);
+        infoMsg.setPriority(PRIORITY);
         RouterInfo target = _context.netDb().lookupRouterInfoLocally(_remotePeer.calculateHash());
         if (target != null) {
             infoMsg.setTarget(target);
