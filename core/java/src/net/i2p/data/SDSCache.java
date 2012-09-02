@@ -98,6 +98,11 @@ public class SDSCache<V extends SimpleDataStructure> {
     }
 
     /**
+     *  WARNING - If the SDS is found in the cache, the passed-in
+     *  byte array will be returned to the SimpleByteCache for reuse.
+     *  Do NOT save a reference to the passed-in data, or use or modify it,
+     *  after this call.
+     *
      *  @param data non-null, the byte array for the SimpleDataStructure
      *  @return the cached value if available, otherwise
      *          makes a new object and returns it

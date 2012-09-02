@@ -16,9 +16,9 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Big ol' class to do all our packet formatting.  The UDPPackets generated are
@@ -102,9 +102,6 @@ class PacketBuilder {
     private final Log _log;
     private final UDPTransport _transport;
     
-    private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
-    private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
-
     /**
      *  For debugging and stats only - does not go out on the wire.
      *  These are chosen to be higher than the highest I2NP message type,
@@ -607,12 +604,12 @@ class PacketBuilder {
         
         // ok, now the full data is in there, but we also need to encrypt
         // the signature, which means we need the IV
-        ByteArray iv = _ivCache.acquire();
-        _context.random().nextBytes(iv.getData());
+        byte[] iv = SimpleByteCache.acquire(UDPPacket.IV_SIZE);
+        _context.random().nextBytes(iv);
         
         int encrWrite = Signature.SIGNATURE_BYTES + 8;
         int sigBegin = off - encrWrite;
-        _context.aes().encrypt(data, sigBegin, data, sigBegin, state.getCipherKey(), iv.getData(), encrWrite);
+        _context.aes().encrypt(data, sigBegin, data, sigBegin, state.getCipherKey(), iv, encrWrite);
         
         // pad up so we're on the encryption boundary
         if ( (off % 16) != 0)
@@ -620,7 +617,7 @@ class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());
-        _ivCache.release(iv);
+        SimpleByteCache.release(iv);
         packet.setMessageType(TYPE_CREAT);
         return packet;
     }
@@ -1290,10 +1287,10 @@ class PacketBuilder {
      * @param macKey key to generate the, er, MAC
      */
     private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey) {
-        ByteArray iv = _ivCache.acquire();
-        _context.random().nextBytes(iv.getData());
+        byte[] iv = SimpleByteCache.acquire(UDPPacket.IV_SIZE);
+        _context.random().nextBytes(iv);
         authenticate(packet, cipherKey, macKey, iv);
-        _ivCache.release(iv);
+        SimpleByteCache.release(iv);
     }
     
     /**
@@ -1308,38 +1305,38 @@ class PacketBuilder {
      * @param macKey key to generate the, er, MAC
      * @param iv IV to deliver
      */
-    private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, ByteArray iv) {
+    private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, byte[] iv) {
         long before = System.currentTimeMillis();
         int encryptOffset = packet.getPacket().getOffset() + UDPPacket.IV_SIZE + UDPPacket.MAC_SIZE;
         int encryptSize = packet.getPacket().getLength() - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
         byte data[] = packet.getPacket().getData();
-        _context.aes().encrypt(data, encryptOffset, data, encryptOffset, cipherKey, iv.getData(), encryptSize);
+        _context.aes().encrypt(data, encryptOffset, data, encryptOffset, cipherKey, iv, encryptSize);
         
         // ok, now we need to prepare things for the MAC, which requires reordering
         int off = packet.getPacket().getOffset();
         System.arraycopy(data, encryptOffset, data, off, encryptSize);
         off += encryptSize;
-        System.arraycopy(iv.getData(), 0, data, off, UDPPacket.IV_SIZE);
+        System.arraycopy(iv, 0, data, off, UDPPacket.IV_SIZE);
         off += UDPPacket.IV_SIZE;
         DataHelper.toLong(data, off, 2, encryptSize ^ PROTOCOL_VERSION);
         
         int hmacOff = packet.getPacket().getOffset();
         int hmacLen = encryptSize + UDPPacket.IV_SIZE + 2;
         //Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);
-        ByteArray ba = _hmacCache.acquire();
-        _context.hmac().calculate(macKey, data, hmacOff, hmacLen, ba.getData(), 0);
+        byte[] ba = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        _context.hmac().calculate(macKey, data, hmacOff, hmacLen, ba, 0);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Authenticating " + packet.getPacket().getLength() +
-                       "\nIV: " + Base64.encode(iv.getData()) +
-                       "\nraw mac: " + Base64.encode(ba.getData()) +
+                       "\nIV: " + Base64.encode(iv) +
+                       "\nraw mac: " + Base64.encode(ba) +
                        "\nMAC key: " + macKey);
         // ok, now lets put it back where it belongs...
         System.arraycopy(data, hmacOff, data, encryptOffset, encryptSize);
         //System.arraycopy(hmac.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
-        System.arraycopy(ba.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
-        System.arraycopy(iv.getData(), 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
-        _hmacCache.release(ba);
+        System.arraycopy(ba, 0, data, hmacOff, UDPPacket.MAC_SIZE);
+        System.arraycopy(iv, 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
+        SimpleByteCache.release(ba);
         long timeToAuth = System.currentTimeMillis() - before;
         _context.statManager().addRateData("udp.packetAuthTime", timeToAuth, timeToAuth);
         if (timeToAuth > 100)

@@ -2,7 +2,6 @@ package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
@@ -29,7 +28,6 @@ class HopProcessor {
      */
     static final boolean USE_DOUBLE_IV_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
-    private static final ByteCache _cache = ByteCache.getInstance(128, IV_LENGTH);
     
     /** @deprecated unused */
     public HopProcessor(I2PAppContext ctx, HopConfig config) {

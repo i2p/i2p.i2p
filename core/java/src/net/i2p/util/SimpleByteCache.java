@@ -18,7 +18,7 @@ public final class SimpleByteCache {
 
     private static final Map<Integer, SimpleByteCache> _caches = new ConcurrentHashMap(8);
 
-    private static final int DEFAULT_SIZE = 16;
+    private static final int DEFAULT_SIZE = 64;
 
     /** up to this, use ABQ to minimize object churn and for performance; above this, use LBQ for two locks */
     private static final int MAX_FOR_ABQ = 64;

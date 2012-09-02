@@ -13,21 +13,13 @@ import net.i2p.data.ByteArray;
  * Cache the objects frequently used to reduce memory churn.  The ByteArray 
  * should be held onto as long as the  data referenced in it is needed.
  *
+ * For small arrays where the management of valid bytes in ByteArray
+ * and prezeroing isn't required, use SimpleByteArray instead.
+ *
  * Heap size control - survey of usage (April 2010) :
  *
  *  <pre>
 	Size	Max	MaxMem	From
-
-	16	16	256	CryptixAESEngine
-	16	32	512	BloomFilterIVValidator
-	16	64	1K	UDP PacketBuilder
-	16	128	2K	tunnel HopProcessor
-	16	128	2K	tunnel TrivialPreprocessor
-	16	128	2K	tunnel InboundEndpointProcessor
-	16	128	2K	tunnel OutboundGatewayProcessor
-
-	32	64	2K	UDP PacketBuilder
-	32	128	4K	tunnel TrivialPreprocessor
 
 	1K	32	32K	tunnel TrivialPreprocessor
 	1K	512	512K	tunnel FragmentHandler

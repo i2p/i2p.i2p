@@ -9,6 +9,7 @@ import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /** 
  * Do the simplest thing possible for preprocessing - for each message available,
@@ -33,9 +34,6 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      */
     protected static final ByteCache _dataCache = ByteCache.getInstance(32, PREPROCESSED_SIZE);
 
-    private static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
-    private static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
-    
     public TrivialPreprocessor(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
@@ -63,16 +61,15 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * @param fragmentLength fragments[0:fragmentLength] is used
      */
     protected void preprocess(byte fragments[], int fragmentLength) {
-        ByteArray ivBuf = _ivCache.acquire();
-        byte iv[] = ivBuf.getData(); // new byte[IV_SIZE];
+        byte iv[] = SimpleByteCache.acquire(IV_SIZE);
         _context.random().nextBytes(iv);
         
         // payload ready, now H(instructions+payload+IV)
         System.arraycopy(iv, 0, fragments, fragmentLength, IV_SIZE);
         
-        ByteArray hashBuf = _hashCache.acquire();
+        byte[] hashBuf = SimpleByteCache.acquire(Hash.HASH_LENGTH);
         //Hash h = _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE);
-        _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE, hashBuf.getData(), 0);
+        _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE, hashBuf, 0);
         
         //Hash h = _context.sha().calculateHash(target, 0, offset + IV_SIZE);
         //_log.debug("before shift: " + Base64.encode(target));
@@ -91,12 +88,12 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         System.arraycopy(iv, 0, fragments, offset, IV_SIZE);
         offset += IV_SIZE;
         //System.arraycopy(h.getData(), 0, fragments, offset, 4);
-        System.arraycopy(hashBuf.getData(), 0, fragments, offset, 4);
+        System.arraycopy(hashBuf, 0, fragments, offset, 4);
         offset += 4;
         //_log.debug("before pad  : " + Base64.encode(target));
         
-        _hashCache.release(hashBuf);
-        _ivCache.release(ivBuf);
+        SimpleByteCache.release(hashBuf);
+        SimpleByteCache.release(iv);
         
         // fits in a single message, so may be smaller than the full size
         int numPadBytes = PREPROCESSED_SIZE     // max 
