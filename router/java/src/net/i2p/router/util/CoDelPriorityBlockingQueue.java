@@ -139,6 +139,9 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
         return codel(rv);
     }
 
+    /**
+     *  Updates stats and possibly drops while draining.
+     */
     @Override
     public int drainTo(Collection<? super E> c) {
         int rv = 0;
@@ -150,6 +153,9 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
         return rv;
     }
 
+    /**
+     *  Updates stats and possibly drops while draining.
+     */
     @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
         int rv = 0;
@@ -158,6 +164,13 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
             c.add(e);
         }
         return rv;
+    }
+
+    /**
+     *  Drains all, without updating stats or dropping.
+     */
+    public int drainAllTo(Collection<? super E> c) {
+        return super.drainTo(c);
     }
 
     /////// private below here
