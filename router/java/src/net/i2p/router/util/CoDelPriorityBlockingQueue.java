@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -66,7 +67,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
 
     private final String STAT_DROP;
     private final String STAT_DELAY;
-    private static final long[] RATES = {5*60*1000};
+    private static final long[] RATES = {5*60*1000, 60*60*1000};
     public static final int MIN_PRIORITY = 100;
     private static final int[] PRIORITIES = {MIN_PRIORITY, 200, 300, 400, 500};
     /** if priority is >= this, never drop */
@@ -285,6 +286,8 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
             _log.warn(_name + " dropped item with delay " + delay + ", priority " +
                       entry.getPriority() + ", seq " +
                       entry.getSeqNum() + ", " +
+                      DataHelper.formatDuration(_context.clock().now() - _first_above_time) + " since first above, " +
+                      (_count+1) + " dropped in this phase, " +
                       size() + " remaining in queue: " + entry);
         entry.drop();
     }
