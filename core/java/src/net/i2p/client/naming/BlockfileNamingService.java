@@ -29,6 +29,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
@@ -134,7 +135,7 @@ public class BlockfileNamingService extends DummyNamingService {
         super(context);
         _lists = new ArrayList();
         _invalid = new ArrayList();
-        _negativeCache = new LHM(NEGATIVE_CACHE_SIZE);
+        _negativeCache = new LHMCache(NEGATIVE_CACHE_SIZE);
         BlockFile bf = null;
         RAIFile raf = null;
         boolean readOnly = false;

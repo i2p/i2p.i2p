@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 
 /**
@@ -658,7 +658,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
         public Range(T us, int bValue) {
             _bValue = bValue;
             _bigUs = new BigInteger(1, us.getData());
-            _distanceCache = new LHM(256);
+            _distanceCache = new LHMCache(256);
         }
 
         /** @return 0 to max-1 or -1 for us */
@@ -694,20 +694,6 @@ public class KBucketSet<T extends SimpleDataStructure> {
             synchronized (_distanceCache) {
                 _distanceCache.clear();
             }
-        }
-    }
-
-    private static class LHM<K, V> extends LinkedHashMap<K, V> {
-        private final int _max;
-
-        public LHM(int max) {
-            super(max, 0.75f, true);
-            _max = max;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > _max;
         }
     }
 

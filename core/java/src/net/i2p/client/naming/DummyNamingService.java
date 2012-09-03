@@ -7,13 +7,13 @@
  */
 package net.i2p.client.naming;
 
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
+import net.i2p.util.LHMCache;
 
 /**
  * A Dummy naming service that can only handle base64 and b32 destinations.
@@ -30,7 +30,7 @@ class DummyNamingService extends NamingService {
      *  Classes should take care to call removeCache() for any entries that
      *  are invalidated.
      */
-    private static final Map<String, Destination> _cache = new LHM(CACHE_MAX_SIZE);
+    private static final Map<String, Destination> _cache = new LHMCache(CACHE_MAX_SIZE);
 
     /** 
      * The naming service should only be constructed and accessed through the 
@@ -113,20 +113,6 @@ class DummyNamingService extends NamingService {
     protected static void clearCache() {
         synchronized (_cache) {
             _cache.clear();
-        }
-    }
-
-    protected static class LHM<K, V> extends LinkedHashMap<K, V> {
-        private final int _max;
-
-        public LHM(int max) {
-            super(max, 0.75f, true);
-            _max = max;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > _max;
         }
     }
 }

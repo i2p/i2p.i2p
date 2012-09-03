@@ -18,7 +18,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,6 +43,7 @@ import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -140,7 +140,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  @since 0.8.9
      */
-    private static final LookupCache _lookupCache = new LookupCache(16);
+    private static final Map<Hash, Destination> _lookupCache = new LHMCache(16);
 
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
@@ -984,22 +984,5 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             buf.append("[null dest]");
         buf.append(getPrefix());
         return buf.toString();
-    }
-
-    /**
-     *  @since 0.8.9
-     */
-    private static class LookupCache extends LinkedHashMap<Hash, Destination> {
-        private final int _max;
-
-        public LookupCache(int max) {
-            super(max, 0.75f, true);
-            _max = max;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Hash, Destination> eldest) {
-            return size() > _max;
-        }
     }
 }
