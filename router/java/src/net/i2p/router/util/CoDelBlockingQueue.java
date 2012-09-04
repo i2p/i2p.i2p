@@ -3,6 +3,7 @@ package net.i2p.router.util;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -42,6 +43,10 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     /** following is a per-request global for ease of use, locked by this */
     private long _now;
 
+    /** debugging */
+    private static final AtomicLong __id = new AtomicLong();
+    private final long _id;
+
     /**
      *  Quote:
      *  Below a target of 5 ms, utilization suffers for some conditions and traffic loads;
@@ -76,6 +81,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
         STAT_DELAY = "codel." + name + ".delay";
         ctx.statManager().createRequiredRateStat(STAT_DROP, "queue delay of dropped items", "Router", RATES);
         ctx.statManager().createRequiredRateStat(STAT_DELAY, "average queue delay", "Router", RATES);
+        _id = __id.incrementAndGet();
     }
 
     @Override
@@ -276,8 +282,9 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
         long delay = _context.clock().now() - entry.getEnqueueTime();
         _context.statManager().addRateData(STAT_DROP, delay);
         if (_log.shouldLog(Log.WARN))
-            _log.warn(_name + " dropped item with delay " + delay + ", " +
+            _log.warn("CDQ #" + _id + ' ' + _name + " dropped item with delay " + delay + ", " +
                       DataHelper.formatDuration(_context.clock().now() - _first_above_time) + " since first above, " +
+                      DataHelper.formatDuration(_context.clock().now() - _drop_next) + " since drop next, " +
                       (_count+1) + " dropped in this phase, " +
                       size() + " remaining in queue: " + entry);
         entry.drop();

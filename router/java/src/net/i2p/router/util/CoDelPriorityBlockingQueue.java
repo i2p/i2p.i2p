@@ -47,6 +47,10 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
 
     private int _lastDroppedPriority;
 
+    /** debugging */
+    static final AtomicLong __id = new AtomicLong();
+    private final long _id;
+
     /**
      *  Quote:
      *  Below a target of 5 ms, utilization suffers for some conditions and traffic loads;
@@ -87,6 +91,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
             ctx.statManager().createRequiredRateStat(STAT_DROP + PRIORITIES[i], "queue delay of dropped items by priority", "Router", RATES);
         }
         ctx.statManager().createRequiredRateStat(STAT_DELAY, "average queue delay", "Router", RATES);
+        _id = __id.incrementAndGet();
     }
 
     @Override
@@ -296,10 +301,11 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
         long delay = _context.clock().now() - entry.getEnqueueTime();
         _context.statManager().addRateData(STAT_DROP + entry.getPriority(), delay);
         if (_log.shouldLog(Log.WARN))
-            _log.warn(_name + " dropped item with delay " + delay + ", priority " +
+            _log.warn("CDPQ #" + _id + ' ' + _name + " dropped item with delay " + delay + ", priority " +
                       entry.getPriority() + ", seq " +
                       entry.getSeqNum() + ", " +
                       DataHelper.formatDuration(_context.clock().now() - _first_above_time) + " since first above, " +
+                      DataHelper.formatDuration(_context.clock().now() - _drop_next) + " since drop next, " +
                       (_count+1) + " dropped in this phase, " +
                       size() + " remaining in queue: " + entry);
         entry.drop();
