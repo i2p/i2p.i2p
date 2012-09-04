@@ -463,8 +463,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             _log.debug("Removing tunnels for the client " + destination);
         if (_context.clientManager().isLocal(destination)) {
             // race with buildTunnels() on restart of a client
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Not removing pool still registered with client manager: " + destination.toBase64(), new Exception("i did it"));
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Not removing pool still registered with client manager: " + destination.toBase64(), new Exception("i did it"));
             return;
         }
         TunnelPool inbound = _clientInboundPools.remove(destination);
