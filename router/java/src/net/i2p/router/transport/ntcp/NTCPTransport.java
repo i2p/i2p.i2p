@@ -539,7 +539,7 @@ public class NTCPTransport extends TransportImpl {
                 try {
                     bindToAddr = InetAddress.getByName(bindTo);
                 } catch (UnknownHostException uhe) {
-                    _log.log(Log.CRIT, "Invalid SSU bind interface specified [" + bindTo + "]", uhe);
+                    _log.log(Log.CRIT, "Invalid NTCP bind interface specified [" + bindTo + "]", uhe);
                     // this can be implemented later, just updates some stats
                     // see udp/UDPTransport.java
                     //setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
