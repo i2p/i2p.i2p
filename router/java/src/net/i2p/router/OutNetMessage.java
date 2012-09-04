@@ -32,8 +32,6 @@ public class OutNetMessage {
     private final RouterContext _context;
     private RouterInfo _target;
     private I2NPMessage _message;
-    /** cached message class name, for use after we discard the message */
-    private String _messageType;
     private int _messageTypeId;
     /** cached message ID, for use after we discard the message */
     private long _messageId;
@@ -148,7 +146,6 @@ public class OutNetMessage {
     public void setMessage(I2NPMessage msg) {
         _message = msg;
         if (msg != null) {
-            _messageType = msg.getClass().getSimpleName();
             _messageTypeId = msg.getType();
             _messageId = msg.getUniqueId();
             _messageSize = _message.getMessageSize();
@@ -156,9 +153,13 @@ public class OutNetMessage {
     }
     
     /**
+     *  For debugging only.
      *  @return the simple class name
      */
-    public String getMessageType() { return _messageType; }
+    public String getMessageType() {
+        I2NPMessage msg = _message;
+        return msg != null ? msg.getClass().getSimpleName() : "null";
+    }
 
     public int getMessageTypeId() { return _messageTypeId; }
     public long getMessageId() { return _messageId; }
@@ -272,7 +273,7 @@ public class OutNetMessage {
             _messageSize = _message.getMessageSize();
         if (_log.shouldLog(Log.DEBUG)) {
             long timeToDiscard = _context.clock().now() - _created;
-            _log.debug("Discard " + _messageSize + "byte " + _messageType + " message after " 
+            _log.debug("Discard " + _messageSize + "byte " + getMessageType() + " message after " 
                        + timeToDiscard);
         }
         _message = null;
@@ -308,7 +309,7 @@ public class OutNetMessage {
             buf.append("*no message*");
         } else {
             buf.append("a ").append(_messageSize).append(" byte ");
-            buf.append(_messageType);
+            buf.append(getMessageType());
         }
         buf.append(" expiring on ").append(new Date(_expiration));
         if (_failedTransports != null)
