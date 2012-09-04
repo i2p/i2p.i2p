@@ -15,7 +15,7 @@ public abstract class I2PTunnelTask extends EventDispatcherImpl {
 
     private int id;
     private String name;
-    protected boolean open;
+    protected volatile boolean open;
     private I2PTunnel tunnel;
 
     //protected I2PTunnelTask(String name) {

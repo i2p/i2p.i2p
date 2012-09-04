@@ -375,7 +375,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             } catch (I2PException ipe) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting - KILLING THE TUNNEL SERVER", ipe);
-                return;
+                // TODO delay and loop if internal router is soft restarting?
+                open = false;
+                break;
             } catch (ConnectException ce) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting", ce);
