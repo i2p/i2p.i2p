@@ -93,7 +93,7 @@ class EstablishmentManager {
     private static final int MAX_QUEUED_OUTBOUND = 50;
 
     /** max queued msgs per peer while the peer connection is queued */
-    private static final int MAX_QUEUED_PER_PEER = 3;
+    private static final int MAX_QUEUED_PER_PEER = 16;
     
     private static final long MAX_NONCE = 0xFFFFFFFFl;
 
@@ -302,15 +302,16 @@ class EstablishmentManager {
             }
             if (state == null) {
                 if (queueIfMaxExceeded && _outboundStates.size() >= getMaxConcurrentEstablish()) {
-                    if (_queuedOutbound.size() >= MAX_QUEUED_OUTBOUND) {
+                    if (_queuedOutbound.size() >= MAX_QUEUED_OUTBOUND && !_queuedOutbound.containsKey(to)) {
                         rejected = true;
                     } else {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Queueing outbound establish, increase " + PROP_MAX_CONCURRENT_ESTABLISH);
                         List<OutNetMessage> newQueued = new ArrayList(MAX_QUEUED_PER_PEER);
                         List<OutNetMessage> queued = _queuedOutbound.putIfAbsent(to, newQueued);
-                        if (queued == null)
+                        if (queued == null) {
                             queued = newQueued;
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Queueing outbound establish to " + to + ", increase " + PROP_MAX_CONCURRENT_ESTABLISH);
+                        }
                         // this used to be inside a synchronized (_outboundStates) block,
                         // but that's now a CHM, so protect the ArrayList
                         // There are still races possible but this should prevent AIOOBE and NPE
@@ -320,6 +321,8 @@ class EstablishmentManager {
                                 queued.add(msg);
                                 // increment for the stat below
                                 queueCount++;
+                            } else {
+                                rejected = true;
                             }
                             deferred = _queuedOutbound.size();
                         }
@@ -371,7 +374,7 @@ class EstablishmentManager {
         
         if (rejected) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting outbound establish");
+                _log.warn("Too many pending, rejecting outbound establish to " + to);
             _transport.failed(msg, "Too many pending outbound connections");
             _context.statManager().addRateData("udp.establishRejected", deferred, 0);
             return;

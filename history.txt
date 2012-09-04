@@ -1,3 +1,8 @@
+2012-09-04 zzz
+ * I2PTunnelServer: Clean shutdown after session exception
+ * OutNetMessage: Speedup after profiling (ticket #707 - thx dg, kytv, zab)
+ * SSU: Fix some issues with queueing outbound establishments
+
 2012-08-31 zzz
  * i2psnark: Remove * from magnet and download names
  * Router: Lengthen shutdown spinner life
