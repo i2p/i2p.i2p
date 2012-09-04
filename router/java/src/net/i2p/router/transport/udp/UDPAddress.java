@@ -12,9 +12,9 @@ import net.i2p.data.SessionKey;
  * FIXME public for ConfigNetHelper
  */
 public class UDPAddress {
-    private String _host;
+    private final String _host;
     private InetAddress _hostAddress;
-    private int _port;
+    private final int _port;
     private byte[] _introKey;
     private String _introHosts[];
     private InetAddress _introAddresses[];
@@ -23,8 +23,8 @@ public class UDPAddress {
     private long _introTags[];
     private int _mtu;
     
-    public static final String PROP_PORT = "port";
-    public static final String PROP_HOST = "host";
+    public static final String PROP_PORT = RouterAddress.PROP_PORT;
+    public static final String PROP_HOST = RouterAddress.PROP_HOST;
     public static final String PROP_INTRO_KEY = "key";
     public static final String PROP_MTU = "mtu";
     
@@ -40,16 +40,13 @@ public class UDPAddress {
 
     public UDPAddress(RouterAddress addr) {
         // TODO make everything final
-        if (addr == null) return;
-        _host = addr.getOption(PROP_HOST);
-        if (_host != null) _host = _host.trim();
-        try { 
-            String port = addr.getOption(PROP_PORT);
-            if (port != null)
-                _port = Integer.parseInt(port);
-        } catch (NumberFormatException nfe) {
-            _port = -1;
+        if (addr == null) {
+            _host = null;
+            _port = 0;
+            return;
         }
+        _host = addr.getOption(PROP_HOST);
+        _port = addr.getPort();
         try { 
             String mtu = addr.getOption(PROP_MTU);
             if (mtu != null)
@@ -146,7 +143,7 @@ public class UDPAddress {
     }
 
     /**
-     *  @return 0 if unset; -1 if invalid
+     *  @return 0 if unset or invalid
      */
     public int getPort() { return _port; }
 

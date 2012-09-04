@@ -1203,26 +1203,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //UDPAddress ua = new UDPAddress(addr);
             //if (ua.getIntroducerCount() <= 0) {
             if (addr.getOption("ihost0") == null) {
-                String host = addr.getOption(UDPAddress.PROP_HOST);
-                String port = addr.getOption(UDPAddress.PROP_PORT);
-                if (host == null || port == null) {
+                byte[] ip = addr.getIP();
+                int port = addr.getPort();
+                if (ip == null || port <= 0 ||
+                    (!isValid(ip)) ||
+                    Arrays.equals(ip, getExternalIP())) {
                     markUnreachable(to);
                     return null;
-                }
-                try {
-                    InetAddress ia = InetAddress.getByName(host);
-                    int iport = Integer.parseInt(port);
-                    if (iport <= 0 || iport > 65535 || (!isValid(ia.getAddress())) ||
-                        Arrays.equals(ia.getAddress(), getExternalIP())) {
-                        markUnreachable(to);
-                        return null;
-                    }
-                } catch (UnknownHostException uhe) {
-                        markUnreachable(to);
-                        return null;
-                } catch (NumberFormatException nfe) {
-                        markUnreachable(to);
-                        return null;
                 }
             }
             if (!allowConnection())
@@ -1338,6 +1325,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _fragments.add(msg);
     }
 
+    /**
+     *  "injected" message from the EstablishmentManager
+     */
     void send(I2NPMessage msg, PeerState peer) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Injecting a data message to a new peer: " + peer);
@@ -1447,7 +1437,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 addr.setCost(DEFAULT_COST + 1);
             else
                 addr.setCost(DEFAULT_COST);
-            addr.setExpiration(null);
+            //addr.setExpiration(null);
             addr.setTransportStyle(STYLE);
             addr.setOptions(options);
 

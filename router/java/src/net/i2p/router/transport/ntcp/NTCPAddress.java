@@ -8,13 +8,13 @@ package net.i2p.router.transport.ntcp;
  *
  */
 
-import java.net.InetAddress;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -25,9 +25,9 @@ public class NTCPAddress {
     private final String _host;
     //private InetAddress _addr;
     /** Port number used in RouterAddress definitions */
-    public final static String PROP_PORT = "port";
+    public final static String PROP_PORT = RouterAddress.PROP_PORT;
     /** Host name used in RouterAddress definitions */
-    public final static String PROP_HOST = "host";
+    public final static String PROP_HOST = RouterAddress.PROP_HOST;
     public static final int DEFAULT_COST = 10;
     
     public NTCPAddress(String host, int port) {
@@ -59,23 +59,8 @@ public class NTCPAddress {
             _port = -1;
             return;
         }
-        String host = addr.getOption(PROP_HOST);
-        int iport = -1;
-        if (host == null) {
-            _host = null;
-        } else { 
-            _host = host.trim();
-            String port = addr.getOption(PROP_PORT);
-            if ( (port != null) && (port.trim().length() > 0) && !("null".equals(port)) ) {
-                try {
-                    iport = Integer.parseInt(port.trim());
-                } catch (NumberFormatException nfe) {
-                    Log log = I2PAppContext.getGlobalContext().logManager().getLog(NTCPAddress.class);
-                    log.error("Invalid port [" + port + "]", nfe);
-                }
-            }
-        }
-        _port = iport;
+        _host = addr.getOption(PROP_HOST);
+        _port = addr.getPort();
     }
     
     public RouterAddress toRouterAddress() {
@@ -85,7 +70,7 @@ public class NTCPAddress {
         RouterAddress addr = new RouterAddress();
         
         addr.setCost(DEFAULT_COST);
-        addr.setExpiration(null);
+        //addr.setExpiration(null);
         
         Properties props = new Properties();
         props.setProperty(PROP_HOST, _host);
@@ -106,24 +91,11 @@ public class NTCPAddress {
     public boolean isPubliclyRoutable() {
         return isPubliclyRoutable(_host);
     }
+
     public static boolean isPubliclyRoutable(String host) {
         if (host == null) return false;
-        try {
-            InetAddress addr = InetAddress.getByName(host);
-            byte quad[] = addr.getAddress();
-            // allow ipv6 for ntcpaddress, since we've still got ssu
-            //if (quad.length != 4) {
-            //    if (_log.shouldLog(Log.ERROR))
-            //        _log.error("Refusing IPv6 address (" + host + " / " + addr.getHostAddress() + ") "
-            //                   + " since not all peers support it, and we don't support restricted routes");
-            //    return false;
-            //}
-            return TransportImpl.isPubliclyRoutable(quad);
-        } catch (Throwable t) {
-            //if (_log.shouldLog(Log.WARN))
-            //    _log.warn("Error checking routability", t);
-            return false;
-        }
+        byte quad[] = Addresses.getIP(host);
+        return TransportImpl.isPubliclyRoutable(quad);
     }
     
     @Override

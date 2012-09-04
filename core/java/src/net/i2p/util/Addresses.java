@@ -10,10 +10,13 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.i2p.I2PAppContext;
 
 /**
  * Methods to get the local addresses, and other IP utilities
@@ -149,6 +152,69 @@ public abstract class Addresses {
             return '[' + ip + "]:" + port;
         } catch (UnknownHostException uhe) {
             return "(bad IP length " + addr.length + "):" + port;
+        }
+    }
+
+    /**
+     *  Textual IP to bytes, because InetAddress.getByName() is slow.
+     *
+     *  @since 0.9.3
+     */
+    private static final Map<String, byte[]> _IPAddress;
+
+    static {
+        int size;
+        I2PAppContext ctx = I2PAppContext.getCurrentContext();
+        if (ctx != null && ctx.isRouterContext()) {
+            long maxMemory = Runtime.getRuntime().maxMemory();
+            if (maxMemory == Long.MAX_VALUE)
+                maxMemory = 96*1024*1024l;
+            long min = 128;
+            long max = 4096;
+            // 512 nominal for 128 MB
+            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
+        } else {
+            size = 32;
+        }
+        _IPAddress = new LHMCache(size);
+    }
+
+    /**
+     *  Caching version of InetAddress.getByName(host).getAddress(), which is slow.
+     *  Caches numeric host names only.
+     *  Will resolve but not cache DNS host names.
+     *
+     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @return IP or null
+     *  @since 0.9.3
+     */
+    public static byte[] getIP(String host) {
+        if (host == null)
+            return null;
+        byte[] rv;
+        synchronized (_IPAddress) {
+            rv = _IPAddress.get(host);
+        }
+        if (rv == null) {
+            try {
+                rv = InetAddress.getByName(host).getAddress();
+                if (host.replaceAll("[0-9\\.]", "").length() == 0 ||
+                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                    synchronized (_IPAddress) {
+                        _IPAddress.put(host, rv);
+                    }
+                }
+            } catch (UnknownHostException uhe) {}
+        }
+        return rv;
+    }
+
+    /**
+     *  @since 0.9.3
+     */
+    public static void clearCaches() {
+        synchronized(_IPAddress) {
+            _IPAddress.clear();
         }
     }
 

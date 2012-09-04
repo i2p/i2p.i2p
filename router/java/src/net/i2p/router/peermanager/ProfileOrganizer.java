@@ -1261,16 +1261,8 @@ public class ProfileOrganizer {
         if (paddr == null)
             return rv;
         for (RouterAddress pa : paddr) {
-            String phost = pa.getOption("host");
-            if (phost == null) continue;
-            InetAddress pi;
-            try {
-                pi = InetAddress.getByName(phost);
-            } catch (UnknownHostException uhe) {
-                continue;
-            }
-            if (pi == null) continue;
-            byte[] pib = pi.getAddress();
+            byte[] pib = pa.getIP();
+            if (pib == null) continue;
             rv.add(maskedIP(pib, mask));
         }
         return rv;

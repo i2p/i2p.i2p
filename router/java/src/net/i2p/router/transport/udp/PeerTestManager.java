@@ -9,6 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.CommSystemFacade;
@@ -584,7 +585,13 @@ class PeerTestManager {
             aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
             testInfo.readIntroKey(aliceIntroKey.getData(), 0);
 
-            UDPAddress addr = new UDPAddress(charlieInfo.getTargetAddress(UDPTransport.STYLE));
+            RouterAddress raddr = charlieInfo.getTargetAddress(UDPTransport.STYLE);
+            if (raddr == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to pick a charlie");
+                return;
+            }
+            UDPAddress addr = new UDPAddress(raddr);
             SessionKey charlieIntroKey = new SessionKey(addr.getIntroKey());
             
             //UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, charlieIntroKey, nonce);

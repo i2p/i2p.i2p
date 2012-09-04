@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
@@ -35,6 +36,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -53,7 +55,18 @@ public abstract class TransportImpl implements Transport {
     private final Map<Hash, Long>  _unreachableEntries;
     private final Set<Hash> _wasUnreachableEntries;
     /** global router ident -> IP */
-    private static final Map<Hash, byte[]> _IPMap = new ConcurrentHashMap(128);
+    private static final Map<Hash, byte[]> _IPMap;
+
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        long min = 512;
+        long max = 4096;
+        // 1024 nominal for 128 MB
+        int size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (128*1024))));
+        _IPMap = new LHMCache(size);
+    }
 
     /**
      * Initialize the new transport
@@ -585,12 +598,27 @@ public abstract class TransportImpl implements Transport {
     }
 
     public void setIP(Hash peer, byte[] ip) {
-        _IPMap.put(peer, ip);
-        _context.commSystem().queueLookup(ip);
+        byte[] old;
+        synchronized (_IPMap) {
+            old = _IPMap.put(peer, ip);
+        }
+        if (!DataHelper.eq(old, ip))
+            _context.commSystem().queueLookup(ip);
     }
 
     public static byte[] getIP(Hash peer) {
-        return _IPMap.get(peer);
+        synchronized (_IPMap) {
+            return _IPMap.get(peer);
+        }
+    }
+
+    /**
+     *  @since 0.9.3
+     */
+    static void clearCaches() {
+        synchronized(_IPMap) {
+            _IPMap.clear();
+        }
     }
 
     /** @param addr non-null */
