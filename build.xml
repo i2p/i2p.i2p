@@ -768,6 +768,9 @@
         <copy todir="pkg-temp/lib/wrapper/macosx/">
             <fileset dir="installer/lib/wrapper/macosx/" excludes="*.txt" />
         </copy>
+        <copy file="installer/resources/net.i2p.router.plist.template" todir="pkg-temp/" />
+        <copy file="installer/resources/install_i2p_service_osx.command" todir="pkg-temp/" />
+        <copy file="installer/resources/uninstall_i2p_service_osx.command" todir="pkg-temp/" />
     </target>
 
     <target name="preppkg-osx-only" depends="preppkg-osx, jbigi-osx-only" >

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>net.i2p.router</string>
+    <key>OnDemand</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>~/.i2p/wrapper.log</string>
+    <key>StandardErrorPath</key>
+    <string>~/.i2p/wrapper.log</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>COMMAND</string>
+        <string>console</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>UserName</key>
+    <string>USERNAME</string>
+    <key>ServiceDescription</key>
+    <string>I2P Router service</string>
+    <key>Disabled</key>
+    <false/>
+    <key>WorkingDirectory</key>
+    <string>I2PPATH</string>
+</dict>
+</plist>

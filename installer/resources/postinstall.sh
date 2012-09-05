@@ -74,6 +74,8 @@ case $HOST_OS in
         wrapperpath="./lib/wrapper/macosx"
         cp ${wrapperpath}/libwrapper*.jnilib ./lib/
         chmod 755 ./Start\ I2P\ Router.app/Contents/MacOS/i2prouter
+        chmod 755 ./install_i2p_service_osx.command
+        chmod 755 ./uninstall_i2p_service_osx.command
         ;;
     solaris )
         wrapperpath="./lib/wrapper/solaris"
@@ -114,6 +116,9 @@ rm -rf ./installer
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -rf ./Start\ I2P\ Router.app
+    rm -f install_i2p_service_osx.command
+    rm -f install_i2p_service_osx.command
+    rm -f net.i2p.router.plist.template
     #rm -f I2P\ Router\ Console.webloc
 fi
 
