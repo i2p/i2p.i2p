@@ -25,7 +25,7 @@ import net.i2p.util.Log;
  *
  *  @since 0.9.3
  */
-public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlockingQueue<E> {
+public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlockingQueue<E> {
 
     private final I2PAppContext _context;
     private final Log _log;
@@ -81,7 +81,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
      *  @param name for stats
      */
     public CoDelPriorityBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
-        super(initialCapacity, new PriorityComparator());
+        super(initialCapacity);
         _context = ctx;
         _log = ctx.logManager().getLog(CoDelPriorityBlockingQueue.class);
         _name = name;
@@ -92,30 +92,6 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
         }
         ctx.statManager().createRequiredRateStat(STAT_DELAY, "average queue delay", "Router", RATES);
         _id = __id.incrementAndGet();
-    }
-
-    @Override
-    public boolean add(E o) {
-        timestamp(o);
-        return super.add(o);
-    }
-
-    @Override
-    public boolean offer(E o) {
-        timestamp(o);
-        return super.offer(o);
-    }
-
-    @Override
-    public boolean offer(E o, long timeout, TimeUnit unit) {
-        timestamp(o);
-        return super.offer(o, timeout, unit);
-    }
-
-    @Override
-    public void put(E o) {
-        timestamp(o);
-        super.put(o);
     }
 
     @Override
@@ -180,7 +156,8 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
 
     /////// private below here
 
-    private void timestamp(E o) {
+    @Override
+    protected void timestamp(E o) {
         o.setSeqNum(_seqNum.incrementAndGet());
         o.setEnqueueTime(_context.clock().now());
         if (o.getPriority() < MIN_PRIORITY && _log.shouldLog(Log.WARN))
@@ -316,18 +293,5 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriorityBlo
      */
     private void control_law(long t) {
         _drop_next = t + (long) (INTERVAL / Math.sqrt(_count));
-    }
-
-    /**
-     *  highest priority first, then lowest sequence number first
-     */
-    private static class PriorityComparator<E extends CDPQEntry> implements Comparator<E> {
-        public int compare(E l, E r) {
-            int d = r.getPriority() - l.getPriority();
-            if (d != 0)
-                return d;
-            long ld = l.getSeqNum() - r.getSeqNum();
-            return ld > 0 ? 1 : -1;
-        }
     }
 }
