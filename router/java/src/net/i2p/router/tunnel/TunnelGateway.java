@@ -54,7 +54,7 @@ class TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public TunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
+    protected TunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
         _context = context;
         _log = context.logManager().getLog(getClass());
         _queue = new ArrayList(4);
@@ -192,26 +192,27 @@ class TunnelGateway {
 
         public void timeReached() {
             boolean wantRequeue = false;
-            int remaining = 0;
-            long beforeLock = _context.clock().now();
-            long afterChecked = -1;
+            //int remaining = 0;
+            //long beforeLock = _context.clock().now();
+            //long afterChecked = -1;
             long delayAmount = -1;
             //if (_queue.size() > 10000) // stay out of the synchronized block
             //    System.out.println("foo!");
             synchronized (_queue) {
                 //if (_queue.size() > 10000) // stay in the synchronized block
                 //    System.out.println("foo!");
-                afterChecked = _context.clock().now();
+                //afterChecked = _context.clock().now();
                 if (!_queue.isEmpty()) {
-                    if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
-                        _log.debug("Remaining before delayed flush preprocessing: " + _queue);
+                    //if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
+                    //    _log.debug("Remaining before delayed flush preprocessing: " + _queue);
                     wantRequeue = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
-                    if (wantRequeue)
+                    if (wantRequeue) {
                         delayAmount = _preprocessor.getDelayAmount();
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Remaining after delayed flush preprocessing (requeue? " + wantRequeue + "): " + _queue);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Remaining after delayed flush preprocessing: " + _queue);
+                    }
                 }
-                remaining = _queue.size();
+                //remaining = _queue.size();
             }
             
             if (wantRequeue)

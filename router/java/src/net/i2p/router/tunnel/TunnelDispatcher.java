@@ -809,7 +809,7 @@ public class TunnelDispatcher implements Service {
     }
 ******/
 
-    public void startup() {
+    public synchronized void startup() {
         // Note that we only use the validator for participants and OBEPs, not IBGWs, so
         // this BW estimate will be high by about 33% assuming 2-hop tunnels average
         _validator = new BloomFilterIVValidator(_context, getShareBandwidth(_context));
@@ -823,7 +823,7 @@ public class TunnelDispatcher implements Service {
         return (int) (pct * Math.min(irateKBps, orateKBps));
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (_validator != null)
             _validator.destroy();
         _validator = null;
@@ -833,6 +833,7 @@ public class TunnelDispatcher implements Service {
         _participants.clear();
         _inboundGateways.clear();
         _participatingConfig.clear();
+        _leaveJob.clear();
     }
 
     public void restart() { 
@@ -865,6 +866,10 @@ public class TunnelDispatcher implements Service {
 
         public void add(HopConfig cfg) {
             _configs.offer(cfg);
+        }
+
+        public void clear() {
+            _configs.clear();
         }
         
         public String getName() { return "Expire participating tunnels"; }
