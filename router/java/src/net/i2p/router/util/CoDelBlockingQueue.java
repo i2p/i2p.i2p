@@ -29,6 +29,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     private final I2PAppContext _context;
     private final Log _log;
     private final String _name;
+    private final int _capacity;
 
     // following 4 are state variables defined by sample code, locked by this
     /** Time when we'll declare we're above target (0 if below) */
@@ -68,6 +69,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
     private final String STAT_DROP;
     private final String STAT_DELAY;
     private static final long[] RATES = {5*60*1000, 60*60*1000};
+    private static final long BACKLOG_TIME = 2*1000;
 
     /**
      *  @param name for stats
@@ -77,6 +79,7 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
         _context = ctx;
         _log = ctx.logManager().getLog(CoDelBlockingQueue.class);
         _name = name;
+        _capacity = capacity;
         STAT_DROP = "codel." + name + ".drop";
         STAT_DELAY = "codel." + name + ".delay";
         ctx.statManager().createRequiredRateStat(STAT_DROP, "queue delay of dropped items", "Router", RATES);
@@ -166,6 +169,18 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
      */
     public int drainAllTo(Collection<? super E> c) {
         return super.drainTo(c);
+    }
+
+    /**
+     *  Has the head of the queue been waiting too long,
+     *  or is the queue almost full?
+     */
+    public boolean isBacklogged() {
+        E e = peek();
+        if (e == null)
+            return false;
+        return _context.clock().now() - e.getEnqueueTime() >= BACKLOG_TIME ||
+               remainingCapacity() < _capacity / 4;
     }
 
     /////// private below here

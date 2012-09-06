@@ -76,6 +76,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
     private static final int[] PRIORITIES = {MIN_PRIORITY, 200, 300, 400, 500};
     /** if priority is >= this, never drop */
     public static final int DONT_DROP_PRIORITY = 1000;
+    private static final long BACKLOG_TIME = 2*1000;
 
     /**
      *  @param name for stats
@@ -152,6 +153,19 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      */
     public int drainAllTo(Collection<? super E> c) {
         return super.drainTo(c);
+    }
+
+    /**
+     *  Has the head of the queue been waiting too long,
+     *  or is the queue too big?
+     */
+    @Override
+    public boolean isBacklogged() {
+        E e = peek();
+        if (e == null)
+            return false;
+        return _context.clock().now() - e.getEnqueueTime() >= BACKLOG_TIME ||
+               size() >= BACKLOG_SIZE;
     }
 
     /////// private below here

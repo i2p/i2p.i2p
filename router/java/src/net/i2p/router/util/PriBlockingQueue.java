@@ -18,6 +18,8 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
 
     private final AtomicLong _seqNum = new AtomicLong();
 
+    protected static final int BACKLOG_SIZE = 256;
+
     public PriBlockingQueue(int initialCapacity) {
         super(initialCapacity, new PriorityComparator());
     }
@@ -44,6 +46,13 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
     public void put(E o) {
         timestamp(o);
         super.put(o);
+    }
+
+    /**
+     *  Is the queue too big?
+     */
+    public boolean isBacklogged() {
+        return size() >= BACKLOG_SIZE;
     }
 
     /////// private below here
