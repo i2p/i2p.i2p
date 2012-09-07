@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -22,24 +23,31 @@ class ClientWriterRunner implements Runnable {
     private I2PSessionImpl _session;
     private BlockingQueue<I2CPMessage> _messagesToWrite;
     private static volatile long __Id = 0;
+
+    private static final int MAX_QUEUE_SIZE = 32;
+    private static final long MAX_SEND_WAIT = 10*1000;
     
     /** starts the thread too */
     public ClientWriterRunner(OutputStream out, I2PSessionImpl session) {
         _out = out;
         _session = session;
-        _messagesToWrite = new LinkedBlockingQueue();
+        _messagesToWrite = new LinkedBlockingQueue(MAX_QUEUE_SIZE);
         Thread t = new I2PAppThread(this, "I2CP Client Writer " + (++__Id), true);
         t.start();
     }
 
     /**
-     * Add this message to the writer's queue
-     *
+     * Add this message to the writer's queue.
+     * Blocking if queue is full.
+     * @throws I2PSessionException if we wait too long or are interrupted
      */
-    public void addMessage(I2CPMessage msg) {
+    public void addMessage(I2CPMessage msg) throws I2PSessionException {
         try {
-            _messagesToWrite.put(msg);
-        } catch (InterruptedException ie) {}
+            if (!_messagesToWrite.offer(msg, MAX_SEND_WAIT, TimeUnit.MILLISECONDS))
+                throw new I2PSessionException("Timed out waiting while write queue was full");
+        } catch (InterruptedException ie) {
+            throw new I2PSessionException("Interrupted while write queue was full", ie);
+        }
     }
 
     /**

@@ -52,6 +52,8 @@ class ClientManager {
     /** SSL interface (only) @since 0.8.3 */
     private static final String PROP_ENABLE_SSL = "i2cp.SSL";
 
+    private static final int INTERNAL_QUEUE_SIZE = 256;
+
     public ClientManager(RouterContext context, int port) {
         _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);
@@ -125,9 +127,8 @@ class ClientManager {
     public I2CPMessageQueue internalConnect() throws I2PSessionException {
         if (!_isStarted)
             throw new I2PSessionException("Router client manager is shut down");
-        // for now we make these unlimited size
-        LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue();
-        LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue();
+        LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue(INTERNAL_QUEUE_SIZE);
+        LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue(INTERNAL_QUEUE_SIZE);
         I2CPMessageQueue myQueue = new I2CPMessageQueueImpl(in, out);
         I2CPMessageQueue hisQueue = new I2CPMessageQueueImpl(out, in);
         ClientConnectionRunner runner = new QueuedClientConnectionRunner(_ctx, this, myQueue);

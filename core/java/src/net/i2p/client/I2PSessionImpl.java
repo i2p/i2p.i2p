@@ -147,6 +147,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private static final long VERIFY_USAGE_TIME = 60*1000;
 
+    private static final long MAX_SEND_WAIT = 10*1000;
+
     void dateUpdated() {
         _dateReceived = true;
         synchronized (_dateReceivedLock) {
@@ -643,18 +645,26 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     /**
      * Deliver an I2CP message to the router
+     * As of 0.9.3, may block for several seconds if the write queue to the router is full
      *
      * @throws I2PSessionException if the message is malformed or there is an error writing it out
      */
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        if (isClosed())
+        if (isClosed()) {
             throw new I2PSessionException("Already closed");
-        else if (_queue != null)
-            _queue.offer(message);  // internal
-        else if (_writer == null)
+        } else if (_queue != null) {
+            // internal
+            try {
+                if (!_queue.offer(message, MAX_SEND_WAIT))
+                    throw new I2PSessionException("Timed out waiting while write queue was full");
+            } catch (InterruptedException ie) {
+                throw new I2PSessionException("Interrupted while write queue was full", ie);
+            }
+        } else if (_writer == null) {
             throw new I2PSessionException("Already closed");
-        else
+        } else {
             _writer.addMessage(message);
+        }
     }
 
     /**
