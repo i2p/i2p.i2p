@@ -26,8 +26,8 @@ class LogWriter implements Runnable {
     /** every 10 seconds? why? Just have the gui force a reread after a change?? */
     private final static long CONFIG_READ_INTERVAL = 50 * 1000;
     private final static long FLUSH_INTERVAL = 9 * 1000;
-    private long _lastReadConfig = 0;
-    private long _numBytesInCurrentFile = 0;
+    private long _lastReadConfig;
+    private long _numBytesInCurrentFile;
     // volatile as it changes on log file rotation
     private volatile Writer _currentOut;
     private int _rotationNum = -1;
@@ -66,16 +66,35 @@ class LogWriter implements Runnable {
     }
 
     public void flushRecords() { flushRecords(true); }
+
     public void flushRecords(boolean shouldWait) {
         try {
             // zero copy, drain the manager queue directly
             Queue<LogRecord> records = _manager.getQueue();
             if (records == null) return;
             if (!records.isEmpty()) {
+                LogRecord last = null;
                 LogRecord rec;
+                int dupCount = 0;
                 while ((rec = records.poll()) != null) {
-                    writeRecord(rec);
+                    if (rec.equals(last)) {
+                        dupCount++;
+                    } else {
+                        if (dupCount > 0) {
+                            if (dupCount == 1)
+                                writeRecord("*** 1 similar message omitted\n");
+                            else
+                                writeRecord("*** " + dupCount + " similar messages omitted\n");
+                            dupCount = 0;
+                        }
+                        last = rec;
+                        writeRecord(rec);
+                    }
                 }
+                if (dupCount == 1)
+                    writeRecord("*** 1 similar message omitted\n");
+                else if (dupCount > 0)
+                    writeRecord("*** " + dupCount + " similar messages omitted\n");
                 try {
                     if (_currentOut != null)
                         _currentOut.flush();
