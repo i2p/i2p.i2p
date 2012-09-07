@@ -487,7 +487,7 @@ public class I2PAppContext {
         String val = getProperty(propName);
         if (val == null)
             return defaultVal;
-        return Boolean.valueOf(val).booleanValue();
+        return Boolean.parseBoolean(val);
     }
 
     /**
@@ -495,7 +495,7 @@ public class I2PAppContext {
      * @since 0.7.12
      */
     public boolean getBooleanProperty(String propName) {
-        return Boolean.valueOf(getProperty(propName)).booleanValue();
+        return Boolean.parseBoolean(getProperty(propName));
     }
 
     /**
