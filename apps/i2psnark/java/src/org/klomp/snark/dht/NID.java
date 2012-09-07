@@ -18,7 +18,7 @@ public class NID extends SHA1Hash {
     private long lastSeen;
     private int fails;
 
-    private static final int MAX_FAILS = 3;
+    private static final int MAX_FAILS = 2;
 
     public NID() {
         super(null);
@@ -41,6 +41,6 @@ public class NID extends SHA1Hash {
      *  @return if more than max timeouts
      */
     public boolean timeout() {
-        return fails++ > MAX_FAILS;
+        return ++fails > MAX_FAILS;
     }
 }
