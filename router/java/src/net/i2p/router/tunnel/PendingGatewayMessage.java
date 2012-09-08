@@ -7,13 +7,14 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.CDQEntry;
 
 /**
  *  Stores all the state for an unsent or partially-sent message
  *
  *  @since 0.9.3 refactored from TunnelGateway.Pending
  */
-class PendingGatewayMessage {
+class PendingGatewayMessage implements CDQEntry {
     protected final Hash _toRouter;
     protected final TunnelId _toTunnel;
     protected final long _messageId;
@@ -23,6 +24,7 @@ class PendingGatewayMessage {
     protected int _fragmentNumber;
     protected final long _created;
     private List<Long> _messageIds;
+    private long _enqueueTime;
     
     public PendingGatewayMessage(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
         _toRouter = toRouter;
@@ -83,6 +85,29 @@ class PendingGatewayMessage {
             else
                 return new ArrayList();
         } 
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void setEnqueueTime(long now) {
+        _enqueueTime = now;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public long getEnqueueTime() {
+        return _enqueueTime;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void drop() {
     }
     
     @Override
