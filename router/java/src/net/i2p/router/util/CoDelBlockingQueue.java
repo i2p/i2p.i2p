@@ -53,9 +53,11 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
      *  Below a target of 5 ms, utilization suffers for some conditions and traffic loads;
      *  above 5 ms there is very little or no improvement in utilization.
      *
+     *  I2P: Raise to 15 due to multithreading environment
+     *
      *  Maybe need to make configurable per-instance.
      */
-    private static final long TARGET = 5;
+    private static final long TARGET = 15;
 
     /**
      *  Quote:
@@ -179,7 +181,8 @@ public class CoDelBlockingQueue<E extends CDQEntry> extends LinkedBlockingQueue<
         E e = peek();
         if (e == null)
             return false;
-        return _context.clock().now() - e.getEnqueueTime() >= BACKLOG_TIME ||
+        return _dropping ||
+               _context.clock().now() - e.getEnqueueTime() >= BACKLOG_TIME ||
                remainingCapacity() < _capacity / 4;
     }
 

@@ -56,17 +56,21 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      *  Below a target of 5 ms, utilization suffers for some conditions and traffic loads;
      *  above 5 ms there is very little or no improvement in utilization.
      *
+     *  I2P: Raise to 15 due to multithreading environment
+     *
      *  Maybe need to make configurable per-instance.
      */
-    private static final long TARGET = 5;
+    private static final long TARGET = 15;
 
     /**
      *  Quote:
      *  A setting of 100 ms works well across a range of RTTs from 10 ms to 1 second
      *
+     *  I2P: Raise to 300 due to longer end-to-end RTTs
+     *
      *  Maybe need to make configurable per-instance.
      */
-    private static final long INTERVAL = 100;
+    private static final long INTERVAL = 300;
     //private static final int MAXPACKET = 512;
 
     private final String STAT_DROP;
@@ -164,7 +168,8 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
         E e = peek();
         if (e == null)
             return false;
-        return _context.clock().now() - e.getEnqueueTime() >= BACKLOG_TIME ||
+        return _dropping ||
+               _context.clock().now() - e.getEnqueueTime() >= BACKLOG_TIME ||
                size() >= BACKLOG_SIZE;
     }
 
