@@ -20,6 +20,7 @@ import java.util.Set;
 
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.util.CDPQEntry;
 import net.i2p.util.Log;
 
 /**
@@ -27,7 +28,7 @@ import net.i2p.util.Log;
  * delivery and jobs to be fired off if particular events occur.
  *
  */
-public class OutNetMessage {
+public class OutNetMessage implements CDPQEntry {
     private final Log _log;
     private final RouterContext _context;
     private RouterInfo _target;
@@ -49,6 +50,8 @@ public class OutNetMessage {
     private long _sendBegin;
     //private Exception _createdBy;
     private final long _created;
+    private long _enqueueTime;
+    private long _seqNum;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
     private HashMap<String, Long> _timestamps;
     /**
@@ -282,6 +285,45 @@ public class OutNetMessage {
 
     /** time the transport tries to send the message (including any queueing) */
     public long getSendTime() { return _context.clock().now() - _sendBegin; }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void setEnqueueTime(long now) {
+        _enqueueTime = now;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public long getEnqueueTime() {
+        return _enqueueTime;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void drop() {
+    }
+
+    /**
+     *  For CDPQ
+     *  @since 0.9.3
+     */
+    public void setSeqNum(long num) {
+        _seqNum = num;
+    }
+
+    /**
+     *  For CDPQ
+     *  @since 0.9.3
+     */
+    public long getSeqNum() {
+        return _seqNum;
+    }
 
     /** 
      * We've done what we need to do with the data from this message, though

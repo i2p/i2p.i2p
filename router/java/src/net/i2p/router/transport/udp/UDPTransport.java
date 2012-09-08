@@ -1678,7 +1678,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return getPeerState(dest) != null;
     }
 
+    /**
+     *  @since 0.9.3
+     */
+    @Override
+    public boolean isBacklogged(Hash dest) {
+        PeerState peer =  _peersByIdent.get(dest);
+        return peer != null && peer.isBacklogged();
+    }
+
     public boolean allowConnection() {
+
             return _peersByIdent.size() < getMaxConnections();
     }
 
@@ -2187,6 +2197,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(THINSP).append(peer.getConcurrentSends());
             buf.append(THINSP).append(peer.getConcurrentSendWindow());
             buf.append(THINSP).append(peer.getConsecutiveSendRejections());
+            if (peer.isBacklogged())
+                buf.append(' ').append(_("backlogged"));
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");

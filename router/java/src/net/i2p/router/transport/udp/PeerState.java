@@ -16,6 +16,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
@@ -188,8 +189,19 @@ class PeerState {
     
     /** list of InboundMessageState for active message */
     private final Map<Long, InboundMessageState> _inboundMessages;
-    /** list of OutboundMessageState */
+
+    /**
+     *  Mostly messages that have been transmitted and are awaiting acknowledgement,
+     *  although there could be some that have not been sent yet.
+     */
     private final List<OutboundMessageState> _outboundMessages;
+
+    /**
+     *  Priority queue of messages that have not yet been sent.
+     *  They are taken from here and put in _outboundMessages.
+     */
+    private final CoDelPriorityBlockingQueue<OutboundMessageState> _outboundQueue;
+
     /** which outbound message is currently being retransmitted */
     private OutboundMessageState _retransmitter;
     
@@ -298,6 +310,7 @@ class PeerState {
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
+        _outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager
         _remoteIP = remoteIP;
         _remotePeer = remotePeer;
@@ -726,8 +739,8 @@ class PeerState {
     public List<Long> getCurrentFullACKs() {
             // no such element exception seen here
             List<Long> rv = new ArrayList(_currentACKs);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Returning " + _currentACKs.size() + " current acks");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Returning " + _currentACKs.size() + " current acks");
             return rv;
     }
 
@@ -748,8 +761,8 @@ class PeerState {
     public List<Long> getCurrentResendACKs() {
             List<Long> randomResends = new ArrayList(_currentACKsResend);
             Collections.shuffle(randomResends, _context.random());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Returning " + randomResends.size() + " resend acks");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Returning " + randomResends.size() + " resend acks");
             return randomResends;
     }
 
@@ -1194,24 +1207,26 @@ class PeerState {
      *  TODO priority queue? (we don't implement priorities in SSU now)
      *  TODO backlog / pushback / block instead of dropping? Can't really block here.
      *  TODO SSU does not support isBacklogged() now
-     *  @return total pending messages
      */
-    public int add(OutboundMessageState state) {
+    public void add(OutboundMessageState state) {
         if (_dead) { 
             _transport.failed(state, false);
-            return 0;
+            return;
 	}
         state.setPeer(this);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding to " + _remotePeer + ": " + state.getMessageId());
         int rv = 0;
-        boolean fail = false;
+        // will never fail for CDPQ
+        boolean fail = !_outboundQueue.offer(state);
+/****
         synchronized (_outboundMessages) {
             rv = _outboundMessages.size() + 1;
             if (rv > MAX_SEND_MSGS_PENDING) { 
                 // too many queued messages to one peer?  nuh uh.
                 fail = true;
                 rv--;
+****/
 
          /******* proactive tail drop disabled by jr 2006-04-19 so all this is pointless
 
@@ -1250,17 +1265,17 @@ class PeerState {
                 }
 
              *******/
-
+/****
             } else {
                 _outboundMessages.add(state);
             }
         }
+****/
         if (fail) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping msg, OB queue full for " + toString());
             _transport.failed(state, false);
         }
-        return rv;
     }
 
     /** drop all outbound messages */
@@ -1268,19 +1283,17 @@ class PeerState {
         //if (_dead) return;
         _dead = true;
         //_outboundMessages = null;
-        _retransmitter = null;
 
-            int sz = 0;
-            List<OutboundMessageState> tempList = null;
+            List<OutboundMessageState> tempList;
             synchronized (_outboundMessages) {
-                sz = _outboundMessages.size();
-                if (sz > 0) {
+                    _retransmitter = null;
                     tempList = new ArrayList(_outboundMessages);
                     _outboundMessages.clear();
-		}
             }
-            for (int i = 0; i < sz; i++)
-                _transport.failed(tempList.get(i), false);
+            _outboundQueue.drainAllTo(tempList);
+            for (OutboundMessageState oms : tempList) {
+                _transport.failed(oms, false);
+            }
 
         // so the ACKSender will drop this peer from its queue
         _wantACKSendSince = -1;
@@ -1291,7 +1304,7 @@ class PeerState {
      */
     public int getOutboundMessageCount() {
         if (_dead) return 0;
-        return _outboundMessages.size();
+        return _outboundMessages.size() + _outboundQueue.size();
     }
     
     /**
@@ -1305,7 +1318,7 @@ class PeerState {
     public int finishMessages() {
         // short circuit, unsynchronized
         if (_outboundMessages.isEmpty())
-            return 0;
+            return _outboundQueue.size();
 
         if (_dead) {
             dropOutbound();
@@ -1367,7 +1380,7 @@ class PeerState {
             state.releaseResources();
         }
         
-        return rv;
+        return rv + _outboundQueue.size();
     }
     
     /**
@@ -1387,7 +1400,7 @@ class PeerState {
                 ShouldSend should = locked_shouldSend(state);
                 if (should == ShouldSend.YES) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Allocate sending to " + _remotePeer + ": " + state.getMessageId());
+                        _log.debug("Allocate sending (OLD) to " + _remotePeer + ": " + state.getMessageId());
                     /*
                     while (iter.hasNext()) {
                         OutboundMessageState later = (OutboundMessageState)iter.next();
@@ -1402,16 +1415,37 @@ class PeerState {
                     // we don't bother looking for a smaller msg that would fit.
                     // By not looking further, we keep strict sending order, and that allows
                     // some efficiency in acked() below.
-                    break;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Nothing to send (BW) to " + _remotePeer + ", with " + _outboundMessages.size() +
+                                   " / " + _outboundQueue.size() + " remaining");
+                    return null;
                 } /* else {
                     OutNetMessage msg = state.getMessage();
                     if (msg != null)
                         msg.timestamp("passed over for allocation with " + msgs.size() + " peers");
                 } */
             }
+            // Peek at head of _outboundQueue and see if we can send it.
+            // If so, pull it off, put it in _outbundMessages, test
+            // again for bandwidth if necessary, and return it.
+            OutboundMessageState state = _outboundQueue.peek();
+            if (state != null && ShouldSend.YES == locked_shouldSend(state)) {
+                // we could get a different state, or null, when we poll,
+                // due to AQM drops, so we test again if necessary
+                OutboundMessageState dequeuedState = _outboundQueue.poll();
+                if (dequeuedState != null) {
+                    _outboundMessages.add(dequeuedState);
+                    if (dequeuedState == state || ShouldSend.YES == locked_shouldSend(dequeuedState)) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Allocate sending (NEW) to " + _remotePeer + ": " + dequeuedState.getMessageId());
+                        return dequeuedState;
+                    }
+                }
+            }
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Nothing to send to " + _remotePeer + ", with " + _outboundMessages.size() + " remaining");
+            _log.debug("Nothing to send to " + _remotePeer + ", with " + _outboundMessages.size() +
+                       " / " + _outboundQueue.size() + " remaining");
         return null;
     }
     
@@ -1441,7 +1475,17 @@ class PeerState {
                     rv = delay;
             }
         }
+        // failsafe... is this OK?
+        if (rv > 100 && !_outboundQueue.isEmpty())
+            rv = 100;
         return rv;
+    }
+
+    /**
+     *  @since 0.9.3
+     */
+    public boolean isBacklogged() {
+        return _dead || _outboundQueue.isBacklogged();
     }
 
     /**
@@ -1521,8 +1565,8 @@ class PeerState {
 
             int size = state.getUnackedSize();
             if (allocateSendingBytes(size, state.getPushCount())) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Allocation of " + size + " allowed with " 
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Allocation of " + size + " allowed with " 
                               + getSendWindowBytesRemaining() 
                               + "/" + getSendWindowBytes() 
                               + " remaining"
@@ -1566,7 +1610,7 @@ class PeerState {
     
     /**
      *  A full ACK was received.
-     *  TODO if messages awaiting ack were a HashSet this would be faster.
+     *  TODO if messages awaiting ack were a HashMap<Long, OutboundMessageState> this would be faster.
      *
      *  @return true if the message was acked for the first time
      */
@@ -1620,8 +1664,8 @@ class PeerState {
             state.releaseResources();
         } else {
             // dupack, likely
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received an ACK for a message not pending: " + messageId);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Received an ACK for a message not pending: " + messageId);
         }
         return state != null;
     }
@@ -1765,6 +1809,14 @@ class PeerState {
                 _retransmitter = retransmitter;
             }
         }
+    }
+
+    /**
+     *  Convenience for OutboundMessageState so it can fail itself
+     *  @since 0.9.3
+     */
+    public UDPTransport getTransport() {
+        return _transport;
     }
 
     // why removed? Some risk of dups in OutboundMessageFragments._activePeers ???
