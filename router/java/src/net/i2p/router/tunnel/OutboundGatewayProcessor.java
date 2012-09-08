@@ -3,8 +3,8 @@ package net.i2p.router.tunnel;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Turn the preprocessed tunnel data into something that can be delivered to the
@@ -18,7 +18,6 @@ class OutboundGatewayProcessor {
     private final TunnelCreatorConfig _config;
         
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
-    private static final ByteCache _cache = ByteCache.getInstance(128, HopProcessor.IV_LENGTH);
 
     public OutboundGatewayProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
@@ -35,8 +34,7 @@ class OutboundGatewayProcessor {
      * @param length how much of orig can we write to (must be a multiple of 16).
      */
     public void process(byte orig[], int offset, int length) {
-        ByteArray ba = _cache.acquire();
-        byte iv[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH];
+        byte iv[] = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
         //_context.random().nextBytes(iv);
         //System.arraycopy(iv, 0, orig, offset, HopProcessor.IV_LENGTH);
         System.arraycopy(orig, offset, iv, 0, HopProcessor.IV_LENGTH);
@@ -49,7 +47,7 @@ class OutboundGatewayProcessor {
             decrypt(_context, _config, iv, orig, offset, length);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("finished processing the preprocessed data");
-        _cache.release(ba);
+        SimpleByteCache.release(iv);
     }
     
     /**
@@ -58,8 +56,7 @@ class OutboundGatewayProcessor {
      */
     private void decrypt(I2PAppContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
         Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
-        ByteArray ba = _cache.acquire();
-        byte cur[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH]; // so we dont malloc
+        byte cur[] = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
         for (int i = cfg.getLength()-1; i >= 1; i--) { // dont include hop 0, since that is the creator
             decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
             if (log.shouldLog(Log.DEBUG)) {
@@ -67,7 +64,7 @@ class OutboundGatewayProcessor {
                 //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
             }
         }
-        _cache.release(ba);
+        SimpleByteCache.release(cur);
     }
     
     /**

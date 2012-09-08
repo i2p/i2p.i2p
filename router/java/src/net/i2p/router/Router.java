@@ -40,6 +40,7 @@ import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.router.util.EventLog;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
@@ -77,6 +78,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private I2PThread _gracefulShutdownDetector;
     private RouterWatchdog _watchdog;
     private Thread _watchdogThread;
+    private final EventLog _eventLog;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -100,6 +102,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public final static String PROP_KEYS_FILENAME_DEFAULT = "router.keys";
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public final static String DNS_CACHE_TIME = "" + (5*60);
+    private static final String EVENTLOG = "eventlog.txt";
         
     private static final String originalTimeZoneID;
     static {
@@ -219,12 +222,14 @@ public class Router implements RouterClock.ClockShiftListener {
         // i2p.dir.pid defaults to i2p.dir.router
         // i2p.dir.base defaults to user.dir == $CWD
         _context = new RouterContext(this, envProps);
+        _eventLog = new EventLog(_context, new File(_context.getRouterDir(), EVENTLOG));
 
         // This is here so that we can get the directory location from the context
         // for the ping file
         // Check for other router but do not start a thread yet so the update doesn't cause
         // a NCDFE
         if (!isOnlyRouterRunning()) {
+            _eventLog.addEvent(EventLog.ABORTED, "Another router running");
             System.err.println("ERROR: There appears to be another router already running!");
             System.err.println("       Please make sure to shut down old instances before starting up");
             System.err.println("       a new one.  If you are positive that no other instance is running,");
@@ -410,6 +415,12 @@ public class Router implements RouterClock.ClockShiftListener {
     public void runRouter() {
         if (_isAlive)
             throw new IllegalStateException();
+        String last = _config.get("router.previousFullVersion");
+        if (last != null) {
+            _eventLog.addEvent(EventLog.UPDATED, "from " + last + " to " + RouterVersion.FULL_VERSION);
+            saveConfig("router.previousFullVersion", null);
+        }
+        _eventLog.addEvent(EventLog.STARTED, RouterVersion.FULL_VERSION);
         startupStuff();
         _isAlive = true;
         _started = _context.clock().now();
@@ -632,6 +643,13 @@ public class Router implements RouterClock.ClockShiftListener {
     }
     
     /**
+     *  @since 0.9.3
+     */
+    public EventLog eventLog() {
+        return _eventLog;
+    }
+    
+    /**
      * Ugly list of files that we need to kill if we are building a new identity
      *
      */
@@ -646,7 +664,6 @@ public class Router implements RouterClock.ClockShiftListener {
                                                                  "sessionKeys.dat"     // no longer used
                                                                };
 
-    static final String IDENTLOG = "identlog.txt";
     public void killKeys() {
         //new Exception("Clearing identity files").printStackTrace();
         int remCount = 0;
@@ -671,18 +688,10 @@ public class Router implements RouterClock.ClockShiftListener {
         }
 
         if (remCount > 0) {
-            FileOutputStream log = null;
-            try {
-                log = new FileOutputStream(new File(_context.getRouterDir(), IDENTLOG), true);
-                log.write((new Date() + ": Old router identity keys cleared\n").getBytes());
-            } catch (IOException ioe) {
-                // ignore
-            } finally {
-                if (log != null)
-                    try { log.close(); } catch (IOException ioe) {}
-            }
+            _eventLog.addEvent(EventLog.REKEYED);
         }
     }
+
     /**
      * Rebuild a new identity the hard way - delete all of our old identity 
      * files, then reboot the router.
@@ -836,6 +845,7 @@ public class Router implements RouterClock.ClockShiftListener {
         // logManager shut down in finalShutdown()
         _watchdog.shutdown();
         _watchdogThread.interrupt();
+        _eventLog.addEvent(EventLog.STOPPED, Integer.toString(exitCode));
         finalShutdown(exitCode);
     }
 
@@ -1139,6 +1149,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
                 // Set the last version to the current version, since 0.8.13
                 _config.put("router.previousVersion", RouterVersion.VERSION);
+                _config.put("router.previousFullVersion", RouterVersion.FULL_VERSION);
                 saveConfig();
                 ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             }

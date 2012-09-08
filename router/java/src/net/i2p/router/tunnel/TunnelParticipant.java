@@ -30,6 +30,7 @@ class TunnelParticipant {
     private static final long MAX_LOOKUP_TIME = 15*1000;
     /** for next hop when a tunnel is first created */
     private static final long LONG_MAX_LOOKUP_TIME = 30*1000;
+    private static final int PRIORITY = OutNetMessage.PRIORITY_PARTICIPATING;
 
     /** not an inbound endpoint */
     public TunnelParticipant(RouterContext ctx, HopConfig config, HopProcessor processor) {
@@ -196,7 +197,7 @@ class TunnelParticipant {
         m.setMessage(msg);
         m.setExpiration(msg.getMessageExpiration());
         m.setTarget(ri);
-        m.setPriority(200);
+        m.setPriority(PRIORITY);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Forward on from " + _config + ": " + msg);
         _context.outNetMessagePool().add(m);

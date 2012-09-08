@@ -298,8 +298,8 @@ public class NTCPTransport extends TransportImpl {
                 _log.debug("no bid when trying to send to " + peer.toBase64() + " as they don't have an ntcp address");
             return null;
         }
-        NTCPAddress naddr = new NTCPAddress(addr);
-        if ( (naddr.getPort() <= 0) || (naddr.getHost() == null) ) {
+        byte[] ip = addr.getIP();
+        if ( (addr.getPort() <= 0) || (ip == null) ) {
             _context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
             markUnreachable(peer);
             //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
@@ -307,7 +307,7 @@ public class NTCPTransport extends TransportImpl {
                 _log.debug("no bid when trying to send to " + peer.toBase64() + " as they don't have a valid ntcp address");
             return null;
         }
-        if (!naddr.isPubliclyRoutable()) {
+        if (!isPubliclyRoutable(ip)) {
             if (! _context.getProperty("i2np.ntcp.allowLocal", "false").equals("true")) {
                 _context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1);
                 markUnreachable(peer);

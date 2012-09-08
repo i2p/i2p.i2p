@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
@@ -71,6 +72,17 @@ class GeoIP {
     static final String GEOIP_FILE_DEFAULT = "geoip.txt";
     static final String COUNTRY_FILE_DEFAULT = "countries.txt";
     public static final String PROP_IP_COUNTRY = "i2np.lastCountry";
+
+    /**
+     *  @since 0.9.3
+     */
+    public void shutdown() {
+        _codeToName.clear();
+        _codeCache.clear();
+        _IPToCountry.clear();
+        _pendingSearch.clear();
+        _notFound.clear();
+    }
 
     /**
      * Fire off a thread to lookup all pending IPs.
@@ -297,14 +309,8 @@ class GeoIP {
      * Add to the list needing lookup
      */
     public void add(String ip) {
-        InetAddress pi;
-        try {
-            pi = InetAddress.getByName(ip);
-        } catch (UnknownHostException uhe) {
-            return;
-        }
-        if (pi == null) return;
-        byte[] pib = pi.getAddress();
+        byte[] pib = Addresses.getIP(ip);
+        if (pib == null) return;
         add(pib);
     }
 
@@ -325,14 +331,8 @@ class GeoIP {
      * @return lower-case code, generally two letters, or null.
      */
     public String get(String ip) {
-        InetAddress pi;
-        try {
-            pi = InetAddress.getByName(ip);
-        } catch (UnknownHostException uhe) {
-            return null;
-        }
-        if (pi == null) return null;
-        byte[] pib = pi.getAddress();
+        byte[] pib = Addresses.getIP(ip);
+        if (pib == null) return null;
         return get(pib);
     }
 

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -35,7 +35,7 @@ class UDPSender {
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (1024*1024)));
-        _outboundQueue = new LinkedBlockingQueue(qsize);
+        _outboundQueue = new CoDelBlockingQueue(ctx, "UDP-Sender", qsize);
         _socket = socket;
         _runner = new Runner();
         _name = name;

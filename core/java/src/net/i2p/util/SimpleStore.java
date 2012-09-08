@@ -5,6 +5,7 @@
 package net.i2p.util;
 
 /**
+ *  Deprecated - used only by SimpleTimer
  *
  * @author sponge
  */

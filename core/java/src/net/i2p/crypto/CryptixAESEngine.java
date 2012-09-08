@@ -21,8 +21,8 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /** 
  * Wrapper for AES cypher operation using Cryptix's Rijndael implementation.  Implements
@@ -37,8 +37,6 @@ public class CryptixAESEngine extends AESEngine {
     private final static boolean USE_FAKE_CRYPTO = false;
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
-    
-    private static final ByteCache _prevCache = ByteCache.getInstance(16, 16);
     
 /**** see comments for main() below
     private static final boolean USE_SYSTEM_AES;
@@ -166,10 +164,8 @@ public class CryptixAESEngine extends AESEngine {
         int numblock = length / 16;
         if (length % 16 != 0) numblock++;
 
-        ByteArray prevA = _prevCache.acquire();
-        byte prev[] = prevA.getData();
-        ByteArray curA = _prevCache.acquire();
-        byte cur[] = curA.getData();
+        byte prev[] = SimpleByteCache.acquire(16);
+        byte cur[] = SimpleByteCache.acquire(16);
         System.arraycopy(iv, ivOffset, prev, 0, 16);
         
         for (int x = 0; x < numblock; x++) {
@@ -190,8 +186,8 @@ public class CryptixAESEngine extends AESEngine {
         }
          */
         
-        _prevCache.release(prevA);
-        _prevCache.release(curA);
+        SimpleByteCache.release(prev);
+        SimpleByteCache.release(cur);
     }
     
     /** encrypt exactly 16 bytes using the session key

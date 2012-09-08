@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,6 +26,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
@@ -83,7 +86,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /**
      * pending unprepared OutNetMessage instances
      */
-    private final Queue<OutNetMessage> _outbound;
+    private final CoDelPriorityBlockingQueue<OutNetMessage> _outbound;
     /**
      *  current prepared OutNetMessage, or null - synchronize on _outbound to modify
      *  FIXME why do we need this???
@@ -136,6 +139,8 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     public static final int BUFFER_SIZE = 16*1024;
     /** 2 bytes for length and 4 for CRC */
     public static final int MAX_MSG_SIZE = BUFFER_SIZE - (2 + 4);
+
+    private static final int PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_STORE_LOW;
     
     /**
      * Create an inbound connected (though not established) NTCP connection
@@ -150,8 +155,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _readBufs = new ConcurrentLinkedQueue();
         _writeBufs = new ConcurrentLinkedQueue();
         _bwRequests = new ConcurrentHashSet(2);
-        // TODO possible switch to CLQ but beware non-constant size() - see below
-        _outbound = new LinkedBlockingQueue();
+        _outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
         _isInbound = true;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
@@ -175,8 +179,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _readBufs = new ConcurrentLinkedQueue();
         _writeBufs = new ConcurrentLinkedQueue();
         _bwRequests = new ConcurrentHashSet(8);
-        // TODO possible switch to CLQ but beware non-constant size() - see below
-        _outbound = new LinkedBlockingQueue();
+        _outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
         _isInbound = false;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
@@ -295,15 +298,16 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             EventPumper.releaseBuf(bb);
         }
 
-        OutNetMessage msg;
-        while ((msg = _outbound.poll()) != null) {
+        List<OutNetMessage> pending = new ArrayList();
+        _outbound.drainAllTo(pending);
+        for (OutNetMessage msg : pending) {
             Object buf = msg.releasePreparationBuffer();
             if (buf != null)
                 releaseBuf((PrepBuffer)buf);
             _transport.afterSend(msg, false, allowRequeue, msg.getLifetime());
         }
 
-        msg = _currentOutbound;
+        OutNetMessage msg = _currentOutbound;
         if (msg != null) {
             Object buf = msg.releasePreparationBuffer();
             if (buf != null)
@@ -316,6 +320,9 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
      * toss the message onto the connection's send queue
      */
     public void send(OutNetMessage msg) {
+     /****
+       always enqueue, let the queue do the dropping
+
         if (tooBacklogged()) {
             boolean allowRequeue = false; // if we are too backlogged in tcp, don't try ssu
             boolean successful = false;
@@ -335,20 +342,20 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             return;
         }
         _consecutiveBacklog = 0;
-        int enqueued = 0;
+     ****/
         //if (FAST_LARGE)
             bufferedPrepare(msg);
-        boolean noOutbound = false;
         _outbound.offer(msg);
-        enqueued = _outbound.size();
+        //int enqueued = _outbound.size();
         // although stat description says ahead of this one, not including this one...
-        _context.statManager().addRateData("ntcp.sendQueueSize", enqueued);
-        noOutbound = (_currentOutbound == null);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("messages enqueued on " + toString() + ": " + enqueued + " new one: " + msg.getMessageId() + " of " + msg.getMessageType());
+        //_context.statManager().addRateData("ntcp.sendQueueSize", enqueued);
+        boolean noOutbound = (_currentOutbound == null);
+        //if (_log.shouldLog(Log.DEBUG)) _log.debug("messages enqueued on " + toString() + ": " + enqueued + " new one: " + msg.getMessageId() + " of " + msg.getMessageType());
         if (_established && noOutbound)
             _transport.getWriter().wantsWrite(this, "enqueued");
     }
 
+/****
     private long queueTime() {    
         OutNetMessage msg = _currentOutbound;
         if (msg == null) {
@@ -358,29 +365,31 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
         return msg.getSendTime(); // does not include any of the pre-send(...) preparation
     }
+****/
 
     public boolean tooBacklogged() {
-        long queueTime = queueTime();
-        if (queueTime <= 0) return false;
-        boolean currentOutboundSet = _currentOutbound != null;
+        //long queueTime = queueTime();
+        //if (queueTime <= 0) return false;
         
         // perhaps we could take into account the size of the queued messages too, our
         // current transmission rate, and how much time is left before the new message's expiration?
         // ok, maybe later...
         if (getUptime() < 10*1000) // allow some slack just after establishment
             return false;
-        if (queueTime > 5*1000) { // bloody arbitrary.  well, its half the average message lifetime...
+        //if (queueTime > 5*1000) { // bloody arbitrary.  well, its half the average message lifetime...
+        if (_outbound.isBacklogged()) { // bloody arbitrary.  well, its half the average message lifetime...
             int size = _outbound.size();
             if (_log.shouldLog(Log.WARN)) {
 	        int writeBufs = _writeBufs.size();
+                boolean currentOutboundSet = _currentOutbound != null;
                 try {
-                    _log.warn("Too backlogged: queue time " + queueTime + " and the size is " + size 
+                    _log.warn("Too backlogged: size is " + size 
                           + ", wantsWrite? " + (0 != (_conKey.interestOps()&SelectionKey.OP_WRITE))
                           + ", currentOut set? " + currentOutboundSet
 			  + ", writeBufs: " + writeBufs + " on " + toString());
                 } catch (Exception e) {}  // java.nio.channels.CancelledKeyException
             }
-            _context.statManager().addRateData("ntcp.sendBacklogTime", queueTime);
+            //_context.statManager().addRateData("ntcp.sendBacklogTime", queueTime);
             return true;
         //} else if (size > 32) { // another arbitrary limit.
         //    if (_log.shouldLog(Log.ERROR))
@@ -397,7 +406,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
         dsm.setEntry(_context.router().getRouterInfo());
         infoMsg.setMessage(dsm);
-        infoMsg.setPriority(100);
+        infoMsg.setPriority(PRIORITY);
         RouterInfo target = _context.netDb().lookupRouterInfoLocally(_remotePeer.calculateHash());
         if (target != null) {
             infoMsg.setTarget(target);
@@ -649,11 +658,14 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     _log.info("attempt for multiple outbound messages with " + System.identityHashCode(_currentOutbound) + " already waiting and " + _outbound.size() + " queued");
                 return;
             }
+/****
                 //throw new RuntimeException("We should not be preparing a write while we still have one pending");
             if (queueTime() > 3*1000) {  // don't stall low-priority messages
+****/
                 msg = _outbound.poll();
                 if (msg == null)
                     return;
+/****
             } else {
                 // FIXME
                 // This is a linear search to implement a priority queue, O(n**2)
@@ -679,6 +691,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 if ((!removed) && _log.shouldLog(Log.WARN))
                     _log.warn("Already removed??? " + msg.getMessage().getType());
             }
+****/
             _currentOutbound = msg;
         }
         

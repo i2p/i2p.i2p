@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -47,7 +47,7 @@ class UDPReceiver {
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
-        _inboundQueue = new LinkedBlockingQueue(qsize);
+        _inboundQueue = new CoDelBlockingQueue(ctx, "UDP-Receiver", qsize);
         _socket = socket;
         _transport = transport;
         _runner = new Runner();
@@ -177,6 +177,7 @@ class UDPReceiver {
             return 0;
         }
 
+/****
         packet.enqueue();
         boolean rejected = false;
         int queueSize = 0;
@@ -190,6 +191,7 @@ class UDPReceiver {
                 }
             }
             if (!rejected) {
+****/
                 try {
                     _inboundQueue.put(packet);
                 } catch (InterruptedException ie) {
@@ -198,6 +200,7 @@ class UDPReceiver {
                 }
                 //return queueSize + 1;
                 return 0;
+/****
             }
         
         // rejected
@@ -214,6 +217,7 @@ class UDPReceiver {
             _log.warn(msg.toString());
         }
         return queueSize;
+****/
     }
     
   /****

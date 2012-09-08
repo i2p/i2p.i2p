@@ -25,6 +25,7 @@ import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
@@ -78,6 +79,10 @@ class SearchJob extends JobImpl {
      *
      */
     private static final long REQUEUE_DELAY = 1000;
+
+    // TODO pass to the tunnel dispatcher
+    //private final static int LOOKUP_PRIORITY = OutNetMessage.PRIORITY_MY_NETDB_LOOKUP;
+    //private final static int STORE_PRIORITY = OutNetMessage.PRIORITY_HIS_NETDB_STORE;
     
     /**
      * Create a new search for the routingKey specified
@@ -445,6 +450,7 @@ class SearchJob extends JobImpl {
         if (FloodfillNetworkDatabaseFacade.isFloodfill(router))
             _floodfillSearchesOutstanding++;
         getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), timeout);
+        // TODO pass a priority to the dispatcher
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, to);
     }
     
@@ -652,6 +658,7 @@ class SearchJob extends JobImpl {
         if (outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("resending leaseSet out to " + to + " through " + outTunnel + ": " + msg);
+            // TODO pass a priority to the dispatcher
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, to);
             return true;
         } else {

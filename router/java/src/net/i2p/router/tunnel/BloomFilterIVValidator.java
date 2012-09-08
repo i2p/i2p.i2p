@@ -5,7 +5,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.DecayingHashSet;
-import net.i2p.util.ByteCache;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Manage the IV validation for all of the router's tunnels by way of a big
@@ -15,7 +15,6 @@ import net.i2p.util.ByteCache;
 class BloomFilterIVValidator implements IVValidator {
     private final RouterContext _context;
     private final DecayingBloomFilter _filter;
-    private final ByteCache _ivXorCache = ByteCache.getInstance(32, HopProcessor.IV_LENGTH);
     
     /**
      * After 2*halflife, an entry is completely forgotten from the bloom filter.
@@ -57,10 +56,10 @@ class BloomFilterIVValidator implements IVValidator {
     }
     
     public boolean receiveIV(byte ivData[], int ivOffset, byte payload[], int payloadOffset) {
-        ByteArray buf = _ivXorCache.acquire();
-        DataHelper.xor(ivData, ivOffset, payload, payloadOffset, buf.getData(), 0, HopProcessor.IV_LENGTH);
-        boolean dup = _filter.add(buf.getData()); 
-        _ivXorCache.release(buf);
+        byte[] buf = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
+        DataHelper.xor(ivData, ivOffset, payload, payloadOffset, buf, 0, HopProcessor.IV_LENGTH);
+        boolean dup = _filter.add(buf); 
+        SimpleByteCache.release(buf);
         if (dup) _context.statManager().addRateData("tunnel.duplicateIV", 1);
         return !dup; // return true if it is OK, false if it isn't
     }

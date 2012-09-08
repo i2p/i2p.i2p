@@ -29,6 +29,43 @@ import net.i2p.util.Log;
  * Handle the actual processing and forwarding of messages through the
  * various tunnels.
  *
+ *<pre>
+ *  For each type of tunnel, it creates a chain of handlers, as follows:
+ *
+ *  Following tunnels are created by us:
+ *
+ *    Outbound Gateway > 0 hops:
+ *       PumpedTunnelGateway
+ *         BatchedRouterPreprocessor -> OutboundSender -> OutboundReceiver -> OutNetMessagePool
+ *
+ *    Outbound zero-hop Gateway+Endpoint:
+ *       TunnelGatewayZeroHop
+ *         OutboundMessageDistributor -> OutNetMessagePool
+ *
+ *    Inbound Endpoint > 0 hops:
+ *       TunnelParticipant
+ *        RouterFragmentHandler ->  InboundEndpointProcessor -> InboundMessageDistributor -> InNetMessagePool
+ *
+ *    Inbound zero-hop Gateway+Endpoint:
+ *       TunnelGatewayZeroHop
+ *         InboundMessageDistributor -> InNetMessagePool
+ *
+ *
+ *  Following tunnels are NOT created by us:
+ *
+ *    Participant (not gateway or endpoint)
+ *       TunnelParticipant
+ *         HopProcessor -> OutNetMessagePool
+ *
+ *    Outbound Endpoint > 0 hops:
+ *       OutboundTunnelEndpoint
+ *         RouterFragmentHandler -> HopProcessor -> OutboundMessageDistributor -> OutNetMessagePool
+ *
+ *    Inbound Gateway > 0 hops:
+ *       ThrottledPumpedTunnelGateway
+ *         BatchedRouterPreprocessor -> InboundSender -> InboundGatewayReceiver -> OutNetMessagePool
+ *
+ *</pre>
  */
 public class TunnelDispatcher implements Service {
     private final RouterContext _context;
@@ -174,6 +211,8 @@ public class TunnelDispatcher implements Service {
         // following are for InboundMessageDistributor
         ctx.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
+        // following is for PumpedTunnelGateway
+        ctx.statManager().createRateStat("tunnel.dropGatewayOverflow", "Dropped message at GW, queue full", "Tunnels", new long[] { 60*60*1000 });
     }
 
     /** for IBGW */
@@ -770,7 +809,7 @@ public class TunnelDispatcher implements Service {
     }
 ******/
 
-    public void startup() {
+    public synchronized void startup() {
         // Note that we only use the validator for participants and OBEPs, not IBGWs, so
         // this BW estimate will be high by about 33% assuming 2-hop tunnels average
         _validator = new BloomFilterIVValidator(_context, getShareBandwidth(_context));
@@ -784,7 +823,7 @@ public class TunnelDispatcher implements Service {
         return (int) (pct * Math.min(irateKBps, orateKBps));
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (_validator != null)
             _validator.destroy();
         _validator = null;
@@ -794,6 +833,7 @@ public class TunnelDispatcher implements Service {
         _participants.clear();
         _inboundGateways.clear();
         _participatingConfig.clear();
+        _leaveJob.clear();
     }
 
     public void restart() { 
@@ -826,6 +866,10 @@ public class TunnelDispatcher implements Service {
 
         public void add(HopConfig cfg) {
             _configs.offer(cfg);
+        }
+
+        public void clear() {
+            _configs.clear();
         }
         
         public String getName() { return "Expire participating tunnels"; }

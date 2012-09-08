@@ -205,10 +205,8 @@ public class SimpleTimer2 {
         }
 
         /**
-         *  More efficient than reschedule().
-         *  Only call this after calling the non-scheduling constructor,
-         *  or from within timeReached(), or you will get duplicates on the queue.
-         *  Otherwise use reschedule().
+         *  Slightly more efficient than reschedule().
+         *  Does nothing if already scheduled.
          */
         public synchronized void schedule(long timeoutMs) {
             if (_log.shouldLog(Log.DEBUG))
@@ -236,7 +234,8 @@ public class SimpleTimer2 {
 
         /**
          * Use the earliest of the new time and the old time
-         * Do not call from within timeReached()
+         * May be called from within timeReached(), but schedule() is
+         * better there.
          *
          * @param timeoutMs 
          */
@@ -245,8 +244,8 @@ public class SimpleTimer2 {
         }
 
         /**
-         * useEarliestTime must be false if called from within timeReached(), as
-         * it won't be rescheduled, in favor of the currently running task
+         * May be called from within timeReached(), but schedule() is
+         * better there.
          *
          * @param timeoutMs 
          * @param useEarliestTime if its already scheduled, use the earlier of the 

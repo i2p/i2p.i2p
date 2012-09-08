@@ -62,6 +62,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public void shutdown() {
         if (_manager != null)
             _manager.shutdown();
+        _geoIP.shutdown();
     }
     
     public void restart() {
@@ -250,7 +251,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         props.setProperty(NTCPAddress.PROP_PORT, port);
         RouterAddress addr = new RouterAddress();
         addr.setCost(NTCPAddress.DEFAULT_COST);
-        addr.setExpiration(null);
+        //addr.setExpiration(null);
         addr.setOptions(props);
         addr.setTransportStyle(NTCPTransport.STYLE);
         //if (isNew) {

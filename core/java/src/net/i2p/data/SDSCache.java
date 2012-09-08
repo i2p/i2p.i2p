@@ -6,10 +6,10 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.LHMCache;
 import net.i2p.util.SimpleByteCache;
 
 /**
@@ -71,7 +71,7 @@ public class SDSCache<V extends SimpleDataStructure> {
      */
     public SDSCache(Class<V> rvClass, int len, int max) {
         int size = (int) (max * FACTOR);
-        _cache = new LHM(size);
+        _cache = new LHMCache(size);
         _datalen = len;
         try {
             _rvCon = rvClass.getConstructor(conArg);
@@ -98,6 +98,11 @@ public class SDSCache<V extends SimpleDataStructure> {
     }
 
     /**
+     *  WARNING - If the SDS is found in the cache, the passed-in
+     *  byte array will be returned to the SimpleByteCache for reuse.
+     *  Do NOT save a reference to the passed-in data, or use or modify it,
+     *  after this call.
+     *
      *  @param data non-null, the byte array for the SimpleDataStructure
      *  @return the cached value if available, otherwise
      *          makes a new object and returns it
@@ -175,19 +180,5 @@ public class SDSCache<V extends SimpleDataStructure> {
         for (int i = 1; i < 4; i++)
             rv ^= (data[i] << (i*8));
         return Integer.valueOf(rv);
-    }
-
-    private static class LHM<K, V> extends LinkedHashMap<K, V> {
-        private final int _max;
-
-        public LHM(int max) {
-            super(max, 0.75f, true);
-            _max = max;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > _max;
-        }
     }
 }

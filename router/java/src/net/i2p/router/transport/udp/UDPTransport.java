@@ -42,6 +42,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 
 /**
@@ -369,7 +370,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //    _flooder.startup();
         _expireEvent.setIsAlive(true);
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
-        SimpleTimer.getInstance().addEvent(_testEvent, 10*1000); // lets requeue it for Real Soon
+        _testEvent.reschedule(10*1000); // lets requeue it for Real Soon
     }
     
     public void shutdown() {
@@ -681,7 +682,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.router().rebuildRouterInfo();
         }
         _testEvent.forceRun();
-        SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
+        _testEvent.reschedule(5*1000);
         return updated;
     }
 
@@ -859,7 +860,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         if (getReachabilityStatus() != CommSystemFacade.STATUS_OK) {
             _testEvent.forceRun();
-            SimpleTimer.getInstance().addEvent(_testEvent, 0);
+            _testEvent.reschedule(0);
         }
         return true;
     }
@@ -933,7 +934,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     private class RemoveDropList implements SimpleTimer.TimedEvent {
-        private RemoteHostId _peer;
+        private final RemoteHostId _peer;
         public RemoveDropList(RemoteHostId peer) { _peer = peer; }
         public void timeReached() { 
             _dropList.remove(_peer);
@@ -1202,26 +1203,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //UDPAddress ua = new UDPAddress(addr);
             //if (ua.getIntroducerCount() <= 0) {
             if (addr.getOption("ihost0") == null) {
-                String host = addr.getOption(UDPAddress.PROP_HOST);
-                String port = addr.getOption(UDPAddress.PROP_PORT);
-                if (host == null || port == null) {
+                byte[] ip = addr.getIP();
+                int port = addr.getPort();
+                if (ip == null || port <= 0 ||
+                    (!isValid(ip)) ||
+                    Arrays.equals(ip, getExternalIP())) {
                     markUnreachable(to);
                     return null;
-                }
-                try {
-                    InetAddress ia = InetAddress.getByName(host);
-                    int iport = Integer.parseInt(port);
-                    if (iport <= 0 || iport > 65535 || (!isValid(ia.getAddress())) ||
-                        Arrays.equals(ia.getAddress(), getExternalIP())) {
-                        markUnreachable(to);
-                        return null;
-                    }
-                } catch (UnknownHostException uhe) {
-                        markUnreachable(to);
-                        return null;
-                } catch (NumberFormatException nfe) {
-                        markUnreachable(to);
-                        return null;
                 }
             }
             if (!allowConnection())
@@ -1337,6 +1325,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _fragments.add(msg);
     }
 
+    /**
+     *  "injected" message from the EstablishmentManager
+     */
     void send(I2NPMessage msg, PeerState peer) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Injecting a data message to a new peer: " + peer);
@@ -1446,7 +1437,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 addr.setCost(DEFAULT_COST + 1);
             else
                 addr.setCost(DEFAULT_COST);
-            addr.setExpiration(null);
+            //addr.setExpiration(null);
             addr.setTransportStyle(STYLE);
             addr.setOptions(options);
 
@@ -1687,7 +1678,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return getPeerState(dest) != null;
     }
 
+    /**
+     *  @since 0.9.3
+     */
+    @Override
+    public boolean isBacklogged(Hash dest) {
+        PeerState peer =  _peersByIdent.get(dest);
+        return peer != null && peer.isBacklogged();
+    }
+
     public boolean allowConnection() {
+
             return _peersByIdent.size() < getMaxConnections();
     }
 
@@ -2196,6 +2197,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(THINSP).append(peer.getConcurrentSends());
             buf.append(THINSP).append(peer.getConcurrentSendWindow());
             buf.append(THINSP).append(peer.getConsecutiveSendRejections());
+            if (peer.isBacklogged())
+                buf.append(' ').append(_("backlogged"));
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
@@ -2361,12 +2364,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public String toString() { return "UDP bid @ " + getLatencyMs(); }
     }
     
-    private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
+    private class ExpirePeerEvent extends SimpleTimer2.TimedEvent {
         private final Set<PeerState> _expirePeers;
         private final List<PeerState> _expireBuffer;
         private volatile boolean _alive;
 
         public ExpirePeerEvent() {
+            super(_context.simpleTimer2());
             _expirePeers = new ConcurrentHashSet(128);
             _expireBuffer = new ArrayList();
         }
@@ -2403,7 +2407,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _expireBuffer.clear();
 
             if (_alive)
-                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 30*1000);
+                schedule(30*1000);
         }
         public void add(PeerState peer) {
                 _expirePeers.add(peer);
@@ -2414,9 +2418,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public void setIsAlive(boolean isAlive) {
             _alive = isAlive;
             if (isAlive) {
-                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 30*1000);
+                reschedule(30*1000);
             } else {
-                SimpleTimer.getInstance().removeEvent(ExpirePeerEvent.this);
+                cancel();
                 _expirePeers.clear();
             }
         }
@@ -2515,12 +2519,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //return ( (val != null) && ("true".equals(val)) );
     }
     
-    private class PeerTestEvent implements SimpleTimer.TimedEvent {
+    private class PeerTestEvent extends SimpleTimer2.TimedEvent {
         private volatile boolean _alive;
         /** when did we last test our reachability */
         private long _lastTested;
         private boolean _forceRun;
 
+        PeerTestEvent() {
+            super(_context.simpleTimer2());
+        }
+        
         public void timeReached() {
             if (shouldTest()) {
                 long now = _context.clock().now();
@@ -2532,7 +2540,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 long delay = (TEST_FREQUENCY / 2) + _context.random().nextInt(TEST_FREQUENCY);
                 if (delay <= 0)
                     throw new RuntimeException("wtf, delay is " + delay);
-                SimpleTimer.getInstance().addEvent(PeerTestEvent.this, delay);
+                schedule(delay);
             }
         }
         
@@ -2558,9 +2566,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _alive = isAlive;
             if (isAlive) {
                 long delay = _context.random().nextInt(2*TEST_FREQUENCY);
-                SimpleTimer.getInstance().addEvent(PeerTestEvent.this, delay);
+                reschedule(delay);
             } else {
-                SimpleTimer.getInstance().removeEvent(PeerTestEvent.this);
+                cancel();
             }
         }
     }

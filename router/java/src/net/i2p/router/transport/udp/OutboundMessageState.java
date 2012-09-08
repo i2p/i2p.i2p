@@ -7,6 +7,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.util.CDPQEntry;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -14,7 +15,7 @@ import net.i2p.util.Log;
  * Maintain the outbound fragmentation for resending, for a single message.
  *
  */
-class OutboundMessageState {
+class OutboundMessageState implements CDPQEntry {
     private final I2PAppContext _context;
     private final Log _log;
     /** may be null if we are part of the establishment */
@@ -36,6 +37,9 @@ class OutboundMessageState {
     /** for tracking use-after-free bugs */
     private boolean _released;
     private Exception _releasedBy;
+    // we can't use the ones in _message since it is null for injections
+    private long _enqueueTime;
+    private long _seqNum;
     
     public static final int MAX_MSG_SIZE = 32 * 1024;
     /** is this enough for a high-bandwidth router? */
@@ -104,6 +108,7 @@ class OutboundMessageState {
     
     /**
      *  Called from OutboundMessageFragments
+     *  @param m null if msg is "injected"
      *  @return success
      */
     private boolean initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
@@ -128,8 +133,8 @@ class OutboundMessageState {
             _expiration = _startedOn + EXPIRATION;
             //_expiration = msg.getExpiration();
 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
             return true;
         } catch (IllegalStateException ise) {
             _cache.release(_messageBuf);
@@ -368,6 +373,56 @@ class OutboundMessageState {
         }
     }
     
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void setEnqueueTime(long now) {
+        _enqueueTime = now;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public long getEnqueueTime() {
+        return _enqueueTime;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void drop() {
+        _peer.getTransport().failed(this, false);
+        releaseResources();
+    }
+
+    /**
+     *  For CDPQ
+     *  @since 0.9.3
+     */
+    public void setSeqNum(long num) {
+        _seqNum = num;
+    }
+
+    /**
+     *  For CDPQ
+     *  @since 0.9.3
+     */
+    public long getSeqNum() {
+        return _seqNum;
+    }
+
+    /**
+     *  For CDPQ
+     *  @return OutNetMessage priority or 1000 for injected
+     *  @since 0.9.3
+     */
+    public int getPriority() {
+        return _message != null ? _message.getPriority() : 1000;
+    }
+
     @Override
     public String toString() {
         short sends[] = _fragmentSends;

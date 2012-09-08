@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.CDQEntry;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -12,7 +13,7 @@ import net.i2p.util.Log;
  * Warning - there is no synchronization in this class, take care in
  * InboundMessageFragments to avoid use-after-release, etc.
  */
-class InboundMessageState {
+class InboundMessageState implements CDQEntry {
     private final RouterContext _context;
     private final Log _log;
     private final long _messageId;
@@ -29,6 +30,7 @@ class InboundMessageState {
      */
     private int _lastFragment;
     private final long _receiveBegin;
+    private long _enqueueTime;
     private int _completeSize;
     private boolean _released;
     
@@ -136,6 +138,30 @@ class InboundMessageState {
 
     public long getLifetime() {
         return _context.clock().now() - _receiveBegin;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void setEnqueueTime(long now) {
+        _enqueueTime = now;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public long getEnqueueTime() {
+        return _enqueueTime;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void drop() {
+        releaseResources();
     }
 
     public Hash getFrom() { return _from; }

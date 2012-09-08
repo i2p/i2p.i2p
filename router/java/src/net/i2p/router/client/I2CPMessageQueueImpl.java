@@ -1,6 +1,7 @@
 package net.i2p.router.client;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.internal.I2CPMessageQueue;
@@ -30,6 +31,16 @@ class I2CPMessageQueueImpl extends I2CPMessageQueue {
      */
     public boolean offer(I2CPMessage msg) {
         return _out.offer(msg);
+    }
+
+    /**
+     *  Send a message, blocking.
+     *  @param timeout how long to wait for space (ms)
+     *  @return success (false if no space available or if timed out)
+     *  @since 0.9.3
+     */
+    public boolean offer(I2CPMessage msg, long timeout) throws InterruptedException {
+        return _out.offer(msg, timeout, TimeUnit.MILLISECONDS);
     }
 
     /**

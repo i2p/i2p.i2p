@@ -1,7 +1,10 @@
 package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -9,13 +12,17 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 
 /**
- * run through the tunnel gateways that have had messages added to them and push
- * those messages through the preprocessing and sending process
+ * Run through the tunnel gateways that have had messages added to them and push
+ * those messages through the preprocessing and sending process.
+ *
+ * TODO do we need this many threads?
+ * TODO this combines IBGWs and OBGWs, do we wish to separate the two
+ * and/or prioritize OBGWs (i.e. our outbound traffic) over IBGWs (participating)?
  */
 class TunnelGatewayPumper implements Runnable {
     private final RouterContext _context;
-    private final BlockingQueue<PumpedTunnelGateway> _wantsPumping;
-    private boolean _stop;
+    private final Set<PumpedTunnelGateway> _wantsPumping;
+    private volatile boolean _stop;
     private static final int MIN_PUMPERS = 1;
     private static final int MAX_PUMPERS = 4;
     private final int _pumpers;
@@ -23,7 +30,7 @@ class TunnelGatewayPumper implements Runnable {
     /** Creates a new instance of TunnelGatewayPumper */
     public TunnelGatewayPumper(RouterContext ctx) {
         _context = ctx;
-        _wantsPumping = new LinkedBlockingQueue();
+        _wantsPumping = new LinkedHashSet(16);
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
@@ -35,9 +42,10 @@ class TunnelGatewayPumper implements Runnable {
     public void stopPumping() {
         _stop=true;
         _wantsPumping.clear();
-        PumpedTunnelGateway poison = new PoisonPTG(_context);
-        for (int i = 0; i < _pumpers; i++)
-            _wantsPumping.offer(poison);
+        for (int i = 0; i < _pumpers; i++) {
+            PumpedTunnelGateway poison = new PoisonPTG(_context);
+            wantsPumping(poison);
+        }
         for (int i = 1; i <= 5 && !_wantsPumping.isEmpty(); i++) {
             try {
                 Thread.sleep(i * 50);
@@ -47,16 +55,28 @@ class TunnelGatewayPumper implements Runnable {
     }
     
     public void wantsPumping(PumpedTunnelGateway gw) {
-        if (!_stop)
-            _wantsPumping.offer(gw);
+        if (!_stop) {
+            synchronized (_wantsPumping) {
+                if (_wantsPumping.add(gw))
+                    _wantsPumping.notify();
+            }
+        }
     }
     
     public void run() {
         PumpedTunnelGateway gw = null;
-        List<TunnelGateway.Pending> queueBuf = new ArrayList(32);
+        List<PendingGatewayMessage> queueBuf = new ArrayList(32);
         while (!_stop) {
             try {
-                gw = _wantsPumping.take();
+                synchronized (_wantsPumping) {
+                    if (_wantsPumping.isEmpty()) {
+                        _wantsPumping.wait();
+                    } else {
+                        Iterator<PumpedTunnelGateway> iter = _wantsPumping.iterator();
+                        gw = iter.next();
+                        iter.remove();
+                    }
+                }
             } catch (InterruptedException ie) {}
             if (gw != null) {
                 if (gw.getMessagesSent() == POISON_PTG)

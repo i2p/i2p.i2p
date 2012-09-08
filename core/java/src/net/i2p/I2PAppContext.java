@@ -487,7 +487,7 @@ public class I2PAppContext {
         String val = getProperty(propName);
         if (val == null)
             return defaultVal;
-        return Boolean.valueOf(val).booleanValue();
+        return Boolean.parseBoolean(val);
     }
 
     /**
@@ -495,7 +495,7 @@ public class I2PAppContext {
      * @since 0.7.12
      */
     public boolean getBooleanProperty(String propName) {
-        return Boolean.valueOf(getProperty(propName)).booleanValue();
+        return Boolean.parseBoolean(getProperty(propName));
     }
 
     /**
@@ -953,6 +953,7 @@ public class I2PAppContext {
     /**
      * Use instead of SimpleTimer.getInstance()
      * @since 0.9 to replace static instance in the class
+     * @deprecated use SimpleTimer2
      */
     public SimpleTimer simpleTimer() {
         if (!_simpleTimerInitialized)
@@ -960,6 +961,9 @@ public class I2PAppContext {
         return _simpleTimer;
     }
 
+    /**
+     * @deprecated use SimpleTimer2
+     */
     private void initializeSimpleTimer() {
         synchronized (_lock19) {
             if (_simpleTimer == null)

@@ -24,6 +24,14 @@ public abstract class I2CPMessageQueue {
     public abstract boolean offer(I2CPMessage msg);
 
     /**
+     *  Send a message, blocking.
+     *  @param timeout how long to wait for space (ms)
+     *  @return success (false if no space available or if timed out)
+     *  @since 0.9.3
+     */
+    public abstract boolean offer(I2CPMessage msg, long timeout) throws InterruptedException;
+
+    /**
      *  Receive a message, nonblocking.
      *  Unused for now.
      *  @return message or null if none available

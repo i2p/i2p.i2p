@@ -24,6 +24,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.message.SendMessageDirectJob;
@@ -40,7 +41,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
     private final static int REPLY_TIMEOUT = 60*1000;
-    private final static int MESSAGE_PRIORITY = 300;
+    private final static int MESSAGE_PRIORITY = OutNetMessage.PRIORITY_NETDB_REPLY;
     
     /**
      * If a routerInfo structure isn't this recent, don't send it out.
@@ -283,7 +284,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             m.setMessage(message);
             m.setMessageExpiration(message.getMessageExpiration());
             m.setTunnelId(replyTunnel);
-            SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, 100);
+            SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, MESSAGE_PRIORITY);
             j.runJob();
             //getContext().jobQueue().addJob(j);
         }

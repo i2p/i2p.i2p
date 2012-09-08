@@ -14,7 +14,7 @@ import java.util.Date;
  *
  *  Use socket.setsotimeout instead?
  */
-public class SocketTimeout implements SimpleTimer.TimedEvent {
+public class SocketTimeout extends SimpleTimer2.TimedEvent {
     private Socket _targetSocket;
     private long _startTime;
     private long _inactivityDelay;
@@ -24,12 +24,13 @@ public class SocketTimeout implements SimpleTimer.TimedEvent {
     private Runnable _command;
     public SocketTimeout(long delay) { this(null, delay); }
     public SocketTimeout(Socket socket, long delay) {
+        super(SimpleTimer2.getInstance());
         _inactivityDelay = delay;
         _targetSocket = socket;
         _cancelled = false;
         _lastActivity = _startTime = System.currentTimeMillis();
         _totalTimeoutTime = -1;
-        SimpleTimer.getInstance().addEvent(SocketTimeout.this, delay);
+        schedule(delay);
     }
     public void timeReached() {
         if (_cancelled) return;
@@ -44,13 +45,13 @@ public class SocketTimeout implements SimpleTimer.TimedEvent {
             }
             if (_command != null) _command.run();
         }  else {
-            SimpleTimer.getInstance().addEvent(SocketTimeout.this, _inactivityDelay);
+            schedule(_inactivityDelay);
         }
     }
     
-    public void cancel() {
+    public boolean cancel() {
         _cancelled = true;
-        SimpleTimer.getInstance().removeEvent(SocketTimeout.this);
+        return super.cancel();
     }
     public void setSocket(Socket s) { _targetSocket = s; }
     public void resetTimer() { _lastActivity = System.currentTimeMillis();  }

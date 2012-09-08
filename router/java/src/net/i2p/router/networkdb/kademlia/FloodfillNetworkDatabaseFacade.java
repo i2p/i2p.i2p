@@ -41,6 +41,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     private static final int MAX_TO_FLOOD = 4;
     
+    private static final int FLOOD_PRIORITY = OutNetMessage.PRIORITY_NETDB_FLOOD;
+    private static final int FLOOD_TIMEOUT = 30*1000;
+    
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
@@ -224,9 +227,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
-    private static final int FLOOD_PRIORITY = 200;
-    private static final int FLOOD_TIMEOUT = 30*1000;
-    
     @Override
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     

@@ -21,6 +21,7 @@ public class SimpleTimer {
 
     /**
      *  If you have a context, use context.simpleTimer() instead
+     *  @deprecated use SimpleTimer2
      */
     public static SimpleTimer getInstance() {
         return I2PAppContext.getGlobalContext().simpleTimer();
@@ -39,6 +40,7 @@ public class SimpleTimer {
     /**
      *  To be instantiated by the context.
      *  Others should use context.simpleTimer() instead
+     *  @deprecated use SimpleTimer2
      */
     public SimpleTimer(I2PAppContext context) {
         this(context, "SimpleTimer");
@@ -47,6 +49,7 @@ public class SimpleTimer {
     /**
      *  To be instantiated by the context.
      *  Others should use context.simpleTimer() instead
+     *  @deprecated use SimpleTimer2
      */
     private SimpleTimer(I2PAppContext context, String name) {
         runn = new SimpleStore(true);
@@ -146,6 +149,7 @@ public class SimpleTimer {
                     }
                 }
             }
+            // FIXME if you plan to use this class again
             while (_events.containsKey(time))
                 time = new Long(time.longValue() + 1);
             _events.put(time, event);

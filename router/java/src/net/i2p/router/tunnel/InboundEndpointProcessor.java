@@ -3,8 +3,8 @@ package net.i2p.router.tunnel;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Receive the inbound tunnel message, removing all of the layers
@@ -21,7 +21,6 @@ class InboundEndpointProcessor {
     private final IVValidator _validator;    
     
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
-    private static final ByteCache _cache = ByteCache.getInstance(128, HopProcessor.IV_LENGTH);
     
     /** @deprecated unused */
     public InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg) {
@@ -54,8 +53,7 @@ class InboundEndpointProcessor {
             return false;
         }
         
-        ByteArray ba = _cache.acquire();
-        byte iv[] = ba.getData(); //new byte[HopProcessor.IV_LENGTH];
+        byte iv[] = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
         System.arraycopy(orig, offset, iv, 0, iv.length);
         //if (_config.getLength() > 1)
         //    _log.debug("IV at inbound endpoint before decrypt: " + Base64.encode(iv));
@@ -64,7 +62,7 @@ class InboundEndpointProcessor {
         if (!ok) {
             if (_log.shouldLog(Log.WARN)) 
                 _log.warn("Invalid IV, dropping at IBEP " + _config);
-            _cache.release(ba);
+            SimpleByteCache.release(iv);
             return false;
         }
         
@@ -72,7 +70,7 @@ class InboundEndpointProcessor {
         if (USE_ENCRYPTION)
             decrypt(_context, _config, iv, orig, offset, length);
         
-        _cache.release(ba);
+        SimpleByteCache.release(iv);
         
         if (_config.getLength() > 0) {
             int rtt = 0; // dunno... may not be related to an rtt
@@ -91,8 +89,7 @@ class InboundEndpointProcessor {
      */
     private void decrypt(RouterContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
         //Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
-        ByteArray ba = _cache.acquire();
-        byte cur[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH]; // so we dont malloc
+        byte cur[] = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
         for (int i = cfg.getLength()-2; i >= 0; i--) { // dont include the endpoint, since that is the creator
             OutboundGatewayProcessor.decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
             //if (log.shouldLog(Log.DEBUG)) {
@@ -100,7 +97,7 @@ class InboundEndpointProcessor {
                 //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
             //}
         }
-        _cache.release(ba);
+        SimpleByteCache.release(cur);
     }
     
 }

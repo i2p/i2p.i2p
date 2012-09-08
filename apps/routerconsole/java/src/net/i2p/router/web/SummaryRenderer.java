@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -15,6 +16,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 
 import org.jrobin.core.RrdException;
@@ -137,9 +139,11 @@ class SummaryRenderer {
                 // Strings.java
                 descr = _(_listener.getRate().getRateStat().getDescription());
             }
-            long started = ((RouterContext)_context).router().getWhenStarted();
-            if (started > start && started < end)
-                def.vrule(started / 1000, RESTART_BAR_COLOR, _("Restart"), 4.0f);
+
+            //long started = ((RouterContext)_context).router().getWhenStarted();
+            //if (started > start && started < end)
+            //    def.vrule(started / 1000, RESTART_BAR_COLOR, _("Restart"), 4.0f);
+
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
             if (descr.length() > 0)
                 def.area(plotName, Color.BLUE, descr + "\\r");
@@ -151,6 +155,14 @@ class SummaryRenderer {
                 def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
                 // '07-Jul 21:09 UTC' with month name in the system locale
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
+                Map<Long, String> events = ((RouterContext)_context).router().eventLog().getEvents(EventLog.STARTED, start);
+                for (Map.Entry<Long, String> event : events.entrySet()) {
+                    long started = event.getKey().longValue();
+                    if (started > start && started < end) {
+                        String legend = _("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\r";
+                        def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 4.0f);
+                    }
+                }
                 def.comment(sdf.format(new Date(start)) + " -- " + sdf.format(new Date(end)) + " UTC\\r");
             }
             if (!showCredit)

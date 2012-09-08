@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+import net.i2p.util.Addresses;
 import net.i2p.util.OrderedProperties;
 
 /**
@@ -33,9 +34,15 @@ import net.i2p.util.OrderedProperties;
  */
 public class RouterAddress extends DataStructureImpl {
     private int _cost;
-    private Date _expiration;
+    //private Date _expiration;
     private String _transportStyle;
     private final Properties _options;
+    // cached values
+    private byte[] _ip;
+    private int _port;
+
+    public static final String PROP_HOST = "host";
+    public static final String PROP_PORT = "port";
 
     public RouterAddress() {
         _cost = -1;
@@ -68,18 +75,21 @@ public class RouterAddress extends DataStructureImpl {
      * is null, then the address never expires.
      *
      * @deprecated unused for now
+     * @return null always
      */
     public Date getExpiration() {
-        return _expiration;
+        //return _expiration;
+        return null;
     }
 
     /**
      * Configure the expiration date of the address (null for no expiration)
      *
      * Unused for now, always null
+     * @deprecated unused for now
      */
     public void setExpiration(Date expiration) {
-        _expiration = expiration;
+        //_expiration = expiration;
     }
 
     /**
@@ -141,13 +151,59 @@ public class RouterAddress extends DataStructureImpl {
     }
     
     /**
+     *  Caching version of InetAddress.getByName(getOption("host")).getAddress(), which is slow.
+     *  Caches numeric host names only.
+     *  Will resolve but not cache resolution of DNS host names.
+     *
+     *  @return IP or null
+     *  @since 0.9.3
+     */
+    public byte[] getIP() {
+        if (_ip != null)
+            return _ip;
+        byte[] rv = null;
+        String host = _options.getProperty(PROP_HOST);
+        if (host != null) {
+            rv = Addresses.getIP(host);
+            if (rv != null &&
+                (host.replaceAll("[0-9\\.]", "").length() == 0 ||
+                 host.replaceAll("[0-9a-fA-F:]", "").length() == 0)) {
+                _ip = rv;
+            }
+        }
+        return rv;
+    }
+    
+    /**
+     *  Caching version of Integer.parseInt(getOption("port"))
+     *  Caches valid ports 1-65535 only.
+     *
+     *  @return 1-65535 or 0 if invalid
+     *  @since 0.9.3
+     */
+    public int getPort() {
+        if (_port != 0)
+            return _port;
+        String port = _options.getProperty(PROP_PORT);
+        if (port != null) {
+            try {
+                int rv = Integer.parseInt(port);
+                if (rv > 0 && rv <= 65535)
+                    _port = rv;
+            } catch (NumberFormatException nfe) {}
+        }
+        return _port;
+    }
+
+    /**
      *  @throws IllegalStateException if was already read in
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_transportStyle != null)
             throw new IllegalStateException();
         _cost = (int) DataHelper.readLong(in, 1);
-        _expiration = DataHelper.readDate(in);
+        //_expiration = DataHelper.readDate(in);
+        DataHelper.readDate(in);
         _transportStyle = DataHelper.readString(in);
         // reduce Object proliferation
         if (_transportStyle.equals("SSU"))
@@ -161,7 +217,8 @@ public class RouterAddress extends DataStructureImpl {
         if ((_cost < 0) || (_transportStyle == null))
             throw new DataFormatException("Not enough data to write a router address");
         DataHelper.writeLong(out, 1, _cost);
-        DataHelper.writeDate(out, _expiration);
+        //DataHelper.writeDate(out, _expiration);
+        DataHelper.writeDate(out, null);
         DataHelper.writeString(out, _transportStyle);
         DataHelper.writeProperties(out, _options);
     }
@@ -198,15 +255,13 @@ public class RouterAddress extends DataStructureImpl {
         buf.append("[RouterAddress: ");
         buf.append("\n\tTransportStyle: ").append(_transportStyle);
         buf.append("\n\tCost: ").append(_cost);
-        buf.append("\n\tExpiration: ").append(_expiration);
-        if (_options != null) {
+        //buf.append("\n\tExpiration: ").append(_expiration);
             buf.append("\n\tOptions: #: ").append(_options.size());
             for (Map.Entry e : _options.entrySet()) {
                 String key = (String) e.getKey();
                 String val = (String) e.getValue();
                 buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
             }
-        }
         buf.append("]");
         return buf.toString();
     }

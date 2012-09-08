@@ -15,6 +15,7 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -24,6 +25,9 @@ import net.i2p.util.Log;
  * as if they arrived locally.  Other instructions are not yet implemented (but
  * need to be. soon)
  *
+ * This is essentially unused, as InNetMessagePool short circuits tunnel messages,
+ * and the garlics are handled in InboundMessageDistributor.
+ * Unless we get a garlic message not down a tunnel?
  */
 class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
     private final Log _log;
@@ -34,6 +38,9 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
     //private MessageHandler _handler;
     //private GarlicMessageParser _parser;
    
+    private final static int ROUTER_PRIORITY = OutNetMessage.PRIORITY_LOWEST;
+    private final static int TUNNEL_PRIORITY = OutNetMessage.PRIORITY_LOWEST;
+
     /**
      *  @param from ignored
      *  @param fromHash ignored
@@ -42,8 +49,8 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
         getContext().statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("New handle garlicMessageJob called w/ message from [" + from + "]", new Exception("Debug"));
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Garlic Message not down a tunnel??? from [" + from + "]", new Exception("I did it"));
         _message = msg;
         //_from = from;
         //_fromHash = fromHash;
@@ -78,10 +85,10 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("router delivery instructions targetting " 
-                                   + instructions.getRouter().toBase64().substring(0,4));
+                                   + instructions.getRouter().toBase64().substring(0,4) + " for " + data);
                     SendMessageDirectJob j = new SendMessageDirectJob(getContext(), data, 
                                                                       instructions.getRouter(), 
-                                                                      10*1000, 100);
+                                                                      10*1000, ROUTER_PRIORITY);
                     // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
                     j.runJob(); 
                     //getContext().jobQueue().addJob(j);
@@ -92,9 +99,12 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
                 gw.setMessage(data);
                 gw.setTunnelId(instructions.getTunnelId());
                 gw.setMessageExpiration(data.getMessageExpiration());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("tunnel delivery instructions targetting " 
+                               + instructions.getRouter().toBase64().substring(0,4) + " for " + data);
                 SendMessageDirectJob job = new SendMessageDirectJob(getContext(), gw, 
                                                                     instructions.getRouter(), 
-                                                                    10*1000, 100);
+                                                                    10*1000, TUNNEL_PRIORITY);
                 // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
                 job.runJob(); 
                 // getContext().jobQueue().addJob(job);

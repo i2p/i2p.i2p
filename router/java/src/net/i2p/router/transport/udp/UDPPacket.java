@@ -9,6 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
+import net.i2p.router.util.CDQEntry;
 import net.i2p.util.Log;
 
 /**
@@ -16,7 +17,7 @@ import net.i2p.util.Log;
  * of object instances to allow rapid reuse.
  *
  */
-class UDPPacket {
+class UDPPacket implements CDQEntry {
     private I2PAppContext _context;
     private final DatagramPacket _packet;
     private volatile short _priority;
@@ -246,8 +247,12 @@ class UDPPacket {
         _context.aes().decrypt(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _data, _packet.getOffset() + MAC_SIZE + IV_SIZE, cipherKey, _ivBuf, len - MAC_SIZE - IV_SIZE);
     }
 
-    /** the UDPReceiver has tossed it onto the inbound queue */
-    void enqueue() { _enqueueTime = _context.clock().now(); }
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void setEnqueueTime(long now) { _enqueueTime = now; }
+
     /** a packet handler has pulled it off the inbound queue */
     void received() { _receivedTime = _context.clock().now(); }
 
@@ -256,8 +261,11 @@ class UDPPacket {
     /** a packet handler has finished parsing out the good bits */
     //void afterHandling() { _afterHandlingTime = _context.clock().now(); } 
       
-    /** the UDPReceiver has tossed it onto the inbound queue */
-    //long getTimeSinceEnqueue() { return (_enqueueTime > 0 ? _context.clock().now() - _enqueueTime : 0); }
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public long getEnqueueTime() { return _enqueueTime; }
 
     /** a packet handler has pulled it off the inbound queue */
     long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
@@ -269,8 +277,6 @@ class UDPPacket {
     
     // Following 5: All used only for stats in PacketHandler, commented out
 
-    /** when it was added to the endpoint's receive queue */
-    //long getEnqueueTime() { return _enqueueTime; }
     /** when it was pulled off the endpoint receive queue */
     //long getReceivedTime() { return _receivedTime; }
     /** when we began validate() */
@@ -324,6 +330,14 @@ class UDPPacket {
         //}
         //rv._acquiredBy = new Exception("acquired on");
         return rv;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void drop() {
+        release();
     }
 
     public void release() {

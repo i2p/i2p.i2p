@@ -42,6 +42,6 @@ class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
                 _config.incrementProcessedMessages();
             return;
         }
-        super.add(msg, toRouter, toTunnel);
+        add(new PendingGatewayMessage(msg, toRouter, toTunnel));
     }
 }

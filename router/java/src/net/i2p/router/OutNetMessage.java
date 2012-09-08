@@ -20,6 +20,7 @@ import java.util.Set;
 
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.util.CDPQEntry;
 import net.i2p.util.Log;
 
 /**
@@ -27,7 +28,7 @@ import net.i2p.util.Log;
  * delivery and jobs to be fired off if particular events occur.
  *
  */
-public class OutNetMessage {
+public class OutNetMessage implements CDPQEntry {
     private final Log _log;
     private final RouterContext _context;
     private RouterInfo _target;
@@ -47,6 +48,8 @@ public class OutNetMessage {
     private long _sendBegin;
     //private Exception _createdBy;
     private final long _created;
+    private long _enqueueTime;
+    private long _seqNum;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
     private HashMap<String, Long> _timestamps;
     /**
@@ -56,6 +59,26 @@ public class OutNetMessage {
     private List<String> _timestampOrder;
     private Object _preparationBuf;
     
+    /**
+     *  Priorities, higher is higher priority.
+     *  @since 0.9.3
+     */
+    public static final int PRIORITY_HIGHEST = 1000;
+    public static final int PRIORITY_MY_BUILD_REQUEST = 500;
+    public static final int PRIORITY_MY_NETDB_LOOKUP = 500;
+    public static final int PRIORITY_MY_NETDB_STORE = 400;
+    public static final int PRIORITY_MY_DATA = 400;
+    public static final int PRIORITY_MY_NETDB_STORE_LOW = 300;
+    public static final int PRIORITY_HIS_BUILD_REQUEST = 300;
+    public static final int PRIORITY_BUILD_REPLY = 300;
+    public static final int PRIORITY_NETDB_REPLY = 300;
+    public static final int PRIORITY_HIS_NETDB_STORE = 200;
+    public static final int PRIORITY_NETDB_FLOOD = 200;
+    public static final int PRIORITY_PARTICIPATING = 200;
+    public static final int PRIORITY_NETDB_EXPLORE = 100;
+    public static final int PRIORITY_NETDB_HARVEST = 100;
+    public static final int PRIORITY_LOWEST = 100;
+
     public OutNetMessage(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(OutNetMessage.class);
@@ -263,6 +286,45 @@ public class OutNetMessage {
 
     /** time the transport tries to send the message (including any queueing) */
     public long getSendTime() { return _context.clock().now() - _sendBegin; }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void setEnqueueTime(long now) {
+        _enqueueTime = now;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public long getEnqueueTime() {
+        return _enqueueTime;
+    }
+
+    /**
+     *  For CDQ
+     *  @since 0.9.3
+     */
+    public void drop() {
+    }
+
+    /**
+     *  For CDPQ
+     *  @since 0.9.3
+     */
+    public void setSeqNum(long num) {
+        _seqNum = num;
+    }
+
+    /**
+     *  For CDPQ
+     *  @since 0.9.3
+     */
+    public long getSeqNum() {
+        return _seqNum;
+    }
 
     /** 
      * We've done what we need to do with the data from this message, though

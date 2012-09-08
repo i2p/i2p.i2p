@@ -18,7 +18,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,6 +43,7 @@ import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -140,12 +140,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  @since 0.8.9
      */
-    private static final LookupCache _lookupCache = new LookupCache(16);
+    private static final Map<Hash, Destination> _lookupCache = new LHMCache(16);
 
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
 
     private static final long VERIFY_USAGE_TIME = 60*1000;
+
+    private static final long MAX_SEND_WAIT = 10*1000;
 
     void dateUpdated() {
         _dateReceived = true;
@@ -643,18 +645,26 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     /**
      * Deliver an I2CP message to the router
+     * As of 0.9.3, may block for several seconds if the write queue to the router is full
      *
      * @throws I2PSessionException if the message is malformed or there is an error writing it out
      */
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        if (isClosed())
+        if (isClosed()) {
             throw new I2PSessionException("Already closed");
-        else if (_queue != null)
-            _queue.offer(message);  // internal
-        else if (_writer == null)
+        } else if (_queue != null) {
+            // internal
+            try {
+                if (!_queue.offer(message, MAX_SEND_WAIT))
+                    throw new I2PSessionException("Timed out waiting while write queue was full");
+            } catch (InterruptedException ie) {
+                throw new I2PSessionException("Interrupted while write queue was full", ie);
+            }
+        } else if (_writer == null) {
             throw new I2PSessionException("Already closed");
-        else
+        } else {
             _writer.addMessage(message);
+        }
     }
 
     /**
@@ -984,22 +994,5 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             buf.append("[null dest]");
         buf.append(getPrefix());
         return buf.toString();
-    }
-
-    /**
-     *  @since 0.8.9
-     */
-    private static class LookupCache extends LinkedHashMap<Hash, Destination> {
-        private final int _max;
-
-        public LookupCache(int max) {
-            super(max, 0.75f, true);
-            _max = max;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Hash, Destination> eldest) {
-            return size() > _max;
-        }
     }
 }

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
@@ -438,14 +439,8 @@ public class Blocklist {
      * of IP ranges read in from the file.
      */
     public void add(String ip) {
-        InetAddress pi;
-        try {
-            pi = InetAddress.getByName(ip);
-        } catch (UnknownHostException uhe) {
-            return;
-        }
-        if (pi == null) return;
-        byte[] pib = pi.getAddress();
+        byte[] pib = Addresses.getIP(ip);
+        if (pib == null) return;
         add(pib);
     }
 
@@ -478,21 +473,13 @@ public class Blocklist {
         List<byte[]> rv = new ArrayList(1);
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null) return rv;
-        String oldphost = null;
+        byte[] oldpib = null;
         // for each peer address
         for (RouterAddress pa : pinfo.getAddresses()) {
-            String phost = pa.getOption("host");
-            if (phost == null) continue;
-            if (oldphost != null && oldphost.equals(phost)) continue;
-            oldphost = phost;
-            InetAddress pi;
-            try {
-                pi = InetAddress.getByName(phost);
-            } catch (UnknownHostException uhe) {
-                continue;
-            }
-            if (pi == null) continue;
-            byte[] pib = pi.getAddress();
+            byte[] pib = pa.getIP();
+            if (pib == null) continue;
+            if (DataHelper.eq(oldpib, pib)) continue;
+            oldpib = pib;
             rv.add(pib);
          }
          return rv;
@@ -520,14 +507,8 @@ public class Blocklist {
      * calling this externally won't shitlist the peer, this is just an IP check
      */
     public boolean isBlocklisted(String ip) {
-        InetAddress pi;
-        try {
-            pi = InetAddress.getByName(ip);
-        } catch (UnknownHostException uhe) {
-            return false;
-        }
-        if (pi == null) return false;
-        byte[] pib = pi.getAddress();
+        byte[] pib = Addresses.getIP(ip);
+        if (pib == null) return false;
         return isBlocklisted(pib);
     }
 

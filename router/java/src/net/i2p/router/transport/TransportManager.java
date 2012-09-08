@@ -185,6 +185,8 @@ public class TransportManager implements TransportEventListener {
     public void shutdown() {
         stopListening();
         _dhThread.shutdown();
+        Addresses.clearCaches();
+        TransportImpl.clearCaches();
     }
     
     public Transport getTransport(String style) {

@@ -1,5 +1,7 @@
 package net.i2p.util;
 
+import net.i2p.data.DataHelper;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -58,5 +60,20 @@ class LogRecord {
 
     public Throwable getThrowable() {
         return _throwable;
+    }
+
+    /**
+     *  Matches source class, message string, and throwable class only.
+     *  @since 0.9.3
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof LogRecord))
+            return false;
+        LogRecord r = (LogRecord) o;
+        return _source == r._source &&
+               DataHelper.eq(_message, r._message) &&
+               ((_throwable == null && r._throwable == null) ||
+                (_throwable != null && r._throwable != null && _throwable.getClass() == r._throwable.getClass()));
     }
 }
