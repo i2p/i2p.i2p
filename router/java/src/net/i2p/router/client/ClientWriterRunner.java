@@ -15,21 +15,22 @@ import net.i2p.util.Log;
  * the client reads from their i2cp socket, causing all sorts of bad things to
  * happen)
  *
+ * For external I2CP connections only.
  */
 class ClientWriterRunner implements Runnable {
     private final BlockingQueue<I2CPMessage> _messagesToWrite;
     private final ClientConnectionRunner _runner;
-    private final Log _log;
-    private final long _id;
-    private static long __id = 0;
+    //private final Log _log;
+    //private final long _id;
+    //private static long __id = 0;
 
     private static final int QUEUE_SIZE = 256;
     
     public ClientWriterRunner(RouterContext context, ClientConnectionRunner runner) {
-        _log = context.logManager().getLog(ClientWriterRunner.class);
+        //_log = context.logManager().getLog(ClientWriterRunner.class);
         _messagesToWrite = new LinkedBlockingQueue(QUEUE_SIZE);
         _runner = runner;
-        _id = ++__id;
+        //_id = ++__id;
     }
 
     /**

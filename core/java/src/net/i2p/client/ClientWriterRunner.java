@@ -1,5 +1,6 @@
 package net.i2p.client;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
@@ -29,7 +30,7 @@ class ClientWriterRunner implements Runnable {
     
     /** starts the thread too */
     public ClientWriterRunner(OutputStream out, I2PSessionImpl session) {
-        _out = out;
+        _out = new BufferedOutputStream(out);
         _session = session;
         _messagesToWrite = new LinkedBlockingQueue(MAX_QUEUE_SIZE);
         Thread t = new I2PAppThread(this, "I2CP Client Writer " + (++__Id), true);

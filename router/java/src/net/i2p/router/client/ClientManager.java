@@ -141,10 +141,15 @@ class ClientManager {
     }
 
     public void registerConnection(ClientConnectionRunner runner) {
-        synchronized (_pendingRunners) {
-            _pendingRunners.add(runner);
+        try {
+            runner.startRunning();
+            synchronized (_pendingRunners) {
+                _pendingRunners.add(runner);
+            }
+        } catch (IOException ioe) {
+            _log.error("Error starting up the runner", ioe);
+            runner.stopRunning();
         }
-        runner.startRunning();
     }
     
     public void unregisterConnection(ClientConnectionRunner runner) {
