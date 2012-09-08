@@ -119,13 +119,14 @@ class ClientConnectionRunner {
     }
     
     private static volatile int __id = 0;
+
     /**
      * Actually run the connection - listen for I2CP messages and respond.  This
      * is the main driver for this class, though it gets all its meat from the
      * {@link net.i2p.data.i2cp.I2CPMessageReader I2CPMessageReader}
      *
      */
-    public void startRunning() {
+    public synchronized void startRunning() {
         try {
             _reader = new I2CPMessageReader(new BufferedInputStream(_socket.getInputStream(), BUF_SIZE),
                                             new ClientMessageEventListener(_context, this, true));
@@ -137,13 +138,14 @@ class ClientConnectionRunner {
             t.start();
             _out = _socket.getOutputStream(); // FIXME OWCH! needs a better way so it can be final. FIXME
             _reader.startReading();
+            // TODO need a cleaner for unclaimed items in _messages, but we have no timestamps...
         } catch (IOException ioe) {
             _log.error("Error starting up the runner", ioe);
         }
     }
     
     /** die a horrible death */
-    void stopRunning() {
+    public synchronized void stopRunning() {
         if (_dead) return;
         if (_context.router().isAlive() && _log.shouldLog(Log.WARN)) 
             _log.warn("Stop the I2CP connection!  current leaseSet: " 
@@ -171,16 +173,20 @@ class ClientConnectionRunner {
     public SessionConfig getConfig() { return _config; }
     /** current client's sessionkeymanager */
     public SessionKeyManager getSessionKeyManager() { return _sessionKeyManager; }
+
     /** currently allocated leaseSet */
     public LeaseSet getLeaseSet() { return _currentLeaseSet; }
     void setLeaseSet(LeaseSet ls) { _currentLeaseSet = ls; }
+
     public Hash getDestHash() { return _destHashCache; }
     
     /** current client's sessionId */
     SessionId getSessionId() { return _sessionId; }
     void setSessionId(SessionId id) { if (id != null) _sessionId = id; }
+
     /** data for the current leaseRequest, or null if there is no active leaseSet request */
     LeaseRequestState getLeaseRequest() { return _leaseRequest; }
+
     void setLeaseRequest(LeaseRequestState req) { 
         synchronized (this) {
             if ( (_leaseRequest != null) && (req != _leaseRequest) )
@@ -188,6 +194,7 @@ class ClientConnectionRunner {
             _leaseRequest = req; 
         }
     }
+
     /** already closed? */
     boolean isDead() { return _dead; }
 
@@ -469,12 +476,14 @@ class ClientConnectionRunner {
         private final long _expirationTime;
         private final Job _onCreate;
         private final Job _onFailed;
+
         public Rerequest(LeaseSet ls, long expirationTime, Job onCreate, Job onFailed) {
             _ls = ls;
             _expirationTime = expirationTime;
             _onCreate = onCreate;
             _onFailed = onFailed;
         }
+
         public void timeReached() {
             requestLeaseSet(_ls, _expirationTime, _onCreate, _onFailed);
         }
@@ -579,14 +588,14 @@ class ClientConnectionRunner {
     private final static long REQUEUE_DELAY = 500;
     
     private class MessageDeliveryStatusUpdate extends JobImpl {
-        private MessageId _messageId;
-        private boolean _success;
+        private final MessageId _messageId;
+        private final boolean _success;
         private long _lastTried;
+
         public MessageDeliveryStatusUpdate(MessageId id, boolean success) {
             super(ClientConnectionRunner.this._context);
             _messageId = id;
             _success = success;
-            _lastTried = 0;
         }
 
         public String getName() { return "Update Delivery Status"; }

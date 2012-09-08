@@ -40,16 +40,22 @@ class MessageReceivedJob extends JobImpl {
         MessageId id = new MessageId();
         id.setMessageId(_runner.getNextMessageId());
         _runner.setPayload(id, _payload);
-        messageAvailable(id, _payload.getSize());
+        try {
+            messageAvailable(id, _payload.getSize());
+        } catch (I2CPMessageException ime) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error writing out the message status message", ime);
+            _runner.removePayload(id);
+        }
     }
     
     /**
      * Deliver notification to the client that the given message is available.
      */
-    private void messageAvailable(MessageId id, long size) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending message available: " + id + " to sessionId " + _runner.getSessionId() 
-                       + " (with nonce=1)", new Exception("available"));
+    private void messageAvailable(MessageId id, long size) throws I2CPMessageException {
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Sending message available: " + id + " to sessionId " + _runner.getSessionId() 
+        //               + " (with nonce=1)", new Exception("available"));
         MessageStatusMessage msg = new MessageStatusMessage();
         msg.setMessageId(id.getMessageId());
         msg.setSessionId(_runner.getSessionId().getSessionId());
@@ -57,11 +63,6 @@ class MessageReceivedJob extends JobImpl {
         // has to be >= 0, it is initialized to -1
         msg.setNonce(1);
         msg.setStatus(MessageStatusMessage.STATUS_AVAILABLE);
-        try {
-            _runner.doSend(msg);
-        } catch (I2CPMessageException ime) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the message status message", ime);
-        }
+        _runner.doSend(msg);
     }
 }

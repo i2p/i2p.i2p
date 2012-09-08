@@ -238,7 +238,9 @@ class ClientManager {
             _payload = payload;
             _msgId = id;
         }
+
         public String getName() { return "Distribute local message"; }
+
         public void runJob() {
             _to.receiveMessage(_toDest, _fromDest, _payload);
             if (_from != null) {
@@ -274,6 +276,7 @@ class ClientManager {
     }
 
     private static final int REQUEST_LEASESET_TIMEOUT = 120*1000;
+
     public void requestLeaseSet(Hash dest, LeaseSet ls) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)  {
@@ -298,6 +301,7 @@ class ClientManager {
         }
         return rv;
     }
+
     public boolean isLocal(Hash destHash) { 
         if (destHash == null) return false;
         synchronized (_runners) {
@@ -480,18 +484,23 @@ class ClientManager {
     }
     
     public void messageReceived(ClientMessage msg) {
-        _ctx.jobQueue().addJob(new HandleJob(msg));
+        // This is fast and non-blocking, run in-line
+        //_ctx.jobQueue().addJob(new HandleJob(msg));
+        (new HandleJob(msg)).runJob();
     }
 
     private class HandleJob extends JobImpl {
-        private ClientMessage _msg;
+        private final ClientMessage _msg;
+
         public HandleJob(ClientMessage msg) {
             super(_ctx);
             _msg = msg;
         }
+
         public String getName() { return "Handle Inbound Client Messages"; }
+
         public void runJob() {
-            ClientConnectionRunner runner = null;
+            ClientConnectionRunner runner;
             if (_msg.getDestination() != null) 
                 runner = getRunner(_msg.getDestination());
             else 

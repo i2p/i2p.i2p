@@ -31,7 +31,7 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
      * Starts the reader thread. Does not call super().
      */
     @Override
-    public void startRunning() {
+    public synchronized void startRunning() {
         _reader = new QueuedI2CPMessageReader(this.queue, new ClientMessageEventListener(_context, this, false));
         _reader.startReading();
     }
@@ -40,7 +40,7 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
      * Calls super() to stop the reader, and sends a poison message to the client.
      */
     @Override
-    void stopRunning() {
+    public synchronized void stopRunning() {
         super.stopRunning();
         queue.close();
         // queue = null;
