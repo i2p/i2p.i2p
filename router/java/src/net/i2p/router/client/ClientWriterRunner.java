@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.i2cp.I2CPMessage;
+import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.PoisonI2CPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -11,10 +12,9 @@ import net.i2p.util.Log;
 /**
  * Async writer class so that if a client app hangs, they wont take down the
  * whole router with them (since otherwise the JobQueue would block until
- * the client reads from their i2cp socket, causing all sorts of bad shit to
+ * the client reads from their i2cp socket, causing all sorts of bad things to
  * happen)
  *
- * @author zzz modded to use concurrent
  */
 class ClientWriterRunner implements Runnable {
     private final BlockingQueue<I2CPMessage> _messagesToWrite;
@@ -22,10 +22,12 @@ class ClientWriterRunner implements Runnable {
     private final Log _log;
     private final long _id;
     private static long __id = 0;
+
+    private static final int QUEUE_SIZE = 256;
     
     public ClientWriterRunner(RouterContext context, ClientConnectionRunner runner) {
         _log = context.logManager().getLog(ClientWriterRunner.class);
-        _messagesToWrite = new LinkedBlockingQueue();
+        _messagesToWrite = new LinkedBlockingQueue(QUEUE_SIZE);
         _runner = runner;
         _id = ++__id;
     }
@@ -33,13 +35,14 @@ class ClientWriterRunner implements Runnable {
     /**
      * Add this message to the writer's queue
      *
+     * Nonblocking, throws exception if queue is full
      */
-    public void addMessage(I2CPMessage msg) {
-        try {
-            _messagesToWrite.put(msg);
-        } catch (InterruptedException ie) {}
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("["+_id+"] addMessage completed for " + msg.getClass().getName());
+    public void addMessage(I2CPMessage msg) throws I2CPMessageException {
+        boolean success = _messagesToWrite.offer(msg);
+        if (!success)
+            throw new I2CPMessageException("I2CP write to queue failed");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("["+_id+"] addMessage completed for " + msg.getClass().getName());
     }
 
     /**
