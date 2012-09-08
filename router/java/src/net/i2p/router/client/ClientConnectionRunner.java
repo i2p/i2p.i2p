@@ -375,7 +375,9 @@ class ClientConnectionRunner {
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
         if (_dead) return;
         MessageReceivedJob j = new MessageReceivedJob(_context, this, toDest, fromDest, payload);
-        _context.jobQueue().addJob(j);//j.runJob();
+        // This is fast and non-blocking, run in-line
+        //_context.jobQueue().addJob(j);
+        j.runJob();
     }
     
     /**

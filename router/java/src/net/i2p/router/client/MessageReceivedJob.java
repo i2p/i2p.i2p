@@ -25,6 +25,7 @@ class MessageReceivedJob extends JobImpl {
     private final Log _log;
     private final ClientConnectionRunner _runner;
     private final Payload _payload;
+
     public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest, Destination fromDest, Payload payload) {
         super(ctx);
         _log = ctx.logManager().getLog(MessageReceivedJob.class);
@@ -33,6 +34,7 @@ class MessageReceivedJob extends JobImpl {
     }
     
     public String getName() { return "Deliver New Message"; }
+
     public void runJob() {
         if (_runner.isDead()) return;
         MessageId id = new MessageId();
@@ -44,7 +46,7 @@ class MessageReceivedJob extends JobImpl {
     /**
      * Deliver notification to the client that the given message is available.
      */
-    public void messageAvailable(MessageId id, long size) {
+    private void messageAvailable(MessageId id, long size) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending message available: " + id + " to sessionId " + _runner.getSessionId() 
                        + " (with nonce=1)", new Exception("available"));
