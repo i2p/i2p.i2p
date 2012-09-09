@@ -43,7 +43,7 @@ public class Clock implements Timestamper.UpdateListener {
     /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
     protected Log getLog() { return _context.logManager().getLog(Clock.class); }
 
-    /** if the clock is skewed by 3+ days, fuck 'em */
+    /** if the clock is skewed by 3+ days, forget it */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
     /** after we've started up and shifted the clock, don't allow shifts of more than 10 minutes */
     public final static long MAX_LIVE_OFFSET = 10 * 60 * 1000;
@@ -67,7 +67,7 @@ public class Clock implements Timestamper.UpdateListener {
      *
      * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
-    public void setOffset(long offsetMs, boolean force) {
+    public synchronized void setOffset(long offsetMs, boolean force) {
         if (false) return;
         long delta = offsetMs - _offset;
         if (!force) {

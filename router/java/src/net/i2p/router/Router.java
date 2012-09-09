@@ -1056,6 +1056,7 @@ public class Router implements RouterClock.ClockShiftListener {
             return;
         if (delta > -60*1000 && delta < 60*1000)
             return;
+        _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
         _context.routingKeyGenerator().generateDateBasedModData();
         if (_context.commSystem().countActivePeers() <= 0)

@@ -91,7 +91,7 @@ public class RouterClock extends Clock {
      * @since 0.7.12
      * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
-    private void setOffset(long offsetMs, boolean force, int stratum) {
+    private synchronized void setOffset(long offsetMs, boolean force, int stratum) {
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
@@ -236,7 +236,7 @@ public class RouterClock extends Clock {
      *
      *  @since 0.8.8
      */
-    private void notifyMassive(long shift) {
+    private synchronized void notifyMassive(long shift) {
         long nowNanos = System.nanoTime();
         // try to prevent dups, not guaranteed
         // nanoTime() isn't guaranteed to be monotonic either :(
