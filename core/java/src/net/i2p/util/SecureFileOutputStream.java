@@ -15,8 +15,7 @@ import net.i2p.I2PAppContext;
  */
 public class SecureFileOutputStream extends FileOutputStream {
 
-    private static final boolean oneDotSix =
-        (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0;
+    private static final boolean oneDotSix = SystemVersion.isJava6();
 
     /**
      *  Sets output file to mode 600

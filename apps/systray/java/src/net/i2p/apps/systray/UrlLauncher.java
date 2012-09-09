@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.ShellCommand;
+import net.i2p.util.SystemVersion;
 
 /**
  * A quick and simple multi-platform URL launcher. It attempts to launch the
@@ -124,7 +125,7 @@ public class UrlLauncher {
                 if (_shellCommand.executeSilentAndWaitTimed("iexplore " + url, 5))
                     return true;
 
-            } else if (osName.startsWith("Windows")) {
+            } else if (SystemVersion.isWindows()) {
 
                 String         browserString  = "\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" -nohome";
                 BufferedReader bufferedReader = null;

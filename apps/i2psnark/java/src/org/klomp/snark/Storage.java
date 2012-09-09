@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.crypto.SHA1;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
+import net.i2p.util.SystemVersion;
 
 /**
  * Maintains pieces on disk. Can be used to store and retrieve pieces.
@@ -77,7 +78,7 @@ public class Storage
 
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap();
 
-  private static final boolean _isWindows = System.getProperty("os.name").startsWith("Win");
+  private static final boolean _isWindows = SystemVersion.isWindows();
 
   /**
    * Creates a new storage based on the supplied MetaInfo.  This will

@@ -5,7 +5,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-import net.i2p.util.VersionComparator;
+import net.i2p.util.SystemVersion;
 
 /**
  * Get the MTU for the network interface of an address.
@@ -14,8 +14,7 @@ import net.i2p.util.VersionComparator;
  */
 abstract class MTU {
 
-    private static final boolean hasMTU =
-        (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0;
+    private static final boolean hasMTU = SystemVersion.isJava6();
     
     /**
      * The MTU for the socket interface, if available.

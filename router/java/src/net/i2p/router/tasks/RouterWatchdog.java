@@ -11,6 +11,7 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.ShellCommand;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Periodically check to make sure things haven't gone totally haywire (and if
@@ -112,7 +113,7 @@ public class RouterWatchdog implements Runnable {
                 // This works on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
-                if (_context.hasWrapper() && !System.getProperty("os.name").startsWith("Win")) {
+                if (_context.hasWrapper() && !SystemVersion.isWindows()) {
                     ShellCommand sc = new ShellCommand();
                     File i2pr = new File(_context.getBaseDir(), "i2prouter");
                     String[] args = new String[2];

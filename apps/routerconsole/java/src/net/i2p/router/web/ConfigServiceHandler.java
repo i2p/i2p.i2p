@@ -8,6 +8,7 @@ import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 import org.tanukisoftware.wrapper.WrapperManager;
@@ -140,7 +141,7 @@ public class ConfigServiceHandler extends FormHandler {
      */
     synchronized static void registerSignalHandler(RouterContext ctx) {
         if (ctx.hasWrapper() && _wrapperListener == null &&
-            !System.getProperty("os.name").startsWith("Win")) {
+            !SystemVersion.isWindows()) {
             String wv = System.getProperty("wrapper.version");
             if (wv != null && (new VersionComparator()).compare(wv, LISTENER_AVAILABLE) >= 0) {
                 try {

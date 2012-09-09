@@ -158,15 +158,15 @@ public class NativeBigInteger extends BigInteger {
     /**
      * Operating systems
      */
-    private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
+    private static final boolean _isWin = SystemVersion.isWindows();
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
-    private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
+    private static final boolean _isMac = SystemVersion.isMac();
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
     private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
     private static final boolean _isNetbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("netbsd");
     private static final boolean _isOpenbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("openbsd");
     private static final boolean _isSunos = System.getProperty("os.name").toLowerCase(Locale.US).contains("sunos");
-    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+    private static final boolean _isAndroid = SystemVersion.isAndroid();
 
     /*
      * This isn't always correct.
@@ -178,8 +178,7 @@ public class NativeBigInteger extends BigInteger {
      * sun.arch.data.model == 32 => A 32 bit JVM but could be either 32 or 64 bit processor or libs
      * os.arch contains "64" could be 32 or 64 bit libs
      */
-    private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
-                                         System.getProperty("os.arch").contains("64");
+    private static final boolean _is64 = SystemVersion.is64Bit();
 
     private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
 	                                 System.getProperty("os.arch").equals("amd64");

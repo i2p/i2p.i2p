@@ -13,6 +13,7 @@ import java.util.Properties;
 import net.i2p.data.DataHelper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Get a working directory for i2p.
@@ -69,7 +70,7 @@ public class WorkingDir {
             dir = envProps.getProperty(PROP_WORKING_DIR);
         if (dir == null)
             dir = System.getProperty(PROP_WORKING_DIR);
-        boolean isWindows = System.getProperty("os.name").startsWith("Win");
+        boolean isWindows = SystemVersion.isWindows();
         File dirf = null;
         if (dir != null) {
             dirf = new SecureDirectory(dir);

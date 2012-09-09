@@ -23,6 +23,7 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
@@ -418,7 +419,7 @@ public class StatSummarizer implements Runnable {
         FileUtil.rmdir(rrdDir, false);
     }
 
-    private static final boolean IS_WIN = System.getProperty("os.name").startsWith("Win");
+    private static final boolean IS_WIN = SystemVersion.isWindows();
 
     /** translate a string */
     private String _(String s) {

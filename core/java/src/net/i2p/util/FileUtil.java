@@ -452,7 +452,7 @@ public class FileUtil {
         if (!from.exists())
             return false;
         boolean success = false;
-        boolean isWindows = System.getProperty("os.name").startsWith("Win");
+        boolean isWindows = SystemVersion.isWindows();
         // overwrite fails on windows
         if (!isWindows)
             success = from.renameTo(to);

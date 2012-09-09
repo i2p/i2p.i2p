@@ -11,6 +11,7 @@ import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SystemVersion;
 
 /**
  * Lowest level component to pull raw UDP datagrams off the wire as fast
@@ -32,7 +33,7 @@ class UDPReceiver {
     private static int __id;
     private final int _id;
 
-    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+    private static final boolean _isAndroid = SystemVersion.isAndroid();
 
     private static final int TYPE_POISON = -99999;
     private static final int MIN_QUEUE_SIZE = 16;

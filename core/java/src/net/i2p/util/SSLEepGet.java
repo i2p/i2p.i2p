@@ -91,7 +91,7 @@ public class SSLEepGet extends EepGet {
     /** may be null if init failed */
     private SavingTrustManager _stm;
 
-    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+    private static final boolean _isAndroid = SystemVersion.isAndroid();
 
     /**
      *  A new SSLEepGet with a new SSLState

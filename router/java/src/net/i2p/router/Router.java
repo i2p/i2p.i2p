@@ -52,6 +52,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SystemVersion;
 
 /**
  * Main driver for the router.
@@ -207,7 +208,7 @@ public class Router implements RouterClock.ClockShiftListener {
         List<RouterContext> contexts = RouterContext.getContexts();
         if (contexts.isEmpty()) {
             RouterContext.killGlobalContext();
-        } else if (System.getProperty("java.vendor").contains("Android")) {
+        } else if (SystemVersion.isAndroid()) {
             System.err.println("Warning: Killing " + contexts.size() + " other routers in this JVM");
             contexts.clear();
             RouterContext.killGlobalContext();
@@ -260,7 +261,7 @@ public class Router implements RouterClock.ClockShiftListener {
         // *********  Start no threads before here ********* //
         //
         // NOW we can start the ping file thread.
-        if (!System.getProperty("java.vendor").contains("Android"))
+        if (!SystemVersion.isAndroid())
             beginMarkingLiveliness();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
@@ -888,7 +889,7 @@ public class Router implements RouterClock.ClockShiftListener {
             //Runtime.getRuntime().halt(exitCode);
             // allow the Runtime shutdown hooks to execute
             Runtime.getRuntime().exit(exitCode);
-        } else if (System.getProperty("java.vendor").contains("Android")) {
+        } else if (SystemVersion.isAndroid()) {
             Runtime.getRuntime().gc();
         }
     }
@@ -1217,8 +1218,8 @@ public class Router implements RouterClock.ClockShiftListener {
             String osArch = System.getProperty("os.arch");
             boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
             String osName = System.getProperty("os.name").toLowerCase(Locale.US);
-            boolean isWin = osName.startsWith("win");
-            boolean isMac = osName.startsWith("mac");
+            boolean isWin = SystemVersion.isWindows();
+            boolean isMac = SystemVersion.isMac();
             // only do this on these OSes
             boolean goodOS = isWin || isMac ||
                              osName.contains("linux") || osName.contains("freebsd");

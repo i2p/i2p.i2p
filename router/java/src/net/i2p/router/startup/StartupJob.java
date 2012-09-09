@@ -11,6 +11,7 @@ package net.i2p.router.startup;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.util.SystemVersion;
 
 /**
  * The StartupJob should be run once on router startup to initialize the system
@@ -33,7 +34,7 @@ public class StartupJob extends JobImpl {
 
     public String getName() { return "Startup Router"; }
     public void runJob() {
-        if (!System.getProperty("java.vendor").contains("Android"))
+        if (!SystemVersion.isAndroid())
             getContext().jobQueue().addJob(new LoadClientAppsJob(getContext()));
         getContext().statPublisher().startup();
         getContext().jobQueue().addJob(new LoadRouterInfoJob(getContext()));

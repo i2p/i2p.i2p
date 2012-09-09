@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class SecureDirectory extends File {
 
-    protected static final boolean isNotWindows = !System.getProperty("os.name").startsWith("Win");
+    protected static final boolean isNotWindows = !SystemVersion.isWindows();
 
     public SecureDirectory(String pathname) {
         super(pathname);

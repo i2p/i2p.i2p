@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 
 import net.i2p.util.RandomSource;
+import net.i2p.util.SystemVersion;
 
 /**
  *
@@ -89,11 +90,17 @@ public class RandomIterator<E> implements Iterator<E> {
     /** Used to narrow the range to take random indexes from */
     private int lower, upper;
 
-    private static final boolean isAndroid = System.getProperty("java.vendor").contains("Android");
-
+    private static final boolean hasAndroidBug;
     static {
-        if (isAndroid)
-            testAndroid();
+        if (SystemVersion.isAndroid()) {
+            // only present on Gingerbread (API 11), but set if version check failed also
+            int ver = SystemVersion.getAndroidVersion();
+            hasAndroidBug = ver == 11 || ver == 0;
+            if (hasAndroidBug)
+                testAndroid();
+        } else {
+            hasAndroidBug = false;
+        }
     }
 
     public RandomIterator(List<E> list){
@@ -137,7 +144,7 @@ public class RandomIterator<E> implements Iterator<E> {
         if (hasNext()) {
             if (index == lower)
                 // workaround for Android ICS bug - see below
-                lower = isAndroid ? nextClearBit(index) : served.nextClearBit(index);
+                lower = hasAndroidBug ? nextClearBit(index) : served.nextClearBit(index);
             else if (index == upper)
                 upper = previousClearBit(index - 1);
         }
@@ -199,7 +206,7 @@ public class RandomIterator<E> implements Iterator<E> {
      *  @since 0.9.2
      */
     private static void testAndroid() {
-        System.out.println("checking for Android bug");
+        System.out.println("Checking for Android BitSet bug");
         BitSet theBitSet = new BitSet(864);
         for (int exp =0; exp < 864; exp++) {
             int act = theBitSet.nextClearBit(0);

@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
+import net.i2p.util.SystemVersion;
 
 
 /**
@@ -50,15 +51,15 @@ public class CPUID {
 
     private static final boolean isX86 = System.getProperty("os.arch").contains("86") ||
                                          System.getProperty("os.arch").equals("amd64");
-    private static final String libPrefix = (System.getProperty("os.name").startsWith("Win") ? "" : "lib");
-    private static final String libSuffix = (System.getProperty("os.name").startsWith("Win") ? ".dll" : ".so");
-    private static final boolean isWindows = System.getProperty("os.name").toLowerCase(Locale.US).contains("windows");
+    private static final boolean isWindows = SystemVersion.isWindows();
+    private static final String libPrefix = isWindows ? "" : "lib";
+    private static final String libSuffix = isWindows ? ".dll" : ".so";
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
     private static final boolean isNetbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("netbsd");
     private static final boolean isOpenbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("openbsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase(Locale.US).contains("sunos");
-    private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
+    private static final boolean isMac = SystemVersion.isMac();
 
 
     /**
@@ -71,8 +72,7 @@ public class CPUID {
      * sun.arch.data.model == 32 => A 32 bit JVM but could be either 32 or 64 bit processor or libs
      * os.arch contains "64" could be 32 or 64 bit libs
      */
-    private static final boolean is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
-                                        System.getProperty("os.arch").contains("64");
+    private static final boolean is64 = SystemVersion.is64Bit();
 
     static
     {

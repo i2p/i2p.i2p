@@ -37,6 +37,7 @@ import java.util.Map;
 
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Utility class providing methods to parse and write files in config file
@@ -49,7 +50,7 @@ import net.i2p.util.SecureFileOutputStream;
  */
 class ConfigParser {
 
-    private static final boolean isWindows = System.getProperty("os.name").startsWith("Win");
+    private static final boolean isWindows = SystemVersion.isWindows();
 
     /**
      * Strip the comments from a String. Lines that begin with '#' and ';' are

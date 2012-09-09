@@ -15,8 +15,7 @@ import java.io.PipedInputStream;
  */
 public class BigPipedInputStream extends PipedInputStream {
 
-    private static final boolean oneDotSix =
-        (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0;
+    private static final boolean oneDotSix = SystemVersion.isJava6();
 
     private static final int PIPE_SIZE = 64*1024;
 
