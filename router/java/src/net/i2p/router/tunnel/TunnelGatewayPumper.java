@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Run through the tunnel gateways that have had messages added to them and push
@@ -22,15 +25,23 @@ import net.i2p.util.I2PThread;
 class TunnelGatewayPumper implements Runnable {
     private final RouterContext _context;
     private final Set<PumpedTunnelGateway> _wantsPumping;
+    private final Set<PumpedTunnelGateway> _backlogged;
     private volatile boolean _stop;
     private static final int MIN_PUMPERS = 1;
     private static final int MAX_PUMPERS = 4;
     private final int _pumpers;
+
+    /**
+     *  Wait just a little, but this lets the pumper queue back up.
+     *  See additional comments in PTG.
+     */
+    private static final long REQUEUE_TIME = 50;
     
     /** Creates a new instance of TunnelGatewayPumper */
     public TunnelGatewayPumper(RouterContext ctx) {
         _context = ctx;
         _wantsPumping = new LinkedHashSet(16);
+        _backlogged = new HashSet(16);
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
@@ -57,7 +68,7 @@ class TunnelGatewayPumper implements Runnable {
     public void wantsPumping(PumpedTunnelGateway gw) {
         if (!_stop) {
             synchronized (_wantsPumping) {
-                if (_wantsPumping.add(gw))
+                if ((!_backlogged.contains(gw)) && _wantsPumping.add(gw))
                     _wantsPumping.notify();
             }
         }
@@ -66,9 +77,17 @@ class TunnelGatewayPumper implements Runnable {
     public void run() {
         PumpedTunnelGateway gw = null;
         List<PendingGatewayMessage> queueBuf = new ArrayList(32);
+        boolean requeue = false;
         while (!_stop) {
             try {
                 synchronized (_wantsPumping) {
+                    if (requeue && gw != null) {
+                        // in case another packet came in
+                        _wantsPumping.remove(gw);
+                        if (_backlogged.add(gw))
+                            _context.simpleScheduler().addEvent(new Requeue(gw), REQUEUE_TIME);
+                    }
+                    gw = null;
                     if (_wantsPumping.isEmpty()) {
                         _wantsPumping.wait();
                     } else {
@@ -81,11 +100,27 @@ class TunnelGatewayPumper implements Runnable {
             if (gw != null) {
                 if (gw.getMessagesSent() == POISON_PTG)
                     break;
-                gw.pump(queueBuf);
-                gw = null;
+                requeue = gw.pump(queueBuf);
             }
         }
     }
+
+    private class Requeue implements SimpleTimer.TimedEvent {
+        private final PumpedTunnelGateway _ptg;
+
+        public Requeue(PumpedTunnelGateway ptg) {
+            _ptg = ptg;
+        }
+
+        public void timeReached() {
+            synchronized (_wantsPumping) {
+                _backlogged.remove(_ptg);
+                if (_wantsPumping.add(_ptg))
+                    _wantsPumping.notify();
+            }
+        }
+    }
+
 
     private static final int POISON_PTG = -99999;
 

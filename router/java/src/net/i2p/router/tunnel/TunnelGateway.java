@@ -183,6 +183,13 @@ class TunnelGateway {
          * @return message ID it was sent in, or -1 if it had to be deferred
          */
         public long receiveEncrypted(byte encrypted[]);
+
+        /**
+         * The next hop
+         * @return non-null
+         * @since 0.9.3
+         */
+        public Hash getSendTo();
     }
 
     protected class DelayedFlush extends SimpleTimer2.TimedEvent {

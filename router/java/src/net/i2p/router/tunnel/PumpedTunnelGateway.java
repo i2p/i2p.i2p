@@ -39,9 +39,14 @@ class PumpedTunnelGateway extends TunnelGateway {
     private final BlockingQueue<PendingGatewayMessage> _prequeue;
     private final TunnelGatewayPumper _pumper;
     private final boolean _isInbound;
+    private final Hash _nextHop;
     
-    private static final int MAX_OB_MSGS_PER_PUMP = 16;
-    private static final int MAX_IB_MSGS_PER_PUMP = 8;
+    /**
+     *  warning - these limit total messages per second throughput due to
+     *  requeue delay in TunnelGatewayPumper to max * 1000 / REQUEUE_TIME
+     */
+    private static final int MAX_OB_MSGS_PER_PUMP = 64;
+    private static final int MAX_IB_MSGS_PER_PUMP = 24;
     private static final int INITIAL_OB_QUEUE = 64;
     private static final int MAX_IB_QUEUE = 1024;
 
@@ -53,15 +58,23 @@ class PumpedTunnelGateway extends TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
+    public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor,
+                               Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
         super(context, preprocessor, sender, receiver);
         if (getClass() == PumpedTunnelGateway.class) {
             // Unbounded priority queue for outbound
             _prequeue = new CoDelPriorityBlockingQueue(context, "OBGW", INITIAL_OB_QUEUE);
+            _nextHop = receiver.getSendTo();
             _isInbound = false;
-        } else {  // extended by ThrottledPTG for IB
+        } else if (receiver != null) {  // extended by ThrottledPTG for IB
             // Bounded non-priority queue for inbound
             _prequeue = new CoDelBlockingQueue(context, "IBGW", MAX_IB_QUEUE);
+            _nextHop = receiver.getSendTo();
+            _isInbound = true;
+        } else {
+            // Poison PTG
+            _prequeue = null;
+            _nextHop = null;
             _isInbound = true;
         }
         _pumper = pumper;
@@ -103,15 +116,25 @@ class PumpedTunnelGateway extends TunnelGateway {
      *
      * @param queueBuf Empty list for convenience, to use as a temporary buffer.
      *                 Must be empty when called; will always be emptied before return.
+     * @return true if we did not finish, and the pumper should be requeued.
      */
-    void pump(List<PendingGatewayMessage> queueBuf) {
-        // TODO if an IBGW, and the next hop is backlogged,
-        // drain less or none... better to let things back up here.
-        // Don't do this for OBGWs?
-        int max = _isInbound ? MAX_IB_MSGS_PER_PUMP : MAX_OB_MSGS_PER_PUMP;
+    public boolean pump(List<PendingGatewayMessage> queueBuf) {
+        // If the next hop is backlogged,
+        // drain only a little... better to let things back up here,
+        // before fragmentation, where we have priority queueing (for OBGW)
+        int max;
+        boolean backlogged = _context.commSystem().isBacklogged(_nextHop);
+        if (backlogged && _log.shouldLog(Log.INFO))
+            _log.info("PTG backlogged, queued to " + _nextHop + " : " + _prequeue.size() +
+                      " IB? " + _isInbound);
+        if (backlogged)
+            max = _isInbound ? 1 : 2;
+        else
+            max = _isInbound ? MAX_IB_MSGS_PER_PUMP : MAX_OB_MSGS_PER_PUMP;
         _prequeue.drainTo(queueBuf, max);
         if (queueBuf.isEmpty())
-            return;
+            return false;
+        boolean rv = !_prequeue.isEmpty();
 
         long startAdd = System.currentTimeMillis();
         long beforeLock = startAdd;
@@ -162,8 +185,10 @@ class PumpedTunnelGateway extends TunnelGateway {
                        + " queue flush: " + (complete-afterExpire));
         }
         queueBuf.clear();
-        if (!_prequeue.isEmpty())
-            _pumper.wantsPumping(this);
+        if (rv && _log.shouldLog(Log.INFO))
+            _log.info("PTG remaining to " + _nextHop + " : " + _prequeue.size() +
+                      " IB? " + _isInbound + " backlogged? " + backlogged);
+        return rv;
     }
     
 }

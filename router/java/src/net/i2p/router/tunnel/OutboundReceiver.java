@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel;
 
+import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.router.JobImpl;
@@ -12,6 +13,7 @@ import net.i2p.util.Log;
  * Receive the outbound message after it has been preprocessed and encrypted,
  * then forward it on to the first hop in the tunnel.
  *
+ * Not used for zero-hop OBGWs.
  */
 class OutboundReceiver implements TunnelGateway.Receiver {
     private final RouterContext _context;
@@ -53,6 +55,15 @@ class OutboundReceiver implements TunnelGateway.Receiver {
                                               new FailedJob(_context), MAX_LOOKUP_TIME);
             return -1;
         }
+    }
+
+    /**
+     * The next hop
+     * @return non-null
+     * @since 0.9.3
+     */
+    public Hash getSendTo() {
+        return _config.getPeer(1);
     }
 
     private void send(TunnelDataMessage msg, RouterInfo ri) {
