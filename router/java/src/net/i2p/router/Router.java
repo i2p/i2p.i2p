@@ -766,6 +766,9 @@ public class Router implements RouterClock.ClockShiftListener {
      *  NOT to be called by others, use shutdown().
      */
     public void shutdown2(int exitCode) {
+        // help us shut down esp. after OOM
+        int priority = (exitCode == EXIT_OOM) ? Thread.MAX_PRIORITY - 1 : Thread.NORM_PRIORITY + 2;
+        Thread.currentThread().setPriority(priority);
         _shutdownInProgress = true;
         _log.log(Log.CRIT, "Starting final shutdown(" + exitCode + ')');
         // So we can get all the way to the end

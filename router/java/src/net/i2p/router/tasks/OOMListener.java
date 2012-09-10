@@ -18,6 +18,8 @@ public class OOMListener implements I2PThread.OOMEventListener {
     }
 
     public void outOfMemory(OutOfMemoryError oom) { 
+        // boost priority to help us shut down
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY - 1);
         Router.clearCaches();
         Log log = _context.logManager().getLog(Router.class);
         log.log(Log.CRIT, "Thread ran out of memory, shutting down I2P", oom);
