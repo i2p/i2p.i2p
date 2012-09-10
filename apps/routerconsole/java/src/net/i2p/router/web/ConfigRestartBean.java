@@ -59,7 +59,7 @@ public class ConfigRestartBean {
         boolean restarting = isRestarting(ctx);
         long timeRemaining = ctx.router().getShutdownTimeRemaining();
         StringBuilder buf = new StringBuilder(128);
-        if ((shuttingDown || restarting) && timeRemaining <= 0) {
+        if ((shuttingDown || restarting) && timeRemaining <= 5*1000) {
             buf.append("<h4>");
             if (restarting)
                 buf.append(_("Restart imminent", ctx));
