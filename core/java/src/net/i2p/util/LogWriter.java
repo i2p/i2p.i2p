@@ -77,7 +77,7 @@ class LogWriter implements Runnable {
                 LogRecord rec;
                 int dupCount = 0;
                 while ((rec = records.poll()) != null) {
-                    if (rec.equals(last)) {
+                    if (_manager.shouldDropDuplicates() && rec.equals(last)) {
                         dupCount++;
                     } else {
                         if (dupCount > 0) {

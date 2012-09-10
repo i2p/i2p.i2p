@@ -58,6 +58,8 @@ public class LogManager {
     private static final String PROP_LOG_BUFFER_SIZE = "logger.logBufferSize";
     /** @since 0.9.2 */
     private static final String PROP_DROP = "logger.dropOnOverflow";
+    /** @since 0.9.3 */
+    private static final String PROP_DUP = "logger.dropDuplicates";
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
     public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
@@ -120,6 +122,7 @@ public class LogManager {
     private final LogConsoleBuffer _consoleBuffer;
     private int _logBufferSize = MAX_BUFFER;
     private boolean _dropOnOverflow;
+    private boolean _dropDuplicates;
     private final AtomicLong _droppedRecords = new AtomicLong();
     
     private boolean _alreadyNoticedMissingConfig;
@@ -280,6 +283,13 @@ public class LogManager {
     }
 
     /**
+     *  @since 0.9.3
+     */
+    boolean shouldDropDuplicates() {
+        return _dropDuplicates;
+    }
+
+    /**
      * Do not log here, deadlock of LogWriter via rereadConfig().
      */
     private void loadConfig() {
@@ -368,7 +378,9 @@ public class LogManager {
                 _logBufferSize = Integer.parseInt(str);
         } catch (NumberFormatException nfe) {}
 
-        _dropOnOverflow = Boolean.valueOf(config.getProperty(PROP_DROP)).booleanValue();
+        _dropOnOverflow = Boolean.parseBoolean(config.getProperty(PROP_DROP));
+        String str = config.getProperty(PROP_DUP);
+        _dropDuplicates = str == null || Boolean.parseBoolean(str);
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Log set to use the base log file as " + _baseLogfilename);
