@@ -1,3 +1,9 @@
+2012-09-10 meeh
+ * Added fix for startup issues on newer versions of launchd (osx startup scripts)
+
+2012-09-05 meeh
+ * Added startup scripts for osx
+
 2012-09-04 zzz
  * I2PTunnelServer: Clean shutdown after session exception
  * OutNetMessage: Speedup after profiling (ticket #707 - thx dg, kytv, zab)
