@@ -368,9 +368,13 @@ public class SimpleTimer2 {
             long time = System.currentTimeMillis() - before;
             if (time > 500 && _log.shouldLog(Log.WARN))
                 _log.warn(_pool + " wtf, event execution took " + time + ": " + this);
-            long completed = _pool.getCompletedTaskCount();
-            if (_log.shouldLog(Log.INFO) && completed % 250  == 0)
-                _log.info(_pool.debug());
+            if (_log.shouldLog(Log.INFO)) {
+                 // this call is slow - iterates through a HashMap -
+                 // would be better to have a local AtomicLong if we care
+                 long completed = _pool.getCompletedTaskCount();
+                 if (completed % 250 == 0)
+                     _log.info(_pool.debug());
+            }
         }
 
         /** 
@@ -387,6 +391,7 @@ public class SimpleTimer2 {
         return _name;
     }
 
+    /** warning - slow */
     private long getCompletedTaskCount() {
         return _executor.getCompletedTaskCount();
     }

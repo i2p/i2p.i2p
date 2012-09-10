@@ -449,7 +449,8 @@ class PersistentDataStore extends TransientDataStore {
                             // so add it here.
                             getContext().profileManager().heardAbout(ri.getIdentity().getHash(), ri.getPublished());
                         } catch (IllegalArgumentException iae) {
-                            _log.info("Refused locally loaded routerInfo - deleting", iae);
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Refused locally loaded routerInfo - deleting", iae);
                             corrupt = true;
                         }
                     }
@@ -524,10 +525,12 @@ class PersistentDataStore extends TransientDataStore {
         File f = new File(dir, riName);
         if (f.exists()) {
             boolean removed = f.delete();
-            if (!removed)
-                _log.warn("Unable to remove router info at " + f.getAbsolutePath());
-            else
+            if (!removed) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to remove router info at " + f.getAbsolutePath());
+            } else if (_log.shouldLog(Log.INFO)) {
                 _log.info("Removed router info at " + f.getAbsolutePath());
+            }
             return;
         }
     }

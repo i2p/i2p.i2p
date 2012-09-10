@@ -389,7 +389,8 @@ class MessageOutputStream extends OutputStream {
         // should we? To be researched further.
         // false -> wait for completion, not just accept.
         flush(false);
-        _log.debug("Output stream closed after writing " + _written);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Output stream closed after writing " + _written);
         ByteArray ba = null;
         synchronized (_dataLock) {
             if (_buf != null) {

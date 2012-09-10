@@ -174,9 +174,13 @@ public class SimpleScheduler {
             long time = System.currentTimeMillis() - before;
             if (time > 1000 && _log.shouldLog(Log.WARN))
                 _log.warn(_name + " wtf, event execution took " + time + ": " + _timedEvent);
-            long completed = _executor.getCompletedTaskCount();
-            if (_log.shouldLog(Log.INFO) && completed % 250  == 0)
-                _log.info(debug());
+            if (_log.shouldLog(Log.INFO)) {
+                 // this call is slow - iterates through a HashMap -
+                 // would be better to have a local AtomicLong if we care
+                 long completed = _executor.getCompletedTaskCount();
+                 if (completed % 250 == 0)
+                     _log.info(debug());
+            }
         }
     }
 
