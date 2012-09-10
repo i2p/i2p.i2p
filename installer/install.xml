@@ -137,10 +137,7 @@
             <parsable targetfile="$INSTALL_PATH/eepget.bat" type="shell" os="windows" />
             <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/Start I2P Router.app/Contents/MacOS/i2prouter" type="shell" os="mac" />
-            <parsable targetfile="$INSTALL_PATH/net.i2p.router.plist.template" type="shell" os="mac" />
-            <parsable targetfile="$INSTALL_PATH/install_i2p_service_osx.command" type="shell" os="mac" />
-            <parsable targetfile="$INSTALL_PATH/uninstall_i2p_service_osx.command" type="shell" os="mac" />
-            
+
 	    <conditions>
 	        <condition type="variable" id="is64bit">
 	            <name>SYSTEM_sun_arch_data_model</name>
