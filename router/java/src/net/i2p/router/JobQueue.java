@@ -55,6 +55,7 @@ public class JobQueue {
     private boolean _alive;
     
     private final Object _jobLock;
+    private volatile long _nextPumperRun;
     
     /** how many when we go parallel */
     private static final int RUNNERS;
@@ -187,7 +188,9 @@ public class JobQueue {
                     } else {
                         _timedJobs.add(job);
                         // only notify for _timedJobs, as _readyJobs does not use that lock
-                        _jobLock.notifyAll();
+                        // only notify if sooner, to reduce contention
+                        if (job.getTiming().getStartAfter() < _nextPumperRun)
+                            _jobLock.notifyAll();
                     }
                 }
             }
@@ -225,6 +228,9 @@ public class JobQueue {
         return false;
     }
     
+    /**
+     *  @deprecated contention - see JobTiming.setStartAfter() comments
+     */
     public void timingUpdated() {
         synchronized (_jobLock) {
             _jobLock.notifyAll();
@@ -518,6 +524,7 @@ public class JobQueue {
                                     timeToWait = 10*1000;
                                 //if (_log.shouldLog(Log.DEBUG))
                                 //    _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
+                                _nextPumperRun = _context.clock().now() + timeToWait;
                                 _jobLock.wait(timeToWait);
                         } // synchronize (_jobLock)
                     } catch (InterruptedException ie) {}

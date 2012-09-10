@@ -43,7 +43,7 @@ public class JobTiming implements Clock.ClockUpdateListener {
         // but...
         // ...
         // who cares?   this helps in the case where it is on the queue
-        _context.jobQueue().timingUpdated();
+        //_context.jobQueue().timingUpdated();
     }
     
     /**
