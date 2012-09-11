@@ -49,12 +49,16 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      *  @since 0.8.8
      */
     public void shutdown() {
-        _fortuna.shutdown();
+        synchronized(_fortuna) {
+            _fortuna.shutdown();
+        }
     }
 
     @Override
-    public synchronized void setSeed(byte buf[]) {
-      _fortuna.addRandomBytes(buf);
+    public void setSeed(byte buf[]) {
+        synchronized(_fortuna) {
+            _fortuna.addRandomBytes(buf);
+        }
     }
 
     /**
@@ -93,16 +97,21 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         //    return (int)((n * (long)nextBits(31)) >> 31);
         //}
 
-        int numBits = 0;
-        int remaining = n;
-        int rv = 0;
-        while (remaining > 0) {
-            remaining >>= 1;
-            rv += nextBits(8) << numBits*8;
-            numBits++;
+        // get at least 4 extra bits if possible for better
+        // distribution after the %
+        int numBits;
+        if (n > 0xfffff)
+            numBits = 31;
+        else if (n > 0xfff)
+            numBits = 24;
+        else if (n > 0xf)
+            numBits = 16;
+        else
+            numBits = 8;
+        int rv;
+        synchronized(_fortuna) {
+            rv = nextBits(numBits);
         }
-        if (rv < 0)
-            rv += n;
         return rv % n;
         
         //int bits, val;
@@ -121,7 +130,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     @Override
     public long nextLong(long n) {
         if (n == 0) return 0;
-        long rv = signedNextLong(n);
+        long rv = signedNextLong();
         if (rv < 0) 
             rv = 0 - rv;
         rv %= n;
@@ -129,25 +138,31 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     }
     
     @Override
-    public long nextLong() { return signedNextLong(Long.MAX_VALUE); }
+    public long nextLong() { return signedNextLong(); }
 
     /**
      * Implementation from Sun's java.util.Random javadocs
      */
-    private long signedNextLong(long n) {
-        return ((long)nextBits(32) << 32) + nextBits(32);
+    private long signedNextLong() {
+        synchronized(_fortuna) {
+            return ((long)nextBits(32) << 32) + nextBits(32);
+        }
     }
 
     @Override
-    public synchronized boolean nextBoolean() { 
-        // wasteful, might be worth caching the boolean byte later
-        byte val = _fortuna.nextByte();
-        return ((val & 0x01) == 1);
+    public boolean nextBoolean() { 
+        byte val;
+        synchronized(_fortuna) {
+            val = _fortuna.nextByte();
+        }
+        return ((val & 0x01) != 0);
     }
 
     @Override
-    public synchronized void nextBytes(byte buf[]) { 
-        _fortuna.nextBytes(buf);
+    public void nextBytes(byte buf[]) { 
+        synchronized(_fortuna) {
+            _fortuna.nextBytes(buf);
+        }
     }
 
     /**
@@ -156,8 +171,10 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      * @since 0.8.12
      */
     @Override
-    public synchronized void nextBytes(byte buf[], int offset, int length) {
-        _fortuna.nextBytes(buf, offset, length);
+    public void nextBytes(byte buf[], int offset, int length) {
+        synchronized(_fortuna) {
+            _fortuna.nextBytes(buf, offset, length);
+        }
     }
 
     /**
@@ -165,24 +182,35 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      */
     @Override
     public double nextDouble() { 
-        return (((long)nextBits(26) << 27) + nextBits(27)) / (double)(1L << 53);
+        long d;
+        synchronized(_fortuna) {
+            d = ((long)nextBits(26) << 27) + nextBits(27);
+        }
+        return d / (double)(1L << 53);
     }
+
     /**
      * Implementation from sun's java.util.Random javadocs 
      */
     @Override
     public float nextFloat() { 
-        return nextBits(24) / ((float)(1 << 24));
+        int d;
+        synchronized(_fortuna) {
+            d = nextBits(24);
+        }
+        return d / ((float)(1 << 24));
     }
+
     /**
      * Implementation from sun's java.util.Random javadocs 
      */
     @Override
-    public synchronized double nextGaussian() { 
-        if (_haveNextGaussian) {
-            _haveNextGaussian = false;
-            return _nextGaussian;
-        } else {
+    public double nextGaussian() { 
+        synchronized (this) {
+            if (_haveNextGaussian) {
+                _haveNextGaussian = false;
+                return _nextGaussian;
+            }
             double v1, v2, s;
             do { 
                 v1 = 2 * nextDouble() - 1;   // between -1.0 and 1.0
@@ -197,10 +225,12 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     }
 
     /**
-     * Pull the next numBits of random data off the fortuna instance (returning -2^numBits-1
+     * Pull the next numBits of random data off the fortuna instance (returning 0
      * through 2^numBits-1
+     *
+     * Caller must synchronize!
      */
-    protected synchronized int nextBits(int numBits) {
+    protected int nextBits(int numBits) {
         long rv = 0;
         int bytes = (numBits + 7) / 8;
         for (int i = 0; i < bytes; i++)
@@ -218,14 +248,18 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
  
     /** reseed the fortuna */
     @Override
-    public synchronized void feedEntropy(String source, long data, int bitoffset, int bits) {
-        _fortuna.addRandomByte((byte)(data & 0xFF));
+    public void feedEntropy(String source, long data, int bitoffset, int bits) {
+        synchronized(_fortuna) {
+            _fortuna.addRandomByte((byte)(data & 0xFF));
+        }
     }
  
     /** reseed the fortuna */
     @Override
-    public synchronized void feedEntropy(String source, byte[] data, int offset, int len) {
-        _fortuna.addRandomBytes(data, offset, len);
+    public void feedEntropy(String source, byte[] data, int offset, int len) {
+        synchronized(_fortuna) {
+            _fortuna.addRandomBytes(data, offset, len);
+        }
     }
     
 /*****

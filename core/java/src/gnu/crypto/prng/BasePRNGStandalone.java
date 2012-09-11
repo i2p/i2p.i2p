@@ -55,7 +55,7 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
    // -------------------------------------------------------------------------
 
    /** The canonical name prefix of the PRNG algorithm. */
-   protected String name;
+   protected final String name;
 
    /** Indicate if this instance has already been initialised or not. */
    protected boolean initialised;
@@ -75,10 +75,7 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
     * @param name the canonical name of this instance.
     */
    protected BasePRNGStandalone(String name) {
-      super();
-
       this.name = name;
-      initialised = false;
       buffer = new byte[0];
    }
 

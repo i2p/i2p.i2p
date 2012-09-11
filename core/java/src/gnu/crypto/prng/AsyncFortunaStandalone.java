@@ -14,7 +14,7 @@ import net.i2p.util.Log;
  *
  * Note that this class is not fully Thread safe!
  * The following methods must be synchronized externally, they are not
- * sycned here or in super():
+ * synced here or in super():
  *   addRandomByte(), addRandomBytes(), nextByte(), nextBytes(), seed()
  *
  */
