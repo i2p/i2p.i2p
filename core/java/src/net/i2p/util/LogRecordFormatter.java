@@ -87,7 +87,7 @@ class LogRecordFormatter {
         return toString(logRecord.getThreadName(), MAX_THREAD_LENGTH);
     }
 
-    private static String getWhen(LogManager manager, LogRecord logRecord) {
+    public static String getWhen(LogManager manager, LogRecord logRecord) {
         return manager.getDateFormat().format(new Date(logRecord.getDate()));
     }
 

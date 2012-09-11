@@ -44,6 +44,7 @@ fi
 # list specific files in core/ and router/ here, so we don't scan the whole tree
 ROUTERFILES="\
    ../../../core/java/src/net/i2p/data/DataHelper.java \
+   ../../../core/java/src/net/i2p/util/LogWriter.java \
    ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
    ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
    ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
