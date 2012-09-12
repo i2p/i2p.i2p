@@ -202,7 +202,26 @@ class ConnectionManager {
         _context.statManager().addRateData("stream.receiveActive", active, total);
         
         if (reject) {
-            PacketLocal reply = new PacketLocal(_context, synPacket.getOptionalFrom());
+            Destination from = synPacket.getOptionalFrom();
+            if (from == null)
+                return null;
+            if (_dayThrottler != null || _hourThrottler != null) {
+                Hash h = from.calculateHash();
+                if ((_hourThrottler != null && _hourThrottler.isThrottled(h)) ||
+                    (_dayThrottler != null && _dayThrottler.isThrottled(h)) ||
+                    (_defaultOptions.isAccessListEnabled() && !_defaultOptions.getAccessList().contains(h)) ||
+                    (_defaultOptions.isBlacklistEnabled() && _defaultOptions.getBlacklist().contains(h))) {
+                    // A signed RST packet + ElGamal + session tags is fairly expensive, so
+                    // once the hour/day limit is hit for a particular peer, don't even send it.
+                    // Ditto for blacklist / whitelist
+                    // This is a tradeoff, because it will keep retransmitting the SYN for a while,
+                    // thus more inbound, but let's not spend several KB on the outbound.
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Dropping RST to " + h);
+                    return null;
+                }
+            }
+            PacketLocal reply = new PacketLocal(_context, from);
             reply.setFlag(Packet.FLAG_RESET);
             reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
             reply.setAckThrough(synPacket.getSequenceNum());

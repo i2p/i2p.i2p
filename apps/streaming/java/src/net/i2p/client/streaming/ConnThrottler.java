@@ -38,12 +38,24 @@ class ConnThrottler {
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), period);
     }
 
-    /** increments before checking */
+    /**
+     *  Checks both individual and total. Increments before checking.
+     */
     boolean shouldThrottle(Hash h) {
         if (_totalMax > 0 && _currentTotal.incrementAndGet() > _totalMax)
             return true;
         if (_max > 0)
             return this.counter.increment(h) > _max;
+        return false;
+    }
+
+    /**
+     *  Checks individual count only. Does not increment.
+     *  @since 0.9.3
+     */
+    boolean isThrottled(Hash h) {
+        if (_max > 0)
+            return this.counter.count(h) > _max;
         return false;
     }
 
