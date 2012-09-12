@@ -55,13 +55,15 @@ class PeerState {
      * of rekeying.
      */
     private SessionKey _nextCipherKey;
+
     /**
      * The keying material used for the rekeying, or null if we are not in
      * the process of rekeying.
      */
-    private byte[] _nextKeyingMaterial;
+    //private byte[] _nextKeyingMaterial;
     /** true if we began the current rekeying, false otherwise */
-    private boolean _rekeyBeganLocally;
+    //private boolean _rekeyBeganLocally;
+
     /** when were the current cipher and MAC keys established/rekeyed? */
     private long _keyEstablishedTime;
 
@@ -81,6 +83,7 @@ class PeerState {
     private long _lastReceiveTime;
     /** how many consecutive messages have we sent and not received an ACK to */
     private int _consecutiveFailedSends;
+
     /** when did we last have a failed send (beginning of period) */
     // private long _lastFailedSendPeriod;
 
@@ -109,7 +112,7 @@ class PeerState {
      * have all of the packets received in the current second requested that
      * the previous second's ACKs be sent?
      */
-    private boolean _remoteWantsPreviousACKs;
+    //private boolean _remoteWantsPreviousACKs;
     /** how many bytes should we send to the peer in a second */
     private volatile int _sendWindowBytes;
     /** how many bytes can we send to the peer in the current second */
@@ -141,7 +144,8 @@ class PeerState {
     private final RemoteHostId _remoteHostId;
 
     /** if we need to contact them, do we need to talk to an introducer? */
-    private boolean _remoteRequiresIntroduction;
+    //private boolean _remoteRequiresIntroduction;
+
     /** 
      * if we are serving as an introducer to them, this is the the tag that
      * they can publish that, when presented to us, will cause us to send
@@ -179,10 +183,12 @@ class PeerState {
     private long _packetsTransmitted;
     /** how many packets were retransmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private long _packetsRetransmitted;
+
     /** how many packets were transmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
-    private long _packetsPeriodTransmitted;
-    private int _packetsPeriodRetransmitted;
-    private int _packetRetransmissionRate;
+    //private long _packetsPeriodTransmitted;
+    //private int _packetsPeriodRetransmitted;
+    //private int _packetRetransmissionRate;
+
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private long _packetsReceivedDuplicate;
     private long _packetsReceived;
@@ -279,7 +285,8 @@ class PeerState {
     public static final int LARGE_MTU = 1484;
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 3000; // 5000;
+    private static final int INIT_RTO = 4*1000;
+    private static final int MAX_RTO = 15*1000;
     
     public PeerState(RouterContext ctx, UDPTransport transport,
                      byte[] remoteIP, int remotePort, Hash remotePeer, boolean isInbound) {
@@ -301,12 +308,12 @@ class PeerState {
         _lastCongestionOccurred = -1;
         _remotePort = remotePort;
         _mtu = DEFAULT_MTU;
-        _mtuReceive = _mtu;
+        _mtuReceive = DEFAULT_MTU;
         _largeMTU = transport.getMTU();
         //_mtuLastChecked = -1;
         _lastACKSend = -1;
-        _rto = MIN_RTO;
-        _rtt = _rto/2;
+        _rto = INIT_RTO;
+        _rtt = INIT_RTO / 2;
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
@@ -351,12 +358,13 @@ class PeerState {
     /**
      * The keying material used for the rekeying, or null if we are not in
      * the process of rekeying.
-     * @deprecated unused
+     * deprecated unused
      */
-    public byte[] getNextKeyingMaterial() { return _nextKeyingMaterial; }
+    //public byte[] getNextKeyingMaterial() { return _nextKeyingMaterial; }
 
     /** true if we began the current rekeying, false otherwise */
-    public boolean getRekeyBeganLocally() { return _rekeyBeganLocally; }
+    //public boolean getRekeyBeganLocally() { return _rekeyBeganLocally; }
+
     /** when were the current cipher and MAC keys established/rekeyed? */
     public long getKeyEstablishedTime() { return _keyEstablishedTime; }
 
@@ -382,7 +390,7 @@ class PeerState {
      * have all of the packets received in the current second requested that
      * the previous second's ACKs be sent?
      */
-    public boolean getRemoteWantsPreviousACKs() { return _remoteWantsPreviousACKs; }
+    //public boolean getRemoteWantsPreviousACKs() { return _remoteWantsPreviousACKs; }
     /** how many bytes should we send to the peer in a second */
     public int getSendWindowBytes() { return _sendWindowBytes; }
     /** how many bytes can we send to the peer in the current second */
@@ -409,7 +417,7 @@ class PeerState {
     public int getRemotePort() { return _remotePort; }
 
     /** if we need to contact them, do we need to talk to an introducer? */
-    public boolean getRemoteRequiresIntroduction() { return _remoteRequiresIntroduction; }
+    //public boolean getRemoteRequiresIntroduction() { return _remoteRequiresIntroduction; }
 
     /** 
      * if we are serving as an introducer to them, this is the the tag that
@@ -475,13 +483,13 @@ class PeerState {
      * the process of rekeying.
      * @deprecated unused
      */
-    public void setNextKeyingMaterial(byte data[]) { _nextKeyingMaterial = data; }
+    //public void setNextKeyingMaterial(byte data[]) { _nextKeyingMaterial = data; }
 
     /**
      * @param local true if we began the current rekeying, false otherwise
      * @deprecated unused
      */
-    public void setRekeyBeganLocally(boolean local) { _rekeyBeganLocally = local; }
+    //public void setRekeyBeganLocally(boolean local) { _rekeyBeganLocally = local; }
 
     /**
      * when were the current cipher and MAC keys established/rekeyed?
@@ -536,7 +544,7 @@ class PeerState {
      * have all of the packets received in the current second requested that
      * the previous second's ACKs be sent?
      */
-    public void remoteDoesNotWantPreviousACKs() { _remoteWantsPreviousACKs = false; }
+    //public void remoteDoesNotWantPreviousACKs() { _remoteWantsPreviousACKs = false; }
     
     /** should we ignore the peer state's congestion window, and let anything through? */
     private static final boolean IGNORE_CWIN = false;
@@ -550,7 +558,12 @@ class PeerState {
      * not adjusted at all.
      */
     public boolean allocateSendingBytes(int size, int messagePushCount) { return allocateSendingBytes(size, false, messagePushCount); }
+
     public boolean allocateSendingBytes(int size, boolean isForACK) { return allocateSendingBytes(size, isForACK, -1); }
+
+    /**
+     *  Caller should synch
+     */
     public boolean allocateSendingBytes(int size, boolean isForACK, int messagePushCount) { 
         long now = _context.clock().now();
         long duration = now - _lastSendRefill;
@@ -591,7 +604,7 @@ class PeerState {
     }
     
     /** if we need to contact them, do we need to talk to an introducer? */
-    public void setRemoteRequiresIntroduction(boolean required) { _remoteRequiresIntroduction = required; }
+    //public void setRemoteRequiresIntroduction(boolean required) { _remoteRequiresIntroduction = required; }
 
     /** 
      * if we are serving as an introducer to them, this is the the tag that
@@ -1038,7 +1051,7 @@ class PeerState {
                        + " rttDev=" + _rttDeviation + " rto=" + _rto);
         if (_rto < minRTO())
             _rto = minRTO();
-        if (_rto > MAX_RTO)
+        else if (_rto > MAX_RTO)
             _rto = MAX_RTO;
     }
     
@@ -1124,10 +1137,11 @@ class PeerState {
     public long getMessagesReceived() { return _messagesReceived; }
     public long getPacketsTransmitted() { return _packetsTransmitted; }
     public long getPacketsRetransmitted() { return _packetsRetransmitted; }
-    public long getPacketsPeriodTransmitted() { return _packetsPeriodTransmitted; }
-    public int getPacketsPeriodRetransmitted() { return _packetsPeriodRetransmitted; }
+    //public long getPacketsPeriodTransmitted() { return _packetsPeriodTransmitted; }
+    //public int getPacketsPeriodRetransmitted() { return _packetsPeriodRetransmitted; }
+
     /** avg number of packets retransmitted for every 100 packets */
-    public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
+    //public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
     public long getPacketsReceived() { return _packetsReceived; }
     public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
 
@@ -1191,12 +1205,12 @@ class PeerState {
     }
 
     private int minRTO() {
-        if (_packetRetransmissionRate < 10)
+        //if (_packetRetransmissionRate < 10)
             return MIN_RTO;
-        else if (_packetRetransmissionRate < 50)
-            return 2*MIN_RTO;
-        else
-            return MAX_RTO;
+        //else if (_packetRetransmissionRate < 50)
+        //    return 2*MIN_RTO;
+        //else
+        //    return MAX_RTO;
     }
     
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
