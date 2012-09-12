@@ -1,3 +1,6 @@
+2012-09-12 kytv
+* Czech translation updates from Transifex
+
 2012-09-10 meeh
  * Added fix for startup issues on newer versions of launchd (osx startup scripts)
 
