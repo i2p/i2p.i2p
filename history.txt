@@ -1,3 +1,6 @@
+2012-09-13 kytv
+* Update geoip.txt based on Maxmind GeoLite Country database from 2012-09-05
+
 2012-09-12 kytv
 * Czech translation updates from Transifex
 
