@@ -157,6 +157,7 @@ class UDPEndpoint {
      *  @since 0.9.2
      */
     public void clearOutbound() {
-        _sender.clear();
+        if (_sender != null)
+            _sender.clear();
     }
 }
