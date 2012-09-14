@@ -19,8 +19,17 @@ import net.i2p.data.DataStructure;
  * @author jrandom
  */
 public interface I2NPMessage extends DataStructure {
-    final long MAX_ID_VALUE = (1l<<32l)-1l;
-    final int MAX_SIZE = 64*1024; // insane
+
+    /** 4 bytes unsigned */
+    public static final long MAX_ID_VALUE = (1l << 32) - 1l;
+
+    /**
+     * Nominal limit, actual max is much less.
+     * See website docs for further restrictions due to
+     * various overhead and limitations in encryption,
+     * fragmentation, and the transports.
+     */
+    public static final int MAX_SIZE = 64*1024;
     
     /**
      * Read the body into the data structures, after the initial type byte, using
