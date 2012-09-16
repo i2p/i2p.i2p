@@ -463,6 +463,7 @@ public class SingleFileNamingService extends NamingService {
         _fileLock.writeLock().unlock();
     }
 
+/****
     public static void main(String[] args) {
         NamingService ns = new SingleFileNamingService(I2PAppContext.getGlobalContext(), "hosts.txt");
         Destination d = new Destination();
@@ -482,4 +483,5 @@ public class SingleFileNamingService extends NamingService {
         b = !ns.putIfAbsent("bbbbb", d);
         System.out.println("Test 6 pass? " + b);
     }
+****/
 }

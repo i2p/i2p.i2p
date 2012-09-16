@@ -1188,6 +1188,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  BlockfileNamingService [force]
      *  force = force writable
      */
+/****
     public static void main(String[] args) {
         Properties ctxProps = new Properties();
         if (args.length > 0 && args[0].equals("force"))
@@ -1284,4 +1285,5 @@ public class BlockfileNamingService extends DummyNamingService {
         System.out.println("HTNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
         System.out.println("found " + found + " notfound " + notfound);
     }
+****/
 }
