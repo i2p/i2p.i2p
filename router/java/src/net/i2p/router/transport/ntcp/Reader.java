@@ -36,7 +36,7 @@ class Reader {
         _readAfterLive = new HashSet(8);
     }
     
-    public void startReading(int numReaders) {
+    public synchronized void startReading(int numReaders) {
         for (int i = 1; i <= numReaders; i++) {
             Runner r = new Runner();
             I2PThread t = new I2PThread(r, "NTCP reader " + i + '/' + numReaders, true);
@@ -45,7 +45,7 @@ class Reader {
         }
     }
 
-    public void stopReading() {
+    public synchronized void stopReading() {
         while (!_runners.isEmpty()) {
             Runner r = _runners.remove(0);
             r.stop();

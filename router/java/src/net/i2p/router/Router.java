@@ -66,6 +66,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private String _configFilename;
     private RouterInfo _routerInfo;
     public final Object routerInfoFileLock = new Object();
+    private final Object _configFileLock = new Object();
     private long _started;
     private boolean _higherVersionSeen;
     //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
@@ -413,7 +414,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Most users will just call main() instead.
      *  @since public as of 0.9 for Android and other embedded uses
      */
-    public void runRouter() {
+    public synchronized void runRouter() {
         if (_isAlive)
             throw new IllegalStateException();
         String last = _config.get("router.previousFullVersion");
@@ -468,16 +469,19 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      * This is synchronized with saveConfig()
      */
-    public synchronized void readConfig() {
-        String f = getConfigFilename();
-        Properties config = getConfig(_context, f);
-        // to avoid compiler errror
-        Map foo = _config;
-        foo.putAll(config);
+    public void readConfig() {
+        synchronized(_configFileLock) {
+            String f = getConfigFilename();
+            Properties config = getConfig(_context, f);
+            // to avoid compiler errror
+            Map foo = _config;
+            foo.putAll(config);
+        }
     }
     
     /**
      *  this does not use ctx.getConfigDir(), must provide a full path in filename
+     *  Caller must synchronize
      *
      *  @param ctx will be null at startup when called from constructor
      */
@@ -518,6 +522,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * has changed.
      */
     public void rebuildRouterInfo() { rebuildRouterInfo(false); }
+
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Rebuilding new routerInfo");
@@ -698,7 +703,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * files, then reboot the router.
      *
      */
-    public void rebuildNewIdentity() {
+    public synchronized void rebuildNewIdentity() {
         if (_shutdownHook != null) {
             try {
                 Runtime.getRuntime().removeShutdownHook(_shutdownHook);
@@ -747,7 +752,7 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Shutdown with no chance of cancellation
      */
-    public void shutdown(int exitCode) {
+    public synchronized void shutdown(int exitCode) {
         if (_shutdownInProgress)
             return;
         _shutdownInProgress = true;
@@ -765,7 +770,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Called by the ShutdownHook.
      *  NOT to be called by others, use shutdown().
      */
-    public void shutdown2(int exitCode) {
+    public synchronized void shutdown2(int exitCode) {
         // help us shut down esp. after OOM
         int priority = (exitCode == EXIT_OOM) ? Thread.MAX_PRIORITY - 1 : Thread.NORM_PRIORITY + 2;
         Thread.currentThread().setPriority(priority);
@@ -862,7 +867,7 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Cancel the JVM runtime hook before calling this.
      */
-    private void finalShutdown(int exitCode) {
+    private synchronized void finalShutdown(int exitCode) {
         clearCaches();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
@@ -977,36 +982,38 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      * Synchronized with file read in getConfig()
      */
-    public synchronized boolean saveConfig() {
-        FileOutputStream fos = null;
-        try {
-            fos = new SecureFileOutputStream(_configFilename);
-            StringBuilder buf = new StringBuilder(8*1024);
-            buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
-            TreeSet ordered = new TreeSet(_config.keySet());
-            for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
-                String key = (String)iter.next();
-                String val = _config.get(key);
-                    // Escape line breaks before saving.
-                    // Remember: "\" needs escaping both for regex and string.
-                    // NOOO - see comments in DataHelper
-                    //val = val.replaceAll("\\r","\\\\r");
-                    //val = val.replaceAll("\\n","\\\\n");
-                buf.append(key).append('=').append(val).append('\n');
+    public boolean saveConfig() {
+        synchronized(_configFileLock) {
+            FileOutputStream fos = null;
+            try {
+                fos = new SecureFileOutputStream(_configFilename);
+                StringBuilder buf = new StringBuilder(8*1024);
+                buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
+                TreeSet ordered = new TreeSet(_config.keySet());
+                for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
+                    String key = (String)iter.next();
+                    String val = _config.get(key);
+                        // Escape line breaks before saving.
+                        // Remember: "\" needs escaping both for regex and string.
+                        // NOOO - see comments in DataHelper
+                        //val = val.replaceAll("\\r","\\\\r");
+                        //val = val.replaceAll("\\n","\\\\n");
+                    buf.append(key).append('=').append(val).append('\n');
+                }
+                fos.write(buf.toString().getBytes("UTF-8"));
+            } catch (IOException ioe) {
+                // warning, _log will be null when called from constructor
+                if (_log != null)
+                    _log.error("Error saving the config to " + _configFilename, ioe);
+                else
+                    System.err.println("Error saving the config to " + _configFilename + ": " + ioe);
+                return false;
+            } finally {
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
             }
-            fos.write(buf.toString().getBytes("UTF-8"));
-        } catch (IOException ioe) {
-            // warning, _log will be null when called from constructor
-            if (_log != null)
-                _log.error("Error saving the config to " + _configFilename, ioe);
-            else
-                System.err.println("Error saving the config to " + _configFilename + ": " + ioe);
-            return false;
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            
+            return true;
         }
-        
-        return true;
     }
     
     /**
@@ -1019,12 +1026,14 @@ public class Router implements RouterClock.ClockShiftListener {
      * @return success
      * @since 0.8.13
      */
-    public synchronized boolean saveConfig(String name, String value) {
-        if (value != null)
-            _config.put(name, value);
-        else
-            removeConfigSetting(name);
-        return saveConfig();
+    public boolean saveConfig(String name, String value) {
+        synchronized(_configFileLock) {
+            if (value != null)
+                _config.put(name, value);
+            else
+                removeConfigSetting(name);
+            return saveConfig();
+        }
     }
 
     /**
@@ -1037,15 +1046,17 @@ public class Router implements RouterClock.ClockShiftListener {
      * @return success
      * @since 0.8.13
      */
-    public synchronized boolean saveConfig(Map toAdd, Collection<String> toRemove) {
-        if (toAdd != null)
-            _config.putAll(toAdd);
-        if (toRemove != null) {
-            for (String s : toRemove) {
-                removeConfigSetting(s);
+    public boolean saveConfig(Map toAdd, Collection<String> toRemove) {
+        synchronized(_configFileLock) {
+            if (toAdd != null)
+                _config.putAll(toAdd);
+            if (toRemove != null) {
+                for (String s : toRemove) {
+                    removeConfigSetting(s);
+                }
             }
+            return saveConfig();
         }
-        return saveConfig();
     }
 
     /**

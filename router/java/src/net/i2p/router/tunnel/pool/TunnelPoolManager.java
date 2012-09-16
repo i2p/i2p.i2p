@@ -390,7 +390,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
     
-    public void restart() { 
+    public synchronized void restart() { 
         _handler.restart();
         _executor.restart();
         shutdownExploratory();
@@ -504,7 +504,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
 
-    public void startup() { 
+    public synchronized void startup() { 
         _isShutdown = false;
         if (!_executor.isRunning()) {
             I2PThread t = new I2PThread(_executor, "BuildExecutor");
@@ -546,7 +546,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     /**
      *  Cannot be restarted
      */
-    public void shutdown() { 
+    public synchronized void shutdown() { 
         _handler.shutdown(_numHandlerThreads);
         _executor.shutdown();
         shutdownExploratory();

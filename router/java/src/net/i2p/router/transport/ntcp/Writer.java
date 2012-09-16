@@ -32,7 +32,7 @@ class Writer {
         _writeAfterLive = new HashSet(5);
     }
     
-    public void startWriting(int numWriters) {
+    public synchronized void startWriting(int numWriters) {
         for (int i = 1; i <=numWriters; i++) {
             Runner r = new Runner();
             I2PThread t = new I2PThread(r, "NTCP writer " + i + '/' + numWriters, true);
@@ -40,7 +40,7 @@ class Writer {
             t.start();
         }
     }
-    public void stopWriting() {
+    public synchronized void stopWriting() {
         while (!_runners.isEmpty()) {
             Runner r = _runners.remove(0);
             r.stop();

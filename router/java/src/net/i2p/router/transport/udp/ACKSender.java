@@ -53,14 +53,14 @@ class ACKSender implements Runnable {
             _peersToACK.offer(peer);
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _alive = true;
         _peersToACK.clear();
         I2PThread t = new I2PThread(this, "UDP ACK sender", true);
         t.start();
     }
     
-    public void shutdown() { 
+    public synchronized void shutdown() { 
         _alive = false;
         PeerState poison = new PeerState(_context, _transport, null, 0, null, false);
         poison.setTheyRelayToUsAs(POISON_PS);

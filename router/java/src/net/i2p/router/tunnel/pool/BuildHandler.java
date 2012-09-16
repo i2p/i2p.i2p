@@ -134,7 +134,7 @@ class BuildHandler implements Runnable {
      *  @param numThreads the number of threads to be shut down
      *  @since 0.9
      */
-    public void shutdown(int numThreads) {
+    public synchronized void shutdown(int numThreads) {
         _isRunning = false;
         _inboundBuildMessages.clear();
         BuildMessageState poison = new BuildMessageState(null, null, null);

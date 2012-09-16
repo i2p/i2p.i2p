@@ -46,12 +46,12 @@ class NTCPSendFinisher {
         //_context.statManager().createRateStat("ntcp.sendFinishTime", "How long to queue and excecute msg.afterSend()", "ntcp", new long[] {5*1000});
     }
     
-    public void start() {
+    public synchronized void start() {
         _count = 0;
         _executor = new CustomThreadPoolExecutor(THREADS);
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if (_executor != null)
             _executor.shutdownNow();
     }

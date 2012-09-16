@@ -157,13 +157,13 @@ class EstablishmentManager {
         //_context.statManager().createRateStat("udp.queueAllowTotalLifetime", "When a peer is retransmitting and we probabalistically allow a new message, what is the sum of the pending message lifetimes? (period is the new message's lifetime)?", "udp", UDPTransport.RATES);
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _alive = true;
         I2PThread t = new I2PThread(new Establisher(), "UDP Establisher", true);
         t.start();
     }
 
-    public void shutdown() { 
+    public synchronized void shutdown() { 
         _alive = false;
         notifyActivity();
     }

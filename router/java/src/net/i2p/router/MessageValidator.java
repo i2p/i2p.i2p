@@ -94,11 +94,11 @@ public class MessageValidator {
         return dup;
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _filter = new DecayingHashSet(_context, (int)Router.CLOCK_FUDGE_FACTOR * 2, 8, "RouterMV");
     }
     
-    void shutdown() {
+    synchronized void shutdown() {
         _filter.stopDecaying();
     }
 }

@@ -69,7 +69,7 @@ class MessageReceiver {
         _alive = true;
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _alive = true;
         for (int i = 0; i < _threadCount; i++) {
             I2PThread t = new I2PThread(new Runner(), "UDP message receiver " + (i+1) + '/' + _threadCount, true);
@@ -83,7 +83,7 @@ class MessageReceiver {
         public void run() { loop(_handler); }
     }
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         _alive = false;
         _completeMessages.clear();
         for (int i = 0; i < _threadCount; i++) {

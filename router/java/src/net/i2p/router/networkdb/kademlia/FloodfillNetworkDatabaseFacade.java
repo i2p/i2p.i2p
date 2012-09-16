@@ -65,7 +65,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
 
     @Override
-    public void startup() {
+    public synchronized void startup() {
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
         _lookupThrottler = new LookupThrottler();
@@ -87,7 +87,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      *  @since 0.8.9
      */
     @Override
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (_floodfillEnabled) {
             // turn off to build a new RI...
             _floodfillEnabled = false;

@@ -59,14 +59,14 @@ class UDPReceiver {
         _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", UDPTransport.RATES);
     }
     
-    public void startup() {
+    public synchronized void startup() {
         //adjustDropProbability();
         _keepRunning = true;
         I2PThread t = new I2PThread(_runner, _name + '.' + _id, true);
         t.start();
     }
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         _keepRunning = false;
         _inboundQueue.clear();
         for (int i = 0; i < _transport.getPacketHandlerCount(); i++) {

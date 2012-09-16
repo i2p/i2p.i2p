@@ -245,7 +245,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _fragments.shutdown();
         if (_pusher != null)
             _pusher.shutdown();
@@ -373,7 +373,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testEvent.reschedule(10*1000); // lets requeue it for Real Soon
     }
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         destroyAll();
         if (_endpoint != null)
             _endpoint.shutdown();

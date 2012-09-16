@@ -38,14 +38,14 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         _testJob = new PeerTestJob(_context);
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _log.info("Starting up the peer manager");
         _manager = new PeerManager(_context);
         _persistenceHelper.setUs(_context.routerHash());
         _testJob.startTesting(_manager);
     }
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         _log.info("Shutting down the peer manager");
         _testJob.stopTesting();
         if (_manager != null) {
@@ -54,7 +54,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         }
     }
     
-    public void restart() {
+    public synchronized void restart() {
         _manager.storeProfiles();
         _persistenceHelper.setUs(_context.routerHash());
         _manager.loadProfiles();

@@ -50,7 +50,7 @@ public class PeerTestJob extends JobImpl {
     private int getTestConcurrency() { return 1; }
     
     // FIXME Exporting non-public type through public API FIXME
-    public void startTesting(PeerManager manager) {
+    public synchronized void startTesting(PeerManager manager) {
         _manager = manager;
         _keepTesting = true;
         this.getTiming().setStartAfter(getContext().clock().now() + DEFAULT_PEER_TEST_DELAY);
@@ -58,7 +58,8 @@ public class PeerTestJob extends JobImpl {
         if (_log.shouldLog(Log.INFO))
             _log.info("Start testing peers");
     }
-    public void stopTesting() { 
+
+    public synchronized void stopTesting() { 
         _keepTesting = false;
         if (_log.shouldLog(Log.INFO))
             _log.info("Stop testing peers");

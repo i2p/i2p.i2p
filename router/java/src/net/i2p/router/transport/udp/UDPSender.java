@@ -64,7 +64,7 @@ class UDPSender {
         _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_CREAT, "session created packet size", "udp", UDPTransport.RATES);
     }
     
-    public void startup() {
+    public synchronized void startup() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting the runner: " + _name);
         _keepRunning = true;
@@ -72,7 +72,7 @@ class UDPSender {
         t.start();
     }
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         _keepRunning = false;
         _outboundQueue.clear();
         UDPPacket poison = UDPPacket.acquire(_context, false);

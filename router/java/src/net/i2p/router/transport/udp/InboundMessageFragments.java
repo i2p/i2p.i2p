@@ -48,7 +48,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         _context.statManager().createRateStat("udp.receivePiggyback", "How many acks were included in a packet with data fragments (time == # data fragments)", "udp", UDPTransport.RATES);
     }
     
-    public void startup() { 
+    public synchronized void startup() { 
         _alive = true; 
         // may want to extend the DecayingBloomFilter so we can use a smaller 
         // array size (currently its tuned for 10 minute rates for the 
@@ -57,7 +57,8 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         _ackSender.startup();
         _messageReceiver.startup();
     }
-    public void shutdown() {
+
+    public synchronized void shutdown() {
         _alive = false;
         if (_recentlyCompletedMessages != null)
             _recentlyCompletedMessages.stopDecaying();

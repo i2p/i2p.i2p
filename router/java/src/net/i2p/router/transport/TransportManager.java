@@ -136,7 +136,7 @@ public class TransportManager implements TransportEventListener {
             t.forwardPortStatus(port, externalPort, success, reason);
     }
 
-    public void startListening() {
+    public synchronized void startListening() {
         if (_dhThread.getState() == Thread.State.NEW)
             _dhThread.start();
         // For now, only start UPnP if we have no publicly-routable addresses
@@ -159,7 +159,7 @@ public class TransportManager implements TransportEventListener {
         _context.router().rebuildRouterInfo();
     }
     
-    public void restart() {
+    public synchronized void restart() {
         stopListening();
         try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
         startListening();
@@ -168,7 +168,7 @@ public class TransportManager implements TransportEventListener {
     /**
      *  Can be restarted.
      */
-    public void stopListening() {
+    public synchronized void stopListening() {
         if (_upnpManager != null)
             _upnpManager.stop();
         for (Transport t : _transports.values()) {
@@ -182,7 +182,7 @@ public class TransportManager implements TransportEventListener {
      *  Cannot be restarted.
      *  @since 0.9
      */
-    public void shutdown() {
+    public synchronized void shutdown() {
         stopListening();
         _dhThread.shutdown();
         Addresses.clearCaches();

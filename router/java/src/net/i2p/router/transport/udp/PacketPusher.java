@@ -23,13 +23,13 @@ class PacketPusher implements Runnable {
         _sender = sender;
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _alive = true;
         I2PThread t = new I2PThread(this, "UDP packet pusher", true);
         t.start();
     }
     
-    public void shutdown() { _alive = false; }
+    public synchronized void shutdown() { _alive = false; }
      
     public void run() {
         while (_alive) {

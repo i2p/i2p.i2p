@@ -49,7 +49,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         startGeoIP();
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _log.info("Starting up the comm system");
         _manager = new TransportManager(_context);
         _manager.startListening();
@@ -59,13 +59,13 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      *  Cannot be restarted.
      */
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (_manager != null)
             _manager.shutdown();
         _geoIP.shutdown();
     }
     
-    public void restart() {
+    public synchronized void restart() {
         if (_manager == null)
             startup();
         else

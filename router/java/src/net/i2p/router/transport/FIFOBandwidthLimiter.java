@@ -140,13 +140,13 @@ public class FIFOBandwidthLimiter {
     /** The configured maximum, not the current rate */
     public int getInboundBurstKBytesPerSecond() { return _refiller.getInboundBurstKBytesPerSecond(); } 
     
-    public void reinitialize() {
+    public synchronized void reinitialize() {
         clear();
         _refiller.reinitialize();
     }
 
     /** @since 0.8.8 */
-    public void shutdown() {
+    public synchronized void shutdown() {
         _refiller.shutdown();
         _refillerThread.interrupt();
         clear();

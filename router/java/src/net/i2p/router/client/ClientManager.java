@@ -89,7 +89,7 @@ class ClientManager {
         _isStarted = true;
     }
     
-    public void restart() {
+    public synchronized void restart() {
         shutdown("Router restart");
         
         // to let the old listener die
@@ -103,7 +103,7 @@ class ClientManager {
     /**
      *  @param msg message to send to the clients
      */
-    public void shutdown(String msg) {
+    public synchronized void shutdown(String msg) {
         _isStarted = false;
         _log.info("Shutting down the ClientManager");
         if (_listener != null)

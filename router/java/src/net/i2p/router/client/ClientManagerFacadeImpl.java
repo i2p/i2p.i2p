@@ -52,13 +52,13 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         //_log.debug("Client manager facade created");
     }
     
-    public void startup() {
+    public synchronized void startup() {
         _log.info("Starting up the client subsystem");
         int port = _context.getProperty(PROP_CLIENT_PORT, DEFAULT_PORT);
         _manager = new ClientManager(_context, port);
     }    
     
-    public void shutdown() {
+    public synchronized void shutdown() {
         shutdown("Router shutdown");
     }
 
@@ -66,12 +66,12 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
      *  @param msg message to send to the clients
      *  @since 0.8.8
      */
-    public void shutdown(String msg) {
+    public synchronized void shutdown(String msg) {
         if (_manager != null)
             _manager.shutdown(msg);
     }
     
-    public void restart() {
+    public synchronized void restart() {
         if (_manager != null)
             _manager.restart();
         else

@@ -91,7 +91,7 @@ class PacketHandler {
         //_context.statManager().createRateStat("udp.receivePacketSize.relayResponse", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", UDPTransport.RATES);
     }
     
-    public void startup() { 
+    public synchronized void startup() { 
         _keepReading = true;
         for (int i = 0; i < _handlers.length; i++) {
             I2PThread t = new I2PThread(_handlers[i], "UDP Packet handler " + (i+1) + '/' + _handlers.length, true);
@@ -99,7 +99,7 @@ class PacketHandler {
         }
     }
     
-    public void shutdown() { 
+    public synchronized void shutdown() { 
         _keepReading = false; 
     }
 

@@ -92,9 +92,9 @@ class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.sendCycleTimeSlow", "How long it takes to cycle through all of the active messages, when its going slowly?", "udp", UDPTransport.RATES);
     }
 
-    public void startup() { _alive = true; }
+    public synchronized void startup() { _alive = true; }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         _alive = false;
         _activePeers.clear();
         synchronized (_activePeers) {

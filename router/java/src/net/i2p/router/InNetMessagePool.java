@@ -324,14 +324,14 @@ public class InNetMessagePool implements Service {
     public void renderStatusHTML(Writer out) {}
 
     /** does nothing since we aren't threaded */
-    public void restart() { 
+    public synchronized void restart() { 
         shutdown(); 
         try { Thread.sleep(100); } catch (InterruptedException ie) {}
         startup(); 
     }
 
     /** does nothing since we aren't threaded */
-    public void shutdown() {
+    public synchronized void shutdown() {
         _alive = false;
         if (!DISPATCH_DIRECT) {
             synchronized (_pendingDataMessages) {
@@ -343,7 +343,7 @@ public class InNetMessagePool implements Service {
     }
     
     /** does nothing since we aren't threaded */
-    public void startup() {
+    public synchronized void startup() {
         _alive = true;
         _dispatchThreaded = DEFAULT_DISPATCH_THREADED;
         String threadedStr = _context.getProperty(PROP_DISPATCH_THREADED);

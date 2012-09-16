@@ -65,7 +65,7 @@ public class MessageHistory {
     }
     
     /** @since 0.8.12 */
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (_doLog)
             addEntry(getPrefix() + "** Router shutdown");
         _doPause = false;
@@ -89,7 +89,7 @@ public class MessageHistory {
      * Call this whenever the router identity changes.
      *
      */
-    public void initialize(boolean forceReinitialize) {
+    public synchronized void initialize(boolean forceReinitialize) {
         if (!forceReinitialize) return;
 
         if (_context.router().getRouterInfo() == null) {
