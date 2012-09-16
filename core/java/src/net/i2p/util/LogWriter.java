@@ -25,7 +25,7 @@ import java.util.Queue;
 class LogWriter implements Runnable {
     /** every 10 seconds? why? Just have the gui force a reread after a change?? */
     private final static long CONFIG_READ_INTERVAL = 50 * 1000;
-    private final static long FLUSH_INTERVAL = 9 * 1000;
+    private final static long FLUSH_INTERVAL = 29 * 1000;
     private long _lastReadConfig;
     private long _numBytesInCurrentFile;
     // volatile as it changes on log file rotation
