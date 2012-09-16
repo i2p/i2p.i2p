@@ -78,6 +78,7 @@ class EventPumper implements Runnable {
 
     /**
      *  Do we use direct buffers for reading? Default false.
+     *  NOT recommended as we don't keep good track of them so they will leak.
      *  @see java.nio.ByteBuffer
      */
     private static final String PROP_DIRECT = "i2np.ntcp.useDirectBuffers";
@@ -776,7 +777,8 @@ class EventPumper implements Runnable {
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {
-                        _context.statManager().addRateData("ntcp.connectImmediate", 1);
+                        // Never happens, we use nonblocking
+                        //_context.statManager().addRateData("ntcp.connectImmediate", 1);
                         key.interestOps(SelectionKey.OP_READ);
                         processConnect(key);
                     }
