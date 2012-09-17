@@ -16,7 +16,7 @@ import net.i2p.data.ByteArray;
  * For small arrays where the management of valid bytes in ByteArray
  * and prezeroing isn't required, use SimpleByteArray instead.
  *
- * Heap size control - survey of usage (April 2010) :
+ * Heap size control - survey of usage:
  *
  *  <pre>
 	Size	Max	MaxMem	From
@@ -33,6 +33,8 @@ import net.i2p.data.ByteArray;
 	4K	32	128K	I2PTunnelRunner
 
 	8K	8	64K	I2PTunnel HTTPResponseOutputStream
+
+	16K	16	256K	I2PSnark
 
 	32K	4	128K	SAM StreamSession
 	32K	10	320K	SAM v2StreamSession
@@ -67,7 +69,10 @@ public final class ByteCache {
     }
 
     /**
-     * Get a cache responsible for objects of the given size
+     * Get a cache responsible for objects of the given size.
+     * Warning, if you store the result in a static field, the cleaners will
+     * not operate after a restart on Android, as the old context's SimpleScheduler will have shut down.
+     * TODO tie this to the context or clean up all calls.
      *
      * @param cacheSize how large we want the cache to grow 
      *                  (number of objects, NOT memory size)
@@ -103,7 +108,7 @@ public final class ByteCache {
     /** list of available and available entries */
     private Queue<ByteArray> _available;
     private int _maxCached;
-    private int _entrySize;
+    private final int _entrySize;
     private long _lastOverflow;
     
     /** do we actually want to cache? Warning - setting to false may NPE, this should be fixed or removed */
@@ -120,7 +125,7 @@ public final class ByteCache {
         _maxCached = maxCachedEntries;
         _entrySize = entrySize;
         _lastOverflow = -1;
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY + (entrySize % 7));   //stagger
+        SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY + (entrySize % 777));   //stagger
         I2PAppContext.getGlobalContext().statManager().createRateStat("byteCache.memory." + entrySize, "Memory usage (B)", "Router", new long[] { 10*60*1000 });
     }
     
@@ -136,8 +141,11 @@ public final class ByteCache {
     }
     
     /**
-     * Get the next available structure, either from the cache or a brand new one
-     *
+     * Get the next available structure, either from the cache or a brand new one.
+     * Returned ByteArray will have valid = 0 and offset = 0.
+     * Returned ByteArray may or may not be zero, depends on whether
+     * release(ba) or release(ba, false) was called.
+     * Which is a problem, you should really specify shouldZero on acquire, not release.
      */
     public final ByteArray acquire() {
         if (_cache) {
@@ -149,7 +157,7 @@ public final class ByteCache {
         byte data[] = new byte[_entrySize];
         ByteArray rv = new ByteArray(data);
         rv.setValid(0);
-        rv.setOffset(0);
+        //rv.setOffset(0);
         return rv;
     }
     
@@ -160,11 +168,17 @@ public final class ByteCache {
     public final void release(ByteArray entry) {
         release(entry, true);
     }
+
     public final void release(ByteArray entry, boolean shouldZero) {
         if (_cache) {
-            if ( (entry == null) || (entry.getData() == null) )
+            if (entry == null || entry.getData() == null)
                 return;
-            
+            if (entry.getData().length != _entrySize) {
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Bad size", new Exception("I did it"));
+                return;
+            }
             entry.setValid(0);
             entry.setOffset(0);
             

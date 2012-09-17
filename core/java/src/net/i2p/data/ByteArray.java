@@ -24,11 +24,21 @@ public class ByteArray implements Serializable, Comparable {
     public ByteArray() {
     }
 
-    /** Sets valid */
+    /**
+     *  Sets valid = data.length, unless data is null
+     *  Sets offset = 0
+     *  @param data may be null
+     */
     public ByteArray(byte[] data) {
         _data = data;
         _valid = (data != null ? data.length : 0);
     }
+
+    /**
+     *  Sets offset = offset
+     *  Sets valid = length
+     *  @param data may be null but why would you do that
+     */
     public ByteArray(byte[] data, int offset, int length) {
         _data = data;
         _offset = offset;
