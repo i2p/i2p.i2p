@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.ConcurrentHashSet;
@@ -874,7 +875,7 @@ class PeerCoordinator implements PeerListener
    *
    * @throws RuntimeException on IOE getting the data
    */
-  public byte[] gotRequest(Peer peer, int piece, int off, int len)
+  public ByteArray gotRequest(Peer peer, int piece, int off, int len)
   {
     if (halted)
       return null;

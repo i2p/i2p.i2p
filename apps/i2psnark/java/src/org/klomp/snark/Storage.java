@@ -34,6 +34,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SHA1;
+import net.i2p.data.ByteArray;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SystemVersion;
@@ -79,6 +81,9 @@ public class Storage
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap();
 
   private static final boolean _isWindows = SystemVersion.isWindows();
+
+  private static final int BUFSIZE = PeerState.PARTSIZE;
+  private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
 
   /**
    * Creates a new storage based on the supplied MetaInfo.  This will
@@ -899,22 +904,28 @@ public class Storage
    * Returns a byte array containing a portion of the requested piece or null if
    * the storage doesn't contain the piece yet.
    */
-  public byte[] getPiece(int piece, int off, int len) throws IOException
+  public ByteArray getPiece(int piece, int off, int len) throws IOException
   {
     if (!bitfield.get(piece))
       return null;
 
     //Catch a common place for OOMs esp. on 1MB pieces
+    ByteArray rv;
     byte[] bs;
     try {
-      bs = new byte[len];
+        // Will be restored to cache in Message.sendMessage()
+        if (len == BUFSIZE)
+            rv = _cache.acquire();
+        else
+            rv = new ByteArray(new byte[len]);
     } catch (OutOfMemoryError oom) {
       if (_log.shouldLog(Log.WARN))
           _log.warn("Out of memory, can't honor request for piece " + piece, oom);
       return null;
     }
+    bs = rv.getData();
     getUncheckedPiece(piece, bs, off, len);
-    return bs;
+    return rv;
   }
 
   /**

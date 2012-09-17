@@ -23,8 +23,13 @@ package org.klomp.snark;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-// Used to queue outgoing connections
-// sendMessage() should be used to translate them to wire format.
+import net.i2p.data.ByteArray;
+import net.i2p.util.ByteCache;
+
+/**
+ * Used to queue outgoing connections
+ * sendMessage() should be used to translate them to wire format.
+ */
 class Message
 {
   final static byte KEEP_ALIVE   = -1;
@@ -69,6 +74,9 @@ class Message
   // now unused
   //SimpleTimer.TimedEvent expireEvent;
   
+  private static final int BUFSIZE = PeerState.PARTSIZE;
+  private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
+
   /** Utility method for sending a message through a DataStream. */
   void sendMessage(DataOutputStream dos) throws IOException
   {
@@ -79,11 +87,15 @@ class Message
         return;
       }
 
+    ByteArray ba;
     // Get deferred data
     if (data == null && dataLoader != null) {
-        data = dataLoader.loadData(piece, begin, length);
-        if (data == null)
+        ba = dataLoader.loadData(piece, begin, length);
+        if (ba == null)
             return;  // hmm will get retried, but shouldn't happen
+        data = ba.getData();
+    } else {
+        ba = null;
     }
 
     // Calculate the total length in bytes
@@ -139,6 +151,10 @@ class Message
     // Send actual data
     if (type == BITFIELD || type == PIECE || type == EXTENSION)
       dos.write(data, off, len);
+
+    // Was pulled from cache in Storage.getPiece() via dataLoader
+    if (ba != null && ba.getData().length == BUFSIZE)
+        _cache.release(ba, false);
   }
 
     @Override

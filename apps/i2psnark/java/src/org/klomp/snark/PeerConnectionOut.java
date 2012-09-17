@@ -437,6 +437,7 @@ class PeerConnectionOut implements Runnable
    */
   void sendPiece(int piece, int begin, int length, DataLoader loader)
   {
+    /****
       boolean sendNow = false;
       // are there any cases where we should?
 
@@ -447,6 +448,7 @@ class PeerConnectionOut implements Runnable
             sendPiece(piece, begin, length, bytes);
         return;
       }
+    ****/
 
       // queue a fake message... set everything up,
       // except save the PeerState instead of the bytes.

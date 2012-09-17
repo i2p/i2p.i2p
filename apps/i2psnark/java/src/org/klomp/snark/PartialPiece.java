@@ -9,6 +9,8 @@ import java.security.MessageDigest;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1;
+import net.i2p.data.ByteArray;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 
@@ -41,6 +43,9 @@ class PartialPiece implements Comparable {
     private RandomAccessFile raf;
     private final int pclen;
     private final File tempDir;
+
+    private static final int BUFSIZE = PeerState.PARTSIZE;
+    private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
 
     // Any bigger than this, use temp file instead of heap
     private static final int MAX_IN_MEM = 128 * 1024;
@@ -154,7 +159,16 @@ class PartialPiece implements Comparable {
             sha1.update(bs);
         } else {
             int read = 0;
-            byte[] buf = new byte[Math.min(pclen, 16384)];
+            int buflen = Math.min(pclen, BUFSIZE);
+            ByteArray ba;
+            byte[] buf;
+            if (buflen == BUFSIZE) {
+                ba = _cache.acquire();
+                buf = ba.getData();
+            } else {
+                ba = null;
+                buf = new byte[buflen];
+            }
             synchronized (this) {
                 if (raf == null)
                     throw new IOException();
@@ -167,6 +181,8 @@ class PartialPiece implements Comparable {
                     sha1.update(buf, 0, rd);
                 }
             }
+            if (ba != null)
+                _cache.release(ba, false);
             if (read < pclen)
                 throw new IOException();
         }
@@ -182,7 +198,15 @@ class PartialPiece implements Comparable {
             din.readFully(bs, off, len);
         } else {
             // read in fully before synching on raf
-            byte[] tmp = new byte[len];
+            ByteArray ba;
+            byte[] tmp;
+            if (len == BUFSIZE) {
+                ba = _cache.acquire();
+                tmp = ba.getData();
+            } else {
+                ba = null;
+                tmp = new byte[len];
+            }
             din.readFully(tmp);
             synchronized (this) {
                 if (raf == null)
@@ -190,6 +214,8 @@ class PartialPiece implements Comparable {
                 raf.seek(off);
                 raf.write(tmp);
             }
+            if (ba != null)
+                _cache.release(ba, false);
         }
     }
 
@@ -208,7 +234,16 @@ class PartialPiece implements Comparable {
             out.write(bs, offset, len);
         } else {
             int read = 0;
-            byte[] buf = new byte[Math.min(len, 16384)];
+            int buflen = Math.min(len, BUFSIZE);
+            ByteArray ba;
+            byte[] buf;
+            if (buflen == BUFSIZE) {
+                ba = _cache.acquire();
+                buf = ba.getData();
+            } else {
+                ba = null;
+                buf = new byte[buflen];
+            }
             synchronized (this) {
                 if (raf == null)
                     throw new IOException();
@@ -220,6 +255,8 @@ class PartialPiece implements Comparable {
                     out.write(buf, 0, rd);
                 }
             }
+            if (ba != null)
+                _cache.release(ba, false);
         }
     }
     

@@ -22,6 +22,8 @@ package org.klomp.snark;
 
 import java.util.List;
 
+import net.i2p.data.ByteArray;
+
 /**
  * Listener for Peer events.
  */
@@ -114,7 +116,7 @@ interface PeerListener
    * @return a byte array containing the piece or null when the piece
    * is not available (which is a protocol error).
    */
-  byte[] gotRequest(Peer peer, int piece, int off, int len);
+  ByteArray gotRequest(Peer peer, int piece, int off, int len);
 
   /**
    * Called when a (partial) piece has been downloaded from the peer.
