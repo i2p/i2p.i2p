@@ -187,7 +187,7 @@
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-	        <args><arg value="$INSTALL_PATH/net.i2p.router.plist" /></args></executable>
+	        <args><arg value="$INSTALL_PATH/net.i2p.router.plist.template" /></args></executable>
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/install_i2p_service_osx.command" /></args></executable>
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />

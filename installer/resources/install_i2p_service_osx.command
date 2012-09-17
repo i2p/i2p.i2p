@@ -5,7 +5,7 @@
 # Author: Meeh
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 shfile="tmp$$.sh"
-echo -n 'cat `pwd`/net.i2p.router.plist |' > `pwd`/$shfile
+echo -n 'cat `pwd`/net.i2p.router.plist.template |' > `pwd`/$shfile
 echo -n "sed 's#USERNAME#`whoami`#' " >> `pwd`/$shfile
 echo -n '| sed "s#COMMAND#`pwd`/i2prouter#" | sed "s#I2PPATH#`pwd`/#" > /Library/LaunchDaemons/net.i2p.router.plist' >> `pwd`/$shfile
 chmod +x `pwd`/$shfile
