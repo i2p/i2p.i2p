@@ -119,7 +119,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private final byte _meta[] = new byte[META_SIZE];
     private boolean _sendingMeta;
     /** how many consecutive sends were failed due to (estimated) send queue time */
-    private int _consecutiveBacklog;
+    //private int _consecutiveBacklog;
     private long _nextInfoTime;
     
     /*
@@ -253,8 +253,6 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /** @return milliseconds */
     public long getTimeSinceCreated() { return System.currentTimeMillis()-_created; }
 
-    public int getConsecutiveBacklog() { return _consecutiveBacklog; }
-     
     /**
      *  workaround for EventPumper
      *  @since 0.8.12
@@ -367,6 +365,8 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
 ****/
 
+    public boolean isBacklogged() { return _outbound.isBacklogged(); }
+     
     public boolean tooBacklogged() {
         //long queueTime = queueTime();
         //if (queueTime <= 0) return false;

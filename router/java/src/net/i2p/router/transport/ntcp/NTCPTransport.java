@@ -807,7 +807,7 @@ public class NTCPTransport extends TransportImpl {
             long outQueue = con.getOutboundQueueSize();
             buf.append("</td><td class=\"cells\" align=\"center\">").append(outQueue);
             buf.append("</td><td class=\"cells\" align=\"center\">");
-            if (con.getConsecutiveBacklog() > 0)
+            if (con.isBacklogged())
                 buf.append("&#x2713;");
             else
                 buf.append("&nbsp;");
