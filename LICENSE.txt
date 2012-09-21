@@ -83,7 +83,9 @@ Public domain except as listed below:
    Copyright (C) 2003-2010 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
-   GeoIP data free to use, courtesy http://www.maxmind.com/
+   GeoIP: GeoLite databases are licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+   http://creativecommons.org/licenses/by-sa/3.0/
+   This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/
 
 
 Installer:

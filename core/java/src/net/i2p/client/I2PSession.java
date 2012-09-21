@@ -278,7 +278,7 @@ public interface I2PSession {
 
     /**
      *  A raw (unsigned) datagram
-     *  @since 0.9.1
+     *  @since 0.9.2
      */
     public static final int PROTO_DATAGRAM_RAW = 18;
 }

@@ -1,3 +1,23 @@
+* 2012-09-21 0.9.2 released
+
+2012-09-15 zzz
+ * Build: Fix unpack problem on Java 5: http://forum.i2p/viewtopic.php?t=7334
+
+2012-09-14 zzz
+ * SSU: Fix shutdown NPE (ticket #709)
+
+2012-09-13 kytv
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2012-09-05
+
+2012-09-12 kytv
+ * Czech translation updates from Transifex
+
+2012-09-10 meeh
+ * Added fix for startup issues on newer versions of launchd (osx startup scripts)
+
+2012-09-05 meeh
+ * Added startup scripts for osx
+
 2012-09-04 zzz
  * I2PTunnelServer: Clean shutdown after session exception
  * OutNetMessage: Speedup after profiling (ticket #707 - thx dg, kytv, zab)
