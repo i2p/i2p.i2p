@@ -1,3 +1,85 @@
+2012-09-21 zzz
+ * BuildHandler: Use CoDel for inbound queue
+ * ByteCache:
+   - Prevent release of wrong size
+   - Move all 16/32 byte users to SimpleByteCache
+   - Increase SimpleByteCache default size.
+ * ClientConnectionRunner:
+   - Run HandleJob and MessageReceivedJob inline for speed
+   - Remove payload from message map if availability announce fails
+   - Cleanups
+ * ClientManager:
+   - Concurrent client map for faster lookup
+   - Add by-hash client map for faster lookup by hash
+ * ClientWriterRunner: Limit queue size
+ * Clock: Synchronization, log large shifts to event log
+ * Console: Mark all restarts on graphs using the event log.
+ * FortunaRandomSource:
+   - Fix bug that wasted entropy in nextInt()
+   - Improved synchronization
+ * GarlicMessage:
+   - Add notes about GarlicMessageHandler and HandleGarlicMessageJob
+     being unused in practice
+ * I2CP:
+   - Limit router/client queue sizes and queue wait times
+   - Buffer output streams
+ * i2psnark:
+   - Implement blacklist for unreachable DHT peers
+   - Reduce threshold for unreachable
+   - Use ByteCache for chunks in/out
+ * IP Lookup:
+   - Add caching in RouterAddress with secondary caching
+     in Addresses; use caches to speed up transport bids,
+     blocklist checks, geoip lookups, and profile organizer
+     checks (ticket #707)
+   - Limit IP cache size in TransportImpl
+   - Clear caches at shutdown
+ * JobQueue: Reduce lock contention
+ * LHMCache: New util, replacing several private versions
+ * LogWriter:
+   -  Duplicate log message removal
+   -  Increase buffer time
+ * NTCP: Move NTCPConnection outbound queue to CoDelPriority
+ * OutNetMessage:
+   - Centralize priority definitions
+   - Raise netdb store and reply priority
+ * Router:
+   - Boost priority of shutdown thread
+   - Replace ident log with new, general-purpose event log.
+   - Use for stops, starts, and updates, and others.
+   - New AQM CoDel queue utilities
+   - Startup/shutdown synchronization fixes
+ * RouterAddress: Remove unused expiration field to save space
+ * SimpleTimer (ticket #653):
+   - Move all remaining uses to SimpleTimer2
+   - Deprecate
+ * SSU:
+   - Move MessageReceiver, UDPSender and UDPReceiver queues to CoDel
+   - Separate PeerState outbound message list into a queue for unsent messages
+     and a list for sent messages awaiting ack
+   - Implement PeerState outbound queue as CoDelPriority
+   - Implement backlogged indication like in NTCP
+   - Increase initial and max RTO
+   - Don't count ack-only packets in bandwidth allocation
+ * Streaming: Don't send a RST to an hour/day limited peer,
+   or blacklisted, or non-whitelisted, to not waste outbound bandwidth
+ * SystemVersion: New util, to consolidate duplicate code,
+   and determine Java version on Android
+ * TunnelGateway:
+   - Refactor TunnelGateway.Pending to its own file PendingGatewayMesasge
+   - Move OBGW queue to CoDelPriority
+   - Move IBGW queue to CoDel
+   - Limit queue sizes
+   - Add stat for overflow
+   - Remove some stats
+   - Change pumper to LinkedHashSet for efficiency
+     (like NTCP Reader/Writer)
+   - Limit messages pumped per cycle to increase
+     round-robin fairness
+   - Implement pushback from a backlogged transport
+     queue to the pre-fragmentation queue
+   - Comment out some unused code
+
 * 2012-09-21 0.9.2 released
 
 2012-09-15 zzz
