@@ -1,3 +1,5 @@
+* 2012-09-21 0.9.2 released
+
 2012-09-15 zzz
  * Build: Fix unpack problem on Java 5: http://forum.i2p/viewtopic.php?t=7334
 
