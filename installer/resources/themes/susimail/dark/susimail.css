@@ -76,6 +76,9 @@ p.footer {
      margin-right:10mm;
      font-size:8pt;
      line-height:10pt;
+}
+
+.iframed p.footer {
      display: none;
 }
 
