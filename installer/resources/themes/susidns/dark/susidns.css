@@ -135,7 +135,7 @@ p.footer {
      text-align: center;
 }
 
-.iframed p.footer {
+.iframed #footer {
      display: none;
 }
 
