@@ -23,6 +23,7 @@ import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
+import net.i2p.update.UpdateManager;
 import net.i2p.util.KeyRing;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
@@ -56,11 +57,12 @@ public class RouterContext extends I2PAppContext {
     private Shitlist _shitlist;
     private Blocklist _blocklist;
     private MessageValidator _messageValidator;
+    private UpdateManager _updateManager;
     //private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
-    private final Object _lock1 = new Object(), _lock2 = new Object();
+    private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object();
 
     private static final List<RouterContext> _contexts = new CopyOnWriteArrayList();
     
@@ -483,6 +485,7 @@ public class RouterContext extends I2PAppContext {
      *  @return true
      *  @since 0.7.9
      */
+    @Override
     public boolean isRouterContext() {
         return true;
     }
@@ -492,7 +495,44 @@ public class RouterContext extends I2PAppContext {
      *  @return the client manager
      *  @since 0.8.3
      */
+    @Override
     public InternalClientManager internalClientManager() {
         return _clientManagerFacade;
+    }
+
+    /**
+     *  The controller of router, plugin, and other updates.
+     *  @return The manager if it is registered, else null
+     *  @since 0.9.2
+     */
+    @Override
+    public UpdateManager updateManager() {
+        return _updateManager;
+    }
+
+    /**
+     *  Register as the update manager.
+     *  @throws IllegalStateException if one was already registered
+     *  @since 0.9.2
+     */
+    public void registerUpdateManager(UpdateManager mgr) {
+        synchronized(_lock3) {
+            if (_updateManager != null)
+                throw new IllegalStateException();
+            _updateManager = mgr;
+        }
+    }
+
+    /**
+     *  Unregister the update manager.
+     *  @throws IllegalStateException if it was not registered
+     *  @since 0.9.2
+     */
+    public void unregisterUpdateManager(UpdateManager mgr) {
+        synchronized(_lock3) {
+            if (_updateManager != mgr)
+                throw new IllegalStateException();
+            _updateManager = null;
+        }
     }
 }

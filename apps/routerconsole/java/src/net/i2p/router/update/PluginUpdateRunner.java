@@ -1,7 +1,9 @@
-package net.i2p.router.web;
+package net.i2p.router.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -9,6 +11,12 @@ import net.i2p.CoreVersion;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.web.ConfigClientsHelper;
+import net.i2p.router.web.ConfigUpdateHandler;
+import net.i2p.router.web.LogsHelper;
+import net.i2p.router.web.Messages;
+import net.i2p.router.web.PluginStarter;
+import net.i2p.update.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -19,107 +27,55 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
 
+
 /**
- * Download and install a plugin.
+ * Check for an updated version of a plugin.
  * A plugin is a standard .sud file with a 40-byte signature,
  * a 16-byte version, and a .zip file.
- * Unlike for router updates, we need not have the public key
- * for the signature in advance.
  *
- * The zip file must have a standard directory layout, with
- * a plugin.config file at the top level.
- * The config file contains properties for the package name, version,
- * signing public key, and other settings.
- * The zip file will typically contain a webapps/ or lib/ dir,
- * and a webapps.config and/or clients.config file.
+ * So we get the current version and update URL for the installed plugin,
+ * then fetch the first 56 bytes of the URL, extract the version,
+ * and compare.
  *
- * @since 0.7.12
- * @author zzz
+ * Moved from web/ and turned into an UpdateTask.
+ *
+ * @since 0.9.2 moved from PluginUpdateHandler
  */
-public class PluginUpdateHandler extends UpdateHandler {
-    private static PluginUpdateRunner _pluginUpdateRunner;
-    private String _xpi2pURL;
-    private String _appStatus;
-    private volatile boolean _updated;
+class PluginUpdateRunner extends UpdateRunner {
+
+    private String _appName;
+    private final String _oldVersion;
+    private final URI _uri;
+    private final String _xpi2pURL;
+    private boolean _updated;
 
     private static final String XPI2P = "app.xpi2p";
     private static final String ZIP = XPI2P + ".zip";
-    public static final String PLUGIN_DIR = "plugins";
+    public static final String PLUGIN_DIR = PluginStarter.PLUGIN_DIR;
 
-    private static PluginUpdateHandler _instance;
-    public static final synchronized PluginUpdateHandler getInstance(RouterContext ctx) {
-        if (_instance != null)
-            return _instance;
-        _instance = new PluginUpdateHandler(ctx);
-        return _instance;
+    public PluginUpdateRunner(RouterContext ctx, List<URI> uris, String appName, String oldVersion ) { 
+        super(ctx, uris);
+        if (uris.isEmpty())
+            _uri = null;
+        else
+            _uri = uris.get(0);
+        _xpi2pURL = _uri.toString();
+        _appName = appName;
+        _oldVersion = oldVersion;
     }
 
-    private PluginUpdateHandler(RouterContext ctx) {
-        super(ctx);
-        _appStatus = "";
-    }
 
-    public void update(String xpi2pURL) {
-        // don't block waiting for the other one to finish
-        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
-            _log.error("Update already running");
-            return;
-        }
-        synchronized (UpdateHandler.class) {
-            if (_pluginUpdateRunner == null)
-                _pluginUpdateRunner = new PluginUpdateRunner(_xpi2pURL);
-            if (_pluginUpdateRunner.isRunning())
-                return;
-            _xpi2pURL = xpi2pURL;
-            _updateFile = (new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + XPI2P)).getAbsolutePath();
-            System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
-            I2PAppThread update = new I2PAppThread(_pluginUpdateRunner, "AppDownload");
-            update.start();
-        }
-    }
-
-    public String getAppStatus() {
-        return _appStatus;
-    }
-
-    public boolean isRunning() {
-        return _pluginUpdateRunner != null && _pluginUpdateRunner.isRunning();
+    @Override
+    public UpdateType getType() {
+        return _oldVersion.equals("") ? UpdateType.PLUGIN_INSTALL : UpdateType.PLUGIN;
     }
 
     @Override
-    public boolean isDone() {
-        // FIXME
-        return false;
-    }
-
-    /** @since 0.8.13 */
-    public boolean wasUpdateSuccessful() {
-        return _updated;
-    }
-
-    private void scheduleStatusClean(String msg) {
-        _context.simpleScheduler().addEvent(new Cleaner(msg), 20*60*1000);
-    }
-
-    private class Cleaner implements SimpleTimer.TimedEvent {
-        private final String _msg;
-        public Cleaner(String msg) {
-            _msg = msg;
-        }
-        public void timeReached() {
-            if (_msg.equals(getStatus()))
-                updateStatus("");
-        }
-    }
-
-    public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
-
-        public PluginUpdateRunner(String url) {
-            super();
-        }
+    public URI getURI() { return _uri; }
 
         @Override
         protected void update() {
+
             _updated = false;
             if(_xpi2pURL.startsWith("file://")) {
                 updateStatus("<b>" + _("Attempting to install from file {0}", _xpi2pURL) + "</b>");
@@ -154,21 +110,6 @@ public class PluginUpdateHandler extends UpdateHandler {
                     _log.error("Error downloading plugin", t);
                 }
             }
-        }
-
-        @Override
-        public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
-            StringBuilder buf = new StringBuilder(64);
-            buf.append("<b>").append(_("Downloading plugin")).append(' ');
-            double pct = ((double)alreadyTransferred + (double)currentWrite) /
-                         ((double)alreadyTransferred + (double)currentWrite + bytesRemaining);
-            synchronized (_pct) {
-                buf.append(_pct.format(pct));
-            }
-            buf.append(": ");
-            buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
-            buf.append("</b>");
-            updateStatus(buf.toString());
         }
 
         @Override
@@ -468,15 +409,7 @@ public class PluginUpdateHandler extends UpdateHandler {
 
         private void statusDone(String msg) {
             updateStatus(msg);
-            scheduleStatusClean(msg);
         }
 
-    }
-
-    @Override
-    protected void updateStatus(String s) {
-        super.updateStatus(s);
-        _appStatus = s;
-    }
 }
 

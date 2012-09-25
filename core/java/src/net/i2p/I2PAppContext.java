@@ -26,6 +26,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.stat.StatManager;
+import net.i2p.update.UpdateManager;
 import net.i2p.util.Clock;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
@@ -988,5 +989,14 @@ public class I2PAppContext {
                 _simpleTimer2 = new SimpleTimer2(this);
             _simpleTimer2Initialized = true;
         }
+    }
+
+    /**
+     *  The controller of router, plugin, and other updates.
+     *  @return always null in I2PAppContext, the update manager if in RouterContext and it is registered
+     *  @since 0.9.2
+     */
+    public UpdateManager updateManager() {
+        return null;
     }
 }

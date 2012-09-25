@@ -60,7 +60,7 @@ public class FileDumpHelper extends HelperBase {
         dumpDir(buf, dir, ".war");
 
         // plugins
-        File pluginDir = new File(_context.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR);
+        File pluginDir = new File(_context.getConfigDir(), PluginStarter.PLUGIN_DIR);
         File[] files = pluginDir.listFiles();
         if (files != null) {
             Arrays.sort(files);

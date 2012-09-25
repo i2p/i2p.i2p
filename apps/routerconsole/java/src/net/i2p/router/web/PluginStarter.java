@@ -25,6 +25,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
+import net.i2p.router.update.ConsoleUpdateManager;
+import static net.i2p.update.UpdateType.*;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -45,8 +47,9 @@ import org.mortbay.jetty.handler.ContextHandlerCollection;
  */
 public class PluginStarter implements Runnable {
     protected RouterContext _context;
-    static final String PREFIX = "plugin.";
-    static final String ENABLED = ".startOnLoad";
+    public static final String PREFIX = "plugin.";
+    public static final String ENABLED = ".startOnLoad";
+    public static final String PLUGIN_DIR = "plugins";
     private static final String[] STANDARD_WEBAPPS = { "i2psnark", "i2ptunnel", "susidns",
                                                        "susimail", "addressbook", "routerconsole" };
     private static final String[] STANDARD_THEMES = { "images", "light", "dark", "classic",
@@ -66,7 +69,7 @@ public class PluginStarter implements Runnable {
 
     public void run() {
         if (_context.getBooleanPropertyDefaultTrue("plugins.autoUpdate") &&
-            (!Boolean.valueOf(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS)).booleanValue()) &&
+            (!NewsHelper.isUpdateInProgress()) &&
             (!RouterVersion.VERSION.equals(_context.getProperty("router.previousVersion"))))
             updateAll(_context, true);
         startPlugins(_context);
@@ -112,18 +115,24 @@ public class PluginStarter implements Runnable {
         }
         if (toUpdate.isEmpty())
             return;
-        PluginUpdateChecker puc = PluginUpdateChecker.getInstance(ctx);
-        if (puc.isRunning())
+
+        ConsoleUpdateManager mgr = (ConsoleUpdateManager) ctx.updateManager();
+        if (mgr == null)
+            return;
+        if (mgr.isUpdateInProgress())
             return;
 
         if (delay) {
             // wait for proxy
-            System.setProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS, "true");
-            puc.setAppStatus(Messages.getString("Checking for plugin updates", ctx));
-            try {
-                Thread.sleep(3*60*1000);
-            } catch (InterruptedException ie) {}
-            System.setProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS, "false");
+            mgr.update(TYPE_DUMMY, 3*60*1000);
+            mgr.notifyProgress(null, Messages.getString("Checking for plugin updates", ctx));
+            int loop = 0;
+            do {
+                try {
+                    Thread.sleep(5*1000);
+                } catch (InterruptedException ie) {}
+                if (loop++ > 40) break;
+            } while (mgr.isUpdateInProgress(TYPE_DUMMY));
         }
 
         Log log = ctx.logManager().getLog(PluginStarter.class);
@@ -132,34 +141,32 @@ public class PluginStarter implements Runnable {
             String appName = entry.getKey();
             if (log.shouldLog(Log.WARN))
                 log.warn("Checking for update plugin: " + appName);
-            puc.update(appName);
-            do {
-                try {
-                    Thread.sleep(5*1000);
-                } catch (InterruptedException ie) {}
-            } while (puc.isRunning());
-            if (!puc.isNewerAvailable()) {
+
+            // blocking
+            if (mgr.checkAvailable(PLUGIN, appName, 60*1000) == null) {
                 if (log.shouldLog(Log.WARN))
                     log.warn("No update available for plugin: " + appName);
                 continue;
             }
-            PluginUpdateHandler puh = PluginUpdateHandler.getInstance(ctx);
-            String url = entry.getValue();
+
             if (log.shouldLog(Log.WARN))
                 log.warn("Updating plugin: " + appName);
-            puh.update(url);
+            mgr.update(PLUGIN, appName, 30*60*1000);
+            int loop = 0;
             do {
                 try {
                     Thread.sleep(5*1000);
                 } catch (InterruptedException ie) {}
-            } while (puh.isRunning());
-            if (puh.wasUpdateSuccessful())
+                if (loop++ > 40) break;
+            } while (mgr.isUpdateInProgress(PLUGIN, appName));
+
+            if (mgr.getUpdateAvailable(PLUGIN, appName) != null)
                 updated++;
         }
         if (updated > 0)
-            puc.setDoneStatus(ngettext("1 plugin updated", "{0} plugins updated", updated, ctx));
+            mgr.notifyComplete(null, ngettext("1 plugin updated", "{0} plugins updated", updated, ctx));
         else
-            puc.setDoneStatus(Messages.getString("Plugin update check complete", ctx));
+            mgr.notifyComplete(null, Messages.getString("Plugin update check complete", ctx));
     }
 
     /** this shouldn't throw anything */
@@ -189,9 +196,9 @@ public class PluginStarter implements Runnable {
      *  @return true on success
      *  @throws just about anything, caller would be wise to catch Throwable
      */
-    static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
+    public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot start nonexistent plugin: " + appName);
             disablePlugin(appName);
@@ -199,7 +206,7 @@ public class PluginStarter implements Runnable {
         }
 
         // Do we need to extract an update?
-        File pluginUpdate = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + "/app.xpi2p.zip" );
+        File pluginUpdate = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName + "/app.xpi2p.zip" );
         if(pluginUpdate.exists()) {
             // Compare the start time of the router with the plugin.
             if(ctx.router().getWhenStarted() > pluginUpdate.lastModified()) {
@@ -363,9 +370,9 @@ public class PluginStarter implements Runnable {
      *  @return true on success
      *  @throws just about anything, caller would be wise to catch Throwable
      */
-    static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
+    public static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot stop nonexistent plugin: " + appName);
             return false;
@@ -424,7 +431,7 @@ public class PluginStarter implements Runnable {
     /** @return true on success - caller should call stopPlugin() first */
     static boolean deletePlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot delete nonexistent plugin: " + appName);
             return false;
@@ -469,7 +476,7 @@ public class PluginStarter implements Runnable {
 
     /** plugin.config */
     public static Properties pluginProperties(I2PAppContext ctx, String appName) {
-        File cfgFile = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + '/' + "plugin.config");
+        File cfgFile = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName + '/' + "plugin.config");
         Properties rv = new Properties();
         try {
             DataHelper.loadProps(rv, cfgFile);
@@ -530,7 +537,7 @@ public class PluginStarter implements Runnable {
      */
     public static List<String> getPlugins() {
         List<String> rv = new ArrayList();
-        File pluginDir = new File(I2PAppContext.getGlobalContext().getConfigDir(), PluginUpdateHandler.PLUGIN_DIR);
+        File pluginDir = new File(I2PAppContext.getGlobalContext().getConfigDir(), PLUGIN_DIR);
         File[] files = pluginDir.listFiles();
         if (files == null)
             return rv;

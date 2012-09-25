@@ -27,6 +27,7 @@ import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -540,10 +541,8 @@ public class RouterConsoleRunner {
         if (contexts != null) {
             RouterContext ctx = contexts.get(0);
 
-            NewsFetcher fetcher = NewsFetcher.getInstance(ctx);
-            Thread newsThread = new I2PAppThread(fetcher, "NewsFetcher", true);
-            newsThread.setPriority(Thread.NORM_PRIORITY - 1);
-            newsThread.start();
+            ConsoleUpdateManager um = new ConsoleUpdateManager(ctx);
+            um.start();
         
             if (PluginStarter.pluginsEnabled(ctx)) {
                 t = new I2PAppThread(new PluginStarter(ctx), "PluginStarter", true);
@@ -551,7 +550,6 @@ public class RouterConsoleRunner {
                 t.start();
                 ctx.addShutdownTask(new PluginStopper(ctx));
             }
-            ctx.addShutdownTask(new NewsShutdown(fetcher, newsThread));
             // stat summarizer registers its own hook
             ctx.addShutdownTask(new ServerShutdown());
             ConfigServiceHandler.registerSignalHandler(ctx);
@@ -723,22 +721,6 @@ public class RouterConsoleRunner {
         }
     }
     
-    /** @since 0.8.8 */
-    private static class NewsShutdown implements Runnable {
-        private final NewsFetcher _fetcher;
-        private final Thread _newsThread;
-
-        public NewsShutdown(NewsFetcher fetcher, Thread t) {
-            _fetcher = fetcher;
-            _newsThread = t;
-        }
-
-        public void run() {
-            _fetcher.shutdown();
-            _newsThread.interrupt();
-        }
-    }
-
     public static Properties webAppProperties() {
         return webAppProperties(I2PAppContext.getGlobalContext().getConfigDir().getAbsolutePath());
     }

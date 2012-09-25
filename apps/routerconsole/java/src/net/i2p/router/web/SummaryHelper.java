@@ -627,19 +627,19 @@ public class SummaryHelper extends HelperBase {
 ********/
 
     public boolean updateAvailable() { 
-        return NewsFetcher.getInstance(_context).updateAvailable();
+        return NewsHelper.isUpdateAvailable();
     }
 
     public boolean unsignedUpdateAvailable() { 
-        return NewsFetcher.getInstance(_context).unsignedUpdateAvailable();
+        return NewsHelper.isUnsignedUpdateAvailable();
     }
 
     public String getUpdateVersion() { 
-        return NewsFetcher.getInstance(_context).updateVersion();
+        return NewsHelper.updateVersion();
     }
 
     public String getUnsignedUpdateVersion() { 
-        return NewsFetcher.getInstance(_context).unsignedUpdateVersion();
+        return NewsHelper.unsignedUpdateVersion();
     }
 
     /**
@@ -649,12 +649,12 @@ public class SummaryHelper extends HelperBase {
     public String getUpdateStatus() {
         StringBuilder buf = new StringBuilder(512);
         // display all the time so we display the final failure message, and plugin update messages too
-        String status = UpdateHandler.getStatus();
+        String status = NewsHelper.getUpdateStatus();
         if (status.length() > 0) {
             buf.append("<h4>").append(status).append("</h4>\n");
         }
         if (updateAvailable() || unsignedUpdateAvailable()) {
-            if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+            if (NewsHelper.isUpdateInProgress()) {
                 // nothing
             } else if(
                       // isDone() is always false for now, see UpdateHandler
