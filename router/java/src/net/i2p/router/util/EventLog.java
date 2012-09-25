@@ -48,12 +48,11 @@ public class EventLog {
     public static final String WATCHDOG = "watchdog";
 
     /**
-     *  @param file must be absolute
-     *  @throws IllegalArgumentException if not absolute
+     *  @param file should be absolute
      */
     public EventLog(I2PAppContext ctx, File file) {
-        if (!file.isAbsolute())
-            throw new IllegalArgumentException();
+        //if (!file.isAbsolute())
+        //    throw new IllegalArgumentException();
         _context = ctx;
         _file = file;
         _cache = new HashMap(4);
@@ -128,7 +127,7 @@ public class EventLog {
                         continue;
                     Long ltime = Long.valueOf(time);
                     String info = s.length > 2 ? s[2] : "";
-                    rv.put(time, info);
+                    rv.put(ltime, info);
                 } catch (IndexOutOfBoundsException ioobe) {
                 } catch (NumberFormatException nfe) {
                 }
