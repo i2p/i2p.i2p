@@ -56,7 +56,7 @@ p.footer {
      line-height:10pt;
 }
 
-.iframed p.footer {
+.iframed #footer {
      display: none;
 }
 
