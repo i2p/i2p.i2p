@@ -113,13 +113,13 @@ public class I2PAppContext {
     private volatile boolean _simpleTimerInitialized;
     private volatile boolean _simpleTimer2Initialized;
     protected final Set<Runnable> _shutdownTasks;
-    private File _baseDir;
-    private File _configDir;
-    private File _routerDir;
-    private File _pidDir;
-    private File _logDir;
-    private File _appDir;
-    private File _tmpDir;
+    private final File _baseDir;
+    private final File _configDir;
+    private final File _routerDir;
+    private final File _pidDir;
+    private final File _logDir;
+    private final File _appDir;
+    private volatile File _tmpDir;
     // split up big lock on this to avoid deadlocks
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
@@ -210,11 +210,9 @@ public class I2PAppContext {
         if (envProps != null)
             _overrideProps.putAll(envProps);
         _shutdownTasks = new ConcurrentHashSet(32);
-        initializeDirs();
         _portMapper = new PortMapper(this);
-    }
     
-   /**
+   /*
     *  Directories. These are all set at instantiation and will not be changed by
     *  subsequent property changes.
     *  All properties, if set, should be absolute paths.
@@ -259,7 +257,7 @@ public class I2PAppContext {
     *  All dirs except the base are created if they don't exist, but the creation will fail silently.
     *  @since 0.7.6
     */
-    private void initializeDirs() {
+
         String s = getProperty("i2p.dir.base", System.getProperty("user.dir"));
         _baseDir = new File(s);
 

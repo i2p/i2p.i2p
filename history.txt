@@ -1,3 +1,12 @@
+2012-09-25 zzz
+ * Context: Make files final
+ * EventLog: Fix IAE on portable
+ * Jetty: Add non-NIO selector option (ticket #715)
+ * OutboundEstablishState: Cleanup (ticket #671)
+ * SimpleByteCache: Concurrent fix
+ * UPnP: Cleanup & final
+ * URLLauncher: Add xdg-open (ticket #617)
+
 2012-09-21 zzz
  * BuildHandler: Use CoDel for inbound queue
  * ByteCache:
@@ -45,8 +54,8 @@
    - Raise netdb store and reply priority
  * Router:
    - Boost priority of shutdown thread
-   - Replace ident log with new, general-purpose event log.
-   - Use for stops, starts, and updates, and others.
+   - Replace ident log with new, general-purpose event log;
+     use for stops, starts, and updates, and others.
    - New AQM CoDel queue utilities
    - Startup/shutdown synchronization fixes
  * RouterAddress: Remove unused expiration field to save space

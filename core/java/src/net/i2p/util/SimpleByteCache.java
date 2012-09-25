@@ -16,7 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public final class SimpleByteCache {
 
-    private static final Map<Integer, SimpleByteCache> _caches = new ConcurrentHashMap(8);
+    private static final ConcurrentHashMap<Integer, SimpleByteCache> _caches = new ConcurrentHashMap(8);
 
     private static final int DEFAULT_SIZE = 64;
 
@@ -45,7 +45,9 @@ public final class SimpleByteCache {
         SimpleByteCache cache = _caches.get(sz);
         if (cache == null) {
             cache = new SimpleByteCache(cacheSize, size);
-            _caches.put(sz, cache);
+            SimpleByteCache old = _caches.putIfAbsent(sz, cache);
+            if (old != null)
+                cache = old;
         }
         cache.resize(cacheSize);
         return cache;
