@@ -1,7 +1,5 @@
 package net.i2p.router.web;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +11,7 @@ import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler;
+import net.i2p.util.Addresses;
 
 /**
  * Handler to deal with form submissions from the main config form and act
@@ -143,6 +142,7 @@ public class ConfigNetHandler extends FormHandler {
      */
     private void saveChanges() {
         boolean restartRequired = false;
+        boolean error = false;
         List<String> removes = new ArrayList();
         
         if (!_ratesOnly) {
@@ -166,6 +166,8 @@ public class ConfigNetHandler extends FormHandler {
                     valid = verifyAddress(uhost);
                     if (valid) {
                         changes.put(UDPTransport.PROP_EXTERNAL_HOST, uhost);
+                    } else {
+                        error = true;
                     }
                 } else {
                     removes.add(UDPTransport.PROP_EXTERNAL_HOST);
@@ -195,7 +197,9 @@ public class ConfigNetHandler extends FormHandler {
                     valid = verifyAddress(_ntcpHostname);
                     if (valid) {
                         changes.put(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
-                        addFormNotice(_("Updating inbound TCP address to") + " " + _ntcpHostname);
+                        addFormNotice(_("Updating TCP address to {0}", _ntcpHostname));
+                    } else {
+                        error = true;
                     }
                 } else {
                     removes.add(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
@@ -212,8 +216,13 @@ public class ConfigNetHandler extends FormHandler {
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
                 if (_ntcpPort.length() > 0 && !_ntcpAutoPort) {
-                    changes.put(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
-                    addFormNotice(_("Updating inbound TCP port to") + " " + _ntcpPort);
+                    if (Addresses.getPort(_ntcpPort) != 0) {
+                        changes.put(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
+                        addFormNotice(_("Updating TCP port to {0}", _ntcpPort));
+                    } else {
+                        addFormError(_("Invalid port") + ": " + _ntcpPort);
+                        error = true;
+                    }
                 } else {
                     removes.add(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
                     addFormNotice(_("Updating inbound TCP port to auto"));
@@ -226,10 +235,15 @@ public class ConfigNetHandler extends FormHandler {
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
                 String oldPort = _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
                 if (!oldPort.equals(_udpPort)) {
-                    changes.put(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
-                    changes.put(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
-                    addFormNotice(_("Updating UDP port from") + " " + oldPort + " " + _("to") + " " + _udpPort);
-                    restartRequired = true;
+                    if (Addresses.getPort(_udpPort) != 0) {
+                        changes.put(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
+                        changes.put(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
+                        addFormNotice(_("Updating UDP port to {0}", _udpPort));
+                        restartRequired = true;
+                    } else {
+                        addFormError(_("Invalid port") + ": " + _udpPort);
+                        error = true;
+                    }
                 }
             }
 
@@ -302,10 +316,11 @@ public class ConfigNetHandler extends FormHandler {
         if (ratesUpdated)
             _context.bandwidthLimiter().reinitialize();
         
-        if (switchRequired) {
-            hiddenSwitch();
-        } else if (restartRequired) {
-            //if (_context.hasWrapper()) {
+        if (saved && !error) {
+            if (switchRequired) {
+                hiddenSwitch();
+            } else if (restartRequired) {
+              //if (_context.hasWrapper()) {
                 // Wow this dumps all conns immediately and really isn't nice
                 addFormNotice("Performing a soft restart");
                 _context.router().restart();
@@ -320,12 +335,13 @@ public class ConfigNetHandler extends FormHandler {
                 // So don't do this...
                 //_context.router().rebuildRouterInfo();
                 //addFormNotice("Router Info rebuilt");
-            //} else {
+              //} else {
                 // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
                 // But it would be hard to get right, so just do a restart.
                 //addFormError(_("Gracefully restarting I2P to change published router address"));
                 //_context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            //}
+              //}
+            }
         }
     }
 
@@ -337,17 +353,15 @@ public class ConfigNetHandler extends FormHandler {
     private boolean verifyAddress(String addr) {
         if (addr == null || addr.length() <= 0)
             return false;
-        try {
-            InetAddress ia = InetAddress.getByName(addr);
-            byte[] iab = ia.getAddress();
-            boolean rv = TransportImpl.isPubliclyRoutable(iab);
-            if (!rv)
-                addFormError(_("The hostname or IP {0} is not publicly routable", addr));
-            return rv;
-        } catch (UnknownHostException uhe) {
-            addFormError(_("The hostname or IP {0} is invalid", addr) + ": " + uhe);
+        byte[] iab = Addresses.getIP(addr);
+        if (iab == null) {
+            addFormError(_("Invalid address") + ": " + addr);
             return false;
         }
+        boolean rv = TransportImpl.isPubliclyRoutable(iab);
+        if (!rv)
+            addFormError(_("The hostname or IP {0} is not publicly routable", addr));
+        return rv;
     }
 
     private void hiddenSwitch() {

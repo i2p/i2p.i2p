@@ -222,14 +222,8 @@
             <label><%=intl._("Port")%>:</label>
             <span class="text">
          <%
-               String cPort= indexBean.getClientPort(curClient);
-               if ("".equals(cPort)) {
-                   out.write("<font color=\"red\">");
-                   out.write(intl._("Port not set"));
-                   out.write("</font>");
-               } else {
-                   out.write(cPort);
-               }
+               String cPort= indexBean.getClientPort2(curClient);
+               out.write(cPort);
           %>
             </span>
         </div>

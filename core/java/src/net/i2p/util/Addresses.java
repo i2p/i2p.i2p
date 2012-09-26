@@ -154,6 +154,26 @@ public abstract class Addresses {
             return "(bad IP length " + addr.length + "):" + port;
         }
     }
+    
+    /**
+     *  Convenience method to convert and validate a port String
+     *  without throwing an exception.
+     *  Does not trim.
+     *
+     *  @return 1-65535 or 0 if invalid
+     *  @since 0.9.3
+     */
+    public static int getPort(String port) {
+        int rv = 0;
+        if (port != null) {
+            try {
+                int iport = Integer.parseInt(port);
+                if (iport > 0 && iport <= 65535)
+                    rv = iport;
+            } catch (NumberFormatException nfe) {}
+        }
+        return rv;
+    }
 
     /**
      *  Textual IP to bytes, because InetAddress.getByName() is slow.
@@ -184,6 +204,9 @@ public abstract class Addresses {
      *  Caches numeric host names only.
      *  Will resolve but not cache DNS host names.
      *
+     *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
+     *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
+     *
      *  @param host DNS or IPv4 or IPv6 host name; if null returns null
      *  @return IP or null
      *  @since 0.9.3
@@ -197,8 +220,11 @@ public abstract class Addresses {
         }
         if (rv == null) {
             try {
+                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
+                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
+                    return null;
                 rv = InetAddress.getByName(host).getAddress();
-                if (host.replaceAll("[0-9\\.]", "").length() == 0 ||
+                if (isIPv4 ||
                     host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
                     synchronized (_IPAddress) {
                         _IPAddress.put(host, rv);
