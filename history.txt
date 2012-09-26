@@ -1,3 +1,15 @@
+2012-09-xx zzz
+ * Addresses: Reject numeric IPs of the form n, n.n, and n.n.n
+ * Console, i2ptunnel: More validation of address and port in forms
+ * ConvertToHash:
+   - Add support for b64hash.i2p
+   - Cleanup and use cache
+ * i2psnark: Enable DHT by default
+ * RFC822Date: Synchronization fix
+ * Streaming:
+   - Implement changing connection limits on a running session
+   - Implement global blacklist
+
 2012-09-25 zzz
  * Context: Make files final
  * EventLog: Fix IAE on portable
@@ -5,7 +17,7 @@
  * OutboundEstablishState: Cleanup (ticket #671)
  * SimpleByteCache: Concurrent fix
  * UPnP: Cleanup & final
- * URLLauncher: Add xdg-open (ticket #617)
+ * URLLauncher: Add xdg-open (ticket #717)
 
 2012-09-21 zzz
  * BuildHandler: Use CoDel for inbound queue

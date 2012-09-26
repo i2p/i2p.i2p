@@ -36,7 +36,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final ConnectionOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
-    private int _maxStreams;
     private static int __managerId = 0;
     private final ConnectionManager _connectionManager;
     
@@ -53,9 +52,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public I2PSocketManagerFull() {
         throw new UnsupportedOperationException();
     }
-    
-    /** how many streams will we allow at once?  */
-    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
     
     /**
      * @deprecated use 4-arg constructor
@@ -79,19 +75,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _session = session;
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
         
-        _maxStreams = -1;
-        try {
-            String num = (opts != null ? opts.getProperty(PROP_MAX_STREAMS, "-1") : "-1");
-            _maxStreams = Integer.parseInt(num);
-        } catch (NumberFormatException nfe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid max # of concurrent streams, defaulting to unlimited", nfe);
-            _maxStreams = -1;
-        }
         _name = name + " " + (++__managerId);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
-        _connectionManager = new ConnectionManager(_context, _session, _maxStreams, _defaultOptions);
+        _connectionManager = new ConnectionManager(_context, _session, _defaultOptions);
         _serverSocket = new I2PServerSocketFull(this);
         
         if (_log.shouldLog(Log.INFO)) {
@@ -182,6 +169,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Changing options from:\n " + _defaultOptions + "\nto:\n " + options);
         _defaultOptions.updateAll((ConnectionOptions) options);
+        _connectionManager.updateOptions();
     }
 
     /**
@@ -244,7 +232,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         // the following blocks unless connect delay > 0
         Connection con = _connectionManager.connect(peer, opts);
         if (con == null)
-            throw new TooManyStreamsException("Too many streams (max " + _maxStreams + ")");
+            throw new TooManyStreamsException("Too many streams, max " + _defaultOptions.getMaxConns());
         I2PSocketFull socket = new I2PSocketFull(con);
         con.setSocket(socket);
         if (con.getConnectionError() != null) { 

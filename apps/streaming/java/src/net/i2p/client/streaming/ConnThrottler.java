@@ -15,8 +15,8 @@ import net.i2p.util.SimpleTimer;
  */
 class ConnThrottler {
     private final ObjectCounter<Hash> counter;
-    private final int _max;
-    private final int _totalMax;
+    private volatile int _max;
+    private volatile int _totalMax;
     private final AtomicInteger _currentTotal;
 
     /*
@@ -27,15 +27,19 @@ class ConnThrottler {
     ConnThrottler(int max, int totalMax, long period) {
         _max = max;
         _totalMax = totalMax;
-        if (max > 0)
-            this.counter = new ObjectCounter<Hash>();
-        else
-            this.counter = null;
-        if (totalMax > 0)
-            _currentTotal = new AtomicInteger();
-        else
-            _currentTotal = null;
+        this.counter = new ObjectCounter<Hash>();
+        _currentTotal = new AtomicInteger();
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), period);
+    }
+
+    /*
+     * @param max per-peer, 0 for unlimited
+     * @param totalMax for all peers, 0 for unlimited
+     * @since 0.9.3
+     */
+    public void updateLimits(int max, int totalMax) {
+        _max = max;
+        _totalMax = totalMax;
     }
 
     /**
