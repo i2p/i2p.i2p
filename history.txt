@@ -1,4 +1,4 @@
-2012-09-xx zzz
+2012-09-26 zzz
  * Addresses: Reject numeric IPs of the form n, n.n, and n.n.n
  * Console, i2ptunnel: More validation of address and port in forms
  * ConvertToHash:
