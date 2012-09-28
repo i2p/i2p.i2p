@@ -705,6 +705,9 @@ public class I2PAppContext {
      * There is absolutely no good reason to make this context specific, 
      * other than for consistency, and perhaps later we'll want to 
      * include some stats.
+     *
+     * DEPRECATED - non-standard and used only by SSU.
+     * To be moved from context to SSU.
      */
     public HMACGenerator hmac() { 
         if (!_hmacInitialized)
