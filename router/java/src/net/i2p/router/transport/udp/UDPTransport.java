@@ -1744,7 +1744,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int FLAG_CWND= 6;
     private static final int FLAG_SSTHRESH = 7;
     private static final int FLAG_RTT = 8;
-    private static final int FLAG_DEV = 9;
+    //private static final int FLAG_DEV = 9;
     private static final int FLAG_RTO = 10;
     private static final int FLAG_MTU = 11;
     private static final int FLAG_SEND = 12;
@@ -1784,9 +1784,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             case FLAG_RTT:
                 rv = RTTComparator.instance();
                 break;
-            case FLAG_DEV:
-                rv = DevComparator.instance();
-                break;
+            //case FLAG_DEV:
+            //    rv = DevComparator.instance();
+            //    break;
             case FLAG_RTO:
                 rv = RTOComparator.instance();
                 break;
@@ -1927,6 +1927,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
+ /***
     private static class DevComparator extends PeerComparator {
         private static final DevComparator _instance = new DevComparator();
         public static final DevComparator instance() { return _instance; }
@@ -1939,6 +1941,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+  ****/
+
+    /** */
     private static class RTOComparator extends PeerComparator {
         private static final RTOComparator _instance = new RTOComparator();
         public static final RTOComparator instance() { return _instance; }
@@ -2088,8 +2093,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rtt\">RTT</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time"), FLAG_RTT);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_("Dev")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time deviation"), FLAG_DEV);
+        //buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_("Dev")).append("</a><br>");
+        //appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time deviation"), FLAG_DEV);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.rto\">RTO</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _("Sort by retransmission timeout"), FLAG_RTO);
         buf.append("</th>\n");
@@ -2212,9 +2217,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(DataHelper.formatDuration2(rtt));
             buf.append("</td>");
             
-            buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(DataHelper.formatDuration2(peer.getRTTDeviation()));
-            buf.append("</td>");
+            //buf.append("<td class=\"cells\" align=\"right\">");
+            //buf.append(DataHelper.formatDuration2(peer.getRTTDeviation()));
+            //buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(DataHelper.formatDuration2(rto));
@@ -2291,7 +2296,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</b></td><td>&nbsp;</td>\n" +
                    "<td align=\"center\"><b>");
         buf.append(numPeers > 0 ? DataHelper.formatDuration2(rttTotal/numPeers) : '0');
-        buf.append("</b></td><td>&nbsp;</td><td align=\"center\"><b>");
+        //buf.append("</b></td><td>&nbsp;</td><td align=\"center\"><b>");
+        buf.append("</b></td><td align=\"center\"><b>");
         buf.append(numPeers > 0 ? DataHelper.formatDuration2(rtoTotal/numPeers) : '0');
         buf.append("</b></td><td align=\"center\"><b>").append(_mtu).append("</b></td><td align=\"center\"><b>");
         buf.append(sendTotal).append("</b></td><td align=\"center\"><b>").append(recvTotal).append("</b></td>\n" +
