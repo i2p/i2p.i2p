@@ -80,9 +80,12 @@ class Writer {
     }
     
     private class Runner implements Runnable {
-        private boolean _stop;
-        public Runner() { _stop = false; }
+        private volatile boolean _stop;
+
+        public Runner() {}
+
         public void stop() { _stop = true; }
+
         public void run() {
             if (_log.shouldLog(Log.INFO)) _log.info("Starting writer");
             NTCPConnection con = null;
