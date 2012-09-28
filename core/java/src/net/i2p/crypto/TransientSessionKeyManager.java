@@ -744,7 +744,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                 total += size;
                 buf.append("<li><b>ID: ").append(ts.getID())
                    .append(" Received:</b> ").append(DataHelper.formatDuration2(now - ts.getDate())).append(" ago with ");
-                buf.append(size).append(" tags remaining</li>");
+                buf.append(size).append('/').append(ts.getOriginalSize()).append(" tags remaining</li>");
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
@@ -774,7 +774,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                 total += size;
                 buf.append("<li><b>ID: ").append(ts.getID())
                    .append(" Sent:</b> ").append(DataHelper.formatDuration2(now - ts.getDate())).append(" ago with ");
-                buf.append(size).append(" tags remaining; acked? ").append(ts.getAcked()).append("</li>");
+                buf.append(size).append('/').append(ts.getOriginalSize()).append(" tags remaining; acked? ").append(ts.getAcked()).append("</li>");
             }
             buf.append("</ul></td></tr>\n");
             out.write(buf.toString());
@@ -1084,6 +1084,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         private final SessionKey _key;
         private final long _date;
         private final int _id;
+        private final int _origSize;
         //private Exception _createdBy;
         /** did we get an ack for this tagset? Only for outbound tagsets */
         private boolean _acked;
@@ -1095,6 +1096,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             _key = key;
             _date = date;
             _id = id;
+            _origSize = tags.size();
             //if (true) {
             //    long now = I2PAppContext.getGlobalContext().clock().now();
             //    _createdBy = new Exception("Created by: key=" + _key.toBase64() + " on " 
@@ -1106,6 +1108,11 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         /** when the tag set was created */
         public long getDate() {
             return _date;
+        }
+
+        /** @since 0.9.3 for debugging */
+        public long getOriginalSize() {
+            return _origSize;
         }
 
         //void setDate(long when) {
