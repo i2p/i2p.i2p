@@ -240,6 +240,7 @@ class ConnectionManager {
                 Hash h = from.calculateHash();
                 if ((_hourThrottler != null && _hourThrottler.isThrottled(h)) ||
                     (_dayThrottler != null && _dayThrottler.isThrottled(h)) ||
+                    _globalBlacklist.contains(h) ||
                     (_defaultOptions.isAccessListEnabled() && !_defaultOptions.getAccessList().contains(h)) ||
                     (_defaultOptions.isBlacklistEnabled() && _defaultOptions.getBlacklist().contains(h))) {
                     // A signed RST packet + ElGamal + session tags is fairly expensive, so
@@ -435,7 +436,7 @@ class ConnectionManager {
         if (!_currentBlacklist.equals(hashes)) {
             // rebuild _globalBlacklist when property changes
             synchronized(_globalBlacklist) {
-                if (hashes != null) {
+                if (hashes.length() > 0) {
                     Set<Hash> newSet = new HashSet();
                     StringTokenizer tok = new StringTokenizer(hashes, ",; ");
                     while (tok.hasMoreTokens()) {
