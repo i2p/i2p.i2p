@@ -74,15 +74,14 @@ public class ConfigUpdateHelper extends HelperBase {
     
     public String getUpdateThroughProxy() {
         String proxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
-        if (Boolean.valueOf(proxy).booleanValue()) 
+        if (Boolean.parseBoolean(proxy)) 
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"checked\" >";
         else
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
     }
     
     public String getUpdateUnsigned() {
-        String foo = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
-        if (Boolean.valueOf(foo).booleanValue()) 
+        if (_context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED))
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"checked\" >";
         else
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";

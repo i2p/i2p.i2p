@@ -190,11 +190,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         // no need to load the netDb with leaseSets for destinations that will never 
         // be looked up
         boolean dccEnabled = (this instanceof I2PTunnelIRCClient) &&
-                      Boolean.valueOf(tunnel.getClientOptions().getProperty(I2PTunnelIRCClient.PROP_DCC)).booleanValue();
+                      Boolean.parseBoolean(tunnel.getClientOptions().getProperty(I2PTunnelIRCClient.PROP_DCC));
         if (!dccEnabled)
             tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
         
-        boolean openNow = !Boolean.valueOf(tunnel.getClientOptions().getProperty("i2cp.delayOpen")).booleanValue();
+        boolean openNow = !Boolean.parseBoolean(tunnel.getClientOptions().getProperty("i2cp.delayOpen"));
         if (openNow) {
             while (sockMgr == null) {
                 verifySocketManager();
@@ -258,8 +258,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 if (sess == null) {
                     newManager = true;
                 } else if (sess.isClosed() &&
-                           Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.closeOnIdle")).booleanValue() &&
-                           Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.newDestOnResume")).booleanValue()) {
+                           Boolean.parseBoolean(getTunnel().getClientOptions().getProperty("i2cp.closeOnIdle")) &&
+                           Boolean.parseBoolean(getTunnel().getClientOptions().getProperty("i2cp.newDestOnResume"))) {
                     // build a new socket manager and a new dest if the session is closed.
                     getTunnel().removeSession(sess);
                     if (_log.shouldLog(Log.WARN))

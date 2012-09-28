@@ -169,7 +169,7 @@ public class UpdateHandler {
             // Alternative: In bytesTransferred(), Check the data in the output file after
             // we've received at least 56 bytes. Need a cancel() method in EepGet ?
 
-            boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+            boolean shouldProxy = Boolean.parseBoolean(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY));
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             int proxyPort = ConfigUpdateHandler.proxyPort(_context);
 

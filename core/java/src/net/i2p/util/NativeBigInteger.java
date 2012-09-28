@@ -449,7 +449,7 @@ public class NativeBigInteger extends BigInteger {
     private static final void loadNative() {
         try{
             String wantedProp = System.getProperty("jbigi.enable", "true");
-            boolean wantNative = Boolean.valueOf(wantedProp).booleanValue();
+            boolean wantNative = Boolean.parseBoolean(wantedProp);
             if (wantNative) {
                 debug("trying loadGeneric");
                 boolean loaded = loadGeneric("jbigi");

@@ -91,7 +91,7 @@ class GeoIP {
      */
 /******
     public void lookup() {
-        if (! Boolean.valueOf(_context.getProperty(PROP_GEOIP_ENABLED, "true")).booleanValue()) {
+        if (! _context.getBooleanPropertyDefaultTrue(PROP_GEOIP_ENABLED)) {
             _pendingSearch.clear();
             return;
         }
@@ -105,7 +105,7 @@ class GeoIP {
      * Results will be added to the table and available via get() after completion.
      */
     public void blockingLookup() {
-        if (! Boolean.valueOf(_context.getProperty(PROP_GEOIP_ENABLED, "true")).booleanValue()) {
+        if (! _context.getBooleanPropertyDefaultTrue(PROP_GEOIP_ENABLED)) {
             _pendingSearch.clear();
             return;
         }

@@ -708,7 +708,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private boolean getIsPortFixed() {
         String prop = _context.getProperty(PROP_FIXED_PORT);
         if (prop != null)
-            return Boolean.valueOf(prop).booleanValue();
+            return Boolean.parseBoolean(prop);
         int status = getReachabilityStatus();
         return status != CommSystemFacade.STATUS_REJECT_UNSOLICITED;
     }
@@ -1503,7 +1503,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  it's usually false positives.
          ******************
         String forceIntroducers = _context.getProperty(PROP_FORCE_INTRODUCERS);
-        if ( (forceIntroducers != null) && (Boolean.valueOf(forceIntroducers).booleanValue()) ) {
+        if ( (forceIntroducers != null) && (Boolean.parseBoolean(forceIntroducers)) ) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Force introducers specified");
             return true;

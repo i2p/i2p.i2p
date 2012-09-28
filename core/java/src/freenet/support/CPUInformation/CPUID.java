@@ -260,7 +260,7 @@ public class CPUID {
     private static final void loadNative() {
         try{
         String wantedProp = System.getProperty("jcpuid.enable", "true");
-        boolean wantNative = Boolean.valueOf(wantedProp).booleanValue();
+        boolean wantNative = Boolean.parseBoolean(wantedProp);
         if (wantNative) {
             boolean loaded = loadGeneric();
             if (loaded) {

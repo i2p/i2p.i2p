@@ -114,7 +114,7 @@ public class EditBean extends IndexBean {
     public boolean isSharedClient(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null)
-            return Boolean.valueOf(tun.getSharedClient()).booleanValue();
+            return Boolean.parseBoolean(tun.getSharedClient());
         else
             return false;
     }
@@ -312,7 +312,7 @@ public class EditBean extends IndexBean {
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts != null)
-                return Boolean.valueOf(opts.getProperty(prop)).booleanValue();
+                return Boolean.parseBoolean(opts.getProperty(prop));
         }
         return false;
     }

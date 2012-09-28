@@ -154,7 +154,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             boolean allowGZIP = true;
             if (opts != null) {
                 String val = opts.getProperty("i2ptunnel.gzip");
-                if ( (val != null) && (!Boolean.valueOf(val).booleanValue()) ) 
+                if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
                     allowGZIP = false;
             }
             if (_log.shouldLog(Log.INFO))

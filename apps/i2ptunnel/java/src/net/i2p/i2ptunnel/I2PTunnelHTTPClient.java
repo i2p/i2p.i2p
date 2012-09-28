@@ -521,7 +521,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             // Try to find an address helper in the query
                             String[] helperStrings = removeHelper(query);
                             if(helperStrings != null &&
-                                    !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER)).booleanValue()) {
+                                    !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER))) {
                                 query = helperStrings[0];
                                 if(query.equals("")) {
                                     query = null;
@@ -736,7 +736,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if(lowercaseLine.startsWith("user-agent: ")) {
                         // save for deciding whether to offer address book form
                         userAgent = lowercaseLine.substring(12);
-                        if(!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue()) {
+                        if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             line = null;
                             continue;
                         }
@@ -746,13 +746,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         line = null;
                         continue;
                     } else if(lowercaseLine.startsWith("referer: ") &&
-                            !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_REFERER)).booleanValue()) {
+                            !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_REFERER))) {
                         // Shouldn't we be more specific, like accepting in-site referers ?
                         //line = "Referer: i2p";
                         line = null;
                         continue; // completely strip the line
                     } else if(lowercaseLine.startsWith("via: ") &&
-                            !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_VIA)).booleanValue()) {
+                            !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_VIA))) {
                         //line = "Via: i2p";
                         line = null;
                         continue; // completely strip the line
@@ -786,7 +786,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     String ok = getTunnel().getClientOptions().getProperty("i2ptunnel.gzip");
                     boolean gzip = DEFAULT_GZIP;
                     if(ok != null) {
-                        gzip = Boolean.valueOf(ok).booleanValue();
+                        gzip = Boolean.parseBoolean(ok);
                     }
                     if(gzip && !usingInternalServer) {
                         // according to rfc2616 s14.3, this *should* force identity, even if
@@ -796,7 +796,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }
                     if(!shout) {
-                        if(!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue()) {
+                        if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
                             if(usingWWWProxy) {
                                 newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
@@ -806,7 +806,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         }
                     }
                     // Add Proxy-Authentication header for next hop (outproxy)
-                    if(usingWWWProxy && Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_AUTH)).booleanValue()) {
+                    if(usingWWWProxy && Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_AUTH))) {
                         // specific for this proxy
                         String user = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_USER_PREFIX + currentProxy);
                         String pw = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_PW_PREFIX + currentProxy);
@@ -869,7 +869,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if(usingInternalServer) {
                 // disable the add form if address helper is disabled
                 if(internalPath.equals("/add") &&
-                        Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER)).booleanValue()) {
+                        Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER))) {
                     out.write(ERR_HELPER_DISABLED);
                 } else {
                     LocalHTTPServer.serveLocalFile(out, method, internalPath, internalRawQuery, _proxyNonce);
@@ -949,7 +949,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // Don't do this for eepget, which uses a user-agent of "Wget"
             if(ahelperNew && "GET".equals(method) &&
                     (userAgent == null || !userAgent.startsWith("Wget")) &&
-                    !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER)).booleanValue()) {
+                    !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER))) {
                 writeHelperSaveForm(out, destination, ahelperKey, targetRequest);
                 s.close();
                 return;

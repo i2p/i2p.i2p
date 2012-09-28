@@ -348,7 +348,7 @@ public class InNetMessagePool implements Service {
         _dispatchThreaded = DEFAULT_DISPATCH_THREADED;
         String threadedStr = _context.getProperty(PROP_DISPATCH_THREADED);
         if (threadedStr != null) {
-            _dispatchThreaded = Boolean.valueOf(threadedStr).booleanValue();
+            _dispatchThreaded = Boolean.parseBoolean(threadedStr);
         }
         if (_dispatchThreaded) {
             _context.statManager().createRateStat("pool.dispatchDataTime", "How long a tunnel dispatch takes", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });

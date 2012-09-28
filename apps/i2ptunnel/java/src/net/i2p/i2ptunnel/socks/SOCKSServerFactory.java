@@ -49,7 +49,7 @@ public class SOCKSServerFactory {
             switch (socksVer) {
             case 0x04:
                 // SOCKS version 4/4a
-                if (Boolean.valueOf(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)).booleanValue() &&
+                if (Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_USER) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_PW)) {
                     throw new SOCKSException("SOCKS 4/4a not supported when authorization is required");

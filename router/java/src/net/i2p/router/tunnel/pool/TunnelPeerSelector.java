@@ -460,7 +460,7 @@ public abstract class TunnelPeerSelector {
             else 
                 val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
         
-        boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
+        boolean rv = (val != null ? Boolean.parseBoolean(val) : def);
         //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
         return rv;
     }
@@ -490,7 +490,7 @@ public abstract class TunnelPeerSelector {
             else 
                 val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW);
         
-        boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
+        boolean rv = (val != null ? Boolean.parseBoolean(val) : def);
         //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
         return rv;
     }
@@ -519,7 +519,7 @@ public abstract class TunnelPeerSelector {
             else 
                 val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME);
         
-        boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
+        boolean rv = (val != null ? Boolean.parseBoolean(val) : def);
         //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
         return rv;
     }

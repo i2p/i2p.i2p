@@ -45,7 +45,7 @@ class HarvesterJob extends JobImpl {
     public static final String PROP_ENABLED = "netDb.shouldHarvest";
 
     private boolean harvestDirectly() { 
-        return Boolean.valueOf(getContext().getProperty("netDb.harvestDirectly", "false")).booleanValue();
+        return getContext().getBooleanProperty("netDb.harvestDirectly");
     }
     
     public HarvesterJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {

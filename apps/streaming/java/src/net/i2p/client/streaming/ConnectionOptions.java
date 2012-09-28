@@ -764,7 +764,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts == null) return defaultVal;
         String val = opts.getProperty(name);
         if (val == null)  return defaultVal;
-        return Boolean.valueOf(val).booleanValue();
+        return Boolean.parseBoolean(val);
     }
 
 /****

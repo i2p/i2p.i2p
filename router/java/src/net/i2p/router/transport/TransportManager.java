@@ -362,7 +362,7 @@ public class TransportManager implements TransportEventListener {
             }
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
             if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
-                Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue()) {
+                _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
                 Transport udp = getTransport(UDPTransport.STYLE);
                 if (udp != null)
                     port = t.getRequestedPort();

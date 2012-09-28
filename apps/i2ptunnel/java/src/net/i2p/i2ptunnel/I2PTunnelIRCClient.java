@@ -87,7 +87,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
         
         setName("IRC Client on " + tunnel.listenHost + ':' + localPort);
 
-        _dccEnabled = Boolean.valueOf(tunnel.getClientOptions().getProperty(PROP_DCC)).booleanValue();
+        _dccEnabled = Boolean.parseBoolean(tunnel.getClientOptions().getProperty(PROP_DCC));
         // TODO add some prudent tunnel options (or is it too late?)
 
         startRunning();

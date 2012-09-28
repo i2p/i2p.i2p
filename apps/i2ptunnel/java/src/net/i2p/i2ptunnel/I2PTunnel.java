@@ -694,7 +694,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     public void runClient(String args[], Logging l) {
         boolean isShared = true;
         if (args.length >= 3)
-            isShared = Boolean.valueOf(args[2].trim()).booleanValue();
+            isShared = Boolean.parseBoolean(args[2].trim());
         if (args.length >= 2) {
             int portNum = -1;
             try {
@@ -766,7 +766,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             String proxy = "";
             boolean isShared = true;
             if (args.length > 1) {
-                if (Boolean.valueOf(args[1].trim()).booleanValue()) {
+                if (Boolean.parseBoolean(args[1].trim())) {
                     isShared = true;
                     if (args.length == 3)
                         proxy = args[2];
@@ -835,7 +835,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             String proxy = "";
             boolean isShared = true;
             if (args.length > 1) {
-                if (Boolean.valueOf(args[1].trim()).booleanValue()) {
+                if (Boolean.parseBoolean(args[1].trim())) {
                     isShared = true;
                     if (args.length == 3)
                         proxy = args[2];
@@ -906,7 +906,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             
             boolean isShared = true;
             if (args.length > 2) {
-                if (Boolean.valueOf(args[2].trim()).booleanValue()) {
+                if (Boolean.parseBoolean(args[2].trim())) {
                     isShared = true;
                 } else if ("false".equalsIgnoreCase(args[2].trim())) {
                     _log.warn("args[2] == [" + args[2] + "] and rejected explicitly");
@@ -973,7 +973,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
             boolean isShared = false;
             if (args.length > 1)
-                isShared = Boolean.valueOf(args[1].trim()).booleanValue();
+                isShared = Boolean.parseBoolean(args[1].trim());
 
             ownDest = !isShared;
             try {
@@ -1017,7 +1017,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
             boolean isShared = false;
             if (args.length == 2)
-                isShared = Boolean.valueOf(args[1].trim()).booleanValue();
+                isShared = Boolean.parseBoolean(args[1].trim());
 
             ownDest = !isShared;
             String privateKeyFile = null;

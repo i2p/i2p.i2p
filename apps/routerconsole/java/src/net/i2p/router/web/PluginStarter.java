@@ -61,12 +61,12 @@ public class PluginStarter implements Runnable {
     }
 
     static boolean pluginsEnabled(I2PAppContext ctx) {
-         return Boolean.valueOf(ctx.getProperty("router.enablePlugins", "true")).booleanValue();
+         return ctx.getBooleanPropertyDefaultTrue("router.enablePlugins");
     }
 
     public void run() {
         if (_context.getBooleanPropertyDefaultTrue("plugins.autoUpdate") &&
-            (!Boolean.valueOf(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS)).booleanValue()) &&
+            (!Boolean.parseBoolean(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) &&
             (!RouterVersion.VERSION.equals(_context.getProperty("router.previousVersion"))))
             updateAll(_context, true);
         startPlugins(_context);
@@ -169,7 +169,7 @@ public class PluginStarter implements Runnable {
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (name.startsWith(PREFIX) && name.endsWith(ENABLED)) {
-                if (Boolean.valueOf(props.getProperty(name)).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty(name))) {
                     String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
                     // plugins could have been started after update
                     if (isPluginRunning(app, ctx))
@@ -508,7 +508,7 @@ public class PluginStarter implements Runnable {
     public static boolean isPluginEnabled(String appName) {
         Properties props = pluginProperties();
         String prop = PREFIX + appName + ENABLED;
-        return Boolean.valueOf(props.getProperty(prop, "true")).booleanValue();
+        return Boolean.parseBoolean(props.getProperty(prop, "true"));
     }
 
     /**
@@ -519,7 +519,7 @@ public class PluginStarter implements Runnable {
     public static void disablePlugin(String appName) {
         Properties props = pluginProperties();
         String prop = PREFIX + appName + ENABLED;
-        if (Boolean.valueOf(props.getProperty(prop, "true")).booleanValue()) {
+        if (Boolean.parseBoolean(props.getProperty(prop, "true"))) {
             props.setProperty(prop, "false");
             storePluginProperties(props);
         }

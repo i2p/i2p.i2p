@@ -134,7 +134,7 @@ public class SAMStreamSession {
         
         socketMgr.addDisconnectListener(new DisconnectListener());
 
-        forceFlush = Boolean.valueOf(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH)).booleanValue();
+        forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
         
         boolean canReceive = false;
         if (dir.equals("BOTH")) {

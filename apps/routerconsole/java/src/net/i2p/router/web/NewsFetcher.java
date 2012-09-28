@@ -172,7 +172,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     boolean dontInstall() {
         File test = new File(_context.getBaseDir(), "history.txt");
         boolean readonly = ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite()));
-        boolean disabled = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED)).booleanValue();
+        boolean disabled = _context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED);
         return readonly || disabled;
     }
 
@@ -220,7 +220,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
 
     public void fetchNews() {
         String newsURL = ConfigUpdateHelper.getNewsURL(_context);
-        boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+        boolean shouldProxy = Boolean.parseBoolean(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY));
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         int proxyPort = ConfigUpdateHandler.proxyPort(_context);
         if (_tempFile.exists())
@@ -252,7 +252,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public boolean shouldFetchUnsigned() {
         String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
         return url != null && url.length() > 0 &&
-               Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED)).booleanValue() &&
+               _context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED) &&
                !dontInstall();
     }
 
@@ -265,7 +265,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         if (url == null || url.length() <= 0)
             return;
         // assume always proxied for now
-        //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+        //boolean shouldProxy = Boolean.parseBoolean(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY));
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
 

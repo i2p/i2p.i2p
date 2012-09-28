@@ -176,7 +176,7 @@ public class Router implements RouterClock.ClockShiftListener {
 
         // Do we copy all the data files to the new directory? default false
         String migrate = System.getProperty("i2p.dir.migrate");
-        boolean migrateFiles = Boolean.valueOf(migrate).booleanValue();
+        boolean migrateFiles = Boolean.parseBoolean(migrate);
         String userDir = WorkingDir.getWorkingDir(envProps, migrateFiles);
 
         // Use the router.config file specified in the router.configLocation property
@@ -196,7 +196,7 @@ public class Router implements RouterClock.ClockShiftListener {
         envProps.putAll(_config);
 
         // This doesn't work, guess it has to be in the static block above?
-        // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
+        // if (Boolean.parseBoolean(envProps.getProperty("router.disableIPv6")))
         //    System.setProperty("java.net.preferIPv4Stack", "true");
 
         if (envProps.getProperty("i2p.dir.config") == null)
@@ -630,7 +630,7 @@ public class Router implements RouterClock.ClockShiftListener {
             return true;
         String h = _context.getProperty(PROP_HIDDEN_HIDDEN);
         if (h != null)
-            return Boolean.valueOf(h).booleanValue();
+            return Boolean.parseBoolean(h);
         return _context.commSystem().isInBadCountry();
     }
 

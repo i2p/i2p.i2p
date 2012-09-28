@@ -219,7 +219,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
         // auto-add auth if required, not set in the options, and we are not in the same JVM
         if ((!_context.isRouterContext()) &&
-            Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue() &&
+            _context.getBooleanProperty("i2cp.auth") &&
             ((!options.containsKey("i2cp.username")) || (!options.containsKey("i2cp.password")))) {
             String configUser = _context.getProperty("i2cp.username");
             String configPW = _context.getProperty("i2cp.password");
@@ -349,7 +349,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _queue = mgr.connect();
                 _reader = new QueuedI2CPMessageReader(_queue, this);
             } else {
-                if (Boolean.valueOf(_options.getProperty(PROP_ENABLE_SSL)).booleanValue())
+                if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL)))
                     _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
                 else
                     _socket = new Socket(_hostname, _portNum);
@@ -976,8 +976,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private void startIdleMonitor() {
         _isReduced = false;
-        boolean reduce = Boolean.valueOf(_options.getProperty("i2cp.reduceOnIdle")).booleanValue();
-        boolean close = Boolean.valueOf(_options.getProperty("i2cp.closeOnIdle")).booleanValue();
+        boolean reduce = Boolean.parseBoolean(_options.getProperty("i2cp.reduceOnIdle"));
+        boolean close = Boolean.parseBoolean(_options.getProperty("i2cp.closeOnIdle"));
         if (reduce || close) {
             updateActivity();
             _context.simpleScheduler().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);

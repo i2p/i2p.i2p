@@ -16,7 +16,7 @@ public class ContentHelper extends HelperBase {
      */
     public void setPage(String page) { _page = page; }
     public void setStartAtBeginning(String moo) { 
-        _startAtBeginning = Boolean.valueOf(""+moo).booleanValue(); 
+        _startAtBeginning = Boolean.parseBoolean(moo); 
     }
     public void setLang(String l) {
 /*****

@@ -120,8 +120,8 @@ public class SummaryHelper extends HelperBase {
     
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
-               ((_context.netDb().getKnownRouters() < 30) ||
-                Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed")).booleanValue());
+               (_context.netDb().getKnownRouters() < 30) ||
+                _context.getBooleanProperty("i2p.alwaysAllowReseed");
     }
     
     /** subtract one for ourselves, so if we know no other peers it displays zero */

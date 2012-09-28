@@ -184,7 +184,7 @@ public class ConfigNetHandler extends FormHandler {
             String oldNPort = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT, "");
             String oldAutoHost = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, "true");
             String sAutoPort = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "true");
-            boolean oldAutoPort = Boolean.valueOf(sAutoPort).booleanValue();
+            boolean oldAutoPort = Boolean.parseBoolean(sAutoPort);
             if (_ntcpHostname == null) _ntcpHostname = "";
             if (_ntcpPort == null) _ntcpPort = "";
             if (_ntcpAutoIP == null) _ntcpAutoIP = "true";
@@ -265,7 +265,7 @@ public class ConfigNetHandler extends FormHandler {
 
             changes.put(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
 
-            if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)).booleanValue() !=
+            if (Boolean.parseBoolean(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)) !=
                 _upnp) {
                 // This is minor, don't set restartRequired
                 if (_upnp)
@@ -275,7 +275,7 @@ public class ConfigNetHandler extends FormHandler {
             }
             changes.put(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
 
-            if (Boolean.valueOf(_context.getProperty(UDPTransport.PROP_LAPTOP_MODE)).booleanValue() !=
+            if (Boolean.parseBoolean(_context.getProperty(UDPTransport.PROP_LAPTOP_MODE)) !=
                 _laptop) {
                 // This is minor, don't set restartRequired
                 if (_laptop)

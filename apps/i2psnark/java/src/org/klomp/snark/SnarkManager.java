@@ -200,11 +200,11 @@ public class SnarkManager implements Snark.CompleteListener {
      *  @since 0.8.9
      */
     public boolean areFilesPublic() {
-        return Boolean.valueOf(_config.getProperty(PROP_FILES_PUBLIC)).booleanValue();
+        return Boolean.parseBoolean(_config.getProperty(PROP_FILES_PUBLIC));
     }
 
     public boolean shouldAutoStart() {
-        return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START)).booleanValue();
+        return Boolean.parseBoolean(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START));
     }
 
 /****
@@ -384,11 +384,11 @@ public class SnarkManager implements Snark.CompleteListener {
         if (ot != null)
             _util.setOpenTrackers(getOpenTrackers());
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
-        boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
+        boolean bOT = useOT == null || Boolean.parseBoolean(useOT);
         _util.setUseOpenTrackers(bOT);
         // careful, so we can switch default to true later
-        _util.setUseDHT(Boolean.valueOf(_config.getProperty(PROP_USE_DHT,
-                                          Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT))).booleanValue());
+        _util.setUseDHT(Boolean.parseBoolean(_config.getProperty(PROP_USE_DHT,
+                                          Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT))));
         getDataDir().mkdirs();
         initTrackerMap();
     }

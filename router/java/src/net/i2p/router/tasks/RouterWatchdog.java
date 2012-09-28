@@ -64,7 +64,7 @@ public class RouterWatchdog implements Runnable {
     
     private boolean shutdownOnHang() {
         // prop default false
-        if (!Boolean.valueOf(_context.getProperty("watchdog.haltOnHang")).booleanValue())
+        if (!_context.getBooleanProperty("watchdog.haltOnHang"))
             return false;
 
         // Client manager starts complaining after 10 minutes, and we run every minute,
