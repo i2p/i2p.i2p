@@ -207,7 +207,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             if (sockMgr == null) {
                 // try to make this error sensible as it will happen...
                 String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
-                             " and build tunnels for the server at " + getTunnel().listenHost + ':' + port;
+                             " and build tunnels for the server at " + host.getHostAddress() + ':' + port;
                 if (++retries < MAX_RETRIES) {
                     this.l.log(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
                     _log.error(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
@@ -223,7 +223,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
         sockMgr.setName("Server");
         getTunnel().addSession(sockMgr.getSession());
-        l.log("Tunnels ready for server at " + getTunnel().listenHost + ':' + port);
+        l.log("Tunnels ready for server at " + host.getHostAddress() + ':' + port);
         notifyEvent("openServerResult", "ok");
         open = true;
     }
