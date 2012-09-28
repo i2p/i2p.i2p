@@ -1,3 +1,13 @@
+2012-09-28 zzz
+ * i2psnark:
+   - Fix bugs in rarest-first tracking
+   - Fix requesting of partial piece when there are multiple seeds
+   - Synch fix in BitField
+ * i2ptunnel: Fix wrong server IP in log message
+ * peers.jsp: Remove SSU "Dev" column
+ * SessionKeyManager: Store original tagset size for debugging
+ * Streaming: Don't send RST on globally-blackisted conns
+
 2012-09-26 zzz
  * Addresses: Reject numeric IPs of the form n, n.n, and n.n.n
  * Console, i2ptunnel: More validation of address and port in forms

@@ -649,10 +649,15 @@ class PeerCoordinator implements PeerListener
     if (listener != null)
       listener.peerChange(this, peer);
 
-    synchronized(wantedPieces)
-      {
-        return wantedPieces.contains(new Piece(piece));
-      }
+    synchronized(wantedPieces) {
+        for (Piece pc : wantedPieces) {
+            if (pc.getId() == piece) {
+                pc.addPeer(peer);
+                return true;
+            }
+        }
+        return false;
+    }
   }
 
   /**
@@ -664,20 +669,17 @@ class PeerCoordinator implements PeerListener
     if (listener != null)
       listener.peerChange(this, peer);
 
-    synchronized(wantedPieces)
-      {
-        Iterator<Piece> it = wantedPieces.iterator();
-        while (it.hasNext())
-          {
-            Piece p = it.next();
+    boolean rv = false;
+    synchronized(wantedPieces) {
+        for (Piece p : wantedPieces) {
             int i = p.getId();
             if (bitfield.get(i)) {
               p.addPeer(peer);
-              return true;
+              rv = true;
             }
-          }
-      }
-    return false;
+        }
+    }
+    return rv;
   }
 
   /**
@@ -1077,8 +1079,7 @@ class PeerCoordinator implements PeerListener
    */
   public void removePeerFromPieces(Peer peer) {
       synchronized(wantedPieces) {
-          for(Iterator<Piece> iter = wantedPieces.iterator(); iter.hasNext(); ) {
-              Piece piece = iter.next();
+          for (Piece piece : wantedPieces) {
               piece.removePeer(peer);
           }
       } 
@@ -1172,11 +1173,24 @@ class PeerCoordinator implements PeerListener
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
                          if (peer.isCompleted() && piece.getPeerCount() > 1) {
-                             // Try to preserve rarest-first when we have only one seeder
-                             // by not preferring a partial piece that others have too
+                             // Try to preserve rarest-first
+                             // by not requesting a partial piece that non-seeders also have
                              // from a seeder
-                             skipped = true;
-                             break;
+                             boolean nonSeeds = false;
+                             for (Peer pr : peers) {
+                                 PeerState state = pr.state;
+                                 if (state == null) continue;
+                                 BitField bf = state.bitfield;
+                                 if (bf == null) continue;
+                                 if (bf.get(savedPiece) && !pr.isCompleted()) {
+                                     nonSeeds = true;
+                                     break;
+                                 }
+                             }
+                             if (nonSeeds) {
+                                 skipped = true;
+                                 break;
+                             }
                          }
                          iter.remove();
                          piece.setRequested(peer, true);

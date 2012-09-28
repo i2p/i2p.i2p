@@ -39,7 +39,6 @@ public class BitField
     this.size = size;
     int arraysize = ((size-1)/8)+1;
     bitfield = new byte[arraysize];
-    this.count = 0;
   }
 
   /**
@@ -99,9 +98,11 @@ public class BitField
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     int index = bit/8;
     int mask = 128 >> (bit % 8);
-    if ((bitfield[index] & mask) == 0) {
-      count++;
-      bitfield[index] |= mask;
+    synchronized(this) {
+        if ((bitfield[index] & mask) == 0) {
+            count++;
+            bitfield[index] |= mask;
+        }
     }
   }
 
