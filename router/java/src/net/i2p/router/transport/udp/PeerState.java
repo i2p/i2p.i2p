@@ -137,11 +137,11 @@ class PeerState {
     /** what IP is the peer sending and receiving packets on? */
     private final byte[] _remoteIP;
     /** cached IP address */
-    private transient InetAddress _remoteIPAddress;
+    private volatile InetAddress _remoteIPAddress;
     /** what port is the peer sending and receiving packets on? */
-    private final int _remotePort;
+    private volatile int _remotePort;
     /** cached RemoteHostId, used to find the peerState by remote info */
-    private final RemoteHostId _remoteHostId;
+    private volatile RemoteHostId _remoteHostId;
 
     /** if we need to contact them, do we need to talk to an introducer? */
     //private boolean _remoteRequiresIntroduction;
@@ -284,8 +284,10 @@ class PeerState {
      */
     public static final int LARGE_MTU = 1484;
     
+    /** 600 */
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
-    private static final int INIT_RTO = 4*1000;
+    private static final int INIT_RTO = 3*1000;
+    public static final int INIT_RTT = INIT_RTO / 2;
     private static final int MAX_RTO = 15*1000;
     
     public PeerState(RouterContext ctx, UDPTransport transport,
@@ -313,7 +315,7 @@ class PeerState {
         //_mtuLastChecked = -1;
         _lastACKSend = -1;
         _rto = INIT_RTO;
-        _rtt = INIT_RTO / 2;
+        _rtt = INIT_RTT;
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
@@ -325,6 +327,17 @@ class PeerState {
         _remoteHostId = new RemoteHostId(remoteIP, remotePort);
     }
     
+    /** 
+     *  Caller should sync; UDPTransport must remove and add to peersByRemoteHost map
+     *  @since 0.9.3
+     */
+    public void changePort(int newPort) {
+        if (newPort != _remotePort) {
+            _remoteHostId = new RemoteHostId(_remoteIP, newPort);
+            _remotePort = newPort;
+        }
+    }
+
     /**
      * The peer are we talking to.  This should be set as soon as this
      * state is created if we are initiating a connection, but if we are
@@ -342,9 +355,12 @@ class PeerState {
      * connection is established.
      */
     public SessionKey getCurrentCipherKey() { return _currentCipherKey; }
+
     /** 
      * The pending AES key for verifying packets if we are rekeying the 
      * connection, or null if we are not in the process of rekeying.
+     *
+     * @return null always, rekeying unimplemented
      */
     public SessionKey getNextMACKey() { return _nextMACKey; }
 
@@ -352,6 +368,8 @@ class PeerState {
      * The pending AES key for encrypting/decrypting packets if we are 
      * rekeying the connection, or null if we are not in the process 
      * of rekeying.
+     *
+     * @return null always, rekeying unimplemented
      */
     public SessionKey getNextCipherKey() { return _nextCipherKey; }
 
@@ -1213,6 +1231,7 @@ class PeerState {
         //    return MAX_RTO;
     }
     
+    /** @return non-null */
     RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
     /**
@@ -1875,6 +1894,9 @@ class PeerState {
         buf.append(" consecFail: ").append(_consecutiveFailedSends);
         buf.append(" recv OK/Dup: ").append(_packetsReceived).append('/').append(_packetsReceivedDuplicate);
         buf.append(" send OK/Dup: ").append(_packetsTransmitted).append('/').append(_packetsRetransmitted);
+        buf.append(" IBM: ").append(_inboundMessages.size());
+        buf.append(" OBQ: ").append(_outboundQueue.size());
+        buf.append(" OBL: ").append(_outboundMessages.size());
         return buf.toString();
     }
 }

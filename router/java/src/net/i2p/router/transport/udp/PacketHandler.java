@@ -1,11 +1,14 @@
 package net.i2p.router.transport.udp;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 
 /**
@@ -30,6 +33,8 @@ class PacketHandler {
     private final IntroductionManager _introManager;
     private volatile boolean _keepReading;
     private final Handler[] _handlers;
+    private final Map<RemoteHostId, Object> _failCache;
+    private static final Object DUMMY = new Object();
     
     private static final int MIN_NUM_HANDLERS = 1;  // unless < 32MB
     private static final int MAX_NUM_HANDLERS = 1;
@@ -46,6 +51,7 @@ class PacketHandler {
         _inbound = inbound;
         _testManager = testManager;
         _introManager = introManager;
+        _failCache = new LHMCache(24);
 
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
@@ -143,8 +149,8 @@ class PacketHandler {
                 if (packet == null) break; // keepReading is probably false, or bind failed...
 
                 packet.received();
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Received: " + packet);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Received: " + packet);
                 _state = 4;
                 long queueTime = packet.getLifetime();
                 long handleStart = _context.clock().now();
@@ -294,7 +300,7 @@ class PacketHandler {
                             receivePacket(reader, packet, est, false);
                         } else {
                             if (_log.shouldLog(Log.WARN))
-                                _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP");
+                                _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP " + packet);
                             _context.statManager().addRateData("udp.droppedInvalidReestablish", packet.getLifetime(), packet.getExpiration());
                         }
                         return;
@@ -327,8 +333,70 @@ class PacketHandler {
             if (!isValid) {
                 // Note that the vast majority of these are NOT corrupted packets, but
                 // packets for which we don't have the PeerState (i.e. SessionKey)
+                // Case 1: 48 byte destroy packet, we already closed
+                // Case 2: 369 byte session created packet, re-tx of one that failed validation
+                //         (peer probably doesn't know his correct external port, esp. on <= 0.9.1
+
+                // Case 3:
+                // For peers that change ports, look for an existing session with the same IP
+                // If we find it, and the packet validates with its mac key, tell the transport
+                // to change the port, and handle the packet.
+                // All this since 0.9.3.
+                RemoteHostId remoteHost = packet.getRemoteHost();
+                boolean alreadyFailed;
+                synchronized(_failCache) {
+                    alreadyFailed = _failCache.get(remoteHost) != null;
+                }                
+                if (!alreadyFailed) {
+                    // this is slow, that's why we cache it above.
+                    List<PeerState> peers = _transport.getPeerStatesByIP(remoteHost);
+                    if (!peers.isEmpty()) {
+                        StringBuilder buf = new StringBuilder(256);
+                        buf.append("Established peers with this IP: ");
+                        boolean foundSamePort = false;
+                        PeerState state = null;
+                        int newPort = remoteHost.getPort();
+                        for (PeerState ps : peers) {
+                            boolean valid = false;
+                            long now = _context.clock().now();
+                            if (_log.shouldLog(Log.WARN))
+                                buf.append(ps.getRemoteHostId().toString())
+                                   .append(" last sent: ").append(now - ps.getLastSendTime())
+                                   .append(" last rcvd: ").append(now - ps.getLastReceiveTime());
+                            if (ps.getRemotePort() == newPort) {
+                                foundSamePort = true;
+                            } else if (packet.validate(ps.getCurrentMACKey())) {
+                                packet.decrypt(ps.getCurrentCipherKey());
+                                reader.initialize(packet);
+                                if (_log.shouldLog(Log.WARN))
+                                    buf.append(" VALID type ").append(reader.readPayloadType()).append("; ");
+                                valid = true;
+                                if (state == null)
+                                    state = ps;
+                            } else {
+                                if (_log.shouldLog(Log.WARN))
+                                    buf.append(" INVALID; ");
+                            }
+                        }
+                        if (state != null && !foundSamePort) {
+                            _transport.changePeerPort(state, newPort);
+                            if (_log.shouldLog(Log.WARN)) {
+                                buf.append(" CHANGED PORT TO ").append(newPort).append(" AND HANDLED");
+                                _log.warn(buf.toString());
+                            }
+                            handlePacket(reader, packet, state, null, null, true);
+                            return;
+                        }
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(buf.toString());
+                    }
+                    synchronized(_failCache) {
+                        _failCache.put(remoteHost, DUMMY);
+                    }                
+                }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Cannot validate rcvd pkt (path): " + packet);
+                    _log.warn("Cannot validate rcvd pkt (path) wasCached? " + alreadyFailed + ": " + packet);
+
                 _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
                 switch (peerType) {
                     case INBOUND_FALLBACK:

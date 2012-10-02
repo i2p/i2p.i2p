@@ -1,3 +1,21 @@
+2012-10-02 zzz
+ * I2CP: Delay after sending disconnect message to
+         help it get through
+ * i2psnark: Fix delete download message
+ * i2ptunnel: Fix log message
+ * NTCP: Only set keepalive if firewalled
+ * OOMListener: Dump threads on OOM
+ * PRNG, LogWriter: Use I2PThread to catch OOM
+ * SimpleByteCache: Fix ABQ/LBQ selection
+ * SSU:
+   - Fix memory leak in _peersByRemoteHost map caused by not
+     removing peers that change IP or port
+   - Send keepalives if firewalled
+   - Handle peers that change ports on an established session
+   - Synchronize adds and drops
+   - Don't use peers with high RTTs in clock skew calculation
+   - Reduce initial RTT/RTO
+
 2012-09-28 zzz
  * i2psnark:
    - Fix bugs in rarest-first tracking
