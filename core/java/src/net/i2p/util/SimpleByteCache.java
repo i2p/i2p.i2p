@@ -88,7 +88,7 @@ public final class SimpleByteCache {
      *  @since 0.9.2
      */
     private Queue<byte[]> createQueue() {
-        if (_maxCached <= MAX_FOR_ABQ)
+        if (_entrySize <= MAX_FOR_ABQ)
             return new ArrayBlockingQueue(_maxCached);
         return new LinkedBlockingQueue(_maxCached);
     }
