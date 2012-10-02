@@ -308,6 +308,11 @@ class ClientConnectionRunner {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error writing out the disconnect message: " + ime);
         }
+        // give it a little time to get sent out...
+        // even better would be to have stopRunning() flush it?
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ie) {}
         stopRunning();
     }
     
