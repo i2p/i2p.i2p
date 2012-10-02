@@ -609,6 +609,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                             MetaInfo meta = snark.getMetaInfo();
                             if (meta == null) {
                                 // magnet - remove and delete are the same thing
+                                // Remove not shown on UI so we shouldn't get here
                                 _manager.deleteMagnet(snark);
                                 _manager.addMessage(_("Magnet deleted: {0}", name));
                                 return;
@@ -637,7 +638,10 @@ public class I2PSnarkServlet extends DefaultServlet {
                             if (meta == null) {
                                 // magnet - remove and delete are the same thing
                                 _manager.deleteMagnet(snark);
-                                _manager.addMessage(_("Magnet deleted: {0}", name));
+                                if (snark instanceof FetchAndAdd)
+                                    _manager.addMessage(_("Download deleted: {0}", name));
+                                else
+                                    _manager.addMessage(_("Magnet deleted: {0}", name));
                                 return;
                             }
                             _manager.stopTorrent(snark, true);
