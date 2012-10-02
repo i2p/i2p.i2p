@@ -1,11 +1,11 @@
 --- a/router/java/src/net/i2p/router/tasks/OOMListener.java
 +++ b/router/java/src/net/i2p/router/tasks/OOMListener.java
-@@ -33,7 +33,7 @@
-                 // gobble
-             }
-         }
--        log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in $I2P/wrapper.config");
-+        log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in /etc/i2p/wrapper.config");
-         _context.router().shutdown(Router.EXIT_OOM); 
-     }
- }
+@@ -46,7 +46,7 @@
+             log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
+                               " total mem: " + Runtime.getRuntime().totalMemory());
+             if (_context.hasWrapper())
+-                log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in $I2P/wrapper.config");
++                log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in /etc/i2p/wrapper.config");
+         } catch (OutOfMemoryError oome) {}
+         try { 
+             ThreadDump.dump(_context, 1);
