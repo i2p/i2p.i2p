@@ -717,7 +717,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 addtask(task);
                 notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
-                String msg = "Invalid I2PTunnel configuration to create an HTTP Proxy connecting to the router at " + host + ':'+ port +
+                String msg = "Invalid I2PTunnel configuration to create a standard client tunnel connecting to the router at " + host + ':'+ port +
                              " and listening on " + listenHost + ':' + portNum;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
