@@ -72,6 +72,7 @@ class PeerState {
      *  A positive number means our clock is ahead of theirs.
      */
     private long _clockSkew;
+    private final Object _clockSkewLock = new Object();
 
     /** what is the current receive second, for congestion control? */
     private long _currentReceiveSecond;
@@ -79,6 +80,8 @@ class PeerState {
     private long _lastSendTime;
     /** when did we last send them a message that was ACKed */
     private long _lastSendFullyTime;
+    /** when did we last send them a ping? */
+    private long _lastPingTime;
     /** when did we last receive a packet from them? */
     private long _lastReceiveTime;
     /** how many consecutive messages have we sent and not received an ACK to */
@@ -289,6 +292,7 @@ class PeerState {
     private static final int INIT_RTO = 3*1000;
     public static final int INIT_RTT = INIT_RTO / 2;
     private static final int MAX_RTO = 15*1000;
+    private static final int CLOCK_SKEW_FUDGE = (ACKSender.ACK_FREQUENCY * 2) / 3;
     
     public PeerState(RouterContext ctx, UDPTransport transport,
                      byte[] remoteIP, int remotePort, Hash remotePeer, boolean isInbound) {
@@ -522,7 +526,12 @@ class PeerState {
      *              A positive number means our clock is ahead of theirs.
      */
     public void adjustClockSkew(long skew) { 
-        _clockSkew = (long) (0.9*_clockSkew + 0.1*(skew - (_rtt / 2))); 
+        // the real one-way delay is much less than RTT / 2, due to ack delays,
+        // so add a fudge factor
+        double adj = 0.1 * (skew + CLOCK_SKEW_FUDGE - (_rtt / 2)); 
+        synchronized(_clockSkewLock) {
+            _clockSkew = (long) (0.9*_clockSkew + adj); 
+        }
     }
 
     /** what is the current receive second, for congestion control? */
@@ -531,6 +540,19 @@ class PeerState {
     public void setLastSendTime(long when) { _lastSendTime = when; }
     /** when did we last receive a packet from them? */
     public void setLastReceiveTime(long when) { _lastReceiveTime = when; }
+
+    /**
+     *  Note ping sent. Does not update last send time.
+     *  @since 0.9.3
+     */
+    public void setLastPingTime(long when) { _lastPingTime = when; }
+
+    /**
+     *  Latest of last sent and last ping
+     *  @since 0.9.3
+     */
+    public long getLastSendOrPingTime() { return Math.max(_lastSendTime, _lastPingTime); }
+
     /** return the smoothed send transfer rate */
     public int getSendBps() { return _sendBps; }
     public int getReceiveBps() { return _receiveBps; }

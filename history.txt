@@ -1,3 +1,13 @@
+2012-10-03 zzz
+ * NTCP: Reduce conLock contention
+ * SSU:
+   - Increase max outbound establishments based on bandwidth
+   - Synchronization fix for Java 5
+   - Use multiple buffer sizes in OutboundMessageState to
+     reduce memory usage
+   - Adjust skew calculation, synchronize too
+   - Ping loop improvements
+
 2012-10-02 zzz
  * I2CP: Delay after sending disconnect message to
          help it get through

@@ -42,10 +42,20 @@ class OutboundMessageState implements CDPQEntry {
     private long _seqNum;
     
     public static final int MAX_MSG_SIZE = 32 * 1024;
-    /** is this enough for a high-bandwidth router? */
-    private static final int MAX_ENTRIES = 64;
-    /** would two caches, one for small and one for large messages, be better? */
-    private static final ByteCache _cache = ByteCache.getInstance(MAX_ENTRIES, MAX_MSG_SIZE);
+    private static final int CACHE4_BYTES = MAX_MSG_SIZE;
+    private static final int CACHE3_BYTES = CACHE4_BYTES / 4;
+    private static final int CACHE2_BYTES = CACHE3_BYTES / 4;
+    private static final int CACHE1_BYTES = CACHE2_BYTES / 4;
+
+    private static final int CACHE1_MAX = 256;
+    private static final int CACHE2_MAX = CACHE1_MAX / 4;
+    private static final int CACHE3_MAX = CACHE2_MAX / 4;
+    private static final int CACHE4_MAX = CACHE3_MAX / 4;
+
+    private static final ByteCache _cache1 = ByteCache.getInstance(CACHE1_MAX, CACHE1_BYTES);
+    private static final ByteCache _cache2 = ByteCache.getInstance(CACHE2_MAX, CACHE2_BYTES);
+    private static final ByteCache _cache3 = ByteCache.getInstance(CACHE3_MAX, CACHE3_BYTES);
+    private static final ByteCache _cache4 = ByteCache.getInstance(CACHE4_MAX, CACHE4_BYTES);
 
     private static final long EXPIRATION = 10*1000;
     
@@ -72,6 +82,7 @@ class OutboundMessageState implements CDPQEntry {
      *  Called from UDPTransport
      *  TODO make two constructors, remove this, and make more things final
      *  @return success
+     *  @throws IAE if too big
      */
     public boolean initialize(I2NPMessage msg, PeerState peer) {
         if (msg == null) 
@@ -91,6 +102,7 @@ class OutboundMessageState implements CDPQEntry {
      *  Called from OutboundMessageFragments
      *  TODO make two constructors, remove this, and make more things final
      *  @return success
+     *  @throws IAE if too big
      */
     public boolean initialize(OutNetMessage m, I2NPMessage msg) {
         if ( (m == null) || (msg == null) ) 
@@ -110,19 +122,13 @@ class OutboundMessageState implements CDPQEntry {
      *  Called from OutboundMessageFragments
      *  @param m null if msg is "injected"
      *  @return success
+     *  @throws IAE if too big
      */
     private boolean initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
         _message = m;
         _peer = peer;
-        if (_messageBuf != null) {
-            _cache.release(_messageBuf);
-            _messageBuf = null;
-        }
-
-        _messageBuf = _cache.acquire();
         int size = msg.getRawMessageSize();
-        if (size > _messageBuf.getData().length)
-            throw new IllegalArgumentException("Size too large!  " + size + " in " + msg);
+        acquireBuf(size);
         try {
             int len = msg.toRawByteArray(_messageBuf.getData());
             _messageBuf.setValid(len);
@@ -137,13 +143,49 @@ class OutboundMessageState implements CDPQEntry {
             //    _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
             return true;
         } catch (IllegalStateException ise) {
-            _cache.release(_messageBuf);
-            _messageBuf = null;
-            _released = true;
+            releaseBuf();
             return false;
         }
     }
     
+    /**
+     *  @throws IAE if too big
+     *  @since 0.9.3
+     */
+    private void acquireBuf(int size) {
+        if (_messageBuf != null)
+            releaseBuf();
+        if (size <= CACHE1_BYTES)
+            _messageBuf =  _cache1.acquire();
+        else if (size <= CACHE2_BYTES)
+            _messageBuf = _cache2.acquire();
+        else if (size <= CACHE3_BYTES)
+            _messageBuf = _cache3.acquire();
+        else if (size <= CACHE4_BYTES)
+            _messageBuf = _cache4.acquire();
+        else
+            throw new IllegalArgumentException("Size too large! " + size);
+    }
+    
+    /**
+     *  @since 0.9.3
+     */
+    private void releaseBuf() {
+        if (_messageBuf == null)
+            return;
+        int size = _messageBuf.getData().length;
+        if (size == CACHE1_BYTES)
+            _cache1.release(_messageBuf);
+        else if (size == CACHE2_BYTES)
+            _cache2.release(_messageBuf);
+        else if (size == CACHE3_BYTES)
+            _cache3.release(_messageBuf);
+        else if (size == CACHE4_BYTES)
+            _cache4.release(_messageBuf);
+        _messageBuf = null;
+        _released = true;
+    }
+
     /**
      *  This is synchronized with writeFragment(),
      *  so we do not release (probably due to an ack) while we are retransmitting.
@@ -151,8 +193,7 @@ class OutboundMessageState implements CDPQEntry {
      */
     public synchronized void releaseResources() { 
         if (_messageBuf != null && !_released) {
-            _cache.release(_messageBuf);
-            _released = true;
+            releaseBuf();
             if (_log.shouldLog(Log.WARN))
                 _releasedBy = new Exception ("Released on " + new Date() + " by:");
         }

@@ -86,7 +86,9 @@ class EstablishmentManager {
     private int _activity;
     
     /** max outbound in progress - max inbound is half of this */
-    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 30;
+    private final int DEFAULT_MAX_CONCURRENT_ESTABLISH;
+    private static final int DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH = 20;
+    private static final int DEFAULT_HIGH_MAX_CONCURRENT_ESTABLISH = 150;
     private static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
 
     /** max pending outbound connections (waiting because we are at MAX_CONCURRENT_ESTABLISH) */
@@ -132,6 +134,9 @@ class EstablishmentManager {
         _outboundByClaimedAddress = new ConcurrentHashMap();
         _outboundByHash = new ConcurrentHashMap();
         _activityLock = new Object();
+        DEFAULT_MAX_CONCURRENT_ESTABLISH = Math.max(DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH,
+                                                    Math.min(DEFAULT_HIGH_MAX_CONCURRENT_ESTABLISH,
+                                                             ctx.bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
         _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.inboundEstablishFailedState", "What state a failed inbound establishment request fails in", "udp", UDPTransport.RATES);
@@ -573,7 +578,14 @@ class EstablishmentManager {
                     }
                 }
                 
+        if (_outboundStates.size() < getMaxConcurrentEstablish() && !_queuedOutbound.isEmpty()) {
+            // in theory shouldn't need locking, but
+            // getting IllegalStateExceptions on old Java 5,
+            // which hoses this state.
+            synchronized(_queuedOutbound) {
                 locked_admitQueued();
+            }
+        }
             //remaining = _queuedOutbound.size();
 
         //if (admitted > 0)
@@ -600,6 +612,7 @@ class EstablishmentManager {
             // ok, active shrunk, lets let some queued in.
 
             Map.Entry<RemoteHostId, List<OutNetMessage>> entry = iter.next();
+            // java 5 IllegalStateException here
             iter.remove();
             RemoteHostId to = entry.getKey();
             List<OutNetMessage> allQueued = entry.getValue();
@@ -709,7 +722,7 @@ class EstablishmentManager {
     private void sendInboundComplete(PeerState peer) {
         // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
         if (_log.shouldLog(Log.INFO))
-            _log.info("Completing to the peer after confirm: " + peer);
+            _log.info("Completing to the peer after IB confirm: " + peer);
         DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
         dsm.setArrival(Router.NETWORK_ID); // overloaded, sure, but future versions can check this
                                            // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat

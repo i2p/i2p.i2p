@@ -2440,6 +2440,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private final Set<PeerState> _expirePeers;
         private final List<PeerState> _expireBuffer;
         private volatile boolean _alive;
+        private int _runCount;
+        // we've seen firewalls change ports after 40 seconds
+        private static final long PING_FIREWALL_TIME = 30*1000;
+        private static final long PING_FIREWALL_CUTOFF = PING_FIREWALL_TIME / 2;
+        // ping 1/4 of the peers every loop
+        private static final int SLICES = 4;
+        private static final long SHORT_LOOP_TIME = PING_FIREWALL_CUTOFF / (SLICES + 1);
+        private static final long LONG_LOOP_TIME = 25*1000;
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
@@ -2457,10 +2465,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long shortInactivityCutoff = now - _expireTimeout;
             long longInactivityCutoff = now - EXPIRE_TIMEOUT;
             long pingCutoff = now - (2 * 60*60*1000);
-            long pingFirewallCutoff = now - (60 * 1000);
+            long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
             boolean shouldPingFirewall = _reachabilityStatus != CommSystemFacade.STATUS_OK;
             boolean pingOneOnly = shouldPingFirewall && _externalListenPort == _endpoint.getListenPort();
+            boolean shortLoop = shouldPingFirewall;
             _expireBuffer.clear();
+            _runCount++;
 
                 for (Iterator<PeerState> iter = _expirePeers.iterator(); iter.hasNext(); ) {
                     PeerState peer = iter.next();
@@ -2474,7 +2484,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         _expireBuffer.add(peer);
                         iter.remove();
                     } else if (shouldPingFirewall &&
-                               peer.getLastSendTime() < pingFirewallCutoff &&
+                               ((_runCount ^ peer.hashCode()) & (SLICES - 1)) == 0 &&
+                               peer.getLastSendOrPingTime() < pingFirewallCutoff &&
                                peer.getLastReceiveTime() < pingFirewallCutoff) {
                         // ping if firewall is mapping the port to keep port the same...
                         // if the port changes we are screwed
@@ -2485,6 +2496,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // or else session will stay open forever?
                         //peer.setLastSendTime(now);
                         send(_destroyBuilder.buildPing(peer));
+                        peer.setLastPingTime(now);
                         // If external port is different, it may be changing the port for every
                         // session, so ping all of them. Otherwise only one.
                         if (pingOneOnly)
@@ -2499,7 +2511,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _expireBuffer.clear();
 
             if (_alive)
-                schedule(30*1000);
+                schedule(shortLoop ? SHORT_LOOP_TIME : LONG_LOOP_TIME);
         }
 
         public void add(PeerState peer) {
@@ -2513,7 +2525,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public void setIsAlive(boolean isAlive) {
             _alive = isAlive;
             if (isAlive) {
-                reschedule(30*1000);
+                reschedule(LONG_LOOP_TIME);
             } else {
                 cancel();
                 _expirePeers.clear();
