@@ -957,9 +957,10 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (clearMessage) {
             // see synchronization comments in prepareNextWriteFast()
             synchronized (_outbound) {
-                if (_currentOutbound != null)
+                if (_currentOutbound != null) {
                     msg = _currentOutbound;
-                _currentOutbound = null;
+                    _currentOutbound = null;
+                }
             }
             if (msg != null) {
                 _lastSendTime = System.currentTimeMillis();
@@ -1032,11 +1033,11 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             //_sendBps15s = (0.955f)*_sendBps15s + (0.045f)*((float)sent*1000f)/(float)time;
             //_recvBps15s = (0.955f)*_recvBps15s + (0.045f)*((float)recv*1000)/(float)time;
 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Rates updated to "
-                           + _sendBps + '/' + _recvBps + "Bps in/out " 
-                           //+ _sendBps15s + "/" + _recvBps15s + "Bps in/out 15s after "
-                           + sent + '/' + recv + " in " + DataHelper.formatDuration(time));
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Rates updated to "
+            //               + _sendBps + '/' + _recvBps + "Bps in/out " 
+            //               //+ _sendBps15s + "/" + _recvBps15s + "Bps in/out 15s after "
+            //               + sent + '/' + recv + " in " + DataHelper.formatDuration(time));
         }
     }
         
