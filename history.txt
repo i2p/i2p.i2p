@@ -1,3 +1,15 @@
+2012-10-05 zzz
+ * configservice.jsp: Add GC button
+ * DataHelper: Sanity checks in storeProps(), use
+               storeProps() for router config again
+ * SSU:
+   - More synchronization fixes
+   - Reduce chance of dup acks in a single message
+   - Reduce max unsent acks to 50
+   - Use last ack time in ping decision too
+   - Reduce ack delay
+ * TunnelPoolManager: Fix early NPE (ticket #724)
+
 2012-10-03 zzz
  * NTCP: Reduce conLock contention
  * SSU:
