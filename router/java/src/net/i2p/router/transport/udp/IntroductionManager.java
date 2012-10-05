@@ -185,14 +185,15 @@ class IntroductionManager {
      */
     public void pingIntroducers() {
         // Try to keep the connection up for two hours after we made anybody an introducer
-        long pingCutoff = _context.clock().now() - (105 * 60 * 1000);
-        long inactivityCutoff = _context.clock().now() - UDPTransport.MIN_EXPIRE_TIMEOUT;
+        long now = _context.clock().now();
+        long pingCutoff = now - (105 * 60 * 1000);
+        long inactivityCutoff = now - UDPTransport.MIN_EXPIRE_TIMEOUT;
         for (PeerState cur : _inbound) {
             if (cur.getIntroducerTime() > pingCutoff &&
                 cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Pinging introducer: " + cur);
-                cur.setLastSendTime(_context.clock().now());
+                cur.setLastSendTime(now);
                 _transport.send(_builder.buildPing(cur));
             }
         }
