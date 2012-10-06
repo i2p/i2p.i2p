@@ -146,6 +146,7 @@ class EstablishmentManager {
         _context.statManager().createRateStat("udp.establishDropped", "Dropped an inbound establish message", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.establishRejected", "How many pending outbound connections are there when we refuse to add any more?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.establishOverflow", "How many messages were queued up on a pending connection when it was too much?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.establishBadIP", "Received IP or port was bad", "udp", UDPTransport.RATES);
         // following are for PeerState
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", UDPTransport.RATES);
@@ -251,6 +252,7 @@ class EstablishmentManager {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
                 _transport.markUnreachable(toHash);
                 //_context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
+                _context.statManager().addRateData("udp.establishBadIP", 1);
                 return;
             }
 
@@ -439,6 +441,7 @@ class EstablishmentManager {
                 if (_context.blocklist().isBlocklisted(from.getIP())) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Receive session request from blocklisted IP: " + from);
+                    _context.statManager().addRateData("udp.establishBadIP", 1);
                     return; // drop the packet
                 }
                 if (!_transport.allowConnection())
@@ -889,15 +892,14 @@ class EstablishmentManager {
         byte ip[] = new byte[sz];
         reader.getRelayResponseReader().readCharlieIP(ip, 0);
         int port = reader.getRelayResponseReader().readCharliePort();
+        if ((!isValid(ip, port)) || (!isValid(bob.getIP(), bob.getPort()))) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad relay resp from " + bob + " for " + Addresses.toString(ip, port));
+            _context.statManager().addRateData("udp.relayBadIP", 1);
+            return;
+        }
         InetAddress addr = null;
         try {
-            if (!_transport.isValid(ip))
-                throw new UnknownHostException("non-public IP");
-            // let's not relay to a privileged port, sounds like trouble
-            if (port < 1024 || port > 65535)
-                throw new UnknownHostException("bad port " + port);
-            if (Arrays.equals(ip, _transport.getExternalIP()))
-                throw new UnknownHostException("relay myself");
             addr = InetAddress.getByAddress(ip);
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
@@ -931,7 +933,19 @@ class EstablishmentManager {
         }
         notifyActivity();
     }
-    
+
+    /**
+     *  Are IP and port valid?
+     *  @since 0.9.3
+     */
+    private boolean isValid(byte[] ip, int port) {
+        return port >= 1024 &&
+               port <= 65535 &&
+               _transport.isValid(ip) &&
+               (!Arrays.equals(ip, _transport.getExternalIP())) &&
+               (!_context.blocklist().isBlocklisted(ip));
+    }
+
     /**
      *  Note that while a SessionConfirmed could in theory be fragmented,
      *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,

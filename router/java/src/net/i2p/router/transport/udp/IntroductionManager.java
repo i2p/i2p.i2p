@@ -64,6 +64,7 @@ class IntroductionManager {
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
+        ctx.statManager().createRateStat("udp.relayBadIP", "Received IP or port was bad", "udp", UDPTransport.RATES);
     }
     
     public void reset() {
@@ -160,7 +161,7 @@ class IntroductionManager {
             }
             byte[] ip = cur.getRemoteIP();
             int port = cur.getRemotePort();
-            if (ip == null || !TransportImpl.isPubliclyRoutable(ip) || port < 1024 || port > 65535)
+            if (!isValid(ip, port))
                 continue;
             if (_log.shouldLog(Log.INFO))
                 _log.info("Picking introducer: " + cur);
@@ -227,7 +228,7 @@ class IntroductionManager {
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
-        _context.statManager().addRateData("udp.receiveRelayIntro", 1, 0);
+        _context.statManager().addRateData("udp.receiveRelayIntro", 1);
 
         if (!_transport.allowConnection()) {
             if (_log.shouldLog(Log.WARN))
@@ -239,23 +240,25 @@ class IntroductionManager {
         byte ip[] = new byte[ipSize];
         reader.getRelayIntroReader().readIP(ip, 0);
         int port = reader.getRelayIntroReader().readPort();
+
+        if ((!isValid(ip, port)) || (!isValid(bob.getIP(), bob.getPort()))) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad relay intro from " + bob + " for " + Addresses.toString(ip, port));
+            _context.statManager().addRateData("udp.relayBadIP", 1);
+            return;
+        }
+
         if (_log.shouldLog(Log.INFO))
             _log.info("Receive relay intro from " + bob + " for " + Addresses.toString(ip, port));
         
         InetAddress to = null;
         try {
-            if (!_transport.isValid(ip))
-                throw new UnknownHostException("non-public IP");
-            // let's not punch to a privileged port, sounds like trouble
-            if (port < 1024 || port > 65535)
-                throw new UnknownHostException("bad port " + port);
-            if (Arrays.equals(ip, _transport.getExternalIP()))
-                throw new UnknownHostException("punch myself");
             to = InetAddress.getByAddress(ip);
         } catch (UnknownHostException uhe) {
             // shitlist Bob?
             if (_log.shouldLog(Log.WARN))
                 _log.warn("IP for alice to hole punch to is invalid", uhe);
+            _context.statManager().addRateData("udp.relayBadIP", 1);
             return;
         }
         
@@ -321,7 +324,20 @@ class IntroductionManager {
     void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
-        long tag = reader.getRelayRequestReader().readTag();
+        UDPPacketReader.RelayRequestReader rrReader = reader.getRelayRequestReader();
+        long tag = rrReader.readTag();
+        int ipSize = rrReader.readIPSize();
+        byte ip[] = new byte[ipSize];
+        rrReader.readIP(ip, 0);
+        int port = rrReader.readPort();
+
+        if ((!isValid(ip, port)) || (!isValid(alice.getIP(), alice.getPort()))) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(ip, port));
+            _context.statManager().addRateData("udp.relayBadIP", 1);
+            return;
+        }
+
         PeerState charlie = get(tag);
         if (charlie == null) {
             if (_log.shouldLog(Log.INFO))
@@ -345,5 +361,17 @@ class IntroductionManager {
         _transport.send(_builder.buildRelayIntro(alice, charlie, reader.getRelayRequestReader()));
         // send alice back charlie's info
         _transport.send(_builder.buildRelayResponse(alice, charlie, reader.getRelayRequestReader().readNonce(), aliceIntroKey));
+    }
+
+    /**
+     *  Are IP and port valid?
+     *  @since 0.9.3
+     */
+    private boolean isValid(byte[] ip, int port) {
+        return port >= 1024 &&
+               port <= 65535 &&
+               _transport.isValid(ip) &&
+               (!Arrays.equals(ip, _transport.getExternalIP())) &&
+               (!_context.blocklist().isBlocklisted(ip));
     }
 }

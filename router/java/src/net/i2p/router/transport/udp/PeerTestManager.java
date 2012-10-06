@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -123,6 +124,7 @@ class PeerTestManager {
         _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receiveTestReply", "How often we get a reply to our peer test?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receiveTest", "How often we get a packet requesting us to participate in a peer test?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.testBadIP", "Received IP or port was bad", "udp", UDPTransport.RATES);
     }
     
     private static final int RESEND_TIMEOUT = 5*1000;
@@ -240,7 +242,7 @@ class PeerTestManager {
      * test. We are Alice.
      */
     private synchronized void receiveTestReply(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo) {
-        _context.statManager().addRateData("udp.receiveTestReply", 1, 0);
+        _context.statManager().addRateData("udp.receiveTestReply", 1);
         PeerTestState test = _currentTest;
         if (expired())
             return;
@@ -270,7 +272,10 @@ class PeerTestManager {
                 InetAddress addr = InetAddress.getByAddress(ip);
                 test.setAliceIP(addr);
                 test.setReceiveBobTime(_context.clock().now());
-                test.setAlicePort(testInfo.readPort());
+                int testPort = testInfo.readPort();
+                if (testPort == 0)
+                    throw new UnknownHostException("port 0");
+                test.setAlicePort(testPort);
 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Receive test reply from bob @ " + from + " via our " + test.getAlicePort() + "/" + test.getAlicePortFromCharlie());
@@ -280,6 +285,7 @@ class PeerTestManager {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Unable to get our IP (length " + ipSize +
                                ") from bob's reply: " + from + ", " + testInfo, uhe);
+                _context.statManager().addRateData("udp.testBadIP", 1);
             }
         } else {
             // The reply is from Charlie
@@ -294,7 +300,7 @@ class PeerTestManager {
                               + _currentTest + ", charlie: " + from + ")");
                 // why are we doing this instead of calling testComplete() ?
                 _currentTestComplete = true;
-                _context.statManager().addRateData("udp.statusKnownCharlie", 1, 0);
+                _context.statManager().addRateData("udp.statusKnownCharlie", 1);
                 honorStatus(CommSystemFacade.STATUS_UNKNOWN);
                 _currentTest = null;
                 return;
@@ -302,10 +308,13 @@ class PeerTestManager {
     
             if (test.getReceiveCharlieTime() > 0) {
                 // this is our second charlie, yay!
-                test.setAlicePortFromCharlie(testInfo.readPort());
-                byte ip[] = new byte[testInfo.readIPSize()];
-                testInfo.readIP(ip, 0);
                 try {
+                    int testPort = testInfo.readPort();
+                    if (testPort == 0)
+                        throw new UnknownHostException("port 0");
+                    test.setAlicePortFromCharlie(testPort);
+                    byte ip[] = new byte[testInfo.readIPSize()];
+                    testInfo.readIP(ip, 0);
                     InetAddress addr = InetAddress.getByAddress(ip);
                     test.setAliceIPFromCharlie(addr);
                     if (_log.shouldLog(Log.DEBUG))
@@ -316,6 +325,7 @@ class PeerTestManager {
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
+                    _context.statManager().addRateData("udp.testBadIP", 1);
                 }
             } else {
                 if (test.getPacketsRelayed() > MAX_RELAYED_PER_TEST) {
@@ -343,6 +353,7 @@ class PeerTestManager {
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Charlie's IP is b0rked: " + from + ": " + testInfo);
+                    _context.statManager().addRateData("udp.testBadIP", 1);
                 }
             }
         }
@@ -415,10 +426,42 @@ class PeerTestManager {
      * We could be Alice, Bob, or Charlie.
      */
     public void receiveTest(RemoteHostId from, UDPPacketReader reader) {
-        _context.statManager().addRateData("udp.receiveTest", 1, 0);
+        _context.statManager().addRateData("udp.receiveTest", 1);
+        byte[] fromIP = from.getIP();
+        int fromPort = from.getPort();
+        if (fromPort < 1024 || fromPort > 65535 ||
+            (!_transport.isValid(fromIP)) ||
+            _context.blocklist().isBlocklisted(fromIP)) {
+            // spoof check, and don't respond to privileged ports
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid PeerTest address: " + Addresses.toString(fromIP, fromPort));
+            _context.statManager().addRateData("udp.testBadIP", 1);
+            return;
+        }
         UDPPacketReader.PeerTestReader testInfo = reader.getPeerTestReader();
         byte testIP[] = null;
         int testPort = testInfo.readPort();
+
+        if (testInfo.readIPSize() > 0) {
+            testIP = new byte[testInfo.readIPSize()];
+            testInfo.readIP(testIP, 0);
+        }
+
+        if ((testPort > 0 && (testPort < 1024 || testPort > 65535)) ||
+            (testIP != null && (Arrays.equals(testIP, _transport.getExternalIP()) ||
+                                (!_transport.isValid(testIP)) ||
+                                _context.blocklist().isBlocklisted(testIP)))) {
+            // spoof check, and don't respond to privileged ports
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid address in PeerTest: " + Addresses.toString(testIP, testPort));
+            _context.statManager().addRateData("udp.testBadIP", 1);
+            return;
+        }
+
+        // The from IP/port and message's IP/port are now validated.
+        // EXCEPT that either the message's IP could be empty or the message's port could be 0.
+        // Both of those cases should be checked in receiveXfromY() as appropriate.
+
         long nonce = testInfo.readNonce();
         PeerTestState test = _currentTest;
         if ( (test != null) && (test.getNonce() == nonce) ) {
@@ -429,22 +472,11 @@ class PeerTestManager {
 
         // we are Bob or Charlie
 
-        if ( (testInfo.readIPSize() > 0) && (testPort > 0) ) {
-            testIP = new byte[testInfo.readIPSize()];
-            testInfo.readIP(testIP, 0);
-        }
-
         PeerTestState state = _activeTests.get(Long.valueOf(nonce));
         
         if (state == null) {
             // NEW TEST
-            if ((testPort > 0 && (testPort < 1024 || testPort > 65535)) ||
-                (testIP != null && !_transport.isValid(testIP))) {
-                // spoof check, and don't respond to privileged ports
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid IP/Port rcvd in PeerTest: " + Addresses.toString(testIP, testPort));
-                return;
-            } else if ( (testIP == null) || (testPort <= 0) ) {
+            if ( (testIP == null) || (testPort <= 0) ) {
                 // we are bob, since we haven't seen this nonce before AND its coming from alice
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
@@ -464,11 +496,11 @@ class PeerTestManager {
         } else {
             // EXISTING TEST
             if (state.getOurRole() == PeerTestState.BOB) {
-                if (DataHelper.eq(from.getIP(), state.getAliceIP().getAddress()) && 
-                    (from.getPort() == state.getAlicePort()) ) {
+                if (DataHelper.eq(fromIP, state.getAliceIP().getAddress()) && 
+                    (fromPort == state.getAlicePort()) ) {
                     receiveFromAliceAsBob(from, testInfo, nonce, state);
-                } else if (DataHelper.eq(from.getIP(), state.getCharlieIP().getAddress()) && 
-                           (from.getPort() == state.getCharliePort()) ) {
+                } else if (DataHelper.eq(fromIP, state.getCharlieIP().getAddress()) && 
+                           (fromPort == state.getCharliePort()) ) {
                     receiveFromCharlieAsBob(from, state);
                 } else {
                     if (_log.shouldLog(Log.WARN))
@@ -509,6 +541,8 @@ class PeerTestManager {
         try {
             testInfo.readIP(aliceIPData, 0);
             int alicePort = testInfo.readPort();
+            if (alicePort == 0)
+                throw new UnknownHostException("port 0");
             InetAddress aliceIP = InetAddress.getByAddress(aliceIPData);
             InetAddress bobIP = InetAddress.getByAddress(from.getIP());
             SessionKey aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
@@ -558,6 +592,7 @@ class PeerTestManager {
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to build the aliceIP from " + from + ", ip size: " + sz + " ip val: " + Base64.encode(aliceIPData), uhe);
+            _context.statManager().addRateData("udp.testBadIP", 1);
         }
     }
 
@@ -649,6 +684,7 @@ class PeerTestManager {
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to build the aliceIP from " + from, uhe);
+            _context.statManager().addRateData("udp.testBadIP", 1);
         }
     }
     
@@ -695,6 +731,7 @@ class PeerTestManager {
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to build the aliceIP from " + from, uhe);
+            _context.statManager().addRateData("udp.testBadIP", 1);
         }
     }
     
