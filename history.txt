@@ -1,3 +1,14 @@
+2012-10-06 zzz
+ * configlogging.jsp: Fix IAE
+ * error500.jsp: Fix whitespace
+ * i2psnark:
+   - Add allocating and checking indications
+   - Add bandwidth message at startup
+   - More checks at torrent creation
+ * SSU:
+   - Throttle outbound destroys on shutdown
+   - Limit outbound introduction offers
+
 2012-10-05 zzz
  * configservice.jsp: Add GC button
  * DataHelper: Sanity checks in storeProps(), use

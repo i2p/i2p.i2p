@@ -32,6 +32,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
@@ -1214,20 +1215,33 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
-     *  Send a session destroy message to everybody
-     *  BLOCKING if OB queue is full.
+     *  Send a session destroy message to everybody.
+     *  BLOCKING for at least 1 sec per 1K peers, more if BW is very low or if OB queue is full.
      *
      *  @since 0.8.9
      */
     private void destroyAll() {
         _endpoint.clearOutbound();
         int howMany = _peersByIdent.size();
+        // use no more than 1/4 of configured bandwidth
+        final int burst = 8;
+        int pps = Math.max(48, (_context.bandwidthLimiter().getOutboundKBytesPerSecond() * 1000 / 4) /  48);
+        int burstps = pps / burst;
+        // max of 1000 pps
+        int toSleep = Math.max(8, (1000 / burstps));
+        int count = 0;
         if (_log.shouldLog(Log.WARN))
             _log.warn("Sending destroy to : " + howMany + " peers");
         for (PeerState peer : _peersByIdent.values()) {
             sendDestroy(peer);
+            // 1000 per second * 48 bytes = 400 KBps
+            if ((++count) % burst == 0) { 
+                try {
+                    Thread.sleep(toSleep);
+                } catch (InterruptedException ie) {}
+            }
         }
-        int toSleep = Math.min(howMany / 3, 750);
+        toSleep = Math.min(howMany / 3, 750);
         if (toSleep > 0) {
             try {
                 Thread.sleep(toSleep);
@@ -1595,6 +1609,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    /**
+     *  For EstablishmentManager
+     *  @since 0.9.3
+     */
+    boolean canIntroduce() {
+        // we don't expect inbound connections when hidden, but it could happen
+        // Don't offer if we are approaching max connections. While Relay Intros do not
+        // count as connections, we have to keep the connection to this peer up longer if
+        // we are offering introductions.
+        return
+            (!_context.router().isHidden()) &&
+            (!introducersRequired()) &&
+            haveCapacity() &&
+            (!((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) &&
+            _introManager.introducedCount() < IntroductionManager.MAX_OUTBOUND &&
+            _introManager.introducedCount() < getMaxConnections() / 4;
+    }
+
     /** default true */
     private boolean allowDirectUDP() {
         return _context.getBooleanPropertyDefaultTrue(PROP_ALLOW_DIRECT);

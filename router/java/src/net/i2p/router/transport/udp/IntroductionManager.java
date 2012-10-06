@@ -43,10 +43,10 @@ class IntroductionManager {
     private static final int MAX_INBOUND = 20;
 
     /**
-     * TODO this should be enforced in EstablishmentManager, it isn't now.
+     * This is enforced in EstablishmentManager
      * @since 0.8.11
      */
-    private static final int MAX_OUTBOUND = 100;
+    public static final int MAX_OUTBOUND = 100;
 
     /** Max one per target in this time */
     private static final long PUNCH_CLEAN_TIME = 5*1000;
@@ -207,6 +207,14 @@ class IntroductionManager {
      */
     int introducerCount() {
             return _inbound.size();
+    }
+    
+    /**
+     *  @return number of peers we have volunteered to introduce
+     *  @since 0.9.3
+     */
+    int introducedCount() {
+            return _outbound.size();
     }
 
     /**

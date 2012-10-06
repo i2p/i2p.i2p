@@ -21,7 +21,6 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.udp.InboundEstablishState.InboundState.*;
 import static net.i2p.router.transport.udp.OutboundEstablishState.OutboundState.*;
@@ -455,14 +454,9 @@ class EstablishmentManager {
             }
 
         if (isNew) {
-            // we don't expect inbound connections when hidden, but it could happen
-            // Don't offer if we are approaching max connections. While Relay Intros do not
-            // count as connections, we have to keep the connection to this peer up longer if
-            // we are offering introductions.
             // Don't offer to relay to privileged ports.
-            if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
-                state.getSentPort() >= 1024 &&
-                !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
+            // TODO if already we have their RI, only offer if they need it (no 'C' cap)
+            if (_transport.canIntroduce() && state.getSentPort() >= 1024) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
@@ -816,29 +810,10 @@ class EstablishmentManager {
     /** the relay tag is a 4-byte field in the protocol */
     public static final long MAX_TAG_VALUE = 0xFFFFFFFFl;
     
+    /**
+     *  This may be called more than once
+     */
     private void sendCreated(InboundEstablishState state) {
-        long now = _context.clock().now();
-        // This is usually handled in receiveSessionRequest() above, except, I guess,
-        // if the session isn't new and we are going through again.
-        // Don't offer if we are approaching max connections (see comments above)
-        // Also don't offer if we are floodfill, as this extends the max idle time
-        // and we will have lots of incoming conns
-        if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
-            !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
-            // offer to relay
-            // (perhaps we should check our bw usage and/or how many peers we are 
-            //  already offering introducing?)
-            if (state.getSentRelayTag() == 0) {
-                // ensure > 0
-                state.setSentRelayTag(1 + _context.random().nextLong(MAX_TAG_VALUE));
-            } else {
-                // don't change it, since we've already prepared our sig
-            }
-        } else {
-            // don't offer to relay
-            state.setSentRelayTag(0);
-        }
-        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send created to: " + state);
         
