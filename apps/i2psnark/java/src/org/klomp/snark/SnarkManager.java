@@ -707,7 +707,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Properties getConfig() { return _config; }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    private static final int MAX_FILES_PER_TORRENT = 512;
+    public static final int MAX_FILES_PER_TORRENT = 512;
     
     /**
      *  Set of canonical .torrent filenames that we are dealing with.
@@ -1370,6 +1370,8 @@ public class SnarkManager implements Snark.CompleteListener {
                     } catch (Exception e) {
                         _log.error("Error in the DirectoryMonitor", e);
                     }
+                    if (!_snarks.isEmpty())
+                        addMessage(_("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }

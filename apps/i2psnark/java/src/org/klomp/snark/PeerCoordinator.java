@@ -787,7 +787,8 @@ class PeerCoordinator implements PeerListener
         }
         if (record) {
             if (_log.shouldLog(Log.INFO))
-                _log.info(peer + " is now requesting: piece " + piece + " priority " + piece.getPriority());
+                _log.info("Now requesting from " + peer + ": piece " + piece + " priority " + piece.getPriority() +
+                          " peers " + piece.getPeerCount() + '/' + peers.size());
             piece.setRequested(peer, true);
         }
         return piece;
