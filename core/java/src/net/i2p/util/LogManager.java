@@ -66,7 +66,7 @@ public class LogManager {
     //public final static String DEFAULT_DATEFORMAT = "HH:mm:ss.SSS";
     /** blank means default short date and medium time for the locale - see DateFormat */
     public final static String DEFAULT_DATEFORMAT = "";
-    public final static String DEFAULT_FILENAME = "logs/log-#.txt";
+    public final static String DEFAULT_FILENAME = "logs/log-@.txt";
     public final static String DEFAULT_FILESIZE = "10m";
     public final static boolean DEFAULT_DISPLAYONSCREEN = true;
     public final static int DEFAULT_CONSOLEBUFFERSIZE = 20;
@@ -349,9 +349,9 @@ public class LogManager {
 
         String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
         if (filenameOverride != null)
-            _baseLogfilename = filenameOverride;
+            setBaseLogfilename(filenameOverride);
         else
-            _baseLogfilename = config.getProperty(PROP_FILENAME, DEFAULT_FILENAME);
+            setBaseLogfilename(config.getProperty(PROP_FILENAME, DEFAULT_FILENAME));
 
         _fileSize = getFileSize(config.getProperty(PROP_FILESIZE, DEFAULT_FILESIZE));
         _rotationLimit = -1;
@@ -591,7 +591,8 @@ public class LogManager {
     }
     
     public void setBaseLogfilename(String filenamePattern) {
-        _baseLogfilename = filenamePattern;
+        // '#' is a comment character in loadProps/storeProps
+        _baseLogfilename = filenamePattern.replace('#', '@');
     }
 
     public int getFileSize() {
