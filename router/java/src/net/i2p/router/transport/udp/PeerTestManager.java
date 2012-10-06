@@ -433,11 +433,18 @@ class PeerTestManager {
             testIP = new byte[testInfo.readIPSize()];
             testInfo.readIP(testIP, 0);
         }
-       
+
         PeerTestState state = _activeTests.get(Long.valueOf(nonce));
         
         if (state == null) {
-            if ( (testIP == null) || (testPort <= 0) ) {
+            // NEW TEST
+            if ((testPort > 0 && (testPort < 1024 || testPort > 65535)) ||
+                (testIP != null && !_transport.isValid(testIP))) {
+                // spoof check, and don't respond to privileged ports
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid IP/Port rcvd in PeerTest: " + Addresses.toString(testIP, testPort));
+                return;
+            } else if ( (testIP == null) || (testPort <= 0) ) {
                 // we are bob, since we haven't seen this nonce before AND its coming from alice
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
@@ -455,6 +462,7 @@ class PeerTestManager {
                 }
             }
         } else {
+            // EXISTING TEST
             if (state.getOurRole() == PeerTestState.BOB) {
                 if (DataHelper.eq(from.getIP(), state.getAliceIP().getAddress()) && 
                     (from.getPort() == state.getAlicePort()) ) {
