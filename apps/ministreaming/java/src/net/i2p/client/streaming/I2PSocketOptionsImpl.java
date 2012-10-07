@@ -96,6 +96,9 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
     /**
      * How long we will wait for the ACK from a SYN, in milliseconds.
      *
+     * Default 60 seconds. Max of 2 minutes enforced in Connection.java,
+     * and it also interprets <= 0 as default.
+     *
      * @return milliseconds to wait, or -1 if we will wait indefinitely
      */
     public long getConnectTimeout() {
@@ -104,6 +107,9 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
 
     /**
      * Define how long we will wait for the ACK from a SYN, in milliseconds.
+     *
+     * Default 60 seconds. Max of 2 minutes enforced in Connection.java,
+     * and it also interprets <= 0 as default.
      *
      */
     public void setConnectTimeout(long ms) {
@@ -114,6 +120,8 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      * What is the longest we'll block on the input stream while waiting
      * for more data.  If this value is exceeded, the read() throws 
      * InterruptedIOException
+     *
+     * WARNING: Default -1 (unlimited), which is probably not what you want.
      */
     public long getReadTimeout() {
         return _readTimeout;
@@ -123,6 +131,8 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      * What is the longest we'll block on the input stream while waiting
      * for more data.  If this value is exceeded, the read() throws 
      * InterruptedIOException
+     *
+     * WARNING: Default -1 (unlimited), which is probably not what you want.
      */
     public void setReadTimeout(long ms) {
         _readTimeout = ms;
@@ -133,6 +143,8 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      * this amount has been exceeded, subsequent .write calls will block until
      * either some data is removed or the connection is closed.  If this is 
      * less than or equal to zero, there is no limit (warning: can eat ram)
+     *
+     * Default 64 KB
      *
      * @return buffer size limit, in bytes
      */
@@ -146,6 +158,8 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      * either some data is removed or the connection is closed.  If this is 
      * less than or equal to zero, there is no limit (warning: can eat ram)
      *
+     * Default 64 KB
+     *
      */
     public void setMaxBufferSize(int numBytes) {
         _maxBufferSize = numBytes; 
@@ -156,6 +170,8 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      * for the data to flush.  If this value is exceeded, the write() throws 
      * InterruptedIOException.  If this is less than or equal to zero, there 
      * is no timeout.
+     *
+     * Default -1 (unlimited)
      */
     public long getWriteTimeout() {
         return _writeTimeout;
@@ -166,6 +182,8 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      * for the data to flush.  If this value is exceeded, the write() throws 
      * InterruptedIOException.  If this is less than or equal to zero, there 
      * is no timeout.
+     *
+     * Default -1 (unlimited)
      */
     public void setWriteTimeout(long ms) {
         _writeTimeout = ms;

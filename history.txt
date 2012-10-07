@@ -1,3 +1,15 @@
+2012-10-07 zzz
+ * I2PAppContext: Improved synching in constructor
+ * i2ptunnel:
+   - Set default read timeout in standard server
+   - Reduce header timeout, enforce total header timeout
+     in IRC and HTTP servers (ticket #723)
+ * Logs:
+   - Flush buffers in logs.jsp
+   - Add dup message to buffers, was in file only
+ * Streaming: Don't ignore option or force connect timeout to 5 minutes
+ * UPnP: Workaround NPE (ticket #728)
+
 2012-10-06 zzz
  * configlogging.jsp: Fix IAE
  * error500.jsp: Fix whitespace

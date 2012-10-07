@@ -343,8 +343,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
                                                       DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
                                             DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
-        // overrides default in super()
-        setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+        // overrides default in super()... why?
+        //setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
         initLists(opts);
@@ -399,9 +399,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
                                                 DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
-            // wow 5 minutes!!! FIXME!!
             // overrides default in super()
-            setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+            setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DEFAULT_CONNECT_TIMEOUT));
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         if (opts.containsKey(PROP_ENFORCE_PROTO))

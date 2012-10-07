@@ -49,8 +49,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     protected Logging l;
 
-    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
-    /** default timeout to 3 minutes - override if desired */
+    private static final long DEFAULT_READ_TIMEOUT = 5*60*1000;
+    /** default timeout to 5 minutes - override if desired */
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     /** do we use threads? default true (ignored for standard servers, always false) */

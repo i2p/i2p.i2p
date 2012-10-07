@@ -62,7 +62,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
 	public static final String PROP_WEBIRC_SPOOF_IP_DEFAULT="127.0.0.1";
     public static final String PROP_HOSTNAME="ircserver.fakeHostname";
     public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
-    private static final long HEADER_TIMEOUT = 60*1000;
+    private static final long HEADER_TIMEOUT = 15*1000;
+    private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     
     private final static byte[] ERR_UNAVAILABLE =
         (":ircserver.i2p 499 you :" +
@@ -188,12 +189,16 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
         StringBuilder buf = new StringBuilder(128);
         int lineCount = 0;
         
+        // slowloris / darkloris
+        long expire = System.currentTimeMillis() + TOTAL_HEADER_TIMEOUT;
         while (true) {
             String s = DataHelper.readLine(in);
             if (s == null)
                 throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
             if (++lineCount > 10)
                 throw new IOException("Too many lines before USER or SERVER, giving up");
+            if (System.currentTimeMillis() > expire)
+                throw new IOException("Headers took too long [" + buf.toString() + "]");
             s = s.trim();
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Got line: " + s);
