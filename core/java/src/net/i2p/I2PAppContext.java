@@ -64,7 +64,7 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
  * contexts should build their own context as soon as possible (within the main(..))
  * so that any referenced components will latch on to that context instead of 
  * instantiating a new one.  However, there are situations in which both can be
- * relevent.
+ * relevant.
  *
  */
 public class I2PAppContext {
@@ -196,16 +196,7 @@ public class I2PAppContext {
      *               Will only apply if there is no global context now.
      */
     private I2PAppContext(boolean doInit, Properties envProps) {
-        if (doInit) {
-            synchronized (I2PAppContext.class) { 
-                if (_globalAppContext == null) {
-                    _globalAppContext = this;
-                } else {
-                    System.out.println("Warning - New context not replacing old one, you now have a second one");
-                    (new Exception("I did it")).printStackTrace();
-                }
-            }
-        }
+      synchronized (I2PAppContext.class) { 
         _overrideProps = new I2PProperties();
         if (envProps != null)
             _overrideProps.putAll(envProps);
@@ -319,6 +310,16 @@ public class I2PAppContext {
         System.err.println("PID directory:    " + _pidDir.getAbsolutePath());
         System.err.println("Temp directory:   " + getTempDir().getAbsolutePath());
         ******/
+
+        if (doInit) {
+            if (_globalAppContext == null) {
+                _globalAppContext = this;
+            } else {
+                System.out.println("Warning - New context not replacing old one, you now have a second one");
+                (new Exception("I did it")).printStackTrace();
+            }
+        }
+      } // synch
     }
 
     /**
