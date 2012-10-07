@@ -693,18 +693,30 @@ public class LogManager {
     }
 *****/
 
+    /**
+     *  Flush any pending records to disk.
+     *  Blocking up to 250 ms.
+     *  @since 0.9.3
+     */
+    public void flush() {
+        if (_writer != null) {
+            int i = 50;
+            while ((!_records.isEmpty()) && i-- > 0) {
+                synchronized (_writer) {
+                    _writer.notifyAll();
+                }
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException ie) {}
+            }
+        }
+    }
+
     public void shutdown() {
         if (_writer != null) {
             //_log.log(Log.WARN, "Shutting down logger");
             // try to prevent out-of-order logging at shutdown
-            synchronized (_writer) {
-                _writer.notifyAll();
-            }
-            if (!_records.isEmpty()) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException ie) {}
-            }
+            flush();
             // this could generate out-of-order messages
             _writer.flushRecords(false);
             _writer.stopWriting();
