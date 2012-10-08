@@ -327,13 +327,16 @@ class IntroductionManager {
         UDPPacketReader.RelayRequestReader rrReader = reader.getRelayRequestReader();
         long tag = rrReader.readTag();
         int ipSize = rrReader.readIPSize();
-        byte ip[] = new byte[ipSize];
-        rrReader.readIP(ip, 0);
         int port = rrReader.readPort();
 
-        if ((!isValid(ip, port)) || (!isValid(alice.getIP(), alice.getPort()))) {
-            if (_log.shouldLog(Log.WARN))
+        // ip/port inside message should be 0:0, as it's unimplemented on send -
+        // see PacketBuilder.buildRelayRequest()
+        if (!isValid(alice.getIP(), alice.getPort()) || ipSize != 0 || port != 0) {
+            if (_log.shouldLog(Log.WARN)) {
+                byte ip[] = new byte[ipSize];
+                rrReader.readIP(ip, 0);
                 _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(ip, port));
+            }
             _context.statManager().addRateData("udp.relayBadIP", 1);
             return;
         }

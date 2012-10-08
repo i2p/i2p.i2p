@@ -892,8 +892,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer already connected (PBRH): old=" + oldPeer2 + " new=" + peer);
             // transfer over the old state/inbound message fragments/etc
-            peer.loadFrom(oldPeer);
-            oldEstablishedOn = oldPeer.getKeyEstablishedTime();
+            peer.loadFrom(oldPeer2);
+            oldEstablishedOn = oldPeer2.getKeyEstablishedTime();
             oldPeer2.dropOutbound();
             _introManager.remove(oldPeer2);
             _expireEvent.remove(oldPeer2);

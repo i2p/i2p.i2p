@@ -1863,6 +1863,7 @@ class PeerState {
     /**
      * Transfer the basic activity/state from the old peer to the current peer
      *
+     * @param oldPeer non-null
      */
     public void loadFrom(PeerState oldPeer) {
         _rto = oldPeer._rto;

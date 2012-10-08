@@ -448,8 +448,8 @@ class PeerTestManager {
         }
 
         if ((testPort > 0 && (testPort < 1024 || testPort > 65535)) ||
-            (testIP != null && (Arrays.equals(testIP, _transport.getExternalIP()) ||
-                                (!_transport.isValid(testIP)) ||
+            (testIP != null &&
+                               ((!_transport.isValid(testIP)) ||
                                 _context.blocklist().isBlocklisted(testIP)))) {
             // spoof check, and don't respond to privileged ports
             if (_log.shouldLog(Log.WARN))
@@ -461,6 +461,7 @@ class PeerTestManager {
         // The from IP/port and message's IP/port are now validated.
         // EXCEPT that either the message's IP could be empty or the message's port could be 0.
         // Both of those cases should be checked in receiveXfromY() as appropriate.
+        // Also, IP could be us, check is below.
 
         long nonce = testInfo.readNonce();
         PeerTestState test = _currentTest;
@@ -471,6 +472,15 @@ class PeerTestManager {
         }
 
         // we are Bob or Charlie
+
+        if (testIP != null && Arrays.equals(testIP, _transport.getExternalIP())) {
+            // spoof check - have to do this after receiveTestReply(), since
+            // the field should be us there
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid address in PeerTest: " + Addresses.toString(testIP, testPort));
+            _context.statManager().addRateData("udp.testBadIP", 1);
+            return;
+        }
 
         PeerTestState state = _activeTests.get(Long.valueOf(nonce));
         
@@ -600,6 +610,7 @@ class PeerTestManager {
      * The PeerTest message came from the peer referenced in the message (or there wasn't
      * any info in the message), plus we are not acting as Charlie (so we've got to be Bob).
      *
+     * testInfo IP/port ignored
      */
     private void receiveFromAliceAsBob(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
         // we are Bob, so pick a (potentially) Charlie and send Charlie Alice's info
@@ -692,10 +703,11 @@ class PeerTestManager {
      * The PeerTest message came from one of the Charlies picked for an existing test, so send Alice the
      * packet verifying participation.
      *
+     * testInfo IP/port ignored
      */
     private void receiveFromCharlieAsBob(RemoteHostId from, PeerTestState state) {
         state.setReceiveCharlieTime(_context.clock().now());
-        
+
         state.incrementPacketsRelayed();
         if (state.getPacketsRelayed() > MAX_RELAYED_PER_TEST) {
             if (_log.shouldLog(Log.WARN))
@@ -716,6 +728,7 @@ class PeerTestManager {
     /** 
      * We are charlie, so send Alice her PeerTest message  
      *
+     * testInfo IP/port ignored
      */
     private void receiveFromAliceAsCharlie(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce) {
         try {
@@ -723,7 +736,7 @@ class PeerTestManager {
             SessionKey aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
             testInfo.readIntroKey(aliceIntroKey.getData(), 0);
             UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, _transport.getIntroKey(), nonce);
-            
+
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive from alice as charlie, w/ alice @ " + aliceIP + ":" + from.getPort() + " and nonce " + nonce);
             

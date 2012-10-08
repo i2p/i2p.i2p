@@ -1,3 +1,9 @@
+2012-10-08 zzz
+ * SSU:
+   - Fix relay request handling bug from -10
+   - Fix peer test reply handling bug from -10
+   - Fix NPE from -6
+
 2012-10-07 zzz
  * I2PAppContext: Improved synching in constructor
  * i2ptunnel:
