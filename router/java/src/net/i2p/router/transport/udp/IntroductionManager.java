@@ -3,7 +3,6 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -368,13 +368,14 @@ class IntroductionManager {
 
     /**
      *  Are IP and port valid?
+     *  Refuse anybody in the same /16
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
         return port >= 1024 &&
                port <= 65535 &&
                _transport.isValid(ip) &&
-               (!Arrays.equals(ip, _transport.getExternalIP())) &&
+               (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
                (!_context.blocklist().isBlocklisted(ip));
     }
 }

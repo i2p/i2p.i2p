@@ -69,6 +69,13 @@ public class NTCPTransport extends TransportImpl {
     private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
 
+    /**
+     *  To prevent trouble. To be raised to 1024 in 0.9.4.
+     *
+     *  @since 0.9.3
+     */
+    private static final int MIN_PEER_PORT = 500;
+
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
     private static final String THINSP = " / ";
@@ -301,7 +308,7 @@ public class NTCPTransport extends TransportImpl {
             return null;
         }
         byte[] ip = addr.getIP();
-        if ( (addr.getPort() <= 0) || (ip == null) ) {
+        if ( (addr.getPort() < MIN_PEER_PORT) || (ip == null) ) {
             _context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
             markUnreachable(peer);
             //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
@@ -541,11 +548,14 @@ public class NTCPTransport extends TransportImpl {
                 ServerSocketChannel chan = ServerSocketChannel.open();
                 chan.configureBlocking(false);
 
+                int port = _myAddress.getPort();
+                if (port > 0 && port < 1024)
+                    _log.logAlways(Log.WARN, "Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
                 InetSocketAddress addr = null;
                 if(bindToAddr==null) {
-                    addr = new InetSocketAddress(_myAddress.getPort());
+                    addr = new InetSocketAddress(port);
                 } else {
-                    addr = new InetSocketAddress(bindToAddr, _myAddress.getPort());
+                    addr = new InetSocketAddress(bindToAddr, port);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Binding only to " + bindToAddr);
                 }

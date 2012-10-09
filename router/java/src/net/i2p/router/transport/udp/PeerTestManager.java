@@ -2,7 +2,6 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,12 +14,16 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
+ *  Entry points are runTest() to start a new test as Alice,
+ *  and receiveTest() for all received test packets.
+ *
  *  From udp.html on the website:
 
 <p>The automation of collaborative reachability testing for peers is
@@ -31,12 +34,27 @@ quite simple:</p>
 
 <pre>
         Alice                  Bob                  Charlie
+
+    runTest()
+    sendTestToBob()     receiveFromAliceAsBob()
     PeerTest -------------------&gt;
+
+                        sendTestToCharlie()       receiveFromBobAsCharlie()
                              PeerTest--------------------&gt;
+
+                        receiveFromCharlieAsBob()
                                 &lt;-------------------PeerTest
+
+    receiveTestReply()
          &lt;-------------------PeerTest
+
+    receiveTestReply()
          &lt;------------------------------------------PeerTest
+
+                                                  receiveFromAliceAsCharlie()
     PeerTest------------------------------------------&gt;
+
+    receiveTestReply()
          &lt;------------------------------------------PeerTest
 </pre>
 
@@ -105,9 +123,27 @@ class PeerTestManager {
     private boolean _currentTestComplete;
     /** as Alice */
     private final Queue<Long> _recentTests;
+    private final IPThrottler _throttle;
+    
+    private static final int MAX_RELAYED_PER_TEST_ALICE = 9;
+    private static final int MAX_RELAYED_PER_TEST_BOB = 6;
+    private static final int MAX_RELAYED_PER_TEST_CHARLIE = 6;
     
     /** longest we will keep track of a Charlie nonce for */
-    private static final int MAX_CHARLIE_LIFETIME = 10*1000;
+    private static final int MAX_CHARLIE_LIFETIME = 15*1000;
+
+    /** as Bob/Charlie */
+    private static final int MAX_ACTIVE_TESTS = 20;
+    private static final int MAX_RECENT_TESTS = 40;
+
+    /** for the throttler */
+    private static final int MAX_PER_IP = 12;
+    private static final long THROTTLE_CLEAN_TIME = 10*60*1000;
+
+    /** initial - ContinueTest adds backoff */
+    private static final int RESEND_TIMEOUT = 4*1000;
+    private static final int MAX_TEST_TIME = 30*1000;
+    private static final long MAX_NONCE = (1l << 32) - 1l;
 
     /**
      *  Have seen peer tests (as Alice) get stuck (_currentTest != null)
@@ -121,16 +157,12 @@ class PeerTestManager {
         _activeTests = new ConcurrentHashMap();
         _recentTests = new LinkedBlockingQueue();
         _packetBuilder = new PacketBuilder(context, transport);
+        _throttle = new IPThrottler(MAX_PER_IP, THROTTLE_CLEAN_TIME);
         _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receiveTestReply", "How often we get a reply to our peer test?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receiveTest", "How often we get a packet requesting us to participate in a peer test?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.testBadIP", "Received IP or port was bad", "udp", UDPTransport.RATES);
     }
-    
-    private static final int RESEND_TIMEOUT = 5*1000;
-    private static final int MAX_TEST_TIME = 30*1000;
-    private static final long MAX_NONCE = (1l << 32) - 1l;
-    //public void runTest(InetAddress bobIP, int bobPort, SessionKey bobIntroKey) {
 
     /**
      *  The next few methods are for when we are Alice
@@ -138,42 +170,60 @@ class PeerTestManager {
     public synchronized void runTest(InetAddress bobIP, int bobPort, SessionKey bobCipherKey, SessionKey bobMACKey) {
         if (_currentTest != null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("We are already running a test with bob = " + _currentTest.getBobIP() + ", aborting test with bob = " + bobIP);
+                _log.warn("We are already running a test: " + _currentTest + ", aborting test with bob = " + bobIP);
             return;
         }
-        PeerTestState test = new PeerTestState();
-        test.setNonce(_context.random().nextLong(MAX_NONCE));
+        if (DataHelper.eq(bobIP.getAddress(), 0, _transport.getExternalIP(), 0, 2)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Not running test with Bob too close to us " + bobIP);
+            return;
+        }
+        PeerTestState test = new PeerTestState(ALICE,
+                                               _context.random().nextLong(MAX_NONCE),
+                                               _context.clock().now());
         test.setBobIP(bobIP);
         test.setBobPort(bobPort);
         test.setBobCipherKey(bobCipherKey);
         test.setBobMACKey(bobMACKey);
-        test.setBeginTime(_context.clock().now());
         test.setLastSendTime(test.getBeginTime());
-        test.setOurRole(PeerTestState.ALICE);
         _currentTest = test;
         _currentTestComplete = false;
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Running test with bob = " + bobIP + ":" + bobPort + " " + test.getNonce());
-        while (_recentTests.size() > 16)
+            _log.debug("Start new test: " + test);
+        while (_recentTests.size() > MAX_RECENT_TESTS)
             _recentTests.poll();
         _recentTests.offer(Long.valueOf(test.getNonce()));
         
+        test.incrementPacketsRelayed();
         sendTestToBob();
         
-        _context.simpleScheduler().addEvent(new ContinueTest(), RESEND_TIMEOUT);
+        _context.simpleScheduler().addEvent(new ContinueTest(test.getNonce()), RESEND_TIMEOUT);
     }
     
     private class ContinueTest implements SimpleTimer.TimedEvent {
+        private final long _nonce;
+
+        public ContinueTest(long nonce) {
+            _nonce = nonce;
+        }
+
         public void timeReached() {
             synchronized (PeerTestManager.this) {
                 PeerTestState state = _currentTest;
-                if (state == null) {
-                    // already completed
+                if (state == null || state.getNonce() != _nonce) {
+                    // already completed, possibly on to the next test
                     return;
                 } else if (expired()) {
                     testComplete(true);
                 } else if (_context.clock().now() - state.getLastSendTime() >= RESEND_TIMEOUT) {
+                    int sent = state.incrementPacketsRelayed();
+                    if (sent > MAX_RELAYED_PER_TEST_ALICE) {
+                        testComplete(false);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Sent too many packets: " + state);
+                        return;
+                    }
                     if (state.getReceiveBobTime() <= 0) {
                         // no message from Bob yet, send it again
                         sendTestToBob();
@@ -186,7 +236,8 @@ class PeerTestManager {
                         // second message from Charlie yet
                         sendTestToCharlie();
                     }
-                    _context.simpleScheduler().addEvent(ContinueTest.this, RESEND_TIMEOUT);
+                    // retx at 4, 10, 17, 25 elapsed time
+                    _context.simpleScheduler().addEvent(ContinueTest.this, RESEND_TIMEOUT + (sent*1000));
                 }
             }
         }
@@ -206,19 +257,20 @@ class PeerTestManager {
         PeerTestState test = _currentTest;
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending test to bob: " + test.getBobIP() + ":" + test.getBobPort());
+                _log.debug("Sending test to Bob: " + test);
             _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getBobIP(), test.getBobPort(), test.getBobCipherKey(), test.getBobMACKey(), //_bobIntroKey, 
                             test.getNonce(), _transport.getIntroKey()));
         } else {
             _currentTest = null;
         }
     }
+
     /** call from a synchronized method */
     private void sendTestToCharlie() {
         PeerTestState test = _currentTest;
         if (!expired()) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending test to charlie: " + test.getCharlieIP() + ":" + test.getCharliePort());
+                _log.debug("Sending test to Charlie: " + test);
             _transport.send(_packetBuilder.buildPeerTestFromAlice(test.getCharlieIP(), test.getCharliePort(), test.getCharlieIntroKey(), 
                             test.getNonce(), _transport.getIntroKey()));
         } else {
@@ -278,7 +330,7 @@ class PeerTestManager {
                 test.setAlicePort(testPort);
 
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Receive test reply from bob @ " + from + " via our " + test.getAlicePort() + "/" + test.getAlicePortFromCharlie());
+                    _log.debug("Receive test reply from Bob: " + test);
                 if (test.getAlicePortFromCharlie() > 0)
                     testComplete(false);
             } catch (UnknownHostException uhe) {
@@ -318,8 +370,7 @@ class PeerTestManager {
                     InetAddress addr = InetAddress.getByAddress(ip);
                     test.setAliceIPFromCharlie(addr);
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Receive test reply from charlie @ " + test.getCharlieIP() + " via our " 
-                                   + test.getAlicePort() + "/" + test.getAlicePortFromCharlie());
+                        _log.debug("Receive test reply from Charlie: " + test);
                     if (test.getReceiveBobTime() > 0)
                         testComplete(true);
                 } catch (UnknownHostException uhe) {
@@ -328,10 +379,10 @@ class PeerTestManager {
                     _context.statManager().addRateData("udp.testBadIP", 1);
                 }
             } else {
-                if (test.getPacketsRelayed() > MAX_RELAYED_PER_TEST) {
+                if (test.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_ALICE) {
                     testComplete(false);
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Received too many packets on the test: " + test);
+                        _log.warn("Sent too many packets on the test: " + test);
                     return;
                 }
                 
@@ -348,7 +399,7 @@ class PeerTestManager {
                     test.setCharlieIP(InetAddress.getByAddress(from.getIP()));
                     test.setCharliePort(from.getPort());
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Receive test from charlie @ " + from);
+                        _log.debug("Receive test from Charlie: " + test);
                     sendTestToCharlie();
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldLog(Log.WARN))
@@ -420,9 +471,12 @@ class PeerTestManager {
     }
     
     /**
+     * Entry point for all incoming packets. Most of the source and dest validation is here.
+     *
      * Receive a test message of some sort from the given peer, queueing up any packet
      * that should be sent in response, or if its a reply to our own current testing,
      * adjusting our test state.
+     *
      * We could be Alice, Bob, or Charlie.
      */
     public void receiveTest(RemoteHostId from, UDPPacketReader reader) {
@@ -431,6 +485,7 @@ class PeerTestManager {
         int fromPort = from.getPort();
         if (fromPort < 1024 || fromPort > 65535 ||
             (!_transport.isValid(fromIP)) ||
+            DataHelper.eq(fromIP, 0, _transport.getExternalIP(), 0, 2) ||
             _context.blocklist().isBlocklisted(fromIP)) {
             // spoof check, and don't respond to privileged ports
             if (_log.shouldLog(Log.WARN))
@@ -466,36 +521,69 @@ class PeerTestManager {
         long nonce = testInfo.readNonce();
         PeerTestState test = _currentTest;
         if ( (test != null) && (test.getNonce() == nonce) ) {
-            // we are Alice
+            // we are Alice, we initiated the test
             receiveTestReply(from, testInfo);
             return;
         }
 
-        // we are Bob or Charlie
+        // we are Bob or Charlie, we are helping Alice
 
-        if (testIP != null && Arrays.equals(testIP, _transport.getExternalIP())) {
-            // spoof check - have to do this after receiveTestReply(), since
-            // the field should be us there
+        if (_throttle.shouldThrottle(fromIP)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid address in PeerTest: " + Addresses.toString(testIP, testPort));
-            _context.statManager().addRateData("udp.testBadIP", 1);
+                _log.warn("PeerTest throttle from " + Addresses.toString(fromIP, fromPort));
             return;
         }
 
-        PeerTestState state = _activeTests.get(Long.valueOf(nonce));
+        // use the same counter for both from and to IPs
+        if (testIP != null && _throttle.shouldThrottle(testIP)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("PeerTest throttle to " + Addresses.toString(testIP, testPort));
+            return;
+        }
+
+        Long lNonce = Long.valueOf(nonce);
+        PeerTestState state = _activeTests.get(lNonce);
+
+        if (testIP != null && DataHelper.eq(testIP, 0, _transport.getExternalIP(), 0, 2)) {
+            // spoof check - have to do this after receiveTestReply(), since
+            // the field should be us there.
+            // Let's also eliminate anybody in the same /16
+            if (_recentTests.contains(lNonce)) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Got delayed reply on nonce " + nonce +
+                              " from: " + Addresses.toString(fromIP, fromPort));
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Nearby address in PeerTest: " + Addresses.toString(testIP, testPort) +
+                              " from: " + Addresses.toString(fromIP, fromPort) +
+                              " state? " + state);
+                _context.statManager().addRateData("udp.testBadIP", 1);
+            }
+            return;
+        }
         
         if (state == null) {
             // NEW TEST
             if ( (testIP == null) || (testPort <= 0) ) {
                 // we are bob, since we haven't seen this nonce before AND its coming from alice
+                if (_activeTests.size() >= MAX_ACTIVE_TESTS) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Too many active tests, droppping from Alice " + Addresses.toString(fromIP, fromPort));
+                    return;
+                }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
                 receiveFromAliceAsBob(from, testInfo, nonce, null);
             } else {
-                if (_recentTests.contains(Long.valueOf(nonce))) {
+                if (_recentTests.contains(lNonce)) {
                     // ignore the packet, as its a holdover from a recently completed locally
                     // initiated test
                 } else {
+                    if (_activeTests.size() >= MAX_ACTIVE_TESTS) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Too many active tests, droppping from Bob " + Addresses.toString(fromIP, fromPort));
+                        return;
+                    }
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("We are charlie, as the testIP/port is " + Addresses.toString(testIP, testPort) + " and the state is unknown for " + nonce);
                     // we are charlie, since alice never sends us her IP and port, only bob does (and,
@@ -505,7 +593,7 @@ class PeerTestManager {
             }
         } else {
             // EXISTING TEST
-            if (state.getOurRole() == PeerTestState.BOB) {
+            if (state.getOurRole() == BOB) {
                 if (DataHelper.eq(fromIP, state.getAliceIP().getAddress()) && 
                     (fromPort == state.getAlicePort()) ) {
                     receiveFromAliceAsBob(from, testInfo, nonce, state);
@@ -516,9 +604,9 @@ class PeerTestManager {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Received from a fourth party as bob!  alice: " + state.getAliceIP() + ", charlie: " + state.getCharlieIP() + ", dave: " + from);
                 }
-            } else if (state.getOurRole() == PeerTestState.CHARLIE) {
+            } else if (state.getOurRole() == CHARLIE) {
                 if ( (testIP == null) || (testPort <= 0) ) {
-                    receiveFromAliceAsCharlie(from, testInfo, nonce);
+                    receiveFromAliceAsCharlie(from, testInfo, nonce, state);
                 } else {
                     receiveFromBobAsCharlie(from, testInfo, nonce, state);
                 }
@@ -528,24 +616,27 @@ class PeerTestManager {
     
     // Below here are methods for when we are Bob or Charlie
 
-    private static final int MAX_RELAYED_PER_TEST = 5;
-    
     /**
      * The packet's IP/port does not match the IP/port included in the message, 
      * so we must be Charlie receiving a PeerTest from Bob.
      *  
+     * @param state null if new
      */
     private void receiveFromBobAsCharlie(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
+        long now = _context.clock().now();
         boolean isNew = false;
         if (state == null) {
             isNew = true;
-            state = new PeerTestState();
-            state.setOurRole(PeerTestState.CHARLIE);
+            state = new PeerTestState(CHARLIE, nonce, now);
+        } else {
+            if (state.getReceiveBobTime() > now - (RESEND_TIMEOUT / 2)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Too soon, not retransmitting: " + state);
+                return;
+            }
         }
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive test as charlie nonce " + nonce);
-            
+
+        // TODO should only do most of this if isNew
         int sz = testInfo.readIPSize();
         byte aliceIPData[] = new byte[sz];
         try {
@@ -561,12 +652,10 @@ class PeerTestManager {
             state.setAliceIP(aliceIP);
             state.setAlicePort(alicePort);
             state.setAliceIntroKey(aliceIntroKey);
-            state.setNonce(nonce);
             state.setBobIP(bobIP);
             state.setBobPort(from.getPort());
-            state.setLastSendTime(_context.clock().now());
-            state.setOurRole(PeerTestState.CHARLIE);
-            state.setReceiveBobTime(_context.clock().now());
+            state.setLastSendTime(now);
+            state.setReceiveBobTime(now);
             
             PeerState bob = _transport.getPeerState(from);
             if (bob == null) {
@@ -578,16 +667,15 @@ class PeerTestManager {
                 state.setBobMACKey(bob.getCurrentMACKey());
             }
 
-            state.incrementPacketsRelayed();
-            if (state.getPacketsRelayed() > MAX_RELAYED_PER_TEST) {
+            // we send two packets below, but increment just once
+            if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Receive from bob (" + from + ") as charlie with alice @ " + aliceIP + ":" + alicePort
-                              + ", but we've already relayed too many packets to that test, so we're dropping it");
+                    _log.warn("Too many, not retransmitting: " + state);
                 return;
             }
             
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive from bob (" + from + ") as charlie, sending back to bob and sending to alice @ " + aliceIP + ":" + alicePort);
+                _log.debug("Receive from Bob: " + state);
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
@@ -611,20 +699,19 @@ class PeerTestManager {
      * any info in the message), plus we are not acting as Charlie (so we've got to be Bob).
      *
      * testInfo IP/port ignored
+     * @param state null if new
      */
     private void receiveFromAliceAsBob(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce, PeerTestState state) {
         // we are Bob, so pick a (potentially) Charlie and send Charlie Alice's info
-        PeerState charlie = null;
+        PeerState charlie;
         RouterInfo charlieInfo = null;
         if (state == null) { // pick a new charlie
             charlie = _transport.pickTestPeer(from);
-            if (charlie != null)
-                charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
         } else {
             charlie = _transport.getPeerState(new RemoteHostId(state.getCharlieIP().getAddress(), state.getCharliePort()));
-            if (charlie != null)
-                charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
         }
+        if (charlie != null)
+            charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
         
         if ( (charlie == null) || (charlieInfo == null) ) {
             if (_log.shouldLog(Log.WARN))
@@ -632,6 +719,7 @@ class PeerTestManager {
             return;
         }
         
+        // TODO should only do most of this if isNew
         InetAddress aliceIP = null;
         SessionKey aliceIntroKey = null;
         try {
@@ -651,28 +739,30 @@ class PeerTestManager {
             //UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, charlieIntroKey, nonce);
             //_transport.send(packet);
 
+            long now = _context.clock().now();
             boolean isNew = false;
             if (state == null) {
                 isNew = true;
-                state = new PeerTestState();
-                state.setBeginTime(_context.clock().now());
+                state = new PeerTestState(BOB, nonce, now);
+            } else {
+                if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Too soon, not retransmitting: " + state);
+                    return;
+                }
             }
             state.setAliceIP(aliceIP);
             state.setAlicePort(from.getPort());
             state.setAliceIntroKey(aliceIntroKey);
-            state.setNonce(nonce);
             state.setCharlieIP(charlie.getRemoteIPAddress());
             state.setCharliePort(charlie.getRemotePort());
             state.setCharlieIntroKey(charlieIntroKey);
-            state.setLastSendTime(_context.clock().now());
-            state.setOurRole(PeerTestState.BOB);
-            state.setReceiveAliceTime(_context.clock().now());
+            state.setLastSendTime(now);
+            state.setReceiveAliceTime(now);
             
-            state.incrementPacketsRelayed();
-            if (state.getPacketsRelayed() > MAX_RELAYED_PER_TEST) {
+            if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Receive from alice (" + aliceIP + ":" + from.getPort() 
-                              + ") as bob, but we've already relayed too many packets to that test, so we're dropping it");
+                    _log.warn("Too many, not retransmitting: " + state);
                 return;
             }
             
@@ -688,8 +778,7 @@ class PeerTestManager {
                                                                      charlie.getCurrentMACKey());
             
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive from alice as bob for " + nonce + ", picking charlie @ " + charlie.getRemoteIPAddress() + ":" 
-                           + charlie.getRemotePort() + " for alice @ " + aliceIP + ":" + from.getPort());
+                _log.debug("Receive from Alice: " + state);
             
             _transport.send(packet);
         } catch (UnknownHostException uhe) {
@@ -704,23 +793,29 @@ class PeerTestManager {
      * packet verifying participation.
      *
      * testInfo IP/port ignored
+     * @param state non-null
      */
     private void receiveFromCharlieAsBob(RemoteHostId from, PeerTestState state) {
-        state.setReceiveCharlieTime(_context.clock().now());
-
-        state.incrementPacketsRelayed();
-        if (state.getPacketsRelayed() > MAX_RELAYED_PER_TEST) {
+        long now = _context.clock().now();
+        if (state.getReceiveCharlieTime() > now - (RESEND_TIMEOUT / 2)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Received from charlie (" + from + ") as bob (" + state + "), but we've already relayed too many, so drop it");
+                _log.warn("Too soon, not retransmitting: " + state);
             return;
         }
+
+        if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_BOB) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Too many, not retransmitting: " + state);
+            return;
+        }
+        state.setReceiveCharlieTime(now);
         
         UDPPacket packet = _packetBuilder.buildPeerTestToAlice(state.getAliceIP(), state.getAlicePort(),
                                                                state.getAliceIntroKey(), state.getCharlieIntroKey(), 
                                                                state.getNonce());
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive from charlie @ " + from + " as bob, sending alice back the ok @ " + state.getAliceIP() + ":" + state.getAlicePort());
+            _log.debug("Receive from Charlie, sending Alice back the OK: " + state);
 
         _transport.send(packet);
     }
@@ -729,8 +824,24 @@ class PeerTestManager {
      * We are charlie, so send Alice her PeerTest message  
      *
      * testInfo IP/port ignored
+     * @param state non-null
      */
-    private void receiveFromAliceAsCharlie(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo, long nonce) {
+    private void receiveFromAliceAsCharlie(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo,
+                                           long nonce, PeerTestState state) {
+        long now = _context.clock().now();
+        if (state.getReceiveAliceTime() > now - (RESEND_TIMEOUT / 2)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Too soon, not retransmitting: " + state);
+            return;
+        }
+
+        if (state.incrementPacketsRelayed() > MAX_RELAYED_PER_TEST_CHARLIE) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Too many, not retransmitting: " + state);
+            return;
+        }
+        state.setReceiveAliceTime(now);
+
         try {
             InetAddress aliceIP = InetAddress.getByAddress(from.getIP());
             SessionKey aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
@@ -738,7 +849,7 @@ class PeerTestManager {
             UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, _transport.getIntroKey(), nonce);
 
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive from alice as charlie, w/ alice @ " + aliceIP + ":" + from.getPort() + " and nonce " + nonce);
+                _log.debug("Receive from Alice: " + state);
             
             _transport.send(packet);
         } catch (UnknownHostException uhe) {
@@ -749,13 +860,15 @@ class PeerTestManager {
     }
     
     /** 
-     * forget about charlie's nonce after 60s.  
+     * forget about charlie's nonce after a short while.
      */
     private class RemoveTest implements SimpleTimer.TimedEvent {
-        private long _nonce;
+        private final long _nonce;
+
         public RemoveTest(long nonce) {
             _nonce = nonce;
         }
+
         public void timeReached() {
                 _activeTests.remove(Long.valueOf(_nonce));
         }

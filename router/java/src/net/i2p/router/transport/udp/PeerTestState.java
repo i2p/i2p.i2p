@@ -1,15 +1,17 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.SessionKey;
 
 /**
- *
+ *  Track the state of a peer test.
+ *  Used only by PeerTestManager.
  */
 class PeerTestState {
-    private long _testNonce;
-    private short _ourRole;
+    private final long _testNonce;
+    private final Role _ourRole;
     private InetAddress _aliceIP;
     private int _alicePort;
     private InetAddress _bobIP;
@@ -22,22 +24,26 @@ class PeerTestState {
     private SessionKey _charlieIntroKey;
     private SessionKey _bobCipherKey;
     private SessionKey _bobMACKey;
-    private long _beginTime;
+    private final long _beginTime;
     private long _lastSendTime;
     private long _receiveAliceTime;
     private long _receiveBobTime;
     private long _receiveCharlieTime;
-    private int _packetsRelayed;
+    private final AtomicInteger _packetsRelayed = new AtomicInteger();
     
-    public static final short ALICE = 1;
-    public static final short BOB = 2;
-    public static final short CHARLIE = 3;
+    public enum Role {ALICE, BOB, CHARLIE};
     
+    public PeerTestState(Role role, long nonce, long now) {
+        _ourRole = role;
+        _testNonce = nonce;
+        _beginTime = now;
+    }
+
     public long getNonce() { return _testNonce; }
-    public void setNonce(long nonce) { _testNonce = nonce; }
+
     /** Are we Alice, bob, or Charlie. */
-    public short getOurRole() { return _ourRole; }
-    public void setOurRole(short role) { _ourRole = role; }
+    public Role getOurRole() { return _ourRole; }
+
     /**
      * If we are Alice, this will contain the IP that Bob says we
      * can be reached at - the IP Charlie says we can be reached 
@@ -79,47 +85,49 @@ class PeerTestState {
     
     /** when did this test begin? */
     public long getBeginTime() { return _beginTime; }
-    public void setBeginTime(long when) { _beginTime = when; }
+
     /** when did we last send out a packet? */
     public long getLastSendTime() { return _lastSendTime; }
     public void setLastSendTime(long when) { _lastSendTime = when; }
-    /** when did we last hear from alice? */
+
+    /**
+     * when did we last hear from alice?
+     */
     public long getReceiveAliceTime() { return _receiveAliceTime; }
     public void setReceiveAliceTime(long when) { _receiveAliceTime = when; }
+
     /** when did we last hear from bob? */
     public long getReceiveBobTime() { return _receiveBobTime; }
     public void setReceiveBobTime(long when) { _receiveBobTime = when; }
+
     /** when did we last hear from charlie? */
     public long getReceiveCharlieTime() { return _receiveCharlieTime; }
     public void setReceiveCharlieTime(long when) { _receiveCharlieTime = when; }
     
-    public int getPacketsRelayed() { return _packetsRelayed; }
-    public void incrementPacketsRelayed() { ++_packetsRelayed; }
+    /** @return new value */
+    public int incrementPacketsRelayed() { return _packetsRelayed.incrementAndGet(); }
     
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(512);
-        buf.append("Role: ");
-        if (_ourRole == ALICE) buf.append("Alice");
-        else if (_ourRole == BOB) buf.append("Bob");
-        else if (_ourRole == CHARLIE) buf.append("Charlie");
-        else buf.append("unkown!");
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("PeerTest ").append(_testNonce)
+           .append(" as ").append(_ourRole.toString());
         if (_aliceIP != null)
-            buf.append(" alice: ").append(_aliceIP).append(':').append(_alicePort);
+            buf.append("; Alice: ").append(_aliceIP).append(':').append(_alicePort);
         if (_aliceIPFromCharlie != null)
             buf.append(" (fromCharlie ").append(_aliceIPFromCharlie).append(':').append(_alicePortFromCharlie).append(')');
         if (_bobIP != null)
-            buf.append(" bob: ").append(_bobIP).append(':').append(_bobPort);
+            buf.append("; Bob: ").append(_bobIP).append(':').append(_bobPort);
         if (_charlieIP != null)
-            buf.append(" charlie: ").append(_charlieIP).append(':').append(_charliePort);
-        buf.append(" last send after ").append(_lastSendTime - _beginTime).append("ms");
+            buf.append(" Charlie: ").append(_charlieIP).append(':').append(_charliePort);
+        buf.append("; last send after ").append(_lastSendTime - _beginTime);
         if (_receiveAliceTime > 0)
-            buf.append(" receive from alice after ").append(_receiveAliceTime - _beginTime).append("ms");
+            buf.append("; rcvd from Alice after ").append(_receiveAliceTime - _beginTime);
         if (_receiveBobTime > 0)
-            buf.append(" receive from bob after ").append(_receiveBobTime - _beginTime).append("ms");
+            buf.append("; rcvd from Bob after ").append(_receiveBobTime - _beginTime);
         if (_receiveCharlieTime > 0)
-            buf.append(" receive from charlie after ").append(_receiveCharlieTime - _beginTime).append("ms");
-        buf.append(" packets relayed: ").append(_packetsRelayed);
+            buf.append("; rcvd from Charlie after ").append(_receiveCharlieTime - _beginTime);
+        buf.append("; pkts relayed: ").append(_packetsRelayed.get());
         return buf.toString();
     }
 }

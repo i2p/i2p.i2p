@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
@@ -419,9 +420,9 @@ class EstablishmentManager {
      *
      */
     void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
-        if (!_transport.isValid(from.getIP())) {
+        if (from.getPort() < UDPTransport.MIN_PEER_PORT || !_transport.isValid(from.getIP())) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive session request from invalid IP: " + from);
+                _log.warn("Receive session request from invalid: " + from);
             return;
         }
         
@@ -936,13 +937,14 @@ class EstablishmentManager {
 
     /**
      *  Are IP and port valid?
+     *  Refuse anybody in the same /16
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
         return port >= 1024 &&
                port <= 65535 &&
                _transport.isValid(ip) &&
-               (!Arrays.equals(ip, _transport.getExternalIP())) &&
+               (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
                (!_context.blocklist().isBlocklisted(ip));
     }
 

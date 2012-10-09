@@ -112,6 +112,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     public static final int DEFAULT_INTERNAL_PORT = 8887;
 
+    /**
+     *  To prevent trouble. To be raised to 1024 in 0.9.4.
+     *
+     *  @since 0.9.3
+     */
+    static final int MIN_PEER_PORT = 500;
+
     /** Limits on port told to us by others,
      *  We should have an exception if it matches the existing low port.
      */
@@ -1288,7 +1295,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (addr.getOption("ihost0") == null) {
                 byte[] ip = addr.getIP();
                 int port = addr.getPort();
-                if (ip == null || port <= 0 ||
+                if (ip == null || port < MIN_PEER_PORT ||
                     (!isValid(ip)) ||
                     Arrays.equals(ip, getExternalIP())) {
                     markUnreachable(to);
@@ -2646,8 +2653,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (peerInfo == null)
                 continue;
             RouterAddress addr = peerInfo.getTargetAddress(STYLE);
-            if (addr != null)
-                return peer;
+            if (addr == null)
+                continue;
+            byte[] ip = addr.getIP();
+            if (ip == null)
+                continue;
+            if (DataHelper.eq(ip, 0, getExternalIP(), 0, 2))
+                continue;
+            return peer;
         }
         return null;
     }

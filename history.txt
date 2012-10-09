@@ -1,3 +1,17 @@
+2012-10-09 zzz
+ * Console, i2ptunnel: Warn on low ports
+ * NetDB: Increase floodfills again
+ * RouterInfo: Exit 1 on error in main()
+ * SSU:
+   - Add peer test throttling
+   - Peer test packet count fixes
+   - Adjust peer test timeouts and add backoff
+   - Reject relays and peer tests from same /16
+   - More peer test cleanup and log tweaks
+ * Transports:
+   - Enforce minimum peer port
+   - Warn on low router ports
+
 2012-10-08 zzz
  * SSU:
    - Fix relay request handling bug from -10
