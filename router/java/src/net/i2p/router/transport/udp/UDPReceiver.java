@@ -293,7 +293,7 @@ class UDPReceiver {
                         //FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
                         req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
-                        while (req.getPendingInboundRequested() > 0)
+                        while (req.getPendingRequested() > 0)
                             req.waitForNextAllocation();
                         
                         int queued = receive(packet);

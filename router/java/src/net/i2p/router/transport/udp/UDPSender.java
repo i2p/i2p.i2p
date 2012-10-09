@@ -212,7 +212,7 @@ class UDPSender {
                     if (size > 0) {
                         //_context.bandwidthLimiter().requestOutbound(req, size, "UDP sender");
                         req = _context.bandwidthLimiter().requestOutbound(size, "UDP sender");
-                        while (req.getPendingOutboundRequested() > 0)
+                        while (req.getPendingRequested() > 0)
                             req.waitForNextAllocation();
                     }
                     
