@@ -849,6 +849,7 @@ public class Blocklist {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
+/****
     public static void main(String args[]) {
         Blocklist b = new Blocklist();
         if ( (args != null) && (args.length == 1) )
@@ -861,4 +862,5 @@ public class Blocklist {
             System.out.println("Testing " + tests[i] + " returns " + b.isBlocklisted(tests[i]));
         }
     }
+****/
 }
