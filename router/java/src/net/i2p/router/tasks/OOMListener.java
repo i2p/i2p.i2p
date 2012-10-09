@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -34,6 +35,7 @@ public class OOMListener implements I2PThread.OOMEventListener {
 
         try { 
             // boost priority to help us shut down
+            // this may or may not do anything...
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY - 1);
         } catch (OutOfMemoryError oome) {}
         try { 
@@ -50,6 +52,9 @@ public class OOMListener implements I2PThread.OOMEventListener {
         } catch (OutOfMemoryError oome) {}
         try { 
             ThreadDump.dump(_context, 1);
+        } catch (OutOfMemoryError oome) {}
+        try { 
+            _context.router().eventLog().addEvent(EventLog.OOM);
         } catch (OutOfMemoryError oome) {}
         _context.router().shutdown(Router.EXIT_OOM); 
     }

@@ -37,9 +37,11 @@ public class EventLog {
     public static final String CHANGE_PORT = "changePort";
     public static final String CLOCK_SHIFT = "clockShift";
     public static final String CRASHED = "crashed";
+    public static final String CRITICAL = "critical";
     public static final String INSTALLED = "installed";
     public static final String INSTALL_FAILED = "intallFailed";
     public static final String NEW_IDENT = "newIdent";
+    public static final String OOM = "oom";
     public static final String REKEYED = "rekeyed";
     public static final String SOFT_RESTART = "softRestart";
     public static final String STARTED = "started";
