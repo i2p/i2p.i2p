@@ -77,6 +77,7 @@ public class DataHelper {
             "ihost2", "iport2", "ikey2", "itag2",
             // RouterInfo options
             "caps", "coreVersion", "netId", "router.version",
+            "netdb.knownLeaseSets", "netdb.knownRouters",
             "stat_bandwidthReceiveBps.60m",
             "stat_bandwidthSendBps.60m",
             "stat_tunnel.buildClientExpire.60m",
