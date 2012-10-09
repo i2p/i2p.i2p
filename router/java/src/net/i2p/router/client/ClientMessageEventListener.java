@@ -169,7 +169,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
 
         // Auth, since 0.8.2
-        if (_enforceAuth && Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue()) {
+        if (_enforceAuth && _context.getBooleanProperty("i2cp.auth")) {
             String configUser = _context.getProperty("i2cp.username");
             String configPW = _context.getProperty("i2cp.password");
             if (configUser != null && configPW != null) {

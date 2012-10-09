@@ -64,7 +64,7 @@ public class RouterWatchdog implements Runnable {
     
     private boolean shutdownOnHang() {
         // prop default false
-        if (!Boolean.valueOf(_context.getProperty("watchdog.haltOnHang")).booleanValue())
+        if (!_context.getBooleanProperty("watchdog.haltOnHang"))
             return false;
 
         // Client manager starts complaining after 10 minutes, and we run every minute,
@@ -113,16 +113,7 @@ public class RouterWatchdog implements Runnable {
                 // This works on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
-                if (_context.hasWrapper() && !SystemVersion.isWindows()) {
-                    ShellCommand sc = new ShellCommand();
-                    File i2pr = new File(_context.getBaseDir(), "i2prouter");
-                    String[] args = new String[2];
-                    args[0] = i2pr.getAbsolutePath();
-                    args[1] = "dump";
-                    boolean success = sc.executeSilentAndWaitTimed(args, 10);
-                    if (success)
-                        _log.log(Log.CRIT, "Threads dumped to wrapper log");
-                }
+                ThreadDump.dump(_context, 10);
             }
         }
     }

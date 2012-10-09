@@ -102,6 +102,9 @@ p.messages {
 p.footer {
      font-size:7pt;
      text-align: center;
+}
+
+.iframed #footer {
      display: none;
 }
 

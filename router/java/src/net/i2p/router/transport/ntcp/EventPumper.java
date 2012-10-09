@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.RouterIdentity;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.ConcurrentHashSet;
@@ -499,7 +500,8 @@ class EventPumper implements Runnable {
                 return;
             }
             // BUGFIX for firewalls. --Sponge
-            chan.socket().setKeepAlive(true);
+            if (_context.commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_OK)
+                chan.socket().setKeepAlive(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
             new NTCPConnection(_context, _transport, chan, ckey);
@@ -519,7 +521,8 @@ class EventPumper implements Runnable {
                 _log.debug("processing connect for " + con + ": connected? " + connected);
             if (connected) {
                 // BUGFIX for firewalls. --Sponge
-                chan.socket().setKeepAlive(true);
+                if (_context.commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_OK)
+                    chan.socket().setKeepAlive(true);
                 con.setKey(key);
                 con.outboundConnected();
                 _context.statManager().addRateData("ntcp.connectSuccessful", 1);

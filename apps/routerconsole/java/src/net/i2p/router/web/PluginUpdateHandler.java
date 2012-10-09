@@ -139,7 +139,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             } else {
                 updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
                 // use the same settings as for updater
-                boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+                boolean shouldProxy = Boolean.parseBoolean(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY));
                 String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
                 int proxyPort = ConfigUpdateHandler.proxyPort(_context);
                 try {
@@ -313,7 +313,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             boolean wasRunning = false;
             File destDir = new SecureDirectory(appDir, appName);
             if (destDir.exists()) {
-                if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty("install-only"))) {
                     to.delete();
                     statusDone("<b>" + _("Downloaded plugin is for new installs only, but the plugin is already installed", url) + "</b>");
                     return;
@@ -374,7 +374,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
                 // do we defer extraction and installation?
-                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty("router-restart-required"))) {
                     // Yup!
                     try {
                         if(!FileUtil.copy(to, (new SecureFile( new SecureFile(appDir.getCanonicalPath() +"/" + appName +"/"+ ZIP).getCanonicalPath())) , true, true)) {
@@ -405,7 +405,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 }
                 update = true;
             } else {
-                if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
+                if (Boolean.parseBoolean(props.getProperty("update-only"))) {
                     to.delete();
                     statusDone("<b>" + _("Plugin is for upgrades only, but the plugin is not installed") + "</b>");
                     return;
@@ -426,7 +426,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             _updated = true;
             to.delete();
             // install != update. Changing the user's settings like this is probabbly a bad idea.
-            if (Boolean.valueOf( props.getProperty("dont-start-at-install")).booleanValue()) {
+            if (Boolean.parseBoolean( props.getProperty("dont-start-at-install"))) {
                 statusDone("<b>" + _("Plugin {0} installed", appName) + "</b>");
                 if(!update) {
                     Properties pluginProps = PluginStarter.pluginProperties();

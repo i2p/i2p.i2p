@@ -37,9 +37,11 @@ public class EventLog {
     public static final String CHANGE_PORT = "changePort";
     public static final String CLOCK_SHIFT = "clockShift";
     public static final String CRASHED = "crashed";
+    public static final String CRITICAL = "critical";
     public static final String INSTALLED = "installed";
     public static final String INSTALL_FAILED = "intallFailed";
     public static final String NEW_IDENT = "newIdent";
+    public static final String OOM = "oom";
     public static final String REKEYED = "rekeyed";
     public static final String SOFT_RESTART = "softRestart";
     public static final String STARTED = "started";
@@ -48,12 +50,11 @@ public class EventLog {
     public static final String WATCHDOG = "watchdog";
 
     /**
-     *  @param file must be absolute
-     *  @throws IllegalArgumentException if not absolute
+     *  @param file should be absolute
      */
     public EventLog(I2PAppContext ctx, File file) {
-        if (!file.isAbsolute())
-            throw new IllegalArgumentException();
+        //if (!file.isAbsolute())
+        //    throw new IllegalArgumentException();
         _context = ctx;
         _file = file;
         _cache = new HashMap(4);
@@ -128,7 +129,7 @@ public class EventLog {
                         continue;
                     Long ltime = Long.valueOf(time);
                     String info = s.length > 2 ? s[2] : "";
-                    rv.put(time, info);
+                    rv.put(ltime, info);
                 } catch (IndexOutOfBoundsException ioobe) {
                 } catch (NumberFormatException nfe) {
                 }

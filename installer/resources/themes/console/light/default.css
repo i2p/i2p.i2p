@@ -160,7 +160,7 @@ hr {
      width: 150px;
      height: 24px;
      border: 1px solid #447;
-     padding: 2px;
+     padding: 2px 3px;
      margin: 4px 0 2px 0px;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-weight: bold;

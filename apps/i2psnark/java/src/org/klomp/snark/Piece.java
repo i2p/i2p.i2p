@@ -18,7 +18,7 @@ class Piece implements Comparable {
     
     public Piece(int id) {
         this.id = id;
-        this.peers = new HashSet(I2PSnarkUtil.MAX_CONNECTIONS);
+        this.peers = new HashSet(I2PSnarkUtil.MAX_CONNECTIONS / 2);
         // defer creating requests to save memory
     }
     

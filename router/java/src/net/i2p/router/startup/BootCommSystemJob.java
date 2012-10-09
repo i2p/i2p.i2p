@@ -54,7 +54,7 @@ public class BootCommSystemJob extends JobImpl {
         
     private void startupDb() {
         Job bootDb = new BootNetworkDbJob(getContext());
-        boolean useTrusted = Boolean.valueOf(getContext().getProperty(PROP_USE_TRUSTED_LINKS)).booleanValue();
+        boolean useTrusted = getContext().getBooleanProperty(PROP_USE_TRUSTED_LINKS);
         if (useTrusted) {
             _log.debug("Using trusted links...");
             getContext().jobQueue().addJob(new BuildTrustedLinksJob(getContext(), bootDb));

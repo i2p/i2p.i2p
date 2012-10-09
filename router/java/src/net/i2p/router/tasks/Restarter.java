@@ -3,6 +3,7 @@ package net.i2p.router.tasks;
 import net.i2p.router.Router;
 import net.i2p.router.RouterClock;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 
 /**
@@ -16,6 +17,7 @@ public class Restarter implements Runnable {
     }
 
     public void run() {
+        _context.router().eventLog().addEvent(EventLog.SOFT_RESTART);
         Log log = _context.logManager().getLog(Router.class);
         log.error("Stopping the router for a restart...");
         log.logAlways(Log.WARN, "Stopping the client manager");

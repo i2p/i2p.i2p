@@ -72,7 +72,7 @@ public class RouterTimestamper extends Timestamper {
         // so the property must be set at startup.
         // We still need to be instantiated since the router calls clock().getTimestamper().waitForInitialization()
         String disabled = ctx.getProperty(PROP_DISABLED, DEFAULT_DISABLED);
-        if (Boolean.valueOf(disabled).booleanValue()) {
+        if (Boolean.parseBoolean(disabled)) {
             _initialized = true;
             return;
         }
@@ -321,7 +321,7 @@ public class RouterTimestamper extends Timestamper {
                                    _context.getProperty(PROP_QUERY_FREQUENCY, DEFAULT_QUERY_FREQUENCY));
         
         String disabled = _context.getProperty(PROP_DISABLED, DEFAULT_DISABLED);
-        _disabled = Boolean.valueOf(disabled).booleanValue();
+        _disabled = Boolean.parseBoolean(disabled);
         
         _concurringServers = Math.min(4, Math.max(1,
                               _context.getProperty(PROP_CONCURRING_SERVERS, DEFAULT_CONCURRING_SERVERS)));

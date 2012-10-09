@@ -29,7 +29,7 @@ class SchedulerChooser {
             TaskScheduler scheduler = _schedulers.get(i);
             if (scheduler.accept(con)) {
                 //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("Scheduling for " + con + " with " + scheduler.getClass().getName());
+                //    _log.debug("Scheduling for " + con + " with " + scheduler.getClass().getSimpleName());
                 return scheduler;
             }
         }

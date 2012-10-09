@@ -111,7 +111,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
              return false;
          String p = getOptions().getProperty("i2cp.gzip");
          if (p != null)
-             return Boolean.valueOf(p).booleanValue();
+             return Boolean.parseBoolean(p);
          return SHOULD_COMPRESS;
     }
     

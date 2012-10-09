@@ -21,8 +21,8 @@ public class TunnelPoolSettings {
     private int _length;
     private int _lengthVariance;
     private int _lengthOverride;
-    private boolean _isInbound;
-    private boolean _isExploratory;
+    private final boolean _isInbound;
+    private final boolean _isExploratory;
     private boolean _allowZeroHop;
     private int _IPRestriction;
     private final Properties _unknownOptions;
@@ -54,7 +54,9 @@ public class TunnelPoolSettings {
     public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)
     
-    public TunnelPoolSettings() {
+    public TunnelPoolSettings(boolean isExploratory, boolean isInbound) {
+        _isExploratory = isExploratory;
+        _isInbound = isInbound;
         _quantity = DEFAULT_QUANTITY;
         _backupQuantity = DEFAULT_BACKUP_QUANTITY;
         // _rebuildPeriod = DEFAULT_REBUILD_PERIOD;
@@ -130,11 +132,9 @@ public class TunnelPoolSettings {
 
     /** is this an inbound tunnel? */
     public boolean isInbound() { return _isInbound; }
-    public void setIsInbound(boolean isInbound) { _isInbound = isInbound; }
     
     /** is this an exploratory tunnel (or a client tunnel) */
     public boolean isExploratory() { return _isExploratory; }
-    public void setIsExploratory(boolean isExploratory) { _isExploratory = isExploratory; }
     
     // Duration is hardcoded
     //public int getDuration() { return _duration; }
@@ -237,7 +237,7 @@ public class TunnelPoolSettings {
     
     private static final boolean getBoolean(String str, boolean defaultValue) { 
         if (str == null) return defaultValue;
-        boolean v = Boolean.valueOf(str).booleanValue() ||
+        boolean v = Boolean.parseBoolean(str) ||
                     (str != null && "YES".equals(str.toUpperCase(Locale.US)));
         return v;
     }

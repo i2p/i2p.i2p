@@ -88,8 +88,8 @@
 </p>
 <center><img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
 </div>
-<hr>
 <div id="footer">
+<hr>
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
 </div>
 </div>

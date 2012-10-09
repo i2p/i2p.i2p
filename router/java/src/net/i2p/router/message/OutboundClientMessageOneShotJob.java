@@ -452,7 +452,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // Per-message flag == false overrides session option which is default true
         String allow = _clientMessage.getSenderConfig().getOptions().getProperty(BUNDLE_REPLY_LEASESET);
         boolean allowLeaseBundle = SendMessageOptions.getSendLeaseSet(sendFlags) &&
-                                   (allow == null || Boolean.valueOf(allow).booleanValue());
+                                   (allow == null || Boolean.parseBoolean(allow));
         if (allowLeaseBundle) {
             // If we want an ack, bundle a leaseSet...
             //replyLeaseSet = getReplyLeaseSet(wantACK);

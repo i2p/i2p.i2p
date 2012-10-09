@@ -527,7 +527,7 @@ public class Reseeder {
 
 /******
     public static void main(String args[]) {
-        if ( (args != null) && (args.length == 1) && (!Boolean.valueOf(args[0]).booleanValue()) ) {
+        if ( (args != null) && (args.length == 1) && (!Boolean.parseBoolean(args[0])) ) {
             System.out.println("Not reseeding, as requested");
             return; // not reseeding on request
         }

@@ -62,17 +62,21 @@
 
  <h3><%=intl._("Debugging")%></h3>
  <p><a href="/jobs"><%=intl._("View the job queue")%></a>
- <% if (System.getProperty("wrapper.version") != null) { %>
+<% if (System.getProperty("wrapper.version") != null) { %>
  <p><%=intl._("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%></p>
-  <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("Dump threads")%>" >
- </div>
+  <hr>
 <% } %>
+ <div class="formaction">
+ <input type="submit" class="reload" name="action" value="<%=intl._("Force GC")%>" >
+<% if (System.getProperty("wrapper.version") != null) { %>
+ <input type="submit" class="download" name="action" value="<%=intl._("Dump threads")%>" >
+<% } %>
+ </div>
 
  <h3><%=intl._("Launch browser on router startup?")%></h3>
  <p><%=intl._("I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at")%>
  <a href="http://127.0.0.1:7657/">http://127.0.0.1:7657/</a> .</p>
  <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("View console on startup")%>" >
- <input type="submit" name="action" value="<%=intl._("Do not view console on startup")%>" >
+ <input type="submit" class="check" name="action" value="<%=intl._("View console on startup")%>" >
+ <input type="submit" class="delete" name="action" value="<%=intl._("Do not view console on startup")%>" >
 </div></form></div></div></body></html>

@@ -252,7 +252,7 @@ public class SAMBridge implements Runnable {
         }
         SAMBridge bridge = new SAMBridge(host, port, opts, keyfile);
         I2PAppThread t = new I2PAppThread(bridge, "SAMListener");
-        if (Boolean.valueOf(System.getProperty("sam.shutdownOnOOM", "false")).booleanValue()) {
+        if (Boolean.parseBoolean(System.getProperty("sam.shutdownOnOOM"))) {
             t.addOOMEventThreadListener(new I2PAppThread.OOMEventListener() {
                 public void outOfMemory(OutOfMemoryError err) {
                     err.printStackTrace();

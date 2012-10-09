@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -14,6 +15,7 @@ import net.i2p.data.Hash;
  *    Base64 dest
  *    Base64 dest.i2p
  *    Base64 Hash
+ *    Base64 Hash.i2p
  *    Base32 Hash
  *    Base32 desthash.b32.i2p
  *    example.i2p
@@ -30,52 +32,54 @@ public class ConvertToHash {
     public static Hash getHash(String peer) {
         if (peer == null)
             return null;
-        Hash h = new Hash();
         String peerLC = peer.toLowerCase(Locale.US);
         // b64 hash
         if (peer.length() == 44 && !peerLC.endsWith(".i2p")) {
-            try {
-                h.fromBase64(peer);
-            } catch (DataFormatException dfe) {}
+            byte[] b = Base64.decode(peer);
+            if (b != null && b.length == Hash.HASH_LENGTH)
+                return Hash.create(b);
+        }
+        // b64 hash.i2p
+        if (peer.length() == 48 && peerLC.endsWith(".i2p")) {
+            byte[] b = Base64.decode(peer.substring(0, 44));
+            if (b != null && b.length == Hash.HASH_LENGTH)
+                return Hash.create(b);
         }
         // b64 dest.i2p
-        if (h.getData() == null && peer.length() >= 520 && peerLC.endsWith(".i2p")) {
+        if (peer.length() >= 520 && peerLC.endsWith(".i2p")) {
             try {
                 Destination d = new Destination();
                 d.fromBase64(peer.substring(0, peer.length() - 4));
-                h = d.calculateHash();
+                return d.calculateHash();
             } catch (DataFormatException dfe) {}
         }
         // b64 dest
-        if (h.getData() == null && peer.length() >= 516 && !peerLC.endsWith(".i2p")) {
+        if (peer.length() >= 516 && !peerLC.endsWith(".i2p")) {
             try {
                 Destination d = new Destination();
                 d.fromBase64(peer);
-                h = d.calculateHash();
+                return d.calculateHash();
             } catch (DataFormatException dfe) {}
         }
         // b32 hash.b32.i2p
         // do this here rather than in naming service so it will work
         // even if the leaseset is not found
-        if (h.getData() == null && peer.length() == 60 && peerLC.endsWith(".b32.i2p")) {
+        if (peer.length() == 60 && peerLC.endsWith(".b32.i2p")) {
             byte[] b = Base32.decode(peer.substring(0, 52));
             if (b != null && b.length == Hash.HASH_LENGTH)
-                h.setData(b);
+                return Hash.create(b);
         }
         // b32 hash
-        if (h.getData() == null && peer.length() == 52 && !peerLC.endsWith(".i2p")) {
+        if (peer.length() == 52 && !peerLC.endsWith(".i2p")) {
             byte[] b = Base32.decode(peer);
             if (b != null && b.length == Hash.HASH_LENGTH)
-                h.setData(b);
+                return Hash.create(b);
         }
         // example.i2p
-        if (h.getData() == null) {
-            Destination d = I2PAppContext.getGlobalContext().namingService().lookup(peer);
-            if (d != null)
-                h = d.calculateHash();
-        }
-        if (h.getData() == null)
-            return null;
-        return h;
+        Destination d = I2PAppContext.getGlobalContext().namingService().lookup(peer);
+        if (d != null)
+            return d.calculateHash();
+
+        return null;
     }
 }

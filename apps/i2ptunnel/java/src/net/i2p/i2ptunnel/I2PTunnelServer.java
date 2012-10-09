@@ -49,8 +49,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     protected Logging l;
 
-    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
-    /** default timeout to 3 minutes - override if desired */
+    private static final long DEFAULT_READ_TIMEOUT = 5*60*1000;
+    /** default timeout to 5 minutes - override if desired */
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     /** do we use threads? default true (ignored for standard servers, always false) */
@@ -191,7 +191,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (_usePool) {
             String usePool = getTunnel().getClientOptions().getProperty(PROP_USE_POOL);
             if (usePool != null)
-                _usePool = Boolean.valueOf(usePool).booleanValue();
+                _usePool = Boolean.parseBoolean(usePool);
             else
                 _usePool = DEFAULT_USE_POOL;
         }
@@ -207,7 +207,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             if (sockMgr == null) {
                 // try to make this error sensible as it will happen...
                 String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
-                             " and build tunnels for the server at " + getTunnel().listenHost + ':' + port;
+                             " and build tunnels for the server at " + host.getHostAddress() + ':' + port;
                 if (++retries < MAX_RETRIES) {
                     this.l.log(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
                     _log.error(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
@@ -223,7 +223,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
         sockMgr.setName("Server");
         getTunnel().addSession(sockMgr.getSession());
-        l.log("Tunnels ready for server at " + getTunnel().listenHost + ':' + port);
+        l.log("Tunnels ready for server at " + host.getHostAddress() + ':' + port);
         notifyEvent("openServerResult", "ok");
         open = true;
     }

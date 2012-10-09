@@ -81,15 +81,18 @@ class LogWriter implements Runnable {
                         dupCount++;
                     } else {
                         if (dupCount > 0) {
-                            writeRecord(dupMessage(dupCount, last));
+                            writeRecord(dupMessage(dupCount, last, false));
+                            _manager.getBuffer().add(dupMessage(dupCount, last, true));
                             dupCount = 0;
                         }
                         writeRecord(rec);
                     }
                     last = rec;
                 }
-                if (dupCount > 0)
-                    writeRecord(dupMessage(dupCount, last));
+                if (dupCount > 0) {
+                    writeRecord(dupMessage(dupCount, last, false));
+                    _manager.getBuffer().add(dupMessage(dupCount, last, true));
+                }
                 try {
                     if (_currentOut != null)
                         _currentOut.flush();
@@ -113,12 +116,13 @@ class LogWriter implements Runnable {
     }
 
     /**
-     *  Write a msg with the date stamp of the last duplicate
+     *  Return a msg with the date stamp of the last duplicate
      *  @since 0.9.3
      */
-    private String dupMessage(int dupCount, LogRecord lastRecord) {
-        return LogRecordFormatter.getWhen(_manager, lastRecord) + " ^^^ " +
-               _(dupCount, "1 similar message omitted", "{0} similar messages omitted") + " ^^^\n";
+    private String dupMessage(int dupCount, LogRecord lastRecord, boolean reverse) {
+        String arrows = reverse ? "&darr;&darr;&darr;" : "^^^";
+        return LogRecordFormatter.getWhen(_manager, lastRecord) + ' ' + arrows + ' ' +
+               _(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows + '\n';
     }
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";

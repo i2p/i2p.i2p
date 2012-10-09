@@ -24,12 +24,19 @@ public class LogsHelper extends HelperBase {
         return Server.getVersion();
     }
 
+    /**
+     *  Does not call logManager.flush(); call getCriticalLogs() first to flush
+     */
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
         return _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b><br><br>" + str;
     }
     
+    /**
+     *  Side effect - calls logManager.flush()
+     */
     public String getCriticalLogs() {
+        _context.logManager().flush();
         return formatMessages(_context.logManager().getBuffer().getMostRecentCriticalMessages());
     }
     
@@ -91,6 +98,7 @@ public class LogsHelper extends HelperBase {
         for (int i = msgs.size() - 1; i >= 0; i--) { 
             String msg = msgs.get(i);
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+            msg = msg.replace("&amp;darr;", "&darr;");  // hack - undo the damage (LogWriter)
             // remove  last \n that LogRecordFormatter added
             if (msg.endsWith(NL))
                 msg = msg.substring(0, msg.length() - NL.length());

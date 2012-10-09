@@ -253,7 +253,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     line = null;
                 } else {
                     // Add Proxy-Authentication header for next hop (outproxy)
-                    if (usingWWWProxy && Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_AUTH)).booleanValue()) {
+                    if (usingWWWProxy && Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_AUTH))) {
                         // specific for this proxy
                         String user = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_USER_PREFIX + currentProxy);
                         String pw = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_PW_PREFIX + currentProxy);

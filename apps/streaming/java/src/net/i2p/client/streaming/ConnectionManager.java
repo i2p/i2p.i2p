@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
@@ -12,6 +13,8 @@ import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -35,21 +38,28 @@ class ConnectionManager {
     private final ConcurrentHashMap<Long, Connection> _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
     private final Map<Long, PingRequest> _pendingPings;
-    private boolean _throttlersInitialized;
-    private int _maxConcurrentStreams;
+    private volatile boolean _throttlersInitialized;
     private final ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
     private long _soTimeout;
-    private ConnThrottler _minuteThrottler;
-    private ConnThrottler _hourThrottler;
-    private ConnThrottler _dayThrottler;
+    private volatile ConnThrottler _minuteThrottler;
+    private volatile ConnThrottler _hourThrottler;
+    private volatile ConnThrottler _dayThrottler;
     /** since 0.9, each manager instantiates its own timer */
     private final SimpleTimer2 _timer;
+    /** cache of the property to detect changes */
+    private static volatile String _currentBlacklist = "";
+    private static final Set<Hash> _globalBlacklist = new ConcurrentHashSet();
     
-    public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
+    /** @since 0.9.3 */
+    public static final String PROP_BLACKLIST = "i2p.streaming.blacklist";
+
+    /**
+     *  Manage all conns for this session
+     */
+    public ConnectionManager(I2PAppContext context, I2PSession session, ConnectionOptions defaultOptions) {
         _context = context;
         _session = session;
-        _maxConcurrentStreams = maxConcurrent;
         _defaultOptions = defaultOptions;
         _log = _context.logManager().getLog(ConnectionManager.class);
         _connectionByInboundId = new ConcurrentHashMap(32);
@@ -128,21 +138,42 @@ class ConnectionManager {
 
     public void setAllowIncomingConnections(boolean allow) { 
         _connectionHandler.setActive(allow);
-        if (allow && !_throttlersInitialized) {
-            _throttlersInitialized = true;
-            if (_defaultOptions.getMaxConnsPerMinute() > 0 || _defaultOptions.getMaxTotalConnsPerMinute() > 0) {
-               _context.statManager().createRateStat("stream.con.throttledMinute", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
-               _minuteThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute(), 60*1000);
-            }
-            if (_defaultOptions.getMaxConnsPerHour() > 0 || _defaultOptions.getMaxTotalConnsPerHour() > 0) {
-               _context.statManager().createRateStat("stream.con.throttledHour", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
-               _hourThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour(), 60*60*1000);
-            }
-            if (_defaultOptions.getMaxConnsPerDay() > 0 || _defaultOptions.getMaxTotalConnsPerDay() > 0) {
-               _context.statManager().createRateStat("stream.con.throttledDay", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
-               _dayThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay(), 24*60*60*1000);
+        if (allow) {
+            synchronized(this) {
+                if (!_throttlersInitialized) {
+                    updateOptions();
+                    _throttlersInitialized = true;
+                }
             }
         }
+    }
+
+    /*
+     * Update the throttler options
+     * @since 0.9.3
+     */
+    public synchronized void updateOptions() { 
+            if ((_defaultOptions.getMaxConnsPerMinute() > 0 || _defaultOptions.getMaxTotalConnsPerMinute() > 0) &&
+                _minuteThrottler == null) {
+               _context.statManager().createRateStat("stream.con.throttledMinute", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
+               _minuteThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute(), 60*1000);
+            } else if (_minuteThrottler != null) {
+               _minuteThrottler.updateLimits(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute());
+            }
+            if ((_defaultOptions.getMaxConnsPerHour() > 0 || _defaultOptions.getMaxTotalConnsPerHour() > 0) &&
+                _hourThrottler == null) {
+               _context.statManager().createRateStat("stream.con.throttledHour", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
+               _hourThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour(), 60*60*1000);
+            } else if (_hourThrottler != null) {
+               _hourThrottler.updateLimits(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour());
+            }
+            if ((_defaultOptions.getMaxConnsPerDay() > 0 || _defaultOptions.getMaxTotalConnsPerDay() > 0) &&
+                _dayThrottler == null) {
+               _context.statManager().createRateStat("stream.con.throttledDay", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
+               _dayThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay(), 24*60*60*1000);
+            } else if (_dayThrottler != null) {
+               _dayThrottler.updateLimits(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay());
+            }
     }
 
     /** @return if we should accept connections */
@@ -177,7 +208,7 @@ class ConnectionManager {
             //}
             if (locked_tooManyStreams()) {
                 _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
-                              + _maxConcurrentStreams + " connections");
+                              + _defaultOptions.getMaxConns() + " connections");
                 reject = true;
             } else {
                 // this may not be right if more than one is enabled
@@ -209,6 +240,7 @@ class ConnectionManager {
                 Hash h = from.calculateHash();
                 if ((_hourThrottler != null && _hourThrottler.isThrottled(h)) ||
                     (_dayThrottler != null && _dayThrottler.isThrottled(h)) ||
+                    _globalBlacklist.contains(h) ||
                     (_defaultOptions.isAccessListEnabled() && !_defaultOptions.getAccessList().contains(h)) ||
                     (_defaultOptions.isBlacklistEnabled() && _defaultOptions.getBlacklist().contains(h))) {
                     // A signed RST packet + ElGamal + session tags is fairly expensive, so
@@ -267,16 +299,17 @@ class ConnectionManager {
             long remaining = expiration - _context.clock().now();
             if (remaining <= 0) { 
                 _log.logAlways(Log.WARN, "Refusing to connect since we have exceeded our max of " 
-                          + _maxConcurrentStreams + " connections");
+                          + _defaultOptions.getMaxConns() + " connections");
                 _numWaiting--;
                 return null;
             }
 
                 if (locked_tooManyStreams()) {
+                    int max = _defaultOptions.getMaxConns();
                     // allow a full buffer of pending/waiting streams
-                    if (_numWaiting > _maxConcurrentStreams) {
+                    if (_numWaiting > max) {
                         _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of "
-                                      + _maxConcurrentStreams + " and there are " + _numWaiting
+                                      + max + " and there are " + _numWaiting
                                       + " waiting already");
                         _numWaiting--;
                         return null;
@@ -320,8 +353,9 @@ class ConnectionManager {
      *  @return too many
      */
     private boolean locked_tooManyStreams() {
-        if (_maxConcurrentStreams <= 0) return false;
-        if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
+        int max = _defaultOptions.getMaxConns();
+        if (max <= 0) return false;
+        if (_connectionByInboundId.size() < max) return false;
         int active = 0;
         for (Connection con : _connectionByInboundId.values()) {
             if (con.getIsConnected())
@@ -332,7 +366,7 @@ class ConnectionManager {
             _log.info("More than 100 connections!  " + active
                       + " total: " + _connectionByInboundId.size());
 
-        return (active >= _maxConcurrentStreams);
+        return (active >= max);
     }
     
     /**
@@ -398,6 +432,32 @@ class ConnectionManager {
         if (_defaultOptions.isBlacklistEnabled() &&
             _defaultOptions.getBlacklist().contains(h))
             return "blacklisted";
+        String hashes = _context.getProperty(PROP_BLACKLIST, "");
+        if (!_currentBlacklist.equals(hashes)) {
+            // rebuild _globalBlacklist when property changes
+            synchronized(_globalBlacklist) {
+                if (hashes.length() > 0) {
+                    Set<Hash> newSet = new HashSet();
+                    StringTokenizer tok = new StringTokenizer(hashes, ",; ");
+                    while (tok.hasMoreTokens()) {
+                        String hashstr = tok.nextToken();
+                        Hash hh = ConvertToHash.getHash(hashstr);
+                        if (hh != null)
+                            newSet.add(hh);
+                        else
+                            _log.error("Bad blacklist entry: " + hashstr);
+                    }
+                    _globalBlacklist.addAll(newSet);
+                    _globalBlacklist.retainAll(newSet);
+                    _currentBlacklist = hashes;
+                } else {
+                    _globalBlacklist.clear();
+                    _currentBlacklist = "";
+                }
+            }
+        }
+        if (hashes.length() > 0 && _globalBlacklist.contains(h))
+            return "blacklisted globally";
         return null;
     }
 

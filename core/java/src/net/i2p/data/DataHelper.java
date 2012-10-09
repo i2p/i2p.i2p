@@ -77,6 +77,7 @@ public class DataHelper {
             "ihost2", "iport2", "ikey2", "itag2",
             // RouterInfo options
             "caps", "coreVersion", "netId", "router.version",
+            "netdb.knownLeaseSets", "netdb.knownRouters",
             "stat_bandwidthReceiveBps.60m",
             "stat_bandwidthSendBps.60m",
             "stat_tunnel.buildClientExpire.60m",
@@ -388,8 +389,6 @@ public class DataHelper {
      * - Leading whitespace is not trimmed
      * - '=' is the only key-termination character (not ':' or whitespace)
      *
-     * Note that the escaping of \r or \n was probably a mistake and should be taken out.
-     *
      */
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);
@@ -448,20 +447,40 @@ public class DataHelper {
      * Writes the props to the file, unsorted (unless props is an OrderedProperties)
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
      * As of 0.8.1, file will be mode 600.
+     *
+     * Leading or trailing whitespace in values is not checked but
+     * will be trimmed by loadProps()
+     *
+     * @throws IllegalArgumentException if a key contains any of "#=\n" or starts with ';',
+     *                                  or a value contains '#' or '\n'
      */
     public static void storeProps(Properties props, File file) throws IOException {
         PrintWriter out = null;
+        IllegalArgumentException iae = null;
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
             for (Map.Entry entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
+                if (name.contains("#") ||
+                    name.contains("=") ||
+                    name.contains("\n") ||
+                    name.startsWith(";") ||
+                    val.contains("#") ||
+                    val.contains("\n")) {
+                    if (iae == null)
+                        iae = new IllegalArgumentException("Invalid character (one of \"#;=\\n\") in key or value: \"" +
+                                                           name + "\" = \"" + val + '\"');
+                    continue;
+                }
                 out.println(name + "=" + val);
             }
         } finally {
             if (out != null) out.close();
         }
+        if (iae != null)
+            throw iae;
     }
     
     /**

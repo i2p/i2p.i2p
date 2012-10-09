@@ -63,7 +63,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                 _queue = mgr.connect();
                 _reader = new QueuedI2CPMessageReader(_queue, this);
             } else {
-                if (Boolean.valueOf(getOptions().getProperty(PROP_ENABLE_SSL)).booleanValue())
+                if (Boolean.parseBoolean(getOptions().getProperty(PROP_ENABLE_SSL)))
                     _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
                 else
                     _socket = new Socket(_hostname, _portNum);

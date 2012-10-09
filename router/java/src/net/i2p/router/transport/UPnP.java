@@ -78,7 +78,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private volatile boolean thinksWeAreDoubleNatted = false;
 	
 	/** List of ports we want to forward */
-	private Set<ForwardPort> portsToForward;
+	private final Set<ForwardPort> portsToForward;
 	/** List of ports we have actually forwarded */
 	private final Set<ForwardPort> portsForwarded;
 	/** Callback to call when a forward fails or succeeds */
@@ -88,13 +88,14 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		super();
 		_context = context;
 		_log = _context.logManager().getLog(UPnP.class);
+		portsToForward = new HashSet<ForwardPort>();
 		portsForwarded = new HashSet<ForwardPort>();
 		addDeviceChangeListener(this);
 	}
 	
-	public boolean runPlugin() {
+	public synchronized boolean runPlugin() {
 		synchronized(lock) {
-			portsToForward = null;
+			portsToForward.clear();
 		}
 		return super.start();
 	}
@@ -102,9 +103,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	/**
 	 *  WARNING - Blocking up to 2 seconds
 	 */
-	public void terminate() {
+	public synchronized void terminate() {
 		synchronized(lock) {
-			portsToForward = null;
+			portsToForward.clear();
 		}
 		// this gets spun off in a thread...
 		unregisterPortMappings();
@@ -221,9 +222,10 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private void registerPortMappings() {
 		Set ports;
 		synchronized(lock) {
-			ports = portsToForward;
+			ports = new HashSet(portsForwarded);
 		}
-		if(ports == null) return;
+		if (ports.isEmpty())
+			return;
 		registerPorts(ports);
 	}
 
@@ -281,6 +283,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		synchronized(lock) {
 			ports = new HashSet(portsForwarded);
 		}
+		if (ports.isEmpty())
+			return;
 		this.unregisterPorts(ports);
 	}
 	
@@ -528,17 +532,15 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(upstreamMaxBitRate > 0)
 			sb.append("<br>").append(_("UPnP reports the maximum upstream bit rate is {0}bits/sec", DataHelper.formatSize2(upstreamMaxBitRate)));
 		synchronized(lock) {
-			if(portsToForward != null) {
-				for(ForwardPort port : portsToForward) {
-					sb.append("<br>");
-					if(portsForwarded.contains(port))
-						// {0} is TCP or UDP
-						// {1,number,#####} prevents 12345 from being output as 12,345 in the English locale.
-						// If you want the digit separator in your locale, translate as {1}.
-						sb.append(_("{0} port {1,number,#####} was successfully forwarded by UPnP.", protoToString(port.protocol), port.portNumber));
-					else
-						sb.append(_("{0} port {1,number,#####} was not forwarded by UPnP.", protoToString(port.protocol), port.portNumber));
-				}
+			for(ForwardPort port : portsToForward) {
+				sb.append("<br>");
+				if(portsForwarded.contains(port))
+					// {0} is TCP or UDP
+					// {1,number,#####} prevents 12345 from being output as 12,345 in the English locale.
+					// If you want the digit separator in your locale, translate as {1}.
+					sb.append(_("{0} port {1,number,#####} was successfully forwarded by UPnP.", protoToString(port.protocol), port.portNumber));
+				else
+					sb.append(_("{0} port {1,number,#####} was not forwarded by UPnP.", protoToString(port.protocol), port.portNumber));
 			}
 		}
 		
@@ -726,13 +728,13 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				_log.error("ForwardPortCallback changed from "+forwardCallback+" to "+cb+" - using new value, but this is very strange!");
 			}
 			forwardCallback = cb;
-			if(portsToForward == null || portsToForward.isEmpty()) {
-				portsToForward = ports;
+			if (portsToForward.isEmpty()) {
+				portsToForward.addAll(ports);
 				portsToForwardNow = ports;
 				portsToDumpNow = null;
 			} else if(ports.isEmpty()) {
 				portsToDumpNow = portsToForward;
-				portsToForward = ports;
+				portsToForward.clear();
 				portsToForwardNow = null;
 			} else {
 				// Some ports to keep, some ports to dump
@@ -760,7 +762,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 						portsToDumpNow.add(port);
 					}
 				}
-				portsToForward = ports;
+				portsToForward.clear();
+				portsToForward.addAll(ports);
 			}
 			if(_router == null) {
 				if (_log.shouldLog(Log.WARN))
@@ -768,9 +771,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				return; // When one is found, we will do the forwards
 			}
 		}
-		if(portsToDumpNow != null)
+		if(portsToDumpNow != null && !portsToDumpNow.isEmpty())
 			unregisterPorts(portsToDumpNow);
-		if(portsToForwardNow != null)
+		if(portsToForwardNow != null && !portsToForwardNow.isEmpty())
 			registerPorts(portsToForwardNow);
 	}
 

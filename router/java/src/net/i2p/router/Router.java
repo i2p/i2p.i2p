@@ -49,6 +49,7 @@ import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
@@ -176,7 +177,7 @@ public class Router implements RouterClock.ClockShiftListener {
 
         // Do we copy all the data files to the new directory? default false
         String migrate = System.getProperty("i2p.dir.migrate");
-        boolean migrateFiles = Boolean.valueOf(migrate).booleanValue();
+        boolean migrateFiles = Boolean.parseBoolean(migrate);
         String userDir = WorkingDir.getWorkingDir(envProps, migrateFiles);
 
         // Use the router.config file specified in the router.configLocation property
@@ -196,7 +197,7 @@ public class Router implements RouterClock.ClockShiftListener {
         envProps.putAll(_config);
 
         // This doesn't work, guess it has to be in the static block above?
-        // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
+        // if (Boolean.parseBoolean(envProps.getProperty("router.disableIPv6")))
         //    System.setProperty("java.net.preferIPv4Stack", "true");
 
         if (envProps.getProperty("i2p.dir.config") == null)
@@ -630,7 +631,7 @@ public class Router implements RouterClock.ClockShiftListener {
             return true;
         String h = _context.getProperty(PROP_HIDDEN_HIDDEN);
         if (h != null)
-            return Boolean.valueOf(h).booleanValue();
+            return Boolean.parseBoolean(h);
         return _context.commSystem().isInBadCountry();
     }
 
@@ -976,44 +977,24 @@ public class Router implements RouterClock.ClockShiftListener {
      * Save the current config options (returning true if save was 
      * successful, false otherwise)
      *
-     * Note that unlike DataHelper.storeProps(),
-     * this does escape the \r or \n that are unescaped in DataHelper.loadProps().
-     * Note that the escaping of \r or \n was probably a mistake and should be taken out.
-     *
      * Synchronized with file read in getConfig()
      */
     public boolean saveConfig() {
-        synchronized(_configFileLock) {
-            FileOutputStream fos = null;
-            try {
-                fos = new SecureFileOutputStream(_configFilename);
-                StringBuilder buf = new StringBuilder(8*1024);
-                buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
-                TreeSet ordered = new TreeSet(_config.keySet());
-                for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
-                    String key = (String)iter.next();
-                    String val = _config.get(key);
-                        // Escape line breaks before saving.
-                        // Remember: "\" needs escaping both for regex and string.
-                        // NOOO - see comments in DataHelper
-                        //val = val.replaceAll("\\r","\\\\r");
-                        //val = val.replaceAll("\\n","\\\\n");
-                    buf.append(key).append('=').append(val).append('\n');
-                }
-                fos.write(buf.toString().getBytes("UTF-8"));
-            } catch (IOException ioe) {
+        try {
+            Properties ordered = new OrderedProperties();
+            synchronized(_configFileLock) {
+                ordered.putAll(_config);
+                DataHelper.storeProps(ordered, new File(_configFilename));
+            }
+        } catch (Exception ioe) {
                 // warning, _log will be null when called from constructor
                 if (_log != null)
                     _log.error("Error saving the config to " + _configFilename, ioe);
                 else
                     System.err.println("Error saving the config to " + _configFilename + ": " + ioe);
                 return false;
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-            }
-            
-            return true;
         }
+        return true;
     }
     
     /**

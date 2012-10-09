@@ -1316,7 +1316,7 @@ public class WebMail extends HttpServlet
 				else if( sessionObject.state == STATE_NEW )
 					showCompose( out, sessionObject, request );
 				
-				out.println( "</form><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></body>\n</html>");				
+				out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
 				out.flush();
 			}
 		}

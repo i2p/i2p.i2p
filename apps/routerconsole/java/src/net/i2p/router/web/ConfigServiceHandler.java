@@ -218,6 +218,9 @@ public class ConfigServiceHandler extends FormHandler {
         } else if (_("Do not view console on startup").equals(_action)) {
             browseOnStartup(false);
             addFormNotice(_("Console is not to be shown on startup"));
+        } else if (_("Force GC").equals(_action)) {
+            Runtime.getRuntime().gc();
+            addFormNotice(_("Full garbage collection requested"));
         } else {
             //addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }

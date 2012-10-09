@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -67,6 +68,13 @@ public class NTCPTransport extends TransportImpl {
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
+
+    /**
+     *  To prevent trouble. To be raised to 1024 in 0.9.4.
+     *
+     *  @since 0.9.3
+     */
+    private static final int MIN_PEER_PORT = 500;
 
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
@@ -140,7 +148,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.writeError", "", "ntcp", RATES);
         _establishing = new ConcurrentHashSet(16);
         _conLock = new Object();
-        _conByIdent = new HashMap(64);
+        _conByIdent = new ConcurrentHashMap(64);
 
         _finisher = new NTCPSendFinisher(ctx, this);
 
@@ -160,7 +168,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1);
         markReachable(con.getRemotePeer().calculateHash(), true);
         //_context.shitlist().unshitlistRouter(con.getRemotePeer().calculateHash());
-        NTCPConnection old = null;
+        NTCPConnection old;
         synchronized (_conLock) {
             old = _conByIdent.put(con.getRemotePeer().calculateHash(), con);
         }
@@ -263,6 +271,7 @@ public class NTCPTransport extends TransportImpl {
     public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
         super.afterSend(msg, sendSuccessful, allowRequeue, msToSend);
     }
+
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
         if (!isAlive())
             return null;
@@ -299,7 +308,7 @@ public class NTCPTransport extends TransportImpl {
             return null;
         }
         byte[] ip = addr.getIP();
-        if ( (addr.getPort() <= 0) || (ip == null) ) {
+        if ( (addr.getPort() < MIN_PEER_PORT) || (ip == null) ) {
             _context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
             markUnreachable(peer);
             //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
@@ -354,26 +363,23 @@ public class NTCPTransport extends TransportImpl {
 
     @Override
     public boolean isEstablished(Hash dest) {
-        synchronized (_conLock) {
             NTCPConnection con = _conByIdent.get(dest);
             return (con != null) && con.isEstablished() && !con.isClosed();
-        }
     }
 
     @Override
     public boolean isBacklogged(Hash dest) {
-        synchronized (_conLock) {
             NTCPConnection con = _conByIdent.get(dest);
             return (con != null) && con.isEstablished() && con.tooBacklogged();
-        }
     }
 
     void removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
-        synchronized (_conLock) {
-            RouterIdentity ident = con.getRemotePeer();
-            if (ident != null)
+        RouterIdentity ident = con.getRemotePeer();
+        if (ident != null) {
+            synchronized (_conLock) {
                 removed = _conByIdent.remove(ident.calculateHash());
+            }
         }
         if ( (removed != null) && (removed != con) ) {// multiple cons, close 'em both
             if (_log.shouldLog(Log.WARN))
@@ -388,19 +394,17 @@ public class NTCPTransport extends TransportImpl {
      *
      */
     @Override
-    public int countActivePeers() { synchronized (_conLock) { return _conByIdent.size(); } }
+    public int countActivePeers() { return _conByIdent.size(); }
+
     /**
      * How many peers are we actively sending messages to (this minute)
      */
     @Override
     public int countActiveSendPeers() {
         int active = 0;
-        synchronized (_conLock) {
-            for (Iterator iter = _conByIdent.values().iterator(); iter.hasNext(); ) {
-                NTCPConnection con = (NTCPConnection)iter.next();
+        for (NTCPConnection con : _conByIdent.values()) {
                 if ( (con.getTimeSinceSend() <= 60*1000) || (con.getTimeSinceReceive() <= 60*1000) )
                     active++;
-            }
         }
         return active;
     }
@@ -416,16 +420,9 @@ public class NTCPTransport extends TransportImpl {
      */
     @Override
     public Vector<Long> getClockSkews() {
-
-        Vector<NTCPConnection> peers = new Vector();
         Vector<Long> skews = new Vector();
 
-        synchronized (_conLock) {
-            peers.addAll(_conByIdent.values());
-        }
-
-        for (Iterator<NTCPConnection> iter = peers.iterator(); iter.hasNext(); ) {
-            NTCPConnection con = iter.next();
+        for (NTCPConnection con : _conByIdent.values()) {
             if (con.isEstablished())
                 skews.addElement(Long.valueOf(con.getClockSkew()));
         }
@@ -551,11 +548,14 @@ public class NTCPTransport extends TransportImpl {
                 ServerSocketChannel chan = ServerSocketChannel.open();
                 chan.configureBlocking(false);
 
+                int port = _myAddress.getPort();
+                if (port > 0 && port < 1024)
+                    _log.logAlways(Log.WARN, "Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
                 InetSocketAddress addr = null;
                 if(bindToAddr==null) {
-                    addr = new InetSocketAddress(_myAddress.getPort());
+                    addr = new InetSocketAddress(port);
                 } else {
-                    addr = new InetSocketAddress(bindToAddr, _myAddress.getPort());
+                    addr = new InetSocketAddress(bindToAddr, port);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Binding only to " + bindToAddr);
                 }
@@ -603,6 +603,7 @@ public class NTCPTransport extends TransportImpl {
     void establishing(NTCPConnection con) {
             _establishing.add(con);
     }
+
     /**
      * called in the EventPumper no more than once a second or so, closing
      * any unconnected/unestablished connections
@@ -694,12 +695,10 @@ public class NTCPTransport extends TransportImpl {
     @Override
     public short getReachabilityStatus() { 
         if (isAlive() && _myAddress != null) {
-            synchronized (_conLock) {
                 for (NTCPConnection con : _conByIdent.values()) {
                     if (con.isInbound())
                         return CommSystemFacade.STATUS_OK;
                 }
-            }
         }
         return CommSystemFacade.STATUS_UNKNOWN;
     }
@@ -727,17 +726,17 @@ public class NTCPTransport extends TransportImpl {
         // will this work?
         replaceAddress(null);
     }
+
     public static final String STYLE = "NTCP";
 
     public void renderStatusHTML(java.io.Writer out, int sortFlags) throws IOException {}
+
     @Override
     public void renderStatusHTML(java.io.Writer out, String urlBase, int sortFlags) throws IOException {
         TreeSet peers = new TreeSet(getComparator(sortFlags));
-        synchronized (_conLock) {
-            peers.addAll(_conByIdent.values());
-        }
-        long offsetTotal = 0;
+        peers.addAll(_conByIdent.values());
 
+        long offsetTotal = 0;
         float bpsSend = 0;
         float bpsRecv = 0;
         long totalUptime = 0;
@@ -838,6 +837,7 @@ public class NTCPTransport extends TransportImpl {
     }
 
     private static final NumberFormat _rateFmt = new DecimalFormat("#,##0.00");
+
     private static String formatRate(float rate) {
         synchronized (_rateFmt) { return _rateFmt.format(rate); }
     }
@@ -858,14 +858,12 @@ public class NTCPTransport extends TransportImpl {
         public static final AlphaComparator instance() { return _instance; }
     }
 
-    private static class PeerComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            if ( (lhs == null) || (rhs == null) || !(lhs instanceof NTCPConnection) || !(rhs instanceof NTCPConnection))
-                throw new IllegalArgumentException("rhs = " + rhs + " lhs = " + lhs);
-            return compare((NTCPConnection)lhs, (NTCPConnection)rhs);
-        }
-        protected int compare(NTCPConnection l, NTCPConnection r) {
+    private static class PeerComparator implements Comparator<NTCPConnection> {
+        public int compare(NTCPConnection l, NTCPConnection r) {
+            if (l == null || r == null)
+                throw new IllegalArgumentException();
             // base64 retains binary ordering
+            // UM, no it doesn't, but close enough
             return l.getRemotePeer().calculateHash().toBase64().compareTo(r.getRemotePeer().calculateHash().toBase64());
         }
     }

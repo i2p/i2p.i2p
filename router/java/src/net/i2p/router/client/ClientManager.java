@@ -326,7 +326,7 @@ class ClientManager {
         if (destHash == null) return true;
         ClientConnectionRunner runner = getRunner(destHash);
         if (runner == null) return true;
-        return !Boolean.valueOf(runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY)).booleanValue();
+        return !Boolean.parseBoolean(runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY));
     }
 
     /**

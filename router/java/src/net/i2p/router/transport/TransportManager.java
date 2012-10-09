@@ -362,7 +362,7 @@ public class TransportManager implements TransportEventListener {
             }
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
             if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
-                Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue()) {
+                _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
                 Transport udp = getTransport(UDPTransport.STYLE);
                 if (udp != null)
                     port = t.getRequestedPort();
@@ -545,7 +545,7 @@ public class TransportManager implements TransportEventListener {
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of pending sends which exceed congestion window")).append("<br>\n" +
                    "<b id=\"def.ssthresh\">SST</b>: ").append(_("The slow start threshold")).append("<br>\n" +
                    "<b id=\"def.rtt\">RTT</b>: ").append(_("The round trip time in milliseconds")).append("<br>\n" +
-                   "<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The standard deviation of the round trip time in milliseconds")).append("<br>\n" +
+                   //"<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The standard deviation of the round trip time in milliseconds")).append("<br>\n" +
                    "<b id=\"def.rto\">RTO</b>: ").append(_("The retransmit timeout in milliseconds")).append("<br>\n" +
                    "<b id=\"def.mtu\">MTU</b>: ").append(_("Current maximum send packet size / estimated maximum receive packet size (bytes)")).append("<br>\n" +
                    "<b id=\"def.send\">").append(_("TX")).append("</b>: ").append(_("The total number of packets sent to the peer")).append("<br>\n" +

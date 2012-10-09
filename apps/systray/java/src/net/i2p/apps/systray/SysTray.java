@@ -49,7 +49,7 @@ public class SysTray implements SysTrayMenuListener {
 
         _browserString = _configFile.getProperty("browser", "default");
         _portString = _configFile.getProperty("port", "7657");
-        _showIcon = Boolean.valueOf(_configFile.getProperty("visible", "true")).booleanValue();
+        _showIcon = Boolean.parseBoolean(_configFile.getProperty("visible", "true"));
 
         //if (!(new File("router.config")).exists())
         //    openRouterConsole("http://localhost:" + _portString + "/index.jsp");

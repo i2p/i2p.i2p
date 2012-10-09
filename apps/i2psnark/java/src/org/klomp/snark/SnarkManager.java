@@ -200,11 +200,11 @@ public class SnarkManager implements Snark.CompleteListener {
      *  @since 0.8.9
      */
     public boolean areFilesPublic() {
-        return Boolean.valueOf(_config.getProperty(PROP_FILES_PUBLIC)).booleanValue();
+        return Boolean.parseBoolean(_config.getProperty(PROP_FILES_PUBLIC));
     }
 
     public boolean shouldAutoStart() {
-        return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START)).booleanValue();
+        return Boolean.parseBoolean(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START));
     }
 
 /****
@@ -384,11 +384,11 @@ public class SnarkManager implements Snark.CompleteListener {
         if (ot != null)
             _util.setOpenTrackers(getOpenTrackers());
         String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
-        boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
+        boolean bOT = useOT == null || Boolean.parseBoolean(useOT);
         _util.setUseOpenTrackers(bOT);
         // careful, so we can switch default to true later
-        _util.setUseDHT(Boolean.valueOf(_config.getProperty(PROP_USE_DHT,
-                                          Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT))).booleanValue());
+        _util.setUseDHT(Boolean.parseBoolean(_config.getProperty(PROP_USE_DHT,
+                                          Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT))));
         getDataDir().mkdirs();
         initTrackerMap();
     }
@@ -707,7 +707,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Properties getConfig() { return _config; }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    private static final int MAX_FILES_PER_TORRENT = 512;
+    public static final int MAX_FILES_PER_TORRENT = 512;
     
     /**
      *  Set of canonical .torrent filenames that we are dealing with.
@@ -1370,6 +1370,8 @@ public class SnarkManager implements Snark.CompleteListener {
                     } catch (Exception e) {
                         _log.error("Error in the DirectoryMonitor", e);
                     }
+                    if (!_snarks.isEmpty())
+                        addMessage(_("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }

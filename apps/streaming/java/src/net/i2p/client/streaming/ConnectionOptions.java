@@ -14,6 +14,8 @@ import net.i2p.util.Log;
 /**
  * Define the current options for the con (and allow custom tweaking midstream)
  *
+ * TODO many of these are not per-connection options, and should be migrated
+ * somewhere so they aren't copied for every connection
  */
 class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
@@ -47,6 +49,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _maxTotalConnsPerMinute;
     private int _maxTotalConnsPerHour;
     private int _maxTotalConnsPerDay;
+    private int _maxConns;
 
     // NOTE - almost all the options are below, but see
     // I2PSocketOptions in ministreaming for a few more
@@ -90,6 +93,12 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
     /** @since 0.9.1 */
     public static final String PROP_ENFORCE_PROTO = "i2p.streaming.enforceProtocol";
+    /**
+     *  how many streams will we allow at once?
+     *  @since 0.9.3 moved from I2PSocketManagerFull
+     */
+    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+    
     
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 6;
@@ -308,6 +317,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerMinute = opts.getMaxTotalConnsPerMinute();
             _maxTotalConnsPerHour = opts.getMaxTotalConnsPerHour();
             _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
+            _maxConns = opts.getMaxConns();
     }
     
     /**
@@ -333,8 +343,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
                                                       DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
                                             DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
-        // overrides default in super()
-        setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+        // overrides default in super()... why?
+        //setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
         initLists(opts);
@@ -344,6 +354,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _maxTotalConnsPerMinute = getInt(opts, PROP_MAX_TOTAL_CONNS_MIN, 0);
         _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
         _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
+        _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
     }
     
     /**
@@ -388,9 +399,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
                                                 DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
-            // wow 5 minutes!!! FIXME!!
             // overrides default in super()
-            setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+            setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DEFAULT_CONNECT_TIMEOUT));
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         if (opts.containsKey(PROP_ENFORCE_PROTO))
@@ -408,6 +418,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
         if (opts.containsKey(PROP_MAX_TOTAL_CONNS_DAY))
             _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
+        if (opts.containsKey(PROP_MAX_STREAMS))
+            _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
     }
     
     /** 
@@ -660,6 +672,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getMaxTotalConnsPerMinute() { return _maxTotalConnsPerMinute; }
     public int getMaxTotalConnsPerHour() { return _maxTotalConnsPerHour; }
     public int getMaxTotalConnsPerDay() { return _maxTotalConnsPerDay; }
+    /** @since 0.9.3; no public setter */
+    public int getMaxConns() { return _maxConns; }
 
     public boolean isAccessListEnabled() { return _accessListEnabled; }
     public boolean isBlacklistEnabled() { return _blackListEnabled; }
@@ -691,7 +705,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             String hashes = opts.getProperty(PROP_ACCESS_LIST);
             if (hashes == null)
                 return;
-            StringTokenizer tok = new StringTokenizer(hashes, ", ");
+            StringTokenizer tok = new StringTokenizer(hashes, ",; ");
             while (tok.hasMoreTokens()) {
                 String hashstr = tok.nextToken();
                 Hash h = ConvertToHash.getHash(hashstr);
@@ -749,7 +763,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts == null) return defaultVal;
         String val = opts.getProperty(name);
         if (val == null)  return defaultVal;
-        return Boolean.valueOf(val).booleanValue();
+        return Boolean.parseBoolean(val);
     }
 
 /****

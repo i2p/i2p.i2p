@@ -689,6 +689,22 @@ public class Snark
     }
 
     /**
+     *  File checking in progress.
+     *  @since 0.9.3
+     */
+    public boolean isChecking() {
+        return storage != null && storage.isChecking();
+    }
+
+    /**
+     *  Disk allocation (ballooning) in progress.
+     *  @since 0.9.3
+     */
+    public boolean isAllocating() {
+        return storage != null && storage.isAllocating();
+    }
+
+    /**
      *  @since 0.8.4
      */
     public long getDownloadRate() {

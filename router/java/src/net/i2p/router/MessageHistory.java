@@ -80,7 +80,7 @@ public class MessageHistory {
     String getFilename() { return _historyFile; }
     
     private void updateSettings() {
-        _doLog = Boolean.valueOf(_context.getProperty(PROP_KEEP_MESSAGE_HISTORY)).booleanValue();
+        _doLog = _context.getBooleanProperty(PROP_KEEP_MESSAGE_HISTORY);
         _historyFile = _context.getProperty(PROP_MESSAGE_HISTORY_FILENAME, DEFAULT_MESSAGE_HISTORY_FILENAME);
     }
     

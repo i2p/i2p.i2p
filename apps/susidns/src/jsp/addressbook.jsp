@@ -202,8 +202,8 @@ ${book.loadBookMessages}
 </p>
 </div></form>
 
-<hr>
 <div id="footer">
+<hr>
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
 </div>
 </div>

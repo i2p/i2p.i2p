@@ -331,7 +331,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (_log.shouldLog(Log.INFO))
             _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
         if (enabled.equals("always") ||
-            (Boolean.valueOf(enabled).booleanValue() && status == STATUS_OK)) {
+            (Boolean.parseBoolean(enabled) && status == STATUS_OK)) {
             String nhost = UDPAddr.getOption(UDPAddress.PROP_HOST);
             if (_log.shouldLog(Log.INFO))
                 _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
@@ -354,7 +354,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
             return;
-        } else if (Boolean.valueOf(enabled).booleanValue() && status != STATUS_OK) {
+        } else if (Boolean.parseBoolean(enabled) && status != STATUS_OK) {
             // UDP transitioned to not-OK, turn off NTCP address
             // This will commonly happen at startup if we were initially OK
             // because UPnP was successful, but a subsequent SSU Peer Test determines

@@ -6,10 +6,12 @@ package net.i2p.router.transport;
 
 import java.net.InetAddress;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
@@ -59,15 +61,42 @@ class UPnPManager {
         _upnpCallback = new UPnPCallback();
     }
     
+    /**
+     *  Blocking, may take a while
+     */
     public synchronized void start() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Start");
-        if (!_isRunning)
-            _isRunning = _upnp.runPlugin();
-        if (!_isRunning)
-            _log.error("UPnP start failed - port conflict?");
+        if (!_isRunning) {
+            long b = _context.clock().now();
+            try {
+                _isRunning = _upnp.runPlugin();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("UPnP runPlugin took " + (_context.clock().now() - b));
+            } catch (Exception e) {
+                // NPE in UPnP (ticket #728), can't let it bring us down
+                _log.error("UPnP error, please report", e);
+            }
+        }
+        if (!_isRunning) {
+            // Do we have a non-loopback, non-broadcast address?
+            // If not, that's why it failed (HTTPServer won't start)
+            Set<String> addrs = Addresses.getAddresses(true, false);
+            addrs.remove("0.0.0.0");
+            for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+                if (iter.next().startsWith("127."))
+                    iter.remove();
+            }
+            if (addrs.isEmpty())
+                _log.logAlways(Log.WARN, "UPnP start failed - no network connection?");
+            else
+                _log.error("UPnP start failed - port conflict?");
+        }
     }
 
+    /**
+     *  Blocking, may take a while
+     */
     public synchronized void stop() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Stop");
@@ -86,8 +115,17 @@ class UPnPManager {
     public void update(Map<String, Integer> ports) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Update with " + ports.size() + " ports");
-        if (!_isRunning)
-            return;
+
+        //synchronized(this) {
+            // TODO
+            // called too often and may block for too long
+            // may not have started if net was disconnected previously
+            //if (!_isRunning && !ports.isEmpty())
+            //    start();
+            if (!_isRunning)
+                return;
+        //}
+
         Set<ForwardPort> forwards = new HashSet(ports.size());
         for (Map.Entry<String, Integer> entry : ports.entrySet()) {
             String style = entry.getKey();

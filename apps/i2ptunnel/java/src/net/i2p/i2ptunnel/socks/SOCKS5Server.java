@@ -61,7 +61,7 @@ public class SOCKS5Server extends SOCKSServer {
         this.clientSock = clientSock;
         this.props = props;
         this.authRequired =
-                    Boolean.valueOf(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)).booleanValue() &&
+                    Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_USER) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_PW);
     }
@@ -181,7 +181,7 @@ public class SOCKS5Server extends SOCKSServer {
             sendRequestReply(Reply.COMMAND_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("BIND command not supported");
         case Command.UDP_ASSOCIATE:
-          /*** if(!Boolean.valueOf(tunnel.getOptions().getProperty("i2ptunnel.socks.allowUDP")).booleanValue()) {
+          /*** if(!Boolean.parseBoolean(tunnel.getOptions().getProperty("i2ptunnel.socks.allowUDP"))) {
             _log.debug("UDP ASSOCIATE command is not supported!");
             sendRequestReply(Reply.COMMAND_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("UDP ASSOCIATE command not supported");
@@ -463,7 +463,7 @@ public class SOCKS5Server extends SOCKSServer {
         I2PSocket destSock = tun.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(proxy), proxyOpts);
         try {
             DataOutputStream out = new DataOutputStream(destSock.getOutputStream());
-            boolean authAvail = Boolean.valueOf(props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH)).booleanValue();
+            boolean authAvail = Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH));
             String configUser =  null;
             String configPW = null;
             if (authAvail) {

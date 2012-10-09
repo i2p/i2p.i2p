@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
@@ -21,7 +22,6 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.udp.InboundEstablishState.InboundState.*;
 import static net.i2p.router.transport.udp.OutboundEstablishState.OutboundState.*;
@@ -86,7 +86,9 @@ class EstablishmentManager {
     private int _activity;
     
     /** max outbound in progress - max inbound is half of this */
-    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 30;
+    private final int DEFAULT_MAX_CONCURRENT_ESTABLISH;
+    private static final int DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH = 20;
+    private static final int DEFAULT_HIGH_MAX_CONCURRENT_ESTABLISH = 150;
     private static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
 
     /** max pending outbound connections (waiting because we are at MAX_CONCURRENT_ESTABLISH) */
@@ -132,6 +134,9 @@ class EstablishmentManager {
         _outboundByClaimedAddress = new ConcurrentHashMap();
         _outboundByHash = new ConcurrentHashMap();
         _activityLock = new Object();
+        DEFAULT_MAX_CONCURRENT_ESTABLISH = Math.max(DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH,
+                                                    Math.min(DEFAULT_HIGH_MAX_CONCURRENT_ESTABLISH,
+                                                             ctx.bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
         _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.inboundEstablishFailedState", "What state a failed inbound establishment request fails in", "udp", UDPTransport.RATES);
@@ -142,6 +147,7 @@ class EstablishmentManager {
         _context.statManager().createRateStat("udp.establishDropped", "Dropped an inbound establish message", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.establishRejected", "How many pending outbound connections are there when we refuse to add any more?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.establishOverflow", "How many messages were queued up on a pending connection when it was too much?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.establishBadIP", "Received IP or port was bad", "udp", UDPTransport.RATES);
         // following are for PeerState
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", UDPTransport.RATES);
@@ -247,6 +253,7 @@ class EstablishmentManager {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
                 _transport.markUnreachable(toHash);
                 //_context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
+                _context.statManager().addRateData("udp.establishBadIP", 1);
                 return;
             }
 
@@ -413,9 +420,9 @@ class EstablishmentManager {
      *
      */
     void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
-        if (!_transport.isValid(from.getIP())) {
+        if (from.getPort() < UDPTransport.MIN_PEER_PORT || !_transport.isValid(from.getIP())) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Receive session request from invalid IP: " + from);
+                _log.warn("Receive session request from invalid: " + from);
             return;
         }
         
@@ -435,6 +442,7 @@ class EstablishmentManager {
                 if (_context.blocklist().isBlocklisted(from.getIP())) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Receive session request from blocklisted IP: " + from);
+                    _context.statManager().addRateData("udp.establishBadIP", 1);
                     return; // drop the packet
                 }
                 if (!_transport.allowConnection())
@@ -450,14 +458,9 @@ class EstablishmentManager {
             }
 
         if (isNew) {
-            // we don't expect inbound connections when hidden, but it could happen
-            // Don't offer if we are approaching max connections. While Relay Intros do not
-            // count as connections, we have to keep the connection to this peer up longer if
-            // we are offering introductions.
             // Don't offer to relay to privileged ports.
-            if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
-                state.getSentPort() >= 1024 &&
-                !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
+            // TODO if already we have their RI, only offer if they need it (no 'C' cap)
+            if (_transport.canIntroduce() && state.getSentPort() >= 1024) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
@@ -573,7 +576,14 @@ class EstablishmentManager {
                     }
                 }
                 
+        if (_outboundStates.size() < getMaxConcurrentEstablish() && !_queuedOutbound.isEmpty()) {
+            // in theory shouldn't need locking, but
+            // getting IllegalStateExceptions on old Java 5,
+            // which hoses this state.
+            synchronized(_queuedOutbound) {
                 locked_admitQueued();
+            }
+        }
             //remaining = _queuedOutbound.size();
 
         //if (admitted > 0)
@@ -600,6 +610,7 @@ class EstablishmentManager {
             // ok, active shrunk, lets let some queued in.
 
             Map.Entry<RemoteHostId, List<OutNetMessage>> entry = iter.next();
+            // java 5 IllegalStateException here
             iter.remove();
             RemoteHostId to = entry.getKey();
             List<OutNetMessage> allQueued = entry.getValue();
@@ -709,7 +720,7 @@ class EstablishmentManager {
     private void sendInboundComplete(PeerState peer) {
         // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
         if (_log.shouldLog(Log.INFO))
-            _log.info("Completing to the peer after confirm: " + peer);
+            _log.info("Completing to the peer after IB confirm: " + peer);
         DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
         dsm.setArrival(Router.NETWORK_ID); // overloaded, sure, but future versions can check this
                                            // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat
@@ -803,29 +814,10 @@ class EstablishmentManager {
     /** the relay tag is a 4-byte field in the protocol */
     public static final long MAX_TAG_VALUE = 0xFFFFFFFFl;
     
+    /**
+     *  This may be called more than once
+     */
     private void sendCreated(InboundEstablishState state) {
-        long now = _context.clock().now();
-        // This is usually handled in receiveSessionRequest() above, except, I guess,
-        // if the session isn't new and we are going through again.
-        // Don't offer if we are approaching max connections (see comments above)
-        // Also don't offer if we are floodfill, as this extends the max idle time
-        // and we will have lots of incoming conns
-        if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
-            !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
-            // offer to relay
-            // (perhaps we should check our bw usage and/or how many peers we are 
-            //  already offering introducing?)
-            if (state.getSentRelayTag() == 0) {
-                // ensure > 0
-                state.setSentRelayTag(1 + _context.random().nextLong(MAX_TAG_VALUE));
-            } else {
-                // don't change it, since we've already prepared our sig
-            }
-        } else {
-            // don't offer to relay
-            state.setSentRelayTag(0);
-        }
-        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send created to: " + state);
         
@@ -901,15 +893,14 @@ class EstablishmentManager {
         byte ip[] = new byte[sz];
         reader.getRelayResponseReader().readCharlieIP(ip, 0);
         int port = reader.getRelayResponseReader().readCharliePort();
+        if ((!isValid(ip, port)) || (!isValid(bob.getIP(), bob.getPort()))) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad relay resp from " + bob + " for " + Addresses.toString(ip, port));
+            _context.statManager().addRateData("udp.relayBadIP", 1);
+            return;
+        }
         InetAddress addr = null;
         try {
-            if (!_transport.isValid(ip))
-                throw new UnknownHostException("non-public IP");
-            // let's not relay to a privileged port, sounds like trouble
-            if (port < 1024 || port > 65535)
-                throw new UnknownHostException("bad port " + port);
-            if (Arrays.equals(ip, _transport.getExternalIP()))
-                throw new UnknownHostException("relay myself");
             addr = InetAddress.getByAddress(ip);
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
@@ -943,7 +934,20 @@ class EstablishmentManager {
         }
         notifyActivity();
     }
-    
+
+    /**
+     *  Are IP and port valid?
+     *  Refuse anybody in the same /16
+     *  @since 0.9.3
+     */
+    private boolean isValid(byte[] ip, int port) {
+        return port >= 1024 &&
+               port <= 65535 &&
+               _transport.isValid(ip) &&
+               (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
+               (!_context.blocklist().isBlocklisted(ip));
+    }
+
     /**
      *  Note that while a SessionConfirmed could in theory be fragmented,
      *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,

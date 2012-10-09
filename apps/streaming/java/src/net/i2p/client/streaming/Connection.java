@@ -87,7 +87,7 @@ class Connection {
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static final int DISCONNECT_TIMEOUT = 5*60*1000;
     
-    private static final long DEFAULT_CONNECT_TIMEOUT = 60*1000;
+    public static final int DEFAULT_CONNECT_TIMEOUT = 60*1000;
     private static final long MAX_CONNECT_TIMEOUT = 2*60*1000;
 
     public static final int MAX_WINDOW_SIZE = 128;
@@ -549,7 +549,15 @@ class Connection {
     
     public void setInbound() { _isInbound = true; }
     public boolean isInbound() { return _isInbound; }
+
+    /**
+     *  Always true at the start, even if we haven't gotten a reply on an
+     *  outbound connection. Only set to false on disconnect.
+     *  For outbound, use getHighestAckedThrough() >= 0 also,
+     *  to determine if the connection is up.
+     */
     public boolean getIsConnected() { return _connected; }
+
     public boolean getHardDisconnected() { return _hardDisconnected; }
     public boolean getResetSent() { return _resetSent; }
     public long getResetSentOn() { return _resetSentOn; }
@@ -1017,7 +1025,7 @@ class Connection {
 
     @Override
     public String toString() { 
-        StringBuilder buf = new StringBuilder(128);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("[Connection ");
         if (_receiveStreamId > 0)
             buf.append(Packet.toId(_receiveStreamId));
@@ -1075,6 +1083,7 @@ class Connection {
             buf.append(" close received ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
         buf.append(" sent: ").append(1 + _lastSendId.get());
         buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
+        buf.append(" ackThru ").append(_highestAckedThrough);
         
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
         buf.append(" MTU ").append(getOptions().getMaxMessageSize());

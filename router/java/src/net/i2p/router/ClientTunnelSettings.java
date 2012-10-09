@@ -20,12 +20,8 @@ public class ClientTunnelSettings {
     private TunnelPoolSettings _outboundSettings;
     
     public ClientTunnelSettings() {
-        _inboundSettings = new TunnelPoolSettings();
-        _inboundSettings.setIsInbound(true);
-        _inboundSettings.setIsExploratory(false);
-        _outboundSettings = new TunnelPoolSettings();
-        _outboundSettings.setIsInbound(false);
-        _outboundSettings.setIsExploratory(false);
+        _inboundSettings = new TunnelPoolSettings(false, true);
+        _outboundSettings = new TunnelPoolSettings(false, false);
     }
     
     public TunnelPoolSettings getInboundSettings() { return _inboundSettings; }

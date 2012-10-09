@@ -49,12 +49,9 @@
      width: 300px;
 }
 
-#tunnelEditPage #port {
+#tunnelEditPage #port, #tunnelEditPage #targetPort, #tunnelEditPage #clientPort, #tunnelEditPage #tunnelBackupQuantity, #tunnelEditPage #tunnelVariance {
+     text-align: right;
      width: 80px;
-}
-
-#tunnelEditPage #targetPort, #tunnelEditPage #clientPort, #tunnelEditPage #tunnelBackupQuantity, #tunnelEditPage #tunnelVariance {
-     width: 150px;
 }
 
 #tunnelEditPage #shared, #tunnelEditPage #connectDelay, #tunnelEditPage #startOnLoad {

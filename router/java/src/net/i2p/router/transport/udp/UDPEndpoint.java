@@ -96,6 +96,8 @@ class UDPEndpoint {
     private DatagramSocket getSocket() {
         DatagramSocket socket = null;
         int port = _listenPort;
+        if (port > 0 && port < 1024)
+            _log.logAlways(Log.WARN, "Specified UDP port is " + port + ", ports lower than 1024 not recommended");
 
         for (int i = 0; i < MAX_PORT_RETRIES; i++) {
              if (port <= 0) {
@@ -113,7 +115,7 @@ class UDPEndpoint {
                  break;
              } catch (SocketException se) {
                  if (_log.shouldLog(Log.WARN))
-                     _log.warn("Binding to port " + port + " failed: " + se);
+                     _log.warn("Binding to port " + port + " failed", se);
              }
              port = -1;
         }
@@ -157,6 +159,7 @@ class UDPEndpoint {
      *  @since 0.9.2
      */
     public void clearOutbound() {
-        _sender.clear();
+        if (_sender != null)
+            _sender.clear();
     }
 }

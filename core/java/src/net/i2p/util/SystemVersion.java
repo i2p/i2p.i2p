@@ -84,4 +84,12 @@ public abstract class SystemVersion {
     public static int getAndroidVersion() {
         return _androidSDK;
     }
+
+    /**
+     *  Is the wrapper present?
+     *  Same as I2PAppContext.hasWrapper()
+     */
+    public static boolean hasWrapper() {
+        return System.getProperty("wrapper.version") != null;
+    }
 }

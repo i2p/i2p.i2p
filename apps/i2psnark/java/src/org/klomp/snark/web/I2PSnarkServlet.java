@@ -609,6 +609,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                             MetaInfo meta = snark.getMetaInfo();
                             if (meta == null) {
                                 // magnet - remove and delete are the same thing
+                                // Remove not shown on UI so we shouldn't get here
                                 _manager.deleteMagnet(snark);
                                 _manager.addMessage(_("Magnet deleted: {0}", name));
                                 return;
@@ -637,7 +638,10 @@ public class I2PSnarkServlet extends DefaultServlet {
                             if (meta == null) {
                                 // magnet - remove and delete are the same thing
                                 _manager.deleteMagnet(snark);
-                                _manager.addMessage(_("Magnet deleted: {0}", name));
+                                if (snark instanceof FetchAndAdd)
+                                    _manager.addMessage(_("Download deleted: {0}", name));
+                                else
+                                    _manager.addMessage(_("Magnet deleted: {0}", name));
                                 return;
                             }
                             _manager.stopTorrent(snark, true);
@@ -739,6 +743,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                     try {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
+                        // TODO thread it for big torrents, perhaps a la FetchAndAdd
                         boolean isPrivate = _manager.getPrivateTrackers().contains(announceURL);
                         Storage s = new Storage(_manager.util(), baseFile, announceURL, isPrivate, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
@@ -988,7 +993,13 @@ public class I2PSnarkServlet extends DefaultServlet {
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         String statusString;
-        if (err != null) {
+        if (snark.isChecking()) {
+            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Checking") + "\"></td>" +
+                           "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Checking");
+        } else if (snark.isAllocating()) {
+            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
+                           "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Allocating");
+        } else if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
                                "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
@@ -1170,7 +1181,9 @@ public class I2PSnarkServlet extends DefaultServlet {
         String b64 = Base64.encode(snark.getInfoHash());
         if (showPeers)
             parameters = parameters + "&p=1";
-        if (isRunning) {
+        if (snark.isChecking()) {
+            // show no buttons
+        } else if (isRunning) {
             // Stop Button
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");

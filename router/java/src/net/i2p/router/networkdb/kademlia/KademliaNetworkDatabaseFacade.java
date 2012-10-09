@@ -220,7 +220,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         String enforce = _context.getProperty(PROP_ENFORCE_NETID);
         if (enforce != null) 
-            _enforceNetId = Boolean.valueOf(enforce).booleanValue();
+            _enforceNetId = Boolean.parseBoolean(enforce);
         else
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
@@ -246,7 +246,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
         String enforce = _context.getProperty(PROP_ENFORCE_NETID);
         if (enforce != null) 
-            _enforceNetId = Boolean.valueOf(enforce).booleanValue();
+            _enforceNetId = Boolean.parseBoolean(enforce);
         else
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         

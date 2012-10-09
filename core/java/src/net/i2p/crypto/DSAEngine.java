@@ -311,6 +311,7 @@ public class DSAEngine {
      *  Reads the stream until EOF. Does not close the stream.
      *
      *  @return hash SHA-1 hash, NOT a SHA-256 hash
+     *  @deprecated unused
      */
     public SHA1Hash calculateHash(InputStream in) {
         MessageDigest digest = SHA1.getInstance();

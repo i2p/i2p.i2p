@@ -30,6 +30,7 @@ public class Hash extends SimpleDataStructure {
 
     /**
      * Pull from cache or return new
+     * @throws IllegalArgumentException if data is not the correct number of bytes
      * @since 0.8.3
      */
     public static Hash create(byte[] data) {
@@ -38,6 +39,7 @@ public class Hash extends SimpleDataStructure {
 
     /**
      * Pull from cache or return new
+     * @throws AIOOBE if not enough bytes
      * @since 0.8.3
      */
     public static Hash create(byte[] data, int off) {

@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  *  This should be deprecated.
- *  It is only used by EepGet, and it uses the inefficient SimpleTimer.
+ *  It is only used by EepGet.
  *  The only advantage seems to be a total timeout period, which is the second
  *  argument to EepGet.fetch(headerTimeout, totalTimeout, inactivityTimeout),
  *  which is most likely always set to -1.
@@ -15,14 +15,16 @@ import java.util.Date;
  *  Use socket.setsotimeout instead?
  */
 public class SocketTimeout extends SimpleTimer2.TimedEvent {
-    private Socket _targetSocket;
-    private long _startTime;
-    private long _inactivityDelay;
-    private long _lastActivity;
-    private long _totalTimeoutTime;
-    private boolean _cancelled;
-    private Runnable _command;
+    private volatile Socket _targetSocket;
+    private final long _startTime;
+    private volatile long _inactivityDelay;
+    private volatile long _lastActivity;
+    private volatile long _totalTimeoutTime;
+    private volatile boolean _cancelled;
+    private volatile Runnable _command;
+
     public SocketTimeout(long delay) { this(null, delay); }
+
     public SocketTimeout(Socket socket, long delay) {
         super(SimpleTimer2.getInstance());
         _inactivityDelay = delay;
@@ -32,6 +34,7 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
         _totalTimeoutTime = -1;
         schedule(delay);
     }
+
     public void timeReached() {
         if (_cancelled) return;
         
@@ -53,25 +56,29 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
         _cancelled = true;
         return super.cancel();
     }
+
     public void setSocket(Socket s) { _targetSocket = s; }
     public void resetTimer() { _lastActivity = System.currentTimeMillis();  }
     public void setInactivityTimeout(long timeout) { _inactivityDelay = timeout; }
+
     public void setTotalTimeoutPeriod(long timeoutPeriod) { 
         if (timeoutPeriod > 0)
             _totalTimeoutTime = _startTime + timeoutPeriod;
         else
             _totalTimeoutTime = -1;
     }
+
     public void setTimeoutCommand(Runnable job) { _command = job; }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss.SSS");
     private static String ts(long when) { synchronized (_fmt) { return _fmt.format(new Date(when)); } }
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("started on ");
+        buf.append("SocketTimeout started on ");
         buf.append(ts(_startTime));
-        buf.append("idle for ");
+        buf.append(" idle for ");
         buf.append(System.currentTimeMillis() - _lastActivity);
         buf.append("ms ");
         if (_totalTimeoutTime > 0)

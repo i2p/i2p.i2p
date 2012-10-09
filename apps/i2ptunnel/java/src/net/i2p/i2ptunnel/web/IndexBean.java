@@ -32,6 +32,7 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -265,7 +266,7 @@ public class IndexBean {
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
-        if (Boolean.valueOf(cur.getSharedClient()).booleanValue() && isClient(cur.getType())) {
+        if (Boolean.parseBoolean(cur.getSharedClient()) && isClient(cur.getType())) {
             // all clients use the same I2CP session, and as such, use the same I2CP options
             List controllers = _group.getControllers();
 
@@ -277,7 +278,7 @@ public class IndexBean {
 
                 // Only modify this non-current tunnel
                 // if it belongs to a shared destination, and is of supported type
-                if (Boolean.valueOf(c.getSharedClient()).booleanValue() && isClient(c.getType())) {
+                if (Boolean.parseBoolean(c.getSharedClient()) && isClient(c.getType())) {
                     Properties cOpt = c.getConfig("");
                     if (_tunnelQuantity != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelQuantity);
@@ -436,12 +437,37 @@ public class IndexBean {
             return _("New Tunnel");
     }
     
+    /**
+     *  No validation
+     */
     public String getClientPort(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getListenPort() != null)
             return tun.getListenPort();
         else
             return "";
+    }
+    
+    /**
+     *  Returns error message if blank or invalid
+     *  @since 0.9.3
+     */
+    public String getClientPort2(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null && tun.getListenPort() != null) {
+            String port = tun.getListenPort();
+            if (port.length() == 0)
+                return "<font color=\"red\">" + _("Port not set") + "</font>";
+            int iport = Addresses.getPort(port);
+            if (iport == 0)
+                return "<font color=\"red\">" + _("Invalid port") + ' ' + port + "</font>";
+            if (iport < 1024)
+                return "<font color=\"red\">" +
+                       _("Warning - ports less than 1024 are not recommended") +
+                       ": " + port + "</font>";
+            return port;
+        }
+        return "<font color=\"red\">" + _("Port not set") + "</font>";
     }
     
     public String getTunnelType(int tunnel) {
@@ -551,12 +577,16 @@ public class IndexBean {
             else
                 host = tun.getTargetHost();
             String port = tun.getTargetPort();
-            if (host == null)
+            if (host == null || host.length() == 0)
                 host = "<font color=\"red\">" + _("Host not set") + "</font>";
+            else if (Addresses.getIP(host) == null)
+                host = "<font color=\"red\">" + _("Invalid address") + ' ' + host + "</font>";
             else if (host.indexOf(':') >= 0)
                 host = '[' + host + ']';
-            if (port == null)
+            if (port == null || port.length() == 0)
                 port = "<font color=\"red\">" + _("Port not set") + "</font>";
+            else if (Addresses.getPort(port) == 0)
+                port = "<font color=\"red\">" + _("Invalid port") + ' ' + port + "</font>";
             return host + ':' + port;
        }  else
             return "";

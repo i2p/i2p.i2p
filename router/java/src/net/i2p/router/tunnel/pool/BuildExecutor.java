@@ -392,6 +392,7 @@ class BuildExecutor implements Runnable {
                 pools.clear();
             } catch (RuntimeException e) {
                     _log.log(Log.CRIT, "B0rked in the tunnel builder", e);
+                    try { Thread.sleep(LOOP_TIME); } catch (InterruptedException ie) {}
             }
         }
         

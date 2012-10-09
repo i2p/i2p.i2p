@@ -45,7 +45,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER, DEST64_HEADER, DEST32_HEADER};
     private static final String SERVER_HEADER = "Server";
     private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER};
-    private static final long HEADER_TIMEOUT = 60*1000;
+    private static final long HEADER_TIMEOUT = 15*1000;
+    private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final long START_INTERVAL = (60 * 1000) * 3;
     private long _startedOn = 0L;
 
@@ -154,7 +155,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             boolean allowGZIP = true;
             if (opts != null) {
                 String val = opts.getProperty("i2ptunnel.gzip");
-                if ( (val != null) && (!Boolean.valueOf(val).booleanValue()) ) 
+                if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
                     allowGZIP = false;
             }
             if (_log.shouldLog(Log.INFO))
@@ -492,7 +493,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     	}
     }
 
-    protected static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command, String[] skipHeaders, I2PAppContext ctx) throws IOException {
+    protected static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command,
+                                                           String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
         
@@ -516,6 +518,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if (trimmed > 0)
             ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
         
+        // slowloris / darkloris
+        long expire = ctx.clock().now() + TOTAL_HEADER_TIMEOUT;
         int i = 0;
         while (true) {
             if (++i > MAX_HEADERS)
@@ -528,6 +532,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 // end of headers reached
                 return headers;
             } else {
+                if (ctx.clock().now() > expire)
+                    throw new IOException("Headers took too long [" + buf.toString() + "]");
                 int split = buf.indexOf(":");
                 if (split <= 0) throw new IOException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
                 String name = buf.substring(0, split).trim();

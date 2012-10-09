@@ -637,7 +637,8 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
-     *  Print out routerinfos from files specified on the command line
+     *  Print out routerinfos from files specified on the command line.
+     *  Exits 1 if any RI is invalid, fails signature, etc.
      *  @since 0.8
      */
     public static void main(String[] args) {
@@ -645,23 +646,29 @@ public class RouterInfo extends DatabaseEntry {
             System.err.println("Usage: RouterInfo file ...");
             System.exit(1);
         }
+        boolean fail = false;
         for (int i = 0; i < args.length; i++) {
              RouterInfo ri = new RouterInfo();
              InputStream is = null;
              try {
                  is = new java.io.FileInputStream(args[i]);
                  ri.readBytes(is);
-                 if (ri.isValid())
+                 if (ri.isValid()) {
                      System.out.println(ri.toString());
-                 else
+                  } else {
                      System.err.println("Router info " + args[i] + " is invalid");
+                     fail = true;
+                  }
              } catch (Exception e) {
                  System.err.println("Error reading " + args[i] + ": " + e);
+                 fail = true;
              } finally {
                  if (is != null) {
                      try { is.close(); } catch (IOException ioe) {}
                  }
              }
         }
+        if (fail)
+            System.exit(1);
     }
 }

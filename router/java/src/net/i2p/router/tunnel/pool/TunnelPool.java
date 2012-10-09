@@ -75,7 +75,7 @@ public class TunnelPool {
      *  Destination (i.e. for servers or clients w/ persistent key,
      *  or restarting close-on-idle clients)
      */
-    void startup() {
+    synchronized void startup() {
         synchronized (_inProgress) {
             _inProgress.clear();
         }
@@ -102,7 +102,7 @@ public class TunnelPool {
                                new long[] { 5*60*1000l });
     }
     
-    void shutdown() {
+    synchronized void shutdown() {
         if (_log.shouldLog(Log.WARN))
             _log.warn(toString() + ": Shutdown called");
         _alive = false;

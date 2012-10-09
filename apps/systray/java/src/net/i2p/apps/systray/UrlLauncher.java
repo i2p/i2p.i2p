@@ -44,6 +44,32 @@ public class UrlLauncher {
     private static final int MAX_TRIES = 99;
 
     /**
+     *  Browsers to try IN-ORDER
+     */
+    private static final String[] BROWSERS = {
+            // This debian script tries everything in $BROWSER, then gnome-www-browser and x-www-browser
+            // if X is running and www-browser otherwise. Those point to the user's preferred
+            // browser using the update-alternatives system.
+            "sensible-browser",
+            // another one that opens a preferred browser
+            "xdg-open",
+            // Try x-www-browser directly
+            "x-www-browser",
+            // general graphical browsers
+            "defaultbrowser",  // puppy linux
+            "opera -newpage",
+            "firefox",
+            "mozilla",
+            "netscape",
+            "konqueror",
+            "galeon",
+            // Text Mode Browsers only below here
+            "www-browser",
+            "links",
+            "lynx"
+    };
+            
+    /**
      *  Prevent bad user experience by waiting for the server to be there
      *  before launching the browser.
      *  @return success
@@ -156,7 +182,7 @@ public class UrlLauncher {
                     if (bufferedReader != null)
                         try { bufferedReader.close(); } catch (IOException ioe) {}
                 }
-                if (_shellCommand.executeSilentAndWaitTimed(browserString + " " + url, 5))
+                if (_shellCommand.executeSilentAndWaitTimed(browserString + ' ' + url, 5))
                     return true;
 
             } else {
@@ -164,48 +190,10 @@ public class UrlLauncher {
                 // fall through
             }
 
-            // This debian script tries everything in $BROWSER, then gnome-www-browser and x-www-browser
-            // if X is running and www-browser otherwise. Those point to the user's preferred
-            // browser using the update-alternatives system.
-            if (_shellCommand.executeSilentAndWaitTimed("sensible-browser " + url, 5))
-                return true;
-
-            // Try x-www-browser directly
-            if (_shellCommand.executeSilentAndWaitTimed("x-www-browser " + url, 5))
-                return true;
-
-            // puppy linux
-            if (_shellCommand.executeSilentAndWaitTimed("defaultbrowser " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("opera -newpage " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("firefox " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("mozilla " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("netscape " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("konqueror " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
-                return true;
-            
-            // Text Mode Browsers only below here
-            if (_shellCommand.executeSilentAndWaitTimed("www-browser " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("links " + url, 5))
-                return true;
-
-            if (_shellCommand.executeSilentAndWaitTimed("lynx " + url, 5))
-                return true;
-            
+            for (int i = 0; i < BROWSERS.length; i++) {
+                if (_shellCommand.executeSilentAndWaitTimed(BROWSERS[i] + ' ' + url, 5))
+                    return true;
+            }
         }
         return false;
     }

@@ -230,7 +230,7 @@ public class Daemon {
      */
     public static void update(Map<String, String> settings, String home) {
         File published = null;
-        boolean should_publish = Boolean.valueOf(settings.get("should_publish")).booleanValue();
+        boolean should_publish = Boolean.parseBoolean(settings.get("should_publish"));
         if (should_publish) 
             published = new File(home, settings
                 .get("published_addressbook"));
@@ -261,7 +261,7 @@ public class Daemon {
 
         // If false, add hosts via naming service; if true, write hosts.txt file directly
         // Default false
-        if (Boolean.valueOf(settings.get("update_direct")).booleanValue()) {
+        if (Boolean.parseBoolean(settings.get("update_direct"))) {
             // Direct hosts.txt access
             File routerFile = new File(home, settings.get("router_addressbook"));
             AddressBook master;
