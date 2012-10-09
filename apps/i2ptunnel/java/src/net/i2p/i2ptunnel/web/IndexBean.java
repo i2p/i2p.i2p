@@ -458,8 +458,13 @@ public class IndexBean {
             String port = tun.getListenPort();
             if (port.length() == 0)
                 return "<font color=\"red\">" + _("Port not set") + "</font>";
-            if (Addresses.getPort(port) == 0)
+            int iport = Addresses.getPort(port);
+            if (iport == 0)
                 return "<font color=\"red\">" + _("Invalid port") + ' ' + port + "</font>";
+            if (iport < 1024)
+                return "<font color=\"red\">" +
+                       _("Warning - ports less than 1024 are not recommended") +
+                       ": " + port + "</font>";
             return port;
         }
         return "<font color=\"red\">" + _("Port not set") + "</font>";

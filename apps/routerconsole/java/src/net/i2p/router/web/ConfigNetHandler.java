@@ -216,9 +216,14 @@ public class ConfigNetHandler extends FormHandler {
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
                 if (_ntcpPort.length() > 0 && !_ntcpAutoPort) {
-                    if (Addresses.getPort(_ntcpPort) != 0) {
+                    int port = Addresses.getPort(_ntcpPort);
+                    if (port != 0) {
                         changes.put(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
                         addFormNotice(_("Updating TCP port to {0}", _ntcpPort));
+                        if (port < 1024) {
+                            addFormError(_("Warning - ports less than 1024 are not recommended"));
+                            error = true;
+                        }
                     } else {
                         addFormError(_("Invalid port") + ": " + _ntcpPort);
                         error = true;
@@ -235,11 +240,17 @@ public class ConfigNetHandler extends FormHandler {
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
                 String oldPort = _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
                 if (!oldPort.equals(_udpPort)) {
-                    if (Addresses.getPort(_udpPort) != 0) {
+                    int port = Addresses.getPort(_udpPort);
+                    if (port != 0) {
                         changes.put(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
                         changes.put(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
                         addFormNotice(_("Updating UDP port to {0}", _udpPort));
-                        restartRequired = true;
+                        if (port < 1024) {
+                            addFormError(_("Warning - ports less than 1024 are not recommended"));
+                            error = true;
+                        } else {
+                            restartRequired = true;
+                        }
                     } else {
                         addFormError(_("Invalid port") + ": " + _udpPort);
                         error = true;
