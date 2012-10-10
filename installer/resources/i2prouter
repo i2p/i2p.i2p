@@ -1245,6 +1245,19 @@ installdaemon() {
                         /sbin/chkconfig "$APP_NAME" on
                     fi
                 fi
+            elif [ -f /etc/slackware-version ]; then
+                eval echo `gettext 'Detected Slackware Linux:'`
+                if grep -q ${APP_NAME}router /etc/rc.d/rc.local > /dev/null 2>&1; then
+                    eval echo `gettext ' The $APP_LONG_NAME daemon is already installed.'`
+                    exit 1
+                else
+                    echo "${REALDIR}/${APP_NAME}router start"  >> /etc/rc.d/rc.local
+                    if [ ! -e /etc/rc.d/rc.local_shutdown ]; then
+                        echo "#!/bin/sh" >> /etc/rc.d/rc.local_shutdown
+                    fi
+                    echo "${REALDIR}/${APP_NAME}router stop"  >> /etc/rc.d/rc.local_shutdown
+                    chmod 755 /etc/rc.d/rc.local_shutdown
+                fi
             elif [ -f /etc/arch-release ]; then
             eval echo `gettext 'Detected Arch Linux:'`
                 if [ -f "/etc/rc.d/i2prouter" -o -f "/usr/lib/systemd/system/i2prouter.service" ]; then
@@ -1515,6 +1528,15 @@ removedaemon() {
                 elif [ -f "/etc/init/${APP_NAME}.conf" ] ; then
                     eval echo `gettext ' Removing $APP_LONG_NAME daemon from upstart...'`
                     rm "/etc/init/${APP_NAME}.conf"
+                else
+                    eval echo `gettext ' The $APP_LONG_NAME daemon is not currently installed.'`
+                    exit 1
+                fi
+            elif [ -f /etc/slackware-version ] ; then
+                eval echo `gettext 'Detected Slackware Linux:'`
+                if grep -q ${APP_NAME}router /etc/rc.d/rc.local > /dev/null 2>&1 ; then
+                    eval echo `gettext ' Removing $APP_LONG_NAME daemon...'`
+                    sed -i "/i2prouter/d" /etc/rc.d/rc.local /etc/rc.d/rc.local_shutdown
                 else
                     eval echo `gettext ' The $APP_LONG_NAME daemon is not currently installed.'`
                     exit 1
@@ -1854,6 +1876,7 @@ docommand() {
             if [ ! `grep ^RUN_AS_USER $0` ]; then
                  showsetusermesg
             fi
+            echo
             echo "You may want to disable the browser from launching at startup at"
             echo "http://127.0.0.1:7657/configclients"
             ;;
