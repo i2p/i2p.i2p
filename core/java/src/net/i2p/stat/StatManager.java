@@ -1,12 +1,11 @@
 package net.i2p.stat;
 
-import java.text.Collator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -212,19 +211,28 @@ public class StatManager {
         return _frequencyStats.containsKey(statName);
     }
 
-    /** Group name (String) to a Set of stat names, ordered alphabetically */
+    /**
+     * Group name (untranslated String) to a SortedSet of untranslated stat names.
+     * Map is unsorted.
+     */
     public Map<String, SortedSet<String>> getStatsByGroup() {
-        Map<String, SortedSet<String>> groups = new TreeMap(Collator.getInstance());
-        for (Iterator<FrequencyStat> iter = _frequencyStats.values().iterator(); iter.hasNext();) {
-            FrequencyStat stat = iter.next();
-            if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());
-            Set<String> names = groups.get(stat.getGroupName());
+        Map<String, SortedSet<String>> groups = new HashMap(32);
+        for (FrequencyStat stat : _frequencyStats.values()) {
+            String gname = stat.getGroupName();
+            SortedSet<String> names = groups.get(gname);
+            if (names == null) {
+                names = new TreeSet();
+                groups.put(gname, names);
+            }
             names.add(stat.getName());
         }
-        for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext();) {
-            RateStat stat = iter.next();
-            if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());
-            Set<String> names = groups.get(stat.getGroupName());
+        for (RateStat stat : _rateStats.values()) {
+            String gname = stat.getGroupName();
+            SortedSet<String> names = groups.get(gname);
+            if (names == null) {
+                names = new TreeSet();
+                groups.put(gname, names);
+            }
             names.add(stat.getName());
         }
         return groups;
