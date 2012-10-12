@@ -1247,16 +1247,21 @@ installdaemon() {
                 fi
             elif [ -f /etc/slackware-version ]; then
                 eval echo `gettext 'Detected Slackware Linux:'`
-                if grep -q ${APP_NAME}router /etc/rc.d/rc.local > /dev/null 2>&1; then
-                    eval echo `gettext ' The $APP_LONG_NAME daemon is already installed.'`
+                if [ -e "/etc/rc.d/rc.i2p" -o -f "/etc/rc.d/rc.i2p.new" ]; then
+                    echo "Found initscript from I2P Slackpkg. Aborting." >&2
                     exit 1
                 else
-                    echo "${REALDIR}/${APP_NAME}router start"  >> /etc/rc.d/rc.local
-                    if [ ! -e /etc/rc.d/rc.local_shutdown ]; then
-                        echo "#!/bin/sh" >> /etc/rc.d/rc.local_shutdown
+                    if grep -q ${APP_NAME}router /etc/rc.d/rc.local > /dev/null 2>&1; then
+                        eval echo `gettext ' The $APP_LONG_NAME daemon is already installed.'`
+                        exit 1
+                    else
+                        echo "${REALDIR}/${APP_NAME}router start"  >> /etc/rc.d/rc.local
+                        if [ ! -e /etc/rc.d/rc.local_shutdown ]; then
+                            echo "#!/bin/sh" >> /etc/rc.d/rc.local_shutdown
+                        fi
+                        echo "${REALDIR}/${APP_NAME}router stop"  >> /etc/rc.d/rc.local_shutdown
+                        chmod 755 /etc/rc.d/rc.local_shutdown
                     fi
-                    echo "${REALDIR}/${APP_NAME}router stop"  >> /etc/rc.d/rc.local_shutdown
-                    chmod 755 /etc/rc.d/rc.local_shutdown
                 fi
             elif [ -f /etc/arch-release ]; then
             eval echo `gettext 'Detected Arch Linux:'`
