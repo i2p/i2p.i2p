@@ -26,9 +26,14 @@ public class RouterPasswordManager extends PasswordManager {
     // migrate these to hash
     private static final String PROP_I2CP_OLD = "i2cp.password";
     private static final String PROP_I2CP_NEW = "i2cp.auth";
+/****
     // migrate these to b64
     private static final String[] MIGRATE_FROM = {
+        // This has a separate router.reseedProxy.username prop,
+        // so let's not mess with it
         "router.reseedProxy.password", 
+        // Don't migrate these until we have a console form for them,
+        // which we aren't likely to ever bother with
         "routerconsole.keyPassword",
         "routerconsole.keystorePassword",
         "i2cp.keyPassword",
@@ -41,6 +46,7 @@ public class RouterPasswordManager extends PasswordManager {
         "i2cp.ssl.key.auth",
         "i2cp.ssl.keystore.auth"
     };
+****/
 
     public RouterPasswordManager(RouterContext ctx) {
         super(ctx);
@@ -67,12 +73,14 @@ public class RouterPasswordManager extends PasswordManager {
             // obfuscation of plaintext passwords
             Map<String, String> toAdd = new HashMap(5);
             List<String> toDel = new ArrayList(5);
+         /****
             for (int i = 0; i < MIGRATE_FROM.length; i++) {
                 if ((pw = _context.getProperty(MIGRATE_FROM[i])) != null) {
                     toAdd.put(MIGRATE_TO[i], Base64.encode(DataHelper.getUTF8(pw)));
                     toDel.add(MIGRATE_FROM[i]);
                 }
             }
+          ****/
             toAdd.put(PROP_MIGRATED, "true");
             return _context.router().saveConfig(toAdd, toDel);
         }
