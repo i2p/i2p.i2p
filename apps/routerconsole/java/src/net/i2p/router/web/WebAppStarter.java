@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.i2p.I2PAppContext;
+import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.SecureDirectory;
 
@@ -51,7 +51,7 @@ public class WebAppStarter {
      *  adds and starts
      *  @throws just about anything, caller would be wise to catch Throwable
      */
-    static void startWebApp(I2PAppContext ctx, ContextHandlerCollection server,
+    static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
                             String appName, String warPath) throws Exception {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
          WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
@@ -65,7 +65,7 @@ public class WebAppStarter {
      *  This is used only by RouterConsoleRunner, which adds all the webapps first
      *  and then starts all at once.
      */
-    static WebAppContext addWebApp(I2PAppContext ctx, ContextHandlerCollection server,
+    static WebAppContext addWebApp(RouterContext ctx, ContextHandlerCollection server,
                                    String appName, String warPath, File tmpdir) throws IOException {
 
         // Jetty will happily load one context on top of another without stopping
@@ -103,7 +103,7 @@ public class WebAppStarter {
         wac.setExtractWAR(false);
 
         // this does the passwords...
-        RouterConsoleRunner.initialize(wac);
+        RouterConsoleRunner.initialize(ctx, wac);
 
         // see WebAppConfiguration for info
         String[] classNames = wac.getConfigurationClasses();

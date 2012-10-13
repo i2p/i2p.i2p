@@ -260,7 +260,7 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void saveWebAppChanges() {
-        Properties props = RouterConsoleRunner.webAppProperties();
+        Properties props = RouterConsoleRunner.webAppProperties(_context);
         Set keys = props.keySet();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -271,7 +271,7 @@ public class ConfigClientsHandler extends FormHandler {
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(app))
                 props.setProperty(name, "" + (val != null));
         }
-        RouterConsoleRunner.storeWebAppProperties(props);
+        RouterConsoleRunner.storeWebAppProperties(_context, props);
         addFormNotice(_("WebApp configuration saved."));
     }
 

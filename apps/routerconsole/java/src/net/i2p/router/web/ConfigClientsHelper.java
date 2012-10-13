@@ -128,7 +128,7 @@ public class ConfigClientsHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
         buf.append("<tr><th align=\"right\">" + _("WebApp") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
-        Properties props = RouterConsoleRunner.webAppProperties();
+        Properties props = RouterConsoleRunner.webAppProperties(_context);
         Set<String> keys = new TreeSet(props.keySet());
         for (Iterator<String> iter = keys.iterator(); iter.hasNext(); ) {
             String name = iter.next();
