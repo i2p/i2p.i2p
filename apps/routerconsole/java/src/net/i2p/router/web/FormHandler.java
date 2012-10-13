@@ -21,7 +21,6 @@ public class FormHandler {
     private String _nonce;
     protected String _action;
     protected String _method;
-    protected String _passphrase;
     private final List<String> _errors;
     private final List<String> _notices;
     private boolean _processed;
@@ -52,7 +51,6 @@ public class FormHandler {
 
     public void setNonce(String val) { _nonce = val; }
     public void setAction(String val) { _action = val; }
-    public void setPassphrase(String val) { _passphrase = val; }
 
     /**
      * Call this to prevent changes using GET
@@ -168,14 +166,8 @@ public class FormHandler {
         String noncePrev = nonce + PREV_SUFFIX;
         if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&
              ( (noncePrev == null) || (!_nonce.equals(noncePrev)) ) ) {
-                 
-            String expected = _context.getProperty("consolePassword");
-            if ( (expected != null) && (expected.trim().length() > 0) && (expected.equals(_passphrase)) ) {
-                // ok
-            } else {
                 addFormError(_("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."));
                 _valid = false;
-            }
         }
     }
     

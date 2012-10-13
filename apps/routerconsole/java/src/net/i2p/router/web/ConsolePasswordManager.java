@@ -28,11 +28,11 @@ public class ConsolePasswordManager extends RouterPasswordManager {
     private static final String PROP_MIGRATED = "routerconsole.passwordManager.migrated";
     // migrate these to hash
     private static final String PROP_CONSOLE_OLD = "consolePassword";
-    public static final String PROP_CONSOLE_NEW = "routerconsole.auth";
     private static final String CONSOLE_USER = "admin";
 
     public ConsolePasswordManager(RouterContext ctx) {
         super(ctx);
+        migrateConsole();
     }
     
     /**
@@ -48,7 +48,7 @@ public class ConsolePasswordManager extends RouterPasswordManager {
                //checkCrypt(realm, user, pw) ||
                checkMD5(realm, user, pw);
     }
-    
+
     /**
      *  The username is the salt
      *
@@ -119,7 +119,8 @@ public class ConsolePasswordManager extends RouterPasswordManager {
     }
 
     /**
-     *  Migrate from plaintext to salt/hash
+     *  Migrate from plaintext to MD5 hash
+     *  Ref: RFC 2617
      *
      *  @return success or nothing to migrate
      */
@@ -130,9 +131,13 @@ public class ConsolePasswordManager extends RouterPasswordManager {
             // consolePassword
             String pw = _context.getProperty(PROP_CONSOLE_OLD);
             if (pw != null) {
-                if (pw.length() > 0)
-                    saveMD5(PROP_CONSOLE_NEW, CONSOLE_USER, pw);
-                return _context.router().saveConfig(PROP_CONSOLE_OLD, null);
+                if (pw.length() > 0) {
+                    pw = CONSOLE_USER + ':' + RouterConsoleRunner.JETTY_REALM + ':' + pw;
+                    saveMD5(RouterConsoleRunner.PROP_CONSOLE_PW, CONSOLE_USER, pw);
+                }
+                Map toAdd = Collections.singletonMap(PROP_MIGRATED, "true");
+                List toDel = Collections.singletonList(PROP_CONSOLE_OLD);
+                return _context.router().saveConfig(toAdd, toDel);
             }
             return true;
         }

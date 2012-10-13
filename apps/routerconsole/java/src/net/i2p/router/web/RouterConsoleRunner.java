@@ -80,8 +80,9 @@ public class RouterConsoleRunner implements RouterApp {
 
     // Jetty Auth
     private static final DigestAuthenticator authenticator = new DigestAuthenticator();
-    private static final String JETTY_REALM = "i2prouter";
+    public static final String JETTY_REALM = "i2prouter";
     private static final String JETTY_ROLE = "routerAdmin";
+    public static final String PROP_CONSOLE_PW = "routerconsole.auth." + JETTY_REALM;
 
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
@@ -706,8 +707,7 @@ public class RouterConsoleRunner implements RouterApp {
         SecurityHandler sec = new SecurityHandler();
         List<ConstraintMapping> constraints = new ArrayList(4);
         ConsolePasswordManager mgr = new ConsolePasswordManager(ctx);
-        mgr.migrateConsole();
-        Map<String, String> userpw = mgr.getMD5(PasswordManager.PROP_CONSOLE_NEW);
+        Map<String, String> userpw = mgr.getMD5(PROP_CONSOLE_PW);
         if (!userpw.isEmpty()) {
             HashUserRealm realm = new HashUserRealm(JETTY_REALM);
             sec.setUserRealm(realm);
