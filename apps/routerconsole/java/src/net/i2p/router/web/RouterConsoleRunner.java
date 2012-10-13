@@ -23,10 +23,14 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
+import static net.i2p.app.ClientAppState.*;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.app.RouterApp;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -61,8 +65,10 @@ import org.mortbay.thread.concurrent.ThreadPool;
 /**
  *  Start the router console.
  */
-public class RouterConsoleRunner {
+public class RouterConsoleRunner implements RouterApp {
     private final RouterContext _context;
+    private final ClientAppManager _mgr;
+    private volatile ClientAppState _state = UNINITIALIZED;
     private static Server _server;
     private String _listenPort;
     private String _listenHost;
@@ -127,7 +133,9 @@ public class RouterConsoleRunner {
      *              to both, we can't connect to [::1]:7657 for some reason.
      *              So the wise choice is ::1,127.0.0.1
      */
-    public RouterConsoleRunner(String args[]) {
+    public RouterConsoleRunner(RouterContext ctx, ClientAppManager mgr, String args[]) {
+        _context = ctx;
+        _mgr = mgr;
         if (args.length == 0) {
             // _listenHost and _webAppsDir are defaulted below
             _listenPort = Integer.toString(DEFAULT_LISTEN_PORT);
@@ -163,18 +171,61 @@ public class RouterConsoleRunner {
             System.err.println(USAGE);
             throw new IllegalArgumentException(USAGE);
         }
-        List<RouterContext> contexts = RouterContext.listContexts();
-        if (contexts == null || contexts.isEmpty())
-            throw new IllegalStateException("no router context");
-        _context = contexts.get(0);
+        _state = INITIALIZED;
     }
     
     public static void main(String args[]) {
-        RouterConsoleRunner runner = new RouterConsoleRunner(args);
-        startTrayApp(runner._context);
-        runner.startConsole();
+        List<RouterContext> contexts = RouterContext.listContexts();
+        if (contexts == null || contexts.isEmpty())
+            throw new IllegalStateException("no router context");
+        RouterConsoleRunner runner = new RouterConsoleRunner(contexts.get(0), null, args);
+        runner.startup();
     }
     
+    /////// ClientApp methods
+
+    /** @since 0.9.4 */
+    public void startup() {
+        changeState(STARTING);
+        startTrayApp(_context);
+        startConsole();
+    }
+
+    /** @since 0.9.4 */
+    public void shutdown(String[] args) {
+        changeState(STOPPING);
+        try {
+            _server.stop();
+        } catch (Exception ie) {}
+        PortMapper portMapper = _context.portMapper();
+        portMapper.unregister(PortMapper.SVC_CONSOLE);
+        portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
+        changeState(STOPPED);
+    }
+
+    /** @since 0.9.4 */
+    public ClientAppState getState() {
+        return _state;
+    }
+
+    /** @since 0.9.4 */
+    public String getName() {
+        return "console";
+    }
+
+    /** @since 0.9.4 */
+    public String getDisplayName() {
+        return "Router Console";
+    }
+
+    /////// end ClientApp methods
+
+    private synchronized void changeState(ClientAppState state) {
+        _state = state;
+        if (_mgr != null)
+            _mgr.notify(this, state, null, null);
+    }
+
     /**
      *  SInce _server is now static
      *  @return may be null or stopped perhaps
@@ -513,9 +564,11 @@ public class RouterConsoleRunner {
                         notStarted.add(appName);
                     }
                 }
+                changeState(RUNNING);
             }
         } else {
             System.err.println("ERROR: Router console did not start, not starting webapps");
+            changeState(START_FAILED);
         }
 
         if (rewrite)
@@ -559,7 +612,7 @@ public class RouterConsoleRunner {
             }
             _context.addShutdownTask(new NewsShutdown(fetcher, newsThread));
             // stat summarizer registers its own hook
-            _context.addShutdownTask(new ServerShutdown(_context));
+            _context.addShutdownTask(new ServerShutdown());
             ConfigServiceHandler.registerSignalHandler(_context);
     }
     
@@ -706,20 +759,9 @@ public class RouterConsoleRunner {
     }
     
     /** @since 0.8.8 */
-    private static class ServerShutdown implements Runnable {
-        private final I2PAppContext _ctx;
-
-        public ServerShutdown(I2PAppContext ctx) {
-            _ctx = ctx;
-        }
-
+    private class ServerShutdown implements Runnable {
         public void run() {
-            try {
-                _server.stop();
-            } catch (Exception ie) {}
-            PortMapper portMapper = _ctx.portMapper();
-            portMapper.unregister(PortMapper.SVC_CONSOLE);
-            portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
+            shutdown(null);
         }
     }
     
