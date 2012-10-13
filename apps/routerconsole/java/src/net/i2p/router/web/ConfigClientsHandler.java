@@ -394,11 +394,12 @@ public class ConfigClientsHandler extends FormHandler {
         if (intfc != null)
             changes.put(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
         String user = getJettyString("user");
-        if (user != null)
-            changes.put(ConfigClientsHelper.PROP_USER, user);
         String pw = getJettyString("pw");
-        if (pw != null)
-            changes.put(ConfigClientsHelper.PROP_PW, pw);
+        if (user != null && pw != null && user.length() > 0 && pw.length() > 0) {
+            ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
+            mgr.saveHash(ConfigClientsHelper.PROP_AUTH, user, pw);
+            addFormNotice(_("Added user {0}", user));
+        }
         String mode = getJettyString("mode");
         boolean disabled = "0".equals(mode);
         boolean ssl = "2".equals(mode);

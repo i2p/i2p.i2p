@@ -24,7 +24,8 @@ public class RouterPasswordManager extends PasswordManager {
 
     private static final String PROP_MIGRATED = "router.passwordManager.migrated";
     // migrate these to hash
-    private static final String PROP_I2CP_OLD = "i2cp.password";
+    private static final String PROP_I2CP_OLD_PW = "i2cp.password";
+    private static final String PROP_I2CP_OLD_USER = "i2cp.username";
     private static final String PROP_I2CP_NEW = "i2cp.auth";
 /****
     // migrate these to b64
@@ -64,11 +65,10 @@ public class RouterPasswordManager extends PasswordManager {
             if (_context.getBooleanProperty(PROP_MIGRATED))
                 return true;
             // i2cp.password
-            String pw = _context.getProperty(PROP_I2CP_OLD);
-            if (pw != null) {
-                if (pw.length() > 0)
-                    saveHash(PROP_I2CP_NEW, null, pw);
-                _context.router().saveConfig(PROP_I2CP_OLD, null);
+            String user = _context.getProperty(PROP_I2CP_OLD_USER);
+            String pw = _context.getProperty(PROP_I2CP_OLD_PW);
+            if (pw != null && user != null && pw.length() > 0 && user.length() > 0) {
+                    saveHash(PROP_I2CP_NEW, user, pw);
             }
             // obfuscation of plaintext passwords
             Map<String, String> toAdd = new HashMap(5);
@@ -81,6 +81,8 @@ public class RouterPasswordManager extends PasswordManager {
                 }
             }
           ****/
+            toDel.add(PROP_I2CP_OLD_USER);
+            toDel.add(PROP_I2CP_OLD_PW);
             toAdd.put(PROP_MIGRATED, "true");
             return _context.router().saveConfig(toAdd, toDel);
         }

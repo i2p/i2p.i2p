@@ -24,8 +24,6 @@ public class ConfigClientsHelper extends HelperBase {
     public static final String PROP_ENABLE_SSL = "i2cp.SSL";
     /** from ClientMessageEventListener */
     public static final String PROP_AUTH = "i2cp.auth";
-    public static final String PROP_USER = "i2cp.username";
-    public static final String PROP_PW = "i2cp.password";
 
     public ConfigClientsHelper() {}
 
@@ -33,16 +31,6 @@ public class ConfigClientsHelper extends HelperBase {
     public String getPort() {
         return _context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT,
                                     Integer.toString(ClientManagerFacadeImpl.DEFAULT_PORT));
-    }
-
-    /** @since 0.8.3 */
-    public String getUser() {
-        return _context.getProperty(PROP_USER, "");
-    }
-
-    /** @since 0.8.3 */
-    public String getPw() {
-        return _context.getProperty(PROP_PW, "");
     }
 
     /** @since 0.8.3 */
