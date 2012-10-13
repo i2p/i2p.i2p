@@ -18,6 +18,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
+import net.i2p.router.startup.RouterAppManager;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
@@ -58,14 +59,22 @@ public class RouterContext extends I2PAppContext {
     private MessageValidator _messageValidator;
     //private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
+    private RouterAppManager _appManager;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
+    private volatile boolean _initialized;
     private final Object _lock1 = new Object(), _lock2 = new Object();
 
     private static final List<RouterContext> _contexts = new CopyOnWriteArrayList();
     
+    /**
+     *  Caller MUST call initAll() after instantiation.
+     */
     public RouterContext(Router router) { this(router, null); }
 
+    /**
+     *  Caller MUST call initAll() after instantiation.
+     */
     public RouterContext(Router router, Properties envProps) { 
         super(filterProps(envProps));
         _router = router;
@@ -141,7 +150,9 @@ public class RouterContext extends I2PAppContext {
     }
 
 
-    public void initAll() {
+    public synchronized void initAll() {
+        if (_initialized)
+            throw new IllegalStateException();
         if (getBooleanProperty("i2p.dummyClientFacade"))
             System.err.println("i2p.dummyClientFacade currently unsupported");
         _clientManagerFacade = new ClientManagerFacadeImpl(this);
@@ -182,6 +193,8 @@ public class RouterContext extends I2PAppContext {
         _messageValidator = new MessageValidator(this);
         _throttle = new RouterThrottleImpl(this);
         //_throttle = new RouterDoSThrottle(this);
+        _appManager = new RouterAppManager(this);
+        _initialized = true;
     }
     
     /**
@@ -494,5 +507,14 @@ public class RouterContext extends I2PAppContext {
      */
     public InternalClientManager internalClientManager() {
         return _clientManagerFacade;
+    }
+
+    /**
+     *  The RouterAppManager.
+     *  @return the manager
+     *  @since 0.9.4
+     */
+    public RouterAppManager clientAppManager() {
+        return _appManager;
     }
 }

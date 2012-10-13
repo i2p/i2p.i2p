@@ -1,12 +1,17 @@
 package net.i2p.router.startup;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.app.RouterApp;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -24,6 +29,7 @@ public class LoadClientAppsJob extends JobImpl {
         super(ctx);
         _log = ctx.logManager().getLog(LoadClientAppsJob.class);
     }
+
     public void runJob() {
         synchronized (LoadClientAppsJob.class) {
             if (_loaded) return;
@@ -42,7 +48,7 @@ public class LoadClientAppsJob extends JobImpl {
             String argVal[] = parseArgs(app.args);
             if (app.delay <= 0) {
                 // run this guy now
-                runClient(app.className, app.clientName, argVal, _log);
+                runClient(app.className, app.clientName, argVal, getContext(), _log);
             } else {
                 // wait before firing it up
                 getContext().jobQueue().addJob(new DelayedRunClient(getContext(), app.className, app.clientName, argVal, app.delay));
@@ -73,9 +79,11 @@ public class LoadClientAppsJob extends JobImpl {
             _cl = cl;
             getTiming().setStartAfter(getContext().clock().now() + delay);
         }
+
         public String getName() { return "Delayed client job"; }
+
         public void runJob() {
-            runClient(_className, _clientName, _args, _log, _threadGroup, _cl);
+            runClient(_className, _clientName, _args, getContext(), _log, _threadGroup, _cl);
         }
     }
     
@@ -179,8 +187,8 @@ public class LoadClientAppsJob extends JobImpl {
      *  @param clientName can be null
      *  @param args can be null
      */
-    public static void runClient(String className, String clientName, String args[], Log log) {
-        runClient(className, clientName, args, log, null, null);
+    public static void runClient(String className, String clientName, String args[], RouterContext ctx, Log log) {
+        runClient(className, clientName, args, ctx, log, null, null);
     }
     
     /**
@@ -192,15 +200,15 @@ public class LoadClientAppsJob extends JobImpl {
      *  @param cl can be null
      *  @since 0.7.13
      */
-    public static void runClient(String className, String clientName, String args[], Log log,
+    public static void runClient(String className, String clientName, String args[], RouterContext ctx, Log log,
                                  ThreadGroup threadGroup, ClassLoader cl) {
         if (log.shouldLog(Log.INFO))
             log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
         I2PThread t;
         if (threadGroup != null)
-            t = new I2PThread(threadGroup, new RunApp(className, clientName, args, log, cl));
+            t = new I2PThread(threadGroup, new RunApp(className, clientName, args, ctx, log, cl));
         else
-            t = new I2PThread(new RunApp(className, clientName, args, log, cl));
+            t = new I2PThread(new RunApp(className, clientName, args, ctx, log, cl));
         if (clientName == null) 
             clientName = className + " client";
         t.setName(clientName);
@@ -214,16 +222,18 @@ public class LoadClientAppsJob extends JobImpl {
         private final String _className;
         private final String _appName;
         private final String _args[];
+        private final RouterContext _ctx;
         private final Log _log;
         private final ClassLoader _cl;
 
-        public RunApp(String className, String appName, String args[], Log log, ClassLoader cl) { 
+        public RunApp(String className, String appName, String args[], RouterContext ctx, Log log, ClassLoader cl) { 
             _className = className; 
             _appName = appName;
             if (args == null)
                 _args = new String[0];
             else
                 _args = args;
+            _ctx = ctx;
             _log = log;
             if (cl == null)
                 _cl = ClassLoader.getSystemClassLoader();
@@ -234,14 +244,53 @@ public class LoadClientAppsJob extends JobImpl {
         public void run() {
             try {
                 Class cls = Class.forName(_className, true, _cl);
-                Method method = cls.getMethod("main", new Class[] { String[].class });
-                method.invoke(cls, new Object[] { _args });
+                if (isRouterApp(cls)) {
+                    Constructor con = cls.getConstructor(RouterContext.class, ClientAppManager.class, String[].class);
+                    RouterAppManager mgr = _ctx.clientAppManager();
+                    Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
+                    RouterApp app = (RouterApp) con.newInstance(conArgs);
+                    mgr.addAndStart(app);
+                } else if (isClientApp(cls)) {
+                    Constructor con = cls.getConstructor(I2PAppContext.class, ClientAppManager.class, String[].class);
+                    RouterAppManager mgr = _ctx.clientAppManager();
+                    Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
+                    ClientApp app = (ClientApp) con.newInstance(conArgs);
+                    mgr.addAndStart(app);
+                } else {
+                    Method method = cls.getMethod("main", new Class[] { String[].class });
+                    method.invoke(cls, new Object[] { _args });
+                }
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error starting up the client class " + _className, t);
             }
             if (_log.shouldLog(Log.INFO))
                 _log.info("Done running client application " + _appName);
         }
+
+        private static boolean isRouterApp(Class cls) {
+            return isInterface(cls, RouterApp.class);
+        }
+
+        private static boolean isClientApp(Class cls) {
+            return isInterface(cls, ClientApp.class);
+        }
+
+        private static boolean isInterface(Class cls, Class intfc) {
+            try {
+                Class[] intfcs = cls.getInterfaces();
+                for (int i = 0; i < intfcs.length; i++) {
+                    if (intfcs[i] == intfc)
+                        return true;
+                }
+            } catch (Throwable t) {}
+            return false;
+        }
+
+
+
+
+
+
     }
 
     public String getName() { return "Load up any client applications"; }
