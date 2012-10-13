@@ -13,8 +13,13 @@ public class ConfigUIHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if (_shouldSave)
+        if (_shouldSave) {
             saveChanges();
+        } else if (_action.equals(_("Delete selected"))) {
+            delUser();
+        } else if (_action.equals(_("Add user"))) {
+            addUser();
+        }
     }
     
     public void setShouldsave(String moo) { _shouldSave = true; }
@@ -50,5 +55,48 @@ public class ConfigUIHandler extends FormHandler {
         } else {
             addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
+    }
+
+    private void addUser() {
+        String name = getJettyString("name");
+        if (name == null || name.length() <= 0) {
+            addFormError(_("No user name entered"));
+            return;
+        }
+        String pw = getJettyString("pw");
+        if (pw == null || pw.length() <= 0) {
+            addFormError(_("No password entered"));
+            return;
+        }
+        ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
+        // rfc 2617
+        pw = name + ':' + RouterConsoleRunner.JETTY_REALM + ':' + pw;
+        if (mgr.saveMD5(RouterConsoleRunner.PROP_CONSOLE_PW, name, pw)) {
+            addFormNotice(_("Added user {0}", name));
+            addFormNotice(_("Restart required to take effect"));
+        } else {
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+        }
+    }
+
+    private void delUser() {
+        ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
+        boolean success = false;
+        for (Object o : _settings.keySet()) {
+            if (!(o instanceof String))
+                continue;
+            String k = (String) o;
+            if (!k.startsWith("delete_"))
+                continue;
+            k = k.substring(7);
+            if (mgr.remove(RouterConsoleRunner.PROP_CONSOLE_PW, k)) {
+                addFormNotice(_("Removed user {0}", k));
+                success = true;
+            } else {
+                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+            }
+        }
+        if (success)
+            addFormNotice(_("Restart required to take effect"));
     }
 }

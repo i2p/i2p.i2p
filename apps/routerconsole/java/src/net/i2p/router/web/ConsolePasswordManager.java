@@ -173,9 +173,9 @@ public class ConsolePasswordManager extends RouterPasswordManager {
     /**
      *  Straight MD5, no salt
      *
-     *  @param realm e.g. i2cp, routerconsole, etc.
+     *  @param realm The full realm, e.g. routerconsole.auth.i2prouter, etc.
      *  @param user null or "" for no user, already trimmed
-     *  @param pw plain text, already trimmed
+     *  @param pw plain text, must be of the form user:realm:pw to be compatible with Jetty
      *  @return if pw verified
      */
     public boolean saveMD5(String realm, String user, String pw) {

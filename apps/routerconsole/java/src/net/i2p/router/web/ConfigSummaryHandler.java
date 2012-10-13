@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,8 +15,6 @@ import net.i2p.data.DataHelper;
  *  @since 0.9.1
  */
 public class ConfigSummaryHandler extends FormHandler {
-
-    private Map _settings;
     
     @Override
     protected void processForm() {
@@ -142,16 +139,6 @@ public class ConfigSummaryHandler extends FormHandler {
         } else {
             addFormError(_("Unsupported"));
         }
-    }
-
-    public void setSettings(Map settings) { _settings = new HashMap(settings); }
-
-    /** curses Jetty for returning arrays */
-    private String getJettyString(String key) {
-        String[] arr = (String[]) _settings.get(key);
-        if (arr == null)
-            return null;
-        return arr[0].trim();
     }
 
     public void setMovingAction() {

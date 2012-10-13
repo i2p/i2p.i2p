@@ -164,4 +164,24 @@ public class RouterPasswordManager extends PasswordManager {
         toDel.add(pfx + PROP_CRYPT);
         return _context.router().saveConfig(toAdd, toDel);
     }
+
+    /**
+     *  Remove password, any kind.
+     *
+     *  @param realm e.g. i2cp, routerconsole, etc.
+     *  @param user null or "" for no user, already trimmed
+     *  @return success
+     */
+    public boolean remove(String realm, String user) {
+        String pfx = realm;
+        if (user != null && user.length() > 0)
+            pfx += '.' + user;
+        List<String> toDel = new ArrayList(5);
+        toDel.add(pfx + PROP_PW);
+        toDel.add(pfx + PROP_B64);
+        toDel.add(pfx + PROP_MD5);
+        toDel.add(pfx + PROP_CRYPT);
+        toDel.add(pfx + PROP_SHASH);
+        return _context.router().saveConfig(null, toDel);
+    }
 }

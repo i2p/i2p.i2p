@@ -6,6 +6,13 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config UI")%>
+<style type='text/css'>
+input.default {
+    width: 1px;
+    height: 1px;
+    visibility: hidden;
+}
+</style>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
@@ -24,6 +31,7 @@
  <% formhandler.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure"><div class="topshimten"><h3><%=uihelper._("Router Console Theme")%></h3></div>
  <form action="" method="POST">
@@ -34,9 +42,10 @@
         consoleNonce = Long.toString(new java.util.Random().nextLong());
         System.setProperty("router.consoleNonce", consoleNonce);
     }
+    String pageNonce = formhandler.getNewNonce();
 %>
  <input type="hidden" name="consoleNonce" value="<%=consoleNonce%>" >
- <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <%
  String userAgent = request.getHeader("User-Agent");
@@ -54,5 +63,17 @@
 </p><hr><div class="formaction">
 <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="shouldsave" class="accept" value="<%=intl._("Apply")%>" >
-</div></form></div>
+</div></form>
+
+<h3><%=uihelper._("Router Console Password")%></h3>
+<form action="" method="POST">
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+ <jsp:getProperty name="uihelper" property="passwordForm" />
+ <div class="formaction">
+  <input type="submit" name="action" class="default" value="<%=intl._("Add user")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._("Add user")%>" >
+ </div>
+</form></div>
 </div></body></html>

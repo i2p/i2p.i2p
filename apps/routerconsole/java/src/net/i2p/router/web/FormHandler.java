@@ -1,7 +1,9 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -18,6 +20,7 @@ import net.i2p.util.Log;
 public class FormHandler {
     protected RouterContext _context;
     protected Log _log;
+    protected Map _settings;
     private String _nonce;
     protected String _action;
     protected String _method;
@@ -51,6 +54,28 @@ public class FormHandler {
 
     public void setNonce(String val) { _nonce = val; }
     public void setAction(String val) { _action = val; }
+
+    /**
+     * For many forms, it's easiest just to put all the parameters here.
+     *
+     * @since 0.9.4 consolidated from numerous FormHandlers
+     */
+    public void setSettings(Map settings) { _settings = new HashMap(settings); }
+
+    /**
+     * setSettings() must have been called previously
+     * Curses Jetty for returning arrays.
+     *
+     * @since 0.9.4 consolidated from numerous FormHandlers
+     */
+    protected String getJettyString(String key) {
+        if (_settings == null)
+            return null;
+        String[] arr = (String[]) _settings.get(key);
+        if (arr == null)
+            return null;
+        return arr[0].trim();
+    }
 
     /**
      * Call this to prevent changes using GET
