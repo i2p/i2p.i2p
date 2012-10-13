@@ -652,7 +652,7 @@ public class PluginStarter implements Runnable {
                 // quick check, will throw ClassNotFoundException on error
                 LoadClientAppsJob.testClient(app.className, cl);
                 // run this guy now
-                LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log, pluginThreadGroup, cl);
+                LoadClientAppsJob.runClient(app.className, app.clientName, argVal, ctx, log, pluginThreadGroup, cl);
             } else {
                 // If there is some delay, there may be a really good reason for it.
                 // Loading a class would be one of them!

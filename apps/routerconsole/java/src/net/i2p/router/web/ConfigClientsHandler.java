@@ -244,7 +244,7 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         ClientAppConfig ca = clients.get(i);
-        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
+        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _context, _log);
         addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("started") + '.');
     }
 
