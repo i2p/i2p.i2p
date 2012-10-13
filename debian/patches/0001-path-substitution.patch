@@ -47,7 +47,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Application
  APP_NAME="i2p"
-@@ -55,8 +48,8 @@
+@@ -61,8 +54,8 @@
  #RUN_AS_USER=
  
  # Wrapper
@@ -58,7 +58,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -167,48 +160,6 @@
+@@ -173,48 +166,6 @@
  # Workaround for Gentoo
  JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
  
@@ -107,7 +107,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -899,9 +850,6 @@
+@@ -905,9 +856,6 @@
          # The string passed to eval must handles spaces in paths correctly.
          COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
          eval $COMMAND_LINE
@@ -117,7 +117,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1025,9 +973,6 @@
+@@ -1031,9 +979,6 @@
          # The string passed to eval must handles spaces in paths correctly.
          COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
          eval $COMMAND_LINE
@@ -127,7 +127,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1798,16 +1743,8 @@
+@@ -1871,18 +1816,9 @@
              status
              ;;
  
@@ -136,13 +136,16 @@ Debian wrapper.config to try to prevent confusion.
 -            if [ ! `grep ^RUN_AS_USER $0` ]; then
 -                 showsetusermesg
 -            fi
--
+-            echo
+-            echo "You may want to disable the browser from launching at startup at"
+-            echo "http://127.0.0.1:7657/configclients"
 -            ;;
 -
 -        'remove' | 'uninstall')
 -            removedaemon
 +        'install' | 'remove' | 'uninstall')
 +            echo "Use \"dpkg-reconfigure i2p\" to configure the initscript."
++            exit 1
              ;;
  
          'dump')
@@ -186,7 +189,7 @@ Debian wrapper.config to try to prevent confusion.
  #
  #********************************************************************
  # Java Application
-@@ -53,13 +44,14 @@
+@@ -60,13 +51,14 @@
  # classes, or all the classes of i2p.jar, are in a different directory).
  # Be sure there are no other duplicate classes.
  #
@@ -206,7 +209,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Java Bits.  On applicable platforms, tells the JVM to run in 32 or 64-bit mode.
  wrapper.java.additional.auto_bits=TRUE
-@@ -69,7 +61,7 @@
+@@ -76,7 +68,7 @@
  wrapper.java.additional.1=-DloggerFilenameOverride=logs/log-router-@.txt
  wrapper.java.additional.2=-Dorg.mortbay.http.Version.paranoid=true
  wrapper.java.additional.3=-Dorg.mortbay.xml.XmlParser.NotValidating=true
@@ -215,7 +218,7 @@ Debian wrapper.config to try to prevent confusion.
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -137,11 +129,7 @@
+@@ -144,11 +136,7 @@
  # NOTE: On Linux/Mac this is overridden in the i2prouter script; changes here will have no effect.
  # Windows users may wish to change this to %APPDATA%\I2P\wrapper.log
  # System temp directory:
@@ -228,7 +231,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -211,11 +199,7 @@
+@@ -218,11 +206,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -241,7 +244,7 @@ Debian wrapper.config to try to prevent confusion.
  #
  # From i2prouter:
  #
-@@ -229,10 +213,7 @@
+@@ -236,10 +220,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -253,7 +256,7 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -249,30 +230,3 @@
+@@ -256,30 +237,3 @@
  wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=077

@@ -1,6 +1,6 @@
 --- a/router/java/src/net/i2p/router/tasks/OOMListener.java
 +++ b/router/java/src/net/i2p/router/tasks/OOMListener.java
-@@ -46,7 +46,7 @@
+@@ -48,7 +48,7 @@
              log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
                                " total mem: " + Runtime.getRuntime().totalMemory());
              if (_context.hasWrapper())

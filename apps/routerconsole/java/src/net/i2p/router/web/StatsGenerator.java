@@ -3,10 +3,14 @@ package net.i2p.router.web;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
+import java.text.Collator;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -14,18 +18,15 @@ import net.i2p.stat.Frequency;
 import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.util.Log;
 
 /**
  * Dump the stats to the web admin interface
  */
 public class StatsGenerator {
-    private Log _log;
     private RouterContext _context;
 
     public StatsGenerator(RouterContext context) {
         _context = context;
-        _log = context.logManager().getLog(StatsGenerator.class);
     }
     
     public void generateStatsPage(Writer out, boolean showAll) throws IOException {
@@ -35,10 +36,10 @@ public class StatsGenerator {
         out.write(buf.toString());
         buf.setLength(0);
         
-        Map groups = _context.statManager().getStatsByGroup();
-        for (Iterator iter = groups.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String group = (String)entry.getKey();
+        Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
+        Map<String, Set<String>> groups = new TreeMap(new AlphaComparator());
+        groups.putAll(unsorted);
+        for (String group : groups.keySet()) {
             buf.append("<option value=\"#").append(group).append("\">");
             buf.append(_(group)).append("</option>\n");
             // let's just do the groups
@@ -66,9 +67,9 @@ public class StatsGenerator {
         out.write(buf.toString());
         buf.setLength(0);
         
-        for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
-            String group = (String)iter.next();
-            Set stats = (Set)groups.get(group);
+        for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
+            String group = entry.getKey();
+            Set<String> stats = entry.getValue();
             buf.append("<h3><a name=\"");
             buf.append(group);
             buf.append("\">");
@@ -77,8 +78,7 @@ public class StatsGenerator {
             buf.append("<ul>");
             out.write(buf.toString());
             buf.setLength(0);
-            for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
-                String stat = (String)statIter.next();
+            for (String stat : stats) {
                 buf.append("<li><b><a name=\"");
                 buf.append(stat);
                 buf.append("\">");
@@ -249,6 +249,18 @@ public class StatsGenerator {
     
     private final static DecimalFormat _pct = new DecimalFormat("#0.00%");
     private final static String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
+
+    /**
+     *  Translated sort
+     *  @since 0.9.3
+     */
+    private class AlphaComparator implements Comparator<String> {
+        public int compare(String lhs, String rhs) {
+            String lname = _(lhs);
+            String rname = _(rhs);
+            return Collator.getInstance().compare(lname, rname);
+        }
+    }
 
     /** translate a string */
     private String _(String s) {

@@ -37,7 +37,7 @@ public class HomeHelper extends HelperBase {
 
     static final String DEFAULT_FAVORITES =
         _x("Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
-        "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
+        //"colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
         _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "eepsite.png" + S +
         _x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "eepsite.png" + S +
         "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "eepsite.png" + S +

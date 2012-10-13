@@ -1,5 +1,16 @@
+2012-10-11 kytv
+* Italian translation updates from Transifex
+* i2prouter:
+  - Support for installing as a daemon with systemd on Arch Linux and Suse
+  - Support installing as a daemon on Slackware
+
+2012-10-10 zzz
+ * ShellCommand: Fix launching all browsers at startup (ticket #453)
+ * stats.jsp: Sort groups by translated name
+
 2012-10-09 zzz
  * Console, i2ptunnel: Warn on low ports
+ * EventLog: Add more events
  * NetDB: Increase floodfills again
  * RouterInfo: Exit 1 on error in main()
  * SSU:

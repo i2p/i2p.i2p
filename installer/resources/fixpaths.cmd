@@ -30,6 +30,9 @@ findstr /V /R "^wrapper.logfile=" wrapper.config > wrapper.tmp1
 findstr /V /R "^wrapper.java.pidfile=" wrapper.tmp1 > wrapper.tmp2
 findstr /V /R "^wrapper.pidfile=" wrapper.tmp2 > wrapper.new
 del /F /Q wrapper.tmp*
+echo #PORTABLE installation: >> wrapper.new
+echo # The remaining lines should be commented out (or removed) >> wrapper.new
+echo # for PORTABLE I2P installations: >> wrapper.new
 echo wrapper.logfile=%%temp%%\wrapper.log >> wrapper.new
 echo wrapper.java.pidfile=%%temp%%\routerjvm.pid >> wrapper.new
 echo wrapper.pidfile=%%temp%%\i2p.pid >> wrapper.new

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 
 /**
  * Passes a command to the OS shell for execution and manages the input and
@@ -27,55 +28,49 @@ import java.io.OutputStreamWriter;
  */
 public class ShellCommand {
 
+    private static final boolean DEBUG = false;
     private static final boolean CONSUME_OUTPUT    = true;
     private static final boolean NO_CONSUME_OUTPUT = false;
 
     private static final boolean WAIT_FOR_EXIT_STATUS    = true;
     private static final boolean NO_WAIT_FOR_EXIT_STATUS = false;
 
-    private boolean       _commandSuccessful;
-    private boolean       _commandCompleted;
-    private CommandThread _commandThread;
+    // Following are unused, only for NO_CONSUME_OUTPUT;
+    // need synchronization or volatile or something if we start using it.
     private InputStream   _errorStream;
     private InputStream   _inputStream;
-    private boolean       _isTimerRunning;
     private OutputStream  _outputStream;
-    private Process       _process;
+
+    /** @since 0.9.3 */
+    private static class Result {
+        public volatile boolean commandSuccessful;
+    }
 
     /**
      * Executes a shell command in its own thread.
-     * Use caution when repeatedly calling execute methods with the same object
-     * as there are some globals here...
      * 
      * @author hypercubus
      */
     private class CommandThread extends Thread {
-
-        private final Object  caller;
         private final boolean consumeOutput;
         private final Object shellCommand;
+        private final Result result;
 
         /**
          *  @param shellCommand either a String or a String[] (since 0.8.3)
+         *  @param consumeOutput always true, false is unused, possibly untested
+         *  @param result out parameter
          */
-        CommandThread(Object caller, Object shellCommand, boolean consumeOutput) {
-            super("CommandThread");
-            this.caller = caller;
+        CommandThread(Object shellCommand, boolean consumeOutput, Result result) {
+            super("ShellCommand Executor");
             this.shellCommand = shellCommand;
             this.consumeOutput = consumeOutput;
+            this.result = result;
         }
 
         @Override
         public void run() {
-            // FIXME these will corrupt the globals if the command times out and the caller
-            // makes another request with the same object.
-            _commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
-            _commandCompleted = true;
-            if (_isTimerRunning) {
-                synchronized(caller) {
-                    caller.notifyAll();  // In case the caller is still in the wait() state.
-                }
-            }
+            result.commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
         }
     }
 
@@ -90,19 +85,16 @@ public class ShellCommand {
      * @author hypercubus
      */
     private static class StreamConsumer extends Thread {
-
-        private BufferedReader    bufferedReader;
-        private InputStreamReader inputStreamReader;
+        private final BufferedReader bufferedReader;
 
         public StreamConsumer(InputStream inputStream) {
-            super("StreamConsumer");
-            this.inputStreamReader = new InputStreamReader(inputStream);
+            super("ShellCommand Consumer");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             this.bufferedReader = new BufferedReader(inputStreamReader);
         }
 
         @Override
         public void run() {
-
             try {
                 while ((bufferedReader.readLine()) != null) {
                     // Just like a Hoover.
@@ -119,27 +111,25 @@ public class ShellCommand {
      * Reads data from a <code>java.io.InputStream</code> and writes it to
      * <code>STDOUT</code>.
      * 
+     * UNUSED, only for NO_CONSUME_OUTPUT
+     * 
      * @author hypercubus
      */
     private static class StreamReader extends Thread {
-
-        private BufferedReader    bufferedReader;
-        private InputStreamReader inputStreamReader;
+        private final BufferedReader bufferedReader;
 
         public StreamReader(InputStream inputStream) {
-            super("StreamReader");
-            this.inputStreamReader = new InputStreamReader(inputStream);
+            super("ShellCommand Reader");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             this.bufferedReader = new BufferedReader(inputStreamReader);
         }
 
         @Override
         public void run() {
-
             char[] buffer    = new char[BUFFER_SIZE];
             int    bytesRead;
 
             try {
-
                 while (true)
                     while ((bytesRead = bufferedReader.read(buffer, 0, BUFFER_SIZE)) != -1)
                         for (int i = 0; i < bytesRead; i++)
@@ -155,30 +145,26 @@ public class ShellCommand {
      * Reads data from <code>STDIN</code> and writes it to a
      * <code>java.io.OutputStream</code>.
      * 
+     * UNUSED, only for NO_CONSUME_OUTPUT
+     * 
      * @author hypercubus
      */
     private static class StreamWriter extends Thread {
-
-        private BufferedWriter     bufferedWriter;
-        private BufferedReader     in;
-        private OutputStreamWriter outputStreamWriter;
+        private final BufferedWriter bufferedWriter;
 
         public StreamWriter(OutputStream outputStream) {
-            super("StreamWriter");
-            this.outputStreamWriter = new OutputStreamWriter(outputStream);
+            super("ShellCommand Writer");
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
             this.bufferedWriter = new BufferedWriter(outputStreamWriter);
         }
 
         @Override
         public void run() {
-
-            String input;
-
-            in = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             try {
                 while (true) {
-                    input = in.readLine() + "\r\n";
-                    bufferedWriter.write(input, 0, input.length());
+                    bufferedWriter.write(in.readLine());
+                    bufferedWriter.write("\r\n");
                     bufferedWriter.flush();
                 }
             } catch (IOException e) {
@@ -226,11 +212,7 @@ public class ShellCommand {
      *                      else <code>false</code>.
      */
     public boolean executeAndWait(String shellCommand) {
-
-        if (execute(shellCommand, NO_CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS))
-            return true;
-
-        return false;
+        return execute(shellCommand, NO_CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
     }
 
     /**
@@ -254,29 +236,20 @@ public class ShellCommand {
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
      */
-    public synchronized boolean executeAndWaitTimed(String shellCommand, int seconds) {
-
-        _commandThread = new CommandThread(this, shellCommand, NO_CONSUME_OUTPUT);
-        _commandThread.start();
+    public boolean executeAndWaitTimed(String shellCommand, int seconds) {
+        Result result = new Result();
+        Thread commandThread = new CommandThread(shellCommand, NO_CONSUME_OUTPUT, result);
+        commandThread.start();
         try {
-
             if (seconds > 0) {
-                _isTimerRunning = true;
-                wait(seconds * 1000);
-                _isTimerRunning = false;
-                if (!_commandCompleted)
+                commandThread.join(seconds * 1000);
+                if (commandThread.isAlive())
                     return true;
             }
-
         } catch (InterruptedException e) {
             // Wake up, time to die.
         }
-        _isTimerRunning = false;
-
-        if (_commandSuccessful)
-            return true;
-
-        return false;
+        return result.commandSuccessful;
     }
 
     /**
@@ -307,11 +280,7 @@ public class ShellCommand {
      *                      else <code>false</code>.
      */
     public boolean executeSilentAndWait(String shellCommand) {
-
-        if (execute(shellCommand, CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS))
-            return true;
-
-        return false;
+        return execute(shellCommand, CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
     }
 
     /**
@@ -332,9 +301,10 @@ public class ShellCommand {
      *                      here disables waiting.
      * @return              <code>true</code> if the spawned shell process
      *                      returns an exit status of 0 (indicating success),
+     *                      OR if the time expires,
      *                      else <code>false</code>.
      */
-    public synchronized boolean executeSilentAndWaitTimed(String shellCommand, int seconds) {
+    public boolean executeSilentAndWaitTimed(String shellCommand, int seconds) {
         return executeSAWT(shellCommand, seconds);
     }
 
@@ -353,50 +323,65 @@ public class ShellCommand {
      *                      here disables waiting.
      * @return              <code>true</code> if the spawned shell process
      *                      returns an exit status of 0 (indicating success),
+     *                      OR if the time expires,
      *                      else <code>false</code>.
      * @since 0.8.3
      */
-    public synchronized boolean executeSilentAndWaitTimed(String[] commandArray, int seconds) {
+    public boolean executeSilentAndWaitTimed(String[] commandArray, int seconds) {
         return executeSAWT(commandArray, seconds);
     }
 
     /** @since 0.8.3 */
     private boolean executeSAWT(Object shellCommand, int seconds) {
-        _commandThread = new CommandThread(this, shellCommand, CONSUME_OUTPUT);
-        _commandThread.start();
-        try {
-
-            if (seconds > 0) {
-                _isTimerRunning = true;
-                wait(seconds * 1000);
-                _isTimerRunning = false;
-                if (!_commandCompleted)
-                    return true;
+        String name = null;
+        long begin = 0;
+        if (DEBUG) {
+            if (shellCommand instanceof String) {
+                name = (String) shellCommand;
+            } else if (shellCommand instanceof String[]) {
+                String[] arr = (String[]) shellCommand;
+                name = Arrays.toString(arr);
             }
-
+            begin = System.currentTimeMillis();
+        }
+        Result result = new Result();
+        Thread commandThread = new CommandThread(shellCommand, CONSUME_OUTPUT, result);
+        commandThread.start();
+        try {
+            if (seconds > 0) {
+                commandThread.join(seconds * 1000);
+                if (commandThread.isAlive()) {
+                    if (DEBUG)
+                        System.out.println("ShellCommand gave up waiting for \"" + name + "\" after " + seconds + " seconds");
+                    return true;
+                }
+            }
         } catch (InterruptedException e) {
             // Wake up, time to die.
         }
-        _isTimerRunning = false;
-
-        if (_commandSuccessful)
-            return true;
-
-        return false;
+        if (DEBUG)
+            System.out.println("ShellCommand returning " + result.commandSuccessful + " for \"" + name + "\" after " + (System.currentTimeMillis() - begin) + " ms");
+        return result.commandSuccessful;
     }
 
+    /** @deprecated unused */
     public InputStream getErrorStream() {
         return _errorStream;
     }
 
+    /** @deprecated unused */
     public InputStream getInputStream() {
         return _inputStream;
     }
 
+    /** @deprecated unused */
     public OutputStream getOutputStream() {
         return _outputStream;
     }
 
+    /**
+     *  Just does exec, this is NOT a test of ShellCommand.
+     */
     public static void main(String args[]) {
         if (args.length <= 0) {
             System.err.println("Usage: ShellCommand commandline");
@@ -410,63 +395,80 @@ public class ShellCommand {
     
     /**
      *  @param shellCommand either a String or a String[] (since 0.8.3) - quick hack
+     *  @param consumeOutput always true, false is unused, possibly untested
      */
     private boolean execute(Object shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
-
-        StreamConsumer processStderrConsumer;
-        StreamConsumer processStdoutConsumer;
-
-        StreamReader   processStderrReader;
-        StreamWriter   processStdinWriter;
-        StreamReader   processStdoutReader;
-
+        Process process;
+        String name = null;  // for debugging only
         try {
             // easy way so we don't have to copy this whole method
-            if (shellCommand instanceof String)
-                _process = Runtime.getRuntime().exec((String)shellCommand);
-            else if (shellCommand instanceof String[])
-                _process = Runtime.getRuntime().exec((String[])shellCommand);
-            else
+            if (shellCommand instanceof String) {
+                name = (String) shellCommand;
+                if (DEBUG)
+                    System.out.println("ShellCommand exec \"" + name + "\" consume? " + consumeOutput + " wait? " + waitForExitStatus);
+                process = Runtime.getRuntime().exec(name);
+            } else if (shellCommand instanceof String[]) {
+                String[] arr = (String[]) shellCommand;
+                if (DEBUG) {
+                    name = Arrays.toString(arr);
+                    System.out.println("ShellCommand exec \"" + name + "\" consume? " + consumeOutput + " wait? " + waitForExitStatus);
+                }
+                process = Runtime.getRuntime().exec(arr);
+            } else {
                throw new ClassCastException("shell command must be a String or a String[]");
+            }
             if (consumeOutput) {
-                processStderrConsumer = new StreamConsumer(_process.getErrorStream());
+                Thread processStderrConsumer = new StreamConsumer(process.getErrorStream());
                 processStderrConsumer.start();
-                processStdoutConsumer = new StreamConsumer(_process.getInputStream());
+                Thread processStdoutConsumer = new StreamConsumer(process.getInputStream());
                 processStdoutConsumer.start();
             } else {
-                _errorStream = _process.getErrorStream();
-                _inputStream = _process.getInputStream();
-                _outputStream = _process.getOutputStream();
-                processStderrReader = new StreamReader(_errorStream);
+                // unused, consumeOutput always true
+                _errorStream = process.getErrorStream();
+                _inputStream = process.getInputStream();
+                _outputStream = process.getOutputStream();
+                Thread processStderrReader = new StreamReader(_errorStream);
                 processStderrReader.start();
-                processStdinWriter = new StreamWriter(_outputStream);
+                Thread processStdinWriter = new StreamWriter(_outputStream);
                 processStdinWriter.start();
-                processStdoutReader = new StreamReader(_inputStream);
+                Thread processStdoutReader = new StreamReader(_inputStream);
                 processStdoutReader.start();
             }
             if (waitForExitStatus) {
+                if (DEBUG)
+                    System.out.println("ShellCommand waiting for \"" + name + '\"');
                 try {
-                    _process.waitFor();
+                    process.waitFor();
                 } catch (Exception e) {
-
+                    if (DEBUG) {
+                        System.out.println("ShellCommand exception waiting for \"" + name + '\"');
+                        e.printStackTrace();
+                    }
                     if (!consumeOutput)
                         killStreams();
-
                     return false;
                 }
 
                 if (!consumeOutput)
                     killStreams();
 
-                if (_process.exitValue() > 0)
+                if (DEBUG)
+                    System.out.println("ShellCommand exit value is " + process.exitValue() + " for \"" + name + '\"');
+                if (process.exitValue() > 0)
                     return false;
             }
         } catch (Exception e) {
+            // probably IOException, file not found from exec()
+            if (DEBUG) {
+                System.out.println("ShellCommand execute exception for \"" + name + '\"');
+                e.printStackTrace();
+            }
             return false;
         }
         return true;
     }
 
+    /** unused, only for NO_CONSUME_OUTPUT */
     private void killStreams() {
         try {
             _errorStream.close();
