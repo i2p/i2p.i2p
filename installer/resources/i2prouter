@@ -45,7 +45,7 @@ GETTEXT=$(which gettext > /dev/null 2>&1)
 
 # Where to install the systemd service
 SYSTEMD_SERVICE="/etc/systemd/system/${APP_NAME}.service"
-if grep -q systemd /proc/cmdline; then
+if grep -q systemd /proc/1/comm ; then
     USE_SYSTEMD=1
 fi
 
@@ -1321,6 +1321,8 @@ installdaemon() {
                                 echo "esac"  >> /etc/rc.d/${APP_NAME}
                                 chmod 755 /etc/rc.d/${APP_NAME}
                                 chown root:root /etc/rc.d/${APP_NAME}
+                                eval echo `gettext ' The $APP_LONG_NAME daemon has been installed.'`
+                                eval echo `gettext ' Add \"i2p\" to the DAEMONS variable in /etc/rc.conf to enable.'`
                             else
                                 # We'll end up here if systemd is enabled.
                                 # If systemd is enabled we don't need the initscript
@@ -1330,10 +1332,6 @@ installdaemon() {
                         if [ ! -f "${SYSTEMD_SERVICE}" ]; then
                             installsystemd
                         fi
-                    if ! grep -q systemd /proc/cmdline; then
-                        eval echo `gettext ' The $APP_LONG_NAME daemon has been installed.'`
-                        eval echo `gettext ' Add \"i2p\" to the DAEMONS variable in /etc/rc.conf to enable.'`
-                    fi
                 fi
             elif [ -f /etc/SuSE-release ] ; then
                 eval echo `gettext 'Detected SuSE or SLES:'`
