@@ -12,7 +12,7 @@ class Piece implements Comparable {
     private final int id;
     private final Set<PeerID> peers;
     /** @since 0.8.3 */
-    private Set<PeerID> requests;
+    private volatile Set<PeerID> requests;
     /** @since 0.8.1 */
     private int priority;
     
@@ -54,7 +54,10 @@ class Piece implements Comparable {
     /** caller must synchronize */
     public boolean addPeer(Peer peer) { return this.peers.add(peer.getPeerID()); }
 
-    /** caller must synchronize */
+    /**
+     * Caller must synchronize.
+     * @return true if removed
+     */
     public boolean removePeer(Peer peer) { return this.peers.remove(peer.getPeerID()); }
 
     /**
@@ -103,6 +106,17 @@ class Piece implements Comparable {
      */
     public int getRequestCount() {
         return this.requests == null ? 0 : this.requests.size();
+    } 
+
+    /**
+     * Clear all knowledge of peers
+     * Caller must synchronize
+     * @since 0.9.3
+     */
+    public void clear() {
+        peers.clear();
+        if (requests != null)
+            requests.clear();
     } 
     
     /** @return default 0 @since 0.8.1 */

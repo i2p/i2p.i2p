@@ -1,3 +1,8 @@
+2012-10-14 zzz
+ * Console: Use non-nio connector for Java 5 and JamVM/gij
+            (tickets #715 and #743)
+ * i2psnark: Fix request tracking bug preventing piece requests
+
 2012-10-11 kytv
 * Italian translation updates from Transifex
 * i2prouter:

@@ -682,6 +682,7 @@ class PeerState implements DataLoader
                   _log.debug(peer + " addRequest() we are choked, delaying requestNextPiece()");
               return;
           }
+          // huh? rv unused
           more_pieces = requestNextPiece();
         } else if (more_pieces) // We want something
           {
@@ -711,6 +712,8 @@ class PeerState implements DataLoader
       }
 
     // failsafe
+    // However this is bad as it thrashes the peer when we change our mind
+    // Ticket 691 cause here?
     if (interesting && lastRequest == null && outstandingRequests.isEmpty())
         setInteresting(false);
 
@@ -784,6 +787,8 @@ class PeerState implements DataLoader
     }
 
     // failsafe
+    // However this is bad as it thrashes the peer when we change our mind
+    // Ticket 691 cause here?
     if (outstandingRequests.isEmpty())
         lastRequest = null;
 
