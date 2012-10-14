@@ -20,6 +20,8 @@ import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import net.i2p.util.SystemVersion;
+
 /**
  * NOTE: As of 0.8.7, use getInstance() instead of new SHA1(), which will
  * return the JVM's MessageDigest if it is faster.
@@ -94,10 +96,8 @@ public final class SHA1 extends MessageDigest implements Cloneable {
     static {
         // oddly, Bitzi is faster than Oracle - see test results below
         boolean useBitzi = true;
-        String vendor = System.getProperty("java.vendor");
-        if (vendor.startsWith("Apache") ||                      // Harmony
-            vendor.startsWith("GNU Classpath") ||               // JamVM
-            vendor.startsWith("Free Software Foundation")) {    // gij
+        if (SystemVersion.isApache() ||            // Harmony
+            SystemVersion.isGNU()) {               // JamVM or gij
             try {
                 MessageDigest.getInstance("SHA-1");
                 useBitzi = false;

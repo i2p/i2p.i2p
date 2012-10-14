@@ -15,14 +15,23 @@ public abstract class SystemVersion {
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
-    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+    private static final boolean _isAndroid;
+    private static final boolean _isApache;
+    private static final boolean _isGNU;
     private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
                                          System.getProperty("os.arch").contains("64");
+    private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
 
     private static final boolean _oneDotSix;
     private static final int _androidSDK;
 
     static {
+        String vendor = System.getProperty("java.vendor");
+        _isAndroid = vendor.contains("Android");
+        _isApache = vendor.startsWith("Apache");
+        _isGNU = vendor.startsWith("GNU Classpath") ||               // JamVM
+                 vendor.startsWith("Free Software Foundation");      // gij
+
         int sdk = 0;
         if (_isAndroid) {
             try {
@@ -50,6 +59,20 @@ public abstract class SystemVersion {
 
     public static boolean isAndroid() {
         return _isAndroid;
+    }
+
+    /**
+     *  Apache Harmony JVM, or Android
+     */
+    public static boolean isApache() {
+        return _isApache || _isAndroid;
+    }
+
+    /**
+     *  gij or JamVM with GNU Classpath
+     */
+    public static boolean isGNU() {
+        return _isGNU;
     }
 
     /**
@@ -90,6 +113,6 @@ public abstract class SystemVersion {
      *  Same as I2PAppContext.hasWrapper()
      */
     public static boolean hasWrapper() {
-        return System.getProperty("wrapper.version") != null;
+        return _hasWrapper;
     }
 }

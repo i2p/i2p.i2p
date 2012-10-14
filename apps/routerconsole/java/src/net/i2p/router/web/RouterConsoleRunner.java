@@ -34,11 +34,14 @@ import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.ShellCommand;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
+import org.mortbay.jetty.AbstractConnector;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.NCSARequestLog;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
@@ -49,6 +52,7 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
+import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.security.SslSelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -177,8 +181,7 @@ public class RouterConsoleRunner {
         try {
             //TODO: move away from routerconsole into a separate application.
             //ApplicationManager?
-            VersionComparator v = new VersionComparator();
-            boolean recentJava = v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0;
+            boolean recentJava = SystemVersion.isJava6();
             // default false for now
             boolean desktopguiEnabled = I2PAppContext.getGlobalContext().getBooleanProperty("desktopgui.enabled");
             if (recentJava && desktopguiEnabled) {
@@ -334,12 +337,22 @@ public class RouterConsoleRunner {
                         //    _server.addListener('[' + host + "]:" + _listenPort);
                         //else
                         //    _server.addListener(host + ':' + _listenPort);
-                        SelectChannelConnector lsnr = new SelectChannelConnector();
+                        AbstractConnector lsnr;
+                        if (SystemVersion.isJava6() && !SystemVersion.isGNU()) {
+                            SelectChannelConnector slsnr = new SelectChannelConnector();
+                            slsnr.setUseDirectBuffers(false);  // default true seems to be leaky
+                            lsnr = slsnr;
+                        } else {
+                            // Jetty 6 and NIO on Java 5 don't get along that well
+                            // Also: http://jira.codehaus.org/browse/JETTY-1238
+                            // "Do not use GCJ with Jetty, it will not work."
+                            // Actually it does if you don't use NIO
+                            lsnr = new SocketConnector();
+                        }
                         lsnr.setHost(host);
                         lsnr.setPort(lport);
                         lsnr.setMaxIdleTime(90*1000);  // default 10 sec
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
-                        lsnr.setUseDirectBuffers(false);  // default true seems to be leaky
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
@@ -389,22 +402,37 @@ public class RouterConsoleRunner {
                             }
                             // TODO if class not found use SslChannelConnector
                             // Sadly there's no common base class with the ssl methods in it
-                            SslSelectChannelConnector ssll = new SslSelectChannelConnector();
+                            AbstractConnector ssll;
+                            if (SystemVersion.isJava6() && !SystemVersion.isGNU()) {
+                                SslSelectChannelConnector sssll = new SslSelectChannelConnector();
+                                // the keystore path and password
+                                sssll.setKeystore(keyStore.getAbsolutePath());
+                                sssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                                // the X.509 cert password (if not present, verifyKeyStore() returned false)
+                                sssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                sssll.setUseDirectBuffers(false);  // default true seems to be leaky
+                                ssll = sssll;
+                            } else {
+                                // Jetty 6 and NIO on Java 5 don't get along that well
+                                SslSocketConnector sssll = new SslSocketConnector();
+                            // the keystore path and password
+                                sssll.setKeystore(keyStore.getAbsolutePath());
+                                sssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                            // the X.509 cert password (if not present, verifyKeyStore() returned false)
+                                sssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                ssll = sssll;
+                            }
                             ssll.setHost(host);
                             ssll.setPort(sslPort);
-                            // the keystore path and password
-                            ssll.setKeystore(keyStore.getAbsolutePath());
-                            ssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
-                            // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                            ssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                             ssll.setMaxIdleTime(90*1000);  // default 10 sec
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
-                            ssll.setUseDirectBuffers(false);  // default true seems to be leaky
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;
                         } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
+                            if (SystemVersion.isGNU())
+                                System.err.println("Probably because GNU classpath does not support Sun keystores");
                             System.err.println("You may ignore this warning if the console is still available at https://localhost:" + sslPort);
                         }
                     }
