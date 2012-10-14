@@ -1153,7 +1153,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("</a>");
 
         out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
-        if(isRunning && remainingSeconds > 0)
+        if(isRunning && remainingSeconds > 0 && !snark.isChecking())
             out.write(DataHelper.formatDuration2(Math.max(remainingSeconds, 10) * 1000)); // (eta 6h)
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");

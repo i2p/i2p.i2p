@@ -377,7 +377,10 @@ class PeerCoordinator implements PeerListener
   public boolean needOutboundPeers() {
         //return wantedBytes != 0 && needPeers();
         // minus one to make it a little easier for new peers to get in on large swarms
-        return wantedBytes != 0 && !halted && peers.size() < getMaxConnections() - 1;
+        return wantedBytes != 0 &&
+               !halted &&
+               peers.size() < getMaxConnections() - 1 &&
+               (storage == null || !storage.isChecking());
   }
   
   /**
@@ -945,6 +948,8 @@ class PeerCoordinator implements PeerListener
   {
     if (metainfo == null || storage == null)
         return true;
+    if (storage.isChecking())
+        return true;
     int piece = pp.getPiece();
     if (halted) {
       _log.info("Got while-halted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
@@ -968,6 +973,7 @@ class PeerCoordinator implements PeerListener
         
         try
           {
+            // this takes forever if complete, as it rechecks
             if (storage.putPiece(pp))
               {
                 if (_log.shouldLog(Log.INFO))
@@ -1172,6 +1178,8 @@ class PeerCoordinator implements PeerListener
    */
   public PartialPiece getPartialPiece(Peer peer, BitField havePieces) {
       if (metainfo == null)
+          return null;
+      if (storage != null && storage.isChecking())
           return null;
       synchronized(wantedPieces) {
           // sorts by remaining bytes, least first

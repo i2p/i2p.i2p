@@ -982,6 +982,8 @@ public class Storage
 
   /**
    * Put the piece in the Storage if it is correct.
+   * Warning - takes a LONG time if complete as it does the recheck here.
+   * TODO thread the recheck?
    *
    * @return true if the piece was correct (sha metainfo hash
    * matches), otherwise false.
