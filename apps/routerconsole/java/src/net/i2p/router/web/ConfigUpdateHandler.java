@@ -6,6 +6,8 @@ import java.util.Map;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
+import net.i2p.router.update.ConsoleUpdateManager;
+import static net.i2p.update.UpdateType.*;
 import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;
 
@@ -84,7 +86,7 @@ public class ConfigUpdateHandler extends FormHandler {
      *  @return the configured value, else the registered HTTP proxy, else the default
      *  @since 0.8.13
      */
-    static int proxyPort(I2PAppContext ctx) {
+    public static int proxyPort(I2PAppContext ctx) {
         return ctx.getProperty(PROP_PROXY_PORT,
                                ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY, DEFAULT_PROXY_PORT_INT));
     }
@@ -94,11 +96,16 @@ public class ConfigUpdateHandler extends FormHandler {
         if (_action == null)
             return;
         if (_action.equals(_("Check for updates"))) {
-            NewsFetcher fetcher = NewsFetcher.getInstance(_context);
-            fetcher.fetchNews();
-            if (fetcher.shouldFetchUnsigned())
-                fetcher.fetchUnsignedHead();
-            if (fetcher.updateAvailable() || fetcher.unsignedUpdateAvailable()) {
+            ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
+            if (mgr == null) {
+                addFormError("Update manager not registered, cannot check");
+                return;
+            }
+            boolean a1 = mgr.checkAvailable(NEWS, 60*1000) != null;
+            boolean a2 = false;
+            if ((!a1) && _updateUnsigned && _zipURL != null && _zipURL.length() > 0)
+                a2 = mgr.checkAvailable(ROUTER_UNSIGNED, 60*1000) != null;
+            if (a1 || a2) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice(_("Update available, attempting to download now"));
                 else
@@ -118,7 +125,8 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
                 changes.put(PROP_NEWS_URL, _newsURL);
-                NewsFetcher.getInstance(_context).invalidateNews();
+                // this invalidates the news
+                changes.put(NewsHelper.PROP_LAST_CHECKED, "0");
                 addFormNotice(_("Updating news URL to {0}", _newsURL));
             }
         }

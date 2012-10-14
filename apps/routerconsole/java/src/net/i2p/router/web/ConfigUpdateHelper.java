@@ -14,7 +14,7 @@ public class ConfigUpdateHelper extends HelperBase {
     @Override
     public void setContextId(String contextId) {
         super.setContextId(contextId);
-        _dontInstall = NewsFetcher.getInstance(_context).dontInstall();
+        _dontInstall = NewsHelper.dontInstall(_context);
     }
 
     public boolean canInstall() {
@@ -159,6 +159,6 @@ public class ConfigUpdateHelper extends HelperBase {
     }
 
     public String getNewsStatus() { 
-        return NewsFetcher.getInstance(_context).status();
+        return NewsHelper.status(_context);
     }
 }

@@ -20,7 +20,7 @@ public class LogsHelper extends HelperBase {
     }
 
     /** @since 0.8.13 */
-    static String jettyVersion() {
+    public static String jettyVersion() {
         return Server.getVersion();
     }
 
