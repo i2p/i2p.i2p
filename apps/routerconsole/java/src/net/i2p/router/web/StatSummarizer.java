@@ -67,12 +67,10 @@ public class StatSummarizer implements Runnable {
     
     public void run() {
         // JRobin 1.5.9 crashes these JVMs
-        String vendor = System.getProperty("java.vendor");
-        if (vendor.startsWith("Apache") ||                      // Harmony
-            vendor.startsWith("GNU Classpath") ||               // JamVM
-            vendor.startsWith("Free Software Foundation")) {    // gij
+        if (SystemVersion.isApache() ||            // Harmony
+            SystemVersion.isGNU()) {               // JamVM or gij
             _log.logAlways(Log.WARN, "Graphing not supported with this JVM: " +
-                                     vendor + ' ' +
+                                     System.getProperty("java.vendor") + ' ' +
                                      System.getProperty("java.version") + " (" +
                                      System.getProperty("java.runtime.name") + ' ' +
                                      System.getProperty("java.runtime.version") + ')');

@@ -456,10 +456,11 @@ public class SummaryHelper extends HelperBase {
     
     /** compare translated nicknames - put "shared clients" first in the sort */
     private class AlphaComparator implements Comparator<Destination> {
+        private final String xsc = _("shared clients");
+
         public int compare(Destination lhs, Destination rhs) {
             String lname = getName(lhs);
             String rname = getName(rhs);
-            String xsc = _("shared clients");
             if (lname.equals(xsc))
                 return -1;
             if (rname.equals(xsc))

@@ -90,7 +90,9 @@
 
     <!-- Use this connector for many frequently idle connections
          and for threadless continuations.
-         Not recommended on Java 5 - comment out and uncomment the
+         Not recommended on Java 5 - comment this out, and uncomment the
+         SocketConnector below.
+         Do not use for gij or JamVM - comment this out, and uncomment the
          SocketConnector below.
     -->    
     <Call name="addConnector">

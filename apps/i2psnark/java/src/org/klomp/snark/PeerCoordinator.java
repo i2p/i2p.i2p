@@ -215,7 +215,7 @@ class PeerCoordinator implements PeerListener
 
   public Storage getStorage() { return storage; }
 
-  // for web page detailed stats
+  /** for web page detailed stats */
   public List<Peer> peerList()
   {
         return new ArrayList(peers);
@@ -445,6 +445,12 @@ class PeerCoordinator implements PeerListener
     }
     synchronized (downloaded_old) {
         Arrays.fill(downloaded_old, 0);
+    }
+    // failsafe
+    synchronized(wantedPieces) {
+        for (Piece pc : wantedPieces) {
+            pc.clear();
+        }
     }
     timer.schedule((CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD));
   }
@@ -750,8 +756,12 @@ class PeerCoordinator implements PeerListener
             // AND if there are almost no wanted pieces left (real end game).
             // If we do end game all the time, we generate lots of extra traffic
             // when the seeder is super-slow and all the peers are "caught up"
-            if (wantedSize > END_GAME_THRESHOLD)
+            if (wantedSize > END_GAME_THRESHOLD) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Nothing to request, " + requested.size() + " being requested and " +
+                              wantedSize + " still wanted");
                 return null;  // nothing to request and not in end game
+            }
             // let's not all get on the same piece
             // Even better would be to sort by number of requests
             if (record)
@@ -1078,10 +1088,11 @@ class PeerCoordinator implements PeerListener
   /** Called when a peer is removed, to prevent it from being used in 
    * rarest-first calculations.
    */
-  public void removePeerFromPieces(Peer peer) {
+  private void removePeerFromPieces(Peer peer) {
       synchronized(wantedPieces) {
           for (Piece piece : wantedPieces) {
               piece.removePeer(peer);
+              piece.setRequested(peer, false);
           }
       } 
   }

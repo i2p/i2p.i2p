@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
     // Apache Harmony 5.0M13 Deflater doesn't work after reset()
     // Neither does Android
-    private static final boolean ENABLE_CACHING = !(System.getProperty("java.vendor").startsWith("Apache") ||
+    private static final boolean ENABLE_CACHING = !(SystemVersion.isApache() ||
                                                     SystemVersion.isAndroid());
     private static final LinkedBlockingQueue<ReusableGZIPInputStream> _available;
     static {
