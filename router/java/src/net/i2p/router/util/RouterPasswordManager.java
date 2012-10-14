@@ -60,7 +60,7 @@ public class RouterPasswordManager extends PasswordManager {
      *
      *  @return success or nothing to migrate
      */
-    public boolean migrate() {
+    protected boolean migrate() {
         synchronized(RouterPasswordManager.class) {
             if (_context.getBooleanProperty(PROP_MIGRATED))
                 return true;

@@ -124,7 +124,7 @@ public class ConsolePasswordManager extends RouterPasswordManager {
      *
      *  @return success or nothing to migrate
      */
-    public boolean migrateConsole() {
+    private boolean migrateConsole() {
         synchronized(ConsolePasswordManager.class) {
             if (_context.getBooleanProperty(PROP_MIGRATED))
                 return true;
@@ -205,6 +205,8 @@ public class ConsolePasswordManager extends RouterPasswordManager {
         ConsolePasswordManager pm = new ConsolePasswordManager(ctx);
         if (!pm.migrate())
             System.out.println("Fail 1");
+        if (!pm.migrateConsole())
+            System.out.println("Fail 1a");
 
         System.out.println("Test plain");
         if (!pm.savePlain("type1", "user1", "pw1"))

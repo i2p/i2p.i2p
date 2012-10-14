@@ -469,9 +469,9 @@ public class RouterConsoleRunner implements RouterApp {
                                 SslSelectChannelConnector sssll = new SslSelectChannelConnector();
                                 // the keystore path and password
                                 sssll.setKeystore(keyStore.getAbsolutePath());
-                                sssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                                sssll.setPassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                                 // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                                sssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                sssll.setKeyPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                                 sssll.setUseDirectBuffers(false);  // default true seems to be leaky
                                 ssll = sssll;
                             } else {
@@ -479,9 +479,9 @@ public class RouterConsoleRunner implements RouterApp {
                                 SslSocketConnector sssll = new SslSocketConnector();
                             // the keystore path and password
                                 sssll.setKeystore(keyStore.getAbsolutePath());
-                                sssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                                sssll.setPassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                             // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                                sssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                sssll.setKeyPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                                 ssll = sssll;
                             }
                             ssll.setHost(host);

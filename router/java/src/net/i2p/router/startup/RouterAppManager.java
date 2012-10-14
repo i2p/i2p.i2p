@@ -55,13 +55,13 @@ public class RouterAppManager implements ClientAppManager {
           case UNINITIALIZED:
           case INITIALIZED:
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Client " + app.getDisplayName() + " called notify for" + state);
+                _log.warn("Client " + app.getDisplayName() + " called notify for " + state);
             break;
 
           case STARTING:
           case RUNNING:
             if (_log.shouldLog(Log.INFO))
-                _log.info("Client " + app.getDisplayName() + " called notify for" + state);
+                _log.info("Client " + app.getDisplayName() + " called notify for " + state);
             break;
 
           case FORKED:
@@ -72,7 +72,7 @@ public class RouterAppManager implements ClientAppManager {
             if (message == null)
                 message = "";
             if (_log.shouldLog(Log.INFO))
-                _log.info("Client " + app.getDisplayName() + " called notify for" + state +
+                _log.info("Client " + app.getDisplayName() + " called notify for " + state +
                           ' ' + message, e);
             break;
 
