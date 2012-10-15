@@ -1,5 +1,9 @@
 package net.i2p.util;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -143,5 +147,28 @@ public class PasswordManager {
         if (b64 == null)
             return null;
         return Base64.decodeToString(b64);
+    }
+
+    /**
+     *  Straight MD5, no salt
+     *  Will return the MD5 sum of "user:subrealm:pw", compatible with Jetty
+     *  and RFC 2617.
+     *
+     *  @param subrealm to be used in creating the checksum
+     *  @param user non-null, non-empty, already trimmed
+     *  @param pw non-null, plain text, already trimmed
+     *  @return lower-case hex with leading zeros, 32 chars, or null on error
+     */
+    public static String md5Hex(String subrealm, String user, String pw) {
+        String fullpw = user + ':' + subrealm + ':' + pw;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(fullpw.getBytes("ISO-8859-1"));
+            // adds leading zeros if necessary
+            return DataHelper.toString(md.digest());
+        } catch (UnsupportedEncodingException uee) {
+        } catch (NoSuchAlgorithmException nsae) {
+        }
+        return null;
     }
 }

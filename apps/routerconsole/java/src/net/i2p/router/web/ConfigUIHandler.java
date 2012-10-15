@@ -70,8 +70,7 @@ public class ConfigUIHandler extends FormHandler {
         }
         ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
         // rfc 2617
-        pw = name + ':' + RouterConsoleRunner.JETTY_REALM + ':' + pw;
-        if (mgr.saveMD5(RouterConsoleRunner.PROP_CONSOLE_PW, name, pw)) {
+        if (mgr.saveMD5(RouterConsoleRunner.PROP_CONSOLE_PW, RouterConsoleRunner.JETTY_REALM, name, pw)) {
             addFormNotice(_("Added user {0}", name));
             addFormNotice(_("Restart required to take effect"));
         } else {
