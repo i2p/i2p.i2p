@@ -3,9 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,10 +71,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      *  via address helper links
      */
     private final ConcurrentHashMap<String, String> addressHelpers = new ConcurrentHashMap(8);
+
     /**
      *  Used to protect actions via http://proxy.i2p/
      */
     private final String _proxyNonce;
+
+    private static final String AUTH_REALM = "I2P HTTP Proxy";
+
     /**
      *  These are backups if the xxx.ht error page is missing.
      */
@@ -167,12 +169,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "\r\n" +
             "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>" +
             "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>").getBytes();
+
     private final static byte[] ERR_AUTH =
                                 ("HTTP/1.1 407 Proxy Authentication Required\r\n" +
             "Content-Type: text/html; charset=UTF-8\r\n" +
             "Cache-control: no-cache\r\n" +
             "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" + // try to get a UTF-8-encoded response back for the password
-            "Proxy-Authenticate: Basic realm=\"I2P HTTP Proxy\"\r\n" +
+            "Proxy-Authenticate: Basic realm=\"" + AUTH_REALM + "\"\r\n" +
             "\r\n" +
             "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>" +
             "This proxy is configured to require authentication.<BR>").getBytes();
@@ -300,6 +303,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
         return rv;
     }
+
+    /** @since 0.9.4 */
+    protected String getRealm() {
+        return AUTH_REALM;
+    }
+
     private static final String HELPER_PARAM = "i2paddresshelper";
     public static final String LOCAL_SERVER = "proxy.i2p";
     private static final boolean DEFAULT_GZIP = true;
@@ -769,10 +778,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // hop-by-hop header, and we definitely want to block Windows NTLM after a far-end 407.
                         // Response to far-end shouldn't happen, as we
                         // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
-                        if(lowercaseLine.startsWith("proxy-authorization: basic ")) // save for auth check below
-                        {
-                            authorization = line.substring(27);  // "proxy-authorization: basic ".length()
-                        }
+                        authorization = line.substring(21);  // "proxy-authorization: ".length()
                         line = null;
                         continue;
                     } else if(lowercaseLine.startsWith("icy")) {
@@ -858,7 +864,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                     }
                 }
-                out.write(getErrorPage("auth", ERR_AUTH));
+                if (isDigestAuthRequired()) {
+                    // weep
+                } else {
+                    out.write(getErrorPage("auth", ERR_AUTH));
+                }
                 writeFooter(out);
                 s.close();
                 return;
@@ -1096,61 +1106,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /**
-     *  foo => errordir/foo-header_xx.ht for lang xx, or errordir/foo-header.ht,
-     *  or the backup byte array on fail.
-     *
-     *  .ht files must be UTF-8 encoded and use \r\n terminators so the
-     *  HTTP headers are conformant.
-     *  We can't use FileUtil.readFile() because it strips \r
-     *
-     *  @return non-null
-     */
-    private byte[] getErrorPage(String base, byte[] backup) {
-        return getErrorPage(_context, base, backup);
-    }
-
-    private static byte[] getErrorPage(I2PAppContext ctx, String base, byte[] backup) {
-        File errorDir = new File(ctx.getBaseDir(), "docs");
-        String lang = ctx.getProperty("routerconsole.lang", Locale.getDefault().getLanguage());
-        if(lang != null && lang.length() > 0 && !lang.equals("en")) {
-            File file = new File(errorDir, base + "-header_" + lang + ".ht");
-            try {
-                return readFile(file);
-            } catch(IOException ioe) {
-                // try the english version now
-            }
-        }
-        File file = new File(errorDir, base + "-header.ht");
-        try {
-            return readFile(file);
-        } catch(IOException ioe) {
-            return backup;
-        }
-    }
-
-    private static byte[] readFile(File file) throws IOException {
-        FileInputStream fis = null;
-        byte[] buf = new byte[512];
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
-        try {
-            int len = 0;
-            fis = new FileInputStream(file);
-            while((len = fis.read(buf)) > 0) {
-                baos.write(buf, 0, len);
-            }
-            return baos.toByteArray();
-        } finally {
-            try {
-                if(fis != null) {
-                    fis.close();
-                }
-            } catch(IOException foo) {
-            }
-        }
-    // we won't ever get here
-    }
-
-    /**
      *  Public only for LocalHTTPServer, not for general use
      */
     public static void writeFooter(OutputStream out) throws IOException {
@@ -1163,12 +1118,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
     private static class OnTimeout implements Runnable {
 
-        private Socket _socket;
-        private OutputStream _out;
-        private String _target;
-        private boolean _usingProxy;
-        private String _wwwProxy;
-        private long _requestId;
+        private final Socket _socket;
+        private final OutputStream _out;
+        private final String _target;
+        private final boolean _usingProxy;
+        private final String _wwwProxy;
+        private final long _requestId;
 
         public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
             _socket = s;
