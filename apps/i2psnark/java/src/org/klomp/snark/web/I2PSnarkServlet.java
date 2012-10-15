@@ -999,14 +999,16 @@ public class I2PSnarkServlet extends DefaultServlet {
         } else if (snark.isAllocating()) {
             statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
                            "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Allocating");
-        } else if (err != null) {
-            if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
-                               curPeers + thinsp(noThinsp) +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
-            else if (isRunning)
+        } else if (err != null && curPeers == 0) {
+            // let's only show this if we have no peers, otherwise PEX and DHT should bail us out, user doesn't care
+            //if (isRunning && curPeers > 0 && !showPeers)
+            //    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
+            //                   "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
+            //                   ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+            //                   curPeers + thinsp(noThinsp) +
+            //                   ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+            //else if (isRunning)
+            if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
                                "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                                ": " + curPeers + thinsp(noThinsp) +
