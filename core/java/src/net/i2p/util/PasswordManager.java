@@ -162,13 +162,27 @@ public class PasswordManager {
     public static String md5Hex(String subrealm, String user, String pw) {
         String fullpw = user + ':' + subrealm + ':' + pw;
         try {
+            byte[] data = fullpw.getBytes("ISO-8859-1");
+            byte[] sum = md5Sum(data);
+            if (sum != null)
+                // adds leading zeros if necessary
+                return DataHelper.toString(sum);
+        } catch (UnsupportedEncodingException uee) {}
+        return null;
+    }
+
+    /**
+     *  Standard MD5 checksum
+     *
+     *  @param data non-null
+     *  @return 16 bytes, or null on error
+     */
+    public static byte[] md5Sum(byte[] data) {
+        try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(fullpw.getBytes("ISO-8859-1"));
-            // adds leading zeros if necessary
-            return DataHelper.toString(md.digest());
-        } catch (UnsupportedEncodingException uee) {
-        } catch (NoSuchAlgorithmException nsae) {
-        }
+            md.update(data);
+            return md.digest();
+        } catch (NoSuchAlgorithmException nsae) {}
         return null;
     }
 }
