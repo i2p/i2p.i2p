@@ -91,17 +91,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
     
-    private final static byte[] ERR_AUTH =
-        ("HTTP/1.1 407 Proxy Authentication Required\r\n"+
-         "Content-Type: text/html; charset=UTF-8\r\n"+
-         "Cache-control: no-cache\r\n"+
-         "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" +         // try to get a UTF-8-encoded response back for the password
-         "Proxy-Authenticate: Basic realm=\"" + AUTH_REALM + "\"\r\n" +
-         "\r\n"+
-         "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>"+
-         "This proxy is configured to require authentication.<BR>")
-        .getBytes();
-
     private final static byte[] SUCCESS_RESPONSE =
         ("HTTP/1.1 200 Connection Established\r\n"+
          "Proxy-agent: I2P\r\n"+
@@ -288,14 +277,14 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             }
             
             // Authorization
-            if (!authorize(s, requestId, authorization)) {
+            if (!authorize(s, requestId, method, authorization)) {
                 if (_log.shouldLog(Log.WARN)) {
                     if (authorization != null)
                         _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
                     else
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                 }
-                writeErrorMessage(ERR_AUTH, out);
+                out.write(getAuthError(false).getBytes());
                 s.close();
                 return;
             }

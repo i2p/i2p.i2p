@@ -170,16 +170,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>" +
             "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>").getBytes();
 
-    private final static byte[] ERR_AUTH =
-                                ("HTTP/1.1 407 Proxy Authentication Required\r\n" +
-            "Content-Type: text/html; charset=UTF-8\r\n" +
-            "Cache-control: no-cache\r\n" +
-            "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" + // try to get a UTF-8-encoded response back for the password
-            "Proxy-Authenticate: Basic realm=\"" + AUTH_REALM + "\"\r\n" +
-            "\r\n" +
-            "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>" +
-            "This proxy is configured to require authentication.<BR>").getBytes();
-
     /**
      *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
      *  It is used to add a client to an existing socket manager.
@@ -856,7 +846,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
 
             // Authorization
-            if(!authorize(s, requestId, authorization)) {
+            if(!authorize(s, requestId, method, authorization)) {
                 if(_log.shouldLog(Log.WARN)) {
                     if(authorization != null) {
                         _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
@@ -864,11 +854,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                     }
                 }
-                if (isDigestAuthRequired()) {
-                    // weep
-                } else {
-                    out.write(getErrorPage("auth", ERR_AUTH));
-                }
+                out.write(getAuthError(false).getBytes());
                 writeFooter(out);
                 s.close();
                 return;

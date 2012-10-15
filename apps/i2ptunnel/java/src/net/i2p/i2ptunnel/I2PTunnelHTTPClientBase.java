@@ -10,8 +10,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -35,6 +37,19 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     /** 24 */
     private static final int NONCE_BYTES = DataHelper.DATE_LENGTH + MD5_BYTES;
     private static final long MAX_NONCE_AGE = 30*24*60*60*1000L;
+
+    private static final String ERR_AUTH1 =
+            "HTTP/1.1 407 Proxy Authentication Required\r\n" +
+            "Content-Type: text/html; charset=UTF-8\r\n" +
+            "Cache-control: no-cache\r\n" +
+            "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" + // try to get a UTF-8-encoded response back for the password
+            "Proxy-Authenticate: ";
+    // put the auth type and realm in between
+    private static final String ERR_AUTH2 =
+            "\r\n" +
+            "\r\n" +
+            "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>" +
+            "This proxy is configured to require authentication.";
 
     protected final List<String> _proxyList;
 
@@ -93,6 +108,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         _context.random().nextBytes(_proxyNonce);
     }
 
+    //////// Authorization stuff
+
     /** all auth @since 0.8.2 */
     public static final String PROP_AUTH = "proxyAuth";
     public static final String PROP_USER = "proxyUsername";
@@ -114,7 +131,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     protected boolean isDigestAuthRequired() {
         String authRequired = getTunnel().getClientOptions().getProperty(PROP_AUTH);
         if (authRequired == null)
-            return true;
+            return false;
         return authRequired.toLowerCase(Locale.US).equals("digest");
     }
 
@@ -123,10 +140,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  Ref: RFC 2617
      *  If the socket is an InternalSocket, no auth required.
      *
+     *  @param method GET, POST, etc.
      *  @param authorization may be null, the full auth line e.g. "Basic lskjlksjf"
      *  @return success
      */
-    protected boolean authorize(Socket s, long requestId, String authorization) {
+    protected boolean authorize(Socket s, long requestId, String method, String authorization) {
         String authRequired = getTunnel().getClientOptions().getProperty(PROP_AUTH);
         if (authRequired == null)
             return true;
@@ -195,12 +213,63 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             if (!authLC.startsWith("digest "))
                 return false;
             authorization = authorization.substring(7);
-            _log.error("Digest unimplemented");
-            return true;
+            Map<String, String> args = parseArgs(authorization);
+            AuthResult rv = validateDigest(method, args);
+            return rv == AuthResult.AUTH_GOOD;
         } else {
             _log.error("Unknown proxy authorization type configured: " + authRequired);
             return true;
         }
+    }
+
+    /**
+     *  Verify all of it.
+     *  Ref: RFC 2617
+     *  @since 0.9.4
+     */
+    private AuthResult validateDigest(String method, Map<String, String> args) {
+        String user = args.get("username");
+        String realm = args.get("realm");
+        String nonce = args.get("nonce");
+        String qop = args.get("qop");
+        String uri = args.get("uri");
+        String cnonce = args.get("cnonce");
+        String nc = args.get("nc");
+        String response = args.get("response");
+        if (user == null || realm == null || nonce == null || qop == null ||
+            uri == null || cnonce == null || nc == null || response == null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Bad digest request: " + DataHelper.toString(args));
+            return AuthResult.AUTH_BAD_REQ;
+        }
+        // nonce check
+        AuthResult check = verifyNonce(nonce);
+        if (check != AuthResult.AUTH_GOOD) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Bad digest nonce: " + check + ' ' + DataHelper.toString(args));
+            return check;
+        }
+        // get H(A1) == stored password
+        String ha1 = getTunnel().getClientOptions().getProperty(PROP_PW_PREFIX + user);
+        if (ha1 == null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Bad digest auth - no stored pw for user: " + user);
+            return AuthResult.AUTH_BAD;
+        }
+        // get H(A2)
+        String a2 = method + ':' + uri;
+        String ha2 = PasswordManager.md5Hex(a2);
+        // response check
+        String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
+        String hkd = PasswordManager.md5Hex(kd);
+        if (!response.equals(hkd)) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Bad digest auth - user: " + user);
+            return AuthResult.AUTH_BAD;
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Good digest auth - user: " + user);
+        return AuthResult.AUTH_GOOD;
     }
 
     /**
@@ -219,7 +288,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         return Base64.encode(n);
     }
 
-    enum AuthResult {AUTH_BAD, AUTH_STALE, AUTH_GOOD}
+    protected enum AuthResult {AUTH_BAD_REQ, AUTH_BAD, AUTH_STALE, AUTH_GOOD}
 
     /**
      *  Verify the Base 64 of 24 bytes: (now, md5 of (now, proxy nonce))
@@ -242,15 +311,90 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         return AuthResult.AUTH_GOOD;
     }
 
-    protected String getDigestHeader(boolean isStale) {
+    /**
+     *  What to send if digest auth fails
+     *  @since 0.9.4
+     */
+    protected String getAuthError(boolean isStale) {
+        boolean isDigest = isDigestAuthRequired();
         return
-            "Proxy-Authenticate: Digest realm=\"" + getRealm() + "\"" +
-            " nonce=\"" + getNonce() + "\"" +
-            " algorithm=MD5" +
-            " qop=\"auth\"" +
-            (isStale ? " stale=true" : "") +
-            "\r\n";
+            ERR_AUTH1 +
+            (isDigest ? "Digest" : "Basic") +
+            " realm=\"" + getRealm() + '"' +
+            (isDigest ? ", nonce=\"" + getNonce() + "\"," +
+                        " algorithm=MD5," +
+                        " qop=\"auth\"" +
+                        (isStale ? ", stale=true" : "")
+                      : "") +
+            ERR_AUTH2;
     }
+
+    /**
+     *  Modified from LoadClientAppsJob.
+     *  All keys are mapped to lower case.
+     *  Ref: RFC 2617
+     *
+     *  @param args non-null
+     *  @since 0.9.4
+     */
+    private static Map<String, String> parseArgs(String args) {
+        Map<String, String> rv = new HashMap(8);
+        char data[] = args.toCharArray();
+        StringBuilder buf = new StringBuilder(32);
+        boolean isQuoted = false;
+        String key = null;
+        for (int i = 0; i < data.length; i++) {
+            switch (data[i]) {
+                case '\"':
+                    if (isQuoted) {
+                        // keys never quoted
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    isQuoted = !isQuoted;
+                    break;
+
+                case ' ':
+                case '\r':
+                case '\n':
+                case '\t':
+                case ',':
+                    // whitespace - if we're in a quoted section, keep this as part of the quote,
+                    // otherwise use it as a delim
+                    if (isQuoted) {
+                        buf.append(data[i]);
+                    } else {
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    break;
+
+                case '=':
+                    if (isQuoted) {
+                        buf.append(data[i]);
+                    } else {
+                        key = buf.toString().trim().toLowerCase(Locale.US);
+                        buf.setLength(0);
+                    }
+                    break;
+
+                default:
+                    buf.append(data[i]);
+                    break;
+            }
+        }
+        if (key != null)
+            rv.put(key, buf.toString().trim());
+        return rv;
+    }
+
+    //////// Error page stuff
 
     /**
      *  foo => errordir/foo-header_xx.ht for lang xx, or errordir/foo-header.ht,

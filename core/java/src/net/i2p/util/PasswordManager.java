@@ -161,6 +161,18 @@ public class PasswordManager {
      */
     public static String md5Hex(String subrealm, String user, String pw) {
         String fullpw = user + ':' + subrealm + ':' + pw;
+        return md5Hex(fullpw);
+    }
+
+    /**
+     *  Straight MD5, no salt
+     *  Will return the MD5 sum of the data, compatible with Jetty
+     *  and RFC 2617.
+     *
+     *  @param fullpw non-null, plain text, already trimmed
+     *  @return lower-case hex with leading zeros, 32 chars, or null on error
+     */
+    public static String md5Hex(String fullpw) {
         try {
             byte[] data = fullpw.getBytes("ISO-8859-1");
             byte[] sum = md5Sum(data);

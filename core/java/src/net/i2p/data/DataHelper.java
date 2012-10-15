@@ -361,12 +361,21 @@ public class DataHelper {
             throw new RuntimeException("IO error writing to memory?! " + ioe.getMessage());
         }
     }
-    
+
     /**
      * Pretty print the mapping, unsorted
      * (unless the options param is an OrderedProperties)
      */
     public static String toString(Properties options) {
+        return toString((Map) options);
+    }
+
+    /**
+     * Pretty print the mapping, unsorted
+     * (unless the options param is an OrderedProperties)
+     * @since 0.9.4
+     */
+    public static String toString(Map<?, ?> options) {
         StringBuilder buf = new StringBuilder();
         if (options != null) {
             for (Map.Entry entry : options.entrySet()) {
@@ -502,7 +511,7 @@ public class DataHelper {
     }
 
     /**
-     *  Hex with leading zeros.
+     *  Lower-case hex with leading zeros.
      *  Use toHexString(byte[]) to not get leading zeros
      *  @param buf may be null (returns "")
      *  @return String of length 2*buf.length
@@ -516,7 +525,7 @@ public class DataHelper {
     private static final byte[] EMPTY_BUFFER = "".getBytes();
     
     /**
-     *  Hex with leading zeros.
+     *  Lower-case hex with leading zeros.
      *  Use toHexString(byte[]) to not get leading zeros
      *  @param buf may be null
      *  @param len number of bytes. If greater than buf.length, additional zeros will be prepended
@@ -546,7 +555,7 @@ public class DataHelper {
     }
 
     /**
-     *  Hex without leading zeros.
+     *  Lower-case hex without leading zeros.
      *  Use toString(byte[] to get leading zeros
      *  @param data may be null (returns "00")
      */
