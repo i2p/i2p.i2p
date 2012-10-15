@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-12 00:46+0000\n"
-"PO-Revision-Date: 2012-10-12 00:40+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2012-10-15 17:57+0000\n"
+"PO-Revision-Date: 2012-10-12 00:51+0000\n"
+"Last-Translator: BadCluster <badcluster@i2pmail.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
 "it/)\n"
 "Language: it\n"
@@ -185,11 +185,11 @@ msgstr "Porta non impostata"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:463
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:589
 msgid "Invalid port"
-msgstr ""
+msgstr "Porta non valida"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:466
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Attenzione - E' meglio non utilizzare porte inderiori alla 1024"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:482
 msgid "Standard client"
@@ -246,7 +246,7 @@ msgstr "Host non impostato"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:583
 msgid "Invalid address"
-msgstr ""
+msgstr "Indirizzo non valido"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:82
 msgid "I2P Tunnel Manager - Edit Client Tunnel"

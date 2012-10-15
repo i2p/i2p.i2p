@@ -1,3 +1,6 @@
+2012-10-15 kytv
+* Italian and Swedish updates from Transifex
+
 2012-10-14 zzz
  * Console: Use non-nio connector for Java 5 and JamVM/gij
             (tickets #715 and #743)
