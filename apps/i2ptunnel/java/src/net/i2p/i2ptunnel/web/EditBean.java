@@ -221,19 +221,7 @@ public class EditBean extends IndexBean {
     
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH) &&
-               getProxyUsername(tunnel).length() > 0 &&
-               getProxyPassword(tunnel).length() > 0;
-    }
-    
-    public String getProxyUsername(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_USER, "");
-    }
-    
-    public String getProxyPassword(int tunnel) {
-        if (getProxyUsername(tunnel).length() <= 0)
-            return "";
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_PW, "");
+        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH, "false") != "false";
     }
     
     public boolean getOutproxyAuth(int tunnel) {
@@ -354,9 +342,16 @@ public class EditBean extends IndexBean {
             if (opts == null) return "";
             StringBuilder buf = new StringBuilder(64);
             int i = 0;
+            boolean isMD5Proxy = "httpclient".equals(tun.getType()) ||
+                                 "connectclient".equals(tun.getType());
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 if (_noShowSet.contains(key))
+                    continue;
+                // leave in for HTTP and Connect so it can get migrated to MD5
+                // hide for SOCKS until migrated to MD5
+                if ((!isMD5Proxy) &&
+                    _nonProxyNoShowSet.contains(key))
                     continue;
                 String val = opts.getProperty(key);
                 if (i != 0) buf.append(' ');

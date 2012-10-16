@@ -77,7 +77,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      */
     private final String _proxyNonce;
 
-    private static final String AUTH_REALM = "I2P HTTP Proxy";
+    public static final String AUTH_REALM = "I2P HTTP Proxy";
 
     /**
      *  These are backups if the xxx.ht error page is missing.
@@ -846,7 +846,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
 
             // Authorization
-            if(!authorize(s, requestId, method, authorization)) {
+            AuthResult result = authorize(s, requestId, method, authorization);
+            if (result != AuthResult.AUTH_GOOD) {
                 if(_log.shouldLog(Log.WARN)) {
                     if(authorization != null) {
                         _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
@@ -854,7 +855,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                     }
                 }
-                out.write(getAuthError(false).getBytes());
+                out.write(getAuthError(result == AuthResult.AUTH_STALE).getBytes());
                 writeFooter(out);
                 s.close();
                 return;

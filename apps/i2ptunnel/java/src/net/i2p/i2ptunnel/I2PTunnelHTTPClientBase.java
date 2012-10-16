@@ -122,8 +122,15 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     /** passwords for specific outproxies may be added with outproxyUsername.fooproxy.i2p=user and outproxyPassword.fooproxy.i2p=pw */
     public static final String PROP_OUTPROXY_USER_PREFIX = PROP_OUTPROXY_USER + '.';
     public static final String PROP_OUTPROXY_PW_PREFIX = PROP_OUTPROXY_PW + '.';
+    /** new style MD5 auth */
+    public static final String PROP_PROXY_DIGEST_PREFIX = "proxy.auth.";
+    public static final String PROP_PROXY_DIGEST_SUFFIX = ".md5";
+    public static final String BASIC_AUTH = "basic";
+    public static final String DIGEST_AUTH = "digest";
 
     protected abstract String getRealm();
+
+    protected enum AuthResult {AUTH_BAD_REQ, AUTH_BAD, AUTH_STALE, AUTH_GOOD}
 
     /**
      *  @since 0.9.4
@@ -144,81 +151,77 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  @param authorization may be null, the full auth line e.g. "Basic lskjlksjf"
      *  @return success
      */
-    protected boolean authorize(Socket s, long requestId, String method, String authorization) {
+    protected AuthResult authorize(Socket s, long requestId, String method, String authorization) {
         String authRequired = getTunnel().getClientOptions().getProperty(PROP_AUTH);
         if (authRequired == null)
-            return true;
+            return AuthResult.AUTH_GOOD;
         authRequired = authRequired.toLowerCase(Locale.US);
         if (authRequired.equals("false"))
-            return true;
+            return AuthResult.AUTH_GOOD;
         if (s instanceof InternalSocket) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix(requestId) + "Internal access, no auth required");
-            return true;
+            return AuthResult.AUTH_GOOD;
         }
         if (authorization == null)
-            return false;
+            return AuthResult.AUTH_BAD;
         if (_log.shouldLog(Log.INFO))
             _log.info(getPrefix(requestId) + "Auth: " + authorization);
         String authLC = authorization.toLowerCase(Locale.US);
-        if (authRequired.equals("true") || authRequired.equals("basic")) {
+        if (authRequired.equals("true") || authRequired.equals(BASIC_AUTH)) {
             if (!authLC.startsWith("basic "))
-                return false;
+                return AuthResult.AUTH_BAD;
             authorization = authorization.substring(6);
 
-                // hmm safeDecode(foo, true) to use standard alphabet is private in Base64
-                byte[] decoded = Base64.decode(authorization.replace("/", "~").replace("+", "="));
-                if (decoded != null) {
-                    // We send Accept-Charset: UTF-8 in the 407 so hopefully it comes back that way inside the B64 ?
-                    try {
-                        String dec = new String(decoded, "UTF-8");
-                        String[] parts = dec.split(":");
-                        String user = parts[0];
-                        String pw = parts[1];
-                        // first try pw for that user
-                        String configPW = getTunnel().getClientOptions().getProperty(PROP_PW_PREFIX + user);
-                        if (configPW == null) {
-                            // if not, look at default user and pw
-                            String configUser = getTunnel().getClientOptions().getProperty(PROP_USER);
-                            if (user.equals(configUser))
-                                configPW = getTunnel().getClientOptions().getProperty(PROP_PW);
-                        }
-                        if (configPW != null) {
-                            if (pw.equals(configPW)) {
-                                if (_log.shouldLog(Log.INFO))
-                                    _log.info(getPrefix(requestId) + "Good auth - user: " + user + " pw: " + pw);
-                                return true;
-                            } else {
-                                if (_log.shouldLog(Log.WARN))
-                                    _log.warn(getPrefix(requestId) + "Bad auth, pw mismatch - user: " + user + " pw: " + pw + " expected: " + configPW);
-                            }
-                        } else {
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn(getPrefix(requestId) + "Bad auth, no stored pw for user: " + user + " pw: " + pw);
-                        }
-                    } catch (UnsupportedEncodingException uee) {
-                        _log.error(getPrefix(requestId) + "No UTF-8 support? B64: " + authorization, uee);
-                    } catch (ArrayIndexOutOfBoundsException aioobe) {
-                        // no ':' in response
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn(getPrefix(requestId) + "Bad auth B64: " + authorization, aioobe);
+            // hmm safeDecode(foo, true) to use standard alphabet is private in Base64
+            byte[] decoded = Base64.decode(authorization.replace("/", "~").replace("+", "="));
+            if (decoded != null) {
+                // We send Accept-Charset: UTF-8 in the 407 so hopefully it comes back that way inside the B64 ?
+                try {
+                    String dec = new String(decoded, "UTF-8");
+                    String[] parts = dec.split(":");
+                    String user = parts[0];
+                    String pw = parts[1];
+                    // first try pw for that user
+                    String configPW = getTunnel().getClientOptions().getProperty(PROP_PW_PREFIX + user);
+                    if (configPW == null) {
+                        // if not, look at default user and pw
+                        String configUser = getTunnel().getClientOptions().getProperty(PROP_USER);
+                        if (user.equals(configUser))
+                            configPW = getTunnel().getClientOptions().getProperty(PROP_PW);
                     }
-                } else {
+                    if (configPW != null) {
+                        if (pw.equals(configPW)) {
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info(getPrefix(requestId) + "Good auth - user: " + user + " pw: " + pw);
+                            return AuthResult.AUTH_GOOD;
+                        }
+                    }
+                    _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+                } catch (UnsupportedEncodingException uee) {
+                    _log.error(getPrefix(requestId) + "No UTF-8 support? B64: " + authorization, uee);
+                } catch (ArrayIndexOutOfBoundsException aioobe) {
+                    // no ':' in response
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn(getPrefix(requestId) + "Bad auth B64: " + authorization);
+                        _log.warn(getPrefix(requestId) + "Bad auth B64: " + authorization, aioobe);
+                    return AuthResult.AUTH_BAD_REQ;
                 }
-
-            return false;
-        } else if (authRequired.equals("digest")) {
+                return AuthResult.AUTH_BAD;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getPrefix(requestId) + "Bad auth B64: " + authorization);
+                return AuthResult.AUTH_BAD_REQ;
+            }
+        } else if (authRequired.equals(DIGEST_AUTH)) {
             if (!authLC.startsWith("digest "))
-                return false;
+                return AuthResult.AUTH_BAD;
             authorization = authorization.substring(7);
             Map<String, String> args = parseArgs(authorization);
             AuthResult rv = validateDigest(method, args);
-            return rv == AuthResult.AUTH_GOOD;
+            return rv;
         } else {
             _log.error("Unknown proxy authorization type configured: " + authRequired);
-            return true;
+            return AuthResult.AUTH_BAD_REQ;
         }
     }
 
@@ -250,10 +253,10 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             return check;
         }
         // get H(A1) == stored password
-        String ha1 = getTunnel().getClientOptions().getProperty(PROP_PW_PREFIX + user);
+        String ha1 = getTunnel().getClientOptions().getProperty(PROP_PROXY_DIGEST_PREFIX + user +
+                                                                PROP_PROXY_DIGEST_SUFFIX);
         if (ha1 == null) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Bad digest auth - no stored pw for user: " + user);
+            _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
             return AuthResult.AUTH_BAD;
         }
         // get H(A2)
@@ -263,8 +266,9 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
         String hkd = PasswordManager.md5Hex(kd);
         if (!response.equals(hkd)) {
+            _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
             if (_log.shouldLog(Log.INFO))
-                _log.info("Bad digest auth - user: " + user);
+                _log.info("Bad digest auth: " + DataHelper.toString(args));
             return AuthResult.AUTH_BAD;
         }
         if (_log.shouldLog(Log.INFO))
@@ -287,8 +291,6 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         System.arraycopy(md5, 0, n, DataHelper.DATE_LENGTH, MD5_BYTES);
         return Base64.encode(n);
     }
-
-    protected enum AuthResult {AUTH_BAD_REQ, AUTH_BAD, AUTH_STALE, AUTH_GOOD}
 
     /**
      *  Verify the Base 64 of 24 bytes: (now, md5 of (now, proxy nonce))

@@ -58,7 +58,7 @@ import net.i2p.util.PortMapper;
  */
 public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements Runnable {
 
-    private static final String AUTH_REALM = "I2P SSL Proxy";
+    public static final String AUTH_REALM = "I2P SSL Proxy";
 
     private final static byte[] ERR_DESTINATION_UNKNOWN =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -277,14 +277,15 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             }
             
             // Authorization
-            if (!authorize(s, requestId, method, authorization)) {
+            AuthResult result = authorize(s, requestId, method, authorization);
+            if (result != AuthResult.AUTH_GOOD) {
                 if (_log.shouldLog(Log.WARN)) {
                     if (authorization != null)
                         _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
                     else
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                 }
-                out.write(getAuthError(false).getBytes());
+                out.write(getAuthError(result == AuthResult.AUTH_STALE).getBytes());
                 s.close();
                 return;
             }
