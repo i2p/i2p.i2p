@@ -1,6 +1,8 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -82,7 +84,15 @@ public class NewsHelper extends ContentHelper {
     public static String unsignedUpdateVersion() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return null;
-        return mgr.getUpdateAvailable(ROUTER_UNSIGNED);
+        String ver = mgr.getUpdateAvailable(ROUTER_UNSIGNED);
+        if (ver != null) {
+            try {
+                long modtime = Long.parseLong(ver);
+                // '07-Jul 21:09 UTC' with month name in the system locale
+                return (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
+            } catch (NumberFormatException nfe) {}
+        }
+        return null;
     }
 
     /**

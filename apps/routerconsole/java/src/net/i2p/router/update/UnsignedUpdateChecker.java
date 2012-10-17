@@ -2,9 +2,7 @@ package net.i2p.router.update;
 
 import java.io.File;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Date;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.RFC822Date;
@@ -78,10 +76,8 @@ class UnsignedUpdateChecker extends UpdateRunner {
                     if (_ms <= 0) return false;
                     if (modtime > _ms) {
                         _unsignedUpdateAvailable = true;
-                        // '07-Jul 21:09 UTC' with month name in the system locale
-                        String unsignedUpdateVersion = (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
                         _mgr.notifyVersionAvailable(this, _urls.get(0), getType(), "", getMethod(), _urls,
-                                                    unsignedUpdateVersion, "");
+                                                    Long.toString(modtime), "");
                     }
                 }
                 return true;

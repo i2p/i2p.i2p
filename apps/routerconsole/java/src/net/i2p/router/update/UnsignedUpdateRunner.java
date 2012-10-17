@@ -60,8 +60,10 @@ class UnsignedUpdateRunner extends UpdateRunner {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             String lastmod = _get.getLastModified();
             File tmp = new File(_updateFile);
-/////// FIXME RFC822 or long?
-            if (_mgr.notifyComplete(this, lastmod, tmp))
+            long modtime = RFC822Date.parse822Date(lastmod);
+            if (modtime <= 0)
+                modtime = _context.clock().now();
+            if (_mgr.notifyComplete(this, Long.toString(modtime), tmp))
                 this.done = true;
             else
                 tmp.delete();  // corrupt

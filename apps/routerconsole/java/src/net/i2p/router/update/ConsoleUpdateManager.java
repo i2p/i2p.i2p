@@ -5,9 +5,11 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,9 @@ import net.i2p.util.VersionComparator;
  *  The UpdateManager starts and stops all updates,
  *  prevents multiple updates as appropriate,
  *  and controls notification to the user.
+ *
+ *  Version notes: For news and unsigned updates, use
+ *  Long.toString(modtime).
  *
  *  @since 0.9.4
  */
@@ -149,7 +154,6 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  @return new version or null if nothing newer is available
      */
     public String checkAvailable(UpdateType type, String id, long maxWait) {
-//// update too?
         if (isCheckInProgress(type, id) || isUpdateInProgress(type, id)) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Check or update already in progress for: " + type + ' ' + id);
@@ -157,7 +161,8 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
         for (RegisteredChecker r : _registeredCheckers) {
             if (r.type == type) {
-                UpdateTask t = r.checker.check(type, r.method, id, "FIXME", maxWait);
+                String current = getDownloadedOrInstalledVersion(type, id);
+                UpdateTask t = r.checker.check(type, r.method, id, current, maxWait);
                 if (t != null) {
                     synchronized(t) {
                         try {
@@ -183,8 +188,8 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
         for (RegisteredChecker r : _registeredCheckers) {
             if (r.type == type) {
-/// fixme "" will put an entry in _available for everything grrrrr????
-                UpdateTask t = r.checker.check(type, r.method, id, "", 5*60*1000);
+                String current = getDownloadedOrInstalledVersion(type, id);
+                UpdateTask t = r.checker.check(type, r.method, id, current, 5*60*1000);
                 if (t != null)
                     break;
             }
@@ -231,6 +236,22 @@ public class ConsoleUpdateManager implements UpdateManager {
         if (v == null)
             return null;
         return v.version;
+    }
+
+    /**
+     *  The highest of the installed or downloaded version.
+     *  @return new version or null if nothing was downloaded or installed
+     */
+    private String getDownloadedOrInstalledVersion(UpdateType type, String id) {
+        UpdateItem ui = new UpdateItem(type, id);
+        Version vi = _installed.get(ui);
+        Version vd = _downloaded.get(ui);
+        if (vi != null) {
+            if (vd != null)
+                return (vi.compareTo(vd) > 0) ? vi.version : vd.version;
+            return vi.version;
+        }
+        return vd != null ? vd.version : null;
     }
 
     /**
@@ -701,7 +722,6 @@ public class ConsoleUpdateManager implements UpdateManager {
 
             case ROUTER_UNSIGNED:
                 rv = handleUnsignedFile(task.getURI(), actualVersion, file);
-/////// FIXME RFC822 or long?
                 if (rv)
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
                 break;
@@ -846,15 +866,8 @@ public class ConsoleUpdateManager implements UpdateManager {
         if (err == null) {
             String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
             // So unsigned update handler doesn't overwrite unless newer.
-/// FIXME
-            //String lastmod = _get.getLastModified();
-            String lastmod = null;
-            long modtime = 0;
-            if (lastmod != null)
-                modtime = RFC822Date.parse822Date(lastmod);
-            if (modtime <= 0)
-                modtime = _context.clock().now();
-            _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, "" + modtime);
+            long modtime = _context.clock().now();
+            _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, Long.toString(modtime));
 
             if ("install".equals(policy)) {
                 _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
@@ -881,6 +894,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     }
 
     /**
+     *  @param Long.toString(timestamp)
      *  @return success
      */
     private boolean handleUnsignedFile(URI uri, String lastmod, File updFile) {
@@ -899,11 +913,14 @@ public class ConsoleUpdateManager implements UpdateManager {
             updFile.delete();
             String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
             long modtime = 0;
-            if (lastmod != null)
-                modtime = RFC822Date.parse822Date(lastmod);
+            if (lastmod != null) {
+                try {
+                    modtime = Long.parseLong(lastmod);
+                } catch (NumberFormatException nfe) {}
+            }
             if (modtime <= 0)
                 modtime = _context.clock().now();
-            _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, "" + modtime);
+            _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, Long.toString(modtime));
             if ("install".equals(policy)) {
                 _log.log(Log.CRIT, "Update was downloaded, restarting to install it");
                 updateStatus("<b>" + _("Update downloaded") + "</b><br>" + _("Restarting"));
@@ -916,8 +933,8 @@ public class ConsoleUpdateManager implements UpdateManager {
                     buf.append(_("Click Restart to install"));
                 else
                     buf.append(_("Click Shutdown and restart to install"));
-/// OK?
-                    buf.append(' ').append(_("Version {0}", lastmod));
+                String ver = (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
+                buf.append(' ').append(_("Version {0}", ver));
                 updateStatus(buf.toString());
             }
         } else {
