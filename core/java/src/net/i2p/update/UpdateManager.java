@@ -2,7 +2,7 @@ package net.i2p.update;
 
 import java.io.File;
 import java.net.URI;
-import java.util.List;;
+import java.util.List;
 
 /**
  *  The central resource coordinating updates.
@@ -11,17 +11,20 @@ import java.util.List;;
  *  The UpdateManager starts and stops all updates,
  *  and controls notification to the user.
  *
- *  @since 0.9.2
+ *  @since 0.9.4
  */
 public interface UpdateManager {
     
     /**
-     *  Call multiple times for each type/method pair.
-     *  The UpdateManager will then call start()
+     *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority);
 
+    public void register(Checker checker, UpdateType type, UpdateMethod method, int priority);
+
     public void unregister(Updater updater, UpdateType type, UpdateMethod method);
+
+    public void unregister(Checker checker, UpdateType type, UpdateMethod method);
     
     public void start();
 

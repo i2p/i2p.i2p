@@ -33,7 +33,7 @@ import net.i2p.util.SimpleTimer;
  *
  * Runs forever on instantiation, can't be stopped.
  *
- * @since 0.9.2 moved from NewsFetcher
+ * @since 0.9.4 moved from NewsFetcher
  */
 class NewsTimerTask implements SimpleTimer.TimedEvent {
     private final RouterContext _context;

@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  *  Eepget the .zip file to the temp dir, then notify.r
  *  Moved from UnsignedUpdateHandler and turned into an UpdateTask.
  *
- *  @since 0.9.2
+ *  @since 0.9.4
  */
 class UnsignedUpdateRunner extends UpdateRunner {
 

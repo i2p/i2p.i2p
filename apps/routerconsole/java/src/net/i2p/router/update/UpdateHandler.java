@@ -43,12 +43,6 @@ class UpdateHandler implements Updater {
         _context = ctx;
     }
     
-    /** Can't check, the NewsHandler does that */
-    public UpdateTask check(UpdateType type, UpdateMethod method,
-                            String id, String currentVersion, long maxTime) {
-        return null;
-    }
-
     /**
      *  Start a download and return a handle to the download task.
      *  Should not block.

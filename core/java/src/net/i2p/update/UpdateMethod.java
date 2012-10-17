@@ -3,7 +3,7 @@ package net.i2p.update;
 /**
  *  Transport mechanism for getting something.
  *
- *  @since 0.9.2
+ *  @since 0.9.4
  */
 public enum UpdateMethod {
     METHOD_DUMMY,

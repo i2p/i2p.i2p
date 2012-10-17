@@ -24,7 +24,7 @@ import net.i2p.util.VersionComparator;
  *  The downloader for router signed updates,
  *  and the base class for all the other Checkers and Runners.
  *
- *  @since 0.9.2 moved from UpdateHandler
+ *  @since 0.9.4 moved from UpdateHandler
  *
  */
 class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusListener {

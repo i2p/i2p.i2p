@@ -27,7 +27,7 @@ import net.i2p.util.Log;
  * the update process.
  * </p>
  */
-class UnsignedUpdateHandler implements Updater {
+class UnsignedUpdateHandler implements Checker, Updater {
     private final RouterContext _context;
 
     public UnsignedUpdateHandler(RouterContext ctx) {

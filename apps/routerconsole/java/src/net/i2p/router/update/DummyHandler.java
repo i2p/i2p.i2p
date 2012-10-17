@@ -10,9 +10,9 @@ import net.i2p.update.*;
 /**
  * Dummy to lock up the updates for a period of time
  *
- * @since 0.9.2
+ * @since 0.9.4
  */
-class DummyHandler implements Updater {
+class DummyHandler implements Checker, Updater {
     private final RouterContext _context;
     
     public DummyHandler(RouterContext ctx) {

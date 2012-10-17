@@ -13,9 +13,9 @@ import net.i2p.update.*;
  * Task to periodically look for updates to the news.xml, and to keep
  * track of whether that has an announcement for a new version.
  *
- * @since 0.9.2 moved from NewsFetcher
+ * @since 0.9.4 moved from NewsFetcher
  */
-class NewsHandler extends UpdateHandler {
+class NewsHandler extends UpdateHandler implements Checker {
     
     /** @since 0.7.14 not configurable */
     private static final String BACKUP_NEWS_URL = "http://www.i2p2.i2p/_static/news/news.xml";
@@ -44,13 +44,5 @@ class NewsHandler extends UpdateHandler {
         UpdateRunner update = new NewsFetcher(_context, updateSources);
         update.start();
         return update;
-    }
-
-    /**
-     *  Does nothing. check() also does update.
-     */
-    public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
-                             String id, String newVersion, long maxTime) {
-        return null;
     }
 }

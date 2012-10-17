@@ -39,7 +39,7 @@ import net.i2p.util.VersionComparator;
  *
  * Moved from web/ and turned into an UpdateTask.
  *
- * @since 0.9.2 moved from PluginUpdateHandler
+ * @since 0.9.4 moved from PluginUpdateHandler
  */
 class PluginUpdateRunner extends UpdateRunner {
 

@@ -5,7 +5,7 @@ import java.net.URI;
 /**
  *  A running check or download. Cannot be restarted.
  *
- *  @since 0.9.2
+ *  @since 0.9.4
  */
 public interface UpdateTask {
     

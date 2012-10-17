@@ -34,7 +34,7 @@ import net.i2p.util.VersionComparator;
  * @since 0.7.12
  * @author zzz
  */
-class PluginUpdateHandler implements Updater {
+class PluginUpdateHandler implements Checker, Updater {
     private final RouterContext _context;
 
     public PluginUpdateHandler(RouterContext ctx) {

@@ -9,16 +9,18 @@ import java.util.List;
  *
  *  @since 0.9.4
  */
-public interface Updater {
+public interface Checker {
     
     /**
-     *  Start a download and return a handle to the download task.
+     *  Check for updates.
      *  Should not block.
+     *  If any are found, call back to UpdateManager.notifyUpdateAvailable().
      *
      *  @param id plugin name or ignored
      *  @param maxTime how long you have
-     *  @return active task or null if unable to download
+     *  @return active task or null if unable to check
      */
-    public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
-                               String id, String newVersion, long maxTime);
+    public UpdateTask check(UpdateType type, UpdateMethod method,
+                            String id, String currentVersion, long maxTime);
+
 }

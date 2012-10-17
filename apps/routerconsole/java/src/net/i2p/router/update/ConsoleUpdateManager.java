@@ -45,34 +45,37 @@ import net.i2p.util.VersionComparator;
  *  prevents multiple updates as appropriate,
  *  and controls notification to the user.
  *
- *  @since 0.9.2
+ *  @since 0.9.4
  */
 public class ConsoleUpdateManager implements UpdateManager {
     
     private final RouterContext _context;
     private final Log _log;
-    /** registered checkers / updaters */
-    private final Collection<RegisteredUpdater> _registered;
+    private final Collection<RegisteredUpdater> _registeredUpdaters;
+    private final Collection<RegisteredChecker> _registeredCheckers;
     /** active checking tasks */
-    private final Collection<UpdateTask> _checkers;
+    private final Collection<UpdateTask> _activeCheckers;
     /** active updating tasks, pointing to the next ones to try */
     private final Map<UpdateTask, List<RegisteredUpdater>> _downloaders;
     /** as reported by checkers */
     private final Map<UpdateItem, VersionAvailable> _available;
     /** downloaded but NOT installed */
     private final Map<UpdateItem, Version> _downloaded;
-    /** downloaded but NOT installed */
+    /** downloaded AND installed */
     private final Map<UpdateItem, Version> _installed;
-    private final DecimalFormat _pct = new DecimalFormat("0.0%");
+    private static final DecimalFormat _pct = new DecimalFormat("0.0%");
     private static final VersionComparator _versionComparator = new VersionComparator();
 
     private volatile String _status;
 
+    private static final long DEFAULT_MAX_TIME = 3*60*60*1000L;
+
     public ConsoleUpdateManager(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(ConsoleUpdateManager.class);
-        _registered = new ConcurrentHashSet();
-        _checkers = new ConcurrentHashSet();
+        _registeredUpdaters = new ConcurrentHashSet();
+        _registeredCheckers = new ConcurrentHashSet();
+        _activeCheckers = new ConcurrentHashSet();
         _downloaders = new ConcurrentHashMap();
         _available = new ConcurrentHashMap();
         _downloaded = new ConcurrentHashMap();
@@ -101,16 +104,18 @@ public class ConsoleUpdateManager implements UpdateManager {
         register(u, TYPE_DUMMY, HTTP, 0);
         // register news before router, so we don't fire off an update
         // right at instantiation if the news is already indicating a new version
-        u = new NewsHandler(_context);
-        register(u, NEWS, HTTP, 0);
-        register(u, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
+        Checker c = new NewsHandler(_context);
+        register(c, NEWS, HTTP, 0);
+        register(c, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
         u = new UpdateHandler(_context);
         register(u, ROUTER_SIGNED, HTTP, 0);
-        u = new UnsignedUpdateHandler(_context);
-        register(u, ROUTER_UNSIGNED, HTTP, 0);
-        u = new PluginUpdateHandler(_context);
-        register(u, PLUGIN, HTTP, 0);
-        register(u, PLUGIN_INSTALL, HTTP, 0);
+        UnsignedUpdateHandler uuh = new UnsignedUpdateHandler(_context);
+        register((Checker)uuh, ROUTER_UNSIGNED, HTTP, 0);
+        register((Updater)uuh, ROUTER_UNSIGNED, HTTP, 0);
+        PluginUpdateHandler puh = new PluginUpdateHandler(_context);
+        register((Checker)puh, PLUGIN, HTTP, 0);
+        register((Checker)puh, PLUGIN_INSTALL, HTTP, 0);
+        register((Updater)puh, PLUGIN_INSTALL, HTTP, 0);
         new NewsTimerTask(_context);
     }
 
@@ -118,7 +123,8 @@ public class ConsoleUpdateManager implements UpdateManager {
         _context.unregisterUpdateManager(this);
         stopChecks();
         stopUpdates();
-        _registered.clear();
+        _registeredUpdaters.clear();
+        _registeredCheckers.clear();
         _available.clear();
         _downloaded.clear();
         _installed.clear();
@@ -149,9 +155,9 @@ public class ConsoleUpdateManager implements UpdateManager {
                 _log.warn("Check or update already in progress for: " + type + ' ' + id);
             return null;
         }
-        for (RegisteredUpdater r : _registered) {
+        for (RegisteredChecker r : _registeredCheckers) {
             if (r.type == type) {
-                UpdateTask t = r.updater.check(type, r.method, id, "FIXME", maxWait);
+                UpdateTask t = r.checker.check(type, r.method, id, "FIXME", maxWait);
                 if (t != null) {
                     synchronized(t) {
                         try {
@@ -175,10 +181,10 @@ public class ConsoleUpdateManager implements UpdateManager {
                 _log.warn("Check or update already in progress for: " + type + ' ' + id);
             return;
         }
-        for (RegisteredUpdater r : _registered) {
+        for (RegisteredChecker r : _registeredCheckers) {
             if (r.type == type) {
 /// fixme "" will put an entry in _available for everything grrrrr????
-                UpdateTask t = r.updater.check(type, r.method, id, "", 5*60*1000);
+                UpdateTask t = r.checker.check(type, r.method, id, "", 5*60*1000);
                 if (t != null)
                     break;
             }
@@ -288,7 +294,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Does not include updates.
      */
     public boolean isCheckInProgress() {
-        return !_checkers.isEmpty();
+        return !_activeCheckers.isEmpty();
     }
 
     /**
@@ -302,7 +308,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Is a check in progress?
      */
     public boolean isCheckInProgress(UpdateType type, String id) {
-        for (UpdateTask t : _checkers) {
+        for (UpdateTask t : _activeCheckers) {
             if (t.getType() == type && id.equals(t.getID()))
                 return true;
         }
@@ -313,10 +319,10 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Stop all checks in progress
      */
     public void stopChecks() {
-        for (UpdateTask t : _checkers) {
+        for (UpdateTask t : _activeCheckers) {
             t.shutdown();
         }
-        _checkers.clear();
+        _activeCheckers.clear();
     }
 
     /**
@@ -330,7 +336,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Stop this check
      */
     public void stopCheck(UpdateType type, String id) {
-        for (Iterator<UpdateTask> iter = _checkers.iterator(); iter.hasNext(); ) {
+        for (Iterator<UpdateTask> iter = _activeCheckers.iterator(); iter.hasNext(); ) {
             UpdateTask t = iter.next();
             if (t.getType() == type && id.equals(t.getID())) {
                 iter.remove();
@@ -360,7 +366,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  @return true if task started
      */
     public boolean update(UpdateType type) {
-        return update(type, "", 3*60*1000);
+        return update(type, "", DEFAULT_MAX_TIME);
     }
 
     /**
@@ -370,7 +376,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  @return true if task started
      */
     public boolean update(UpdateType type, String id) {
-        return update(type, id, 3*60*60*1000);
+        return update(type, id, DEFAULT_MAX_TIME);
     }
 
     /**
@@ -385,14 +391,31 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /**
      *  Non-blocking. Does not check.
+     *  Fails if check or update already in progress.
      *  If returns true, then call isUpdateInProgress() in a loop
      *  @param maxTime not honored by all Updaters
      *  @return true if task started
      */
     public boolean update(UpdateType type, String id, long maxTime) {
-        if (isCheckInProgress(type, id) || isUpdateInProgress(type, id)) {
+        if (isCheckInProgress(type, id)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Check or update already in progress for: " + type + ' ' + id);
+                _log.warn("Check already in progress for: " + type + ' ' + id);
+            return false;
+        }
+        return update_fromCheck(type, id, maxTime);
+    }
+
+    /**
+     *  Non-blocking. Does not check.
+     *  Fails update already in progress. Use this to call from within a checker task.
+     *  If returns true, then call isUpdateInProgress() in a loop
+     *  @param maxTime not honored by all Updaters
+     *  @return true if task started
+     */
+    private boolean update_fromCheck(UpdateType type, String id, long maxTime) {
+        if (isUpdateInProgress(type, id)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Update already in progress for: " + type + ' ' + id);
             return false;
         }
         List<URI> updateSources = null;
@@ -400,7 +423,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         VersionAvailable va = _available.get(ui);
         if (va == null)
             return false;
-        List<RegisteredUpdater> sorted = new ArrayList(_registered);
+        List<RegisteredUpdater> sorted = new ArrayList(_registeredUpdaters);
         Collections.sort(sorted);
         return retry(ui, va.sourceMap, sorted, maxTime) != null;
     }
@@ -412,7 +435,7 @@ public class ConsoleUpdateManager implements UpdateManager {
             RegisteredUpdater r = iter.next();
             iter.remove();
             // check in case unregistered later
-            if (!_registered.contains(r))
+            if (!_registeredUpdaters.contains(r))
                 continue;
             for (Map.Entry<UpdateMethod, List<URI>> e : sourceMap.entrySet()) {
                 UpdateMethod meth = e.getKey();
@@ -434,20 +457,34 @@ public class ConsoleUpdateManager implements UpdateManager {
     /////////// start UpdateManager interface
 
     /**
-     *  Call multiple times, one for each type/method pair.
+     *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority) {
         RegisteredUpdater ru = new RegisteredUpdater(updater, type, method, priority);
         if (_log.shouldLog(Log.INFO))
             _log.info("Registering " + ru);
-        _registered.add(ru);
+        _registeredUpdaters.add(ru);
     }
 
     public void unregister(Updater updater, UpdateType type, UpdateMethod method) {
         RegisteredUpdater ru = new RegisteredUpdater(updater, type, method, 0);
         if (_log.shouldLog(Log.INFO))
             _log.info("Unregistering " + ru);
-        _registered.remove(ru);
+        _registeredUpdaters.remove(ru);
+    }
+    
+    public void register(Checker updater, UpdateType type, UpdateMethod method, int priority) {
+        RegisteredChecker rc = new RegisteredChecker(updater, type, method, priority);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Registering " + rc);
+        _registeredCheckers.add(rc);
+    }
+
+    public void unregister(Checker updater, UpdateType type, UpdateMethod method) {
+        RegisteredChecker rc = new RegisteredChecker(updater, type, method, 0);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Unregistering " + rc);
+        _registeredCheckers.remove(rc);
     }
     
     /**
@@ -509,33 +546,33 @@ public class ConsoleUpdateManager implements UpdateManager {
             _log.info(ui.toString() + ' ' + newVA + " now available");
         _available.put(ui, newVA);
 
+        String msg = null;
         switch (type) {
             case NEWS:
                 break;
 
             case ROUTER_SIGNED:
             case ROUTER_SIGNED_PACK200:
-                if (shouldInstall()) {
-////////////
-                }
-                break;
-
             case ROUTER_UNSIGNED:
-                if (shouldInstall()) {
-////////////
+                if (shouldInstall() &&
+                    !(isUpdateInProgress(ROUTER_SIGNED) ||
+                      isUpdateInProgress(ROUTER_SIGNED_PACK200) ||
+                      isUpdateInProgress(ROUTER_UNSIGNED))) {
+                    update_fromCheck(type, id, DEFAULT_MAX_TIME);
                 }
+                // ConfigUpdateHandler, SummaryHelper, SummaryBarRenderer handle status display
                 break;
 
             case PLUGIN:
-                String msg = "<b>" + _("New plugin version {0} is available", newVersion) + "</b>";
-                finishStatus(msg);
+                msg = "<b>" + _("New plugin version {0} is available", newVersion) + "</b>";
                 break;
 
             default:
                 break;
         }
+        if (msg != null)
+            finishStatus(msg);
         return true;
-// TODO
     }
 
     /**
@@ -544,35 +581,30 @@ public class ConsoleUpdateManager implements UpdateManager {
     public void notifyCheckComplete(UpdateTask task, boolean newer, boolean success) {
         if (_log.shouldLog(Log.INFO))
             _log.info(task.toString() + " complete");
-        _checkers.remove(task);
+        _activeCheckers.remove(task);
+        String msg = null;
         switch (task.getType()) {
             case NEWS:
-                // NewsFetcher will notify and spin off update tasks
-                break;
-
             case ROUTER_SIGNED:
             case ROUTER_SIGNED_PACK200:
-                break;
-
             case ROUTER_UNSIGNED:
-                // if  _mgr.getUpdateDownloaded(ROUTER_SIGNED) != null;
+                // ConfigUpdateHandler, SummaryHelper, SummaryBarRenderer handle status display
                 break;
 
             case PLUGIN:
-                String msg = null;
                 if (!success)
                     msg = "<b>" + _("Update check failed for plugin {0}", task.getID()) + "</b>";
                 else if (!newer)
                     msg = "<b>" + _("No new version is available for plugin {0}", task.getID()) + "</b>";
                 /// else success.... message for that?
 
-                if (msg != null)
-                    finishStatus(msg);
                 break;
 
             default:
                 break;
         }
+        if (msg != null)
+            finishStatus(msg);
         synchronized(task) {
             task.notifyAll();
         }
@@ -626,7 +658,7 @@ public class ConsoleUpdateManager implements UpdateManager {
             UpdateItem ui = new UpdateItem(task.getType(), task.getID());
             VersionAvailable va = _available.get(ui);
             if (va != null) {
-                UpdateTask next = retry(ui, va.sourceMap, toTry, 3*60*1000);  // fixme old maxtime lost
+                UpdateTask next = retry(ui, va.sourceMap, toTry, DEFAULT_MAX_TIME);  // fixme old maxtime lost
                 if (next != null) {
                    if (_log.shouldLog(Log.WARN))
                        _log.warn("Retrying with " + next);
@@ -983,6 +1015,47 @@ public class ConsoleUpdateManager implements UpdateManager {
         @Override
         public String toString() {
             return "RegisteredUpdater " + updater + " for " + type + ' ' + method + " @pri " + priority;
+        }
+    }
+
+    /**
+     *  Equals on checker, type and method only
+     */
+    private static class RegisteredChecker implements Comparable<RegisteredChecker> {
+        public final Checker checker;
+        public final UpdateType type;
+        public final UpdateMethod method;
+        public final int priority;
+
+        public RegisteredChecker(Checker u, UpdateType t, UpdateMethod m, int priority) {
+            checker = u; type = t; method = m; this.priority = priority;
+        }
+
+        /** reverse, highest priority first, ensure different ones are different */
+        public int compareTo(RegisteredChecker r) {
+            int p = r.priority - priority;
+            if (p != 0)
+                return p;
+            return hashCode() - r.hashCode();
+        }
+
+        @Override
+        public int hashCode() {
+            return checker.hashCode() ^ type.hashCode() ^ method.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof RegisteredChecker))
+                return false;
+            RegisteredChecker r = (RegisteredChecker) o;
+            return type == r.type && method == r.method &&
+                   checker.equals(r.checker);
+        }
+
+        @Override
+        public String toString() {
+            return "RegisteredChecker " + checker + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 

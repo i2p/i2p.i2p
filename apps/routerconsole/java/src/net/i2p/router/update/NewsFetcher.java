@@ -31,7 +31,7 @@ import net.i2p.util.Log;
  * Task to fetch updates to the news.xml, and to keep
  * track of whether that has an announcement for a new version.
  *
- * @since 0.9.2 moved from NewsFetcher and make an Updater
+ * @since 0.9.4 moved from NewsFetcher and make an Updater
  */
 class NewsFetcher extends UpdateRunner {
     private String _lastModified;
