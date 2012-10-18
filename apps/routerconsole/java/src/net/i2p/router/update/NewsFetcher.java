@@ -97,15 +97,10 @@ class NewsFetcher extends UpdateRunner {
                 else
                     get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
                 get.addStatusListener(this);
+                long start = _context.clock().now();
                 if (get.fetch()) {
-                    String lastMod = get.getLastModified();
-                    if (lastMod != null) {
-                        _lastModified = lastMod;
-                        long lm = RFC822Date.parse822Date(lastMod);
-                        if (lm == 0)
-                            lm = _context.clock().now();
-                        _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED, Long.toString(lm));
-                    }
+                    _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED,
+                                                 Long.toString(start));
                     return;
                 }
             } catch (Throwable t) {

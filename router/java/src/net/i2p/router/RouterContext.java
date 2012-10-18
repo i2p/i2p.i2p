@@ -417,6 +417,25 @@ public class RouterContext extends I2PAppContext {
     }
 
     /**
+     * Return a long with a long default
+     * @since 0.9.4
+     */
+    @Override
+    public long getProperty(String propName, long defaultVal) {
+        if (_router != null) {
+            String val = _router.getConfigSetting(propName);
+            if (val != null) {
+                long rv = defaultVal;
+                try {
+                    rv = Long.parseLong(val);
+                } catch (NumberFormatException nfe) {}
+                return rv;
+            }
+        }
+        return super.getProperty(propName, defaultVal);
+    }
+
+    /**
      * @return new Properties with system and context properties
      * @since 0.8.4
      */

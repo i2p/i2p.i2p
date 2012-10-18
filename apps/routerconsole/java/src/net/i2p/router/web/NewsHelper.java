@@ -125,7 +125,7 @@ public class NewsHelper extends ContentHelper {
      *  @since 0.9.4
      */
     public static boolean shouldShowNews(RouterContext ctx) {
-         long lastUpdated = lastUpdated(ctx);
+        long lastUpdated = lastUpdated(ctx);
         if (lastUpdated <= 0)
             return true;
         long last = ctx.getProperty(PROP_LAST_HIDDEN, 0L);

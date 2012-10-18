@@ -1097,7 +1097,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredUpdater " + updater + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredUpdater " + updater.getClass().getSimpleName() + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
@@ -1138,7 +1138,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredChecker " + checker + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredChecker " + checker.getClass().getSimpleName() + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
