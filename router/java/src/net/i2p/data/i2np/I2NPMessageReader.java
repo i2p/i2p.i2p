@@ -142,7 +142,7 @@ public class I2NPMessageReader {
                         if (msg != null) {
                             long msToRead = _handler.getLastReadTime();
                             int bytesRead = _handler.getLastSize();
-                            msToRead += injectLag(bytesRead);
+                            //msToRead += injectLag(bytesRead);
                             _listener.messageReceived(I2NPMessageReader.this, msg, msToRead, bytesRead);
                         }
                     } catch (I2NPMessageException ime) {
@@ -179,6 +179,7 @@ public class I2NPMessageReader {
             // boom bye bye bad bwoy
         }
         
+     /****
         private final long injectLag(int size) {
             if (true) { 
                 return 0;
@@ -202,11 +203,8 @@ public class I2NPMessageReader {
         }
         
         private final long getReadLag() {
-            try { 
-                return Long.parseLong(_context.getProperty("router.injectLagMs", "0")); 
-            } catch (NumberFormatException nfe) {
-                return 0;
-            }
+            return _context.getProperty("router.injectLagMs", 0L); 
         }
+     ****/
     }
 }
