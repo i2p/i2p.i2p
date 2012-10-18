@@ -74,6 +74,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     private volatile String _status;
 
     private static final long DEFAULT_MAX_TIME = 3*60*60*1000L;
+    private static final long DEFAULT_CHECK_TIME = 60*1000;
 
     public ConsoleUpdateManager(RouterContext ctx) {
         _context = ctx;
@@ -162,7 +163,12 @@ public class ConsoleUpdateManager implements UpdateManager {
         for (RegisteredChecker r : _registeredCheckers) {
             if (r.type == type) {
                 String current = getDownloadedOrInstalledVersion(type, id);
-                UpdateTask t = r.checker.check(type, r.method, id, current, maxWait);
+                UpdateTask t;
+                synchronized(_activeCheckers) {
+                    t = r.checker.check(type, r.method, id, current, maxWait);
+                    if (t != null)
+                        _activeCheckers.add(t);
+                }
                 if (t != null) {
                     synchronized(t) {
                         try {
@@ -189,9 +195,13 @@ public class ConsoleUpdateManager implements UpdateManager {
         for (RegisteredChecker r : _registeredCheckers) {
             if (r.type == type) {
                 String current = getDownloadedOrInstalledVersion(type, id);
-                UpdateTask t = r.checker.check(type, r.method, id, current, 5*60*1000);
-                if (t != null)
-                    break;
+                synchronized(_activeCheckers) {
+                    UpdateTask t = r.checker.check(type, r.method, id, current, DEFAULT_CHECK_TIME);
+                    if (t != null) {
+                        _activeCheckers.add(t);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -340,10 +350,12 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Stop all checks in progress
      */
     public void stopChecks() {
-        for (UpdateTask t : _activeCheckers) {
-            t.shutdown();
+        synchronized(_activeCheckers) {
+            for (UpdateTask t : _activeCheckers) {
+                t.shutdown();
+            }
+            _activeCheckers.clear();
         }
-        _activeCheckers.clear();
     }
 
     /**
@@ -458,11 +470,13 @@ public class ConsoleUpdateManager implements UpdateManager {
             // check in case unregistered later
             if (!_registeredUpdaters.contains(r))
                 continue;
+            VersionAvailable va = _available.get(ui);
+            String newVer = va != null ? va.version : "";
             for (Map.Entry<UpdateMethod, List<URI>> e : sourceMap.entrySet()) {
                 UpdateMethod meth = e.getKey();
                 if (r.type == ui.type && r.method == meth) {
-                                                                                    // fixme
-                    UpdateTask t = r.updater.update(ui.type, meth, e.getValue(), ui.id, "", maxTime);
+                    UpdateTask t = r.updater.update(ui.type, meth, e.getValue(),
+                                                    ui.id, newVer, maxTime);
                     if (t != null) {
                         // race window here
                         //  store the remaining ones for retrying
@@ -602,7 +616,9 @@ public class ConsoleUpdateManager implements UpdateManager {
     public void notifyCheckComplete(UpdateTask task, boolean newer, boolean success) {
         if (_log.shouldLog(Log.INFO))
             _log.info(task.toString() + " complete");
-        _activeCheckers.remove(task);
+        synchronized(_activeCheckers) {
+            _activeCheckers.remove(task);
+        }
         String msg = null;
         switch (task.getType()) {
             case NEWS:
