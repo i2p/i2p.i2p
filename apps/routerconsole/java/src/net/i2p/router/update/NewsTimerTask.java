@@ -55,16 +55,22 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
 
     public void timeReached() {
         if (shouldFetchNews()) {
+            // blocking
             fetchNews();
-            if (shouldFetchUnsigned())
-                fetchUnsignedHead();
+            if (shouldFetchUnsigned()) {
+                // give it a sec for the download to kick in, if it's going to
+                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                if (!_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
+                    // nonblocking
+                    fetchUnsignedHead();
+            }
         }
     }
     
     private boolean shouldFetchNews() {
         if (_context.router().gracefulShutdownInProgress())
             return false;
-        if (NewsHelper.isUpdateInProgress())
+        if (_mgr.isCheckInProgress() || _mgr.isUpdateInProgress())
             return false;
         long lastFetch = NewsHelper.lastChecked(_context);
         String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
@@ -88,8 +94,9 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
         }
     }
 
+    /** blocking */
     private void fetchNews() {
-        _mgr.check(NEWS, "");
+        _mgr.checkAvailable(NEWS, 60*1000);
     }
     
     private boolean shouldFetchUnsigned() {
@@ -102,8 +109,10 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
     /**
      * HEAD the update url, and if the last-mod time is newer than the last update we
      * downloaded, as stored in the properties, then we download it using eepget.
+     *
+     * Non-blocking
      */
     private void fetchUnsignedHead() {
-        _mgr.check(ROUTER_UNSIGNED, "");
+        _mgr.check(ROUTER_UNSIGNED);
     }
 }

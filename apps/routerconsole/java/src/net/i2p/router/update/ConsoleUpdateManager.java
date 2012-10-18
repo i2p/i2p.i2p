@@ -106,14 +106,15 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
 
         _context.registerUpdateManager(this);
-        Updater u = new DummyHandler(_context);
-        register(u, TYPE_DUMMY, HTTP, 0);
+        DummyHandler dh = new DummyHandler(_context);
+        register((Checker)dh, TYPE_DUMMY, HTTP, 0);
+        register((Updater)dh, TYPE_DUMMY, HTTP, 0);
         // register news before router, so we don't fire off an update
         // right at instantiation if the news is already indicating a new version
         Checker c = new NewsHandler(_context);
         register(c, NEWS, HTTP, 0);
         register(c, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
-        u = new UpdateHandler(_context);
+        Updater u = new UpdateHandler(_context);
         register(u, ROUTER_SIGNED, HTTP, 0);
         UnsignedUpdateHandler uuh = new UnsignedUpdateHandler(_context);
         register((Checker)uuh, ROUTER_UNSIGNED, HTTP, 0);
@@ -180,6 +181,14 @@ public class ConsoleUpdateManager implements UpdateManager {
             }
         }
         return null;
+    }
+
+    /**
+     *  Fire off a checker task
+     *  Non-blocking.
+     */
+    public void check(UpdateType type) {
+        check(type, "");
     }
 
     /**
@@ -645,7 +654,6 @@ public class ConsoleUpdateManager implements UpdateManager {
         synchronized(task) {
             task.notifyAll();
         }
-// TODO
     }
 
     public void notifyProgress(UpdateTask task, String status, long downloaded, long totalSize) {
