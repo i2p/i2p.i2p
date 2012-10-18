@@ -1,5 +1,6 @@
 2012-10-18 kytv
 * Portuguese and Spanish updates from Transifex
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2012-10-02
 
 2012-10-15 kytv
 * Italian and Swedish updates from Transifex
