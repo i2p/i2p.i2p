@@ -12,6 +12,8 @@ import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.NewsHelper;
 import net.i2p.update.*;
+import static net.i2p.update.UpdateType.*;
+import static net.i2p.update.UpdateMethod.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -54,18 +56,7 @@ class UnsignedUpdateHandler implements Checker, Updater {
             return null;
         }
 
-        String lastUpdate = _context.getProperty(NewsHelper.PROP_LAST_UPDATE_TIME);
-        if (lastUpdate == null) {
-            // we don't know what version you have, so stamp it with the current time,
-            // and we'll look for something newer next time around.
-            _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME,
-                                               Long.toString(_context.clock().now()));
-            return null;
-        }
-        long ms = 0;
-        try {
-            ms = Long.parseLong(lastUpdate);
-        } catch (NumberFormatException nfe) {}
+        long ms = _context.getProperty(NewsHelper.PROP_LAST_UPDATE_TIME, 0L);
         if (ms <= 0) {
             // we don't know what version you have, so stamp it with the current time,
             // and we'll look for something newer next time around.
@@ -90,7 +81,7 @@ class UnsignedUpdateHandler implements Checker, Updater {
     @Override
     public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
                              String id, String newVersion, long maxTime) {
-        if (type != UpdateType.ROUTER_UNSIGNED || method != UpdateMethod.HTTP || updateSources.isEmpty())
+        if (type != ROUTER_UNSIGNED || method != HTTP || updateSources.isEmpty())
             return null;
         UpdateRunner update = new UnsignedUpdateRunner(_context, updateSources);
         update.start();

@@ -12,5 +12,6 @@ public enum UpdateType {
     ROUTER_SIGNED_PACK200,      // unused, use ROUTER_SIGNED for both
     ROUTER_UNSIGNED,
     PLUGIN, PLUGIN_INSTALL,
-    GEOIP, BLOCKLIST, RESEED
+    GEOIP, BLOCKLIST, RESEED,
+    HOMEPAGE
 }

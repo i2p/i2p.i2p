@@ -9,6 +9,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
+import static net.i2p.update.UpdateType.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -31,7 +32,7 @@ class UnsignedUpdateRunner extends UpdateRunner {
 
 
     @Override
-    public UpdateType getType() { return UpdateType.ROUTER_UNSIGNED; }
+    public UpdateType getType() { return ROUTER_UNSIGNED; }
 
 
         /** Get the file */

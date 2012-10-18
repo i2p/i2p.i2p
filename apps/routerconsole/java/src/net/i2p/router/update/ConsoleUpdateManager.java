@@ -75,6 +75,8 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     private static final long DEFAULT_MAX_TIME = 3*60*60*1000L;
     private static final long DEFAULT_CHECK_TIME = 60*1000;
+    private static final long STATUS_CLEAN_TIME = 20*60*1000;
+    private static final long TASK_CLEANER_TIME = 15*60*1000;
 
     public ConsoleUpdateManager(RouterContext ctx) {
         _context = ctx;
@@ -124,6 +126,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         register((Checker)puh, PLUGIN_INSTALL, HTTP, 0);
         register((Updater)puh, PLUGIN_INSTALL, HTTP, 0);
         new NewsTimerTask(_context);
+        _context.simpleScheduler().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
     }
 
     public void shutdown() {
@@ -167,8 +170,11 @@ public class ConsoleUpdateManager implements UpdateManager {
                 UpdateTask t;
                 synchronized(_activeCheckers) {
                     t = r.checker.check(type, r.method, id, current, maxWait);
-                    if (t != null)
+                    if (t != null) {
+                         if (_log.shouldLog(Log.INFO))
+                             _log.info("Starting " + r);
                         _activeCheckers.add(t);
+                    }
                 }
                 if (t != null) {
                     synchronized(t) {
@@ -198,7 +204,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     public void check(UpdateType type, String id) {
         if (isCheckInProgress(type, id)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Check or update already in progress for: " + type + ' ' + id);
+                _log.warn("Check already in progress for: " + type + ' ' + id);
             return;
         }
         for (RegisteredChecker r : _registeredCheckers) {
@@ -207,6 +213,8 @@ public class ConsoleUpdateManager implements UpdateManager {
                 synchronized(_activeCheckers) {
                     UpdateTask t = r.checker.check(type, r.method, id, current, DEFAULT_CHECK_TIME);
                     if (t != null) {
+                         if (_log.shouldLog(Log.INFO))
+                             _log.info("Starting " + r);
                         _activeCheckers.add(t);
                         break;
                     }
@@ -489,6 +497,8 @@ public class ConsoleUpdateManager implements UpdateManager {
                     if (t != null) {
                         // race window here
                         //  store the remaining ones for retrying
+                         if (_log.shouldLog(Log.INFO))
+                             _log.info("Starting " + r);
                         _downloaders.put(t, toTry);
                         return t;
                     }
@@ -624,7 +634,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      */
     public void notifyCheckComplete(UpdateTask task, boolean newer, boolean success) {
         if (_log.shouldLog(Log.INFO))
-            _log.info(task.toString() + " complete");
+            _log.info("Checker " + task + " for " + task.getType() + " complete");
         synchronized(_activeCheckers) {
             _activeCheckers.remove(task);
         }
@@ -688,7 +698,8 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  @param t may be null
      */
     public void notifyAttemptFailed(UpdateTask task, String reason, Throwable t) {
-        _log.warn("Attempt failed " + task + ": " + reason, t);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Attempt failed " + task + " for " + task.getType() + ": " + reason, t);
     }
 
     /**
@@ -697,7 +708,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      */
     public void notifyTaskFailed(UpdateTask task, String reason, Throwable t) {
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Failed " + task + ": " + reason, t);
+            _log.warn("Failed " + task + " for " + task.getType() + ": " + reason, t);
         List<RegisteredUpdater> toTry = _downloaders.get(task);
         if (toTry != null) {
             UpdateItem ui = new UpdateItem(task.getType(), task.getID());
@@ -711,6 +722,7 @@ public class ConsoleUpdateManager implements UpdateManager {
             }
         }
         _downloaders.remove(task);
+        _activeCheckers.remove(task);
 ///// for certain types only
         finishStatus("<b>" + _("Transfer failed from {0}", linkify(task.getURI().toString())) + "</b>");
     }
@@ -729,7 +741,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      */
     public boolean notifyComplete(UpdateTask task, String actualVersion, File file) {
         if (_log.shouldLog(Log.INFO))
-            _log.info(task.toString() + " complete");
+            _log.info("Updater " + task + " for " + task.getType() + " complete");
         boolean rv = false;
         switch (task.getType()) {
             case TYPE_DUMMY:
@@ -1004,17 +1016,47 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     private void finishStatus(String msg) {
         updateStatus(msg);
-        _context.simpleScheduler().addEvent(new Cleaner(msg), 20*60*1000);
+        _context.simpleScheduler().addEvent(new StatusCleaner(msg), STATUS_CLEAN_TIME);
     }
 
-    private class Cleaner implements SimpleTimer.TimedEvent {
+    private class StatusCleaner implements SimpleTimer.TimedEvent {
         private final String _msg;
-        public Cleaner(String msg) {
+        public StatusCleaner(String msg) {
             _msg = msg;
         }
         public void timeReached() {
             if (_msg.equals(getStatus()))
                 updateStatus("");
+        }
+    }
+
+    /**
+     *  Failsafe
+     */
+    private class TaskCleaner implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (!_activeCheckers.isEmpty()) {
+                synchronized(_activeCheckers) {
+                    for (Iterator<UpdateTask> iter = _activeCheckers.iterator(); iter.hasNext(); ) {
+                        UpdateTask t = iter.next();
+                        if (!t.isRunning()) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Failsafe remove checker " + t);
+                            iter.remove();
+                        }
+                    }
+                }
+            }
+            if (!_downloaders.isEmpty()) {
+                for (Iterator<UpdateTask> iter = _downloaders.keySet().iterator(); iter.hasNext(); ) {
+                    UpdateTask t = iter.next();
+                    if (!t.isRunning()) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Failsafe remove downloader " + t);
+                        iter.remove();
+                    }
+                }
+            }
         }
     }
 

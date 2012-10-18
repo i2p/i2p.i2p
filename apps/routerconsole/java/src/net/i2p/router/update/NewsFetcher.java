@@ -37,6 +37,9 @@ class NewsFetcher extends UpdateRunner {
     private String _lastModified;
     private final File _newsFile;
     private final File _tempFile;
+    /** is the news newer */
+    private boolean _isNewer;
+    private boolean _success;
 
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
     
@@ -65,8 +68,14 @@ class NewsFetcher extends UpdateRunner {
     }
     
     @Override
-    public void update() {
-        fetchNews();
+    public void run() {
+        _isRunning = true;
+        try {
+            fetchNews();
+        } finally {
+            _mgr.notifyCheckComplete(this, _isNewer, _success);
+            _isRunning = false;
+        }
     }
 
     public void fetchNews() {
@@ -93,8 +102,9 @@ class NewsFetcher extends UpdateRunner {
                     if (lastMod != null) {
                         _lastModified = lastMod;
                         long lm = RFC822Date.parse822Date(lastMod);
-                        if (lm > 0)
-                            _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED, Long.toString(lm));
+                        if (lm == 0)
+                            lm = _context.clock().now();
+                        _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED, Long.toString(lm));
                     }
                     return;
                 }
@@ -106,8 +116,6 @@ class NewsFetcher extends UpdateRunner {
     
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
     private static final String VERSION_PREFIX = "version=\"";
-
-///// move to UpdateManager?
 
     /**
      *  Parse the installed (not the temp) news file for the latest version.
@@ -181,6 +189,7 @@ class NewsFetcher extends UpdateRunner {
                 _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATED, newVer);
                 _mgr.notifyVersionAvailable(this, _currentURI, NEWS, "", HTTP,
                                             null, newVer, "");
+                _isNewer = true;
                 checkForUpdates();
             } else {
                 if (_log.shouldLog(Log.ERROR))
@@ -190,6 +199,7 @@ class NewsFetcher extends UpdateRunner {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
+        _success = true;
     }
 
     /** override to prevent status update */

@@ -20,15 +20,15 @@ public class NewsHelper extends ContentHelper {
     public static final String PROP_LAST_UPDATE_TIME = "router.updateLastDownloaded";
     /** @since 0.8.12 */
     private static final String PROP_LAST_HIDDEN = "routerconsole.newsLastHidden";
-    /** @since 0.9.2 */
+    /** @since 0.9.4 */
     public static final String PROP_LAST_CHECKED = "routerconsole.newsLastChecked";
-    /** @since 0.9.2 */
+    /** @since 0.9.4 */
     public static final String PROP_LAST_UPDATED = "routerconsole.newsLastUpdated";
     public static final String NEWS_FILE = "docs/news.xml";
 
     /**
      *  If ANY update is in progress.
-     *  @since 0.9.2 was stored in system properties
+     *  @since 0.9.4 was stored in system properties
      */
     public static boolean isAnyUpdateInProgress() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -39,7 +39,7 @@ public class NewsHelper extends ContentHelper {
     /**
      *  If a signed or unsigned router update is in progress.
      *  Does NOT cover plugins, news, etc.
-     *  @since 0.9.2 was stored in system properties
+     *  @since 0.9.4 was stored in system properties
      */
     public static boolean isUpdateInProgress() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -50,7 +50,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean isUpdateAvailable() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -60,7 +60,7 @@ public class NewsHelper extends ContentHelper {
 
     /**
      *  @return null if none
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public static String updateVersion() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -69,7 +69,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean isUnsignedUpdateAvailable() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -79,7 +79,7 @@ public class NewsHelper extends ContentHelper {
 
     /**
      *  @return null if none
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public static String unsignedUpdateVersion() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -97,7 +97,7 @@ public class NewsHelper extends ContentHelper {
 
     /**
      *  @return "" if none
-     *  @since 0.9.2 moved from UpdateHelper
+     *  @since 0.9.4 moved from UpdateHelper
      */
     public static String getUpdateStatus() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
@@ -122,19 +122,13 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public static boolean shouldShowNews(RouterContext ctx) {
          long lastUpdated = lastUpdated(ctx);
         if (lastUpdated <= 0)
             return true;
-        String h = ctx.getProperty(PROP_LAST_HIDDEN);
-        if (h == null)
-            return true;
-        long last = 0;
-        try {
-            last = Long.parseLong(h);
-        } catch (NumberFormatException nfe) {}
+        long last = ctx.getProperty(PROP_LAST_HIDDEN, 0L);
         return lastUpdated > last;
     }
 
@@ -148,18 +142,16 @@ public class NewsHelper extends ContentHelper {
 
     /**
      *  Save config with the timestamp of the current news to hide, or 0 to show
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public static void showNews(RouterContext ctx, boolean yes) {
-         long lastUpdated = 0;
-/////// FIME from props, or from last mod time?
-        long stamp = yes ? 0 : lastUpdated;
+        long stamp = yes ? 0 : lastUpdated(ctx);
         ctx.router().saveConfig(PROP_LAST_HIDDEN, Long.toString(stamp));
     }
 
     /**
      *  @return HTML
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public String status() {
         return status(_context);
@@ -167,7 +159,7 @@ public class NewsHelper extends ContentHelper {
 
     /**
      *  @return HTML
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public static String status(RouterContext ctx) {
          StringBuilder buf = new StringBuilder(128);
@@ -202,7 +194,7 @@ public class NewsHelper extends ContentHelper {
     }
     
     /**
-     *  @since 0.9.2 moved from NewsFetcher
+     *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean dontInstall(RouterContext ctx) {
         File test = new File(ctx.getBaseDir(), "history.txt");
@@ -212,31 +204,22 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public static long lastChecked(RouterContext ctx) {
-        String lc = ctx.getProperty(PROP_LAST_CHECKED);
-        if (lc == null) {
-            try {
-                return Long.parseLong(lc);
-            } catch (NumberFormatException nfe) {}
-        }
-        return 0;
+        return ctx.getProperty(PROP_LAST_CHECKED, 0L);
     }
 
     /**
      *  When the news was last downloaded
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public static long lastUpdated(RouterContext ctx) {
-        String lc = ctx.getProperty(PROP_LAST_UPDATED);
-        if (lc == null) {
-            try {
-                return Long.parseLong(lc);
-            } catch (NumberFormatException nfe) {}
-        }
+        long rv = ctx.getProperty(PROP_LAST_UPDATED, 0L);
+        if (rv > 0)
+            return rv;
         File newsFile = new File(ctx.getRouterDir(), NEWS_FILE);
-        long rv = newsFile.lastModified();
+        rv = newsFile.lastModified();
         ctx.router().saveConfig(PROP_LAST_UPDATED, Long.toString(rv));
         return rv;
     }

@@ -8,10 +8,14 @@ import java.util.List;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigUpdateHelper;
 import net.i2p.update.*;
+import static net.i2p.update.UpdateType.*;
+import static net.i2p.update.UpdateMethod.*;
 
 /**
  * Task to periodically look for updates to the news.xml, and to keep
  * track of whether that has an announcement for a new version.
+ *
+ * Overrides UpdateRunner for convenience, this is not an Updater
  *
  * @since 0.9.4 moved from NewsFetcher
  */
@@ -31,8 +35,8 @@ class NewsHandler extends UpdateHandler implements Checker {
      */
     public UpdateTask check(UpdateType type, UpdateMethod method,
                             String id, String currentVersion, long maxTime) {
-        if ((type != UpdateType.ROUTER_SIGNED && type != UpdateType.ROUTER_SIGNED_PACK200 && type != UpdateType.NEWS) ||
-            method != UpdateMethod.HTTP)
+        if ((type != ROUTER_SIGNED && type != ROUTER_SIGNED_PACK200 && type != NEWS) ||
+            method != HTTP)
             return null;
         List<URI> updateSources = new ArrayList(2);
         try {

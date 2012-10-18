@@ -46,9 +46,9 @@ class UnsignedUpdateChecker extends UpdateRunner {
         try {
             success = fetchUnsignedHead();
         } finally {
+            _mgr.notifyCheckComplete(this, _unsignedUpdateAvailable, success);
             _isRunning = false;
         }
-        _mgr.notifyCheckComplete(this, _unsignedUpdateAvailable, success);
     }
 
 

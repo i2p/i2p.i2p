@@ -9,6 +9,7 @@ public enum UpdateMethod {
     METHOD_DUMMY,
     HTTP,              // .i2p or via outproxy
     HTTP_CLEARNET,     // direct non-.i2p
+    HTTPS_CLEARNET,    // direct non-.i2p
     TORRENT,
     GNUTELLA, IMULE, TAHOE_LAFS,
     DEBIAN

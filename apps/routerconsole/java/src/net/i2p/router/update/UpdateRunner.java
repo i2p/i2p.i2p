@@ -83,6 +83,8 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         _isRunning = true;
         try {
             update();
+        } catch (Throwable t) {
+            _mgr.notifyTaskFailed(this, "", t);
         } finally {
             _isRunning = false;
         }
@@ -207,6 +209,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         _log.error("Update from " + url + " did not download completely (" +
                            bytesRemaining + " remaining after " + currentAttempt + " tries)");
         updateStatus("<b>" + _("Transfer failed from {0}", linkify(url)) + "</b>");
+        _mgr.notifyTaskFailed(this, "", null);
     }
 
     public void headerReceived(String url, int attemptNum, String key, String val) {}

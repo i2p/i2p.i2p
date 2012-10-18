@@ -101,10 +101,14 @@ public class ConfigUpdateHandler extends FormHandler {
                 addFormError("Update manager not registered, cannot check");
                 return;
             }
-            boolean a1 = mgr.checkAvailable(NEWS, 60*1000) != null;
+            if (mgr.isUpdateInProgress() || mgr.isCheckInProgress()) {
+                addFormError(_("Update or check already in progress"));
+                return;
+            }
+            boolean a1 = mgr.checkAvailable(NEWS, 30*1000) != null;
             boolean a2 = false;
             if ((!a1) && _updateUnsigned && _zipURL != null && _zipURL.length() > 0)
-                a2 = mgr.checkAvailable(ROUTER_UNSIGNED, 60*1000) != null;
+                a2 = mgr.checkAvailable(ROUTER_UNSIGNED, 30*1000) != null;
             if (a1 || a2) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice(_("Update available, attempting to download now"));

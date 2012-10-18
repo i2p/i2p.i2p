@@ -43,9 +43,18 @@ class PluginUpdateChecker extends UpdateRunner {
         _oldVersion = oldVersion;
     }
 
-
     @Override
     public UpdateType getType() { return UpdateType.PLUGIN; }
+    
+    @Override
+    public void run() {
+        _isRunning = true;
+        try {
+            update();
+        } finally {
+            _isRunning = false;
+        }
+    }
 
         @Override
         protected void update() {

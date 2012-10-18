@@ -480,6 +480,26 @@ public class I2PAppContext {
     }
 
     /**
+     * Return a long with a long default
+     * @since 0.9.4
+     */
+    public long getProperty(String propName, long defaultVal) {
+        String val = null;
+        if (_overrideProps != null) {
+            val = _overrideProps.getProperty(propName);
+            if (val == null)
+                val = System.getProperty(propName);
+        }
+        long rv = defaultVal;
+        if (val != null) {
+            try {
+                rv = Long.parseLong(val);
+            } catch (NumberFormatException nfe) {}
+        }
+        return rv;
+    }
+
+    /**
      * Return a boolean with a boolean default
      * @since 0.7.12
      */
