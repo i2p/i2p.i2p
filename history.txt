@@ -1,3 +1,6 @@
+2012-10-19 zzz
+ * UDP: Fix peer test NPE (ticket # 748)
+
 2012-10-18 kytv
 * Portuguese and Spanish updates from Transifex
  * Update geoip.txt based on Maxmind GeoLite Country database from 2012-10-02

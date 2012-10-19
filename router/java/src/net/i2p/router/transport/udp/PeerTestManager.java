@@ -734,7 +734,13 @@ class PeerTestManager {
                 return;
             }
             UDPAddress addr = new UDPAddress(raddr);
-            SessionKey charlieIntroKey = new SessionKey(addr.getIntroKey());
+            byte[] ikey - addr.getIntroKey();
+            if (ikey == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to pick a charlie");
+                return;
+            }
+            SessionKey charlieIntroKey = new SessionKey(ikey);
             
             //UDPPacket packet = _packetBuilder.buildPeerTestToAlice(aliceIP, from.getPort(), aliceIntroKey, charlieIntroKey, nonce);
             //_transport.send(packet);
