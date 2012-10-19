@@ -2,21 +2,22 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susidns package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 #   <rutweiller@hotmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2012-07-16 23:58+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-19 07:45+0000\n"
 "PO-Revision-Date: 2012-10-17 23:34+0000\n"
 "Last-Translator: Ruthein <rutweiller@hotmail.com>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
+"Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/"
+"pt/)\n"
+"Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:130
@@ -45,8 +46,8 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:157
 #, java-format
 msgid ""
-"Host name \"{0}\" requires conversion to ASCII but the conversion library is"
-" unavailable in this JVM"
+"Host name \"{0}\" requires conversion to ASCII but the conversion library is "
+"unavailable in this JVM"
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:218
@@ -127,8 +128,8 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:240
 #, java-format
 msgid ""
-"Host name {0} is already in address book with a different destination. Click"
-" \"Replace\" to overwrite."
+"Host name {0} is already in address book with a different destination. Click "
+"\"Replace\" to overwrite."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:282
@@ -214,9 +215,11 @@ msgstr "ERROR: Could not write addressbook file."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
 msgid ""
-"Invalid form submission, probably because you used the \"back\" or "
-"\"reload\" button on your browser. Please resubmit."
-msgstr "Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit."
+"Invalid form submission, probably because you used the \"back\" or \"reload"
+"\" button on your browser. Please resubmit."
+msgstr ""
+"Invalid form submission, probably because you used the \"back\" or \"reload"
+"\" button on your browser. Please resubmit."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:139
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:103
@@ -262,7 +265,8 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:115
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
-msgstr "Subscriptions saved, updating addressbook from subscription sources now."
+msgstr ""
+"Subscriptions saved, updating addressbook from subscription sources now."
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:120
 msgid "Subscriptions saved."
@@ -438,14 +442,14 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:157
 msgid ""
 "File and directory paths here are relative to the addressbook's working "
-"directory, which is normally ~/.i2p/addressbook/ (Linux) or "
-"%APPDATA%\\I2P\\addressbook\\ (Windows)."
+"directory, which is normally ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P"
+"\\addressbook\\ (Windows)."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:159
 msgid ""
-"If you want to manually add lines to an addressbook, add them to the private"
-" or master addressbooks."
+"If you want to manually add lines to an addressbook, add them to the private "
+"or master addressbooks."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
@@ -458,7 +462,9 @@ msgstr ""
 msgid ""
 "When you publish your addressbook, ALL destinations from the master and "
 "router addressbooks appear there."
-msgstr "When you publish your addressbook, ALL destinations from the master and router addressbooks appear there."
+msgstr ""
+"When you publish your addressbook, ALL destinations from the master and "
+"router addressbooks appear there."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:163
 msgid ""
@@ -510,14 +516,14 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:185
 msgid ""
-"File containing the etags header from the fetched subscription URLs (no need"
-" to change)"
+"File containing the etags header from the fetched subscription URLs (no need "
+"to change)"
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:187
 msgid ""
-"File containing the modification timestamp for each fetched subscription URL"
-" (no need to change)"
+"File containing the modification timestamp for each fetched subscription URL "
+"(no need to change)"
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:189
@@ -608,20 +614,20 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:137
 msgid ""
-"In the default configuration, the address book is only subscribed to "
-"www.i2p2.i2p."
+"In the default configuration, the address book is only subscribed to www."
+"i2p2.i2p."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:138
 msgid ""
-"Subscribing to additional sites is easy, just add them to your <a "
-"href=\"subscriptions\">subscriptions</a> file."
+"Subscribing to additional sites is easy, just add them to your <a href="
+"\"subscriptions\">subscriptions</a> file."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
 msgid ""
-"For more information on naming in I2P, see <a "
-"href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>."
+"For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
+"naming.html\">the overview on www.i2p2.i2p</a>."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142
@@ -643,8 +649,7 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:146
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
-"address book, which will be publicly available if you are running an "
-"eepsite."
+"address book, which will be publicly available if you are running an eepsite."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:148
@@ -655,14 +660,14 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:149
 msgid ""
-"Hosts in the private address book can be accessed by you but their addresses"
-" are never distributed to others."
+"Hosts in the private address book can be accessed by you but their addresses "
+"are never distributed to others."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:150
 msgid ""
-"The private address book can also be used for aliases of hosts in your other"
-" address books."
+"The private address book can also be used for aliases of hosts in your other "
+"address books."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:111

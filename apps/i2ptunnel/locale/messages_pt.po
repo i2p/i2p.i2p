@@ -2,21 +2,22 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 #   <wicked@riseup.net>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2012-10-12 00:38+0000\n"
-"PO-Revision-Date: 2012-10-17 22:46+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-19 07:45+0000\n"
+"PO-Revision-Date: 2012-10-18 23:41+0000\n"
 "Last-Translator: wicked <wicked@riseup.net>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
+"Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/"
+"pt/)\n"
+"Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:554
@@ -30,10 +31,13 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:621
 #, java-format
 msgid ""
-"To visit the destination in your host database, click <a "
-"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
-"click <a href=\"{1}\">here</a>."
-msgstr "Para visitar o destino da sua base de dados, clique <a href=\"{0}\">aqui</a>. Para visitar o endereço de ajuda do conflito, clique <a href=\"{1}\">aqui</a>."
+"To visit the destination in your host database, click <a href=\"{0}\">here</"
+"a>. To visit the conflicting addresshelper destination, click <a href="
+"\"{1}\">here</a>."
+msgstr ""
+"Para visitar o destino da sua base de dados, clique <a href=\"{0}\">aqui</"
+"a>. Para visitar o endereço de ajuda do conflito, clique <a href="
+"\"{1}\">aqui</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1023
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:403
@@ -79,9 +83,10 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1216
 msgid ""
-"Click a link below to look for an address helper by using a \"jump\" "
-"service:"
-msgstr "Clique no link abaixo para procurar um ajudante de endereços usando um serviço \"jump\":"
+"Click a link below to look for an address helper by using a \"jump\" service:"
+msgstr ""
+"Clique no link abaixo para procurar um ajudante de endereços usando um "
+"serviço \"jump\":"
 
 #. Translators: parameter is a host name
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1252
@@ -137,7 +142,9 @@ msgstr "interno"
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr "Envio de formulário inválido, provavelmente porque você usou o 'voltar' ou 'recarregar' no seu navegador. Por favor reenvie."
+msgstr ""
+"Envio de formulário inválido, provavelmente porque você usou o 'voltar' ou "
+"'recarregar' no seu navegador. Por favor reenvie."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:222
 msgid "Configuration reloaded for all tunnels"
@@ -328,7 +335,9 @@ msgstr "Cliente Partilhado"
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr "(Compartilhe túneis com outros clientes e IRC / httpclients? Mudança requer a reinicialização do proxy do cliente)"
+msgstr ""
+"(Compartilhe túneis com outros clientes e IRC / httpclients? Mudança requer "
+"a reinicialização do proxy do cliente)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:225
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:135
@@ -356,7 +365,9 @@ msgstr "Opções avançadas da rede"
 msgid ""
 "(NOTE: when this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!)"
-msgstr "(NOTA: quando esse cliente proxy é configurado para partilhar túneis, então, essas opções são para todos os clientes proxy compartilhados!)"
+msgstr ""
+"(NOTA: quando esse cliente proxy é configurado para partilhar túneis, então, "
+"essas opções são para todos os clientes proxy compartilhados!)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:245
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:255
@@ -391,54 +402,58 @@ msgstr "3 túneis de salto (muito alto anonimato, muito alta latência)"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:274
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:284
 msgid "hop tunnel (very poor performance)"
-msgstr ""
+msgstr "túnel de salto (muito baixa performance)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:279
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
 msgid "Variance"
-msgstr ""
+msgstr "Variação"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:286
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:296
 msgid "0 hop variance (no randomisation, consistant performance)"
-msgstr ""
+msgstr "0 variações de salto (sem randomização, performance constante)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:290
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:300
 msgid ""
 "+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
 msgstr ""
+"+ 0-1 variações de salto (randomização aditivada media, performance "
+"subtraída)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:294
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:304
 msgid ""
 "+ 0-2 hop variance (high additive randomisation, subtractive performance)"
 msgstr ""
+"+ 0-2 variações de salto (randomização aditivada alta, performance subtraída)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:298
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:308
 msgid "+/- 0-1 hop variance (standard randomisation, standard performance)"
-msgstr ""
+msgstr "+/- 0-1 variações de salto (randomização padrão, performance padrão)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:302
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:312
 msgid "+/- 0-2 hop variance (not recommended)"
-msgstr ""
+msgstr "+/- 0-2 variações de salto (não recomendado)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:313
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:323
 msgid "hop variance"
-msgstr ""
+msgstr "variação de salto"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:318
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:328
 msgid "Count"
-msgstr ""
+msgstr "Contar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:325
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:335
 msgid "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
 msgstr ""
+"1 entrada, 1 túnel de saída  (baixo uso de largura de banda, menor confiança)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:329
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:339
@@ -446,22 +461,25 @@ msgid ""
 "2 inbound, 2 outbound tunnels (standard bandwidth usage, standard "
 "reliability)"
 msgstr ""
+"2 entrada, 2 túneis de saída  (uso de largura de banda padrão, confiança "
+"padrão)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:333
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:343
 msgid ""
 "3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
 msgstr ""
+"3 entrada, 3 túneis de saída  (uso de largura de banda alto, alta confiança)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:341
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:351
 msgid "tunnels"
-msgstr ""
+msgstr "túneis"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:346
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:356
 msgid "Backup Count"
-msgstr ""
+msgstr "Contagem de Backups"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:353
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:363
@@ -938,20 +956,20 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:189
 msgid ""
-"This wizard will take you through the various options available for creating"
-" tunnels in I2P."
+"This wizard will take you through the various options available for creating "
+"tunnels in I2P."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:191
 msgid ""
-"The first thing to decide is whether you want to create a server or a client"
-" tunnel."
+"The first thing to decide is whether you want to create a server or a client "
+"tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
-"If you need to connect to a remote service, such as an IRC server inside I2P"
-" or a code repository, then you will require a CLIENT tunnel."
+"If you need to connect to a remote service, such as an IRC server inside I2P "
+"or a code repository, then you will require a CLIENT tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
@@ -990,8 +1008,8 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
-"\"http_proxy\" environment variable for command-line applications in "
-"GNU/Linux."
+"\"http_proxy\" environment variable for command-line applications in GNU/"
+"Linux."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
