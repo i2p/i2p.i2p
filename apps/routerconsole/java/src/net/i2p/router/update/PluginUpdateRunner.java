@@ -53,8 +53,9 @@ class PluginUpdateRunner extends UpdateRunner {
     private static final String ZIP = XPI2P + ".zip";
     public static final String PLUGIN_DIR = PluginStarter.PLUGIN_DIR;
 
-    public PluginUpdateRunner(RouterContext ctx, List<URI> uris, String appName, String oldVersion ) { 
-        super(ctx, uris);
+    public PluginUpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris,
+                              String appName, String oldVersion ) { 
+        super(ctx, mgr, uris);
         if (uris.isEmpty())
             _uri = null;
         else

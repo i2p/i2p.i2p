@@ -31,9 +31,27 @@ import net.i2p.util.Log;
  */
 class UnsignedUpdateHandler implements Checker, Updater {
     private final RouterContext _context;
+    private final ConsoleUpdateManager _mgr;
 
-    public UnsignedUpdateHandler(RouterContext ctx) {
+    public UnsignedUpdateHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         _context = ctx;
+        _mgr = mgr;
+    }
+
+    /**
+     *  @return null if none
+     *  @since 0.9.4
+     */
+    public List<URI> getUpdateSources() {
+        String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
+        if (url == null)
+            return null;
+
+        try {
+            return Collections.singletonList(new URI(url));
+        } catch (URISyntaxException use) {
+            return null;
+        }
     }
 
     /**
@@ -45,16 +63,9 @@ class UnsignedUpdateHandler implements Checker, Updater {
         if (type != UpdateType.ROUTER_UNSIGNED || method != UpdateMethod.HTTP)
             return null;
 
-        String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
-        if (url == null)
+        List<URI> updateSources = getUpdateSources();
+        if (updateSources == null)
             return null;
-
-        List<URI> updateSources;
-        try {
-            updateSources = Collections.singletonList(new URI(url));
-        } catch (URISyntaxException use) {
-            return null;
-        }
 
         long ms = _context.getProperty(NewsHelper.PROP_LAST_UPDATE_TIME, 0L);
         if (ms <= 0) {
@@ -65,7 +76,7 @@ class UnsignedUpdateHandler implements Checker, Updater {
             return null;
         }
 
-        UpdateRunner update = new UnsignedUpdateChecker(_context, updateSources, ms);
+        UpdateRunner update = new UnsignedUpdateChecker(_context, _mgr, updateSources, ms);
         update.start();
         return update;
     }
@@ -83,7 +94,9 @@ class UnsignedUpdateHandler implements Checker, Updater {
                              String id, String newVersion, long maxTime) {
         if (type != ROUTER_UNSIGNED || method != HTTP || updateSources.isEmpty())
             return null;
-        UpdateRunner update = new UnsignedUpdateRunner(_context, updateSources);
+        UpdateRunner update = new UnsignedUpdateRunner(_context, _mgr, updateSources);
+        // set status before thread to ensure UI feedback
+        _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
         update.start();
         return update;
     }

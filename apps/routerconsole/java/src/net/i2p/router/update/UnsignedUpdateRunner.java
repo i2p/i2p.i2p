@@ -24,8 +24,8 @@ import net.i2p.util.Log;
  */
 class UnsignedUpdateRunner extends UpdateRunner {
 
-    public UnsignedUpdateRunner(RouterContext ctx, List<URI> uris) { 
-        super(ctx, uris);
+    public UnsignedUpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
+        super(ctx, mgr, uris);
         if (!uris.isEmpty())
             _currentURI = uris.get(0);
     }
@@ -39,7 +39,6 @@ class UnsignedUpdateRunner extends UpdateRunner {
         @Override
         protected void update() {
             String zipURL = _currentURI.toString();
-            updateStatus("<b>" + _("Updating") + "</b>");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Starting unsigned update URL: " + zipURL);
             // always proxy for now

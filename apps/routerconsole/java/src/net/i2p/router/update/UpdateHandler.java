@@ -38,9 +38,11 @@ import net.i2p.util.VersionComparator;
  */
 class UpdateHandler implements Updater {
     protected final RouterContext _context;
+    protected final ConsoleUpdateManager _mgr;
     
-    public UpdateHandler(RouterContext ctx) {
+    public UpdateHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         _context = ctx;
+        _mgr = mgr;
     }
     
     /**
@@ -56,7 +58,9 @@ class UpdateHandler implements Updater {
         if ((type != UpdateType.ROUTER_SIGNED && type != UpdateType.ROUTER_SIGNED_PACK200) ||
             method != UpdateMethod.HTTP || updateSources.isEmpty())
             return null;
-        UpdateRunner update = new UpdateRunner(_context, updateSources);
+        UpdateRunner update = new UpdateRunner(_context, _mgr, updateSources);
+        // set status before thread to ensure UI feedback
+        _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
         update.start();
         return update;
     }

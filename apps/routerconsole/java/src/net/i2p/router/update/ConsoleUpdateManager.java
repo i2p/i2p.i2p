@@ -5,7 +5,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,6 +76,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     private static final long DEFAULT_CHECK_TIME = 60*1000;
     private static final long STATUS_CLEAN_TIME = 20*60*1000;
     private static final long TASK_CLEANER_TIME = 15*60*1000;
+    private static final String PROP_UNSIGNED_AVAILABLE = "router.updateUnsignedAvailable";
 
     public ConsoleUpdateManager(RouterContext ctx) {
         _context = ctx;
@@ -99,7 +99,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         notifyInstalled(NEWS, "", Long.toString(NewsHelper.lastUpdated(_context)));
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
         // hack to init from the current news file... do this before we register Updaters
-        (new NewsFetcher(_context, Collections.EMPTY_LIST)).checkForUpdates();
+        (new NewsFetcher(_context, this, Collections.EMPTY_LIST)).checkForUpdates();
         for (String plugin : PluginStarter.getPlugins()) {
             Properties props = PluginStarter.pluginProperties(_context, plugin);
             String ver = props.getProperty("version");
@@ -108,24 +108,32 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
 
         _context.registerUpdateManager(this);
-        DummyHandler dh = new DummyHandler(_context);
+        DummyHandler dh = new DummyHandler(_context, this);
         register((Checker)dh, TYPE_DUMMY, HTTP, 0);
         register((Updater)dh, TYPE_DUMMY, HTTP, 0);
         // register news before router, so we don't fire off an update
         // right at instantiation if the news is already indicating a new version
-        Checker c = new NewsHandler(_context);
+        Checker c = new NewsHandler(_context, this);
         register(c, NEWS, HTTP, 0);
         register(c, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
-        Updater u = new UpdateHandler(_context);
+        Updater u = new UpdateHandler(_context, this);
         register(u, ROUTER_SIGNED, HTTP, 0);
-        UnsignedUpdateHandler uuh = new UnsignedUpdateHandler(_context);
+        UnsignedUpdateHandler uuh = new UnsignedUpdateHandler(_context, this);
         register((Checker)uuh, ROUTER_UNSIGNED, HTTP, 0);
         register((Updater)uuh, ROUTER_UNSIGNED, HTTP, 0);
-        PluginUpdateHandler puh = new PluginUpdateHandler(_context);
+        String newVersion = _context.getProperty(PROP_UNSIGNED_AVAILABLE);
+        if (newVersion != null) {
+            List<URI> updateSources = uuh.getUpdateSources();
+            if (uuh != null) {
+                VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                _available.put(new UpdateItem(ROUTER_UNSIGNED, ""), newVA);
+            }
+        }
+        PluginUpdateHandler puh = new PluginUpdateHandler(_context, this);
         register((Checker)puh, PLUGIN, HTTP, 0);
         register((Checker)puh, PLUGIN_INSTALL, HTTP, 0);
         register((Updater)puh, PLUGIN_INSTALL, HTTP, 0);
-        new NewsTimerTask(_context);
+        new NewsTimerTask(_context, this);
         _context.simpleScheduler().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
     }
 
@@ -605,9 +613,13 @@ public class ConsoleUpdateManager implements UpdateManager {
             case NEWS:
                 break;
 
+            case ROUTER_UNSIGNED:
+                // save across restarts
+                _context.router().saveConfig(PROP_UNSIGNED_AVAILABLE, newVersion);
+                // fall through
+
             case ROUTER_SIGNED:
             case ROUTER_SIGNED_PACK200:
-            case ROUTER_UNSIGNED:
                 if (shouldInstall() &&
                     !(isUpdateInProgress(ROUTER_SIGNED) ||
                       isUpdateInProgress(ROUTER_SIGNED_PACK200) ||
@@ -758,8 +770,10 @@ public class ConsoleUpdateManager implements UpdateManager {
 
             case ROUTER_UNSIGNED:
                 rv = handleUnsignedFile(task.getURI(), actualVersion, file);
-                if (rv)
+                if (rv) {
+                    _context.router().saveConfig(PROP_UNSIGNED_AVAILABLE, null);
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
+                }
                 break;
 
             case PLUGIN:
@@ -887,6 +901,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     }
 
     /**
+     *
      *  @return success
      */
     private boolean handleSudFile(URI uri, String actualVersion, File f) {
@@ -911,16 +926,8 @@ public class ConsoleUpdateManager implements UpdateManager {
                 restart();
             } else {
                 _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
-                StringBuilder buf = new StringBuilder(64);
-                buf.append("<b>").append(_("Update downloaded")).append("<br>");
-                if (_context.hasWrapper())
-                    buf.append(_("Click Restart to install"));
-                else
-                    buf.append(_("Click Shutdown and restart to install"));
-                if (up.newVersion() != null)
-                    buf.append(' ').append(_("Version {0}", up.newVersion()));
-                buf.append("</b>");
-                updateStatus(buf.toString());
+                // SummaryHelper will display restart info separately
+                updateStatus("");
             }
         } else {
             _log.log(Log.CRIT, err + " from " + url);
@@ -963,15 +970,8 @@ public class ConsoleUpdateManager implements UpdateManager {
                 restart();
             } else {
                 _log.log(Log.CRIT, "Update was downloaded, will be installed at next restart");
-                StringBuilder buf = new StringBuilder(64);
-                buf.append("<b>").append(_("Update downloaded")).append("</b><br>");
-                if (_context.hasWrapper())
-                    buf.append(_("Click Restart to install"));
-                else
-                    buf.append(_("Click Shutdown and restart to install"));
-                String ver = (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
-                buf.append(' ').append(_("Version {0}", ver));
-                updateStatus(buf.toString());
+                // SummaryHelper will display restart info separately
+                updateStatus("");
             }
         } else {
             _log.log(Log.CRIT, "Failed copy to " + to);
@@ -999,14 +999,14 @@ public class ConsoleUpdateManager implements UpdateManager {
     }
 
     /** translate a string */
-    private String _(String s) {
+    public String _(String s) {
         return Messages.getString(s, _context);
     }
 
     /**
      *  translate a string with a parameter
      */
-    private String _(String s, Object o) {
+    public String _(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 

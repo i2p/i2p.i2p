@@ -49,12 +49,12 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
     protected static final long NOPROXY_INACTIVITY_TIMEOUT = 60*1000;
 
-    public UpdateRunner(RouterContext ctx, List<URI> uris) { 
+    public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
         super("Update Runner");
         setDaemon(true);
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
-        _mgr = (ConsoleUpdateManager) ctx.updateManager();
+        _mgr = mgr;
         _urls = uris;
         _updateFile = (new File(ctx.getTempDir(), "update" + ctx.random().nextInt() + ".tmp")).getAbsolutePath();
     }
@@ -226,13 +226,13 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
 
     /** translate a string */
     protected String _(String s) {
-        return Messages.getString(s, _context);
+        return _mgr._(s);
     }
 
     /**
      *  translate a string with a parameter
      */
     protected String _(String s, Object o) {
-        return Messages.getString(s, o, _context);
+        return _mgr._(s, o);
     }
 }

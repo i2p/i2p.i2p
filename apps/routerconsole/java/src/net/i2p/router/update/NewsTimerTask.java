@@ -43,10 +43,10 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
     private static final long INITIAL_DELAY = 5*60*1000;
     private static final long RUN_DELAY = 10*60*1000;
 
-    public NewsTimerTask(RouterContext ctx) {
+    public NewsTimerTask(RouterContext ctx, ConsoleUpdateManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsTimerTask.class);
-        _mgr = (ConsoleUpdateManager) _context.updateManager();
+        _mgr = mgr;
         ctx.simpleScheduler().addPeriodicEvent(this,
                                              INITIAL_DELAY + _context.random().nextLong(INITIAL_DELAY),
                                              RUN_DELAY);

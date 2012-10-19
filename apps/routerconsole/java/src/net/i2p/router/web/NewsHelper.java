@@ -50,6 +50,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Will be false if already downloaded
      *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean isUpdateAvailable() {
@@ -59,6 +60,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Available version, will be null if already downloaded
      *  @return null if none
      *  @since 0.9.4 moved from NewsFetcher
      */
@@ -69,6 +71,18 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Already downloaded but not installed version
+     *  @return null if none
+     *  @since 0.9.4
+     */
+    public static String updateVersionDownloaded() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateDownloaded(ROUTER_SIGNED);
+    }
+
+    /**
+     *  Will be false if already downloaded
      *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean isUnsignedUpdateAvailable() {
@@ -84,11 +98,30 @@ public class NewsHelper extends ContentHelper {
     public static String unsignedUpdateVersion() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return null;
-        String ver = mgr.getUpdateAvailable(ROUTER_UNSIGNED);
+        return formatUnsignedVersion(mgr.getUpdateAvailable(ROUTER_UNSIGNED));
+    }
+
+    /**
+     *  Already downloaded but not installed version
+     *  @return null if none
+     *  @since 0.9.4
+     */
+    public static String unsignedVersionDownloaded() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return formatUnsignedVersion(mgr.getUpdateDownloaded(ROUTER_UNSIGNED));
+    }
+
+    /**
+     *  Convert long date stamp to
+     *  '07-Jul 21:09 UTC' with month name in the system locale
+     *  @return null if ver = null
+     *  @since 0.9.4 moved from NewsFetcher
+     */
+    private static String formatUnsignedVersion(String ver) {
         if (ver != null) {
             try {
                 long modtime = Long.parseLong(ver);
-                // '07-Jul 21:09 UTC' with month name in the system locale
                 return (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
             } catch (NumberFormatException nfe) {}
         }

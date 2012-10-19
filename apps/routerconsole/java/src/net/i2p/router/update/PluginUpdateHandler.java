@@ -36,9 +36,11 @@ import net.i2p.util.VersionComparator;
  */
 class PluginUpdateHandler implements Checker, Updater {
     private final RouterContext _context;
+    private final ConsoleUpdateManager _mgr;
 
-    public PluginUpdateHandler(RouterContext ctx) {
+    public PluginUpdateHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         _context = ctx;
+        _mgr = mgr;
     }
     
     /** check a single plugin */
@@ -64,7 +66,7 @@ class PluginUpdateHandler implements Checker, Updater {
             return null;
         }
 
-        UpdateRunner update = new PluginUpdateChecker(_context, updateSources, appName, oldVersion);
+        UpdateRunner update = new PluginUpdateChecker(_context, _mgr, updateSources, appName, oldVersion);
         update.start();
         return update;
     }
@@ -84,7 +86,9 @@ class PluginUpdateHandler implements Checker, Updater {
             return null;
         }
 
-        UpdateRunner update = new PluginUpdateRunner(_context, updateSources, appName, oldVersion);
+        UpdateRunner update = new PluginUpdateRunner(_context, _mgr, updateSources, appName, oldVersion);
+        // set status before thread to ensure UI feedback
+        _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
         update.start();
         return update;
     }

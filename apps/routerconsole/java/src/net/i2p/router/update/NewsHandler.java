@@ -24,8 +24,8 @@ class NewsHandler extends UpdateHandler implements Checker {
     /** @since 0.7.14 not configurable */
     private static final String BACKUP_NEWS_URL = "http://www.i2p2.i2p/_static/news/news.xml";
 
-    public NewsHandler(RouterContext ctx) {
-        super(ctx);
+    public NewsHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
+        super(ctx, mgr);
     }
 
     /**
@@ -45,7 +45,7 @@ class NewsHandler extends UpdateHandler implements Checker {
         try {
             updateSources.add(new URI(BACKUP_NEWS_URL));
         } catch (URISyntaxException use) {}
-        UpdateRunner update = new NewsFetcher(_context, updateSources);
+        UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources);
         update.start();
         return update;
     }

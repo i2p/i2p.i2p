@@ -43,8 +43,8 @@ class NewsFetcher extends UpdateRunner {
 
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
     
-    public NewsFetcher(RouterContext ctx, List<URI> uris) { 
-        super(ctx, uris);
+    public NewsFetcher(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
+        super(ctx, mgr, uris);
         _newsFile = new File(ctx.getRouterDir(), NewsHelper.NEWS_FILE);
         _tempFile = new File(ctx.getTempDir(), "tmp-" + ctx.random().nextLong() + TEMP_NEWS_FILE);
         long lastMod = NewsHelper.lastChecked(ctx);

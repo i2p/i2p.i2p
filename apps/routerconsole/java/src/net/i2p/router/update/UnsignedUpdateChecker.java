@@ -27,8 +27,9 @@ class UnsignedUpdateChecker extends UpdateRunner {
 
     protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
-    public UnsignedUpdateChecker(RouterContext ctx, List<URI> uris, long lastUpdateTime) { 
-        super(ctx, uris);
+    public UnsignedUpdateChecker(RouterContext ctx, ConsoleUpdateManager mgr,
+                                 List<URI> uris, long lastUpdateTime) { 
+        super(ctx, mgr, uris);
         _ms = lastUpdateTime;
     }
 

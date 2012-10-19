@@ -14,9 +14,11 @@ import net.i2p.update.*;
  */
 class DummyHandler implements Checker, Updater {
     private final RouterContext _context;
+    private final ConsoleUpdateManager _mgr;
     
-    public DummyHandler(RouterContext ctx) {
+    public DummyHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         _context = ctx;
+        _mgr = mgr;
     }
 
     /**
@@ -26,7 +28,7 @@ class DummyHandler implements Checker, Updater {
                             String id, String currentVersion, long maxTime) {
         if (type != UpdateType.TYPE_DUMMY)
             return null;
-         return new DummyRunner(_context, maxTime);
+         return new DummyRunner(_context, _mgr, maxTime);
     }
 
     /**
@@ -36,7 +38,7 @@ class DummyHandler implements Checker, Updater {
                              String id, String newVersion, long maxTime) {
         if (type != UpdateType.TYPE_DUMMY)
             return null;
-         return new DummyRunner(_context, maxTime);
+         return new DummyRunner(_context, _mgr, maxTime);
     }
 
     /**
@@ -45,8 +47,8 @@ class DummyHandler implements Checker, Updater {
     private static class DummyRunner extends UpdateRunner {
         private final long _delay;
 
-        public DummyRunner(RouterContext ctx, long maxTime) {
-            super(ctx, Collections.EMPTY_LIST);
+        public DummyRunner(RouterContext ctx, ConsoleUpdateManager mgr, long maxTime) {
+            super(ctx, mgr, Collections.EMPTY_LIST);
             _delay = maxTime;
         }
 
@@ -58,11 +60,8 @@ class DummyHandler implements Checker, Updater {
             try {
                 Thread.sleep(_delay);
             } catch (InterruptedException ie) {}
-            UpdateManager mgr = _context.updateManager();
-            if (mgr != null) {
-                mgr.notifyCheckComplete(this, false, false);
-                mgr.notifyTaskFailed(this, "dummy", null);
-            }
+            _mgr.notifyCheckComplete(this, false, false);
+            _mgr.notifyTaskFailed(this, "dummy", null);
         }
     }
 }

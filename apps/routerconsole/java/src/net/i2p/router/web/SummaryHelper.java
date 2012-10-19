@@ -27,6 +27,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.PortMapper;
 
 /**
  * Simple helper to query the appropriate router for data necessary to render
@@ -627,19 +628,19 @@ public class SummaryHelper extends HelperBase {
     }
 ********/
 
-    public boolean updateAvailable() { 
+    private boolean updateAvailable() { 
         return NewsHelper.isUpdateAvailable();
     }
 
-    public boolean unsignedUpdateAvailable() { 
+    private boolean unsignedUpdateAvailable() { 
         return NewsHelper.isUnsignedUpdateAvailable();
     }
 
-    public String getUpdateVersion() { 
+    private String getUpdateVersion() { 
         return NewsHelper.updateVersion();
     }
 
-    public String getUnsignedUpdateVersion() { 
+    private String getUnsignedUpdateVersion() { 
         return NewsHelper.unsignedUpdateVersion();
     }
 
@@ -654,15 +655,26 @@ public class SummaryHelper extends HelperBase {
         if (status.length() > 0) {
             buf.append("<h4>").append(status).append("</h4>\n");
         }
-        if (updateAvailable() || unsignedUpdateAvailable()) {
-            if (NewsHelper.isUpdateInProgress()) {
-                // nothing
-            } else if(
-                      // isDone() is always false for now, see UpdateHandler
-                      // ((!update.isDone()) &&
-                      getAction() == null &&
-                      getUpdateNonce() == null &&
-                      ConfigRestartBean.getRestartTimeRemaining() > 12*60*1000) {
+        String dver = NewsHelper.updateVersionDownloaded();
+        if (dver == null)
+            dver = NewsHelper.unsignedVersionDownloaded();
+        if (dver != null &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress()) {
+            buf.append("<h4><b>").append(_("Update downloaded")).append("<br>");
+            if (_context.hasWrapper())
+                buf.append(_("Click Restart to install"));
+            else
+                buf.append(_("Click Shutdown and restart to install"));
+            buf.append(' ').append(_("Version {0}", dver));
+            buf.append("</b></h4>");
+        }
+        if ((updateAvailable() || unsignedUpdateAvailable()) &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress() &&
+            _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0 &&  // assume using proxy for now
+            getAction() == null &&
+            getUpdateNonce() == null) {
                 long nonce = _context.random().nextLong();
                 String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
                 if (prev != null)
@@ -686,7 +698,6 @@ public class SummaryHelper extends HelperBase {
                        .append("</button><br>\n");
                 }
                 buf.append("</form>\n");
-            }
         }
         return buf.toString();
     }

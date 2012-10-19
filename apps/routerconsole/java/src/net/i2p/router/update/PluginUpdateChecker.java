@@ -34,8 +34,9 @@ class PluginUpdateChecker extends UpdateRunner {
     private final String _appName;
     private final String _oldVersion;
 
-    public PluginUpdateChecker(RouterContext ctx, List<URI> uris, String appName, String oldVersion ) { 
-        super(ctx, uris);
+    public PluginUpdateChecker(RouterContext ctx, ConsoleUpdateManager mgr,
+                               List<URI> uris, String appName, String oldVersion ) { 
+        super(ctx, mgr, uris);
         _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
         if (!uris.isEmpty())
             _currentURI = uris.get(0);
