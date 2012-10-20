@@ -28,11 +28,7 @@ input.default {
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigUIHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
+<%@include file="formhandler.jsi" %>
 <div class="configure"><div class="topshimten"><h3><%=uihelper._("Router Console Theme")%></h3></div>
  <form action="" method="POST">
 <%
@@ -42,7 +38,6 @@ input.default {
         consoleNonce = Long.toString(new java.util.Random().nextLong());
         System.setProperty("router.consoleNonce", consoleNonce);
     }
-    String pageNonce = formhandler.getNewNonce();
 %>
  <input type="hidden" name="consoleNonce" value="<%=consoleNonce%>" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >

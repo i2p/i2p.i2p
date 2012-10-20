@@ -17,13 +17,7 @@
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:setProperty name="formhandler" property="shouldsave" value="<%=request.getParameter(\"shouldsave\")%>" />
- <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter(\"action\")%>" />
- <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter(\"nonce\")%>" />
- <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
+<%@include file="formhandler.jsi" %>
  <div class="configure"><p>
  <%=intl._("NOTE")%>: 
  <%=intl._("The default settings work for most people.")%> 
@@ -33,7 +27,7 @@
  <%=intl._("Change these settings with care, and adjust them if you have problems.")%>
 <div class="wideload">
 <form action="" method="POST">
- <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
  <jsp:getProperty name="tunnelshelper" property="form" />
  <%=intl._("Note")%>: <%=intl._("Exploratory tunnel setting changes are stored in the router.config file.")%>
