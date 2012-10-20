@@ -21,15 +21,13 @@ public class FormHandler {
     protected RouterContext _context;
     protected Log _log;
     protected Map _settings;
-    private String _nonce;
+    private String _nonce, _nonce1, _nonce2;
     protected String _action;
     protected String _method;
     private final List<String> _errors;
     private final List<String> _notices;
     private boolean _processed;
     private boolean _valid;
-    private static final String NONCE_SUFFIX = ".nonce";
-    private static final String PREV_SUFFIX = "Prev";
     
     public FormHandler() {
         _errors = new ArrayList();
@@ -84,6 +82,15 @@ public class FormHandler {
      * @since 0.8.2
      */
     public void storeMethod(String val) { _method = val; }
+
+    /**
+     * The old nonces from the session
+     * @since 0.9.4
+     */
+    public void storeNonces(String n1, String n2) {
+        _nonce1 = n1;
+        _nonce2 = n2;
+    }
     
     /**
      * Override this to perform the final processing (in turn, adding formNotice
@@ -187,10 +194,7 @@ public class FormHandler {
             return;
         }
         
-        String nonce = System.getProperty(getClass().getName() + NONCE_SUFFIX);
-        String noncePrev = nonce + PREV_SUFFIX;
-        if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&
-             ( (noncePrev == null) || (!_nonce.equals(noncePrev)) ) ) {
+        if (!_nonce.equals(_nonce1) && !_nonce.equals(_nonce2)) {
                 addFormError(_("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."));
                 _valid = false;
         }
@@ -221,18 +225,13 @@ public class FormHandler {
     }
     
     /**
-     *  Generate a new nonce, store old and new in the system properties.
+     *  Generate a new nonce.
      *  Only call once per page!
      *  @return a new random long as a String
      *  @since 0.8.5
      */
     public String getNewNonce() {
-        String prop = getClass().getName() + NONCE_SUFFIX;
-        String prev = System.getProperty(prop);
-        if (prev != null)
-            System.setProperty(prop + PREV_SUFFIX, prev);
         String rv = Long.toString(_context.random().nextLong());
-        System.setProperty(prop, rv);
         return rv;
     }
 

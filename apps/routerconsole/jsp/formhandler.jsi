@@ -15,6 +15,14 @@
     // Prevents any saves via GET
     formhandler.storeMethod(request.getMethod());
 
+    // Store the nonces for verification
+    String klass = getClass().getName();
+    String nonceAttr1 = klass + ".nonce";
+    String nonceAttr2 = nonceAttr1 + "Prev";
+    String nonce1 = (String) session.getAttribute(nonceAttr1);
+    String nonce2 = (String) session.getAttribute(nonceAttr2);
+    formhandler.storeNonces(nonce1, nonce2);
+
     // Put all the params in the map, some handlers use this instead of individual setters
     // We also call all of the setters below.
     formhandler.setSettings(request.getParameterMap());
@@ -29,5 +37,7 @@
     // This shuffles down the nonces, so it must be after getAllMessages() above,
     // since it does the form validation.
     String pageNonce = formhandler.getNewNonce();
+    session.setAttribute(nonceAttr2, nonce1);
+    session.setAttribute(nonceAttr1, pageNonce);
 
 %>
