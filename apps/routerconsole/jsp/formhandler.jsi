@@ -16,7 +16,7 @@
     formhandler.storeMethod(request.getMethod());
 
     // Store the nonces for verification
-    String klass = getClass().getName();
+    String klass = formhandler.getClass().getName();
     String nonceAttr1 = klass + ".nonce";
     String nonceAttr2 = nonceAttr1 + "Prev";
     String nonce1 = (String) session.getAttribute(nonceAttr1);
