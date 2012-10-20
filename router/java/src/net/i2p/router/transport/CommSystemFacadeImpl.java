@@ -31,21 +31,26 @@ import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
     private final Log _log;
     private final RouterContext _context;
     private TransportManager _manager;
-    private GeoIP _geoIP;
+    private final GeoIP _geoIP;
+    private volatile boolean _netMonitorStatus;
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(CommSystemFacadeImpl.class);
         _context.statManager().createRateStat("transport.getBidsJobTime", "How long does it take?", "Transport", new long[] { 10*60*1000l });
+        _netMonitorStatus = true;
+        _geoIP = new GeoIP(_context);
         startGeoIP();
     }
     
@@ -54,6 +59,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _manager = new TransportManager(_context);
         _manager.startListening();
         startTimestamper();
+        startNetMonitor();
     }
     
     /**
@@ -169,8 +175,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public short getReachabilityStatus() { 
         if (_manager == null) return STATUS_UNKNOWN;
-        if (_context.router().isHidden()) return STATUS_OK;
-        return _manager.getReachabilityStatus(); 
+        if (!_netMonitorStatus)
+            return STATUS_DISCONNECTED;
+        short rv = _manager.getReachabilityStatus(); 
+        if (rv != STATUS_HOSED && _context.router().isHidden())
+            return STATUS_OK;
+        return rv; 
     }
     @Override
     public void recheckReachability() { _manager.recheckReachability(); }
@@ -416,7 +426,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private static final int START_DELAY = 5*60*1000;
     private static final int LOOKUP_TIME = 30*60*1000;
     private void startGeoIP() {
-        _geoIP = new GeoIP(_context);
         _context.simpleScheduler().addEvent(new QueueAll(), START_DELAY);
     }
 
@@ -555,6 +564,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     private static final int TIME_START_DELAY = 5*60*1000;
     private static final int TIME_REPEAT_DELAY = 10*60*1000;
+
     /** @since 0.7.12 */
     private void startTimestamper() {
         _context.simpleScheduler().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
@@ -577,6 +587,30 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
              // ... so we subtract it to get in sync with them
              long newOffset = currentOffset - peerOffset;
              _context.clock().setOffset(newOffset);
+        }
+    }
+
+    /** @since 0.9.4 */
+    private void startNetMonitor() {
+        new NetMonitor();
+    }
+
+    /**
+     * Simple check to see if we have a network connection
+     * @since 0.9.4
+     */
+    private class NetMonitor extends SimpleTimer2.TimedEvent {
+        private static final long SHORT_DELAY = 15*1000;
+        private static final long LONG_DELAY = 3*60*1000;
+
+        public NetMonitor() {
+            super(_context.simpleTimer2(), 0);
+        }
+
+        public void timeReached() {
+             boolean good = Addresses.isConnected();
+             _netMonitorStatus = good;
+             reschedule(good ? LONG_DELAY : SHORT_DELAY);
         }
     }
 }

@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.RouterInfo;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.stat.Rate;
@@ -104,6 +105,8 @@ class BuildExecutor implements Runnable {
     }
 
     private int allowed() {
+        if (_context.commSystem().getReachabilityStatus() == CommSystemFacade.STATUS_DISCONNECTED)
+            return 0;
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
         RateStat rs = _context.statManager().getRate("tunnel.buildRequestTime");
