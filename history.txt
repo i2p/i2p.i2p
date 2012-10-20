@@ -1,3 +1,6 @@
+2012-10-20 zzz
+ * Transport: Back out CoDel for SSU PeerState and NTCP
+
 2012-10-19 zzz
  * UDP: Fix peer test NPE (ticket # 748)
 
