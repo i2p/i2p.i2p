@@ -734,7 +734,7 @@ class PeerTestManager {
                 return;
             }
             UDPAddress addr = new UDPAddress(raddr);
-            byte[] ikey - addr.getIntroKey();
+            byte[] ikey = addr.getIntroKey();
             if (ikey == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to pick a charlie");
