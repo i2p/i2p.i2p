@@ -889,7 +889,27 @@ public class SnarkManager implements CompleteListener {
      * @since 0.8.4
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus) {
-        Snark torrent = new Snark(_util, name, ih, trackerURL, this,
+        addMagnet(name, ih, trackerURL, updateStatus, shouldAutoStart(), this);
+    }
+    
+    /**
+     * Add a torrent with the info hash alone (magnet / maggot)
+     * External use is for UpdateRunner.
+     *
+     * @param name hex or b32 name from the magnet link
+     * @param ih 20 byte info hash
+     * @param trackerURL may be null
+     * @param updateStatus should we add this magnet to the config file,
+     *                     to save it across restarts, in case we don't get
+     *                     the metadata before shutdown?
+     * @param listener to intercept callbacks, should pass through to this
+     * @return the new Snark or null on failure
+     * @throws RuntimeException via Snark.fatal()
+     * @since 0.9.4
+     */
+    public Snark addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus,
+                          boolean autoStart, CompleteListener listener) {
+        Snark torrent = new Snark(_util, name, ih, trackerURL, listener,
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   false, getDataDir().getPath());
 
@@ -897,7 +917,7 @@ public class SnarkManager implements CompleteListener {
             Snark snark = getTorrentByInfoHash(ih);
             if (snark != null) {
                 addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
-                return;
+                return null;
             }
             // Tell the dir monitor not to delete us
             _magnets.add(name);
@@ -905,7 +925,7 @@ public class SnarkManager implements CompleteListener {
                 saveMagnetStatus(ih);
             _snarks.put(name, torrent);
         }
-        if (shouldAutoStart()) {
+        if (autoStart) {
             torrent.startTorrent();
             addMessage(_("Fetching {0}", name));
             DHT dht = _util.getDHT();
@@ -918,7 +938,8 @@ public class SnarkManager implements CompleteListener {
             }
         } else {
             addMessage(_("Adding {0}", name));
-      }
+        }
+        return torrent;
     }
 
     /**
