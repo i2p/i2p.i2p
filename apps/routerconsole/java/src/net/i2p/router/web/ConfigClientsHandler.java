@@ -322,7 +322,7 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("No plugin URL specified."));
             return;
         }
-        installPlugin(url);
+        installPlugin(null, url);
     }
 
     private void updatePlugin(String app) {
@@ -332,7 +332,7 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("No update URL specified for {0}",app));
             return;
         }
-        installPlugin(url);
+        installPlugin(app, url);
     }
 
     /** @since 0.8.13 */
@@ -349,7 +349,10 @@ public class ConfigClientsHandler extends FormHandler {
         } catch (InterruptedException ie) {}
     }
 
-    private void installPlugin(String url) {
+    /**
+     *  @param app null for a new install
+     */
+    private void installPlugin(String app, String url) {
         ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
         if (mgr == null) {
             addFormError("Update manager not registered, cannot install");
@@ -366,7 +369,7 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("Bad URL {0}", url));
             return;
         }
-        if (mgr.installPlugin(uri))
+        if (mgr.installPlugin(app, uri))
             addFormNotice(_("Downloading plugin from {0}", url));
         else
             addFormError("Cannot install, check logs");

@@ -62,7 +62,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     /** active updating tasks, pointing to the next ones to try */
     private final Map<UpdateTask, List<RegisteredUpdater>> _downloaders;
     /** as reported by checkers */
-    private final Map<UpdateItem, VersionAvailable> _available;
+    private final ConcurrentHashMap<UpdateItem, VersionAvailable> _available;
     /** downloaded but NOT installed */
     private final Map<UpdateItem, Version> _downloaded;
     /** downloaded AND installed */
@@ -406,15 +406,19 @@ public class ConsoleUpdateManager implements UpdateManager {
     /**
      *  Install a plugin. Non-blocking.
      *  If returns true, then call isUpdateInProgress() in a loop
+     *  @param name if null, a new install
      *  @return true if task started
      */
-    public boolean installPlugin(URI uri) {
-        String fakeName = Long.toString(_context.random().nextLong());
+    public boolean installPlugin(String name, URI uri) {
+        if (name == null)
+            name = Long.toString(_context.random().nextLong());
         List<URI> uris = Collections.singletonList(uri);
-        UpdateItem fake = new UpdateItem(PLUGIN_INSTALL, fakeName);
+        UpdateItem item = new UpdateItem(PLUGIN_INSTALL, name);
         VersionAvailable va = new VersionAvailable("", "", HTTP, uris);
-        _available.put(fake, va);
-        return update(PLUGIN_INSTALL, fakeName);
+        _available.putIfAbsent(item, va);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Install plugin: " + name + ' ' + va);
+        return update(PLUGIN_INSTALL, name);
     }
 
     /**
@@ -479,8 +483,11 @@ public class ConsoleUpdateManager implements UpdateManager {
         List<URI> updateSources = null;
         UpdateItem ui = new UpdateItem(type, id);
         VersionAvailable va = _available.get(ui);
-        if (va == null)
+        if (va == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No version available for: " + type + ' ' + id);
             return false;
+        }
         List<RegisteredUpdater> sorted = new ArrayList(_registeredUpdaters);
         Collections.sort(sorted);
         return retry(ui, va.sourceMap, sorted, maxTime) != null;
@@ -505,14 +512,21 @@ public class ConsoleUpdateManager implements UpdateManager {
                     if (t != null) {
                         // race window here
                         //  store the remaining ones for retrying
-                         if (_log.shouldLog(Log.INFO))
-                             _log.info("Starting " + r);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Starting " + r);
                         _downloaders.put(t, toTry);
                         return t;
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Updater refused: " + r + " for " + meth + ' ' + e.getValue());
                     }
                 }
             }
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Nothing left to try for: " + r);
         }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Nothing left to try for: " + ui);
         return null;
     }
 
@@ -1097,7 +1111,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredUpdater " + updater.getClass().getSimpleName() + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredUpdater " + updater.getClass() + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
@@ -1138,7 +1152,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredChecker " + checker.getClass().getSimpleName() + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredChecker " + checker.getClass() + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
@@ -1206,7 +1220,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "VersionAvailable " + version + ' ' + sourceMap;
+            return "VersionAvailable \"" + version + "\" " + sourceMap;
         }
     }
 }

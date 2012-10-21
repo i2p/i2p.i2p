@@ -111,6 +111,8 @@ class PluginUpdateRunner extends UpdateRunner {
                     _log.error("Error downloading plugin", t);
                 }
             }
+            if (!_updated)
+                _mgr.notifyTaskFailed(this, "", null);
         }
 
         @Override

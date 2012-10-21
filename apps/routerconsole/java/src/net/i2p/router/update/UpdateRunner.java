@@ -167,6 +167,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Attempt failed on " + url, cause);
         // ignored
+        _mgr.notifyAttemptFailed(this, url, null);
     }
 
     /** subclasses should override */
@@ -204,10 +205,12 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     /** subclasses should override */
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
         // don't display bytesTransferred as it is meaningless
-        _log.error("Update from " + url + " did not download completely (" +
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Update from " + url + " did not download completely (" +
                            bytesRemaining + " remaining after " + currentAttempt + " tries)");
         updateStatus("<b>" + _("Transfer failed from {0}", linkify(url)) + "</b>");
-        _mgr.notifyTaskFailed(this, "", null);
+        _mgr.notifyAttemptFailed(this, url, null);
+        // update() will call notifyTaskFailed() after last URL
     }
 
     public void headerReceived(String url, int attemptNum, String key, String val) {}

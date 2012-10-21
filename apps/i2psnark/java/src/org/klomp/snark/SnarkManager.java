@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.update.*;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -65,6 +66,8 @@ public class SnarkManager implements CompleteListener {
     private volatile boolean _running;
     private volatile boolean _stopping;
     private final Map<String, Tracker> _trackerMap;
+    private UpdateManager _umgr;
+    private UpdateHandler _uhandler;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -149,10 +152,28 @@ public class SnarkManager implements CompleteListener {
         _connectionAcceptor = new ConnectionAcceptor(_util);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
+        // delay until UpdateManager is there
+        _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
     }
 
+    /** @since 0.9.4 */
+    private class Register implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (!_running)
+                return;
+            _umgr = _context.updateManager();
+            if (_umgr != null) {
+                _uhandler = new UpdateHandler(_context, _umgr, SnarkManager.this);
+                _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT, 10);
+                _log.warn("Registering with update manager");
+            } else {
+                _log.warn("No update manager to register with");
+            }
+        }
+    }
+    
     /*
      *  Called by the webapp at Jetty shutdown.
      *  Stops all torrents. Does not close the tunnel, so the announces have a chance.
@@ -160,6 +181,10 @@ public class SnarkManager implements CompleteListener {
      *  Runs inline.
      */
     public void stop() {
+        if (_umgr != null && _uhandler != null) {
+            //_uhandler.shutdown();
+            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
+        }
         _running = false;
         _monitor.interrupt();
         _connectionAcceptor.halt();

@@ -70,10 +70,9 @@ class PluginUpdateHandler implements Checker, Updater {
             return null;
         Properties props = PluginStarter.pluginProperties(_context, appName);
         String oldVersion = props.getProperty("version");
-        String xpi2pURL = props.getProperty("updateURL");
-        if (oldVersion == null || xpi2pURL == null) {
-            //updateStatus("<b>" + _("Cannot check, plugin {0} is not installed", appName) + "</b>");
-            return null;
+        if (oldVersion == null) {
+            // assume new install
+            oldVersion = "0";
         }
 
         UpdateRunner update = new PluginUpdateRunner(_context, _mgr, updateSources, appName, oldVersion);

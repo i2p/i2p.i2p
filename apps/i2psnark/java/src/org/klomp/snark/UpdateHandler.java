@@ -21,7 +21,7 @@ import net.i2p.update.*;
  *
  * @since 0.9.4
  */
-public class UpdateHandler implements Updater {
+class UpdateHandler implements Updater {
     private final I2PAppContext _context;
     private final UpdateManager _umgr;
     private final SnarkManager _smgr;
