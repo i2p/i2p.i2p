@@ -28,13 +28,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 import org.klomp.snark.I2PSnarkUtil;
+import org.klomp.snark.MagnetURI;
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Peer;
 import org.klomp.snark.Snark;
@@ -64,11 +64,6 @@ public class I2PSnarkServlet extends DefaultServlet {
     private String _lastAnnounceURL = "";
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
-    /** BEP 9 */
-    private static final String MAGNET = "magnet:";
-    private static final String MAGNET_FULL = MAGNET + "?xt=urn:btih:";
-    /** http://sponge.i2p/files/maggotspec.txt */
-    private static final String MAGGOT = "maggot://";
  
     @Override
     public void init(ServletConfig cfg) throws ServletException {
@@ -564,12 +559,13 @@ public class I2PSnarkServlet extends DefaultServlet {
                 if (newURL.startsWith("http://")) {
                     FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL);
                     _manager.addDownloader(fetch);
-                } else if (newURL.startsWith(MAGNET) || newURL.startsWith(MAGGOT)) {
+                } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
                     addMagnet(newURL);
                 } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
-                    addMagnet(MAGNET_FULL + newURL);
+                    addMagnet(MagnetURI.MAGNET_FULL + newURL);
                 } else {
-                    _manager.addMessage(_("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"", MAGNET, MAGGOT));
+                    _manager.addMessage(_("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
+                                          MagnetURI.MAGNET, MagnetURI.MAGGOT));
                 }
             } else {
                 // no file or URL specified
@@ -1790,165 +1786,15 @@ public class I2PSnarkServlet extends DefaultServlet {
      *  @since 0.8.4
      */
     private void addMagnet(String url) {
-        String ihash;
-        String name;
-        String trackerURL = null;
-        if (url.startsWith(MAGNET)) {
-            // magnet:?xt=urn:btih:0691e40aae02e552cfcb57af1dca56214680c0c5&tr=http://tracker2.postman.i2p/announce.php
-            String xt = getParam("xt", url);
-            if (xt == null || !xt.startsWith("urn:btih:")) {
-                _manager.addMessage(_("Invalid magnet URL {0}", url));
-                return;
-            }
-            ihash = xt.substring("urn:btih:".length());
-            trackerURL = getTrackerParam(url);
-            name = _("Magnet") + ' ' + ihash;
-            String dn = getParam("dn", url);
-            if (dn != null)
-                name += " (" + Storage.filterName(dn) + ')';
-        } else if (url.startsWith(MAGGOT)) {
-            // maggot://0691e40aae02e552cfcb57af1dca56214680c0c5:0b557bbdf8718e95d352fbe994dec3a383e2ede7
-            ihash = url.substring(MAGGOT.length()).trim();
-            int col = ihash.indexOf(':');
-            if (col >= 0)
-                ihash = ihash.substring(0, col);
-            name = _("Magnet") + ' ' + ihash;
-        } else {
-            return;
+        try {
+            MagnetURI magnet = new MagnetURI(_manager.util(), url);
+            String name = magnet.getName();
+            byte[] ih = magnet.getInfoHash();
+            String trackerURL = magnet.getTrackerURL();
+            _manager.addMagnet(name, ih, trackerURL, true);
+        } catch (IllegalArgumentException iae) {
+            _manager.addMessage(_("Invalid magnet URL {0}", url));
         }
-        byte[] ih = null;
-        if (ihash.length() == 32) {
-            ih = Base32.decode(ihash);
-        } else if (ihash.length() == 40) {
-            //  Like DataHelper.fromHexString() but ensures no loss of leading zero bytes
-            ih = new byte[20];
-            try {
-                for (int i = 0; i < 20; i++) {
-                    ih[i] = (byte) (Integer.parseInt(ihash.substring(i*2, (i*2) + 2), 16) & 0xff);
-                }
-            } catch (NumberFormatException nfe) {
-                ih = null;
-            }
-        }
-        if (ih == null || ih.length != 20) {
-            _manager.addMessage(_("Invalid info hash in magnet URL {0}", url));
-            return;
-        }
-        _manager.addMagnet(name, ih, trackerURL, true);
-    }
-
-    /**
-     *  @return first decoded parameter or null
-     */
-    private static String getParam(String key, String uri) {
-        int idx = uri.indexOf('?' + key + '=');
-        if (idx >= 0) {
-            idx += key.length() + 2;
-        } else {
-            idx = uri.indexOf('&' + key + '=');
-            if (idx >= 0)
-                idx += key.length() + 2;
-        }
-        if (idx < 0 || idx > uri.length())
-            return null;
-        String rv = uri.substring(idx);
-        idx = rv.indexOf('&');
-        if (idx >= 0)
-            rv = rv.substring(0, idx);
-        else
-            rv = rv.trim();
-        return decode(rv);
-    }
-
-    /**
-     *  @return all decoded parameters or null
-     *  @since 0.9.1
-     */
-    private static List<String> getMultiParam(String key, String uri) {
-        int idx = uri.indexOf('?' + key + '=');
-        if (idx >= 0) {
-            idx += key.length() + 2;
-        } else {
-            idx = uri.indexOf('&' + key + '=');
-            if (idx >= 0)
-                idx += key.length() + 2;
-        }
-        if (idx < 0 || idx > uri.length())
-            return null;
-        List<String> rv = new ArrayList();
-        while (true) {
-            String p = uri.substring(idx);
-            uri = p;
-            idx = p.indexOf('&');
-            if (idx >= 0)
-                p = p.substring(0, idx);
-            else
-                p = p.trim();
-            rv.add(decode(p));
-            idx = uri.indexOf('&' + key + '=');
-            if (idx < 0)
-                break;
-            idx += key.length() + 2;
-        }
-        return rv;
-    }
-
-    /**
-     *  @return first valid I2P tracker or null
-     *  @since 0.9.1
-     */
-    private static String getTrackerParam(String uri) {
-        List<String> trackers = getMultiParam("tr", uri);
-        if (trackers == null)
-            return null;
-        for (String t : trackers) {
-            try {
-                URI u = new URI(t);
-                String protocol = u.getScheme();
-                String host = u.getHost();
-                if (protocol == null || host == null ||
-                    !protocol.toLowerCase(Locale.US).equals("http") ||
-                    !host.toLowerCase(Locale.US).endsWith(".i2p"))
-                    continue;
-                return t;
-            } catch(URISyntaxException use) {}
-        }
-        return null;
-    }
-
-    /**
-     *  Decode %xx encoding, convert to UTF-8 if necessary
-     *  Copied from i2ptunnel LocalHTTPServer
-     *  @since 0.9.1
-     */
-    private static String decode(String s) {
-        if (!s.contains("%"))
-            return s;
-        StringBuilder buf = new StringBuilder(s.length());
-        boolean utf8 = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c != '%') {
-                buf.append(c);
-            } else {
-                try {
-                    int val = Integer.parseInt(s.substring(++i, (++i) + 1), 16);
-                    if ((val & 0x80) != 0)
-                        utf8 = true;
-                    buf.append((char) val);
-                } catch (IndexOutOfBoundsException ioobe) {
-                    break;
-                } catch (NumberFormatException nfe) {
-                    break;
-                }
-            }
-        }
-        if (utf8) {
-            try {
-                return new String(buf.toString().getBytes("ISO-8859-1"), "UTF-8");
-            } catch (UnsupportedEncodingException uee) {}
-        }
-        return buf.toString();
     }
 
     /** copied from ConfigTunnelsHelper */
@@ -2171,11 +2017,11 @@ public class I2PSnarkServlet extends DefaultServlet {
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td><a href=\"")
-                   .append(MAGNET_FULL).append(hex).append("\">")
+                   .append(MagnetURI.MAGNET_FULL).append(hex).append("\">")
                    .append(toImg("magnet", _("Magnet link")))
                    .append("</a> <b>Magnet:</b> <a href=\"")
-                   .append(MAGNET_FULL).append(hex).append("\">")
-                   .append(MAGNET_FULL).append(hex).append("</a>")
+                   .append(MagnetURI.MAGNET_FULL).append(hex).append("\">")
+                   .append(MagnetURI.MAGNET_FULL).append(hex).append("</a>")
                    .append("</td></tr>\n");
             } else {
                 buf.append("<tr><td>")
