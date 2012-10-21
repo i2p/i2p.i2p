@@ -1,3 +1,6 @@
+2012-10-21 zzz
+ * Watchdog: Don't dump threads too often (ticket #519)
+
 2012-10-20 zzz
  * Transport: Back out CoDel for SSU PeerState and NTCP
 
