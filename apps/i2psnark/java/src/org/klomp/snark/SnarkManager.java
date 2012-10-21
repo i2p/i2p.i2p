@@ -42,7 +42,7 @@ import org.klomp.snark.dht.DHT;
 /**
  * Manage multiple snarks
  */
-public class SnarkManager implements Snark.CompleteListener {
+public class SnarkManager implements CompleteListener {
     
     /**
      *  Map of (canonical) filename of the .torrent file to Snark instance.

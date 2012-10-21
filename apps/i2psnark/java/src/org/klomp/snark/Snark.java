@@ -1204,34 +1204,6 @@ public class Snark
           completeListener.addMessage(this, message);
   }
 
-  public interface CompleteListener {
-    public void torrentComplete(Snark snark);
-    public void updateStatus(Snark snark);
-
-    /**
-     * We transitioned from magnet mode, we have now initialized our
-     * metainfo and storage. The listener should now call getMetaInfo()
-     * and save the data to disk.
-     *
-     * @return the new name for the torrent or null on error
-     * @since 0.8.4
-     */
-    public String gotMetaInfo(Snark snark);
-
-    /**
-     * @since 0.9
-     */
-    public void fatal(Snark snark, String error);
-
-    /**
-     * @since 0.9.2
-     */
-    public void addMessage(Snark snark, String message);
-
-    // not really listeners but the easiest way to get back to an optional SnarkManager
-    public long getSavedTorrentTime(Snark snark);
-    public BitField getSavedTorrentBitField(Snark snark);
-  }
 
   /** Maintain a configurable total uploader cap
    * coordinatorListener
