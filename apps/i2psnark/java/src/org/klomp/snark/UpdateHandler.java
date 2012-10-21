@@ -46,7 +46,6 @@ public class UpdateHandler implements Updater {
             method != UpdateMethod.TORRENT || updateSources.isEmpty())
             return null;
         UpdateRunner update = new UpdateRunner(_context, _umgr, _smgr, updateSources, newVersion);
-        // set status before thread to ensure UI feedback
         _umgr.notifyProgress(update, "<b>" + _smgr.util().getString("Updating") + "</b>");
         update.start();
         return update;

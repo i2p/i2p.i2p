@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.update.*;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -42,6 +43,7 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
+import org.klomp.snark.UpdateHandler;
 import org.klomp.snark.dht.DHT;
 
 import org.mortbay.jetty.servlet.DefaultServlet;
@@ -57,6 +59,8 @@ public class I2PSnarkServlet extends DefaultServlet {
     private I2PAppContext _context;
     private Log _log;
     private SnarkManager _manager;
+    private UpdateManager _umgr;
+    private UpdateHandler _uhandler;
     private static long _nonce;
     private Resource _resourceBase;
     private String _themePath;
@@ -76,6 +80,11 @@ public class I2PSnarkServlet extends DefaultServlet {
             configFile = "i2psnark.config";
         _manager.loadConfig(configFile);
         _manager.start();
+        _umgr = _context.updateManager();
+        if (_umgr != null) {
+            _uhandler = new UpdateHandler(_context, _umgr, _manager);
+            _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT, 10);
+        }
         try {
             _resourceBase = Resource.newResource(_manager.getDataDir().getAbsolutePath());
         } catch (IOException ioe) {}
@@ -86,6 +95,10 @@ public class I2PSnarkServlet extends DefaultServlet {
     public void destroy() {
         if (_manager != null)
             _manager.stop();
+        if (_umgr != null && _uhandler != null) {
+            //_uhandler.shutdown();
+            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
+        }
         super.destroy();
     }
 

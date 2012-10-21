@@ -31,10 +31,9 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private ByteArrayOutputStream _baos;
     private URI _currentURI;
     private Snark _snark;
+    private boolean _hasMetaInfo;
 
-    private static final long CONNECT_TIMEOUT = 55*1000;
-    private static final long INACTIVITY_TIMEOUT = 5*60*1000;
-    private static final long NOPROXY_INACTIVITY_TIMEOUT = 60*1000;
+    private static final long MAX_LENGTH = 30*1024*1024;
 
     public UpdateRunner(I2PAppContext ctx, UpdateManager umgr, SnarkManager smgr,
                         List<URI> uris, String newVersion) { 
@@ -101,17 +100,43 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                 }
             } catch (IllegalArgumentException iae) {}
         }
-        if (_snark == null) {
-            _umgr.notifyTaskFailed(this, "", null);
+        if (_snark == null)
+            fatal("No valid URLs");
+    }
+
+    private void fatal(String error) {
+            if (_snark != null) {
+                if (_hasMetaInfo) {
+                    _smgr.stopTorrent(_snark, true);
+                    String file = _snark.getName();
+                    _smgr.removeTorrent(file);
+                    // delete torrent file
+                    File f = new File(_smgr.getDataDir(), file);
+                    f.delete();
+                    // delete data
+                    file = _snark.getBaseName();
+                    f = new File(_smgr.getDataDir(), file);
+                    f.delete();
+                } else {
+                    _smgr.deleteMagnet(_snark);
+                }
+            }
+            _umgr.notifyTaskFailed(this, error, null);
+            _log.error(error);
             _isRunning = false;
-        }
     }
 
     //////// begin CompleteListener methods
     //////// all pass through to SnarkManager
 
     public void torrentComplete(Snark snark) {
-
+        String dataFile = snark.getBaseName();
+        File f = new File(_smgr.getDataDir(), dataFile);
+        String sudVersion = TrustedUpdate.getVersionString(f);
+        if (!_newVersion.equals(sudVersion)) {
+            fatal("version mismatch");
+        }
+        _umgr.notifyComplete(this, _newVersion, f);
         _smgr.torrentComplete(snark);
     }
 
@@ -121,11 +146,26 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     }
 
     public String gotMetaInfo(Snark snark) {
-
+        Storage storage = snark.getStorage();
+        MetaInfo info = snark.getMetaInfo();
+        if (info.getFiles() != null) {
+            fatal("more than 1 file");
+            return null;
+        }
+        if (info.isPrivate()) {
+            fatal("private torrent");
+            return null;
+        }
+        if (info.getTotalLength() > MAX_LENGTH) {
+            fatal("too big");
+            return null;
+        }
+        _hasMetaInfo = true;
         return _smgr.gotMetaInfo(snark);
     }
 
     public void fatal(Snark snark, String error) {
+         fatal(error);
         _smgr.fatal(snark, error);
     }
 

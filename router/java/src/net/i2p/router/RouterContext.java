@@ -522,7 +522,7 @@ public class RouterContext extends I2PAppContext {
     /**
      *  The controller of router, plugin, and other updates.
      *  @return The manager if it is registered, else null
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     @Override
     public UpdateManager updateManager() {
@@ -532,7 +532,7 @@ public class RouterContext extends I2PAppContext {
     /**
      *  Register as the update manager.
      *  @throws IllegalStateException if one was already registered
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public void registerUpdateManager(UpdateManager mgr) {
         synchronized(_lock3) {
@@ -545,7 +545,7 @@ public class RouterContext extends I2PAppContext {
     /**
      *  Unregister the update manager.
      *  @throws IllegalStateException if it was not registered
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public void unregisterUpdateManager(UpdateManager mgr) {
         synchronized(_lock3) {

@@ -1016,7 +1016,7 @@ public class I2PAppContext {
     /**
      *  The controller of router, plugin, and other updates.
      *  @return always null in I2PAppContext, the update manager if in RouterContext and it is registered
-     *  @since 0.9.2
+     *  @since 0.9.4
      */
     public UpdateManager updateManager() {
         return null;

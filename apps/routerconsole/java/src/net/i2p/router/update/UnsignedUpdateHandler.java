@@ -6,18 +6,12 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.NewsHelper;
 import net.i2p.update.*;
 import static net.i2p.update.UpdateType.*;
 import static net.i2p.update.UpdateMethod.*;
-import net.i2p.util.EepGet;
-import net.i2p.util.FileUtil;
-import net.i2p.util.I2PAppThread;
-import net.i2p.util.Log;
 
 /**
  * <p>Handles the request to update the router by firing off an

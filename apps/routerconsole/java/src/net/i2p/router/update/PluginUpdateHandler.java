@@ -1,24 +1,14 @@
 package net.i2p.router.update;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import net.i2p.crypto.TrustedUpdate;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.PluginStarter;
 import net.i2p.update.*;
-import net.i2p.util.EepGet;
-import net.i2p.util.I2PAppThread;
-import net.i2p.util.PartialEepGet;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
-import net.i2p.util.VersionComparator;
 
 /**
  * Check for or download an updated version of a plugin.

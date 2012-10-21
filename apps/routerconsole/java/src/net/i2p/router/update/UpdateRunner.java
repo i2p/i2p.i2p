@@ -12,7 +12,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.web.ConfigUpdateHandler;
-import net.i2p.router.web.Messages;
 import net.i2p.update.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
@@ -40,7 +39,8 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected boolean _isPartial;
     /** set by the listeners on completion */
     protected String _newVersion;
-    private ByteArrayOutputStream _baos;
+    // 56 byte header, only used for suds
+    private final ByteArrayOutputStream _baos;
     protected URI _currentURI;
 
     private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
@@ -56,6 +56,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         _log = ctx.logManager().getLog(getClass());
         _mgr = mgr;
         _urls = uris;
+        _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
         _updateFile = (new File(ctx.getTempDir(), "update" + ctx.random().nextInt() + ".tmp")).getAbsolutePath();
     }
 
@@ -110,14 +111,11 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_urls.isEmpty()) {
             // not likely, don't bother translating
             updateStatus("<b>Update source list is empty, cannot download update</b>");
-            _log.log(Log.CRIT, "Update source list is empty - cannot download update");
+            _log.error("Update source list is empty - cannot download update");
             _mgr.notifyTaskFailed(this, "", null);
             return;
         }
 
-        ByteArrayOutputStream baos = null;
-        if (shouldProxy)
-            baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
         for (URI uri : _urls) {
             _currentURI = uri;
             String updateURL = uri.toString();
@@ -128,10 +126,10 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
             // Check the first 56 bytes for the version
             if (shouldProxy) {
                 _isPartial = true;
-                baos.reset();
+                _baos.reset();
                 try {
                     // no retries
-                    _get = new PartialEepGet(_context, proxyHost, proxyPort, baos, updateURL, TrustedUpdate.HEADER_BYTES);
+                    _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, updateURL, TrustedUpdate.HEADER_BYTES);
                     _get.addStatusListener(UpdateRunner.this);
                     _get.fetch(CONNECT_TIMEOUT);
                 } catch (Throwable t) {
