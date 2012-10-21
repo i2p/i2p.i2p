@@ -7,8 +7,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
@@ -109,13 +114,14 @@ class NewsFetcher extends UpdateRunner {
         }
     }
     
-    private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
-    private static final String VERSION_PREFIX = "version=\"";
+    private static final String VERSION_PREFIX = "<i2p.release ";
+    private static final String VERSION_KEY = "version";
+    private static final String SUD_KEY = "sudmagnet";
+    private static final String SU2_KEY = "su2magnet";
 
     /**
      *  Parse the installed (not the temp) news file for the latest version.
-     *  TODO: Real XML parsing, different update methods,
-     *  URLs in the file, ...
+     *  TODO: Real XML parsing
      */
     void checkForUpdates() {
         FileInputStream in = null;
@@ -125,9 +131,9 @@ class NewsFetcher extends UpdateRunner {
             while (DataHelper.readLine(in, buf)) {
                 int index = buf.indexOf(VERSION_PREFIX);
                 if (index >= 0) {
-                    int end = buf.indexOf("\"", index + VERSION_PREFIX.length());
-                    if (end > index) {
-                        String ver = buf.substring(index+VERSION_PREFIX.length(), end);
+                    Map<String, String> args = parseArgs(buf.substring(index+VERSION_PREFIX.length()));
+                    String ver = args.get(VERSION_KEY);
+                    if (ver != null) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Found version: [" + ver + "]");
                         if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
@@ -137,14 +143,27 @@ class NewsFetcher extends UpdateRunner {
                                                         ROUTER_SIGNED, "", HTTP,
                                                         _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP),
                                                         ver, "");
+                            String key = FileUtil.isPack200Supported() ? SU2_KEY : SUD_KEY;
+                            String murl = args.get(key);
+                            if (murl != null) {
+                                List<URI> uris = tokenize(murl);
+                                if (!uris.isEmpty()) {
+                                    Collections.shuffle(uris, _context.random());
+                                    _mgr.notifyVersionAvailable(this, _currentURI,
+                                                        ROUTER_SIGNED, "", TORRENT,
+                                                        uris, ver, "");
+                                }
+                            }
                         } else {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is current");
                         }
                         return;
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("No version in " + buf.toString());
                     }
-                }
-                if (buf.indexOf(VERSION_STRING) == -1) {
+                } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("No match in " + buf.toString());
                 }
@@ -162,6 +181,82 @@ class NewsFetcher extends UpdateRunner {
             _log.warn("No version found in news.xml file");
     }
     
+    /**
+     *  Modified from LoadClientAppsJob and I2PTunnelHTTPClientBase
+     *  All keys are mapped to lower case.
+     *
+     *  @param args non-null
+     *  @since 0.9.4
+     */
+    private static Map<String, String> parseArgs(String args) {
+        Map<String, String> rv = new HashMap(8);
+        char data[] = args.toCharArray();
+        StringBuilder buf = new StringBuilder(32);
+        boolean isQuoted = false;
+        String key = null;
+        for (int i = 0; i < data.length; i++) {
+            switch (data[i]) {
+                case '\'':
+                case '"':
+                    if (isQuoted) {
+                        // keys never quoted
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    isQuoted = !isQuoted;
+                    break;
+
+                case ' ':
+                case '\r':
+                case '\n':
+                case '\t':
+                case ',':
+                    // whitespace - if we're in a quoted section, keep this as part of the quote,
+                    // otherwise use it as a delim
+                    if (isQuoted) {
+                        buf.append(data[i]);
+                    } else {
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    break;
+
+                case '=':
+                    if (isQuoted) {
+                        buf.append(data[i]);
+                    } else {
+                        key = buf.toString().trim().toLowerCase(Locale.US);
+                        buf.setLength(0);
+                    }
+                    break;
+
+                default:
+                    buf.append(data[i]);
+                    break;
+            }
+        }
+        if (key != null)
+            rv.put(key, buf.toString().trim());
+        return rv;
+    }
+
+    private static List<URI> tokenize(String URLs) {
+        StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
+        List<URI> rv = new ArrayList();
+        while (tok.hasMoreTokens()) {
+            try {
+                rv.add(new URI(tok.nextToken().trim()));
+            } catch (URISyntaxException use) {}
+        }
+        return rv;
+    }
+
     /** override to prevent status update */
     @Override
     public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
