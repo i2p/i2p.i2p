@@ -82,8 +82,19 @@ class UpdateRunner implements UpdateTask, CompleteListener {
             String updateURL = uri.toString();
             try {
                 MagnetURI magnet = new MagnetURI(_smgr.util(), updateURL);
-                String name = magnet.getName();
                 byte[] ih = magnet.getInfoHash();
+                // do we already have it?
+                _snark = _smgr.getTorrentByInfoHash(ih);
+                if (_snark != null) {
+                    if (_snark.getMetaInfo() != null) {
+                         _hasMetaInfo = true;
+                         Storage storage = _snark.getStorage();
+                         if (storage != null && storage.complete())
+                             processComplete(_snark);
+                    }
+                    break;
+                }
+                String name = magnet.getName();
                 String trackerURL = magnet.getTrackerURL();
                 if (trackerURL == null && !_smgr.util().shouldUseDHT() &&
                     !_smgr.util().shouldUseOpenTrackers()) {
@@ -151,21 +162,33 @@ class UpdateRunner implements UpdateTask, CompleteListener {
             _umgr.notifyTaskFailed(this, error, null);
             _log.error(error);
             _isRunning = false;
+            // stop the tunnel if we were the only one running
+            if (_smgr.util().connected() && !_smgr.util().isConnecting()) {
+                for (Snark s : _smgr.getTorrents()) {
+                    if (!s.isStopped())
+                        return;
+                }
+                _smgr.util().disconnect();
+            }
+    }
+
+    private void processComplete(Snark snark) {
+        String dataFile = snark.getBaseName();
+        File f = new File(_smgr.getDataDir(), dataFile);
+        String sudVersion = TrustedUpdate.getVersionString(f);
+        if (_newVersion.equals(sudVersion))
+            _umgr.notifyComplete(this, _newVersion, f);
+        else
+            fatal("version mismatch");
+        _isComplete = true;
     }
 
     //////// begin CompleteListener methods
     //////// all pass through to SnarkManager
 
     public void torrentComplete(Snark snark) {
-        String dataFile = snark.getBaseName();
-        File f = new File(_smgr.getDataDir(), dataFile);
-        String sudVersion = TrustedUpdate.getVersionString(f);
-        if (!_newVersion.equals(sudVersion)) {
-            fatal("version mismatch");
-        }
-        _umgr.notifyComplete(this, _newVersion, f);
+        processComplete(snark);
         _smgr.torrentComplete(snark);
-        _isComplete = true;
     }
 
     /**

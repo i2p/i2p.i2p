@@ -749,6 +749,14 @@ public class SnarkManager implements CompleteListener {
     public Snark getTorrent(String filename) { synchronized (_snarks) { return _snarks.get(filename); } }
 
     /**
+     *  Unmodifiable
+     *  @since 0.9.4
+     */
+    public Collection<Snark> getTorrents() {
+        return Collections.unmodifiableCollection(_snarks.values());
+    }
+
+    /**
      * Grab the torrent given the base name of the storage
      * @return Snark or null
      * @since 0.7.14

@@ -1553,6 +1553,23 @@
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
         </exec>
+        <!-- make torrent files -->
+        <copy file="i2pupdate.sud" tofile="i2pupdate_${release.number}.sud" />
+        <java classname="org.klomp.snark.Storage" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/i2psnark.jar" />
+            </classpath>
+            <arg value="i2pupdate_${release.number}.sud" />
+        </java>
+        <copy file="i2pupdate.su2" tofile="i2pupdate_${release.number}.su2" />
+        <java classname="org.klomp.snark.Storage" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/i2psnark.jar" />
+            </classpath>
+            <arg value="i2pupdate_${release.number}.su2" />
+        </java>
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>

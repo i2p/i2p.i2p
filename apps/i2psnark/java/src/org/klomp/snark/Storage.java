@@ -21,6 +21,7 @@
 package org.klomp.snark;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
@@ -34,8 +35,10 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
@@ -1200,4 +1203,41 @@ public class Storage
     rafs[i] = null;
   }
 
+  /**
+   *  Create a metainfo.
+   *  Used in the installer build process; do not comment out.
+   *  @since 0.9.4
+   */
+  public static void main(String[] args) {
+      if (args.length < 1 || args.length > 2) {
+          System.err.println("Usage: Storage file-or-dir [announceURL]");
+          System.exit(1);
+      }
+      File base = new File(args[0]);
+      String announce = args.length == 2 ? args[1] : null;
+      I2PAppContext ctx = I2PAppContext.getGlobalContext();
+      I2PSnarkUtil util = new I2PSnarkUtil(ctx);
+      File file = null;
+      FileOutputStream out = null;
+      try {
+          Storage storage = new Storage(util, base, announce, false, null);
+          MetaInfo meta = storage.getMetaInfo();
+          file = new File(storage.getBaseName() + ".torrent");
+          out = new FileOutputStream(file);
+          out.write(meta.getTorrentData());
+          String hex = DataHelper.toString(meta.getInfoHash());
+          System.out.println("Created:     " + file);
+          System.out.println("InfoHash:    " + hex);
+          String magnet = MagnetURI.MAGNET_FULL + hex;
+          if (announce != null)
+              magnet += "&tr=" + announce;
+          System.out.println("Magnet:      " + magnet);
+      } catch (IOException ioe) {
+          if (file != null)
+              file.delete();
+          ioe.printStackTrace();
+      } finally {
+          try { if (out != null) out.close(); } catch (IOException ioe) {}
+      }
+  }
 }
