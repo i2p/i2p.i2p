@@ -49,6 +49,11 @@ public interface CompleteListener {
      */
     public void addMessage(Snark snark, String message);
 
+    /**
+     * @since 0.9.4
+     */
+    public void gotPiece(Snark snark);
+
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);
     public BitField getSavedTorrentBitField(Snark snark);

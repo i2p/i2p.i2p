@@ -1115,7 +1115,12 @@ public class Snark
       }
   }
 
+
+  ///////////// Begin StorageListener methods
+
   //private boolean allocating = false;
+
+  /** does nothing */
   public void storageCreateFile(Storage storage, String name, long length)
   {
     //if (allocating)
@@ -1129,6 +1134,7 @@ public class Snark
   // How much storage space has been allocated
   private long allocated = 0;
 
+  /** does nothing */
   public void storageAllocated(Storage storage, long length)
   {
     //allocating = true;
@@ -1140,7 +1146,8 @@ public class Snark
 
   private boolean allChecked = false;
   private boolean checking = false;
-  private boolean prechecking = true;
+  //private boolean prechecking = true;
+
   public void storageChecked(Storage storage, int num, boolean checked)
   {
     //allocating = false;
@@ -1158,6 +1165,8 @@ public class Snark
     if (!checking) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Got " + (checked ? "" : "BAD ") + "piece: " + num);
+        if (completeListener != null)
+            completeListener.gotPiece(this);
     }
   }
 
@@ -1186,6 +1195,9 @@ public class Snark
   {
     coordinator.setWantedPieces();
   }
+
+  ///////////// End StorageListener methods
+
 
   /** SnarkSnutdown callback unused */
   public void shutdown()

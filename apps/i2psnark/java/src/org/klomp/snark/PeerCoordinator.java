@@ -515,8 +515,8 @@ class PeerCoordinator implements PeerListener
             peerCount = peers.size();
             unchokePeer();
 
-            if (listener != null)
-              listener.peerChange(this, peer);
+            //if (listener != null)
+            //  listener.peerChange(this, peer);
           }
       }
     if (toDisconnect != null) {
@@ -652,8 +652,8 @@ class PeerCoordinator implements PeerListener
    */
   public boolean gotHave(Peer peer, int piece)
   {
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
 
     synchronized(wantedPieces) {
         for (Piece pc : wantedPieces) {
@@ -672,8 +672,8 @@ class PeerCoordinator implements PeerListener
    */
   public boolean gotBitField(Peer peer, BitField bitfield)
   {
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
 
     boolean rv = false;
     synchronized(wantedPieces) {
@@ -919,8 +919,8 @@ class PeerCoordinator implements PeerListener
   {
     uploaded += size;
 
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
   }
 
   /**
@@ -930,8 +930,8 @@ class PeerCoordinator implements PeerListener
   {
     downloaded += size;
 
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
   }
 
   /**
@@ -1040,8 +1040,8 @@ class PeerCoordinator implements PeerListener
     if (_log.shouldLog(Log.INFO))
       _log.info("Got choke(" + choke + "): " + peer);
 
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
   }
 
   public void gotInterest(Peer peer, boolean interest)
@@ -1060,8 +1060,8 @@ class PeerCoordinator implements PeerListener
               }
       }
 
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
   }
 
   public void disconnected(Peer peer)
@@ -1081,8 +1081,8 @@ class PeerCoordinator implements PeerListener
         peerCount = peers.size();
       }
 
-    if (listener != null)
-      listener.peerChange(this, peer);
+    //if (listener != null)
+    //  listener.peerChange(this, peer);
   }
   
   /** Called when a peer is removed, to prevent it from being used in 

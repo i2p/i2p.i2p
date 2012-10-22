@@ -1517,6 +1517,12 @@ public class SnarkManager implements CompleteListener {
         addMessage(message);
     }
 
+    /**
+     * A Snark.CompleteListener method.
+     * @since 0.9.4
+     */
+    public void gotPiece(Snark snark) {}
+
     // End Snark.CompleteListeners
 
     /**

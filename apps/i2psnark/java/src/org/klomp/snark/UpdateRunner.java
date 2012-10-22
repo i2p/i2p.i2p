@@ -1,17 +1,15 @@
 package org.klomp.snark;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.update.*;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -25,15 +23,16 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private final UpdateManager _umgr;
     private final SnarkManager _smgr;
     private final List<URI> _urls;
-    private final String _updateFile;
     private volatile boolean _isRunning;
+    private volatile boolean _hasMetaInfo;
+    private volatile boolean _isComplete;
     private final String _newVersion;
-    private ByteArrayOutputStream _baos;
     private URI _currentURI;
     private Snark _snark;
-    private boolean _hasMetaInfo;
 
     private static final long MAX_LENGTH = 30*1024*1024;
+    private static final long METAINFO_TIMEOUT = 30*60*1000;
+    private static final long COMPLETE_TIMEOUT = 3*60*60*1000;
 
     public UpdateRunner(I2PAppContext ctx, UpdateManager umgr, SnarkManager smgr,
                         List<URI> uris, String newVersion) { 
@@ -43,7 +42,6 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         _smgr = smgr;
         _urls = uris;
         _newVersion = newVersion;
-        _updateFile = (new File(ctx.getTempDir(), "update" + ctx.random().nextInt() + ".tmp")).getAbsolutePath();
     }
 
     //////// begin UpdateTask methods
@@ -79,7 +77,6 @@ class UpdateRunner implements UpdateTask, CompleteListener {
      *  If it is, get the whole thing.
      */
     private void update() {
-
         if (_urls.isEmpty()) {
             _umgr.notifyTaskFailed(this, "", null);
             return;
@@ -93,15 +90,48 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                 String name = magnet.getName();
                 byte[] ih = magnet.getInfoHash();
                 String trackerURL = magnet.getTrackerURL();
+                if (trackerURL == null && !_smgr.util().shouldUseDHT() &&
+                    !_smgr.util().shouldUseOpenTrackers()) {
+                    // but won't we use OT as a failsafe even if disabled?
+                    _umgr.notifyAttemptFailed(this, "No tracker, no DHT, no OT", null);
+                    continue;
+                }
                 _snark = _smgr.addMagnet(name, ih, trackerURL, true, true, this);
                 if (_snark != null) {
                     updateStatus("<b>" + _smgr.util().getString("Updating from {0}", updateURL) + "</b>");
+                    new Timeout();
                     break;
                 }
             } catch (IllegalArgumentException iae) {}
         }
         if (_snark == null)
             fatal("No valid URLs");
+    }
+
+    /**
+     *  This will run twice, once at the metainfo timeout and
+     *  once at the complete timeout.
+     */
+    private class Timeout extends SimpleTimer2.TimedEvent {
+        private final long _start = _context.clock().now();
+
+        public Timeout() {
+            super(_context.simpleTimer2(), METAINFO_TIMEOUT);
+        }
+
+        public void timeReached() {
+            if (_isComplete || !_isRunning)
+                return;
+            if (!_hasMetaInfo) {
+                fatal("Metainfo timeout");
+                return;
+            }
+            if (_context.clock().now() - _start >= COMPLETE_TIMEOUT) {
+                fatal("Complete timeout");
+                return;
+            }
+            reschedule(COMPLETE_TIMEOUT - METAINFO_TIMEOUT);
+        }
     }
 
     private void fatal(String error) {
@@ -138,15 +168,21 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         }
         _umgr.notifyComplete(this, _newVersion, f);
         _smgr.torrentComplete(snark);
+        _isComplete = true;
     }
 
+    /**
+     *  This is called by stopTorrent() among others
+     */
     public void updateStatus(Snark snark) {
-
+        if (snark.isStopped()) {
+            if (!_isComplete)
+                fatal("stopped by user");
+        }
         _smgr.updateStatus(snark);
     }
 
     public String gotMetaInfo(Snark snark) {
-        Storage storage = snark.getStorage();
         MetaInfo info = snark.getMetaInfo();
         if (info.getFiles() != null) {
             fatal("more than 1 file");
@@ -171,6 +207,16 @@ class UpdateRunner implements UpdateTask, CompleteListener {
 
     public void addMessage(Snark snark, String message) {
         _smgr.addMessage(snark, message);
+    }
+
+    public void gotPiece(Snark snark) {
+        if (_hasMetaInfo) {
+            long total = snark.getTotalLength();
+            long remaining = snark.getRemainingLength(); 
+            String status = "<b>" + _smgr.util().getString("Updating") + "</b>";
+            _umgr.notifyProgress(this, status, total - remaining, total);
+        }
+        _smgr.gotPiece(snark);
     }
 
     public long getSavedTorrentTime(Snark snark) {
