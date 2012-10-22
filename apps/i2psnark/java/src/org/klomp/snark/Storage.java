@@ -1236,6 +1236,7 @@ public class Storage
           if (file != null)
               file.delete();
           ioe.printStackTrace();
+          System.exit(1);
       } finally {
           try { if (out != null) out.close(); } catch (IOException ioe) {}
       }
