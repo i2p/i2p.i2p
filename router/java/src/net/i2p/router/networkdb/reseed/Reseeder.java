@@ -66,7 +66,6 @@ public class Reseeder {
               "http://euve5653.vserver.de/netDb/" +  "," +
           //  "http://r31453.ovh.net/static_media/files/netDb/" + "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
-              "http://75.145.125.59/netDb/" + "," +
               "http://i2p.mooo.com/netDb/" + "," +
               "http://193.150.121.66/netDb/";
 
@@ -78,7 +77,6 @@ public class Reseeder {
               "https://reseed.i2p-projekt.de/" + "," +
           //  "https://r31453.ovh.net/static_media/files/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
-              "https://75.145.125.59/netDb/" + "," +
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/";
 
