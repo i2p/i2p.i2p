@@ -46,10 +46,9 @@ public class VersionComparator implements Comparator<String> {
         } catch (NumberFormatException nfe) {
             return 1;
         }
-        long diff = left - right;
-        if (diff < 0)
+        if (left < right)
             return -1;
-        if (diff > 0)
+        if (left > right)
             return 1;
         return 0;
     }

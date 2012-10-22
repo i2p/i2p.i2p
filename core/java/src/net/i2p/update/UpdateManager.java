@@ -1,6 +1,8 @@
 package net.i2p.update;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.net.URI;
 import java.util.List;
 
@@ -79,4 +81,9 @@ public interface UpdateManager {
      *  @return true if valid, false if corrupt
      */
     public boolean notifyComplete(UpdateTask task, String actualVersion, File file);
+
+    /**
+     *  For debugging
+     */
+    public void renderStatusHTML(Writer out) throws IOException;
 }

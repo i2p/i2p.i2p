@@ -13,7 +13,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1>Router SKM</h1>
+<h1>Router Debug</h1>
 <div class="main" id="main">
 <%
     /*
@@ -22,9 +22,14 @@
     net.i2p.router.RouterContext ctx = (net.i2p.router.RouterContext) net.i2p.I2PAppContext.getGlobalContext();
 
     /*
+     *  Print out the status for the UpdateManager
+     */
+    ctx.updateManager().renderStatusHTML(out);
+
+    /*
      *  Print out the status for all the SessionKeyManagers
      */
-
+    out.print("<h2>Router SKM</h2>");
     ctx.sessionKeyManager().renderStatusHTML(out);
     java.util.Set<net.i2p.data.Destination> clients = ctx.clientManager().listClients();
     for (net.i2p.data.Destination dest : clients) {

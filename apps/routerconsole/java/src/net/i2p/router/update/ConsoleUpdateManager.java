@@ -1,13 +1,15 @@
 package net.i2p.router.update;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -1111,7 +1113,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredUpdater " + updater.getClass() + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredUpdater " + updater.getClass().getName() + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
@@ -1152,7 +1154,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
-            return "RegisteredChecker " + checker.getClass() + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredChecker " + checker.getClass().getName() + " for " + type + ' ' + method + " @pri " + priority;
         }
     }
 
@@ -1221,6 +1223,53 @@ public class ConsoleUpdateManager implements UpdateManager {
         @Override
         public String toString() {
             return "VersionAvailable \"" + version + "\" " + sourceMap;
+        }
+    }
+
+    /** debug */
+    public void renderStatusHTML(Writer out) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<h2>Update Manager</h2>");
+        buf.append("<h3>Installed</h3>");
+        toString(buf, _installed);
+        buf.append("<h3>Available</h3>");
+        toString(buf, _available);
+        buf.append("<h3>Downloaded</h3>");
+        toString(buf, _downloaded);
+        buf.append("<h3>Registered Checkers</h3>");
+        toString(buf, _registeredCheckers);
+        buf.append("<h3>Registered Updaters</h3>");
+        toString(buf, _registeredUpdaters);
+        buf.append("<h3>Active Checkers</h3>");
+        toString(buf, _activeCheckers);
+        buf.append("<h3>Active Updaters</h3>");
+        toString(buf, _downloaders);
+        out.write(buf.toString());
+    }
+
+    /** debug */
+    private static void toString(StringBuilder buf, Collection col) {
+        List<String> list = new ArrayList(col.size());
+        for (Object o : col) {
+            list.add(o.toString());
+        }
+        Collections.sort(list);
+        for (String e : list) {
+            buf.append("[").append(e).append("]<br>");
+        }
+    }
+
+    /** debug */
+    private static void toString(StringBuilder buf, Map<?, ?> map) {
+        List<String> list = new ArrayList(map.size());
+        for (Map.Entry entry : map.entrySet()) {
+            String key = entry.getKey().toString();
+            String val = entry.getValue().toString();
+            list.add("[" + key + "] = [" + val + "]<br>");
+        }
+        Collections.sort(list);
+        for (String e : list) {
+            buf.append(e);
         }
     }
 }
