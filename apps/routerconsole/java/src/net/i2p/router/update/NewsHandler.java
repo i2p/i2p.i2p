@@ -46,7 +46,6 @@ class NewsHandler extends UpdateHandler implements Checker {
             updateSources.add(new URI(BACKUP_NEWS_URL));
         } catch (URISyntaxException use) {}
         UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources);
-        update.start();
         return update;
     }
 }

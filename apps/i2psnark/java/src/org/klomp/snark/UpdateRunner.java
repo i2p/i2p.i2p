@@ -77,11 +77,6 @@ class UpdateRunner implements UpdateTask, CompleteListener {
      *  If it is, get the whole thing.
      */
     private void update() {
-        if (_urls.isEmpty()) {
-            _umgr.notifyTaskFailed(this, "", null);
-            return;
-        }
-
         for (URI uri : _urls) {
             _currentURI = uri;
             String updateURL = uri.toString();
@@ -102,7 +97,9 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                     new Timeout();
                     break;
                 }
-            } catch (IllegalArgumentException iae) {}
+            } catch (IllegalArgumentException iae) {
+                _log.error("Invalid update URL", iae);
+            }
         }
         if (_snark == null)
             fatal("No valid URLs");
@@ -231,5 +228,10 @@ class UpdateRunner implements UpdateTask, CompleteListener {
 
     private void updateStatus(String s) {
         _umgr.notifyProgress(this, s);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + ' ' + getType() + ' ' + getID() + ' ' + getMethod() + ' ' + getURI();
     }
 }

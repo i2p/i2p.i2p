@@ -57,7 +57,6 @@ class PluginUpdateHandler implements Checker, Updater {
         }
 
         UpdateRunner update = new PluginUpdateChecker(_context, _mgr, updateSources, appName, oldVersion);
-        update.start();
         return update;
     }
     
@@ -78,7 +77,6 @@ class PluginUpdateHandler implements Checker, Updater {
         UpdateRunner update = new PluginUpdateRunner(_context, _mgr, updateSources, appName, oldVersion);
         // set status before thread to ensure UI feedback
         _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
-        update.start();
         return update;
     }
 }

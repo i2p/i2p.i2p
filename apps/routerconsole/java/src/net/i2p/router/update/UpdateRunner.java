@@ -236,4 +236,9 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected String _(String s, Object o) {
         return _mgr._(s, o);
     }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + ' ' + getType() + ' ' + getID() + ' ' + getMethod() + ' ' + getURI();
+    }
 }

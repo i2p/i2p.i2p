@@ -74,6 +74,9 @@ class PluginUpdateRunner extends UpdateRunner {
     @Override
     public URI getURI() { return _uri; }
 
+    @Override
+    public String getID() { return _appName; }
+
         @Override
         protected void update() {
 

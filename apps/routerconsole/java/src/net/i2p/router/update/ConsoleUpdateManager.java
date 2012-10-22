@@ -184,6 +184,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                          if (_log.shouldLog(Log.INFO))
                              _log.info("Starting " + r);
                         _activeCheckers.add(t);
+                        t.start();
                     }
                 }
                 if (t != null) {
@@ -226,6 +227,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                          if (_log.shouldLog(Log.INFO))
                              _log.info("Starting " + r);
                         _activeCheckers.add(t);
+                        t.start();
                         break;
                     }
                 }
@@ -517,6 +519,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Starting " + r);
                         _downloaders.put(t, toTry);
+                        t.start();
                         return t;
                     } else {
                         if (_log.shouldLog(Log.WARN))

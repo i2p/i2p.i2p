@@ -46,6 +46,9 @@ class PluginUpdateChecker extends UpdateRunner {
 
     @Override
     public UpdateType getType() { return UpdateType.PLUGIN; }
+
+    @Override
+    public String getID() { return _appName; }
     
     @Override
     public void run() {

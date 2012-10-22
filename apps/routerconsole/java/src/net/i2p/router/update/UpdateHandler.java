@@ -44,7 +44,6 @@ class UpdateHandler implements Updater {
         UpdateRunner update = new UpdateRunner(_context, _mgr, updateSources);
         // set status before thread to ensure UI feedback
         _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
-        update.start();
         return update;
     }
 }

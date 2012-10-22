@@ -652,8 +652,10 @@ public class SummaryHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(512);
         // display all the time so we display the final failure message, and plugin update messages too
         String status = NewsHelper.getUpdateStatus();
+        boolean needSpace = false;
         if (status.length() > 0) {
             buf.append("<h4>").append(status).append("</h4>\n");
+            needSpace = true;
         }
         String dver = NewsHelper.updateVersionDownloaded();
         if (dver == null)
@@ -661,6 +663,10 @@ public class SummaryHelper extends HelperBase {
         if (dver != null &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress()) {
+            if (needSpace)
+                buf.append("<hr>");
+            else
+                needSpace = true;
             buf.append("<h4><b>").append(_("Update downloaded")).append("<br>");
             if (_context.hasWrapper())
                 buf.append(_("Click Restart to install"));
@@ -675,6 +681,8 @@ public class SummaryHelper extends HelperBase {
             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0 &&  // assume using proxy for now
             getAction() == null &&
             getUpdateNonce() == null) {
+                if (needSpace)
+                    buf.append("<hr>");
                 long nonce = _context.random().nextLong();
                 String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
                 if (prev != null)

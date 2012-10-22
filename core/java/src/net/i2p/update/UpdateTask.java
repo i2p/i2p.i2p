@@ -9,6 +9,11 @@ import java.net.URI;
  */
 public interface UpdateTask {
     
+    /**
+     *  Tasks must not start themselves in the constructor. Do it here.
+     */
+    public void start();
+
     public void shutdown();
 
     public boolean isRunning();
