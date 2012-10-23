@@ -35,7 +35,7 @@ class NewsHandler extends UpdateHandler implements Checker {
      */
     public UpdateTask check(UpdateType type, UpdateMethod method,
                             String id, String currentVersion, long maxTime) {
-        if ((type != ROUTER_SIGNED && type != ROUTER_SIGNED_PACK200 && type != NEWS) ||
+        if ((type != ROUTER_SIGNED && type != NEWS) ||
             method != HTTP)
             return null;
         List<URI> updateSources = new ArrayList(2);

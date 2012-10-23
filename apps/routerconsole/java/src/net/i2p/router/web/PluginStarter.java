@@ -151,13 +151,16 @@ public class PluginStarter implements Runnable {
 
             if (log.shouldLog(Log.WARN))
                 log.warn("Updating plugin: " + appName);
+            // non-blocking
             mgr.update(PLUGIN, appName, 30*60*1000);
             int loop = 0;
             do {
+                // only wait for 4 minutes, then we will
+                // keep going
                 try {
                     Thread.sleep(5*1000);
                 } catch (InterruptedException ie) {}
-                if (loop++ > 40) break;
+                if (loop++ > 48) break;
             } while (mgr.isUpdateInProgress(PLUGIN, appName));
 
             if (mgr.getUpdateAvailable(PLUGIN, appName) != null)

@@ -38,7 +38,7 @@ class UpdateHandler implements Updater {
      */
     public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
                              String id, String newVersion, long maxTime) {
-        if ((type != UpdateType.ROUTER_SIGNED && type != UpdateType.ROUTER_SIGNED_PACK200) ||
+        if (type != UpdateType.ROUTER_SIGNED ||
             method != UpdateMethod.HTTP || updateSources.isEmpty())
             return null;
         UpdateRunner update = new UpdateRunner(_context, _mgr, updateSources);

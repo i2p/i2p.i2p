@@ -133,8 +133,10 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
         PluginUpdateHandler puh = new PluginUpdateHandler(_context, this);
         register((Checker)puh, PLUGIN, HTTP, 0);
-        register((Checker)puh, PLUGIN_INSTALL, HTTP, 0);
-        register((Updater)puh, PLUGIN_INSTALL, HTTP, 0);
+        register((Updater)puh, PLUGIN, HTTP, 0);
+        // Don't do this until we can prevent it from retrying the same thing again...
+        // handled inside P.U.H. for now
+        //register((Updater)puh, PLUGIN, FILE, 0);
         new NewsTimerTask(_context, this);
         _context.simpleScheduler().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
     }
@@ -414,15 +416,21 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  @return true if task started
      */
     public boolean installPlugin(String name, URI uri) {
+        // We must have a name and install it in _available or else
+        // update_fromCheck() will fail.
+        // It's not removed from _available on success, as we lose the name.
         if (name == null)
             name = Long.toString(_context.random().nextLong());
         List<URI> uris = Collections.singletonList(uri);
-        UpdateItem item = new UpdateItem(PLUGIN_INSTALL, name);
-        VersionAvailable va = new VersionAvailable("", "", HTTP, uris);
-        _available.putIfAbsent(item, va);
+        UpdateItem item = new UpdateItem(PLUGIN, name);
+        VersionAvailable va = _available.get(item);
+        if (va == null) {
+            va = new VersionAvailable("", "", HTTP, uris);
+            _available.putIfAbsent(item, va);
+        }
         if (_log.shouldLog(Log.WARN))
             _log.warn("Install plugin: " + name + ' ' + va);
-        return update(PLUGIN_INSTALL, name);
+        return update(PLUGIN, name);
     }
 
     /**
@@ -492,7 +500,11 @@ public class ConsoleUpdateManager implements UpdateManager {
                 _log.warn("No version available for: " + type + ' ' + id);
             return false;
         }
-        List<RegisteredUpdater> sorted = new ArrayList(_registeredUpdaters);
+        List<RegisteredUpdater> sorted = new ArrayList(4);
+        for (RegisteredUpdater ru : _registeredUpdaters) {
+            if (ru.type == type)
+                sorted.add(ru);
+        }
         Collections.sort(sorted);
         return retry(ui, va.sourceMap, sorted, maxTime) != null;
     }
@@ -573,7 +585,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *
      *  @param newsSource who told us
      *  @param id plugin name for plugins, ignored otherwise
-     *  @param updateSourcew Where to get the new version
+     *  @param updateSources Where to get the new version
      *  @param newVersion The new version available
      *  @param minVersion The minimum installed version to be able to update to newVersion
      *  @return true if it's newer
@@ -638,10 +650,8 @@ public class ConsoleUpdateManager implements UpdateManager {
                 // fall through
 
             case ROUTER_SIGNED:
-            case ROUTER_SIGNED_PACK200:
                 if (shouldInstall() &&
                     !(isUpdateInProgress(ROUTER_SIGNED) ||
-                      isUpdateInProgress(ROUTER_SIGNED_PACK200) ||
                       isUpdateInProgress(ROUTER_UNSIGNED))) {
                     update_fromCheck(type, id, DEFAULT_MAX_TIME);
                 }
@@ -673,7 +683,6 @@ public class ConsoleUpdateManager implements UpdateManager {
         switch (task.getType()) {
             case NEWS:
             case ROUTER_SIGNED:
-            case ROUTER_SIGNED_PACK200:
             case ROUTER_UNSIGNED:
                 // ConfigUpdateHandler, SummaryHelper, SummaryBarRenderer handle status display
                 break;
@@ -766,8 +775,9 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  If the return value is false, caller must call notifyTaskFailed() or notifyComplete()
      *  again.
      *
+     *  @param must be an Updater, not a Checker
      *  @param actualVersion may be higher (or lower?) than the version requested
-     *  @param file a valid format for the task's UpdateType
+     *  @param file a valid format for the task's UpdateType, or null if it did the installation itself
      *  @return true if valid, false if corrupt
      */
     public boolean notifyComplete(UpdateTask task, String actualVersion, File file) {
@@ -781,7 +791,6 @@ public class ConsoleUpdateManager implements UpdateManager {
                 break;
 
             case ROUTER_SIGNED:
-            case ROUTER_SIGNED_PACK200:
                 rv = handleSudFile(task.getURI(), actualVersion, file);
                 if (rv)
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
@@ -795,12 +804,10 @@ public class ConsoleUpdateManager implements UpdateManager {
                 }
                 break;
 
-            case PLUGIN:
-/// FIXME probably handled in PluginUpdateRunner??????????
-                rv = handlePluginFile(task.getURI(), actualVersion, file);
-                break;
-
-            default:
+            case PLUGIN:     // file handled in PluginUpdateRunner
+            default:         // assume Updater installed it
+                rv = true;
+                notifyInstalled(task.getType(), task.getID(), actualVersion);
                 break;
         }
         if (rv)
@@ -881,7 +888,6 @@ public class ConsoleUpdateManager implements UpdateManager {
                 break;
 
             case ROUTER_SIGNED:
-            case ROUTER_SIGNED_PACK200:
                 String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
                 StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
                 List<URI> rv = new ArrayList();

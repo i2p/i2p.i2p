@@ -64,7 +64,7 @@ class PluginUpdateHandler implements Checker, Updater {
     @Override
     public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
                                String appName, String newVersion, long maxTime) {
-        if ((type != UpdateType.PLUGIN && type != UpdateType.PLUGIN_INSTALL) ||
+        if (type != UpdateType.PLUGIN ||
             method != UpdateMethod.HTTP || updateSources.isEmpty())
             return null;
         Properties props = PluginStarter.pluginProperties(_context, appName);

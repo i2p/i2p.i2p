@@ -38,7 +38,7 @@ public interface UpdateManager {
      *  @param newsSource who told us
      *  @param id plugin name for plugins, ignored otherwise
      *  @param method How to get the new version
-     *  @param updateSourcew Where to get the new version
+     *  @param updateSources Where to get the new version
      *  @param newVersion The new version available
      *  @param minVersion The minimum installed version to be able to update to newVersion
      *  @return true if we didn't know already

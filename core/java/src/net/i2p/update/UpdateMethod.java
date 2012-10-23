@@ -6,11 +6,14 @@ package net.i2p.update;
  *  @since 0.9.4
  */
 public enum UpdateMethod {
-    METHOD_DUMMY,
+    METHOD_DUMMY,      // Internal use only
     HTTP,              // .i2p or via outproxy
     HTTP_CLEARNET,     // direct non-.i2p
     HTTPS_CLEARNET,    // direct non-.i2p
     TORRENT,
-    GNUTELLA, IMULE, TAHOE_LAFS,
-    DEBIAN
+    GNUTELLA,
+    IMULE,
+    TAHOE_LAFS,
+    DEBIAN,
+    FILE               // local file
 }

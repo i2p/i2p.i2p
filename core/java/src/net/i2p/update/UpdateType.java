@@ -6,13 +6,14 @@ package net.i2p.update;
  *  @since 0.9.4
  */
 public enum UpdateType {
-    TYPE_DUMMY,
+    TYPE_DUMMY,   // Internal use only
     NEWS,
     ROUTER_SIGNED,
-    ROUTER_SIGNED_PACK200,      // unused, use ROUTER_SIGNED for both
     ROUTER_UNSIGNED,
-    PLUGIN, PLUGIN_INSTALL,
-    GEOIP, BLOCKLIST, RESEED,
+    PLUGIN,
+    GEOIP,
+    BLOCKLIST,
+    RESEED,
     HOMEPAGE,
     ADDRESSBOOK
 }

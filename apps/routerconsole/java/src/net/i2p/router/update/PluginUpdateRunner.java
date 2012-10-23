@@ -48,6 +48,7 @@ class PluginUpdateRunner extends UpdateRunner {
     private final URI _uri;
     private final String _xpi2pURL;
     private boolean _updated;
+    private String _errMsg = "";
 
     private static final String XPI2P = "app.xpi2p";
     private static final String ZIP = XPI2P + ".zip";
@@ -68,7 +69,7 @@ class PluginUpdateRunner extends UpdateRunner {
 
     @Override
     public UpdateType getType() {
-        return _oldVersion.equals("") ? UpdateType.PLUGIN_INSTALL : UpdateType.PLUGIN;
+        return UpdateType.PLUGIN;
     }
 
     @Override
@@ -85,7 +86,7 @@ class PluginUpdateRunner extends UpdateRunner {
                 updateStatus("<b>" + _("Attempting to install from file {0}", _xpi2pURL) + "</b>");
                 // strip off "file://"
                 String xpi2pfile = _xpi2pURL.substring(7);
-                if(xpi2pfile.length() == 0) { // This is actually what String.isEmpty() does, so it should be safe.
+                if(xpi2pfile.length() == 0) {
                         statusDone("<b>" + _("No file specified {0}", _xpi2pURL) + "</b>");
                 } else {
                     // copy the contents of from to _updateFile
@@ -114,8 +115,10 @@ class PluginUpdateRunner extends UpdateRunner {
                     _log.error("Error downloading plugin", t);
                 }
             }
-            if (!_updated)
-                _mgr.notifyTaskFailed(this, "", null);
+            if (_updated)
+                _mgr.notifyComplete(this, _newVersion, null);
+            else
+                _mgr.notifyTaskFailed(this, _errMsg, null);
         }
 
         @Override
@@ -240,6 +243,9 @@ class PluginUpdateRunner extends UpdateRunner {
                 statusDone("<b>" + _("Plugin {0} has mismatched versions", appName) + "</b>");
                 return;
             }
+            // set so notifyComplete() will work
+            _appName = appName;
+            _newVersion = version;
 
             String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
             if (minVersion != null &&
@@ -414,6 +420,8 @@ class PluginUpdateRunner extends UpdateRunner {
         }
 
         private void statusDone(String msg) {
+            // if we fail, we will pass this back in notifyTaskFailed()
+            _errMsg = msg;
             updateStatus(msg);
         }
 
