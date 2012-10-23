@@ -1002,9 +1002,9 @@ public class Storage
           // TODO alternative - check hash on the fly as we write to the file,
           // to save another I/O pass
           boolean correctHash = metainfo.checkPiece(pp);
-          if (listener != null)
-            listener.storageChecked(this, piece, correctHash);
           if (!correctHash) {
+              if (listener != null)
+                  listener.storageChecked(this, piece, false);
               return false;
           }
 
@@ -1066,6 +1066,9 @@ public class Storage
             complete = needed == 0;
           }
       }
+    // tell listener after counts are updated
+    if (listener != null)
+        listener.storageChecked(this, piece, true);
 
     if (complete) {
       // do we also need to close all of the files and reopen
@@ -1228,7 +1231,8 @@ public class Storage
           String hex = DataHelper.toString(meta.getInfoHash());
           System.out.println("Created:     " + file);
           System.out.println("InfoHash:    " + hex);
-          String magnet = MagnetURI.MAGNET_FULL + hex;
+          String basename = base.getName().replace(" ", "%20");
+          String magnet = MagnetURI.MAGNET_FULL + hex + "&dn=" + basename;
           if (announce != null)
               magnet += "&tr=" + announce;
           System.out.println("Magnet:      " + magnet);

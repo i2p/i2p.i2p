@@ -56,6 +56,9 @@ class DummyHandler implements Checker, Updater {
         public UpdateType getType() { return UpdateType.TYPE_DUMMY; }
 
         @Override
+        public UpdateMethod getMethod() { return UpdateMethod.METHOD_DUMMY; }
+
+        @Override
         protected void update() {
             try {
                 Thread.sleep(_delay);

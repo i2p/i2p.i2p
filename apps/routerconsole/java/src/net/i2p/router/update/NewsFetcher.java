@@ -114,14 +114,23 @@ class NewsFetcher extends UpdateRunner {
         }
     }
     
+    // Fake XML parsing
+    // Line must contain this, and full entry must be on one line
     private static final String VERSION_PREFIX = "<i2p.release ";
+    // all keys mapped to lower case by parseArgs()
     private static final String VERSION_KEY = "version";
-    private static final String SUD_KEY = "sudmagnet";
-    private static final String SU2_KEY = "su2magnet";
+    private static final String MIN_VERSION_KEY = "minversion";
+    private static final String SUD_KEY = "sudtorrent";
+    private static final String SU2_KEY = "su2torrent";
+    private static final String CLEARNET_SUD_KEY = "sudclearnet";
+    private static final String CLEARNET_SU2_KEY = "su2clearnet";
+    private static final String I2P_SUD_KEY = "sudi2p";
+    private static final String I2P_SU2_KEY = "su2i2p";
 
     /**
      *  Parse the installed (not the temp) news file for the latest version.
      *  TODO: Real XML parsing
+     *  TODO: Check minVersion, use backup URLs specified
      */
     void checkForUpdates() {
         FileInputStream in = null;
@@ -139,6 +148,9 @@ class NewsFetcher extends UpdateRunner {
                         if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is out of date, update!");
+                            // TODO if minversion > our version, continue
+                            // and look for a second entry with clearnet URLs
+                            // TODO clearnet URLs, notify with HTTP_CLEARNET and/or HTTPS_CLEARNET
                             _mgr.notifyVersionAvailable(this, _currentURI,
                                                         ROUTER_SIGNED, "", HTTP,
                                                         _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP),

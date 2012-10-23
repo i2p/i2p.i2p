@@ -111,8 +111,10 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         _context.registerUpdateManager(this);
         DummyHandler dh = new DummyHandler(_context, this);
-        register((Checker)dh, TYPE_DUMMY, HTTP, 0);
-        register((Updater)dh, TYPE_DUMMY, HTTP, 0);
+        register((Checker)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
+        register((Updater)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
+        VersionAvailable dummyVA = new VersionAvailable("", "", METHOD_DUMMY, Collections.EMPTY_LIST);
+        _available.put(new UpdateItem(TYPE_DUMMY, ""), dummyVA);
         // register news before router, so we don't fire off an update
         // right at instantiation if the news is already indicating a new version
         Checker c = new NewsHandler(_context, this);
@@ -120,6 +122,9 @@ public class ConsoleUpdateManager implements UpdateManager {
         register(c, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
         Updater u = new UpdateHandler(_context, this);
         register(u, ROUTER_SIGNED, HTTP, 0);
+        // TODO see NewsFetcher
+        //register(u, ROUTER_SIGNED, HTTPS_CLEARNET, -5);
+        //register(u, ROUTER_SIGNED, HTTP_CLEARNET, -10);
         UnsignedUpdateHandler uuh = new UnsignedUpdateHandler(_context, this);
         register((Checker)uuh, ROUTER_UNSIGNED, HTTP, 0);
         register((Updater)uuh, ROUTER_UNSIGNED, HTTP, 0);
@@ -735,6 +740,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /**
      *  Not necessarily the end if there are more URIs to try.
+     *  @param task checker or updater
      *  @param t may be null
      */
     public void notifyAttemptFailed(UpdateTask task, String reason, Throwable t) {
@@ -744,6 +750,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /**
      *  The task has finished and failed.
+     *  @param task checker or updater
      *  @param t may be null
      */
     public void notifyTaskFailed(UpdateTask task, String reason, Throwable t) {
@@ -763,8 +770,9 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
         _downloaders.remove(task);
         _activeCheckers.remove(task);
-///// for certain types only
-        finishStatus("<b>" + _("Transfer failed from {0}", linkify(task.getURI().toString())) + "</b>");
+        // any other types that shouldn't display?
+        if (task.getURI() != null && task.getType() != TYPE_DUMMY)
+            finishStatus("<b>" + _("Transfer failed from {0}", linkify(task.getURI().toString())) + "</b>");
     }
 
     /**
@@ -775,7 +783,7 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  If the return value is false, caller must call notifyTaskFailed() or notifyComplete()
      *  again.
      *
-     *  @param must be an Updater, not a Checker
+     *  @param task must be an Updater, not a Checker
      *  @param actualVersion may be higher (or lower?) than the version requested
      *  @param file a valid format for the task's UpdateType, or null if it did the installation itself
      *  @return true if valid, false if corrupt

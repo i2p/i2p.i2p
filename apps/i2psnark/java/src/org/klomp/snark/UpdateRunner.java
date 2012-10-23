@@ -33,6 +33,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private static final long MAX_LENGTH = 30*1024*1024;
     private static final long METAINFO_TIMEOUT = 30*60*1000;
     private static final long COMPLETE_TIMEOUT = 3*60*60*1000;
+    private static final long CHECK_INTERVAL = 3*60*1000;
 
     public UpdateRunner(I2PAppContext ctx, UpdateManager umgr, SnarkManager smgr,
                         List<URI> uris, String newVersion) { 
@@ -92,6 +93,12 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                          if (storage != null && storage.complete())
                              processComplete(_snark);
                     }
+                    if (!_isComplete) {
+                        if (_snark.isStopped() && !_snark.isStarting())
+                            _snark.startTorrent();
+                        // we aren't a listener so we must poll
+                        new Watcher();
+                    }
                     break;
                 }
                 String name = magnet.getName();
@@ -142,6 +149,36 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         }
     }
 
+    /**
+     *  Rarely used - only if the user added the torrent, so
+     *  we aren't a complete listener.
+     *  This will periodically until the complete timeout.
+     */
+    private class Watcher extends SimpleTimer2.TimedEvent {
+        private final long _start = _context.clock().now();
+
+        public Watcher() {
+            super(_context.simpleTimer2(), CHECK_INTERVAL);
+        }
+
+        public void timeReached() {
+            if (_hasMetaInfo && _snark.getRemainingLength() == 0 && !_isComplete)
+                processComplete(_snark);
+            if (_isComplete || !_isRunning)
+                return;
+            if (_context.clock().now() - _start >= METAINFO_TIMEOUT && !_hasMetaInfo) {
+                fatal("Metainfo timeout");
+                return;
+            }
+            if (_context.clock().now() - _start >= COMPLETE_TIMEOUT) {
+                fatal("Complete timeout");
+                return;
+            }
+            notifyProgress();
+            reschedule(CHECK_INTERVAL);
+        }
+    }
+
     private void fatal(String error) {
             if (_snark != null) {
                 if (_hasMetaInfo) {
@@ -183,6 +220,15 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         _isComplete = true;
     }
 
+    private void notifyProgress() {
+        if (_hasMetaInfo) {
+            long total = _snark.getTotalLength();
+            long remaining = _snark.getRemainingLength(); 
+            String status = "<b>" + _smgr.util().getString("Updating") + "</b>";
+            _umgr.notifyProgress(this, status, total - remaining, total);
+        }
+    }
+
     //////// begin CompleteListener methods
     //////// all pass through to SnarkManager
 
@@ -217,6 +263,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
             return null;
         }
         _hasMetaInfo = true;
+        notifyProgress();
         return _smgr.gotMetaInfo(snark);
     }
 
@@ -230,12 +277,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     }
 
     public void gotPiece(Snark snark) {
-        if (_hasMetaInfo) {
-            long total = snark.getTotalLength();
-            long remaining = snark.getRemainingLength(); 
-            String status = "<b>" + _smgr.util().getString("Updating") + "</b>";
-            _umgr.notifyProgress(this, status, total - remaining, total);
-        }
+        notifyProgress();
         _smgr.gotPiece(snark);
     }
 
