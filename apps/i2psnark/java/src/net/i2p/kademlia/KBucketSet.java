@@ -518,6 +518,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
     
     /**
      *  For every bucket that hasn't been updated in this long,
+     *  or isn't close to full,
      *  generate a random key that would be a member of that bucket.
      *  The returned keys may be searched for to "refresh" the buckets.
      *  @return non-null, closest first
@@ -528,7 +529,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
         getReadLock();
         try {
             for (KBucket b : _buckets) {
-                if (b.getLastChanged() < old)
+                if (b.getLastChanged() < old || b.getKeyCount() < BUCKET_SIZE * 3 / 4)
                     rv.add(generateRandomKey(b));
             }
         } finally { releaseReadLock(); }

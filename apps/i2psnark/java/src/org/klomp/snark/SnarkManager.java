@@ -959,7 +959,7 @@ public class SnarkManager implements CompleteListener {
             _snarks.put(name, torrent);
         }
         if (autoStart) {
-            torrent.startTorrent();
+            startTorrent(ih);
             addMessage(_("Fetching {0}", name));
             DHT dht = _util.getDHT();
             boolean shouldWarn = _util.connected() &&
