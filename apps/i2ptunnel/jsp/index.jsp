@@ -285,7 +285,7 @@
             </label>
             <div class="text">
             <% String cdest = indexBean.getClientDestination(curClient);
-               if (cdest.length() < 70) { // Probably a B64 (a B32 is 60 chars) so truncate
+               if (cdest.length() > 70) { // Probably a B64 (a B32 is 60 chars) so truncate
                    %><%=cdest.substring(0, 45)%>&hellip;<%=cdest.substring(cdest.length() - 15, cdest.length())%><%
                } else if (cdest.length() > 0) {
                    %><%=cdest%><%
