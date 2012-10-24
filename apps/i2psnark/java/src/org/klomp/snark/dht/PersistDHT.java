@@ -56,12 +56,15 @@ abstract class PersistDHT {
             log.info("Loaded " + count + " nodes from " + file);
     }
 
-    public static synchronized void saveDHT(DHTNodes nodes, File file) {
+    /**
+     *  @param saveAll if true, don't check last seen time
+     */
+    public static synchronized void saveDHT(DHTNodes nodes, boolean saveAll, File file) {
         if (nodes.size() <= 0)
             return;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistDHT.class);
         int count = 0;
-        long maxAge = I2PAppContext.getGlobalContext().clock().now() - MAX_AGE;
+        long maxAge = saveAll ? 0 : I2PAppContext.getGlobalContext().clock().now() - MAX_AGE;
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "ISO-8859-1")));

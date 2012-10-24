@@ -1,3 +1,9 @@
+2012-10-24 zzz
+ * I2PSnark:
+   - Fix several partial piece (temp file) leaks
+   - Don't lose all DHT peers if we stop quickly	
+   - Explore a kbucket if it's less than 3/4 full
+
 2012-10-24 str4d
  * i2ptunnel: Truncate long client destinations (ticket #581)
 

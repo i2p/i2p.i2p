@@ -572,7 +572,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _session.removeListener(I2PSession.PROTO_DATAGRAM_RAW, _rPort);
         // clear the DHT and tracker
         _tracker.stop();
-        PersistDHT.saveDHT(_knownNodes, _dhtFile);
+        // don't lose all our peers if we didn't have time to check them
+        boolean saveAll = _context.clock().now() - _started < 20*60*1000;
+        PersistDHT.saveDHT(_knownNodes, saveAll, _dhtFile);
         _knownNodes.stop();
         for (Iterator<ReplyWaiter> iter = _sentQueries.values().iterator(); iter.hasNext(); ) {
             ReplyWaiter waiter = iter.next();
