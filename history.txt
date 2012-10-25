@@ -1,3 +1,6 @@
+2012-10-25 zzz
+ * BuildHandler: Fix "too slow" rejections due to internal clock skew
+
 2012-10-24 zzz
  * I2PSnark:
    - Fix several partial piece (temp file) leaks

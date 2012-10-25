@@ -181,12 +181,13 @@ class BuildHandler implements Runnable {
                 return;
             }
 
-            long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
+            long now = _context.clock().now();
+            long dropBefore = now - (BuildRequestor.REQUEST_TIMEOUT/4);
             if (state.recvTime <= dropBefore) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
-                              + ", since we received it a long time ago: " + (System.currentTimeMillis() - state.recvTime));
-                _context.statManager().addRateData("tunnel.dropLoadDelay", System.currentTimeMillis() - state.recvTime, 0);
+                              + ", since we received it a long time ago: " + (now - state.recvTime));
+                _context.statManager().addRateData("tunnel.dropLoadDelay", now - state.recvTime, 0);
                 _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Too slow"));
                 return;
             }       
@@ -324,7 +325,7 @@ class BuildHandler implements Runnable {
     
     /** @return handle time or -1 if it wasn't completely handled */
     private long handleRequest(BuildMessageState state) {
-        long timeSinceReceived = System.currentTimeMillis()-state.recvTime;
+        long timeSinceReceived = _context.clock().now()-state.recvTime;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(state.msg.getUniqueId() + ": handling request after " + timeSinceReceived);
         
@@ -533,7 +534,7 @@ class BuildHandler implements Runnable {
         //    response = TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
         
         int proactiveDrops = countProactiveDrops();
-        long recvDelay = System.currentTimeMillis()-state.recvTime;
+        long recvDelay = _context.clock().now()-state.recvTime;
         if (response == 0) {
             float pDrop = ((float) recvDelay) / (float) (BuildRequestor.REQUEST_TIMEOUT*3);
             pDrop = (float)Math.pow(pDrop, 16);
@@ -771,7 +772,7 @@ class BuildHandler implements Runnable {
                     BuildMessageState cur = _inboundBuildMessages.peek();
                     boolean accept = true;
                     if (cur != null) {
-                        long age = System.currentTimeMillis() - cur.recvTime;
+                        long age = _context.clock().now() - cur.recvTime;
                         if (age >= BuildRequestor.REQUEST_TIMEOUT/4) {
                             _context.statManager().addRateData("tunnel.dropLoad", age, sz);
                             _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: High load"));
