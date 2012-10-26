@@ -105,11 +105,13 @@ public class ConsolePasswordManager extends RouterPasswordManager {
             // consolePassword
             String pw = _context.getProperty(PROP_CONSOLE_OLD);
             if (pw != null) {
+                Map toAdd = new HashMap(2);
                 if (pw.length() > 0) {
                     saveMD5(RouterConsoleRunner.PROP_CONSOLE_PW, RouterConsoleRunner.JETTY_REALM,
                             CONSOLE_USER, pw);
+                    toAdd.put(RouterConsoleRunner.PROP_PW_ENABLE, "true");
                 }
-                Map toAdd = Collections.singletonMap(PROP_MIGRATED, "true");
+                toAdd.put(PROP_MIGRATED, "true");
                 List toDel = Collections.singletonList(PROP_CONSOLE_OLD);
                 return _context.router().saveConfig(toAdd, toDel);
             }

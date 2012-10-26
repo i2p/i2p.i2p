@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-import net.i2p.I2PAppContext;
 import net.i2p.util.SecureFileOutputStream;
 
 public class SubscriptionsBean extends BaseBean
@@ -99,7 +98,8 @@ public class SubscriptionsBean extends BaseBean
 	public String getMessages() {
 		String message = "";
 		if( action != null ) {
-			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
+                        if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
+			    (serial != null && serial.equals(lastSerial))) {
 				if (action.equals(_("Save"))) {
 					save();
 				/*******
@@ -115,7 +115,7 @@ public class SubscriptionsBean extends BaseBean
 						message = _("Subscriptions saved, updating addressbook from subscription sources now.");
 						          // + "<img height=\"1\" width=\"1\" alt=\"\" " +
 						          // "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
-						I2PAppContext.getGlobalContext().namingService().requestUpdate(null);
+						_context.namingService().requestUpdate(null);
 					} else {
 						message = _("Subscriptions saved.");
 					}
@@ -125,7 +125,9 @@ public class SubscriptionsBean extends BaseBean
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+                                          + ' ' +
+                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		if( message.length() > 0 )

@@ -87,6 +87,7 @@ public class RouterConsoleRunner implements RouterApp {
     public static final String JETTY_REALM = "i2prouter";
     private static final String JETTY_ROLE = "routerAdmin";
     public static final String PROP_CONSOLE_PW = "routerconsole.auth." + JETTY_REALM;
+    public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
 
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
@@ -735,22 +736,28 @@ public class RouterConsoleRunner implements RouterApp {
         SecurityHandler sec = new SecurityHandler();
         List<ConstraintMapping> constraints = new ArrayList(4);
         ConsolePasswordManager mgr = new ConsolePasswordManager(ctx);
-        Map<String, String> userpw = mgr.getMD5(PROP_CONSOLE_PW);
-        if (!userpw.isEmpty()) {
-            HashUserRealm realm = new HashUserRealm(JETTY_REALM);
-            sec.setUserRealm(realm);
-            sec.setAuthenticator(authenticator);
-            for (Map.Entry<String, String> e : userpw.entrySet()) {
-                String user = e.getKey();
-                String pw = e.getValue();
-                realm.put(user, MD5.__TYPE + pw);
-                realm.addUserToRole(user, JETTY_ROLE);
-                Constraint constraint = new Constraint(user, JETTY_ROLE);
-                constraint.setAuthenticate(true);
-                ConstraintMapping cm = new ConstraintMapping();
-                cm.setConstraint(constraint);
-                cm.setPathSpec("/");
-                constraints.add(cm);
+        boolean enable = ctx.getBooleanProperty(PROP_PW_ENABLE);
+        if (enable) {
+            Map<String, String> userpw = mgr.getMD5(PROP_CONSOLE_PW);
+            if (userpw.isEmpty()) {
+                enable = false;
+                ctx.router().saveConfig(PROP_CONSOLE_PW, "false");
+            } else {
+                HashUserRealm realm = new HashUserRealm(JETTY_REALM);
+                sec.setUserRealm(realm);
+                sec.setAuthenticator(authenticator);
+                for (Map.Entry<String, String> e : userpw.entrySet()) {
+                    String user = e.getKey();
+                    String pw = e.getValue();
+                    realm.put(user, MD5.__TYPE + pw);
+                    realm.addUserToRole(user, JETTY_ROLE);
+                    Constraint constraint = new Constraint(user, JETTY_ROLE);
+                    constraint.setAuthenticate(true);
+                    ConstraintMapping cm = new ConstraintMapping();
+                    cm.setConstraint(constraint);
+                    cm.setPathSpec("/");
+                    constraints.add(cm);
+                }
             }
         }
 

@@ -93,9 +93,6 @@ public class IndexBean {
     public static final int NOT_RUNNING = 3;
     public static final int STANDBY = 4;
     
-    /** deprecated unimplemented, now using routerconsole realm */
-    //public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
-    public static final String PROP_TUNNEL_PASSPHRASE = "consolePassword";
     //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
     //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
     /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
@@ -108,6 +105,7 @@ public class IndexBean {
     public static final String DEFAULT_THEME = "light";
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
+    private static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
     
     public IndexBean() {
         _context = I2PAppContext.getGlobalContext();
@@ -149,14 +147,11 @@ public class IndexBean {
         }
     }
 
-    /** deprecated unimplemented, now using routerconsole realm */
-    public void setPassphrase(String phrase) {
-    }
-    
     public void setAction(String action) {
         if ( (action == null) || (action.trim().length() <= 0) ) return;
         _action = action;
     }
+
     public void setTunnel(String tunnel) {
         if ( (tunnel == null) || (tunnel.trim().length() <= 0) ) return;
         try {
@@ -166,17 +161,15 @@ public class IndexBean {
         }
     }
     
-    /** just check if console password option is set, jetty will do auth */
-    private boolean validPassphrase() {
-        String pass = _context.getProperty(PROP_TUNNEL_PASSPHRASE);
-        return pass != null && pass.trim().length() > 0;
-    }
-    
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
-        if ( (!haveNonce(_curNonce)) && (!validPassphrase()) )
-            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.");
+        // If passwords are turned on, all is assumed good
+        if (!_context.getBooleanProperty(PROP_PW_ENABLE) &&
+            !haveNonce(_curNonce))
+            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
+                   + ' ' +
+                   _("If the problem persists, verify that you have cookies enabled in your browser.");
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))

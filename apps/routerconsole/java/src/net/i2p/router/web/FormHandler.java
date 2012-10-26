@@ -177,14 +177,19 @@ public class FormHandler {
             _valid = false;
             return;
         }
-        if (_nonce == null) {
-            //addFormError("You trying to mess with me?  Huh?  Are you?");
-            _valid = false;
-            return;
-        }
         // To prevent actions with GET, jsps must call storeMethod()
         if (_method != null && !"POST".equals(_method)) {
             addFormError("Invalid form submission, requires POST not " + _method);
+            _valid = false;
+            return;
+        }
+        // If passwords are turned on, all is assumed good
+        if (_context.getBooleanProperty(RouterConsoleRunner.PROP_PW_ENABLE)) {
+            _valid = true;
+            return;
+        }
+        if (_nonce == null) {
+            //addFormError("You trying to mess with me?  Huh?  Are you?");
             _valid = false;
             return;
         }
@@ -195,7 +200,9 @@ public class FormHandler {
         }
         
         if (!_nonce.equals(_nonce1) && !_nonce.equals(_nonce2)) {
-                addFormError(_("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."));
+                addFormError(_("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
+                             + ' ' +
+                             _("If the problem persists, verify that you have cookies enabled in your browser."));
                 _valid = false;
         }
     }
