@@ -207,7 +207,7 @@
  <p>
  This setting causes your router identity to be regenerated every time your IP address
  changes. If you have a dynamic IP this option can speed up your reintegration into
- the network (since people will have shitlisted your old router identity), and, for
+ the network (since people will have banned your old router identity), and, for
  very weak adversaries, help frustrate trivial
  <a href="http://www.i2p.net/how_threatmodel#intersection">intersection
  attacks</a> against the NetDB.  Your different router identities would only be

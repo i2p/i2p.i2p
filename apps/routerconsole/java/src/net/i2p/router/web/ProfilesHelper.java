@@ -46,7 +46,7 @@ public class ProfilesHelper extends HelperBase {
             renderNavBar();
         } catch (IOException ioe) {}
         if (_full == 3)
-            getShitlistSummary();
+            getBanlistSummary();
         else
             getProfileSummary();
         return "";
@@ -64,9 +64,9 @@ public class ProfilesHelper extends HelperBase {
     }
     
     /** @return empty string, writes directly to _out */
-    public String getShitlistSummary() {
+    public String getBanlistSummary() {
         try {
-            ShitlistRenderer rend = new ShitlistRenderer(_context);
+            BanlistRenderer rend = new BanlistRenderer(_context);
             rend.renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();

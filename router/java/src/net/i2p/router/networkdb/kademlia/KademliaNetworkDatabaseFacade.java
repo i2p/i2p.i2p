@@ -106,7 +106,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public final static String DEFAULT_DB_DIR = "netDb";
     
     /** if we have less than this many routers left, don't drop any more,
-     *  even if they're failing or doing bad shit.
+     *  even if they're failing or doing bad stuff.
      */
     protected final static int MIN_REMAINING_ROUTERS = 25;
     
@@ -747,7 +747,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return "Invalid routerInfo signature on " + key.toBase64();
         } else if (upLongEnough && !routerInfo.isCurrent(adjustedExpiration)) {
             if (routerInfo.getNetworkId() != Router.NETWORK_ID) {
-                _context.shitlist().shitlistRouter(key, "Peer is not in our network");
+                _context.banlist().banlistRouter(key, "Peer is not in our network");
                 return "Peer is not in our network (" + routerInfo.getNetworkId() + ", wants " 
                        + Router.NETWORK_ID + "): " + routerInfo.calculateHash().toBase64();
             }

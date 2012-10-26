@@ -60,7 +60,7 @@ public class PeerProfile {
     // does this peer profile contain expanded data, or just the basics?
     private boolean _expanded;
     private boolean _expandedDB;
-    private int _consecutiveShitlists;
+    private int _consecutiveBanlists;
     private final int _distance;
     
     /**
@@ -109,8 +109,8 @@ public class PeerProfile {
     public boolean getIsExpanded() { return _expanded; }
     public boolean getIsExpandedDB() { return _expandedDB; }
     
-    public int incrementShitlists() { return _consecutiveShitlists++; }
-    public void unshitlist() { _consecutiveShitlists = 0; }
+    public int incrementBanlists() { return _consecutiveBanlists++; }
+    public void unbanlist() { _consecutiveBanlists = 0; }
     
     /**
      * Is this peer active at the moment (sending/receiving messages within the last

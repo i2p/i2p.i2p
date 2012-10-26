@@ -57,9 +57,9 @@ public class TransportManager implements TransportEventListener {
     public TransportManager(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(TransportManager.class);
-        _context.statManager().createRateStat("transport.shitlistOnUnreachable", "Add a peer to the shitlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("transport.noBidsYetNotAllUnreachable", "Add a peer to the shitlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("transport.bidFailShitlisted", "Could not attempt to bid on message, as they were shitlisted", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("transport.banlistOnUnreachable", "Add a peer to the banlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("transport.noBidsYetNotAllUnreachable", "Add a peer to the banlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("transport.bidFailBanlisted", "Could not attempt to bid on message, as they were banlisted", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailSelf", "Could not attempt to bid on message, as it targeted ourselves", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -418,8 +418,8 @@ public class TransportManager implements TransportEventListener {
         for (Transport t : _transports.values()) {
             if (t.isUnreachable(peer)) {
                 unreachableTransports++;
-                // this keeps GetBids() from shitlisting for "no common transports"
-                // right after we shitlisted for "unreachable on any transport" below...
+                // this keeps GetBids() from banlisting for "no common transports"
+                // right after we banlisted for "unreachable on any transport" below...
                 msg.transportFailed(t.getStyle());
                 continue;
             }
@@ -434,7 +434,7 @@ public class TransportManager implements TransportEventListener {
             TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
             if (bid != null) {
                 if (bid.getLatencyMs() == TransportBid.TRANSIENT_FAIL)
-                    // this keeps GetBids() from shitlisting for "no common transports"
+                    // this keeps GetBids() from banlisting for "no common transports"
                     msg.transportFailed(t.getStyle());
                 else if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
                     rv = bid;    
@@ -449,10 +449,10 @@ public class TransportManager implements TransportEventListener {
             }
         }
         if (unreachableTransports >= _transports.size()) {
-            // Don't shitlist if we aren't talking to anybody, as we may have a network connection issue
+            // Don't banlist if we aren't talking to anybody, as we may have a network connection issue
             if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
-                _context.statManager().addRateData("transport.shitlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
-                _context.shitlist().shitlistRouter(peer, _x("Unreachable on any transport"));
+                _context.statManager().addRateData("transport.banlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
+                _context.banlist().banlistRouter(peer, _x("Unreachable on any transport"));
             }
         } else if (rv == null) {
             _context.statManager().addRateData("transport.noBidsYetNotAllUnreachable", unreachableTransports, msg.getLifetime());

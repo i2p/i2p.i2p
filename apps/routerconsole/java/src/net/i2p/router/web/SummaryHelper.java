@@ -282,11 +282,11 @@ public class SummaryHelper extends HelperBase {
      *
      */
 /********
-    public int getShitlistedPeers() { 
+    public int getBanlistedPeers() { 
         if (_context == null) 
             return 0;
         else
-            return _context.shitlist().getRouterCount();
+            return _context.banlist().getRouterCount();
     }
 ********/
  

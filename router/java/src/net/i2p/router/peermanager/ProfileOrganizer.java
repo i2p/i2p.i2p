@@ -1342,10 +1342,10 @@ public class ProfileOrganizer {
         // the CLI shouldn't depend upon the netDb
         if (netDb == null) return true;
         if (_context.router() == null) return true;
-        if ( (_context.shitlist() != null) && (_context.shitlist().isShitlisted(peer)) ) {
+        if ( (_context.banlist() != null) && (_context.banlist().isBanlisted(peer)) ) {
             // if (_log.shouldLog(Log.DEBUG))
-            //     _log.debug("Peer " + peer.toBase64() + " is shitlisted, dont select it");
-            return false; // never select a shitlisted peer
+            //     _log.debug("Peer " + peer.toBase64() + " is banlisted, dont select it");
+            return false; // never select a banlisted peer
         }
             
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
@@ -1395,7 +1395,7 @@ public class ProfileOrganizer {
             
             _notFailingPeers.put(profile.getPeer(), profile);
             _notFailingPeersList.add(profile.getPeer());
-            // if not selectable for a tunnel (shitlisted for example),
+            // if not selectable for a tunnel (banlisted for example),
             // don't allow them in the high-cap pool, what would the point of that be?
             if (_thresholdCapacityValue <= profile.getCapacityValue() &&
                 isSelectable(profile.getPeer())) {

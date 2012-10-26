@@ -490,7 +490,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _establishedOn = System.currentTimeMillis();
         _establishState = null;
         _transport.markReachable(getRemotePeer().calculateHash(), false);
-        //_context.shitlist().unshitlistRouter(getRemotePeer().calculateHash(), NTCPTransport.STYLE);
+        //_context.banlist().unbanlistRouter(getRemotePeer().calculateHash(), NTCPTransport.STYLE);
         boolean msgs = !_outbound.isEmpty();
         _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
         _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);

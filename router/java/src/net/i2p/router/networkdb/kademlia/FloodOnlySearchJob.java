@@ -109,11 +109,11 @@ class FloodOnlySearchJob extends FloodSearchJob {
         // We need to randomize our ff selection, else we stay with the same ones since
         // getFloodfillPeers() is sorted by closest distance. Always using the same
         // ones didn't help reliability.
-        // Also, query the unheard-from, unprofiled, failing, unreachable and shitlisted ones last.
+        // Also, query the unheard-from, unprofiled, failing, unreachable and banlisted ones last.
         // We should hear from floodfills pretty frequently so set a 30m time limit.
         // If unprofiled we haven't talked to them in a long time.
-        // We aren't contacting the peer directly, so shitlist doesn't strictly matter,
-        // but it's a bad sign, and we often shitlist a peer before we fail it...
+        // We aren't contacting the peer directly, so banlist doesn't strictly matter,
+        // but it's a bad sign, and we often banlist a peer before we fail it...
         if (floodfillPeers.size() > CONCURRENT_SEARCHES) {
             Collections.shuffle(floodfillPeers, getContext().random());
             List ffp = new ArrayList(floodfillPeers.size());
@@ -123,7 +123,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
                  Hash peer = (Hash)floodfillPeers.get(i);
                  PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
                  if (profile == null || profile.getLastHeardFrom() < before ||
-                     profile.getIsFailing() || getContext().shitlist().isShitlisted(peer) ||
+                     profile.getIsFailing() || getContext().banlist().isBanlisted(peer) ||
                      getContext().commSystem().wasUnreachable(peer)) {
                      failcount++;
                      ffp.add(peer);
@@ -135,7 +135,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
             if (floodfillPeers.size() - failcount <= 2)
                 _shouldProcessDSRM = true;
             if (_log.shouldLog(Log.INFO) && failcount > 0)
-                _log.info(getJobId() + ": " + failcount + " of " + floodfillPeers.size() + " floodfills are not heard from, unprofiled, failing, unreachable or shitlisted");
+                _log.info(getJobId() + ": " + failcount + " of " + floodfillPeers.size() + " floodfills are not heard from, unprofiled, failing, unreachable or banlisted");
             floodfillPeers = ffp;
         } else {
             _shouldProcessDSRM = true;

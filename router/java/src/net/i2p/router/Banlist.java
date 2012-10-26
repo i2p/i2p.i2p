@@ -24,12 +24,12 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
- * Routers are shitlisted only if none of our transports can talk to them
+ * Routers are banlisted only if none of our transports can talk to them
  * or their signed router info is completely screwy.  Individual transports
  * manage their own unreachable lists and do not generally add to the overall
- * shitlist.
+ * banlist.
  */
-public class Shitlist {
+public class Banlist {
     private final Log _log;
     private final RouterContext _context;
     private final Map<Hash, Entry> _entries;
@@ -37,11 +37,11 @@ public class Shitlist {
     public static class Entry {
         /** when it should expire, per the i2p clock */
         public long expireOn;
-        /** why they were shitlisted */
+        /** why they were banlisted */
         public String cause;
         /** separate code so cause can contain {0} for translation */
         public String causeCode;
-        /** what transports they were shitlisted for (String), or null for all transports */
+        /** what transports they were banlisted for (String), or null for all transports */
         public Set<String> transports;
     }
     
@@ -49,46 +49,46 @@ public class Shitlist {
      *  Don't make this too long as the failure may be transient
      *  due to connection limits.
      */
-    public final static long SHITLIST_DURATION_MS = 7*60*1000;
-    public final static long SHITLIST_DURATION_MAX = 30*60*1000;
-    public final static long SHITLIST_DURATION_PARTIAL = 10*60*1000;
-    public final static long SHITLIST_DURATION_FOREVER = 181l*24*60*60*1000; // will get rounded down to 180d on console
-    public final static long SHITLIST_CLEANER_START_DELAY = SHITLIST_DURATION_PARTIAL;
+    public final static long BANLIST_DURATION_MS = 7*60*1000;
+    public final static long BANLIST_DURATION_MAX = 30*60*1000;
+    public final static long BANLIST_DURATION_PARTIAL = 10*60*1000;
+    public final static long BANLIST_DURATION_FOREVER = 181l*24*60*60*1000; // will get rounded down to 180d on console
+    public final static long BANLIST_CLEANER_START_DELAY = BANLIST_DURATION_PARTIAL;
     
-    public Shitlist(RouterContext context) {
+    public Banlist(RouterContext context) {
         _context = context;
-        _log = context.logManager().getLog(Shitlist.class);
+        _log = context.logManager().getLog(Banlist.class);
         _entries = new ConcurrentHashMap(16);
         _context.jobQueue().addJob(new Cleanup(_context));
     }
     
     private class Cleanup extends JobImpl {
-        private List<Hash> _toUnshitlist;
+        private List<Hash> _toUnbanlist;
         public Cleanup(RouterContext ctx) {
             super(ctx);
-            _toUnshitlist = new ArrayList(4);
-            getTiming().setStartAfter(ctx.clock().now() + SHITLIST_CLEANER_START_DELAY);
+            _toUnbanlist = new ArrayList(4);
+            getTiming().setStartAfter(ctx.clock().now() + BANLIST_CLEANER_START_DELAY);
         }
         public String getName() { return "Expire banned peers"; }
         public void runJob() {
-            _toUnshitlist.clear();
+            _toUnbanlist.clear();
             long now = getContext().clock().now();
             try {
                 for (Iterator iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
                     Map.Entry<Hash, Entry> e = (Map.Entry) iter.next();
                     if (e.getValue().expireOn <= now) {
                         iter.remove();
-                        _toUnshitlist.add(e.getKey());
+                        _toUnbanlist.add(e.getKey());
                     }
                 }
             } catch (IllegalStateException ise) {} // next time...
-            for (Hash peer : _toUnshitlist) {
+            for (Hash peer : _toUnbanlist) {
                 PeerProfile prof = _context.profileOrganizer().getProfile(peer);
                 if (prof != null)
-                    prof.unshitlist();
-                _context.messageHistory().unshitlist(peer);
+                    prof.unbanlist();
+                _context.messageHistory().unbanlist(peer);
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Unshitlisting router (expired) " + peer.toBase64());
+                    _log.info("Unbanlisting router (expired) " + peer.toBase64());
             }
             
             requeue(30*1000);
@@ -100,69 +100,69 @@ public class Shitlist {
     }
     
     /**
-     *  For ShitlistRenderer in router console.
+     *  For BanlistRenderer in router console.
      *  Note - may contain expired entries.
      */
     public Map<Hash, Entry> getEntries() {
         return Collections.unmodifiableMap(_entries);
     }
     
-    public boolean shitlistRouter(Hash peer) {
-        return shitlistRouter(peer, null);
+    public boolean banlistRouter(Hash peer) {
+        return banlistRouter(peer, null);
     }
 
-    public boolean shitlistRouter(Hash peer, String reason) { return shitlistRouter(peer, reason, null); }
+    public boolean banlistRouter(Hash peer, String reason) { return banlistRouter(peer, reason, null); }
 
     /** ick have to put the reasonCode in the front to avoid ambiguity */
-    public boolean shitlistRouter(String reasonCode, Hash peer, String reason) {
-        return shitlistRouter(peer, reason, reasonCode, null, false);
+    public boolean banlistRouter(String reasonCode, Hash peer, String reason) {
+        return banlistRouter(peer, reason, reasonCode, null, false);
     }
 
-    public boolean shitlistRouter(Hash peer, String reason, String transport) {
-        return shitlistRouter(peer, reason, transport, false);
+    public boolean banlistRouter(Hash peer, String reason, String transport) {
+        return banlistRouter(peer, reason, transport, false);
     }
 
-    public boolean shitlistRouterForever(Hash peer, String reason) {
-        return shitlistRouter(peer, reason, null, true);
+    public boolean banlistRouterForever(Hash peer, String reason) {
+        return banlistRouter(peer, reason, null, true);
     }
 
-    public boolean shitlistRouterForever(Hash peer, String reason, String reasonCode) {
-        return shitlistRouter(peer, reason, reasonCode, null, true);
+    public boolean banlistRouterForever(Hash peer, String reason, String reasonCode) {
+        return banlistRouter(peer, reason, reasonCode, null, true);
     }
 
-    public boolean shitlistRouter(Hash peer, String reason, String transport, boolean forever) {
-        return shitlistRouter(peer, reason, null, transport, forever);
+    public boolean banlistRouter(Hash peer, String reason, String transport, boolean forever) {
+        return banlistRouter(peer, reason, null, transport, forever);
     }
 
-    private boolean shitlistRouter(Hash peer, String reason, String reasonCode, String transport, boolean forever) {
+    private boolean banlistRouter(Hash peer, String reason, String reasonCode, String transport, boolean forever) {
         if (peer == null) {
-            _log.error("wtf, why did we try to shitlist null?", new Exception("shitfaced"));
+            _log.error("wtf, why did we try to banlist null?", new Exception("banfaced"));
             return false;
         }
         if (_context.routerHash().equals(peer)) {
-            _log.error("wtf, why did we try to shitlist ourselves?", new Exception("shitfaced"));
+            _log.error("wtf, why did we try to banlist ourselves?", new Exception("banfaced"));
             return false;
         }
         boolean wasAlready = false;
         if (_log.shouldLog(Log.INFO))
-            _log.info("Shitlisting router " + peer.toBase64() +
-               ((transport != null) ? " on transport " + transport : ""), new Exception("Shitlist cause: " + reason));
+            _log.info("Banlisting router " + peer.toBase64() +
+               ((transport != null) ? " on transport " + transport : ""), new Exception("Banlist cause: " + reason));
         
         Entry e = new Entry();
         if (forever) {
-            e.expireOn = _context.clock().now() + SHITLIST_DURATION_FOREVER;
+            e.expireOn = _context.clock().now() + BANLIST_DURATION_FOREVER;
         } else if (transport != null) {
-            e.expireOn = _context.clock().now() + SHITLIST_DURATION_PARTIAL;
+            e.expireOn = _context.clock().now() + BANLIST_DURATION_PARTIAL;
         } else {
-            long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS / 4);
+            long period = BANLIST_DURATION_MS + _context.random().nextLong(BANLIST_DURATION_MS / 4);
             PeerProfile prof = _context.profileOrganizer().getProfile(peer);
             if (prof != null) {
-                period = SHITLIST_DURATION_MS << prof.incrementShitlists();
+                period = BANLIST_DURATION_MS << prof.incrementBanlists();
                 period += _context.random().nextLong(period);
             }
        
-            if (period > SHITLIST_DURATION_MAX)
-                period = SHITLIST_DURATION_MAX;
+            if (period > BANLIST_DURATION_MAX)
+                period = BANLIST_DURATION_MAX;
             e.expireOn = _context.clock().now() + period;
         }
         e.cause = reason;
@@ -202,28 +202,28 @@ public class Shitlist {
         //_context.tunnelManager().peerFailed(peer);
         //_context.messageRegistry().peerFailed(peer);
         if (!wasAlready)
-            _context.messageHistory().shitlist(peer, reason);
+            _context.messageHistory().banlist(peer, reason);
         return wasAlready;
     }
     
-    public void unshitlistRouter(Hash peer) {
-        unshitlistRouter(peer, true);
+    public void unbanlistRouter(Hash peer) {
+        unbanlistRouter(peer, true);
     }
 
-    private void unshitlistRouter(Hash peer, boolean realUnshitlist) { unshitlistRouter(peer, realUnshitlist, null); }
+    private void unbanlistRouter(Hash peer, boolean realUnbanlist) { unbanlistRouter(peer, realUnbanlist, null); }
 
-    public void unshitlistRouter(Hash peer, String transport) { unshitlistRouter(peer, true, transport); }
+    public void unbanlistRouter(Hash peer, String transport) { unbanlistRouter(peer, true, transport); }
 
-    private void unshitlistRouter(Hash peer, boolean realUnshitlist, String transport) {
+    private void unbanlistRouter(Hash peer, boolean realUnbanlist, String transport) {
         if (peer == null) return;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Calling unshitlistRouter " + peer.toBase64()
+            _log.debug("Calling unbanlistRouter " + peer.toBase64()
                       + (transport != null ? "/" + transport : ""));
         boolean fully = false;
 
         Entry e = _entries.remove(peer);
         if ( (e == null) || (e.transports == null) || (transport == null) || (e.transports.size() <= 1) ) {
-            // fully unshitlisted
+            // fully unbanlisted
             fully = true;
         } else {
             e.transports.remove(transport);
@@ -234,30 +234,30 @@ public class Shitlist {
         }
 
         if (fully) {
-            if (realUnshitlist) {
+            if (realUnbanlist) {
                 PeerProfile prof = _context.profileOrganizer().getProfile(peer);
                 if (prof != null)
-                    prof.unshitlist();
+                    prof.unbanlist();
             }
-            _context.messageHistory().unshitlist(peer);
+            _context.messageHistory().unbanlist(peer);
             if (_log.shouldLog(Log.INFO) && e != null)
-                _log.info("Unshitlisting router " + peer.toBase64()
+                _log.info("Unbanlisting router " + peer.toBase64()
                           + (transport != null ? "/" + transport : ""));
         }
     }
     
-    public boolean isShitlisted(Hash peer) { return isShitlisted(peer, null); }
+    public boolean isBanlisted(Hash peer) { return isBanlisted(peer, null); }
 
-    public boolean isShitlisted(Hash peer, String transport) {
+    public boolean isBanlisted(Hash peer, String transport) {
         boolean rv = false;
-        boolean unshitlist = false;
+        boolean unbanlist = false;
 
         Entry entry = _entries.get(peer);
         if (entry == null) {
             rv = false;
         } else if (entry.expireOn <= _context.clock().now()) {
             _entries.remove(peer);
-            unshitlist = true;
+            unbanlist = true;
             rv = false;
         } else if (entry.transports == null) {
             rv = true;
@@ -265,21 +265,21 @@ public class Shitlist {
             rv = entry.transports.contains(transport);
         }
         
-        if (unshitlist) {
+        if (unbanlist) {
             PeerProfile prof = _context.profileOrganizer().getProfile(peer);
             if (prof != null)
-                prof.unshitlist();
-            _context.messageHistory().unshitlist(peer);
+                prof.unbanlist();
+            _context.messageHistory().unbanlist(peer);
             if (_log.shouldLog(Log.INFO))
-                _log.info("Unshitlisting router (expired) " + peer.toBase64());
+                _log.info("Unbanlisting router (expired) " + peer.toBase64());
         }
         
         return rv;
     }
     
-    public boolean isShitlistedForever(Hash peer) {
+    public boolean isBanlistedForever(Hash peer) {
         Entry entry = _entries.get(peer);
-        return entry != null && entry.expireOn > _context.clock().now() + SHITLIST_DURATION_MAX;
+        return entry != null && entry.expireOn > _context.clock().now() + BANLIST_DURATION_MAX;
     }
 
     /** @deprecated moved to router console */

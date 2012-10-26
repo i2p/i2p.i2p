@@ -409,7 +409,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *
      * This is only used in the router console for now, but we put it here because
      * 1) it's a lot easier, and 2) we could use it in the future for peer selection,
-     * tunnel selection, shitlisting, etc.
+     * tunnel selection, banlisting, etc.
      */
 
     /* We hope the routerinfos are read in and things have settled down by now, but it's not required to be so */

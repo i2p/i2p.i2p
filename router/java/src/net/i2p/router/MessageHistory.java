@@ -391,21 +391,21 @@ public class MessageHistory {
     }
     
     /**
-     * We shitlisted the peer
+     * We banlisted the peer
      */
-    public void shitlist(Hash peer, String reason) {
+    public void banlist(Hash peer, String reason) {
         if (!_doLog) return;
         if (peer == null) return;
-        addEntry("Shitlist " + peer.toBase64() + ": " + reason);
+        addEntry("Banlist " + peer.toBase64() + ": " + reason);
     }
        
     /**
-     * We unshitlisted the peer
+     * We unbanlisted the peer
      */
-    public void unshitlist(Hash peer) {
+    public void unbanlist(Hash peer) {
         if (!_doLog) return;
         if (peer == null) return;
-        addEntry("Unshitlist " + peer.toBase64());
+        addEntry("Unbanlist " + peer.toBase64());
     }
     
     /**

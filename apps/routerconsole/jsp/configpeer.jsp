@@ -61,11 +61,11 @@
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
  <input type="submit" name="action" class="add" value="<%=intl._("Adjust peer bonuses")%>" /></p></div>
  </form>
- <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>
+ <a name="banlist"> </a><h2><%=intl._("Banned Peers")%></h2>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% profilesHelper.storeWriter(out); %>
- <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
+ <jsp:getProperty name="profilesHelper" property="banlistSummary" />
  <div class="wideload"><h2><%=intl._("Banned IPs")%></h2>
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 

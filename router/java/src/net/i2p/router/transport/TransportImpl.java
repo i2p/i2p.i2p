@@ -550,8 +550,8 @@ public abstract class TransportImpl implements Transport {
     }
     /** called when we establish a peer connection (outbound or inbound) */
     public void markReachable(Hash peer, boolean isInbound) {
-        // if *some* transport can reach them, then we shouldn't shitlist 'em
-        _context.shitlist().unshitlistRouter(peer);
+        // if *some* transport can reach them, then we shouldn't banlist 'em
+        _context.banlist().unbanlistRouter(peer);
         synchronized (_unreachableEntries) {
             _unreachableEntries.remove(peer);
         }
