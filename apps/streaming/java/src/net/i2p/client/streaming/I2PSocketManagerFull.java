@@ -315,6 +315,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             } catch (I2PSessionException ise) {
                 _log.warn("Unable to destroy the session", ise);
             }
+            if (pcapWriter != null)
+                pcapWriter.flush();
         }
     }
 
@@ -351,7 +353,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private static final String PCAP_FILE = "streaming.pcap";
 
     private static void debugInit(I2PAppContext ctx) {
-        if (!Boolean.valueOf(ctx.getProperty(PROP_PCAP)).booleanValue())
+        if (!ctx.getBooleanProperty(PROP_PCAP))
             return;
         synchronized(_pcapInitLock) {
             if (!_pcapInitialized) {

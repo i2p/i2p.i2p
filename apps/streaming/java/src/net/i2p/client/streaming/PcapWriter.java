@@ -1,8 +1,10 @@
 package net.i2p.client.streaming;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -72,8 +74,8 @@ public class PcapWriter {
     private static final byte OPTION_NACK = (byte) 0xac;
 
 
-    private FileOutputStream _fos;
-    private I2PAppContext _context;
+    private final OutputStream _fos;
+    private final I2PAppContext _context;
 
     public PcapWriter(I2PAppContext ctx, String file) throws IOException {
         _context = ctx;
@@ -81,37 +83,52 @@ public class PcapWriter {
         //if (f.exists()) {
         //    _fos = new FileOutputStream(f, true);
         //} else {
-            _fos = new FileOutputStream(f);
+            _fos = new BufferedOutputStream(new FileOutputStream(f), 64*1024);
             _fos.write(FILE_HEADER);
         //}
     }
 
     public void close() {
-        FileOutputStream fos = _fos;
-        if (fos != null) {
             try {
-                fos.close();
+                _fos.close();
             } catch (IOException ioe) {}
-            _fos = null;
-        }
     }
 
-    public void write(PacketLocal pkt, boolean isInbound) throws IOException {
+    public void flush() {
+            try {
+                _fos.flush();
+            } catch (IOException ioe) {}
+    }
+
+    /**
+     *  For outbound packets
+     */
+    public void write(PacketLocal pkt) throws IOException {
         try {
-            wrt(pkt, isInbound);
+            wrt(pkt, pkt.getConnection(), false);
         } catch (DataFormatException dfe) {
             dfe.printStackTrace();
             throw new IOException(dfe.toString());
         }
-        // remove me
-        _fos.flush();
     }
 
-    private synchronized void wrt(PacketLocal pkt, boolean isInbound) throws IOException, DataFormatException {
-        FileOutputStream fos = _fos;
-        if (fos == null)
-            throw new IOException("Not open or already closed");
-        Connection con = pkt.getConnection();
+    /**
+     *  For inbound packets
+     *  @param con may be null
+     */
+    public void write(Packet pkt, Connection con) throws IOException {
+        try {
+            wrt(pkt, con, true);
+        } catch (DataFormatException dfe) {
+            dfe.printStackTrace();
+            throw new IOException(dfe.toString());
+        }
+    }
+
+    /**
+     *  @param con may be null
+     */
+    private synchronized void wrt(Packet pkt, Connection con, boolean isInbound) throws IOException, DataFormatException {
         int includeLen = Math.min(MAX_PAYLOAD_BYTES, pkt.getPayloadSize());
 
         // option block
@@ -142,23 +159,23 @@ public class PcapWriter {
         // PCAP Header
         long now;
         if (isInbound)
-            now = pkt.getCreatedOn();
+            now = _context.clock().now();
         else
-            now = pkt.getLastSend();
-        DataHelper.writeLong(fos, 4, now / 1000);
-        DataHelper.writeLong(fos, 4, 1000 * (now % 1000));
-        DataHelper.writeLong(fos, 4, 54 + optLen + includeLen);   // 14 MAC + 20 IP + 20 TCP
-        DataHelper.writeLong(fos, 4, 58 + optLen + pkt.getPayloadSize()); // 54 + MAC checksum
+            now = ((PacketLocal)pkt).getLastSend();
+        DataHelper.writeLong(_fos, 4, now / 1000);
+        DataHelper.writeLong(_fos, 4, 1000 * (now % 1000));
+        DataHelper.writeLong(_fos, 4, 54 + optLen + includeLen);   // 14 MAC + 20 IP + 20 TCP
+        DataHelper.writeLong(_fos, 4, 58 + optLen + pkt.getPayloadSize()); // 54 + MAC checksum
 
         // MAC Header 14 bytes
-        fos.write(MAC_HEADER);
+        _fos.write(MAC_HEADER);
 
         // IP 20 bytes total
         // IP Header 12 bytes
         int length = 20 + 20 + optLen + pkt.getPayloadSize();
-        fos.write(IP_HEADER_1);
-        DataHelper.writeLong(fos, 2, length);  // total IP length
-        fos.write(IP_HEADER_2);
+        _fos.write(IP_HEADER_1);
+        DataHelper.writeLong(_fos, 2, length);  // total IP length
+        _fos.write(IP_HEADER_2);
 
         // src and dst IP 8 bytes
         // make our side always start with 127.0.x.x
@@ -199,17 +216,17 @@ public class PcapWriter {
         checksum = update(checksum, IP_HEADER_2);
         checksum = update(checksum, srcAddr, 4);
         checksum = update(checksum, dstAddr, 4);
-        DataHelper.writeLong(fos, 2, checksum ^ 0xffff);
+        DataHelper.writeLong(_fos, 2, checksum ^ 0xffff);
 
         // IPs
-        fos.write(srcAddr, 0, 4);
-        fos.write(dstAddr, 0, 4);
+        _fos.write(srcAddr, 0, 4);
+        _fos.write(dstAddr, 0, 4);
 
         // TCP header 20 bytes total
         // src and dst port 4 bytes
         // the rcv ID is the source, and the send ID is the dest.
-        DataHelper.writeLong(fos, 2, pkt.getReceiveStreamId() & 0xffff);
-        DataHelper.writeLong(fos, 2, pkt.getSendStreamId() & 0xffff);
+        DataHelper.writeLong(_fos, 2, pkt.getReceiveStreamId() & 0xffff);
+        DataHelper.writeLong(_fos, 2, pkt.getSendStreamId() & 0xffff);
 
         // seq and acks 8 bytes
         long seq;
@@ -226,8 +243,8 @@ public class PcapWriter {
             else
                 acked = getLowestAckedThrough(pkt, con);
         }
-        DataHelper.writeLong(fos, 4, pkt.getSequenceNum());
-        DataHelper.writeLong(fos, 4, acked);
+        DataHelper.writeLong(_fos, 4, pkt.getSequenceNum());
+        DataHelper.writeLong(_fos, 4, acked);
 
         // offset and flags 2 bytes
         int flags = 0;
@@ -241,8 +258,8 @@ public class PcapWriter {
             flags |= 0x10;
         // offset byte
         int osb = (5 + (optLen / 4)) << 4;
-        DataHelper.writeLong(fos, 1, osb); // 5 + optLen/4 32-byte words
-        DataHelper.writeLong(fos, 1, flags);
+        DataHelper.writeLong(_fos, 1, osb); // 5 + optLen/4 32-byte words
+        DataHelper.writeLong(_fos, 1, flags);
 
         // window size 2 bytes
         long window = ConnectionOptions.INITIAL_WINDOW_SIZE;
@@ -268,18 +285,20 @@ public class PcapWriter {
         // for now we don't spoof window scaling
         if (window > 65535)
             window = 65535;
-        DataHelper.writeLong(fos, 2, window);
+        DataHelper.writeLong(_fos, 2, window);
 
         // checksum and urgent pointer 4 bytes
-        DataHelper.writeLong(fos, 4, 0);
+        DataHelper.writeLong(_fos, 4, 0);
 
         // TCP option block
         if (optLen > 0)
-            fos.write(options, 0, optLen);
+            _fos.write(options, 0, optLen);
 
         // some data
         if (includeLen > 0)
-            fos.write(pkt.getPayload().getData(), 0, includeLen);
+            _fos.write(pkt.getPayload().getData(), 0, includeLen);
+        if (pkt.isFlagSet(Packet.FLAG_CLOSE))
+            _fos.flush();
     }
 
     /**
@@ -294,7 +313,7 @@ public class PcapWriter {
      *
      *  To do: Add the SACK option to the TCP header.
      */
-    private static long getLowestAckedThrough(PacketLocal pkt, Connection con) {
+    private static long getLowestAckedThrough(Packet pkt, Connection con) {
         long nacks[] = pkt.getNacks();
         long lowest = pkt.getAckThrough(); // can return -1 but we increment below
         if (nacks != null) {
@@ -311,14 +330,16 @@ public class PcapWriter {
     }
 
     private static class Options {
-        byte[] _b;
-        int _len;
+        private final byte[] _b;
+        private int _len;
+
         public Options() {
             _b = new byte[MAX_OPTION_LEN];
         }
 
         /** 40 bytes long, caller must use size() to get actual size */
         public byte[] getData() { return _b; }
+
         /** rounded to next 4 bytes */
         public int size() { return ((_len + 3) / 4) * 4; }
 

@@ -195,7 +195,9 @@ class ConnectionHandler {
             _manager.getPacketHandler().receivePacketDirect(packet, false);
         } else {
             // log it here, just before we kill it - dest will be unknown
-            ((PacketLocal)packet).logTCPDump(true);
+            if (I2PSocketManagerFull.pcapWriter != null &&
+                _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+                packet.logTCPDump(null);
 
             // goodbye
             if (_log.shouldLog(Log.WARN))

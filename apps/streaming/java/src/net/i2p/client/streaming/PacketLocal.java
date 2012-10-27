@@ -10,6 +10,8 @@ import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
 /**
+ * This is the class used for outbound packets.
+ *
  * coordinate local attributes about a packet - send time, ack time, number of
  * retries, etc.
  */
@@ -143,8 +145,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
 
     /** @return null if not bound */
     public Connection getConnection() { return _connection; }
-    /** used to set the rcvd conn after the fact for incoming syn replies */
-    public void setConnection(Connection con) { _connection = con; }
 
     /**
      *  Will force a fast restransmit on the 3rd call (FAST_RETRANSMIT_THRESHOLD)
@@ -263,16 +263,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /** Generate a pcap/tcpdump-compatible format,
      *  so we can use standard debugging tools.
      */
-    public void logTCPDump(boolean isInbound) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info(toString());
-        if (I2PSocketManagerFull.pcapWriter != null &&
-            Boolean.valueOf(_context.getProperty(I2PSocketManagerFull.PROP_PCAP)).booleanValue()) {
+    public void logTCPDump() {
             try {
-                I2PSocketManagerFull.pcapWriter.write(this, isInbound);
+                I2PSocketManagerFull.pcapWriter.write(this);
             } catch (IOException ioe) {
                _log.warn("pcap write ioe: " + ioe);
             }
-        }
     }
 }

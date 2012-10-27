@@ -131,8 +131,9 @@ class PacketHandler {
     
     private void receiveKnownCon(Connection con, Packet packet) {
         // is this ok here or does it need to be below each packetHandler().receivePacket() ?
-        ((PacketLocal)packet).setConnection(con);
-        ((PacketLocal)packet).logTCPDump(true);
+        if (I2PSocketManagerFull.pcapWriter != null &&
+            _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+            packet.logTCPDump(con);
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
             if (packet.getSendStreamId() > 0) {
                 if (con.getOptions().getAnswerPings())
@@ -318,7 +319,9 @@ class PacketHandler {
                 _manager.getConnectionHandler().receiveNewSyn(packet);
             } else {
                 // log it here, just before we kill it - dest will be unknown
-                ((PacketLocal)packet).logTCPDump(true);
+                if (I2PSocketManagerFull.pcapWriter != null &&
+                    _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+                    packet.logTCPDump(null);
                 // don't queue again (infinite loop!)
                 sendReset(packet);
                 packet.releasePayload();

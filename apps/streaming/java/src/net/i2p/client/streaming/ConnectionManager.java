@@ -267,8 +267,9 @@ class ConnectionManager {
         
         con.setReceiveStreamId(receiveId);
         // finally, we know enough that we can log the packet with the conn filled in
-        ((PacketLocal)synPacket).setConnection(con);
-        ((PacketLocal)synPacket).logTCPDump(true);
+        if (I2PSocketManagerFull.pcapWriter != null &&
+            _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+            synPacket.logTCPDump(con);
         try {
             // This validates the packet, and sets the con's SendStreamID and RemotePeer
             con.getPacketHandler().receivePacket(synPacket, con);
