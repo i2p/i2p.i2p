@@ -280,7 +280,7 @@ public class Blocklist {
         }
     }
 
-    private Entry parse(String buf, boolean bitch) {
+    private Entry parse(String buf, boolean shouldLog) {
         byte[] ip1;
         byte[] ip2;
         int start1 = 0;
@@ -365,15 +365,15 @@ public class Blocklist {
                 ip2 = ip1;
             }
         } catch (UnknownHostException uhe) {
-            if (bitch && _log.shouldLog(Log.ERROR))
+            if (shouldLog && _log.shouldLog(Log.ERROR))
                 _log.error("Format error in the blocklist file: " + buf);
             return null;
         } catch (NumberFormatException nfe) {
-            if (bitch && _log.shouldLog(Log.ERROR))
+            if (shouldLog && _log.shouldLog(Log.ERROR))
                 _log.error("Format error in the blocklist file: " + buf);
             return null;
         } catch (IndexOutOfBoundsException ioobe) {
-            if (bitch && _log.shouldLog(Log.ERROR))
+            if (shouldLog && _log.shouldLog(Log.ERROR))
                 _log.error("Format error in the blocklist file: " + buf);
             return null;
         }
