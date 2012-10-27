@@ -194,6 +194,9 @@ class ConnectionHandler {
             // between here and PacketHandler, causing the packet to loop forever....
             _manager.getPacketHandler().receivePacketDirect(packet, false);
         } else {
+            // log it here, just before we kill it - dest will be unknown
+            ((PacketLocal)packet).logTCPDump(true);
+
             // goodbye
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Did not find con for queued non-syn packet, dropping: " + packet);

@@ -1,5 +1,6 @@
 package net.i2p.client.streaming;
 
+import java.io.IOException;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -142,6 +143,8 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
 
     /** @return null if not bound */
     public Connection getConnection() { return _connection; }
+    /** used to set the rcvd conn after the fact for incoming syn replies */
+    public void setConnection(Connection con) { _connection = con; }
 
     /**
      *  Will force a fast restransmit on the 3rd call (FAST_RETRANSMIT_THRESHOLD)
@@ -256,4 +259,20 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public boolean writeAccepted() { return _acceptedOn > 0 && _cancelledOn <= 0; }
     public boolean writeFailed() { return _cancelledOn > 0; }
     public boolean writeSuccessful() { return _ackOn > 0 && _cancelledOn <= 0; }
+
+    /** Generate a pcap/tcpdump-compatible format,
+     *  so we can use standard debugging tools.
+     */
+    public void logTCPDump(boolean isInbound) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info(toString());
+        if (I2PSocketManagerFull.pcapWriter != null &&
+            Boolean.valueOf(_context.getProperty(I2PSocketManagerFull.PROP_PCAP)).booleanValue()) {
+            try {
+                I2PSocketManagerFull.pcapWriter.write(this, isInbound);
+            } catch (IOException ioe) {
+               _log.warn("pcap write ioe: " + ioe);
+            }
+        }
+    }
 }

@@ -77,6 +77,8 @@ class Connection {
     private final SimpleTimer2 _timer;
     
     private long _lifetimeBytesSent;
+    /** TBD for tcpdump-compatible ack output */
+    private long _lowestBytesAckedThrough;
     private long _lifetimeBytesReceived;
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;

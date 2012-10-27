@@ -59,7 +59,9 @@ class MessageHandler implements I2PSessionMuxedListener {
             return;
         }
         if (data == null) return;
-        Packet packet = new Packet();
+        //Packet packet = new Packet();
+        // for tcpdump
+        Packet packet = new PacketLocal(_context, null);
         try {
             packet.readPacket(data, 0, data.length);
             packet.setRemotePort(fromPort);
