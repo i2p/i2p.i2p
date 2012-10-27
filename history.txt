@@ -1,3 +1,5 @@
+* 2012-10-27 0.9.3 released
+
 2012-10-25 zzz
  * BuildHandler: Fix "too slow" rejections due to internal clock skew
 
