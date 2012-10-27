@@ -31,7 +31,11 @@
 <body id="tunnelEditPage">
     <div id="pageHeader">
     </div>
+<%
 
+  if (editBean.isInitialized()) {
+
+%>
     <form method="post" action="list">
 
         <div id="tunnelEditPanel" class="panel">
@@ -508,5 +512,12 @@
     </form>
     <div id="pageFooter">
         </div>
+<%
+
+  } else {
+     %>Tunnels are not initialized yet, please reload in two minutes.<%
+  }  // isInitialized()
+
+%>
     </body>
 </html>

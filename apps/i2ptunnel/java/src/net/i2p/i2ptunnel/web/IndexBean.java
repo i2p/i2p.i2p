@@ -42,14 +42,15 @@ import net.i2p.util.PasswordManager;
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
  *
- * Warning - This class is not part of the i2ptunnel API, and at some point
- * it will be moved from the jar to the war.
+ * Warning - This class is not part of the i2ptunnel API,
+ * it has been moved from the jar to the war.
  * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class IndexBean {
     protected final I2PAppContext _context;
     protected final Log _log;
     protected final TunnelControllerGroup _group;
+    private final String _fatalError;
     private String _action;
     private int _tunnel;
     //private long _prevNonce;
@@ -110,7 +111,18 @@ public class IndexBean {
     public IndexBean() {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(IndexBean.class);
-        _group = TunnelControllerGroup.getInstance();
+        TunnelControllerGroup tcg;
+        String error;
+        try {
+            tcg = TunnelControllerGroup.getInstance();
+            error = tcg == null ? _("Tunnels are not initialized yet, please reload in two minutes.")
+                                : null;
+        } catch (IllegalArgumentException iae) {
+            tcg = null;
+            error = iae.toString();
+        }
+        _group = tcg;
+        _fatalError = error;
         _tunnel = -1;
         _curNonce = "-1";
         addNonce();
@@ -118,6 +130,13 @@ public class IndexBean {
         _otherOptions = new ConcurrentHashMap(4);
     }
     
+    /**
+     *  @since 0.9.4
+     */
+    public boolean isInitialized() {
+        return _group != null;
+    }
+
     public static String getNextNonce() {
         synchronized (_nonces) {
             return _nonces.get(0);
@@ -164,6 +183,8 @@ public class IndexBean {
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
+        if (_group == null)
+            return "Error - tunnels are not initialized yet";
         // If passwords are turned on, all is assumed good
         if (!_context.getBooleanProperty(PROP_PW_ENABLE) &&
             !haveNonce(_curNonce))
@@ -197,27 +218,27 @@ public class IndexBean {
         else
             return "Action " + _action + " unknown";
     }
+
     private String stopAll() {
-        if (_group == null) return "";
         List<String> msgs = _group.stopAllControllers();
         return getMessages(msgs);
     }
+
     private String startAll() {
-        if (_group == null) return "";
         List<String> msgs = _group.startAllControllers();
         return getMessages(msgs);
     }
+
     private String restartAll() {
-        if (_group == null) return "";
         List<String> msgs = _group.restartAllControllers();
         return getMessages(msgs);
     }
+
     private String reloadConfig() {
-        if (_group == null) return "";
-        
         _group.reloadControllers();
         return _("Configuration reloaded for all tunnels");
     }
+
     private String start() {
         if (_tunnel < 0) return "Invalid tunnel";
         
@@ -372,7 +393,7 @@ public class IndexBean {
      */
     public String getMessages() {
         if (_group == null)
-            return "";
+            return _fatalError;
         
         StringBuilder buf = new StringBuilder(512);
         if (_action != null) {
