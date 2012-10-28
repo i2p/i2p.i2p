@@ -27,6 +27,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
+import net.i2p.router.util.PriBlockingQueue;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
@@ -89,7 +90,8 @@ class NTCPConnection {
     /**
      * pending unprepared OutNetMessage instances
      */
-    private final CoDelPriorityBlockingQueue<OutNetMessage> _outbound;
+    //private final CoDelPriorityBlockingQueue<OutNetMessage> _outbound;
+    private final PriBlockingQueue<OutNetMessage> _outbound;
     /**
      *  current prepared OutNetMessage, or null - synchronize on _outbound to modify
      *  FIXME why do we need this???
@@ -159,7 +161,8 @@ class NTCPConnection {
         _writeBufs = new ConcurrentLinkedQueue();
         _bwInRequests = new ConcurrentHashSet(2);
         _bwOutRequests = new ConcurrentHashSet(8);
-        _outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
+        //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
+        _outbound = new PriBlockingQueue(32);
         _isInbound = true;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
@@ -186,7 +189,8 @@ class NTCPConnection {
         _writeBufs = new ConcurrentLinkedQueue();
         _bwInRequests = new ConcurrentHashSet(2);
         _bwOutRequests = new ConcurrentHashSet(8);
-        _outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
+        //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
+        _outbound = new PriBlockingQueue(32);
         _isInbound = false;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
@@ -310,7 +314,8 @@ class NTCPConnection {
         }
 
         List<OutNetMessage> pending = new ArrayList();
-        _outbound.drainAllTo(pending);
+        //_outbound.drainAllTo(pending);
+        _outbound.drainTo(pending);
         for (OutNetMessage msg : pending) {
             Object buf = msg.releasePreparationBuffer();
             if (buf != null)

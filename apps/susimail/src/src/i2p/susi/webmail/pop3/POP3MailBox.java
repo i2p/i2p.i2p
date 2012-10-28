@@ -42,7 +42,7 @@ public class POP3MailBox {
 
 	private String host = null, user = null, pass = null;
 
-	private String lastLine = "-ERR", lastError = null;
+	private String lastLine = "-ERR No response from server", lastError = null;
 
 	private int port = 0, mails = 0, read = 0;
 

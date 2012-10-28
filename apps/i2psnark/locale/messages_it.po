@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-12 00:46+0000\n"
-"PO-Revision-Date: 2012-10-12 00:39+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2012-10-15 17:57+0000\n"
+"PO-Revision-Date: 2012-10-12 00:54+0000\n"
+"Last-Translator: BadCluster <badcluster@i2pmail.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
 "it/)\n"
 "Language: it\n"
@@ -342,7 +342,7 @@ msgstr "Torrent in aggiunta in {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:1374
 #, java-format
 msgid "Up bandwidth limit is {0} KBps"
-msgstr ""
+msgstr "La banda di Upload massima è {0} KBps"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1396
 #, java-format
@@ -606,7 +606,7 @@ msgstr "File torrent eliminato: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:642
 #, java-format
 msgid "Download deleted: {0}"
-msgstr ""
+msgstr "Downloads cancellati: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:656
 #, java-format
@@ -701,12 +701,12 @@ msgstr "Ripristina tracker di default"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:997
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:998
 msgid "Checking"
-msgstr ""
+msgstr "Controllo (Check)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1000
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1001
 msgid "Allocating"
-msgstr ""
+msgstr "Allocando"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1005
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1011

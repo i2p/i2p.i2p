@@ -24,8 +24,10 @@ public class RouterWatchdog implements Runnable {
     private final RouterContext _context;
     private int _consecutiveErrors;
     private volatile boolean _isRunning;
+    private long _lastDump;
     
     private static final long MAX_JOB_RUN_LAG = 60*1000;
+    private static final long MIN_DUMP_INTERVAL= 6*60*60*1000;
     
     public RouterWatchdog(RouterContext ctx) {
         _context = ctx;
@@ -70,7 +72,7 @@ public class RouterWatchdog implements Runnable {
 
         // Client manager starts complaining after 10 minutes, and we run every minute,
         // so this will restart 30 minutes after we lose a lease, if the wrapper is present.
-        if (_consecutiveErrors >= 20 && System.getProperty("wrapper.version") != null)
+        if (_consecutiveErrors >= 20 && SystemVersion.hasWrapper())
             return true;
         return false;
     }
@@ -114,7 +116,11 @@ public class RouterWatchdog implements Runnable {
                 // This works on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
-                ThreadDump.dump(_context, 10);
+                long now = _context.clock().now();
+                if (now - _lastDump > MIN_DUMP_INTERVAL) {
+                    _lastDump = now;
+                    ThreadDump.dump(_context, 10);
+                }
             }
         }
     }
