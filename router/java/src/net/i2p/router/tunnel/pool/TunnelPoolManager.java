@@ -659,7 +659,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             int len = tun.getLength();
             if (len > 1 && tun.getPeer(1).equals(peer)) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Removing OB tunnel, first hop shitlisted: " + tun);
+                    _log.warn("Removing OB tunnel, first hop banlisted: " + tun);
                 pool.tunnelFailed(tun, peer);
             }
         }
@@ -675,7 +675,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             int len = tun.getLength();
             if (len > 1 && tun.getPeer(len - 2).equals(peer)) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Removing IB tunnel, prev. hop shitlisted: " + tun);
+                    _log.warn("Removing IB tunnel, prev. hop banlisted: " + tun);
                 pool.tunnelFailed(tun, peer);
             }
         }

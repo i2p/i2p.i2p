@@ -54,7 +54,7 @@ public class RouterContext extends I2PAppContext {
     private TunnelManagerFacade _tunnelManager;
     private TunnelDispatcher _tunnelDispatcher;
     private StatisticsManager _statPublisher;
-    private Shitlist _shitlist;
+    private Banlist _banlist;
     private Blocklist _blocklist;
     private MessageValidator _messageValidator;
     //private MessageStateMonitor _messageStateMonitor;
@@ -188,7 +188,7 @@ public class RouterContext extends I2PAppContext {
             _tunnelManager = new DummyTunnelManagerFacade();
         _tunnelDispatcher = new TunnelDispatcher(this);
         _statPublisher = new StatisticsManager(this);
-        _shitlist = new Shitlist(this);
+        _banlist = new Banlist(this);
         _blocklist = new Blocklist(this);
         _messageValidator = new MessageValidator(this);
         _throttle = new RouterThrottleImpl(this);
@@ -343,7 +343,7 @@ public class RouterContext extends I2PAppContext {
     /** 
      * who does this peer hate?
      */
-    public Shitlist shitlist() { return _shitlist; }
+    public Banlist banlist() { return _banlist; }
     public Blocklist blocklist() { return _blocklist; }
     /**
      * The router keeps track of messages it receives to prevent duplicates, as
@@ -377,7 +377,7 @@ public class RouterContext extends I2PAppContext {
         buf.append(_bandwidthLimiter).append('\n');
         buf.append(_tunnelManager).append('\n');
         buf.append(_statPublisher).append('\n');
-        buf.append(_shitlist).append('\n');
+        buf.append(_banlist).append('\n');
         buf.append(_messageValidator).append('\n');
         return buf.toString();
     }

@@ -535,7 +535,7 @@ class EventPumper implements Runnable {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Failed outbound " + con, ioe);
             con.close();
-            //_context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "Error connecting", NTCPTransport.STYLE);
+            //_context.banlist().banlistRouter(con.getRemotePeer().calculateHash(), "Error connecting", NTCPTransport.STYLE);
             _transport.markUnreachable(con.getRemotePeer().calculateHash());
             _context.statManager().addRateData("ntcp.connectFailedTimeoutIOE", 1);
         } catch (NoConnectionPendingException ncpe) {
@@ -790,10 +790,10 @@ class EventPumper implements Runnable {
                     _context.statManager().addRateData("ntcp.connectFailedIOE", 1);
                     _transport.markUnreachable(con.getRemotePeer().calculateHash());
                     //if (ntcpOnly(con)) {
-                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage());
+                    //    _context.banlist().banlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage());
                     //    con.close(false);
                     //} else {
-                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage(), NTCPTransport.STYLE);
+                    //    _context.banlist().banlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage(), NTCPTransport.STYLE);
                         con.close(true);
                     //}
                 } catch (UnresolvedAddressException uae) {                    
@@ -801,10 +801,10 @@ class EventPumper implements Runnable {
                     _context.statManager().addRateData("ntcp.connectFailedUnresolved", 1);
                     _transport.markUnreachable(con.getRemotePeer().calculateHash());
                     //if (ntcpOnly(con)) {
-                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect/resolve: " + uae.getMessage());
+                    //    _context.banlist().banlistRouter(con.getRemotePeer().calculateHash(), "unable to connect/resolve: " + uae.getMessage());
                     //    con.close(false);
                     //} else {
-                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect/resolve: " + uae.getMessage(), NTCPTransport.STYLE);
+                    //    _context.banlist().banlistRouter(con.getRemotePeer().calculateHash(), "unable to connect/resolve: " + uae.getMessage(), NTCPTransport.STYLE);
                         con.close(true);
                     //}
                 } catch (CancelledKeyException cke) {
@@ -823,7 +823,7 @@ class EventPumper implements Runnable {
     }
     
     /**
-     * If the other peer only supports ntcp, we should shitlist them when we can't reach 'em,
+     * If the other peer only supports ntcp, we should banlist them when we can't reach 'em,
      * but if they support other transports (eg ssu) we should allow those transports to be
      * tried as well.
      */

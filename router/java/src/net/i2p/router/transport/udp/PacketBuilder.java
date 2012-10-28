@@ -1071,7 +1071,7 @@ class PacketBuilder {
                 if (_log.shouldLog(_log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
-                // TODO implement some sort of introducer shitlist
+                // TODO implement some sort of introducer banlist
                 continue;
             }
             rv.add(buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true));

@@ -94,7 +94,7 @@ public class I2Plistener implements Runnable {
 
 				}
 			} catch (I2PException e) {
-				// bad shit
+				// bad stuff
 				System.out.println("Exception " + e);
 			}
 		} finally {

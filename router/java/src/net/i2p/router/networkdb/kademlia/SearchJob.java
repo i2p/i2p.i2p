@@ -309,8 +309,8 @@ class SearchJob extends JobImpl {
                             if (onlyFloodfill)
                                 continue;
 			}
-                        if (ri.isHidden()) {// || // allow querying shitlisted, since its indirect
-                            //getContext().shitlist().isShitlisted(peer)) {
+                        if (ri.isHidden()) {// || // allow querying banlisted, since its indirect
+                            //getContext().banlist().isBanlisted(peer)) {
                             // dont bother
                         } else {
                             _state.addPending(peer);
@@ -413,8 +413,8 @@ class SearchJob extends JobImpl {
         }
         TunnelId inTunnelId = inTunnel.getReceiveTunnelId(0);
 
-        // this will fail if we've shitlisted our inbound gateway, but the gw may not necessarily
-        // be shitlisted by whomever needs to contact them, so we don't need to check this
+        // this will fail if we've banlisted our inbound gateway, but the gw may not necessarily
+        // be banlisted by whomever needs to contact them, so we don't need to check this
         
         //RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
         //if (inGateway == null) {

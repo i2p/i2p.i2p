@@ -23,7 +23,7 @@ class SearchReplyJob extends JobImpl {
      * Peer who we think sent us the reply.  Note: could be spoofed!  If the
      * attacker knew we were searching for a particular key from a 
      * particular peer, they could send us some searchReply messages with
-     * shitty values, trying to get us to consider that peer unreliable.  
+     * bad values, trying to get us to consider that peer unreliable.  
      * Potential fixes include either authenticated 'from' address or use a
      * nonce in the search + searchReply (and check for it in the selector).
      *
@@ -85,12 +85,12 @@ class SearchReplyJob extends JobImpl {
                 if (!sendsBadInfo) {
                     // we don't need to search for everthing we're given here - only ones that
                     // are next in our search path...
-                    // note: no need to think about shitlisted targets in the netdb search, given
+                    // note: no need to think about banlisted targets in the netdb search, given
                     //       the floodfill's behavior
                     // This keeps us from continually chasing blocklisted floodfills
-                    if (getContext().shitlist().isShitlisted(peer)) {
+                    if (getContext().banlist().isBanlisted(peer)) {
                     //    if (_log.shouldLog(Log.INFO))
-                    //        _log.info("Not looking for a shitlisted peer...");
+                    //        _log.info("Not looking for a banlisted peer...");
                     //    getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
                     } else {
                         //getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);

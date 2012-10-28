@@ -94,7 +94,7 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     /**
-     *  @return all floodfills not shitlisted forever.
+     *  @return all floodfills not banlisted forever.
      *  List will not include our own hash.
      *  List is not sorted and not shuffled.
      */
@@ -105,7 +105,7 @@ class FloodfillPeerSelector extends PeerSelector {
 
     /**
      *  @param toIgnore can be null
-     *  @return all floodfills not shitlisted forever.
+     *  @return all floodfills not banlisted forever.
      *  List MAY INCLUDE our own hash.
      *  List is not sorted and not shuffled.
      */
@@ -122,7 +122,7 @@ class FloodfillPeerSelector extends PeerSelector {
         List<Hash> rv = new ArrayList(set.size());
         for (Hash h : set) {
             if ((toIgnore != null && toIgnore.contains(h)) ||
-                _context.shitlist().isShitlistedForever(h))
+                _context.banlist().isBanlistedForever(h))
                continue;
             rv.add(h);
         }
@@ -135,7 +135,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  searches and stores won't work well.
      *  List will not include our own hash.
      *
-     *  @return floodfills closest to the key that are not shitlisted forever
+     *  @return floodfills closest to the key that are not banlisted forever
      *  @param key the ROUTING key (NOT the original key)
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
@@ -299,11 +299,11 @@ class FloodfillPeerSelector extends PeerSelector {
                 return;
             //if (entry.equals(_context.routerHash()))
             //    return;
-            // it isn't direct, so who cares if they're shitlisted
-            //if (_context.shitlist().isShitlisted(entry))
+            // it isn't direct, so who cares if they're banlisted
+            //if (_context.banlist().isBanlisted(entry))
             //    return;
             // ... unless they are really bad
-            if (_context.shitlist().isShitlistedForever(entry))
+            if (_context.banlist().isBanlistedForever(entry))
                 return;
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
             //if (info == null)
@@ -330,7 +330,7 @@ class FloodfillPeerSelector extends PeerSelector {
         }
 
         /**
-         *  @return list of all with the 'f' mark in their netdb except for shitlisted ones.
+         *  @return list of all with the 'f' mark in their netdb except for banlisted ones.
          *  Will return non-floodfills only if there aren't enough floodfills.
          *
          *  The list is in 3 groups - unsorted (shuffled) within each group.
@@ -348,7 +348,7 @@ class FloodfillPeerSelector extends PeerSelector {
             long now = _context.clock().now();
             // Only add in "good" floodfills here...
             // Let's say published in last 3h and no failed sends in last 30m
-            // (Forever shitlisted ones are excluded in add() above)
+            // (Forever banlisted ones are excluded in add() above)
             for (Iterator<Hash> iter = new RandomIterator(_floodfillMatches); (found < howMany) && iter.hasNext(); ) {
                 Hash entry = iter.next();
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);

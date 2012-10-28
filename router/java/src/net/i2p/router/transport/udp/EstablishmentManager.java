@@ -233,7 +233,7 @@ class EstablishmentManager {
         RouterIdentity toIdentity = toRouterInfo.getIdentity();
         Hash toHash = toIdentity.calculateHash();
         if (toRouterInfo.getNetworkId() != Router.NETWORK_ID) {
-            _context.shitlist().shitlistRouter(toHash);
+            _context.banlist().banlistRouter(toHash);
             _transport.markUnreachable(toHash);
             _transport.failed(msg, "Remote peer is on the wrong network, cannot establish");
             return;
@@ -252,7 +252,7 @@ class EstablishmentManager {
                 Arrays.equals(maybeTo.getIP(), _transport.getExternalIP())) {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
                 _transport.markUnreachable(toHash);
-                //_context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
+                //_context.banlist().banlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
                 _context.statManager().addRateData("udp.establishBadIP", 1);
                 return;
             }
@@ -707,15 +707,15 @@ class EstablishmentManager {
 
     /**
      * dont send our info immediately, just send a small data packet, and 5-10s later, 
-     * if the peer isnt shitlisted, *then* send them our info.  this will help kick off
+     * if the peer isnt banlisted, *then* send them our info.  this will help kick off
      * the oldnet
      * The "oldnet" was < 0.6.1.10, it is long gone.
      * The delay really slows down the network.
-     * The peer is unshitlisted and marked reachable by addRemotePeerState() which calls markReachable()
+     * The peer is unbanlisted and marked reachable by addRemotePeerState() which calls markReachable()
      * so the check below is fairly pointless.
      * If for some strange reason an oldnet router (NETWORK_ID == 1) does show up,
      *  it's handled in UDPTransport.messageReceived()
-     * (where it will get dropped, marked unreachable and shitlisted at that time).
+     * (where it will get dropped, marked unreachable and banlisted at that time).
      */
     private void sendInboundComplete(PeerState peer) {
         // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
@@ -733,15 +733,15 @@ class EstablishmentManager {
         //_context.simpleScheduler().addEvent(new PublishToNewInbound(peer), 0);
 
             Hash hash = peer.getRemotePeer();
-            if ((hash != null) && (!_context.shitlist().isShitlisted(hash)) && (!_transport.isUnreachable(hash))) {
+            if ((hash != null) && (!_context.banlist().isBanlisted(hash)) && (!_transport.isUnreachable(hash))) {
                 // ok, we are fine with them, send them our latest info
                 //if (_log.shouldLog(Log.INFO))
-                //    _log.info("Publishing to the peer after confirm plus delay (without shitlist): " + peer);
+                //    _log.info("Publishing to the peer after confirm plus delay (without banlist): " + peer);
                 sendOurInfo(peer, true);
             } else {
                 // nuh uh.
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("NOT publishing to the peer after confirm plus delay (WITH shitlist): " + (hash != null ? hash.toString() : "unknown"));
+                    _log.warn("NOT publishing to the peer after confirm plus delay (WITH banlist): " + (hash != null ? hash.toString() : "unknown"));
             }
     }
     
@@ -1103,9 +1103,9 @@ class EstablishmentManager {
                   case IB_STATE_CONFIRMED_COMPLETELY:
                     RouterIdentity remote = inboundState.getConfirmedIdentity();
                     if (remote != null) {
-                        if (_context.shitlist().isShitlistedForever(remote.calculateHash())) {
+                        if (_context.banlist().isBanlistedForever(remote.calculateHash())) {
                             if (_log.shouldLog(Log.WARN))
-                                _log.warn("Dropping inbound connection from permanently shitlisted peer: " + remote.calculateHash());
+                                _log.warn("Dropping inbound connection from permanently banlisted peer: " + remote.calculateHash());
                             // So next time we will not accept the con, rather than doing the whole handshake
                             _context.blocklist().add(inboundState.getSentIP());
                             inboundState.fail();
@@ -1299,7 +1299,7 @@ class EstablishmentManager {
             }
             String err = "Took too long to establish OB connection, state = " + outboundState.getState();
             Hash peer = outboundState.getRemoteIdentity().calculateHash();
-            //_context.shitlist().shitlistRouter(peer, err, UDPTransport.STYLE);
+            //_context.banlist().banlistRouter(peer, err, UDPTransport.STYLE);
             _transport.markUnreachable(peer);
             _transport.dropPeer(peer, false, err);
             //_context.profileManager().commErrorOccurred(peer);

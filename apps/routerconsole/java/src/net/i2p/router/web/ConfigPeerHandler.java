@@ -20,7 +20,7 @@ public class ConfigPeerHandler extends FormHandler {
         } else if (_action.equals(_("Ban peer until restart"))) {
             Hash h = getHash();
             if (h != null) {
-                _context.shitlist().shitlistRouterForever(h, _("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
+                _context.banlist().banlistRouterForever(h, _("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
                 addFormNotice(_("Peer") + " " + _peer + " " + _("banned until restart") );
                 return;
             }
@@ -28,8 +28,8 @@ public class ConfigPeerHandler extends FormHandler {
         } else if (_action.equals(_("Unban peer"))) {
             Hash h = getHash();
             if (h != null) {
-                if (_context.shitlist().isShitlisted(h)) {
-                    _context.shitlist().unshitlistRouter(h);
+                if (_context.banlist().isBanlisted(h)) {
+                    _context.banlist().unbanlistRouter(h);
                     addFormNotice(_("Peer") + " " + _peer + " " + _("unbanned") );
                 } else
                     addFormNotice(_("Peer") + " " + _peer + " " + _("is not currently banned") );

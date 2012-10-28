@@ -183,10 +183,10 @@ class StoreJob extends JobImpl {
                     //    _state.addSkipped(peer);
                     //}
                     
-                    // we don't want to filter out peers based on our local shitlist, as that opens an avenue for
-                    // manipulation (since a peer can get us to shitlist them by, well, being shitty, and that
+                    // we don't want to filter out peers based on our local banlist, as that opens an avenue for
+                    // manipulation (since a peer can get us to banlist them, and that
                     // in turn would let them assume that a netDb store received didn't come from us)
-                    //if (getContext().shitlist().isShitlisted(((RouterInfo)ds).getIdentity().calculateHash())) {
+                    //if (getContext().banlist().isBanlisted(((RouterInfo)ds).getIdentity().calculateHash())) {
                     //    _state.addSkipped(peer);
                     //} else {
                     //

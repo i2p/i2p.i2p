@@ -96,11 +96,11 @@ class FloodfillMonitorJob extends JobImpl {
         // Count the "good" ff peers.
         //
         // Who's not good?
-        // the unheard-from, unprofiled, failing, unreachable and shitlisted ones.
+        // the unheard-from, unprofiled, failing, unreachable and banlisted ones.
         // We should hear from floodfills pretty frequently so set a 60m time limit.
         // If unprofiled we haven't talked to them in a long time.
-        // We aren't contacting the peer directly, so shitlist doesn't strictly matter,
-        // but it's a bad sign, and we often shitlist a peer before we fail it...
+        // We aren't contacting the peer directly, so banlist doesn't strictly matter,
+        // but it's a bad sign, and we often banlist a peer before we fail it...
         //
         // Future: use Integration calculation
         //
@@ -110,7 +110,7 @@ class FloodfillMonitorJob extends JobImpl {
         for (Hash peer : floodfillPeers) {
             PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
             if (profile == null || profile.getLastHeardFrom() < before ||
-                profile.getIsFailing() || getContext().shitlist().isShitlisted(peer) ||
+                profile.getIsFailing() || getContext().banlist().isBanlisted(peer) ||
                 getContext().commSystem().wasUnreachable(peer))
                 failcount++;
         }
