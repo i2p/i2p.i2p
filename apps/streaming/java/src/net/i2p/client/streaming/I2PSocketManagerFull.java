@@ -85,6 +85,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             _log.info("Socket manager created.  \ndefault options: " + _defaultOptions
                       + "\noriginal properties: " + opts);
         }
+        debugInit(context);
     }
 
     /**
@@ -314,6 +315,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             } catch (I2PSessionException ise) {
                 _log.warn("Unable to destroy the session", ise);
             }
+            if (pcapWriter != null)
+                pcapWriter.flush();
         }
     }
 
@@ -341,5 +344,26 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
     public void removeDisconnectListener(I2PSocketManager.DisconnectListener lsnr) {
         _connectionManager.getMessageHandler().removeDisconnectListener(lsnr);
+    }
+
+    private static final Object _pcapInitLock = new Object();
+    private static boolean _pcapInitialized;
+    static PcapWriter pcapWriter;
+    static final String PROP_PCAP = "i2p.streaming.pcap";
+    private static final String PCAP_FILE = "streaming.pcap";
+
+    private static void debugInit(I2PAppContext ctx) {
+        if (!ctx.getBooleanProperty(PROP_PCAP))
+            return;
+        synchronized(_pcapInitLock) {
+            if (!_pcapInitialized) {
+                try {
+                    pcapWriter = new PcapWriter(ctx, PCAP_FILE);
+                } catch (java.io.IOException ioe) {
+                     System.err.println("pcap init ioe: " + ioe);
+                }
+                _pcapInitialized = true;
+            }
+        }
     }
 }
