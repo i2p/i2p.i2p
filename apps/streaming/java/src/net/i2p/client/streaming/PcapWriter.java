@@ -40,7 +40,7 @@ import net.i2p.data.Hash;
  *  Yes we could dump it natively and write a wireshark dissector. That sounds hard.
  *  And we wouldn't get the TCP stream analysis built into the tools.
  *
- * @author zzz
+ *  @since 0.9.4
  */
 public class PcapWriter {
 

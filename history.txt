@@ -1,3 +1,47 @@
+2012-10-28 zzz
+ * Addresses:
+   - Add methods for connectivity detection
+   - Remove Hamachi restriction
+ * Banlist: renamed
+ * Clients: New interface for clients started via clients.config, and a new
+   manager to track the lifecycle and start/stop clients on demand.
+   (ticket #347)
+ * Console:
+   - Add console password form to configui.jsp
+   - Consolidate all the jsp formhandler boilerplate in the new formhandler.jsi
+   - Store form handler nonces in the servlet session instead of system properties,
+     to prevent cross-session interference
+   - Bypass nonces if console password enabled
+   - Remove ports from port mapper on shutdown, other changes to
+     track actual ports better (ticket #731)
+   - Prep for RouterApp interface by storing context in a field,
+     shuffle around what's static and what's not (ticket #347)
+   - Convert to RouterApp interface
+   - Convert from basic to digest authentication
+   - Use new password manager (ticket #731)
+ * Core: New password manager for storing passwords in router.config
+   in consistent ways, including salting and hashing if possible.
+   (ticket #731)
+ * i2ptunnel:
+   - Convert HTTP and CONNECT proxies from basic to digest authentication
+   - Bypass nonces if console password enabled
+   - Convert to ClientApp interface
+   - Synchronization improvements
+ * Streaming: Add pcap debug facility, from i2p.i2p.zzz.pcap
+ * Transport:
+   - Add a simple network monitor
+   - Add new reachability state for network disconnected
+   - Prevent any tunnel building when disconnected (ticket #519)
+   - Don't unleash watchdog when disconnected
+   - Split up NTCPConnection's single _bwRequests Set into inbound and outbound,
+     make FIFOBandwithLimiter.Request unidirectional (ticket #719)
+ * Update: Major redesign of the update facilities:
+   - Generic interfaces for updating and checking things
+   - Allow checkers and updaters outside router context
+   - Hide update buttons after downloading update (ticket #484)
+   - Add update-via-i2psnark facility
+   - Don't hold references to updaters after completion
+
 * 2012-10-27 0.9.3 released
 
 2012-10-25 zzz

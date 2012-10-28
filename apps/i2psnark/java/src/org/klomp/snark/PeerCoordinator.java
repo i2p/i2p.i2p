@@ -958,16 +958,11 @@ class PeerCoordinator implements PeerListener
    */
   public boolean gotPiece(Peer peer, PartialPiece pp)
   {
-    if (metainfo == null || storage == null || storage.isChecking()) {
+    if (metainfo == null || storage == null || storage.isChecking() || halted) {
         pp.release();
         return true;
     }
     int piece = pp.getPiece();
-    if (halted) {
-      _log.info("Got while-halted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
-      pp.release();
-      return true; // We don't actually care anymore.
-    }
     
     synchronized(wantedPieces)
       {

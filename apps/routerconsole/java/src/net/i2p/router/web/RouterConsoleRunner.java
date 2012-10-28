@@ -798,15 +798,6 @@ public class RouterConsoleRunner implements RouterApp {
         }
     }
     
-    /** @since 0.8.8 */
-    private static class ServerShutdown implements Runnable {
-        public void run() {
-            try {
-                _server.stop();
-            } catch (Exception ie) {}
-        }
-    }
-
     private Properties webAppProperties() {
         return webAppProperties(_context.getConfigDir().getAbsolutePath());
     }

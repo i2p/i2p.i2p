@@ -73,9 +73,8 @@ public abstract class Addresses {
     /**
      *  @return a sorted set of all addresses
      *  @param includeSiteLocal whether to include private like 192.168.x.x
-     *  @param includeLoopAndWildcard whether to include 127.x.x.x and 0.0.0.0
+     *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
      *  @param includeIPv6 whether to include IPV6
-     *  @param includeWildCard whether to include 0.0.0.0 and/or 0:0:0:0:0:0 (includeLocal must be true)
      *  @return an array of all addresses
      *  @since 0.9.4
      */

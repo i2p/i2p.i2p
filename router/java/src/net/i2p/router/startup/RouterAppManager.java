@@ -94,7 +94,6 @@ public class RouterAppManager implements ClientAppManager {
      *  Only required for apps used by other apps.
      *
      *  @param app non-null
-     *  @param name non-null
      *  @return true if successful, false if duplicate name
      */
     public boolean register(ClientApp app) {
@@ -109,7 +108,6 @@ public class RouterAppManager implements ClientAppManager {
      *  Only required for apps used by other apps.
      *
      *  @param app non-null
-     *  @param name non-null
      */
     public void unregister(ClientApp app) {
         _registered.remove(app.getName(), app);
@@ -121,7 +119,6 @@ public class RouterAppManager implements ClientAppManager {
      *  Do not hold a static reference.
      *  If you only need to find a port, use the PortMapper instead.
      *
-     *  @param app non-null
      *  @param name non-null
      *  @return client app or null
      */

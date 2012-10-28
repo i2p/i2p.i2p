@@ -25,7 +25,6 @@ public interface ClientAppManager {
      *  Only required for apps used by other apps.
      *
      *  @param app non-null
-     *  @param name non-null
      *  @return true if successful, false if duplicate name
      */
     public boolean register(ClientApp app);
@@ -35,7 +34,6 @@ public interface ClientAppManager {
      *  Only required for apps used by other apps.
      *
      *  @param app non-null
-     *  @param name non-null
      */
     public void unregister(ClientApp app);
     
@@ -43,7 +41,6 @@ public interface ClientAppManager {
      *  Get a registered app.
      *  Only used for apps finding other apps.
      *
-     *  @param app non-null
      *  @param name non-null
      *  @return client app or null
      */
