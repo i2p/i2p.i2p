@@ -253,7 +253,6 @@ class UDPReceiver {
 
         public void run() {
             //_socketChanged = false;
-            FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().createRequest();
             while (_keepRunning) {
                 //if (_socketChanged) {
                 //    Thread.currentThread().setName(_name + "." + _id);
@@ -292,7 +291,8 @@ class UDPReceiver {
                     if (size > 0) {
                         //FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
-                        req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
+                        FIFOBandwidthLimiter.Request req =
+                              _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         while (req.getPendingRequested() > 0)
                             req.waitForNextAllocation();
                         

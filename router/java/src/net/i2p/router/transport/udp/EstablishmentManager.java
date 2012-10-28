@@ -824,8 +824,8 @@ class EstablishmentManager {
         try {
             state.generateSessionKey();
         } catch (DHSessionKeyBuilder.InvalidPublicParameterException ippe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Peer " + state + " sent us an invalid DH parameter (or were spoofed)", ippe);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Peer " + state + " sent us an invalid DH parameter", ippe);
             _inboundStates.remove(state.getRemoteHostId());
             return;
         }

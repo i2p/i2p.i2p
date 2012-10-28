@@ -375,7 +375,7 @@ class EventPumper implements Runnable {
      */
     public void wantsWrite(NTCPConnection con, byte data[]) {
         ByteBuffer buf = ByteBuffer.wrap(data);
-        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(data.length, "NTCP write");//con, buf);
+        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(data.length, 0, "NTCP write");//con, buf);
         if (req.getPendingRequested() > 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("queued write on " + con + " for " + data.length);

@@ -2595,6 +2595,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 // if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
 //
                 // fall through...
+            case CommSystemFacade.STATUS_DISCONNECTED:
             case CommSystemFacade.STATUS_HOSED:
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
