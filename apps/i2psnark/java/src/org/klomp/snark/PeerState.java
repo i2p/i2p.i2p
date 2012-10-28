@@ -592,6 +592,7 @@ class PeerState implements DataLoader
                 // Send cancel even when we are choked to make sure that it is
                 // really never ever send.
                 out.sendCancel(req);
+                req.getPartialPiece().release();
               }
           }
   }
@@ -741,6 +742,10 @@ class PeerState implements DataLoader
                   out.sendRequest(r);
                 lastRequest = r;
                 return true;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Got dup from coord: " + pp);
+                pp.release();
             }
         }
 

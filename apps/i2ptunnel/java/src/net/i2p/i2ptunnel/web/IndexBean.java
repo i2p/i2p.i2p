@@ -27,6 +27,7 @@ import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.i2ptunnel.I2PTunnelConnectClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
@@ -36,18 +37,20 @@ import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.PasswordManager;
 
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
  *
- * Warning - This class is not part of the i2ptunnel API, and at some point
- * it will be moved from the jar to the war.
+ * Warning - This class is not part of the i2ptunnel API,
+ * it has been moved from the jar to the war.
  * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class IndexBean {
     protected final I2PAppContext _context;
     protected final Log _log;
     protected final TunnelControllerGroup _group;
+    private final String _fatalError;
     private String _action;
     private int _tunnel;
     //private long _prevNonce;
@@ -83,15 +86,14 @@ public class IndexBean {
     private int _hashCashValue;
     private int _certType;
     private String _certSigner;
+    private String _newProxyUser;
+    private String _newProxyPW;
     
     public static final int RUNNING = 1;
     public static final int STARTING = 2;
     public static final int NOT_RUNNING = 3;
     public static final int STANDBY = 4;
     
-    /** deprecated unimplemented, now using routerconsole realm */
-    //public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
-    public static final String PROP_TUNNEL_PASSPHRASE = "consolePassword";
     //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
     //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
     /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
@@ -104,11 +106,23 @@ public class IndexBean {
     public static final String DEFAULT_THEME = "light";
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
+    private static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
     
     public IndexBean() {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(IndexBean.class);
-        _group = TunnelControllerGroup.getInstance();
+        TunnelControllerGroup tcg;
+        String error;
+        try {
+            tcg = TunnelControllerGroup.getInstance();
+            error = tcg == null ? _("Tunnels are not initialized yet, please reload in two minutes.")
+                                : null;
+        } catch (IllegalArgumentException iae) {
+            tcg = null;
+            error = iae.toString();
+        }
+        _group = tcg;
+        _fatalError = error;
         _tunnel = -1;
         _curNonce = "-1";
         addNonce();
@@ -116,6 +130,13 @@ public class IndexBean {
         _otherOptions = new ConcurrentHashMap(4);
     }
     
+    /**
+     *  @since 0.9.4
+     */
+    public boolean isInitialized() {
+        return _group != null;
+    }
+
     public static String getNextNonce() {
         synchronized (_nonces) {
             return _nonces.get(0);
@@ -145,14 +166,11 @@ public class IndexBean {
         }
     }
 
-    /** deprecated unimplemented, now using routerconsole realm */
-    public void setPassphrase(String phrase) {
-    }
-    
     public void setAction(String action) {
         if ( (action == null) || (action.trim().length() <= 0) ) return;
         _action = action;
     }
+
     public void setTunnel(String tunnel) {
         if ( (tunnel == null) || (tunnel.trim().length() <= 0) ) return;
         try {
@@ -162,17 +180,17 @@ public class IndexBean {
         }
     }
     
-    /** just check if console password option is set, jetty will do auth */
-    private boolean validPassphrase() {
-        String pass = _context.getProperty(PROP_TUNNEL_PASSPHRASE);
-        return pass != null && pass.trim().length() > 0;
-    }
-    
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
-        if ( (!haveNonce(_curNonce)) && (!validPassphrase()) )
-            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.");
+        if (_group == null)
+            return "Error - tunnels are not initialized yet";
+        // If passwords are turned on, all is assumed good
+        if (!_context.getBooleanProperty(PROP_PW_ENABLE) &&
+            !haveNonce(_curNonce))
+            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
+                   + ' ' +
+                   _("If the problem persists, verify that you have cookies enabled in your browser.");
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))
@@ -200,33 +218,33 @@ public class IndexBean {
         else
             return "Action " + _action + " unknown";
     }
+
     private String stopAll() {
-        if (_group == null) return "";
         List<String> msgs = _group.stopAllControllers();
         return getMessages(msgs);
     }
+
     private String startAll() {
-        if (_group == null) return "";
         List<String> msgs = _group.startAllControllers();
         return getMessages(msgs);
     }
+
     private String restartAll() {
-        if (_group == null) return "";
         List<String> msgs = _group.restartAllControllers();
         return getMessages(msgs);
     }
+
     private String reloadConfig() {
-        if (_group == null) return "";
-        
         _group.reloadControllers();
         return _("Configuration reloaded for all tunnels");
     }
+
     private String start() {
         if (_tunnel < 0) return "Invalid tunnel";
         
-        List controllers = _group.getControllers();
+        List<TunnelController> controllers = _group.getControllers();
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
-        TunnelController controller = (TunnelController)controllers.get(_tunnel);
+        TunnelController controller = controllers.get(_tunnel);
         controller.startTunnelBackground();
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
@@ -237,9 +255,9 @@ public class IndexBean {
     private String stop() {
         if (_tunnel < 0) return "Invalid tunnel";
         
-        List controllers = _group.getControllers();
+        List<TunnelController> controllers = _group.getControllers();
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
-        TunnelController controller = (TunnelController)controllers.get(_tunnel);
+        TunnelController controller = controllers.get(_tunnel);
         controller.stopTunnel();
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
@@ -268,10 +286,10 @@ public class IndexBean {
         // if the current tunnel is shared, and of supported type
         if (Boolean.parseBoolean(cur.getSharedClient()) && isClient(cur.getType())) {
             // all clients use the same I2CP session, and as such, use the same I2CP options
-            List controllers = _group.getControllers();
+            List<TunnelController> controllers = _group.getControllers();
 
             for (int i = 0; i < controllers.size(); i++) {
-                TunnelController c = (TunnelController)controllers.get(i);
+                TunnelController c = controllers.get(i);
 
                 // Current tunnel modified by user, skip
                 if (c == cur) continue;
@@ -375,7 +393,7 @@ public class IndexBean {
      */
     public String getMessages() {
         if (_group == null)
-            return "";
+            return _fatalError;
         
         StringBuilder buf = new StringBuilder(512);
         if (_action != null) {
@@ -804,21 +822,22 @@ public class IndexBean {
 
     /** all proxy auth @since 0.8.2 */
     public void setProxyAuth(String s) {
-        _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_AUTH);
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.DIGEST_AUTH);
     }
     
     public void setProxyUsername(String s) {
         if (s != null)
-            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_USER, s.trim());
+            _newProxyUser = s.trim();
     }
     
     public void setProxyPassword(String s) {
         if (s != null)
-            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_PW, s.trim());
+            _newProxyPW = s.trim();
     }
     
     public void setOutproxyAuth(String s) {
-        _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH);
+        _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH, I2PTunnelHTTPClientBase.DIGEST_AUTH);
     }
     
     public void setOutproxyUsername(String s) {
@@ -1040,6 +1059,45 @@ public class IndexBean {
                 config.setProperty("proxyList", _proxyList);
         }
 
+        // Proxy auth including migration to MD5
+        if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
+            // Migrate even if auth is disabled
+            // go get the old from custom options that updateConfigGeneric() put in there
+            String puser = "option." + I2PTunnelHTTPClientBase.PROP_USER;
+            String user = config.getProperty(puser);
+            String ppw = "option." + I2PTunnelHTTPClientBase.PROP_PW;
+            String pw = config.getProperty(ppw);
+            if (user != null && pw != null && user.length() > 0 && pw.length() > 0) {
+                String pmd5 = "option." + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                              user + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SUFFIX;
+                if (config.getProperty(pmd5) == null) {
+                    // not in there, migrate
+                    String realm = _type.equals("httpclient") ? I2PTunnelHTTPClient.AUTH_REALM
+                                                              : I2PTunnelConnectClient.AUTH_REALM;
+                    String hex = PasswordManager.md5Hex(realm, user, pw);
+                    if (hex != null) {
+                        config.setProperty(pmd5, hex);
+                        config.remove(puser);
+                        config.remove(ppw);
+                    }
+                }
+            }
+            // New user/password
+            String auth = _otherOptions.get(I2PTunnelHTTPClientBase.PROP_AUTH);
+            if (auth != null && !auth.equals("false")) {
+                if (_newProxyUser != null && _newProxyPW != null &&
+                    _newProxyUser.length() > 0 && _newProxyPW.length() > 0) {
+                    String pmd5 = "option." + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                                  _newProxyUser + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SUFFIX;
+                    String realm = _type.equals("httpclient") ? I2PTunnelHTTPClient.AUTH_REALM
+                                                              : I2PTunnelConnectClient.AUTH_REALM;
+                    String hex = PasswordManager.md5Hex(realm, _newProxyUser, _newProxyPW);
+                    if (hex != null)
+                        config.setProperty(pmd5, hex);
+                }
+            }
+        }
+
         if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
@@ -1084,15 +1142,16 @@ public class IndexBean {
         "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
         };
     private static final String _booleanProxyOpts[] = {
-        I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
+        I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
-        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword",
-        I2PTunnelHTTPClient.PROP_JUMP_SERVERS
+        "outproxyUsername", "outproxyPassword",
+        I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
+        I2PTunnelHTTPClientBase.PROP_AUTH
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
@@ -1101,7 +1160,17 @@ public class IndexBean {
          PROP_MAX_STREAMS
         };
 
+    /**
+     *  do NOT add these to noShoOpts, we must leave them in for HTTPClient and ConnectCLient
+     *  so they will get migrated to MD5
+     *  TODO migrate socks to MD5
+     */
+    private static final String _otherProxyOpts[] = {
+        "proxyUsername", "proxyPassword"
+        };
+
     protected static final Set _noShowSet = new HashSet(64);
+    protected static final Set _nonProxyNoShowSet = new HashSet(4);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));
@@ -1109,6 +1178,7 @@ public class IndexBean {
         _noShowSet.addAll(Arrays.asList(_booleanServerOpts));
         _noShowSet.addAll(Arrays.asList(_otherClientOpts));
         _noShowSet.addAll(Arrays.asList(_otherServerOpts));
+        _nonProxyNoShowSet.addAll(Arrays.asList(_otherProxyOpts));
     }
 
     private void updateConfigGeneric(Properties config) {
@@ -1138,6 +1208,12 @@ public class IndexBean {
                     continue;
                 String key = pair.substring(0, eq);
                 if (_noShowSet.contains(key))
+                    continue;
+                // leave in for HTTP and Connect so it can get migrated to MD5
+                // hide for SOCKS until migrated to MD5
+                if ((!"httpclient".equals(_type)) &&
+                    (! "connectclient".equals(_type)) &&
+                    _nonProxyNoShowSet.contains(key))
                     continue;
                 String val = pair.substring(eq+1);
                 config.setProperty("option." + key, val);
@@ -1190,9 +1266,9 @@ public class IndexBean {
     protected TunnelController getController(int tunnel) {
         if (tunnel < 0) return null;
         if (_group == null) return null;
-        List controllers = _group.getControllers();
+        List<TunnelController> controllers = _group.getControllers();
         if (controllers.size() > tunnel)
-            return (TunnelController)controllers.get(tunnel); 
+            return controllers.get(tunnel); 
         else
             return null;
     }

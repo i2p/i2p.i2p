@@ -353,7 +353,7 @@ public class NativeBigInteger extends BigInteger {
     /**
      * <p>Compare the BigInteger.modPow vs the NativeBigInteger.modPow of some 
      * really big (2Kbit) numbers 100 different times and benchmark the 
-     * performance (or shit a brick if they don't match).  </p>
+     * performance.</p>
      *
      */
     public static void main(String args[]) {

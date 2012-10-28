@@ -17,6 +17,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
+import net.i2p.router.util.PriBlockingQueue;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
@@ -209,7 +210,8 @@ class PeerState {
      *  Priority queue of messages that have not yet been sent.
      *  They are taken from here and put in _outboundMessages.
      */
-    private final CoDelPriorityBlockingQueue<OutboundMessageState> _outboundQueue;
+    //private final CoDelPriorityBlockingQueue<OutboundMessageState> _outboundQueue;
+    private final PriBlockingQueue<OutboundMessageState> _outboundQueue;
 
     /** which outbound message is currently being retransmitted */
     private OutboundMessageState _retransmitter;
@@ -323,7 +325,8 @@ class PeerState {
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
-        _outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
+        //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
+        _outboundQueue = new PriBlockingQueue(32);
         // all createRateStat() moved to EstablishmentManager
         _remoteIP = remoteIP;
         _remotePeer = remotePeer;
@@ -1397,7 +1400,8 @@ class PeerState {
                     tempList = new ArrayList(_outboundMessages);
                     _outboundMessages.clear();
             }
-            _outboundQueue.drainAllTo(tempList);
+            //_outboundQueue.drainAllTo(tempList);
+            _outboundQueue.drainTo(tempList);
             for (OutboundMessageState oms : tempList) {
                 _transport.failed(oms, false);
             }

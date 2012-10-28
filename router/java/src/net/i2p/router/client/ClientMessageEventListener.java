@@ -36,6 +36,7 @@ import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.PasswordManager;
 import net.i2p.util.RandomSource;
 
 /**
@@ -49,6 +50,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private final ClientConnectionRunner _runner;
     private final boolean  _enforceAuth;
     
+    private static final String PROP_AUTH = "i2cp.auth";
+
     /**
      *  @param enforceAuth set false for in-JVM, true for socket access
      */
@@ -169,26 +172,23 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
 
         // Auth, since 0.8.2
-        if (_enforceAuth && _context.getBooleanProperty("i2cp.auth")) {
-            String configUser = _context.getProperty("i2cp.username");
-            String configPW = _context.getProperty("i2cp.password");
-            if (configUser != null && configPW != null) {
+        if (_enforceAuth && _context.getBooleanProperty(PROP_AUTH)) {
                 Properties props = in.getOptions();
                 String user = props.getProperty("i2cp.username");
                 String pw = props.getProperty("i2cp.password");
-                if (user == null || pw == null) {
+                if (user == null || user.length() == 0 || pw == null || pw.length() == 0) {
                     _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname"));
                     _runner.disconnectClient("Authorization required to create session, specify i2cp.username and i2cp.password in session options");
                     return;
                 }
-                if ((!user.equals(configUser)) || (!pw.equals(configPW))) {
+                PasswordManager mgr = new PasswordManager(_context);
+                if (!mgr.checkHash(PROP_AUTH, user, pw)) {
                     _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname") + " user: " + user);
                     _runner.disconnectClient("Authorization failed for Create Session, user = " + user);
                     return;
                 }
                 if (_log.shouldLog(Log.INFO))
                     _log.info("I2CP auth success for client: " + props.getProperty("inbound.nickname") + " user: " + user);
-            }
         }
 
         SessionId sessionId = new SessionId();
@@ -244,9 +244,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         msg.setSessionId(_runner.getSessionId().getSessionId());
         Payload payload = _runner.getPayload(new MessageId(message.getMessageId()));
         if (payload == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Payload for message id [" + message.getMessageId() 
-                           + "] is null!  Unknown message id?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Payload for message id [" + message.getMessageId() 
+                           + "] is null!  Dropped or Unknown message id");
             return;
         }
         msg.setPayload(payload);

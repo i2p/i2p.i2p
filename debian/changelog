@@ -1,4 +1,50 @@
-i2p (0.9.1-1) unstable; urgency=low
+i2p (0.9.3-1) stable; urgency=low
+
+  * New Upstream release
+  * Upstream changelog (full details in history.txt):
+    - Active Queue Management
+    - I2PSnark DHT: Several bug fixes, enable by default.
+    - Priority queues
+    - Several SSU fixes including memory leak, and better handling of routers
+      behind firewalls that change UDP ports; additional defenses for malicious
+      packets.
+    - Fix piece selection (rarest-first) bugs in i2psnark
+    - Fix bug causing multiple browsers to open at startup
+    - Improvements in caching
+    - Several synchronization fixes and lock contention reduction
+    - Major reduction in SSU buffers memory use
+    - Fix streaming connection timeout back to 1 minute, was inadvertently
+      changed to 5 minutes; set i2ptunnel server read timeout to 5 minutes, was
+      unlimited
+    - Improved defenses in i2ptunnel for "darkloris"
+    - More validation at torrent creation in i2psnark
+    - Several parameter changes in SSU to improve throughput
+    - New event log for major events including restarts; show multiple restart
+      lines on graphs
+    - Remove duplicate messages from logs
+    - Don't respond to blocked streaming connections with a reset, just drop
+    - Remove all uses of inefficient SimpleTimer
+    - More checks for valid IPs and ports entered in console
+    - Fix bug that wasted a lot of entropy
+    - Translation updates: Italian, Portuguese, Spanish, Swedish
+    - Add non-NIO configuration in jetty.xml, recommended for Java 5
+    - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 27 Oct 2012 16:47:37 +0000
+
+i2p (0.9.2-2) stable; urgency=high
+
+  * Fix stupid bug in i2prouter
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 22 Sep 2012 13:57:39 +0000
+
+i2p (0.9.2-1) stable; urgency=low
+
+  * New upstream release (see history.txt for details)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 21 Sep 2012 18:13:32 +0000
+
+i2p (0.9.1-1) stable; urgency=low
 
   * New upstream version 0.9.1
   * Don't depend on Debian's/Ubuntu's version of Jetty. Jetty6 is going away
@@ -13,13 +59,13 @@ i2p (0.9.1-1) unstable; urgency=low
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 30 Jul 2012 17:41:04 +0000
 
-i2p (0.9-1) unstable; urgency=low
+i2p (0.9-1) stable; urgency=low
 
   * New Upstream Version
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 02 May 2012 16:33:11 +0000
 
-i2p (0.8.13-2) unstable; urgency=low
+i2p (0.8.13-2) stable; urgency=low
 
   * Fix bug in postinst cause by changes to adduser's behaviour.
 
@@ -66,38 +112,38 @@ i2p (0.8.12-1) stable; urgency=low
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 06 Jan 2012 02:49:03 +0000
 
-i2p (0.8.11+repack-2) stable; urgency=medium
+i2p (0.8.11-2) stable; urgency=medium
 
   * Fix STUPID bug running I2P with i2prouter. Thanks soundwave.
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 08 Nov 2011 20:02:05 +0000
 
-i2p (0.8.11+repack-1) stable; urgency=low
+i2p (0.8.11-1) stable; urgency=low
 
   * New Upstream Version
   * sv and uk debconf translation updates
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 07 Nov 2011 19:20:15 +0000
 
-i2p (0.8.10+repack-1) stable; urgency=medium
+i2p (0.8.10-1) stable; urgency=medium
 
   * New upstream version
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 20 Oct 2011 05:25:04 +0000
 
-i2p (0.8.9+repack-1) stable; urgency=medium
+i2p (0.8.9-1) stable; urgency=medium
 
   * New upstream version
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 11 Oct 2011 19:55:08 +0000
 
-i2p (0.8.8+repack-3) UNRELEASED; urgency=low
+i2p (0.8.8-3) UNRELEASED; urgency=low
 
   * Add dump option to initscript
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 06 Sep 2011 12:42:22 +0000
 
-i2p (0.8.8+repack-2) stable; urgency=medium
+i2p (0.8.8-2) stable; urgency=medium
 
   * Backport patch from mtn 04ec606 to fix trac #515
   * Fix trac ticket #514 ("debconf values are overwritten upon
@@ -107,7 +153,7 @@ i2p (0.8.8+repack-2) stable; urgency=medium
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 02 Sep 2011 23:32:32 +0000
 
-i2p (0.8.8+repack-1) stable; urgency=low
+i2p (0.8.8-1) stable; urgency=low
 
   * New Upstream Version
 

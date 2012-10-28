@@ -8,6 +8,7 @@ import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
@@ -257,7 +258,9 @@ public class ConfigServiceHandler extends FormHandler {
         }
         // releases <= 0.6.5 deleted the entry completely
         if (shouldLaunchBrowser && !found) {
-            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser", "http://127.0.0.1:7657", 5, false);
+            int port = _context.portMapper().getPort(PortMapper.SVC_CONSOLE, RouterConsoleRunner.DEFAULT_LISTEN_PORT);
+            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser",
+                                                     "http://127.0.0.1:" + port + '/', 5, false);
             clients.add(ca);
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);

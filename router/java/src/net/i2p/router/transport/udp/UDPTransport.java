@@ -563,7 +563,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.error("The router " + from + " told us we have an invalid IP - " 
                            + Addresses.toString(ourIP, ourPort) + ".  Lets throw tomatoes at them");
             markUnreachable(from);
-            //_context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
+            //_context.banlist().banlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
         } else if (inboundRecent && _externalListenPort > 0 && _externalListenHost != null) {
             // use OS clock since its an ordering thing, not a time thing
@@ -913,7 +913,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _activeThrottle.unchoke(peer.getRemotePeer());
         markReachable(peer.getRemotePeer(), peer.isInbound());
-        //_context.shitlist().unshitlistRouter(peer.getRemotePeer(), STYLE);
+        //_context.banlist().unbanlistRouter(peer.getRemotePeer(), STYLE);
 
         //if (SHOULD_FLOOD_PEERS)
         //    _flooder.addPeer(peer);
@@ -956,13 +956,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
                 /*
                 if (remoteIdentHash != null) {
-                    _context.shitlist().shitlistRouter(remoteIdentHash, "Sent us a peer from the wrong network");
+                    _context.banlist().banlistRouter(remoteIdentHash, "Sent us a peer from the wrong network");
                     dropPeer(remoteIdentHash);
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Dropping the peer " + remoteIdentHash
                                    + " because they are in the wrong net");
                 } else if (remoteIdent != null) {
-                    _context.shitlist().shitlistRouter(remoteIdent.calculateHash(), "Sent us a peer from the wrong network");
+                    _context.banlist().banlistRouter(remoteIdent.calculateHash(), "Sent us a peer from the wrong network");
                     dropPeer(remoteIdent.calculateHash());
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Dropping the peer " + remoteIdent.calculateHash()
@@ -978,8 +978,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
-                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getOption("router.version"));
-                //_context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
+                _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getOption("router.version"));
+                //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping the peer " + peerHash + " because they are in the wrong net: " + entry);
@@ -1013,13 +1013,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     boolean isInDropList(RemoteHostId peer) { return _dropList.contains(peer); }
     
-    void dropPeer(Hash peer, boolean shouldShitlist, String why) {
+    void dropPeer(Hash peer, boolean shouldBanlist, String why) {
         PeerState state = getPeerState(peer);
         if (state != null)
-            dropPeer(state, shouldShitlist, why);
+            dropPeer(state, shouldBanlist, why);
     }
 
-    void dropPeer(PeerState peer, boolean shouldShitlist, String why) {
+    void dropPeer(PeerState peer, boolean shouldBanlist, String why) {
         if (_log.shouldLog(Log.INFO)) {
             long now = _context.clock().now();
             StringBuilder buf = new StringBuilder(4096);
@@ -1028,7 +1028,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long timeSinceAck  = now - peer.getLastACKSend();
             long timeSinceSendOK = now - peer.getLastSendFullyTime();
             int consec = peer.getConsecutiveFailedSends();
-            buf.append("Dropping remote peer: ").append(peer.toString()).append(" shitlist? ").append(shouldShitlist);
+            buf.append("Dropping remote peer: ").append(peer.toString()).append(" banlist? ").append(shouldBanlist);
             buf.append(" lifetime: ").append(now - peer.getKeyEstablishedTime());
             buf.append(" time since send/fully/recv/ack: ").append(timeSinceSend).append(" / ");
             buf.append(timeSinceSendOK).append(" / ");
@@ -1067,13 +1067,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.info(buf.toString(), new Exception("Dropped by"));
         }
         synchronized(_addDropLock) {
-            locked_dropPeer(peer, shouldShitlist, why);
+            locked_dropPeer(peer, shouldBanlist, why);
         }
         if (needsRebuild())
             rebuildExternalAddress();
     }
 
-    private void locked_dropPeer(PeerState peer, boolean shouldShitlist, String why) {
+    private void locked_dropPeer(PeerState peer, boolean shouldBanlist, String why) {
         peer.dropOutbound();
         peer.expireInboundMessages();
         _introManager.remove(peer);
@@ -1083,9 +1083,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (peer.getRemotePeer() != null) {
             dropPeerCapacities(peer);
             
-            if (shouldShitlist) {
+            if (shouldBanlist) {
                 markUnreachable(peer.getRemotePeer());
-                //_context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries", STYLE);
+                //_context.banlist().banlistRouter(peer.getRemotePeer(), "dropped after too many retries", STYLE);
             }
             long now = _context.clock().now();
             _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
@@ -1110,8 +1110,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireEvent.remove(peer);
         
         // deal with races to make sure we drop the peers fully
-        if ( (altByIdent != null) && (peer != altByIdent) ) locked_dropPeer(altByIdent, shouldShitlist, "recurse");
-        if ( (altByHost != null) && (peer != altByHost) ) locked_dropPeer(altByHost, shouldShitlist, "recurse");
+        if ( (altByIdent != null) && (peer != altByIdent) ) locked_dropPeer(altByIdent, shouldBanlist, "recurse");
+        if ( (altByHost != null) && (peer != altByHost) ) locked_dropPeer(altByHost, shouldBanlist, "recurse");
     }
     
     private boolean needsRebuild() {
@@ -2253,7 +2253,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 buf.append("</i>");
                 appended = true;
             }
-            if (_context.shitlist().isShitlisted(peer.getRemotePeer(), STYLE)) {
+            if (_context.banlist().isBanlisted(peer.getRemotePeer(), STYLE)) {
                 if (!appended) buf.append("<br>");
                 buf.append(" <i>").append(_("Banned")).append("</i>");
                 appended = true;
@@ -2595,6 +2595,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 // if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
 //
                 // fall through...
+            case CommSystemFacade.STATUS_DISCONNECTED:
             case CommSystemFacade.STATUS_HOSED:
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;

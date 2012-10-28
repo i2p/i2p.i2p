@@ -18,14 +18,9 @@
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHandler" id="formhandler" scope="request" />
-<% formhandler.storeMethod(request.getMethod()); %>
-<jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
-<jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter(\"action\")%>" />
-<jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter(\"nonce\")%>" />
-<jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
-<jsp:getProperty name="formhandler" property="allMessages" />
+<%@include file="formhandler.jsi" %>
 <div class="configure"><form action="" method="POST">
-<input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <h3><%=intl._("Reseeding Configuration")%></h3>
 <p><%=intl._("Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
 <%=intl._("If reseeding has failed, you should first check your network connection.")%>

@@ -1060,7 +1060,7 @@
        -->
     </target>
 
-    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
@@ -1116,7 +1116,7 @@
     </target>
 
     <!-- Jetty 6 I2P logging addons, not really fixes -->
-    <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
+    <target name="prepjupdatefixes" depends="buildWEB">
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 

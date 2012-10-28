@@ -18,15 +18,15 @@ import java.util.TreeMap;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
-import net.i2p.router.Shitlist;
+import net.i2p.router.Banlist;
 
 /**
- *  Moved from Shitlist.java
+ *  Moved from Banlist.java
  */
-public class ShitlistRenderer {
+public class BanlistRenderer {
     private final RouterContext _context;
 
-    public ShitlistRenderer(RouterContext context) {
+    public BanlistRenderer(RouterContext context) {
         _context = context;
     }
     
@@ -40,9 +40,9 @@ public class ShitlistRenderer {
         StringBuilder buf = new StringBuilder(1024);
         // move to the jsp
         //buf.append("<h2>Banned Peers</h2>");
-        Map<Hash, Shitlist.Entry> entries = new TreeMap(new HashComparator());
+        Map<Hash, Banlist.Entry> entries = new TreeMap(new HashComparator());
         
-        entries.putAll(_context.shitlist().getEntries());
+        entries.putAll(_context.banlist().getEntries());
         if (entries.isEmpty()) {
             buf.append("<i>").append(_("none")).append("</i>");
             out.write(buf.toString());
@@ -51,9 +51,9 @@ public class ShitlistRenderer {
 
         buf.append("<ul>");
         
-        for (Map.Entry<Hash, Shitlist.Entry> e : entries.entrySet()) {
+        for (Map.Entry<Hash, Banlist.Entry> e : entries.entrySet()) {
             Hash key = e.getKey();
-            Shitlist.Entry entry = e.getValue();
+            Banlist.Entry entry = e.getValue();
             long expires = entry.expireOn-_context.clock().now();
             if (expires <= 0)
                 continue;

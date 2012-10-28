@@ -619,6 +619,8 @@ public class Router implements RouterClock.ClockShiftListener {
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 ri.addCapability(CAPABILITY_UNREACHABLE);
                 break;
+            case CommSystemFacade.STATUS_DISCONNECTED:
+            case CommSystemFacade.STATUS_HOSED:
             case CommSystemFacade.STATUS_UNKNOWN:
                 // no explicit capability
                 break;

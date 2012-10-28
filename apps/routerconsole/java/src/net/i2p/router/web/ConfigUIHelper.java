@@ -2,8 +2,9 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class ConfigUIHelper extends HelperBase {
 
@@ -85,6 +86,40 @@ public class ConfigUIHelper extends HelperBase {
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(flags[i]).append("\"> ")
                .append(_(xlangs[i])).append("<br>\n");
         }
+        return buf.toString();
+    }
+
+    /** @since 0.9.4 */
+    public String getPasswordForm() {
+        StringBuilder buf = new StringBuilder(512);
+        ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
+        Map<String, String> userpw = mgr.getMD5(RouterConsoleRunner.PROP_CONSOLE_PW);
+        buf.append("<table>");
+        if (userpw.isEmpty()) {
+            buf.append("<tr><td colspan=\"3\">");
+            buf.append(_("Add a user and password to enable."));
+            buf.append("</td></tr>");
+        } else {
+            buf.append("<tr><th>")
+               .append(_("Remove"))
+               .append("</th><th>")
+               .append(_("User Name"))
+               .append("</th><th>&nbsp;</th></tr>\n");
+            for (String name : userpw.keySet()) {
+                buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+                   .append(name)
+                   .append("\"></td><td colspan=\"2\">")
+                   .append(name)
+                   .append("</td></tr>\n");
+            }
+        }
+        buf.append("<tr><td align=\"center\"><b>")
+           .append(_("Add")).append(":</b>" +
+                   "</td><td align=\"left\"><input type=\"text\" name=\"name\">" +
+                   "</td><td align=\"left\"><b>");
+        buf.append(_("Password")).append(":</b> " +
+                   "<input type=\"password\" size=\"40\" name=\"pw\"></td></tr>" +
+                   "</table>\n");
         return buf.toString();
     }
 }

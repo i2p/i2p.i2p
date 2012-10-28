@@ -74,7 +74,7 @@ public class WebAppConfiguration implements Configuration {
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
             dir = pluginDir;
         } else {
-            Properties props = RouterConsoleRunner.webAppProperties();
+            Properties props = RouterConsoleRunner.webAppProperties(i2pContext);
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
         }
         if (cp == null)

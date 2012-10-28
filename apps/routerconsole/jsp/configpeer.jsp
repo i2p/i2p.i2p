@@ -15,13 +15,7 @@
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
-
-
-
+<%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHelper" id="peerhelper" scope="request" />
  <jsp:setProperty name="peerhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
@@ -31,7 +25,7 @@
  %>
  <div class="configure">
  <form action="configpeer" method="POST">
- <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
@@ -61,11 +55,11 @@
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
  <input type="submit" name="action" class="add" value="<%=intl._("Adjust peer bonuses")%>" /></p></div>
  </form>
- <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>
+ <a name="banlist"> </a><h2><%=intl._("Banned Peers")%></h2>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% profilesHelper.storeWriter(out); %>
- <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
+ <jsp:getProperty name="profilesHelper" property="banlistSummary" />
  <div class="wideload"><h2><%=intl._("Banned IPs")%></h2>
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 

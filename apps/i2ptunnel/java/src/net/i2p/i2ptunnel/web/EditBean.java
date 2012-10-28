@@ -29,8 +29,8 @@ import net.i2p.util.Addresses;
 /**
  * Ugly little accessor for the edit page
  *
- * Warning - This class is not part of the i2ptunnel API, and at some point
- * it will be moved from the jar to the war.
+ * Warning - This class is not part of the i2ptunnel API,
+ * it has been moved from the jar to the war.
  * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class EditBean extends IndexBean {
@@ -38,6 +38,8 @@ public class EditBean extends IndexBean {
     
     public static boolean staticIsClient(int tunnel) {
         TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return false;
         List controllers = group.getControllers();
         if (controllers.size() > tunnel) {
             TunnelController cur = (TunnelController)controllers.get(tunnel);
@@ -55,6 +57,7 @@ public class EditBean extends IndexBean {
         else
             return "127.0.0.1";
     }
+
     public String getTargetPort(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getTargetPort() != null)
@@ -62,6 +65,7 @@ public class EditBean extends IndexBean {
         else
             return "";
     }
+
     public String getSpoofedHost(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getSpoofedHost() != null)
@@ -69,12 +73,13 @@ public class EditBean extends IndexBean {
         else
             return "";
     }
+
     public String getPrivateKeyFile(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
         if (tunnel < 0)
-            tunnel = _group.getControllers().size();
+            tunnel = _group == null ? 1 : _group.getControllers().size() + 1;
         return "i2ptunnel" + tunnel + "-privKeys.dat";
     }
     
@@ -221,19 +226,7 @@ public class EditBean extends IndexBean {
     
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH) &&
-               getProxyUsername(tunnel).length() > 0 &&
-               getProxyPassword(tunnel).length() > 0;
-    }
-    
-    public String getProxyUsername(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_USER, "");
-    }
-    
-    public String getProxyPassword(int tunnel) {
-        if (getProxyUsername(tunnel).length() <= 0)
-            return "";
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_PW, "");
+        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH, "false") != "false";
     }
     
     public boolean getOutproxyAuth(int tunnel) {
@@ -354,9 +347,16 @@ public class EditBean extends IndexBean {
             if (opts == null) return "";
             StringBuilder buf = new StringBuilder(64);
             int i = 0;
+            boolean isMD5Proxy = "httpclient".equals(tun.getType()) ||
+                                 "connectclient".equals(tun.getType());
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 if (_noShowSet.contains(key))
+                    continue;
+                // leave in for HTTP and Connect so it can get migrated to MD5
+                // hide for SOCKS until migrated to MD5
+                if ((!isMD5Proxy) &&
+                    _nonProxyNoShowSet.contains(key))
                     continue;
                 String val = opts.getProperty(key);
                 if (i != 0) buf.append(' ');

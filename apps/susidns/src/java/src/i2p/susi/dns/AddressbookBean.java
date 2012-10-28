@@ -119,10 +119,10 @@ public class AddressbookBean extends BaseBean
 	}
 	public String getBook()
 	{
-		if( book == null || ( book.compareToIgnoreCase( "master" ) != 0 &&
-				book.compareToIgnoreCase( "router" ) != 0 &&
-				book.compareToIgnoreCase( "private" ) != 0 &&
-				book.compareToIgnoreCase( "published" ) != 0  ))
+		if( book == null || ( !book.equalsIgnoreCase( "master" ) &&
+				!book.equalsIgnoreCase( "router" ) &&
+				!book.equalsIgnoreCase( "private" ) &&
+				!book.equalsIgnoreCase( "published" )))
 			book = "router";
 		
 		return book;
@@ -252,7 +252,8 @@ public class AddressbookBean extends BaseBean
 		String message = "";
 		
 		if( action != null ) {
-			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
+                        if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
+			    (serial != null && serial.equals(lastSerial))) {
 				boolean changed = false;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if( addressbook != null && hostname != null && destination != null ) {
@@ -336,7 +337,9 @@ public class AddressbookBean extends BaseBean
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+                                          + ' ' +
+                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		
@@ -364,22 +367,22 @@ public class AddressbookBean extends BaseBean
 
 	public boolean isMaster()
 	{
-		return getBook().compareToIgnoreCase( "master" ) == 0;
+		return getBook().equalsIgnoreCase("master");
 	}
 	public boolean isRouter()
 	{
-		return getBook().compareToIgnoreCase( "router" ) == 0;
+		return getBook().equalsIgnoreCase("router");
 	}
 	public boolean isPublished()
 	{
-		return getBook().compareToIgnoreCase( "published" ) == 0;
+		return getBook().equalsIgnoreCase("published");
 	}
 	public boolean isPrivate()
 	{
-		return getBook().compareToIgnoreCase( "private" ) == 0;
+		return getBook().equalsIgnoreCase("private");
 	}
 	public void setFilter(String filter) {
-		if( filter != null && ( filter.length() == 0 || filter.compareToIgnoreCase( "none" ) == 0 ) ) {
+		if( filter != null && ( filter.length() == 0 || filter.equalsIgnoreCase("none"))) {
 			filter = null;
 			search = null;
 		}

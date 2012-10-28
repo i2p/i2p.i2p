@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-12 00:46+0000\n"
-"PO-Revision-Date: 2012-10-12 00:44+0000\n"
+"POT-Creation-Date: 2012-10-15 17:57+0000\n"
+"PO-Revision-Date: 2012-10-12 00:50+0000\n"
 "Last-Translator: BadCluster <badcluster@i2pmail.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
 "it/)\n"
@@ -361,7 +361,7 @@ msgstr "Quanto è passato dall'inizio di questa connessione"
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:756
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2188
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:835
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:836
 msgid "Up"
 msgstr "Su"
 
@@ -722,7 +722,7 @@ msgstr "Bannato"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2310
 msgid "backlogged"
-msgstr ""
+msgstr "ritardi"
 
 #. buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2390
@@ -2134,7 +2134,7 @@ msgstr "Cancella"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:25
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:26
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:855
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:856
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:419
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:439
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:455
@@ -2143,7 +2143,7 @@ msgstr "Elimina selezionati"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:26
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:27
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:874
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:875
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:417
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:425
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:437
@@ -2294,7 +2294,7 @@ msgstr "WARN"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:88
 #: ../java/src/net/i2p/router/web/HomeHelper.java:192
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:809
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:810
 msgid "Remove"
 msgstr "Rimuovi"
 
@@ -2448,12 +2448,12 @@ msgstr "Aggiornamento porta TCP a {0}"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:224
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:249
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Attenzione - è meglio non utilizzare le porte da 0 a 1024!"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:228
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:255
 msgid "Invalid port"
-msgstr ""
+msgstr "Porta non valida"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:233
 msgid "Updating inbound TCP port to auto"
@@ -2462,7 +2462,7 @@ msgstr "Aggiornando le porte TCP entranti a automatiche"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:247
 #, java-format
 msgid "Updating UDP port to {0}"
-msgstr ""
+msgstr "Aggiornamento porta UDP a {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:272
 msgid "Gracefully restarting into Hidden Router Mode"
@@ -2502,7 +2502,7 @@ msgstr "Introduttori SSU richiesti"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:369
 msgid "Invalid address"
-msgstr ""
+msgstr "Indirizzo non valido"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:374
 #, java-format
@@ -2745,11 +2745,11 @@ msgstr "La console non verrà mostrata all'avvio"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:221
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:457
 msgid "Force GC"
-msgstr ""
+msgstr "Forza GC"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:223
 msgid "Full garbage collection requested"
-msgstr ""
+msgstr "Richieste totali"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:232
 msgid "Service installed"
@@ -3468,7 +3468,7 @@ msgstr ""
 "Il tuo browser non è configurato correttamente per usare il proxy HTTP al {0}"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:194
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:811
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:812
 msgid "Name"
 msgstr "Nome"
 
@@ -3477,7 +3477,7 @@ msgid "URL"
 msgstr "URL"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:214
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:857
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:858
 msgid "Add"
 msgstr "Aggiungi"
 
@@ -4135,37 +4135,37 @@ msgstr "Bannato fino al riavvio o in {0}"
 msgid "unban now"
 msgstr "riammissione istantanea"
 
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:314
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:312
 msgid "Bandwidth usage"
 msgstr "Utilizzo di larghezza di banda"
 
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:324
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:322
 msgid "Outbound Bytes/sec"
 msgstr "Bytes/s In Uscita"
 
 #. def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:326
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:324
 msgid "Inbound Bytes/sec"
 msgstr "Bytes/s In Entrata"
 
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:327
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:328
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:329
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:330
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:331
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:332
 msgid "Bps"
 msgstr "Bps"
 
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:329
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:327
 msgid "Out average"
 msgstr "Media In Uscita"
 
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:328
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:330
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:332
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:155
 msgid "max"
 msgstr "massimo"
 
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:331
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:329
 msgid "In average"
 msgstr "Media In Entrata"
 
@@ -4678,13 +4678,13 @@ msgstr "Costruendo i tunnel"
 #. nicely under 'local destinations' in the summary bar
 #. note that if the wording changes in i2ptunnel.config, we have to
 #. keep the old string here as well for existing installs
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:462
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:459
 #: ../java/strings/Strings.java:36
 msgid "shared clients"
 msgstr "client condivisi"
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:676
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:677
 #, java-format
 msgid "Download {0} Update"
 msgstr "Scaricamento {0} Aggiornamento"
@@ -4692,40 +4692,40 @@ msgstr "Scaricamento {0} Aggiornamento"
 #. Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
 #. <br> is optional, to help the browser make the lines even in the button
 #. If the translation is shorter than the English, you should probably not include <br>
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:684
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:685
 #, java-format
 msgid "Download Unsigned<br>Update {0}"
 msgstr "Scaricamento Aggiornamento {0} Non Firmato<br>"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:709
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:710
 msgid "Help with firewall configuration"
 msgstr "Aiuto con la configurazione del firewall"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:711
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:712
 msgid "Check network connection and NAT/firewall"
 msgstr "Controlla la connessione di rete e il NAT/firewall"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:730
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:731
 msgid "Reseed"
 msgstr "Reseed"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:813
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:814
 msgid "Order"
 msgstr "Ordine"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:830
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:831
 msgid "Top"
 msgstr "Sopra"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:843
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:844
 msgid "Down"
 msgstr "Sotto"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:848
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:849
 msgid "Bottom"
 msgstr "Basso"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:860
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:861
 msgid "Select a section to add"
 msgstr "Seleziona una sezione da aggiungere"
 

@@ -172,6 +172,8 @@ public class SummaryHelper extends HelperBase {
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return _("WARN-Firewalled and Fast");
                 return _("Firewalled");
+            case CommSystemFacade.STATUS_DISCONNECTED:
+                return _("Disconnected - check network cable");
             case CommSystemFacade.STATUS_HOSED:
                 return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
@@ -283,11 +285,11 @@ public class SummaryHelper extends HelperBase {
      *
      */
 /********
-    public int getShitlistedPeers() { 
+    public int getBanlistedPeers() { 
         if (_context == null) 
             return 0;
         else
-            return _context.shitlist().getRouterCount();
+            return _context.banlist().getRouterCount();
     }
 ********/
  

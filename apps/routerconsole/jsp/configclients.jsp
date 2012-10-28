@@ -25,16 +25,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter(\"action\")%>" />
- <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter(\"nonce\")%>" />
- <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
+<%@include file="formhandler.jsi" %>
  <div class="configure">
-<%
-    String pageNonce = formhandler.getNewNonce();
-%>
  <h3><%=intl._("Client Configuration")%></h3><p>
  <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
  </p><div class="wideload">
@@ -85,9 +77,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
 <%=intl._("Require username and password")%><br>
 <%=intl._("Username")%>:
-<input name="user" type="text" value="<jsp:getProperty name="clientshelper" property="user" />" ><br>
+<input name="user" type="text" value="" /><br>
 <%=intl._("Password")%>:
-<input name="pw" type="password" value="<jsp:getProperty name="clientshelper" property="pw" />" ><br>
+<input name="pw" type="password" value="" /><br>
 </p><p><b><%=intl._("The default settings will work for most people.")%></b>
 <%=intl._("Any changes made here must also be configured in the external client.")%>
 <%=intl._("Many clients do not support SSL or authorization.")%>

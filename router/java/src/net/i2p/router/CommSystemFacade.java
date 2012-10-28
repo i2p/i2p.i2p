@@ -81,6 +81,7 @@ public abstract class CommSystemFacade implements Service {
      * Tell other transports our address changed
      */
     public void notifyReplaceAddress(RouterAddress UDPAddr) {}
+
     /** 
      * These must be increasing in "badness" (see TransportManager.java),
      * but UNKNOWN must be last.
@@ -100,13 +101,18 @@ public abstract class CommSystemFacade implements Service {
      */
     public static final short STATUS_REJECT_UNSOLICITED = 2;
     /**
+     *  We have no network interface at all
+     *  @since 0.9.4
+     */
+    public static final short STATUS_DISCONNECTED = 3;
+    /**
      * Our detection system is broken (SSU bind port failed)
      */
-    public static final short STATUS_HOSED = 3;
+    public static final short STATUS_HOSED = 4;
     /**
      * Our reachability is unknown
      */
-    public static final short STATUS_UNKNOWN = 4;
+    public static final short STATUS_UNKNOWN = 5;
     
 }
 

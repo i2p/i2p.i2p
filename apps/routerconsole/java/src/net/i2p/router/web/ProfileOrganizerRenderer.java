@@ -168,7 +168,7 @@ class ProfileOrganizerRenderer {
             }
             buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
             buf.append("</td><td align=\"center\">");
-            if (_context.shitlist().isShitlisted(peer)) buf.append(_("Banned"));
+            if (_context.banlist().isBanlisted(peer)) buf.append(_("Banned"));
             if (prof.getIsFailing()) buf.append(' ').append(_("Failing"));
             if (_context.commSystem().wasUnreachable(peer)) buf.append(' ').append(_("Unreachable"));
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);

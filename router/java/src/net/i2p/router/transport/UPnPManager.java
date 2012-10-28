@@ -81,13 +81,7 @@ class UPnPManager {
         if (!_isRunning) {
             // Do we have a non-loopback, non-broadcast address?
             // If not, that's why it failed (HTTPServer won't start)
-            Set<String> addrs = Addresses.getAddresses(true, false);
-            addrs.remove("0.0.0.0");
-            for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
-                if (iter.next().startsWith("127."))
-                    iter.remove();
-            }
-            if (addrs.isEmpty())
+            if (!Addresses.isConnected())
                 _log.logAlways(Log.WARN, "UPnP start failed - no network connection?");
             else
                 _log.error("UPnP start failed - port conflict?");

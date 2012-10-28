@@ -108,6 +108,8 @@ class PacketHandler {
             receiveUnknownCon(packet, sendId, queueIfNoConn);
             displayPacket(packet, "UNKN", null);
         }
+        // Don't log here, wait until we have the conn to make the dumps easier to follow
+        //((PacketLocal)packet).logTCPDump(true);
     }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -128,6 +130,10 @@ class PacketHandler {
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {
+        // is this ok here or does it need to be below each packetHandler().receivePacket() ?
+        if (I2PSocketManagerFull.pcapWriter != null &&
+            _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+            packet.logTCPDump(con);
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
             if (packet.getSendStreamId() > 0) {
                 if (con.getOptions().getAnswerPings())
@@ -282,8 +288,13 @@ class PacketHandler {
             }
             
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                // logTCPDump() will be called in ConnectionManager.receiveConnection(),
+                // which is called by ConnectionHandler.receiveNewSyn(),
+                // after we have a new conn, which makes the logging better.
                 _manager.getConnectionHandler().receiveNewSyn(packet);
             } else if (queueIfNoConn) {
+                // don't call logTCPDump() here, wait for it to find a conn
+
                 // We can get here on the 2nd+ packet if the 1st (SYN) packet
                 // is still on the _synQueue in the ConnectionHandler, and
                 // ConnectionManager.receiveConnection() hasn't run yet to put
@@ -307,6 +318,10 @@ class PacketHandler {
                 //packet.releasePayload();
                 _manager.getConnectionHandler().receiveNewSyn(packet);
             } else {
+                // log it here, just before we kill it - dest will be unknown
+                if (I2PSocketManagerFull.pcapWriter != null &&
+                    _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+                    packet.logTCPDump(null);
                 // don't queue again (infinite loop!)
                 sendReset(packet);
                 packet.releasePayload();

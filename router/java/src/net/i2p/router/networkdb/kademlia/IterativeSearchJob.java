@@ -270,7 +270,7 @@ class IterativeSearchJob extends FloodSearchJob {
         RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
         if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
             return;
-        if (getContext().shitlist().isShitlistedForever(peer))
+        if (getContext().banlist().isBanlistedForever(peer))
             return;
         synchronized (this) {
             if (_failedPeers.contains(peer) ||

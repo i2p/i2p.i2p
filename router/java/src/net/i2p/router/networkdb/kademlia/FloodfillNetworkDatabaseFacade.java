@@ -180,7 +180,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         for (int i = 0; i < peers.size(); i++) {
             Hash peer = peers.get(i);
             RouterInfo target = lookupRouterInfoLocally(peer);
-            if ( (target == null) || (_context.shitlist().isShitlisted(peer)) )
+            if ( (target == null) || (_context.banlist().isBanlisted(peer)) )
                 continue;
             // Don't flood a RI back to itself
             // Not necessary, a ff will do its own flooding (reply token == 0)
