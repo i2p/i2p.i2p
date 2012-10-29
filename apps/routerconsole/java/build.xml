@@ -353,9 +353,9 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
+                <pathelement location="${scalatest.libs}/mockito-all.jar" />
                 <pathelement location="../../../core/java/build/i2pscalatest.jar" />
                 <pathelement location="../../../router/java/build/routerscalatest.jar" />
                 <pathelement location="./build/obj" />
