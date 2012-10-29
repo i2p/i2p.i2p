@@ -69,6 +69,9 @@ class DHTNodes {
 
     // begin ConcurrentHashMap methods
 
+    /**
+     *  @return known nodes, not total net size
+     */
     public int size() {
         return _nodeMap.size();
     }
@@ -128,11 +131,19 @@ class DHTNodes {
         return _kad.getExploreKeys(MAX_BUCKET_AGE);
     }
 
+    /**
+     * Debug info, HTML formatted
+     * @since 0.9.4
+     */
+    public void renderStatusHTML(StringBuilder buf) {
+        buf.append(_kad.toString().replace("\n", "<br>\n"));
+    }
+
     /** */
     private class Cleaner extends SimpleTimer2.TimedEvent {
 
         public Cleaner() {
-            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+            super(SimpleTimer2.getInstance(), 5 * CLEAN_TIME);
         }
 
         public void timeReached() {

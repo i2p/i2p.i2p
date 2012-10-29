@@ -558,10 +558,22 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority) {
+        // DEBUG slow start for snark updates
+        // For 0.9.4 update, only for dev builds
+        // For 0.9.5 update, only for dev builds and 1% more
+        // Remove this in 0.9.6 or 0.9.7
+        if (method == TORRENT && RouterVersion.BUILD == 0 && _context.random().nextInt(100) != 0) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Ignoring torrent registration");
+            return;
+        }
         RegisteredUpdater ru = new RegisteredUpdater(updater, type, method, priority);
         if (_log.shouldLog(Log.INFO))
             _log.info("Registering " + ru);
-        _registeredUpdaters.add(ru);
+        if (!_registeredUpdaters.add(ru)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Duplicate registration " + ru);
+        }
     }
 
     public void unregister(Updater updater, UpdateType type, UpdateMethod method) {
@@ -575,7 +587,10 @@ public class ConsoleUpdateManager implements UpdateManager {
         RegisteredChecker rc = new RegisteredChecker(updater, type, method, priority);
         if (_log.shouldLog(Log.INFO))
             _log.info("Registering " + rc);
-        _registeredCheckers.add(rc);
+        if (!_registeredCheckers.add(rc)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Duplicate registration " + rc);
+        }
     }
 
     public void unregister(Checker updater, UpdateType type, UpdateMethod method) {

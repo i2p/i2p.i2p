@@ -39,6 +39,8 @@ class DHTTracker {
     private static final long DELTA_EXPIRE_TIME = 3*60*1000;
     private static final int MAX_PEERS = 2000;
     private static final int MAX_PEERS_PER_TORRENT = 150;
+    private static final int ABSOLUTE_MAX_PER_TORRENT = MAX_PEERS_PER_TORRENT * 2;
+    private static final int MAX_TORRENTS = 400;
 
     DHTTracker(I2PAppContext ctx) {
         _context = ctx;
@@ -62,17 +64,29 @@ class DHTTracker {
             _log.debug("Announce " + hash + " for " + ih);
         Peers peers = _torrents.get(ih);
         if (peers == null) {
+            if (_torrents.size() >= MAX_TORRENTS)
+                return;
             peers = new Peers();
             Peers peers2 = _torrents.putIfAbsent(ih, peers);
             if (peers2 != null)
                 peers = peers2;
         }
 
-        Peer peer = new Peer(hash.getData());
-        Peer peer2 = peers.putIfAbsent(peer, peer);
-        if (peer2 != null)
-            peer = peer2;
-        peer.setLastSeen(_context.clock().now());
+        if (peers.size() < ABSOLUTE_MAX_PER_TORRENT) {
+            Peer peer = new Peer(hash.getData());
+            Peer peer2 = peers.putIfAbsent(peer, peer);
+            if (peer2 != null)
+                peer = peer2;
+            peer.setLastSeen(_context.clock().now());
+        } else {
+            // We could update setLastSeen if he is already
+            // in there, but that would tend to keep
+            // the same set of peers.
+            // So let it expire so new ones can come in.
+            //Peer peer = peers.get(hash);
+            //if (peer != null)
+            //    peer.setLastSeen(_context.clock().now());
+        }
     }
 
     void unannounce(InfoHash ih, Hash hash) {
@@ -113,7 +127,7 @@ class DHTTracker {
     private class Cleaner extends SimpleTimer2.TimedEvent {
 
         public Cleaner() {
-            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+            super(SimpleTimer2.getInstance(), 2 * CLEAN_TIME);
         }
 
         public void timeReached() {
@@ -122,6 +136,7 @@ class DHTTracker {
             long now = _context.clock().now();
             int torrentCount = 0;
             int peerCount = 0;
+            boolean tooMany = false;
             for (Iterator<Peers> iter = _torrents.values().iterator(); iter.hasNext(); ) {
                 Peers p = iter.next();
                 int recent = 0;
@@ -136,6 +151,7 @@ class DHTTracker {
                 }
                 if (recent > MAX_PEERS_PER_TORRENT) {
                     // too many, delete at random
+                    // TODO sort and remove oldest?
                     // TODO per-torrent adjustable expiration?
                     for (Iterator<Peer> iterp = p.values().iterator(); iterp.hasNext() && p.size() > MAX_PEERS_PER_TORRENT; ) {
                          iterp.next();
@@ -143,6 +159,7 @@ class DHTTracker {
                          peerCount--;
                     }
                     torrentCount++;
+                    tooMany = true;
                 } else if (recent <= 0) {
                     iter.remove();
                 } else {
@@ -151,6 +168,8 @@ class DHTTracker {
             }
 
             if (peerCount > MAX_PEERS)
+                tooMany = true;
+            if (tooMany)
                 _expireTime = Math.max(_expireTime - DELTA_EXPIRE_TIME, MIN_EXPIRE_TIME);
             else
                 _expireTime = Math.min(_expireTime + DELTA_EXPIRE_TIME, MAX_EXPIRE_TIME);
@@ -162,7 +181,7 @@ class DHTTracker {
                          DataHelper.formatDuration(_expireTime) + " expiration");
             _peerCount = peerCount;
             _torrentCount = torrentCount;
-            schedule(CLEAN_TIME);
+            schedule(tooMany ? CLEAN_TIME / 3 : CLEAN_TIME);
         }
     }
 }

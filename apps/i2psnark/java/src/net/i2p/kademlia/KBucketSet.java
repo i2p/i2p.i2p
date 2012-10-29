@@ -526,11 +526,17 @@ public class KBucketSet<T extends SimpleDataStructure> {
     public List<T> getExploreKeys(long age) {
         List<T> rv = new ArrayList(_buckets.size());
         long old = _context.clock().now() - age;
+        int prevSize = -1;
         getReadLock();
         try {
             for (KBucket b : _buckets) {
-                if (b.getLastChanged() < old || b.getKeyCount() < BUCKET_SIZE * 3 / 4)
+                int curSize = b.getKeyCount();
+                // The first few buckets are all empty, we only need one
+                // explore key for all of them.
+                if ((prevSize != 0 || curSize != 0) &&
+                    (b.getLastChanged() < old || curSize < BUCKET_SIZE * 3 / 4))
                     rv.add(generateRandomKey(b));
+                prevSize = curSize;
             }
         } finally { releaseReadLock(); }
         return rv;

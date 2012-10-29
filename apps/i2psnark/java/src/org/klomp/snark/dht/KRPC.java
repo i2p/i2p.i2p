@@ -613,6 +613,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                    "Rcvd tokens: ").append(_incomingTokens.size()).append("<br>" +
                    "Pending queries: ").append(_sentQueries.size()).append("<br>");
         _tracker.renderStatusHTML(buf);
+        _knownNodes.renderStatusHTML(buf);
         return buf.toString();
     }
 
@@ -1518,7 +1519,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private class Cleaner extends SimpleTimer2.TimedEvent {
 
         public Cleaner() {
-            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+            super(SimpleTimer2.getInstance(), 7 * CLEAN_TIME);
         }
 
         public void timeReached() {
