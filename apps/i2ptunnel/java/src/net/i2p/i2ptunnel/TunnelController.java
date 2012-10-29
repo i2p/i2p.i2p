@@ -19,8 +19,10 @@ import net.i2p.client.I2PSession;
 import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
+import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 
 /**
@@ -43,6 +45,8 @@ public class TunnelController implements Logging {
     private boolean _running;
     private boolean _starting;
     
+    private static final String KEY_BACKUP_DIR = "i2ptunnel-keyBackup";
+
     /**
      * Create a new controller for a tunnel out of the specific config options.
      * The config may contain a large number of options - only ones that begin in
@@ -102,8 +106,19 @@ public class TunnelController implements Logging {
             Destination dest = client.createDestination(fos);
             String destStr = dest.toBase64();
             log("Private key created and saved in " + keyFile.getAbsolutePath());
+            log("You should backup this file in a secure place.");
             log("New destination: " + destStr);
             log("Base32: " + Base32.encode(dest.calculateHash().getData()) + ".b32.i2p");
+            File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
+            if (backupDir.exists() || backupDir.mkdir()) {
+                String name = keyFile.getName();
+                if (name.endsWith(".dat"))
+                    name = name.substring(0, name.length() - 4);
+                name += "-" + I2PAppContext.getGlobalContext().clock().now() + ".dat";
+                File backup = new File(backupDir, name);
+                if (FileUtil.copy(keyFile, backup, false, true))
+                    log("Private key backup saved to " + backup.getAbsolutePath());
+            }
         } catch (I2PException ie) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error creating new destination", ie);

@@ -20,6 +20,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate a set of tunnels within the JVM, loading and storing their config
@@ -50,7 +51,7 @@ public class TunnelControllerGroup implements ClientApp {
     
     /**
      *  In I2PAppContext will instantiate if necessary and always return non-null.
-     *  As of 0.9.4, when in RouterContext, will return null
+     *  As of 0.9.4, when in RouterContext, will return null (except in Android)
      *  if the TCG has not yet been started by the router.
      *
      *  @throws IllegalArgumentException if unable to load from i2ptunnel.config
@@ -59,7 +60,7 @@ public class TunnelControllerGroup implements ClientApp {
         synchronized (TunnelControllerGroup.class) {
             if (_instance == null) {
                 I2PAppContext ctx = I2PAppContext.getGlobalContext();
-                if (!ctx.isRouterContext()) {
+                if (SystemVersion.isAndroid() || !ctx.isRouterContext()) {
                     _instance = new TunnelControllerGroup(ctx, null, null);
                     _instance.startup();
                 } // else wait for the router to start it
