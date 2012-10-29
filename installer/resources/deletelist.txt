@@ -1,3 +1,5 @@
 # Files listed here will be deleted after the update is extracted
-# expired cert
+# old reseed certs
 certificates/r31453.ovh.net
+certificates/75.145.125.59.crt
+certificates/forum.i2p2.de.crt
