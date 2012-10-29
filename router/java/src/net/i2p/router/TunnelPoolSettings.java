@@ -27,6 +27,7 @@ public class TunnelPoolSettings {
     private int _IPRestriction;
     private final Properties _unknownOptions;
     private final Hash _randomKey;
+    private int _priority;
     
     /** prefix used to override the router's defaults for clients */
     public static final String  PREFIX_DEFAULT = "router.defaultPool.";
@@ -44,6 +45,7 @@ public class TunnelPoolSettings {
     public static final String  PROP_LENGTH_VARIANCE = "lengthVariance";
     public static final String  PROP_ALLOW_ZERO_HOP = "allowZeroHop";
     public static final String  PROP_IP_RESTRICTION = "IPRestriction";
+    public static final String  PROP_PRIORITY = "priority";
     
     public static final int     DEFAULT_QUANTITY = 2;
     public static final int     DEFAULT_BACKUP_QUANTITY = 0;
@@ -53,6 +55,8 @@ public class TunnelPoolSettings {
     public static final int     DEFAULT_LENGTH_VARIANCE = 0;
     public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)
+    private static final int MIN_PRIORITY = -25;
+    private static final int MAX_PRIORITY = 25;
     
     public TunnelPoolSettings(boolean isExploratory, boolean isInbound) {
         _isExploratory = isExploratory;
@@ -160,6 +164,13 @@ public class TunnelPoolSettings {
     public int getIPRestriction() { int r = _IPRestriction; if (r>4) r=4; else if (r<0) r=0; return r;}
     public void setIPRestriction(int b) { _IPRestriction = b; }
     
+    /**
+     *  Outbound message priority - for outbound tunnels only
+     *  @return -25 to +25, default 0
+     *  @since 0.9.4
+     */
+    public int getPriority() { return _priority; }
+
     public Properties getUnknownOptions() { return _unknownOptions; }
     
     public void readFromProperties(String prefix, Map<Object, Object> props) {
@@ -185,6 +196,8 @@ public class TunnelPoolSettings {
                     _destinationNickname = value;
                 else if (name.equalsIgnoreCase(prefix + PROP_IP_RESTRICTION))
                     _IPRestriction = getInt(value, DEFAULT_IP_RESTRICTION);
+                else if ((!_isInbound) && name.equalsIgnoreCase(prefix + PROP_PRIORITY))
+                    _IPRestriction = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY, getInt(value, 0)));
                 else
                     _unknownOptions.setProperty(name.substring((prefix != null ? prefix.length() : 0)), value);
             }
@@ -203,6 +216,8 @@ public class TunnelPoolSettings {
         props.setProperty(prefix + PROP_QUANTITY, ""+_quantity);
         // props.setProperty(prefix + PROP_REBUILD_PERIOD, ""+_rebuildPeriod);
         props.setProperty(prefix + PROP_IP_RESTRICTION, ""+_IPRestriction);
+        if (!_isInbound)
+            props.setProperty(prefix + PROP_PRIORITY, Integer.toString(_priority));
         for (Map.Entry e : _unknownOptions.entrySet()) {
             String name = (String) e.getKey();
             String val = (String) e.getValue();

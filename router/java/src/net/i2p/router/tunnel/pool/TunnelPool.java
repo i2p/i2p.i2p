@@ -1128,7 +1128,9 @@ public class TunnelPool {
             // don't need to worry about prev/next hop
         }
         cfg.setExpiration(expiration);
-        
+        if (!settings.isInbound())
+            cfg.setPriority(settings.getPriority());
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Config contains " + peers + ": " + cfg);
         synchronized (_inProgress) {

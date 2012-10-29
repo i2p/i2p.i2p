@@ -66,8 +66,9 @@ public class OutNetMessage implements CDPQEntry {
     public static final int PRIORITY_HIGHEST = 1000;
     public static final int PRIORITY_MY_BUILD_REQUEST = 500;
     public static final int PRIORITY_MY_NETDB_LOOKUP = 500;
-    public static final int PRIORITY_MY_NETDB_STORE = 400;
-    public static final int PRIORITY_MY_DATA = 400;
+    public static final int PRIORITY_MY_NETDB_STORE = 460;
+    /** may be adjusted +/- 25 for outbound traffic */
+    public static final int PRIORITY_MY_DATA = 425;
     public static final int PRIORITY_MY_NETDB_STORE_LOW = 300;
     public static final int PRIORITY_HIS_BUILD_REQUEST = 300;
     public static final int PRIORITY_BUILD_REPLY = 300;
@@ -308,6 +309,18 @@ public class OutNetMessage implements CDPQEntry {
      *  @since 0.9.3
      */
     public void drop() {
+        // This is essentially what TransportImpl.afterSend(this, false) does
+        // but we don't have a ref to the Transport.
+        // No requeue with other transport allowed.
+        if (_onFailedSend != null)
+            _context.jobQueue().addJob(_onFailedSend);
+        if (_onFailedReply != null)
+            _context.jobQueue().addJob(_onFailedReply);
+        if (_replySelector != null)
+            _context.messageRegistry().unregisterPending(this);
+        discardData();
+        // we want this stat to reflect the lag
+        _context.statManager().addRateData("transport.sendProcessingTime", _context.clock().now() - _enqueueTime);
     }
 
     /**
@@ -333,11 +346,11 @@ public class OutNetMessage implements CDPQEntry {
     public void discardData() {
         if ( (_message != null) && (_messageSize <= 0) )
             _messageSize = _message.getMessageSize();
-        if (_log.shouldLog(Log.DEBUG)) {
-            long timeToDiscard = _context.clock().now() - _created;
-            _log.debug("Discard " + _messageSize + "byte " + getMessageType() + " message after " 
-                       + timeToDiscard);
-        }
+        //if (_log.shouldLog(Log.DEBUG)) {
+        //    long timeToDiscard = _context.clock().now() - _created;
+        //    _log.debug("Discard " + _messageSize + "byte " + getMessageType() + " message after " 
+        //               + timeToDiscard);
+        //}
         _message = null;
         //_context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
         //_context.messageStateMonitor().outboundMessageDiscarded();

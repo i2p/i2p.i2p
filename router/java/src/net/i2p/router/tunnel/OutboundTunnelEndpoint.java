@@ -4,6 +4,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -26,7 +27,7 @@ class OutboundTunnelEndpoint {
         _config = config;
         _processor = processor;
         _handler = new RouterFragmentHandler(ctx, new DefragmentedHandler());
-        _outDistributor = new OutboundMessageDistributor(ctx, 200);
+        _outDistributor = new OutboundMessageDistributor(ctx, OutNetMessage.PRIORITY_PARTICIPATING);
     }
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
         _config.incrementProcessedMessages();

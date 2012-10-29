@@ -6,6 +6,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.data.i2np.UnknownI2NPMessage;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -27,7 +28,7 @@ class TunnelGatewayZeroHop extends TunnelGateway {
         if (config.isInbound())
             _inDistributor = new InboundMessageDistributor(context, config.getDestination());
         else
-            _outDistributor = new OutboundMessageDistributor(context, 400);
+            _outDistributor = new OutboundMessageDistributor(context, OutNetMessage.PRIORITY_MY_DATA);
     }
     
     /**

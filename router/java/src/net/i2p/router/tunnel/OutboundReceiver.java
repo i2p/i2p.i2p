@@ -20,6 +20,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
     private final Log _log;
     private final TunnelCreatorConfig _config;
     private RouterInfo _nextHopCache;
+    private final int _priority;
     
     private static final long MAX_LOOKUP_TIME = 15*1000;
     private static final int PRIORITY = OutNetMessage.PRIORITY_MY_DATA;
@@ -29,6 +30,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         _log = ctx.logManager().getLog(OutboundReceiver.class);
         _config = cfg;
         _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
+        _priority = PRIORITY + cfg.getPriority();
         // all createRateStat() in TunnelDispatcher
     }
     
@@ -73,7 +75,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         m.setMessage(msg);
         m.setExpiration(msg.getMessageExpiration());
         m.setTarget(ri);
-        m.setPriority(PRIORITY);
+        m.setPriority(_priority);
         _context.outNetMessagePool().add(m);
         _config.incrementProcessedMessages();
     }

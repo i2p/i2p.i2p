@@ -295,7 +295,9 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
 
     private void drop(E entry) {
         long delay = _context.clock().now() - entry.getEnqueueTime();
-        _context.statManager().addRateData(STAT_DROP + entry.getPriority(), delay);
+        // round down for the stat
+        int priority = entry.getPriority() / 100 * 100;
+        _context.statManager().addRateData(STAT_DROP + priority, delay);
         if (_log.shouldLog(Log.WARN))
             _log.warn("CDPQ #" + _id + ' ' + _name + " dropped item with delay " + delay + ", priority " +
                       entry.getPriority() + ", seq " +

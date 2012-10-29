@@ -16,8 +16,8 @@ import java.util.Properties;
  *
  */
 public class ClientTunnelSettings {
-    private TunnelPoolSettings _inboundSettings;
-    private TunnelPoolSettings _outboundSettings;
+    private final TunnelPoolSettings _inboundSettings;
+    private final TunnelPoolSettings _outboundSettings;
     
     public ClientTunnelSettings() {
         _inboundSettings = new TunnelPoolSettings(false, true);
@@ -25,16 +25,16 @@ public class ClientTunnelSettings {
     }
     
     public TunnelPoolSettings getInboundSettings() { return _inboundSettings; }
-    public void setInboundSettings(TunnelPoolSettings settings) { _inboundSettings = settings; }
+    //public void setInboundSettings(TunnelPoolSettings settings) { _inboundSettings = settings; }
     public TunnelPoolSettings getOutboundSettings() { return _outboundSettings; }
-    public void setOutboundSettings(TunnelPoolSettings settings) { _outboundSettings = settings; }
+    //public void setOutboundSettings(TunnelPoolSettings settings) { _outboundSettings = settings; }
     
     public void readFromProperties(Properties props) {
         _inboundSettings.readFromProperties("inbound.", props);
         _outboundSettings.readFromProperties("outbound.", props);
 	}
     
-    public void writeToProperties(Properties props) {
+    private void writeToProperties(Properties props) {
         if (props == null) return;
         _inboundSettings.writeToProperties("inbound.", props);
         _outboundSettings.writeToProperties("outbound.", props);
