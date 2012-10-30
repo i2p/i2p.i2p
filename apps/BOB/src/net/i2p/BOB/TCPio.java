@@ -1,17 +1,9 @@
 /**
- *            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ *                    WTFPL
  *                    Version 2, December 2004
  *
  * Copyright (C) sponge
  *   Planet Earth
- * Everyone is permitted to copy and distribute verbatim or modified
- * copies of this license document, and changing it is allowed as long
- * as the name is changed.
- *
- *            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
- *   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
- *
- *  0. You just DO WHAT THE FUCK YOU WANT TO.
  *
  * See...
  *
@@ -19,7 +11,7 @@
  *	and
  *	http://en.wikipedia.org/wiki/WTFPL
  *
- * ...for any additional details and liscense questions.
+ * ...for any additional details and license questions.
  */
 package net.i2p.BOB;
 

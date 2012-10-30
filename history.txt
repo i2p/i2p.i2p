@@ -1,3 +1,6 @@
+2012-10-30 sponge
+ * cleanups as requested
+
 2012-10-28 zzz
  * Addresses:
    - Add methods for connectivity detection
