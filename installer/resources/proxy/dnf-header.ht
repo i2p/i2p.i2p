@@ -22,7 +22,7 @@ The eepsite was not reachable.
 The eepsite is offline, there is network congestion,
 or your router is not yet well-integrated with peers.
 You may want to
-<a href="javascript: window.location.reload()">retry</a>.</p>
+<a href="javascript:window.location.reload()">retry</a>.</p>
 <hr>
 <p><b>Could not find the following destination:</b>
 </p>

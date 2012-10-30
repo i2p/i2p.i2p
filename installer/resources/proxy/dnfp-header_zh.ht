@@ -21,7 +21,7 @@ Proxy-Connection: close
 未找到 WWW 出口代理.
 它可能以下线, 或网络拥堵，或你的路由器与网络
 尚未良好整合。您可以
-<a href="javascript: parent.window.location.reload()">重试</a>
+<a href="javascript:parent.window.location.reload()">重试</a>
 这将从所设置的所有出口代理中随机选择一个代理做出口。
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">点此</a>
 (如果您设置了超过1个的出口代理地址)。

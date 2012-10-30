@@ -22,7 +22,7 @@ Proxy-Connection: close
 此匿名站点可能不在线(时区差异、对方路由器繁忙等),
 或您的路由器在网络中的整合度不佳。
 你可以尝试
-<a href="javascript: window.location.reload()">重试</a>。
+<a href="javascript:window.location.reload()">重试</a>。
 </p>
 <hr>
 <p>

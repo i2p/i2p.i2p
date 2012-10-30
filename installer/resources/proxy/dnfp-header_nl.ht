@@ -21,7 +21,7 @@ Proxy-Connection: close
 De HTTP Outproxy was niet gevonden.
 Het is offline, er is een netwerk verstopping,
 of je router is niet goed geïntegreerd met peers.
-Probeer <a href="javascript: parent.window.location.reload()">opnieuw</a>
+Probeer <a href="javascript:parent.window.location.reload()">opnieuw</a>
 aangezien dit willekeurig een outproxy van de groep zal selecteren die
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">hier</a> gedefinieerd
 (indien er meer van één geconfigureerd is).

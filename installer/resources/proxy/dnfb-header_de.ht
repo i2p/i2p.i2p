@@ -21,7 +21,7 @@ Proxy-Connection: close
 Das angegebene Eepseiten-Ziel ist nicht gültig,
 oder auf andere Art nicht erreichbar. Vielleicht haben Sie eine falsche BASIS64-Zeichenkette kopiert
 oder Sie folgten einem ungültigen Verweis. Möglicherweise ist auch der I2P-Host offline.
-Versuchen Sie, die Seite <a href="javascript: window.location.reload()">erneut zu laden</a>!
+Versuchen Sie, die Seite <a href="javascript:window.location.reload()">erneut zu laden</a>!
 </p>
 <hr>
 <p>
