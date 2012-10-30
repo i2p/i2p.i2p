@@ -269,7 +269,7 @@ public abstract class TransportImpl implements Transport {
                           + " to " + msg.getTarget().getIdentity().getHash().toBase64()
                           + " (details: " + msg + ')');
             if (msg.getExpiration() < _context.clock().now())
-                _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime, lifetime);
+                _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime);
 
             if (allowRequeue) {
                 if ( ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) )
@@ -343,7 +343,7 @@ public abstract class TransportImpl implements Transport {
 
         if (sendSuccessful) {
             // TODO fix this stat for SSU ticket #698
-            _context.statManager().addRateData("transport.sendProcessingTime", lifetime, lifetime);
+            _context.statManager().addRateData("transport.sendProcessingTime", lifetime);
             // object churn. 33 ms for NTCP and 788 for SSU, but meaningless due to
             // differences in how it's computed (immediate vs. round trip)
             //_context.statManager().addRateData("transport.sendProcessingTime." + getStyle(), lifetime, 0);
@@ -351,7 +351,7 @@ public abstract class TransportImpl implements Transport {
             _context.statManager().addRateData("transport.sendMessageSize", msg.getMessageSize(), sendTime);
         } else {
             _context.profileManager().messageFailed(msg.getTarget().getIdentity().getHash(), getStyle());
-            _context.statManager().addRateData("transport.sendMessageFailureLifetime", lifetime, lifetime);
+            _context.statManager().addRateData("transport.sendMessageFailureLifetime", lifetime);
         }
     }
 
@@ -433,9 +433,9 @@ public abstract class TransportImpl implements Transport {
             _context.statManager().addRateData("transport.receiveMessageSize", bytesReceived, msToReceive);
         }
 
-        _context.statManager().addRateData("transport.receiveMessageTime", msToReceive, msToReceive);
+        _context.statManager().addRateData("transport.receiveMessageTime", msToReceive);
         if (msToReceive > 1000) {
-            _context.statManager().addRateData("transport.receiveMessageTimeSlow", msToReceive, msToReceive);
+            _context.statManager().addRateData("transport.receiveMessageTimeSlow", msToReceive);
         }
 
         //// this functionality is built into the InNetMessagePool

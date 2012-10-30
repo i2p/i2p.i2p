@@ -113,11 +113,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final int DEFAULT_INTERNAL_PORT = 8887;
 
     /**
-     *  To prevent trouble. To be raised to 1024 in 0.9.4.
+     *  To prevent trouble. 1024 as of 0.9.4.
      *
      *  @since 0.9.3
      */
-    static final int MIN_PEER_PORT = 500;
+    static final int MIN_PEER_PORT = 1024;
 
     /** Limits on port told to us by others,
      *  We should have an exception if it matches the existing low port.
@@ -1419,12 +1419,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  "injected" message from the EstablishmentManager
      */
     void send(I2NPMessage msg, PeerState peer) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Injecting a data message to a new peer: " + peer);
-        OutboundMessageState state = new OutboundMessageState(_context);
-        boolean ok = state.initialize(msg, peer);
-        if (ok)
+        try {
+            OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting a data message to a new peer: " + peer);
             _fragments.add(state);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
     }
     
     // we don't need the following, since we have our own queueing

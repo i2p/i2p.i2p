@@ -70,11 +70,11 @@ public class NTCPTransport extends TransportImpl {
     private static final long[] RATES = { 10*60*1000 };
 
     /**
-     *  To prevent trouble. To be raised to 1024 in 0.9.4.
+     *  To prevent trouble. 1024 as of 0.9.4.
      *
      *  @since 0.9.3
      */
-    private static final int MIN_PEER_PORT = 500;
+    private static final int MIN_PEER_PORT = 1024;
 
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";

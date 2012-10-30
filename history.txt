@@ -1,3 +1,30 @@
+2012-10-30 zzz
+ * i2psnark:
+   - Add kbucket debugging
+   - Eliminate redundant explore keys
+   - Add more limits to DHT tracker
+   - Delay expiration at startup
+   - Only enable updates for dev builds and 1% of release builds
+ * i2ptunnel:
+   - Create backup privkey files (ticket #752)
+   - Fix NPE in Android startup
+   - Fix disabling proxy authorization
+ * Installer: Drop news.xml and old certs
+ * logs.jsp:
+   - Don't display dup message if last
+   - Spacing tweaks
+ * OutNetMessage: Properly clean up when dropped by codel (but unused for now
+   since codel is disabled for ONM)
+ * SSU:
+   - Adjust RTT/RTO calculations
+   - Better bandwidth tracking
+   - Cleanup of OutboundMessageState
+   - Stat tweaks
+ * StatisticsManager: Publish stats less often
+ * Transports: Increase min peer port to 1024
+ * Tunnels: Implement per-client outbound tunnel message priority (ticket #719)
+ * Update Manager: Warn on dup registration
+
 2012-10-30 sponge
  * cleanups as requested
 

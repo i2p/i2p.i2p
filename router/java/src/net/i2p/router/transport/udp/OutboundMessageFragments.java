@@ -80,8 +80,8 @@ class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.sendAggressiveFailed", "How many volleys was a packet sent before we gave up", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.outboundActiveCount", "How many messages are in the peer's active pool", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.outboundActivePeers", "How many peers we are actively sending to", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendRejected", "What volley are we on when the peer was throttled (time == message lifetime)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.partialACKReceived", "How many fragments were partially ACKed (time == message lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendRejected", "What volley are we on when the peer was throttled", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.partialACKReceived", "How many fragments were partially ACKed", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendSparse", "How many fragments were partially ACKed and hence not resent (time == message lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendPiggyback", "How many acks were piggybacked on a data packet (time == message lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendPiggybackPartial", "How many partial acks were piggybacked on a data packet (time == message lifetime)", "udp", UDPTransport.RATES);
@@ -152,25 +152,18 @@ class OutboundMessageFragments {
     public void add(OutNetMessage msg) {
         I2NPMessage msgBody = msg.getMessage();
         RouterInfo target = msg.getTarget();
-        if ( (msgBody == null) || (target == null) )
+        if (target == null)
             return;
 
-        // todo: make sure the outNetMessage is initialzed once and only once
-        OutboundMessageState state = new OutboundMessageState(_context);
-        boolean ok = state.initialize(msg, msgBody);
-        if (ok) {
-            PeerState peer = _transport.getPeerState(target.getIdentity().calculateHash());
-            if (peer == null) {
-                _transport.failed(msg, "Peer disconnected quickly");
-                state.releaseResources();
-                return;
-            }
+        PeerState peer = _transport.getPeerState(target.getIdentity().calculateHash());
+        try {
+            // will throw IAE if peer == null
+            OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
             peer.add(state);
             add(peer);
-            //_context.statManager().addRateData("udp.outboundActiveCount", active, 0);
-        } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error initializing " + msg);
+        } catch (IllegalArgumentException iae) {
+            _transport.failed(msg, "Peer disconnected quickly");
+            return;
         }
     }
 
