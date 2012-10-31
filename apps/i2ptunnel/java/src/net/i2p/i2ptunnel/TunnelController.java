@@ -322,7 +322,9 @@ public class TunnelController implements Logging {
                 I2PSession session = sessions.get(i);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Acquiring session " + session);
-                TunnelControllerGroup.getInstance().acquire(this, session);
+                TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+                if (group != null)
+                    group.acquire(this, session);
             }
             _sessions = sessions;
         } else {
@@ -341,7 +343,9 @@ public class TunnelController implements Logging {
                 I2PSession s = _sessions.get(i);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Releasing session " + s);
-                TunnelControllerGroup.getInstance().release(this, s);
+                TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+                if (group != null)
+                    group.release(this, s);
             }
             // _sessions.clear() ????
         } else {
