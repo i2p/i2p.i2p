@@ -10,12 +10,12 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
- *  Thread that runs every 100 ms to "give" bandwidth to
+ *  Thread that runs several times a second to "give" bandwidth to
  *  FIFOBandwidthLimiter.
  *  Instantiated by FIFOBandwidthLimiter.
  *
  *  As of 0.8.12, this also contains a counter for outbound participating bandwidth.
- *  This was a good place for it since we needed a 100ms thread for it.
+ *  This was a good place for it since we needed a thread for it.
  *
  *  Public only for the properties and defaults.
  */
@@ -72,9 +72,9 @@ public class FIFOBandwidthRefiller implements Runnable {
     
     /** 
      * how often we replenish the queues.  
-     * the bandwidth limiter is configured to expect an update 10 times per second 
+     * the bandwidth limiter will get an update this often (ms)
      */
-    private static final long REPLENISH_FREQUENCY = 100;
+    private static final long REPLENISH_FREQUENCY = 40;
     
     FIFOBandwidthRefiller(I2PAppContext context, FIFOBandwidthLimiter limiter) {
         _limiter = limiter;
@@ -293,14 +293,14 @@ public class FIFOBandwidthRefiller implements Runnable {
      */
     private static final int TOTAL_TIME = 4000;
     private static final int PERIODS = TOTAL_TIME / (int) REPLENISH_FREQUENCY;
-    /** count in current 100 ms period */
+    /** count in current replenish period */
     private final AtomicInteger _currentParticipating = new AtomicInteger();
     private long _lastPartUpdateTime;
     private int _lastTotal;
     /** the actual length of last total period as coalesced (nominally TOTAL_TIME) */
     private long _lastTotalTime;
     private int _lastIndex;
-    /** buffer of count per 100 ms period, last is at _lastIndex, older at higher indexes (wraps) */
+    /** buffer of count per replenish period, last is at _lastIndex, older at higher indexes (wraps) */
     private final int[] _counts = new int[PERIODS];
     /** the actual length of the period (nominally REPLENISH_FREQUENCY) */
     private final long[] _times = new long[PERIODS];
@@ -344,7 +344,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
 
     /**
-     *  Run once every 100 ms
+     *  Run once every replenish period
      *
      *  @since 0.8.12
      */

@@ -327,7 +327,7 @@ public class FIFOBandwidthLimiter {
                 _unavailableOutboundBurst.set(_maxOutboundBurst);
             }
         } else {
-            // try to pull in up to 1/10th of the burst rate, since we refill every 100ms
+            // try to pull in up to the burst rate, since we refill periodically
             int want = (int)maxBurstOut;
             if (want > (_maxOutbound - avo))
                 want = _maxOutbound - avo;
