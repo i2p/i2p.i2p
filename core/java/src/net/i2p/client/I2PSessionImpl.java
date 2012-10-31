@@ -515,9 +515,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  Needs work.
      */
     protected class AvailabilityNotifier implements Runnable {
-        private List _pendingIds;
-        private List _pendingSizes;
-        private boolean _alive;
+        private final List _pendingIds;
+        private final List _pendingSizes;
+        private volatile boolean _alive;
  
         public AvailabilityNotifier() {
             _pendingIds = new ArrayList(2);

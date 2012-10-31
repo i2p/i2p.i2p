@@ -32,53 +32,53 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     // Debugging methods and variables
     //...........................................................................
 
-    static final String _NAME = "Rijndael_Algorithm";
-    static final boolean _IN = true, _OUT = false;
+    private static final String _NAME = "Rijndael_Algorithm";
+    private static final boolean _IN = true, _OUT = false;
 
-    static final boolean _RDEBUG = false;
-    static final int _debuglevel = 0; // RDEBUG ? Rijndael_Properties.getLevel(NAME): 0;
+    private static final boolean _RDEBUG = false;
+    private static final int _debuglevel = 0; // RDEBUG ? Rijndael_Properties.getLevel(NAME): 0;
     //    static final PrintWriter err = RDEBUG ? Rijndael_Properties.getOutput() : null;
-    static final PrintWriter _err = new PrintWriter(new java.io.OutputStreamWriter(System.err));
+    private static final PrintWriter _err = new PrintWriter(new java.io.OutputStreamWriter(System.err));
 
-    static final boolean _TRACE = false; // Rijndael_Properties.isTraceable(NAME);
+    private static final boolean _TRACE = false; // Rijndael_Properties.isTraceable(NAME);
 
-    static void debug(String s) {
+    private static void debug(String s) {
         _err.println(">>> " + _NAME + ": " + s);
     }
 
-    static void trace(boolean in, String s) {
+    private static void trace(boolean in, String s) {
         if (_TRACE) _err.println((in ? "==> " : "<== ") + _NAME + "." + s);
     }
 
-    static void trace(String s) {
+    private static void trace(String s) {
         if (_TRACE) _err.println("<=> " + _NAME + "." + s);
     }
 
     // Constants and variables
     //...........................................................................
 
-    static final int _BLOCK_SIZE = 16; // default block size in bytes
+    private static final int _BLOCK_SIZE = 16; // default block size in bytes
 
-    static final int[] _alog = new int[256];
-    static final int[] _log = new int[256];
+    private static final int[] _alog = new int[256];
+    private static final int[] _log = new int[256];
 
-    static final byte[] _S = new byte[256];
-    static final byte[] _Si = new byte[256];
-    static final int[] _T1 = new int[256];
-    static final int[] _T2 = new int[256];
-    static final int[] _T3 = new int[256];
-    static final int[] _T4 = new int[256];
-    static final int[] _T5 = new int[256];
-    static final int[] _T6 = new int[256];
-    static final int[] _T7 = new int[256];
-    static final int[] _T8 = new int[256];
-    static final int[] _U1 = new int[256];
-    static final int[] _U2 = new int[256];
-    static final int[] _U3 = new int[256];
-    static final int[] _U4 = new int[256];
-    static final byte[] _rcon = new byte[30];
+    private static final byte[] _S = new byte[256];
+    private static final byte[] _Si = new byte[256];
+    private static final int[] _T1 = new int[256];
+    private static final int[] _T2 = new int[256];
+    private static final int[] _T3 = new int[256];
+    private static final int[] _T4 = new int[256];
+    private static final int[] _T5 = new int[256];
+    private static final int[] _T6 = new int[256];
+    private static final int[] _T7 = new int[256];
+    private static final int[] _T8 = new int[256];
+    private static final int[] _U1 = new int[256];
+    private static final int[] _U2 = new int[256];
+    private static final int[] _U3 = new int[256];
+    private static final int[] _U4 = new int[256];
+    private static final byte[] _rcon = new byte[30];
 
-    static final int[][][] _shifts = new int[][][] { { { 0, 0}, { 1, 3}, { 2, 2}, { 3, 1}},
+    private static final int[][][] _shifts = new int[][][] { { { 0, 0}, { 1, 3}, { 2, 2}, { 3, 1}},
                                                     { { 0, 0}, { 1, 5}, { 2, 4}, { 3, 3}},
                                                     { { 0, 0}, { 1, 7}, { 3, 5}, { 4, 4}}};
 
@@ -344,12 +344,12 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     }
 
     // multiply two elements of GF(2^m)
-    static final int mul(int a, int b) {
+    private static final int mul(int a, int b) {
         return (a != 0 && b != 0) ? _alog[(_log[a & 0xFF] + _log[b & 0xFF]) % 255] : 0;
     }
 
     // convenience method used in generating Transposition boxes
-    static final int mul4(int a, byte[] b) {
+    private static final int mul4(int a, byte[] b) {
         if (a == 0) return 0;
         a = _log[a & 0xFF];
         int a0 = (b[0] != 0) ? _alog[(a + _log[b[0] & 0xFF]) % 255] & 0xFF : 0;

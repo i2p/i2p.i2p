@@ -25,14 +25,18 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 
 /**
- * Base client implementation
+ * Base client implementation.
+ * An I2PClient contains no state, it is just a facility for creating private key files
+ * and generating sesssions from existing private key files.
  *
  * @author jrandom
  */
 class I2PClientImpl implements I2PClient {
 
     /**
-     * Create the destination with a null payload
+     * Create the destination with a null payload.
+     * This is not bound to the I2PClient, you must supply the data back again
+     * in createSession().
      *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
