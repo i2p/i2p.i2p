@@ -5,6 +5,7 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Zero-copy in-JVM.
@@ -67,8 +68,8 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
         // with non-blocking writes for the router
         // and blocking writes for the client?
         boolean success = queue.offer(msg);
-        if (!success)
-            throw new I2CPMessageException("I2CP write to queue failed");
+        if (!success && _log.shouldLog(Log.WARN))
+            _log.warn("I2CP write to queue failed: " + msg);
     }
     
 }

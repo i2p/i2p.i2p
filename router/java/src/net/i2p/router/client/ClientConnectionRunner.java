@@ -56,7 +56,7 @@ import net.i2p.util.SimpleTimer;
  * @author jrandom
  */
 class ClientConnectionRunner {
-    private final Log _log;
+    protected final Log _log;
     protected final RouterContext _context;
     private final ClientManager _manager;
     /** socket for this particular peer connection */
