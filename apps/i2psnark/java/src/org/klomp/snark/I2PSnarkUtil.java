@@ -244,6 +244,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.maxConnsPerHour", "20");
             if (opts.getProperty("i2p.streaming.enforceProtocol") == null)
                 opts.setProperty("i2p.streaming.enforceProtocol", "true");
+            if (opts.getProperty("i2p.streaming.disableRejectLogging") == null)
+                opts.setProperty("i2p.streaming.disableRejectLogging", "true");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             _connecting = false;
         }
