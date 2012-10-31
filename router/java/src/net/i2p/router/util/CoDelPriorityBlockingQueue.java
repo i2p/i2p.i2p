@@ -27,11 +27,6 @@ import net.i2p.util.Log;
  */
 public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlockingQueue<E> {
 
-    private final I2PAppContext _context;
-    private final Log _log;
-    private final String _name;
-    private final AtomicLong _seqNum = new AtomicLong();
-
     // following 4 are state variables defined by sample code, locked by this
     /** Time when we'll declare we're above target (0 if below) */
     private long _first_above_time;
@@ -75,7 +70,6 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
 
     private final String STAT_DROP;
     private final String STAT_DELAY;
-    private static final long[] RATES = {5*60*1000, 60*60*1000};
     public static final int MIN_PRIORITY = 100;
     private static final int[] PRIORITIES = {MIN_PRIORITY, 200, 300, 400, 500};
     /** if priority is >= this, never drop */
@@ -86,10 +80,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
      *  @param name for stats
      */
     public CoDelPriorityBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
-        super(initialCapacity);
-        _context = ctx;
-        _log = ctx.logManager().getLog(CoDelPriorityBlockingQueue.class);
-        _name = name;
+        super(ctx, name, initialCapacity);
         STAT_DROP = ("codel." + name + ".drop.").intern();
         STAT_DELAY = ("codel." + name + ".delay").intern();
         for (int i = 0; i < PRIORITIES.length; i++) {
@@ -177,7 +168,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
 
     @Override
     protected void timestamp(E o) {
-        o.setSeqNum(_seqNum.incrementAndGet());
+        super.timestamp(o);
         o.setEnqueueTime(_context.clock().now());
         if (o.getPriority() < MIN_PRIORITY && _log.shouldLog(Log.WARN))
             _log.warn(_name + " added item with low priority " + o.getPriority() +

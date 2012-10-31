@@ -325,7 +325,7 @@ class PeerState {
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
         //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
-        _outboundQueue = new PriBlockingQueue(32);
+        _outboundQueue = new PriBlockingQueue(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager
         _remoteIP = remoteIP;
         _remotePeer = remotePeer;

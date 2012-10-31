@@ -5,6 +5,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 /**
  *  Priority Blocking Queue using methods in the entries,
  *  as definied in PQEntry, to store priority and sequence number,
@@ -16,32 +19,79 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E> {
 
+    protected final I2PAppContext _context;
+    protected final Log _log;
+    protected final String _name;
     private final AtomicLong _seqNum = new AtomicLong();
 
+    private final String STAT_FULL;
+    protected static final long[] RATES = {5*60*1000, 60*60*1000};
     protected static final int BACKLOG_SIZE = 256;
+    protected static final int MAX_SIZE = 512;
 
-    public PriBlockingQueue(int initialCapacity) {
+    /**
+     *  Bounded queue with a hardcoded failsafe max size,
+     *  except when using put(), which is unbounded.
+     */
+    public PriBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
         super(initialCapacity, new PriorityComparator());
+        _context = ctx;
+        _log = ctx.logManager().getLog(PriorityBlockingQueue.class);
+        _name = name;
+        STAT_FULL = ("pbq." + name + ".full").intern();
+        ctx.statManager().createRequiredRateStat(STAT_FULL, "queue full", "Router", RATES);
     }
 
+    /**
+     *  OpenJDK add(o) calls offer(o), so use offer(o) to avoid dup stamping.
+     *  Returns false if full
+     *  @deprecated use offer(o)
+     */
     @Override
     public boolean add(E o) {
         timestamp(o);
+        if (size() >= MAX_SIZE) {
+            _context.statManager().addRateData(STAT_FULL, 1);
+            return false;
+        }
         return super.add(o);
     }
 
+    /**
+     *  Returns false if full
+     */
     @Override
     public boolean offer(E o) {
         timestamp(o);
+        if (size() >= MAX_SIZE) {
+            _context.statManager().addRateData(STAT_FULL, 1);
+            return false;
+        }
         return super.offer(o);
     }
 
+    /**
+     *  OpenJDK offer(o, timeout, unit) calls offer(o), so use offer(o) to avoid dup stamping.
+     *  Non blocking. Returns false if full.
+     *  @param timeout ignored
+     *  @param unit ignored
+     *  @deprecated use offer(o)
+     */
     @Override
     public boolean offer(E o, long timeout, TimeUnit unit) {
         timestamp(o);
+        if (size() >= MAX_SIZE) {
+            _context.statManager().addRateData(STAT_FULL, 1);
+            return false;
+        }
         return super.offer(o, timeout, unit);
     }
 
+    /**
+     *  OpenJDK put(o) calls offer(o), so use offer(o) to avoid dup stamping.
+     *  Non blocking. Does not add if full.
+     *  @deprecated use offer(o)
+     */
     @Override
     public void put(E o) {
         timestamp(o);

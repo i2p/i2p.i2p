@@ -162,7 +162,7 @@ class NTCPConnection {
         _bwInRequests = new ConcurrentHashSet(2);
         _bwOutRequests = new ConcurrentHashSet(8);
         //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
-        _outbound = new PriBlockingQueue(32);
+        _outbound = new PriBlockingQueue(ctx, "NTCP-Connection", 32);
         _isInbound = true;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
@@ -190,7 +190,7 @@ class NTCPConnection {
         _bwInRequests = new ConcurrentHashSet(2);
         _bwOutRequests = new ConcurrentHashSet(8);
         //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
-        _outbound = new PriBlockingQueue(32);
+        _outbound = new PriBlockingQueue(ctx, "NTCP-Connection", 32);
         _isInbound = false;
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();

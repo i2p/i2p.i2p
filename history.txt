@@ -1,3 +1,10 @@
+2012-10-31 zzz
+ * FIFOBandwidthRefiller: Reduce refill interval to smooth output
+ * I2CP: Reduce log level when outbound queue is full (ticket #758)
+ * i2ptunnel: Fix NPE in zzzot plugin
+ * PriBlockingQueue: Enforce max size
+ * Streaming: New disableRejectLogging option (default false), enable for snark
+
 2012-10-30 zzz
  * i2psnark:
    - Add kbucket debugging
@@ -8,7 +15,6 @@
  * i2ptunnel:
    - Create backup privkey files (ticket #752)
    - Fix NPE in Android startup
-   - Fix disabling proxy authorization
  * Installer: Drop news.xml and old certs
  * logs.jsp:
    - Don't display dup message if last
