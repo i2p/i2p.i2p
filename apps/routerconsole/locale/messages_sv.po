@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2012-10-12 00:38+0000\n"
-"PO-Revision-Date: 2012-10-12 00:41+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2012-10-31 14:22+0000\n"
+"Last-Translator: Martin Svensson <digitalmannen@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -710,7 +710,7 @@ msgstr "Förbjudna"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2310
 msgid "backlogged"
-msgstr ""
+msgstr "backlogged"
 
 #. buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2390
@@ -2408,7 +2408,7 @@ msgstr "Inaktiverar TCP helt"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:200
 #, java-format
 msgid "Updating TCP address to {0}"
-msgstr ""
+msgstr "Uppdaterar TCP adress till {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:207
 msgid "Disabling inbound TCP"
@@ -2421,17 +2421,17 @@ msgstr "Uppdaterar inkommande TCP-adress till auto"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:222
 #, java-format
 msgid "Updating TCP port to {0}"
-msgstr ""
+msgstr "Uppdaterar TCP port till {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:224
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:249
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Varning - port-nummer lägre är 1024 inte lämpligt"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:228
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:255
 msgid "Invalid port"
-msgstr ""
+msgstr "Ogiltig port"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:233
 msgid "Updating inbound TCP port to auto"
@@ -2440,7 +2440,7 @@ msgstr "Uppdaterar inkommande TCP-port till auto"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:247
 #, java-format
 msgid "Updating UDP port to {0}"
-msgstr ""
+msgstr "Uppdaterar UDP port till {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:272
 msgid "Gracefully restarting into Hidden Router Mode"
@@ -2480,7 +2480,7 @@ msgstr "Kräver SSU introducerare"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:369
 msgid "Invalid address"
-msgstr ""
+msgstr "ogiltig adress"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:374
 #, java-format
@@ -2723,11 +2723,11 @@ msgstr "Konsolen ska inte visas vid start"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:221
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:457
 msgid "Force GC"
-msgstr ""
+msgstr "Tvinga GC"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:223
 msgid "Full garbage collection requested"
-msgstr ""
+msgstr "Fullständig garbage collection begärd"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:232
 msgid "Service installed"

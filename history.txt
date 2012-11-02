@@ -1,3 +1,7 @@
+2012-11-02 kytv
+* German, Portuguese, and Swedish translation updates from Transifex
+* Refreshed English po files to push to TX.
+
 2012-11-02 zzz
  * configstats: Fix group sorting, translate groups
  * I2CP:

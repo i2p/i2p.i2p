@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Martin Svensson <digitalmannen@gmail.com>, 2011, 2012.
+# Martin Svensson <digitalmannen@gmail.com>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2012-10-12 00:38+0000\n"
-"PO-Revision-Date: 2012-10-12 00:40+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2012-10-31 14:26+0000\n"
+"Last-Translator: Martin Svensson <digitalmannen@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -174,11 +174,11 @@ msgstr "Ingen port angiven"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:463
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:589
 msgid "Invalid port"
-msgstr ""
+msgstr "Ogiltig port"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:466
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Varning - port-nummer under 1024 är inte lämpligt"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:482
 msgid "Standard client"
@@ -235,7 +235,7 @@ msgstr "Ingen värd angiven"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:583
 msgid "Invalid address"
-msgstr ""
+msgstr "Ogiltig adress"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:82
 msgid "I2P Tunnel Manager - Edit Client Tunnel"
