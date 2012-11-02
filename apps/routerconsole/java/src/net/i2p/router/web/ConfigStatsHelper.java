@@ -1,12 +1,16 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.text.Collator;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
@@ -17,9 +21,9 @@ import net.i2p.util.Log;
 public class ConfigStatsHelper extends HelperBase {
     private Log _log;
     private String _filter;
-    private Set _filters;
+    private Set<String> _filters;
     /** list of names of stats which are remaining, ordered by nested groups */
-    private List _stats;
+    private List<String> _stats;
     private String _currentStatName;
     private String _currentGraphName;
     private String _currentStatDescription;
@@ -43,11 +47,11 @@ public class ConfigStatsHelper extends HelperBase {
         _log = _context.logManager().getLog(ConfigStatsHelper.class);
         
         _stats = new ArrayList();
-        Map groups = _context.statManager().getStatsByGroup();
-        for (Iterator iter = groups.values().iterator(); iter.hasNext(); ) {
-            Set stats = (Set)iter.next();
-            for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) 
-                _stats.add(statIter.next());
+        Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
+        Map<String, Set<String>> groups = new TreeMap(new AlphaComparator());
+        groups.putAll(unsorted);
+        for (Set<String> stats : groups.values()) {
+             _stats.addAll(stats);
         }
         _filter = _context.statManager().getStatFilter(); 
         if (_filter == null)
@@ -148,5 +152,17 @@ public class ConfigStatsHelper extends HelperBase {
     public String getExplicitFilter() { return _filter; }
     public boolean getIsFull() {
         return _context.getBooleanProperty(StatManager.PROP_STAT_FULL);
+    }
+
+    /**
+     *  Translated sort
+     *  @since 0.9.4
+     */
+    private class AlphaComparator implements Comparator<String> {
+        public int compare(String lhs, String rhs) {
+            String lname = _(lhs);
+            String rname = _(rhs);
+            return Collator.getInstance().compare(lname, rname);
+        }
     }
 }

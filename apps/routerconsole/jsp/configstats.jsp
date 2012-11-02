@@ -97,7 +97,7 @@ Warning - Log with care, stat file grows without limit.<br>
       while (statshelper.groupRequired()) { %>
  <tr class="tablefooter">
      <td align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
-     <b><%=statshelper.getCurrentGroupName()%></b>
+     <b><%=intl._(statshelper.getCurrentGroupName())%></b>
      (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._("toggle all")%></a>)
      </td></tr>
  <tr class="tablefooter">
