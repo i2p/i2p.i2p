@@ -8,8 +8,10 @@ package net.i2p.router.startup;
  *
  */
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 
 import net.i2p.data.DataFormatException;
@@ -64,8 +66,8 @@ public class LoadRouterInfoJob extends JobImpl {
         if (rkf.exists())
             _keysExist = true;
         
-        FileInputStream fis1 = null;
-        FileInputStream fis2 = null;
+        InputStream fis1 = null;
+        InputStream fis2 = null;
         try {
             // if we have a routerinfo but no keys, things go bad in a hurry:
             // CRIT   ...rkdb.PublishLocalRouterInfoJob: Internal error - signing private key not known?  rescheduling publish for 30s
@@ -74,7 +76,7 @@ public class LoadRouterInfoJob extends JobImpl {
             // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
             // so pretend the RI isn't there if there is no keyfile
             if (_infoExists && _keysExist) {
-                fis1 = new FileInputStream(rif);
+                fis1 = new BufferedInputStream(new FileInputStream(rif));
                 info = new RouterInfo();
                 info.readBytes(fis1);
                 // Catch this here before it all gets worse
@@ -86,7 +88,7 @@ public class LoadRouterInfoJob extends JobImpl {
             }
             
             if (_keysExist) {
-                fis2 = new FileInputStream(rkf);
+                fis2 = new BufferedInputStream(new FileInputStream(rkf));
                 PrivateKey privkey = new PrivateKey();
                 privkey.readBytes(fis2);
                 SigningPrivateKey signingPrivKey = new SigningPrivateKey();
@@ -96,10 +98,7 @@ public class LoadRouterInfoJob extends JobImpl {
                 SigningPublicKey signingPubKey = new SigningPublicKey();
                 signingPubKey.readBytes(fis2);
                 
-                getContext().keyManager().setPrivateKey(privkey);
-                getContext().keyManager().setSigningPrivateKey(signingPrivKey);
-                getContext().keyManager().setPublicKey(pubkey); //info.getIdentity().getPublicKey());
-                getContext().keyManager().setSigningPublicKey(signingPubKey); // info.getIdentity().getSigningPublicKey());
+                getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             }
         } catch (IOException ioe) {
             _log.log(Log.CRIT, "Error reading the router info from " + rif.getAbsolutePath() + " and the keys from " + rkf.getAbsolutePath(), ioe);

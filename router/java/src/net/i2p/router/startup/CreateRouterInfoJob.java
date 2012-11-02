@@ -8,9 +8,11 @@ package net.i2p.router.startup;
  *
  */
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import net.i2p.data.Certificate;
@@ -50,12 +52,25 @@ public class CreateRouterInfoJob extends JobImpl {
     }
     
     /**
-     *  Caller must hold Router.routerInfoFileLock
+     *  Writes 6 files: router.info (standard RI format),
+     *  router,keys, and 4 individual key files under keyBackup/
+     *
+     *  router.keys file format: Note that this is NOT the
+     *  same "eepPriv.dat" format used by the client code.
+     *<pre>
+     *   - Private key (256 bytes)
+     *   - Signing Private key (20 bytes)
+     *   - Public key (256 bytes)
+     *   - Signing Public key (128 bytes)
+     *  Total 660 bytes
+     *</pre>
+     *
+     *  Caller must hold Router.routerInfoFileLock.
      */
     RouterInfo createRouterInfo() {
         RouterInfo info = new RouterInfo();
-        FileOutputStream fos1 = null;
-        FileOutputStream fos2 = null;
+        OutputStream fos1 = null;
+        OutputStream fos2 = null;
         try {
             info.setAddresses(getContext().commSystem().createAddresses());
             Properties stats = getContext().statPublisher().publishStatistics();
@@ -89,21 +104,18 @@ public class CreateRouterInfoJob extends JobImpl {
             
             String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
             File ifile = new File(getContext().getRouterDir(), infoFilename);
-            fos1 = new SecureFileOutputStream(ifile);
+            fos1 = new BufferedOutputStream(new SecureFileOutputStream(ifile));
             info.writeBytes(fos1);
             
             String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
             File kfile = new File(getContext().getRouterDir(), keyFilename);
-            fos2 = new SecureFileOutputStream(kfile);
+            fos2 = new BufferedOutputStream(new SecureFileOutputStream(kfile));
             privkey.writeBytes(fos2);
             signingPrivKey.writeBytes(fos2);
             pubkey.writeBytes(fos2);
             signingPubKey.writeBytes(fos2);
             
-            getContext().keyManager().setSigningPrivateKey(signingPrivKey);
-            getContext().keyManager().setSigningPublicKey(signingPubKey);
-            getContext().keyManager().setPrivateKey(privkey);
-            getContext().keyManager().setPublicKey(pubkey);
+            getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             
             _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
         } catch (DataFormatException dfe) {

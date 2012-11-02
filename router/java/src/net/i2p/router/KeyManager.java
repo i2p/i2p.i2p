@@ -8,10 +8,14 @@ package net.i2p.router;
  *
  */
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,7 +46,6 @@ public class KeyManager {
     private SigningPrivateKey _signingPrivateKey;
     private SigningPublicKey _signingPublicKey;
     private final Map<Hash, LeaseSetKeys> _leaseSetKeys; // Destination --> LeaseSetKeys
-    private final SynchronizeKeysJob _synchronizeJob;
     
     public final static String PROP_KEYDIR = "router.keyBackupDir";
     public final static String DEFAULT_KEYDIR = "keyBackup";
@@ -50,49 +53,38 @@ public class KeyManager {
     private final static String KEYFILE_PUBLIC_ENC = "publicEncryption.key";
     private final static String KEYFILE_PRIVATE_SIGNING = "privateSigning.key";
     private final static String KEYFILE_PUBLIC_SIGNING = "publicSigning.key";
-    // Doesn't seem like we need to periodically back up,
-    // since we don't store leaseSet keys,
-    // but for now just make it a long time.
-    private final static long DELAY = 7*24*60*60*1000;
     
     public KeyManager(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(KeyManager.class);	
-        _synchronizeJob = new SynchronizeKeysJob();
         _leaseSetKeys = new ConcurrentHashMap();
     }
     
     public void startup() {
-        queueWrite();
+        // run inline so keys are loaded immediately
+        (new SynchronizeKeysJob()).runJob();
     }
     
-    /** Configure the router's private key */
-    public void setPrivateKey(PrivateKey key) { 
-        _privateKey = key; 
-        if (key != null)
-            queueWrite();
+    /**
+     *  Configure the router's keys.
+     *  @since 0.9.4 replace individual setters
+     */
+    public void setKeys(PublicKey key1, PrivateKey key2, SigningPublicKey key3, SigningPrivateKey key4) { 
+        synchronized(this) {
+            _publicKey = key1; 
+            _privateKey = key2; 
+            _signingPublicKey = key3; 
+            _signingPrivateKey = key4; 
+        }
+        queueWrite();
     }
+
     public PrivateKey getPrivateKey() { return _privateKey; }
-    /** Configure the router's public key */
-    public void setPublicKey(PublicKey key) { 
-        _publicKey = key; 
-        if (key != null)
-            queueWrite();
-    }
+
     public PublicKey getPublicKey() { return _publicKey; }
-    /** Configure the router's signing private key */
-    public void setSigningPrivateKey(SigningPrivateKey key) { 
-        _signingPrivateKey = key; 
-        if (key != null)
-            queueWrite();
-    }
+
     public SigningPrivateKey getSigningPrivateKey() { return _signingPrivateKey; }
-    /** Configure the router's signing public key */
-    public void setSigningPublicKey(SigningPublicKey key) { 
-        _signingPublicKey = key; 
-        if (key != null)
-            queueWrite();
-    }
+
     public SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
     
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
@@ -102,15 +94,10 @@ public class KeyManager {
     }
    
     /**
-     *  Wait one second, as this will get called 4 times in quick succession
-     *  There is still a race here though, if a key is set while the sync job is running
+     *  Read/Write the router keys from/to disk
      */
     private void queueWrite() {
-        Clock cl = _context.clock();
-        JobQueue q = _context.jobQueue();
-        if ( (cl == null) || (q == null) ) return;
-        _synchronizeJob.getTiming().setStartAfter(cl.now() + 1000);
-        q.addJob(_synchronizeJob);
+        _context.jobQueue().addJob(new SynchronizeKeysJob());
     }
 
     public LeaseSetKeys unregisterKeys(Destination dest) {
@@ -122,27 +109,36 @@ public class KeyManager {
     public LeaseSetKeys getKeys(Destination dest) {
         return getKeys(dest.calculateHash());
     }
+
     public LeaseSetKeys getKeys(Hash dest) {
             return _leaseSetKeys.get(dest);
     }
     
+    /**
+     *  Read/Write the 4 files in keyBackup/
+     *  As of 0.9.4 this is run on-demand only, there's no need to
+     *  periodically sync.
+     *  Actually, there's little need for this at all.
+     *  If router.keys is corrupt, we should just make a new router identity,
+     *  there's no real reason to try so hard to recover our old keys.
+     */
     private class SynchronizeKeysJob extends JobImpl {
         public SynchronizeKeysJob() {
             super(KeyManager.this._context);
         }
+
         public void runJob() {
             String keyDir = getContext().getProperty(PROP_KEYDIR, DEFAULT_KEYDIR);
             File dir = new SecureDirectory(getContext().getRouterDir(), keyDir);
             if (!dir.exists())
                 dir.mkdirs();
             if (dir.exists() && dir.isDirectory() && dir.canRead() && dir.canWrite()) {
-                syncKeys(dir);
+                synchronized(KeyManager.this) {
+                    syncKeys(dir);
+                }
             } else {
                 _log.log(Log.CRIT, "Unable to synchronize keys in " + keyDir + " - permissions problem?");
             }
-
-            getTiming().setStartAfter(KeyManager.this._context.clock().now()+DELAY);
-            KeyManager.this._context.jobQueue().addJob(this);
         }
         
         private void syncKeys(File keyDir) {
@@ -152,7 +148,7 @@ public class KeyManager {
             syncVerificationKey(keyDir);
         }
 
-        private synchronized void syncPrivateKey(File keyDir) {
+        private void syncPrivateKey(File keyDir) {
             DataStructure ds;
             File keyFile = new File(keyDir, KEYFILE_PRIVATE_ENC);
             boolean exists = (_privateKey != null);
@@ -165,7 +161,7 @@ public class KeyManager {
                 _privateKey = (PrivateKey) readin;
         }
 
-        private synchronized void syncPublicKey(File keyDir) {
+        private void syncPublicKey(File keyDir) {
             DataStructure ds;
             File keyFile = new File(keyDir, KEYFILE_PUBLIC_ENC);
             boolean exists = (_publicKey != null);
@@ -178,7 +174,7 @@ public class KeyManager {
                 _publicKey = (PublicKey) readin;
         }
 
-        private synchronized void syncSigningKey(File keyDir) {
+        private void syncSigningKey(File keyDir) {
             DataStructure ds;
             File keyFile = new File(keyDir, KEYFILE_PRIVATE_SIGNING);
             boolean exists = (_signingPrivateKey != null);
@@ -191,7 +187,7 @@ public class KeyManager {
                 _signingPrivateKey = (SigningPrivateKey) readin;
         }
 
-        private synchronized void syncVerificationKey(File keyDir) {
+        private void syncVerificationKey(File keyDir) {
             DataStructure ds;
             File keyFile = new File(keyDir, KEYFILE_PUBLIC_SIGNING);
             boolean exists = (_signingPublicKey != null);
@@ -205,16 +201,16 @@ public class KeyManager {
         }
 
         private DataStructure syncKey(File keyFile, DataStructure structure, boolean exists) {
-            FileOutputStream out = null;
-            FileInputStream in = null;
+            OutputStream out = null;
+            InputStream in = null;
             try {
                 if (exists) {
-                    out = new SecureFileOutputStream(keyFile);
+                    out = new BufferedOutputStream(new SecureFileOutputStream(keyFile));
                     structure.writeBytes(out);
                     return structure;
                 } else {
                     if (keyFile.exists()) {
-                        in = new FileInputStream(keyFile);
+                        in = new BufferedInputStream(new FileInputStream(keyFile));
                         structure.readBytes(in);
                         return structure;
                     } else {
