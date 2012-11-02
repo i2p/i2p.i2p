@@ -38,6 +38,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.PasswordManager;
+import net.i2p.util.SecureFile;
 
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
@@ -373,10 +374,13 @@ public class IndexBean {
                             name = Long.toString(_context.clock().now());
                     }
                 }
-                name = "i2ptunnel-deleted-" + name.replace(' ', '_') + "-privkeys.dat";
-                File to = new File(_context.getConfigDir(), name);
-                if (to.exists())
-                    to = new File(_context.getConfigDir(), name + '-' + _context.clock().now());
+                name = "i2ptunnel-deleted-" + name.replace(' ', '_') + '-' + _context.clock().now() + "-privkeys.dat";
+                File backupDir = new SecureFile(_context.getConfigDir(), TunnelController.KEY_BACKUP_DIR);
+                File to;
+                if (backupDir.isDirectory() || backupDir.mkdir())
+                    to = new File(backupDir, name);
+                else
+                    to = new File(_context.getConfigDir(), name);
                 boolean success = FileUtil.rename(pkf, to);
                 if (success)
                     msgs.add("Private key file " + pkf.getAbsolutePath() +

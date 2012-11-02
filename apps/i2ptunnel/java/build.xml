@@ -179,6 +179,7 @@
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
@@ -202,6 +203,7 @@
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
         </javac>
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />
@@ -213,6 +215,7 @@
 
     <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
         <srcfiles dir= "../jsp" includes="*.jsp, *.html, web.xml"/>
+        <srcfiles dir= "src/net/i2p/i2ptunnel/web" includes="*.java"/>
     </uptodate>
 
     <target name="javadoc">

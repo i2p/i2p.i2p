@@ -45,7 +45,7 @@ public class TunnelController implements Logging {
     private boolean _running;
     private boolean _starting;
     
-    private static final String KEY_BACKUP_DIR = "i2ptunnel-keyBackup";
+    public static final String KEY_BACKUP_DIR = "i2ptunnel-keyBackup";
 
     /**
      * Create a new controller for a tunnel out of the specific config options.
@@ -108,13 +108,11 @@ public class TunnelController implements Logging {
             log("Private key created and saved in " + keyFile.getAbsolutePath());
             log("You should backup this file in a secure place.");
             log("New destination: " + destStr);
-            log("Base32: " + Base32.encode(dest.calculateHash().getData()) + ".b32.i2p");
+            String b32 = Base32.encode(dest.calculateHash().getData()) + ".b32.i2p";
+            log("Base32: " + b32);
             File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
-            if (backupDir.exists() || backupDir.mkdir()) {
-                String name = keyFile.getName();
-                if (name.endsWith(".dat"))
-                    name = name.substring(0, name.length() - 4);
-                name += "-" + I2PAppContext.getGlobalContext().clock().now() + ".dat";
+            if (backupDir.isDirectory() || backupDir.mkdir()) {
+                String name = b32 + '-' + I2PAppContext.getGlobalContext().clock().now() + ".dat";
                 File backup = new File(backupDir, name);
                 if (FileUtil.copy(keyFile, backup, false, true))
                     log("Private key backup saved to " + backup.getAbsolutePath());

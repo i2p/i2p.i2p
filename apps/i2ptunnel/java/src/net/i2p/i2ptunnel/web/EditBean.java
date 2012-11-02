@@ -79,7 +79,7 @@ public class EditBean extends IndexBean {
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
         if (tunnel < 0)
-            tunnel = _group == null ? 1 : _group.getControllers().size() + 1;
+            tunnel = _group == null ? 999 : _group.getControllers().size();
         return "i2ptunnel" + tunnel + "-privKeys.dat";
     }
     

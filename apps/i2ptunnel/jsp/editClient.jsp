@@ -433,7 +433,7 @@
                 <label>
                     <%=intl._("Enable")%>:
                 </label>
-                <input value="1" type="checkbox" id="proxyAuth" name="proxyAuth" title="Check to require authorization for this service"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="checkbox" id="startOnLoad" name="proxyAuth" title="Check to require authorization for this service"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="portField" class="rowItem">
                 <label>
@@ -457,7 +457,7 @@
                 <label>
                     <%=intl._("Enable")%>:
                 </label>
-                <input value="1" type="checkbox" id="outproxyAuth" name="outproxyAuth" title="Check if the outproxy requires authorization"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="checkbox" id="startOnLoad" name="outproxyAuth" title="Check if the outproxy requires authorization"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="portField" class="rowItem">
                 <label>
