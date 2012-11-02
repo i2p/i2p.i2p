@@ -60,16 +60,13 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
     /**
      * Actually send the I2CPMessage to the client.
      * Nonblocking.
+     * @throws I2CPMessageException if queue full or on other errors
      */
     @Override
     void doSend(I2CPMessage msg) throws I2CPMessageException {
-        // This will never fail, for now, as the router uses unbounded queues
-        // Perhaps in the future we may want to use bounded queues,
-        // with non-blocking writes for the router
-        // and blocking writes for the client?
         boolean success = queue.offer(msg);
-        if (!success && _log.shouldLog(Log.WARN))
-            _log.warn("I2CP write to queue failed: " + msg);
+        if (!success)
+            throw new I2CPMessageException("I2CP write to queue failed");
     }
     
 }

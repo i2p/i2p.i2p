@@ -12,40 +12,51 @@ import net.i2p.data.Destination;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Async job to notify the client that a new message is available for them
+ * Async job to notify the client that a new message is available for them,
+ * or just send it directly if specified.
  *
  */
 class MessageReceivedJob extends JobImpl {
     private final Log _log;
     private final ClientConnectionRunner _runner;
     private final Payload _payload;
+    private final boolean _sendDirect;
 
-    public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest, Destination fromDest, Payload payload) {
+    public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest,
+                              Destination fromDest, Payload payload, boolean sendDirect) {
         super(ctx);
         _log = ctx.logManager().getLog(MessageReceivedJob.class);
         _runner = runner;
         _payload = payload;
+        _sendDirect = sendDirect;
     }
     
     public String getName() { return "Deliver New Message"; }
 
     public void runJob() {
         if (_runner.isDead()) return;
-        MessageId id = new MessageId();
-        id.setMessageId(_runner.getNextMessageId());
-        _runner.setPayload(id, _payload);
+        MessageId id = null;
+        long nextID = _runner.getNextMessageId();
         try {
-            messageAvailable(id, _payload.getSize());
+            if (_sendDirect) {
+                sendMessage(nextID);
+            } else {
+                id = new MessageId(nextID);
+                _runner.setPayload(id, _payload);
+                messageAvailable(id, _payload.getSize());
+            }
         } catch (I2CPMessageException ime) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the message status message", ime);
-            _runner.removePayload(id);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error writing out the message", ime);
+            if (!_sendDirect)
+                _runner.removePayload(id);
         }
     }
     
@@ -63,6 +74,18 @@ class MessageReceivedJob extends JobImpl {
         // has to be >= 0, it is initialized to -1
         msg.setNonce(1);
         msg.setStatus(MessageStatusMessage.STATUS_AVAILABLE);
+        _runner.doSend(msg);
+    }
+    
+    /**
+     *  Deliver the message directly, skip notification
+     *  @since 0.9.4
+     */
+    private void sendMessage(long id) throws I2CPMessageException {
+        MessagePayloadMessage msg = new MessagePayloadMessage();
+        msg.setMessageId(id);
+        msg.setSessionId(_runner.getSessionId().getSessionId());
+        msg.setPayload(_payload);
         _runner.doSend(msg);
     }
 }

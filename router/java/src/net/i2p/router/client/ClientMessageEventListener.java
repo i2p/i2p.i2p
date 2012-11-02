@@ -69,8 +69,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      */
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
         if (_runner.isDead()) return;
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Message recieved: \n" + message);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Message received: \n" + message);
         switch (message.getType()) {
             case GetDateMessage.MESSAGE_TYPE:
                 handleGetDate(reader, (GetDateMessage)message);
@@ -225,7 +225,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         MessageId id = _runner.distributeMessage(message);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         _runner.ackSendMessage(id, message.getNonce());
-        _context.statManager().addRateData("client.distributeTime", timeToDistribute, timeToDistribute);
+        _context.statManager().addRateData("client.distributeTime", timeToDistribute);
         if ( (timeToDistribute > 50) && (_log.shouldLog(Log.WARN)) )
             _log.warn("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
     }
@@ -253,7 +253,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
-            _log.error("Error delivering the payload", ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error delivering the payload", ime);
+            _runner.removePayload(new MessageId(message.getMessageId()));
         }
     }
     
@@ -330,7 +332,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the session status message", ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error writing out the session status message", ime);
         }
     }
 
@@ -348,7 +351,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the session status message", ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error writing out the session status message", ime);
         }
     }
 

@@ -1,3 +1,20 @@
+2012-11-02 zzz
+ * configstats: Fix group sorting, translate groups
+ * I2CP:
+   - Better fix for logging dropped messages (ticket #758)
+   - Implement fast receive to reduce per-message handshakes
+   - Make messageReliability=none the default
+ * i2psnark:
+   - Split buckets correctly
+   - More exploration fixes
+ * i2ptunnel:
+   - Better privkey backup file name
+   - Revert increment of privkey tunnel name
+   - Move deleted privkeys to backup dir
+   - Fix jsp build dependencies
+   - Fix layout issue on Chrome (ticket #757)
+ * KeyManager: Eliminate races, buffer I/O, eliminate periodic syncing
+
 2012-10-31 zzz
  * FIFOBandwidthRefiller: Reduce refill interval to smooth output
  * I2CP: Reduce log level when outbound queue is full (ticket #758)

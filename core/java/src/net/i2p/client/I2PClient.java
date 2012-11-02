@@ -40,6 +40,24 @@ public interface I2PClient {
     /** @since 0.8.1 */
     public final static String PROP_RELIABILITY_NONE = "none";
 
+    /**
+     * For router->client payloads.
+     *
+     * If false, the router will send the MessageStatus,
+     * the client must respond with a ReceiveMessageBegin,
+     * the router will send the MessagePayload,
+     * and the client respond with a ReceiveMessageEnd.
+     *
+     * If true, the router will send the MessagePayload immediately,
+     * and will not send a MessageStatus.
+     * The client will not send ReceiveMessageBegin or ReceiveMessageEnd.
+     *
+     * Default false, but the implementation in this package sets to true.
+     *
+     * @since 0.9.4
+     */
+    public final static String PROP_FAST_RECEIVE = "i2cp.fastReceive";
+
     /** protocol flag that must be sent when opening the i2cp connection to the router */
     public final static int PROTOCOL_BYTE = 0x2A;
 
