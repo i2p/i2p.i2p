@@ -1638,7 +1638,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write("\" ></td></tr>\n" +
         
                   "<tr><td>");
-        out.write(_("Enable DHT") + " (**BETA**)");
+        out.write(_("Enable DHT"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"useDHT\" value=\"true\" " 
                   + (useDHT ? "checked " : "") 
                   + "title=\"");

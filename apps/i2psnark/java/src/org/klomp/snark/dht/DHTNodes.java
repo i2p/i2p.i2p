@@ -89,8 +89,13 @@ class DHTNodes {
      *  @return the old value if present, else null
      */
     public NodeInfo putIfAbsent(NodeInfo nInfo) {
-        _kad.add(nInfo.getNID());
-        return _nodeMap.putIfAbsent(nInfo.getNID(), nInfo);
+        NodeInfo rv = _nodeMap.putIfAbsent(nInfo.getNID(), nInfo);
+        // ensure same object in both places
+        if (rv != null)
+            _kad.add(rv.getNID());
+        else
+            _kad.add(nInfo.getNID());
+        return rv;
     }
 
     public NodeInfo remove(NID nid) {

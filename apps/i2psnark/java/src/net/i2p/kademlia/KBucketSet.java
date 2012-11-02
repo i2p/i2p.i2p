@@ -209,10 +209,10 @@ public class KBucketSet<T extends SimpleDataStructure> {
             int s1, e1, s2, e2;
             s1 = b0.getRangeBegin();
             e2 = b0.getRangeEnd();
-            if (B_FACTOR > 1 &&
-                (s1 & (B_FACTOR - 1)) == 0 &&
-                ((e2 + 1) & (B_FACTOR - 1)) == 0 &&
-                e2 > s1 + B_FACTOR) {
+            if (B_VALUE == 1 ||
+                ((s1 & (B_FACTOR - 1)) == 0 &&
+                 ((e2 + 1) & (B_FACTOR - 1)) == 0 &&
+                 e2 > s1 + B_FACTOR)) {
                 // The bucket is a "whole" kbucket with a range > B_FACTOR,
                 // so it should be split into two "whole" kbuckets each with
                 // a range >= B_FACTOR.
@@ -526,17 +526,14 @@ public class KBucketSet<T extends SimpleDataStructure> {
     public List<T> getExploreKeys(long age) {
         List<T> rv = new ArrayList(_buckets.size());
         long old = _context.clock().now() - age;
-        int prevSize = -1;
         getReadLock();
         try {
             for (KBucket b : _buckets) {
                 int curSize = b.getKeyCount();
-                // The first few buckets are all empty, we only need one
-                // explore key for all of them.
-                if ((prevSize != 0 || curSize != 0) &&
+                // Always explore the closest bucket
+                if ((b.getRangeBegin() == 0) ||
                     (b.getLastChanged() < old || curSize < BUCKET_SIZE * 3 / 4))
                     rv.add(generateRandomKey(b));
-                prevSize = curSize;
             }
         } finally { releaseReadLock(); }
         return rv;
@@ -765,8 +762,8 @@ public class KBucketSet<T extends SimpleDataStructure> {
     public String toString() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("Bucket set rooted on: ").append(_us.toString())
-           .append(" K= ").append(BUCKET_SIZE)
-           .append(" B= ").append(B_VALUE)
+           .append(" K=").append(BUCKET_SIZE)
+           .append(" B=").append(B_VALUE)
            .append(" with ").append(size())
            .append(" keys in ").append(_buckets.size()).append(" buckets:\n");
         getReadLock();

@@ -1108,8 +1108,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (nInfo.equals(_myNodeInfo))
             return _myNodeInfo;
         NodeInfo rv = _knownNodes.putIfAbsent(nInfo);
-        if (rv == null)
+        if (rv == null) {
             rv = nInfo;
+            // if we didn't know about it before, set the timestamp
+            // so it isn't immediately removed by the DHTNodes cleaner
+            rv.getNID().setLastSeen();
+        }
         return rv;
     }
 
