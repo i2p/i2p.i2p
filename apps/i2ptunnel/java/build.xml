@@ -233,7 +233,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <!-- We need the ant runtime, as it includes junit -->
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5"
+        <javac srcdir="./src:./test/junit" debug="true" source="1.5" target="1.5"
                includeAntRuntime="true"
                deprecation="on" destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />
@@ -251,7 +251,7 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
             <batchtest>
-                <fileset dir="./test/">
+                <fileset dir="./test/junit/">
                     <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
