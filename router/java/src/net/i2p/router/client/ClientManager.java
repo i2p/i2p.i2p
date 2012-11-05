@@ -62,6 +62,8 @@ class ClientManager {
 
     private static final int INTERNAL_QUEUE_SIZE = 256;
 
+    private static final long REQUEST_LEASESET_TIMEOUT = 60*1000;
+
     public ClientManager(RouterContext context, int port) {
         _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);
@@ -275,6 +277,8 @@ class ClientManager {
      * within the timeout specified, queue up the onFailedJob.  This call does not
      * block.
      *
+     * UNUSED, the call below without jobs is always used.
+     *
      * @param dest Destination from which the LeaseSet's authorization should be requested
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases)
@@ -290,11 +294,9 @@ class ClientManager {
                           + dest.calculateHash().toBase64() + ".  disconnected?");
             _ctx.jobQueue().addJob(onFailedJob);
         } else {
-            runner.requestLeaseSet(set, _ctx.clock().now() + timeout, onCreateJob, onFailedJob);
+            runner.requestLeaseSet(set, timeout, onCreateJob, onFailedJob);
         }
     }
-
-    private static final int REQUEST_LEASESET_TIMEOUT = 120*1000;
 
     public void requestLeaseSet(Hash dest, LeaseSet ls) {
         ClientConnectionRunner runner = getRunner(dest);

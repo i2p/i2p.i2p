@@ -3,6 +3,8 @@ package net.i2p.router.web;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.util.RandomSource;
+
 /**
  * Copied and modded from I2PTunnel IndexBean (GPL)
  * @author zzz
@@ -10,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CSSHelper extends HelperBase {
 
     private static final Map<String, Boolean> _UACache = new ConcurrentHashMap();
-
-    public CSSHelper() {}
 
     public static final String PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME_NAME = "routerconsole.theme";
@@ -23,6 +23,16 @@ public class CSSHelper extends HelperBase {
     public static final int MIN_REFRESH = 3;
     public static final String PROP_DISABLE_REFRESH = "routerconsole.summaryDisableRefresh";
     private static final String PROP_XFRAME = "routerconsole.disableXFrame";
+
+    private static final String _consoleNonce = Long.toString(RandomSource.getInstance().nextLong());
+
+    /**
+     *  formerly stored in System.getProperty("router.consoleNonce")
+     *  @since 0.9.4
+     */
+    public static String getNonce() { 
+        return _consoleNonce;
+    }
 
     public String getTheme(String userAgent) {
         String url = BASE_THEME_PATH;

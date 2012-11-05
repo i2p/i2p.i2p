@@ -606,7 +606,7 @@ public class SummaryBarRenderer {
         NewsHelper newshelper = _helper.getNewsHelper();
         if (newshelper == null || newshelper.shouldShowNews()) return "";
         StringBuilder buf = new StringBuilder(512);
-        String consoleNonce = System.getProperty("router.consoleNonce");
+        String consoleNonce = CSSHelper.getNonce();
         if (consoleNonce != null) {
             // Set up title and pre-headings stuff.
             buf.append("<h3><a href=\"/configupdate\">")

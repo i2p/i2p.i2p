@@ -212,7 +212,7 @@ public class NewsHelper extends ContentHelper {
                                            ctx));
          }
          buf.append("</i>");
-         String consoleNonce = System.getProperty("router.consoleNonce");
+         String consoleNonce = CSSHelper.getNonce();
          if (lastUpdated > 0 && consoleNonce != null) {
              if (shouldShowNews(ctx)) {
                  buf.append(" <a href=\"/?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")

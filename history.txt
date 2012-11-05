@@ -1,6 +1,20 @@
+2012-11-05 zzz
+ * Console:
+   - Fix NPE after restart (ticket #763)
+   - Move more nonces out of system properties
+ * i2psnark:
+   - More DHT limits
+   - Announce to backup trackers if DHT is empty
+   - Use PEX and DHT info in torrent peer count
+   - Don't use temp files for announces
+ * PeerManager: Don't reorganize as often if it takes too long (ticket #765)
+ * RequestLeaseSetJob: Only disconnect client after multiple dropped
+   lease set requests; reduce timeout, other cleanups
+ * Unsigned Update: Fix notification on failure
+
 2012-11-02 kytv
-* German, Portuguese, and Swedish translation updates from Transifex
-* Refreshed English po files to push to TX.
+ * German, Portuguese, and Swedish translation updates from Transifex
+ * Refreshed English po files to push to TX.
 
 2012-11-02 zzz
  * configstats: Fix group sorting, translate groups

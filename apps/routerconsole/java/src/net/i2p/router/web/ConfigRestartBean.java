@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.RandomSource;
 
 /**
  * simple helper to control restarts/shutdowns in the left hand nav
@@ -12,20 +13,18 @@ public class ConfigRestartBean {
     /** all these are tagged below so no need to _x them here.
      *  order is: form value, form class, display text.
      */
-    static final String[] SET1 = {"shutdownImmediate", "stop", "Shutdown immediately", "cancelShutdown", "cancel", "Cancel shutdown"};
-    static final String[] SET2 = {"restartImmediate", "reload", "Restart immediately", "cancelShutdown", "cancel", "Cancel restart"};
-    static final String[] SET3 = {"restart", "reload", "Restart", "shutdown", "stop", "Shutdown"};
-    static final String[] SET4 = {"shutdown", "stop", "Shutdown"};
+    private static final String[] SET1 = {"shutdownImmediate", "stop", "Shutdown immediately", "cancelShutdown", "cancel", "Cancel shutdown"};
+    private static final String[] SET2 = {"restartImmediate", "reload", "Restart immediately", "cancelShutdown", "cancel", "Cancel restart"};
+    private static final String[] SET3 = {"restart", "reload", "Restart", "shutdown", "stop", "Shutdown"};
+    private static final String[] SET4 = {"shutdown", "stop", "Shutdown"};
 
+    private static final String _systemNonce = Long.toString(RandomSource.getInstance().nextLong());
+
+    /** formerly System.getProperty("console.nonce") */
     public static String getNonce() { 
-        RouterContext ctx = ContextHelper.getContext(null);
-        String nonce = System.getProperty("console.nonce");
-        if (nonce == null) {
-            nonce = ""+ctx.random().nextLong();
-            System.setProperty("console.nonce", nonce);
-        }
-        return nonce;
+        return _systemNonce;
     }
+
     public static String renderStatus(String urlBase, String action, String nonce) {
         RouterContext ctx = ContextHelper.getContext(null);
         String systemNonce = getNonce();

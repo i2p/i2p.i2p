@@ -1,5 +1,6 @@
 package org.klomp.snark;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -393,6 +394,46 @@ public class I2PSnarkUtil {
         }
     }
     
+    /**
+     * Fetch to memory
+     * @param retries if < 0, set timeout to a few seconds
+     * @param initialSize buffer size
+     * @param maxSize fails if greater
+     * @return null on error
+     * @since 0.9.4
+     */
+    public byte[] get(String url, boolean rewrite, int retries, int initialSize, int maxSize) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Fetching [" + url + "] to memory");
+        String fetchURL = url;
+        if (rewrite)
+            fetchURL = rewriteAnnounce(url);
+        int timeout;
+        if (retries < 0) {
+            if (!connected())
+                return null;
+            timeout = EEPGET_CONNECT_TIMEOUT_SHORT;
+            retries = 0;
+        } else {
+            timeout = EEPGET_CONNECT_TIMEOUT;
+            if (!connected()) {
+                if (!connect())
+                    return null;
+            }
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream(initialSize);
+        EepGet get = new I2PSocketEepGet(_context, _manager, retries, -1, maxSize, null, out, fetchURL);
+        if (get.fetch(timeout)) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Fetch successful [" + url + "]: size=" + out.size());
+            return out.toByteArray();
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Fetch failed [" + url + "]");
+            return null;
+        }
+    }
+    
     public I2PServerSocket getServerSocket() { 
         I2PSocketManager mgr = _manager;
         if (mgr != null)
@@ -521,6 +562,15 @@ public class I2PSnarkUtil {
     public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
             return Collections.EMPTY_LIST;
+        return _openTrackers;
+    }
+
+    /**
+     *  List of open trackers to use as backups even if disabled
+     *  @return non-null
+     *  @since 0.9.4
+     */
+    public List<String> getBackupTrackers() { 
         return _openTrackers;
     }
     

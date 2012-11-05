@@ -10,11 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%
-    String consoleNonce = System.getProperty("router.consoleNonce");
-    if (consoleNonce == null) {
-        consoleNonce = Long.toString(new java.util.Random().nextLong());
-        System.setProperty("router.consoleNonce", consoleNonce);
-    }
+    String consoleNonce = intl.getNonce();
 %>
 
 <%@include file="summary.jsi" %>
