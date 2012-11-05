@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -38,7 +39,7 @@ public class SendGarlicJob extends JobImpl {
     private MessageSelector _replySelector;
     private GarlicMessage _message;
     private SessionKey _wrappedKey;
-    private Set _wrappedTags;
+    private Set<SessionTag> _wrappedTags;
     
     /**
      *

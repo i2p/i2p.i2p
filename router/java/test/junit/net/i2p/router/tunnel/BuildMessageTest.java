@@ -50,16 +50,15 @@ public class BuildMessageTest {
         _replyTunnel = 42;
         
         // populate and encrypt the message
-        BuildMessageGenerator gen = new BuildMessageGenerator();
         TunnelBuildMessage msg = new TunnelBuildMessage(ctx);
-        for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++) {
+        for (int i = 0; i < order.size(); i++) {
             int hop = ((Integer)order.get(i)).intValue();
             PublicKey key = null;
             if (hop < _pubKeys.length)
                 key = _pubKeys[hop];
-            gen.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
+            BuildMessageGenerator.createRecord(i, hop, msg, cfg, _replyRouter, _replyTunnel, ctx, key);
         }
-        gen.layeredEncrypt(ctx, msg, cfg, order);
+        BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         
         log.debug("\n================================================================" +
                   "\nMessage fully encrypted" + 
@@ -86,10 +85,9 @@ public class BuildMessageTest {
             long time = req.readRequestTime();
             long now = (ctx.clock().now() / (60l*60l*1000l)) * (60*60*1000);
             int ourSlot = -1;
-            
-            BuildResponseRecord resp = new BuildResponseRecord();
-            byte reply[] = resp.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), -1);
-            for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
+
+            byte reply[] = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), -1);
+            for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
                 if (msg.getRecord(j) == null) {
                     ourSlot = j;
                     msg.setRecord(j, new ByteArray(reply));
@@ -111,11 +109,10 @@ public class BuildMessageTest {
         
         // now all of the replies are populated, toss 'em into a reply message and handle it
         TunnelBuildReplyMessage reply = new TunnelBuildReplyMessage(ctx);
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++)
+        for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
             reply.setRecord(i, msg.getRecord(i));
-       
-        BuildReplyHandler handler = new BuildReplyHandler();
-        int statuses[] = handler.decrypt(ctx, reply, cfg, order);
+
+        int statuses[] = BuildReplyHandler.decrypt(ctx, reply, cfg, order);
         if (statuses == null) throw new RuntimeException("bar");
         boolean allAgree = true;
         for (int i = 0; i < cfg.getLength(); i++) {

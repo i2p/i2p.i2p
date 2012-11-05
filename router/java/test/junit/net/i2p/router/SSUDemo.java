@@ -237,7 +237,7 @@ public class SSUDemo {
         
         public int getType() { return MESSAGE_TYPE; }
         protected int calculateWrittenLength() { return _data.length; }
-        public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+        public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
             _data = new byte[dataSize];
             System.arraycopy(data, offset, _data, 0, dataSize);
         }

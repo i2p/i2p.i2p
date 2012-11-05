@@ -49,7 +49,6 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     public static final long MAX_NONCE_VALUE = ((1l << 32l) - 1l);
     
     private static final Hash INVALID_HASH = new Hash(new byte[Hash.HASH_LENGTH]); // all 0s
-    private static final TunnelId INVALID_TUNNEL = TunnelId.INVALID;
 
     public TunnelCreateMessage(I2PAppContext context) {
         super(context);
@@ -83,7 +82,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     public Properties getOptions() { return _options; }
     public void setOptions(Properties opts) { _options = opts; }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         
         if (DataHelper.eq(INVALID_HASH.getData(), 0, data, offset, Hash.HASH_LENGTH)) {
@@ -161,9 +160,13 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         length += SessionKey.KEYSIZE_BYTES; // layerKey
         length += SessionKey.KEYSIZE_BYTES; // ivKey
         
-        if (_optionsCache == null)
-            _optionsCache = DataHelper.toProperties(_options);
-        length += _optionsCache.length;
+        if (_optionsCache == null) {
+            try {
+                _optionsCache = DataHelper.toProperties(_options);
+                length += _optionsCache.length;
+            } catch (DataFormatException dfe) {
+            }
+        }
         
         length += Hash.HASH_LENGTH; // replyGateway
         length += 4; // replyTunnel
@@ -200,8 +203,13 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         System.arraycopy(_ivKey.getData(), 0, data, offset, SessionKey.KEYSIZE_BYTES);
         offset += SessionKey.KEYSIZE_BYTES;
         
-        if (_optionsCache == null)
-            _optionsCache = DataHelper.toProperties(_options);
+        if (_optionsCache == null) {
+            try {
+                _optionsCache = DataHelper.toProperties(_options);
+            } catch (DataFormatException dfe) {
+                throw new I2NPMessageException("Error reading the options", dfe);
+            }
+        }
         System.arraycopy(_optionsCache, 0, data, offset, _optionsCache.length);
         offset += _optionsCache.length;
         

@@ -29,7 +29,7 @@ public class DateMessage extends I2NPMessageImpl {
     public long getNow() { return _now; }
     public void setNow(long now) { _now = now; }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         

@@ -50,7 +50,7 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public long getNonce() { return _nonce; }
     public void setNonce(long nonce) { _nonce = nonce; }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
