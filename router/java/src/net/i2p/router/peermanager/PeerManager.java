@@ -89,14 +89,16 @@ class PeerManager {
             super(_context.simpleTimer2(), REORGANIZE_TIME);
         }
         public void timeReached() {
+            long start = System.currentTimeMillis();
             try {
                 _organizer.reorganize(true);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error evaluating profiles", t);
             }
+            long orgtime = System.currentTimeMillis() - start;
             long uptime = _context.router().getUptime();
             long delay;
-            if (uptime > 2*60*60*1000)
+            if (orgtime > 1000 || uptime > 2*60*60*1000)
                 delay = REORGANIZE_TIME_LONG;
             else if (uptime > 10*60*1000)
                 delay = REORGANIZE_TIME_MEDIUM;
