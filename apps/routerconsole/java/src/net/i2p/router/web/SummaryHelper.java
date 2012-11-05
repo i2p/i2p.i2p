@@ -809,7 +809,13 @@ public class SummaryHelper extends HelperBase {
 
     private String _requestURI;
     public void setRequestURI(String s) { _requestURI = s; }
-    public String getRequestURI() { return _requestURI; }
+
+    /**
+     * @return non-null; "/home" if (strangely) not set by jsp
+     */
+    public String getRequestURI() {
+        return _requestURI != null ? _requestURI : "/home";
+    }
 
     public String getConfigTable() {
         String[] allSections = SummaryBarRenderer.ALL_SECTIONS;

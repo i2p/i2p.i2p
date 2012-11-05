@@ -34,7 +34,7 @@
       response.setHeader("X-Frame-Options", "SAMEORIGIN");
 
    String conNonceParam = request.getParameter("consoleNonce");
-   if (conNonceParam != null && conNonceParam.equals(System.getProperty("router.consoleNonce"))) {
+   if (intl.getNonce().equals(conNonceParam)) {
        intl.setLang(request.getParameter("lang"));
        intl.setNews(request.getParameter("news"));
    }

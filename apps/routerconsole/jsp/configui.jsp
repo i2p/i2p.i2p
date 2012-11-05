@@ -31,15 +31,7 @@ input.default {
 <%@include file="formhandler.jsi" %>
 <div class="configure"><div class="topshimten"><h3><%=uihelper._("Router Console Theme")%></h3></div>
  <form action="" method="POST">
-<%
-    /** lang setting is done in css.jsi, not in ConfigUIHandler */
-    String consoleNonce = System.getProperty("router.consoleNonce");
-    if (consoleNonce == null) {
-        consoleNonce = Long.toString(new java.util.Random().nextLong());
-        System.setProperty("router.consoleNonce", consoleNonce);
-    }
-%>
- <input type="hidden" name="consoleNonce" value="<%=consoleNonce%>" >
+ <input type="hidden" name="consoleNonce" value="<%=intl.getNonce()%>" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <%

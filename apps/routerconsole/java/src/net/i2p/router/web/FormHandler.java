@@ -194,8 +194,8 @@ public class FormHandler {
             return;
         }
         
-        String sharedNonce = System.getProperty("router.consoleNonce");
-        if ( (sharedNonce != null) && (sharedNonce.equals(_nonce) ) ) {
+        String sharedNonce = CSSHelper.getNonce();
+        if (sharedNonce.equals(_nonce)) {
             return;
         }
         
