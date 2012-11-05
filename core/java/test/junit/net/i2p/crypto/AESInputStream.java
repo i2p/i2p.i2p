@@ -53,7 +53,7 @@ public class AESInputStream extends FilterInputStream {
     /** how many bytes are available for reading without decrypt? */
     private int _decryptedSize;
 
-    private final static int BLOCK_SIZE = CryptixRijndael_Algorithm._BLOCK_SIZE;
+    private final static int BLOCK_SIZE = 16;
 
     public AESInputStream(I2PAppContext context, InputStream source, SessionKey key, byte[] iv) {
         super(source);

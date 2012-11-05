@@ -48,7 +48,7 @@ public class AESOutputStream extends FilterOutputStream {
 
     public final static float EXPANSION_FACTOR = 1.0625f; // 6% overhead w/ the padding
 
-    private final static int BLOCK_SIZE = CryptixRijndael_Algorithm._BLOCK_SIZE;
+    private final static int BLOCK_SIZE = 16;
     private final static int MAX_BUF = 256;
 
     public AESOutputStream(I2PAppContext context, OutputStream source, SessionKey key, byte[] iv) {
