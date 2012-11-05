@@ -53,6 +53,8 @@ class UnsignedUpdateRunner extends UpdateRunner {
             } catch (Throwable t) {
                 _log.error("Error updating", t);
             }
+            if (!this.done)
+                _mgr.notifyTaskFailed(this, "", null);
         }
         
         /** eepget listener callback Overrides */
