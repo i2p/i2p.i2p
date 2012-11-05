@@ -3,7 +3,11 @@ package net.i2p.router.update
 import org.scalatest.FunSpec
 import org.scalatest.mock.MockitoSugar
 
+import java.util.TreeSet
+
 import net.i2p.router.RouterContext
+import net.i2p.update.UpdateMethod
+import net.i2p.update.UpdateType
 
 /**
  * @author str4d
@@ -16,9 +20,21 @@ class UnsignedUpdateHandlerSpec extends FunSpec with CheckerBehaviors with Updat
         uuh
     }
 
+    def validTypes = {
+        val vt = new TreeSet<UpdateType>
+        vt.add(UpdateType.ROUTER_UNSIGNED)
+        vt
+    }
+
+    def validMethods = {
+        val vm = new TreeSet<UpdateMethod>
+        vm.add(UpdateMethod.HTTP)
+        vm
+    }
+
     describe("An UnsignedUpdateHandler") {
         it should behave like checker(unsignedUpdateHandler)
 
-        it should behave like updater(unsignedUpdateHandler)
+        it should behave like updater(unsignedUpdateHandler, validTypes, validMethods)
     }
 }
