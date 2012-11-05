@@ -18,13 +18,10 @@
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigLoggingHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
+<%@include file="formhandler.jsi" %>
 <div class="configure">
  <form action="" method="POST">
- <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
  <h3><%=intl._("Configure I2P Logging Options")%></h3>
  <div class="wideload">

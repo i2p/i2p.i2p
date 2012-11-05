@@ -33,7 +33,7 @@
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
         <echo message="  updaterWithJettyFixesAndGeoIP" />
         <echo message="  updaterWithJettyFixesAndJbigi" />
-        <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, news.xml, or history.txt" />
+        <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
         <!-- <echo message="  syndie:    generate a standalone syndie install" /> -->
@@ -1054,13 +1054,9 @@
             <arg value="&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
         </exec>
         <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
-      <!-- May be pointless now, people with split directories will never see this,
-           and for flat installs we don't want to overwrite news more recent than the update package.
-        <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
-       -->
     </target>
 
-    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
@@ -1116,7 +1112,7 @@
     </target>
 
     <!-- Jetty 6 I2P logging addons, not really fixes -->
-    <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
+    <target name="prepjupdatefixes" depends="buildWEB">
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 
@@ -1386,7 +1382,6 @@
             <arg value="-l" />
             <arg value="history.txt" />
             <arg value="installer/install.xml" />
-            <arg value="installer/resources/news.xml" />
 	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
 	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>

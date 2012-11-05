@@ -143,7 +143,7 @@ class IntroductionManager {
                 continue;
             }
             if ( /* _context.profileOrganizer().isFailing(cur.getRemotePeer()) || */
-                _context.shitlist().isShitlisted(cur.getRemotePeer()) ||
+                _context.banlist().isBanlisted(cur.getRemotePeer()) ||
                 _transport.wasUnreachable(cur.getRemotePeer())) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Peer is failing, shistlisted or was unreachable: " + cur);
@@ -255,7 +255,7 @@ class IntroductionManager {
         try {
             to = InetAddress.getByAddress(ip);
         } catch (UnknownHostException uhe) {
-            // shitlist Bob?
+            // banlist Bob?
             if (_log.shouldLog(Log.WARN))
                 _log.warn("IP for alice to hole punch to is invalid", uhe);
             _context.statManager().addRateData("udp.relayBadIP", 1);

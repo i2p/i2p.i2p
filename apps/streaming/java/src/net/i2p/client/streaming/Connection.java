@@ -77,6 +77,8 @@ class Connection {
     private final SimpleTimer2 _timer;
     
     private long _lifetimeBytesSent;
+    /** TBD for tcpdump-compatible ack output */
+    private long _lowestBytesAckedThrough;
     private long _lifetimeBytesReceived;
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;
@@ -974,7 +976,7 @@ class Connection {
             switch (_options.getInactivityAction()) {
                 case ConnectionOptions.INACTIVITY_ACTION_NOOP:
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Inactivity timer expired, but we aint doin' shit");
+                        _log.warn("Inactivity timer expired, not doing anything");
                     break;
                 case ConnectionOptions.INACTIVITY_ACTION_SEND:
                     if (_closeSentOn <= 0 && _closeReceivedOn <= 0) {

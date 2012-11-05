@@ -57,7 +57,7 @@ public class SSUDemo {
         // we want SNTP synchronization for replay prevention
         envProps.setProperty("time.disabled", "false");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
-        // peers who say they're on an invalid IP are shitlisted
+        // peers who say they're on an invalid IP are banlisted
         envProps.setProperty("i2np.udp.allowLocal", "true");
         // explicit IP+port.  at least one router on the net has to have their IP+port
         // set, since there has to be someone to detect one's IP off.  most don't need
@@ -173,9 +173,9 @@ public class SSUDemo {
         out.setOnSendJob(new AfterACK());
         // queue up the message, establishing a new SSU session if necessary, using
         // their direct SSU address if they have one, or their indirect SSU addresses
-        // if they don't.  If we cannot contact them, we will 'shitlist' their address,
+        // if they don't.  If we cannot contact them, we will 'banlist' their address,
         // during which time we will not even attempt to send messages to them.  We also
-        // drop their netDb info when we shitlist them, in case their info is no longer
+        // drop their netDb info when we banlist them, in case their info is no longer
         // correct.  Since the netDb is disabled for all meaningful purposes, the SSUDemo
         // will be responsible for fetching such information.
         _us.outNetMessagePool().add(out);

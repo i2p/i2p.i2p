@@ -18,6 +18,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
+import net.i2p.router.startup.RouterAppManager;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
@@ -54,20 +55,28 @@ public class RouterContext extends I2PAppContext {
     private TunnelManagerFacade _tunnelManager;
     private TunnelDispatcher _tunnelDispatcher;
     private StatisticsManager _statPublisher;
-    private Shitlist _shitlist;
+    private Banlist _banlist;
     private Blocklist _blocklist;
     private MessageValidator _messageValidator;
     private UpdateManager _updateManager;
     //private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
+    private RouterAppManager _appManager;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
+    private volatile boolean _initialized;
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object();
 
     private static final List<RouterContext> _contexts = new CopyOnWriteArrayList();
     
+    /**
+     *  Caller MUST call initAll() after instantiation.
+     */
     public RouterContext(Router router) { this(router, null); }
 
+    /**
+     *  Caller MUST call initAll() after instantiation.
+     */
     public RouterContext(Router router, Properties envProps) { 
         super(filterProps(envProps));
         _router = router;
@@ -143,7 +152,9 @@ public class RouterContext extends I2PAppContext {
     }
 
 
-    public void initAll() {
+    public synchronized void initAll() {
+        if (_initialized)
+            throw new IllegalStateException();
         if (getBooleanProperty("i2p.dummyClientFacade"))
             System.err.println("i2p.dummyClientFacade currently unsupported");
         _clientManagerFacade = new ClientManagerFacadeImpl(this);
@@ -179,11 +190,13 @@ public class RouterContext extends I2PAppContext {
             _tunnelManager = new DummyTunnelManagerFacade();
         _tunnelDispatcher = new TunnelDispatcher(this);
         _statPublisher = new StatisticsManager(this);
-        _shitlist = new Shitlist(this);
+        _banlist = new Banlist(this);
         _blocklist = new Blocklist(this);
         _messageValidator = new MessageValidator(this);
         _throttle = new RouterThrottleImpl(this);
         //_throttle = new RouterDoSThrottle(this);
+        _appManager = new RouterAppManager(this);
+        _initialized = true;
     }
     
     /**
@@ -332,7 +345,7 @@ public class RouterContext extends I2PAppContext {
     /** 
      * who does this peer hate?
      */
-    public Shitlist shitlist() { return _shitlist; }
+    public Banlist banlist() { return _banlist; }
     public Blocklist blocklist() { return _blocklist; }
     /**
      * The router keeps track of messages it receives to prevent duplicates, as
@@ -366,7 +379,7 @@ public class RouterContext extends I2PAppContext {
         buf.append(_bandwidthLimiter).append('\n');
         buf.append(_tunnelManager).append('\n');
         buf.append(_statPublisher).append('\n');
-        buf.append(_shitlist).append('\n');
+        buf.append(_banlist).append('\n');
         buf.append(_messageValidator).append('\n');
         return buf.toString();
     }
@@ -553,5 +566,14 @@ public class RouterContext extends I2PAppContext {
                 throw new IllegalStateException();
             _updateManager = null;
         }
+    }
+
+    /**
+     *  The RouterAppManager.
+     *  @return the manager
+     *  @since 0.9.4
+     */
+    public RouterAppManager clientAppManager() {
+        return _appManager;
     }
 }

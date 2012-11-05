@@ -395,8 +395,8 @@ class EstablishState {
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
                     _transport.markReachable(_con.getRemotePeer().calculateHash(), false);
-                    // Only shitlist if we know what time it is
-                    _context.shitlist().shitlistRouter(DataHelper.formatDuration(diff),
+                    // Only banlist if we know what time it is
+                    _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
                                                        _con.getRemotePeer().calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
                     _transport.setLastBadSkew(_tsA- _tsB);
@@ -586,14 +586,14 @@ class EstablishState {
 				// get inet-addr
 				InetAddress addr = this._con.getChannel().socket().getInetAddress();
                 byte[] ip = (addr == null) ? null : addr.getAddress();
-                if (_context.shitlist().isShitlistedForever(alice.calculateHash())) {
+                if (_context.banlist().isBanlistedForever(alice.calculateHash())) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Dropping inbound connection from permanently shitlisted peer: " + alice.calculateHash().toBase64());
+                        _log.warn("Dropping inbound connection from permanently banlisted peer: " + alice.calculateHash().toBase64());
                     // So next time we will not accept the con from this IP,
                     // rather than doing the whole handshake
 					if(ip != null)
 						_context.blocklist().add(ip);
-                    fail("Peer is shitlisted forever: " + alice.calculateHash().toBase64());
+                    fail("Peer is banlisted forever: " + alice.calculateHash().toBase64());
                     return;
                 }
 				if(ip != null)
@@ -612,8 +612,8 @@ class EstablishState {
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
                     _transport.markReachable(alice.calculateHash(), true);
-                    // Only shitlist if we know what time it is
-                    _context.shitlist().shitlistRouter(DataHelper.formatDuration(diff),
+                    // Only banlist if we know what time it is
+                    _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
                                                        alice.calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
                     _transport.setLastBadSkew(tsA- _tsB);

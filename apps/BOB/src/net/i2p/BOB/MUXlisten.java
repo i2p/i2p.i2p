@@ -1,17 +1,9 @@
 /**
- *            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ *                    WTFPL
  *                    Version 2, December 2004
  *
  * Copyright (C) sponge
  *   Planet Earth
- * Everyone is permitted to copy and distribute verbatim or modified
- * copies of this license document, and changing it is allowed as long
- * as the name is changed.
- *
- *            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
- *   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
- *
- *  0. You just DO WHAT THE FUCK YOU WANT TO.
  *
  * See...
  *
@@ -19,7 +11,7 @@
  *	and
  *	http://en.wikipedia.org/wiki/WTFPL
  *
- * ...for any additional details and liscense questions.
+ * ...for any additional details and license questions.
  */
 package net.i2p.BOB;
 
@@ -302,14 +294,14 @@ public class MUXlisten implements Runnable {
 
 			// Hopefully nuke stuff here...
 			{
-				String boner = tg.getName();
+				String groupName = tg.getName();
 				try {
-					_log.warn("destroySocketManager " + boner);
+					_log.warn("destroySocketManager " + groupName);
 					socketManager.destroySocketManager();
-					_log.warn("destroySocketManager Successful" + boner);
+					_log.warn("destroySocketManager Successful" + groupName);
 				} catch (Exception e) {
 					// nop
-					_log.warn("destroySocketManager Failed" + boner);
+					_log.warn("destroySocketManager Failed" + groupName);
 					_log.warn(e.toString());
 				}
 			}
@@ -333,25 +325,25 @@ public class MUXlisten implements Runnable {
 
 			// Wait around till all threads are collected.
 			if (tg != null) {
-				String boner = tg.getName();
-				// System.out.println("BOB: MUXlisten: Starting thread collection for: " + boner);
-				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
+				String groupName = tg.getName();
+				// System.out.println("BOB: MUXlisten: Starting thread collection for: " + groupName);
+				_log.warn("BOB: MUXlisten: Starting thread collection for: " + groupName);
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
-					// visit(tg, 0, boner);
+					// visit(tg, 0, groupName);
 					int foo = tg.activeCount() + tg.activeGroupCount();
 					// hopefully no longer needed!
 					// int bar = lives;
-					// System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
-					// System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
-					// visit(tg, 0, boner);
-					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+					// System.out.println("BOB: MUXlisten: Waiting on threads for " + groupName);
+					// System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + groupName);
+					// visit(tg, 0, groupName);
+					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + groupName + "\n");
 					// Happily spin forever :-(
 					while (foo != 0) {
 						foo = tg.activeCount() + tg.activeGroupCount();
 						// if (lives != bar && lives != 0) {
-						// 	System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
-						// 	visit(tg, 0, boner);
-						// 	System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+						// 	System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + groupName);
+						// 	visit(tg, 0, groupName);
+						// 	System.out.println("BOB: MUXlisten: ThreadGroup dump END " + groupName + "\n");
 						// }
 						// bar = lives;
 						try {
@@ -361,8 +353,8 @@ public class MUXlisten implements Runnable {
 						}
 					}
 				}
-				// System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
-				_log.warn("BOB: MUXlisten: Threads went away. Success: " + boner);
+				// System.out.println("BOB: MUXlisten: Threads went away. Success: " + groupName);
+				_log.warn("BOB: MUXlisten: Threads went away. Success: " + groupName);
 				tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
 				tg = null;

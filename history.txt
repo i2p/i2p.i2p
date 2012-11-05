@@ -1,3 +1,134 @@
+2012-11-02 kytv
+* German, Portuguese, and Swedish translation updates from Transifex
+* Refreshed English po files to push to TX.
+
+2012-11-02 zzz
+ * configstats: Fix group sorting, translate groups
+ * I2CP:
+   - Better fix for logging dropped messages (ticket #758)
+   - Implement fast receive to reduce per-message handshakes
+   - Make messageReliability=none the default
+ * i2psnark:
+   - Split buckets correctly
+   - More exploration fixes
+ * i2ptunnel:
+   - Better privkey backup file name
+   - Revert increment of privkey tunnel name
+   - Move deleted privkeys to backup dir
+   - Fix jsp build dependencies
+   - Fix layout issue on Chrome (ticket #757)
+ * KeyManager: Eliminate races, buffer I/O, eliminate periodic syncing
+
+2012-10-31 zzz
+ * FIFOBandwidthRefiller: Reduce refill interval to smooth output
+ * I2CP: Reduce log level when outbound queue is full (ticket #758)
+ * i2ptunnel: Fix NPE in zzzot plugin
+ * PriBlockingQueue: Enforce max size
+ * Streaming: New disableRejectLogging option (default false), enable for snark
+
+2012-10-30 zzz
+ * i2psnark:
+   - Add kbucket debugging
+   - Eliminate redundant explore keys
+   - Add more limits to DHT tracker
+   - Delay expiration at startup
+   - Only enable updates for dev builds and 1% of release builds
+ * i2ptunnel:
+   - Create backup privkey files (ticket #752)
+   - Fix NPE in Android startup
+ * Installer: Drop news.xml and old certs
+ * logs.jsp:
+   - Don't display dup message if last
+   - Spacing tweaks
+ * OutNetMessage: Properly clean up when dropped by codel (but unused for now
+   since codel is disabled for ONM)
+ * SSU:
+   - Adjust RTT/RTO calculations
+   - Better bandwidth tracking
+   - Cleanup of OutboundMessageState
+   - Stat tweaks
+ * StatisticsManager: Publish stats less often
+ * Transports: Increase min peer port to 1024
+ * Tunnels: Implement per-client outbound tunnel message priority (ticket #719)
+ * Update Manager: Warn on dup registration
+
+2012-10-30 sponge
+ * cleanups as requested
+
+2012-10-28 zzz
+ * Addresses:
+   - Add methods for connectivity detection
+   - Remove Hamachi restriction
+ * Banlist: renamed
+ * Clients: New interface for clients started via clients.config, and a new
+   manager to track the lifecycle and start/stop clients on demand.
+   (ticket #347)
+ * Console:
+   - Add console password form to configui.jsp
+   - Consolidate all the jsp formhandler boilerplate in the new formhandler.jsi
+   - Store form handler nonces in the servlet session instead of system properties,
+     to prevent cross-session interference
+   - Bypass nonces if console password enabled
+   - Remove ports from port mapper on shutdown, other changes to
+     track actual ports better (ticket #731)
+   - Prep for RouterApp interface by storing context in a field,
+     shuffle around what's static and what's not (ticket #347)
+   - Convert to RouterApp interface
+   - Convert from basic to digest authentication
+   - Use new password manager (ticket #731)
+ * Core: New password manager for storing passwords in router.config
+   in consistent ways, including salting and hashing if possible.
+   (ticket #731)
+ * i2ptunnel:
+   - Convert HTTP and CONNECT proxies from basic to digest authentication
+   - Bypass nonces if console password enabled
+   - Convert to ClientApp interface
+   - Synchronization improvements
+ * Streaming: Add pcap debug facility, from i2p.i2p.zzz.pcap
+ * Transport:
+   - Add a simple network monitor
+   - Add new reachability state for network disconnected
+   - Prevent any tunnel building when disconnected (ticket #519)
+   - Don't unleash watchdog when disconnected
+   - Split up NTCPConnection's single _bwRequests Set into inbound and outbound,
+     make FIFOBandwithLimiter.Request unidirectional (ticket #719)
+ * Update: Major redesign of the update facilities:
+   - Generic interfaces for updating and checking things
+   - Allow checkers and updaters outside router context
+   - Hide update buttons after downloading update (ticket #484)
+   - Add update-via-i2psnark facility
+   - Don't hold references to updaters after completion
+
+* 2012-10-27 0.9.3 released
+
+2012-10-25 zzz
+ * BuildHandler: Fix "too slow" rejections due to internal clock skew
+
+2012-10-24 zzz
+ * I2PSnark:
+   - Fix several partial piece (temp file) leaks
+   - Don't lose all DHT peers if we stop quickly	
+   - Explore a kbucket if it's less than 3/4 full
+
+2012-10-24 str4d
+ * i2ptunnel: Truncate long client destinations (ticket #581)
+
+2012-10-21 zzz
+ * Watchdog: Don't dump threads too often (ticket #519)
+
+2012-10-20 zzz
+ * Transport: Back out CoDel for SSU PeerState and NTCP
+
+2012-10-19 zzz
+ * UDP: Fix peer test NPE (ticket # 748)
+
+2012-10-18 kytv
+* Portuguese and Spanish updates from Transifex
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2012-10-02
+
+2012-10-15 kytv
+* Italian and Swedish updates from Transifex
+
 2012-10-14 zzz
  * Console: Use non-nio connector for Java 5 and JamVM/gij
             (tickets #715 and #743)

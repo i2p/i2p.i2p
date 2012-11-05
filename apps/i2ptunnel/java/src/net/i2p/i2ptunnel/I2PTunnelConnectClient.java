@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
@@ -20,7 +21,6 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 
@@ -58,6 +58,8 @@ import net.i2p.util.PortMapper;
  */
 public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements Runnable {
 
+    public static final String AUTH_REALM = "I2P SSL Proxy";
+
     private final static byte[] ERR_DESTINATION_UNKNOWN =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
@@ -89,17 +91,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
     
-    private final static byte[] ERR_AUTH =
-        ("HTTP/1.1 407 Proxy Authentication Required\r\n"+
-         "Content-Type: text/html; charset=UTF-8\r\n"+
-         "Cache-control: no-cache\r\n"+
-         "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" +         // try to get a UTF-8-encoded response back for the password
-         "Proxy-Authenticate: Basic realm=\"I2P SSL Proxy\"\r\n" +
-         "\r\n"+
-         "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>"+
-         "This proxy is configured to require authentication.<BR>")
-        .getBytes();
-
     private final static byte[] SUCCESS_RESPONSE =
         ("HTTP/1.1 200 Connection Established\r\n"+
          "Proxy-agent: I2P\r\n"+
@@ -163,6 +154,11 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         if (reg == getLocalPort())
             _context.portMapper().unregister(PortMapper.SVC_HTTPS_PROXY);
         return super.close(forced);
+    }
+
+    /** @since 0.9.4 */
+    protected String getRealm() {
+        return AUTH_REALM;
     }
 
     protected void clientConnectionRun(Socket s) {
@@ -237,10 +233,10 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         _log.debug(getPrefix(requestId) + "REST  :" + restofline + ":");
                         _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
                     }
-                } else if (line.toLowerCase(Locale.US).startsWith("proxy-authorization: basic ")) {
+                } else if (line.toLowerCase(Locale.US).startsWith("proxy-authorization: ")) {
                     // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
                     // save for auth check below
-                    authorization = line.substring(27);  // "proxy-authorization: basic ".length()
+                    authorization = line.substring(21);  // "proxy-authorization: ".length()
                     line = null;
                 } else if (line.length() > 0) {
                     // Additional lines - shouldn't be too many. Firefox sends:
@@ -281,30 +277,26 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             }
             
             // Authorization
-            if (!authorize(s, requestId, authorization)) {
+            AuthResult result = authorize(s, requestId, method, authorization);
+            if (result != AuthResult.AUTH_GOOD) {
                 if (_log.shouldLog(Log.WARN)) {
                     if (authorization != null)
                         _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
                     else
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                 }
-                writeErrorMessage(ERR_AUTH, out);
+                out.write(getAuthError(result == AuthResult.AUTH_STALE).getBytes());
                 s.close();
                 return;
             }
 
             Destination clientDest = _context.namingService().lookup(destination);
             if (clientDest == null) {
-                String str;
                 byte[] header;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
+                    header = getErrorPage("dnfp-header.ht", ERR_DESTINATION_UNKNOWN);
                 else
-                    str = FileUtil.readTextFile((new File(_errorDir, "dnfh-header.ht")).getAbsolutePath(), 100, true);
-                if (str != null)
-                    header = str.getBytes();
-                else
-                    header = ERR_DESTINATION_UNKNOWN;
+                    header = getErrorPage("dnfh-header.ht", ERR_DESTINATION_UNKNOWN);
                 writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination);
                 s.close();
                 return;
@@ -341,12 +333,13 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     }
 
     private static class OnTimeout implements Runnable {
-        private Socket _socket;
-        private OutputStream _out;
-        private String _target;
-        private boolean _usingProxy;
-        private String _wwwProxy;
-        private long _requestId;
+        private final Socket _socket;
+        private final OutputStream _out;
+        private final String _target;
+        private final boolean _usingProxy;
+        private final String _wwwProxy;
+        private final long _requestId;
+
         public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
             _socket = s;
             _out = out;
@@ -355,6 +348,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             _wwwProxy = wwwProxy;
             _requestId = id;
         }
+
         public void run() {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Timeout occured requesting " + _target);
@@ -391,17 +385,12 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                                                   boolean usingWWWProxy, String wwwProxy, long requestId) {
         if (out == null)
             return;
+        byte[] header;
+        if (usingWWWProxy)
+            header = getErrorPage(I2PAppContext.getGlobalContext(), "dnfp-header.ht", ERR_DESTINATION_UNKNOWN);
+        else
+            header = getErrorPage(I2PAppContext.getGlobalContext(), "dnf-header.ht", ERR_DESTINATION_UNKNOWN);
         try {
-            String str;
-            byte[] header;
-            if (usingWWWProxy)
-                str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
-            else
-                str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
-            if (str != null)
-                header = str.getBytes();
-            else
-                header = ERR_DESTINATION_UNKNOWN;
             writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy);
         } catch (IOException ioe) {}
     }

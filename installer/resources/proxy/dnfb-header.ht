@@ -22,6 +22,6 @@ The eepsite destination specified was not valid, or was
 otherwise unreachable.  Perhaps you pasted in the
 wrong BASE64 string or the link you are following is
 bad. The I2P host could also be offline.  You may want to
-<a href="javascript: window.location.reload()">retry</a>.
+<a href="javascript:window.location.reload()">retry</a>.
 <hr><b>Could not find the following destination:</b>
 </p>

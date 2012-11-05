@@ -280,9 +280,10 @@ public class ConfigNetHandler extends FormHandler {
                 _upnp) {
                 // This is minor, don't set restartRequired
                 if (_upnp)
-                    addFormNotice(_("Enabling UPnP, restart required to take effect"));
+                    addFormNotice(_("Enabling UPnP"));
                 else
-                    addFormNotice(_("Disabling UPnP, restart required to take effect"));
+                    addFormNotice(_("Disabling UPnP"));
+                addFormNotice(_("Restart required to take effect"));
             }
             changes.put(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
 

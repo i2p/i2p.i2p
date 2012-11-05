@@ -50,6 +50,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _maxTotalConnsPerHour;
     private int _maxTotalConnsPerDay;
     private int _maxConns;
+    private boolean _disableRejectLog;
 
     // NOTE - almost all the options are below, but see
     // I2PSocketOptions in ministreaming for a few more
@@ -98,6 +99,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  @since 0.9.3 moved from I2PSocketManagerFull
      */
     public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+    /** @since 0.9.4  default false */
+    public static final String PROP_DISABLE_REJ_LOG = "i2p.streaming.disableRejectLogging";
     
     
     private static final int TREND_COUNT = 3;
@@ -310,6 +313,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             //setReadTimeout(opts.getReadTimeout());
             setAnswerPings(opts.getAnswerPings());
             setEnforceProtocol(opts.getEnforceProtocol());
+            setDisableRejectLogging(opts.getDisableRejectLogging());
             initLists(opts);
             _maxConnsPerMinute = opts.getMaxConnsPerMinute();
             _maxConnsPerHour = opts.getMaxConnsPerHour();
@@ -347,6 +351,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         //setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
+        setDisableRejectLogging(getBool(opts, PROP_DISABLE_REJ_LOG, false));
         initLists(opts);
         _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
         _maxConnsPerHour = getInt(opts, PROP_MAX_CONNS_HOUR, 0);
@@ -405,6 +410,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         if (opts.containsKey(PROP_ENFORCE_PROTO))
             setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
+        if (opts.containsKey(PROP_DISABLE_REJ_LOG))
+            setDisableRejectLogging(getBool(opts, PROP_DISABLE_REJ_LOG, false));
         initLists(opts);
         if (opts.containsKey(PROP_MAX_CONNS_MIN))
             _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
@@ -469,6 +476,15 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public boolean getEnforceProtocol() { return _enforceProto; }
     public void setEnforceProtocol(boolean yes) { _enforceProto = yes; }
     
+    /**
+     * Do we disable connection rejected logging? Default false.
+     *
+     * @return if we do
+     * @since 0.9.4
+     */
+    public boolean getDisableRejectLogging() { return _disableRejectLog; }
+    public void setDisableRejectLogging(boolean yes) { _disableRejectLog = yes; }
+
     /** 
      * How many messages will we send before waiting for an ACK?
      *

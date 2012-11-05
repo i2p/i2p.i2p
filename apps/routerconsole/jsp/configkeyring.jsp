@@ -15,10 +15,7 @@
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
+<%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHelper" id="keyringhelper" scope="request" />
  <jsp:setProperty name="keyringhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <div class="configure"><h2><%=intl._("Keyring")%></h2><p>
@@ -29,7 +26,7 @@
 </div>
 
  <form action="" method="POST">
- <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <h3><%=intl._("Manual Keyring Addition")%></h3><p>
  <%=intl._("Enter keys for encrypted remote destinations here.")%>
  <%=intl._("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/"><%=intl._("I2PTunnel page")%></a>.

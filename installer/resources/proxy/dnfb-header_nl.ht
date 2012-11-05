@@ -23,7 +23,7 @@ of anderzijds onbereikbaar. Mogelijk heb je de
 BASE64 string niet goed gekopieerd of is de link
 die je probeert te volgen ongeldig.  De I2P host kan
 ook offline zijn. Probeer
-<a href="javascript: window.location.reload()">opnieuw</a>.
+<a href="javascript:window.location.reload()">opnieuw</a>.
 </p>
 <hr>
 <p><b>Kon de volgende destination niet vinden:</b>

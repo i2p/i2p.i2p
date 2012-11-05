@@ -34,10 +34,12 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private boolean _failed;
     private int _failures;
     private boolean _reused;
+    private int _priority;
     
     public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
         this(ctx, length, isInbound, null);
     }
+
     public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
         _context = ctx;
         if (length <= 0)
@@ -203,6 +205,20 @@ public class TunnelCreatorConfig implements TunnelInfo {
      *  @since 0.8.11
      */
     public void setReused() { _reused = true; }
+
+    /**
+     *  Outbound message priority - for outbound tunnels only
+     *  @return -25 to +25, default 0
+     *  @since 0.9.4
+     */
+    public int getPriority() { return _priority; }
+
+    /**
+     *  Outbound message priority - for outbound tunnels only
+     *  @param priority -25 to +25, default 0
+     *  @since 0.9.4
+     */
+    public void setPriority(int priority) { _priority = priority; }
 
     @Override
     public String toString() {

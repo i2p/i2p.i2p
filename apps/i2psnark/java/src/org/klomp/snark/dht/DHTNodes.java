@@ -69,6 +69,9 @@ class DHTNodes {
 
     // begin ConcurrentHashMap methods
 
+    /**
+     *  @return known nodes, not total net size
+     */
     public int size() {
         return _nodeMap.size();
     }
@@ -86,8 +89,13 @@ class DHTNodes {
      *  @return the old value if present, else null
      */
     public NodeInfo putIfAbsent(NodeInfo nInfo) {
-        _kad.add(nInfo.getNID());
-        return _nodeMap.putIfAbsent(nInfo.getNID(), nInfo);
+        NodeInfo rv = _nodeMap.putIfAbsent(nInfo.getNID(), nInfo);
+        // ensure same object in both places
+        if (rv != null)
+            _kad.add(rv.getNID());
+        else
+            _kad.add(nInfo.getNID());
+        return rv;
     }
 
     public NodeInfo remove(NID nid) {
@@ -128,11 +136,19 @@ class DHTNodes {
         return _kad.getExploreKeys(MAX_BUCKET_AGE);
     }
 
+    /**
+     * Debug info, HTML formatted
+     * @since 0.9.4
+     */
+    public void renderStatusHTML(StringBuilder buf) {
+        buf.append(_kad.toString().replace("\n", "<br>\n"));
+    }
+
     /** */
     private class Cleaner extends SimpleTimer2.TimedEvent {
 
         public Cleaner() {
-            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+            super(SimpleTimer2.getInstance(), 5 * CLEAN_TIME);
         }
 
         public void timeReached() {

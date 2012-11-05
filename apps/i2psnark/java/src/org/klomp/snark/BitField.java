@@ -59,7 +59,6 @@ public class BitField
     // cleared or clear them explicitly ourselves.
     System.arraycopy(bitfield, 0, this.bitfield, 0, arraysize);
 
-    this.count = 0;
     for (int i = 0; i < size; i++)
       if (get(i))
         this.count++;

@@ -11,7 +11,6 @@ import net.i2p.router.networkdb.reseed.Reseeder;
  *  @since 0.8.3
  */
 public class ConfigReseedHandler extends FormHandler {
-    private Map _settings;
     private final Map<String, String> changes = new HashMap();
     private final List<String> removes = new ArrayList();
     
@@ -33,16 +32,6 @@ public class ConfigReseedHandler extends FormHandler {
             return;
         }
         addFormError(_("Unsupported") + ' ' + _action + '.');
-    }
-    
-    public void setSettings(Map settings) { _settings = new HashMap(settings); }
-
-    /** curses Jetty for returning arrays */
-    private String getJettyString(String key) {
-        String[] arr = (String[]) _settings.get(key);
-        if (arr == null)
-            return null;
-        return arr[0].trim();
     }
 
     /** @since 0.8.9 */

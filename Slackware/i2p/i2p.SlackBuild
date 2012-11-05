@@ -128,7 +128,7 @@ cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
 #
-# requiredbuilder fucks up REALLY bad, and thinks java is perl?!
+# requiredbuilder messes up REALLY bad, and thinks java is perl?!
 # It also did not catch the shell requirements! BOOOOOOOOOOO! HISSSSSSSS!
 #
 # requiredbuilder -v -y -s $CWD $PKG

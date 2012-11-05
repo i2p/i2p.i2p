@@ -21,7 +21,7 @@ Proxy-Connection: close
 La destination du site eep indiquée est incorrecte, ou injoignable.
 Vous avez peut-être collé une chaîne BASE64 incorrecte le lien que vous suivez est incorrect.
 L'hôte I2P est peut-être aussi hors-servicehost.
-Vous pouvez <a href="javascript: window.location.reload()">réessayer</a>.
+Vous pouvez <a href="javascript:window.location.reload()">réessayer</a>.
 </p>
 <hr>
 <p><b>Destination non trouvée:</b>

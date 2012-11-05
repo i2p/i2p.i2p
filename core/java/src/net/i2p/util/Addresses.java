@@ -25,6 +25,15 @@ import net.i2p.I2PAppContext;
  */
 public abstract class Addresses {
     
+    /**
+     *  Do we have any non-loop, non-wildcard IPv4 address at all?
+     *  @since 0.9.4
+     */
+    public static boolean isConnected() {
+        // not as good as using a Java DBus implementation to talk to NetworkManager...
+        return !getAddresses(true, false, false).isEmpty();
+    }
+
     /** @return the first non-local address it finds, or null */
     public static String getAnyAddress() {
         SortedSet<String> a = getAddresses();
@@ -51,13 +60,27 @@ public abstract class Addresses {
     }
 
     /**
-     *  @return a sorted array of all addresses
+     *  @return a sorted set of all addresses including wildcard
      *  @param includeLocal whether to include local
      *  @param includeIPv6 whether to include IPV6
      *  @return an array of all addresses
      *  @since 0.8.3
      */
     public static SortedSet<String> getAddresses(boolean includeLocal, boolean includeIPv6) {
+        return getAddresses(includeLocal, includeLocal, includeIPv6);
+    }
+
+    /**
+     *  @return a sorted set of all addresses
+     *  @param includeSiteLocal whether to include private like 192.168.x.x
+     *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
+     *  @param includeIPv6 whether to include IPV6
+     *  @return an array of all addresses
+     *  @since 0.9.4
+     */
+    public static SortedSet<String> getAddresses(boolean includeSiteLocal,
+                                                 boolean includeLoopbackAndWildcard,
+                                                 boolean includeIPv6) {
         boolean haveIPv4 = false;
         boolean haveIPv6 = false;
         SortedSet<String> rv = new TreeSet();
@@ -70,7 +93,8 @@ public abstract class Addresses {
                         haveIPv4 = true;
                     else
                         haveIPv6 = true;
-                    if (shouldInclude(allMyIps[i], includeLocal, includeIPv6))
+                    if (shouldInclude(allMyIps[i], includeSiteLocal,
+                                      includeLoopbackAndWildcard, includeIPv6))
                         rv.add(allMyIps[i].getHostAddress());
                 }
             }
@@ -87,34 +111,39 @@ public abstract class Addresses {
                             haveIPv4 = true;
                         else
                             haveIPv6 = true;
-                        if (shouldInclude(addr, includeLocal, includeIPv6))
+                        if (shouldInclude(addr, includeSiteLocal,
+                                          includeLoopbackAndWildcard, includeIPv6))
                             rv.add(addr.getHostAddress());
                     }
                 }
             }
         } catch (SocketException e) {}
 
-        if (includeLocal && haveIPv4)
-            rv.add("0.0.0.0");
-        if (includeLocal && includeIPv6 && haveIPv6)
-            rv.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
+        if (includeLoopbackAndWildcard) {
+            if (haveIPv4)
+                rv.add("0.0.0.0");
+            if (includeIPv6 && haveIPv6)
+                rv.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
+        }
         return rv;
     }
 
-    private static boolean shouldInclude(InetAddress ia, boolean includeLocal, boolean includeIPv6) {
+    private static boolean shouldInclude(InetAddress ia, boolean includeSiteLocal,
+                                         boolean includeLoopbackAndWildcard, boolean includeIPv6) {
         return
-            (!ia.isLinkLocalAddress()) &&
+            (!ia.isLinkLocalAddress()) &&     // 169.254.x.x
             (!ia.isMulticastAddress()) &&
-            (includeLocal ||
+            (includeLoopbackAndWildcard ||
              ((!ia.isAnyLocalAddress()) &&
-              (!ia.isLoopbackAddress()) &&
-              (!ia.isSiteLocalAddress()))) &&
+              (!ia.isLoopbackAddress()))) &&
+            (includeSiteLocal ||
+              !ia.isSiteLocalAddress()) &&
             // Hamachi 5/8 allocated to RIPE (30 November 2010)
             // Removed from TransportImpl.isPubliclyRoutable()
             // Check moved to here, for now, but will eventually need to
             // remove it from here also.
-            (includeLocal ||
-            (!ia.getHostAddress().startsWith("5."))) &&
+            //(includeLocal ||
+            //(!ia.getHostAddress().startsWith("5."))) &&
             (includeIPv6 ||
              (ia instanceof Inet4Address));
     }
@@ -247,13 +276,18 @@ public abstract class Addresses {
      *  Print out the local addresses
      */
     public static void main(String[] args) {
-        System.err.println("External Addresses:");
-        Set<String> a = getAddresses(false, false);
+        System.err.println("External IPv4 Addresses:");
+        Set<String> a = getAddresses(false, false, false);
         for (String s : a)
             System.err.println(s);
-        System.err.println("All addresses:");
-        a = getAddresses(true, true);
+        System.err.println("\nExternal and Local IPv4 Addresses:");
+        a = getAddresses(true, false, false);
         for (String s : a)
             System.err.println(s);
+        System.err.println("\nAll addresses:");
+        a = getAddresses(true, true, true);
+        for (String s : a)
+            System.err.println(s);
+        System.err.println("\nIs connected? " + isConnected());
     }
 }

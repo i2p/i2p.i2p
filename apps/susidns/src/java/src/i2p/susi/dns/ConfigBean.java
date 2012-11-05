@@ -135,7 +135,8 @@ public class ConfigBean implements Serializable {
 	public String getMessages() {
 		String message = "";
 		if( action != null ) {
-			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
+                        if (I2PAppContext.getGlobalContext().getBooleanProperty(BaseBean.PROP_PW_ENABLE) ||
+			    (serial != null && serial.equals(lastSerial))) {
 				if(action.equals(_("Save"))) {
 					save();
 					message = _("Configuration saved.");
@@ -145,7 +146,9 @@ public class ConfigBean implements Serializable {
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+                                          + ' ' +
+                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		if( message.length() > 0 )

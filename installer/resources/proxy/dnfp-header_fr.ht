@@ -22,7 +22,7 @@ Le serveur mandataire sortant est introuvable.
 Il est hors service, le réseau est surchargé,
 ou votre routeur n'est pas encore bien intégré avec des pairs.
 Vous pouvez essayer de
-<a href="javascript: parent.window.location.reload()">retenter</a>
+<a href="javascript:parent.window.location.reload()">retenter</a>
 car il se produira une sélection aléatoire de mandataire dans le groupe que vous avez défini
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">ici</a>
 (si vous en avez plus d'un de défini).

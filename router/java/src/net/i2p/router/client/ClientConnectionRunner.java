@@ -56,7 +56,7 @@ import net.i2p.util.SimpleTimer;
  * @author jrandom
  */
 class ClientConnectionRunner {
-    private final Log _log;
+    protected final Log _log;
     protected final RouterContext _context;
     private final ClientManager _manager;
     /** socket for this particular peer connection */
@@ -90,6 +90,8 @@ class ClientConnectionRunner {
     private volatile boolean _dead;
     /** For outbound traffic. true if i2cp.messageReliability = "none"; @since 0.8.1 */
     private boolean _dontSendMSM;
+    /** For inbound traffic. true if i2cp.fastReceive = "true"; @since 0.9.4 */
+    private boolean _dontSendMSMOnReceive;
     private final AtomicInteger _messageId; // messageId counter
     
     // Was 32767 since the beginning (04-2004).
@@ -113,6 +115,7 @@ class ClientConnectionRunner {
         _log = _context.logManager().getLog(ClientConnectionRunner.class);
         _manager = manager;
         _socket = socket;
+        // unused for fastReceive
         _messages = new ConcurrentHashMap();
         _alreadyProcessed = new ArrayList();
         _acceptedPending = new ConcurrentHashSet();
@@ -136,7 +139,6 @@ class ClientConnectionRunner {
             I2PThread t = new I2PThread(_writer);
             t.setName("I2CP Writer " + __id.incrementAndGet());
             t.setDaemon(true);
-            t.setPriority(I2PThread.MAX_PRIORITY);
             t.start();
             _out = new BufferedOutputStream(_socket.getOutputStream());
             _reader.startReading();
@@ -200,15 +202,24 @@ class ClientConnectionRunner {
     /** already closed? */
     boolean isDead() { return _dead; }
 
-    /** message body */
+    /**
+     *  Only call if _dontSendMSMOnReceive is false, otherwise will always be null
+     */
     Payload getPayload(MessageId id) { 
         return _messages.get(id); 
     }
 
+    /**
+     *  Only call if _dontSendMSMOnReceive is false
+     */
     void setPayload(MessageId id, Payload payload) { 
-        _messages.put(id, payload); 
+        if (!_dontSendMSMOnReceive)
+            _messages.put(id, payload); 
     }
 
+    /**
+     *  Only call if _dontSendMSMOnReceive is false
+     */
     void removePayload(MessageId id) { 
         _messages.remove(id); 
     }
@@ -221,8 +232,10 @@ class ClientConnectionRunner {
         // We process a few options here, but most are handled by the tunnel manager.
         // The ones here can't be changed later.
         Properties opts = config.getOptions();
-        if (opts != null)
-            _dontSendMSM = "none".equals(config.getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
+        if (opts != null) {
+            _dontSendMSM = "none".equals(opts.getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
+            _dontSendMSMOnReceive = Boolean.parseBoolean(opts.getProperty(I2PClient.PROP_FAST_RECEIVE));
+        }
         // per-destination session key manager to prevent rather easy correlation
         if (_sessionKeyManager == null) {
             int tags = TransientSessionKeyManager.DEFAULT_TAGS;
@@ -306,7 +319,7 @@ class ClientConnectionRunner {
             doSend(msg);
         } catch (I2CPMessageException ime) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error writing out the disconnect message: " + ime);
+                _log.warn("Error writing out the disconnect message", ime);
         }
         // give it a little time to get sent out...
         // even better would be to have stopRunning() flush it?
@@ -378,7 +391,8 @@ class ClientConnectionRunner {
             doSend(status);
             _acceptedPending.remove(id);
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the message status message: " + ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error writing out the message status message", ime);
         }
     }
     
@@ -388,7 +402,7 @@ class ClientConnectionRunner {
      */ 
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
         if (_dead) return;
-        MessageReceivedJob j = new MessageReceivedJob(_context, this, toDest, fromDest, payload);
+        MessageReceivedJob j = new MessageReceivedJob(_context, this, toDest, fromDest, payload, _dontSendMSMOnReceive);
         // This is fast and non-blocking, run in-line
         //_context.jobQueue().addJob(j);
         j.runJob();
@@ -680,7 +694,8 @@ class ClientConnectionRunner {
             try {
                 doSend(msg);
             } catch (I2CPMessageException ime) {
-                _log.warn("Error updating the status for message ID " + _messageId, ime);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error updating the status for message ID " + _messageId, ime);
             }
         }
     }

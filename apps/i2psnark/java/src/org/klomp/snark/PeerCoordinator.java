@@ -377,7 +377,10 @@ class PeerCoordinator implements PeerListener
   public boolean needOutboundPeers() {
         //return wantedBytes != 0 && needPeers();
         // minus one to make it a little easier for new peers to get in on large swarms
-        return wantedBytes != 0 && !halted && peers.size() < getMaxConnections() - 1;
+        return wantedBytes != 0 &&
+               !halted &&
+               peers.size() < getMaxConnections() - 1 &&
+               (storage == null || !storage.isChecking());
   }
   
   /**
@@ -741,7 +744,19 @@ class PeerCoordinator implements PeerListener
                 break;
             if (havePieces.get(p.getId()) && !p.isRequested())
               {
-                piece = p;
+                // never ever choose one that's in partialPieces, or we
+                // will create a second one and leak
+                boolean hasPartial = false;
+                for (PartialPiece pp : partialPieces) {
+                    if (pp.getPiece() == p.getId()) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("wantPiece() skipping partial for " + peer + ": piece = " + pp);
+                        hasPartial = true;
+                        break;
+                    }
+                }
+                if (!hasPartial)
+                    piece = p;
               }
             else if (p.isRequested()) 
             {
@@ -943,13 +958,11 @@ class PeerCoordinator implements PeerListener
    */
   public boolean gotPiece(Peer peer, PartialPiece pp)
   {
-    if (metainfo == null || storage == null)
+    if (metainfo == null || storage == null || storage.isChecking() || halted) {
+        pp.release();
         return true;
-    int piece = pp.getPiece();
-    if (halted) {
-      _log.info("Got while-halted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
-      return true; // We don't actually care anymore.
     }
+    int piece = pp.getPiece();
     
     synchronized(wantedPieces)
       {
@@ -962,12 +975,15 @@ class PeerCoordinator implements PeerListener
             // Assume we got a good piece, we don't really care anymore.
             // Well, this could be caused by a change in priorities, so
             // only return true if we already have it, otherwise might as well keep it.
-            if (storage.getBitField().get(piece))
+            if (storage.getBitField().get(piece)) {
+                pp.release();
                 return true;
+            }
           }
         
         try
           {
+            // this takes forever if complete, as it rechecks
             if (storage.putPiece(pp))
               {
                 if (_log.shouldLog(Log.INFO))
@@ -1173,6 +1189,8 @@ class PeerCoordinator implements PeerListener
   public PartialPiece getPartialPiece(Peer peer, BitField havePieces) {
       if (metainfo == null)
           return null;
+      if (storage != null && storage.isChecking())
+          return null;
       synchronized(wantedPieces) {
           // sorts by remaining bytes, least first
           Collections.sort(partialPieces);
@@ -1277,6 +1295,7 @@ class PeerCoordinator implements PeerListener
               PartialPiece pp = iter.next();
               if (pp.getPiece() == piece) {
                   iter.remove();
+                  pp.release();
                   // there should be only one but keep going to be sure
               }
           }

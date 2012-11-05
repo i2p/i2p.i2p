@@ -23,7 +23,7 @@ Proxy-Connection: close
 </h3>
 <p>عنوان الموقع eepsite خاطئ، أو  ربما قمت بلصق عنوان غير موجود، أو الموقع متوقف. يمكنك
 
-<a href="javascript: window.location.reload()">اعادة المحاولة</a>.
+<a href="javascript:window.location.reload()">اعادة المحاولة</a>.
 </p>
 <hr>
 <p><b>لم يتم الوصول الى هذا العنوان:</b></p>

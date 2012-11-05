@@ -20,7 +20,7 @@ Proxy-Connection: close
 <p>
 Der HTTP-Outproxy wurde nicht gefunden.  Er ist offline, das Netz überlastet
 oder verstopft, oder Ihr Router ist noch nicht gut ins Netzwerk integriert.
-Laden Sie die Seite <a href="javascript: parent.window.location.reload()">neu</a>!
+Laden Sie die Seite <a href="javascript:parent.window.location.reload()">neu</a>!
 Dies trifft eine erneute zufällige Auswahl des Outproxys aus der von Ihnen
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">hier</a> vorgegebenen Liste
 (falls mehr als einer angegeben ist).  Sollte das Problem weiterhin bestehen,

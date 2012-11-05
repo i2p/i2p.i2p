@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import net.i2p.I2PAppContext;
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -128,7 +127,7 @@ public class NamingServiceBean extends AddressbookBean
 	/** @return the NamingService for the current file name, or the root NamingService */
 	private NamingService getNamingService()
 	{
-		NamingService root = I2PAppContext.getGlobalContext().namingService();
+		NamingService root = _context.namingService();
 		NamingService rv = searchNamingService(root, getFileName());		
 		return rv != null ? rv : root;		
 	}
@@ -173,7 +172,7 @@ public class NamingServiceBean extends AddressbookBean
 			for (Map.Entry<String, Destination> entry : results.entrySet()) {
 				String name = entry.getKey();
 				if( filter != null && filter.length() > 0 ) {
-					if( filter.compareTo( "0-9" ) == 0 ) {
+					if (filter.equals("0-9")) {
 						char first = name.charAt(0);
 						if( first < '0' || first > '9' )
 							continue;
@@ -222,7 +221,8 @@ public class NamingServiceBean extends AddressbookBean
 			Properties nsOptions = new Properties();
 			// only blockfile needs this
 			nsOptions.setProperty("list", getFileName());
-			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
+                        if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
+			    (serial != null && serial.equals(lastSerial))) {
 				boolean changed = false;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if(hostname != null && destination != null) {
@@ -243,7 +243,7 @@ public class NamingServiceBean extends AddressbookBean
 									Destination dest = new Destination(destination);
 									if (oldDest != null) {
 										nsOptions.putAll(outProperties);
-							                        nsOptions.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
+							                        nsOptions.setProperty("m", Long.toString(_context.clock().now()));
 									}
 						                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
 									boolean success = getNamingService().put(host, dest, nsOptions);
@@ -308,7 +308,9 @@ public class NamingServiceBean extends AddressbookBean
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+                                          + ' ' +
+                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		

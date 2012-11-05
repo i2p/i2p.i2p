@@ -45,7 +45,7 @@ GETTEXT=$(which gettext > /dev/null 2>&1)
 
 # Where to install the systemd service
 SYSTEMD_SERVICE="/etc/systemd/system/${APP_NAME}.service"
-if grep -q systemd /proc/1/comm ; then
+if grep -q systemd /proc/1/comm > /dev/null 2>&1 ; then
     USE_SYSTEMD=1
 fi
 

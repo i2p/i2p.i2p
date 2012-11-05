@@ -995,14 +995,16 @@ public class I2PSnarkServlet extends DefaultServlet {
         } else if (snark.isAllocating()) {
             statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
                            "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Allocating");
-        } else if (err != null) {
-            if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
-                               "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
-                               curPeers + thinsp(noThinsp) +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
-            else if (isRunning)
+        } else if (err != null && curPeers == 0) {
+            // let's only show this if we have no peers, otherwise PEX and DHT should bail us out, user doesn't care
+            //if (isRunning && curPeers > 0 && !showPeers)
+            //    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
+            //                   "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
+            //                   ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+            //                   curPeers + thinsp(noThinsp) +
+            //                   ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+            //else if (isRunning)
+            if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
                                "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                                ": " + curPeers + thinsp(noThinsp) +
@@ -1149,7 +1151,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write("</a>");
 
         out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
-        if(isRunning && remainingSeconds > 0)
+        if(isRunning && remainingSeconds > 0 && !snark.isChecking())
             out.write(DataHelper.formatDuration2(Math.max(remainingSeconds, 10) * 1000)); // (eta 6h)
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
@@ -1636,7 +1638,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write("\" ></td></tr>\n" +
         
                   "<tr><td>");
-        out.write(_("Enable DHT") + " (**BETA**)");
+        out.write(_("Enable DHT"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"useDHT\" value=\"true\" " 
                   + (useDHT ? "checked " : "") 
                   + "title=\"");

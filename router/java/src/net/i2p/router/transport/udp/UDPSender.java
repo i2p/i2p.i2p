@@ -191,7 +191,6 @@ class UDPSender {
     private class Runner implements Runnable {
         //private volatile boolean _socketChanged;
 
-        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().createRequest();
         public void run() {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Running the UDP sender");
@@ -211,8 +210,9 @@ class UDPSender {
                     // ?? int size2 = packet.getPacket().getLength();
                     if (size > 0) {
                         //_context.bandwidthLimiter().requestOutbound(req, size, "UDP sender");
-                        req = _context.bandwidthLimiter().requestOutbound(size, "UDP sender");
-                        while (req.getPendingOutboundRequested() > 0)
+                        FIFOBandwidthLimiter.Request req =
+                              _context.bandwidthLimiter().requestOutbound(size, 0, "UDP sender");
+                        while (req.getPendingRequested() > 0)
                             req.waitForNextAllocation();
                     }
                     

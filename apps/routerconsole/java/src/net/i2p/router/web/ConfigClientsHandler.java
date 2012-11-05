@@ -23,7 +23,6 @@ import org.mortbay.jetty.handler.ContextHandlerCollection;
  *  Saves changes to clients.config or webapps.config
  */
 public class ConfigClientsHandler extends FormHandler {
-    private Map _settings;
     
     @Override
     protected void processForm() {
@@ -171,8 +170,6 @@ public class ConfigClientsHandler extends FormHandler {
 
     }
     
-    public void setSettings(Map settings) { _settings = new HashMap(settings); }
-    
     private void saveClientChanges() {
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
@@ -216,15 +213,8 @@ public class ConfigClientsHandler extends FormHandler {
         }
 
         ClientAppConfig.writeClientAppConfig(_context, clients);
-        addFormNotice(_("Client configuration saved successfully - restart required to take effect."));
-    }
-
-    /** curses Jetty for returning arrays */
-    private String getJettyString(String key) {
-        String[] arr = (String[]) _settings.get(key);
-        if (arr == null)
-            return null;
-        return arr[0].trim();
+        addFormNotice(_("Client configuration saved successfully"));
+        addFormNotice(_("Restart required to take effect"));
     }
 
     // STUB for stopClient, not completed yet.
@@ -248,7 +238,7 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         ClientAppConfig ca = clients.get(i);
-        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
+        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _context, _log);
         addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("started") + '.');
     }
 
@@ -264,7 +254,7 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void saveWebAppChanges() {
-        Properties props = RouterConsoleRunner.webAppProperties();
+        Properties props = RouterConsoleRunner.webAppProperties(_context);
         Set keys = props.keySet();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -275,7 +265,7 @@ public class ConfigClientsHandler extends FormHandler {
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(app))
                 props.setProperty(name, "" + (val != null));
         }
-        RouterConsoleRunner.storeWebAppProperties(props);
+        RouterConsoleRunner.storeWebAppProperties(_context, props);
         addFormNotice(_("WebApp configuration saved."));
     }
 
@@ -416,11 +406,12 @@ public class ConfigClientsHandler extends FormHandler {
         if (intfc != null)
             changes.put(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
         String user = getJettyString("user");
-        if (user != null)
-            changes.put(ConfigClientsHelper.PROP_USER, user);
         String pw = getJettyString("pw");
-        if (pw != null)
-            changes.put(ConfigClientsHelper.PROP_PW, pw);
+        if (user != null && pw != null && user.length() > 0 && pw.length() > 0) {
+            ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
+            mgr.saveHash(ConfigClientsHelper.PROP_AUTH, user, pw);
+            addFormNotice(_("Added user {0}", user));
+        }
         String mode = getJettyString("mode");
         boolean disabled = "0".equals(mode);
         boolean ssl = "2".equals(mode);
@@ -433,9 +424,10 @@ public class ConfigClientsHandler extends FormHandler {
         boolean all = "0.0.0.0".equals(intfc) || "0:0:0:0:0:0:0:0".equals(intfc) ||
                       "::".equals(intfc);
         changes.put(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
-        if (_context.router().saveConfig(changes, null))
-            addFormNotice(_("Interface configuration saved successfully - restart required to take effect."));
-        else
+        if (_context.router().saveConfig(changes, null)) {
+            addFormNotice(_("Interface configuration saved"));
+            addFormNotice(_("Restart required to take effect"));
+        } else
             addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

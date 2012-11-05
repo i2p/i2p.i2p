@@ -23,7 +23,7 @@ Proxy-Connection: close
 либо ваш I2P-маршрутизатор ещё недостаточно интегрирован с другими пирами.
 </p>
 <p>
-Вы можете попробовать <a href="javascript: window.location.reload()">повторить запрос</a>.
+Вы можете попробовать <a href="javascript:window.location.reload()">повторить запрос</a>.
 </p>
 
 <hr>

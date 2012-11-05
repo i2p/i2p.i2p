@@ -1,0 +1,43 @@
+<%
+    /*
+     *  Does the standard setup for all form handlers, then
+     *  displays the message box (which drives the form processing).
+     *
+     *  Included ~15 times, keep whitespace to a minimum
+     *
+     *  Include this directly after the line:
+     *  <jsp:useBean class="net.i2p.router.web.xxxHandler" id="formhandler" scope="request" />
+     */
+
+    // This initializes the RouterContext - must be the first thing
+    formhandler.setContextId((String)session.getAttribute("i2p.contextId"));
+
+    // Prevents any saves via GET
+    formhandler.storeMethod(request.getMethod());
+
+    // Store the nonces for verification
+    String klass = formhandler.getClass().getName();
+    String nonceAttr1 = klass + ".nonce";
+    String nonceAttr2 = nonceAttr1 + "Prev";
+    String nonce1 = (String) session.getAttribute(nonceAttr1);
+    String nonce2 = (String) session.getAttribute(nonceAttr2);
+    formhandler.storeNonces(nonce1, nonce2);
+
+    // Put all the params in the map, some handlers use this instead of individual setters
+    // We also call all of the setters below.
+    formhandler.setSettings(request.getParameterMap());
+
+%>
+<jsp:setProperty name="formhandler" property="*" />
+<jsp:getProperty name="formhandler" property="allMessages" />
+<%
+
+    // Only call this once per page, do not getProperty("newNonce") elsewhere,
+    // use the variable instead.
+    // This shuffles down the nonces, so it must be after getAllMessages() above,
+    // since it does the form validation.
+    String pageNonce = formhandler.getNewNonce();
+    session.setAttribute(nonceAttr2, nonce1);
+    session.setAttribute(nonceAttr1, pageNonce);
+
+%>

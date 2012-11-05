@@ -23,11 +23,15 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
+import static net.i2p.app.ClientAppState.*;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
+import net.i2p.router.app.RouterApp;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -48,6 +52,7 @@ import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.handler.RequestLogHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.security.Credential.MD5;
 import org.mortbay.jetty.security.DigestAuthenticator;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.Constraint;
@@ -65,7 +70,10 @@ import org.mortbay.thread.concurrent.ThreadPool;
 /**
  *  Start the router console.
  */
-public class RouterConsoleRunner {
+public class RouterConsoleRunner implements RouterApp {
+    private final RouterContext _context;
+    private final ClientAppManager _mgr;
+    private volatile ClientAppState _state = UNINITIALIZED;
     private static Server _server;
     private String _listenPort;
     private String _listenHost;
@@ -74,14 +82,21 @@ public class RouterConsoleRunner {
     private String _webAppsDir;
 
     private static final String DEFAULT_WEBAPP_CONFIG_FILENAME = "webapps.config";
+
+    // Jetty Auth
     private static final DigestAuthenticator authenticator = new DigestAuthenticator();
+    public static final String JETTY_REALM = "i2prouter";
+    private static final String JETTY_ROLE = "routerAdmin";
+    public static final String PROP_CONSOLE_PW = "routerconsole.auth." + JETTY_REALM;
+    public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
+
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
     public static final String ENABLED = ".startOnLoad";
     private static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
     private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
-    private static final String DEFAULT_LISTEN_PORT = "7657";
+    public static final int DEFAULT_LISTEN_PORT = 7657;
     private static final String DEFAULT_LISTEN_HOST = "127.0.0.1";
     private static final String DEFAULT_WEBAPPS_DIR = "./webapps/";
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
@@ -125,10 +140,12 @@ public class RouterConsoleRunner {
      *              to both, we can't connect to [::1]:7657 for some reason.
      *              So the wise choice is ::1,127.0.0.1
      */
-    public RouterConsoleRunner(String args[]) {
+    public RouterConsoleRunner(RouterContext ctx, ClientAppManager mgr, String args[]) {
+        _context = ctx;
+        _mgr = mgr;
         if (args.length == 0) {
             // _listenHost and _webAppsDir are defaulted below
-            _listenPort = DEFAULT_LISTEN_PORT;
+            _listenPort = Integer.toString(DEFAULT_LISTEN_PORT);
         } else {
             boolean ssl = false;
             for (int i = 0; i < args.length; i++) {
@@ -161,14 +178,61 @@ public class RouterConsoleRunner {
             System.err.println(USAGE);
             throw new IllegalArgumentException(USAGE);
         }
+        _state = INITIALIZED;
     }
     
     public static void main(String args[]) {
-        startTrayApp();
-        RouterConsoleRunner runner = new RouterConsoleRunner(args);
-        runner.startConsole();
+        List<RouterContext> contexts = RouterContext.listContexts();
+        if (contexts == null || contexts.isEmpty())
+            throw new IllegalStateException("no router context");
+        RouterConsoleRunner runner = new RouterConsoleRunner(contexts.get(0), null, args);
+        runner.startup();
     }
     
+    /////// ClientApp methods
+
+    /** @since 0.9.4 */
+    public void startup() {
+        changeState(STARTING);
+        startTrayApp(_context);
+        startConsole();
+    }
+
+    /** @since 0.9.4 */
+    public void shutdown(String[] args) {
+        changeState(STOPPING);
+        try {
+            _server.stop();
+        } catch (Exception ie) {}
+        PortMapper portMapper = _context.portMapper();
+        portMapper.unregister(PortMapper.SVC_CONSOLE);
+        portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
+        changeState(STOPPED);
+    }
+
+    /** @since 0.9.4 */
+    public ClientAppState getState() {
+        return _state;
+    }
+
+    /** @since 0.9.4 */
+    public String getName() {
+        return "console";
+    }
+
+    /** @since 0.9.4 */
+    public String getDisplayName() {
+        return "Router Console";
+    }
+
+    /////// end ClientApp methods
+
+    private synchronized void changeState(ClientAppState state) {
+        _state = state;
+        if (_mgr != null)
+            _mgr.notify(this, state, null, null);
+    }
+
     /**
      *  SInce _server is now static
      *  @return may be null or stopped perhaps
@@ -178,13 +242,13 @@ public class RouterConsoleRunner {
         return _server;
     }
 
-    private static void startTrayApp() {
+    private static void startTrayApp(I2PAppContext ctx) {
         try {
             //TODO: move away from routerconsole into a separate application.
             //ApplicationManager?
             boolean recentJava = SystemVersion.isJava6();
             // default false for now
-            boolean desktopguiEnabled = I2PAppContext.getGlobalContext().getBooleanProperty("desktopgui.enabled");
+            boolean desktopguiEnabled = ctx.getBooleanProperty("desktopgui.enabled");
             if (recentJava && desktopguiEnabled) {
                 //Check if we are in a headless environment, set properties accordingly
           	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
@@ -219,7 +283,7 @@ public class RouterConsoleRunner {
      *</pre>
      */
     public void startConsole() {
-        File workDir = new SecureDirectory(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
+        File workDir = new SecureDirectory(_context.getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
         if (!workDirRemoved)
             System.err.println("ERROR: Unable to remove Jetty temporary work directory");
@@ -228,7 +292,7 @@ public class RouterConsoleRunner {
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
         //try {
-        //    Log.setLog(new I2PLogger(I2PAppContext.getGlobalContext()));
+        //    Log.setLog(new I2PLogger(_context));
         //} catch (Throwable t) {
         //    System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
         //}
@@ -236,7 +300,7 @@ public class RouterConsoleRunner {
         System.setProperty("org.mortbay.log.class", "net.i2p.jetty.I2PLogger");
 
         // so Jetty can find WebAppConfiguration
-        System.setProperty("jetty.class.path", I2PAppContext.getGlobalContext().getBaseDir() + "/lib/routerconsole.jar");
+        System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");
         _server = new Server();
         _server.setGracefulShutdown(1000);
 
@@ -259,11 +323,11 @@ public class RouterConsoleRunner {
         hColl.addHandler(chColl);
         hColl.addHandler(new DefaultHandler());
 
-        String log = I2PAppContext.getGlobalContext().getProperty("routerconsole.log");
+        String log = _context.getProperty("routerconsole.log");
         if (log != null) {
             File logFile = new File(log);
             if (!logFile.isAbsolute())
-                logFile = new File(I2PAppContext.getGlobalContext().getLogDir(), "logs/" + log);
+                logFile = new File(_context.getLogDir(), "logs/" + log);
             try {
                 RequestLogHandler rhl = new RequestLogHandler();
                 rhl.setRequestLog(new NCSARequestLog(logFile.getAbsolutePath()));
@@ -283,7 +347,7 @@ public class RouterConsoleRunner {
         // We assume relative to the base install dir for backward compatibility
         File app = new File(_webAppsDir);
         if (!app.isAbsolute()) {
-            app = new File(I2PAppContext.getGlobalContext().getBaseDir(), _webAppsDir);
+            app = new File(_context.getBaseDir(), _webAppsDir);
             try {
                 _webAppsDir = app.getCanonicalPath();
             } catch (IOException ioe) {}
@@ -363,7 +427,7 @@ public class RouterConsoleRunner {
                     }
                 }
                 // XXX: what if listenhosts do not include 127.0.0.1? (Should that ever even happen?)
-                I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_CONSOLE,lport);
+                _context.portMapper().register(PortMapper.SVC_CONSOLE,lport);
             }
 
             // add SSL listeners
@@ -376,8 +440,7 @@ public class RouterConsoleRunner {
                     System.err.println("Bad routerconsole SSL port " + _sslListenPort);
             }
             if (sslPort > 0) {
-                I2PAppContext ctx = I2PAppContext.getGlobalContext();
-                File keyStore = new File(ctx.getConfigDir(), "keystore/console.ks");
+                File keyStore = new File(_context.getConfigDir(), "keystore/console.ks");
                 if (verifyKeyStore(keyStore)) {
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
@@ -408,9 +471,9 @@ public class RouterConsoleRunner {
                                 SslSelectChannelConnector sssll = new SslSelectChannelConnector();
                                 // the keystore path and password
                                 sssll.setKeystore(keyStore.getAbsolutePath());
-                                sssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                                sssll.setPassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                                 // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                                sssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                sssll.setKeyPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                                 sssll.setUseDirectBuffers(false);  // default true seems to be leaky
                                 ssll = sssll;
                             } else {
@@ -418,9 +481,9 @@ public class RouterConsoleRunner {
                                 SslSocketConnector sssll = new SslSocketConnector();
                             // the keystore path and password
                                 sssll.setKeystore(keyStore.getAbsolutePath());
-                                sssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                                sssll.setPassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                             // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                                sssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                sssll.setKeyPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                                 ssll = sssll;
                             }
                             ssll.setHost(host);
@@ -437,7 +500,7 @@ public class RouterConsoleRunner {
                             System.err.println("You may ignore this warning if the console is still available at https://localhost:" + sslPort);
                         }
                     }
-                    I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);
+                    _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);
                 } else {
                     System.err.println("Unable to create or access keystore for SSL: " + keyStore.getAbsolutePath());
                 }
@@ -448,7 +511,7 @@ public class RouterConsoleRunner {
                 return;
             }
 
-            rootWebApp = new LocaleWebAppHandler(I2PAppContext.getGlobalContext(),
+            rootWebApp = new LocaleWebAppHandler(_context,
                                                   "/", _webAppsDir + ROUTERCONSOLE + ".war");
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
@@ -458,7 +521,7 @@ public class RouterConsoleRunner {
             rootWebApp.setSessionHandler(new SessionHandler());
             rootServletHandler = new ServletHandler();
             rootWebApp.setServletHandler(rootServletHandler);
-            initialize(rootWebApp);
+            initialize(_context, rootWebApp);
             chColl.addHandler(rootWebApp);
 
         } catch (Exception ioe) {
@@ -495,7 +558,7 @@ public class RouterConsoleRunner {
             }
             if (error) {
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
-                               "If your console is still accessible at http://127.0.0.1:7657/,\n" +
+                               "If your console is still accessible at http://127.0.0.1:" + _listenPort + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");
@@ -517,7 +580,7 @@ public class RouterConsoleRunner {
                     if (! "false".equals(enabled)) {
                         try {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
-                            WebAppStarter.startWebApp(I2PAppContext.getGlobalContext(), chColl, appName, path);
+                            WebAppStarter.startWebApp(_context, chColl, appName, path);
                             if (enabled == null) {
                                 // do this so configclients.jsp knows about all apps from reading the config
                                 props.setProperty(PREFIX + appName + ENABLED, "true");
@@ -532,13 +595,15 @@ public class RouterConsoleRunner {
                         notStarted.add(appName);
                     }
                 }
+                changeState(RUNNING);
             }
         } else {
             System.err.println("ERROR: Router console did not start, not starting webapps");
+            changeState(START_FAILED);
         }
 
         if (rewrite)
-            storeWebAppProperties(props);
+            storeWebAppProperties(_context, props);
 
         if (rootServletHandler != null && notStarted.size() > 0) {
             // map each not-started webapp to the error page
@@ -565,35 +630,29 @@ public class RouterConsoleRunner {
         t.setPriority(Thread.NORM_PRIORITY - 1);
         t.start();
         
-        List<RouterContext> contexts = RouterContext.listContexts();
-        if (contexts != null) {
-            RouterContext ctx = contexts.get(0);
-
-            ConsoleUpdateManager um = new ConsoleUpdateManager(ctx);
+            ConsoleUpdateManager um = new ConsoleUpdateManager(_context);
             um.start();
         
-            if (PluginStarter.pluginsEnabled(ctx)) {
-                t = new I2PAppThread(new PluginStarter(ctx), "PluginStarter", true);
+            if (PluginStarter.pluginsEnabled(_context)) {
+                t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
                 t.setPriority(Thread.NORM_PRIORITY - 1);
                 t.start();
-                ctx.addShutdownTask(new PluginStopper(ctx));
+                _context.addShutdownTask(new PluginStopper(_context));
             }
             // stat summarizer registers its own hook
-            ctx.addShutdownTask(new ServerShutdown());
-            ConfigServiceHandler.registerSignalHandler(ctx);
-        } // else log CRIT ?
+            _context.addShutdownTask(new ServerShutdown());
+            ConfigServiceHandler.registerSignalHandler(_context);
     }
     
     /**
      * @return success if it exists and we have a password, or it was created successfully.
      * @since 0.8.3
      */
-    private static boolean verifyKeyStore(File ks) {
+    private boolean verifyKeyStore(File ks) {
         if (ks.exists()) {
-            I2PAppContext ctx = I2PAppContext.getGlobalContext();
-            boolean rv = ctx.getProperty(PROP_KEY_PASSWORD) != null;
+            boolean rv = _context.getProperty(PROP_KEY_PASSWORD) != null;
             if (!rv)
-                System.err.println("Console SSL error, must set " + PROP_KEY_PASSWORD + " in " + (new File(ctx.getConfigDir(), "router.config")).getAbsolutePath());
+                System.err.println("Console SSL error, must set " + PROP_KEY_PASSWORD + " in " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
             return rv;
         }
         File dir = ks.getParentFile();
@@ -614,14 +673,13 @@ public class RouterConsoleRunner {
      * @return success
      * @since 0.8.3
      */
-    private static boolean createKeyStore(File ks) {
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+    private boolean createKeyStore(File ks) {
         // make a random 48 character password (30 * 8 / 5)
         byte[] rand = new byte[30];
-        ctx.random().nextBytes(rand);
+        _context.random().nextBytes(rand);
         String keyPassword = Base32.encode(rand);
         // and one for the cname
-        ctx.random().nextBytes(rand);
+        _context.random().nextBytes(rand);
         String cname = Base32.encode(rand) + ".console.i2p.net";
 
         String keytool = (new File(System.getProperty("java.home"), "bin/keytool")).getAbsolutePath();
@@ -643,11 +701,10 @@ public class RouterConsoleRunner {
             if (success) {
                 SecureFileOutputStream.setPerms(ks);
                 try {
-                    RouterContext rctx = (RouterContext) ctx;
                     Map<String, String> changes = new HashMap();
                     changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
-                    rctx.router().saveConfig(changes, null);
+                    _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
             }
         }
@@ -664,27 +721,42 @@ public class RouterConsoleRunner {
             System.err.println(buf.toString());
             System.err.println("This is for the Sun/Oracle keytool, others may be incompatible.\n" +
                                "If you create the keystore manually, you must add " + PROP_KEYSTORE_PASSWORD + " and " + PROP_KEY_PASSWORD +
-                               " to " + (new File(ctx.getConfigDir(), "router.config")).getAbsolutePath());
+                               " to " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
         }
         return success;
     }
 
-    static void initialize(WebAppContext context) {
+    /**
+     *  Set up basic security constraints for the webapp.
+     *  Add all users and passwords.
+     */
+    static void initialize(RouterContext ctx, WebAppContext context) {
         SecurityHandler sec = new SecurityHandler();
         List<ConstraintMapping> constraints = new ArrayList(4);
-        String password = getPassword();
-        if (password != null) {
-            HashUserRealm realm = new HashUserRealm("i2prouter");
-            realm.put("admin", password);
-            realm.addUserToRole("admin", "routerAdmin");
-            sec.setUserRealm(realm);
-            sec.setAuthenticator(authenticator);
-            Constraint constraint = new Constraint("admin", "routerAdmin");
-            constraint.setAuthenticate(true);
-            ConstraintMapping cm = new ConstraintMapping();
-            cm.setConstraint(constraint);
-            cm.setPathSpec("/");
-            constraints.add(cm);
+        ConsolePasswordManager mgr = new ConsolePasswordManager(ctx);
+        boolean enable = ctx.getBooleanProperty(PROP_PW_ENABLE);
+        if (enable) {
+            Map<String, String> userpw = mgr.getMD5(PROP_CONSOLE_PW);
+            if (userpw.isEmpty()) {
+                enable = false;
+                ctx.router().saveConfig(PROP_CONSOLE_PW, "false");
+            } else {
+                HashUserRealm realm = new HashUserRealm(JETTY_REALM);
+                sec.setUserRealm(realm);
+                sec.setAuthenticator(authenticator);
+                for (Map.Entry<String, String> e : userpw.entrySet()) {
+                    String user = e.getKey();
+                    String pw = e.getValue();
+                    realm.put(user, MD5.__TYPE + pw);
+                    realm.addUserToRole(user, JETTY_ROLE);
+                    Constraint constraint = new Constraint(user, JETTY_ROLE);
+                    constraint.setAuthenticate(true);
+                    ConstraintMapping cm = new ConstraintMapping();
+                    cm.setConstraint(constraint);
+                    cm.setPathSpec("/");
+                    constraints.add(cm);
+                }
+            }
         }
 
         // This forces a '403 Forbidden' response for TRACE and OPTIONS unless the
@@ -719,43 +791,25 @@ public class RouterConsoleRunner {
         context.setSecurityHandler(sec);
     }
     
-    static String getPassword() {
-        List<RouterContext> contexts = RouterContext.listContexts();
-        if (contexts != null) {
-            for (int i = 0; i < contexts.size(); i++) {
-                RouterContext ctx = contexts.get(i);
-                String password = ctx.getProperty("consolePassword");
-                if (password != null) {
-                    password = password.trim();
-                    if (password.length() > 0) {
-                        return password;
-                    }
-                }
-            }
-            // no password in any context
-            return null;
-        } else {
-            // no contexts?!
-            return null;
-        }
-    }
-    
     /** @since 0.8.8 */
-    private static class ServerShutdown implements Runnable {
+    private class ServerShutdown implements Runnable {
         public void run() {
-            try {
-                _server.stop();
-            } catch (Exception ie) {}
+            shutdown(null);
         }
     }
     
-    public static Properties webAppProperties() {
-        return webAppProperties(I2PAppContext.getGlobalContext().getConfigDir().getAbsolutePath());
+    private Properties webAppProperties() {
+        return webAppProperties(_context.getConfigDir().getAbsolutePath());
+    }
+
+    /** @since 0.9.4 */
+    public static Properties webAppProperties(I2PAppContext ctx) {
+        return webAppProperties(ctx.getConfigDir().getAbsolutePath());
     }
 
     public static Properties webAppProperties(String dir) {
         Properties rv = new Properties();
-        // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
+        // String webappConfigFile = _context.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
         File cfgFile = new File(dir, webappConfigFile);
         
@@ -768,10 +822,10 @@ public class RouterConsoleRunner {
         return rv;
     }
 
-    public static void storeWebAppProperties(Properties props) {
-        // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
+    public static void storeWebAppProperties(RouterContext ctx, Properties props) {
+        // String webappConfigFile = _context.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
-        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), webappConfigFile);
+        File cfgFile = new File(ctx.getConfigDir(), webappConfigFile);
         
         try {
             DataHelper.storeProps(props, cfgFile);

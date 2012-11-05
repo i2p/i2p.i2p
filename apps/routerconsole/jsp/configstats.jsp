@@ -66,17 +66,13 @@ function toggleAll(category)
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
- <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
- <jsp:getProperty name="formhandler" property="allMessages" />
-
+<%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHelper" id="statshelper" scope="request" />
  <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <div class="configure">
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >
- <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <h3><%=intl._("Configure I2P Stat Collection")%></h3>
  <p><%=intl._("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
@@ -101,7 +97,7 @@ Warning - Log with care, stat file grows without limit.<br>
       while (statshelper.groupRequired()) { %>
  <tr class="tablefooter">
      <td align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
-     <b><%=statshelper.getCurrentGroupName()%></b>
+     <b><%=intl._(statshelper.getCurrentGroupName())%></b>
      (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._("toggle all")%></a>)
      </td></tr>
  <tr class="tablefooter">

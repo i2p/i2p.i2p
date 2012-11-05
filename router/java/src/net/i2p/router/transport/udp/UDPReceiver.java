@@ -52,9 +52,9 @@ class UDPReceiver {
         _socket = socket;
         _transport = transport;
         _runner = new Runner();
-        _context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receiveRemaining", "How many packets are left sitting on the receiver's queue", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.receiveRemaining", "How many packets are left sitting on the receiver's queue", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receiveHolePunch", "How often we receive a NAT hole punch", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", UDPTransport.RATES);
     }
@@ -165,7 +165,7 @@ class UDPReceiver {
         if (_transport.isInDropList(from)) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Ignoring packet from the drop-listed peer: " + from);
-            _context.statManager().addRateData("udp.ignorePacketFromDroplist", packet.getLifetime(), 0);
+            _context.statManager().addRateData("udp.ignorePacketFromDroplist", packet.getLifetime());
             packet.release();
             return 0;
         }
@@ -253,7 +253,6 @@ class UDPReceiver {
 
         public void run() {
             //_socketChanged = false;
-            FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().createRequest();
             while (_keepRunning) {
                 //if (_socketChanged) {
                 //    Thread.currentThread().setName(_name + "." + _id);
@@ -292,14 +291,15 @@ class UDPReceiver {
                     if (size > 0) {
                         //FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
-                        req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
-                        while (req.getPendingInboundRequested() > 0)
+                        FIFOBandwidthLimiter.Request req =
+                              _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
+                        while (req.getPendingRequested() > 0)
                             req.waitForNextAllocation();
                         
-                        int queued = receive(packet);
-                        _context.statManager().addRateData("udp.receivePacketSize", size, queued);
+                        receive(packet);
+                        //_context.statManager().addRateData("udp.receivePacketSize", size);
                     } else {
-                        _context.statManager().addRateData("udp.receiveHolePunch", 1, 0);
+                        _context.statManager().addRateData("udp.receiveHolePunch", 1);
                         // nat hole punch packets are 0 bytes
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Received a 0 byte udp packet from " + packet.getPacket().getAddress() + ":" + packet.getPacket().getPort());

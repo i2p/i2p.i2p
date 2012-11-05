@@ -207,14 +207,16 @@ class ConnectionManager {
             //        active++;
             //}
             if (locked_tooManyStreams()) {
-                _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
+                if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
+                    _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of " 
                               + _defaultOptions.getMaxConns() + " connections");
                 reject = true;
             } else {
                 // this may not be right if more than one is enabled
                 String why = shouldRejectConnection(synPacket);
                 if (why != null) {
-                    _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
+                    if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
+                        _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
                            (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().calculateHash().toBase64()));
                     reject = true;
                 } else { 
@@ -266,6 +268,10 @@ class ConnectionManager {
         }
         
         con.setReceiveStreamId(receiveId);
+        // finally, we know enough that we can log the packet with the conn filled in
+        if (I2PSocketManagerFull.pcapWriter != null &&
+            _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
+            synPacket.logTCPDump(con);
         try {
             // This validates the packet, and sets the con's SendStreamID and RemotePeer
             con.getPacketHandler().receivePacket(synPacket, con);

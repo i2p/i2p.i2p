@@ -22,7 +22,7 @@ The HTTP Outproxy was not found.
 It is offline, there is network congestion,
 or your router is not yet well-integrated with peers.
 You may want to
-<a href="javascript: parent.window.location.reload()">retry</a>
+<a href="javascript:parent.window.location.reload()">retry</a>
 as this will randomly reselect an outproxy from the pool you have defined
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">here</a>
 (if you have more than one configured).

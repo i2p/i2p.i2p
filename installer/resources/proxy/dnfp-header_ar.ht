@@ -21,7 +21,7 @@ Proxy-Connection: close
 لم يتم ايجاد بروكسي خارجي www
 خارج الشبكة أو غير متصل جيدا بباقي المستخدمين.
 يمكنك
-<a href="javascript: parent.window.location.reload()">اعادة المحاولة</a>
+<a href="javascript:parent.window.location.reload()">اعادة المحاولة</a>
 لإختيار بروكسي خارجي جديد
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">هنا</a>
 (اذا كان لديك اكثر من واحد).

@@ -19,17 +19,19 @@ class OutboundMessageState implements CDPQEntry {
     private final I2PAppContext _context;
     private final Log _log;
     /** may be null if we are part of the establishment */
-    private OutNetMessage _message;
-    private long _messageId;
+    private final OutNetMessage _message;
+    private final long _messageId;
     /** will be null, unless we are part of the establishment */
-    private PeerState _peer;
-    private long _expiration;
+    private final PeerState _peer;
+    private final long _expiration;
     private ByteArray _messageBuf;
     /** fixed fragment size across the message */
     private int _fragmentSize;
+    /** size of the I2NP message */
+    private final int _totalSize;
     /** sends[i] is how many times the fragment has been sent, or -1 if ACKed */
     private short _fragmentSends[];
-    private long _startedOn;
+    private final long _startedOn;
     private long _nextSendTime;
     private int _pushCount;
     private short _maxSends;
@@ -59,43 +61,15 @@ class OutboundMessageState implements CDPQEntry {
 
     private static final long EXPIRATION = 10*1000;
     
-    public OutboundMessageState(I2PAppContext context) {
-        _context = context;
-        _log = _context.logManager().getLog(OutboundMessageState.class);
-    }
-    
-/****
-    public boolean initialize(OutNetMessage msg) {
-        if (msg == null) return false;
-        try {
-            return initialize(msg, msg.getMessage(), null);
-        } catch (OutOfMemoryError oom) {
-            throw oom;
-        } catch (Exception e) {
-            _log.log(Log.CRIT, "Error initializing " + msg, e);
-            return false;
-        }
-    }
-****/
-    
+
     /**
      *  Called from UDPTransport
      *  TODO make two constructors, remove this, and make more things final
      *  @return success
      *  @throws IAE if too big
      */
-    public boolean initialize(I2NPMessage msg, PeerState peer) {
-        if (msg == null) 
-            return false;
-        
-        try {
-            return initialize(null, msg, peer);
-        } catch (OutOfMemoryError oom) {
-            throw oom;
-        } catch (Exception e) {
-            _log.log(Log.CRIT, "Error initializing " + msg, e);
-            return false;
-        }
+    public OutboundMessageState(I2PAppContext context, I2NPMessage msg, PeerState peer) {
+        this(context, null, msg, peer);
     }
     
     /**
@@ -104,18 +78,8 @@ class OutboundMessageState implements CDPQEntry {
      *  @return success
      *  @throws IAE if too big
      */
-    public boolean initialize(OutNetMessage m, I2NPMessage msg) {
-        if ( (m == null) || (msg == null) ) 
-            return false;
-        
-        try {
-            return initialize(m, msg, null);
-        } catch (OutOfMemoryError oom) {
-            throw oom;
-        } catch (Exception e) {
-            _log.log(Log.CRIT, "Error initializing " + msg, e);
-            return false;
-        }
+    public OutboundMessageState(I2PAppContext context, OutNetMessage m, PeerState peer) {
+        this(context, m, m.getMessage(), peer);
     }
     
     /**
@@ -124,28 +88,26 @@ class OutboundMessageState implements CDPQEntry {
      *  @return success
      *  @throws IAE if too big
      */
-    private boolean initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
+    private OutboundMessageState(I2PAppContext context, OutNetMessage m, I2NPMessage msg, PeerState peer) {
+        if (msg == null || peer == null)
+            throw new IllegalArgumentException();
+        _context = context;
+        _log = _context.logManager().getLog(OutboundMessageState.class);
         _message = m;
         _peer = peer;
         int size = msg.getRawMessageSize();
         acquireBuf(size);
-        try {
-            int len = msg.toRawByteArray(_messageBuf.getData());
-            _messageBuf.setValid(len);
-            _messageId = msg.getUniqueId();
+        _totalSize = msg.toRawByteArray(_messageBuf.getData());
+        _messageBuf.setValid(_totalSize);
+        _messageId = msg.getUniqueId();
 
-            _startedOn = _context.clock().now();
-            _nextSendTime = _startedOn;
-            _expiration = _startedOn + EXPIRATION;
-            //_expiration = msg.getExpiration();
+        _startedOn = _context.clock().now();
+        _nextSendTime = _startedOn;
+        _expiration = _startedOn + EXPIRATION;
+        //_expiration = msg.getExpiration();
 
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
-            return true;
-        } catch (IllegalStateException ise) {
-            releaseBuf();
-            return false;
-        }
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
     }
     
     /**
@@ -203,7 +165,6 @@ class OutboundMessageState implements CDPQEntry {
     public OutNetMessage getMessage() { return _message; }
     public long getMessageId() { return _messageId; }
     public PeerState getPeer() { return _peer; }
-    public void setPeer(PeerState peer) { _peer = peer; }
 
     public boolean isExpired() {
         return _expiration < _context.clock().now(); 
@@ -224,8 +185,7 @@ class OutboundMessageState implements CDPQEntry {
         ByteArray messageBuf = _messageBuf;
         int rv = 0;
         if ( (messageBuf != null) && (fragmentSends != null) ) {
-            int totalSize = messageBuf.getValid();
-            int lastSize = totalSize % _fragmentSize;
+            int lastSize = _totalSize % _fragmentSize;
             if (lastSize == 0)
                 lastSize = _fragmentSize;
             for (int i = 0; i < fragmentSends.length; i++) {
@@ -286,11 +246,22 @@ class OutboundMessageState implements CDPQEntry {
     
     public long getNextSendTime() { return _nextSendTime; }
     public void setNextSendTime(long when) { _nextSendTime = when; }
+
+    /**
+     *  The max number of sends for any fragment, which is the
+     *  same as the push count, at least as it's coded now.
+     */
     public int getMaxSends() { return _maxSends; }
+
+    /**
+     *  The number of times we've pushed some fragments, which is the
+     *  same as the max sends, at least as it's coded now.
+     */
     public int getPushCount() { return _pushCount; }
 
     /** note that we have pushed the message fragments */
     public void push() { 
+        // these will never be different...
         _pushCount++; 
         if (_pushCount > _maxSends)
             _maxSends = (short)_pushCount;
@@ -301,23 +272,35 @@ class OutboundMessageState implements CDPQEntry {
         
     }
 
+    /**
+     * Whether fragment() has been called.
+     * NOT whether it has more than one fragment.
+     *
+     * Caller should synchronize
+     *
+     * @return true iff fragment() has been called previously
+     */
     public boolean isFragmented() { return _fragmentSends != null; }
 
     /**
      * Prepare the message for fragmented delivery, using no more than
      * fragmentSize bytes per fragment.
      *
+     * Caller should synchronize
+     *
+     * @throws IllegalStateException if called more than once
      */
     public void fragment(int fragmentSize) {
-        int totalSize = _messageBuf.getValid();
-        int numFragments = totalSize / fragmentSize;
-        if (numFragments * fragmentSize < totalSize)
+        if (_fragmentSends != null)
+            throw new IllegalStateException();
+        int numFragments = _totalSize / fragmentSize;
+        if (numFragments * fragmentSize < _totalSize)
             numFragments++;
         // This should never happen, as 534 bytes * 64 fragments > 32KB, and we won't bid on > 32KB
         if (numFragments > InboundMessageState.MAX_FRAGMENTS)
-            throw new IllegalArgumentException("Fragmenting a " + totalSize + " message into " + numFragments + " fragments - too many!");
+            throw new IllegalArgumentException("Fragmenting a " + _totalSize + " message into " + numFragments + " fragments - too many!");
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Fragmenting a " + totalSize + " message into " + numFragments + " fragments");
+            _log.debug("Fragmenting a " + _totalSize + " message into " + numFragments + " fragments");
         
         //_fragmentEnd = new int[numFragments];
         _fragmentSends = new short[numFragments];
@@ -327,7 +310,13 @@ class OutboundMessageState implements CDPQEntry {
         _fragmentSize = fragmentSize;
     }
 
-    /** how many fragments in the message */
+    /**
+     * How many fragments in the message.
+     * Only valid after fragment() has been called.
+     * Returns -1 before then.
+     *
+     * Caller should synchronize
+     */
     public int getFragmentCount() { 
         if (_fragmentSends == null) 
             return -1;
@@ -335,15 +324,26 @@ class OutboundMessageState implements CDPQEntry {
             return _fragmentSends.length; 
     }
 
-    public int getFragmentSize() { return _fragmentSize; }
+    /**
+     * The size of the I2NP message. Does not include any SSU overhead.
+     *
+     * Caller should synchronize
+     */
+    public int getMessageSize() { return _totalSize; }
 
-    /** should we continue sending this fragment? */
+    /**
+     * Should we continue sending this fragment?
+     * Only valid after fragment() has been called.
+     * Throws NPE before then.
+     *
+     * Caller should synchronize
+     */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
 
     public int fragmentSize(int fragmentNum) {
         if (_messageBuf == null) return -1;
         if (fragmentNum + 1 == _fragmentSends.length) {
-            int valid = _messageBuf.getValid();
+            int valid = _totalSize;
             if (valid <= _fragmentSize)
                 return valid;
             // bugfix 0.8.12
@@ -406,7 +406,7 @@ class OutboundMessageState implements CDPQEntry {
             System.arraycopy(_messageBuf.getData(), start, out, outOffset, toSend);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Raw fragment[" + fragmentNum + "] for " + _messageId 
-                           + "[" + start + "-" + (start+toSend) + "/" + _messageBuf.getValid() + "/" + _fragmentSize + "]: " 
+                           + "[" + start + "-" + (start+toSend) + "/" + _totalSize + "/" + _fragmentSize + "]: " 
                            + Base64.encode(out, outOffset, toSend));
             return toSend;
         } else {
@@ -467,13 +467,11 @@ class OutboundMessageState implements CDPQEntry {
     @Override
     public String toString() {
         short sends[] = _fragmentSends;
-        ByteArray messageBuf = _messageBuf;
         StringBuilder buf = new StringBuilder(256);
         buf.append("OB Message ").append(_messageId);
         if (sends != null)
             buf.append(" with ").append(sends.length).append(" fragments");
-        if (messageBuf != null)
-            buf.append(" of size ").append(messageBuf.getValid());
+        buf.append(" of size ").append(_totalSize);
         buf.append(" volleys: ").append(_maxSends);
         buf.append(" lifetime: ").append(getLifetime());
         if (sends != null) {

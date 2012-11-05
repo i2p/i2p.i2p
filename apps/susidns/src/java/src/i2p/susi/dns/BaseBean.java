@@ -14,7 +14,7 @@ import net.i2p.I2PAppContext;
  */
 public class BaseBean
 {
-    private final I2PAppContext _context;
+    protected final I2PAppContext _context;
     protected final Properties properties;
 
     private long configLastLoaded = 0;
@@ -26,6 +26,7 @@ public class BaseBean
     public static final String PROP_THEME_NAME = "theme";
     public static final String DEFAULT_THEME = "light";
     public static final String BASE_THEME_PATH = "/themes/susidns/";
+    public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
 
     public BaseBean()
     {

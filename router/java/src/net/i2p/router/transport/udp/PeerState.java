@@ -17,6 +17,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
+import net.i2p.router.util.PriBlockingQueue;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
@@ -209,7 +210,8 @@ class PeerState {
      *  Priority queue of messages that have not yet been sent.
      *  They are taken from here and put in _outboundMessages.
      */
-    private final CoDelPriorityBlockingQueue<OutboundMessageState> _outboundQueue;
+    //private final CoDelPriorityBlockingQueue<OutboundMessageState> _outboundQueue;
+    private final PriBlockingQueue<OutboundMessageState> _outboundQueue;
 
     /** which outbound message is currently being retransmitted */
     private OutboundMessageState _retransmitter;
@@ -287,7 +289,6 @@ class PeerState {
      */
     public static final int LARGE_MTU = 1484;
     
-    /** 600 */
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int INIT_RTO = 3*1000;
     public static final int INIT_RTT = INIT_RTO / 2;
@@ -323,7 +324,8 @@ class PeerState {
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
-        _outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
+        //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
+        _outboundQueue = new PriBlockingQueue(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager
         _remoteIP = remoteIP;
         _remotePeer = remotePeer;
@@ -711,7 +713,7 @@ class PeerState {
             //_receiveACKBytes = 0;
             _receiveBytes = 0;
             _receivePeriodBegin = now;
-           _context.statManager().addRateData("udp.receiveBps", _receiveBps, 0);
+           _context.statManager().addRateData("udp.receiveBps", _receiveBps);
         }
         
         if (_wantACKSendSince <= 0)
@@ -1099,31 +1101,32 @@ class PeerState {
         if (numSends >= 2 && _log.shouldLog(Log.INFO))
             _log.info("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
         
-        _context.statManager().addRateData("udp.sendBps", _sendBps, lifetime);
+        _context.statManager().addRateData("udp.sendBps", _sendBps);
     }
 
+    /** This is the value specified in RFC 2988 */
+    private static final float RTT_DAMPENING = 0.125f;
+    
     /**
      *  Adjust the tcp-esque timeouts.
      *  Caller should synch on this
      */
     private void recalculateTimeouts(long lifetime) {
+        // the rttDev calculation matches that recommended in RFC 2988 (beta = 1/4)
         _rttDeviation = _rttDeviation + (int)(0.25d*(Math.abs(lifetime-_rtt)-_rttDeviation));
         
+        float scale = RTT_DAMPENING;
         // the faster we are going, the slower we want to reduce the rtt
-        float scale = 0.1f;
-        if (_sendBps > 0)
-            scale = lifetime / ((float)lifetime + (float)_sendBps);
-        if (scale < 0.001f) scale = 0.001f;
+        //if (_sendBps > 0)
+        //    scale = lifetime / ((float)lifetime + (float)_sendBps);
+        //if (scale < 0.001f) scale = 0.001f;
         
         _rtt = (int)(_rtt*(1.0f-scale) + (scale)*lifetime);
-        _rto = _rtt + (_rttDeviation<<2);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
-                       + " rttDev=" + _rttDeviation + " rto=" + _rto);
-        if (_rto < minRTO())
-            _rto = minRTO();
-        else if (_rto > MAX_RTO)
-            _rto = MAX_RTO;
+        // K = 4
+        _rto = Math.min(MAX_RTO, Math.max(minRTO(), _rtt + (_rttDeviation<<2)));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
+        //               + " rttDev=" + _rttDeviation + " rto=" + _rto);
     }
     
     /**
@@ -1138,12 +1141,12 @@ class PeerState {
                 if (_context.random().nextLong(_mtuDecreases) <= 0) {
                     _mtu = _largeMTU;
                     _mtuIncreases++;
-                    _context.statManager().addRateData("udp.mtuIncrease", _mtuIncreases, _mtuDecreases);
+                    _context.statManager().addRateData("udp.mtuIncrease", _mtuIncreases);
 		}
 	    } else if (!wantLarge && _mtu == _largeMTU) {
                 _mtu = MIN_MTU;
                 _mtuDecreases++;
-                _context.statManager().addRateData("udp.mtuDecrease", _mtuDecreases, _mtuIncreases);
+                _context.statManager().addRateData("udp.mtuDecrease", _mtuDecreases);
 	    }
         } else {
             _mtu = DEFAULT_MTU;
@@ -1175,7 +1178,7 @@ class PeerState {
             _packetsRetransmitted = packets;
         }
         *****/
-        _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes, _sendBps);
+        _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes);
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
         synchronized (this) {
             congestionOccurred();
@@ -1247,7 +1250,7 @@ class PeerState {
         synchronized(this) {
             congestionOccurred();
         }
-        _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes, _sendBps);
+        _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes);
         _currentSecondECNReceived = true;
         _lastReceiveTime = _context.clock().now();
     }
@@ -1320,7 +1323,12 @@ class PeerState {
             _transport.failed(state, false);
             return;
 	}
-        state.setPeer(this);
+        if (state.getPeer() != this) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Not for me!", new Exception("I did it"));
+            _transport.failed(state, false);
+            return;
+	}
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding to " + _remotePeer + ": " + state.getMessageId());
         int rv = 0;
@@ -1397,7 +1405,8 @@ class PeerState {
                     tempList = new ArrayList(_outboundMessages);
                     _outboundMessages.clear();
             }
-            _outboundQueue.drainAllTo(tempList);
+            //_outboundQueue.drainAllTo(tempList);
+            _outboundQueue.drainTo(tempList);
             for (OutboundMessageState oms : tempList) {
                 _transport.failed(oms, false);
             }
@@ -1448,14 +1457,14 @@ class PeerState {
                     iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
-                    _context.statManager().addRateData("udp.sendFailed", state.getPushCount(), state.getLifetime());
+                    _context.statManager().addRateData("udp.sendFailed", state.getPushCount());
                     if (failed == null) failed = new ArrayList(4);
                     failed.add(state);
                 } else if (state.getPushCount() > OutboundMessageFragments.MAX_VOLLEYS) {
                     iter.remove();
                     if (state == _retransmitter)
                         _retransmitter = null;
-                    _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount(), state.getLifetime());
+                    _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount());
                     if (failed == null) failed = new ArrayList(4);
                     failed.add(state);
                 } // end (pushCount > maxVolleys)
@@ -1620,7 +1629,7 @@ class PeerState {
 
     /**
      *  how much payload data can we shove in there?
-     *  @return MTU - 87, i.e. 521 or 1401
+     *  @return MTU - 87, i.e. 533 or 1397
      */
     private static final int fragmentSize(int mtu) {
         // 46 + 20 + 8 + 13 = 74 + 13 = 87
@@ -1655,7 +1664,7 @@ class PeerState {
             if ( (retrans != null) && (retrans != state) ) {
                 // choke it, since there's already another message retransmitting to this
                 // peer.
-                _context.statManager().addRateData("udp.blockedRetransmissions", _packetsRetransmitted, _packetsTransmitted);
+                _context.statManager().addRateData("udp.blockedRetransmissions", _packetsRetransmitted);
                 int max = state.getMaxSends();
                 if ( (max <= 0) && (!THROTTLE_INITIAL_SEND) ) {
                     //if (state.getMessage() != null)
@@ -1691,7 +1700,7 @@ class PeerState {
                 //    _throttle.unchoke(peer.getRemotePeer());
                 return ShouldSend.YES;
             } else {
-                _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
+                _context.statManager().addRateData("udp.sendRejected", state.getPushCount());
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("send rejected, available=" + getSendWindowBytesRemaining());
                 if (_log.shouldLog(Log.INFO))
@@ -1756,15 +1765,14 @@ class PeerState {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Received ack of " + messageId + " by " + _remotePeer
                           + " after " + state.getLifetime() + " and " + numSends + " sends");
-            _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
+            _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime());
             if (state.getFragmentCount() > 1)
-                _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-            if (numSends > 1)
-                _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
+                _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount());
+            _context.statManager().addRateData("udp.sendConfirmVolley", numSends);
             _transport.succeeded(state);
             int numFragments = state.getFragmentCount();
             // this adjusts the rtt/rto/window/etc
-            messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), numSends);
+            messageACKed(state.getMessageSize(), state.getLifetime(), numSends);
             //if (getSendWindowBytesRemaining() > 0)
             //    _throttle.unchoke(peer.getRemotePeer());
             
@@ -1824,7 +1832,7 @@ class PeerState {
                 if (bitfield.received(i))
                     numACKed++;
             
-            _context.statManager().addRateData("udp.partialACKReceived", numACKed, state.getLifetime());
+            _context.statManager().addRateData("udp.partialACKReceived", numACKed);
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("Received partial ack of " + state.getMessageId() + " by " + _remotePeer
@@ -1832,17 +1840,16 @@ class PeerState {
                           + isComplete + ": " + state);
             
             if (isComplete) {
-                _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
+                _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime());
                 if (state.getFragmentCount() > 1)
-                    _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-                if (numSends > 1)
-                    _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
+                    _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount());
+                _context.statManager().addRateData("udp.sendConfirmVolley", numSends);
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("partial ack to complete after " + numSends);
                 _transport.succeeded(state);
                 
                 // this adjusts the rtt/rto/window/etc
-                messageACKed(state.getFragmentCount()*state.getFragmentSize(), state.getLifetime(), 0);
+                messageACKed(state.getMessageSize(), state.getLifetime(), numSends);
                 //if (state.getPeer().getSendWindowBytesRemaining() > 0)
                 //    _throttle.unchoke(state.getPeer().getRemotePeer());
 

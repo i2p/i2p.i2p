@@ -21,7 +21,7 @@ Proxy-Connection: close
 匿名站点所对应的目标密钥无效因而无法访问。
 或许您复制的Base64字符串有误，或者您所点击的跳转链接有问题。
 也许对方的 I2P 主机目前不在线。您可以选择
-<a href="javascript: window.location.reload()">重试</a>.
+<a href="javascript:window.location.reload()">重试</a>.
 </p>
 <hr>
 <p><b>找不到以下目标:</b></p>

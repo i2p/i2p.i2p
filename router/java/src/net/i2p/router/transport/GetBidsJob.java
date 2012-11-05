@@ -43,11 +43,11 @@ class GetBidsJob extends JobImpl {
         Hash to = msg.getTarget().getIdentity().getHash();
         msg.timestamp("bid");
         
-        if (context.shitlist().isShitlisted(to)) {
+        if (context.banlist().isBanlisted(to)) {
             if (log.shouldLog(Log.WARN))
-                log.warn("Attempt to send a message to a shitlisted peer - " + to);
+                log.warn("Attempt to send a message to a banlisted peer - " + to);
             //context.messageRegistry().peerFailed(to);
-            context.statManager().addRateData("transport.bidFailShitlisted", msg.getLifetime(), 0);
+            context.statManager().addRateData("transport.bidFailBanlisted", msg.getLifetime(), 0);
             fail(context, msg);
             return;
         }
@@ -67,7 +67,7 @@ class GetBidsJob extends JobImpl {
             if (failedCount == 0) {
                 context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime(), 0);
                 // This used to be "no common transports" but it is almost always no transports at all
-                context.shitlist().shitlistRouter(to, _x("No transports (hidden or starting up?)"));
+                context.banlist().banlistRouter(to, _x("No transports (hidden or starting up?)"));
             } else if (failedCount >= facade.getTransportCount()) {
                 context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime(), 0);
                 // fail after all transports were unsuccessful

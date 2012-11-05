@@ -20,7 +20,7 @@ Proxy-Connection: close
 <p>
 Le site eep n'a pas pu être atteint. Il est hors service,
 le réseau est surchargé, ou votre routeur n'est pas bien intégré aux pairs.
-Vous pouvez <a href="javascript: window.location.reload()">réessayer</a>.
+Vous pouvez <a href="javascript:window.location.reload()">réessayer</a>.
 </p>
 <hr>
 <p>

@@ -11,7 +11,7 @@
     <target name="depend" if="depend.available">
         <depend
             cache="../../../build"
-            srcdir="./src:./test" 
+            srcdir="./src:./test/junit" 
             destdir="./build/obj" >
             <!-- Depend on classes instead of jars where available -->
             <classpath>
@@ -35,7 +35,7 @@
     </target>
     <target name="compileTest" depends="compile">
         <javac 
-            srcdir="./test" 
+            srcdir="./test/junit" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             includeAntRuntime="false"
             destdir="./build/obj" 

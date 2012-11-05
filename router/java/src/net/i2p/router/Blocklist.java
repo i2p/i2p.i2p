@@ -35,18 +35,18 @@ import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
 /**
- * Manage blocking by IP address, in a manner similar to the Shitlist,
+ * Manage blocking by IP address, in a manner similar to the Banlist,
  * which blocks by router hash.
  *
  * We also try to keep the two lists in sync: if a router at a given IP is
- * blocked, we will also shitlist it "forever" (until the next reboot).
+ * blocked, we will also banlist it "forever" (until the next reboot).
  *
- * While the reverse case (blocking the IP of a router shitlisted forever)
+ * While the reverse case (blocking the IP of a router banlisted forever)
  * is not automatic, the transports will call add() below to block the IP,
  * which allows the transports to terminate an inbound connection before
  * the router ident handshake.
  *
- * And the on-disk blocklist can also contain router hashes to be shitlisted.
+ * And the on-disk blocklist can also contain router hashes to be banlisted.
  *
  * So, this class maintains three separate lists:
  *<pre>
@@ -58,9 +58,9 @@ import net.i2p.util.Translate;
  * Read in the IP blocklist from a file, store it in-memory as efficiently
  * as we can, and perform tests against it as requested.
  *
- * When queried for a peer that is blocklisted but isn't shitlisted,
- * shitlist it forever, then go back to the file to get the original
- * entry so we can add the reason to the shitlist text.
+ * When queried for a peer that is blocklisted but isn't banlisted,
+ * banlist it forever, then go back to the file to get the original
+ * entry so we can add the reason to the banlist text.
  *
  */
 public class Blocklist {
@@ -128,7 +128,7 @@ public class Blocklist {
                     reason = _x("Banned by router hash: {0}");
                 else
                     reason = _x("Banned by router hash");
-                _context.shitlist().shitlistRouterForever(peer, reason, comment);
+                _context.banlist().banlistRouterForever(peer, reason, comment);
             }
             _peerBlocklist = null;
 
@@ -280,7 +280,7 @@ public class Blocklist {
         }
     }
 
-    private Entry parse(String buf, boolean bitch) {
+    private Entry parse(String buf, boolean shouldLog) {
         byte[] ip1;
         byte[] ip2;
         int start1 = 0;
@@ -365,15 +365,15 @@ public class Blocklist {
                 ip2 = ip1;
             }
         } catch (UnknownHostException uhe) {
-            if (bitch && _log.shouldLog(Log.ERROR))
+            if (shouldLog && _log.shouldLog(Log.ERROR))
                 _log.error("Format error in the blocklist file: " + buf);
             return null;
         } catch (NumberFormatException nfe) {
-            if (bitch && _log.shouldLog(Log.ERROR))
+            if (shouldLog && _log.shouldLog(Log.ERROR))
                 _log.error("Format error in the blocklist file: " + buf);
             return null;
         } catch (IndexOutOfBoundsException ioobe) {
-            if (bitch && _log.shouldLog(Log.ERROR))
+            if (shouldLog && _log.shouldLog(Log.ERROR))
                 _log.error("Format error in the blocklist file: " + buf);
             return null;
         }
@@ -487,16 +487,16 @@ public class Blocklist {
 
     /**
      * Does the peer's IP address appear in the blocklist?
-     * If so, and it isn't shitlisted, shitlist it forever...
+     * If so, and it isn't banlisted, banlist it forever...
      */
     public boolean isBlocklisted(Hash peer) {
         List<byte[]> ips = getAddresses(peer);
         for (Iterator<byte[]> iter = ips.iterator(); iter.hasNext(); ) {
             byte ip[] = iter.next();
             if (isBlocklisted(ip)) {
-                if (! _context.shitlist().isShitlisted(peer))
+                if (! _context.banlist().isBanlisted(peer))
                     // nice knowing you...
-                    shitlist(peer, ip);
+                    banlist(peer, ip);
                 return true;
             }
         }
@@ -504,7 +504,7 @@ public class Blocklist {
     }
 
     /**
-     * calling this externally won't shitlist the peer, this is just an IP check
+     * calling this externally won't banlist the peer, this is just an IP check
      */
     public boolean isBlocklisted(String ip) {
         byte[] pib = Addresses.getIP(ip);
@@ -513,7 +513,7 @@ public class Blocklist {
     }
 
     /**
-     * calling this externally won't shitlist the peer, this is just an IP check
+     * calling this externally won't banlist the peer, this is just an IP check
      */
     public boolean isBlocklisted(byte ip[]) {
         if (ip.length != 4)
@@ -648,10 +648,10 @@ public class Blocklist {
      * actual line in the blocklist file, this could take a while.
      *
      */
-    private void shitlist(Hash peer, byte[] ip) {
+    private void banlist(Hash peer, byte[] ip) {
         // Temporary reason, until the job finishes
         String reason = _x("IP banned by blocklist.txt entry {0}");
-        _context.shitlist().shitlistRouterForever(peer, reason, Addresses.toString(ip));
+        _context.banlist().banlistRouterForever(peer, reason, Addresses.toString(ip));
         if (!  _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_DETAIL))
             return;
         boolean shouldRunJob;
@@ -663,23 +663,23 @@ public class Blocklist {
         if (!shouldRunJob)
             return;
         // get the IPs now because it won't be in the netdb by the time the job runs
-        Job job = new ShitlistJob(peer, getAddresses(peer));
+        Job job = new BanlistJob(peer, getAddresses(peer));
         if (number > 0)
             job.getTiming().setStartAfter(_context.clock().now() + (30*1000l * number));
         _context.jobQueue().addJob(job);
     }
 
-    private class ShitlistJob extends JobImpl {
+    private class BanlistJob extends JobImpl {
         private final Hash _peer;
         private final List<byte[]> _ips;
-        public ShitlistJob (Hash p, List<byte[]> ips) {
+        public BanlistJob (Hash p, List<byte[]> ips) {
             super(_context);
             _peer = p;
             _ips = ips;
         }
         public String getName() { return "Ban Peer by IP"; }
         public void runJob() {
-            shitlistForever(_peer, _ips);
+            banlistForever(_peer, _ips);
             synchronized (_inProcess) {
                 _inProcess.remove(_peer);
             }
@@ -687,7 +687,7 @@ public class Blocklist {
     }
 
     /**
-     * Look up the original record so we can record the reason in the shitlist.
+     * Look up the original record so we can record the reason in the banlist.
      * That's the only reason to do this.
      * Only synchronize to cut down on the I/O load.
      * Additional jobs can wait.
@@ -695,7 +695,7 @@ public class Blocklist {
      * So we also stagger these jobs.
      *
      */
-    private synchronized void shitlistForever(Hash peer, List<byte[]> ips) {
+    private synchronized void banlistForever(Hash peer, List<byte[]> ips) {
         String file = _context.getProperty(PROP_BLOCKLIST_FILE, BLOCKLIST_FILE_DEFAULT);
         File BLFile = new File(file);
         if (!BLFile.isAbsolute())
@@ -732,8 +732,8 @@ public class Blocklist {
                         //}
                         //reason = reason + " banned by " + BLOCKLIST_FILE_DEFAULT + " entry \"" + buf + "\"";
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Shitlisting " + peer + " " + reason);
-                        _context.shitlist().shitlistRouterForever(peer, reason, buf.toString());
+                            _log.warn("Banlisting " + peer + " " + reason);
+                        _context.banlist().banlistRouterForever(peer, reason, buf.toString());
                         return;
                     }
                 }
@@ -744,7 +744,7 @@ public class Blocklist {
                 if (in != null) try { in.close(); } catch (IOException ioe) {}
             }
         }
-        // We already shitlisted in shitlist(peer), that's good enough
+        // We already banlisted in banlist(peer), that's good enough
     }
 
     private static final int MAX_DISPLAY = 1000;

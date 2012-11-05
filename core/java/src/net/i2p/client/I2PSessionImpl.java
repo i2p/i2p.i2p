@@ -136,6 +136,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private long _lastActivity;
     private boolean _isReduced;
+    private final boolean _fastReceive;
 
     /**
      *  @since 0.8.9
@@ -168,6 +169,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         if (options == null)
             options = (Properties) System.getProperties().clone();
         loadConfig(options);
+        _fastReceive = Boolean.parseBoolean(_options.getProperty(I2PClient.PROP_FAST_RECEIVE));
     }
 
     /**
@@ -228,6 +230,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _options.setProperty("i2cp.password", configPW);
             }
         }
+        if (_options.getProperty(I2PClient.PROP_FAST_RECEIVE) == null)
+            _options.setProperty(I2PClient.PROP_FAST_RECEIVE, "true");
+        if (_options.getProperty(I2PClient.PROP_RELIABILITY) == null)
+            _options.setProperty(I2PClient.PROP_RELIABILITY, "none");
     }
 
     /** save some memory, don't pass along the pointless properties */
@@ -278,6 +284,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         try {
             _producer.updateTunnels(this, 0);
         } catch (I2PSessionException ise) {}
+    }
+
+    /**
+     *  @since 0.9.4
+     */
+    public boolean getFastReceive() {
+        return _fastReceive;
     }
 
     void setLeaseSet(LeaseSet ls) {
@@ -515,9 +528,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  Needs work.
      */
     protected class AvailabilityNotifier implements Runnable {
-        private List _pendingIds;
-        private List _pendingSizes;
-        private boolean _alive;
+        private final List _pendingIds;
+        private final List _pendingSizes;
+        private volatile boolean _alive;
  
         public AvailabilityNotifier() {
             _pendingIds = new ArrayList(2);

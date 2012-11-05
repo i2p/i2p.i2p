@@ -22,14 +22,7 @@ input.default {
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigHomeHandler" id="formhandler" scope="request" />
-<% formhandler.storeMethod(request.getMethod()); %>
-<jsp:setProperty name="formhandler" property="*" />
-<jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
-<jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
-<jsp:getProperty name="formhandler" property="allMessages" />
-<%
-    String pageNonce = formhandler.getNewNonce();
-%>
+<%@include file="formhandler.jsi" %>
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 

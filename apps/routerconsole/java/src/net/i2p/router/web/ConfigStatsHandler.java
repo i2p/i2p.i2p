@@ -116,9 +116,10 @@ public class ConfigStatsHandler extends FormHandler {
             addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
         if (fullChanged) {
             if (_isFull)
-                addFormNotice(_("Full statistics enabled - restart required to take effect"));
+                addFormNotice(_("Full statistics enabled"));
             else
-                addFormNotice(_("Full statistics disabled - restart required to take effect"));
+                addFormNotice(_("Full statistics disabled"));
+            addFormNotice(_("Restart required to take effect"));
         }
         if (graphsChanged)
             addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));

@@ -133,26 +133,24 @@ class RouterThrottleImpl implements RouterThrottle {
 
         //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
         if(r != null) {
-            double totalSendProcessingTimeEvents = r.getCurrentEventCount() + r.getLastEventCount();
+            long current = r.getCurrentEventCount();
+            long last = r.getLastEventCount();
+            long total = current + last;
             double avgSendProcessingTime = 0;
             double currentSendProcessingTime = 0;
             double lastSendProcessingTime = 0;
             
             //Calculate times
-            if(r.getCurrentEventCount() > 0) {
-                currentSendProcessingTime = r.getCurrentTotalValue()/r.getCurrentEventCount();
-            }
-            if(r.getLastEventCount() > 0) {
-                lastSendProcessingTime = r.getLastTotalValue()/r.getLastEventCount();
-            }
-            if(totalSendProcessingTimeEvents > 0) {
-                avgSendProcessingTime =  (r.getCurrentTotalValue() + r.getLastTotalValue())/totalSendProcessingTimeEvents;
-            }
-            else {
+            if(total > 0) {
+                if(current > 0)
+                    currentSendProcessingTime = r.getCurrentTotalValue() / current;
+                if(last > 0)
+                    lastSendProcessingTime = r.getLastTotalValue() / last;
+                avgSendProcessingTime =  (r.getCurrentTotalValue() + r.getLastTotalValue()) / total;
+            } else {
                 avgSendProcessingTime = r.getAverageValue();
-                if(_log.shouldLog(Log.WARN)) {
-                    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
-                }
+                //if(_log.shouldLog(Log.WARN))
+                //    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
             }
 
             int maxProcessingTime = _context.getProperty(PROP_MAX_PROCESSINGTIME, DEFAULT_MAX_PROCESSINGTIME);
@@ -162,8 +160,12 @@ class RouterThrottleImpl implements RouterThrottle {
                     || currentSendProcessingTime > maxProcessingTime
                     || lastSendProcessingTime > maxProcessingTime)) {
                 if(_log.shouldLog(Log.WARN)) {
-                    _log.warn("Refusing tunnel request due to sendProcessingTime of " + avgSendProcessingTime
-                            + " ms over the last two minutes, which is too much.");
+                    _log.warn("Refusing tunnel request due to sendProcessingTime " +
+                              ((int)currentSendProcessingTime) + " / " +
+                              ((int)lastSendProcessingTime) + " / " +
+                              ((int)avgSendProcessingTime) + " / " +
+                              maxProcessingTime +
+                              " current/last/avg/max ms");
                 }
                 setTunnelStatus(_x("Rejecting tunnels: High message delay"));
                 return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;

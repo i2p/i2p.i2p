@@ -55,12 +55,23 @@
             </div>
         </div>    
     </div>
+<%
 
+  if (indexBean.isInitialized()) {
+
+%>
     <div id="globalOperationsPanel" class="panel">
         <div class="header"></div>
         <div class="footer">
             <div class="toolbox">
-                <a class="control" href="wizard"><%=intl._("Tunnel Wizard")%></a> <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all"><%=intl._("Stop All")%></a> <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all"><%=intl._("Start All")%></a> <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all"><%=intl._("Restart All")%></a> <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration"><%=intl._("Reload Config")%></a>
+                <a class="control" href="wizard"><%=intl._("Tunnel Wizard")%></a>
+                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all"><%=intl._("Stop All")%></a>
+                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all"><%=intl._("Start All")%></a>
+                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all"><%=intl._("Restart All")%></a>
+<%--
+                //this is really bad because it stops and restarts all tunnels, which is probably not what you want
+                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration"><%=intl._("Reload Config")%></a>
+--%>
             </div>
         </div> 
     </div>
@@ -285,7 +296,9 @@
             </label>
             <div class="text">
             <% String cdest = indexBean.getClientDestination(curClient);
-               if (cdest.length() > 0) {
+               if (cdest.length() > 70) { // Probably a B64 (a B32 is 60 chars) so truncate
+                   %><%=cdest.substring(0, 45)%>&hellip;<%=cdest.substring(cdest.length() - 15, cdest.length())%><%
+               } else if (cdest.length() > 0) {
                    %><%=cdest%><%
                } else {
                    %><i><%=intl._("none")%></i><%
@@ -327,6 +340,11 @@
             </form>
         </div>
     </div>
+<%
+
+  }  // isInitialized()
+
+%>
     <div id="pageFooter">
     </div>
 </body>

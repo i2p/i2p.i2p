@@ -21,7 +21,7 @@ Proxy-Connection: close
 De eepsite was niet bereikbaar.
 De eepsite is offline, er is een netwerk verstopping,
 of je router is niet goed geïntegreerd met peers.
-Probeer <a href="javascript: window.location.reload()">opnieuw</a>.
+Probeer <a href="javascript:window.location.reload()">opnieuw</a>.
 </p>
 <hr>
 <p>

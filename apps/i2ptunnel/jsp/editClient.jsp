@@ -31,7 +31,11 @@
 <body id="tunnelEditPage">
     <div id="pageHeader">
     </div>
+<%
 
+  if (editBean.isInitialized()) {
+
+%>
     <form method="post" action="list">
 
         <div id="tunnelEditPanel" class="panel">
@@ -429,19 +433,19 @@
                 <label>
                     <%=intl._("Enable")%>:
                 </label>
-                <input value="1" type="checkbox" id="proxyAuth" name="proxyAuth" title="Check to require authorization for this service"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="checkbox" id="startOnLoad" name="proxyAuth" title="Check to require authorization for this service"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="portField" class="rowItem">
                 <label>
                     <%=intl._("Username")%>:
                 </label>
-                <input type="text" id="clientPort" name="proxyUsername" title="Set username for this service" value="<%=editBean.getProxyUsername(curTunnel)%>" class="freetext" />                
+                <input type="text" id="clientPort" name="proxyUsername" title="Set username for this service" value="" class="freetext" />                
             </div>
             <div id="portField" class="rowItem">
                 <label>
                     <%=intl._("Password")%>:
                 </label>
-                <input type="password" id="clientPort" name="proxyPassword" title="Set password for this service" value="<%=editBean.getProxyPassword(curTunnel)%>" class="freetext" />                
+                <input type="password" id="clientPort" name="proxyPassword" title="Set password for this service" value="" class="freetext" />                
             </div>
             <div class="subdivider">
                 <hr />
@@ -453,7 +457,7 @@
                 <label>
                     <%=intl._("Enable")%>:
                 </label>
-                <input value="1" type="checkbox" id="outproxyAuth" name="outproxyAuth" title="Check if the outproxy requires authorization"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="checkbox" id="startOnLoad" name="outproxyAuth" title="Check if the outproxy requires authorization"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="portField" class="rowItem">
                 <label>
@@ -508,5 +512,12 @@
     </form>
     <div id="pageFooter">
         </div>
+<%
+
+  } else {
+     %>Tunnels are not initialized yet, please reload in two minutes.<%
+  }  // isInitialized()
+
+%>
     </body>
 </html>

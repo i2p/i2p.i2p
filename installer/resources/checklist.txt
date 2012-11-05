@@ -6,12 +6,10 @@ Sync with mtn.i2p2.i2p
 Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p
 Copy over override.properties to set build.built-by
 Double-check trust list
-Deploy the Jetty archive, a clean checkout lacks it
 
 Change revision in:
 	history.txt
 	installer/install.xml
-	installer/resources/news.xml
 	core/java/src/net/i2p/CoreVersion.java
 	router/java/src/net/i2p/router/RouterVersion.java
 		(change to BUILD = 0 and EXTRA = "")
@@ -85,6 +83,7 @@ Website files to change:
 	index_*.html
 	hosts.txt if it changed (copy from i2p.i2p mtn branch)
         release-x.y.z.html (new)
+        static/news/news.xml
 	Sync with mtn.i2p2.i2p
 
 Announce on:

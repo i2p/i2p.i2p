@@ -29,7 +29,7 @@ public class LogsHelper extends HelperBase {
      */
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
-        return _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b><br><br>" + str;
+        return "<p>" + _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b></p>" + str;
     }
     
     /**
@@ -73,10 +73,10 @@ public class LogsHelper extends HelperBase {
         File f = wrapperLogFile(_context);
         String str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
         if (str == null) 
-            return _("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b>";
+            return "<p>" + _("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
         else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            return _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b> <pre>" + str + "</pre>";
+            return "<p>" + _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p><pre>" + str + "</pre>";
         }
     }
     
@@ -97,6 +97,9 @@ public class LogsHelper extends HelperBase {
         buf.append("<ul>");
         for (int i = msgs.size() - 1; i >= 0; i--) { 
             String msg = msgs.get(i);
+            // don't display the dup message if it is last
+            if (i == 0 && msg.contains("&darr;"))
+                break;
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             msg = msg.replace("&amp;darr;", "&darr;");  // hack - undo the damage (LogWriter)
             // remove  last \n that LogRecordFormatter added

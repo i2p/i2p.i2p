@@ -1,5 +1,6 @@
 package net.i2p.client.streaming;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
@@ -16,7 +17,8 @@ import net.i2p.util.Log;
  * This contains solely the data that goes out on the wire,
  * including the local and remote port which is embedded in
  * the I2CP overhead, not in the packet itself.
- * For local state saved for outbound packets, see PacketLocal.
+ * This is the class used for inbound packets.
+ * For local state saved for outbound packets, see the PacketLocal extension.
  *
  * <p>
  *
@@ -708,5 +710,15 @@ class Packet {
         if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
         if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
         return buf.toString();
+    }
+
+    /** Generate a pcap/tcpdump-compatible format,
+     *  so we can use standard debugging tools.
+     */
+    public void logTCPDump(Connection con) {
+            try {
+                I2PSocketManagerFull.pcapWriter.write(this, con);
+            } catch (IOException ioe) {
+            }
     }
 }

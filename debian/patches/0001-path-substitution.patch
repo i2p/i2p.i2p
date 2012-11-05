@@ -127,7 +127,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1871,18 +1816,9 @@
+@@ -1874,18 +1819,9 @@
              status
              ;;
  

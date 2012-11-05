@@ -70,11 +70,11 @@ public class NTCPTransport extends TransportImpl {
     private static final long[] RATES = { 10*60*1000 };
 
     /**
-     *  To prevent trouble. To be raised to 1024 in 0.9.4.
+     *  To prevent trouble. 1024 as of 0.9.4.
      *
      *  @since 0.9.3
      */
-    private static final int MIN_PEER_PORT = 500;
+    private static final int MIN_PEER_PORT = 1024;
 
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
@@ -94,7 +94,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.failsafeCloses", "How many times do we need to proactively close an idle connection to a peer at any given failsafe pass?", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.failsafeInvalid", "How many times do we close a connection to a peer to work around a JVM bug?", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.accept", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.attemptShitlistedPeer", "", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.attemptBanlistedPeer", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.attemptUnreachablePeer", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.closeOnBacklog", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedIOE", "", "ntcp", RATES);
@@ -167,7 +167,7 @@ public class NTCPTransport extends TransportImpl {
     void inboundEstablished(NTCPConnection con) {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1);
         markReachable(con.getRemotePeer().calculateHash(), true);
-        //_context.shitlist().unshitlistRouter(con.getRemotePeer().calculateHash());
+        //_context.banlist().unbanlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old;
         synchronized (_conLock) {
             old = _conByIdent.put(con.getRemotePeer().calculateHash(), con);
@@ -281,10 +281,10 @@ public class NTCPTransport extends TransportImpl {
             return null;
         }
         Hash peer = toAddress.getIdentity().calculateHash();
-        if (_context.shitlist().isShitlisted(peer, STYLE)) {
-            // we aren't shitlisted in general (since we are trying to get a bid), but we have
-            // recently shitlisted the peer on the NTCP transport, so don't try it
-            _context.statManager().addRateData("ntcp.attemptShitlistedPeer", 1);
+        if (_context.banlist().isBanlisted(peer, STYLE)) {
+            // we aren't banlisted in general (since we are trying to get a bid), but we have
+            // recently banlisted the peer on the NTCP transport, so don't try it
+            _context.statManager().addRateData("ntcp.attemptBanlistedPeer", 1);
             return null;
         } else if (isUnreachable(peer)) {
             _context.statManager().addRateData("ntcp.attemptUnreachablePeer", 1);
@@ -302,7 +302,7 @@ public class NTCPTransport extends TransportImpl {
         if (addr == null) {
             markUnreachable(peer);
             //_context.statManager().addRateData("ntcp.bidRejectedNoNTCPAddress", 1);
-            //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "No NTCP address", STYLE);
+            //_context.banlist().banlistRouter(toAddress.getIdentity().calculateHash(), "No NTCP address", STYLE);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("no bid when trying to send to " + peer + " as they don't have an ntcp address");
             return null;
@@ -311,7 +311,7 @@ public class NTCPTransport extends TransportImpl {
         if ( (addr.getPort() < MIN_PEER_PORT) || (ip == null) ) {
             _context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
             markUnreachable(peer);
-            //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
+            //_context.banlist().banlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("no bid when trying to send to " + peer + " as they don't have a valid ntcp address");
             return null;

@@ -613,6 +613,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                    "Rcvd tokens: ").append(_incomingTokens.size()).append("<br>" +
                    "Pending queries: ").append(_sentQueries.size()).append("<br>");
         _tracker.renderStatusHTML(buf);
+        _knownNodes.renderStatusHTML(buf);
         return buf.toString();
     }
 
@@ -1107,8 +1108,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (nInfo.equals(_myNodeInfo))
             return _myNodeInfo;
         NodeInfo rv = _knownNodes.putIfAbsent(nInfo);
-        if (rv == null)
+        if (rv == null) {
             rv = nInfo;
+            // if we didn't know about it before, set the timestamp
+            // so it isn't immediately removed by the DHTNodes cleaner
+            rv.getNID().setLastSeen();
+        }
         return rv;
     }
 
@@ -1518,7 +1523,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private class Cleaner extends SimpleTimer2.TimedEvent {
 
         public Cleaner() {
-            super(SimpleTimer2.getInstance(), CLEAN_TIME);
+            super(SimpleTimer2.getInstance(), 7 * CLEAN_TIME);
         }
 
         public void timeReached() {
