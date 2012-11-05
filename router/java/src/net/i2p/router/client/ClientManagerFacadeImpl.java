@@ -110,6 +110,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
      * within the timeout specified, queue up the onFailedJob.  This call does not
      * block.
      *
+     * UNUSED, the call below without jobs is always used.
+     *
      * @param dest Destination from which the LeaseSet's authorization should be requested
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases)

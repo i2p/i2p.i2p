@@ -31,7 +31,7 @@ class RequestLeaseSetJob extends JobImpl {
     private final ClientConnectionRunner _runner;
     private final LeaseRequestState _requestState;
     
-    public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseSet set, long expiration, Job onCreate, Job onFail, LeaseRequestState state) {
+    public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseRequestState state) {
         super(ctx);
         _log = ctx.logManager().getLog(RequestLeaseSetJob.class);
         _runner = runner;
@@ -42,6 +42,7 @@ class RequestLeaseSetJob extends JobImpl {
     }
     
     public String getName() { return "Request Lease Set"; }
+
     public void runJob() {
         if (_runner.isDead()) return;
         
@@ -59,21 +60,23 @@ class RequestLeaseSetJob extends JobImpl {
         msg.setSessionId(_runner.getSessionId());
         
         for (int i = 0; i < _requestState.getRequested().getLeaseCount(); i++) {
-            msg.addEndpoint(_requestState.getRequested().getLease(i).getGateway(), _requestState.getRequested().getLease(i).getTunnelId());
+            msg.addEndpoint(_requestState.getRequested().getLease(i).getGateway(),
+                            _requestState.getRequested().getLease(i).getTunnelId());
         }
         
         try {
             //_runner.setLeaseRequest(state);
             _runner.doSend(msg);
-            getContext().jobQueue().addJob(new CheckLeaseRequestStatus(getContext(), _requestState));
-            return;
+            getContext().jobQueue().addJob(new CheckLeaseRequestStatus());
         } catch (I2CPMessageException ime) {
             getContext().statManager().addRateData("client.requestLeaseSetDropped", 1, 0);
             _log.error("Error sending I2CP message requesting the lease set", ime);
             _requestState.setIsSuccessful(false);
-            _runner.setLeaseRequest(null);
-            _runner.disconnectClient("I2CP error requesting leaseSet");
-            return;
+            if (_requestState.getOnFailed() != null)
+                RequestLeaseSetJob.this.getContext().jobQueue().addJob(_requestState.getOnFailed());
+            _runner.failLeaseRequest(_requestState);
+            // Don't disconnect, the tunnel will retry
+            //_runner.disconnectClient("I2CP error requesting leaseSet");
         }
     }
     
@@ -84,14 +87,12 @@ class RequestLeaseSetJob extends JobImpl {
      *
      */
     private class CheckLeaseRequestStatus extends JobImpl {
-        private final LeaseRequestState _req;
         private final long _start;
         
-        public CheckLeaseRequestStatus(RouterContext enclosingContext, LeaseRequestState state) {
-            super(enclosingContext);
-            _req = state;
+        public CheckLeaseRequestStatus() {
+            super(RequestLeaseSetJob.this.getContext());
             _start = System.currentTimeMillis();
-            getTiming().setStartAfter(state.getExpiration());
+            getTiming().setStartAfter(_requestState.getExpiration());
         }
         
         public void runJob() {
@@ -100,20 +101,22 @@ class RequestLeaseSetJob extends JobImpl {
                     _log.debug("Already dead, dont try to expire the leaseSet lookup");
                 return;
             }
-            if (_req.getIsSuccessful()) {
+            if (_requestState.getIsSuccessful()) {
                 // we didn't fail
-                RequestLeaseSetJob.CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetSuccess", 1, 0);
+                CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetSuccess", 1);
                 return;
             } else {
-                RequestLeaseSetJob.CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetTimeout", 1, 0);
+                CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetTimeout", 1);
                 if (_log.shouldLog(Log.ERROR)) {
                     long waited = System.currentTimeMillis() - _start;
-                    _log.error("Failed to receive a leaseSet in the time allotted (" + waited + "): " + _req + " for " 
+                    _log.error("Failed to receive a leaseSet in the time allotted (" + waited + "): " + _requestState + " for " 
                              + _runner.getConfig().getDestination().calculateHash().toBase64());
                 }
-                _runner.disconnectClient("Took too long to request leaseSet");
-                if (_req.getOnFailed() != null)
-                    RequestLeaseSetJob.this.getContext().jobQueue().addJob(_req.getOnFailed());
+                if (_requestState.getOnFailed() != null)
+                    RequestLeaseSetJob.this.getContext().jobQueue().addJob(_requestState.getOnFailed());
+                _runner.failLeaseRequest(_requestState);
+                // Don't disconnect, the tunnel will retry
+                //_runner.disconnectClient("Took too long to request leaseSet");
             }
         }
         public String getName() { return "Check LeaseRequest Status"; }

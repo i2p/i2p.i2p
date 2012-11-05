@@ -71,6 +71,7 @@ class ClientConnectionRunner {
     private final Map<MessageId, Payload> _messages; 
     /** lease set request state, or null if there is no request pending on at the moment */
     private LeaseRequestState _leaseRequest;
+    private int _consecutiveLeaseRequestFails;
     /** currently allocated leaseSet, or null if none is allocated */
     private LeaseSet _currentLeaseSet;
     /** set of messageIds created but not yet ACCEPTED */
@@ -100,6 +101,7 @@ class ClientConnectionRunner {
     // e.g. on local access
     private static final int MAX_MESSAGE_ID = 0x4000000;
 
+    private static final int MAX_LEASE_FAILS = 5;
     private static final int BUF_SIZE = 32*1024;
 
     /** @since 0.9.2 */
@@ -191,12 +193,17 @@ class ClientConnectionRunner {
     /** data for the current leaseRequest, or null if there is no active leaseSet request */
     LeaseRequestState getLeaseRequest() { return _leaseRequest; }
 
-    void setLeaseRequest(LeaseRequestState req) { 
+    /** @param req non-null */
+    public void failLeaseRequest(LeaseRequestState req) { 
+        boolean disconnect = false;
         synchronized (this) {
-            if ( (_leaseRequest != null) && (req != _leaseRequest) )
-                _log.error("Changing leaseRequest from " + _leaseRequest + " to " + req);
-            _leaseRequest = req; 
+            if (_leaseRequest == req) {
+                _leaseRequest = null;
+                disconnect = ++_consecutiveLeaseRequestFails > MAX_LEASE_FAILS;
+            }
         }
+        if (disconnect)
+            disconnectClient("Too many leaseset request fails");
     }
 
     /** already closed? */
@@ -287,6 +294,7 @@ class ClientConnectionRunner {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("LeaseSet created fully: " + state + " / " + ls);
                 _leaseRequest = null;
+                _consecutiveLeaseRequestFails = 0;
             }
         }
         if ( (state != null) && (state.getOnGranted() != null) )
@@ -351,9 +359,8 @@ class ClientConnectionRunner {
             _acceptedPending.add(id);
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("** Receiving message [" + id.getMessageId() + "] with payload of size [" 
-                       + payload.getSize() + "]" + " for session [" + _sessionId.getSessionId() 
-                       + "]");
+            _log.debug("** Receiving message " + id.getMessageId() + " with payload of size " 
+                       + payload.getSize() + " for session " + _sessionId.getSessionId());
         //long beforeDistribute = _context.clock().now();
         // the following blocks as described above
         SessionConfig cfg = _config;
@@ -380,7 +387,7 @@ class ClientConnectionRunner {
         if (sid == null) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Acking message send [accepted]" + id + " / " + nonce + " for sessionId " 
-                       + sid, new Exception("sendAccepted"));
+                       + sid);
         MessageStatusMessage status = new MessageStatusMessage();
         status.setMessageId(id.getMessageId()); 
         status.setSessionId(sid.getSessionId());
@@ -486,10 +493,11 @@ class ClientConnectionRunner {
                 return; // already requesting
             } else {
                 _leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob, _context.clock().now() + expirationTime, set);
-                _log.debug("Not already requesting, continue to request " + set);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("New request: " + state);
             }
         }
-        _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, set, _context.clock().now() + expirationTime, onCreateJob, onFailedJob, state));
+        _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, state));
     }
 
     private class Rerequest implements SimpleTimer.TimedEvent {
@@ -646,8 +654,8 @@ class ClientConnectionRunner {
             if (!alreadyAccepted(_messageId)) {
                 _log.warn("Almost send an update for message " + _messageId + " to " 
                           + MessageStatusMessage.getStatusString(msg.getStatus()) 
-                          + " for session [" + _sessionId.getSessionId() 
-                          + "] before they knew the messageId!  delaying .5s");
+                          + " for session " + _sessionId.getSessionId() 
+                          + " before they knew the messageId!  delaying .5s");
                 _lastTried = _context.clock().now();
                 requeue(REQUEUE_DELAY);
                 return;
@@ -680,15 +688,14 @@ class ClientConnectionRunner {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.info("Updating message status for message " + _messageId + " to " 
                               + MessageStatusMessage.getStatusString(msg.getStatus()) 
-                              + " for session [" + _sessionId.getSessionId() 
-                              + "] (with nonce=2), retrying after [" 
-                              + (_context.clock().now() - _lastTried) 
-                              + "]");
+                              + " for session " + _sessionId.getSessionId() 
+                              + " (with nonce=2), retrying after " 
+                              + (_context.clock().now() - _lastTried));
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating message status for message " + _messageId + " to " 
                                + MessageStatusMessage.getStatusString(msg.getStatus()) 
-                               + " for session [" + _sessionId.getSessionId() + "] (with nonce=2)");
+                               + " for session " + _sessionId.getSessionId() + " (with nonce=2)");
             }
 
             try {
