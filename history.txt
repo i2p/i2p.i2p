@@ -1,3 +1,7 @@
+2012-11-10 kytv
+* eepget: Add logic to figure out the path to java.exe (java isn't always added to the system path
+  in Windows) (ticket #769)
+
 2012-11-05 zzz
  * Console:
    - Fix NPE after restart (ticket #763)
