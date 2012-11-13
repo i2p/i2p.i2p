@@ -215,11 +215,12 @@ public class StatsGenerator {
                 buf.append(")");
             }
             if (curRate.getSummaryListener() != null) {
-                buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
-                buf.append("&amp;period=").append(periods[i]);
+                buf.append(" <a href=\"graph?stat=").append(name)
+                   .append('.').append(periods[i]);
                 buf.append("\">").append(_("Graph Data")).append("</a> - ");
-                buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
-                buf.append("&amp;period=").append(periods[i]).append("&amp;showEvents=true\">").append(_("Graph Event Count")).append("</a> - ");
+                buf.append(" <a href=\"graph?stat=").append(name)
+                   .append('.').append(periods[i]);
+                buf.append("&amp;showEvents=true\">").append(_("Graph Event Count")).append("</a> - ");
                 buf.append("<a href=\"viewstat.jsp?stat=").append(name);
                 buf.append("&amp;period=").append(periods[i]);
                 buf.append("&amp;format=xml\">").append(_("Export Data as XML")).append("</a>");

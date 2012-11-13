@@ -1,3 +1,13 @@
+2012-11-13 zzz
+ * Bandwidth Limiter: Fix stats broken in -1
+ * HTTP Proxy: Store referrer of new addresses in address book
+ * NTCP:
+   - Fix NPE (ticket #770)
+   - Use ByteCache for buffers
+ * SOCKS: Reduce log level of connect errors
+ * SSU: Fix bug that would drop 512 byte messages
+ * stats.jsp: Link to graph page, not single image
+
 2012-11-10 kytv
 * eepget: Add logic to figure out the path to java.exe (java isn't always added to the system path
   in Windows) (ticket #769)
@@ -92,7 +102,7 @@
    - Prep for RouterApp interface by storing context in a field,
      shuffle around what's static and what's not (ticket #347)
    - Convert to RouterApp interface
-   - Convert from basic to digest authentication
+   - Convert from basic to digest authentication (ticket #652)
    - Use new password manager (ticket #731)
  * Core: New password manager for storing passwords in router.config
    in consistent ways, including salting and hashing if possible.
