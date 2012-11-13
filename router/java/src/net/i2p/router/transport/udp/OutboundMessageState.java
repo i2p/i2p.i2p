@@ -402,16 +402,21 @@ class OutboundMessageState implements CDPQEntry {
         int end = start + fragmentSize(fragmentNum);
         int toSend = end - start;
         byte buf[] = _messageBuf.getData();
-        if ( (buf != null) && (start + toSend < buf.length) && (out != null) && (outOffset + toSend < out.length) ) {
-            System.arraycopy(_messageBuf.getData(), start, out, outOffset, toSend);
+        if ( (buf != null) && (start + toSend <= buf.length) && (outOffset + toSend <= out.length) ) {
+            System.arraycopy(buf, start, out, outOffset, toSend);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Raw fragment[" + fragmentNum + "] for " + _messageId 
                            + "[" + start + "-" + (start+toSend) + "/" + _totalSize + "/" + _fragmentSize + "]: " 
                            + Base64.encode(out, outOffset, toSend));
             return toSend;
+        } else if (buf == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error: null buf");
         } else {
-            return -1;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error: " + start + '/' + end + '/' + outOffset + '/' + out.length);
         }
+        return -1;
     }
     
     /**
