@@ -35,7 +35,7 @@ public class RouterAppManager implements ClientAppManager {
             app.startup();
         } catch (Throwable t) {
             _clients.remove(app);
-            _log.error("Client " + app + " failed to start");
+            _log.error("Client " + app + " failed to start", t);
         }
     }
 
