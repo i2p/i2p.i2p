@@ -336,6 +336,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             String userAgent = null;
             String authorization = null;
             int remotePort = 0;
+            String referer = null;
             while((line = reader.readLine(method)) != null) {
                 line = line.trim();
                 if(_log.shouldLog(Log.DEBUG)) {
@@ -744,12 +745,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // browser to browser
                         line = null;
                         continue;
-                    } else if(lowercaseLine.startsWith("referer: ") &&
-                            !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_REFERER))) {
-                        // Shouldn't we be more specific, like accepting in-site referers ?
-                        //line = "Referer: i2p";
-                        line = null;
-                        continue; // completely strip the line
+                    } else if (lowercaseLine.startsWith("referer: ")) {
+                        // save for address helper form below
+                        referer = line.substring(9);
+                        if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_REFERER))) {
+                            // Shouldn't we be more specific, like accepting in-site referers ?
+                            //line = "Referer: i2p";
+                            line = null;
+                            continue; // completely strip the line
+                        }
                     } else if(lowercaseLine.startsWith("via: ") &&
                             !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_VIA))) {
                         //line = "Via: i2p";
@@ -947,7 +951,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if(ahelperNew && "GET".equals(method) &&
                     (userAgent == null || !userAgent.startsWith("Wget")) &&
                     !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER))) {
-                writeHelperSaveForm(out, destination, ahelperKey, targetRequest);
+                writeHelperSaveForm(out, destination, ahelperKey, targetRequest, referer);
                 s.close();
                 return;
             }
@@ -1011,7 +1015,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     /** @since 0.8.7 */
-    private void writeHelperSaveForm(OutputStream out, String destination, String ahelperKey, String targetRequest) throws IOException {
+    private void writeHelperSaveForm(OutputStream out, String destination, String ahelperKey,
+                                     String targetRequest, String referer) throws IOException {
         if(out == null) {
             return;
         }
@@ -1042,6 +1047,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             out.write(("<br><button type=\"submit\" name=\"master\" value=\"master\">" + _("Save {0} to master address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
             out.write(("<button type=\"submit\" name=\"private\" value=\"private\">" + _("Save {0} to private address book and continue to eepsite", destination) + "</button>\n").getBytes("UTF-8"));
         }
+        // Firefox (and others?) don't send referer to meta refresh target, which is
+        // what the jump servers use, so this isn't that useful.
+        if (referer != null)
+            out.write(("<input type=\"hidden\" name=\"referer\" value=\"" + referer + "\">\n").getBytes("UTF-8"));
         out.write(("<input type=\"hidden\" name=\"url\" value=\"" + targetRequest + "\">\n" +
                 "</form></div></div>").getBytes());
         writeFooter(out);

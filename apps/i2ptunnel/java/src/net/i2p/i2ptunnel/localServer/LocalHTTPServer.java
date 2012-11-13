@@ -17,6 +17,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
+import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
 /**
@@ -133,6 +134,7 @@ public abstract class LocalHTTPServer {
             String host = opts.get("host");
             String b64Dest = opts.get("dest");
             String nonce = opts.get("nonce");
+            String referer = opts.get("referer");
             String book = "privatehosts.txt";
             if (opts.get("master") != null)
                 book = "userhosts.txt";
@@ -156,7 +158,12 @@ public abstract class LocalHTTPServer {
                     NamingService ns = I2PAppContext.getGlobalContext().namingService();
                     Properties nsOptions = new Properties();
                     nsOptions.setProperty("list", book);
-                    nsOptions.setProperty("s", _("Added via address helper"));
+                    if (referer != null && referer.startsWith("http")) {
+                        String from = "<a href=\"" + referer + "\">" + referer + "</a>";
+                        nsOptions.setProperty("s", _("Added via address helper from {0}", from));
+                    } else {
+                        nsOptions.setProperty("s", _("Added via address helper"));
+                    }
                     boolean success = ns.put(host, dest, nsOptions);
                     writeRedirectPage(out, success, host, book, url);
                     return;
