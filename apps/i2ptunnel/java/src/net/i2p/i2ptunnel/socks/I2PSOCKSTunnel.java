@@ -22,6 +22,7 @@ import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelRunner;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.util.EventDispatcher;
+import net.i2p.util.Log;
 
 public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
@@ -55,7 +56,8 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             new I2PTunnelRunner(clientSock, destSock, sockLock, null, mySockets);
         } catch (SOCKSException e) {
-            _log.error("Error from SOCKS connection", e);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error from SOCKS connection", e);
             closeSocket(s);
         }
     }

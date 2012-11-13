@@ -15,6 +15,7 @@ import net.i2p.i2ptunnel.irc.IrcOutboundFilter;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 
 /*
  * Pipe SOCKS IRC connections through I2PTunnelIRCClient filtering,
@@ -56,7 +57,8 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
                                           "SOCKS IRC Client " + __clientId + " out", true);
             out.start();
         } catch (SOCKSException e) {
-            _log.error("Error from SOCKS connection", e);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error from SOCKS connection", e);
             closeSocket(s);
         }
     }
