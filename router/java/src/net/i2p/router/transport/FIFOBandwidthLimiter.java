@@ -60,6 +60,8 @@ public class FIFOBandwidthLimiter {
     private final AtomicLong _totalAllocatedInboundBytes = new AtomicLong();
     /** lifetime counter of bytes sent */
     private final AtomicLong _totalAllocatedOutboundBytes = new AtomicLong();
+    // following is temp until switch to PBQ
+    private static final AtomicLong __requestId = new AtomicLong();
 
     /** lifetime counter of tokens available for use but exceeded our maxInboundBurst size */
     //private final AtomicLong _totalWastedInboundBytes = new AtomicLong();
@@ -85,10 +87,10 @@ public class FIFOBandwidthLimiter {
     public FIFOBandwidthLimiter(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthLimiter.class);
-        _context.statManager().createRateStat("bwLimiter.pendingOutboundRequests", "How many outbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        _context.statManager().createRateStat("bwLimiter.pendingInboundRequests", "How many inbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        _context.statManager().createRateStat("bwLimiter.outboundDelayedTime", "How long it takes to honor an outbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.pendingOutboundRequests", "How many outbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.pendingInboundRequests", "How many inbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.outboundDelayedTime", "How long it takes to honor an outbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
         _pendingInboundRequests = new ArrayList(16);
         _pendingOutboundRequests = new ArrayList(16);
         _lastTotalSent = _totalAllocatedOutboundBytes.get();
@@ -218,7 +220,7 @@ public class FIFOBandwidthLimiter {
         satisfyInboundRequests(req.satisfiedBuffer);
         req.satisfiedBuffer.clear();
         if (pending > 0)
-            _context.statManager().addRateData("bwLimiter.pendingInboundRequests", pending, pending);
+            _context.statManager().addRateData("bwLimiter.pendingInboundRequests", pending);
     }
 
     /**
@@ -244,7 +246,7 @@ public class FIFOBandwidthLimiter {
         satisfyOutboundRequests(req.satisfiedBuffer);
         req.satisfiedBuffer.clear();
         if (pending > 0)
-            _context.statManager().addRateData("bwLimiter.pendingOutboundRequests", pending, pending);
+            _context.statManager().addRateData("bwLimiter.pendingOutboundRequests", pending);
     }
     
     void setInboundBurstKBps(int kbytesPerSecond) {
@@ -490,7 +492,7 @@ public class FIFOBandwidthLimiter {
                             + waited
                             + "ms) pending " + _pendingInboundRequests.size());
             if (waited > 10)
-                _context.statManager().addRateData("bwLimiter.inboundDelayedTime", waited, waited);
+                _context.statManager().addRateData("bwLimiter.inboundDelayedTime", waited);
         }
     }
     
@@ -557,7 +559,7 @@ public class FIFOBandwidthLimiter {
                 _pendingInboundRequests.remove(i);
                 i--;
                 if (waited > 10)
-                    _context.statManager().addRateData("bwLimiter.inboundDelayedTime", waited, waited);
+                    _context.statManager().addRateData("bwLimiter.inboundDelayedTime", waited);
             }
         }
     }
@@ -608,7 +610,7 @@ public class FIFOBandwidthLimiter {
                             + "ms) pending " + _pendingOutboundRequests.size()
                             + ", longest waited " + locked_getLongestOutboundWait() + " out");
             if (waited > 10)
-                _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited, waited);
+                _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited);
         }
     }
     
@@ -693,7 +695,7 @@ public class FIFOBandwidthLimiter {
                 _pendingOutboundRequests.remove(i);
                 i--;
                 if (waited > 10)
-                    _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited, waited);
+                    _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited);
             }
         }
     }
@@ -780,8 +782,8 @@ public class FIFOBandwidthLimiter {
     private static class SimpleRequest implements Request {
         private int _allocated;
         private final int _total;
-        private long _requestId;
-        private long _requestTime;
+        private final long _requestId;
+        private final long _requestTime;
         private int _allocationsSinceWait;
         private boolean _aborted;
         private boolean _waited;
@@ -791,14 +793,18 @@ public class FIFOBandwidthLimiter {
         private final int _priority;
         
         /**
-         *  @param target for debugging, to be removed
+         *  @param priority 0 for now
          */
         public SimpleRequest(int bytes, int priority) {
             satisfiedBuffer = new ArrayList(1);
             _total = bytes;
             _priority = priority;
+            // following two are temp until switch to PBQ
+            _requestTime = System.currentTimeMillis();
+            _requestId = __requestId.incrementAndGet();
         }
 
+        /** uses System clock, not context clock */
         public long getRequestTime() { return _requestTime; }
         public int getTotalRequested() { return _total; }
         public int getPendingRequested() { return _total - _allocated; }
@@ -872,7 +878,8 @@ public class FIFOBandwidthLimiter {
 
         // PQEntry methods
         public int getPriority() { return _priority; };
-        public void setSeqNum(long num) { _requestId = num; };
+        // uncomment for switch to PBQ
+        public void setSeqNum(long num) { /** _requestId = num; */ };
         public long getSeqNum() { return _requestId; };
 
         @Override
