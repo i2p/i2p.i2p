@@ -10,7 +10,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 /** 
  * Coordinate the management of various frequencies and rates within I2P components,
@@ -20,7 +19,6 @@ import net.i2p.util.Log;
  * 
  */
 public class StatManager {
-    private final Log _log;
     private final I2PAppContext _context;
 
     /** stat name to FrequencyStat */
@@ -47,11 +45,10 @@ public class StatManager {
      * appropriate application context itself.
      *
      */
-    public StatManager(I2PAppContext context) {
-        _log = context.logManager().getLog(StatManager.class);
+	public StatManager(I2PAppContext context) {
         _context = context;
-        _frequencyStats = new ConcurrentHashMap(8);
-        _rateStats = new ConcurrentHashMap(128);
+        _frequencyStats = new ConcurrentHashMap<String,FrequencyStat>(8);
+        _rateStats = new ConcurrentHashMap<String,RateStat>(128);
         if (getStatFilter() != null)
             _statLog = new BufferedStatLog(context);
     }
@@ -194,11 +191,11 @@ public class StatManager {
     }
 
     public Set<String> getFrequencyNames() {
-        return new HashSet(_frequencyStats.keySet());
+        return new HashSet<String>(_frequencyStats.keySet());
     }
 
     public Set<String> getRateNames() {
-        return new HashSet(_rateStats.keySet());
+        return new HashSet<String>(_rateStats.keySet());
     }
 
     /** is the given stat a monitored rate? */
@@ -216,12 +213,12 @@ public class StatManager {
      * Map is unsorted.
      */
     public Map<String, SortedSet<String>> getStatsByGroup() {
-        Map<String, SortedSet<String>> groups = new HashMap(32);
+        Map<String, SortedSet<String>> groups = new HashMap<String, SortedSet<String>>(32);
         for (FrequencyStat stat : _frequencyStats.values()) {
             String gname = stat.getGroupName();
             SortedSet<String> names = groups.get(gname);
             if (names == null) {
-                names = new TreeSet();
+                names = new TreeSet<String>();
                 groups.put(gname, names);
             }
             names.add(stat.getName());
@@ -230,7 +227,7 @@ public class StatManager {
             String gname = stat.getGroupName();
             SortedSet<String> names = groups.get(gname);
             if (names == null) {
-                names = new TreeSet();
+                names = new TreeSet<String>();
                 groups.put(gname, names);
             }
             names.add(stat.getName());

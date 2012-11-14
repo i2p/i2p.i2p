@@ -35,7 +35,7 @@ public class Frequency {
      * when did the last event occur?
      * @deprecated unused
      */
-    public long getLastEvent() {
+    public synchronized long getLastEvent() {
             return _lastEvent;
     }
 
@@ -44,7 +44,7 @@ public class Frequency {
      * as calculated during the last event occurrence? 
      * @return milliseconds; returns period + 1 if no events in previous period
      */
-    public double getAverageInterval() {
+    public synchronized double getAverageInterval() {
             return _avgInterval;
     }
 
@@ -53,7 +53,7 @@ public class Frequency {
      * @return milliseconds; returns period + 1 if no events in previous period
      * @deprecated unused
      */
-    public double getMinAverageInterval() {
+    public synchronized double getMinAverageInterval() {
             return _minAverageInterval;
     }
 
@@ -61,45 +61,41 @@ public class Frequency {
      * Calculate how many events would occur in a period given the current (rolling) average.
      * Use getStrictAverageInterval() for the real lifetime average.
      */
-    public double getAverageEventsPerPeriod() {
-        synchronized (this) {
-            if (_avgInterval > 0) return _period / _avgInterval;
-                
-            return 0;
-        }
+    public synchronized double getAverageEventsPerPeriod() {
+    	if (_avgInterval > 0) return _period / _avgInterval;
+
+    	return 0;
     }
 
     /**
      * Calculate how many events would occur in a period given the maximum rolling average.
      * Use getStrictAverageEventsPerPeriod() for the real lifetime average.
      */
-    public double getMaxAverageEventsPerPeriod() {
-        synchronized (this) {
-            if (_minAverageInterval > 0 && _minAverageInterval <= _period) return _period / _minAverageInterval;
+    public synchronized double getMaxAverageEventsPerPeriod() {
+    	if (_minAverageInterval > 0 && _minAverageInterval <= _period) return _period / _minAverageInterval;
 
-            return 0;
-        }
+    	return 0;
     }
 
     /**
      * Over the lifetime of this stat, without any decay or weighting, what was the average interval between events? (ms)
      * @return milliseconds; returns Double.MAX_VALUE if no events ever
      */
-    public double getStrictAverageInterval() {
+    public synchronized double getStrictAverageInterval() {
             long duration = now() - _start;
             if ((duration <= 0) || (_count <= 0)) return Double.MAX_VALUE;
             return duration / (double) _count;
     }
 
     /** using the strict average interval, how many events occur within an average period? */
-    public double getStrictAverageEventsPerPeriod() {
+    public synchronized double getStrictAverageEventsPerPeriod() {
         double avgInterval = getStrictAverageInterval();
         if (avgInterval > 0) return _period / avgInterval;
         return 0;
     }
 
     /** how many events have occurred within the lifetime of this stat? */
-    public long getEventCount() {
+    public synchronized long getEventCount() {
             return _count;
     }
 
