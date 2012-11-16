@@ -356,22 +356,21 @@ class PeerState implements DataLoader
                   + piece + "," + begin + "," + length + ") from "
                   + peer);
 
-    int r = getFirstOutstandingRequest(piece);
-
-    // Unrequested piece number?
-    if (r == -1)
-      {
-        if (_log.shouldLog(Log.INFO))
-          _log.info("Unrequested 'piece: " + piece + ", "
-                      + begin + ", " + length + "' received from "
-                      + peer);
-        return null;
-      }
-
     // Lookup the correct piece chunk request from the list.
     Request req;
     synchronized(this)
       {
+        int r = getFirstOutstandingRequest(piece);
+
+        // Unrequested piece number?
+        if (r == -1) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Unrequested 'piece: " + piece + ", "
+                      + begin + ", " + length + "' received from "
+                      + peer);
+            return null;
+        }
+
         req = outstandingRequests.get(r);
         while (req.getPiece() == piece && req.off != begin
                && r < outstandingRequests.size() - 1)
