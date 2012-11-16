@@ -43,6 +43,7 @@ public class EventLog {
     public static final String NEW_IDENT = "newIdent";
     public static final String OOM = "oom";
     public static final String REKEYED = "rekeyed";
+    public static final String RESEED = "reseed";
     public static final String SOFT_RESTART = "softRestart";
     public static final String STARTED = "started";
     public static final String STOPPED = "stopped";

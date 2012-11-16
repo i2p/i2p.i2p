@@ -22,6 +22,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterClock;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.router.util.RFC822Date;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
@@ -172,6 +173,7 @@ public class Reseeder {
             }	
             _isRunning = false;
             _checker.setStatus("");
+            _context.router().eventLog().addEvent(EventLog.RESEED, Integer.toString(total));
         }
 
         // EepGet status listeners
