@@ -31,7 +31,7 @@ Darwin*)
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
-SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
+SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
         UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
         if [ $UNIXTYPE = "sunos" ]; then
             UNIXTYPE="solaris"
