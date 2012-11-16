@@ -30,7 +30,9 @@ public class TunnelPoolSettings {
     private int _priority;
     
     /** prefix used to override the router's defaults for clients */
-    public static final String  PREFIX_DEFAULT = "router.defaultPool.";
+    // unimplemented
+    //public static final String  PREFIX_DEFAULT = "router.defaultPool.";
+
     /** prefix used to configure the inbound exploratory pool */
     public static final String  PREFIX_INBOUND_EXPLORATORY = "router.inboundPool.";
     /** prefix used to configure the outbound exploratory pool */
@@ -197,7 +199,7 @@ public class TunnelPoolSettings {
                 else if (name.equalsIgnoreCase(prefix + PROP_IP_RESTRICTION))
                     _IPRestriction = getInt(value, DEFAULT_IP_RESTRICTION);
                 else if ((!_isInbound) && name.equalsIgnoreCase(prefix + PROP_PRIORITY))
-                    _IPRestriction = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY, getInt(value, 0)));
+                    _priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY, getInt(value, 0)));
                 else
                     _unknownOptions.setProperty(name.substring((prefix != null ? prefix.length() : 0)), value);
             }
