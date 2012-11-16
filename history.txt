@@ -1,3 +1,10 @@
+2012-11-16 zzz
+ * i2psnark: Fix rare IOOBE (ticket #777)
+ * NetDB:
+   - Implement automatic reseeding (ticket #521)
+   - Increase minimum routers
+ * Tunnels: Fix outbound tunnel message priority (ticket #719)
+
 2012-11-13 zzz
  * Bandwidth Limiter: Fix stats broken in -1
  * HTTP Proxy: Store referrer of new addresses in address book

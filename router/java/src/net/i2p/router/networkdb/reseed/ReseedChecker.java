@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -23,10 +24,10 @@ public class ReseedChecker {
     private final RouterContext _context;
     private final Log _log;
     private final AtomicBoolean _inProgress = new AtomicBoolean();
-    private String _lastStatus = "";
-    private String _lastError = "";
+    private volatile String _lastStatus = "";
+    private volatile String _lastError = "";
 
-    private static final int MINIMUM = 15;
+    public static final int MINIMUM = 50;
 
     /**
      *  All reseeding must be done through this instance.
@@ -64,6 +65,10 @@ public class ReseedChecker {
         File noReseedFileAlt2 = new File(_context.getConfigDir(), ".i2pnoreseed");
         File noReseedFileAlt3 = new File(_context.getConfigDir(), "noreseed.i2p");
         if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
+            if (!Addresses.isConnected()) {
+                _log.logAlways(Log.WARN, "Cannot reseed, no network connection");
+                return false;
+            }
             if (count <= 1)
                 _log.logAlways(Log.INFO, "Downloading peer router information for a new I2P installation");
             else
@@ -96,7 +101,7 @@ public class ReseedChecker {
             }
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Reseed already in prgress");
+                _log.warn("Reseed already in progress");
             return false;
         }
     }

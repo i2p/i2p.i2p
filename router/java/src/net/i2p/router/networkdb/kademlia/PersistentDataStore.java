@@ -46,9 +46,9 @@ class PersistentDataStore extends TransientDataStore {
     private final KademliaNetworkDatabaseFacade _facade;
     private final Writer _writer;
     private final ReadJob _readJob;
-    private boolean _initialized;
+    private volatile boolean _initialized;
     
-    private final static int READ_DELAY = 60*1000;
+    private final static int READ_DELAY = 2*60*1000;
     
     /**
      *  @param dbDir relative path
@@ -319,14 +319,21 @@ class PersistentDataStore extends TransientDataStore {
         return data.getDate();
     }
     
-    /** This is only for manual reseeding? Why bother every 60 sec??? */
+    /**
+     *  This is mostly for manual reseeding, i.e. the user manually
+     *  copies RI files to the directory. Nobody does this,
+     *  so this is run way too often.
+     *  Reseed task calls wakeup() on completion.
+     *  As of 0.9.4, also initiates an automatic reseed if necessary.
+     */
     private class ReadJob extends JobImpl {
-        private boolean _alreadyWarned;
         private long _lastModified;
+        private long _lastReseed;
+        private static final int MIN_ROUTERS = KademliaNetworkDatabaseFacade.MIN_RESEED;
+        private static final long MIN_RESEED_INTERVAL = 90*60*1000;
 
         public ReadJob() {
             super(PersistentDataStore.this._context);
-            _alreadyWarned = false;
         }
 
         public String getName() { return "DB Read Job"; }
@@ -334,7 +341,8 @@ class PersistentDataStore extends TransientDataStore {
         public void runJob() {
             // check directory mod time to save a lot of object churn in scanning all the file names
             long lastMod = _dbDir.lastModified();
-            if (lastMod > _lastModified) {
+            // if size() (= RI + LS) is too low, call anyway to check for reseed
+            if (lastMod > _lastModified || size() < MIN_ROUTERS + 10) {
                 _lastModified = lastMod;
                 _log.info("Rereading new files");
                 // synch with the writer job
@@ -354,9 +362,7 @@ class PersistentDataStore extends TransientDataStore {
 
                 File routerInfoFiles[] = _dbDir.listFiles(RouterInfoFilter.getInstance());
                 if (routerInfoFiles != null) {
-                    routerCount += routerInfoFiles.length;
-                    if (routerInfoFiles.length > 5)
-                        _alreadyWarned = false;
+                    routerCount = routerInfoFiles.length;
                     for (int i = 0; i < routerInfoFiles.length; i++) {
                         // drop out if the router gets killed right after startup
                         if (!_context.router().isAlive())
@@ -373,10 +379,16 @@ class PersistentDataStore extends TransientDataStore {
                     }
                 }
             
-            if (!_alreadyWarned) {
-                _facade.reseedChecker().checkReseed(routerCount);
-                _alreadyWarned = true;
+            if (!_initialized) {
+                if (_facade.reseedChecker().checkReseed(routerCount))
+                    _lastReseed = _context.clock().now();
                 _initialized = true;
+            } else if (_lastReseed < _context.clock().now() - MIN_RESEED_INTERVAL) {
+                int count = Math.min(routerCount, size());
+                if (count < MIN_ROUTERS) {
+                    if (_facade.reseedChecker().checkReseed(count))
+                        _lastReseed = _context.clock().now();
+                }
             }
         }
     }
