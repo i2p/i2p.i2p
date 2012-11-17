@@ -8,11 +8,13 @@ package net.i2p.stat;
 public class RateAverages {
     
     private double average, current, last;
+    private long totalEventCount;
     
     public void reset() {
         average = 0;
         current = 0;
         last = 0;
+        totalEventCount = 0;
     }
 
     public double getAverage() {
@@ -37,6 +39,14 @@ public class RateAverages {
 
     public void setLast(double last) {
         this.last = last;
+    }
+    
+    public long getTotalEventCount() {
+        return totalEventCount;
+    }
+    
+    public void setTotalEventCount(long totalEventCount) {
+        this.totalEventCount = totalEventCount;
     }
     
 }

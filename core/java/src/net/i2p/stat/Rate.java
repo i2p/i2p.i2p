@@ -422,6 +422,8 @@ public class Rate {
     public synchronized void computeAverages(RateAverages out, boolean useLifetime) {
         
         final long total = _currentEventCount + _lastEventCount;
+        out.setTotalEventCount(total);
+        
         if (total <= 0) {
             final double avg = useLifetime ? getAvgOrLifetimeAvg() : getAverageValue();
             out.setAverage(avg);

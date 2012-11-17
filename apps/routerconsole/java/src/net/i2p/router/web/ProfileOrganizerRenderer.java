@@ -16,6 +16,7 @@ import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 
 /**
@@ -218,6 +219,7 @@ class ProfileOrganizerRenderer {
         buf.append("<th class=\"smallhead\">").append(_("1h Fail Rate")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
         buf.append("</tr>");
+        RateAverages ra = new RateAverages();
         for (Iterator<PeerProfile> iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = iter.next();
             Hash peer = prof.getPeer();
@@ -240,9 +242,9 @@ class ProfileOrganizerRenderer {
             buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
             time = now - prof.getLastSendFailed();
             buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-            buf.append("<td align=\"right\">").append(avg(prof, 10*60*1000l)).append("</td>");
-            buf.append("<td align=\"right\">").append(avg(prof, 60*60*1000l)).append("</td>");
-            buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l)).append("</td>");
+            buf.append("<td align=\"right\">").append(avg(prof, 10*60*1000l, ra)).append("</td>");
+            buf.append("<td align=\"right\">").append(avg(prof, 60*60*1000l, ra)).append("</td>");
+            buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l, ra)).append("</td>");
             DBHistory dbh = prof.getDBHistory();
             if (dbh != null) {
                 time = now - dbh.getLastLookupSuccessful();
@@ -253,8 +255,8 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
                 time = now - dbh.getLastStoreFailed();
                 buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-                buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
-                buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
+                buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l, ra)).append("</td>");
+                buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l, ra)).append("</td>");
             } else {
                 for (int i = 0; i < 6; i++)
                     buf.append("<td align=\"right\">").append(_(NA));
@@ -340,31 +342,32 @@ class ProfileOrganizerRenderer {
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
     private final static String NA = HelperBase._x("n/a");
 
-    private String avg (PeerProfile prof, long rate) {
+    private String avg (PeerProfile prof, long rate, RateAverages ra) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
                 return _(NA);
             Rate r = rs.getRate(rate);
             if (r == null)
                 return _(NA);
-            long c = r.getCurrentEventCount() + r.getLastEventCount();
-            if (c == 0)
+            ra.reset();
+            r.computeAverages(ra, false);
+            if (ra.getTotalEventCount() == 0)
                 return _(NA);
-            double d = r.getCurrentTotalValue() + r.getLastTotalValue();
-            return DataHelper.formatDuration2(Math.round(d/c));
+            return DataHelper.formatDuration2(Math.round(ra.getAverage()));
     }
 
-    private String davg (DBHistory dbh, long rate) {
+    private String davg (DBHistory dbh, long rate, RateAverages ra) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
                 return "0%";
             Rate r = rs.getRate(rate);
             if (r == null)
                 return "0%";
-            long c = r.getCurrentEventCount() + r.getLastEventCount();
-            if (c <= 0)
+            ra.reset();
+            r.computeAverages(ra, false);
+            if (ra.getTotalEventCount() <= 0)
                 return "0%";
-            double avg = 0.5 + 100 * (r.getCurrentTotalValue() + r.getLastTotalValue()) / c;
+            double avg = 0.5 + 100 * ra.getAverage();
             return ((int) avg) + "%";
     }
 
