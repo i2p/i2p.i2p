@@ -6,7 +6,6 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -146,7 +145,7 @@ class RouterThrottleImpl implements RouterThrottle {
 
         //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
         if(r != null) {
-            r.computeAverages(ra);
+            r.computeAverages(ra,false);
             
             int maxProcessingTime = _context.getProperty(PROP_MAX_PROCESSINGTIME, DEFAULT_MAX_PROCESSINGTIME);
 
@@ -176,11 +175,9 @@ class RouterThrottleImpl implements RouterThrottle {
             double tunnelGrowthFactor = getTunnelGrowthFactor();
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(10*60*1000);
             if (avgTunnels != null) {
-                double avg = 0;
-                if (avgTunnels.getLastEventCount() > 0) 
-                    avg = avgTunnels.getAverageValue();
-                else
-                    avg = avgTunnels.getLifetimeAverageValue();
+                
+                double avg = avgTunnels.getAvgOrLifetimeAvg();
+                
                 int min = getMinThrottleTunnels();
                 if (avg < min)
                     avg = min;
@@ -217,11 +214,7 @@ class RouterThrottleImpl implements RouterThrottle {
         Rate tunnelTestTime10m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
         if ( (tunnelTestTime1m != null) && (tunnelTestTime10m != null) && (tunnelTestTime1m.getLastEventCount() > 0) ) {
             double avg1m = tunnelTestTime1m.getAverageValue();
-            double avg10m = 0;
-            if (tunnelTestTime10m.getLastEventCount() > 0)
-                avg10m = tunnelTestTime10m.getAverageValue();
-            else
-                avg10m = tunnelTestTime10m.getLifetimeAverageValue();
+            double avg10m = tunnelTestTime10m.getAvgOrLifetimeAvg();
 
             if (avg10m < 5000)
                 avg10m = 5000; // minimum before complaining
@@ -268,11 +261,9 @@ class RouterThrottleImpl implements RouterThrottle {
         if (rs != null) {
             r = rs.getRate(60*1000);
             if (r != null) {
-                long count = r.getLastEventCount() + r.getCurrentEventCount();
-                if (count > 0)
-                    messagesPerTunnel = (r.getLastTotalValue() + r.getCurrentTotalValue()) / count;
-                else
-                    messagesPerTunnel = r.getLifetimeAverageValue();
+                ra.reset();
+                r.computeAverages(ra, true);
+                messagesPerTunnel = ra.getAverage();
             }
         }
         if (messagesPerTunnel < DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE)

@@ -287,6 +287,15 @@ public class Rate {
         return 0.0D;
     }
 
+    /**
+     * @return the average or lifetime average depending on last event count
+     */
+    public synchronized double getAvgOrLifetimeAvg() {
+        if (getLastEventCount() > 0)
+            return getAverageValue();
+        return getLifetimeAverageValue();
+    }
+    
     /** 
      * During the last period, how much of the time was spent actually processing events in proportion 
      * to how many events could have occurred if there were no intervals?
@@ -407,12 +416,15 @@ public class Rate {
     
     /**
      * @param out where to store the computed averages.  
+     * @param useLifetime whether the lifetime average should be used if
+     * there are no events.
      */
-    public synchronized void computeAverages(RateAverages out) {
+    public synchronized void computeAverages(RateAverages out, boolean useLifetime) {
         
         final long total = _currentEventCount + _lastEventCount;
         if (total <= 0) {
-            out.setAverage(getAverageValue());
+            final double avg = useLifetime ? getAvgOrLifetimeAvg() : getAverageValue();
+            out.setAverage(avg);
             return;
         }
         
