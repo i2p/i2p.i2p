@@ -1439,6 +1439,7 @@ class PeerCoordinator implements PeerListener
 
   /**
    *  Called by TrackerClient
+   *  @return the Set itself, modifiable, not a copy, caller should clear()
    *  @since 0.8.4
    */
   Set<PeerID> getPEXPeers() {

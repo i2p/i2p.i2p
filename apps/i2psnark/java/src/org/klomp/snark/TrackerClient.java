@@ -560,6 +560,7 @@ public class TrackerClient implements Runnable {
                          }
                     }
                     rv = pids.size();
+                    pids.clear();
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
