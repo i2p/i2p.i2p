@@ -59,6 +59,7 @@ public class TunnelPoolSettings {
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)
     private static final int MIN_PRIORITY = -25;
     private static final int MAX_PRIORITY = 25;
+    private static final int EXPLORATORY_PRIORITY = 30;
     
     public TunnelPoolSettings(boolean isExploratory, boolean isInbound) {
         _isExploratory = isExploratory;
@@ -74,6 +75,8 @@ public class TunnelPoolSettings {
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
         _randomKey = generateRandomKey();
+        if (_isExploratory && !_isInbound)
+            _priority = EXPLORATORY_PRIORITY;
     }
     
     /** how many tunnels should be available at all times */
@@ -168,7 +171,7 @@ public class TunnelPoolSettings {
     
     /**
      *  Outbound message priority - for outbound tunnels only
-     *  @return -25 to +25, default 0
+     *  @return -25 to +30, default 30 for outbound exploratory and 0 for others
      *  @since 0.9.4
      */
     public int getPriority() { return _priority; }
@@ -198,9 +201,11 @@ public class TunnelPoolSettings {
                     _destinationNickname = value;
                 else if (name.equalsIgnoreCase(prefix + PROP_IP_RESTRICTION))
                     _IPRestriction = getInt(value, DEFAULT_IP_RESTRICTION);
-                else if ((!_isInbound) && name.equalsIgnoreCase(prefix + PROP_PRIORITY))
-                    _priority = Math.min(MAX_PRIORITY, Math.max(MIN_PRIORITY, getInt(value, 0)));
-                else
+                else if ((!_isInbound) && name.equalsIgnoreCase(prefix + PROP_PRIORITY)) {
+                     int def = _isExploratory ? EXPLORATORY_PRIORITY : 0;
+                     int max = _isExploratory ? EXPLORATORY_PRIORITY : MAX_PRIORITY;
+                    _priority = Math.min(max, Math.max(MIN_PRIORITY, getInt(value, def)));
+                } else
                     _unknownOptions.setProperty(name.substring((prefix != null ? prefix.length() : 0)), value);
             }
         }

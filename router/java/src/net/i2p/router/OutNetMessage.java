@@ -67,6 +67,7 @@ public class OutNetMessage implements CDPQEntry {
     public static final int PRIORITY_MY_BUILD_REQUEST = 500;
     public static final int PRIORITY_MY_NETDB_LOOKUP = 500;
     public static final int PRIORITY_MY_NETDB_STORE = 460;
+    public static final int PRIORITY_EXPLORATORY = 455;
     /** may be adjusted +/- 25 for outbound traffic */
     public static final int PRIORITY_MY_DATA = 425;
     public static final int PRIORITY_MY_NETDB_STORE_LOW = 300;
@@ -387,6 +388,7 @@ public class OutNetMessage implements CDPQEntry {
             buf.append(getMessageType());
         }
         buf.append(" expiring on ").append(new Date(_expiration));
+        buf.append(" priority ").append(_priority);
         if (_failedTransports != null)
             buf.append(" failed delivery on transports ").append(_failedTransports);
         if (_target == null)

@@ -219,6 +219,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("inbound.nickname", "I2PSnark");
             if (opts.getProperty("outbound.nickname") == null)
                 opts.setProperty("outbound.nickname", "I2PSnark");
+            if (opts.getProperty("outbound.priority") == null)
+                opts.setProperty("outbound.priority", "-10");
             // Dont do this for now, it is set in I2PSocketEepGet for announces,
             // we don't need fast handshake for peer connections.
             //if (opts.getProperty("i2p.streaming.connectDelay") == null)

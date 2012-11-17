@@ -40,11 +40,7 @@ public class OutNetMessagePool {
         }        
         
         if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Adding outbound message to " 
-                          + msg.getTarget().getIdentity().getHash().toBase64().substring(0,6)
-                          + " with id " + msg.getMessage().getUniqueId()
-                          + " expiring on " + msg.getMessage().getMessageExpiration()
-                          + " of type " + msg.getMessageType());
+            _log.debug("Adding " + msg);
         
         MessageSelector selector = msg.getReplySelector();
         if (selector != null) {
