@@ -415,11 +415,20 @@ public class Rate {
     }
     
     /**
+     * @return a thread-local temp object containing computed averages.
+     */
+    public RateAverages computeAverages() {
+        return computeAverages(RateAverages.getTemp(),false);
+    }
+    
+    /**
      * @param out where to store the computed averages.  
      * @param useLifetime whether the lifetime average should be used if
      * there are no events.
+     * @return the same RateAverages object for chaining
      */
-    public synchronized void computeAverages(RateAverages out, boolean useLifetime) {
+    public synchronized RateAverages computeAverages(RateAverages out, boolean useLifetime) {
+        out.reset();
         
         final long total = _currentEventCount + _lastEventCount;
         out.setTotalEventCount(total);
@@ -427,15 +436,17 @@ public class Rate {
         if (total <= 0) {
             final double avg = useLifetime ? getAvgOrLifetimeAvg() : getAverageValue();
             out.setAverage(avg);
-            return;
+        } else {
+
+            if (_currentEventCount > 0)
+                out.setCurrent( getCurrentTotalValue() / _currentEventCount );
+            if (_lastEventCount > 0)
+                out.setLast( getLastTotalValue() / _lastEventCount );
+
+            out.setTotalValues(getCurrentTotalValue() + getLastTotalValue());
+            out.setAverage( out.getTotalValues()  / total );
         }
-        
-        if (_currentEventCount > 0)
-            out.setCurrent( getCurrentTotalValue() / _currentEventCount );
-        if (_lastEventCount > 0)
-            out.setLast( getLastTotalValue() / _lastEventCount );
-        
-        out.setAverage( ( getCurrentTotalValue() + getLastTotalValue() ) / total );
+        return out;
     }
 
     public synchronized void store(String prefix, StringBuilder buf) throws IOException {

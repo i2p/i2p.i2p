@@ -172,11 +172,12 @@ class ProfileOrganizerRenderer {
             if (_context.banlist().isBanlisted(peer)) buf.append(_("Banned"));
             if (prof.getIsFailing()) buf.append(' ').append(_("Failing"));
             if (_context.commSystem().wasUnreachable(peer)) buf.append(' ').append(_("Unreachable"));
+            RateAverages ra = RateAverages.getTemp();
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
-            long fails = failed.getCurrentEventCount() + failed.getLastEventCount();
+            long fails = failed.computeAverages(ra, false).getTotalEventCount();
             if (fails > 0) {
                 Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
-                long total = fails + accepted.getCurrentEventCount() + accepted.getLastEventCount();
+                long total = fails + accepted.computeAverages(ra, false).getTotalEventCount();
                 if (total / fails <= 10)   // hide if < 10%
                     buf.append(' ').append(fails).append('/').append(total).append(' ').append(_("Test Fails"));
             }
@@ -219,7 +220,7 @@ class ProfileOrganizerRenderer {
         buf.append("<th class=\"smallhead\">").append(_("1h Fail Rate")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
         buf.append("</tr>");
-        RateAverages ra = new RateAverages();
+        RateAverages ra = RateAverages.getTemp();
         for (Iterator<PeerProfile> iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = iter.next();
             Hash peer = prof.getPeer();
@@ -349,7 +350,6 @@ class ProfileOrganizerRenderer {
             Rate r = rs.getRate(rate);
             if (r == null)
                 return _(NA);
-            ra.reset();
             r.computeAverages(ra, false);
             if (ra.getTotalEventCount() == 0)
                 return _(NA);
@@ -363,7 +363,6 @@ class ProfileOrganizerRenderer {
             Rate r = rs.getRate(rate);
             if (r == null)
                 return "0%";
-            ra.reset();
             r.computeAverages(ra, false);
             if (ra.getTotalEventCount() <= 0)
                 return "0%";

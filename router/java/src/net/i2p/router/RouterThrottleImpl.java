@@ -41,15 +41,6 @@ class RouterThrottleImpl implements RouterThrottle {
 
     private static final long REJECT_STARTUP_TIME = 20*60*1000;
     
-    /** scratch space for calculations of rate averages */
-    private static final ThreadLocal<RateAverages> RATE_AVERAGES =
-            new ThreadLocal<RateAverages>() {
-        @Override
-        public RateAverages initialValue() {
-            return new RateAverages();
-        }
-    };
-
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
@@ -128,8 +119,7 @@ class RouterThrottleImpl implements RouterThrottle {
         //long lag = _context.jobQueue().getMaxLag();
         // reject here if lag too high???
         
-        RateAverages ra = RATE_AVERAGES.get();
-        ra.reset();
+        RateAverages ra = RateAverages.getTemp();
         
         // TODO
         // This stat is highly dependent on transport mix.
@@ -260,11 +250,8 @@ class RouterThrottleImpl implements RouterThrottle {
         double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
         if (rs != null) {
             r = rs.getRate(60*1000);
-            if (r != null) {
-                ra.reset();
-                r.computeAverages(ra, true);
-                messagesPerTunnel = ra.getAverage();
-            }
+            if (r != null) 
+                messagesPerTunnel = r.computeAverages(ra, true).getAverage();
         }
         if (messagesPerTunnel < DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE)
             messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
