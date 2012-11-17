@@ -48,7 +48,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(CommSystemFacadeImpl.class);
-        _context.statManager().createRateStat("transport.getBidsJobTime", "How long does it take?", "Transport", new long[] { 10*60*1000l });
+        //_context.statManager().createRateStat("transport.getBidsJobTime", "How long does it take?", "Transport", new long[] { 10*60*1000l });
         _netMonitorStatus = true;
         _geoIP = new GeoIP(_context);
         startGeoIP();
@@ -142,9 +142,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public void processMessage(OutNetMessage msg) {	
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
         //j.runJob();
-        long before = _context.clock().now();
+        //long before = _context.clock().now();
         GetBidsJob.getBids(_context, this, msg);
-        _context.statManager().addRateData("transport.getBidsJobTime", _context.clock().now() - before, 0);
+        // < 0.4 ms
+        //_context.statManager().addRateData("transport.getBidsJobTime", _context.clock().now() - before);
     }
     
     @Override
