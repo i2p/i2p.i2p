@@ -3,6 +3,7 @@ package net.i2p.router;
 import net.i2p.data.Hash;
 import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -40,6 +41,15 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final int PREPROCESSED_SIZE = 1024;
 
     private static final long REJECT_STARTUP_TIME = 20*60*1000;
+    
+    /** scratch space for calculations of rate averages */
+    private static final ThreadLocal<RateAverages> RATE_AVERAGES =
+            new ThreadLocal<RateAverages>() {
+        @Override
+        public RateAverages initialValue() {
+            return new RateAverages();
+        }
+    };
 
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
@@ -119,6 +129,9 @@ class RouterThrottleImpl implements RouterThrottle {
         //long lag = _context.jobQueue().getMaxLag();
         // reject here if lag too high???
         
+        RateAverages ra = RATE_AVERAGES.get();
+        ra.reset();
+        
         // TODO
         // This stat is highly dependent on transport mix.
         // For NTCP, it is queueing delay only, ~25ms
@@ -133,37 +146,19 @@ class RouterThrottleImpl implements RouterThrottle {
 
         //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
         if(r != null) {
-            long current = r.getCurrentEventCount();
-            long last = r.getLastEventCount();
-            long total = current + last;
-            double avgSendProcessingTime = 0;
-            double currentSendProcessingTime = 0;
-            double lastSendProcessingTime = 0;
+            r.computeAverages(ra);
             
-            //Calculate times
-            if(total > 0) {
-                if(current > 0)
-                    currentSendProcessingTime = r.getCurrentTotalValue() / current;
-                if(last > 0)
-                    lastSendProcessingTime = r.getLastTotalValue() / last;
-                avgSendProcessingTime =  (r.getCurrentTotalValue() + r.getLastTotalValue()) / total;
-            } else {
-                avgSendProcessingTime = r.getAverageValue();
-                //if(_log.shouldLog(Log.WARN))
-                //    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
-            }
-
             int maxProcessingTime = _context.getProperty(PROP_MAX_PROCESSINGTIME, DEFAULT_MAX_PROCESSINGTIME);
 
             //Set throttling if necessary
-            if((avgSendProcessingTime > maxProcessingTime*0.9 
-                    || currentSendProcessingTime > maxProcessingTime
-                    || lastSendProcessingTime > maxProcessingTime)) {
+            if((ra.getAverage() > maxProcessingTime*0.9 
+                    || ra.getCurrent() > maxProcessingTime
+                    || ra.getLast() > maxProcessingTime)) {
                 if(_log.shouldLog(Log.WARN)) {
                     _log.warn("Refusing tunnel request due to sendProcessingTime " +
-                              ((int)currentSendProcessingTime) + " / " +
-                              ((int)lastSendProcessingTime) + " / " +
-                              ((int)avgSendProcessingTime) + " / " +
+                              ((int)ra.getCurrent()) + " / " +
+                              ((int)ra.getLast()) + " / " +
+                              ((int)ra.getAverage()) + " / " +
                               maxProcessingTime +
                               " current/last/avg/max ms");
                 }
