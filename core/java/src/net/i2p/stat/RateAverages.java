@@ -1,5 +1,10 @@
 package net.i2p.stat;
 
+/**
+ * Storage space for computations of various averages.
+ * 
+ * @author zab
+ */
 public class RateAverages {
     
     private double average, current, last;
