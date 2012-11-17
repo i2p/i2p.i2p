@@ -65,7 +65,6 @@ class OutboundMessageState implements CDPQEntry {
     /**
      *  Called from UDPTransport
      *  TODO make two constructors, remove this, and make more things final
-     *  @return success
      *  @throws IAE if too big
      */
     public OutboundMessageState(I2PAppContext context, I2NPMessage msg, PeerState peer) {
@@ -75,7 +74,6 @@ class OutboundMessageState implements CDPQEntry {
     /**
      *  Called from OutboundMessageFragments
      *  TODO make two constructors, remove this, and make more things final
-     *  @return success
      *  @throws IAE if too big
      */
     public OutboundMessageState(I2PAppContext context, OutNetMessage m, PeerState peer) {
@@ -85,7 +83,6 @@ class OutboundMessageState implements CDPQEntry {
     /**
      *  Called from OutboundMessageFragments
      *  @param m null if msg is "injected"
-     *  @return success
      *  @throws IAE if too big
      */
     private OutboundMessageState(I2PAppContext context, OutNetMessage m, I2NPMessage msg, PeerState peer) {
