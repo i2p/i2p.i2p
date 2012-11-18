@@ -434,7 +434,7 @@ public class Rate {
         out.setTotalEventCount(total);
         
         if (total <= 0) {
-            final double avg = useLifetime ? getAvgOrLifetimeAvg() : getAverageValue();
+            final double avg = useLifetime ? getLifetimeAverageValue() : getAverageValue();
             out.setAverage(avg);
         } else {
 
