@@ -20,8 +20,7 @@ Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  adduser,
  i2p-router (>= 0.8.6-5),
- libjbigi-jni (>= ${source:Version}),
- libjbigi-jni (<< ${source:Version}.1~),
+ libjbigi-jni,
  lsb-base,
  service-wrapper
 Description: Load-balanced unspoofable packet switching network
@@ -65,7 +64,7 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- default-jre-headless | java5-runtime-headless | java6-runtime-headless, libecj-java
+ openjdk-6-jre-headless | openjdk-7-jre-headless | default-jre-headless | java5-runtime-headless | java6-runtime-headless, libecj-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~), ttf-dejavu
