@@ -2,6 +2,7 @@ package net.i2p.router.tunnel.pool;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -81,7 +82,8 @@ class BuildHandler implements Runnable {
         _exec = exec;
         // Queue size = 12 * share BW / 48K
         int sz = Math.min(MAX_QUEUE, Math.max(MIN_QUEUE, TunnelDispatcher.getShareBandwidth(ctx) * MIN_QUEUE / 48));
-        _inboundBuildMessages = new CoDelBlockingQueue(ctx, "BuildHandler", sz);
+        //_inboundBuildMessages = new CoDelBlockingQueue(ctx, "BuildHandler", sz);
+        _inboundBuildMessages = new LinkedBlockingQueue(sz);
     
         _context.statManager().createRateStat("tunnel.reject.10", "How often we reject a tunnel probabalistically", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.reject.20", "How often we reject a tunnel because of transient overload", "Tunnels", new long[] { 60*1000, 10*60*1000 });
