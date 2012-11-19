@@ -754,6 +754,9 @@ public class NativeBigInteger extends BigInteger {
             if (sCPUType.equals(JBIGI_OPTIMIZATION_K6_3) && !_isWin)
                 // k62 and k63 identical except on windows
                 sAppend = JBIGI_OPTIMIZATION_K6_2;
+            else if (sCPUType.equals(JBIGI_OPTIMIZATION_COREI) && (!_is64) && ((_isKFreebsd) || (_isNetbsd) || (_isOpenbsd)))
+                // corei and core2 are identical on 32bit kfreebsd, openbsd, and netbsd
+                sAppend = JBIGI_OPTIMIZATION_CORE2;
             else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC32))
                 // viac32 and pentium3 identical
                 sAppend = JBIGI_OPTIMIZATION_PENTIUM3;
