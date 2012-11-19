@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.HashDistance;
 import net.i2p.util.Log;
 
 /**

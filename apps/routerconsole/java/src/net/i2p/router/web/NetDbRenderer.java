@@ -32,7 +32,7 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
-import net.i2p.router.networkdb.kademlia.HashDistance;   // debug
+import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.VersionComparator;

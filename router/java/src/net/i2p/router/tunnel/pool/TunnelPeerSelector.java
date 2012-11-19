@@ -20,7 +20,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.networkdb.kademlia.HashDistance;
+import net.i2p.router.util.HashDistance;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
