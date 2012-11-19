@@ -55,7 +55,8 @@ public class CPUID {
     private static final String libPrefix = isWindows ? "" : "lib";
     private static final String libSuffix = isWindows ? ".dll" : ".so";
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
-    private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
+    private static final boolean isKFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("kfreebsd");
+    private static final boolean isFreebsd = (!isKFreebsd) && System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
     private static final boolean isNetbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("netbsd");
     private static final boolean isOpenbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("openbsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase(Locale.US).contains("sunos");
@@ -447,6 +448,8 @@ public class CPUID {
 	        return "jcpuid-x86-osx";  // The convention on Intel Macs
 	    }
 	}
+        if(isKFreebsd)
+            return "jcpuid-x86-kfreebsd"; // The convention on kfreebsd...
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
         if(isNetbsd)
@@ -464,6 +467,8 @@ public class CPUID {
     private static final String get64LibraryMiddlePart() {
         if(isWindows)
              return "jcpuid-x86_64-windows";
+        if(isKFreebsd)
+            return "jcpuid-x86_64-kfreebsd";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
         if(isNetbsd)

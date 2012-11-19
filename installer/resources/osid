@@ -34,6 +34,7 @@ fi
 
 DARWIN=`echo "$HOST_OS" | grep Darwin`
 MAC=`echo "$HOST_OS" | grep Mac`
+KFREEBSD=`echo "$HOST_OS" | grep kFreeBSD`
 FREEBSD=`echo "$HOST_OS" | grep FreeBSD`
 LINUX=`echo "$HOST_OS" | grep Linux`
 SOLARIS=`echo "$HOST_OS" | grep Solaris`
@@ -43,25 +44,15 @@ OPENBSD=`echo "$HOST_OS" |grep OpenBSD`
 
 if [ ! "X$DARWIN" = "X" -o ! "X$MAC" = "X" ]; then
     echo osx
-    exit 0
-fi
-
-if [ ! "X$FREEBSD" = "X" ]; then
+elif [ ! "X$KFREEBSD" = "X" ]; then
+    echo kfreebsd
+elif [ ! "X$FREEBSD" = "X" ]; then
     echo freebsd
-    exit 0
-fi
-
-if [ ! "X$NETBSD" = "X" ]; then
+elif [ ! "X$NETBSD" = "X" ]; then
     echo netbsd
-    exit 0
-fi
-
-if [ ! "X$OPENBSD" = "X" ]; then
+elif [ ! "X$OPENBSD" = "X" ]; then
     echo openbsd
-    exit 0
-fi
-
-if [ ! "X$LINUX" = "X" ]; then
+elif [ ! "X$LINUX" = "X" ]; then
 
     LINUX_DISTRO=`cat /proc/version`
     DEBIAN=`echo $LINUX_DISTRO | grep Debian`
@@ -73,43 +64,21 @@ if [ ! "X$LINUX" = "X" ]; then
 
     if [ ! "X$DEBIAN" = "X" ]; then
         echo debian
-        exit 0
-    fi
-
-    if [ ! "X$FEDORA" = "X" ]; then
+    elif [ ! "X$FEDORA" = "X" ]; then
         echo fedora
-        exit 0
-    fi
-
-    if [ ! "X$GENTOO" = "X" ]; then
+    elif [ ! "X$GENTOO" = "X" ]; then
         echo gentoo
-        exit 0
-    fi
-
-    if [ ! "X$MANDRAKE" = "X" ]; then
+    elif [ ! "X$MANDRAKE" = "X" ]; then
         echo mandrake
-        exit 0
-    fi
-
-    if [ ! "X$REDHAT" = "X" ]; then
+    elif [ ! "X$REDHAT" = "X" ]; then
         echo redhat
-        exit 0
-    fi
-
-    if [ ! "X$SUSE" = "X" ]; then
+    elif [ ! "X$SUSE" = "X" ]; then
         echo suse
-        exit 0
+    else
+        echo linux
     fi
-
-    echo linux
-    exit 0
-fi
-
-if [ ! "X$SOLARIS" = "X" -o ! "X$SUNOS" = "X" ]; then
+elif [ ! "X$SOLARIS" = "X" -o ! "X$SUNOS" = "X" ]; then
     echo solaris
-    exit 0
+else
+    echo unknown
 fi
-
-echo unknown
-exit 0
-

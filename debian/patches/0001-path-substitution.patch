@@ -107,7 +107,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -905,9 +856,6 @@
+@@ -908,9 +859,6 @@
          # The string passed to eval must handles spaces in paths correctly.
          COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
          eval $COMMAND_LINE
@@ -117,7 +117,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1031,9 +979,6 @@
+@@ -1034,9 +982,6 @@
          # The string passed to eval must handles spaces in paths correctly.
          COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
          eval $COMMAND_LINE
@@ -127,7 +127,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1874,18 +1819,9 @@
+@@ -1877,18 +1822,9 @@
              status
              ;;
  

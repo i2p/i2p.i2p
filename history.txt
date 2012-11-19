@@ -1,3 +1,7 @@
+2012-11-19 kytv
+ * Add support for kFreeBSD to NBI and CPUID
+ * Improve kFreeBSD support in jcupid/jbigi scripts
+
 2012-11-19 zzz
  * BuildHandler: Disable CoDel, wasn't helping
  * NetDB: Add negative lookup cache

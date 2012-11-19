@@ -35,11 +35,13 @@ case `uname -s` in
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
     Linux*|OpenBSD*|NetBSD*|*FreeBSD*|SunOS*)
+        KFREEBSD=0
         UNIXTYPE="`uname -s | tr [A-Z] [a-z]`"
         if [ ${UNIXTYPE} = "sunos" ]; then
             UNIXTYPE="solaris"
-        elif [ ${UNIXTYPE} = "kfreebsd" ]; then
+        elif [ ${UNIXTYPE} = "gnu/kfreebsd" ]; then
             UNIXTYPE="linux"
+            KFREEBSD=1
         fi
         # If JAVA_HOME isn't set, try to figure it out on our own
         [ -z $JAVA_HOME ] && . ../find-java-home
@@ -62,11 +64,15 @@ case `uname -s` in
                 ARCH="x86";;
             *)
                 echo "Unsupported build environment. jcpuid is only used on x86 systems."
-                exit 1;;
+                exit 0;;
         esac
 
         LINKFLAGS="-shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
-        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
+        if [ $KFREEBSD -eq 1 ]; then
+            LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-kfreebsd.so"
+        else
+            LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
+        fi
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include -I${JAVA_HOME}/include/${UNIXTYPE}";;
 esac

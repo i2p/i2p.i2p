@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# If JAVA_HOME isn't set we'll try to figure it out
+[ -z $JAVA_HOME ] && . ../find-java-home
+if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
+    echo "Cannot find jni.h! Looked in '$JAVA_HOME/include/jni.h'"
+    echo "Please set JAVA_HOME to a java home that has the JNI"
+    exit 1
+fi
+
 #FIXME What platforms for MacOS?
 MISC_DARWIN_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle"
 
@@ -49,6 +57,8 @@ X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon g
 
 if [ $(uname -s |tr "[A-Z]" "[a-z]") = "linux" ]; then
         ECHO="/bin/echo"
+elif [ $(uname -s |tr "[A-Z]" "[a-z]") = "gnu/kfreebsd" ]; then
+        ECHO="/bin/echo"
 else
         ECHO="echo"
 fi
@@ -81,19 +91,23 @@ MINGW*)
         PLATFORM_LIST="${MINGW_PLATFORMS}"
         NAME="jbigi"
         TYPE="dll"
-        TARGET="-windows-"
+        TARGET="windows"
         $ECHO "Building windows .dlls for all architectures";;
 Darwin*)
         PLATFORM_LIST="${DARWIN_PLATFORMS}"
         NAME="libjbigi"
         TYPE="jnilib"
-        TARGET="-osx-"
+        TARGET="osx"
         $ECHO "Building ${TARGET} .jnilibs for all architectures";;
-Linux*)
+Linux*|*kFreeBSD)
         NAME="libjbigi"
         TYPE="so"
         PLATFORM_LIST=""
-        TARGET="-linux-"
+        if [ $(uname -s | tr "[A-Z]" "[a-z]") = "gnu/kfreebsd" ]; then
+                TARGET="kfreebsd"
+        else
+                TARGET="linux"
+        fi
         arch=$(uname -m | cut -f1 -d" ")
         case ${arch} in
                 i[3-6]86)
@@ -102,13 +116,13 @@ Linux*)
         case ${arch} in
                 x86_64 | amd64)
                         PLATFORM_LIST="${X86_64_PLATFORMS}"
-                        TARGET="-linux-X86_64-";;
+                        TARGET="$TARGET-X86_64";;
                 ia64)
                         PLATFORM_LIST="${X86_64_PLATFORMS}"
-                        TARGET="-linux-ia64-";;
+                        TARGET="$TARGET-ia64";;
                 x86)
                         PLATFORM_LIST="${X86_PLATFORMS}"
-                        TARGET="-linux-x86-";;
+                        TARGET="$TARGET-x86";;
                 *)
                         PLATFORM_LIST="${LINUX_PLATFORMS}";;
         esac
@@ -126,13 +140,13 @@ NetBSD*|FreeBSD*|OpenBSD*)
         case ${arch} in
                 x86_64|amd64)
                         PLATFORM_LIST="${X86_64_PLATFORMS}"
-                        TARGET="-${BSDTYPE}-X86_64-";;
+                        TARGET="${BSDTYPE}-X86_64";;
                 ia64)
                         PLATFORM_LIST="${X86_64_PLATFORMS}"
-                        TARGET="-${BSDTYPE}-ia64-";;
+                        TARGET="${BSDTYPE}-ia64";;
                 x86)
                         PLATFORM_LIST="${X86_PLATFORMS}"
-                        TARGET="-${BSDTYPE}-x86-";;
+                        TARGET="${BSDTYPE}-x86";;
                 *)
                         case ${BSDTYPE} in
                                 netbsd)
@@ -153,6 +167,10 @@ NetBSD*|FreeBSD*|OpenBSD*)
 esac
 
 make_static () {
+        #
+        # TODO
+        # Fix formatting of output filename. Final versions will need to look
+        # like libjbigi-linux-athlon64.so or libjbigi-linux-athlon64_64.so
         $ECHO "Attempting .${4} creation for ${3}${5}${2}"
         ../../build_jbigi.sh static || return 1
         cp ${3}.${4} ../../lib/net/i2p/util/${3}${5}${2}.${4}
@@ -217,7 +235,7 @@ do
                         rm -Rf *
                 fi
 
-                build_file "$VER" "$x" "$NAME" "$TYPE" "$TARGET"
+                build_file "$VER" "$x" "$NAME" "$TYPE" "-$TARGET-"
         )
 done
 

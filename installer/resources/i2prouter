@@ -357,6 +357,9 @@ case "$DIST_OS" in
     'unix_sv')
         DIST_OS="unixware"
         ;;
+    'gnu/kfreebsd')
+        DIST_OS="kfreebsd"
+        ;;
     'os/390')
         DIST_OS="zos"
         ;;

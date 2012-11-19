@@ -8,12 +8,16 @@ Subject: rename jcpuid
 
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
-@@ -65,8 +65,8 @@
-                 exit 1;;
+@@ -67,12 +67,8 @@
+                 exit 0;;
          esac
  
 -        LINKFLAGS="-shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
--        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
+-        if [ $KFREEBSD -eq 1 ]; then
+-            LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-kfreebsd.so"
+-        else
+-            LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
+-        fi
 +        LINKFLAGS="-shared -Wl,-soname,libjcpuid.so"
 +        LIBFILE="../jbigi/libjcpuid.so"
          COMPILEFLAGS="-fPIC -Wall"

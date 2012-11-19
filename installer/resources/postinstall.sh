@@ -81,7 +81,7 @@ case $HOST_OS in
         wrapperpath="./lib/wrapper/solaris"
         cp ${wrapperpath}/libwrapper.so ./lib/
         ;;
-    netbsd|openbsd )
+    netbsd|openbsd|kfreebsd)
         # FIXME
         # This isn't displayed when installing, but if we fall back to the "*)"
         # choice, no cleanup happens and users are advised to copy the wrapper

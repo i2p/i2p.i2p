@@ -25,6 +25,10 @@ elif [ $UNIXTYPE = "linux" ] && [ -e /etc/arch-release ]; then
     fi
 elif [ $UNIXTYPE = "darwin" ]; then
     JAVA_HOME=$(/usr/libexec/java_home)
+elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
+    if [ -d /usr/lib/jvm/java-gcj ]; then
+        JAVA_HOME="/usr/lib/jvm/java-gcj"
+    fi
 fi
 
 export JAVA_HOME

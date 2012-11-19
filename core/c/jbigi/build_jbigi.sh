@@ -35,6 +35,8 @@ SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
         UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
         if [ $UNIXTYPE = "sunos" ]; then
             UNIXTYPE="solaris"
+        elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
+            UNIXTYPE="linux"
         fi
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"

@@ -162,7 +162,8 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
     private static final boolean _isMac = SystemVersion.isMac();
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
-    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
+    private static final boolean _isKFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("kfreebsd");
+    private static final boolean _isFreebsd = (!_isKFreebsd) && System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
     private static final boolean _isNetbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("netbsd");
     private static final boolean _isOpenbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("openbsd");
     private static final boolean _isSunos = System.getProperty("os.name").toLowerCase(Locale.US).contains("sunos");
@@ -773,6 +774,8 @@ public class NativeBigInteger extends BigInteger {
     private static final String getMiddleName1() {
         if(_isWin)
              return "jbigi-windows-";
+        if(_isKFreebsd)
+            return "jbigi-kfreebsd-";
         if(_isFreebsd)
             return "jbigi-freebsd-";
         if(_isNetbsd)
