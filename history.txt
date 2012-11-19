@@ -1,3 +1,8 @@
+2012-11-19 zzz
+ * BuildHandler: Disable CoDel, wasn't helping
+ * NetDB: Add negative lookup cache
+ * Profiles: Split up files into subdirectories
+
 2012-11-17 zzz
  * error500.jsp: Add servlet version
  * i2psnark: Clear PEX peers set after use, cause of bad peer counts

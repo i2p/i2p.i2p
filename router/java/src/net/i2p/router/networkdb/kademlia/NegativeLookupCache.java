@@ -6,29 +6,31 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
- * Count how often we have recently flooded a key
- * This offers basic DOS protection but is not a complete solution.
+ * Track lookup fails
  *
- * @since 0.7.11
+ * @since 0.9.4
  */
-class FloodThrottler {
+class NegativeLookupCache {
     private final ObjectCounter<Hash> counter;
-    private static final int MAX_FLOODS = 3;
-    private static final long CLEAN_TIME = 60*1000;
+    private static final int MAX_FAILS = 3;
+    private static final long CLEAN_TIME = 4*60*1000;
 
-    FloodThrottler() {
+    public NegativeLookupCache() {
         this.counter = new ObjectCounter();
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
-    /** increments before checking */
-    boolean shouldThrottle(Hash h) {
-        return this.counter.increment(h) > MAX_FLOODS;
+    public void lookupFailed(Hash h) {
+        this.counter.increment(h);
+    }
+
+    public boolean isCached(Hash h) {
+        return this.counter.count(h) >= MAX_FAILS;
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {
         public void timeReached() {
-            FloodThrottler.this.counter.clear();
+            NegativeLookupCache.this.counter.clear();
         }
     }
 }

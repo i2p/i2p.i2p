@@ -16,7 +16,7 @@ import net.i2p.util.SimpleTimer;
  * @since 0.7.11
  */
 class LookupThrottler {
-    private ObjectCounter<ReplyTunnel> counter;
+    private final ObjectCounter<ReplyTunnel> counter;
     /** the id of this is -1 */
     private static final TunnelId DUMMY_ID = new TunnelId();
     /** this seems like plenty */

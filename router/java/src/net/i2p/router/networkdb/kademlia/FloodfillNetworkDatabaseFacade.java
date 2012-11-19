@@ -33,6 +33,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
+    private NegativeLookupCache _negativeCache;
 
     /**
      *  This is the flood redundancy. Entries are
@@ -62,6 +63,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.negativeCache", "Aborted lookup, already cached", "NetworkDatabase", new long[] { 60*60*1000l });
     }
 
     @Override
@@ -69,6 +71,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
         _lookupThrottler = new LookupThrottler();
+        _negativeCache = new NegativeLookupCache();
 
         // refresh old routers
         Job rrj = new RefreshRoutersJob(_context, this);
@@ -164,6 +167,25 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     boolean shouldThrottleLookup(Hash from, TunnelId id) {
         return _lookupThrottler.shouldThrottle(from, id);
+    }
+
+    /**
+     *  Increment in the negative lookup cache
+     *  @since 0.9.4
+     */
+    void lookupFailed(Hash key) {
+        _negativeCache.lookupFailed(key);
+    }
+
+    /**
+     *  Is the key in the negative lookup cache?
+     *  @since 0.9.4
+     */
+    boolean isNegativeCached(Hash key) {
+        boolean rv = _negativeCache.isCached(key);
+        if (rv)
+            _context.statManager().addRateData("netDb.negativeCache", 1);
+        return rv;
     }
 
     /**
