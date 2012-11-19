@@ -8,8 +8,10 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -19,6 +21,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
@@ -41,6 +44,8 @@ class ProfilePersistenceHelper {
     private static final String SUFFIX = ".txt.gz";
     private static final String UNCOMPRESSED_SUFFIX = ".txt";
     private static final String OLD_SUFFIX = ".dat";
+    private static final String DIR_PREFIX = "p";
+    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
     
     /**
      * If we haven't been able to get a message through to the peer in 3 days,
@@ -48,19 +53,22 @@ class ProfilePersistenceHelper {
      * have changed (etc).
      *
      */
-    public static final long EXPIRE_AGE = 3*24*60*60*1000;
+    private static final long EXPIRE_AGE = 3*24*60*60*1000;
     
-    private File _profileDir = null;
+    private final File _profileDir;
     private Hash _us;
     
     public ProfilePersistenceHelper(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(ProfilePersistenceHelper.class);
-        File profileDir = getProfileDir();
-        _us = null;
-        if (!profileDir.exists()) {
-            profileDir.mkdirs();
-            _log.info("Profile directory " + profileDir.getAbsolutePath() + " created");
+        String dir = _context.getProperty(PROP_PEER_PROFILE_DIR, DEFAULT_PEER_PROFILE_DIR);
+        _profileDir = new SecureDirectory(_context.getRouterDir(), dir);
+        if (!_profileDir.exists())
+            _profileDir.mkdirs();
+        for (int j = 0; j < B64.length(); j++) {
+            File subdir = new SecureDirectory(_profileDir, DIR_PREFIX + B64.charAt(j));
+            if (!subdir.exists())
+                subdir.mkdir();
         }
     }
     
@@ -169,7 +177,7 @@ class ProfilePersistenceHelper {
     
     public Set<PeerProfile> readProfiles() {
         long start = _context.clock().now();
-        Set<File> files = selectFiles();
+        List<File> files = selectFiles();
         Set<PeerProfile> profiles = new HashSet(files.size());
         for (File f :  files) {
             PeerProfile profile = readProfile(f);
@@ -182,17 +190,43 @@ class ProfilePersistenceHelper {
         return profiles;
     }
     
-    private Set<File> selectFiles() {
-        File files[] = getProfileDir().listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return (filename.startsWith(PREFIX) &&
-                        (filename.endsWith(SUFFIX) || filename.endsWith(OLD_SUFFIX) || filename.endsWith(UNCOMPRESSED_SUFFIX)));
-            }
-        });
-        Set rv = new HashSet(files.length);
-        for (int i = 0; i < files.length; i++)
-            rv.add(files[i]);
+    private static class ProfileFilter implements FilenameFilter {
+        public boolean accept(File dir, String filename) {
+            return (filename.startsWith(PREFIX) &&
+                    (filename.endsWith(SUFFIX) || filename.endsWith(OLD_SUFFIX) || filename.endsWith(UNCOMPRESSED_SUFFIX)));
+        }
+    }
+
+    private List<File> selectFiles() {
+        FilenameFilter filter = new ProfileFilter();
+        File files[] = _profileDir.listFiles(filter);
+        if (files != null && files.length > 0)
+            migrate(files);
+        List rv = new ArrayList(1024);
+        for (int j = 0; j < B64.length(); j++) {
+            File subdir = new File(_profileDir, DIR_PREFIX + B64.charAt(j));
+            files = subdir.listFiles(filter);
+            if (files == null)
+                continue;
+            for (int i = 0; i < files.length; i++)
+                rv.add(files[i]);
+        }
         return rv;
+    }
+
+    /**
+     *  Migrate from one-level to two-level directory structure
+     *  @since 0.9.4
+     */
+    private void migrate(File[] files) {
+        for (int i = 0; i < files.length; i++) {
+            File from = files[i];
+            if (!from.isFile())
+                continue;
+            File dir = new File(_profileDir, DIR_PREFIX + from.getName().charAt(PREFIX.length()));
+            File to = new File(dir, from.getName());
+            FileUtil.rename(from, to);
+        }
     }
     
     private boolean isExpired(long lastSentToSuccessfully) {
@@ -342,16 +376,11 @@ class ProfilePersistenceHelper {
     }
     
     private File pickFile(PeerProfile profile) {
-        return new File(getProfileDir(), PREFIX + profile.getPeer().toBase64() + SUFFIX);
+        String hash = profile.getPeer().toBase64();
+        File dir = new File(_profileDir, DIR_PREFIX + hash.charAt(0));
+        return new File(dir, PREFIX + hash + SUFFIX);
     }
     
-    private File getProfileDir() {
-        if (_profileDir == null) {
-            String dir = _context.getProperty(PROP_PEER_PROFILE_DIR, DEFAULT_PEER_PROFILE_DIR);
-            _profileDir = new SecureDirectory(_context.getRouterDir(), dir);
-        }
-        return _profileDir;
-    }
     
     /** generate 1000 profiles */
 /****
