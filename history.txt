@@ -1,3 +1,7 @@
+2012-11-20 zzz
+ * Transport: Fix bug that inadvertently reduced default max
+   SSU connections in 0.9.2, thus reducing tunnel build success rates
+
 2012-11-19 kytv
  * Add support for kFreeBSD to NBI and CPUID
  * Improve kFreeBSD support in jcupid/jbigi scripts

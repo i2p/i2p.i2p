@@ -133,7 +133,7 @@ public abstract class TransportImpl implements Transport {
                 def = MAX_CONNECTION_FACTOR * (1 + bw - Router.CAPABILITY_BW12);
         }
         // increase limit for SSU, for now
-        if (style.equals("udp"))
+        if (style.equals("SSU"))
             //def = def * 3 / 2;
             def *= 3;
         return _context.getProperty(maxProp, def);
