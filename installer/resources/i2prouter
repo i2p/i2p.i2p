@@ -22,7 +22,7 @@
 #
 #-----------------------------------------------------------------------------
 # These settings can be modified to fit the needs of your application
-# Optimized for use with version 3.5.14 of the Wrapper.
+# Optimized for use with version 3.5.16 of the Wrapper.
 
 # Paths
 # Note that (percent)INSTALL_PATH, (percent)USER_HOME,  and (percent)SYSTEM_java_io_tmpdir
@@ -452,6 +452,10 @@ else
             DIST_ARCH="390"
             DIST_BITS="64"
             ;;
+        'arm*')
+            DIST_ARCH="arm"
+            DIST_BITS="32"
+            ;;
     esac
 fi
 
@@ -643,6 +647,12 @@ checkUser() {
     # Check the configured user.  If necessary rerun this script as the desired user.
     if [ "X$RUN_AS_USER" != "X" ]
     then
+        if [ "`$IDEXE -u -n "$RUN_AS_USER" 2>/dev/null`" != "$RUN_AS_USER" ]
+        then
+            echo 'User $RUN_AS_USER does not exist.'
+            exit 1
+        fi
+
         # Resolve the location of the 'id' command
         IDEXE="/usr/xpg4/bin/id"
         if [ ! -x "$IDEXE" ]
