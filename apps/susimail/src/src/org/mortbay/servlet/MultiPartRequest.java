@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 
 //import org.apache.commons.logging.Log;
 //import org.mortbay.log.LogFactory;
-import org.mortbay.jetty.HttpHeaders;
+import org.eclipse.jetty.http.HttpHeaders;
+import org.eclipse.jetty.util.MultiMap;
+import org.eclipse.jetty.util.StringUtil;
 import org.mortbay.util.LineInput;
-import org.mortbay.util.MultiMap;
-import org.mortbay.util.StringUtil;
 
 /* ------------------------------------------------------------ */
 /** Multipart Form Data request.
