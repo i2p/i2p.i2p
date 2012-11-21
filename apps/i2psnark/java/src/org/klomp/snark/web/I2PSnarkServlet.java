@@ -44,9 +44,9 @@ import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
 
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.resource.Resource;
-import org.mortbay.util.URIUtil;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.util.URIUtil;
+import org.eclipse.jetty.util.resource.Resource;
 
 /**
  *  We extend Default instead of HTTPServlet so we can handle

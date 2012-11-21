@@ -5,7 +5,7 @@ import java.io.File;
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Server;
 
 public class RunStandalone {
     static {
