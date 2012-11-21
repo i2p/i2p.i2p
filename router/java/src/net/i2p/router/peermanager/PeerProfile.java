@@ -54,6 +54,13 @@ public class PeerProfile {
     private double _capacityValue;
     private double _integrationValue;
     private boolean _isFailing;
+    // new calculation values, to be updated
+    private double _speedValueNew;
+    private double _capacityValueNew;
+    private double _integrationValueNew;
+    private boolean _isFailingNew;
+    // are we in coalescing state?
+    private boolean _coalescing;
     // good vs bad behavior
     private TunnelHistory _tunnelHistory;
     private DBHistory _dbHistory;
@@ -500,26 +507,45 @@ public class PeerProfile {
     /** update the stats and rates (this should be called once a minute) */
     public void coalesceStats() {
         if (!_expanded) return;
-        //_receiveSize.coalesceStats();
-        //_sendSuccessSize.coalesceStats();
-        _tunnelCreateResponseTime.coalesceStats();
-        _tunnelTestResponseTime.coalesceStats();
-        _tunnelHistory.coalesceStats();
-        if (_expandedDB) {
-            _dbIntroduction.coalesceStats();
-            _dbResponseTime.coalesceStats();
-            _dbHistory.coalesceStats();
-        }
-        
-        coalesceThroughput();
-        
-        _speedValue = calculateSpeed();
-        _capacityValue = calculateCapacity();
-        _integrationValue = calculateIntegration();
-        _isFailing = calculateIsFailing();
+
+        coalesceOnly();
+        updateValues();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Coalesced: speed [" + _speedValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
+    }
+    
+    void coalesceOnly() {
+    	_coalescing = true;
+    	
+    	//_receiveSize.coalesceStats();
+    	//_sendSuccessSize.coalesceStats();
+    	_tunnelCreateResponseTime.coalesceStats();
+    	_tunnelTestResponseTime.coalesceStats();
+    	_tunnelHistory.coalesceStats();
+    	if (_expandedDB) {
+    		_dbIntroduction.coalesceStats();
+    		_dbResponseTime.coalesceStats();
+    		_dbHistory.coalesceStats();
+    	}
+    	
+    	coalesceThroughput();
+    	
+    	_speedValueNew = calculateSpeed();
+    	_capacityValueNew = calculateCapacity();
+    	_integrationValueNew = calculateIntegration();
+    	_isFailingNew = calculateIsFailing();
+    }
+    
+    void updateValues() {
+    	if (!_coalescing) // can happen
+    		coalesceOnly();
+    	_coalescing = false;
+    	
+    	_speedValue = _speedValueNew;
+    	_capacityValue = _capacityValueNew;
+    	_integrationValue = _integrationValueNew;
+    	_isFailing = _isFailingNew;
     }
     
     private double calculateSpeed() { return SpeedCalculator.calc(this); }
