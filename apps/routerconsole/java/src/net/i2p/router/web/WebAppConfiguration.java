@@ -10,9 +10,9 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
-import org.mortbay.jetty.webapp.Configuration;
-import org.mortbay.jetty.webapp.WebAppClassLoader;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.WebAppClassLoader;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 
 /**
@@ -133,14 +133,25 @@ public class WebAppConfiguration implements Configuration {
         return rv;
     }
 
-    public void configureDefaults() {}
-    public void configureWebApp() {}
+    /** @since Jetty 7 */
+    public void deconfigure(WebAppContext context) {}
 
-    /** @since Jetty 6 */
-    public void deconfigureWebApp() {}
-
-    /** @since Jetty 6 */
-    public void configureClassLoader() throws Exception {
+    /** @since Jetty 7 */
+    public void configure(WebAppContext context) throws Exception {
         configureClassPath();
     }
+
+    /** @since Jetty 7 */
+    public void cloneConfigure(WebAppContext template, WebAppContext context) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** @since Jetty 7 */
+    public void destroy(WebAppContext context) {}
+
+    /** @since Jetty 7 */
+    public void preConfigure(WebAppContext context) {}
+
+    /** @since Jetty 7 */
+    public void postConfigure(WebAppContext context) {}
 }

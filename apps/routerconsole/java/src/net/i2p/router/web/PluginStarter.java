@@ -34,7 +34,7 @@ import net.i2p.util.Log;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
-import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
 
 /**

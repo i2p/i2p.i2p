@@ -10,11 +10,11 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.SecureDirectory;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 
 /**
@@ -56,7 +56,7 @@ public class WebAppStarter {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
          WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
          //_log.debug("Loading war from: " + warPath);
-         wac.setInitParams(INIT_PARAMS);
+         LocaleWebAppHandler.setInitParams(wac, INIT_PARAMS);
          wac.start();
     }
 
