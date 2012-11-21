@@ -42,14 +42,6 @@ public class WebAppConfiguration implements Configuration {
 
     private static final String CLASSPATH = ".classpath";
 
-    public void setWebAppContext(WebAppContext context) {
-       _wac = context;
-    }
-
-    public WebAppContext getWebAppContext() {
-        return _wac;
-    }
-
     /**
      *  This was the interface in Jetty 5, now it's configureClassLoader()
      */
@@ -138,6 +130,7 @@ public class WebAppConfiguration implements Configuration {
 
     /** @since Jetty 7 */
     public void configure(WebAppContext context) throws Exception {
+        _wac = context;
         configureClassPath();
     }
 
