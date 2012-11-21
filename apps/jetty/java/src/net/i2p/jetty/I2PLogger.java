@@ -17,13 +17,13 @@ package net.i2p.jetty;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.log.Logger;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.log.Logger;
 
 /**
  * Modified from Jetty 6.1.26 StdErrLog.java and Slf4jLog.java
  *
- * Usage: org.mortbay.log.Log.setLog(new I2PLogger(ctx));
+ * Usage: org.eclipse.log.Log.setLog(new I2PLogger(ctx));
  *
  * @since Jetty 6
  */
@@ -182,5 +182,80 @@ public class I2PLogger implements Logger
         return "I2PLogger";
     }
     
+    /**
+     *  @since Jetty 7
+     */
+    public void ignore(Throwable ignored)
+    {
+            warn("IGNORED", ignored);
+    }
+    
+    /**
+     *  @since Jetty 7
+     */
+    public void debug(Throwable thrown)
+    {
+            debug("", thrown);
+    }
+    
+    /**
+     *  @since Jetty 7
+     */
+    public void debug(String msg, Object... args)
+    {
+            Object a1 = args.length > 0 ? args[0] : null;
+            Object a2 = args.length > 1 ? args[1] : null;
+            debug(msg, a1, a2);
+    }
+    
+    /**
+     *  @since Jetty 7
+     */
+    public void info(Throwable thrown)
+    {
+            info("", thrown);
+    }
+    
+    /**
+     *  @since Jetty 7
+     */
+    public void info(String msg, Object... args)
+    {
+            Object a1 = args.length > 0 ? args[0] : null;
+            Object a2 = args.length > 1 ? args[1] : null;
+            info(msg, a1, a2);
+    }
+    
+    /**
+     *  @since Jetty 7
+     */
+    public void info(String msg, Throwable th)
+    {
+        _log.info(msg,th);
+    }
 
+    /**
+     *  @since Jetty 7
+     */
+    public void warn(Throwable thrown)
+    {
+            warn("", thrown);
+    }
+    
+    /**
+     *  @since Jetty 7
+     */
+    public void warn(String msg, Object... args)
+    {
+            Object a1 = args.length > 0 ? args[0] : null;
+            Object a2 = args.length > 1 ? args[1] : null;
+            warn(msg, a1, a2);
+    }
+
+    /**
+     *  @since Jetty 7
+     */
+    public String getName() {
+        return "net.i2p.jetty.I2PLogger";
+    }
 }

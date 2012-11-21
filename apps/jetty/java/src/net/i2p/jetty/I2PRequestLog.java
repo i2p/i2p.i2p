@@ -24,18 +24,18 @@ import java.util.TimeZone;
 
 import javax.servlet.http.Cookie;
 
-import org.mortbay.component.AbstractLifeCycle;
-import org.mortbay.jetty.HttpHeaders;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.RequestLog;
-import org.mortbay.jetty.Response;
-import org.mortbay.jetty.servlet.PathMap;
-import org.mortbay.log.Log;
-import org.mortbay.util.DateCache;
-import org.mortbay.util.RolloverFileOutputStream;
-import org.mortbay.util.StringUtil;
-import org.mortbay.util.TypeUtil;
-import org.mortbay.util.Utf8StringBuffer;
+import org.eclipse.jetty.http.HttpHeaders;
+import org.eclipse.jetty.http.PathMap;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.DateCache;
+import org.eclipse.jetty.util.RolloverFileOutputStream;
+import org.eclipse.jetty.util.StringUtil;
+import org.eclipse.jetty.util.TypeUtil;
+import org.eclipse.jetty.util.Utf8StringBuilder;
+import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import org.eclipse.jetty.util.log.Log;
 
 /** 
  * This {@link RequestLog} implementation outputs logs in the pseudo-standard NCSA common log format.
@@ -56,8 +56,6 @@ import org.mortbay.util.Utf8StringBuffer;
  *
  * So that we will work with system Jetty 6 packages, we just copy the whole thing
  * and modify log() as required.
- * We leave the package as org.mortbay.http for compatibility with old
- * jetty.xml files.
  *
  * @author Greg Wilkins
  * @author Nigel Canonizado
@@ -259,13 +257,13 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
             if (_fileOut == null)
                 return;
 
-            Utf8StringBuffer u8buf;
-            StringBuffer buf;
+            Utf8StringBuilder u8buf;
+            StringBuilder buf;
             synchronized(_writer)
             {
                 int size=_buffers.size();
-                u8buf = size==0?new Utf8StringBuffer(160):(Utf8StringBuffer)_buffers.remove(size-1);
-                buf = u8buf.getStringBuffer();
+                u8buf = size==0?new Utf8StringBuilder(160):(Utf8StringBuilder)_buffers.remove(size-1);
+                buf = u8buf.getStringBuilder();
             }
             
             synchronized(buf) // for efficiency until we can use StringBuilder
@@ -398,7 +396,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                     if (_logLatency)
                     {
                         _writer.write(' ');
-                        _writer.write(TypeUtil.toString(System.currentTimeMillis() - request.getTimeStamp()));
+                        _writer.write(Long.toString(System.currentTimeMillis() - request.getTimeStamp()));
                     }
 
                     _writer.write(StringUtil.__LINE_SEPARATOR);
