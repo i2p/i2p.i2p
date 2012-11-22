@@ -38,15 +38,15 @@ import org.eclipse.jetty.webapp.WebAppContext;
  *  @author zzz
  */
 public class WebAppConfiguration implements Configuration {
-    private WebAppContext _wac;
 
     private static final String CLASSPATH = ".classpath";
 
     /**
-     *  This was the interface in Jetty 5, now it's configureClassLoader()
+     *  This was the interface in Jetty 5, in Jetty 6 was configureClassLoader(),
+     *  now it's configure()
      */
-    private void configureClassPath() throws Exception {
-        String ctxPath = _wac.getContextPath();
+    private void configureClassPath(WebAppContext wac) throws Exception {
+        String ctxPath = wac.getContextPath();
         //System.err.println("Configure Class Path " + ctxPath);
         if (ctxPath.equals("/"))
             return;
@@ -102,7 +102,7 @@ public class WebAppConfiguration implements Configuration {
         }
         if (buf.length() <= 0)
             return;
-        ClassLoader cl = _wac.getClassLoader();
+        ClassLoader cl = wac.getClassLoader();
         if (cl != null && cl instanceof WebAppClassLoader) {
             WebAppClassLoader wacl = (WebAppClassLoader) cl;
             wacl.addClassPath(buf.toString());
@@ -110,7 +110,7 @@ public class WebAppConfiguration implements Configuration {
             // This was not working because the WebAppClassLoader already exists
             // and it calls getExtraClasspath in its constructor
             // Not sure why WACL already exists...
-            _wac.setExtraClasspath(buf.toString());
+            wac.setExtraClasspath(buf.toString());
         }
     }
 
@@ -130,13 +130,12 @@ public class WebAppConfiguration implements Configuration {
 
     /** @since Jetty 7 */
     public void configure(WebAppContext context) throws Exception {
-        _wac = context;
-        configureClassPath();
+        configureClassPath(context);
     }
 
     /** @since Jetty 7 */
     public void cloneConfigure(WebAppContext template, WebAppContext context) {
-        throw new UnsupportedOperationException();
+        // no state, nothing to be done
     }
 
     /** @since Jetty 7 */

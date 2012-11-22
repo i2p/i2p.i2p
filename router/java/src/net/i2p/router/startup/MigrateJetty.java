@@ -35,13 +35,15 @@ import net.i2p.router.RouterContext;
  */
 abstract class MigrateJetty {
     private static boolean _wasChecked;
-    private static boolean _hasJetty6;
+    private static boolean _hasLatestJetty;
 
     private static final String OLD_CLASS = "org.mortbay.jetty.Server";
-    private static final String NEW_CLASS = "org.mortbay.start.Main";
-    private static final String BACKUP = "jetty5.xml";
-    private static final String JETTY6_TEMPLATE_DIR = "eepsite-jetty6";
-    private static final String JETTY6_TEMPLATE_PKGDIR = "eepsite";
+    private static final String OLD_CLASS_6 = "org.mortbay.start.Main";
+    private static final String NEW_CLASS = "net.i2p.jetty.JettyStart";
+    private static final String TEST_CLASS = "org.eclipse.jetty.server.Server";
+    private static final String BACKUP = "jetty6.xml";
+    private static final String JETTY_TEMPLATE_DIR = "eepsite-jetty7";
+    private static final String JETTY_TEMPLATE_PKGDIR = "eepsite";
     private static final String BASE_CONTEXT = "contexts/base-context.xml";
     private static final String CGI_CONTEXT = "contexts/cgi-context.xml";
     
@@ -49,13 +51,13 @@ abstract class MigrateJetty {
         boolean shouldSave = false;
         for (int i = 0; i < apps.size(); i++) {
             ClientAppConfig app = apps.get(i);
-            if (!app.className.equals(OLD_CLASS))
+            if (!(app.className.equals(OLD_CLASS) || app.className.equals(OLD_CLASS_6)))
                 continue;
             String client = "client application " + i + " [" + app.clientName +
-                            "] from Jetty 5 " + OLD_CLASS +
-                            " to Jetty 6 " + NEW_CLASS;
-            if (!hasJetty6()) {
-                System.err.println("WARNING: Jetty 6 unavailable, cannot migrate " + client);
+                            "] from Jetty 5/6 " + app.className +
+                            " to Jetty 7 " + NEW_CLASS;
+            if (!hasLatestJetty()) {
+                System.err.println("WARNING: Jetty 7 unavailable, cannot migrate " + client);
                 continue;
             }
             if (app.args == null)
@@ -83,10 +85,10 @@ abstract class MigrateJetty {
                                ", cannot migrate " + client);
                 continue;
             }
-            File baseEep = new File(ctx.getBaseDir(), JETTY6_TEMPLATE_DIR);
+            File baseEep = new File(ctx.getBaseDir(), JETTY_TEMPLATE_DIR);
             // in packages, or perhaps on an uninstall/reinstall, the files are in eepsite/
             if (!baseEep.exists())
-                baseEep = new File(ctx.getBaseDir(), JETTY6_TEMPLATE_PKGDIR);
+                baseEep = new File(ctx.getBaseDir(), JETTY_TEMPLATE_PKGDIR);
             if (baseEep.equals(eepsite)) {
                 // non-split directory yet not an upgrade? shouldn't happen
                 System.err.println("Eepsite in non-split directory " + eepsite +
@@ -132,28 +134,29 @@ abstract class MigrateJetty {
         }
         if (shouldSave) {
             File cfgFile = ClientAppConfig.configFile(ctx);
-            File backup = new File(cfgFile.getAbsolutePath() + ".jetty5");
+            File backup = new File(cfgFile.getAbsolutePath() + ".jetty6");
             if (backup.exists())
                 backup = new File(cfgFile.getAbsolutePath() + ctx.random().nextInt());
             boolean ok = WorkingDir.copyFile(cfgFile, backup);
             if (ok) {
                 ClientAppConfig.writeClientAppConfig(ctx, apps);
                 System.err.println("WARNING: Migrated clients config file " + cfgFile +
-                               " from Jetty 5 " + OLD_CLASS +
-                               " to Jetty 6 " + NEW_CLASS + "\n" +
+                               " from Jetty 5/6 " + OLD_CLASS + '/' + OLD_CLASS_6 +
+                               " to Jetty 7 " + NEW_CLASS + "\n" +
                                "Your old clients config file was saved as " + backup);
             }
         }
     }
 
-    private static boolean hasJetty6() {
+    /** do we have Jetty 7? */
+    private static boolean hasLatestJetty() {
         if (!_wasChecked) {
             try {
-                LoadClientAppsJob.testClient(NEW_CLASS, null);
-                _hasJetty6 = true;
+                LoadClientAppsJob.testClient(TEST_CLASS, null);
+                _hasLatestJetty = true;
             } catch (ClassNotFoundException cnfe) {}
             _wasChecked = true;
         }
-        return _hasJetty6;
+        return _hasLatestJetty;
     }
 }

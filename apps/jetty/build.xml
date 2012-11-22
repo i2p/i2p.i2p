@@ -89,8 +89,11 @@
            Reasons for inclusion:
               start.jar: Needed for clients.config startup of eepsites
               jetty-util-xxx.jar: LifeCycle (base class for stuff), URIUtil (used in i2psnark)
-              jetty-sslengine-xxx.jar: SSL NIO Connector for console
-              jetty-java5-threadpool-xxx.jar: Concurrent thread pool for eepsite
+              jetty-deploy, -http, -io, -security, -servlet, -webapp: All split out from main server jar in Jetty 7
+              jetty-continuation-xxx.jar: Needed? Useful?
+              jetty-servlets-xxx.jar: Needed for CGI for eepsite
+              jetty-sslengine-xxx.jar: Old Jetty 6, now a dummy
+              jetty-java5-threadpool-xxx.jar: Old Jetty 6, now a dummy
               glassfish 2.1: Not used, too old, see Tomcat below.
               jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
               jetty-management: Not used by I2P, but only 34KB and could be useful for eepsites, and we bundled it with Jetty 5

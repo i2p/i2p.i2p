@@ -4,26 +4,20 @@
 <!--
 Configure a custom context for the eepsite.
 
-This context contains only a Context with a default servlet
+This context contains only a ServletContextHandler with a default servlet
 to serve static html files and images.
 -->
 
-<Configure class="org.mortbay.jetty.servlet.Context">
+<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./eepsite/docroot/</Set>
-  <Call name="setInitParams">
-    <Arg>
-      <Map>
-        <Entry>
-          <Item>org.mortbay.jetty.servlet.Default.cacheControl</Item>
-          <Item>max-age=3600,public</Item>
-        </Entry>
-      </Map>
-    </Arg>
+  <Call name="setInitParameter">
+    <Arg>cacheControl</Arg>
+    <Arg>max-age=3600,public</Arg>
   </Call>
   <Call name="setMimeTypes">
     <Arg>
-      <New class="org.mortbay.jetty.MimeTypes">
+      <New class="org.eclipse.jetty.http.MimeTypes">
         <Call name="addMimeMapping">
           <Arg>sud</Arg>
           <Arg>application/zip</Arg>
@@ -40,7 +34,7 @@ to serve static html files and images.
     </Arg>
   </Call>
   <Call name="addServlet">
-    <Arg>org.mortbay.jetty.servlet.DefaultServlet</Arg>
+    <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
     <Arg>/</Arg>
   </Call>
 </Configure>
