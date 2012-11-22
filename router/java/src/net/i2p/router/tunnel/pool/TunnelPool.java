@@ -19,6 +19,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
@@ -331,9 +332,10 @@ public class TunnelPool {
                 Rate rr = r.getRate(10*60*1000);
                 Rate sr = s.getRate(10*60*1000);
                 if (er != null && rr != null && sr != null) {
-                    long ec = er.getCurrentEventCount() + er.getLastEventCount();
-                    long rc = rr.getCurrentEventCount() + rr.getLastEventCount();
-                    long sc = sr.getCurrentEventCount() + sr.getLastEventCount();
+                    RateAverages ra = RateAverages.getTemp();
+                    long ec = er.computeAverages(ra, false).getTotalEventCount();
+                    long rc = rr.computeAverages(ra, false).getTotalEventCount();
+                    long sc = sr.computeAverages(ra, false).getTotalEventCount();
                     long tot = ec + rc + sc;
                     if (tot >= BUILD_TRIES_QUANTITY_OVERRIDE) {
                         if (1000 * sc / tot <=  1000 / BUILD_TRIES_QUANTITY_OVERRIDE)
@@ -366,9 +368,10 @@ public class TunnelPool {
                 Rate rr = r.getRate(10*60*1000);
                 Rate sr = s.getRate(10*60*1000);
                 if (er != null && rr != null && sr != null) {
-                    long ec = er.getCurrentEventCount() + er.getLastEventCount();
-                    long rc = rr.getCurrentEventCount() + rr.getLastEventCount();
-                    long sc = sr.getCurrentEventCount() + sr.getLastEventCount();
+                    RateAverages ra = RateAverages.getTemp();
+                    long ec = er.computeAverages(ra, false).getTotalEventCount();
+                    long rc = rr.computeAverages(ra, false).getTotalEventCount();
+                    long sc = sr.computeAverages(ra, false).getTotalEventCount();
                     long tot = ec + rc + sc;
                     if (tot >= BUILD_TRIES_LENGTH_OVERRIDE) {
                         if (1000 * sc / tot <=  1000 / BUILD_TRIES_LENGTH_OVERRIDE)

@@ -2,6 +2,7 @@ package net.i2p.router.peermanager;
 
 import net.i2p.I2PAppContext;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 
 /**
@@ -122,15 +123,16 @@ class CapacityCalculator {
         Rate curAccepted = acceptStat.getRate(period);
         Rate curRejected = rejectStat.getRate(period);
         Rate curFailed = failedStat.getRate(period);
+        RateAverages ra = RateAverages.getTemp();
 
         double eventCount = 0;
         if (curAccepted != null) {
-            eventCount = curAccepted.getCurrentEventCount() + curAccepted.getLastEventCount();
+            eventCount = curAccepted.computeAverages(ra, false).getTotalEventCount();
             // Punish for rejections.
             // We don't want to simply do eventCount -= rejected or we get to zero with 50% rejection,
             // and we don't want everybody to be at zero during times of congestion.
             if (eventCount > 0 && curRejected != null) {
-                long rejected = curRejected.getCurrentEventCount() + curRejected.getLastEventCount();
+                long rejected = curRejected.computeAverages(ra,false).getTotalEventCount();
                 if (rejected > 0)
                     eventCount *= eventCount / (eventCount + (2 * rejected));
             }
@@ -144,7 +146,7 @@ class CapacityCalculator {
         // fast pool, for example, you have a 1/7 chance of being falsely blamed.
         // We also don't want to drive everybody's capacity to zero, that isn't helpful.
         if (curFailed != null) {
-            double failed = curFailed.getCurrentTotalValue() + curFailed.getLastTotalValue();
+            double failed = curFailed.computeAverages(ra, false).getTotalValues();
             if (failed > 0) {
                 //if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
                 //    return 0.0d; // their tunnels have failed in the last 0-10 minutes

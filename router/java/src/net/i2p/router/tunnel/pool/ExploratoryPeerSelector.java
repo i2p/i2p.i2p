@@ -178,6 +178,6 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         Rate r = rs.getRate(period);
         if (r == null)
             return 0;
-        return (int) (r.getLastEventCount() + r.getCurrentEventCount());
+        return (int) (r.computeAverages().getTotalEventCount());
     }
 }
