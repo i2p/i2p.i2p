@@ -43,6 +43,9 @@ case $HOST_OS in
         if [ `echo $OS_ARCH |grep armv7` ]; then
             wrapperpath="./lib/wrapper/linux-armv7"
             cp ${wrapperpath}/libwrapper.so ./lib/
+        elif [ `echo $OS_ARCH |grep armv6` ]; then
+            wrapperpath="./lib/wrapper/linux-armv6"
+            cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ `echo $OS_ARCH |grep arm` ]; then
             wrapperpath="./lib/wrapper/linux-armv5"
             cp ${wrapperpath}/libwrapper.so ./lib/
