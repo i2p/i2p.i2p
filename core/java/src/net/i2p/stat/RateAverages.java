@@ -41,7 +41,7 @@ public class RateAverages {
      * if there are any events (current or last) => weighted average
      * otherwise if the useLifetime parameter to Rate.computeAverages was:
      * true => the lifetime average value
-     * false => the current average value
+     * false => zero
      */
     public double getAverage() {
         return average;

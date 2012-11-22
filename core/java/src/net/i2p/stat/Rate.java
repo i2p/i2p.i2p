@@ -289,6 +289,7 @@ public class Rate {
 
     /**
      * @return the average or lifetime average depending on last event count
+     * @since 0.9.4
      */
     public synchronized double getAvgOrLifetimeAvg() {
         if (getLastEventCount() > 0)
@@ -416,6 +417,7 @@ public class Rate {
     
     /**
      * @return a thread-local temp object containing computed averages.
+     * @since 0.9.4
      */
     public RateAverages computeAverages() {
         return computeAverages(RateAverages.getTemp(),false);
@@ -426,6 +428,7 @@ public class Rate {
      * @param useLifetime whether the lifetime average should be used if
      * there are no events.
      * @return the same RateAverages object for chaining
+     * @since 0.9.4
      */
     public synchronized RateAverages computeAverages(RateAverages out, boolean useLifetime) {
         out.reset();
