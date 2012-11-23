@@ -2,6 +2,7 @@ package net.i2p.util;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,5 +68,25 @@ public class CachedIteratorArrayListTest {
         assertEquals('b',iter.next().charValue());
         assertEquals('c',iter.next().charValue());
         assertFalse(iter.hasNext());
+    }
+    
+    /** 
+     * tests the Collections.sort method because that is used
+     * in the router and internally creates iterators
+     */
+    @Test
+    public void testSorting() {
+        List<Integer> li = new CachedIteratorArrayList<Integer>();
+        li.add(3);
+        li.add(2);
+        li.add(1);
+        Collections.sort(li);
+        
+        Iterator<Integer> ii = li.iterator();
+        assertEquals(1,ii.next().intValue());
+        assertEquals(2,ii.next().intValue());
+        assertEquals(3,ii.next().intValue());
+        
+        assertFalse(ii.hasNext());
     }
 }
