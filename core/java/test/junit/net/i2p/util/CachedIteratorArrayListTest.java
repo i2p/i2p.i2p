@@ -11,6 +11,7 @@ import org.junit.Test;
 public class CachedIteratorArrayListTest {
 
     private List<Character> l;
+    private Iterator<Character> iter; 
     
     @Before
     public void setUp() {
@@ -18,6 +19,7 @@ public class CachedIteratorArrayListTest {
         l.add('a');
         l.add('b');
         l.add('c');
+        iter = l.iterator();
     }
     
     /** test iterations work */
@@ -35,7 +37,7 @@ public class CachedIteratorArrayListTest {
         
         // and one partial
         total = "";
-        Iterator<Character> iter = l.iterator();
+        iter = l.iterator();
         total += iter.next();
         total += iter.next();
         iter = l.iterator();
@@ -49,5 +51,21 @@ public class CachedIteratorArrayListTest {
         Iterator<Character> one = l.iterator();
         assertSame(one, two);
     }
+    
+    @Test
+    public void testRemove() {
+        iter.next();
+        iter.remove();
 
+        // test proper removal
+        assertEquals(2,l.size());
+        assertEquals('b',l.get(0).charValue());
+        assertEquals('c',l.get(1).charValue());
+        
+        // test iterator still workx after removal
+        assertTrue(iter.hasNext());
+        assertEquals('b',iter.next().charValue());
+        assertEquals('c',iter.next().charValue());
+        assertFalse(iter.hasNext());
+    }
 }
