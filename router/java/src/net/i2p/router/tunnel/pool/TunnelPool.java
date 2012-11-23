@@ -803,17 +803,19 @@ public class TunnelPool {
          * we also use the conservative algorithm instead
          *
          **/
-
+        
+        final String rateName = buildRateName();
+        
         // Compute the average time it takes us to build a single tunnel of this type.
         int avg = 0;
-        RateStat rs = _context.statManager().getRate(buildRateName());
+        RateStat rs = _context.statManager().getRate(rateName);
         if (rs == null) {
             // Create the RateStat here rather than at the top because
             // the user could change the length settings while running
-            _context.statManager().createRequiredRateStat(buildRateName(),
+            _context.statManager().createRequiredRateStat(rateName,
                                    "Tunnel Build Frequency", "Tunnels",
                                    new long[] { TUNNEL_LIFETIME });
-            rs = _context.statManager().getRate(buildRateName());
+            rs = _context.statManager().getRate(rateName);
         }
         if (rs != null) {
             Rate r = rs.getRate(TUNNEL_LIFETIME);
@@ -890,7 +892,7 @@ public class TunnelPool {
                        + " soon " + expireSoon + " later " + expireLater
                        + " std " + wanted + " inProgress " + inProgress + " fallback " + fallback 
                        + " for " + toString());
-            _context.statManager().addRateData(buildRateName(), rv + inProgress, 0);
+            _context.statManager().addRateData(rateName, rv + inProgress, 0);
             return rv;
         }
 
@@ -943,7 +945,7 @@ public class TunnelPool {
         
         int rv = countHowManyToBuild(allowZeroHop, expire30s, expire90s, expire150s, expire210s, expire270s, 
                                    expireLater, wanted, inProgress, fallback);
-        _context.statManager().addRateData(buildRateName(), (rv > 0 || inProgress > 0) ? 1 : 0, 0);
+        _context.statManager().addRateData(rateName, (rv > 0 || inProgress > 0) ? 1 : 0, 0);
         return rv;
 
     }
