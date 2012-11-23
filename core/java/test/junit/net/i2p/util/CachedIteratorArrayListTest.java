@@ -10,33 +10,43 @@ import org.junit.Test;
 
 public class CachedIteratorArrayListTest {
 
-    private List<Integer> l;
+    private List<Character> l;
     
     @Before
     public void setUp() {
-        l = new CachedIteratorArrayList<Integer>();
-        l.add(1);
-        l.add(2);
-        l.add(3);
+        l = new CachedIteratorArrayList<Character>();
+        l.add('a');
+        l.add('b');
+        l.add('c');
     }
     
+    /** test iterations work */
     @Test
     public void test() {
-        // test for-each worx
-        int total = 0;
-        for (int i : l)
-            total += i;
-        assertEquals(6, total);
-        for (int i : l)
-            total += i;
-        assertEquals(12, total);
+        String total = "";
         
+        // two full for-each iterations
+        for (char i : l)
+            total += i;
+        assertEquals("abc", total);
+        for (char i : l)
+            total += i;
+        assertEquals("abcabc", total);
+        
+        // and one partial
+        total = "";
+        Iterator<Character> iter = l.iterator();
+        total += iter.next();
+        total += iter.next();
+        iter = l.iterator();
+        total += iter.next();
+        assertEquals("aba",total);
     }
     
     @Test
     public void testSameness() {
-        Iterator<Integer> two = l.iterator();
-        Iterator<Integer> one = l.iterator();
+        Iterator<Character> two = l.iterator();
+        Iterator<Character> one = l.iterator();
         assertSame(one, two);
     }
 
