@@ -647,11 +647,6 @@ checkUser() {
     # Check the configured user.  If necessary rerun this script as the desired user.
     if [ "X$RUN_AS_USER" != "X" ]
     then
-        if [ "`$IDEXE -u -n "$RUN_AS_USER" 2>/dev/null`" != "$RUN_AS_USER" ]
-        then
-            echo 'User $RUN_AS_USER does not exist.'
-            exit 1
-        fi
 
         # Resolve the location of the 'id' command
         IDEXE="/usr/xpg4/bin/id"
@@ -664,6 +659,11 @@ checkUser() {
                 eval echo `gettext 'Please report this message along with the location of the command on your system.'`
                 exit 1
             fi
+        fi
+        if [ "`$IDEXE -u -n "$RUN_AS_USER" 2>/dev/null`" != "$RUN_AS_USER" ]
+        then
+            echo 'User $RUN_AS_USER does not exist.'
+            exit 1
         fi
 
         if [ "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
