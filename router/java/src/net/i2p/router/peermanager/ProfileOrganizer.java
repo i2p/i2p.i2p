@@ -782,9 +782,9 @@ public class ProfileOrganizer {
         }
         
         if (shouldCoalesce) {
-        	getReadLock();
-        	try {
-        		for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
+            getReadLock();
+            try {
+                for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                     PeerProfile prof = iter.next();
                     if ( (expireOlderThan > 0) && (prof.getLastSendSuccessful() <= expireOlderThan) ) {
                         continue;
@@ -792,10 +792,10 @@ public class ProfileOrganizer {
                     long coalesceStart = System.currentTimeMillis();
                     prof.coalesceOnly();
                     coalesceTime += (int)(System.currentTimeMillis()-coalesceStart);
-        		}
-        	} finally {
-        		releaseReadLock();
-        	}
+                }
+            } finally {
+                releaseReadLock();
+            }
         }
         
         if (!getWriteLock())
