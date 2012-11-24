@@ -107,10 +107,6 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
     
-    static {
-        System.setProperty("org.mortbay.http.Version.paranoid", "true");
-    }
-    
     /**
      *  <pre>
      *  non-SSL:
