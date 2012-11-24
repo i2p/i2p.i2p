@@ -80,7 +80,7 @@
                     <isset property="jar.uptodate" />
                 </not>
                 <not>
-                    <isset property="wjar.uptodate" />
+                    <isset property="war.uptodate" />
                 </not>
                 <isset property="mtn.available" />
             </and>
