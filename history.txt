@@ -1,3 +1,9 @@
+2012-11-24 zzz
+ * Addressbook: Disable unused wakeup via http
+
+2012-11-21 zzz
+ * Wrapper: Add armv6 files for Raspberry Pi
+
 2012-11-21 kytv
  * Update Java Service Wrapper to v3.5.16.
     - Windows: Self-compiled with VS2010 in Windows 7. The icon has been

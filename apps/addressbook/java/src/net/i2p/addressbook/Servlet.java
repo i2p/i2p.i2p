@@ -42,8 +42,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Servlet extends HttpServlet {
     private DaemonThread thread;
-    private String nonce;
-    private static final String PROP_NONCE = "addressbook.nonce";
+    //private String nonce;
+    //private static final String PROP_NONCE = "addressbook.nonce";
 
     /**
      * Hack to allow susidns to kick the daemon when the subscription list changes.
@@ -54,15 +54,15 @@ public class Servlet extends HttpServlet {
      */
     public void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //System.err.println("Got request nonce = " + request.getParameter("nonce"));
-        if (this.thread != null && request.getParameter("wakeup") != null &&
-            this.nonce != null && this.nonce.equals(request.getParameter("nonce"))) {
-            //System.err.println("Sending interrupt");
-            this.thread.interrupt();
-            // no output
-        } else {
+        //if (this.thread != null && request.getParameter("wakeup") != null &&
+        //    this.nonce != null && this.nonce.equals(request.getParameter("nonce"))) {
+        //    //System.err.println("Sending interrupt");
+        //    this.thread.interrupt();
+        //    // no output
+        //} else {
             PrintWriter out = response.getWriter();
             out.write("I2P addressbook OK");
-        }
+        //}
     }
 
     /* (non-Javadoc)
@@ -75,9 +75,9 @@ public class Servlet extends HttpServlet {
         } catch (ServletException exp) {
             System.err.println("Addressbook init exception: " + exp);
         }
-        this.nonce = "" + Math.abs((new Random()).nextLong());
+        //this.nonce = "" + Math.abs((new Random()).nextLong());
         // put the nonce where susidns can get it
-        System.setProperty(PROP_NONCE, this.nonce);
+        //System.setProperty(PROP_NONCE, this.nonce);
         String[] args = new String[1];
         args[0] = config.getInitParameter("home");
         this.thread = new DaemonThread(args);
