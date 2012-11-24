@@ -42,9 +42,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private final BuildExecutor _executor;
     private final BuildHandler _handler;
     private final TunnelPeerSelector _clientPeerSelector;
-    private boolean _isShutdown;
+    private volatile boolean _isShutdown;
     private final int _numHandlerThreads;
-    private static final long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
 
     private static final int MIN_KBPS_TWO_HANDLERS = 512;
     private static final int MIN_KBPS_THREE_HANDLERS = 1024;
@@ -83,6 +82,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _numHandlerThreads = ctx.getProperty("router.buildHandlerThreads", numHandlerThreads);
         
         // The following are for TestJob
+        long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
         ctx.statManager().createRequiredRateStat("tunnel.testFailedTime", "Time for tunnel test failure (ms)", "Tunnels", 
                                          RATES);
         ctx.statManager().createRateStat("tunnel.testExploratoryFailedTime", "How long did the failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
@@ -100,7 +100,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     /**
-     * Pick a random inbound exploratory tunnel
+     * Pick a random inbound exploratory tunnel.
+     * Warning - selectInboundExploratoryTunnel(Hash) is preferred.
      *
      * @return null if none
      */
@@ -115,7 +116,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     /**
-     * Pick a random inbound tunnel from the given destination's pool
+     * Pick a random inbound tunnel from the given destination's pool.
+     * Warning - selectOutboundTunnel(Hash, Hash) is preferred.
      *
      * @param destination if null, returns inbound exploratory tunnel
      * @return null if none
@@ -133,7 +135,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     /**
-     * Pick a random outbound exploratory tunnel
+     * Pick a random outbound exploratory tunnel.
+     * Warning - selectOutboundExploratoryTunnel(Hash) is preferred.
      *
      * @return null if none
      */
@@ -148,7 +151,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     /**
-     * Pick a random outbound tunnel from the given destination's pool
+     * Pick a random outbound tunnel from the given destination's pool.
+     * Warning - selectOutboundTunnel(Hash, Hash) is preferred.
      *
      * @param destination if null, returns outbound exploratory tunnel
      * @return null if none
@@ -364,6 +368,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public void setInboundSettings(Hash client, TunnelPoolSettings settings) {
         setSettings(_clientInboundPools, client, settings);
     }
+
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {
         setSettings(_clientOutboundPools, client, settings);
     }
@@ -544,8 +549,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.add(_inboundExploratory);
         out.add(_outboundExploratory);
     }
+
     void tunnelFailed() { _executor.repoll(); }
+
     BuildExecutor getExecutor() { return _executor; }
+
     boolean isShutdown() { return _isShutdown; }
 
     public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
