@@ -1,5 +1,7 @@
 2012-11-24 zzz
  * Addressbook: Disable unused wakeup via http
+ * Codel: Make stats non-required (ticket #786)
+ * Profiles: Small optimization in coalesceOnly() (ticket #765)
 
 2012-11-21 zzz
  * Wrapper: Add armv6 files for Raspberry Pi
