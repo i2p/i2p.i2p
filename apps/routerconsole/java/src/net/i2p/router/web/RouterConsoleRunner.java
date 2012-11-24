@@ -110,10 +110,6 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
     
-    static {
-        System.setProperty("org.mortbay.http.Version.paranoid", "true");
-    }
-    
     /**
      *  <pre>
      *  non-SSL:
@@ -300,7 +296,7 @@ public class RouterConsoleRunner implements RouterApp {
         //    System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
         //}
         // This way it doesn't try to load Slf4jLog first
-        System.setProperty("org.mortbay.log.class", "net.i2p.jetty.I2PLogger");
+        System.setProperty("org.eclipse.jetty.util.log.class", "net.i2p.jetty.I2PLogger");
 
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");
