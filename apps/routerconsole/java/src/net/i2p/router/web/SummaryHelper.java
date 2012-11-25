@@ -852,29 +852,29 @@ public class SummaryHelper extends HelperBase {
                .append(i)
                .append("\">");
             if (i > 0) {
-                buf.append("<input type=\"image\" class=\"buttonTop\" name=\"move_")
+                buf.append("<button type=\"submit\" class=\"buttonTop\" name=\"action\" value=\"move_")
                    .append(i)
-                   .append("_top\" alt=\"")
+                   .append("_top\"><img alt=\"")
                    .append(_("Top"))
-                   .append("\" src=\"" + imgPath + "move_top.png\">");
-                buf.append("<input type=\"image\" class=\"buttonUp\" name=\"move_")
+                   .append("\" src=\"" + imgPath + "move_top.png\" /></button>");
+                buf.append("<button type=\"submit\" class=\"buttonUp\" name=\"action\" value=\"move_")
                    .append(i)
-                   .append("_up\" alt=\"")
+                   .append("_up\"><img alt=\"")
                    .append(_("Up"))
-                   .append("\" src=\"" + imgPath + "move_up.png\">");
+                   .append("\" src=\"" + imgPath + "move_up.png\" /></button>");
             }
             buf.append("</td><td align=\"left\">");
             if (i < sections.size() - 1) {
-                buf.append("<input type=\"image\" class=\"buttonDown\" name=\"move_")
+                buf.append("<button type=\"submit\" class=\"buttonDown\" name=\"action\" value=\"move_")
                    .append(i)
-                   .append("_down\" alt=\"")
+                   .append("_down\"><img alt=\"")
                    .append(_("Down"))
-                   .append("\" src=\"" + imgPath + "move_down.png\">");
-                buf.append("<input type=\"image\" class=\"buttonBottom\" name=\"move_")
+                   .append("\" src=\"" + imgPath + "move_down.png\" /></button>");
+                buf.append("<button type=\"submit\" class=\"buttonBottom\" name=\"action\" value=\"move_")
                    .append(i)
-                   .append("_bottom\" alt=\"")
+                   .append("_bottom\"><img alt=\"")
                    .append(_("Bottom"))
-                   .append("\" src=\"" + imgPath + "move_bottom.png\">");
+                   .append("\" src=\"" + imgPath + "move_bottom.png\" /></button>");
             }
             buf.append("</td></tr>\n");
         }
