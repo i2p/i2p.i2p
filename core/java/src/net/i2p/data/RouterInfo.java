@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -30,7 +31,6 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA1;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SHA256Generator;
-import net.i2p.util.CachedIteratorArrayList;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -81,7 +81,7 @@ public class RouterInfo extends DatabaseEntry {
     public static final String BW_CAPABILITY_CHARS = "KLMNO";
     
     public RouterInfo() {
-        _addresses = new CachedIteratorArrayList<RouterAddress>(2);
+        _addresses = new ArrayList<RouterAddress>(2);
         _options = new OrderedProperties();
     }
 
