@@ -123,6 +123,7 @@ trans.cs = debian/po/cs.po
 trans.de = debian/po/de.po
 trans.el = debian/po/el.po
 trans.es = debian/po/es.po
+trans.fr = debian/po/fr.po
 trans.it = debian/po/it.po
 trans.hu = debian/po/hu.po
 trans.pl = debian/po/pl.po
