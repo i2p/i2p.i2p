@@ -75,6 +75,7 @@ public class Reseeder {
     public static final String DEFAULT_SSL_SEED_URL =
               "https://netdb.i2p2.de/" + "," +
               "https://reseed.i2p-projekt.de/" + "," +
+              "https://euve5653.vserver.de/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
