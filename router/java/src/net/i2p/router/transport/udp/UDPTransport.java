@@ -879,7 +879,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.warn(remotePeer + " changed address FROM " + oldID + " TO " + remoteId);
                 PeerState oldPeer2 = _peersByRemoteHost.remove(oldID);
                 // different ones in the two maps? shouldn't happen
-                if (oldPeer2 != oldPeer) {
+                if (oldPeer2 != oldPeer && oldPeer2 != null) {
                     oldPeer2.dropOutbound();
                      _introManager.remove(oldPeer2);
                     _expireEvent.remove(oldPeer2);
