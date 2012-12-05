@@ -86,7 +86,7 @@ msgstr[1] "{0} résultats de recherche dans la liste filtrée."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:206
 #, java-format
 msgid "Filtered list contains 1 entry."
-msgid_plural "Fltered list contains {0} entries."
+msgid_plural "Filtered list contains {0} entries."
 msgstr[0] "La liste filtrée contient {0} entrée."
 msgstr[1] "La liste filtrée contient {0} entrées."
 

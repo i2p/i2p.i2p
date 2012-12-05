@@ -80,7 +80,7 @@ msgstr[0] "列表中有{0}个与筛选条件匹配的结果。"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:206
 #, java-format
 msgid "Filtered list contains 1 entry."
-msgid_plural "Fltered list contains {0} entries."
+msgid_plural "Filtered list contains {0} entries."
 msgstr[0] "筛选列表中包含{0}条记录。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:211

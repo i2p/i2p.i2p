@@ -82,7 +82,7 @@ msgstr[1] "A keresés a szűrővel ellátott listában {0} eredményt hozott."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:236
 #, java-format
 msgid "Filtered list contains 1 entry."
-msgid_plural "Fltered list contains {0} entries."
+msgid_plural "Filtered list contains {0} entries."
 msgstr[0] "A szűrés után a lista 1 bejegyzést tartalmaz."
 msgstr[1] "A szűrés után a lista {0} bejegyzést tartalmaz."
 
