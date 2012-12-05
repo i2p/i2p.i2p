@@ -1,6 +1,14 @@
+2012-12-05 zzz
+ * GarlicMessage: Fix notes and log in GarlicMessageHandler and HandleGarlicMessageJob,
+   they are used for netdb messages received by floodfills http://zzz.i2p/topics/1282
+ * I2CP: Fix external I2CP apps, including i2ping, caused by 0 nonce value,
+   broken in 0.9.2 (tickets #799, #801). Allow nonces == 0.
+ * Reseed: Don't go on to the next host if we have enough http://zzz.i2p/topics/1287
+ * SSU: Fix rare NPE (ticket #798)
+
 2012-11-28 kytv
-* Chinese, French, Italian, Polish, and Ukrainian translation updates from
- Transifex.
+ * Chinese, French, Italian, Polish, and Ukrainian translation updates from
+   Transifex.
 
 2012-11-24 zzz
  * Addressbook: Disable unused wakeup via http

@@ -26,10 +26,10 @@ import net.i2p.data.Payload;
  */
 public class SendMessageMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 5;
-    private SessionId _sessionId;
-    private Destination _destination;
-    private Payload _payload;
-    private long _nonce;
+    protected SessionId _sessionId;
+    protected Destination _destination;
+    protected Payload _payload;
+    protected long _nonce;
 
     public SendMessageMessage() {
     }
@@ -58,10 +58,16 @@ public class SendMessageMessage extends I2CPMessageImpl {
         _payload = payload;
     }
 
+    /**
+     * @return 0 to 0xffffffff
+     */
     public long getNonce() {
         return _nonce;
     }
 
+    /**
+     * @param 0 to 0xffffffff
+     */
     public void setNonce(long nonce) {
         _nonce = nonce;
     }
@@ -109,8 +115,14 @@ public class SendMessageMessage extends I2CPMessageImpl {
      */
     @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
-        if ((_sessionId == null) || (_destination == null) || (_payload == null) || (_nonce <= 0))
-            throw new I2CPMessageException("Unable to write out the message as there is not enough data");
+        if (_sessionId == null)
+            throw new I2CPMessageException("No session ID");
+        if (_destination == null)
+            throw new I2CPMessageException("No dest");
+        if (_payload == null)
+            throw new I2CPMessageException("No payload");
+        if (_nonce < 0)
+            throw new I2CPMessageException("No nonce");
         int len = 2 + _destination.size() + _payload.getSize() + 4 + 4;
         
         try {

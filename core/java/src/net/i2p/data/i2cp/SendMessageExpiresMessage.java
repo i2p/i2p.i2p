@@ -105,17 +105,23 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
      */
     @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
-        if ((getSessionId() == null) || (getDestination() == null) || (getPayload() == null) || (getNonce() <= 0))
-            throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        int len = 2 + getDestination().size() + getPayload().getSize() + 4 + 4 + DataHelper.DATE_LENGTH;
+        if (_sessionId == null)
+            throw new I2CPMessageException("No session ID");
+        if (_destination == null)
+            throw new I2CPMessageException("No dest");
+        if (_payload == null)
+            throw new I2CPMessageException("No payload");
+        if (_nonce < 0)
+            throw new I2CPMessageException("No nonce");
+        int len = 2 + _destination.size() + _payload.getSize() + 4 + 4 + DataHelper.DATE_LENGTH;
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, getType());
-            getSessionId().writeBytes(out);
-            getDestination().writeBytes(out);
-            getPayload().writeBytes(out);
-            DataHelper.writeLong(out, 4, getNonce());
+            DataHelper.writeLong(out, 1, MESSAGE_TYPE);
+            _sessionId.writeBytes(out);
+            _destination.writeBytes(out);
+            _payload.writeBytes(out);
+            DataHelper.writeLong(out, 4, _nonce);
             _daf.writeBytes(out);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Error writing the msg", dfe);
@@ -142,12 +148,12 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("[SendMessageMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tNonce: ").append(getNonce());
-        buf.append("\n\tDestination: ").append(getDestination());
+        buf.append("[SendMessageExpiresMessage: ");
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tNonce: ").append(_nonce);
+        buf.append("\n\tDestination: ").append(_destination);
         buf.append("\n\tExpiration: ").append(getExpiration());
-        buf.append("\n\tPayload: ").append(getPayload());
+        buf.append("\n\tPayload: ").append(_payload);
         buf.append("]");
         return buf.toString();
     }

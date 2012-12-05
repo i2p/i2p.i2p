@@ -379,9 +379,10 @@ class ClientConnectionRunner {
      * Send a notification to the client that their message (id specified) was accepted 
      * for delivery (but not necessarily delivered)
      * Doesn't do anything if i2cp.messageReliability = "none"
+     * or if the nonce is 0.
      */
     void ackSendMessage(MessageId id, long nonce) {
-        if (_dontSendMSM)
+        if (_dontSendMSM || nonce == 0)
             return;
         SessionId sid = _sessionId;
         if (sid == null) return;
