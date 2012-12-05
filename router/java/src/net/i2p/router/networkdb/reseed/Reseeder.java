@@ -273,6 +273,9 @@ public class Reseeder {
                 int dl = reseedOne(url, echoStatus);
                 if (dl > 0) {
                     total += dl;
+                    // Don't go on to the next URL if we have enough
+                    if (total >= 100)
+                        break;
                     // remove alternate version if we haven't tried it yet
                     String alt;
                     if (url.startsWith("http://"))
@@ -392,9 +395,6 @@ public class Reseeder {
 
                 if (fetched > 0)
                     _context.netDb().rescan();
-                // Don't go on to the next URL if we have enough
-                if (fetched >= 100)
-                    _isRunning = false;
                 return fetched;
             } catch (Throwable t) {
                 _log.warn("Error reseeding", t);
