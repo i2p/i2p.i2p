@@ -85,6 +85,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
     }
 
+    /** clients */
     public String getForm1() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
@@ -112,6 +113,7 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
+    /** webapps */
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
@@ -136,6 +138,7 @@ public class ConfigClientsHelper extends HelperBase {
         return PluginStarter.pluginsEnabled(_context);
     }
 
+    /** plugins */
     public String getForm3() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
@@ -218,7 +221,11 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
-    /** ro trumps edit and showEditButton */
+    /**
+     *  Misnamed, renders a single line in a table for a single client/webapp/plugin.
+     *
+     *  ro trumps edit and showEditButton
+     */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
                             boolean enabled, boolean ro, String desc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
