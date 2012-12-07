@@ -118,7 +118,7 @@ public class RouterClock extends Clock {
             // only listen to a worse stratum if it's been a while
             if (_alreadyChanged && stratum > _lastStratum &&
                 System.currentTimeMillis() - _lastChanged < MIN_DELAY_FOR_WORSE_STRATUM) {
-                getLog().warn("Ignoring update from a stratum " + stratum +
+                getLog().debug("Ignoring update from a stratum " + stratum +
                               " clock, we recently had an update from a stratum " + _lastStratum + " clock");
                 return;
             }
