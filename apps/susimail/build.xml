@@ -10,6 +10,7 @@
     <property name="require.gettext" value="true" />
 
     <target name="compile">
+        <mkdir dir="./src/WEB-INF/classes" />
         <javac 
             srcdir="./src/src"
             debug="true" deprecation="off" source="1.5" target="1.5" 
@@ -43,6 +44,7 @@
     <target name="war" depends="compile, bundle, warUpToDate, listChangedFiles" unless="war.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
+        <copy file="src/susimail.properties" todir="src/WEB-INF/classes" />
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
             <manifest>
@@ -111,10 +113,7 @@
             windowtitle="susimail" />
     </target>
     <target name="clean">
-        <delete>
-            <fileset dir="src/WEB-INF/classes/" includes="**/*.class" />
-        </delete>
-    	<delete dir="src/WEB-INF/classes/i2p"/>
+    	<delete dir="src/WEB-INF/classes"/>
     	<delete file="susimail.war"/>
     </target>
     <target name="cleandep" depends="clean" />
