@@ -41,6 +41,7 @@ class VersionComparatorSpec extends FunSpec with ShouldMatchers {
         same("0.1.2","0-1-2")
         same("0.1.2","0_1_2")
         same("0.1.2-foo", "0.1.2-bar")
+        same("0.1-asdf3","0_1.3fdsa")
 
         // this should be the same, no? --zab
         less("0.1.2","0.1.2.0") 
