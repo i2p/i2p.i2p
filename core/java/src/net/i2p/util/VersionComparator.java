@@ -2,6 +2,13 @@ package net.i2p.util;
 
 import java.util.Comparator;
 
+/**
+ * Compares versions.
+ * Characters other than [0-9.-_] are ignored.
+ * I2P only uses '.' but Sun Java uses '_' and plugins may use any of '.-_'
+ * Moved from TrustedUpdate.java
+ * @since 0.7.10
+ */
 public class VersionComparator implements Comparator<String> {
 
     @Override
