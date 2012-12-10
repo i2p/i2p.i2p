@@ -23,50 +23,68 @@ class VersionComparatorSpec extends FunSpec with ShouldMatchers {
     private def same(A : String, B : String) =
       comp("equals", A, B, 0)
     
-    private def invalid(A : String, B : String) = {
-      it("should throw IAE while comparing "+A+" and "+B) {
-          intercept[IllegalArgumentException] {
-              vc.compare(A,B)
-          }
-      }
-    }
-    
     describe("A VersionComparator") {
         same("0.1.2","0.1.2")
+
         less("0.1.2","0.1.3")
         more("0.1.3","0.1.2")
+
         more("0.1.2.3.4", "0.1.2")
         less("0.1.2", "0.1.2.3.4")
-        more("0.1.3", "0.1.2.3.4")
-        same("0.1.2","0-1-2")
-        same("0.1.2","0_1_2")
-        same("0.1.2-foo", "0.1.2-bar")
-        same("0.1-asdf3","0_1.3fdsa")
 
-        // this should be the same, no? --zab
+        more("0.1.3", "0.1.2.3.4")
+	less("0.1.2.3.4", "0.1.3")
+
+        same("0.1.2","0-1-2")
+	same("0-1-2","0.1.2")
+
+        same("0.1.2","0_1_2")
+	same("0_1_2","0.1.2")
+
+        same("0.1.2-foo", "0.1.2-bar")
+	same("0.1.2-bar", "0.1.2-foo")
+
+        same("0.1-asdf3","0_1.3fdsa")
+	same("0_1.3fdsa","0.1-asdf3")
+
         less("0.1.2","0.1.2.0") 
+        more("0.1.2.0","0.1.2")
         
         /*********
         I think everything below this line should be invalid --zab.
         *********/
-        same("",".")
-        less("-0.1.2", "-0.1.3") 
+        less("",".")
+        more(".","")
+
+        less("-0.1.2", "-0.1.3")
+        more("-0.1.3", "-0.1.2")
+ 
         more("0..2", "0.1.2") 
         less("0.1.2", "0..2") 
-        same("asdf","fdsa") 
+
+        same("asdf","fdsa")
+        same("fdsa","asdf")
+
         same("---","___")
+        same("___","---")
+
         same("1.2.3","0001.0002.0003")
+        same("0001.0002.0003","1.2.3")
+
         more("as123$Aw4423-234","asdfq45#11--_")
-        
+        less("asdfq45#11--_","as123$Aw4423-234")
+       
         // non-ascii string
         val byteArray = new Array[Byte](10)
         byteArray(5) = 1
         byteArray(6) = 10
         val nonAscii = new String(byteArray)
-        same(nonAscii,"")
+        more(nonAscii,"")
+        less("",nonAscii)
         
         // huge value, can't fit in a long
         val huge = String.valueOf(Long.MaxValue)+"0000.0";
         less(huge,"1.2")
+        more("1.2",huge)
     }
 }
