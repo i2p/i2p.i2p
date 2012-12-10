@@ -264,8 +264,11 @@
                   %><option value="1"<%=(tunnelQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._("1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)")%></option>
                     <option value="2"<%=(tunnelQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl._("2 inbound, 2 outbound tunnels (standard bandwidth usage, standard reliability)")%></option>
                     <option value="3"<%=(tunnelQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl._("3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)")%></option>
-                <% if (tunnelQuantity > 3) {
-                %>    <option value="<%=tunnelQuantity%>" selected="selected"><%=tunnelQuantity%> <%=intl._("tunnels")%></option>
+                    <option value="4"<%=(tunnelQuantity == 4 ? " selected=\"selected\"" : "") %>><%=intl._("4 in, 4 out (high traffic server)")%></option>
+                    <option value="5"<%=(tunnelQuantity == 5 ? " selected=\"selected\"" : "") %>><%=intl._("5 in, 5 out (high traffic server)")%></option>
+                    <option value="6"<%=(tunnelQuantity == 6 ? " selected=\"selected\"" : "") %>><%=intl._("6 in, 6 out (high traffic server)")%></option>
+                <% if (tunnelQuantity > 6) {
+                %>    <option value="<%=tunnelQuantity%>" selected="selected"><%=tunnelQuantity%>&nbsp;<%=intl._("tunnels")%></option>
                 <% }
               %></select>                
             </div>
