@@ -40,8 +40,10 @@ X86_64=`echo "${OS_ARCH}" | grep x86_64`
 
 case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
+        # Tanuki-built arm wrapper works on armv5 and armv7 but not on Raspberry Pi armv6.
+        # Wrapper we built for Raspberry Pi does not work on Trimslice armv7.
         if [ `echo $OS_ARCH |grep armv7` ]; then
-            wrapperpath="./lib/wrapper/linux-armv7"
+            wrapperpath="./lib/wrapper/linux-armv5"
             cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ `echo $OS_ARCH |grep armv6` ]; then
             wrapperpath="./lib/wrapper/linux-armv6"

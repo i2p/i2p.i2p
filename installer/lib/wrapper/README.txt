@@ -12,15 +12,15 @@ to xxx/librapper.so, libwrapper.jnilib, or wrapper.dll for the following directo
 Don't forget to disable the execute bit.
 	linux (x86-32)
 	linux64 (x86-64)
-	linux-armv5 (armv5)
+	linux-armv5 (armv5/armv7)
 	solaris (sparc-32)
 
 From the delta pack, strip the binaries in bin/ and copy
 to xxx/i2psvc for the same directories as above.
 Don't forget to disable the execute bit.
 
-For armv7, build from source following the instructions
-in linux-armv7/README.txt.
+For armv6, build from source following the instructions
+in linux-armv6/README.txt.
 Don't forget to strip the binaries and disable the execute bit.
 We use a trimslice for armv7 building.
 
