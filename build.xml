@@ -749,12 +749,9 @@
     </target>
 
     <target name="preppkg-linux-nonx86" depends="preppkg-unix">
-        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
-            <fileset dir="installer/lib/wrapper/linux-armv7/" excludes="*.txt" />
+        <copy todir="pkg-temp/lib/wrapper/linux-ppc/">
+            <fileset dir="installer/lib/wrapper/linux-ppc/" excludes="*.txt" />
         </copy>
-	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
-	    <fileset dir="installer/lib/wrapper/linux-ppc/" excludes="*.txt" />
-	</copy>
         <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
             <fileset dir="installer/lib/wrapper/linux-armv5/" excludes="*.txt" />
         </copy>
