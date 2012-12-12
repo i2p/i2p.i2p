@@ -25,7 +25,6 @@ XMLFILES="\
 ./apps/BOB/nbproject/build-impl.xml \
 ./apps/BOB/nbproject/project.xml \
 ./apps/desktopgui/build.xml \
-./apps/fortuna/build.xml \
 ./apps/i2psnark/java/build.xml \
 ./apps/i2psnark/jetty-i2psnark.xml \
 ./apps/i2psnark/web.xml \
@@ -63,7 +62,6 @@ XMLFILES="\
 
 HTMLFILES="\
 ./installer/resources/initialNews/*.xml \
-./installer/resources/news.xml \
 ./apps/BOB/src/net/i2p/BOB/package.html \
 ./apps/desktopgui/src/net/i2p/desktopgui/package.html \
 ./apps/ministreaming/java/src/net/i2p/client/streaming/package.html \
