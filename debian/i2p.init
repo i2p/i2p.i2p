@@ -124,7 +124,7 @@ do_stop()
     start-stop-daemon --stop --quiet --oknodo --retry=0/60/KILL/20 --exec $DAEMON
 
     rm -rf "$I2PTEMP" > /dev/null 2>&1
-    [ -d "$RUN" ] && rmdir "$RUN" 2>&1
+    [ -d "$RUN" ] && rmdir --ignore-fail-on-non-empty "$RUN" > /dev/null 2>&1
 }
 
 do_dump()

@@ -1,3 +1,40 @@
+i2p (0.9.4-1) stable; urgency=low
+
+  * explicitly prefer openjdk-*-headless over default-jre-headless. Debian
+    Squeeze has default-jre-headless set to gij. Performance with gij is
+    subpar. We can't force a depend on openjdk since kFreeBSD does not include
+    it (yet).
+  * French Debconf translation updates
+  * Initscript: Don't display a warning if /var/run/i2p contains files after
+    shutdown.
+  * Upsteam changelog (full details in history.txt):
+    - Add per-destination outbound priorities
+    - Fix major bug that reduced SSU connection limits which reduced tunnel
+      build success rates
+    - Fix bug with external I2CP that prevented some external apps from working
+    - Fixed several bugs in i2psnark DHT
+    - Fixed bug in i2psnark PEX that inflated peer counts
+    - Handle dropped I2CP messages better
+    - Reduce overhead of I2CP messages
+    - Enforce max size in transport outbound message queues
+    - Fix a bug that would drop messages of exactly 512 bytes in SSU
+    - More performance improvements, memory reduction, and object churn reduction
+    - Better detection of network disconnections
+    - Further improvements in the SSU transport
+    - Add console password form
+    - Convert http proxy and console from basic to digest authentication for added security
+    - Improved verification of console form submissions, using jsp sessions.
+      Cookies may now be required on forms, except when the console password is
+      enabled
+    - Initial work on new interfaces to manage applications started via
+      clients.config
+    - Increase minimum peer port to 1024
+    - Increase granularity of bandwidth limiter for smoother transmissions
+    - Translation updates: Chinese, French, German, Italian, Polish,
+      Portuguese, Swedish, and Ukrainian
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 17 Dec 2012 23:59:59 +0000
+
 i2p (0.9.3-1) stable; urgency=low
 
   * New Upstream release
