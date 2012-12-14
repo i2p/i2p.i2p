@@ -1,5 +1,6 @@
 2012-12-14 kytv
 * German and Swedish translation updates from Transifex
+* Update geoip.txt based on Maxmind GeoLite Country database from 2012-12-04
 
 2012-12-11 zzz
  * Wrapper: Use Tanuki's binary for armv7
