@@ -27,7 +27,8 @@ public class RateStat {
         if (periods.length == 0)
             throw new IllegalArgumentException();
         
-        long [] periodsCopy = copyOf(periods, periods.length); 
+        long [] periodsCopy = new long[periods.length]; 
+        System.arraycopy(periods, 0, periodsCopy, 0, periods.length);
         sort(periodsCopy);
         
         _rates = new Rate[periodsCopy.length];
