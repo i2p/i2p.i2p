@@ -66,7 +66,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
     }
 
     /**
-     * @param 0 to 0xffffffff
+     * @param nonce 0 to 0xffffffff
      */
     public void setNonce(long nonce) {
         _nonce = nonce;

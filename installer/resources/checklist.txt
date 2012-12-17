@@ -66,6 +66,9 @@ Generate PGP signatures:
 (end of tasks automated by 'ant release')
 =========================================
 
+Add magnet links to news.xml
+
+Seed update torrents
 
 Notify the following people:
 	All in-network update hosts
