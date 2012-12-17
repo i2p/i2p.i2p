@@ -1555,7 +1555,7 @@
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/i2psnark.jar" />
             </classpath>
-            <arg value="i2pupdate_${release.number}.sud" />
+            <arg value="i2pupdate-${release.number}.sud" />
             <arg value="http://tracker2.postman.i2p/announce.php" />
         </java>
         <copy file="i2pupdate.su2" tofile="i2pupdate-${release.number}.su2" />
@@ -1564,7 +1564,7 @@
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/i2psnark.jar" />
             </classpath>
-            <arg value="i2pupdate_${release.number}.su2" />
+            <arg value="i2pupdate-${release.number}.su2" />
             <arg value="http://tracker2.postman.i2p/announce.php" />
         </java>
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
