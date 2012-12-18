@@ -117,6 +117,7 @@ rm -f ./lib/*.dll
 rm -f ./*.bat
 rm -f ./*.cmd
 rm -f ./*.exe
+rm -f ./eepsite/*/.placeholder
 rm -rf ./installer
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then

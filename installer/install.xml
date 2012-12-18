@@ -163,7 +163,7 @@
 		  64bit jvm) so that if a 32 bit jvm is installed in the
 		  future, nothing breaks.
 		  -->
-	     <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
                 condition="is64bit" > <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib\wrapper-windows-x86-32.dll" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
@@ -172,7 +172,7 @@
                 <args><arg value="$INSTALL_PATH\install_i2p_service_unix" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install-headless.txt" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\runplain.sh" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\osid" /></args></executable>
@@ -184,22 +184,28 @@
                 <args><arg value="$INSTALL_PATH\lib\wrapper" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\eepget" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-	        <args><arg value="$INSTALL_PATH/net.i2p.router.plist.template" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-	        <args><arg value="$INSTALL_PATH/install_i2p_service_osx.command" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-	        <args><arg value="$INSTALL_PATH/uninstall_i2p_service_osx.command" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/net.i2p.router.plist.template" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/install_i2p_service_osx.command" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/uninstall_i2p_service_osx.command" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH/man" /></args></executable>
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH/locale" /></args></executable>
-	    <!-- Placeholder for an OSX 'shortcut' to the router console
-	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
-		-->
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH\eepsite\webapps\.placeholder" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH\eepste\logs\.placeholder" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH\eepsite\cgi-bin\.placeholder" /></args></executable>
+            <!-- Placeholder for an OSX 'shortcut' to the router console
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
+                -->
             <!-- workaround for bad default path for wrapper.log in Windows. -->
             <executable targetfile="$INSTALL_PATH/fixpaths.cmd" type="bin" stage="postinstall" keep="false"> <os family="windows" />
             </executable>
