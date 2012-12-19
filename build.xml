@@ -223,12 +223,14 @@
 	<ant target="doBuildEXE" />
     </target>
 
-    <taskdef name="launch4j"
-             classname="net.sf.launch4j.ant.Launch4jTask"
-             classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
+    <target name="launch4j">
+        <taskdef name="launch4j"
+                 classname="net.sf.launch4j.ant.Launch4jTask"
+                 classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
+     </target>
 
     <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup -->
-    <target name="doBuildEXE" depends="buildProperties" unless="noExe">
+    <target name="doBuildEXE" depends="buildProperties, launch4j" unless="noExe">
         <echo message="See the file &quot;build.properties&quot; if this step fails." />
         <jar destfile="./build/launchi2p.jar">
             <manifest>
@@ -1130,11 +1132,10 @@
         </exec>
     </target>
 
-    <taskdef name="izpack"
-             classpath="${basedir}/installer/lib/izpack/patches.jar:${basedir}/installer/lib/izpack/standalone-compiler.jar"
-             classname="com.izforge.izpack.ant.IzPackTask" />
-
     <target name="izpack-patches" >
+            <taskdef name="izpack"
+                     classpath="${basedir}/installer/lib/izpack/patches.jar:${basedir}/installer/lib/izpack/standalone-compiler.jar"
+                     classname="com.izforge.izpack.ant.IzPackTask" />
         <jar destfile="${basedir}/installer/lib/izpack/patches.jar"
              basedir="${basedir}/installer/lib/izpack/patches" />
     </target>
@@ -1187,7 +1188,7 @@
         <ant target="installerexe" />
     </target>
 
-    <target name="installerexe">
+    <target name="installerexe" depends="launch4j">
         <condition property="noExe">
 	    <or>
 	        <os arch="ppc" />
@@ -1206,7 +1207,7 @@
     </target>
 
     <!-- this makes i2pinstall.exe from install.jar -->
-    <target name="doInstallerEXE" unless="noExe">
+    <target name="doInstallerEXE" depends="launch4j" unless="noExe">
         <echo message="See the file &quot;build.properties&quot; if this step fails." />
 	<!-- now the installer exe -->
         <launch4j configFile="./installer/i2pinstaller.xml" />
