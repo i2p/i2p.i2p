@@ -584,13 +584,14 @@
 
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
-        <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />	
+        <delete dir="./reports" />
+        <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete failonerror="false" quiet="true">
-            <fileset dir="." includes="i2pinstall*jar javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
+            <fileset dir="." includes="i2pinstall*jar i2p.fba sloccount.sc javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
         </delete>
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
-        <delete file="BOB-one.jar" failonerror="false" quiet="true" />	
+        <delete file="BOB-one.jar" failonerror="false" quiet="true" />
         <delete dir="debian/tmp" />
         <delete dir="debian/db" />
         <delete file="debian/files" />
@@ -618,9 +619,9 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
-	<delete dir="core/c/jbigi/bin" />
-	<delete dir="core/c/jbigi/lib" />
-	<delete dir="core/c/jcpuid/lib" />
+        <delete dir="core/c/jbigi/bin" />
+        <delete dir="core/c/jbigi/lib" />
+        <delete dir="core/c/jcpuid/lib" />
         <ant dir="installer/resources/locale" target="distclean" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
@@ -729,7 +730,6 @@
 
     <target name="preppkg-unix" depends="preppkg-base, prep-script-translation" >
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
-	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/osid" todir="pkg-temp/" />
@@ -777,9 +777,9 @@
 
     <target name="preppkg-osx-only" depends="preppkg-osx, jbigi-osx-only" >
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />	
+        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
-    
+
     <target name="preppkg-windows" depends="preppkg-base, buildexe">
         <copy file="build/i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
@@ -805,7 +805,7 @@
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
 	<copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
-    
+
     <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
