@@ -504,53 +504,51 @@
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
 
-    <target name="getReleaseNumber" >
-        <exec executable="grep" outputproperty="versionLine" failifexecutionfails="false" >
-            <arg value="public final static String VERSION" />
-	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
-        </exec>
-        <property name="versionLine" value="unknown" />
-        <exec executable="cut" osfamily="unix" inputstring="${versionLine}" outputproperty="release.number" failifexecutionfails="false" >
-            <arg value="-f2" />
-	    <arg value="-d&quot;" />
-        </exec>
-        <exec executable="cut" osfamily="mac" inputstring="${versionLine}" outputproperty="release.number" failifexecutionfails="false" >
-            <arg value="-f2" />
-	    <arg value="-d&quot;"/>
-        </exec>
-        <exec executable="cut" osfamily="windows" inputstring="${versionLine}" outputproperty="release.number" failifexecutionfails="false" >
-            <arg value="-f2" />
-	    <arg value="-d&quot;\&quot;&quot;"/>
-        </exec>
+    <target name="getReleaseNumber">
+        <loadfile srcfile="core/java/src/net/i2p/CoreVersion.java" property="release.number">
+            <filterchain>
+                <linecontains>
+                    <contains value="public final static String VERSION"/>
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern=".*&quot;(.*)&quot;;" replace="\1" flags="gi" />
+                </tokenfilter>
+                <striplinebreaks/>
+                <trim/>
+                <ignoreblank/>
+            </filterchain>
+        </loadfile>
         <property name="release.number" value="unknown" />
         <echo message="Release number is ${release.number}" />
     </target>
 
-    <target name="getBuildNumber" >
-        <exec executable="grep" outputproperty="buildLine" failifexecutionfails="false" >
-            <arg value="public final static long BUILD" />
-            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
-        </exec>
-        <property name="buildLine" value="??" />
-        <exec executable="cut" inputstring="${buildLine}" outputproperty="build.temp" failifexecutionfails="false" >
-            <arg value="-f2" />
-            <arg value="-d=" />
-        </exec>
-        <property name="build.temp" value="??" />
-        <exec executable="tr" inputstring="${build.temp}" outputproperty="build.temp.tr" failifexecutionfails="false">
-            <arg value="-d" />
-            <arg value="&quot;[:space:]&quot;"/>
-        </exec>
-        <property name="build.temp.tr" value="??" />
-        <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="i2p.build.number" failifexecutionfails="false" >
-            <arg value="-f1" />
-            <arg value="-d;" />
-        </exec>
-        <exec executable="awk" osfamily="unix" outputproperty="build.extra" failifexecutionfails="false">
-            <arg value="-F&quot;" />
-            <arg value="/public final static String EXTRA/{print $2}" />
-            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
-        </exec>
+    <target name="getBuildNumber">
+        <loadfile srcfile="router/java/src/net/i2p/router/RouterVersion.java" property="i2p.build.number">
+            <filterchain>
+                <linecontains>
+                    <contains value="public final static long BUILD" />
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern=".*([0-9]+);" replace="\1" flags="gi" />
+                </tokenfilter>
+                <striplinebreaks/>
+                <trim/>
+                <ignoreblank/>
+            </filterchain>
+        </loadfile>
+        <loadfile srcfile="router/java/src/net/i2p/router/RouterVersion.java" property="build.extra">
+            <filterchain>
+                <linecontains>
+                    <contains value="public final static String EXTRA" />
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern=".*&quot;(.*)&quot;;" replace="\1" flags="gi" />
+                </tokenfilter>
+                <striplinebreaks/>
+                <ignoreblank/>
+                <trim/>
+            </filterchain>
+        </loadfile>
         <property name="i2p.build.number" value="??" />
         <property name="build.extra" value="" />
         <echo message="Build number is ${i2p.build.number}${build.extra}" />
