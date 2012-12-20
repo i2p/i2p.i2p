@@ -207,20 +207,22 @@
     <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup, if possible -->
     <target name="buildexe">
         <condition property="noExe">
-	    <or>
-	        <os arch="ppc" />
-	        <os arch="armv5tejl" />
-	    </or>
-	</condition>
-	<condition property="noExe">
-	   <not>
-	    <or>
-	     <os name="Linux" />
-	     <os family="windows" />
-	    </or>
-	   </not>
-	</condition>
-	<ant target="doBuildEXE" />
+            <or>
+                <os arch="ppc" />
+                <os arch="armv5tejl" />
+                <os arch="armv6l" />
+                <os arch="armv7l" />
+            </or>
+        </condition>
+        <condition property="noExe">
+            <not>
+                <or>
+                    <os name="Linux" />
+                    <os family="windows" />
+                </or>
+            </not>
+        </condition>
+        <ant target="doBuildEXE" />
     </target>
 
     <target name="launch4j">
