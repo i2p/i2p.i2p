@@ -1333,6 +1333,23 @@
         <ant dir="apps/BOB/" target="onejar" />
         <copy file="apps/BOB/dist/BOB-one.jar" todir="." />
     </target>
+
+    <target name="sloccount.report">
+        <echo message="Generating sloccount report" />
+        <exec executable="sloccount" failonerror="true">
+            <arg value="--details"/>
+            <arg value="--wide"/>
+        <arg value="${basedir}"/>
+            <redirector output="sloccount.sc">
+                <outputfilterchain>
+                    <linecontainsregexp negate="true">
+                        <regexp pattern="(_MTN|reports|pkg-temp|licenses|i2p\.fba|sloccount\.sc)" />
+                    </linecontainsregexp>
+                </outputfilterchain>
+            </redirector>
+        </exec>
+    </target>
+
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />
         <exec executable="nice" failonerror="true">
