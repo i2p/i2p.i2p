@@ -867,7 +867,7 @@
         <!-- Eepsite stuff here -->
         <mkdir dir="pkg-temp/eepsite" />
         <copy todir="pkg-temp/eepsite/" >
-            <fileset dir="installer/resources/eepsite/" />
+            <fileset dir="installer/resources/eepsite/" excludes="**/.placeholder" />
         </copy>
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
             <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
