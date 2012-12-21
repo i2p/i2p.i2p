@@ -531,7 +531,7 @@
                     <contains value="public final static long BUILD" />
                 </linecontains>
                 <tokenfilter>
-                    <replaceregex pattern=".*([0-9]+);" replace="\1" flags="gi" />
+                    <replaceregex pattern=".*=\s([0-9]+);" replace="\1" flags="gi" />
                 </tokenfilter>
                 <striplinebreaks/>
                 <trim/>
