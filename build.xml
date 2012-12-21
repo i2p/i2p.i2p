@@ -1047,14 +1047,12 @@
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
-        <exec executable="head" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt">
-            <arg value="-n" />
-            <arg value="1500" />
-            <arg value="history.txt" />
-        </exec>
-        <exec executable="echo" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt" append="true">
-            <arg value="&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
-        </exec>
+        <copy file="history.txt" tofile="pkg-temp/history.txt" overwrite="true">
+            <filterchain>
+                <headfilter lines="1500" />
+            </filterchain>
+        </copy>
+        <echo message="&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" output="pkg-temp/history.txt" append="true"/>
         <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
     </target>
 
@@ -1340,15 +1338,15 @@
         <exec executable="sloccount" failonerror="true">
             <arg value="--details"/>
             <arg value="--wide"/>
-        <arg value="${basedir}"/>
+            <arg value="${basedir}"/>
             <redirector output="${sloccount.report.file}">
                 <outputfilterchain>
                     <linecontainsregexp negate="true">
                         <regexp pattern="(Warning: |lib/launch4j|_MTN|reports|pkg-temp|licenses|i2p\.fba|gmp-|WEB-INF)" />
                     </linecontainsregexp>
-		    <linecontains negate="true">
-			    <contains value="${sloccount.report.file}" />
-		    </linecontains>
+                    <linecontains negate="true">
+                        <contains value="${sloccount.report.file}" />
+                    </linecontains>
                 </outputfilterchain>
             </redirector>
         </exec>
