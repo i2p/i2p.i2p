@@ -588,7 +588,7 @@
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete failonerror="false" quiet="true">
-            <fileset dir="." includes="i2pinstall*jar i2p.fba sloccount.sc javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
+            <fileset dir="." includes="i2pinstall*jar i2p.fba ${sloccount.report.file} javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
         </delete>
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />
@@ -1335,19 +1335,24 @@
     </target>
 
     <target name="sloccount.report">
-        <echo message="Generating sloccount report" />
+        <property name="sloccount.report.file" value="sloccount.sc" />
+        <echo message="Generating sloccount report (this will take awhile)" />
         <exec executable="sloccount" failonerror="true">
             <arg value="--details"/>
             <arg value="--wide"/>
         <arg value="${basedir}"/>
-            <redirector output="sloccount.sc">
+            <redirector output="${sloccount.report.file}">
                 <outputfilterchain>
                     <linecontainsregexp negate="true">
-                        <regexp pattern="(_MTN|reports|pkg-temp|licenses|i2p\.fba|sloccount\.sc)" />
+                        <regexp pattern="(Warning: |lib/launch4j|_MTN|reports|pkg-temp|licenses|i2p\.fba|gmp-|WEB-INF)" />
                     </linecontainsregexp>
+		    <linecontains negate="true">
+			    <contains value="${sloccount.report.file}" />
+		    </linecontains>
                 </outputfilterchain>
             </redirector>
         </exec>
+        <echo message="sloccount report saved to the file &quot;${sloccount.report.file}&quot;" />
     </target>
 
     <target name="findbugs" depends="build2">
