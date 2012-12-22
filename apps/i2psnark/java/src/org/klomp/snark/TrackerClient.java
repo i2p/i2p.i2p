@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +41,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
@@ -270,8 +272,11 @@ public class TrackerClient implements Runnable {
         primary = meta.getAnnounce();
     else if (additionalTrackerURL != null)
         primary = additionalTrackerURL;
+    Set<Hash> trackerHashes = new HashSet(8);
+
+    // primary tracker
     if (primary != null) {
-        if (isValidAnnounce(primary)) {
+        if (isNewValidTracker(trackerHashes, primary)) {
             trackers.add(new TCTracker(primary, true));
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
@@ -281,36 +286,35 @@ public class TrackerClient implements Runnable {
         }
     } else {
         _log.warn("No primary announce");
-        primary = "";
     }
+
+    // announce list
+    if (meta != null && !meta.isPrivate()) {
+        List<List<String>> list = meta.getAnnounceList();
+        if (list != null) {
+            for (List<String> llist : list) {
+                for (String url : llist) {
+                    if (!isNewValidTracker(trackerHashes, url))
+                        continue;
+                    trackers.add(new TCTracker(url, trackers.isEmpty()));
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Additional announce (list): [" + url + "] for infoHash: " + infoHash);
+                }
+            }
+        }
+    }
+
+    // configured open trackers
     if (meta == null || !meta.isPrivate()) {
         List<String> tlist = _util.getOpenTrackers();
         for (int i = 0; i < tlist.size(); i++) {
-             String url = tlist.get(i);
-             if (!isValidAnnounce(url)) {
-                _log.error("Bad announce URL: [" + url + "]");
+            String url = tlist.get(i);
+            if (!isNewValidTracker(trackerHashes, url))
                 continue;
-             }
-             int slash = url.indexOf('/', 7);
-             if (slash <= 7) {
-                _log.error("Bad announce URL: [" + url + "]");
-                continue;
-             }
-             if (primary.startsWith(url.substring(0, slash)))
-                continue;
-             String dest = _util.lookup(url.substring(7, slash));
-             if (dest == null) {
-                _log.error("Announce host unknown: [" + url.substring(7, slash) + "]");
-                continue;
-             }
-             if (primary.startsWith("http://" + dest))
-                continue;
-             if (primary.startsWith("http://i2p/" + dest))
-                continue;
-             // opentrackers are primary if we don't have primary
-             trackers.add(new TCTracker(url, primary.equals("")));
-             if (_log.shouldLog(Log.DEBUG))
-                 _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
+            // opentrackers are primary if we don't have primary
+            trackers.add(new TCTracker(url, trackers.isEmpty()));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
     }
 
@@ -318,29 +322,38 @@ public class TrackerClient implements Runnable {
     if (trackers.isEmpty() && (meta == null || !meta.isPrivate())) {
         List<String> tlist = _util.getBackupTrackers();
         for (int i = 0; i < tlist.size(); i++) {
-             String url = tlist.get(i);
-             if (!isValidAnnounce(url)) {
-                _log.error("Bad announce URL: [" + url + "]");
+            String url = tlist.get(i);
+            if (!isNewValidTracker(trackerHashes, url))
                 continue;
-             }
-             int slash = url.indexOf('/', 7);
-             if (slash <= 7) {
-                _log.error("Bad announce URL: [" + url + "]");
-                continue;
-             }
-             String dest = _util.lookup(url.substring(7, slash));
-             if (dest == null) {
-                _log.error("Announce host unknown: [" + url.substring(7, slash) + "]");
-                continue;
-             }
-             backupTrackers.add(new TCTracker(url, false));
-             if (_log.shouldLog(Log.DEBUG))
-                 _log.debug("Backup announce: [" + url + "] for infoHash: " + infoHash);
+            backupTrackers.add(new TCTracker(url, false));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Backup announce: [" + url + "] for infoHash: " + infoHash);
         }
-        if (backupTrackers.isEmpty())
+        if (backupTrackers.isEmpty()) {
             backupTrackers.add(new TCTracker(DEFAULT_BACKUP_TRACKER, false));
+        }
     }
     this.completed = coordinator.getLeft() == 0;
+  }
+
+  /**
+   *  @param existing the ones we already know about
+   *  @param ann an announce URL non-null
+   *  @return true if ann is valid and new; adds to existing if returns true
+   *  @since 0.9.5
+   */
+  private boolean isNewValidTracker(Set<Hash> existing, String ann) {
+      Hash h = getHostHash(ann);
+      if (h == null) {
+         _log.error("Bad announce URL: [" + ann + ']');
+         return false;
+      }
+      boolean rv = existing.add(h);
+      if (!rv) {
+          if (_log.shouldLog(Log.INFO))
+             _log.info("Dup announce URL: [" + ann + ']');
+      }
+      return rv;
   }
 
   /**
@@ -775,6 +788,7 @@ public class TrackerClient implements Runnable {
   }
 
   /**
+   *  @param ann an announce URL
    *  @return true for i2p hosts only
    *  @since 0.7.12
    */
@@ -788,6 +802,34 @@ public class TrackerClient implements Runnable {
     return url.getProtocol().equals("http") &&
            (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p")) &&
            url.getPort() < 0;
+  }
+
+  /**
+   *  @param ann an announce URL non-null
+   *  @return a Hash for i2p hosts only, null otherwise
+   *  @since 0.9.5
+   */
+  private static Hash getHostHash(String ann) {
+    URL url;
+    try {
+        url = new URL(ann);
+    } catch (MalformedURLException mue) {
+        return null;
+    }
+    if (url.getPort() >= 0 || !url.getProtocol().equals("http"))
+        return null;
+    String host = url.getHost();
+    if (host.endsWith(".i2p"))
+        return ConvertToHash.getHash(host);
+    if (host.equals("i2p")) {
+        String path = url.getPath();
+        if (path == null || path.length() < 517 ||
+            !path.startsWith("/"))
+            return null;
+        String[] parts = path.substring(1).split("/?&;", 2);
+        return ConvertToHash.getHash(parts[0]);
+    }
+    return null;
   }
 
   private static class TCTracker
