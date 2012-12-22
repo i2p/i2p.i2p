@@ -2,6 +2,7 @@
 # Use mtn add --no-respect-ignore foo.jar to ignore this ignore list
 _jsp\.java$
 \.bz2$
+\.tar$
 \.class$
 \.diff$
 \.exe$
@@ -24,3 +25,5 @@ _jsp\.java$
 /classes/
 ^debian/copyright
 override.properties
+sloccount.sc
+^reports/
