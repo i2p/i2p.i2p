@@ -109,8 +109,8 @@ public class TrackerClient implements Runnable {
   private boolean completed;
   private volatile boolean _fastUnannounce;
   private long lastDHTAnnounce;
-  private final List<Tracker> trackers;
-  private final List<Tracker> backupTrackers;
+  private final List<TCTracker> trackers;
+  private final List<TCTracker> backupTrackers;
 
   /**
    * Call start() to start it.
@@ -272,7 +272,7 @@ public class TrackerClient implements Runnable {
         primary = additionalTrackerURL;
     if (primary != null) {
         if (isValidAnnounce(primary)) {
-            trackers.add(new Tracker(primary, true));
+            trackers.add(new TCTracker(primary, true));
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
         } else {
@@ -308,7 +308,7 @@ public class TrackerClient implements Runnable {
              if (primary.startsWith("http://i2p/" + dest))
                 continue;
              // opentrackers are primary if we don't have primary
-             trackers.add(new Tracker(url, primary.equals("")));
+             trackers.add(new TCTracker(url, primary.equals("")));
              if (_log.shouldLog(Log.DEBUG))
                  _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
@@ -333,12 +333,12 @@ public class TrackerClient implements Runnable {
                 _log.error("Announce host unknown: [" + url.substring(7, slash) + "]");
                 continue;
              }
-             backupTrackers.add(new Tracker(url, false));
+             backupTrackers.add(new TCTracker(url, false));
              if (_log.shouldLog(Log.DEBUG))
                  _log.debug("Backup announce: [" + url + "] for infoHash: " + infoHash);
         }
         if (backupTrackers.isEmpty())
-            backupTrackers.add(new Tracker(DEFAULT_BACKUP_TRACKER, false));
+            backupTrackers.add(new TCTracker(DEFAULT_BACKUP_TRACKER, false));
     }
     this.completed = coordinator.getLeft() == 0;
   }
@@ -425,7 +425,7 @@ public class TrackerClient implements Runnable {
   /**
    *  @return max peers seen
    */
-  private int getPeersFromTrackers(List<Tracker> trckrs) {
+  private int getPeersFromTrackers(List<TCTracker> trckrs) {
             long uploaded = coordinator.getUploaded();
             long downloaded = coordinator.getDownloaded();
             long left = coordinator.getLeft();   // -1 in magnet mode
@@ -442,7 +442,7 @@ public class TrackerClient implements Runnable {
 
             // *** loop once for each tracker
             int maxSeenPeers = 0;
-            for (Tracker tr : trckrs) {
+            for (TCTracker tr : trckrs) {
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needOutboundPeers() || !tr.started) &&
                   (event.equals(COMPLETED_EVENT) || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
@@ -639,7 +639,7 @@ public class TrackerClient implements Runnable {
       if (dht != null)
           dht.unannounce(snark.getInfoHash());
       int i = 0;
-      for (Tracker tr : trackers) {
+      for (TCTracker tr : trackers) {
           if (_util.connected() &&
               tr.started && (!tr.stop) && tr.trackerProblems == null) {
               try {
@@ -659,9 +659,9 @@ public class TrackerClient implements Runnable {
    *  @since 0.9.1
    */
   private class Unannouncer implements Runnable {
-     private final Tracker tr;
+     private final TCTracker tr;
 
-     public Unannouncer(Tracker tr) {
+     public Unannouncer(TCTracker tr) {
          this.tr = tr;
      }
 
@@ -685,7 +685,7 @@ public class TrackerClient implements Runnable {
      }
   }
   
-  private TrackerInfo doRequest(Tracker tr, String infoHash,
+  private TrackerInfo doRequest(TCTracker tr, String infoHash,
                                 String peerID, long uploaded,
                                 long downloaded, long left, String event)
     throws IOException
@@ -790,10 +790,10 @@ public class TrackerClient implements Runnable {
            url.getPort() < 0;
   }
 
-  private static class Tracker
+  private static class TCTracker
   {
-      String announce;
-      boolean isPrimary;
+      final String announce;
+      final boolean isPrimary;
       long interval;
       long lastRequestTime;
       String trackerProblems;
@@ -803,7 +803,7 @@ public class TrackerClient implements Runnable {
       int consecutiveFails;
       int seenPeers;
 
-      public Tracker(String a, boolean p)
+      public TCTracker(String a, boolean p)
       {
           announce = a;
           isPrimary = p;
