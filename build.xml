@@ -396,14 +396,11 @@
     </target>
 
     <target name="prep-script-translation" >
-        <!-- script translation added in 0.8.13, disable for now -->
-        <echo message="i2prouter script translations disabled" />
-<!--
+        <!-- script translation added in 0.8.13, enabled in 0.9.5. -->
         <ant dir="installer/resources/locale" target="bundle" />
         <copy todir="pkg-temp/locale/">
             <fileset dir="installer/resources/locale/mo/" />
         </copy>
--->
     </target>
 
     <target name="javadoc" depends="getReleaseNumber, getBuildNumber" >
