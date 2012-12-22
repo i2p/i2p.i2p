@@ -886,7 +886,9 @@ public class SnarkManager implements CompleteListener {
                         }
                     }
                 } catch (IOException ioe) {
-                    addMessage(_("Torrent in \"{0}\" is invalid", sfile.getName()) + ": " + ioe.getMessage());
+                    String err = _("Torrent in \"{0}\" is invalid", sfile.getName()) + ": " + ioe.getMessage();
+                    addMessage(err);
+                    _log.error(err, ioe);
                     if (sfile.exists())
                         sfile.delete();
                     return;

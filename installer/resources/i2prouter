@@ -493,7 +493,7 @@ gettext() {
 outputFile() {
     if [ -f "$1" ]
     then
-        echo '  $1  Found but not executable.';
+        echo "  $1  Found but not executable.";
     else
         echo "  $1"
     fi
@@ -656,7 +656,7 @@ checkUser() {
         fi
         if [ "`$IDEXE -u -n "$RUN_AS_USER" 2>/dev/null`" != "$RUN_AS_USER" ]
         then
-            echo 'User $RUN_AS_USER does not exist.'
+            echo "User $RUN_AS_USER does not exist."
             exit 1
         fi
 
@@ -794,12 +794,12 @@ getpid() {
                 then
                     # This is a stale pid file.
                     rm -f "$PIDFILE"
-                    echo 'Removed stale pid file: $PIDFILE'
+                    echo "Removed stale pid file: $PIDFILE"
                     pid=""
                 fi
             fi
         else
-            echo 'Cannot read $PIDFILE.'
+            echo "Cannot read $PIDFILE."
             exit 1
         fi
     fi
@@ -982,7 +982,7 @@ startwait() {
 
 macosxstart() {
     # The daemon has been installed.
-    echo 'Starting $APP_LONG_NAME.  Detected Mac OSX and installed launchd daemon.'
+    echo "Starting $APP_LONG_NAME.  Detected Mac OSX and installed launchd daemon."
     if [ `id | sed 's/^uid=//;s/(.*$//'` != "0" ] ; then
         eval echo `gettext 'Must be root to perform this action.'`
         exit 1
@@ -1010,7 +1010,7 @@ macosxstart() {
 
 upstartstart() {
     # The daemon has been installed.
-    echo 'Starting $APP_LONG_NAME.  Detected Linux and installed upstart.'
+    echo "Starting $APP_LONG_NAME.  Detected Linux and installed upstart."
     if [ `id | sed 's/^uid=//;s/(.*$//'` != "0" ] ; then
         eval echo `gettext 'Must be root to perform this action.'`
         exit 1
@@ -1156,11 +1156,11 @@ graceful() {
 }
 
 pause() {
-    echo 'Pausing $APP_LONG_NAME.'
+    echo "Pausing $APP_LONG_NAME."
 }
 
 resume() {
-    echo 'Resuming $APP_LONG_NAME.'
+    echo "Resuming $APP_LONG_NAME."
 }
 
 status() {
@@ -1182,9 +1182,9 @@ status() {
 }
 
 installUpstart() {
-    echo ' Installing the $APP_LONG_NAME daemon using upstart..'
+    echo " Installing the $APP_LONG_NAME daemon using upstart.."
     if [ -f "${APP_NAME}.conf" ] ; then
-        echo ' a custom upstart conf file ${APP_NAME}.conf found'
+        echo " a custom upstart conf file ${APP_NAME}.conf found"
         cp "${REALDIR}/${APP_NAME}.install" "/etc/init/${APP_NAME}.conf"
     else
         echo ' creating default upstart conf file..'
@@ -1328,7 +1328,7 @@ installdaemon() {
                                 echo "esac"  >> /etc/rc.d/${APP_NAME}
                                 chmod 755 /etc/rc.d/${APP_NAME}
                                 chown root:root /etc/rc.d/${APP_NAME}
-                                echo ' The $APP_LONG_NAME daemon has been installed.'
+                                echo " The $APP_LONG_NAME daemon has been installed."
                                 echo ' Add \"i2p\" to the DAEMONS variable in /etc/rc.conf to enable.'
                             else
                                 # We'll end up here if systemd is enabled.
@@ -1369,7 +1369,7 @@ installdaemon() {
                     if [ -n "$USE_UPSTART" -a -d "/etc/init" ] ; then
                         installUpstart
                     else
-                        echo ' Installing the $APP_LONG_NAME daemon using init.d..'
+                        echo " Installing the $APP_LONG_NAME daemon using init.d.."
                         ln -s "$REALPATH" "/etc/init.d/$APP_NAME"
                         update-rc.d "$APP_NAME" defaults
                     fi
@@ -1402,10 +1402,10 @@ installdaemon() {
         elif [ "$DIST_OS" = "aix" ] ; then
             echo 'Detected AIX:'
             if [ -f "/etc/rc.d/init.d/$APP_NAME" ] ; then
-                echo ' The $APP_LONG_NAME daemon is already installed as rc.d script.'
+                echo " The $APP_LONG_NAME daemon is already installed as rc.d script."
                 exit 1
             elif [ -n "`/usr/sbin/lsitab $APP_NAME`" -a -n "`/usr/bin/lssrc -S -s $APP_NAME`" ] ; then
-                echo ' The $APP_LONG_NAME daemon is already installed as SRC service.'
+                echo " The $APP_LONG_NAME daemon is already installed as SRC service."
                 exit 1
             else
                 eval echo " `gettext 'Installing the $APP_LONG_NAME daemon'`.."
@@ -1536,7 +1536,7 @@ removedaemon() {
                     /sbin/chkconfig --del "$APP_NAME"
                     rm -f "/etc/init.d/$APP_NAME"
                 elif [ -f "/etc/init/${APP_NAME}.conf" ] ; then
-                    echo ' Removing $APP_LONG_NAME daemon from upstart...'
+                    echo " Removing $APP_LONG_NAME daemon from upstart..."
                     rm "/etc/init/${APP_NAME}.conf"
                 else
                     eval echo " `gettext 'The $APP_LONG_NAME daemon is not currently installed.'`"
@@ -1575,11 +1575,11 @@ removedaemon() {
             elif [ -f /etc/lsb-release -o -f /etc/debian_version ] ; then
                 echo 'Detected Debian-based distribution:'
                 if [ -f "/etc/init.d/$APP_NAME" ] ; then
-                    echo ' Removing $APP_LONG_NAME daemon from init.d...'
+                    echo " Removing $APP_LONG_NAME daemon from init.d..."
                     update-rc.d -f "$APP_NAME" remove
                     rm -f "/etc/init.d/$APP_NAME"
                 elif [ -f "/etc/init/${APP_NAME}.conf" ] ; then
-                    echo ' Removing $APP_LONG_NAME daemon from upstart...'
+                    echo " Removing $APP_LONG_NAME daemon from upstart..."
                     rm "/etc/init/${APP_NAME}.conf"
                 else
                     eval echo " `gettext 'The $APP_LONG_NAME daemon is not currently installed.'`"
@@ -1674,7 +1674,7 @@ removedaemon() {
 }
 
 dump() {
-    echo 'Dumping $APP_LONG_NAME...'
+    echo "Dumping $APP_LONG_NAME..."
     getpid
     if [ "X$pid" = "X" ]
     then
@@ -1684,10 +1684,10 @@ dump() {
 
         if [ $? -ne 0 ]
         then
-            echo 'Failed to dump $APP_LONG_NAME.'
+            echo "Failed to dump $APP_LONG_NAME."
             exit 1
         else
-            echo 'Dumped $APP_LONG_NAME.'
+            echo "Dumped $APP_LONG_NAME."
         fi
     fi
 }
@@ -1697,14 +1697,14 @@ startmsg() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        echo 'Starting $APP_LONG_NAME...  Wrapper:Stopped'
+        echo "Starting $APP_LONG_NAME...  Wrapper:Stopped"
     else
         if [ "X$DETAIL_STATUS" = "X" ]
         then
-            echo 'Starting $APP_LONG_NAME...  Wrapper:Running'
+            echo "Starting $APP_LONG_NAME...  Wrapper:Running"
         else
             getstatus
-            echo 'Starting $APP_LONG_NAME...  Wrapper:$STATUS, Java:$JAVASTATUS'
+            echo "Starting $APP_LONG_NAME...  Wrapper:$STATUS, Java:$JAVASTATUS"
         fi
     fi
 }
@@ -1714,14 +1714,14 @@ stopmsg() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        echo 'Stopping $APP_LONG_NAME...  Wrapper:Stopped'
+        echo "Stopping $APP_LONG_NAME...  Wrapper:Stopped"
     else
         if [ "X$DETAIL_STATUS" = "X" ]
         then
-            echo 'Stopping $APP_LONG_NAME...  Wrapper:Running'
+            echo "Stopping $APP_LONG_NAME...  Wrapper:Running"
         else
             getstatus
-            echo 'Stopping $APP_LONG_NAME...  Wrapper:$STATUS, Java:$JAVASTATUS'
+            echo "Stopping $APP_LONG_NAME...  Wrapper:$STATUS, Java:$JAVASTATUS"
         fi
     fi
 }
@@ -1731,7 +1731,7 @@ showUsage() {
 
     if [ -n "$1" ]
     then
-        echo 'Unexpected command: $1'
+        echo "Unexpected command: $1"
         echo "";
     fi
 

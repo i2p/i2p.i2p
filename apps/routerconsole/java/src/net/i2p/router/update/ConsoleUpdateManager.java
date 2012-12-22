@@ -558,6 +558,11 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority) {
+        if ((type == ROUTER_SIGNED || type == ROUTER_UNSIGNED) && NewsHelper.dontInstall(_context)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Ignoring registration for " + type + ", router updates disabled");
+            return;
+        }
         // DEBUG slow start for snark updates
         // For 0.9.4 update, only for dev builds
         // For 0.9.5 update, only for dev builds and 1% more

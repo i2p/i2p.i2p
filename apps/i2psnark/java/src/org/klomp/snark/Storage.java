@@ -122,6 +122,7 @@ public class Storage
    * @throws IOException when creating and/or checking files fails.
    */
   public Storage(I2PSnarkUtil util, File baseFile, String announce,
+                 List<List<String>> announce_list,
                  boolean privateTorrent, StorageListener listener)
     throws IOException
   {
@@ -182,7 +183,8 @@ public class Storage
     // TODO thread this so we can return and show something on the UI
     byte[] piece_hashes = fast_digestCreate();
     metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
-                            lengthsList, piece_size, piece_hashes, total, privateTorrent);
+                            lengthsList, piece_size, piece_hashes, total, privateTorrent,
+                            announce_list);
 
   }
 
@@ -1225,7 +1227,7 @@ public class Storage
       File file = null;
       FileOutputStream out = null;
       try {
-          Storage storage = new Storage(util, base, announce, false, null);
+          Storage storage = new Storage(util, base, announce, null, false, null);
           MetaInfo meta = storage.getMetaInfo();
           file = new File(storage.getBaseName() + ".torrent");
           out = new FileOutputStream(file);
