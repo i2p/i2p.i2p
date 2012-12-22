@@ -61,7 +61,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     private Resource _resourceBase;
     private String _themePath;
     private String _imgPath;
-    private String _lastAnnounceURL = "";
+    private String _lastAnnounceURL;
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
  
@@ -730,18 +730,54 @@ public class I2PSnarkServlet extends DefaultServlet {
                 //if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
                 //    announceURL = announceURLOther;
 
-                if (announceURL == null || announceURL.length() <= 0)
-                    _manager.addMessage(_("Error creating torrent - you must select a tracker"));
-                else if (baseFile.exists()) {
-                    _lastAnnounceURL = announceURL;
+                if (baseFile.exists()) {
                     if (announceURL.equals("none"))
                         announceURL = null;
+                    _lastAnnounceURL = announceURL;
+                    List<String> backupURLs = new ArrayList();
+                    Enumeration e = req.getParameterNames();
+                    while (e.hasMoreElements()) {
+                         Object o = e.nextElement();
+                         if (!(o instanceof String))
+                             continue;
+                         String k = (String) o;
+                        if (k.startsWith("backup_")) {
+                            String url = k.substring(7);
+                            if (!url.equals(announceURL))
+                                backupURLs.add(url);
+                        }
+                    }
+                    List<List<String>> announceList = null;
+                    if (!backupURLs.isEmpty()) {
+                        // BEP 12 - Put primary first, then the others, each as the sole entry in their own list
+                        if (announceURL == null) {
+                            _manager.addMessage(_("Error - Cannot include alternate trackers without a primary tracker"));
+                            return;
+                        }
+                        backupURLs.add(0, announceURL);
+                        boolean hasPrivate = false;
+                        boolean hasPublic = false;
+                        for (String url : backupURLs) {
+                            if (_manager.getPrivateTrackers().contains(announceURL))
+                                hasPrivate = true;
+                            else
+                                hasPublic = true;
+                        }
+                        if (hasPrivate && hasPublic) {
+                            _manager.addMessage(_("Error - Cannot mix private and public trackers in a torrent"));
+                            return;
+                        }
+                        announceList = new ArrayList(backupURLs.size());
+                        for (String url : backupURLs) {
+                            announceList.add(Collections.singletonList(url));
+                        }
+                    }
                     try {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
                         // TODO thread it for big torrents, perhaps a la FetchAndAdd
                         boolean isPrivate = _manager.getPrivateTrackers().contains(announceURL);
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, isPrivate, null);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, announceList, isPrivate, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -1372,6 +1408,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /**
+     *  Start of anchor only, caller must add anchor text or img and close anchor
      *  @return string or null
      *  @since 0.8.4
      */
@@ -1399,6 +1436,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /**
+     *  Full anchor with img
      *  @return string or null
      *  @since 0.8.4
      */
@@ -1412,6 +1450,29 @@ public class I2PSnarkServlet extends DefaultServlet {
             return buf.toString();
         }
         return null;
+    }
+
+    /**
+     *  Full anchor with shortened URL as anchor text
+     *  @return string, non-null
+     *  @since 0.9.5
+     */
+    private String getShortTrackerLink(String announce, byte[] infohash) {
+        StringBuilder buf = new StringBuilder(128);
+        String trackerLinkUrl = getTrackerLinkUrl(announce, infohash);
+        if (trackerLinkUrl != null)
+            buf.append(trackerLinkUrl);
+        if (announce.startsWith("http://"))
+            announce = announce.substring(7);
+        int slsh = announce.indexOf('/');
+        if (slsh > 0)
+            announce = announce.substring(0, slsh);
+        if (announce.length() > 67)
+            announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
+        buf.append(announce);
+        if (trackerLinkUrl != null)
+            buf.append("</a>");
+        return buf.toString();
     }
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -1482,23 +1543,32 @@ public class I2PSnarkServlet extends DefaultServlet {
                   + "\" title=\"");
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
-        out.write(_("Tracker"));
-        out.write(":<td><select name=\"announceURL\"><option value=\"\">");
-        out.write(_("Select a tracker"));
-        out.write("</option>\n");
-        // todo remember this one with _lastAnnounceURL also
-        out.write("<option value=\"none\">");
-        //out.write(_("Open trackers and DHT only"));
-        out.write(_("Open trackers only"));
-        out.write("</option>\n");
+        out.write(_("Trackers"));
+        out.write(":<td><table style=\"width: 20%;\"><tr><td></td><td align=\"center\">");
+        out.write(_("Primary"));
+        out.write("</td><td align=\"center\">");
+        out.write(_("Alternates"));
+        out.write("</td></tr>\n");
         for (Tracker t : sortedTrackers) {
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
+            out.write("<tr><td>");
+            out.write(name);
+            out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
+            out.write(announceURL);
+            out.write("\"");
             if (announceURL.equals(_lastAnnounceURL))
-                announceURL += "\" selected=\"selected";
-            out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
+                out.write(" checked");
+            out.write("></td><td align=\"center\"><input type=\"checkbox\" name=\"backup_");
+            out.write(announceURL);
+            out.write("\" value=\"foo\"></td></tr>\n");
         }
-        out.write("</select>\n");
+        out.write("<tr><td>");
+        out.write(_("none"));
+        out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
+        if (_lastAnnounceURL == null)
+            out.write(" checked");
+        out.write("></td><td></td></tr></table>\n");
         // make the user add a tracker on the config form now
         //out.write(_("or"));
         //out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
@@ -1998,20 +2068,26 @@ public class I2PSnarkServlet extends DefaultServlet {
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
                         buf.append(trackerLink).append(' ');
-                    buf.append("<b>").append(_("Tracker")).append(":</b> ");
-                    String trackerLinkUrl = getTrackerLinkUrl(announce, snark.getInfoHash());
-                    if (trackerLinkUrl != null)
-                        buf.append(trackerLinkUrl);
-                    if (announce.startsWith("http://"))
-                        announce = announce.substring(7);
-                    int slsh = announce.indexOf('/');
-                    if (slsh > 0)
-                        announce = announce.substring(0, slsh);
-                    if (announce.length() > 67)
-                        announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
-                    buf.append(announce);
-                    if (trackerLinkUrl != null)
-                        buf.append("</a>");
+                    buf.append("<b>").append(_("Primary Tracker")).append(":</b> ");
+                    buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
+                    buf.append("</td></tr>");
+                }
+                List<List<String>> alist = meta.getAnnounceList();
+                if (alist != null) {
+                    buf.append("<tr><td><b>");
+                    buf.append(_("Tracker List")).append(":</b> ");
+                    for (List<String> alist2 : alist) {
+                        buf.append('[');
+                        boolean more = false;
+                        for (String s : alist2) {
+                            if (more)
+                                buf.append(' ');
+                            else
+                                more = true;
+                            buf.append(getShortTrackerLink(s, snark.getInfoHash()));
+                        }
+                        buf.append("] ");
+                    }
                     buf.append("</td></tr>");
                 }
             }
