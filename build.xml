@@ -184,6 +184,23 @@
         </exec>
     </target>
 
+    <target name="trimMtnRev" depends="getMtnRev">
+        <script language="javascript">
+            <![CDATA[
+            var MtnRev = project.getProperty("workspace.version");
+            if (MtnRev != 'unknown' && MtnRev != null) {
+                echo = project.createTask("echo");
+                var MtnShortHash = MtnRev.substring(0,8);
+                project.setProperty("MtnShortHash", MtnShortHash);
+                echo.setMessage("Trimmed hash: " + MtnShortHash);
+                echo.perform();
+            } else {
+                project.setProperty("MtnShortHash", 'unknown');
+            }
+            ]]>
+        </script>
+    </target>
+
     <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
@@ -585,7 +602,7 @@
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete failonerror="false" quiet="true">
-            <fileset dir="." includes="i2pinstall*jar i2p.fba ${sloccount.report.file} javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
+            <fileset dir="." includes="i2pinstall*jar i2p*deb libjbigi*deb i2p.fba ${sloccount.report.file} javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
         </delete>
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />
@@ -1589,20 +1606,35 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 
-    <target name="debian" depends="debian-clean, debian-binary" />
+    <target name="debian" depends="debian-clean, debchange, debian-binary" />
 
-    <target name="debian-binary" >
-        <echo message="Did you update the version using dch -i?" />
-        <echo message=" " />
-        <echo message="If the changelog was not updated with dch -i, press" />
-        <echo message="press CTRL+C to abort building this Debian package." />
-        <echo message="" />
-        <echo message="Pausing build for ten seconds to give enough time to read this notice." />
-        <exec executable="sleep" failonerror="true">
-                <arg value="10" />
+    <target name="getExtendedVersion" depends="buildProperties, trimMtnRev">
+        <property name="MtnShortHash" value="unknown" />
+        <condition property="Extended.Version" value="${full.version}-${MtnShortHash}">
+            <not>
+                <or>
+                    <equals arg1="${MtnShortHash}" arg2="" />
+                    <equals arg1="${MtnShortHash}" arg2="unknown" />
+                </or>
+            </not>
+        </condition>
+        <!-- if not set above we'll set it here -->
+        <property name="Extended.Version" value="${full.version}" />
+    </target>
+
+    <target name="debchange" depends="getExtendedVersion" unless="noAutoDebchange">
+        <echo message= "Debian version is ${Extended.Version}-1" />
+        <exec executable="dch" failonerror="true">
+            <arg value="-b" />
+            <arg value="--check-dirname-level" />
+            <arg value="0" />
+            <arg value="-v" />
+            <arg value="${Extended.Version}-1" />
+            <arg value="Unofficial Debian package built using &quot;ant debian&quot;" />
         </exec>
-        <echo message="====================" />
+    </target>
 
+    <target name="debian-binary" depends="getExtendedVersion">
         <exec executable="fakeroot" failonerror="true">
             <arg value="debian/rules" />
             <arg value="patch" />
@@ -1610,9 +1642,16 @@
             <arg value="clean" />
         </exec>
         <delete dir=".pc" />
+        <move todir=".">
+            <fileset dir=".." includes="libjbigi*${Extended.Version}-1*.deb i2p*${Extended.Version}-1*.deb" />
+        </move>
+        <echo message="" />
+        <echo message="====================" />
+        <echo message="Packages have been built and moved to ${basedir}" />
+        <echo message="====================" />
     </target>
 
-    <target name="debian-clean" depends="buildProperties" >
+    <target name="debian-clean" depends="getExtendedVersion" >
         <exec executable="fakeroot" failonerror="true">
             <arg value="debian/rules" />
             <arg value="clean" />
@@ -1620,7 +1659,41 @@
         <delete dir="./.pc" />
     </target>
 
-    <target name="debian-patch" depends="buildProperties" >
+    <target name="debian-tarball" depends="getExtendedVersion">
+        <!-- will this use the monotonerc file in the current workspace? -->
+        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
+            <condition>
+                <not>
+                    <isset property="mtn.available" />
+                </not>
+            </condition>
+        </fail>
+        <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
+        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
+        <delete dir="../i2p-${Extended.Version}" />
+        <exec executable="mtn" failonerror="true">
+            <arg value="co" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
+            <!-- w: is the revision of the current workspace -->
+            <arg value="-r" />
+            <arg value="w:" />
+            <arg value="../i2p-${Extended.Version}" />
+        </exec>
+        <delete includeemptydirs="true" quiet="false">
+            <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/Slackware" />
+            <fileset dir="../i2p-${Extended.Version}/_MTN" />
+        </delete>
+        <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
+            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}">
+                <include name="**/**" />
+                <exclude name="debian/**"/>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="debian-patch" depends="getExtendedVersion" >
         <exec executable="quilt" failonerror="true">
             <arg value="-a" />
             <arg value="push" />
