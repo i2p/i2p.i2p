@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Update messages_xx.po and messages_xx.class files,
 # from both java and jsp sources.
