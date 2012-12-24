@@ -1251,29 +1251,28 @@
     </target>
 
     <target name="checkForIzpack2App">
-        <available property="izpack2app.available" file="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
+        <!-- we'll set the izpack2app binary name if it's not been set elsewhere yet -->
+        <property name="izpack2app.binary" value="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
+        <available property="izpack2app.available" file="${izpack2app.binary}" />
     </target>
 
     <target name="installer2app" if="izpack2app.available">
-	<mkdir dir="pkg-temp/osx" />
-	<exec executable="python" failonerror="true">
-	    <arg value="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
-	    <arg value="${basedir}/i2pinstall_${full.version}_osx-only.jar" />
-	    <arg value="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app" />
-	</exec>
-	<exec executable="chmod" failonerror="true" osfamily="unix">
-		<arg value="755" />
-		<arg value="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app/Contents/MacOS/JavaApplicationStub" />
-	</exec>
-	<exec executable="tar" osfamily="unix" failonerror="true">
-		<arg value="--owner=root" />
-		<arg value="--group=root" />
-		<arg value="-cjvf" />
-		<arg value="${basedir}/i2pinstall_${full.version}_osx.tar.bz2" />
-		<arg value="-C" />
-		<arg value="${basedir}/pkg-temp/osx" />
-		<arg value="i2p-${full.version}_osx-install.app" />
-	</exec>
+        <mkdir dir="pkg-temp/osx" />
+        <exec executable="python" failonerror="true">
+            <arg value="${izpack2app.binary}" />
+            <arg value="${basedir}/i2pinstall_${full.version}_osx-only.jar" />
+            <arg value="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app" />
+        </exec>
+
+        <tar longfile="gnu" destfile="${basedir}/i2pinstall_${full.version}_osx.tar.bz2" compression="bzip2">
+            <tarfileset dir="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app" prefix="/i2p-${full.version}_osx-install.app" filemode="644">
+                <include name="**/**" />
+                <exclude name="Contents/MacOS/*" />
+            </tarfileset>
+            <tarfileset dir="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app" prefix="/i2p-${full.version}_osx-install.app" filemode="755">
+                <include name="Contents/MacOS/*" />
+            </tarfileset>
+        </tar>
     </target>
 
     <!-- call between installer-xxx and installer-windows -->
