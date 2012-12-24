@@ -1202,42 +1202,44 @@
 
     <target name="installerexe" depends="launch4j">
         <condition property="noExe">
-	    <or>
-	        <os arch="ppc" />
-	        <os arch="armv5tejl" />
-	    </or>
-	</condition>
-	<condition property="noExe">
-	   <not>
-	    <or>
-	     <os name="Linux" />
-	     <os family="windows" />
-	    </or>
-	   </not>
-	</condition>
-	<ant target="doInstallerEXE" />
+            <or>
+                <os arch="ppc" />
+                <os arch="armv5tejl" />
+                <os arch="armv6l" />
+                <os arch="armv7l" />
+            </or>
+        </condition>
+        <condition property="noExe">
+            <not>
+                <or>
+                    <os name="Linux" />
+                    <os family="windows" />
+                </or>
+            </not>
+        </condition>
+        <ant target="doInstallerEXE" />
     </target>
 
     <!-- this makes i2pinstall.exe from install.jar -->
     <target name="doInstallerEXE" depends="launch4j" unless="noExe">
         <echo message="See the file &quot;build.properties&quot; if this step fails." />
-	<!-- now the installer exe -->
+        <!-- now the installer exe -->
         <launch4j configFile="./installer/i2pinstaller.xml" />
-	<!-- thazzit -->
+        <!-- thazzit -->
     </target>
 
     <!-- Custom installers -->
     <target name="installer-nowindows" depends="clean, preppkg-nowindows, izpack-patches" >
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
     <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, izpack-patches" >
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
     <target name="installer-linux" depends="clean, preppkg-linux-only, izpack-patches" >
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 

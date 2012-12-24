@@ -1,3 +1,8 @@
+2012-12-24 kytv
+* Javadocs: Fix javadoc errors in the cybergarage package. Upstream bug #3598391 has been
+ filed for this issue.  If these javadoc fixes need to be reverted in the future,
+ MTN rev 5bdb7fc27e35f174001bd6105a502fd5094842e5 covers it.
+
 2012-12-22 zzz
   - i2psnark: Add announce list support (BEP 12) (ticket #778)
   - i2ptunnel: Add more tunnel quantity options for servers
