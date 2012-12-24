@@ -60,7 +60,7 @@ public class SSDPSearchSocket extends HTTPMUSocket implements Runnable
 
 	/**
 	 * 
-	 * @param bindAddr the binding address for senging multicast packet
+	 * @param bindAddr the binding address for sending multicast packet
 	 * @since 1.8
 	 */
 	public SSDPSearchSocket(InetAddress bindAddr){
@@ -97,9 +97,9 @@ public class SSDPSearchSocket extends HTTPMUSocket implements Runnable
 
 	/**
 	 * 
-	 * @param bindAddr the hostname of the interface to use for senfing multicast packet
+	 * @param bindAddr the hostname of the interface to use for sending multicast packet
 	 * @return true if and only if it open the socket
-	 * @see {@link SSDP} for default multicast and port destination of the packtes 
+	 * @see org.cybergarage.upnp.ssdp for default multicast and port destination of the packets
 	 */
 	public boolean open(String bindAddr)
 	{

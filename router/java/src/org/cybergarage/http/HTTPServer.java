@@ -121,7 +121,7 @@ public class HTTPServer implements Runnable
 
 	/**
 	 * Set the current socket timeout
-	 * @param longout new timeout
+	 * @param timeout
 	 * @since 1.8
 	 */
 	public synchronized void setTimeout(int timeout) {

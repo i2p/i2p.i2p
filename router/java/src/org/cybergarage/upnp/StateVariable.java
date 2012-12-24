@@ -271,8 +271,6 @@ public class StateVariable extends NodeData
 	 * the last set will be the only present<br>
 	 * 
 	 * @param avl The new AllowedValueList
-	 * 
-	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
 	 */
 	public void setAllowedValueList(AllowedValueList avl) {
 		//TODO Some test done not stable 	
@@ -320,8 +318,6 @@ public class StateVariable extends NodeData
 	 * the last set will be the only present<br>
 	 * 
 	 * @param avr The new AllowedValueRange
-	 * 
-	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
 	 */	
 	public void setAllowedValueRange(AllowedValueRange avr){
 		//TODO Some test done not stable
@@ -439,8 +435,6 @@ public class StateVariable extends NodeData
 	////////////////////////////////////////////////
 	/**
 	 * Get the value of DefaultValue of this StateVariable
-	 * 
-	 * @author Stefano Lenzi kismet-sl@users.sourceforge.net
 	 */
 	public String getDefaultValue() {
 		return getStateVariableNode().getNodeValue(DEFAULT_VALUE);
@@ -453,8 +447,6 @@ public class StateVariable extends NodeData
 	 * Device withtout writing any XML that describe the device<br>.
 	 * 
 	 * @param value The new String value
-	 * 
-	 * @author Stefano Lenzi kismet-sl@users.sourceforge.net
 	 */	
 	public void setDefaultValue(String value){
 		getStateVariableNode().setNode(DEFAULT_VALUE,value);

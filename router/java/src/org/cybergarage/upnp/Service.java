@@ -851,8 +851,6 @@ public class Service
 	 * Note: that no control for duplicate StateVariable is done.
 	 * 
 	 * @param var StateVariable that will be added
-	 * 
-	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
 	 */
 	public void addStateVariable(StateVariable var) {
 		//TODO Some test are done not stable
