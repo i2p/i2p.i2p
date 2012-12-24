@@ -1645,7 +1645,7 @@
         </exec>
         <delete dir=".pc" />
         <move todir=".">
-            <fileset dir=".." includes="libjbigi*${Extended.Version}-1*.deb i2p*${Extended.Version}-1*.deb" />
+            <fileset dir=".." includes="libjbigi*${release.number}*.deb i2p*${release.number}*.deb" />
         </move>
         <echo message="" />
         <echo message="====================" />
