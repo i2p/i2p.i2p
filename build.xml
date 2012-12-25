@@ -937,6 +937,8 @@
         <copy todir="pkg-temp/docs/initialNews/">
           <fileset dir="installer/resources/initialNews/" />
         </copy>
+        <!-- ensure the proxy files have the correct line endings -->
+        <fixcrlf srcdir="pkg-temp/docs" includes="*.ht" encoding="utf8" eol="crlf" />
     </target>
 
     <!-- readme and proxy error page files -->
@@ -1230,24 +1232,28 @@
 
     <!-- Custom installers -->
     <target name="installer-nowindows" depends="clean, preppkg-nowindows, izpack-patches" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
     <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, izpack-patches" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
     <target name="installer-linux" depends="clean, preppkg-linux-only, izpack-patches" >
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
     <target name="installer-osx" depends="clean, checkForIzpack2App, preppkg-osx-only, izpack-patches">
-	<mkdir dir="pkg-temp/osx" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_osx-only.jar" installerType="standard" basedir="${basedir}" />
-	<ant target="installer2app" />
-	<delete dir="pkg-temp/osx" />
+        <fixcrlf srcdir="pkg-temp" includes="*.config **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="lf" />
+        <mkdir dir="pkg-temp/osx" />
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_osx-only.jar" installerType="standard" basedir="${basedir}" />
+        <ant target="installer2app" />
+        <delete dir="pkg-temp/osx" />
     </target>
 
     <target name="checkForIzpack2App">
@@ -1285,7 +1291,8 @@
     </target>
 
     <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches, utility-jars" >
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <fixcrlf srcdir="pkg-temp" includes="*.config *.bat *.cmd **/*.xml **/*.properties **/*.txt scripts/*" encoding="utf8" eol="crlf"/>
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
         <delete file="${basedir}/install.jar" />
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows-only.exe" />
