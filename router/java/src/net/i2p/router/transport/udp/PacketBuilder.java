@@ -156,8 +156,7 @@ class PacketBuilder {
         _context = ctx;
         _transport = transport;
         _log = ctx.logManager().getLog(PacketBuilder.class);
-        _context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", UDPTransport.RATES);
+        // all createRateStat in UDPTransport
     }
     
 /****
