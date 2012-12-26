@@ -50,7 +50,6 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
     public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash) {
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
-        getContext().statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Garlic Message not down a tunnel from [" + from + "]");
         _message = msg;
@@ -59,6 +58,7 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
         //_cloves = new HashMap();
         //_handler = new MessageHandler(context);
         //_parser = new GarlicMessageParser(context);
+        // all createRateStat in OCMOSJ.init()
     }
     
     public String getName() { return "Handle Inbound Garlic Message"; }

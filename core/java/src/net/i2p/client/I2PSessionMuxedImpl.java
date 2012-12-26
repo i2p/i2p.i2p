@@ -218,10 +218,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
     /**
      *  See SendMessageOptions for option details.
      *
-     *  Always uses sendNoEffort for now. These are presumed to be datagrams.
-     *  SendMessageOptions 16-bit flag field is currently undefined, so
-     *  serialization won't work; therefore this only makes sense in RouterContext,
-     *  for now.
+     *  Always uses sendNoEffort for now.
      *
      *  @param proto 1-254 or 0 for unset; recommended:
      *         I2PSession.PROTO_UNSPECIFIED
@@ -294,7 +291,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
     }
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {
-        private LinkedBlockingQueue<MsgData> _msgs;
+        private final LinkedBlockingQueue<MsgData> _msgs;
         private volatile boolean _alive = false;
         private static final int POISON_SIZE = -99999;
         private final AtomicBoolean stopping = new AtomicBoolean(false);
@@ -364,7 +361,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
     /** let's keep this simple */
     private static class MsgData {
-        public int id, size, proto, fromPort, toPort;
+        public final int id, size, proto, fromPort, toPort;
         public MsgData(int i, int s, int p, int f, int t) {
             id = i;
             size = s;

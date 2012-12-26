@@ -33,6 +33,7 @@ public class SessionId extends DataStructureImpl {
         return _sessionId;
     }
 
+    /** @param id 0-65535 */
     public void setSessionId(int id) {
         _sessionId = id;
     }

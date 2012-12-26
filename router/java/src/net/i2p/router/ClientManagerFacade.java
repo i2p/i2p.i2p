@@ -68,7 +68,11 @@ public abstract class ClientManagerFacade implements Service {
      * @param destHash Hash of Destination to be checked
      */
     public abstract boolean isLocal(Hash destHash);
-    public abstract void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered);
+
+    /**
+     *  @param status see I2CP MessageStatusMessage for success/failure codes
+     */
+    public abstract void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, int status);
     
     public abstract void messageReceived(ClientMessage msg);
     

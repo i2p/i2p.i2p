@@ -269,11 +269,13 @@ class ClientConnectionRunner {
      * delivered (or failed delivery)
      * Note that this sends the Guaranteed status codes, even though we only support best effort.
      * Doesn't do anything if i2cp.messageReliability = "none"
+     *
+     *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
-    void updateMessageDeliveryStatus(MessageId id, boolean delivered) {
+    void updateMessageDeliveryStatus(MessageId id, int status) {
         if (_dead || _dontSendMSM)
             return;
-        _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, delivered));
+        _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, status));
     }
 
     /** 
@@ -624,13 +626,16 @@ class ClientConnectionRunner {
     
     private class MessageDeliveryStatusUpdate extends JobImpl {
         private final MessageId _messageId;
-        private final boolean _success;
+        private final int _status;
         private long _lastTried;
 
-        public MessageDeliveryStatusUpdate(MessageId id, boolean success) {
+        /**
+         *  @param status see I2CP MessageStatusMessage for success/failure codes
+         */
+        public MessageDeliveryStatusUpdate(MessageId id, int status) {
             super(ClientConnectionRunner.this._context);
             _messageId = id;
-            _success = success;
+            _status = status;
         }
 
         public String getName() { return "Update Delivery Status"; }
@@ -647,10 +652,7 @@ class ClientConnectionRunner {
             // has to be >= 0, it is initialized to -1
             msg.setNonce(2);
             msg.setSize(0);
-            if (_success) 
-                msg.setStatus(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
-            else
-                msg.setStatus(MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);	
+            msg.setStatus(_status);
 
             if (!alreadyAccepted(_messageId)) {
                 _log.warn("Almost send an update for message " + _messageId + " to " 

@@ -21,6 +21,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
@@ -189,6 +190,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchNoACK", "Repeated message sends to a peer (no ack required)", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
+        // for HandleGarlicMessageJob / GarlicMessageReceiver
+        ctx.statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
     }
 
     public String getName() { return "Outbound client message"; }
@@ -674,6 +677,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * this is safe to call multiple times (only tells the client once)
      */
     private void dieFatal() {
+        dieFatal(MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
+    }
+
+    private void dieFatal(int status) {
         if (_finished) return;
         _finished = true;
         
@@ -693,7 +700,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     
         clearCaches();
         getContext().messageHistory().sendPayloadMessage(_clientMessageId.getMessageId(), false, sendTime);
-        getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, false);
+        getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, status);
         getContext().statManager().updateFrequency("client.sendMessageFailFrequency");
         _clove = null;
     }
@@ -820,7 +827,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             long dataMsgId = _cloveId;
             getContext().messageHistory().sendPayloadMessage(dataMsgId, true, sendTime);
-            getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, true);
+            getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId,
+                                                                     MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
             // unused
             //_lease.setNumSuccess(_lease.getNumSuccess()+1);
         

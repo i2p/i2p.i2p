@@ -26,6 +26,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.router.ClientManagerFacade;
@@ -75,6 +76,10 @@ class ClientManager {
         _runnersByHash = new ConcurrentHashMap();
         _pendingRunners = new HashSet();
         startListeners(port);
+        // following are for RequestLeaseSetJob
+        _ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 60*60*1000 });
+        _ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 60*60*1000 });
+        _ctx.statManager().createRateStat("client.requestLeaseSetDropped", "How frequently the router requests a new leaseSet but the client drops?", "ClientMessages", new long[] { 60*60*1000 });
     }
 
     /** Todo: Start a 3rd listener for IPV6? */
@@ -265,7 +270,7 @@ class ClientManager {
         public void runJob() {
             _to.receiveMessage(_toDest, _fromDest, _payload);
             if (_from != null) {
-                _from.updateMessageDeliveryStatus(_msgId, true);
+                _from.updateMessageDeliveryStatus(_msgId, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
             }
         }
     }
@@ -382,17 +387,20 @@ class ClientManager {
         return _runnersByHash.get(destHash);
     }
     
-    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {
+    /**
+     *  @param status see I2CP MessageStatusMessage for success/failure codes
+     */
+    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, int status) {
         ClientConnectionRunner runner = getRunner(fromDest);
         if (runner != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Delivering status [" + (delivered?"success":"failure") + "] to " 
-                           + fromDest.calculateHash().toBase64() + " for message " + id);
-            runner.updateMessageDeliveryStatus(id, delivered);
+                _log.debug("Delivering status " + status + " to " 
+                           + fromDest.calculateHash() + " for message " + id);
+            runner.updateMessageDeliveryStatus(id, status);
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Cannot deliver status [" + (delivered?"success":"failure") + "] to " 
-                          + fromDest.calculateHash().toBase64() + " for message " + id);
+                _log.warn("Cannot deliver status " + status + " to " 
+                          + fromDest.calculateHash() + " for message " + id);
         }
     }
     
