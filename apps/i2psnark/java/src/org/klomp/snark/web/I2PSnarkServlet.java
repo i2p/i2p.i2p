@@ -1032,6 +1032,8 @@ public class I2PSnarkServlet extends DefaultServlet {
             statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
                            "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Allocating");
         } else if (err != null && curPeers == 0) {
+            // Also don't show if seeding... but then we won't see the not-registered error
+            //       && remaining != 0 && needed != 0) {
             // let's only show this if we have no peers, otherwise PEX and DHT should bail us out, user doesn't care
             //if (isRunning && curPeers > 0 && !showPeers)
             //    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
@@ -1544,11 +1546,15 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
         out.write(_("Trackers"));
-        out.write(":<td><table style=\"width: 20%;\"><tr><td></td><td align=\"center\">");
+        out.write(":<td><table style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
         out.write(_("Primary"));
         out.write("</td><td align=\"center\">");
         out.write(_("Alternates"));
-        out.write("</td></tr>\n");
+        out.write("</td><td rowspan=\"0\">" +
+                  " <input type=\"submit\" class=\"create\" value=\"");
+        out.write(_("Create torrent"));
+        out.write("\" name=\"foo\" >" +
+                  "</td></tr>\n");
         for (Tracker t : sortedTrackers) {
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
@@ -1563,9 +1569,9 @@ public class I2PSnarkServlet extends DefaultServlet {
             out.write(announceURL);
             out.write("\" value=\"foo\"></td></tr>\n");
         }
-        out.write("<tr><td>");
+        out.write("<tr><td><i>");
         out.write(_("none"));
-        out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
+        out.write("</i></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
         if (_lastAnnounceURL == null)
             out.write(" checked");
         out.write("></td><td></td></tr></table>\n");
@@ -1575,10 +1581,7 @@ public class I2PSnarkServlet extends DefaultServlet {
         //          "title=\"");
         //out.write(_("Specify custom tracker announce URL"));
         //out.write("\" > " +
-        out.write(" <input type=\"submit\" class=\"create\" value=\"");
-        out.write(_("Create torrent"));
-        out.write("\" name=\"foo\" >\n" +
-                  "</td></tr>" +
+        out.write("</td></tr>" +
                   "</table>\n" +
                   "</form></div></div>");        
     }
