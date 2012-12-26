@@ -172,6 +172,7 @@ public class ConsolePasswordManager extends RouterPasswordManager {
         return _context.router().saveConfig(toAdd, toDel);
     }
     
+/****
     public static void main(String args[]) {
         RouterContext ctx = (new Router()).getContext();
         ConsolePasswordManager pm = new ConsolePasswordManager(ctx);
@@ -210,4 +211,5 @@ public class ConsolePasswordManager extends RouterPasswordManager {
         if (!pm.checkHash("type5", "user5", "pw5"))
             System.out.println("Fail 11");
     }
+****/
 }
