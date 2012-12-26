@@ -331,7 +331,12 @@ class BuildExecutor implements Runnable {
                 } else {
                     if ( (allowed > 0) && (!wanted.isEmpty()) ) {
                         Collections.shuffle(wanted, _context.random());
-                        Collections.sort(wanted, new TunnelPoolComparator());
+                        try {
+                            Collections.sort(wanted, new TunnelPoolComparator());
+                        } catch (IllegalArgumentException iae) {
+                            // Java 7 TimSort - see info in TunnelPoolComparator
+                            continue;
+                        }
 
                         // force the loops to be short, since 3 consecutive tunnel build requests can take
                         // a long, long time
@@ -391,12 +396,12 @@ class BuildExecutor implements Runnable {
                 //              " built=" + realBuilt +
                 //              " pending=" + pendingRemaining);
                 
-                wanted.clear();
-                pools.clear();
             } catch (RuntimeException e) {
                     _log.log(Log.CRIT, "B0rked in the tunnel builder", e);
                     try { Thread.sleep(LOOP_TIME); } catch (InterruptedException ie) {}
             }
+            wanted.clear();
+            pools.clear();
         }
         
         if (_log.shouldLog(Log.WARN))
@@ -412,6 +417,8 @@ class BuildExecutor implements Runnable {
      *
      *  This prevents a large number of client pools from starving the exploratory pool.
      *
+     *  WARNING - this sort may be unstable, as a pool's tunnel count may change
+     *  during the sort. This will cause Java 7 sort to throw an IAE.
      */
     private static class TunnelPoolComparator implements Comparator<TunnelPool> {
         public int compare(TunnelPool tpl, TunnelPool tpr) {
