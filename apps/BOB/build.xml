@@ -83,7 +83,7 @@
 	        <pathelement path="${javac.classpath}" />
 	    </path>
 	</copy>
-	<copy todir="${dist.dir}/lib" file="../../installer/lib/jbigi/jbigi.jar" />
+	<copy todir="${dist.dir}/lib" file="../../build/jbigi.jar" />
 
 	<!-- Extract the classes inside the jar files -->
 	<unjar dest="${dist.dir}/classes" >
