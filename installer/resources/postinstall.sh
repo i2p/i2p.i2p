@@ -117,7 +117,7 @@ rm -f ./lib/*.dll
 rm -f ./*.bat
 rm -f ./*.cmd
 rm -f ./*.exe
-rm -rf ./installer
+rm -rf ./utility.jar
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -rf ./Start\ I2P\ Router.app

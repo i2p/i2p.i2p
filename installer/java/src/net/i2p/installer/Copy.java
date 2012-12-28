@@ -1,9 +1,11 @@
-package net.i2p.util;
+package net.i2p.installer;
+
+import net.i2p.util.FileUtil;
 
 /**
  * Usage: Copy from to
  *
- * @deprecated only for use by installer, to be removed from i2p.jar, use FileUtil.copy()
+ * only for use by installer
  */
 public class Copy {
     public static void main(String args[]) {

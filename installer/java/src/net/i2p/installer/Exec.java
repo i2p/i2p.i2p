@@ -1,11 +1,11 @@
-package net.i2p.util;
+package net.i2p.installer;
 
 import java.io.File;
 
 /**
  * Usage: Exec dir command [args ...]
  *
- * @deprecated only for use by installer, to be removed from i2p.jar, use ShellCommand
+ * only for use by installer
  */
 public class Exec {
     public static void main(String args[]) {
