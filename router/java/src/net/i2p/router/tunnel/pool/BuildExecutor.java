@@ -466,13 +466,10 @@ class BuildExecutor implements Runnable {
     void buildTunnel(TunnelPool pool, PooledTunnelCreatorConfig cfg) {
         long beforeBuild = System.currentTimeMillis();
         if (cfg.getLength() > 1) {
-            // should we allow an ID of 0?
-            cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-            if (addToBuilding(cfg)) {
-                _log.error("Dup reply ID: " + cfg.getReplyMessageId());
-                // fail
-                return;
-            }
+            do {
+                // should we allow an ID of 0?
+                cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+            } while (addToBuilding(cfg)); // if a dup, go araound again
         }
         BuildRequestor.request(_context, pool, cfg, this);
         long buildTime = System.currentTimeMillis() - beforeBuild;

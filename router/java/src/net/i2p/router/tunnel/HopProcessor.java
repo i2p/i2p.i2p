@@ -61,11 +61,12 @@ class HopProcessor {
     public boolean process(byte orig[], int offset, int length, Hash prev) {
         // prev is null on gateways
         if (prev != null) {
-            if (_config.getReceiveFrom() == null)
+            if (_config.getReceiveFrom() == null) {
                 _config.setReceiveFrom(prev);
-            if (!_config.getReceiveFrom().equals(prev)) {
+            } else if (!_config.getReceiveFrom().equals(prev)) {
+                // shouldn't happen now that we have good dup ID detection in BuildHandler
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Invalid previous peer - attempted hostile loop?  from " + prev 
+                    _log.error("Attempted mid-tunnel injection from " + prev 
                                + ", expected " + _config.getReceiveFrom());
                 return false;
             }

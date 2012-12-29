@@ -65,13 +65,24 @@ abstract class BuildRequestor {
     
     /** new style requests need to fill in the tunnel IDs before hand */
     private static void prepare(RouterContext ctx, PooledTunnelCreatorConfig cfg) {
-        for (int i = 0; i < cfg.getLength(); i++) {
-            if ( (!cfg.isInbound()) && (i == 0) ) {
+        int len = cfg.getLength();
+        boolean isIB = cfg.isInbound();
+        for (int i = 0; i < len; i++) {
+            if ( (!isIB) && (i == 0) ) {
                 // outbound gateway (us) doesn't receive on a tunnel id
-                if (cfg.getLength() <= 1) // zero hop, pretend to have a send id
-                    cfg.getConfig(i).setSendTunnelId(DataHelper.toLong(4, ctx.random().nextLong(TunnelId.MAX_ID_VALUE)));
+                if (len <= 1)  { // zero hop, pretend to have a send id
+                    long id = ctx.tunnelDispatcher().getNewOBGWID();
+                    cfg.getConfig(i).setSendTunnelId(DataHelper.toLong(4, id));
+                }
             } else {
-                cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, ctx.random().nextLong(TunnelId.MAX_ID_VALUE)));
+                long id;
+                if (isIB && len == 1)
+                    id = ctx.tunnelDispatcher().getNewIBZeroHopID();
+                else if (isIB && i == len - 1)
+                    id = ctx.tunnelDispatcher().getNewIBEPID();
+                else
+                    id = ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
+                cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, id));
             }
             
             if (i > 0)
