@@ -188,10 +188,14 @@ public class I2PSnarkServlet extends DefaultServlet {
                 } else {
                     String base = URIUtil.addPaths(req.getRequestURI(), "/");
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
-                    if (listing != null)
+                    if (method.equals("POST")) {
+                        // P-R-G
+                        sendRedirect(req, resp, "");
+                    } else if (listing != null) {
                         resp.getWriter().write(listing);
-                    else // shouldn't happen
+                    } else { // shouldn't happen
                         resp.sendError(404);
+                    }
                 }
             } else {
                 super.service(req, resp);
@@ -209,6 +213,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                 processRequest(req);
             else  // nonce is constant, shouldn't happen
                 _manager.addMessage("Please retry form submission (bad nonce)");
+            // P-R-G (or G-R-G to hide the params from the address bar)
+            sendRedirect(req, resp, peerString);
+            return;	
         }
         
         PrintWriter out = resp.getWriter();
@@ -805,6 +812,22 @@ public class I2PSnarkServlet extends DefaultServlet {
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }
+    }
+
+    /**
+     *  Redirect a POST to a GET (P-R-G), preserving the peer string
+     *  @since 0.9.5
+     */
+    private void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String p) throws IOException {
+        String url = req.getRequestURL().toString();
+        StringBuilder buf = new StringBuilder(128);
+        if (url.endsWith("_post"))
+            url = url.substring(0, url.length() - 5);
+        buf.append(url);
+        if (p.length() > 0)
+            buf.append('?').append(p);
+        resp.setHeader("Location", buf.toString());
+        resp.sendError(302, "Moved");
     }
 
     /** @since 0.9 */
@@ -1768,10 +1791,11 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("I2CP options"));
         out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" spellcheck=\"false\" >"
                   + opts.toString() + "</textarea><br>\n" +
-
+                  "<tr><td colspan=\"2\">&nbsp;\n" +  // spacer
                   "<tr><td>&nbsp;<td><input type=\"submit\" class=\"accept\" value=\"");
         out.write(_("Save configuration"));
         out.write("\" name=\"foo\" >\n" +
+                  "<tr><td colspan=\"2\">&nbsp;\n" +  // spacer
                   "</table></div></div></form>");
     }
     
@@ -1837,6 +1861,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                    "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
                    "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
                    "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\"></td></tr>\n" +
+                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
                    "<tr><td colspan=\"2\"></td><td colspan=\"4\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
@@ -1844,7 +1869,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
-                   "</td></tr></table></div></div></form>\n");
+                   "</td></tr>" +
+                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
+                   "</table></div></div></form>\n");
         out.write(buf.toString());
     }
 
@@ -2001,7 +2028,7 @@ public class I2PSnarkServlet extends DefaultServlet {
      * @param base The base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
-     * @return String of HTML
+     * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
     private String getListHTML(Resource r, String base, boolean parent, Map postParams)
@@ -2013,8 +2040,6 @@ public class I2PSnarkServlet extends DefaultServlet {
             Arrays.sort(ls, Collator.getInstance());
         }  // if r is not a directory, we are only showing torrent info section
         
-        StringBuilder buf=new StringBuilder(4096);
-        buf.append(DOCTYPE + "<HTML><HEAD><TITLE>");
         String title = URIUtil.decodePath(base);
         if (title.startsWith("/i2psnark/"))
             title = title.substring("/i2psnark/".length());
@@ -2028,9 +2053,14 @@ public class I2PSnarkServlet extends DefaultServlet {
             torrentName = title;
         Snark snark = _manager.getTorrentByBaseName(torrentName);
 
-        if (snark != null && postParams != null)
+        if (snark != null && postParams != null) {
+            // caller must P-R-G
             savePriorities(snark, postParams);
+            return null;
+        }
 
+        StringBuilder buf=new StringBuilder(4096);
+        buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         String directory = title;
