@@ -442,6 +442,7 @@
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*:net.i2p.kademlia" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
+            <group title="Installer Utilities" packages="net.i2p.installer" />
             <group title="Jetty Logging" packages="net.i2p.jetty" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
@@ -466,6 +467,7 @@
                 <pathelement location="apps/susidns/src/java/src" />
                 <pathelement location="apps/susimail/src/src" />
                 <pathelement location="apps/jetty/java/src" />
+                <pathelement location="installer/java/src" />
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
@@ -482,6 +484,7 @@
 	    <!-- These variables are stored in build.properties. 
 		 End-users can override by creating the file override.properties -->
             <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
+            <link offline="true" href="${javaeedocs.url}" packagelistLoc="installer/resources/package-lists/javaee/" />
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="${jrobindocs.url}" packagelistLoc="installer/resources/package-lists/jrobin/" />
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
