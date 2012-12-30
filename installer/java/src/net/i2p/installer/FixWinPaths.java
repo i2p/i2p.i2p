@@ -12,9 +12,14 @@ import java.io.PrintStream;
 
 
 /**
- * Usage: FixWinPaths WrapperConfigFile
- *
- * only for use by installer
+ * <p>This class is used by the installer in Windows to process the <code>wrapper.config</code> file. It
+ * <ul>
+ * <li>rewrites the applicable wrapper config options to point to <code>%APPDATA%\I2P</code></li>
+ * <li>corrects the paths, rewriting <code>/</code> to <code>\</code></li>
+ * </ul>
+ * </p>
+ * Usage: <code>FixWinPaths [WrapperConfigFile]</code>
+ * @since 0.9.5
  */
 public class FixWinPaths{
     public static void main(String args[]) {
