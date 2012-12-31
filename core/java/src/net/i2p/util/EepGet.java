@@ -30,8 +30,6 @@ import net.i2p.util.InternalSocket;
  *        [-o outputFile]
  *        [-m markSize lineLen]
  *        url
- *
- * Bug: a malformed url http://example.i2p (no trailing '/') fails cryptically
  */
 public class EepGet {
     protected final I2PAppContext _context;
@@ -1207,7 +1205,7 @@ public class EepGet {
     public void addAuthorization(String userName, String password) {
         if (_shouldProxy)
             addHeader("Proxy-Authorization", 
-                      "Basic " + Base64.encode((userName + ':' + password).getBytes(), true));  // true = use standard alphabet
+                      "Basic " + Base64.encode(DataHelper.getUTF8(userName + ':' + password), true));  // true = use standard alphabet
     }
 
     /**
