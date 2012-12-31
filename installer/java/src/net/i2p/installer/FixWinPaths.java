@@ -82,13 +82,19 @@ public class FixWinPaths{
                 //
             }
         }
-        // Once everything is complete, delete the original wrapper.conf
+        boolean successful = false;
         File oldFile = new File(wConf);
-        oldFile.delete();
-
-        // ...and rename temp file's name to wrapper.conf
         File newFile = new File(wConfTemp);
-        newFile.renameTo(oldFile);
+        // Once changes have been made, delete the original wrapper.conf
+        successful = oldFile.delete();
+        if (successful) {
+            // ...and rename temp file's name to wrapper.conf
+            successful = newFile.renameTo(oldFile);
+            if (!successful) {
+                System.err.println("ERROR: Problem processing " + wConf);
+                System.exit(1);
+            }
+        }
 
     }
 }

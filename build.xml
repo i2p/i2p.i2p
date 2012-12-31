@@ -798,7 +798,7 @@
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="preppkg-windows" depends="preppkg-base, buildexe">
+    <target name="preppkg-windows" depends="preppkg-base, buildUtilityJar, buildexe">
         <copy file="build/i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
@@ -810,17 +810,18 @@
         <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy file="build/utility.jar" todir="pkg-temp" />
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" excludes="*.txt" />
         </copy>
-	<copy todir="pkg-temp/lib/wrapper/win64/">
-	    <fileset dir="installer/lib/wrapper/win64/" excludes="*.txt" />
+        <copy todir="pkg-temp/lib/wrapper/win64/">
+            <fileset dir="installer/lib/wrapper/win64/" excludes="*.txt" />
         </copy>
     </target>
 
     <target name="preppkg-windows-only" depends="preppkg-windows, jbigi-windows-only">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-	<copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">
@@ -1349,7 +1350,7 @@
         <echo message="sloccount report saved to the file &quot;${sloccount.report.file}&quot;" />
     </target>
 
-    <target name="findbugs" depends="build2">
+    <target name="findbugs" depends="build2, buildUtilityJar">
         <echo message="Starting findbugs, this will take a while..." />
         <exec executable="nice" failonerror="true">
             <arg value="findbugs"/>
@@ -1363,7 +1364,7 @@
             <arg value="-auxclasspath"/>
             <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
             <arg value="-sourcepath"/>
-            <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
+            <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->
             <arg value="build/BOB.jar"/>
             <arg value="build/addressbook.war"/>
@@ -1382,6 +1383,7 @@
             <arg value="build/susidns.war"/>
             <arg value="build/susimail.war"/>
             <arg value="build/systray.jar"/>
+            <arg value="build/utility.jar"/>
         </exec>
         <echo message="Findbugs output stored in i2p.fba" />
         <echo message="Now run: findbugs i2p.fba" />

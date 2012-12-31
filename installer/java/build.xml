@@ -45,7 +45,7 @@
     <target name="jar" depends="compile, listChangedFiles">
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-        <jar destfile="../../pkg-temp/utility.jar">
+        <jar destfile="../../build/utility.jar">
             <fileset dir="../../core/java/build/obj" includes="**/FileUtil.class"/>
             <fileset dir="./build/obj" includes="**" />
             <manifest>
