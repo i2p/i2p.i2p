@@ -12,6 +12,7 @@ to xxx/librapper.so, libwrapper.jnilib, or wrapper.dll for the following directo
 Don't forget to disable the execute bit.
 	linux (x86-32)
 	linux64 (x86-64)
+	linux-ppc (linux-ppc-32)
 	linux-armv5 (armv5/armv7)
 	solaris (sparc-32)
 
@@ -29,10 +30,6 @@ because they are compiled in FBSD v6.  Compile from source in
 FreeBSD 7.4 to eliminate the dependency on the compat6x port.
 Don't forget to strip the binaries and disable the execute bit.
 A walkthrough can be found in freebsd/README.txt.
-
-For linux-ppc, we don't use the Tanuki binaires because they're (mistakenly)
-ppc64 compiles. Compile the arch-dependent bits with
-"ant -Dbits=32 compile-c-unix".
 
 For macosx, combine (if possible) the universal-32 and universal-64 files
 from the delta pack (each is a 2-architecture fat file)

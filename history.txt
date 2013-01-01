@@ -1,3 +1,13 @@
+2013-01-01 kytv
+ * Update Java Service Wrapper to v3.5.17 (ticket #826).
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
+      compat6x port.
+    - Linux x86, Linux x64, Linux ARMv5, Linux-PPC32, MacOSX & Solaris: Binares
+      are from the "community edition" deltapack offered by Tanuki. The Linux
+      binaries have been stripped.
+
 2012-12-29 zzz
  * i2psnark: Redirect after post
  * Javadocs: Fix javax links
