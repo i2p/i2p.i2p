@@ -121,8 +121,7 @@ rm -rf ./utility.jar
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -rf ./Start\ I2P\ Router.app
-    rm -f install_i2p_service_osx.command
-    rm -f install_i2p_service_osx.command
+    rm -f *i2p_service_osx.command
     rm -f net.i2p.router.plist.template
     #rm -f I2P\ Router\ Console.webloc
 fi
