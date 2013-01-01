@@ -2,6 +2,7 @@ package net.i2p.router.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.IllegalArgumentException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import net.i2p.util.VersionComparator;
  * then fetch the first 56 bytes of the URL, extract the version,
  * and compare.
  *
+ * uri list must not be empty.
+ *
  * Moved from web/ and turned into an UpdateTask.
  *
  * @since 0.9.4 moved from PluginUpdateHandler
@@ -55,10 +58,10 @@ class PluginUpdateRunner extends UpdateRunner {
     public static final String PLUGIN_DIR = PluginStarter.PLUGIN_DIR;
 
     public PluginUpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris,
-                              String appName, String oldVersion ) { 
+                              String appName, String oldVersion ) {
         super(ctx, mgr, uris);
         if (uris.isEmpty())
-            _uri = null;
+            throw new IllegalArgumentException("uri cannot be empty");
         else
             _uri = uris.get(0);
         _xpi2pURL = _uri.toString();

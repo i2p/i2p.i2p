@@ -184,12 +184,14 @@ public class ProfileOrganizer {
      *
      */
     public PeerProfile addProfile(PeerProfile profile) {
+        if (profile == null) return null;
+
         Hash peer = profile.getPeer();
-        if (profile == null || peer == null) return null;
-        
+        if (peer == null) return null;
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New profile created for " + peer);
-        
+
         PeerProfile old = getProfile(peer);
         profile.coalesceStats();
         if (!getWriteLock())
