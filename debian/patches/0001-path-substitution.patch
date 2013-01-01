@@ -223,9 +223,9 @@ Debian wrapper.config to try to prevent confusion.
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -144,11 +136,7 @@
+@@ -143,11 +135,7 @@
+ # You may wish to change this.
  # NOTE: On Linux/Mac this is overridden in the i2prouter script; changes here will have no effect.
- # Windows users may wish to change this to %APPDATA%\I2P\wrapper.log
  # System temp directory:
 -wrapper.logfile=$SYSTEM_java_io_tmpdir/wrapper.log
 -# PORTABLE installation:
@@ -236,7 +236,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -218,11 +206,7 @@
+@@ -217,11 +205,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -249,7 +249,7 @@ Debian wrapper.config to try to prevent confusion.
  #
  # From i2prouter:
  #
-@@ -236,10 +220,7 @@
+@@ -235,10 +219,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -261,7 +261,7 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -256,30 +237,3 @@
+@@ -255,30 +236,3 @@
  wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=077
