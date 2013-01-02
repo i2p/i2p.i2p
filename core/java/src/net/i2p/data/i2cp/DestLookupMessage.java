@@ -60,16 +60,6 @@ public class DestLookupMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof DestLookupMessage)) {
-            DestLookupMessage msg = (DestLookupMessage) object;
-            return DataHelper.eq(getHash(), msg.getHash());
-        }
-        return false;
-    }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

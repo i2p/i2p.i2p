@@ -107,19 +107,6 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof MessagePayloadMessage)) {
-            MessagePayloadMessage msg = (MessagePayloadMessage) object;
-            return _sessionId == msg.getSessionId()
-                   && _messageId == msg.getMessageId()
-                   && DataHelper.eq(_payload, msg.getPayload());
-        }
-            
-        return false;
-    }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

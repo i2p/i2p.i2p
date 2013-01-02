@@ -76,20 +76,6 @@ public class GetDateMessage extends I2CPMessageImpl {
     }
 
     @Override
-    public int hashCode() {
-        return MESSAGE_TYPE ^ DataHelper.hashCode(_version);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof GetDateMessage)) {
-            return DataHelper.eq(_version, ((GetDateMessage)object)._version);
-        }
-        
-        return false;
-    }
-
-    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[GetDateMessage]");

@@ -133,18 +133,6 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof SendMessageExpiresMessage)) {
-            SendMessageExpiresMessage msg = (SendMessageExpiresMessage) object;
-            return super.equals(object)
-                   && _daf.equals(msg._daf);
-        }
-         
-        return false;
-    }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

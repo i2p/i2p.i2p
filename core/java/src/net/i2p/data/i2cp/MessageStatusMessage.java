@@ -36,9 +36,13 @@ public class MessageStatusMessage extends I2CPMessageImpl {
      */
     public final static int STATUS_AVAILABLE = 0;
     public final static int STATUS_SEND_ACCEPTED = 1;
+
     /** unused */
     public final static int STATUS_SEND_BEST_EFFORT_SUCCESS = 2;
-    /** unused */
+
+    /**
+     *  A probable failure, but we don't know for sure.
+     */
     public final static int STATUS_SEND_BEST_EFFORT_FAILURE = 3;
 
     /**
@@ -223,10 +227,16 @@ public class MessageStatusMessage extends I2CPMessageImpl {
                status == STATUS_AVAILABLE;
     }
 
+    /**
+     *  This is the router's ID for the message
+     */
     public long getMessageId() {
         return _messageId;
     }
 
+    /**
+     *  This is the router's ID for the message
+     */
     public void setMessageId(long id) {
         _messageId = id;
     }
@@ -239,10 +249,16 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         _size = size;
     }
 
+    /**
+     *  This is the client's ID for the message
+     */
     public long getNonce() {
         return _nonce;
     }
 
+    /**
+     *  This is the client's ID for the message
+     */
     public void setNonce(long nonce) {
         _nonce = nonce;
     }
@@ -310,19 +326,6 @@ public class MessageStatusMessage extends I2CPMessageImpl {
 
     public int getType() {
         return MESSAGE_TYPE;
-    }
-
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof MessageStatusMessage)) {
-            MessageStatusMessage msg = (MessageStatusMessage) object;
-            return _sessionId == msg.getSessionId()
-                   && _messageId == msg.getMessageId() && _nonce == msg.getNonce()
-                   && _size == msg.getSize() && _status == msg.getStatus();
-        }
-            
-        return false;
     }
 
     @Override

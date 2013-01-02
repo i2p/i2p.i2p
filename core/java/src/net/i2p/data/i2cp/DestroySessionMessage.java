@@ -66,23 +66,6 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof DestroySessionMessage)) {
-            DestroySessionMessage msg = (DestroySessionMessage) object;
-            return DataHelper.eq(_sessionId, msg.getSessionId());
-        }
-            
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 11 * hash + (this._sessionId != null ? this._sessionId.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DestroySessionMessage: ");
