@@ -230,7 +230,7 @@
         <!-- replace hostname that junit inserts into reports with fake one -->
         <replace dir="../../reports/core/junit/" token="${host.name}" value="${host.fakename}"/>
     </target>
-    <target name="test" depends="scalatest.test"/>
+    <target name="test" depends="junit.test, scalatest.test"/>
     <!-- test reports -->
     <target name="scalatest.report">
         <junitreport todir="../../reports/core/scalatest">
@@ -262,7 +262,7 @@
         <cobertura-report format="html" srcdir="./src" destdir="../../reports/core/html/cobertura" />
         <delete file="./cobertura.ser" />
     </target>
-    <target name="test.report" depends="scalatest.report, clover.report, cobertura.report"/>
+    <target name="test.report" depends="junit.report, scalatest.report, clover.report, cobertura.report"/>
     <!-- end test reports -->
     <target name="fulltest" depends="test, test.report" />
     <!-- end unit tests -->

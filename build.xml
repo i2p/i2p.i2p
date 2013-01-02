@@ -1287,19 +1287,26 @@
     <target name="test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="test" />
     </target>
+    <target name="scalatest.report" depends="buildProperties" >
+        <ant dir="core/java/" target="scalatest.report" />
+        <ant dir="router/java/" target="scalatest.report" />
+    </target>
     <target name="junit.report" depends="buildProperties" >
         <ant dir="core/java/" target="junit.report" />
+        <ant dir="router/java/" target="junit.report" />
     </target>
     <target name="clover.report" depends="buildProperties" if="with.clover">
         <ant dir="core/java/" target="clover.report" />
+        <ant dir="router/java/" target="clover.report" />
     </target>
     <target name="cobertura.report" depends="buildProperties" if="with.cobertura">
         <ant dir="core/java/" target="cobertura.report" />
+        <ant dir="router/java/" target="cobertura.report" />
     </target>
-    <target name="test.report" depends="junit.report, clover.report, cobertura.report"/>
-    <target name="fulltest" depends="buildProperties" >
-		<ant dir="core/java/" target="fulltest" />
-		<ant dir="router/java/" target="fulltest" />
+    <target name="test.report" depends="junit.report, scalatest.report, clover.report, cobertura.report"/>
+    <target name="fulltest" depends="buildProperties, jbigi" >
+        <ant dir="core/java/" target="fulltest" />
+        <ant dir="router/java/" target="fulltest" />
     </target>
     <!-- end unit tests -->
 
