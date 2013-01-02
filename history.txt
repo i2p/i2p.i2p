@@ -8,6 +8,7 @@
    - Remove static logs
    - Fix leak if nonce = 0 but reliability != none
    - More work on failure codes (ticket #788)
+ * Logs: Fix setting log filename (ticket #805)
  * SAM: Synchronize dissector
  * Transport: Fix early NPE (ticket #824)
 
