@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -34,7 +35,7 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class SessionConfig extends DataStructureImpl {
-    private final static Log _log = new Log(SessionConfig.class);
+    private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(SessionConfig.class);
     private Destination _destination;
     private Signature _signature;
     private Date _creationDate;

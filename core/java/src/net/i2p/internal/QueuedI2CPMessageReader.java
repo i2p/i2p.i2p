@@ -20,7 +20,7 @@ public class QueuedI2CPMessageReader extends I2CPMessageReader {
         super(lsnr);
         this.in = in;
         _reader = new QueuedI2CPMessageReaderRunner();
-        _readerThread = new I2PThread(_reader, "I2CP Internal Reader " + (++__readerId), true);
+        _readerThread = new I2PThread(_reader, "I2CP Internal Reader " + __readerId.incrementAndGet(), true);
     }
 
     protected class QueuedI2CPMessageReaderRunner extends I2CPMessageReaderRunner implements Runnable {
