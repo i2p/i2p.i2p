@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.client.SendMessageOptions;
 import net.i2p.crypto.SessionKeyManager;
@@ -59,7 +60,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private PayloadGarlicConfig _clove;
     private long _cloveId;
     private final long _start;
-    private boolean _finished;
+    private final AtomicBoolean _finished = new AtomicBoolean();
     private long _leaseSetLookupBegin;
     private TunnelInfo _outTunnel;
     private TunnelInfo _inTunnel;
@@ -199,7 +200,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     public void runJob() {
         long now = getContext().clock().now();
         if (now >= _overallExpiration) {
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED);
             return;
         }
         //if (_log.shouldLog(Log.DEBUG))
@@ -271,7 +272,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 // shouldn't happen
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to send on a random lease, as getNext returned null (to=" + _toString + ")");
-                dieFatal();
+                dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET);
             }
         }
     }
@@ -403,12 +404,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 getContext().statManager().addRateData("client.leaseSetFailedRemoteTime", lookupTime, lookupTime);
             }
             
-            if (!_finished) {
+            if (!_finished.get()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to send to " + _toString + " because we couldn't find their leaseSet");
             }
 
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET);
         }
     }
     
@@ -421,10 +422,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private void send() {
-        if (_finished) return;
+        if (_finished.get()) return;
         long now = getContext().clock().now();
         if (now >= _overallExpiration) {
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED);
             return;
         }
 
@@ -480,7 +481,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
         boolean ok = buildClove();
         if (!ok) {
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION);
             return;
         }
         //if (_log.shouldLog(Log.DEBUG))
@@ -501,7 +502,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": Unable to create the garlic message (no tunnels left or too lagged) to " + _toString);
             getContext().statManager().addRateData("client.dispatchNoTunnels", now - _start, 0);            
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS);
             return;
         }
         
@@ -545,7 +546,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": Could not find any outbound tunnels to send the payload through... this might take a while");
             getContext().statManager().addRateData("client.dispatchNoTunnels", now - _start, 0);
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS);
         }
         _clove = null;
         getContext().statManager().addRateData("client.dispatchPrepareTime", now - _start, 0);
@@ -681,8 +682,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
 
     private void dieFatal(int status) {
-        if (_finished) return;
-        _finished = true;
+        if (_finished.getAndSet(true))
+            return;
         
         long sendTime = getContext().clock().now() - _start;
         if (_log.shouldLog(Log.WARN))
@@ -811,8 +812,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
         public void runJob() {
             // do we leak tags here?
-            if (_finished) return;
-            _finished = true;
+            if (_finished.getAndSet(true))
+                return;
             long sendTime = getContext().clock().now() - _start;
             if (_log.shouldLog(Log.INFO))
                 _log.info(OutboundClientMessageOneShotJob.this.getJobId() 
@@ -883,7 +884,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (skm != null)
                     skm.failTags(_leaseSet.getEncryptionKey(), _key, _tags);
             }
-            dieFatal();
+            dieFatal(MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE);
         }
     }
 }

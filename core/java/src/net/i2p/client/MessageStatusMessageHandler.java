@@ -30,10 +30,12 @@ class MessageStatusMessageHandler extends HandlerImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
         MessageStatusMessage msg = (MessageStatusMessage) message;
-        switch (msg.getStatus()) {
+        int status = msg.getStatus();
+        long id = msg.getMessageId();
+        switch (status) {
             case MessageStatusMessage.STATUS_AVAILABLE:
                 ReceiveMessageBeginMessage m = new ReceiveMessageBeginMessage();
-                m.setMessageId(msg.getMessageId());
+                m.setMessageId(id);
                 m.setSessionId(msg.getSessionId());
                 try {
                     session.sendMessage(m);
@@ -41,27 +43,23 @@ class MessageStatusMessageHandler extends HandlerImpl {
                     _log.error("Error asking for the message", ise);
                 }
                 return;
+
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
-                session.receiveStatus((int)msg.getMessageId(), msg.getNonce(), msg.getStatus());
+                session.receiveStatus((int)id, msg.getNonce(), status);
                 // noop
                 return;
-            case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
-            case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Message delivery succeeded for message " + msg.getMessageId());
-                //if (!skipStatus)
-                session.receiveStatus((int)msg.getMessageId(), msg.getNonce(), msg.getStatus());
-                return;
-            case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
-            case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Message delivery FAILED for message " + msg.getMessageId());
-                //if (!skipStatus)
-                session.receiveStatus((int)msg.getMessageId(), msg.getNonce(), msg.getStatus());
-                return;
+
             default:
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Invalid message delivery status received: " + msg.getStatus());
+                if (msg.isSuccessful()) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Message delivery succeeded for message " + id);
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Message delivery FAILED (" + status + ") for message " + id);
+                }
+                //if (!skipStatus)
+                session.receiveStatus((int)id, msg.getNonce(), status);
+                return;
         }
     }
 }

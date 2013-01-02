@@ -270,6 +270,8 @@ class ClientConnectionRunner {
      * Note that this sends the Guaranteed status codes, even though we only support best effort.
      * Doesn't do anything if i2cp.messageReliability = "none"
      *
+     *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
+     *
      *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
     void updateMessageDeliveryStatus(MessageId id, int status) {
@@ -357,7 +359,7 @@ class ClientConnectionRunner {
             expiration = msg.getExpirationTime();
             flags = msg.getFlags();
         }
-        if (!_dontSendMSM)
+        if (message.getNonce() != 0 && !_dontSendMSM)
             _acceptedPending.add(id);
 
         if (_log.shouldLog(Log.DEBUG))
@@ -382,6 +384,9 @@ class ClientConnectionRunner {
      * for delivery (but not necessarily delivered)
      * Doesn't do anything if i2cp.messageReliability = "none"
      * or if the nonce is 0.
+     *
+     * @param id OUR id for the message
+     * @param nonce HIS id for the message
      */
     void ackSendMessage(MessageId id, long nonce) {
         if (_dontSendMSM || nonce == 0)
@@ -630,6 +635,8 @@ class ClientConnectionRunner {
         private long _lastTried;
 
         /**
+         *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
+         *
          *  @param status see I2CP MessageStatusMessage for success/failure codes
          */
         public MessageDeliveryStatusUpdate(MessageId id, int status) {
