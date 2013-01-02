@@ -1284,8 +1284,17 @@
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
+    <target name="junit.test" depends="buildProperties, jbigi" >
+        <ant dir="core/java/" target="junit.test" />
+        <ant dir="router/java/" target="junit.test" />
+    </target>
+    <target name="scalatest.test" depends="buildProperties, jbigi" >
+        <ant dir="core/java/" target="scalatest.test" />
+        <ant dir="router/java/" target="scalatest.test" />
+    </target>
     <target name="test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="test" />
+        <ant dir="router/java/" target="test" />
     </target>
     <target name="scalatest.report" depends="buildProperties" >
         <ant dir="core/java/" target="scalatest.report" />
