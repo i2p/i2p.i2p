@@ -11,6 +11,7 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 
 import net.i2p.I2PAppContext;
+import net.i2p.router.RouterContext;
 
 /**
  * Test the batching behavior of the preprocessor with one, two, or three 
@@ -24,8 +25,8 @@ public class BatchedFragmentTest extends FragmentTest {
         BatchedPreprocessor.DEFAULT_DELAY = 200;
     }
     
-    protected TunnelGateway.QueuePreprocessor createPreprocessor(I2PAppContext ctx) {
-        return new BatchedPreprocessor(ctx);
+    protected TunnelGateway.QueuePreprocessor createPreprocessor(RouterContext ctx) {
+        return new BatchedPreprocessor(ctx, "testBatchedPreprocessor");
     }
     
     /**
@@ -35,11 +36,11 @@ public class BatchedFragmentTest extends FragmentTest {
      *
      */
     public void testBatched() {
-        TunnelGateway.Pending pending1 = createPending(10, false, false);
+        PendingGatewayMessage pending1 = createPending(10, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending1);
         
-        TunnelGateway.Pending pending2 = createPending(1024, false, false);
+        PendingGatewayMessage pending2 = createPending(1024, false, false);
         
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
         SenderImpl sender = new SenderImpl();
@@ -111,14 +112,14 @@ public class BatchedFragmentTest extends FragmentTest {
     private void testBatched(int firstSize, boolean firstRouter, boolean firstTunnel, 
                             int secondSize, boolean secondRouter, boolean secondTunnel,
                             int thirdSize, boolean thirdRouter, boolean thirdTunnel) {
-        TunnelGateway.Pending pending1 = createPending(firstSize, firstRouter, firstTunnel);
-        TunnelGateway.Pending pending2 = createPending(secondSize, secondRouter, secondTunnel);
-        TunnelGateway.Pending pending3 = createPending(thirdSize, thirdRouter, thirdTunnel);
+        PendingGatewayMessage pending1 = createPending(firstSize, firstRouter, firstTunnel);
+        PendingGatewayMessage pending2 = createPending(secondSize, secondRouter, secondTunnel);
+        PendingGatewayMessage pending3 = createPending(thirdSize, thirdRouter, thirdTunnel);
         
         runBatch(pending1, pending2, pending3);
     }
     
-    private void runBatch(TunnelGateway.Pending pending1, TunnelGateway.Pending pending2, TunnelGateway.Pending pending3) {
+    private void runBatch(PendingGatewayMessage pending1, PendingGatewayMessage pending2, PendingGatewayMessage pending3) {
         ArrayList messages = new ArrayList();
         messages.add(pending1);
         

@@ -17,13 +17,14 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.RouterContext;
 
 /**
  * Quick unit test for base functionality of outbound tunnel 
  * operation
  */
 public class OutboundGatewayTest extends TestCase{
-    private I2PAppContext _context;
+    private RouterContext _context;
     private TunnelCreatorConfig _config;
     private TunnelGateway.QueuePreprocessor _preprocessor;
     private TunnelGateway.Sender _sender;
@@ -31,7 +32,7 @@ public class OutboundGatewayTest extends TestCase{
     private TunnelGateway _gw;
     
     public void setUp() {
-        _context = I2PAppContext.getGlobalContext();
+        _context = (RouterContext) I2PAppContext.getGlobalContext();
         _config = prepareConfig(8);
         _preprocessor = new TrivialPreprocessor(_context);
         _sender = new OutboundSender(_context, _config);
@@ -154,7 +155,7 @@ public class OutboundGatewayTest extends TestCase{
             _handler = new FragmentHandler(_context, TestReceiver.this);
             _received = new ArrayList(1000);
         }
-        public void receiveEncrypted(byte[] encrypted) {
+        public long receiveEncrypted(byte[] encrypted) {
             // fake all the hops...
             
             for (int i = 1; i < _config.getLength(); i++) {
@@ -174,6 +175,11 @@ public class OutboundGatewayTest extends TestCase{
             _received = new ArrayList();
             return rv;
         }
+        @Override
+        public Hash getSendTo() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
     
     private TunnelCreatorConfig prepareConfig(int numHops) {
@@ -186,7 +192,7 @@ public class OutboundGatewayTest extends TestCase{
             _context.random().nextBytes(tunnelIds[i]);
         }
         
-        TunnelCreatorConfig config = new TunnelCreatorConfig(numHops, false);
+        TunnelCreatorConfig config = new TunnelCreatorConfig(_context, numHops, false);
         for (int i = 0; i < numHops; i++) {
             config.setPeer(i, peers[i]);
             HopConfig cfg = config.getConfig(i);

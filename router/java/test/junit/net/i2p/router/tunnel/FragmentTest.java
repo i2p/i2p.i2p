@@ -17,6 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.RouterContext;
 
 /**
  * Simple test to see if the fragmentation is working, testing the preprocessor,
@@ -24,15 +25,15 @@ import net.i2p.data.i2np.I2NPMessage;
  *
  */
 public class FragmentTest extends TestCase{
-    protected I2PAppContext _context;
+    protected RouterContext _context;
     
     public void setUp() {
-        _context = I2PAppContext.getGlobalContext();
+        _context = (RouterContext) I2PAppContext.getGlobalContext();
         _context.random().nextBoolean();
         FragmentHandler.MAX_DEFRAGMENT_TIME = 10*1000;
     }
     
-    protected TunnelGateway.QueuePreprocessor createPreprocessor(I2PAppContext ctx) {
+    protected TunnelGateway.QueuePreprocessor createPreprocessor(RouterContext ctx) {
         return new TrivialPreprocessor(ctx);
     }
     
@@ -41,7 +42,7 @@ public class FragmentTest extends TestCase{
      *
      */
     public void testSingle() {
-        TunnelGateway.Pending pending = createPending(949, false, false);
+        PendingGatewayMessage pending = createPending(949, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
 
@@ -66,7 +67,7 @@ public class FragmentTest extends TestCase{
      *
      */
     public void testMultiple() {
-        TunnelGateway.Pending pending = createPending(2048, false, false);
+        PendingGatewayMessage pending = createPending(2048, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
         
@@ -92,7 +93,7 @@ public class FragmentTest extends TestCase{
      *
      */
     public void runDelayed() {
-        TunnelGateway.Pending pending = createPending(2048, false, false);
+        PendingGatewayMessage pending = createPending(2048, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
@@ -118,7 +119,7 @@ public class FragmentTest extends TestCase{
     }
     
     protected boolean runVaried(int size, boolean includeRouter, boolean includeTunnel) {
-        TunnelGateway.Pending pending = createPending(size, includeRouter, includeTunnel);
+        PendingGatewayMessage pending = createPending(size, includeRouter, includeTunnel);
         ArrayList messages = new ArrayList();
         messages.add(pending);
         
@@ -139,7 +140,7 @@ public class FragmentTest extends TestCase{
         return handleReceiver.receivedOk();
     }
     
-    protected TunnelGateway.Pending createPending(int size, boolean includeRouter, boolean includeTunnel) {
+    protected PendingGatewayMessage createPending(int size, boolean includeRouter, boolean includeTunnel) {
         DataMessage m = new DataMessage(_context);
         byte data[] = new byte[size];
         _context.random().nextBytes(data);
@@ -155,11 +156,11 @@ public class FragmentTest extends TestCase{
         }
         if (includeTunnel)
             toTunnel = new TunnelId(_context.random().nextLong(TunnelId.MAX_ID_VALUE));
-        return new TunnelGateway.Pending(m, toRouter, toTunnel);
+        return new PendingGatewayMessage(m, toRouter, toTunnel);
     }
     
     protected class SenderImpl implements TunnelGateway.Sender {
-        public void sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
+        public long sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
             receiver.receiveEncrypted(preprocessed);
         }
     }
@@ -170,9 +171,14 @@ public class FragmentTest extends TestCase{
             _handler = handler; 
             _delay = delay;
         }
-        public void receiveEncrypted(byte[] encrypted) {
+        public long receiveEncrypted(byte[] encrypted) {
             _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
             try { Thread.sleep(_delay); } catch (Exception e) {}
+        }
+        @Override
+        public Hash getSendTo() {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
     
