@@ -33,7 +33,7 @@ public interface UpdateManager {
     public void shutdown();
 
     /**
-     *  Called by the Updater, either after check() was called, or it found out on its own.
+     *  Called by the Checker, either after check() was called, or it found out on its own.
      *
      *  @param newsSource who told us
      *  @param id plugin name for plugins, ignored otherwise
@@ -49,7 +49,7 @@ public interface UpdateManager {
                                           String newVersion, String minVersion);
 
     /**
-     *  Called by the Updater after check() was called and all notifyVersionAvailable() callbacks are finished
+     *  Called by the Checker after check() was called and all notifyVersionAvailable() callbacks are finished
      *  @param newer notifyVersionAvailable was called
      *  @param success check succeeded (newer or not)
      */
