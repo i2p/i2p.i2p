@@ -29,25 +29,19 @@ public class UDPEndpointTest {
     
     public void runTest(int numPeers) {
         _log.debug("Run test("+numPeers+")");
-        try {
-            _endpoints = new UDPEndpoint[numPeers];
-            int base = 2000 + _context.random().nextInt(10000);
-            for (int i = 0; i < numPeers; i++) {
-                _log.debug("Building " + i);
-                UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
-                _endpoints[i] = endpoint;
-                endpoint.startup();
-                I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);
-                I2PThread write = new I2PThread(new TestWrite(endpoint), "Test write " + i);
-                //read.setDaemon(true);
-                read.start();
-                //write.setDaemon(true);
-                write.start();
-            }
-        } catch (SocketException se) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error initializing", se);
-            return;
+        _endpoints = new UDPEndpoint[numPeers];
+        int base = 2000 + _context.random().nextInt(10000);
+        for (int i = 0; i < numPeers; i++) {
+            _log.debug("Building " + i);
+            UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
+            _endpoints[i] = endpoint;
+            endpoint.startup();
+            I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);
+            I2PThread write = new I2PThread(new TestWrite(endpoint), "Test write " + i);
+            //read.setDaemon(true);
+            read.start();
+            //write.setDaemon(true);
+            write.start();
         }
         _beginTest = true;
         _log.debug("Test begin");

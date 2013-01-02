@@ -42,7 +42,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));
         long before = _context.clock().now();
-        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(1, _peerTarget);
+        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(1, 0, _peerTarget);
         // only a single byte, no need to loop
         req.waitForNextAllocation();
         long waited = _context.clock().now() - before;
@@ -63,11 +63,11 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         if (len + off > src.length)
             throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
                                                + ", off=" + off + ", data=" + src.length);
-        _currentRequest = _context.bandwidthLimiter().requestOutbound(len, _peerTarget);
+        _currentRequest = _context.bandwidthLimiter().requestOutbound(len, 0, _peerTarget);
         
         int written = 0;
         while (written < len) {
-            int allocated = len - _currentRequest.getPendingOutboundRequested();
+            int allocated = len - _currentRequest.getPendingRequested();
             int toWrite = allocated - written;
             if (toWrite > 0) {
                 try {

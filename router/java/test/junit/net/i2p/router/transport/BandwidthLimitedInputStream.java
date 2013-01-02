@@ -44,7 +44,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     @Override
     public int read() throws IOException {
         if (_pullFromOutbound)
-            _currentRequest = _context.bandwidthLimiter().requestOutbound(1, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestOutbound(1, 0, _peerSource);
         else
             _currentRequest = _context.bandwidthLimiter().requestInbound(1, _peerSource);
         
@@ -68,12 +68,11 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         if (read == -1) return -1;
         
         if (_pullFromOutbound)
-            _currentRequest = _context.bandwidthLimiter().requestOutbound(read, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestOutbound(read, 0, _peerSource);
         else
             _currentRequest = _context.bandwidthLimiter().requestInbound(read, _peerSource);
         
-        while ( (_currentRequest.getPendingInboundRequested() > 0) ||
-                (_currentRequest.getPendingOutboundRequested() > 0) ) {
+        while (_currentRequest.getPendingRequested() > 0) {
             // we still haven't been authorized for everything, keep on waiting
             _currentRequest.waitForNextAllocation();
             if (_currentRequest.getAborted()) {
@@ -92,12 +91,11 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         long skip = in.skip(numBytes);
         
         if (_pullFromOutbound)
-            _currentRequest = _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestOutbound((int)skip, 0, _peerSource);
         else
             _currentRequest = _context.bandwidthLimiter().requestInbound((int)skip, _peerSource);
         
-        while ( (_currentRequest.getPendingInboundRequested() > 0) ||
-                (_currentRequest.getPendingOutboundRequested() > 0) ) {
+        while (_currentRequest.getPendingRequested() > 0) {
             // we still haven't been authorized for everything, keep on waiting
             _currentRequest.waitForNextAllocation();
             if (_currentRequest.getAborted()) {
