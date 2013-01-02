@@ -137,6 +137,7 @@ public class Lease extends DataStructureImpl {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof Lease)) return false;
         Lease lse = (Lease) object;
         return DataHelper.eq(_end, lse.getEndDate())

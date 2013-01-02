@@ -225,6 +225,7 @@ public class RouterAddress extends DataStructureImpl {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
         // let's keep this fast as we are putting an address into the RouterInfo set frequently

@@ -324,6 +324,7 @@ public class LeaseSet extends DatabaseEntry {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof LeaseSet)) return false;
         LeaseSet ls = (LeaseSet) object;
         return DataHelper.eq(getEncryptionKey(), ls.getEncryptionKey()) &&

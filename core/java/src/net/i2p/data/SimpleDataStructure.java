@@ -182,6 +182,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if ((obj == null) || !(obj instanceof SimpleDataStructure)) return false;
         return DataHelper.eq(_data, ((SimpleDataStructure) obj)._data);
     }

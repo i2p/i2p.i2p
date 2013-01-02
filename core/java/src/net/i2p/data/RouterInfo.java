@@ -588,6 +588,7 @@ public class RouterInfo extends DatabaseEntry {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof RouterInfo)) return false;
         RouterInfo info = (RouterInfo) object;
         return DataHelper.eq(_identity, info.getIdentity())

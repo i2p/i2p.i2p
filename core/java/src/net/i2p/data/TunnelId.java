@@ -72,6 +72,7 @@ public class TunnelId extends DataStructureImpl {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if ( (obj == null) || !(obj instanceof TunnelId))
             return false;
         return _tunnelId == ((TunnelId)obj)._tunnelId;

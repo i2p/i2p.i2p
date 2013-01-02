@@ -177,6 +177,7 @@ public class Certificate extends DataStructureImpl {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof Certificate)) return false;
         Certificate cert = (Certificate) object;
         return _type == cert.getCertificateType() && DataHelper.eq(_payload, cert.getPayload());
