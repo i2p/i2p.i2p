@@ -1,3 +1,26 @@
+package net.i2p.util;
+
+/*
+ *  As pulled from https://github.com/nahi/siphash-java-inline
+ *  Last commit was https://github.com/nahi/siphash-java-inline/commit/5be5c84851a28f800fcac66ced658bdbd01f31ef
+ *  2012-11-06
+ * 
+ * Copyright 2012  Hiroshi Nakamura <nahi@ruby-lang.org>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 /**
  * SipHash implementation with hand inlining the SIPROUND.
  *
@@ -7,17 +30,25 @@
  * SIPROUND is defined in siphash24.c that can be downloaded from the above
  * site.  Following license notice is subject to change based on the licensing
  * policy of siphash24.c.
+ * 
+ * I2P mods: add off/len version
+ * 
+ * @since 0.9.5
  */
-public class SipHashInline {
+abstract class SipHashInline {
 
     public static long hash24(long k0, long k1, byte[] data) {
+        return hash24(k0, k1, data, 0, data.length);
+    }
+
+    public static long hash24(long k0, long k1, byte[] data, int off, int len) {
         long v0 = 0x736f6d6570736575L ^ k0;
         long v1 = 0x646f72616e646f6dL ^ k1;
         long v2 = 0x6c7967656e657261L ^ k0;
         long v3 = 0x7465646279746573L ^ k1;
         long m;
-        int last = data.length / 8 * 8;
-        int i = 0;
+        int last = len / 8 * 8;
+        int i = off;
 
         // processing 8 bytes blocks in data
         while (i < last) {
@@ -100,10 +131,10 @@ public class SipHashInline {
 
         // packing the last block to long, as LE 0-7 bytes + the length in the top byte
         m = 0;
-        for (i = data.length - 1; i >= last; --i) {
+        for (i = off + len - 1; i >= last; --i) {
             m <<= 8; m |= (long) data[i];
         }
-        m |= (long) data.length << 56;
+        m |= (long) len << 56;
         // MSGROUND {
             v3 ^= m;
             // SIPROUND {

@@ -9,8 +9,12 @@ package net.i2p.data;
  *
  */
 
+import java.io.InputStream;
+import java.io.IOException;
+
 import net.i2p.util.RandomSource;
 import net.i2p.util.SimpleByteCache;
+import net.i2p.util.SipHash;
 
 /**
  *  32 bytes, usually of random data.
@@ -18,6 +22,7 @@ import net.i2p.util.SimpleByteCache;
  */
 public class SessionTag extends SimpleDataStructure {
     public final static int BYTE_LENGTH = 32;
+    private int _cachedHashCode;
 
     public SessionTag() {
         super();
@@ -31,6 +36,7 @@ public class SessionTag extends SimpleDataStructure {
         if (create) {
             _data = SimpleByteCache.acquire(BYTE_LENGTH);
             RandomSource.getInstance().nextBytes(_data);
+            _cachedHashCode = SipHash.hashCode(_data);
         }
     }
 
@@ -41,4 +47,27 @@ public class SessionTag extends SimpleDataStructure {
     public int length() {
         return BYTE_LENGTH;
     }
+
+    @Override
+    public void setData(byte[] data) {
+        super.setData(data);
+        _cachedHashCode = SipHash.hashCode(data);
+    }
+
+    @Override
+    public void readBytes(InputStream in) throws DataFormatException, IOException {
+        super.readBytes(in);
+        _cachedHashCode = SipHash.hashCode(_data);
+    }
+
+    /**
+     *  SessionTags are generated both locally and by peers, in quantity,
+     *  and are used as keys in several datastructures (see TransientSessionKeyManager),
+     *  so we use a secure hashCode function.
+     */
+    @Override
+    public int hashCode() {
+        return _cachedHashCode;
+    }
+
 }

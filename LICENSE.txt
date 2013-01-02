@@ -72,6 +72,9 @@ Public domain except as listed below:
    Copyright (c) 2006, Matthew Estes
    See licenses/LICENSE-BlockFile.txt
 
+   SipHashInline:
+   Copyright 2012  Hiroshi Nakamura <nahi@ruby-lang.org>
+   See licenses/LICENSE-Apache2.0.txt
 
 Router (router.jar):
 Public domain except as listed below:

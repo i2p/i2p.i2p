@@ -19,6 +19,7 @@ public class UtilTestSuite {
         suite.addTestSuite(ResettableGZIPOutputStreamTest.class);
         suite.addTestSuite(ReusableGZIPInputStreamTest.class);
         suite.addTestSuite(ReusableGZIPOutputStreamTest.class);
+        suite.addTestSuite(SipHashInlineTest.class);
         
         return suite;
     }

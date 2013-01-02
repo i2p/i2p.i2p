@@ -1,3 +1,16 @@
+2013-01-02 zzz
+ * DataHelper: new getASCII() method
+ * DataStructures:
+   - Convert SessionTag.hashCode() to SipHash to prevent collision attacks
+   - Improve equals()
+ * I2CP:
+   - Remove unused equals() methods for message classes
+   - Remove static logs
+   - Fix leak if nonce = 0 but reliability != none
+   - More work on failure codes (ticket #788)
+ * SAM: Synchronize dissector
+ * Transport: Fix early NPE (ticket #824)
+
 2013-01-01 kytv
  * Update Java Service Wrapper to v3.5.17 (ticket #826).
     - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
