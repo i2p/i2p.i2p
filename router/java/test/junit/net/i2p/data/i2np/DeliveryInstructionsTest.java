@@ -26,13 +26,14 @@ public class DeliveryInstructionsTest extends StructureTest {
 		instructions.setDelayRequested(true);
 		instructions.setDelaySeconds(42);
 		instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
-		instructions.setEncrypted(true);
-		SessionKey key = new SessionKey();
-		byte keyData[] = new byte[SessionKey.KEYSIZE_BYTES];
-		for (int i = 0; i < keyData.length; i++) 
-		    keyData[i] = (byte)i;
-		key.setData(keyData);
-		instructions.setEncryptionKey(key);
+                // encryption key read/write disabled
+		//instructions.setEncrypted(true);
+		//SessionKey key = new SessionKey();
+		//byte keyData[] = new byte[SessionKey.KEYSIZE_BYTES];
+		//for (int i = 0; i < keyData.length; i++) 
+		//    keyData[i] = (byte)i;
+		//key.setData(keyData);
+		//instructions.setEncryptionKey(key);
 		Hash hash = new Hash();
 		byte hashData[] = new byte[32];
 		for (int i = 0; i < hashData.length; i++)
