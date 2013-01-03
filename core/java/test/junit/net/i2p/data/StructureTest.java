@@ -46,8 +46,11 @@ public abstract class StructureTest extends TestCase{
         ds.readBytes(bais);
         
 
+        // I2CP message classes don't implement equals()
+        if (!getClass().getName().startsWith("net.i2p.data.i2cp."))
+            assertEquals(orig, ds);
+
         // Not all classes implement equals, so write out again
-        //assertEquals(orig, ds);
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
         ds.writeBytes(baos2);
         byte[] temp2 = baos2.toByteArray();
