@@ -204,12 +204,14 @@
             <reporter type="stdout" />
             <reporter type="junitxml" directory="../../reports/router/scalatest/" />
         </scalatest>
-        <!-- fetch the real hostname of this machine -->
-        <exec executable="hostname" outputproperty="host.name"/>
         <!-- set if unset -->
         <property name="host.fakename" value="i2ptester" />
         <!-- replace hostname that junit inserts into reports with fake one -->
-        <replace dir="../../reports/router/scalatest/" token="${host.name}" value="${host.fakename}"/>
+        <replaceregexp byline="true"
+            match="(hostname=)&quot;[^&quot;]+&quot;"
+            replace="\1&quot;${host.fakename}&quot;">
+            <fileset dir="../../reports/router/scalatest/" />
+        </replaceregexp>
     </target>
     <target name="junit.test" depends="clean, junit.compileTest, prepareTest">
         <mkdir dir="../../reports/router/junit/" />
@@ -240,12 +242,14 @@
             </batchtest>
             <formatter type="xml"/>
         </junit>
-        <!-- fetch the real hostname of this machine -->
-        <exec executable="hostname" outputproperty="host.name"/>
         <!-- set if unset -->
         <property name="host.fakename" value="i2ptester" />
         <!-- replace hostname that junit inserts into reports with fake one -->
-        <replace dir="../../reports/router/junit/" token="${host.name}" value="${host.fakename}"/>
+        <replaceregexp byline="true"
+            match="(hostname=)&quot;[^&quot;]+&quot;"
+            replace="\1&quot;${host.fakename}&quot;">
+            <fileset dir="../../reports/router/junit/" />
+        </replaceregexp>
     </target>
     <target name="test" depends="junit.test"/>
     <!-- test reports -->
