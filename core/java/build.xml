@@ -98,10 +98,20 @@
     <target name="junit.compileTest" depends="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <!-- junit and hamcrest classes should be in ant runtime -->
+        <!-- set hamcrest and junit homes to the old default unless overridden elsewhere -->
+        <property name="hamcrest.home" value="${ant.home}/lib/" />
+        <property name="junit.home" value="${ant.home}/lib/" />
         <javac srcdir="./test/junit" debug="true" source="1.5" target="1.5" deprecation="on"
                includeAntRuntime="true"
                destdir="./build/obj" >
+            <classpath>
+                <pathelement path="${classpath}" />
+                <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
+                <pathelement location="${junit.home}/junit.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
+            </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -191,6 +201,8 @@
         <replace dir="../../reports/core/scalatest/" token="${host.name}" value="${host.fakename}"/>
     </target>
     <target name="junit.test" depends="clean, junit.compileTest, prepareTest">
+        <property name="hamcrest.home" value="${ant.home}/lib/" />
+        <property name="junit.home" value="${ant.home}/lib/" />
         <mkdir dir="../../reports/core/junit/" />
         <delete>
             <fileset dir="../../reports/core/junit">
@@ -201,9 +213,11 @@
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
-                <pathelement location="${ant.home}/lib/hamcrest-core.jar" />
-                <pathelement location="${ant.home}/lib/hamcrest-library.jar" />
-                <pathelement location="${ant.home}/lib/hamcrest-integration.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
+                <pathelement location="${junit.home}/junit.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../build/jbigi.jar" />
