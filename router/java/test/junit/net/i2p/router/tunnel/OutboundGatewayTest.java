@@ -166,6 +166,7 @@ public class OutboundGatewayTest extends TestCase{
             
 
             _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
+            return -1; // or do we need to return the real message ID?
         }        
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
             _received.add(msg);

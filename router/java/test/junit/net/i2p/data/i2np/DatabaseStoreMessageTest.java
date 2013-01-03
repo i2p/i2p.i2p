@@ -25,10 +25,9 @@ public class DatabaseStoreMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(I2PAppContext.getGlobalContext());
         RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
-        msg.setKey(info.getIdentity().getHash());
         msg.setMessageExpiration(Clock.getInstance().now());
         msg.setUniqueId(666);
-        msg.setRouterInfo(info);
+        msg.setEntry(info);
         return msg;
     }
     

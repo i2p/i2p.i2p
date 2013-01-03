@@ -43,7 +43,7 @@ public class KBucketImplTest extends TestCase{
         int low = 1;
         int high = 2000;
         
-        Hash local = Hash.FAKE_HASH;
+        LocalHash local = new LocalHash(Hash.FAKE_HASH);
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
@@ -62,7 +62,7 @@ public class KBucketImplTest extends TestCase{
         
         byte hash[] = new byte[Hash.HASH_LENGTH];
         RandomSource.getInstance().nextBytes(hash);
-        Hash local = new Hash(hash);
+        LocalHash local = new LocalHash(hash);
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
