@@ -21,7 +21,10 @@ import junit.framework.TestCase;
 
 public abstract class StructureTest extends TestCase{
     
+    /** create a populated structure for writing */
     public abstract DataStructure createDataStructure() throws DataFormatException;
+
+    /** create an unpopulated structure for reading */
     public abstract DataStructure createStructureToRead();
     
     public void testStructure() throws Exception{
@@ -42,7 +45,13 @@ public abstract class StructureTest extends TestCase{
         ds = createStructureToRead();
         ds.readBytes(bais);
         
-        assertEquals(orig, ds);
+
+        // Not all classes implement equals, so write out again
+        //assertEquals(orig, ds);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        ds.writeBytes(baos2);
+        byte[] temp2 = baos2.toByteArray();
+        assert(DataHelper.eq(temp, temp2));
     }
     
 }

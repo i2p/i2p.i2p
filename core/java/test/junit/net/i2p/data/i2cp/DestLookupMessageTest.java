@@ -11,6 +11,8 @@ package net.i2p.data.i2cp;
 import net.i2p.data.StructureTest;
 import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
+import net.i2p.util.RandomSource;
 
 /**
  * Test harness for loading / storing DestLookupMessage objects
@@ -19,7 +21,10 @@ import net.i2p.data.DataFormatException;
  */
 public class DestLookupMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
-        DestLookupMessage msg = new DestLookupMessage();
+        byte h[] = new byte[Hash.HASH_LENGTH];
+        RandomSource.getInstance().nextBytes(h);
+        Hash hash = new Hash(h);
+        DestLookupMessage msg = new DestLookupMessage(hash);
         return msg;
     }
     public DataStructure createStructureToRead() { return new DestLookupMessage(); }
