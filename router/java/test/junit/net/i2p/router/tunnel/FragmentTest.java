@@ -161,7 +161,7 @@ public class FragmentTest extends TestCase{
     
     protected class SenderImpl implements TunnelGateway.Sender {
         public long sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
-            receiver.receiveEncrypted(preprocessed);
+            return receiver.receiveEncrypted(preprocessed);
         }
     }
     protected class ReceiverImpl implements TunnelGateway.Receiver {
@@ -174,6 +174,7 @@ public class FragmentTest extends TestCase{
         public long receiveEncrypted(byte[] encrypted) {
             _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
             try { Thread.sleep(_delay); } catch (Exception e) {}
+            return -1; // or do we need to return the real message ID?
         }
         @Override
         public Hash getSendTo() {

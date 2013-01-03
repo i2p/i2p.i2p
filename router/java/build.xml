@@ -133,8 +133,8 @@
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
-                <pathelement location="$junit.home}/junit.jar" />
-                <pathelement location="$junit.home}/junit4.jar" />
+                <pathelement location="${junit.home}/junit.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="../../core/java/build/i2ptest.jar" />
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
@@ -223,6 +223,11 @@
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
+                <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
+                <pathelement location="${junit.home}/junit.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../core/java/build/i2ptest.jar" />
