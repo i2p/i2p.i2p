@@ -614,6 +614,7 @@
         <delete file="debian/files" />
         <delete file="debian/build" />
         <delete file="debian/substvars"/>
+        <delete file="core/java/cobertura.ser"/>
     </target>
 
     <target name="distclean" depends="clean">
