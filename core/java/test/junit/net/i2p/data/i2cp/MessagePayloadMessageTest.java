@@ -33,23 +33,4 @@ import net.i2p.data.PayloadTest;
     }
     public DataStructure createStructureToRead() { return new MessagePayloadMessage(); }
     
-    public void testStructure() throws Exception{
-        byte[] temp = null;
-        
-        DataStructure orig;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        orig = createDataStructure();
-        orig.writeBytes(baos);
-        
-        temp = baos.toByteArray();
-        
-        DataStructure ds;
-        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        ds = createStructureToRead();
-        ds.readBytes(bais);
-        ((MessagePayloadMessage)ds).getPayload().setUnencryptedData(((MessagePayloadMessage)ds).getPayload().getEncryptedData());
-        
-        assertEquals(orig, ds);
-    }
-    
 }

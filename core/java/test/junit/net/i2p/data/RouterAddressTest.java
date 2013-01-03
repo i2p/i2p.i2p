@@ -24,7 +24,7 @@ public class RouterAddressTest extends StructureTest {
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%16);
         addr.setCost(42);
-        addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
+        //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
@@ -78,7 +78,7 @@ public class RouterAddressTest extends StructureTest {
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%16);
         addr.setCost(42);
-        addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
+        //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
@@ -94,13 +94,14 @@ public class RouterAddressTest extends StructureTest {
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%16);
         addr.setCost(42);
-        addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
+        //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
         addr.setOptions(options);
         addr.setTransportStyle("Blah");
         String ret = addr.toString();
-        assertEquals("[RouterAddress: \n\tTransportStyle: Blah\n\tCost: 42\n\tExpiration: Fri Jan 02 00:00:00 UTC 1970\n\tOptions: #: 2\n\t\t[hostname] = [localhost]\n\t\t[portnum] = [1234]]", ret);
+        //assertEquals("[RouterAddress: \n\tTransportStyle: Blah\n\tCost: 42\n\tExpiration: Fri Jan 02 00:00:00 UTC 1970\n\tOptions: #: 2\n\t\t[hostname] = [localhost]\n\t\t[portnum] = [1234]]", ret);
+        assertEquals("[RouterAddress: \n\tTransportStyle: Blah\n\tCost: 42\n\tOptions: #: 2\n\t\t[hostname] = [localhost]\n\t\t[portnum] = [1234]]", ret);
     }
 }
