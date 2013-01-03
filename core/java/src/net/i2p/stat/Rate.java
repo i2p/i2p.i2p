@@ -533,10 +533,13 @@ public class Rate {
         if ((obj == null) || !(obj instanceof Rate)) return false;
         if (obj == this) return true;
         Rate r = (Rate) obj;
-        return _period == r.getPeriod() && _creationDate == r.getCreationDate() &&
-               // do this the easy way to avoid NPEs.
-               // Alternative: compare name and group name (very carefully to avoid NPEs)
-               _stat == r._stat;
+        if (_period != r.getPeriod() || _creationDate != r.getCreationDate())
+            return false;
+        if (_stat == null && r._stat == null)
+            return true;
+        if (_stat != null && r._stat != null) 
+            return _stat.nameGroupDescEquals(r._stat);
+        return false;
     }
 
     /**

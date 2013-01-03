@@ -3,10 +3,14 @@ package net.i2p.stat;
 import java.io.ByteArrayInputStream;
 import java.util.Properties;
 
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 
 public class RateTest extends TestCase {
+    
+    @Test
     public void testRate() throws Exception{
         Rate rate = new Rate(5000);
         for (int i = 0; i < 50; i++) {

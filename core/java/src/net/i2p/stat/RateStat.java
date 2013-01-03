@@ -166,12 +166,15 @@ public class RateStat {
         if (obj == this)
             return true;
         RateStat rs = (RateStat) obj;
-        if (DataHelper.eq(getGroupName(), rs.getGroupName()) && DataHelper.eq(getDescription(), rs.getDescription())
-            && DataHelper.eq(getName(), rs.getName())) {
+        if (nameGroupDescEquals(rs)) 
             return deepEquals(this._rates, rs._rates);
-        } 
         
         return false;
+    }
+    
+    boolean nameGroupDescEquals(RateStat rs) {
+        return DataHelper.eq(getGroupName(), rs.getGroupName()) && DataHelper.eq(getDescription(), rs.getDescription())
+                && DataHelper.eq(getName(), rs.getName());
     }
 
     public void store(OutputStream out, String prefix) throws IOException {
