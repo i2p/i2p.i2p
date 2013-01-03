@@ -82,6 +82,8 @@
 
     <!-- unit tests -->
     <target name="scalatest.compileTest" depends="compile, scala.init">
+        <!-- set classpath property if not set elsewhere first.-->
+        <property name="classpath" value="" />
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
