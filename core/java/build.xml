@@ -213,6 +213,7 @@
         <junit printsummary="withOutAndErr" fork="yes" maxmemory="384m" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
+		<pathelement location="../../installer/resources/" />
                 <pathelement path="${classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />

@@ -1,11 +1,10 @@
 package net.i2p.client.naming;
 
 import junit.framework.TestCase;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +25,9 @@ public class BlockfileNamingServiceTest extends TestCase {
         _names = null;
         Properties props = new Properties();
         try {
-            DataHelper.loadProps(props, new File("../../installer/resources/hosts.txt"), true);
+            InputStream is = getClass().getResourceAsStream("/hosts.txt");
+            assertNotNull("test classpath not set correctly",is);
+            DataHelper.loadProps(props, is, true);
             _names = new ArrayList(props.keySet());
             Collections.shuffle(_names);
         } catch (IOException ioe) {
