@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -22,21 +24,14 @@ import net.i2p.util.Log;
  * during transmission), inject replies, then handle the TunnelBuildReplyMessage (unwrapping
  * the reply encryption and reading the replies).
  */
-public class BuildMessageTest {
+public class BuildMessageTest extends TestCase {
     private Hash _peers[];
     private PrivateKey _privKeys[];
     private PublicKey _pubKeys[];
     private Hash _replyRouter;
     private long _replyTunnel;
     
-    public static void main(String args[]) {
-        BuildMessageTest test = new BuildMessageTest();
-        try {
-            test.runTest();
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-    
-    private void runTest() {
+    public void testBuildMessage() {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         Log log = ctx.logManager().getLog(getClass());
         
@@ -72,10 +67,8 @@ public class BuildMessageTest {
             // this not only decrypts the current hop's record, but encrypts the other records
             // with the reply key
             BuildRequestRecord req = proc.decrypt(ctx, msg, _peers[i], _privKeys[i]);
-            if (req == null) {
-                // no records matched the _peers[i], or the decryption failed
-                throw new RuntimeException("foo @ " + i);
-            }
+            // If false, no records matched the _peers[i], or the decryption failed
+            assertTrue("foo @ " + i, req != null);
             long ourId = req.readReceiveTunnelId();
             byte replyIV[] = req.readReplyIV();
             long nextId = req.readNextTunnelId();
