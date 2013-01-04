@@ -55,7 +55,7 @@ public final class I2PDatagramDissector {
      * Load an I2P repliable datagram into the dissector.
      * Does NOT verify the signature.
      *
-     * @param non-null dgram I2P repliable datagram to be loader
+     * @param dgram non-null I2P repliable datagram to be loader
      *
      * @throws DataFormatException If there's an error in the datagram format
      */
