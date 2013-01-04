@@ -11,7 +11,6 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
@@ -28,7 +27,7 @@ public class FragmentTest extends TestCase{
     protected RouterContext _context;
     
     public void setUp() {
-        _context = (RouterContext) I2PAppContext.getGlobalContext();
+        _context = new RouterContext(null);
         _context.random().nextBoolean();
         FragmentHandler.MAX_DEFRAGMENT_TIME = 10*1000;
     }
