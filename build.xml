@@ -496,6 +496,9 @@
     <target name="javadoc-test" depends="buildRouter, javadoc" >
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc-test" />
+
+        <!-- set junit home to the old default unless overridden elsewhere -->
+        <property name="junit.home" value="${ant.home}/lib/" />
         <javadoc access="package"
             destdir="./build/javadoc-test"
             packagenames="*"
@@ -508,14 +511,15 @@
             <sourcepath>
                 <pathelement location="core/java/test/junit" />
                 <pathelement location="router/java/test/junit" />
+                <pathelement location="core/java/test/scalatest" />
             </sourcepath>
             <classpath>
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/router.jar" />
-                <pathelement location="${ant.home}/lib/junit.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
             </classpath>
-	    <!-- These variables are stored in build.properties. 
-		 End-users can override by creating the file override.properties -->
+            <!-- These variables are stored in build.properties.
+         End-users can override by creating the file override.properties -->
             <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
             <link offline="true" href="${junitdocs.url}" packagelistLoc="installer/resources/package-lists/junit/" />
             <link offline="true" href="${i2pdocs.url}" packagelistLoc="build/javadoc/" />
