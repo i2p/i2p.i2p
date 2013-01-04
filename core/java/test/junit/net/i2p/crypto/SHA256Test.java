@@ -19,12 +19,12 @@ public class SHA256Test extends TestCase{
     private I2PAppContext _context;
     
     protected void setUp() {
-        _context = new I2PAppContext();
+        _context = I2PAppContext.getGlobalContext();
     }
     
     public void testMultiple(){
         int size = 1;
-        for(int i = 0; i < 24; i++){
+        for(int i = 0; i < 16; i++){
             byte[] message = new byte[size];
             size*=2;
             _context.random().nextBytes(message);

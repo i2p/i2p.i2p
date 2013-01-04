@@ -22,7 +22,7 @@ public class AES256Test extends TestCase{
     private byte[] iv;
     
     protected void setUp() {
-        _context = new I2PAppContext();
+        _context = I2PAppContext.getGlobalContext();
     }
     
     public void testMultiple(){

@@ -25,7 +25,7 @@ import net.i2p.data.SessionTag;
  *
  */
 public class SessionEncryptionTest extends TestCase{
-    private static I2PAppContext _context = new I2PAppContext();
+    private static I2PAppContext _context = I2PAppContext.getGlobalContext();
     
     protected void setUp(){
         _context = new I2PAppContext();
