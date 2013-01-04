@@ -32,7 +32,7 @@ public class OutboundGatewayTest extends TestCase{
     private TunnelGateway _gw;
     
     public void setUp() {
-        _context = (RouterContext) I2PAppContext.getGlobalContext();
+        _context = new RouterContext(null);
         _config = prepareConfig(8);
         _preprocessor = new TrivialPreprocessor(_context);
         _sender = new OutboundSender(_context, _config);

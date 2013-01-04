@@ -23,7 +23,7 @@ public class OutboundTest extends TestCase{
     private RouterContext _context;
     
     public void setUp() {
-        _context = (RouterContext) I2PAppContext.getGlobalContext();
+        _context = new RouterContext(null);
     }
     
     public void testOutbound() {

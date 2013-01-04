@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
@@ -34,7 +33,7 @@ public class InboundGatewayTest extends TestCase{
     private TunnelGateway _gw;
     
     public void setUp() {
-        _context = (RouterContext) I2PAppContext.getGlobalContext();
+        _context = new RouterContext(null);
         _config = prepareConfig(8);
         _preprocessor = new TrivialPreprocessor(_context);
         _sender = new InboundSender(_context, _config.getConfig(0));
