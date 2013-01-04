@@ -210,7 +210,7 @@
                 <include name="TEST-*.xml"/>
             </fileset>
         </delete>
-        <junit printsummary="on" fork="yes" maxmemory="384m">
+        <junit printsummary="withOutAndErr" fork="yes" maxmemory="384m" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />

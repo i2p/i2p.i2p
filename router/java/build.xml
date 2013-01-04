@@ -220,7 +220,7 @@
                 <include name="TEST-*.xml"/>
             </fileset>
         </delete>
-        <junit printsummary="on" fork="yes">
+        <junit printsummary="withOutAndErr" fork="yes" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
