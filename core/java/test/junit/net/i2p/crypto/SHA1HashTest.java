@@ -70,8 +70,8 @@ public class SHA1HashTest extends TestCase{
             "cb0082c8 f197d260 991ba6a4 60e76e20 2bad27b3");
  
         {
-            final int RETRIES = 10;
-            final int ITERATIONS = 2000;
+            final int RETRIES = 4;
+            final int ITERATIONS = 200;
             final int BLOCKSIZE = 65536;
             byte[] input = new byte[BLOCKSIZE];
             for (int i = BLOCKSIZE; --i >= 0; )

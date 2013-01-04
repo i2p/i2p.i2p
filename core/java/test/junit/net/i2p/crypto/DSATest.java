@@ -20,11 +20,11 @@ public class DSATest extends TestCase{
     private I2PAppContext _context;
     
     protected void setUp() {
-        _context = new I2PAppContext();
+        _context = I2PAppContext.getGlobalContext();
     }
     
     public void testMultiple(){
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 25; i++){
             byte[] message = new byte[256];
             _context.random().nextBytes(message);
             

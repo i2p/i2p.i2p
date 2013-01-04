@@ -24,7 +24,7 @@ public class KeyGeneratorTest extends TestCase{
         byte src[] = new byte[200];
         RandomSource.getInstance().nextBytes(src);
 
-        I2PAppContext ctx = new I2PAppContext();
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
         for (int i = 0; i < 10; i++) {
             Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
             byte ctext[] = ctx.elGamalEngine().encrypt(src, (PublicKey) keys[0]);
