@@ -534,11 +534,9 @@
                     <contains value="public final static String VERSION"/>
                 </linecontains>
                 <tokenfilter>
-                    <replaceregex pattern=".*&quot;(.*)&quot;;" replace="\1" flags="gi" />
+                    <replaceregex pattern='.*"([^"]+)";' replace="\1" flags="gi" />
                 </tokenfilter>
-                <striplinebreaks/>
                 <trim/>
-                <ignoreblank/>
             </filterchain>
         </loadfile>
         <property name="release.number" value="unknown" />
@@ -554,9 +552,7 @@
                 <tokenfilter>
                     <replaceregex pattern=".*=\s+([0-9]+);" replace="\1" flags="gi" />
                 </tokenfilter>
-                <striplinebreaks/>
                 <trim/>
-                <ignoreblank/>
             </filterchain>
         </loadfile>
         <loadfile srcfile="router/java/src/net/i2p/router/RouterVersion.java" property="build.extra">
@@ -565,10 +561,8 @@
                     <contains value="public final static String EXTRA" />
                 </linecontains>
                 <tokenfilter>
-                    <replaceregex pattern=".*&quot;(.*)&quot;;" replace="\1" flags="gi" />
+                    <replaceregex pattern='.*"(.*)";' replace="\1" flags="gi" />
                 </tokenfilter>
-                <striplinebreaks/>
-                <ignoreblank/>
                 <trim/>
             </filterchain>
         </loadfile>
