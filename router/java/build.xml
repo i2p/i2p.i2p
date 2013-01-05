@@ -172,7 +172,12 @@
         <cobertura-instrument todir="./build/obj_cobertura">
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
+                <!-- exclude Test classes -->
                 <exclude name="**/*Test.class" />
+                <!-- exclude anything not in net.i2p.* -->
+                <exclude name="org/cybergarage/**/*.class" />
+                <exclude name="org/freenetproject/**/*.class" />
+                <exclude name="org/xlattice/**/*.class" />
             </fileset>
         </cobertura-instrument>
     </target>
