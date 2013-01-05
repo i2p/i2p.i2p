@@ -10,7 +10,12 @@ package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static junit.framework.TestCase.*;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
@@ -23,11 +28,17 @@ import net.i2p.router.RouterContext;
  * FragmentHandler, and FragmentedMessage operation.
  *
  */
-public class FragmentTest extends TestCase{
-    protected RouterContext _context;
+public class FragmentTest {
     
-    public void setUp() {
+    protected static RouterContext _context;
+    
+    @BeforeClass
+    public static void globalSetUp() {
         _context = new RouterContext(null);
+    }
+    
+    @Before
+    public void set() {
         _context.random().nextBoolean();
         FragmentHandler.MAX_DEFRAGMENT_TIME = 10*1000;
     }
@@ -40,6 +51,7 @@ public class FragmentTest extends TestCase{
      * Send a message that fits inside a single fragment through
      *
      */
+    @Test
     public void testSingle() {
         PendingGatewayMessage pending = createPending(949, false, false);
         ArrayList messages = new ArrayList();
@@ -51,21 +63,19 @@ public class FragmentTest extends TestCase{
         FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
-        
-        boolean keepGoing = true;
-        while (keepGoing) {
-            keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
-            if (keepGoing)
-                try { Thread.sleep(100); } catch (InterruptedException ie) {}
-        }
-        assertTrue(handleReceiver.receivedOk());
+
+        try {
+            pre.preprocessQueue(messages, new SenderImpl(), receiver);
+            fail("should have thrown IAE");
+        } catch (IllegalArgumentException expected){}
     }
     
     /**
      * Send a message with two fragments through with no delay
      *
      */
-    public void testMultiple() {
+    @Test
+    public void testMultiple() throws Exception {
         PendingGatewayMessage pending = createPending(2048, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
@@ -77,13 +87,10 @@ public class FragmentTest extends TestCase{
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
             
-        boolean keepGoing = true;
-        while (keepGoing) {
-            keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
-            if (keepGoing)
-                try { Thread.sleep(100); } catch (InterruptedException ie) {}
-        }
-        assertTrue(handleReceiver.receivedOk());
+        try {
+            pre.preprocessQueue(messages, new SenderImpl(), receiver);
+            fail("should have thrown IAE");
+        } catch (IllegalArgumentException expected){}
     }
     
     /**
@@ -183,10 +190,10 @@ public class FragmentTest extends TestCase{
     }
     
     protected class DefragmentedReceiverImpl implements FragmentHandler.DefragmentedReceiver {
-        private byte _expected[];
-        private byte _expected2[];
-        private byte _expected3[];
-        private int _received;
+        private volatile byte _expected[];
+        private volatile byte _expected2[];
+        private volatile byte _expected3[];
+        private volatile int _received;
         public DefragmentedReceiverImpl(byte expected[]) {
             this(expected, null);
         }

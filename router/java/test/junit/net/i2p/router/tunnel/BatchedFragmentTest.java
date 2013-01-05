@@ -10,7 +10,10 @@ package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
 
-import net.i2p.I2PAppContext;
+import static junit.framework.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
 import net.i2p.router.RouterContext;
 
 /**
@@ -20,8 +23,8 @@ import net.i2p.router.RouterContext;
  */
 public class BatchedFragmentTest extends FragmentTest {
     
+    @Before
     public void setUp() {
-        super.setUp();
         BatchedPreprocessor.DEFAULT_DELAY = 200;
     }
     
@@ -35,6 +38,7 @@ public class BatchedFragmentTest extends FragmentTest {
      * after a brief delay.
      *
      */
+    @Test
     public void testBatched() {
         PendingGatewayMessage pending1 = createPending(10, false, false);
         ArrayList messages = new ArrayList();
@@ -63,6 +67,58 @@ public class BatchedFragmentTest extends FragmentTest {
             }
         }
         
+        assertTrue(handleReceiver.receivedOk());
+    }
+    
+    /**
+     * Send a message that fits inside a single fragment through
+     *
+     */
+    @Test
+    public void testSingle() {
+        PendingGatewayMessage pending = createPending(949, false, false);
+        ArrayList messages = new ArrayList();
+        messages.add(pending);
+
+        TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
+        SenderImpl sender = new SenderImpl();
+        DefragmentedReceiverImpl handleReceiver = new DefragmentedReceiverImpl(pending.getData());
+        FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
+        ReceiverImpl receiver = new ReceiverImpl(handler, 0);
+        byte msg[] = pending.getData();
+        
+        boolean keepGoing = true;
+        while (keepGoing) {
+            keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
+            if (keepGoing)
+                try { Thread.sleep(100); } catch (InterruptedException ie) {}
+        }
+        assertTrue(handleReceiver.receivedOk());
+    }
+    
+    /**
+     * Send a message with two fragments through with no delay
+     *
+     */
+    @Test
+    public void testMultiple() throws Exception {
+        PendingGatewayMessage pending = createPending(2048, false, false);
+        ArrayList messages = new ArrayList();
+        messages.add(pending);
+        
+        TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
+        SenderImpl sender = new SenderImpl();
+        DefragmentedReceiverImpl handleReceiver = new DefragmentedReceiverImpl(pending.getData());
+        FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
+        ReceiverImpl receiver = new ReceiverImpl(handler, 0);
+        byte msg[] = pending.getData();
+            
+        boolean keepGoing = true;
+        while (keepGoing) {
+            keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
+            if (keepGoing)
+                try { Thread.sleep(100); } catch (InterruptedException ie) {}
+        }
         assertTrue(handleReceiver.receivedOk());
     }
     
