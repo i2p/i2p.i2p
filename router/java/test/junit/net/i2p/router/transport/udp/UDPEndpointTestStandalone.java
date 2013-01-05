@@ -13,17 +13,20 @@ import net.i2p.util.Log;
 
 /**
  *
+ * Note: this is a standalone test, not a JUnit test.
+ * At some point someone may want to convert it to a JUnit test.
+ * --zab
  */
-public class UDPEndpointTest {
+public class UDPEndpointTestStandalone {
     private RouterContext _context;
     private Log _log;
     private UDPEndpoint _endpoints[];
     private boolean _beginTest;
     private List _sentNotReceived;
     
-    public UDPEndpointTest(RouterContext ctx) {
+    public UDPEndpointTestStandalone(RouterContext ctx) {
         _context = ctx;
-        _log = ctx.logManager().getLog(UDPEndpointTest.class);
+        _log = ctx.logManager().getLog(UDPEndpointTestStandalone.class);
         _sentNotReceived = Collections.synchronizedList(new ArrayList(1000));
     }
     
@@ -130,7 +133,7 @@ public class UDPEndpointTest {
         Properties props = new Properties();
         props.setProperty("stat.logFile", "udpEndpointTest.stats");
         props.setProperty("stat.logFilters", "*");
-        UDPEndpointTest test = new UDPEndpointTest(new RouterContext(null, props));
+        UDPEndpointTestStandalone test = new UDPEndpointTestStandalone(new RouterContext(null, props));
         test.runTest(2);
     }
 }
