@@ -11,37 +11,58 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static junit.framework.TestCase.*;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
 
 /**
  * Quick unit test for base functionality of inbound tunnel 
  * operation
  */
-public class InboundGatewayTest extends TestCase{
-    private RouterContext _context;
-    private Log _log;
+public class InboundGatewayTest {
+    private static RouterContext _context;
+    private static TunnelGatewayPumper _pumper;
     private TunnelCreatorConfig _config;
     private TunnelGateway.QueuePreprocessor _preprocessor;
     private TunnelGateway.Sender _sender;
     private TestReceiver _receiver;
     private TunnelGateway _gw;
     
-    public void setUp() {
-        _context = new RouterContext(null);
-        _config = prepareConfig(8);
-        _preprocessor = new TrivialPreprocessor(_context);
-        _sender = new InboundSender(_context, _config.getConfig(0));
-        _receiver = new TestReceiver(_config);
-        _gw = new TunnelGateway(_context, _preprocessor, _sender, _receiver);
+    @BeforeClass
+    public static void globalSetUp() {
+        // order of these matters
+        Router r = new Router();
+        _context = new RouterContext(r);
+        _context.initAll();
+        r.runRouter();
+        RouterIdentity rIdentity = new TestRouterIdentity();
+        RouterInfo rInfo = new RouterInfo();
+        rInfo.setIdentity(rIdentity);
+        r.setRouterInfo(rInfo);
+        _pumper = new TunnelGatewayPumper(_context);
     }
     
-    public void testSmall() {
+    @Before
+    public void setUp() {
+        _config = prepareConfig(8);
+        _preprocessor = new BatchedPreprocessor(_context,"test pre-processor");
+        _sender = new InboundSender(_context, _config.getConfig(0));
+        _receiver = new TestReceiver(_config);
+        _gw = new PumpedTunnelGateway(_context, _preprocessor, _sender, _receiver, _pumper);
+    }
+    
+    @Test
+    public void testSmall() throws Exception {
     	int runCount = 1;
     	
         List messages = new ArrayList(runCount);
@@ -57,8 +78,8 @@ public class InboundGatewayTest extends TestCase{
             messages.add(m);
             _gw.add(m, null, null);
         }
-        
-        long time = _context.clock().now() - start;
+
+        Thread.sleep(1000);
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
@@ -66,7 +87,8 @@ public class InboundGatewayTest extends TestCase{
         }
     }
     
-    public void testRouter() {
+    @Test
+    public void testRouter() throws Exception{
     	int runCount = 1;
     	
         List messages = new ArrayList(runCount);
@@ -85,7 +107,7 @@ public class InboundGatewayTest extends TestCase{
             _gw.add(m, to, null);
         }
         
-        long time = _context.clock().now() - start;
+        Thread.sleep(1000);
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
@@ -93,7 +115,8 @@ public class InboundGatewayTest extends TestCase{
         }
     }
     
-    public void testTunnel() {
+    @Test
+    public void testTunnel() throws Exception {
     	int runCount = 1;
     	
         List messages = new ArrayList(runCount);
@@ -113,7 +136,7 @@ public class InboundGatewayTest extends TestCase{
             _gw.add(m, to, tunnel);
         }
         
-        long time = _context.clock().now() - start;
+        Thread.sleep(1000);
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
@@ -121,7 +144,8 @@ public class InboundGatewayTest extends TestCase{
         }
     }
     
-    public void testLarge() {
+    @Test
+    public void testLarge() throws Exception {
     	int runCount = 1;
     	
         List messages = new ArrayList(runCount);
@@ -138,8 +162,7 @@ public class InboundGatewayTest extends TestCase{
             _gw.add(m, null, null);
         }
         
-        long time = _context.clock().now() - start;
-        //try { Thread.sleep(60*1000); } catch (Exception e) {}
+        Thread.sleep(1000);
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
@@ -147,10 +170,17 @@ public class InboundGatewayTest extends TestCase{
         }
     }
     
+    private static class TestRouterIdentity extends RouterIdentity {
+        @Override
+        public Hash getHash() {
+            return Hash.FAKE_HASH;
+        }
+    }
+    
     private class TestReceiver implements TunnelGateway.Receiver, FragmentHandler.DefragmentedReceiver {
         private TunnelCreatorConfig _config;
         private FragmentHandler _handler;
-        private List _received;
+        private volatile List _received;
         public TestReceiver(TunnelCreatorConfig config) {
             _config = config;
             _handler = new FragmentHandler(_context, TestReceiver.this);
@@ -173,6 +203,7 @@ public class InboundGatewayTest extends TestCase{
             return -1; // or do we need to return the real message ID?
         }        
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
+            System.out.println("got something");
             _received.add(msg);
         }
         public List clearReceived() { 
