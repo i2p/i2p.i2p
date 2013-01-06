@@ -33,6 +33,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
+               debuglevel="lines,vars,source"
                includeAntRuntime="false"
                destdir="./build/obj" classpath="../../core/java/build/obj:../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
@@ -111,7 +112,7 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${classpath}" />
+                <pathelement location="${javac.classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="../../core/java/build/i2pscalatest.jar" />
@@ -127,6 +128,7 @@
         <property name="hamcrest.home" value="${ant.home}/lib/" />
         <property name="junit.home" value="${ant.home}/lib/" />
         <javac srcdir="./test/junit" debug="true" source="1.5" target="1.5" deprecation="on"
+            debuglevel="lines,vars,source"
             includeAntRuntime="true"
             destdir="./build/obj">
             <classpath>
@@ -228,7 +230,7 @@
         <junit printsummary="withOutAndErr" fork="yes" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
-                <pathelement path="${classpath}" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />

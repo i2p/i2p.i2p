@@ -22,6 +22,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
+               debuglevel="lines,vars,source"
                includeAntRuntime="false"
                destdir="./build/obj" classpath="${javac.classpath}" >
             <compilerarg line="${javac.compilerargs}" />
@@ -82,13 +83,11 @@
 
     <!-- unit tests -->
     <target name="scalatest.compileTest" depends="compile, scala.init">
-        <!-- set classpath property if not set elsewhere first.-->
-        <property name="classpath" value="" />
         <mkdir dir="./build" />
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${classpath}" />
+                <pathelement location="${javac.classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj" />
@@ -102,10 +101,11 @@
         <property name="hamcrest.home" value="${ant.home}/lib/" />
         <property name="junit.home" value="${ant.home}/lib/" />
         <javac srcdir="./test/junit" debug="true" source="1.5" target="1.5" deprecation="on"
+               debuglevel="lines,vars,source"
                includeAntRuntime="true"
                destdir="./build/obj" >
             <classpath>
-                <pathelement path="${classpath}" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
@@ -213,8 +213,8 @@
         <junit printsummary="withOutAndErr" fork="yes" maxmemory="384m" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
-		<pathelement location="../../installer/resources/" />
-                <pathelement path="${classpath}" />
+                <pathelement location="../../installer/resources/" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
@@ -230,14 +230,8 @@
                     <include name="**/*Test.java" />
                     <exclude name="**/ElGamalAESEngineTest.java" />
                     <exclude name="**/StructureTest.java" />
-                    <!-- temporarily  exclude slow tests -->
-                    <!-- let's now temporarily exclude the exclusions
-                    <exclude name="**/HMACSHA256Test.java" />
-                    <exclude name="**/SHA1HashTest.java" />
-                    <exclude name="**/SHA256Test.java" />
+                    <!-- DataHelperTest is *very* slow with cobertura -->
                     <exclude name="**/DataHelperTest.java" />
-                    -->
-                    <!-- end of slow tests -->
                 </fileset>
             </batchtest>
             <formatter type="xml"/>

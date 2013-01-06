@@ -1319,6 +1319,20 @@
         <ant dir="core/java/" target="fulltest" />
         <ant dir="router/java/" target="fulltest" />
     </target>
+    <target name="jenkins.cobertura.report" depends="cobertura.report">
+        <!--
+             The jenkins cobertura plugin couldn't find the source files.
+             Let's see if these changes help it out.
+         -->
+        <replaceregexp byline="true" file="reports/core/cobertura/coverage.xml"
+            match='filename="net' replace='filename="core/java/src/net'/>
+        <replaceregexp byline="true" file="reports/core/cobertura/coverage.xml"
+            match="&lt;source&gt;./src" replace='&lt;source&gt;./core/java/src'/>
+        <replaceregexp byline="true" file="reports/router/cobertura/coverage.xml"
+            match='filename="net' replace='filename="router/java/src/net'/>
+        <replaceregexp byline="true" file="reports/router/cobertura/coverage.xml"
+            match="&lt;source&gt;./src" replace="&lt;source&gt;router/java/src"/>
+    </target>
     <!-- end unit tests -->
 
     <target name="testscripts" >
