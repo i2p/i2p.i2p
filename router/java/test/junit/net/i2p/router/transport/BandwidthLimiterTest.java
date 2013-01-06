@@ -14,7 +14,11 @@ import java.io.OutputStream;
 import java.util.Properties;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static junit.framework.TestCase.*;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 
 /**
@@ -28,15 +32,14 @@ import net.i2p.router.RouterContext;
  * 10 concurrent threads is, well, slow.
  *
  */
-public class BandwidthLimiterTest extends TestCase{
-    private RouterContext _context;
+public class BandwidthLimiterTest {
+    private static RouterContext _context;
     private final static int NUM_KB = 256;
     
-    public void setUp() {
-        _context = new RouterContext(null);
-    }
-    
-    public void tearDown(){
+    @BeforeClass
+    public static void setUp() {
+        _context = new RouterContext(new Router());
+        _context.initAll();
     }
     
     private void prepareLimiter(int inKBps, int outKBps, int inBurst, int outBurst) {
@@ -102,6 +105,7 @@ public class BandwidthLimiterTest extends TestCase{
      * with various limits) and log the times.
      *
      */
+    @Test
     public void testOutbound() {
     	double error;
     	double predict;
@@ -137,6 +141,7 @@ public class BandwidthLimiterTest extends TestCase{
      * with various limits) and log the times.
      *
      */
+    @Test
     public void testInbound() {
         double predict;
         double error;
@@ -168,6 +173,7 @@ public class BandwidthLimiterTest extends TestCase{
     }
     
     
+    @Test
     public void testOutboundContention() {
     	double predict;
     	double error;
