@@ -16,17 +16,18 @@ import net.i2p.router.RouterContext;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public abstract class GatewayTestBase {
 
     protected static RouterContext _context;
-    protected static TunnelGatewayPumper _pumper;
+    private static TunnelGatewayPumper _pumper;
     protected static TunnelCreatorConfig _config;
     
-    protected TunnelGateway.QueuePreprocessor _preprocessor;
+    private TunnelGateway.QueuePreprocessor _preprocessor;
     protected TunnelGateway.Sender _sender;
     protected TestReceiver _receiver;
-    protected TunnelGateway _gw;
+    private TunnelGateway _gw;
     
     @BeforeClass
     public static void globalSetUp() {
@@ -50,7 +51,103 @@ public abstract class GatewayTestBase {
         _gw = new PumpedTunnelGateway(_context, _preprocessor, _sender, _receiver, _pumper);
     }
     
+    /** sets up the sender and receiver.  Subclasses must override */
     protected abstract void setupSenderAndReceiver();
+    
+    /**
+     * @return at which hop to start the decryption process
+     */
+    protected abstract int getLastHop();
+    
+    @Test
+    public void testSmall() throws Exception {
+        int runCount = 1;
+        
+        List messages = new ArrayList(runCount);
+        long start = _context.clock().now();
+    
+        for (int i = 0; i < runCount; i++) {
+            DataMessage m = getTestMessage(64);
+            messages.add(m);
+            _gw.add(m, null, null);
+        }
+        
+        Thread.sleep(1000);
+        
+        List received = _receiver.clearReceived();
+        for (int i = 0; i < messages.size(); i++) {
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
+        }
+    }
+    
+    @Test
+    public void testRouter() throws Exception {
+        int runCount = 1;
+        
+        List messages = new ArrayList(runCount);
+        long start = _context.clock().now();
+    
+        for (int i = 0; i < runCount; i++) {
+            DataMessage m = getTestMessage(64);
+            Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
+            java.util.Arrays.fill(to.getData(), (byte)0xFF);
+            messages.add(m);
+            _gw.add(m, to, null);
+        }
+        
+        Thread.sleep(1000);
+        
+        List received = _receiver.clearReceived();
+        for (int i = 0; i < messages.size(); i++) {
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
+        }
+    }
+    
+    @Test
+    public void testTunnel() throws Exception {
+        int runCount = 1;
+        
+        List messages = new ArrayList(runCount);
+        long start = _context.clock().now();
+    
+        for (int i = 0; i < runCount; i++) {
+            DataMessage m = getTestMessage(64);
+            Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
+            java.util.Arrays.fill(to.getData(), (byte)0xFF);
+            TunnelId tunnel = new TunnelId(42);
+            byte data[] = m.toByteArray();
+            messages.add(m);
+            _gw.add(m, to, tunnel);
+        }
+        
+        Thread.sleep(1000);
+        
+        List received = _receiver.clearReceived();
+        for (int i = 0; i < messages.size(); i++) {
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
+        }
+    }
+    
+    @Test
+    public void testLarge() throws Exception {
+        int runCount = 1;
+        
+        List messages = new ArrayList(runCount);
+        long start = _context.clock().now();
+    
+        for (int i = 0; i < runCount; i++) {
+            DataMessage m = getTestMessage(1024);
+            messages.add(m);
+            _gw.add(m, null, null);
+        }
+        
+        Thread.sleep(1000);
+        
+        List received = _receiver.clearReceived();
+        for (int i = 0; i < messages.size(); i++) {
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
+        }
+    }
     
     private static class TestRouterIdentity extends RouterIdentity {
         @Override
@@ -59,7 +156,7 @@ public abstract class GatewayTestBase {
         }
     }
     
-    protected static DataMessage getTestMessage(int size) {
+    private static DataMessage getTestMessage(int size) {
         DataMessage m = new DataMessage(_context);
         m.setData(new byte[size]);
         java.util.Arrays.fill(m.getData(), (byte)0xFF);
@@ -82,7 +179,7 @@ public abstract class GatewayTestBase {
         public long receiveEncrypted(byte[] encrypted) {
             // fake all the hops...
             
-            for (int i = 1; i <= _config.getLength() - 2; i++) {
+            for (int i = 1; i <= _config.getLength() - getLastHop(); i++) {
                 HopProcessor hop = new HopProcessor(_context, _config.getConfig(i));
                 assertTrue(hop.process(encrypted, 0, encrypted.length, _config.getConfig(i).getReceiveFrom()));
             }
