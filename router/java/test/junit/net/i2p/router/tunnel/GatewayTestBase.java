@@ -6,23 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.Router;
-import net.i2p.router.RouterContext;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public abstract class GatewayTestBase {
+public abstract class GatewayTestBase extends RouterTestBase {
 
-    protected static RouterContext _context;
+    
     private static TunnelGatewayPumper _pumper;
-    protected static TunnelCreatorConfig _config;
     
     private TunnelGateway.QueuePreprocessor _preprocessor;
     protected TunnelGateway.Sender _sender;
@@ -30,18 +25,8 @@ public abstract class GatewayTestBase {
     private TunnelGateway _gw;
     
     @BeforeClass
-    public static void globalSetUp() {
-        // order of these matters
-        Router r = new Router();
-        _context = new RouterContext(r);
-        _context.initAll();
-        r.runRouter();
-        RouterIdentity rIdentity = new TestRouterIdentity();
-        RouterInfo rInfo = new RouterInfo();
-        rInfo.setIdentity(rIdentity);
-        r.setRouterInfo(rInfo);
+    public static void gatewayClassSetup() {
         _pumper = new TunnelGatewayPumper(_context);
-        _config = prepareConfig(8);
     }
     
     @Before
@@ -149,13 +134,6 @@ public abstract class GatewayTestBase {
         }
     }
     
-    private static class TestRouterIdentity extends RouterIdentity {
-        @Override
-        public Hash getHash() {
-            return Hash.FAKE_HASH;
-        }
-    }
-    
     private static DataMessage getTestMessage(int size) {
         DataMessage m = new DataMessage(_context);
         m.setData(new byte[size]);
@@ -206,39 +184,5 @@ public abstract class GatewayTestBase {
             // TODO Auto-generated method stub
             return null;
         }
-    }
-    
-    
-    private static TunnelCreatorConfig prepareConfig(int numHops) {
-        Hash peers[] = new Hash[numHops];
-        byte tunnelIds[][] = new byte[numHops][4];
-        for (int i = 0; i < numHops; i++) {
-            peers[i] = new Hash();
-            peers[i].setData(new byte[Hash.HASH_LENGTH]);
-            _context.random().nextBytes(peers[i].getData());
-            _context.random().nextBytes(tunnelIds[i]);
-        }
-        
-        TunnelCreatorConfig config = new TunnelCreatorConfig(_context, numHops, false);
-        for (int i = 0; i < numHops; i++) {
-            config.setPeer(i, peers[i]);
-            HopConfig cfg = config.getConfig(i);
-            cfg.setExpiration(_context.clock().now() + 60000);
-            cfg.setIVKey(_context.keyGenerator().generateSessionKey());
-            cfg.setLayerKey(_context.keyGenerator().generateSessionKey());
-            if (i > 0)
-                cfg.setReceiveFrom(peers[i-1]);
-            else
-                cfg.setReceiveFrom(null);
-            cfg.setReceiveTunnelId(tunnelIds[i]);
-            if (i < numHops - 1) {
-                cfg.setSendTo(peers[i+1]);
-                cfg.setSendTunnelId(tunnelIds[i+1]);
-            } else {
-                cfg.setSendTo(null);
-                cfg.setSendTunnelId(null);
-            }
-        }
-        return config;
     }
 }
