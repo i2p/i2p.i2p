@@ -8,6 +8,9 @@
     <target name="prepare">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
     <condition property="depend.available">
         <typefound name="depend" />
     </condition>
@@ -113,7 +116,7 @@
     </target>
 
     <!-- this is tricky because the message classes go in the jar, not in the war -->
-    <target name="bundle" depends="jar1, precompilejsp" >
+    <target name="bundle" depends="jar1, precompilejsp" unless="no.bundle">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
