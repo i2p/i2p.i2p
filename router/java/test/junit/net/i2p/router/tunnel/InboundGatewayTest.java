@@ -8,16 +8,8 @@ package net.i2p.router.tunnel;
  *
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
 
 import static junit.framework.TestCase.*;
-import net.i2p.data.Hash;
-import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.DataMessage;
-import net.i2p.data.i2np.I2NPMessage;
 
 /**
  * Quick unit test for base functionality of inbound tunnel 
@@ -32,93 +24,9 @@ public class InboundGatewayTest extends GatewayTestBase {
         _receiver = new InboundTestReceiver(_config);
     }
     
-    @Test
-    public void testSmall() throws Exception {
-    	int runCount = 1;
-    	
-        List messages = new ArrayList(runCount);
-        long start = _context.clock().now();
-    
-        for (int i = 0; i < runCount; i++) {
-           DataMessage m = getTestMessage(64);
-            messages.add(m);
-            _gw.add(m, null, null);
-        }
-
-        Thread.sleep(1000);
-        
-        List received = _receiver.clearReceived();
-        for (int i = 0; i < messages.size(); i++) {
-            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
-        }
-    }
-    
-    @Test
-    public void testRouter() throws Exception{
-    	int runCount = 1;
-    	
-        List messages = new ArrayList(runCount);
-        long start = _context.clock().now();
-    
-        for (int i = 0; i < runCount; i++) {
-            DataMessage m = getTestMessage(64);
-            Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
-            java.util.Arrays.fill(to.getData(), (byte)0xFF);
-            messages.add(m);
-            _gw.add(m, to, null);
-        }
-        
-        Thread.sleep(1000);
-        
-        List received = _receiver.clearReceived();
-        for (int i = 0; i < messages.size(); i++) {
-            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
-        }
-    }
-    
-    @Test
-    public void testTunnel() throws Exception {
-    	int runCount = 1;
-    	
-        List messages = new ArrayList(runCount);
-        long start = _context.clock().now();
-    
-        for (int i = 0; i < runCount; i++) {
-            DataMessage m = getTestMessage(64);
-            Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
-            java.util.Arrays.fill(to.getData(), (byte)0xFF);
-            TunnelId tunnel = new TunnelId(42);
-            messages.add(m);
-            _gw.add(m, to, tunnel);
-        }
-        
-        Thread.sleep(1000);
-        
-        List received = _receiver.clearReceived();
-        for (int i = 0; i < messages.size(); i++) {
-            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
-        }
-    }
-    
-    @Test
-    public void testLarge() throws Exception {
-    	int runCount = 1;
-    	
-        List messages = new ArrayList(runCount);
-        long start = _context.clock().now();
-    
-        for (int i = 0; i < runCount; i++) {
-            DataMessage m = getTestMessage(1024);
-            messages.add(m);
-            _gw.add(m, null, null);
-        }
-        
-        Thread.sleep(1000);
-        
-        List received = _receiver.clearReceived();
-        for (int i = 0; i < messages.size(); i++) {
-            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
-        }
+    @Override
+    protected int getLastHop() {
+        return 2;
     }
     
     private class InboundTestReceiver extends TestReceiver {
