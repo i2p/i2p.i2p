@@ -201,6 +201,35 @@
         </script>
     </target>
 
+    <target name="checkIfBumped">
+        <exec executable="mtn" outputproperty="bumped" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="ls" />
+            <arg value="ch" />
+            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+        </exec>
+        <condition property="bumped.already">
+            <not>
+                <equals arg1="${bumped}" arg2=""/>
+            </not>
+        </condition>
+    </target>
+
+    <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
+        <script language="javascript">
+            <![CDATA[
+            var newBuildNumber = (Number(project.getProperty("i2p.build.number")) + 1);
+            if (newBuildNumber != 'unknown' && newBuildNumber != null) {
+                echo = project.createTask("echo");
+                project.setProperty("new.i2p.build.number", newBuildNumber);
+                echo.setMessage("Build number is now: " + newBuildNumber);
+                echo.perform();
+            }
+            ]]>
+        </script>
+        <replaceregexp byline="true" file="router/java/src/net/i2p/router/RouterVersion.java"
+            match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
+    </target>
+
     <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
