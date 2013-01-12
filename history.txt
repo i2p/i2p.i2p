@@ -1,3 +1,10 @@
+2013-01-12 zzz
+ * EepGet: Don't retry if proxy isn't there
+ * I2CP: Failsafe check for delivery job requeueing forever (ticket #819)
+ * jobs.jsp: Add table of pending jobs
+ * NetDB: Split up files into subdirectories
+ * SAM: Force i2cp.messageReliability=None (ticket #819)
+
 2013-01-02 zzz
  * DataHelper: new getASCII() method
  * DataStructures:
@@ -6,7 +13,7 @@
  * I2CP:
    - Remove unused equals() methods for message classes
    - Remove static logs
-   - Fix leak if nonce = 0 but reliability != none
+   - Fix leak if nonce = 0 but reliability != none (ticket #819)
    - More work on failure codes (ticket #788)
  * Logs: Fix setting log filename (ticket #805)
  * SAM: Synchronize dissector

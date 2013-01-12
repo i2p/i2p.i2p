@@ -628,11 +628,13 @@ class ClientConnectionRunner {
      *
      */
     private final static long REQUEUE_DELAY = 500;
+    private static final int MAX_REQUEUE = 60;  // 30 sec.
     
     private class MessageDeliveryStatusUpdate extends JobImpl {
         private final MessageId _messageId;
         private final int _status;
         private long _lastTried;
+        private int _requeueCount;
 
         /**
          *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
@@ -662,12 +664,20 @@ class ClientConnectionRunner {
             msg.setStatus(_status);
 
             if (!alreadyAccepted(_messageId)) {
-                _log.warn("Almost send an update for message " + _messageId + " to " 
+                if (_requeueCount++ > MAX_REQUEUE) {
+                    // bug requeueing forever? failsafe
+                    _log.error("Abandon update for message " + _messageId + " to " 
                           + MessageStatusMessage.getStatusString(msg.getStatus()) 
-                          + " for session " + _sessionId.getSessionId() 
+                          + " for session " + _sessionId.getSessionId());
+                } else {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Almost send an update for message " + _messageId + " to "
+                          + MessageStatusMessage.getStatusString(msg.getStatus())
+                          + " for session " + _sessionId.getSessionId()
                           + " before they knew the messageId!  delaying .5s");
-                _lastTried = _context.clock().now();
-                requeue(REQUEUE_DELAY);
+                    _lastTried = _context.clock().now();
+                    requeue(REQUEUE_DELAY);
+                }
                 return;
             }
 
