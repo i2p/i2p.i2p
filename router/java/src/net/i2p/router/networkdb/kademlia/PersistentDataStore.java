@@ -61,7 +61,7 @@ class PersistentDataStore extends TransientDataStore {
     public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) throws IOException {
         super(ctx);
         _log = ctx.logManager().getLog(PersistentDataStore.class);
-        _flat = ctx.getBooleanPropertyDefaultTrue(PROP_FLAT);
+        _flat = ctx.getBooleanProperty(PROP_FLAT);
         _dbDir = getDbDir(dbDir);
         _facade = facade;
         _readJob = new ReadJob();
