@@ -12,9 +12,12 @@ import java.util.List;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
 import net.i2p.router.JobStats;
+import net.i2p.util.ObjectCounter;
 
 public class JobQueueHelper extends HelperBase {
     
+    private static final int MAX_JOBS = 50;
+
     public String getJobQueueSummary() {
         try {
             if (_out != null) {
@@ -44,7 +47,7 @@ public class JobQueueHelper extends HelperBase {
         int numRunners = _context.jobQueue().getJobs(readyJobs, timedJobs, activeJobs, justFinishedJobs);
         
         StringBuilder buf = new StringBuilder(32*1024);
-        buf.append("<b><div class=\"joblog\"><h3>I2P Job Queue</h3><div class=\"wideload\">Job runners: ").append(numRunners);
+        buf.append("<b><div class=\"joblog\"><h3>I2P Job Queue</h3><br><div class=\"wideload\">Job runners: ").append(numRunners);
         buf.append("</b><br>\n");
 
         long now = _context.clock().now();
@@ -56,6 +59,7 @@ public class JobQueueHelper extends HelperBase {
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
+
         buf.append("<hr><b>Just finished jobs: ").append(justFinishedJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = justFinishedJobs.get(i);
@@ -63,20 +67,32 @@ public class JobQueueHelper extends HelperBase {
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
+
         buf.append("<hr><b>Ready/waiting jobs: ").append(readyJobs.size()).append("</b><ol>\n");
+        ObjectCounter<String> counter = new ObjectCounter();
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = readyJobs.get(i);
+            counter.increment(j.getName());
+            if (i >= MAX_JOBS)
+                continue;
             buf.append("<li>[waiting ");
             buf.append(DataHelper.formatDuration2(now-j.getTiming().getStartAfter()));
             buf.append("]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        out.flush();
+        getJobCounts(buf, counter);
+        out.write(buf.toString());
+        buf.setLength(0);
 
         buf.append("<hr><b>Scheduled jobs: ").append(timedJobs.size()).append("</b><ol>\n");
         long prev = Long.MIN_VALUE;
-        for (Job j : timedJobs) {
+        counter.clear();
+        for (int i = 0; i < timedJobs.size(); i++) {
+            Job j = timedJobs.get(i);
+            counter.increment(j.getName());
+            if (i >= MAX_JOBS)
+                continue;
             long time = j.getTiming().getStartAfter() - now;
             buf.append("<li>").append(j.getName()).append(" in ");
             buf.append(DataHelper.formatDuration2(time));
@@ -88,16 +104,31 @@ public class JobQueueHelper extends HelperBase {
             buf.append("</li>\n");
         }
         buf.append("</ol></div>\n");
+        getJobCounts(buf, counter);
+        out.write(buf.toString());
+        buf.setLength(0);
         
-        out.flush();
-        
+        buf.append("<hr><b>Total Job Stats</b>\n");
         getJobStats(buf);
-        
-        out.flush();
-        
         out.write(buf.toString());
     }
     
+    /** @since 0.9.5 */
+    private static void getJobCounts(StringBuilder buf, ObjectCounter<String> counter) {
+        List<String> names = new ArrayList(counter.objects());
+        if (names.size() < 4)
+            return;
+        buf.append("<table style=\"width: 30%; margin-left: 100px;\">\n" +
+                   "<tr><th>Job</th><th>Queued<th>");
+        Collections.sort(names, new JobCountComparator(counter));
+        for (String name : names) {
+            buf.append("<tr><td>").append(name)
+               .append("</td><td>").append(counter.count(name))
+               .append("</td></tr>\n");
+        }
+        buf.append("</table>\n");
+    }
+
     /**
      *  Render the HTML for the job stats.
      *  Moved from JobQueue
@@ -175,4 +206,23 @@ public class JobQueueHelper extends HelperBase {
         }
     }
 
+    /** @since 0.9.5 */
+    private static class JobCountComparator implements Comparator<String> {
+         private final ObjectCounter<String> _counter;
+
+         public JobCountComparator(ObjectCounter<String> counter) {
+             _counter = counter;
+         }
+
+         public int compare(String l, String r) {
+             // reverse
+             int lc = _counter.count(l);
+             int rc = _counter.count(r);
+             if (lc > rc)
+                 return -1;
+             if (lc < rc)
+                 return 1;
+             return l.compareTo(r);
+        }
+    }
 }
