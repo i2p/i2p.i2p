@@ -125,11 +125,17 @@ public class CryptixAESEngine extends AESEngine {
         }
     }
     
+    /**
+     *  @param iv 16 bytes
+     */
     @Override
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
         decrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
 
+    /**
+     *  @param iv 16 bytes starting at ivOffset
+     */
     @Override
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         if ((iv== null) || (payload == null) || (payload.length <= 0) || (sessionKey == null) ) 
