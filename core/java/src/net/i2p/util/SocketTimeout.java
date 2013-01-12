@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  *  This should be deprecated.
- *  It is only used by EepGet.
+ *  It is only used by EepGet and Syndie.
  *  The only advantage seems to be a total timeout period, which is the second
  *  argument to EepGet.fetch(headerTimeout, totalTimeout, inactivityTimeout),
  *  which is most likely always set to -1.
@@ -52,6 +52,11 @@ public class SocketTimeout extends SimpleTimer2.TimedEvent {
         }
     }
     
+    /**
+     *  Change in return value from void to boolean in
+     *  0.9.3 accidentally broke Syndie, sorry.
+     *  Recompile Syndie to fix it.
+     */
     public boolean cancel() {
         _cancelled = true;
         return super.cancel();
