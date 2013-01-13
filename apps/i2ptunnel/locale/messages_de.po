@@ -5,7 +5,7 @@
 #
 # Translators:
 # blabla, 2011.
-#   <blabla@trash-mail.com>, 2011, 2012.
+#   <blabla@trash-mail.com>, 2011-2012.
 # D.A. Loader <>, 2012.
 #   <driz@i2pmail.org>, 2012.
 # ducki2p <ducki2p@gmail.com>, 2011.
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 19:46+0000\n"
-"PO-Revision-Date: 2012-10-27 16:43+0000\n"
-"Last-Translator: pirr <pirr@tormail.org>\n"
+"POT-Creation-Date: 2012-12-14 15:54+0000\n"
+"PO-Revision-Date: 2012-11-30 02:18+0000\n"
+"Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -27,15 +27,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:553
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:554
 msgid "This seems to be a bad destination:"
 msgstr "Dies scheint kein gültiges Ziel zu sein:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:553
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:554
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "Der I2P-Adresshelfer kann dir bei solch einem Ziel nicht helfen."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:620
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:621
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -46,7 +46,7 @@ msgstr ""
 "\"{0}\">hier</a>, und um das Ziel aus der kollidierenden Adresshelfer-"
 "Anfrage zu besuchen, <a href=\"{1}\">hier</a>!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1020
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1025
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:409
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:413
@@ -54,41 +54,41 @@ msgstr ""
 msgid "Host"
 msgstr "Host"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1024
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1029
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1028
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1033
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
 msgid "Destination"
 msgstr "Ziel"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1039
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Weiter zu {0}, ohne zu speichern"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1039
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1044
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "{0} im Router-Adressbuch speichern und auf die Eepseite weiterleiten"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1047
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "{0} im Master-Adressbuch speichern und auf die Eepseite weiterleiten"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1048
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "{0} im privaten Adressbuch speichern und auf die Eepseite weiterleiten"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1153
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
 msgid "HTTP Outproxy"
 msgstr "HTTP-Outproxy"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1158
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1167
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
@@ -96,49 +96,54 @@ msgstr ""
 "Adresshelfer von einem \"Sprung\"-Service:"
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1194
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1203
 #, java-format
 msgid "{0} jump service"
 msgstr "Weiterleitungsdienst {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:159
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:163
+#, fuzzy, java-format
+msgid "Added via address helper from {0}"
+msgstr "Durch Adresshelfer hinzugefügt"
+
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:165
 msgid "Added via address helper"
 msgstr "Durch Adresshelfer hinzugefügt"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:183
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "Weiterleitung zu {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:189
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
 msgid "Router Console"
 msgstr "Routerkonsole"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
 msgid "Addressbook"
 msgstr "Adressbuch"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
 msgid "Configuration"
 msgstr "Einstellungen"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
 msgid "Help"
 msgstr "Hilfe"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:195
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:202
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr ""
 "{0} wurde ins {1} Adressbuch geschrieben.  Du wirst nun weitergeleitet."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr ""
 "Konnte {0} nicht im {1} Adressbuch speichern. Du wirst nun weitergeleitet."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Click here if you are not redirected automatically."
 msgstr "Klick hier, wenn du nicht automatisch weitergeleitet wirst!"
 
@@ -150,6 +155,8 @@ msgstr "intern"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:119
 msgid "Tunnels are not initialized yet, please reload in two minutes."
 msgstr ""
+"Tunnel sind noch nicht initialisiert. Bitte aktualisiere die Seite in zwei "
+"Minuten."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:192
 msgid ""
@@ -164,6 +171,8 @@ msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr ""
+"Falls dieses Problem weiterhin besteht: Stellen Sie sicher, dass in Ihrem "
+"Browser Cookies aktiviert sind."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:240
 msgid "Configuration reloaded for all tunnels"
@@ -200,11 +209,11 @@ msgstr "Port nicht gesetzt"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:485
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:611
 msgid "Invalid port"
-msgstr "Ungültiger Port"
+msgstr "ungültiger Port"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:488
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr "Warnung - Ports unter 1024 sind nicht empfehlenswert"
+msgstr "Warnung - Ports unter 1024 werden nicht empfohlen"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:504
 msgid "Standard client"
@@ -261,7 +270,7 @@ msgstr "Host nicht gesetzt"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:605
 msgid "Invalid address"
-msgstr "Ungültige Adresse"
+msgstr "ungültige Adresse"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:82
 msgid "I2P Tunnel Manager - Edit Client Tunnel"
@@ -1346,6 +1355,3 @@ msgstr "Abschließen"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
 msgstr "Nächstes"
-
-#~ msgid "Reload Config"
-#~ msgstr "Konfiguration neu einlesen"

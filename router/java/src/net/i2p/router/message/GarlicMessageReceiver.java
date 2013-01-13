@@ -49,11 +49,11 @@ public class GarlicMessageReceiver {
     public GarlicMessageReceiver(RouterContext context, CloveReceiver receiver, Hash clientDestination) {
         _context = context;
         _log = context.logManager().getLog(GarlicMessageReceiver.class);
-        _context.statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 60*60*1000, 24*60*60*1000 });
         _clientDestination = clientDestination;
         _parser = new GarlicMessageParser(context);
         _receiver = receiver;
         //_log.error("New GMR dest = " + clientDestination);
+        // all createRateStat in OCMOSJ.init()
     }
     
     public void receive(GarlicMessage message) {

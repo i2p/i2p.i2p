@@ -18,6 +18,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
+import net.i2p.util.CachedIteratorArrayList;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
@@ -323,7 +324,7 @@ class PeerState {
         _rtt = INIT_RTT;
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
-        _outboundMessages = new ArrayList(32);
+        _outboundMessages = new CachedIteratorArrayList<OutboundMessageState>(32);
         //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
         _outboundQueue = new PriBlockingQueue(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager

@@ -1,7 +1,9 @@
-Changes may be needed for newer versions than 3.5.13.
+Changes may be needed for newer versions than 3.5.17.
 
 To use the patch in this directory, copy Makefile-windows-x86-32.nmake to
 Makefile-windows-x86-64.nmake then "patch < x64-win.patch".
+
+Copy the itoopie icon to src\c\wrapper.ico.
 
 Configure your environment per the apache-ant instructions (i.e., set ANT_HOME
 and JAVA_HOME). Then in the wrapper source directory, run build64.bat.

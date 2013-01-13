@@ -66,6 +66,7 @@ public class ByteArray implements Serializable, Comparable {
     
     @Override
     public final boolean equals(Object o) {
+        if (o == this) return true;
         if (o == null) return false;
         if (o instanceof ByteArray) {
             ByteArray ba = (ByteArray)o;

@@ -204,7 +204,7 @@ public class AddressbookBean extends BaseBean
 				                   resultCount);
 			else
 				message = ngettext("Filtered list contains 1 entry.",
-				                   "Fltered list contains {0} entries.",
+				                   "Filtered list contains {0} entries.",
 				                   resultCount);
 			filterArg = "&amp;filter=" + filter;
 		} else if( search != null && search.length() > 0 ) {

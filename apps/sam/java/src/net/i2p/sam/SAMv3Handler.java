@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -514,7 +515,10 @@ public class SAMv3Handler extends SAMv1Handler
 				}
 				props.remove("STYLE");
 
-
+				// Unconditionally override what the client may have set
+				// (iMule sets BestEffort) as None is more efficient
+				// and the client has no way to access delivery notifications
+				i2cpProps.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
 
 				// Record the session in the database sSessionsHash
 				Properties allProps = new Properties();

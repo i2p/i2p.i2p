@@ -96,9 +96,11 @@ public class SAMDatagramSession extends SAMMessageSession {
         byte[] payload;
         Destination sender;
         try {
-            dgramDissector.loadI2PDatagram(msg);
-            sender = dgramDissector.getSender();
-            payload = dgramDissector.extractPayload();
+            synchronized (dgramDissector) {
+                dgramDissector.loadI2PDatagram(msg);
+                sender = dgramDissector.getSender();
+                payload = dgramDissector.extractPayload();
+            }
         } catch (DataFormatException e) {
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Dropping ill-formatted I2P repliable datagram");

@@ -30,6 +30,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
@@ -47,8 +48,12 @@ class PersistentDataStore extends TransientDataStore {
     private final Writer _writer;
     private final ReadJob _readJob;
     private volatile boolean _initialized;
+    private final boolean _flat;
     
     private final static int READ_DELAY = 2*60*1000;
+    private static final String PROP_FLAT = "router.networkDatabase.flat";
+    private static final String DIR_PREFIX = "r";
+    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
     
     /**
      *  @param dbDir relative path
@@ -56,6 +61,7 @@ class PersistentDataStore extends TransientDataStore {
     public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) throws IOException {
         super(ctx);
         _log = ctx.logManager().getLog(PersistentDataStore.class);
+        _flat = ctx.getBooleanProperty(PROP_FLAT);
         _dbDir = getDbDir(dbDir);
         _facade = facade;
         _readJob = new ReadJob();
@@ -339,16 +345,27 @@ class PersistentDataStore extends TransientDataStore {
         public String getName() { return "DB Read Job"; }
 
         public void runJob() {
+            long now = getContext().clock().now();
             // check directory mod time to save a lot of object churn in scanning all the file names
             long lastMod = _dbDir.lastModified();
             // if size() (= RI + LS) is too low, call anyway to check for reseed
-            if (lastMod > _lastModified || size() < MIN_ROUTERS + 10) {
-                _lastModified = lastMod;
+            boolean shouldScan = lastMod > _lastModified || size() < MIN_ROUTERS + 10;
+            if (!shouldScan && !_flat) {
+                for (int j = 0; j < B64.length(); j++) {
+                    File subdir = new File(_dbDir, DIR_PREFIX + B64.charAt(j));
+                    if (subdir.lastModified() > _lastModified) {
+                        shouldScan = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldScan) {
                 _log.info("Rereading new files");
                 // synch with the writer job
                 synchronized (_dbDir) {
                     readFiles();
                 }
+                _lastModified = now;
             }
             requeue(READ_DELAY);
         }
@@ -360,7 +377,8 @@ class PersistentDataStore extends TransientDataStore {
         private void readFiles() {
             int routerCount = 0;
 
-                File routerInfoFiles[] = _dbDir.listFiles(RouterInfoFilter.getInstance());
+            File routerInfoFiles[] = _dbDir.listFiles(RouterInfoFilter.getInstance());
+            if (_flat) {
                 if (routerInfoFiles != null) {
                     routerCount = routerInfoFiles.length;
                     for (int i = 0; i < routerInfoFiles.length; i++) {
@@ -378,6 +396,28 @@ class PersistentDataStore extends TransientDataStore {
                         }
                     }
                 }
+            } else {
+                // move all new RIs to subdirs, then scan those
+                if (routerInfoFiles != null)
+                    migrate(_dbDir, routerInfoFiles);
+                for (int j = 0; j < B64.length(); j++) {
+                    File subdir = new File(_dbDir, DIR_PREFIX + B64.charAt(j));
+                    File[] files = subdir.listFiles(RouterInfoFilter.getInstance());
+                    if (files == null)
+                        continue;
+                    long lastMod = subdir.lastModified();
+                    if (routerCount >= MIN_ROUTERS && lastMod <= _lastModified)
+                        continue;
+                    routerCount += files.length;
+                    if (lastMod <= _lastModified)
+                        continue;
+                    for (int i = 0; i < files.length; i++) {
+                        Hash key = getRouterInfoHash(files[i].getName());
+                        if (key != null && !isKnown(key))
+                            (new ReadRouterJob(files[i], key)).runJob();
+                    }
+                }
+            }
             
             if (!_initialized) {
                 if (_facade.reseedChecker().checkReseed(routerCount))
@@ -495,7 +535,52 @@ class PersistentDataStore extends TransientDataStore {
             throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not readable!");
         if (!f.canWrite())
             throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not writable!");
+        if (_flat) {
+            unmigrate(f);
+        } else {
+            for (int j = 0; j < B64.length(); j++) {
+                File subdir = new SecureDirectory(f, DIR_PREFIX + B64.charAt(j));
+                if (!subdir.exists())
+                    subdir.mkdir();
+            }
+            File routerInfoFiles[] = f.listFiles(RouterInfoFilter.getInstance());
+            if (routerInfoFiles != null)
+                migrate(f, routerInfoFiles);
+        }
         return f;
+    }
+
+    /**
+     *  Migrate from two-level to one-level directory structure
+     *  @since 0.9.5
+     */
+    private static void unmigrate(File dbdir) {
+        for (int j = 0; j < B64.length(); j++) {
+            File subdir = new File(dbdir, DIR_PREFIX + B64.charAt(j));
+            File[] files = subdir.listFiles(RouterInfoFilter.getInstance());
+            if (files == null)
+                continue;
+            for (int i = 0; i < files.length; i++) {
+                File from = files[i];
+                File to = new File(dbdir, from.getName());
+                FileUtil.rename(from, to);
+            }
+        }
+    }
+
+    /**
+     *  Migrate from one-level to two-level directory structure
+     *  @since 0.9.5
+     */
+    private static void migrate(File dbdir, File[] files) {
+        for (int i = 0; i < files.length; i++) {
+            File from = files[i];
+            if (!from.isFile())
+                continue;
+            File dir = new File(dbdir, DIR_PREFIX + from.getName().charAt(ROUTERINFO_PREFIX.length()));
+            File to = new File(dir, from.getName());
+            FileUtil.rename(from, to);
+        }
     }
     
     private final static String LEASESET_PREFIX = "leaseSet-";
@@ -506,8 +591,12 @@ class PersistentDataStore extends TransientDataStore {
     private static String getLeaseSetName(Hash hash) {
         return LEASESET_PREFIX + hash.toBase64() + LEASESET_SUFFIX;
     }
-    private static String getRouterInfoName(Hash hash) {
-        return ROUTERINFO_PREFIX + hash.toBase64() + ROUTERINFO_SUFFIX;
+
+    private String getRouterInfoName(Hash hash) {
+        String b64 = hash.toBase64();
+        if (_flat)
+            return ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
+        return DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
     }
     
     private static Hash getRouterInfoHash(String filename) {

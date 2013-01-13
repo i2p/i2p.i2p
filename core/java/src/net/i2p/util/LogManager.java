@@ -347,13 +347,18 @@ public class LogManager {
                 _displayOnScreen = false;
         }
 
+        // prior to 0.9.5, override prop trumped config file
+        // as of 0.9.5, override prop trumps config file only if config file is set to default,
+        // so it may be set in the UI.
+        String filename = config.getProperty(PROP_FILENAME, DEFAULT_FILENAME);
         String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
-        if (filenameOverride != null)
+        if (filenameOverride != null && !filename.equals(DEFAULT_FILENAME))
             setBaseLogfilename(filenameOverride);
         else
-            setBaseLogfilename(config.getProperty(PROP_FILENAME, DEFAULT_FILENAME));
+            setBaseLogfilename(filename);
 
         _fileSize = getFileSize(config.getProperty(PROP_FILESIZE, DEFAULT_FILESIZE));
+
         _rotationLimit = -1;
         try {
             _rotationLimit = Integer.parseInt(config.getProperty(PROP_ROTATIONLIMIT, DEFAULT_ROTATIONLIMIT));
@@ -620,11 +625,11 @@ public class LogManager {
         rv.setProperty(PROP_FORMAT, new String(_format));
         rv.setProperty(PROP_DATEFORMAT, _dateFormatPattern);
         rv.setProperty(PROP_DISPLAYONSCREEN, Boolean.toString(_displayOnScreen));
-        String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
-        if (filenameOverride == null)
-            rv.setProperty(PROP_FILENAME, _baseLogfilename);
-        else // this isn't technically correct - this could mess with some funky scenarios
-            rv.setProperty(PROP_FILENAME, DEFAULT_FILENAME);
+
+        // prior to 0.9.5, override prop trumped config file
+        // as of 0.9.5, override prop trumps config file only if config file is set to default,
+        // so it may be set in the UI.
+        rv.setProperty(PROP_FILENAME, _baseLogfilename);
         
         if (_fileSize >= 1024*1024)
             rv.setProperty(PROP_FILESIZE,  (_fileSize / (1024*1024)) + "m");

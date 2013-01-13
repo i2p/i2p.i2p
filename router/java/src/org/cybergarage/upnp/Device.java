@@ -395,7 +395,6 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	 * 
 	 * @return A Device that contain this object.<br>
 	 * 	Return <code>null</code> if this is a root device.
-	 * @author Stefano "Kismet" Lenzi 
 	 */
 	public Device getParentDevice()	{ 
 		if(isRootDevice())
@@ -428,9 +427,6 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	 * Device withtout writing any XML that describe the device<br>.
 	 * 
 	 * @param d Add Device d to the Device
-	 * 
-	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net  - 2005
-	 * 
 	 */
 	public void addDevice(Device d) {
 		Node deviceListNode = getDeviceNode().getNode(DeviceList.ELEM_NAME);
@@ -1553,7 +1549,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	
 	/**
 	 * 
-	 * @return
+	 * @return SSDPIPv4MulticastAddress
 	 * @since 1.8
 	 */
 	public String getSSDPIPv4MulticastAddress(){
@@ -1571,7 +1567,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 	
 	/**
 	 * 
-	 * @return
+	 * @return SSDPIPv6MulticastAddress
 	 * @since 1.8
 	 */
 	public String getSSDPIPv6MulticastAddress(){

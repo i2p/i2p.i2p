@@ -39,7 +39,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
         _log = ctx.logManager().getLog(PriorityBlockingQueue.class);
         _name = name;
         STAT_FULL = ("pbq." + name + ".full").intern();
-        ctx.statManager().createRequiredRateStat(STAT_FULL, "queue full", "Router", RATES);
+        ctx.statManager().createRateStat(STAT_FULL, "queue full", "Router", RATES);
     }
 
     /**

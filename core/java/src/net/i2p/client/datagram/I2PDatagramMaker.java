@@ -62,7 +62,7 @@ public final class I2PDatagramMaker {
     /**
      * Make a repliable I2P datagram containing the specified payload.
      *
-     * @param payload Bytes to be contained in the I2P datagram.
+     * @param payload non-null Bytes to be contained in the I2P datagram.
      */
     public byte[] makeI2PDatagram(byte[] payload) {
         sxDGram.reset();

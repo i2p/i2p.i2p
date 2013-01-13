@@ -2,34 +2,55 @@ package net.i2p.stat;
 
 import java.util.Properties;
 
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 
 public class RateStatTest extends TestCase {
+    
+    @Test
+    public void testNoRates() throws Exception {
+        final long emptyArray[] = new long[0];
+        try {
+            new RateStat("test", "test RateStat getters etc", "tests", emptyArray);
+            fail("created a rate stat with no periods");
+        } catch (IllegalArgumentException expected){}
+    }
+    
+    @Test
     public void testGettersEtc() throws Exception{
-        long emptyArray[] = new long[0];
-        RateStat rs = new RateStat("test", "test RateStat getters etc", "tests", emptyArray);
+        final long periods[] = new long[]{10};
+        RateStat rs = new RateStat("test", "test RateStat getters etc", "tests", periods);
 
         // Test basic getters
         assertEquals("test", rs.getName());
         assertEquals("tests", rs.getGroupName());
         assertEquals("test RateStat getters etc", rs.getDescription());
 
-        // There should be no periods, so other getters should return defaults
-        // TODO: Fix this so it checks that the array is empty rather than comparing objects
-        //assertEquals(rs.getPeriods(), emptyArray);
+        // There should be no data, so other getters should return defaults
         assertEquals(0.0, rs.getLifetimeAverageValue());
         assertEquals(0, rs.getLifetimeEventCount());
         assertNull(rs.getRate(2000));
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Test
+    public void testAddingAndRemovingThrows() throws Exception {
+        final long periods[] = new long[]{10};
+        RateStat rs = new RateStat("test", "test RateStat getters etc", "tests", periods);
 
-        // Test adding and removing a period
-        assertFalse(rs.containsRate(1000));
-        rs.addRate(1000);
-        assertTrue(rs.containsRate(1000));
-        rs.removeRate(1000);
-        assertFalse(rs.containsRate(1000));
+        try {
+            rs.addRate(1000);
+            fail("adding periods should not be supported");
+        } catch (UnsupportedOperationException expected){}
+        try {
+            rs.removeRate(10);
+            fail("removing periods should not be supported");
+        } catch (UnsupportedOperationException expected){}
     }
 
+    @Test
     public void testRateStat() throws Exception{
         RateStat rs = new RateStat("moo", "moo moo moo", "cow trueisms", new long[] { 60 * 1000, 60 * 60 * 1000,
                                                                                      24 * 60 * 60 * 1000});

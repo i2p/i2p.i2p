@@ -125,7 +125,7 @@ public class ElGamalTest extends TestCase{
     };
     
     protected void setUp() {
-        _context = new I2PAppContext();
+        _context = I2PAppContext.getGlobalContext();
         Object o = YKGenerator.class;
     }
     
@@ -331,7 +331,7 @@ public class ElGamalTest extends TestCase{
     }
     
     public void testElGamalAESEngine() throws Exception{
-        I2PAppContext ctx = new I2PAppContext();
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
         ElGamalAESEngine e = new ElGamalAESEngine(ctx);
         Object kp[] = ctx.keyGenerator().generatePKIKeypair();
         PublicKey pubKey = (PublicKey)kp[0];
@@ -352,9 +352,9 @@ public class ElGamalTest extends TestCase{
     }
     
     public void testElGamalEngine(){
-        int numRuns = 100;
+        int numRuns = 10;
         RandomSource.getInstance().nextBoolean();
-        I2PAppContext context = new I2PAppContext();
+        I2PAppContext context = I2PAppContext.getGlobalContext();
 
         for (int i = 0; i < numRuns; i++) {
             Object pair[] = KeyGenerator.getInstance().generatePKIKeypair();
@@ -372,7 +372,7 @@ public class ElGamalTest extends TestCase{
     
     public void testYKGen(){
         RandomSource.getInstance().nextBoolean();
-        I2PAppContext context = new I2PAppContext();
+        I2PAppContext context = I2PAppContext.getGlobalContext();
         YKGenerator ykgen = new YKGenerator(context);
         for (int i = 0; i < 5; i++) {
             ykgen.getNextYK();

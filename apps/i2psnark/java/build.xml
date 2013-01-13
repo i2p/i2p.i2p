@@ -25,6 +25,9 @@
         </depend>
     </target>
 
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
     <property name="javac.compilerargs" value="" />
     <property name="require.gettext" value="true" />
 
@@ -81,7 +84,7 @@
                     <isset property="jar.uptodate" />
                 </not>
                 <not>
-                    <isset property="wjar.uptodate" />
+                    <isset property="war.uptodate" />
                 </not>
                 <isset property="mtn.available" />
             </and>
@@ -121,7 +124,7 @@
         </uptodate>
     </target>
     
-    <target name="bundle" depends="compile">
+    <target name="bundle" depends="compile" unless="no.bundle">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >

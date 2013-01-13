@@ -8,12 +8,15 @@
 	<property name="resources" value="resources"/>
     <property name="javadoc" value="javadoc"/>
 
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
 	<property name="javac.compilerargs" value=""/>
 	<property name="require.gettext" value="true" />
 
 	<target name="init">
-		<mkdir dir="${build}"/>
-        <mkdir dir="${build}/${resources}"/>
+	<mkdir dir="${build}"/>
+	<mkdir dir="${build}/${resources}"/>
         <mkdir dir="${build}/${javadoc}"/>
 		<mkdir dir="${dist}"/>
 	</target>
@@ -39,7 +42,7 @@
         </copy>
 	</target>
 
-	<target name="bundle" >
+	<target name="bundle" unless="no.bundle">
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>

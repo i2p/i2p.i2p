@@ -24,37 +24,17 @@ import java.io.ByteArrayOutputStream;
         SessionKey key = (SessionKey)(new SessionKeyTest()).createDataStructure();
         
         byte data[] = "Hello, I2P".getBytes();
-        payload.setUnencryptedData(data);
+        // This causes equals() to fail unless we override the test
+        // to set the unencrypted data after reading.
+        // Unencrypted data is deprecated, just use encrypted data for the test.
+        //payload.setUnencryptedData(data);
         Hash hash = (Hash)(new HashTest()).createDataStructure();
         
         Destination target = (Destination)(new DestinationTest()).createDataStructure();
-    payload.setEncryptedData(data);
+        payload.setEncryptedData(data);
     
         return payload; 
     }
     public DataStructure createStructureToRead() { return new Payload(); }
-    
-    public void testStructure() throws Exception{
-        byte[] temp = null;
-        
-        DataStructure orig;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
-        orig = createDataStructure();
-        orig.writeBytes(baos);
-        
-        
-        temp = baos.toByteArray();
-        
-        DataStructure ds;
-        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        
-        ds = createStructureToRead();
-        ds.readBytes(bais);
-        Payload payload = (Payload)ds;
-        payload.setUnencryptedData(payload.getEncryptedData());
-        
-        assertEquals(orig, ds);
-    }
     
 }

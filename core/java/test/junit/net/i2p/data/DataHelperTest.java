@@ -4,21 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
-import net.i2p.I2PAppContext;
 
 /**
  * basic unit tests for the DataHelper
  *
  */
 public class DataHelperTest extends TestCase{
-    private I2PAppContext _context;
-    
-    protected void setUp() {
-        _context = I2PAppContext.getGlobalContext();
-    }
     
     /**
      * Test to/from/read/writeLong with every 1, 2, and 4 byte value, as
@@ -120,10 +115,11 @@ public class DataHelperTest extends TestCase{
     }
     
     public void testCompress() throws Exception{
+        Random r = new Random();
         for (int size = 0; size < 32*1024; size+=32){   // Original had size++, changed value because
                                                         // speed was a problem. -Comwiz
             byte data[] = new byte[size];
-            _context.random().nextBytes(data);
+            r.nextBytes(data);
             byte compressed[] = DataHelper.compress(data);
             byte decompressed[] = DataHelper.decompress(compressed);
             assertTrue(DataHelper.eq(data, decompressed));

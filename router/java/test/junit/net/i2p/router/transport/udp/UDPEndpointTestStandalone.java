@@ -13,41 +13,38 @@ import net.i2p.util.Log;
 
 /**
  *
+ * Note: this is a standalone test, not a JUnit test.
+ * At some point someone may want to convert it to a JUnit test.
+ * --zab
  */
-public class UDPEndpointTest {
+public class UDPEndpointTestStandalone {
     private RouterContext _context;
     private Log _log;
     private UDPEndpoint _endpoints[];
     private boolean _beginTest;
     private List _sentNotReceived;
     
-    public UDPEndpointTest(RouterContext ctx) {
+    public UDPEndpointTestStandalone(RouterContext ctx) {
         _context = ctx;
-        _log = ctx.logManager().getLog(UDPEndpointTest.class);
+        _log = ctx.logManager().getLog(UDPEndpointTestStandalone.class);
         _sentNotReceived = Collections.synchronizedList(new ArrayList(1000));
     }
     
     public void runTest(int numPeers) {
         _log.debug("Run test("+numPeers+")");
-        try {
-            _endpoints = new UDPEndpoint[numPeers];
-            int base = 2000 + _context.random().nextInt(10000);
-            for (int i = 0; i < numPeers; i++) {
-                _log.debug("Building " + i);
-                UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
-                _endpoints[i] = endpoint;
-                endpoint.startup();
-                I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);
-                I2PThread write = new I2PThread(new TestWrite(endpoint), "Test write " + i);
-                //read.setDaemon(true);
-                read.start();
-                //write.setDaemon(true);
-                write.start();
-            }
-        } catch (SocketException se) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error initializing", se);
-            return;
+        _endpoints = new UDPEndpoint[numPeers];
+        int base = 2000 + _context.random().nextInt(10000);
+        for (int i = 0; i < numPeers; i++) {
+            _log.debug("Building " + i);
+            UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
+            _endpoints[i] = endpoint;
+            endpoint.startup();
+            I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);
+            I2PThread write = new I2PThread(new TestWrite(endpoint), "Test write " + i);
+            //read.setDaemon(true);
+            read.start();
+            //write.setDaemon(true);
+            write.start();
         }
         _beginTest = true;
         _log.debug("Test begin");
@@ -110,7 +107,8 @@ public class UDPEndpointTest {
                 //try {
                     if (true) throw new RuntimeException("fixme");
                     //packet.initialize(priority, expiration, InetAddress.getLocalHost(), _endpoints[curPeer].getListenPort());
-                    packet.writeData(data, 0, 1024);
+                    // Following method is commented out in UDPPacket
+                    //packet.writeData(data, 0, 1024);
                     packet.getPacket().setLength(1024);
                     int outstanding = _sentNotReceived.size() + 1;
                     _sentNotReceived.add(new ByteArray(data, 0, 1024));
@@ -135,7 +133,7 @@ public class UDPEndpointTest {
         Properties props = new Properties();
         props.setProperty("stat.logFile", "udpEndpointTest.stats");
         props.setProperty("stat.logFilters", "*");
-        UDPEndpointTest test = new UDPEndpointTest(new RouterContext(null, props));
+        UDPEndpointTestStandalone test = new UDPEndpointTestStandalone(new RouterContext(null, props));
         test.runTest(2);
     }
 }

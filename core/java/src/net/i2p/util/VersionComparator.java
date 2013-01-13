@@ -1,7 +1,6 @@
 package net.i2p.util;
 
 import java.util.Comparator;
-import java.util.StringTokenizer;
 
 /**
  * Compares versions.
@@ -11,66 +10,102 @@ import java.util.StringTokenizer;
  * @since 0.7.10
  */
 public class VersionComparator implements Comparator<String> {
-    /** l and r non-null */
+
+    @Override
     public int compare(String l, String r) {
-        // try it the easy way first
+        
         if (l.equals(r))
             return 0;
-        StringTokenizer lTokens = new StringTokenizer(sanitize(l), VALID_SEPARATOR_CHARS);
-        StringTokenizer rTokens = new StringTokenizer(sanitize(r), VALID_SEPARATOR_CHARS);
-
-        while (lTokens.hasMoreTokens() && rTokens.hasMoreTokens()) {
-            String lNumber = lTokens.nextToken();
-            String rNumber = rTokens.nextToken();
-            int diff = longCompare(lNumber, rNumber);
-            if (diff != 0)
-                return diff;
-        }
-
-        if (lTokens.hasMoreTokens() && !rTokens.hasMoreTokens())
-            return 1;
-        if (rTokens.hasMoreTokens() && !lTokens.hasMoreTokens())
-            return -1;
-        return 0;
-    }
-
-    private static final int longCompare(String lop, String rop) {
-        long left, right;
-        try {
-            left = Long.parseLong(lop);
-        } catch (NumberFormatException nfe) {
-            return -1;
-        }
-        try {
-            right = Long.parseLong(rop);
-        } catch (NumberFormatException nfe) {
-            return 1;
-        }
-        if (left < right)
-            return -1;
-        if (left > right)
-            return 1;
-        return 0;
-    }
-
-    private static final String VALID_SEPARATOR_CHARS = ".-_";
-    private static final String VALID_VERSION_CHARS = "0123456789" + VALID_SEPARATOR_CHARS;
-
-    private static final String sanitize(String versionString) {
-        StringBuilder versionStringBuilder = new StringBuilder(versionString);
-
-        for (int i = 0; i < versionStringBuilder.length(); i++) {
-            if (VALID_VERSION_CHARS.indexOf(versionStringBuilder.charAt(i)) == -1) {
-                versionStringBuilder.deleteCharAt(i);
-                i--;
+        
+        final int ll = l.length();
+        final int rl = r.length();
+        int il = 0, ir = 0;
+        int nl = 0, nr = 0;
+        
+        while(true) {
+            
+            // are we at end of strings?
+            if (il >= ll) {
+                if (ir >= rl)
+                    return 0;
+                return -1;
+            } else if (ir >= rl)
+                return 1;
+            
+            long lv = -1;
+            while(lv == -1 && il < ll) {
+                nl = nextSeparator(l, il);
+                lv = parseLong(l,il,nl);
+                il = nl + 1;
             }
+            
+            long rv = -1;
+            while(rv == -1 && ir < rl) {
+                nr = nextSeparator(r, ir);
+                rv = parseLong(r,ir,nr);
+                ir = nr + 1;
+            }
+            
+            if (lv < rv)
+                return -1;
+            else if (lv > rv)
+                return 1;
+            
         }
-
-        return versionStringBuilder.toString();
     }
-
-    public static void main(String[] args) {
-        System.out.println("" + (new VersionComparator()).compare(args[0], args[1]));
+    
+    private static boolean isSeparator(char c) {
+        switch(c) {
+        case '.':
+        case '_':
+        case '-':
+            return true;
+        default :
+            return false;
+        }
+    }
+    
+    private static boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+    
+    private static int getDigit(char c) {
+        return c - '0';
+    }
+    
+    /**
+     * @param s string to process
+     * @param start starting index in the string to process
+     * @return the index of the next separator character, or end of string.
+     */
+    private static int nextSeparator(String s, int start) {
+        while( start < s.length()) {
+            if (isSeparator(s.charAt(start)))
+                return start;
+            start++;
+        }
+        return start;
+    }
+    
+    /**
+     * Parses a long, ignoring any non-digit characters.
+     * @param s string to parse from
+     * @param start index in the string to start
+     * @param end index in the string to stop at
+     * @return the parsed value, or -1 if nothing was parsed or there was a problem.
+     */
+    private static long parseLong(String s, int start, int end) {
+        long rv = 0;
+        boolean parsedAny = false;
+        for (int i = start; i < end && rv >= 0; i++) {
+            final char c = s.charAt(i);
+            if (!isDigit(c))
+                continue;
+            parsedAny = true;
+            rv = rv * 10 + getDigit(c);
+        }
+        if (!parsedAny)
+            return -1;
+        return rv;
     }
 }
-

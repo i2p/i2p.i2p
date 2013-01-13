@@ -64,14 +64,6 @@ class NewsFetcher extends UpdateRunner {
         return NewsHelper.dontInstall(_context);
     }
 
-    private boolean shouldInstall() {
-        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
-        if ("notify".equals(policy) || dontInstall())
-            return false;
-        File zip = new File(_context.getRouterDir(), Router.UPDATE_FILE);
-        return !zip.exists();
-    }
-    
     @Override
     public void run() {
         _isRunning = true;
@@ -133,6 +125,11 @@ class NewsFetcher extends UpdateRunner {
      *  TODO: Check minVersion, use backup URLs specified
      */
     void checkForUpdates() {
+        // For now, don't even tell the manager about new versions if we can't install.
+        // If we do want the manager to know, we must hide the buttons in
+        // SummaryHelper.getUpdateStatus().
+        if (dontInstall())
+            return;
         FileInputStream in = null;
         try {
             in = new FileInputStream(_newsFile);

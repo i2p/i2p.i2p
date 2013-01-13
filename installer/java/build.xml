@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="utility_jars">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <!-- noop, since the core doesnt depend on anything -->
+    </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../build"
+            srcdir="./src"
+            destdir="./build/obj" >
+        </depend>
+    </target>
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.classpath" value="" />
+    <target name="compile" depends="depend">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
+            includeAntRuntime="false"
+            destdir="./build/obj" classpath="${javac.classpath}:../../core/java/build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="listChangedFiles" if="mtn.available" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="jar" depends="compile, listChangedFiles">
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+        <jar destfile="../../build/utility.jar">
+            <fileset dir="../../core/java/build/obj" includes="**/FileUtil.class"/>
+            <fileset dir="./build/obj" includes="**" />
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <!-- noop, since the core doesn't depend on anything -->
+    </target>
+    <target name="distclean" depends="clean">
+        <!-- noop, since the core doesn't depend on anything -->
+    </target>
+</project>
+<!--
+vim:fenc=utf-8:ai:si:ts=4:sw=4:et:nu:fdm=indent:fdn=1:
+-->

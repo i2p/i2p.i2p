@@ -71,13 +71,14 @@ public class TunnelDispatcher implements Service {
     private final RouterContext _context;
     private final Log _log;
     /** us */
-    private final Map<TunnelId, TunnelGateway> _outboundGateways;
-    private final Map<TunnelId, OutboundTunnelEndpoint> _outboundEndpoints;
+    private final ConcurrentHashMap<TunnelId, TunnelGateway> _outboundGateways;
+    private final ConcurrentHashMap<TunnelId, OutboundTunnelEndpoint> _outboundEndpoints;
     /** regular participant or IBEP of our own tunnel */
-    private final Map<TunnelId, TunnelParticipant> _participants;
+    private final ConcurrentHashMap<TunnelId, TunnelParticipant> _participants;
     /** regular IBGW or our own zero-hop inbound */
-    private final Map<TunnelId, TunnelGateway> _inboundGateways;
-    private final Map<TunnelId, HopConfig> _participatingConfig;
+    private final ConcurrentHashMap<TunnelId, TunnelGateway> _inboundGateways;
+    /** anything we did not create - IBGW, OBEP, or middle hop */
+    private final ConcurrentHashMap<TunnelId, HopConfig> _participatingConfig;
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     private long _lastParticipatingExpiration;
     private BloomFilterIVValidator _validator;
@@ -85,6 +86,7 @@ public class TunnelDispatcher implements Service {
     /** what is the date/time we last deliberately dropped a tunnel? **/
     //private long _lastDropTime;
     private final TunnelGatewayPumper _pumper;
+    private final Object _joinParticipantLock = new Object();
 
     /** for shouldDropParticipatingMessage() */
     enum Location {OBEP, PARTICIPANT, IBGW}
@@ -233,93 +235,121 @@ public class TunnelDispatcher implements Service {
     
     /**
      * We are the outbound gateway - we created this tunnel 
+     *
+     *  @return success; false if Tunnel ID is a duplicate
      */
-    public void joinOutbound(TunnelCreatorConfig cfg) {
+    public boolean joinOutbound(TunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Outbound built successfully: " + cfg);
+        TunnelGateway gw;
         if (cfg.getLength() > 1) {
             TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
             TunnelGateway.Sender sender = new OutboundSender(_context, cfg);
             TunnelGateway.Receiver receiver = new OutboundReceiver(_context, cfg);
             //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
-            TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
-            TunnelId outId = cfg.getConfig(0).getSendTunnel();
-            _outboundGateways.put(outId, gw);
+            gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
+        } else {
+            gw = new TunnelGatewayZeroHop(_context, cfg);
+        }
+        TunnelId outId = cfg.getConfig(0).getSendTunnel();
+        if (_outboundGateways.putIfAbsent(outId, gw) != null)
+            return false;
+        if (cfg.getLength() > 1) {
             _context.statManager().addRateData("tunnel.joinOutboundGateway", 1);
             _context.messageHistory().tunnelJoined("outbound", cfg);
         } else {
-            TunnelGatewayZeroHop gw = new TunnelGatewayZeroHop(_context, cfg);
-            TunnelId outId = cfg.getConfig(0).getSendTunnel();
-            _outboundGateways.put(outId, gw);
             _context.statManager().addRateData("tunnel.joinOutboundGatewayZeroHop", 1);
             _context.messageHistory().tunnelJoined("outboundZeroHop", cfg);
         }
+        return true;
     }
 
     /** 
      * We are the inbound endpoint - we created this tunnel
+     *
+     *  @return success; false if Tunnel ID is a duplicate
      */
-    public void joinInbound(TunnelCreatorConfig cfg) {
+    public boolean joinInbound(TunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Inbound built successfully: " + cfg);
         
         if (cfg.getLength() > 1) {
             TunnelParticipant participant = new TunnelParticipant(_context, new InboundEndpointProcessor(_context, cfg, _validator));
             TunnelId recvId = cfg.getConfig(cfg.getLength()-1).getReceiveTunnel();
-            _participants.put(recvId, participant);
+            if (_participants.putIfAbsent(recvId, participant) != null)
+                return false;
             _context.statManager().addRateData("tunnel.joinInboundEndpoint", 1);
             _context.messageHistory().tunnelJoined("inboundEndpoint", cfg);
         } else {
             TunnelGatewayZeroHop gw = new TunnelGatewayZeroHop(_context, cfg);
             TunnelId recvId = cfg.getConfig(0).getReceiveTunnel();
-            _inboundGateways.put(recvId, gw);
+            if (_inboundGateways.putIfAbsent(recvId, gw) != null)
+                return false;
             _context.statManager().addRateData("tunnel.joinInboundEndpointZeroHop", 1);
             _context.messageHistory().tunnelJoined("inboundEndpointZeroHop", cfg);
         }
+        return true;
     }
     
     /** 
      * We are a participant in this tunnel, but not as the endpoint or gateway
      *
+     *  @return success; false if Tunnel ID is a duplicate
      */
-    public void joinParticipant(HopConfig cfg) {
+    public boolean joinParticipant(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Joining as participant: " + cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         TunnelParticipant participant = new TunnelParticipant(_context, cfg, new HopProcessor(_context, cfg, _validator));
-        _participants.put(recvId, participant);
-        _participatingConfig.put(recvId, cfg);
+        synchronized (_joinParticipantLock) {
+            if (_participatingConfig.putIfAbsent(recvId, cfg) != null)
+                return false;
+            if (_participants.putIfAbsent(recvId, participant) != null) {
+                _participatingConfig.remove(recvId);
+                return false;
+            }
+        }
         _context.messageHistory().tunnelJoined("participant", cfg);
         _context.statManager().addRateData("tunnel.joinParticipant", 1);
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
+        return true;
     }
 
     /**
      * We are the outbound endpoint in this tunnel, and did not create it
      *
+     *  @return success; false if Tunnel ID is a duplicate
      */
-    public void joinOutboundEndpoint(HopConfig cfg) {
+    public boolean joinOutboundEndpoint(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Joining as OBEP: " + cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         OutboundTunnelEndpoint endpoint = new OutboundTunnelEndpoint(_context, cfg, new HopProcessor(_context, cfg, _validator));
-        _outboundEndpoints.put(recvId, endpoint);
-        _participatingConfig.put(recvId, cfg);
+        synchronized (_joinParticipantLock) {
+            if (_participatingConfig.putIfAbsent(recvId, cfg) != null)
+                return false;
+            if (_outboundEndpoints.putIfAbsent(recvId, endpoint) != null) {
+                _participatingConfig.remove(recvId);
+                return false;
+            }
+        }
         _context.messageHistory().tunnelJoined("outboundEndpoint", cfg);
         _context.statManager().addRateData("tunnel.joinOutboundEndpoint", 1);
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
+        return true;
     }
     
     /**
      * We are the inbound gateway in this tunnel, and did not create it
      *
+     *  @return success; false if Tunnel ID is a duplicate
      */
-    public void joinInboundGateway(HopConfig cfg) {
+    public boolean joinInboundGateway(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Joining as IBGW: " + cfg);
         TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
@@ -328,20 +358,77 @@ public class TunnelDispatcher implements Service {
         //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
         TunnelGateway gw = new ThrottledPumpedTunnelGateway(_context, preproc, sender, receiver, _pumper, cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
-        _inboundGateways.put(recvId, gw);
-        _participatingConfig.put(recvId, cfg);
+        synchronized (_joinParticipantLock) {
+            if (_participatingConfig.putIfAbsent(recvId, cfg) != null)
+                return false;
+            if (_inboundGateways.putIfAbsent(recvId, gw) != null) {
+                _participatingConfig.remove(recvId);
+                return false;
+            }
+        }
         _context.messageHistory().tunnelJoined("inboundGateway", cfg);
         _context.statManager().addRateData("tunnel.joinInboundGateway", 1);
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
+        return true;
     }
 
     public int getParticipatingCount() {
         return _participatingConfig.size();
     }
     
+    /**
+     *  Get a new random send tunnel ID that isn't a dup.
+     *  Note that we do not keep track of IDs for pending builds so this
+     *  does not fully prevent joinOutbound() from failing later.
+     *  @since 0.9.5
+     */
+    public long getNewOBGWID() {
+        long rv;
+        TunnelId tid;
+        do {
+            rv = _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            tid = new TunnelId(rv);
+        } while (_outboundGateways.containsKey(tid));
+        return rv;
+    }
+    
+    /**
+     *  Get a new random receive tunnel ID that isn't a dup.
+     *  Not for zero hop tunnels.
+     *  Note that we do not keep track of IDs for pending builds so this
+     *  does not fully prevent joinInbound() from failing later.
+     *  @since 0.9.5
+     */
+    public long getNewIBEPID() {
+        long rv;
+        TunnelId tid;
+        do {
+            rv = _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            tid = new TunnelId(rv);
+        } while (_participants.containsKey(tid));
+        return rv;
+    }
+    
+    /**
+     *  Get a new random receive tunnel ID that isn't a dup.
+     *  For zero hop tunnels only.
+     *  Note that we do not keep track of IDs for pending builds so this
+     *  does not fully prevent joinInbound() from failing later.
+     *  @since 0.9.5
+     */
+    public long getNewIBZeroHopID() {
+        long rv;
+        TunnelId tid;
+        do {
+            rv = _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            tid = new TunnelId(rv);
+        } while (_inboundGateways.containsKey(tid));
+        return rv;
+    }
+
     /*******  may be used for congestion control later...
     public int getParticipatingInboundGatewayCount() {
         return _inboundGateways.size();
@@ -598,6 +685,10 @@ public class TunnelDispatcher implements Service {
         //    _context.statManager().addRateData("tunnel.dispatchOutboundTime", dispatchTime, dispatchTime);
     }
     
+    /**
+     *  Only for console TunnelRenderer.
+     *  @return a copy
+     */
     public List<HopConfig> listParticipatingTunnels() {
         return new ArrayList(_participatingConfig.values());
     }

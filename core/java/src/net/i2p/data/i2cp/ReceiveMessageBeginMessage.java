@@ -24,7 +24,7 @@ import net.i2p.data.DataHelper;
  */
 public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 6;
-    private long _sessionId;
+    private int _sessionId;
     private long _messageId;
 
     public ReceiveMessageBeginMessage() {
@@ -36,8 +36,9 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /** @param id 0-65535 */
     public void setSessionId(long id) {
-        _sessionId = id;
+        _sessionId = (int) id;
     }
 
     public long getMessageId() {
@@ -51,7 +52,7 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
-            _sessionId = DataHelper.readLong(in, 2);
+            _sessionId = (int) DataHelper.readLong(in, 2);
             _messageId = DataHelper.readLong(in, 4);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
@@ -85,18 +86,6 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     
     public int getType() {
         return MESSAGE_TYPE;
-    }
-
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof ReceiveMessageBeginMessage)) {
-            ReceiveMessageBeginMessage msg = (ReceiveMessageBeginMessage) object;
-            return _sessionId == msg.getSessionId()
-                   && _messageId == msg.getMessageId();
-        }
-            
-        return false;
     }
 
     @Override

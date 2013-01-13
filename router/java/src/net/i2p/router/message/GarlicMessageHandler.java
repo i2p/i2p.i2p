@@ -19,9 +19,11 @@ import net.i2p.router.RouterContext;
 /**
  * HandlerJobBuilder to build jobs to handle GarlicMessages
  *
- * This is essentially unused, as InNetMessagePool short circuits tunnel messages,
- * and the garlics are handled in InboundMessageDistributor.
- * Unless we get a garlic message not down a tunnel?
+ * This is the handler for garlic message not received down a tunnel, which is the
+ * case for floodfills receiving netdb messages.
+ * It is not the handler for garlic messages received down a tunnel,
+ * as InNetMessagePool short circuits tunnel messages,
+ * and those garlic messages are handled in InboundMessageDistributor.
  */
 public class GarlicMessageHandler implements HandlerJobBuilder {
     private final RouterContext _context;

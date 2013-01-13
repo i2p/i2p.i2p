@@ -271,7 +271,7 @@ public class SSUDemo {
             // is registered as
             DatabaseStoreMessage m = (DatabaseStoreMessage)_msg;
             try {
-                _us.netDb().store(m.getKey(), m.getRouterInfo());
+                _us.netDb().store(m.getKey(), (RouterInfo) m.getEntry());
             } catch (IllegalArgumentException iae) {
                 iae.printStackTrace();
             }

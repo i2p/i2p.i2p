@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -253,6 +254,11 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 }
                 props.remove("STYLE");
                 
+		// Unconditionally override what the client may have set
+		// (iMule sets BestEffort) as None is more efficient
+		// and the client has no way to access delivery notifications
+		props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
+
                 if (style.equals("RAW")) {
                     rawSession = new SAMRawSession(destKeystream, props, this);
                 } else if (style.equals("DATAGRAM")) {

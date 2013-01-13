@@ -508,11 +508,10 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             _log.info("Received " + tagSet);
         TagSet old = null;
         SessionTag dupTag = null;
-        for (Iterator<SessionTag> iter = sessionTags.iterator(); iter.hasNext();) {
-            SessionTag tag = iter.next();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receiving tag " + tag + " in tagSet: " + tagSet);
-            synchronized (_inboundTagSets) {
+        synchronized (_inboundTagSets) {
+            for (SessionTag tag : sessionTags) {
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Receiving tag " + tag + " in tagSet: " + tagSet);
                 old = _inboundTagSets.put(tag, tagSet);
                 overage = _inboundTagSets.size() - MAX_INBOUND_SESSION_TAGS;
                 if (old != null) {
@@ -525,7 +524,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                     }
                 }
             }
-	}
+        }
 
         if (old != null) {
             // drop both old and tagSet tags

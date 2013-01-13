@@ -269,11 +269,15 @@ class ClientConnectionRunner {
      * delivered (or failed delivery)
      * Note that this sends the Guaranteed status codes, even though we only support best effort.
      * Doesn't do anything if i2cp.messageReliability = "none"
+     *
+     *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
+     *
+     *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
-    void updateMessageDeliveryStatus(MessageId id, boolean delivered) {
+    void updateMessageDeliveryStatus(MessageId id, int status) {
         if (_dead || _dontSendMSM)
             return;
-        _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, delivered));
+        _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, status));
     }
 
     /** 
@@ -355,7 +359,7 @@ class ClientConnectionRunner {
             expiration = msg.getExpirationTime();
             flags = msg.getFlags();
         }
-        if (!_dontSendMSM)
+        if (message.getNonce() != 0 && !_dontSendMSM)
             _acceptedPending.add(id);
 
         if (_log.shouldLog(Log.DEBUG))
@@ -379,9 +383,13 @@ class ClientConnectionRunner {
      * Send a notification to the client that their message (id specified) was accepted 
      * for delivery (but not necessarily delivered)
      * Doesn't do anything if i2cp.messageReliability = "none"
+     * or if the nonce is 0.
+     *
+     * @param id OUR id for the message
+     * @param nonce HIS id for the message
      */
     void ackSendMessage(MessageId id, long nonce) {
-        if (_dontSendMSM)
+        if (_dontSendMSM || nonce == 0)
             return;
         SessionId sid = _sessionId;
         if (sid == null) return;
@@ -620,16 +628,23 @@ class ClientConnectionRunner {
      *
      */
     private final static long REQUEUE_DELAY = 500;
+    private static final int MAX_REQUEUE = 60;  // 30 sec.
     
     private class MessageDeliveryStatusUpdate extends JobImpl {
         private final MessageId _messageId;
-        private final boolean _success;
+        private final int _status;
         private long _lastTried;
+        private int _requeueCount;
 
-        public MessageDeliveryStatusUpdate(MessageId id, boolean success) {
+        /**
+         *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
+         *
+         *  @param status see I2CP MessageStatusMessage for success/failure codes
+         */
+        public MessageDeliveryStatusUpdate(MessageId id, int status) {
             super(ClientConnectionRunner.this._context);
             _messageId = id;
-            _success = success;
+            _status = status;
         }
 
         public String getName() { return "Update Delivery Status"; }
@@ -646,18 +661,23 @@ class ClientConnectionRunner {
             // has to be >= 0, it is initialized to -1
             msg.setNonce(2);
             msg.setSize(0);
-            if (_success) 
-                msg.setStatus(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
-            else
-                msg.setStatus(MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);	
+            msg.setStatus(_status);
 
             if (!alreadyAccepted(_messageId)) {
-                _log.warn("Almost send an update for message " + _messageId + " to " 
+                if (_requeueCount++ > MAX_REQUEUE) {
+                    // bug requeueing forever? failsafe
+                    _log.error("Abandon update for message " + _messageId + " to " 
                           + MessageStatusMessage.getStatusString(msg.getStatus()) 
-                          + " for session " + _sessionId.getSessionId() 
+                          + " for session " + _sessionId.getSessionId());
+                } else {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Almost send an update for message " + _messageId + " to "
+                          + MessageStatusMessage.getStatusString(msg.getStatus())
+                          + " for session " + _sessionId.getSessionId()
                           + " before they knew the messageId!  delaying .5s");
-                _lastTried = _context.clock().now();
-                requeue(REQUEUE_DELAY);
+                    _lastTried = _context.clock().now();
+                    requeue(REQUEUE_DELAY);
+                }
                 return;
             }
 

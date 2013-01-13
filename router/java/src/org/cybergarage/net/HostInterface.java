@@ -122,9 +122,8 @@ public class HostInterface
 	 * 
 	 * @param ipfilter
 	 * @param interfaces
-	 * @return
+	 * @return InetAddress[]
 	 * @since 1.8.0
-	 * @author Stefano "Kismet" Lenzi &lt;kismet.sl@gmail.com&gt;
 	 */
 	public final static InetAddress[] getInetAddress(int ipfilter,String[] interfaces){
 		Enumeration nis;

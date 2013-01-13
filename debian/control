@@ -11,6 +11,9 @@ Build-Depends: debhelper (>= 7.0.50~),
  default-jdk,
  gettext,
  libgmp3-dev,
+# uncomment the next line for PPA builds
+# libservice-wrapper-java,
+ libcommons-logging-java,
  po-debconf
 
 Package: i2p

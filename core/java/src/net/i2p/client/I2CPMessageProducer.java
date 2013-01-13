@@ -122,6 +122,7 @@ class I2CPMessageProducer {
     /**
      * Package up and send the payload to the router for delivery
      *
+     * @param nonce 0 to 0xffffffff; if 0, the router will not reply with a MessageStatusMessage
      * @param tag unused - no end-to-end crypto
      * @param tags unused - no end-to-end crypto
      * @param key unused - no end-to-end crypto
@@ -134,6 +135,8 @@ class I2CPMessageProducer {
 
     /**
      * Package up and send the payload to the router for delivery
+     *
+     * @param nonce 0 to 0xffffffff; if 0, the router will not reply with a MessageStatusMessage
      * @since 0.8.4
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload,
@@ -160,6 +163,8 @@ class I2CPMessageProducer {
 
     /**
      * Package up and send the payload to the router for delivery
+     *
+     * @param nonce 0 to 0xffffffff; if 0, the router will not reply with a MessageStatusMessage
      * @since 0.9.2
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload,

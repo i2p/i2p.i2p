@@ -123,12 +123,18 @@ trans.cs = debian/po/cs.po
 trans.de = debian/po/de.po
 trans.el = debian/po/el.po
 trans.es = debian/po/es.po
+trans.fr = debian/po/fr.po
 trans.it = debian/po/it.po
 trans.hu = debian/po/hu.po
 trans.pl = debian/po/pl.po
 trans.ru = debian/po/ru.po
 trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
+
+[I2P.i2prouter-script]
+source_file = installer/resources/locale/messages_en.po
+source_lang = en
+trans.de = installer/resources/locale/po/messages_de.po
 
 [main]
 host = http://www.transifex.net

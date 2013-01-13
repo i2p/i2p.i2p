@@ -78,7 +78,8 @@ public class SendGarlicJob extends JobImpl {
     
     public void runJob() {
         long before = getContext().clock().now();
-        _message = GarlicMessageBuilder.buildMessage(getContext(), _config, _wrappedKey, _wrappedTags);
+        _message = GarlicMessageBuilder.buildMessage(getContext(), _config, _wrappedKey, _wrappedTags,
+                                                     getContext().sessionKeyManager());
         long after = getContext().clock().now();
         if ( (after - before) > 1000) {
             if (_log.shouldLog(Log.WARN))

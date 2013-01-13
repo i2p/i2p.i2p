@@ -107,20 +107,6 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof CreateLeaseSetMessage)) {
-            CreateLeaseSetMessage msg = (CreateLeaseSetMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getSigningPrivateKey(), msg.getSigningPrivateKey())
-                   && DataHelper.eq(getPrivateKey(), msg.getPrivateKey())
-                   && DataHelper.eq(getLeaseSet(), msg.getLeaseSet());
-        }
-        
-        return false;
-    }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

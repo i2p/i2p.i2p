@@ -70,6 +70,7 @@ public class PrivateKey extends SimpleDataStructure {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if ((obj == null) || !(obj instanceof PrivateKey)) return false;
         return DataHelper.eq(_data, ((PrivateKey) obj)._data);
     }

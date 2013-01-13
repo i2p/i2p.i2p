@@ -90,21 +90,6 @@ public class SetDateMessage extends I2CPMessageImpl {
     }
 
     @Override
-    public int hashCode() {
-        return MESSAGE_TYPE ^ DataHelper.hashCode(_version) ^ DataHelper.hashCode(_date);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof SetDateMessage)) {
-            SetDateMessage msg = (SetDateMessage) object;
-            return DataHelper.eq(_date, msg._date) && DataHelper.eq(_version, msg._version);
-        }
-            
-        return false;
-    }
-
-    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[SetDateMessage");

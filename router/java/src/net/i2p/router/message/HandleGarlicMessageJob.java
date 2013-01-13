@@ -25,9 +25,11 @@ import net.i2p.util.Log;
  * as if they arrived locally.  Other instructions are not yet implemented (but
  * need to be. soon)
  *
- * This is essentially unused, as InNetMessagePool short circuits tunnel messages,
- * and the garlics are handled in InboundMessageDistributor.
- * Unless we get a garlic message not down a tunnel?
+ * This is the handler for garlic message not received down a tunnel, which is the
+ * case for floodfills receiving netdb messages.
+ * It is not the handler for garlic messages received down a tunnel,
+ * as InNetMessagePool short circuits tunnel messages,
+ * and those garlic messages are handled in InboundMessageDistributor.
  */
 class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
     private final Log _log;
@@ -48,15 +50,15 @@ class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.Cl
     public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash) {
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
-        getContext().statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Garlic Message not down a tunnel??? from [" + from + "]", new Exception("I did it"));
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Garlic Message not down a tunnel from [" + from + "]");
         _message = msg;
         //_from = from;
         //_fromHash = fromHash;
         //_cloves = new HashMap();
         //_handler = new MessageHandler(context);
         //_parser = new GarlicMessageParser(context);
+        // all createRateStat in OCMOSJ.init()
     }
     
     public String getName() { return "Handle Inbound Garlic Message"; }

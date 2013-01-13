@@ -573,9 +573,11 @@ div.configure h2:first-child {
 .configure form {
      margin: 20px 15px;     
 }
-.sidebarconf input[type="image"] {
+.sidebarconf button {
      margin: 2px;
-     padding: 1px;     
+     padding: 1px;
+     min-width: 0;
+     background: none;
 }
 
 .sidebarconf th:nth-child(1) {

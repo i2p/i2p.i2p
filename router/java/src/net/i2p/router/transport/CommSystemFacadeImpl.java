@@ -41,9 +41,10 @@ import net.i2p.util.Translate;
 public class CommSystemFacadeImpl extends CommSystemFacade {
     private final Log _log;
     private final RouterContext _context;
-    private TransportManager _manager;
+    private final TransportManager _manager;
     private final GeoIP _geoIP;
     private volatile boolean _netMonitorStatus;
+    private boolean _wasStarted;
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
@@ -51,43 +52,43 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //_context.statManager().createRateStat("transport.getBidsJobTime", "How long does it take?", "Transport", new long[] { 10*60*1000l });
         _netMonitorStatus = true;
         _geoIP = new GeoIP(_context);
+        _manager = new TransportManager(_context);
         startGeoIP();
     }
     
     public synchronized void startup() {
         _log.info("Starting up the comm system");
-        _manager = new TransportManager(_context);
         _manager.startListening();
         startTimestamper();
         startNetMonitor();
+        _wasStarted = true;
     }
     
     /**
-     *  Cannot be restarted.
+     *  Cannot be restarted after calling this. Use restart() for that.
      */
     public synchronized void shutdown() {
-        if (_manager != null)
-            _manager.shutdown();
+        _manager.shutdown();
         _geoIP.shutdown();
     }
     
     public synchronized void restart() {
-        if (_manager == null)
+        if (!_wasStarted)
             startup();
         else
             _manager.restart();
     }
     
     @Override
-    public int countActivePeers() { return (_manager == null ? 0 : _manager.countActivePeers()); }
+    public int countActivePeers() { return _manager.countActivePeers(); }
     @Override
-    public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
+    public int countActiveSendPeers() { return _manager.countActiveSendPeers(); } 
     @Override
-    public boolean haveInboundCapacity(int pct) { return (_manager == null ? false : _manager.haveInboundCapacity(pct)); } 
+    public boolean haveInboundCapacity(int pct) { return _manager.haveInboundCapacity(pct); } 
     @Override
-    public boolean haveOutboundCapacity(int pct) { return (_manager == null ? false : _manager.haveOutboundCapacity(pct)); } 
+    public boolean haveOutboundCapacity(int pct) { return _manager.haveOutboundCapacity(pct); } 
     @Override
-    public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
+    public boolean haveHighOutboundCapacity() { return _manager.haveHighOutboundCapacity(); } 
     
     /**
      * @param percentToInclude 1-100
@@ -97,9 +98,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      */
     @Override
     public long getFramedAveragePeerClockSkew(int percentToInclude) {
-        if (_manager == null) {
-            return _context.clock().getOffset();
-        }
         Vector skews = _manager.getClockSkews();
         if (skews == null ||
             skews.isEmpty() ||
@@ -150,17 +148,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     @Override
     public boolean isBacklogged(Hash dest) { 
-        return _manager != null && _manager.isBacklogged(dest); 
+        return _manager.isBacklogged(dest); 
     }
     
     @Override
     public boolean isEstablished(Hash dest) { 
-        return _manager != null && _manager.isEstablished(dest); 
+        return _manager.isEstablished(dest); 
     }
     
     @Override
     public boolean wasUnreachable(Hash dest) { 
-        return _manager != null && _manager.wasUnreachable(dest); 
+        return _manager.wasUnreachable(dest); 
     }
     
     @Override
@@ -175,7 +173,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     @Override
     public short getReachabilityStatus() { 
-        if (_manager == null) return STATUS_UNKNOWN;
         if (!_netMonitorStatus)
             return STATUS_DISCONNECTED;
         short rv = _manager.getReachabilityStatus(); 
@@ -197,22 +194,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         // No, don't do this, it makes it almost impossible to build inbound tunnels
         //if (_context.router().isHidden())
         //    return Collections.EMPTY_SET;
-        Map<String, RouterAddress> addresses = null;
+        Map<String, RouterAddress> addresses = _manager.getAddresses();
         boolean newCreated = false;
-        
-        if (_manager != null) {
-            addresses = _manager.getAddresses();
-        } else {
-            addresses = new HashMap(1);
-            newCreated = true;
-        }
         
         if (!addresses.containsKey(NTCPTransport.STYLE)) {
             RouterAddress addr = createNTCPAddress(_context);
             if (_log.shouldLog(Log.INFO))
                 _log.info("NTCP address: " + addr);
-            if (addr != null)
+            if (addr != null) {
                 addresses.put(NTCPTransport.STYLE, addr);
+                newCreated = true;
+            }
         }
         
         if (_log.shouldLog(Log.INFO))

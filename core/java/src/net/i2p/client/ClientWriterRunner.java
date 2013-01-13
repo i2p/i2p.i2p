@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -20,10 +21,10 @@ import net.i2p.util.I2PAppThread;
  * @author zzz from net.i2p.router.client.ClientWriterRunner
  */
 class ClientWriterRunner implements Runnable {
-    private OutputStream _out;
-    private I2PSessionImpl _session;
-    private BlockingQueue<I2CPMessage> _messagesToWrite;
-    private static volatile long __Id = 0;
+    private final OutputStream _out;
+    private final I2PSessionImpl _session;
+    private final BlockingQueue<I2CPMessage> _messagesToWrite;
+    private static final AtomicLong __Id = new AtomicLong();
 
     private static final int MAX_QUEUE_SIZE = 32;
     private static final long MAX_SEND_WAIT = 10*1000;
@@ -33,7 +34,7 @@ class ClientWriterRunner implements Runnable {
         _out = new BufferedOutputStream(out);
         _session = session;
         _messagesToWrite = new LinkedBlockingQueue(MAX_QUEUE_SIZE);
-        Thread t = new I2PAppThread(this, "I2CP Client Writer " + (++__Id), true);
+        Thread t = new I2PAppThread(this, "I2CP Client Writer " + __Id.incrementAndGet(), true);
         t.start();
     }
 

@@ -61,6 +61,7 @@ public class MetaInfo
   private final byte[] piece_hashes;
   private final long length;
   private final boolean privateTorrent;
+  private final List<List<String>> announce_list;
   private Map<String, BEValue> infoMap;
 
   /**
@@ -69,9 +70,11 @@ public class MetaInfo
    *  @param announce may be null
    *  @param files null for single-file torrent
    *  @param lengths null for single-file torrent
+   *  @param announce_list may be null
    */
   MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
-           int piece_length, byte[] piece_hashes, long length, boolean privateTorrent)
+           int piece_length, byte[] piece_hashes, long length, boolean privateTorrent,
+           List<List<String>> announce_list)
   {
     this.announce = announce;
     this.name = name;
@@ -83,6 +86,7 @@ public class MetaInfo
     this.piece_hashes = piece_hashes;
     this.length = length;
     this.privateTorrent = privateTorrent;
+    this.announce_list = announce_list;
 
     // TODO if we add a parameter for other keys
     //if (other != null) {
@@ -139,6 +143,23 @@ public class MetaInfo
         this.announce = null;
     } else {
         this.announce = val.getString();
+    }
+
+    // BEP 12
+    val = m.get("announce-list");
+    if (val == null) {
+        this.announce_list = null;
+    } else {
+        this.announce_list = new ArrayList();
+        List<BEValue> bl1 = val.getList();
+        for (BEValue bev : bl1) {
+            List<BEValue> bl2 = bev.getList();
+            List<String> sl2 = new ArrayList();           
+            for (BEValue bev2 : bl2) {
+                sl2.add(bev2.getString());
+            }
+            this.announce_list.add(sl2);
+        }
     }
 
     val = m.get("info");
@@ -294,6 +315,15 @@ public class MetaInfo
   public String getAnnounce()
   {
     return announce;
+  }
+
+  /**
+   * Returns a list of lists of urls.
+   *
+   * @since 0.9.5
+   */
+  public List<List<String>> getAnnounceList() {
+    return announce_list;
   }
 
   /**
@@ -470,12 +500,13 @@ public class MetaInfo
   /**
    * Creates a copy of this MetaInfo that shares everything except the
    * announce URL.
+   * Drops any announce-list.
    */
   public MetaInfo reannounce(String announce)
   {
     return new MetaInfo(announce, name, name_utf8, files,
                         lengths, piece_length,
-                        piece_hashes, length, privateTorrent);
+                        piece_hashes, length, privateTorrent, null);
   }
 
   /**
@@ -486,6 +517,8 @@ public class MetaInfo
         Map m = new HashMap();
         if (announce != null)
             m.put("announce", announce);
+        if (announce_list != null)
+            m.put("announce-list", announce_list);
         Map info = createInfoMap();
         m.put("info", info);
         // don't save this locally, we should only do this once

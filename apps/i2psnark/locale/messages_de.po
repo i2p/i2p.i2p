@@ -10,12 +10,13 @@
 # ducki2p <ducki2p@gmail.com>, 2011.
 # foo <foo@bar>, 2009.
 # mixxy, 2011.
+#   <pirr@tormail.org>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 19:46+0000\n"
-"PO-Revision-Date: 2012-08-17 09:44+0000\n"
+"POT-Creation-Date: 2012-12-14 15:54+0000\n"
+"PO-Revision-Date: 2012-11-30 02:09+0000\n"
 "Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
@@ -23,7 +24,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../java/src/org/klomp/snark/MagnetURI.java:42
 #: ../java/src/org/klomp/snark/MagnetURI.java:52
@@ -135,15 +136,16 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:622
 msgid "Enabled DHT."
-msgstr ""
+msgstr "DHT eingeschaltet"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:624
 msgid "Disabled DHT."
-msgstr ""
+msgstr "DHT ausgeschaltet"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:626
 msgid "DHT change requires tunnel shutdown and reopen"
 msgstr ""
+"DHT-Änderungen bedürfen des anhaltens und erneuten Startens der Tunnel."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:633
 #, java-format
@@ -206,31 +208,32 @@ msgid "ERROR - No I2P trackers in private torrent \"{0}\""
 msgstr "Fehler - Keine I2P-Tracker im privaten Torrent {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:862
-#, fuzzy, java-format
+#, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and "
 "DHT only."
 msgstr ""
-"Warnung - keine I2P-Tracker in \"{0}\", werde nur bei I2P-OpenTrackern "
-"bekanntgeben"
+"Warnung - keine I2P-Tracker in \"{0}\", werde nur bei I2P-OpenTrackern und "
+"mittels DHT bekanntgeben"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:865
-#, fuzzy, java-format
+#, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will "
 "announce to DHT only."
 msgstr ""
-"Warnung - keine I2P-Tracker in \"{0}\", werde nur bei I2P-OpenTrackern "
-"bekanntgeben"
+"Warnung - keine I2P-internen Tracker in \"{0}\", und OpenTracker "
+"deaktiviert. Bekanntgabe erfolgt nur mittels DHT."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:867
-#, fuzzy, java-format
+#, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
 "disabled, you should enable open trackers or DHT before starting the torrent."
 msgstr ""
-"Warnung - keine I2P-Tracker in \"{0}\" gefunden. Stell sicher, dass "
-"OpenTracker aktiviert sind, bevor du diesen Torrent startest!"
+"Warnung - keine I2P-internen Tracker in \"{0}\", und as Benutzen von sowohl "
+"DHT alsauch OpenTracker sind deaktiviert. DHT oder OpenTracker sollten "
+"aktiviert werden, bevor du den Torrent startest."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:889
 #, java-format
@@ -262,14 +265,15 @@ msgid "Fetching {0}"
 msgstr "Hole {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:969
-#, fuzzy, java-format
+#, java-format
 msgid ""
 "Open trackers are disabled and we have no DHT peers. Fetch of {0} may not "
 "succeed until you start another torrent, enable open trackers, or enable DHT."
 msgstr ""
-"Wir haben keine gespeicherten Teilnehmer und keine anderen aktiven Torrents. "
-"Das Herunterladen von {0} kann nicht erfolgen, solange du keinen anderen "
-"Torrent startest."
+"Das Verwenden von OpenTrackern ist abgeschaltet und wir haben keine DHT-"
+"Gegenstellen. Das Herunterladen von {0} könnte scheitern, sofern kein "
+"anderer Torrent gestartet und die Verwendung von OpenTrackern oder DHT "
+"erlaubt wird."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:973
 #, java-format
@@ -351,9 +355,9 @@ msgid "Adding torrents in {0}"
 msgstr "Füge Torrents in {0} hinzu ..."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1428
-#, fuzzy, java-format
+#, java-format
 msgid "Up bandwidth limit is {0} KBps"
-msgstr "Minimales Limit der Upload-Bandbreite ist {0} kbyte/s."
+msgstr "Limit der Upload-Bandbreite ist {0} KByte/s."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1450
 #, java-format
@@ -407,21 +411,22 @@ msgstr "Der I2P-Tunnel wird nach Benachrichtigung der Tracker geschlossen."
 msgid "I2P tunnel closed."
 msgstr "I2P-Tunnel geschlossen."
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:227
+#: ../java/src/org/klomp/snark/TrackerClient.java:233
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr ""
+"Keine gültigen Tracker für {0}. Sollen OpenTracker und/oder DHT verwendet "
+"werden?"
 
 #: ../java/src/org/klomp/snark/UpdateHandler.java:49
 #: ../java/src/org/klomp/snark/UpdateRunner.java:227
-#, fuzzy
 msgid "Updating"
-msgstr "Starten"
+msgstr "Lade Aktualisierung ..."
 
 #: ../java/src/org/klomp/snark/UpdateRunner.java:114
 #, java-format
 msgid "Updating from {0}"
-msgstr ""
+msgstr "Lade Aktualisierung von {0}"
 
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:75
 #, java-format
@@ -596,11 +601,11 @@ msgstr[0] "1 verbundener Teilnehmer"
 msgstr[1] "{0} verbundene Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:474
-#, fuzzy, java-format
+#, java-format
 msgid "1 DHT peer"
 msgid_plural "{0} DHT peers"
-msgstr[0] "1 Teilnehmer"
-msgstr[1] "{0} Teilnehmern"
+msgstr[0] "eine DHT-Gegenstelle"
+msgstr[1] "{0} DHT-Gegenstellen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:567
 #, java-format
@@ -620,9 +625,9 @@ msgid "Torrent file deleted: {0}"
 msgstr "Torrentdatei gelöscht: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:638
-#, fuzzy, java-format
+#, java-format
 msgid "Download deleted: {0}"
-msgstr "vollständig heruntergeladen:\"{0}\""
+msgstr "Download gelöscht: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:652
 #, java-format
@@ -719,12 +724,12 @@ msgstr "Auf Default Tracker zurückgesetzt"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:993
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:994
 msgid "Checking"
-msgstr ""
+msgstr "Überprüfe"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:996
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:997
 msgid "Allocating"
-msgstr ""
+msgstr "Reserviere"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1009
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1016
@@ -1035,11 +1040,11 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1641
 msgid "Enable DHT"
-msgstr ""
+msgstr "DHT einschalten"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1645
 msgid "If checked, use DHT"
-msgstr ""
+msgstr "Wenn ausgewählt, wird DHT verwendet"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1661
 msgid "Inbound Settings"
@@ -1198,6 +1203,3 @@ msgstr "auslassen"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2250
 msgid "Save priorities"
 msgstr "Prioritäten speichern"
-
-#~ msgid "Invalid info hash in magnet URL {0}"
-#~ msgstr "ungültiger Infohash im Magnetlink {0}"

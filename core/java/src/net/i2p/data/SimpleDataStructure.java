@@ -69,7 +69,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         if (_data != null)
             throw new RuntimeException("Data already set");
         if (data != null && data.length != _length)
-            throw new IllegalArgumentException("Bad data length");
+            throw new IllegalArgumentException("Bad data length: " + data.length + "; required: " + _length);
         _data = data;
     }
 
@@ -141,7 +141,8 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     @Override
     public void fromByteArray(byte data[]) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
-        if (data.length != _length) throw new DataFormatException("Bad data length");
+        if (data.length != _length)
+            throw new DataFormatException("Bad data length: " + data.length + "; required: " + _length);
         // call setData() instead of _data = data in case overridden
         setData(data);
     }
@@ -182,6 +183,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if ((obj == null) || !(obj instanceof SimpleDataStructure)) return false;
         return DataHelper.eq(_data, ((SimpleDataStructure) obj)._data);
     }

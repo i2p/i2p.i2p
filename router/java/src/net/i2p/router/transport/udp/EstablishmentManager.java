@@ -611,7 +611,11 @@ class EstablishmentManager {
 
             Map.Entry<RemoteHostId, List<OutNetMessage>> entry = iter.next();
             // java 5 IllegalStateException here
-            iter.remove();
+            try {
+                iter.remove();
+            } catch (IllegalStateException ise) {
+                continue;
+            }
             RemoteHostId to = entry.getKey();
             List<OutNetMessage> allQueued = entry.getValue();
             List<OutNetMessage> queued = new ArrayList();

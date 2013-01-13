@@ -104,18 +104,6 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof ReportAbuseMessage)) {
-            ReportAbuseMessage msg = (ReportAbuseMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getSeverity(), msg.getSeverity())
-                   && DataHelper.eq(getReason(), msg.getReason()) && DataHelper.eq(getMessageId(), msg.getMessageId());
-        }
-         
-        return false;
-    }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

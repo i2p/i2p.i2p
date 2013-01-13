@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="java/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/i2p_sdk"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ministreaming"/>
+	<classpathentry kind="lib" path="/jetty/jettylib/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="/jetty/jettylib/jetty-util.jar"/>
+	<classpathentry kind="lib" path="/jetty/jettylib/org.mortbay.jetty.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="java/build/obj"/>
+</classpath>

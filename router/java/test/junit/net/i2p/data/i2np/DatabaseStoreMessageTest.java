@@ -8,6 +8,8 @@ package net.i2p.data.i2np;
  *
  */
 
+import org.junit.Test;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -25,14 +27,22 @@ public class DatabaseStoreMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(I2PAppContext.getGlobalContext());
         RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
-        msg.setKey(info.getIdentity().getHash());
         msg.setMessageExpiration(Clock.getInstance().now());
         msg.setUniqueId(666);
-        msg.setRouterInfo(info);
+        msg.setEntry(info);
         return msg;
     }
     
     public DataStructure createStructureToRead() { 
     	return new DatabaseStoreMessage(I2PAppContext.getGlobalContext()); 
+    }
+    
+    @Override
+    @Test
+    public void testStructure() throws Exception {
+        try {
+            super.testStructure();
+            fail("should not be supported");
+        } catch (UnsupportedOperationException expected){}
     }
 }

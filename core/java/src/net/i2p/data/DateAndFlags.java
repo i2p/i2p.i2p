@@ -116,6 +116,7 @@ public class DateAndFlags extends DataStructureImpl {
 
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof DateAndFlags)) return false;
         DateAndFlags daf = (DateAndFlags) object;
         return _date == daf._date && _flags == daf._flags;

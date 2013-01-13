@@ -1,3 +1,112 @@
+2013-01-12 zzz
+ * EepGet: Don't retry if proxy isn't there
+ * I2CP: Failsafe check for delivery job requeueing forever (ticket #819)
+ * jobs.jsp: Add table of pending jobs
+ * NetDB: Split up files into subdirectories
+ * SAM: Force i2cp.messageReliability=None (ticket #819)
+
+2013-01-02 zzz
+ * DataHelper: new getASCII() method
+ * DataStructures:
+   - Convert SessionTag.hashCode() to SipHash to prevent collision attacks
+   - Improve equals()
+ * I2CP:
+   - Remove unused equals() methods for message classes
+   - Remove static logs
+   - Fix leak if nonce = 0 but reliability != none (ticket #819)
+   - More work on failure codes (ticket #788)
+ * Logs: Fix setting log filename (ticket #805)
+ * SAM: Synchronize dissector
+ * Transport: Fix early NPE (ticket #824)
+
+2013-01-01 kytv
+ * Update Java Service Wrapper to v3.5.17 (ticket #826).
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
+      compat6x port.
+    - Linux x86, Linux x64, Linux ARMv5, Linux-PPC32, MacOSX & Solaris: Binares
+      are from the "community edition" deltapack offered by Tanuki. The Linux
+      binaries have been stripped.
+
+2012-12-29 zzz
+ * i2psnark: Redirect after post
+ * Javadocs: Fix javax links
+ * Tunnels: Handle duplicate tunnel IDs (ticket #812)
+
+2012-12-26 zzz
+ * I2CP:
+   - Prep for delivery of detailed failure codes to the client (ticket #788)
+   - Minor optimizations and cleanups
+ * i2psnark: Create torrent form tweaks
+ * NetDB: Split routerInfo files into subdirectories, disabled for now,
+   enable with router.networkDatabase.flat=false
+ * Stats: Clean up some duplicate createRateStat calls (ticket #787 comment 2)
+ * Tunnels: Catch rare BuildExecutor IAE only in Java 7 (ticket #811)
+
+2012-12-24 kytv
+ * Javadocs: Fix javadoc errors in the cybergarage package. Upstream bug #3598391 has been
+   filed for this issue.  If these javadoc fixes need to be reverted in the future,
+   MTN rev 5bdb7fc27e35f174001bd6105a502fd5094842e5 covers it.
+
+2012-12-22 zzz
+ * i2psnark: Add announce list support (BEP 12) (ticket #778)
+ * i2ptunnel: Add more tunnel quantity options for servers
+ * Jetty: Update to Apache Tomcat 6.0.36
+
+2012-12-22 kytv
+ * French language translation update from Transifex
+
+2012-12-19 zzz
+ * Update: Hide the update buttons when router.updateDisabled=true, as is the case
+   for Debian packages. Broken in 0.9.4. (Ticket #817)
+
+* 2012-12-17 0.9.4 released
+
+2012-12-14 kytv
+ * German and Swedish translation updates from Transifex
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2012-12-04
+
+2012-12-11 zzz
+ * Wrapper: Use Tanuki's binary for armv7
+
+2012-12-08 zzz
+ * susimail: Button CSS tweak
+
+2012-12-07 zzz
+ * RouterClock: Reduce log level (ticket #790)
+
+2012-12-05 zzz
+ * GarlicMessage: Fix notes and log in GarlicMessageHandler and HandleGarlicMessageJob,
+   they are used for netdb messages received by floodfills http://zzz.i2p/topics/1282
+ * I2CP: Fix external I2CP apps, including i2ping, caused by 0 nonce value,
+   broken in 0.9.2 (tickets #799, #801). Allow nonces == 0.
+ * Reseed: Don't go on to the next host if we have enough http://zzz.i2p/topics/1287
+ * SSU: Fix rare NPE (ticket #798)
+
+2012-11-28 kytv
+ * Chinese, French, Italian, Polish, and Ukrainian translation updates from
+   Transifex.
+
+2012-11-24 zzz
+ * Addressbook: Disable unused wakeup via http
+ * Codel: Make stats non-required (ticket #786)
+ * Profiles: Small optimization in coalesceOnly() (ticket #765)
+
+2012-11-21 zzz
+ * Wrapper: Add armv6 files for Raspberry Pi
+
+2012-11-21 kytv
+ * Update Java Service Wrapper to v3.5.16.
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
+      compat6x port.
+    - Linux PPC32: Self-compiled in Debian Squeeze
+    - Linux x86, Linux x64, Linux ARMv5, MacOSX & Solaris: Binares are from the
+      "community edition" deltapack offered by Tanuki. The Linux binaries have
+      been stripped.
+
 2012-11-20 zzz
  * Transport: Fix bug that inadvertently reduced default max
    SSU connections in 0.9.2, thus reducing tunnel build success rates
@@ -235,7 +344,7 @@
  * configlogging.jsp: Fix IAE
  * error500.jsp: Fix whitespace
  * i2psnark:
-   - Add allocating and checking indications
+   - Add allocating and checking indications (ticket #695)
    - Add bandwidth message at startup
    - More checks at torrent creation
  * SSU:

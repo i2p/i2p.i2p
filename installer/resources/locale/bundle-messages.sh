@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Update messages_xx.po and .mo files
 # Requires installed programs xgettext, msgfmt, msgmerge, and find.

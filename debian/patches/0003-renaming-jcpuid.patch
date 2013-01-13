@@ -3,12 +3,14 @@ Date: Tue, 24 May 2011 21:26:10 +0000
 Subject: rename jcpuid
 
 ---
- core/c/jcpuid/build.sh |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ core/c/jcpuid/build.sh |    8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
+diff --git a/core/c/jcpuid/build.sh b/core/c/jcpuid/build.sh
+index f3fc9c2..cbd0934 100755
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
-@@ -67,12 +67,8 @@
+@@ -67,12 +67,8 @@ case `uname -s` in
                  exit 0;;
          esac
  

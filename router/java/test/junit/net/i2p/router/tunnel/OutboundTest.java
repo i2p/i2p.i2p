@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.router.RouterContext;
 
 /**
  * Quick unit test for base functionality of outbound tunnel 
@@ -19,10 +20,10 @@ import net.i2p.data.Hash;
  *
  */
 public class OutboundTest extends TestCase{
-    private I2PAppContext _context;
+    private RouterContext _context;
     
     public void setUp() {
-        _context = I2PAppContext.getGlobalContext();
+        _context = new RouterContext(null);
     }
     
     public void testOutbound() {
@@ -56,7 +57,7 @@ public class OutboundTest extends TestCase{
             _context.random().nextBytes(tunnelIds[i]);
         }
         
-        TunnelCreatorConfig config = new TunnelCreatorConfig(numHops, false);
+        TunnelCreatorConfig config = new TunnelCreatorConfig(_context, numHops, false);
         for (int i = 0; i < numHops; i++) {
         	config.setPeer(i, peers[i]);
             HopConfig cfg = config.getConfig(i);

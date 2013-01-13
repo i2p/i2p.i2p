@@ -230,10 +230,12 @@ public class NewsHelper extends ContentHelper {
      *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean dontInstall(RouterContext ctx) {
+        boolean disabled = ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED);
+        if (disabled)
+            return true;
         File test = new File(ctx.getBaseDir(), "history.txt");
         boolean readonly = ((test.exists() && !test.canWrite()) || (!ctx.getBaseDir().canWrite()));
-        boolean disabled = ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED);
-        return readonly || disabled;
+        return readonly;
     }
 
     /**

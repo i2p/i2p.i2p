@@ -21,6 +21,9 @@
         </depend>
     </target>
 
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
     <property name="javac.compilerargs" value="" />
     <property name="require.gettext" value="true" />
 
@@ -84,7 +87,7 @@
         </condition>
     </target>
 
-    <target name="bundle" depends="compile, precompilejsp">
+    <target name="bundle" depends="compile, precompilejsp" unless="no.bundle">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >

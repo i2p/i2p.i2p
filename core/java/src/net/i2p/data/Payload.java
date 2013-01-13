@@ -105,6 +105,7 @@ public class Payload extends DataStructureImpl {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof Payload)) return false;
         Payload p = (Payload) object;
         return DataHelper.eq(_unencryptedData, p.getUnencryptedData())

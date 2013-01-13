@@ -8,6 +8,11 @@ the Izpack based installer.
 Non-applicable sections (e.g., portable & windows) are also removed for the
 Debian wrapper.config to try to prevent confusion.
 ---
+ installer/resources/eepget         |    2 +-
+ installer/resources/i2prouter      |   82 ++++--------------------------------
+ installer/resources/runplain.sh    |    4 +-
+ installer/resources/wrapper.config |   70 ++++++------------------------
+ 4 files changed, 24 insertions(+), 134 deletions(-)
 
 --- a/installer/resources/eepget
 +++ b/installer/resources/eepget
@@ -29,7 +34,7 @@ Debian wrapper.config to try to prevent confusion.
  # You shall use it only in accordance with the terms of the
 @@ -24,16 +24,9 @@
  # These settings can be modified to fit the needs of your application
- # Optimized for use with version 3.5.14 of the Wrapper.
+ # Optimized for use with version 3.5.17 of the Wrapper.
  
 -# Paths
 -# Note that (percent)INSTALL_PATH, (percent)USER_HOME,  and (percent)SYSTEM_java_io_tmpdir
@@ -58,7 +63,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -173,48 +166,6 @@
+@@ -167,48 +160,6 @@
  # Workaround for Gentoo
  JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
  
@@ -87,7 +92,7 @@ Debian wrapper.config to try to prevent confusion.
 -}
 -
 -failed() {
--        echo "**Failed to load the wrapper**"
+-        echo "**`gettext 'Failed to load the wrapper'`**"
 -        case `uname -s` in
 -             FreeBSD)
 -                echo
@@ -107,9 +112,9 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -908,9 +859,6 @@
+@@ -912,9 +863,6 @@
          # The string passed to eval must handles spaces in paths correctly.
-         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
+         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.17 $ADDITIONAL_PARA"
          eval $COMMAND_LINE
 -        if [ "$?" -ne "0" ]; then
 -                failed
@@ -117,9 +122,9 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1034,9 +982,6 @@
+@@ -1038,9 +986,6 @@
          # The string passed to eval must handles spaces in paths correctly.
-         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
+         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.17 $ADDITIONAL_PARA"
          eval $COMMAND_LINE
 -        if [ "$?" -ne "0" ]; then
 -                failed
@@ -127,7 +132,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1877,18 +1822,9 @@
+@@ -1850,18 +1795,9 @@
              status
              ;;
  
@@ -218,9 +223,9 @@ Debian wrapper.config to try to prevent confusion.
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -144,11 +136,7 @@
+@@ -143,11 +135,7 @@
+ # You may wish to change this.
  # NOTE: On Linux/Mac this is overridden in the i2prouter script; changes here will have no effect.
- # Windows users may wish to change this to %APPDATA%\I2P\wrapper.log
  # System temp directory:
 -wrapper.logfile=$SYSTEM_java_io_tmpdir/wrapper.log
 -# PORTABLE installation:
@@ -231,7 +236,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -218,11 +206,7 @@
+@@ -217,11 +205,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -244,7 +249,7 @@ Debian wrapper.config to try to prevent confusion.
  #
  # From i2prouter:
  #
-@@ -236,10 +220,7 @@
+@@ -235,10 +219,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -256,7 +261,7 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -256,30 +237,3 @@
+@@ -255,30 +236,3 @@
  wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=077

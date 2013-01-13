@@ -81,7 +81,7 @@ public class RouterInfo extends DatabaseEntry {
     public static final String BW_CAPABILITY_CHARS = "KLMNO";
     
     public RouterInfo() {
-        _addresses = new ArrayList(2);
+        _addresses = new ArrayList<RouterAddress>(2);
         _options = new OrderedProperties();
     }
 
@@ -588,6 +588,7 @@ public class RouterInfo extends DatabaseEntry {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof RouterInfo)) return false;
         RouterInfo info = (RouterInfo) object;
         return DataHelper.eq(_identity, info.getIdentity())

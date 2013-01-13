@@ -83,6 +83,7 @@ public class KeysAndCert extends DataStructureImpl {
     
     @Override
     public boolean equals(Object object) {
+        if (object == this) return true;
         if ((object == null) || !(object instanceof KeysAndCert)) return false;
         KeysAndCert  ident = (KeysAndCert) object;
         return DataHelper.eq(_certificate, ident._certificate)

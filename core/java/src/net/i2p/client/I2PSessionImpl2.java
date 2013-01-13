@@ -309,7 +309,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         
         //if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
         
-        long nonce = _context.random().nextInt(Integer.MAX_VALUE);
+        long nonce = _context.random().nextInt(Integer.MAX_VALUE - 1) + 1;
         //if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
         MessageState state = new MessageState(_context, nonce, getPrefix());
         //state.setKey(key);

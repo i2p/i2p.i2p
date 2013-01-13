@@ -10,29 +10,40 @@ package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
-import net.i2p.I2PAppContext;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static junit.framework.TestCase.*;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.RouterContext;
 
 /**
  * Simple test to see if the fragmentation is working, testing the preprocessor,
  * FragmentHandler, and FragmentedMessage operation.
  *
  */
-public class FragmentTest extends TestCase{
-    protected I2PAppContext _context;
+public class FragmentTest {
     
-    public void setUp() {
-        _context = I2PAppContext.getGlobalContext();
+    protected static RouterContext _context;
+    
+    @BeforeClass
+    public static void globalSetUp() {
+        _context = new RouterContext(null);
+    }
+    
+    @Before
+    public void set() {
         _context.random().nextBoolean();
         FragmentHandler.MAX_DEFRAGMENT_TIME = 10*1000;
     }
     
-    protected TunnelGateway.QueuePreprocessor createPreprocessor(I2PAppContext ctx) {
+    protected TunnelGateway.QueuePreprocessor createPreprocessor(RouterContext ctx) {
         return new TrivialPreprocessor(ctx);
     }
     
@@ -40,8 +51,9 @@ public class FragmentTest extends TestCase{
      * Send a message that fits inside a single fragment through
      *
      */
+    @Test
     public void testSingle() {
-        TunnelGateway.Pending pending = createPending(949, false, false);
+        PendingGatewayMessage pending = createPending(949, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
 
@@ -51,22 +63,20 @@ public class FragmentTest extends TestCase{
         FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
-        
-        boolean keepGoing = true;
-        while (keepGoing) {
-            keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
-            if (keepGoing)
-                try { Thread.sleep(100); } catch (InterruptedException ie) {}
-        }
-        assertTrue(handleReceiver.receivedOk());
+
+        try {
+            pre.preprocessQueue(messages, new SenderImpl(), receiver);
+            fail("should have thrown IAE");
+        } catch (IllegalArgumentException expected){}
     }
     
     /**
      * Send a message with two fragments through with no delay
      *
      */
-    public void testMultiple() {
-        TunnelGateway.Pending pending = createPending(2048, false, false);
+    @Test
+    public void testMultiple() throws Exception {
+        PendingGatewayMessage pending = createPending(2048, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
         
@@ -77,13 +87,10 @@ public class FragmentTest extends TestCase{
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
             
-        boolean keepGoing = true;
-        while (keepGoing) {
-            keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
-            if (keepGoing)
-                try { Thread.sleep(100); } catch (InterruptedException ie) {}
-        }
-        assertTrue(handleReceiver.receivedOk());
+        try {
+            pre.preprocessQueue(messages, new SenderImpl(), receiver);
+            fail("should have thrown IAE");
+        } catch (IllegalArgumentException expected){}
     }
     
     /**
@@ -92,7 +99,7 @@ public class FragmentTest extends TestCase{
      *
      */
     public void runDelayed() {
-        TunnelGateway.Pending pending = createPending(2048, false, false);
+        PendingGatewayMessage pending = createPending(2048, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
@@ -118,7 +125,7 @@ public class FragmentTest extends TestCase{
     }
     
     protected boolean runVaried(int size, boolean includeRouter, boolean includeTunnel) {
-        TunnelGateway.Pending pending = createPending(size, includeRouter, includeTunnel);
+        PendingGatewayMessage pending = createPending(size, includeRouter, includeTunnel);
         ArrayList messages = new ArrayList();
         messages.add(pending);
         
@@ -139,7 +146,7 @@ public class FragmentTest extends TestCase{
         return handleReceiver.receivedOk();
     }
     
-    protected TunnelGateway.Pending createPending(int size, boolean includeRouter, boolean includeTunnel) {
+    protected PendingGatewayMessage createPending(int size, boolean includeRouter, boolean includeTunnel) {
         DataMessage m = new DataMessage(_context);
         byte data[] = new byte[size];
         _context.random().nextBytes(data);
@@ -155,12 +162,12 @@ public class FragmentTest extends TestCase{
         }
         if (includeTunnel)
             toTunnel = new TunnelId(_context.random().nextLong(TunnelId.MAX_ID_VALUE));
-        return new TunnelGateway.Pending(m, toRouter, toTunnel);
+        return new PendingGatewayMessage(m, toRouter, toTunnel);
     }
     
     protected class SenderImpl implements TunnelGateway.Sender {
-        public void sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
-            receiver.receiveEncrypted(preprocessed);
+        public long sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
+            return receiver.receiveEncrypted(preprocessed);
         }
     }
     protected class ReceiverImpl implements TunnelGateway.Receiver {
@@ -170,17 +177,23 @@ public class FragmentTest extends TestCase{
             _handler = handler; 
             _delay = delay;
         }
-        public void receiveEncrypted(byte[] encrypted) {
+        public long receiveEncrypted(byte[] encrypted) {
             _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
             try { Thread.sleep(_delay); } catch (Exception e) {}
+            return -1; // or do we need to return the real message ID?
+        }
+        @Override
+        public Hash getSendTo() {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
     
     protected class DefragmentedReceiverImpl implements FragmentHandler.DefragmentedReceiver {
-        private byte _expected[];
-        private byte _expected2[];
-        private byte _expected3[];
-        private int _received;
+        private volatile byte _expected[];
+        private volatile byte _expected2[];
+        private volatile byte _expected3[];
+        private volatile int _received;
         public DefragmentedReceiverImpl(byte expected[]) {
             this(expected, null);
         }

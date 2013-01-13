@@ -61,7 +61,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     private Resource _resourceBase;
     private String _themePath;
     private String _imgPath;
-    private String _lastAnnounceURL = "";
+    private String _lastAnnounceURL;
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
  
@@ -188,10 +188,14 @@ public class I2PSnarkServlet extends DefaultServlet {
                 } else {
                     String base = URIUtil.addPaths(req.getRequestURI(), "/");
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
-                    if (listing != null)
+                    if (method.equals("POST")) {
+                        // P-R-G
+                        sendRedirect(req, resp, "");
+                    } else if (listing != null) {
                         resp.getWriter().write(listing);
-                    else // shouldn't happen
+                    } else { // shouldn't happen
                         resp.sendError(404);
+                    }
                 }
             } else {
                 super.service(req, resp);
@@ -209,6 +213,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                 processRequest(req);
             else  // nonce is constant, shouldn't happen
                 _manager.addMessage("Please retry form submission (bad nonce)");
+            // P-R-G (or G-R-G to hide the params from the address bar)
+            sendRedirect(req, resp, peerString);
+            return;	
         }
         
         PrintWriter out = resp.getWriter();
@@ -730,18 +737,54 @@ public class I2PSnarkServlet extends DefaultServlet {
                 //if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
                 //    announceURL = announceURLOther;
 
-                if (announceURL == null || announceURL.length() <= 0)
-                    _manager.addMessage(_("Error creating torrent - you must select a tracker"));
-                else if (baseFile.exists()) {
-                    _lastAnnounceURL = announceURL;
+                if (baseFile.exists()) {
                     if (announceURL.equals("none"))
                         announceURL = null;
+                    _lastAnnounceURL = announceURL;
+                    List<String> backupURLs = new ArrayList();
+                    Enumeration e = req.getParameterNames();
+                    while (e.hasMoreElements()) {
+                         Object o = e.nextElement();
+                         if (!(o instanceof String))
+                             continue;
+                         String k = (String) o;
+                        if (k.startsWith("backup_")) {
+                            String url = k.substring(7);
+                            if (!url.equals(announceURL))
+                                backupURLs.add(url);
+                        }
+                    }
+                    List<List<String>> announceList = null;
+                    if (!backupURLs.isEmpty()) {
+                        // BEP 12 - Put primary first, then the others, each as the sole entry in their own list
+                        if (announceURL == null) {
+                            _manager.addMessage(_("Error - Cannot include alternate trackers without a primary tracker"));
+                            return;
+                        }
+                        backupURLs.add(0, announceURL);
+                        boolean hasPrivate = false;
+                        boolean hasPublic = false;
+                        for (String url : backupURLs) {
+                            if (_manager.getPrivateTrackers().contains(announceURL))
+                                hasPrivate = true;
+                            else
+                                hasPublic = true;
+                        }
+                        if (hasPrivate && hasPublic) {
+                            _manager.addMessage(_("Error - Cannot mix private and public trackers in a torrent"));
+                            return;
+                        }
+                        announceList = new ArrayList(backupURLs.size());
+                        for (String url : backupURLs) {
+                            announceList.add(Collections.singletonList(url));
+                        }
+                    }
                     try {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
                         // TODO thread it for big torrents, perhaps a la FetchAndAdd
                         boolean isPrivate = _manager.getPrivateTrackers().contains(announceURL);
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, isPrivate, null);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, announceList, isPrivate, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -769,6 +812,22 @@ public class I2PSnarkServlet extends DefaultServlet {
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }
+    }
+
+    /**
+     *  Redirect a POST to a GET (P-R-G), preserving the peer string
+     *  @since 0.9.5
+     */
+    private void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String p) throws IOException {
+        String url = req.getRequestURL().toString();
+        StringBuilder buf = new StringBuilder(128);
+        if (url.endsWith("_post"))
+            url = url.substring(0, url.length() - 5);
+        buf.append(url);
+        if (p.length() > 0)
+            buf.append('?').append(p);
+        resp.setHeader("Location", buf.toString());
+        resp.sendError(302, "Moved");
     }
 
     /** @since 0.9 */
@@ -996,6 +1055,8 @@ public class I2PSnarkServlet extends DefaultServlet {
             statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
                            "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Allocating");
         } else if (err != null && curPeers == 0) {
+            // Also don't show if seeding... but then we won't see the not-registered error
+            //       && remaining != 0 && needed != 0) {
             // let's only show this if we have no peers, otherwise PEX and DHT should bail us out, user doesn't care
             //if (isRunning && curPeers > 0 && !showPeers)
             //    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
@@ -1372,6 +1433,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /**
+     *  Start of anchor only, caller must add anchor text or img and close anchor
      *  @return string or null
      *  @since 0.8.4
      */
@@ -1399,6 +1461,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /**
+     *  Full anchor with img
      *  @return string or null
      *  @since 0.8.4
      */
@@ -1412,6 +1475,29 @@ public class I2PSnarkServlet extends DefaultServlet {
             return buf.toString();
         }
         return null;
+    }
+
+    /**
+     *  Full anchor with shortened URL as anchor text
+     *  @return string, non-null
+     *  @since 0.9.5
+     */
+    private String getShortTrackerLink(String announce, byte[] infohash) {
+        StringBuilder buf = new StringBuilder(128);
+        String trackerLinkUrl = getTrackerLinkUrl(announce, infohash);
+        if (trackerLinkUrl != null)
+            buf.append(trackerLinkUrl);
+        if (announce.startsWith("http://"))
+            announce = announce.substring(7);
+        int slsh = announce.indexOf('/');
+        if (slsh > 0)
+            announce = announce.substring(0, slsh);
+        if (announce.length() > 67)
+            announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
+        buf.append(announce);
+        if (trackerLinkUrl != null)
+            buf.append("</a>");
+        return buf.toString();
     }
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -1482,33 +1568,43 @@ public class I2PSnarkServlet extends DefaultServlet {
                   + "\" title=\"");
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
-        out.write(_("Tracker"));
-        out.write(":<td><select name=\"announceURL\"><option value=\"\">");
-        out.write(_("Select a tracker"));
-        out.write("</option>\n");
-        // todo remember this one with _lastAnnounceURL also
-        out.write("<option value=\"none\">");
-        //out.write(_("Open trackers and DHT only"));
-        out.write(_("Open trackers only"));
-        out.write("</option>\n");
+        out.write(_("Trackers"));
+        out.write(":<td><table style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
+        out.write(_("Primary"));
+        out.write("</td><td align=\"center\">");
+        out.write(_("Alternates"));
+        out.write("</td><td rowspan=\"0\">" +
+                  " <input type=\"submit\" class=\"create\" value=\"");
+        out.write(_("Create torrent"));
+        out.write("\" name=\"foo\" >" +
+                  "</td></tr>\n");
         for (Tracker t : sortedTrackers) {
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
+            out.write("<tr><td>");
+            out.write(name);
+            out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
+            out.write(announceURL);
+            out.write("\"");
             if (announceURL.equals(_lastAnnounceURL))
-                announceURL += "\" selected=\"selected";
-            out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
+                out.write(" checked");
+            out.write("></td><td align=\"center\"><input type=\"checkbox\" name=\"backup_");
+            out.write(announceURL);
+            out.write("\" value=\"foo\"></td></tr>\n");
         }
-        out.write("</select>\n");
+        out.write("<tr><td><i>");
+        out.write(_("none"));
+        out.write("</i></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
+        if (_lastAnnounceURL == null)
+            out.write(" checked");
+        out.write("></td><td></td></tr></table>\n");
         // make the user add a tracker on the config form now
         //out.write(_("or"));
         //out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
         //          "title=\"");
         //out.write(_("Specify custom tracker announce URL"));
         //out.write("\" > " +
-        out.write(" <input type=\"submit\" class=\"create\" value=\"");
-        out.write(_("Create torrent"));
-        out.write("\" name=\"foo\" >\n" +
-                  "</td></tr>" +
+        out.write("</td></tr>" +
                   "</table>\n" +
                   "</form></div></div>");        
     }
@@ -1695,10 +1791,11 @@ public class I2PSnarkServlet extends DefaultServlet {
         out.write(_("I2CP options"));
         out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" spellcheck=\"false\" >"
                   + opts.toString() + "</textarea><br>\n" +
-
+                  "<tr><td colspan=\"2\">&nbsp;\n" +  // spacer
                   "<tr><td>&nbsp;<td><input type=\"submit\" class=\"accept\" value=\"");
         out.write(_("Save configuration"));
         out.write("\" name=\"foo\" >\n" +
+                  "<tr><td colspan=\"2\">&nbsp;\n" +  // spacer
                   "</table></div></div></form>");
     }
     
@@ -1764,6 +1861,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                    "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
                    "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
                    "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\"></td></tr>\n" +
+                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
                    "<tr><td colspan=\"2\"></td><td colspan=\"4\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
@@ -1771,7 +1869,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
-                   "</td></tr></table></div></div></form>\n");
+                   "</td></tr>" +
+                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
+                   "</table></div></div></form>\n");
         out.write(buf.toString());
     }
 
@@ -1928,7 +2028,7 @@ public class I2PSnarkServlet extends DefaultServlet {
      * @param base The base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
-     * @return String of HTML
+     * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
     private String getListHTML(Resource r, String base, boolean parent, Map postParams)
@@ -1940,8 +2040,6 @@ public class I2PSnarkServlet extends DefaultServlet {
             Arrays.sort(ls, Collator.getInstance());
         }  // if r is not a directory, we are only showing torrent info section
         
-        StringBuilder buf=new StringBuilder(4096);
-        buf.append(DOCTYPE + "<HTML><HEAD><TITLE>");
         String title = URIUtil.decodePath(base);
         if (title.startsWith("/i2psnark/"))
             title = title.substring("/i2psnark/".length());
@@ -1955,9 +2053,14 @@ public class I2PSnarkServlet extends DefaultServlet {
             torrentName = title;
         Snark snark = _manager.getTorrentByBaseName(torrentName);
 
-        if (snark != null && postParams != null)
+        if (snark != null && postParams != null) {
+            // caller must P-R-G
             savePriorities(snark, postParams);
+            return null;
+        }
 
+        StringBuilder buf=new StringBuilder(4096);
+        buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         String directory = title;
@@ -1998,20 +2101,26 @@ public class I2PSnarkServlet extends DefaultServlet {
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
                         buf.append(trackerLink).append(' ');
-                    buf.append("<b>").append(_("Tracker")).append(":</b> ");
-                    String trackerLinkUrl = getTrackerLinkUrl(announce, snark.getInfoHash());
-                    if (trackerLinkUrl != null)
-                        buf.append(trackerLinkUrl);
-                    if (announce.startsWith("http://"))
-                        announce = announce.substring(7);
-                    int slsh = announce.indexOf('/');
-                    if (slsh > 0)
-                        announce = announce.substring(0, slsh);
-                    if (announce.length() > 67)
-                        announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
-                    buf.append(announce);
-                    if (trackerLinkUrl != null)
-                        buf.append("</a>");
+                    buf.append("<b>").append(_("Primary Tracker")).append(":</b> ");
+                    buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
+                    buf.append("</td></tr>");
+                }
+                List<List<String>> alist = meta.getAnnounceList();
+                if (alist != null) {
+                    buf.append("<tr><td><b>");
+                    buf.append(_("Tracker List")).append(":</b> ");
+                    for (List<String> alist2 : alist) {
+                        buf.append('[');
+                        boolean more = false;
+                        for (String s : alist2) {
+                            if (more)
+                                buf.append(' ');
+                            else
+                                more = true;
+                            buf.append(getShortTrackerLink(s, snark.getInfoHash()));
+                        }
+                        buf.append("] ");
+                    }
                     buf.append("</td></tr>");
                 }
             }

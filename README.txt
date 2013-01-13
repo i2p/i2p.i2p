@@ -32,7 +32,7 @@ FAQ:
 
 Need help?
 	IRC irc.freenode.net #i2p
-	http://forum.i2p2.de/
+	http://forum.i2p/
 
 Licenses:
 	See LICENSE.txt

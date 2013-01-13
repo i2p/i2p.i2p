@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 19:51+0000\n"
+"POT-Creation-Date: 2012-12-21 22:40+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -375,7 +375,7 @@ msgstr ""
 msgid "I2P tunnel closed."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:227
+#: ../java/src/org/klomp/snark/TrackerClient.java:233
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr ""

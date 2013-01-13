@@ -79,11 +79,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
 
     public I2PTunnelIRCServer(InetAddress host, int port, File privkey, String privkeyname, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privkey, privkeyname, l, notifyThis, tunnel);
-        initCloak(tunnel);
-    }
 
-    /** generate a random 32 bytes, or the hash of the passphrase */
-    private void initCloak(I2PTunnel tunnel) {
+        // generate a random 32 bytes, or the hash of the passphrase
+
         // get the properties of this server-tunnel
         Properties opts = tunnel.getClientOptions();
         
@@ -236,9 +234,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
         return buf.toString();
     }
     
-    private byte[] cloakKey; // 32 bytes of stuff to scramble the dest with
-    private String hostname;
-    private String method;
-    private String webircPassword;
-	private String webircSpoofIP;
+    private final byte[] cloakKey; // 32 bytes of stuff to scramble the dest with
+    private final String hostname;
+    private final String method;
+    private final String webircPassword;
+    private final String webircSpoofIP;
 }

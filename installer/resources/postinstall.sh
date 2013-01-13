@@ -40,8 +40,13 @@ X86_64=`echo "${OS_ARCH}" | grep x86_64`
 
 case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
+        # Tanuki-built arm wrapper works on armv5 and armv7 but not on Raspberry Pi armv6.
+        # Wrapper we built for Raspberry Pi does not work on Trimslice armv7.
         if [ `echo $OS_ARCH |grep armv7` ]; then
-            wrapperpath="./lib/wrapper/linux-armv7"
+            wrapperpath="./lib/wrapper/linux-armv5"
+            cp ${wrapperpath}/libwrapper.so ./lib/
+        elif [ `echo $OS_ARCH |grep armv6` ]; then
+            wrapperpath="./lib/wrapper/linux-armv6"
             cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ `echo $OS_ARCH |grep arm` ]; then
             wrapperpath="./lib/wrapper/linux-armv5"
@@ -112,12 +117,11 @@ rm -f ./lib/*.dll
 rm -f ./*.bat
 rm -f ./*.cmd
 rm -f ./*.exe
-rm -rf ./installer
+rm -rf ./utility.jar
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -rf ./Start\ I2P\ Router.app
-    rm -f install_i2p_service_osx.command
-    rm -f install_i2p_service_osx.command
+    rm -f *i2p_service_osx.command
     rm -f net.i2p.router.plist.template
     #rm -f I2P\ Router\ Console.webloc
 fi

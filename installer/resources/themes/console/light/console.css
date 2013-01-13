@@ -509,9 +509,11 @@ div.configure h3, div.graphspanel h3 {
      text-align: left;
 }
 
-.sidebarconf input[type="image"] {
+.sidebarconf button {
      margin: 2px;
-     padding: 1px;     
+     padding: 1px;
+     min-width: 0;
+     background: none;
 }
 
 .sidebarconf th:nth-child(1) {

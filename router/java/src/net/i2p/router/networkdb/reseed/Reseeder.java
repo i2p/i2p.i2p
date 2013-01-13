@@ -75,6 +75,7 @@ public class Reseeder {
     public static final String DEFAULT_SSL_SEED_URL =
               "https://netdb.i2p2.de/" + "," +
               "https://reseed.i2p-projekt.de/" + "," +
+              "https://euve5653.vserver.de/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
@@ -273,6 +274,9 @@ public class Reseeder {
                 int dl = reseedOne(url, echoStatus);
                 if (dl > 0) {
                     total += dl;
+                    // Don't go on to the next URL if we have enough
+                    if (total >= 100)
+                        break;
                     // remove alternate version if we haven't tried it yet
                     String alt;
                     if (url.startsWith("http://"))
@@ -392,9 +396,6 @@ public class Reseeder {
 
                 if (fetched > 0)
                     _context.netDb().rescan();
-                // Don't go on to the next URL if we have enough
-                if (fetched >= 100)
-                    _isRunning = false;
                 return fetched;
             } catch (Throwable t) {
                 _log.warn("Error reseeding", t);

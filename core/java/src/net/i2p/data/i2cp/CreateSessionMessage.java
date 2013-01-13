@@ -70,17 +70,6 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
-    @Override
-    public boolean equals(Object object) {
-        if ((object != null) && (object instanceof CreateSessionMessage)) {
-            CreateSessionMessage msg = (CreateSessionMessage) object;
-            return DataHelper.eq(_sessionConfig, msg.getSessionConfig());
-        }
-            
-        return false;
-    }
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

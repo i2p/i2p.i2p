@@ -1,11 +1,13 @@
 package net.i2p.client.naming;
 
 import junit.framework.TestCase;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,26 +21,41 @@ import net.i2p.data.Destination;
 public class BlockfileNamingServiceTest extends TestCase {
     BlockfileNamingService _bns;
     List<String> _names;
+    File hostsTxt, routerDir;
 
-    public void setUp() {
+    public void setUp() throws Exception {
         I2PAppContext ctx = new I2PAppContext();
-        _bns = new BlockfileNamingService(ctx);
-        _names = null;
+        routerDir = ctx.getRouterDir();
+        
+        // first load the list of hosts that will be queried
+        InputStream is = getClass().getResourceAsStream("/hosts.txt");
         Properties props = new Properties();
-        try {
-            DataHelper.loadProps(props, new File("../../installer/resources/hosts.txt"), true);
-            _names = new ArrayList(props.keySet());
-            Collections.shuffle(_names);
-        } catch (IOException ioe) {
-            _bns.shutdown();
-            return;
-        }
+        assertNotNull("test classpath not set correctly",is);
+        DataHelper.loadProps(props, is, true);
+        _names = new ArrayList(props.keySet());
+        Collections.shuffle(_names);
+        is.close();
+        
+        // then copy the hosts.txt file so that the naming service can load them
+        hostsTxt = new File(routerDir, "hosts.txt");
+        OutputStream os = new BufferedOutputStream(new FileOutputStream(hostsTxt));
+        is = getClass().getResourceAsStream("/hosts.txt");
+        byte [] b = new byte[8196];
+        int read = 0;
+        while ((read = is.read(b)) > 0 )
+            os.write(b,0,read);
+        os.flush(); os.close();
+        _bns = new BlockfileNamingService(ctx);
     }
 
     public void tearDown() {
         _bns.shutdown();
-        File f = new File("hostsdb.blockfile");
-        f.delete();
+        if (routerDir != null) {
+            File f = new File(routerDir,"hostsdb.blockfile");
+            f.delete();
+        }
+        if (hostsTxt != null)
+            hostsTxt.delete();
     }
 
     public void testRepeatedLookup() throws Exception{

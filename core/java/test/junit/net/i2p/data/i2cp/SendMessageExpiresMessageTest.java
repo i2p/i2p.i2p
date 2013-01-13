@@ -42,26 +42,4 @@ import net.i2p.data.DateAndFlagsTest;
     }
     public DataStructure createStructureToRead() { return new SendMessageExpiresMessage(); }  
     
-    public void testStructure() throws Exception{
-        byte[] temp = null;
-        
-        DataStructure orig;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
-        orig = createDataStructure();
-        orig.writeBytes(baos);
-        
-        
-        temp = baos.toByteArray();
-        
-        DataStructure ds;
-        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        
-        ds = createStructureToRead();
-        ds.readBytes(bais);
-        ((SendMessageExpiresMessage)ds).getPayload().setUnencryptedData(((SendMessageExpiresMessage)ds).getPayload().getEncryptedData());
-        
-        assertEquals(orig, ds);
-    }
-    
 }
