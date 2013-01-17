@@ -135,6 +135,7 @@ trans.uk_UA = debian/po/uk.po
 source_file = installer/resources/locale/messages_en.po
 source_lang = en
 trans.de = installer/resources/locale/po/messages_de.po
+trans.it = installer/resources/locale/po/messages_it.po
 
 [main]
 host = http://www.transifex.net

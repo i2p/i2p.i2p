@@ -1,0 +1,199 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+#   <badcluster@i2pmail.org>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-17 13:10+0000\n"
+"PO-Revision-Date: 2013-01-10 21:29+0000\n"
+"Last-Translator: BadCluster <badcluster@i2pmail.org>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
+"it/)\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../i2prouter:195
+msgid "Failed to load the wrapper"
+msgstr ""
+
+#: ../i2prouter:892 ../i2prouter:919 ../i2prouter:993 ../i2prouter:1021
+#: ../i2prouter:1045
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr ""
+
+#: ../i2prouter:903
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr ""
+
+#: ../i2prouter:926
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr ""
+
+#: ../i2prouter:973
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr ""
+
+#: ../i2prouter:987 ../i2prouter:1015 ../i2prouter:1224 ../i2prouter:1513
+msgid "Must be root to perform this action."
+msgstr ""
+
+#: ../i2prouter:1031
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr ""
+
+#: ../i2prouter:1056
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr ""
+
+#: ../i2prouter:1060 ../i2prouter:1128 ../i2prouter:1681
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr ""
+
+#: ../i2prouter:1073 ../i2prouter:1081 ../i2prouter:1143 ../i2prouter:1151
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr ""
+
+#: ../i2prouter:1099
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr ""
+
+#: ../i2prouter:1113
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr ""
+
+#: ../i2prouter:1116
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr ""
+
+#: ../i2prouter:1124
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr ""
+
+#: ../i2prouter:1170
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr ""
+
+#: ../i2prouter:1175
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr ""
+
+#: ../i2prouter:1178
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr ""
+
+#: ../i2prouter:1231 ../i2prouter:1243 ../i2prouter:1262 ../i2prouter:1279
+#: ../i2prouter:1346 ../i2prouter:1366 ../i2prouter:1380 ../i2prouter:1394
+#: ../i2prouter:1422 ../i2prouter:1460 ../i2prouter:1495
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr ""
+
+#: ../i2prouter:1234 ../i2prouter:1249 ../i2prouter:1351 ../i2prouter:1383
+#: ../i2prouter:1397 ../i2prouter:1411 ../i2prouter:1425 ../i2prouter:1463
+#: ../i2prouter:1498
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr ""
+
+#: ../i2prouter:1505
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "Istallazione non ancora supportata per $DIST_OS"
+
+#: ../i2prouter:1521 ../i2prouter:1534 ../i2prouter:1548 ../i2prouter:1557
+#: ../i2prouter:1567 ../i2prouter:1591 ../i2prouter:1604 ../i2prouter:1616
+#: ../i2prouter:1634 ../i2prouter:1647 ../i2prouter:1661
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr ""
+
+#: ../i2prouter:1527 ../i2prouter:1542 ../i2prouter:1551 ../i2prouter:1561
+#: ../i2prouter:1572 ../i2prouter:1585 ../i2prouter:1597 ../i2prouter:1610
+#: ../i2prouter:1628 ../i2prouter:1641 ../i2prouter:1655 ../i2prouter:1666
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr ""
+
+#: ../i2prouter:1670
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr ""
+
+#: ../i2prouter:1757
+msgid "Commands:"
+msgstr "Comandi:"
+
+#: ../i2prouter:1758
+msgid "Launch in the current console."
+msgstr ""
+
+#: ../i2prouter:1759
+msgid "Start in the background as a daemon process."
+msgstr ""
+
+#: ../i2prouter:1760
+msgid "Stop if running as a daemon or in another console."
+msgstr ""
+
+#: ../i2prouter:1761
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr ""
+
+#: ../i2prouter:1762
+msgid "Stop if running and then start."
+msgstr ""
+
+#: ../i2prouter:1763
+msgid "Restart only if already running."
+msgstr ""
+
+#: ../i2prouter:1764
+msgid "Query the current status."
+msgstr ""
+
+#: ../i2prouter:1765
+msgid "Install to start automatically when system boots."
+msgstr ""
+
+#: ../i2prouter:1766
+msgid "Uninstall."
+msgstr ""
+
+#: ../i2prouter:1767
+msgid "Request a Java thread dump if running."
+msgstr ""
+
+#: ../i2prouter:1780
+msgid "Please edit $0 and set the variable RUN_AS_USER"
+msgstr ""
+
+#: ../i2prouter:1785
+msgid "Running I2P as the root user is *not* recommended."
+msgstr ""
+
+#: ../i2prouter:1788
+msgid "To run as root anyway, edit $0 and set ALLOW_ROOT=true."
+msgstr ""
