@@ -155,7 +155,9 @@ public class CSSHelper extends HelperBase {
                                ua.startsWith("Dillo") ||
                                // mobile
                                // http://www.zytrax.com/tech/web/mobile_ids.html
-                               ua.contains("Android") || ua.contains("iPhone") ||
+                               // Android tablet UAs don't have "Mobile" in them
+                               (ua.contains("Android") && ua.contains("Mobile")) ||
+                               ua.contains("iPhone") ||
                                ua.contains("iPod") || ua.contains("iPad") ||
                                ua.contains("Kindle") || ua.contains("Mobile") ||
                                ua.contains("Nintendo Wii") || ua.contains("Opera Mini") ||
