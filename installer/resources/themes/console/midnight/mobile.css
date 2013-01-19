@@ -1,0 +1,30 @@
+div.routersummaryouter {
+     float: none;
+     margin: 0 5px 5px 0;
+     position: relative;
+     width: auto;
+}
+
+div.routersummary {
+     float: none;
+     width: auto;
+}
+
+div.routersummary table {
+     width: 100% !important;
+}
+
+h1 {
+     margin: 5px 5px 0 0;
+     min-width: 0;
+}
+
+div.news {
+     margin: -1px 5px 0 0;
+     min-width: 0;
+}
+
+div.main {
+     margin: 0 5px 5px 0;
+     min-width: 0;
+}

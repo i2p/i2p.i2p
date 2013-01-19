@@ -52,5 +52,11 @@
 <link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_ar.css" rel="stylesheet" type="text/css">
 <%
    }
+   if (!intl.allowIFrame(request.getHeader("User-Agent"))) {
+%>
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>mobile.css" rel="stylesheet" type="text/css">
+<%
+   }
 %>
 <!--[if IE]><link href="/themes/console/classic/ieshim.css" rel="stylesheet" type="text/css" /><![endif]-->
