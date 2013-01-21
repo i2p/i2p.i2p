@@ -23,6 +23,7 @@ public class CSSHelper extends HelperBase {
     public static final int MIN_REFRESH = 3;
     public static final String PROP_DISABLE_REFRESH = "routerconsole.summaryDisableRefresh";
     private static final String PROP_XFRAME = "routerconsole.disableXFrame";
+    public static final String PROP_FORCE_MOBILE_CONSOLE = "routerconsole.forceMobileConsole";
 
     private static final String _consoleNonce = Long.toString(RandomSource.getInstance().nextLong());
 
@@ -137,6 +138,9 @@ public class CSSHelper extends HelperBase {
      *  @since 0.8.5
      */
     public boolean allowIFrame(String ua) {
+        boolean forceMobileConsole = _context.getBooleanProperty(PROP_FORCE_MOBILE_CONSOLE);
+        if (forceMobileConsole)
+            return false;
         if (ua == null)
             return true;
         Boolean brv = _UACache.get(ua);

@@ -28,6 +28,18 @@ public class ConfigUIHelper extends HelperBase {
         return buf.toString();
     }
 
+    public String getForceMobileConsole() {
+        StringBuilder buf = new StringBuilder(256);
+        boolean forceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
+        buf.append("<input type=\"checkbox\" name=\"forceMobileConsole\" ");
+        if (forceMobileConsole)
+            buf.append("checked=\"checked\" ");
+        buf.append("value=\"1\">")
+           .append(_("Force the mobile console to be used"))
+           .append("<br>\n");
+        return buf.toString();
+    }
+
     static final String PROP_THEME_PFX = "routerconsole.theme.";
 
     /** @return standard and user-installed themes, sorted (untranslated) */

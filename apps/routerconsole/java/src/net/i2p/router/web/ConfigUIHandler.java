@@ -9,6 +9,7 @@ import java.util.Map;
 public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
     private boolean _universalTheming;
+    private boolean _forceMobileConsole;
     private String _config;
     
     @Override
@@ -26,6 +27,8 @@ public class ConfigUIHandler extends FormHandler {
 
     public void setUniversalTheming(String baa) { _universalTheming = true; }
 
+    public void setForceMobileConsole(String baa) { _forceMobileConsole = true; }
+
     public void setTheme(String val) {
         _config = val;
     }
@@ -37,6 +40,7 @@ public class ConfigUIHandler extends FormHandler {
         Map<String, String> changes = new HashMap();
         List<String> removes = new ArrayList();
         String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        boolean oldForceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
         if (_config.equals("default")) // obsolete
             removes.add(CSSHelper.PROP_THEME_NAME);
         else
@@ -45,10 +49,19 @@ public class ConfigUIHandler extends FormHandler {
             changes.put(CSSHelper.PROP_UNIVERSAL_THEMING, "true");
         else
             removes.add(CSSHelper.PROP_UNIVERSAL_THEMING);
+        if (_forceMobileConsole)
+            changes.put(CSSHelper.PROP_FORCE_MOBILE_CONSOLE, "true");
+        else
+            removes.add(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
         boolean ok = _context.router().saveConfig(changes, removes);
         if (ok) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
+                              " <a href=\"configui\">" +
+                              _("Refresh the page to view.") +
+                              "</a>");
+            if (oldForceMobileConsole != _forceMobileConsole)
+                addFormNotice(_("Mobile console option saved.") +
                               " <a href=\"configui\">" +
                               _("Refresh the page to view.") +
                               "</a>");

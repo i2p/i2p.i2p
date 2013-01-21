@@ -1,3 +1,8 @@
+2013-01-21 str4d
+ * Console:
+   - Added option to /configui to force the mobile console to be used
+     (for cases where the UserAgent matching fails)
+
 2013-01-19 str4d
  * Console:
    - Added proper support for mobile browsers with a CSS override file

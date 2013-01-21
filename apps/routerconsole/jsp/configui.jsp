@@ -44,6 +44,7 @@ input.default {
 <hr>
 <%=uihelper._("If you're not using IE, it's likely that your browser is pretending to be IE; please configure your browser (or proxy) to use a different User Agent string if you'd like to access the console themes.")%>
 <% } %>
+ <jsp:getProperty name="uihelper" property="forceMobileConsole" />
 <h3><%=uihelper._("Router Console Language")%></h3>
 <jsp:getProperty name="uihelper" property="langSettings" />
 <p><%=uihelper._("Please contribute to the router console translation project! Contact the developers in #i2p-dev on IRC to help.")%>
