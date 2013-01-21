@@ -2,6 +2,7 @@
  * Console:
    - Added option to /configui to force the mobile console to be used
      (for cases where the UserAgent matching fails)
+   - Added Opera Mobile to list of mobile UserAgents
 
 2013-01-19 str4d
  * Console:
