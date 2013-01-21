@@ -164,7 +164,8 @@ public class CSSHelper extends HelperBase {
                                ua.contains("iPhone") ||
                                ua.contains("iPod") || ua.contains("iPad") ||
                                ua.contains("Kindle") || ua.contains("Mobile") ||
-                               ua.contains("Nintendo Wii") || ua.contains("Opera Mini") ||
+                               ua.contains("Nintendo Wii") ||
+                               ua.contains("Opera Mini") || ua.contains("Opera Mobi") ||
                                ua.contains("Palm") ||
                                ua.contains("PLAYSTATION") || ua.contains("Playstation") ||
                                ua.contains("Profile/MIDP-") || ua.contains("SymbianOS") ||
