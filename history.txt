@@ -3,6 +3,7 @@
    - Added option to /configui to force the mobile console to be used
      (for cases where the UserAgent matching fails)
    - Added Opera Mobile to list of mobile UserAgents
+   - Added a link to the summary bar for mobile users on /home
 
 2013-01-19 str4d
  * Console:

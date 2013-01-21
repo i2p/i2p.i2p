@@ -25,6 +25,13 @@
   <div style="height: 36px;">
    <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>"></a>
   </div>
+<%
+    if (!intl.allowIFrame(request.getHeader("User-Agent"))) {
+%>
+  <a href="/summaryframe"><%=intl._("Summary Bar")%></a>
+<%
+    }
+%>
   <div id="xhr">
 <!-- for non-script -->
 <%@include file="xhr1.jsi" %>
