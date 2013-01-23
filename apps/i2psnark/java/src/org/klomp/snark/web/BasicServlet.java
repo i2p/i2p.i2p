@@ -341,7 +341,7 @@ class BasicServlet extends HttpServlet
             response.setContentType(content.getContentType());
         
         long lml = content.getLastModified();
-        if (lml>=0)
+        if (lml > 0)
             response.setDateHeader("Last-Modified",lml);
 
         if (count != -1)
@@ -435,7 +435,10 @@ class BasicServlet extends HttpServlet
         /* ------------------------------------------------------------ */
         public long getLastModified()
         {
-            return (new File(_context.getBaseDir(), "webapps/i2psnark.war")).lastModified();
+            String cpath = getServletContext().getContextPath();
+            // this won't work if we aren't at top level
+            String cname = cpath == "" ? "i2psnark" : cpath.substring(1).replace("/", "_");
+            return (new File(_context.getBaseDir(), "webapps/" + cname + ".war")).lastModified();
         }
 
         public int getCacheTime()

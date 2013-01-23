@@ -57,6 +57,8 @@ public class SnarkManager implements CompleteListener {
     private /* FIXME final FIXME */ File _configFile;
     private Properties _config;
     private final I2PAppContext _context;
+    private final String _contextPath;
+    private final String _contextName;
     private final Log _log;
     private final Queue<String> _messages;
     private final I2PSnarkUtil _util;
@@ -82,7 +84,7 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_META_PRIORITY_SUFFIX = ".priority";
     public static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
 
-    private static final String CONFIG_FILE = "i2psnark.config";
+    private static final String CONFIG_FILE_SUFFIX = ".config";
     public static final String PROP_FILES_PUBLIC = "i2psnark.filesPublic";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
     public static final String DEFAULT_AUTO_START = "false";
@@ -128,17 +130,24 @@ public class SnarkManager implements CompleteListener {
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */
     public static final String PROP_TRACKERS = "i2psnark.trackers";
 
-    public SnarkManager(I2PAppContext ctx) {
+    /**
+     *  @param ctxPath generally "/i2psnark"
+     *  @param ctxName generally "i2psnark"
+     */
+    public SnarkManager(I2PAppContext ctx, String ctxPath, String ctxName) {
         _snarks = new ConcurrentHashMap();
         _magnets = new ConcurrentHashSet();
         _addSnarkLock = new Object();
         _context = ctx;
+        _contextPath = ctxPath;
+        _contextName = ctxName;
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new LinkedBlockingQueue();
-        _util = new I2PSnarkUtil(_context);
-        _configFile = new File(CONFIG_FILE);
+        _util = new I2PSnarkUtil(_context, ctxName);
+        String cfile = ctxName + CONFIG_FILE_SUFFIX;
+        _configFile = new File(cfile);
         if (!_configFile.isAbsolute())
-            _configFile = new File(_context.getConfigDir(), CONFIG_FILE);
+            _configFile = new File(_context.getConfigDir(), cfile);
         _trackerMap = new ConcurrentHashMap(4);
         loadConfig(null);
     }
@@ -259,7 +268,7 @@ public class SnarkManager implements CompleteListener {
     }
 
     public File getDataDir() { 
-        String dir = _config.getProperty(PROP_DIR, "i2psnark");
+        String dir = _config.getProperty(PROP_DIR, _contextName);
         File f;
         if (areFilesPublic())
             f = new File(dir);
@@ -305,7 +314,7 @@ public class SnarkManager implements CompleteListener {
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
         if (!_config.containsKey(PROP_DIR))
-            _config.setProperty(PROP_DIR, "i2psnark");
+            _config.setProperty(PROP_DIR, _contextName);
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
         if (!_config.containsKey(PROP_REFRESH_DELAY))
@@ -731,6 +740,11 @@ public class SnarkManager implements CompleteListener {
     
     public Properties getConfig() { return _config; }
     
+    /** @since Jetty 7 */
+    public String getConfigFilename() {
+        return _configFile.getAbsolutePath();
+    }
+
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
     public static final int MAX_FILES_PER_TORRENT = 512;
     
@@ -1445,7 +1459,7 @@ public class SnarkManager implements CompleteListener {
         if (meta == null || storage == null)
             return;
         StringBuilder buf = new StringBuilder(256);
-        buf.append("<a href=\"/i2psnark/").append(storage.getBaseName());
+        buf.append("<a href=\"").append(_contextPath).append('/').append(storage.getBaseName());
         if (meta.getFiles() != null)
             buf.append('/');
         buf.append("\">").append(storage.getBaseName()).append("</a>");

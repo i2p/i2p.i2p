@@ -46,17 +46,20 @@ import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
 
 /**
- *  Refactored to eliminate Jetty dependencies
+ *  Refactored to eliminate Jetty dependencies.
  */
 public class I2PSnarkServlet extends BasicServlet {
     /** generally "/i2psnark" */
     private String _contextPath;
+    /** generally "i2psnark" */
+    private String _contextName;
     private SnarkManager _manager;
     private static long _nonce;
     private String _themePath;
     private String _imgPath;
     private String _lastAnnounceURL;
     
+    private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
  
     public I2PSnarkServlet() {
@@ -66,12 +69,19 @@ public class I2PSnarkServlet extends BasicServlet {
     @Override
     public void init(ServletConfig cfg) throws ServletException {
         super.init(cfg);
-        _contextPath = getServletContext().getContextPath();
+        String cpath = getServletContext().getContextPath();
+        _contextPath = cpath == "" ? "/" : cpath;
+        _contextName = cpath == "" ? DEFAULT_NAME : cpath.substring(1).replace("/", "_");
         _nonce = _context.random().nextLong();
-        _manager = new SnarkManager(_context);
+        // limited protection against overwriting other config files or directories
+        // in case you named your war "router.war"
+        String configName = _contextName;
+        if (!configName.equals(DEFAULT_NAME))
+            configName = DEFAULT_NAME + '_' + _contextName;
+        _manager = new SnarkManager(_context, _contextPath, configName);
         String configFile = _context.getProperty(PROP_CONFIG_FILE);
         if ( (configFile == null) || (configFile.trim().length() <= 0) )
-            configFile = "i2psnark.config";
+            configFile = configName + ".config";
         _manager.loadConfig(configFile);
         _manager.start();
         loadMimeMap("org/klomp/snark/web/mime");
@@ -102,15 +112,26 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Tell the browser to cache the icons
+     *  Handle what we can here, calling super.doGet() for the rest.
      *  @since 0.8.3
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        super.doGet(request, response);
+        doGetAndPost(request, response);
     }
 
     /**
+     *  Handle what we can here, calling super.doPost() for the rest.
+     *  @since Jetty 7
+     */
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGetAndPost(request, response);
+    }
+
+    /**
+     * Handle what we can here, calling super.doGet() or super.doPost() for the rest.
+     *
      * Some parts modified from:
      * <pre>
       // ========================================================================
@@ -130,15 +151,11 @@ public class I2PSnarkServlet extends BasicServlet {
      * </pre>
      *
      */
-    @Override
-    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //_log.error("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
+    private void doGetAndPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
-        if (!(method.equals("GET") || method.equals("HEAD") || method.equals("POST"))) {
-            resp.sendError(405);
-            return;
-        }
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
         // this is the part after /i2psnark
@@ -170,6 +187,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // index.jsp doesn't work, it is grabbed by the war handler before here
         if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
             if (path.endsWith("/")) {
+                // Listing of a torrent (torrent detail page)
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
                 String pathInContext = addPaths(path, pathInfo);
@@ -192,10 +210,18 @@ public class I2PSnarkServlet extends BasicServlet {
                     }
                 }
             } else {
-                super.service(req, resp);
+                // local completed files in torrent directories
+                if (method.equals("GET") || method.equals("HEAD"))
+                    super.doGet(req, resp);
+                else if (method.equals("POST"))
+                    super.doPost(req, resp);
+                else
+                    resp.sendError(405);
             }
             return;
         }
+
+        // Either the main page or /configure
 
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
@@ -230,7 +256,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + _("Router is down") + "<\\/b><\\/div>\";\n" +
-                          "function requestAjax1() { ajax(\"/i2psnark/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
+                          "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
                           "function initAjax() { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
                           "</script>\n");
             }
@@ -243,18 +269,24 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<center>");
         List<Tracker> sortedTrackers = null;
         if (isConfigure) {
-            out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
+            out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
             out.write(_("Torrents"));
             out.write("\" class=\"snarkRefresh\">");
             out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
-            out.write(_("I2PSnark"));
+            if (_contextName.equals(DEFAULT_NAME))
+                out.write(_("I2PSnark"));
+            else
+                out.write(_contextName);
             out.write("</a>");
         } else {
-            out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/" + peerString + "\" title=\"");
+            out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + '/' + peerString + "\" title=\"");
             out.write(_("Refresh page"));
             out.write("\" class=\"snarkRefresh\">");
             out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
-            out.write(_("I2PSnark"));
+            if (_contextName.equals(DEFAULT_NAME))
+                out.write(_("I2PSnark"));
+            else
+                out.write(_contextName);
             out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
             out.write(_("Forum"));
             out.write("</a>\n");
@@ -296,7 +328,7 @@ public class I2PSnarkServlet extends BasicServlet {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
             out.write("<div class=\"snarkMessages\">");
-            out.write("<a href=\"/i2psnark/");
+            out.write("<a href=\"" + _contextPath + '/');
             if (isConfigure)
                 out.write("configure");
             if (peerString.length() > 0)
@@ -336,7 +368,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_("Status"));
         out.write("\"></th>\n<th>");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write(" <a href=\"/i2psnark/");
+            out.write(" <a href=\"" + _contextPath + '/');
             if (peerParam != null) {
                 out.write("\">");
                 out.write("<img border=\"0\" src=\"" + _imgPath + "hidepeers.png\" title=\"");
@@ -417,7 +449,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("&nbsp;");
         } else if (_manager.util().connected()) {
             if (isDegraded)
-                out.write("<a href=\"/i2psnark/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else {
                 // http://www.onenaught.com/posts/382/firefox-4-change-input-type-image-only-submits-x-and-y-not-name
                 //out.write("<input type=\"image\" name=\"action\" value=\"StopAll\" title=\"");
@@ -431,7 +463,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("</a>");
         } else if ((!_manager.util().isConnecting()) && !snarks.isEmpty()) {
             if (isDegraded)
-                out.write("<a href=\"/i2psnark/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"/" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
@@ -444,7 +476,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("&nbsp;");
         }
         out.write("</th></tr></thead>\n");
-        String uri = "/i2psnark/";
+        String uri = _contextPath + '/';
         boolean showDebug = "2".equals(peerParam);
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
@@ -1239,7 +1271,7 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if (isRunning) {
             // Stop Button
             if (isDegraded)
-                out.write("<a href=\"/i2psnark/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Stop_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Stop the torrent"));
@@ -1253,7 +1285,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
-                    out.write("<a href=\"/i2psnark/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                    out.write("<a href=\"/" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Start the torrent"));
@@ -1267,7 +1299,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
-                    out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
@@ -1287,7 +1319,7 @@ public class I2PSnarkServlet extends BasicServlet {
             // Delete Button
             // Doesnt work with Opera so use noThinsp instead of isDegraded
             if (noThinsp)
-                out.write("<a href=\"/i2psnark/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
@@ -1614,7 +1646,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean useDHT = _manager.util().shouldUseDHT();
         //int seedPct = 0;
        
-        out.write("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
+        out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
                   "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
                   "<input type=\"hidden\" name=\"action\" value=\"Save\" >\n" +
@@ -1626,7 +1658,8 @@ public class I2PSnarkServlet extends BasicServlet {
 
         out.write(_("Data directory"));
         out.write(": <td><code>" + dataDir + "</code> <i>(");
-        out.write(_("Edit i2psnark.config and restart to change"));
+        // translators: parameter is a file name
+        out.write(_("Edit {0} and restart to change", _manager.getConfigFilename()));
         out.write(")</i><br>\n" +
 
                   "<tr><td>");
@@ -1796,7 +1829,7 @@ public class I2PSnarkServlet extends BasicServlet {
     /** @since 0.9 */
     private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
+        buf.append("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
                   "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
                   "<input type=\"hidden\" name=\"action\" value=\"Save2\" >\n" +
@@ -2035,8 +2068,9 @@ public class I2PSnarkServlet extends BasicServlet {
         }  // if r is not a directory, we are only showing torrent info section
         
         String title = decodePath(base);
-        if (title.startsWith("/i2psnark/"))
-            title = title.substring("/i2psnark/".length());
+        String cpath = _contextPath + '/';
+        if (title.startsWith(cpath))
+            title = title.substring(cpath.length());
 
         // Get the snark associated with this directory
         String torrentName;
@@ -2061,8 +2095,13 @@ public class I2PSnarkServlet extends BasicServlet {
         title = _("Torrent") + ": " + title;
         buf.append(title);
         buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
-             "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;I2PSnark</a></div></center>\n");
+             "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
+        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+        if (_contextName.equals(DEFAULT_NAME))
+            buf.append(_("I2PSnark"));
+        else
+            buf.append(_contextName);
+        buf.append("</a></div></center>\n");
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
@@ -2083,7 +2122,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<tr><td>")
                .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
                .append(_("Torrent file"))
-               .append(":</b> <a href=\"/i2psnark/").append(baseName).append("\">")
+               .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(fullPath)
                .append("</a></td></tr>\n");
 
@@ -2412,13 +2451,13 @@ public class I2PSnarkServlet extends BasicServlet {
     }
     
     /** @since 0.7.14 */
-    private static String toImg(String icon) {
-        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/.icons/" + icon + ".png\">";
+    private String toImg(String icon) {
+        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"" + _contextPath + "/.icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.2 */
-    private static String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/.icons/" + icon + ".png\">";
+    private String toImg(String icon, String altText) {
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + "/.icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.1 */
