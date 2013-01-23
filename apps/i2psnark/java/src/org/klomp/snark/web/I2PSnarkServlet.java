@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,31 +45,28 @@ import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
 
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.util.URIUtil;
-import org.eclipse.jetty.util.resource.Resource;
-
 /**
- *  We extend Default instead of HTTPServlet so we can handle
- *  i2psnark/ file requests with http:// instead of the flaky and
- *  often-blocked-by-the-browser file://
+ *  Refactored to eliminate Jetty dependencies
  */
-public class I2PSnarkServlet extends DefaultServlet {
-    private I2PAppContext _context;
-    private Log _log;
+public class I2PSnarkServlet extends BasicServlet {
+    /** generally "/i2psnark" */
+    private String _contextPath;
     private SnarkManager _manager;
     private static long _nonce;
-    private Resource _resourceBase;
     private String _themePath;
     private String _imgPath;
     private String _lastAnnounceURL;
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
  
+    public I2PSnarkServlet() {
+        super();
+    }
+
     @Override
     public void init(ServletConfig cfg) throws ServletException {
-        _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(I2PSnarkServlet.class);
+        super.init(cfg);
+        _contextPath = getServletContext().getContextPath();
         _nonce = _context.random().nextLong();
         _manager = new SnarkManager(_context);
         String configFile = _context.getProperty(PROP_CONFIG_FILE);
@@ -76,10 +74,9 @@ public class I2PSnarkServlet extends DefaultServlet {
             configFile = "i2psnark.config";
         _manager.loadConfig(configFile);
         _manager.start();
-        try {
-            _resourceBase = Resource.newResource(_manager.getDataDir().getAbsolutePath());
-        } catch (IOException ioe) {}
-        super.init(cfg);
+        loadMimeMap("org/klomp/snark/web/mime");
+        setResourceBase(_manager.getDataDir());
+        setWarBase("/.icons/");
     }
     
     @Override
@@ -95,17 +92,13 @@ public class I2PSnarkServlet extends DefaultServlet {
      *  and we can't get any resources (like icons) out of the .war
      */
     @Override
-    public Resource getResource(String pathInContext)
+    public File getResource(String pathInContext)
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
             pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
-        try {
-            return _resourceBase.addPath(pathInContext);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
+        return new File(_resourceBase, pathInContext);
     }
 
     /**
@@ -139,6 +132,7 @@ public class I2PSnarkServlet extends DefaultServlet {
      */
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //_log.error("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
         if (!(method.equals("GET") || method.equals("HEAD") || method.equals("POST"))) {
@@ -178,15 +172,15 @@ public class I2PSnarkServlet extends DefaultServlet {
             if (path.endsWith("/")) {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
-                String pathInContext = URIUtil.addPaths(path, pathInfo);
+                String pathInContext = addPaths(path, pathInfo);
                 req.setCharacterEncoding("UTF-8");
                 resp.setCharacterEncoding("UTF-8");
                 resp.setContentType("text/html; charset=UTF-8");
-                Resource resource = getResource(pathInContext);
-                if (resource == null || (!resource.exists())) {
+                File resource = getResource(pathInContext);
+                if (resource == null) {
                     resp.sendError(404);
                 } else {
-                    String base = URIUtil.addPaths(req.getRequestURI(), "/");
+                    String base = addPaths(req.getRequestURI(), "/");
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
                     if (method.equals("POST")) {
                         // P-R-G
@@ -2031,7 +2025,7 @@ public class I2PSnarkServlet extends DefaultServlet {
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(Resource r, String base, boolean parent, Map postParams)
+    private String getListHTML(File r, String base, boolean parent, Map postParams)
         throws IOException
     {
         String[] ls = null;
@@ -2040,7 +2034,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             Arrays.sort(ls, Collator.getInstance());
         }  // if r is not a directory, we are only showing torrent info section
         
-        String title = URIUtil.decodePath(base);
+        String title = decodePath(base);
         if (title.startsWith("/i2psnark/"))
             title = title.substring("/i2psnark/".length());
 
@@ -2228,7 +2222,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                .append("\"></th>\n");
         buf.append("</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
-        buf.append(URIUtil.addPaths(base,"../"));
+        buf.append(addPaths(base,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
            .append(_("Up to higher level directory"))
            .append("</A></td></tr>\n");
@@ -2239,12 +2233,12 @@ public class I2PSnarkServlet extends DefaultServlet {
         boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
-            String encoded=URIUtil.encodePath(ls[i]);
+            String encoded = encodePath(ls[i]);
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
             //Resource item = addPath(encoded);
-            Resource item = r.addPath(ls[i]);
+            File item = new File(r, ls[i]);
             
             String rowClass = (i % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
             buf.append("<TR class=\"").append(rowClass).append("\">");
@@ -2264,7 +2258,7 @@ public class I2PSnarkServlet extends DefaultServlet {
                 } else {
                     Storage storage = snark.getStorage();
                     try {
-                        File f = item.getFile();
+                        File f = item;
                         if (f != null) {
                             long remaining = storage.remaining(f.getCanonicalPath());
                             if (remaining < 0) {
@@ -2294,9 +2288,9 @@ public class I2PSnarkServlet extends DefaultServlet {
                 }
             }
 
-            String path=URIUtil.addPaths(base,encoded);
+            String path=addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
-                path=URIUtil.addPaths(path,"/");
+                path=addPaths(path,"/");
             String icon = toIcon(item);
 
             buf.append("<TD class=\"snarkFileIcon ")
@@ -2331,7 +2325,7 @@ public class I2PSnarkServlet extends DefaultServlet {
             buf.append("</TD>");
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
-                File f = item.getFile();
+                File f = item;
                 if ((!complete) && (!item.isDirectory()) && f != null) {
                     int pri = snark.getStorage().getPriority(f.getCanonicalPath());
                     buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
@@ -2368,7 +2362,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     }
 
     /** @since 0.7.14 */
-    private String toIcon(Resource item) {
+    private String toIcon(File item) {
         if (item.isDirectory())
             return "folder";
         return toIcon(item.toString());
@@ -2381,40 +2375,32 @@ public class I2PSnarkServlet extends DefaultServlet {
      */
     private String toIcon(String path) {
         String icon;
-        // Should really just add to the mime.properties file in org.mortbay.jetty.jar
-        // instead of this mishmash. We can't get to HttpContext.setMimeMapping()
-        // from here? We could do it from a web.xml perhaps.
-        // Or could we put our own org/mortbay/http/mime.properties file in the war?
+        // Note that for this to work well, our custom mime.properties file must be loaded.
         String plc = path.toLowerCase(Locale.US);
-        String mime = getServletContext().getMimeType(path);
+        String mime = getMimeType(path);
         if (mime == null)
             mime = "";
         if (mime.equals("text/html"))
             icon = "html";
-        else if (mime.equals("text/plain") || plc.endsWith(".nfo") ||
+        else if (mime.equals("text/plain") ||
                  mime.equals("application/rtf"))
             icon = "page";
-        else if (mime.equals("application/java-archive") || plc.endsWith(".war") ||
+        else if (mime.equals("application/java-archive") ||
                  plc.endsWith(".deb"))
             icon = "package";
         else if (plc.endsWith(".xpi2p"))
             icon = "plugin";
         else if (mime.equals("application/pdf"))
             icon = "page_white_acrobat";
-        else if (mime.startsWith("image/") || plc.endsWith(".ico"))
+        else if (mime.startsWith("image/"))
             icon = "photo";
-        else if (mime.startsWith("audio/") || mime.equals("application/ogg") ||
-                 plc.endsWith(".flac") || plc.endsWith(".m4a") || plc.endsWith(".wma") ||
-                 plc.endsWith(".ape") || plc.endsWith(".oga"))
+        else if (mime.startsWith("audio/") || mime.equals("application/ogg"))
             icon = "music";
-        else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
-                 plc.endsWith(".mp4") || plc.endsWith(".wmv") || plc.endsWith(".flv") ||
-                 plc.endsWith(".ogm") || plc.endsWith(".ogv"))
+        else if (mime.startsWith("video/"))
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
-                 mime.equals("application/x-tar") ||
-                 plc.endsWith(".rar") || plc.endsWith(".bz2") || plc.endsWith(".7z"))
+                 mime.equals("application/x-tar"))
             icon = "compress";
         else if (plc.endsWith(".exe"))
             icon = "application";
