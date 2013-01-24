@@ -1,3 +1,7 @@
+2013-01-23 str4d
+ * i2ptunnel: Added IP -> I2P URL mapping to SOCKS client tunnel
+   (via custom option ipmapping.IP=URL)
+
 2013-01-21 str4d
  * Console:
    - Added option to /configui to force the mobile console to be used
