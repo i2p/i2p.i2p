@@ -42,7 +42,6 @@ public class SOCKS5Server extends SOCKSServer {
     private static final int SOCKS_VERSION_5 = 0x05;
 
     private final Socket clientSock;
-    private final Properties props;
     private boolean setupCompleted = false;
     private final boolean authRequired;
 
@@ -207,7 +206,12 @@ public class SOCKS5Server extends SOCKSServer {
                     connHostName += ".";
                 }
             }
-            if (command != Command.UDP_ASSOCIATE)
+            // Check if the requested IP should be mapped to a .i2p URL
+            String mappedUrl = getMappedUrlForIP(connHostName);
+            if (mappedUrl != null && mappedUrl.toLowerCase(Locale.US).endsWith(".i2p")) {
+                _log.debug("IPV4 address " + connHostName + " was mapped to URL " + mappedUrl);
+                connHostName = mappedUrl;
+            } else if (command != Command.UDP_ASSOCIATE)
                 _log.warn("IPV4 address type in request: " + connHostName + ". Is your client secure?");
             break;
         case AddressType.DOMAINNAME:

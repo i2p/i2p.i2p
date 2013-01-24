@@ -54,7 +54,7 @@ public class SOCKSServerFactory {
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_PW)) {
                     throw new SOCKSException("SOCKS 4/4a not supported when authorization is required");
                 }
-                serv = new SOCKS4aServer(s);
+                serv = new SOCKS4aServer(s, props);
                 break;
             case 0x05:
                 // SOCKS version 5

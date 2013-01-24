@@ -46,9 +46,11 @@ public class SOCKS4aServer extends SOCKSServer {
      * client socket.
      *
      * @param clientSock client socket
+     * @param props non-null
      */
-    public SOCKS4aServer(Socket clientSock) {
+    public SOCKS4aServer(Socket clientSock, Properties props) {
         this.clientSock = clientSock;
+        this.props = props;
     }
 
     public Socket getClientSocket() throws SOCKSException {
@@ -114,6 +116,13 @@ public class SOCKS4aServer extends SOCKSServer {
                     alreadyWarned = true;
                 }
             }
+        }
+
+        // Check if the requested IP should be mapped to a .i2p URL
+        String mappedUrl = getMappedUrlForIP(connHostName);
+        if (mappedUrl != null && mappedUrl.toLowerCase(Locale.US).endsWith(".i2p")) {
+            _log.debug("IPV4 address " + connHostName + " was mapped to URL " + mappedUrl);
+            connHostName = mappedUrl;
         }
 
         // discard user name
