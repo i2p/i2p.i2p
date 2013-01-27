@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
@@ -170,9 +171,14 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     }
  
     public final boolean initSeed(byte buf[]) {
+        boolean ok = false;
+        try {
+            SecureRandom.getInstance("SHA1PRNG").nextBytes(buf);
+            ok = true;
+        } catch (NoSuchAlgorithmException e) {}
         // why urandom?  because /dev/random blocks, and there are arguments
         // suggesting such blockages are largely meaningless
-        boolean ok = seedFromFile(new File("/dev/urandom"), buf);
+        ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
         File localFile = new File(_context.getConfigDir(), SEEDFILE);
         ok = seedFromFile(localFile, buf) || ok;
