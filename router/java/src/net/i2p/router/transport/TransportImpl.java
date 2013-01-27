@@ -397,6 +397,9 @@ public abstract class TransportImpl implements Transport {
     /**
      * Message received from the I2NPMessageReader - send it to the listener
      *
+     * @param inMsg non-null
+     * @param remoteIdent may be null
+     * @param remoteIdentHash may be null, calculated from remoteIdent if null
      */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
         //if (true)

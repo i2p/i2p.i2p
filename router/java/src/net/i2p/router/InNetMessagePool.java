@@ -116,6 +116,10 @@ public class InNetMessagePool implements Service {
      * into a job created by that builder and queued up for processing instead
      * (though if the builder doesn't create a job, it is added to the pool)
      *
+     * @param messageBody non-null
+     * @param fromRouter may be null
+     * @param fromRouterHash may be null, calculated from fromRouter if null
+     *
      * @return -1 for some types of errors but not all; 0 otherwise
      *         (was queue length, long ago)
      */

@@ -460,6 +460,13 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
+    /**
+     * Message received
+     *
+     * @param message non-null
+     * @param fromRouter may be null
+     * @param fromRouterHash may be null, calculated from fromRouter if null
+     */
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));

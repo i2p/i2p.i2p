@@ -13,6 +13,15 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
 
 public interface TransportEventListener {
+
+    /**
+     * Message received
+     *
+     * @param message non-null
+     * @param fromRouter may be null
+     * @param fromRouterHash may be null, calculated from fromRouter if null
+     */
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash);
+
     public void transportAddressChanged();
 }
