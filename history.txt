@@ -1,3 +1,10 @@
+2013-01-27 zzz
+ * BuildHandler:
+   - Add early throttler based on previous hop
+   - Limit concurrent next-hop lookups
+ * NetDB: Increase floodfills again
+ * RandomSource: Seed from SecureRandom too
+
 2013-01-23 str4d
  * i2ptunnel: Added IP -> I2P URL mapping to SOCKS client tunnel
    (via custom option ipmapping.IP=URL)
