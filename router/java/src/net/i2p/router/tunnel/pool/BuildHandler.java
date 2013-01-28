@@ -866,7 +866,7 @@ class BuildHandler implements Runnable {
                     if (accept) {
                         // early request throttle check, before queueing and decryption
                         Hash fh = fromHash;
-                        if (fh == null)
+                        if (fh == null && from != null)
                             fh = from.calculateHash();
                         if (fh != null && _requestThrottler.shouldThrottle(fh)) {
                             if (_log.shouldLog(Log.WARN))
