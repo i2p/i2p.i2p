@@ -73,7 +73,7 @@ public class ConfigUIHelper extends HelperBase {
      *  Any language-specific flag added to the icon set must be
      *  added to the top-level build.xml for the updater.
      */
-    private static final String langs[] = {"ar", "cs", "da", "de", "ee", "el", "en", "es", "fi",
+    private static final String langs[] = {"ar", "cs", "da", "de", "et", "el", "en", "es", "fi",
                                            "fr", "hu", "it", "nl", "pl", "pt", "ru",
                                            "sv", "uk", "vi", "zh"};
     private static final String flags[] = {"lang_ar", "cz", "dk", "de", "ee", "gr", "us", "es", "fi",
@@ -96,7 +96,7 @@ public class ConfigUIHelper extends HelperBase {
                 buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(langs[i]).append("\">")
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(flags[i]).append("\"> ")
-               .append(_(xlangs[i])).append("<br>\n");
+               .append(Messages.getDisplayLanguage(langs[i], xlangs[i], _context)).append("<br>\n");
         }
         return buf.toString();
     }

@@ -39,4 +39,17 @@ public class Messages extends Translate {
     public static String getString(int n, String s, String p, I2PAppContext ctx) {
         return Translate.getString(n, s, p, ctx, BUNDLE_NAME);
     }
+
+    /**
+     *  Return the "display language", e.g. "English" for the language specified
+     *  by langCode, using the current language.
+     *  Uses translation if available, then JVM Locale.getDisplayLanguage() if available, else default param.
+     *
+     *  @param langCode two-letter lower-case
+     *  @param dflt e.g. "English"
+     *  @since 0.9.5
+     */
+    public static String getDisplayLanguage(String langCode, String dflt, I2PAppContext ctx) {
+        return Translate.getDisplayLanguage(langCode, dflt, ctx, BUNDLE_NAME);
+    }
 }

@@ -164,6 +164,29 @@ public abstract class Translate {
     }
 
     /**
+     *  Return the "display language", e.g. "English" for the language specified
+     *  by langCode, using the current language.
+     *  Uses translation if available, then JVM Locale.getDisplayLanguage() if available, else default param.
+     *
+     *  @param langCode two-letter lower-case
+     *  @param dflt e.g. "English"
+     *  @since 0.9.5
+     */
+    public static String getDisplayLanguage(String langCode, String dflt, I2PAppContext ctx, String bun) {
+        String curLang = getLanguage(ctx);
+        if (!"en".equals(curLang)) {
+            String rv = getString(dflt, ctx, bun);
+            if (!rv.equals(dflt))
+                return rv;
+            Locale curLocale = new Locale(curLang);
+            rv = (new Locale(langCode)).getDisplayLanguage(curLocale);
+            if (rv.length() > 0 && !rv.equals(langCode))
+                return rv;
+        }
+        return dflt;
+    }
+
+    /**
      *  Clear the cache.
      *  Call this after adding new bundles to the classpath.
      *  @since 0.7.12
