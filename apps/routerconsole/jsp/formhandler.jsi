@@ -19,9 +19,15 @@
     String klass = formhandler.getClass().getName();
     String nonceAttr1 = klass + ".nonce";
     String nonceAttr2 = nonceAttr1 + "Prev";
-    String nonce1 = (String) session.getAttribute(nonceAttr1);
-    String nonce2 = (String) session.getAttribute(nonceAttr2);
-    formhandler.storeNonces(nonce1, nonce2);
+    String nonce1 = null;
+    try {
+        // Jetty doesn't seem to ISE here...
+        nonce1 = (String) session.getAttribute(nonceAttr1);
+        String nonce2 = (String) session.getAttribute(nonceAttr2);
+        formhandler.storeNonces(nonce1, nonce2);
+    } catch (IllegalStateException ise) {
+        // nonce1 will be null, removed in setAttibute below
+    }
 
     // Put all the params in the map, some handlers use this instead of individual setters
     // We also call all of the setters below.
@@ -37,7 +43,10 @@
     // This shuffles down the nonces, so it must be after getAllMessages() above,
     // since it does the form validation.
     String pageNonce = formhandler.getNewNonce();
-    session.setAttribute(nonceAttr2, nonce1);
-    session.setAttribute(nonceAttr1, pageNonce);
+    try {
+        // Jetty waits to ISE until here....
+        session.setAttribute(nonceAttr2, nonce1);
+        session.setAttribute(nonceAttr1, pageNonce);
+    } catch (IllegalStateException ise) {}
 
 %>

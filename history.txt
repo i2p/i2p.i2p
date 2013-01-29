@@ -1,3 +1,9 @@
+2013-01-29 zzz
+ * Console: Catch IllegalStateException storing nonces (ticket #852)
+ * Translations:
+   - Use JVM language name if available
+   - Correct Estonian language code from ee to et
+
 2013-01-27 zzz
  * BuildHandler:
    - Add early throttler based on previous hop
