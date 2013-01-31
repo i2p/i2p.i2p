@@ -1,3 +1,8 @@
+2013-01-31 zzz
+ * EepGet:
+   - Fix URL when not proxied to conform to RFC 2616
+   - Add port to Host header to conform to RFC 2616
+
 2013-01-29 zzz
  * Console: Catch IllegalStateException storing nonces (ticket #852)
  * Translations:

@@ -1087,24 +1087,36 @@ public class EepGet {
         if ( (_postData != null) && (_postData.length() > 0) )
             post = true;
         URL url = new URL(_actualURL);
-        String proto = url.getProtocol();
         String host = url.getHost();
         int port = url.getPort();
         String path = url.getPath();
         String query = url.getQuery();
-        if (query != null)
-            path = path + '?' + query;
-        if (!path.startsWith("/"))
-	    path = "/" + path;
-        if ( (port == 80) || (port == 443) || (port <= 0) ) path = proto + "://" + host + path;
-        else path = proto + "://" + host + ":" + port + path;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Requesting " + path);
-        if (post) {
-            buf.append("POST ").append(_actualURL).append(" HTTP/1.1\r\n");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Requesting " + _actualURL);
+        // RFC 2616 sec 5.1.2 - full URL if proxied, absolute path only if not proxied
+        String urlToSend;
+        if (_shouldProxy) {
+            urlToSend = _actualURL;
+            if ((path == null || path.length()<= 0) &&
+                (query == null || query.length()<= 0))
+                urlToSend += "/";
         } else {
-            buf.append("GET ").append(_actualURL).append(" HTTP/1.1\r\n");
+            urlToSend = path;
+            if (urlToSend == null || urlToSend.length()<= 0)
+                urlToSend = "/";
+            if (query != null)
+                urlToSend += '?' + query;
         }
-        buf.append("Host: ").append(url.getHost()).append("\r\n");
+        if (post) {
+            buf.append("POST ").append(urlToSend).append(" HTTP/1.1\r\n");
+        } else {
+            buf.append("GET ").append(urlToSend).append(" HTTP/1.1\r\n");
+        }
+        // RFC 2616 sec 5.1.2 - host + port (NOT authority, which includes userinfo)
+        buf.append("Host: ").append(host);
+        if (port >= 0)
+            buf.append(':').append(port);
+        buf.append("\r\n");
         if (_alreadyTransferred > 0) {
             buf.append("Range: bytes=");
             buf.append(_alreadyTransferred);
