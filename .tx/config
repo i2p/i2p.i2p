@@ -9,6 +9,7 @@ trans.es = apps/i2ptunnel/locale/messages_es.po
 trans.fr = apps/i2ptunnel/locale/messages_fr.po
 trans.hu = apps/i2ptunnel/locale/messages_hu.po
 trans.it = apps/i2ptunnel/locale/messages_it.po
+trans.nb = apps/i2ptunnel/locale/messages_nb.po
 trans.nl = apps/i2ptunnel/locale/messages_nl.po
 trans.pt = apps/i2ptunnel/locale/messages_pt.po
 trans.ru = apps/i2ptunnel/locale/messages_ru.po
