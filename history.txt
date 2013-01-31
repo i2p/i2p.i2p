@@ -1,3 +1,7 @@
+2013-01-31 kytv
+* Add Norwegian Bokmål language to the router console
+* Add Bokmål translations from Transifex
+
 2013-01-31 zzz
  * EepGet:
    - Fix URL when not proxied to conform to RFC 2616

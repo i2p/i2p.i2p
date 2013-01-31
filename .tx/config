@@ -32,6 +32,7 @@ trans.fi = apps/routerconsole/locale/messages_fi.po
 trans.fr = apps/routerconsole/locale/messages_fr.po
 trans.hu = apps/routerconsole/locale/messages_hu.po
 trans.it = apps/routerconsole/locale/messages_it.po
+trans.nb = apps/routerconsole/locale/messages_nb.po
 trans.nl = apps/routerconsole/locale/messages_nl.po
 trans.pl = apps/routerconsole/locale/messages_pl.po
 trans.pt = apps/routerconsole/locale/messages_pt.po
