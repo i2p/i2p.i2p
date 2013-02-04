@@ -210,6 +210,7 @@ public class SOCKS5Server extends SOCKSServer {
             String mappedUrl = getMappedUrlForIP(connHostName);
             if (mappedUrl != null && mappedUrl.toLowerCase(Locale.US).endsWith(".i2p")) {
                 _log.debug("IPV4 address " + connHostName + " was mapped to URL " + mappedUrl);
+                addressType = AddressType.DOMAINNAME;
                 connHostName = mappedUrl;
             } else if (command != Command.UDP_ASSOCIATE)
                 _log.warn("IPV4 address type in request: " + connHostName + ". Is your client secure?");
