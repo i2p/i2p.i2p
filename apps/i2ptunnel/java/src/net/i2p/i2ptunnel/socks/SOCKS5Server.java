@@ -206,9 +206,9 @@ public class SOCKS5Server extends SOCKSServer {
                     connHostName += ".";
                 }
             }
-            // Check if the requested IP should be mapped to a .i2p URL
+            // Check if the requested IP should be mapped to a URL
             String mappedUrl = getMappedUrlForIP(connHostName);
-            if (mappedUrl != null && mappedUrl.toLowerCase(Locale.US).endsWith(".i2p")) {
+            if (mappedUrl != null) {
                 _log.debug("IPV4 address " + connHostName + " was mapped to URL " + mappedUrl);
                 addressType = AddressType.DOMAINNAME;
                 connHostName = mappedUrl;
