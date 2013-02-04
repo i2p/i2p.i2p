@@ -118,11 +118,11 @@ public class SOCKS4aServer extends SOCKSServer {
             }
         }
 
-        // Check if the requested IP should be mapped to a URL
-        String mappedUrl = getMappedUrlForIP(connHostName);
-        if (mappedUrl != null) {
-            _log.debug("IPV4 address " + connHostName + " was mapped to URL " + mappedUrl);
-            connHostName = mappedUrl;
+        // Check if the requested IP should be mapped to a domain name
+        String mappedDomainName = getMappedDomainNameForIP(connHostName);
+        if (mappedDomainName != null) {
+            _log.debug("IPV4 address " + connHostName + " was mapped to domain name " + mappedDomainName);
+            connHostName = mappedDomainName;
         }
 
         // discard user name

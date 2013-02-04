@@ -1,3 +1,9 @@
+2013-02-04 str4d
+ * i2ptunnel:
+   - IP -> domain name mapping in SOCKS client tunnel:
+     - Change SOCKS5 addressType on a successful mapping
+     - Allow any domain name to be mapped, not just .i2p
+
 2013-01-31 kytv
 * Add Norwegian Bokmål language to the router console
 * Add Bokmål translations from Transifex
