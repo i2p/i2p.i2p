@@ -1,25 +1,28 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
 #
-#, fuzzy
+# Translators:
+#  <martin2p@i2pmail.org>, 2013.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-22 15:07+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2013-02-06 02:34+0000\n"
+"PO-Revision-Date: 2013-01-27 06:55+0000\n"
+"Last-Translator: Ashoka <martin2p@i2pmail.org>\n"
+"Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
+"de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../i2prouter:195
 msgid "Failed to load the wrapper"
-msgstr ""
+msgstr "Wrapper konnte nicht geladen werden."
 
 #: ../i2prouter:892 ../i2prouter:919 ../i2prouter:993 ../i2prouter:1021
 #: ../i2prouter:1045

@@ -1,3 +1,7 @@
+2013-02-06 kytv
+* German, Polish, Portuguese, Spanish, and Swedish translation updates
+  from Transifex
+
 2013-02-04 str4d
  * i2ptunnel:
    - IP -> domain name mapping in SOCKS client tunnel:
