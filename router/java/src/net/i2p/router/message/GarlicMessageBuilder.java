@@ -172,17 +172,17 @@ public class GarlicMessageBuilder {
     
     /**
      *  used by TestJob and directly above
+     *  and for encrypting DatabaseLookupMessages
      *
      * @param ctx scope
      * @param config how/what to wrap
      * @param wrappedKey unused - why??
-     * @param wrappedTags Output parameter that will be filled with the sessionTags used.
-                          If non-empty on return you must call skm.tagsDelivered() when sent
-                          and then call skm.tagsAcked() or skm.failTags() later.
+     * @param wrappedTags New tags to be sent along with the message.
+     *                    200 max enforced at receiver; null OK
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
-     * @param encryptKey sessionKey used to encrypt the current message
-     * @param encryptTag sessionTag used to encrypt the current message
+     * @param encryptKey sessionKey used to encrypt the current message, non-null
+     * @param encryptTag sessionTag used to encrypt the current message, null to force ElG
      * @throws IllegalArgumentException on error
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,

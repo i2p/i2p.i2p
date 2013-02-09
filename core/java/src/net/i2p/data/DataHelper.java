@@ -393,7 +393,8 @@ public class DataHelper {
      * A more efficient Properties.load
      *
      * Some of the other differences:
-     * - This does not process or drop backslashes
+     * - UTF-8 encoding, not ISO-8859-1
+     * - No escaping! This does not process or drop backslashes
      * - '#' or ';' starts a comment line, but '!' does not
      * - Leading whitespace is not trimmed
      * - '=' is the only key-termination character (not ':' or whitespace)

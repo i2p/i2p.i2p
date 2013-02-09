@@ -461,6 +461,8 @@ public class ElGamalAESEngine {
      * No new session key
      * No current tag (encrypt as new session)
      *
+     * @param tagsForDelivery session tags to be associated with the key or null;
+     *                        200 max enforced at receiver
      * @deprecated unused
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery, long paddedSize) {
@@ -498,6 +500,8 @@ public class ElGamalAESEngine {
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
      * </pre>
      *
+     * @param tagsForDelivery session tags to be associated with the key or null;
+     *                        200 max enforced at receiver
      */
     private byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                     SessionKey newKey, long paddedSize) {
@@ -564,6 +568,8 @@ public class ElGamalAESEngine {
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
      * </pre>
      *
+     * @param tagsForDelivery session tags to be associated with the key or null;
+     *                        200 max enforced at receiver
      */
     private byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                          SessionTag currentTag, SessionKey newKey, long paddedSize) {
@@ -619,12 +625,20 @@ public class ElGamalAESEngine {
      * </pre>
      *
      * Note: package private for ElGamalTest.testAES()
+     *
+     * @param tagsForDelivery session tags to be associated with the key or null;
+     *                        200 max enforced at receiver
      */
     final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
                                         long paddedSize) {
         return encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize, 0);
     }
 
+    /**
+     *
+     * @param tagsForDelivery session tags to be associated with the key or null;
+     *                        200 max enforced at receiver
+     */
     private final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
                                         long paddedSize, int prefixBytes) {
         //_log.debug("iv for encryption: " + DataHelper.toString(iv, 16));
