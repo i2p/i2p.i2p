@@ -115,4 +115,31 @@ class MessageWrapper {
             }
         }
     }    
+
+    /**
+     *  Garlic wrap a message from nobody, destined for a router,
+     *  to hide the contents from the OBEP.
+     *  Forces ElGamal.
+     *
+     *  @return null on encrypt failure
+     *  @since 0.9.5
+     */
+    static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
+
+        PayloadGarlicConfig payload = new PayloadGarlicConfig();
+        payload.setCertificate(Certificate.NULL_CERT);
+        payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        payload.setPayload(m);
+        payload.setRecipient(to);
+        payload.setDeliveryInstructions(instructions);
+        payload.setExpiration(m.getMessageExpiration());
+
+        SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
+        PublicKey key = to.getIdentity().getPublicKey();
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
+                                                              key, sentKey, null);
+        return msg;
+    }
 }    

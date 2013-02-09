@@ -14,6 +14,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
@@ -225,7 +226,21 @@ class IterativeSearchJob extends FloodSearchJob {
                 _log.info(getJobId() + ": Iterative search for " + _key + " to " + peer);
             long now = getContext().clock().now();
             _sentTime.put(peer, Long.valueOf(now));
-            getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), peer);
+
+            I2NPMessage outMsg = null;
+            if (_isLease) {
+                // Full ElG is fairly expensive so only do it for LS lookups
+                // if we have the ff RI, garlic encrypt it
+                RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+                if (ri != null) {
+                    outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(getJobId() + ": Encrypted DLM for " + _key + " to " + peer);
+                }
+            }
+            if (outMsg == null)
+                outMsg = dlm;
+            getContext().tunnelDispatcher().dispatchOutbound(outMsg, outTunnel.getSendTunnelId(0), peer);
 
             // The timeout job is always run (never cancelled)
             // Note that the timeout is much shorter than the message expiration (see above)

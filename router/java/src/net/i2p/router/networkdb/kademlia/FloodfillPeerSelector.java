@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
@@ -205,17 +207,29 @@ class FloodfillPeerSelector extends PeerSelector {
             }
         }
 
-        // 8 == FNDF.MAX_TO_FLOOD + 1
-        int limit = Math.max(8, howMany);
+        // 5 == FNDF.MAX_TO_FLOOD + 1
+        int limit = Math.max(5, howMany);
         limit = Math.min(limit, ffs.size());
+        Set<Integer> maskedIPs = new HashSet(limit + 4);
         // split sorted list into 3 sorted lists
         for (int i = 0; found < howMany && i < limit; i++) {
             Hash entry = sorted.first();
-            sorted.remove(entry);
             if (entry == null)
                 break;  // shouldn't happen
+            sorted.remove(entry);
+            // put anybody in the same /16 at the end
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
-            if (info != null && now - info.getPublished() > 3*60*60*1000) {
+            Set<Integer> entryIPs = maskedIPSet(entry, info, 2);
+            boolean sameIP = false;
+            for (Integer ip : entryIPs) {
+                if (!maskedIPs.add(ip))
+                    sameIP = true;
+            }
+            if (sameIP) {
+                badff.add(entry);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Same /16: " + entry);
+            } else if (info != null && now - info.getPublished() > 3*60*60*1000) {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Old: " + entry);
@@ -270,6 +284,44 @@ class FloodfillPeerSelector extends PeerSelector {
         return rv;
     }
     
+
+    /**
+      * The Set of IPs for this peer, with a given mask.
+      * Includes the comm system's record of the IP, and all netDb addresses.
+      *
+      * @param pinfo may be null
+      * @return an opaque set of masked IPs for this peer
+      * @since 0.9.5 modified from ProfileOrganizer
+      */
+    private Set<Integer> maskedIPSet(Hash peer, RouterInfo pinfo, int mask) {
+        Set<Integer> rv = new HashSet(2);
+        byte[] commIP = _context.commSystem().getIP(peer);
+        if (commIP != null)
+            rv.add(maskedIP(commIP, mask));
+        if (pinfo == null)
+            return rv;
+        Collection<RouterAddress> paddr = pinfo.getAddresses();
+        if (paddr == null)
+            return rv;
+        for (RouterAddress pa : paddr) {
+            byte[] pib = pa.getIP();
+            if (pib == null) continue;
+            rv.add(maskedIP(pib, mask));
+        }
+        return rv;
+    }
+
+    /**
+     * generate an arbitrary unique value for this ip/mask (mask = 1-4)
+     * @since 0.9.5 copied from ProfileOrganizer
+     */
+    private static Integer maskedIP(byte[] ip, int mask) {
+        int rv = 0;
+        for (int i = 0; i < mask; i++)
+             rv = (rv << 8) | (ip[i] & 0xff);
+        return Integer.valueOf(rv);
+    }
+
     private class FloodfillSelectionCollector implements SelectionCollector {
         private final TreeSet<Hash> _sorted;
         private final List<Hash>  _floodfillMatches;

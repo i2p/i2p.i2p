@@ -1,6 +1,12 @@
+2013-02-10 zzz
+ * NetDB:
+   - Encrypt DatabaseLookup messages out exploratory tunnels
+     when we already have the RI of the ff
+   - Don't use multiple routers from the same /16 in lookups or stores
+
 2013-02-06 kytv
-* German, Polish, Portuguese, Spanish, and Swedish translation updates
-  from Transifex
+ * German, Polish, Portuguese, Spanish, and Swedish translation updates
+   from Transifex
 
 2013-02-04 str4d
  * i2ptunnel:
@@ -9,8 +15,8 @@
      - Allow any domain name to be mapped, not just .i2p
 
 2013-01-31 kytv
-* Add Norwegian Bokmål language to the router console
-* Add Bokmål translations from Transifex
+ * Add Norwegian Bokmål language to the router console
+ * Add Bokmål translations from Transifex
 
 2013-01-31 zzz
  * EepGet:
@@ -18,7 +24,7 @@
    - Add port to Host header to conform to RFC 2616
 
 2013-01-29 zzz
- * Console: Catch IllegalStateException storing nonces (ticket #852)
+ * Console: Catch IllegalStateException storing nonces (tickets #836, #852, #858)
  * Translations:
    - Use JVM language name if available
    - Correct Estonian language code from ee to et
