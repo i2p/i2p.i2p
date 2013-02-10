@@ -352,7 +352,7 @@ public class LogManager {
         // so it may be set in the UI.
         String filename = config.getProperty(PROP_FILENAME, DEFAULT_FILENAME);
         String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
-        if (filenameOverride != null && !filename.equals(DEFAULT_FILENAME))
+        if (filenameOverride != null && filename.equals(DEFAULT_FILENAME))
             setBaseLogfilename(filenameOverride);
         else
             setBaseLogfilename(filename);
