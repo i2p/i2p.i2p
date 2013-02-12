@@ -37,7 +37,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private MessageWrapper.WrappedMessage _wrappedMessage;
     private final Set<Hash> _ignore;
     
-    private static final int START_DELAY = 20*1000;
+    private static final int START_DELAY = 18*1000;
+    private static final int START_DELAY_RAND = 9*1000;
     private static final int VERIFY_TIMEOUT = 20*1000;
     private static final int MAX_PEERS_TO_TRY = 4;
     
@@ -59,7 +60,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             _ignore.add(_sentTo);
         }
         // wait some time before trying to verify the store
-        getTiming().setStartAfter(ctx.clock().now() + START_DELAY);
+        getTiming().setStartAfter(ctx.clock().now() + START_DELAY + ctx.random().nextInt(START_DELAY_RAND));
         getContext().statManager().createRateStat("netDb.floodfillVerifyOK", "How long a floodfill verify takes when it succeeds", "NetworkDatabase", new long[] { 60*60*1000 });
         getContext().statManager().createRateStat("netDb.floodfillVerifyFail", "How long a floodfill verify takes when it fails", "NetworkDatabase", new long[] { 60*60*1000 });
         getContext().statManager().createRateStat("netDb.floodfillVerifyTimeout", "How long a floodfill verify takes when it times out", "NetworkDatabase", new long[] { 60*60*1000 });

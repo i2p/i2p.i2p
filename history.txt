@@ -1,4 +1,12 @@
+2013-02-12 zzz
+ * NetDB: Randomize delay before floodfill store verify
+
 2013-02-10 zzz
+ * Logs: Again fix setting log filename (ticket #805)
+ * Update: Bump torrent update to 3% of routers
+ * Wrapper: Update ARMv6 Java Service Wrapper to v3.5.17 (ticket #826).
+
+2013-02-09 zzz
  * NetDB:
    - Encrypt DatabaseLookup messages out exploratory tunnels
      when we already have the RI of the ff
