@@ -1,3 +1,6 @@
+2013-02-13 kytv
+ * Flag for Curaçao (CW), public domain
+
 2013-02-12 zzz
  * NetDB: Randomize delay before floodfill store verify
 

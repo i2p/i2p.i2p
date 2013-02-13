@@ -59,6 +59,7 @@ CR,Costa Rica
 CS,Serbia and Montenegro
 CU,Cuba
 CV,Cape Verde
+CW,Curaçao
 CX,Christmas Island
 CY,Cyprus
 CZ,Czech Republic
