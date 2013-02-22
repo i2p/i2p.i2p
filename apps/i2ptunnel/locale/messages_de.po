@@ -12,13 +12,14 @@
 # foo <foo@bar>, 2009.
 # mixxy, 2011.
 #   <pirr@tormail.org>, 2012.
+#  <zeroflag@i2pmail.org>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 02:34+0000\n"
-"PO-Revision-Date: 2012-11-30 02:18+0000\n"
-"Last-Translator: blabla <blabla@trash-mail.com>\n"
+"POT-Creation-Date: 2013-02-22 13:13+0000\n"
+"PO-Revision-Date: 2013-02-07 20:04+0000\n"
+"Last-Translator: zeroflag <zeroflag@i2pmail.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -102,9 +103,9 @@ msgid "{0} jump service"
 msgstr "Weiterleitungsdienst {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:163
-#, fuzzy, java-format
+#, java-format
 msgid "Added via address helper from {0}"
-msgstr "Durch Adresshelfer hinzugefügt"
+msgstr "Hinzugefüg über den Adressenhelfer von {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:165
 msgid "Added via address helper"

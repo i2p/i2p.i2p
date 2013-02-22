@@ -11,6 +11,7 @@ trans.hu = apps/i2ptunnel/locale/messages_hu.po
 trans.it = apps/i2ptunnel/locale/messages_it.po
 trans.nb = apps/i2ptunnel/locale/messages_nb.po
 trans.nl = apps/i2ptunnel/locale/messages_nl.po
+trans.pl = apps/i2ptunnel/locale/messages_pl.po
 trans.pt = apps/i2ptunnel/locale/messages_pt.po
 trans.ru = apps/i2ptunnel/locale/messages_ru.po
 trans.sv_SE = apps/i2ptunnel/locale/messages_sv.po
@@ -52,6 +53,7 @@ trans.es = apps/i2psnark/locale/messages_es.po
 trans.fr = apps/i2psnark/locale/messages_fr.po
 trans.hu = apps/i2psnark/locale/messages_hu.po
 trans.it = apps/i2psnark/locale/messages_it.po
+trans.nb = apps/i2psnark/locale/messages_nb.po
 trans.nl = apps/i2psnark/locale/messages_nl.po
 trans.pl = apps/i2psnark/locale/messages_pl.po
 trans.pt = apps/i2psnark/locale/messages_pt.po
@@ -137,6 +139,7 @@ trans.uk_UA = debian/po/uk.po
 source_file = installer/resources/locale/messages_en.po
 source_lang = en
 trans.de = installer/resources/locale/po/messages_de.po
+trans.fr = installer/resources/locale/po/messages_fr.po
 trans.it = installer/resources/locale/po/messages_it.po
 
 [main]

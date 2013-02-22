@@ -1,3 +1,7 @@
+2013-02-22 kytv
+ * French, German, Norwegian, and Portuguese translation updates from
+   transifex.
+
 2013-02-13 kytv
  * Flag for Curaçao (CW), public domain
 
