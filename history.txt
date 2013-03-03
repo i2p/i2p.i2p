@@ -1,3 +1,6 @@
+2013-03-03 zzz
+ * graphs.jsp: Fix saving settings (ticket #857)
+
 2013-03-03 kytv
  * Update geoip.txt based on Maxmind GeoLite Country database from 2013-02-19
 

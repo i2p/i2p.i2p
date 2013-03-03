@@ -332,10 +332,10 @@ public class GraphHelper extends FormHandler {
     public String getForm() { 
         if (StatSummarizer.isDisabled())
             return "";
-        String prev = System.getProperty("net.i2p.router.web.GraphHelper.nonce");
-        if (prev != null) System.setProperty("net.i2p.router.web.GraphHelper.noncePrev", prev);
-        String nonce = "" + _context.random().nextLong();
-        System.setProperty("net.i2p.router.web.GraphHelper.nonce", nonce);
+        // too hard to use the standard formhandler.jsi / FormHandler.java session nonces
+        // since graphs.jsp needs the refresh value in its <head>.
+        // So just use the "shared/console nonce".
+        String nonce = CSSHelper.getNonce();
         try {
             _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats\">" + _("Select Stats") + "</a>]</h3>");
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +
