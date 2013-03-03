@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-#  <nekolam55@gmail.com>, 2013.
+#  Boxoa590, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-02-22 13:13+0000\n"
 "PO-Revision-Date: 2013-02-11 17:13+0000\n"
-"Last-Translator: Boxoa590 <nekolam55@gmail.com>\n"
+"Last-Translator: Boxoa590\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
 "Language: fr\n"

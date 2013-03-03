@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the i2p package.
 #
 # Translators:
-#   <nekolam55@gmail.com>, 2012.
+#   Boxoa590, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
 "PO-Revision-Date: 2012-11-13 21:31+0000\n"
-"Last-Translator: Boxoa590 <nekolam55@gmail.com>\n"
+"Last-Translator: Boxoa590\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
 "Language: fr\n"

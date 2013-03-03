@@ -11,7 +11,7 @@
 # foo <foo@bar>, 2009.
 #   <foonikens@gmail.com>, 2011.
 # jackjack <root@waka.site40.net>, 2011.
-#   <nekolam55@gmail.com>, 2012.
+#   Boxoa590, 2012.
 #   <root@waka.site40.net>, 2011.
 msgid ""
 msgstr ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-02-22 13:12+0000\n"
 "PO-Revision-Date: 2012-11-14 19:05+0000\n"
-"Last-Translator: Boxoa590 <nekolam55@gmail.com>\n"
+"Last-Translator: Boxoa590\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
 "Language: fr\n"
