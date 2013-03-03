@@ -1,3 +1,6 @@
+2013-03-03 kytv
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2013-02-19
+
 2013-02-22 kytv
  * French, German, Norwegian, and Portuguese translation updates from
    transifex.
