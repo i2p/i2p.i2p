@@ -15,7 +15,7 @@ WARN=60
 SOON=30
 
 
-if [ $(which 1openssl) ]; then
+if [ $(which openssl) ]; then
     OPENSSL=1
 elif [ $(which certtool) ]; then : ;else
     echo "ERROR: Neither certtool nor openssl were found..." >&2
