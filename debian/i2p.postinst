@@ -60,6 +60,7 @@ case "$1" in
         sed -e "s/^ *wrapper\.java\.maxmemory=.*/wrapper\.java\.maxmemory=$MEMORYLIMIT/" \
             < /etc/i2p/wrapper.config > /etc/i2p/wrapper.config.tmp
         mv -f /etc/i2p/wrapper.config.tmp /etc/i2p/wrapper.config
+        chmod 0644 -f /etc/i2p/wrapper.config
 
     # Older versions of adduser created the home directory.
     # The version of adduser in Debian unstable does not.
