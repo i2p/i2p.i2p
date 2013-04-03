@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="LimeWire3"
+	Name="I2P"
 	ProjectGUID="{0A74F3D1-C70A-4CF0-9390-C676025ED12F}"
-	RootNamespace="LimeWire3"
+	RootNamespace="I2P"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -64,10 +64,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Shlwapi.lib"
-				OutputFile="$(OutDir)/LimeWire.exe"
+				OutputFile="$(OutDir)/I2P.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/LimeWire3.pdb"
+				ProgramDatabaseFile="$(OutDir)/I2P.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -78,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="LimeWire.exe.manifest"
+				AdditionalManifestFiles="I2P.exe.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -143,7 +143,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib"
-				OutputFile="$(OutDir)/MuWire.exe"
+				OutputFile="$(OutDir)/I2P.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -223,7 +223,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib"
-				OutputFile="$(OutDir)/LimeWire.exe"
+				OutputFile="$(OutDir)/I2P.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -265,15 +265,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\i2p.c"
+				>
+			</File>
+			<File
 				RelativePath=".\java.c"
 				>
 			</File>
 			<File
 				RelativePath=".\java_md.c"
-				>
-			</File>
-			<File
-				RelativePath=".\limewire.c"
 				>
 			</File>
 		</Filter>
@@ -303,7 +303,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource1.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 		</Filter>
@@ -313,15 +313,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\LimeWire31.rc"
+				RelativePath=".\I2P.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\merged icon.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\torrent.ico"
+				RelativePath="..\..\resources\start.ico"
 				>
 			</File>
 		</Filter>

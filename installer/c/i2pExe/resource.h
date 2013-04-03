@@ -1,9 +1,8 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by LimeWire31.rc
+// Used by I2P.rc
 //
 #define IDI_ICON1                       111
-#define IDI_ICON2                       112
 
 // Next default values for new objects
 // 

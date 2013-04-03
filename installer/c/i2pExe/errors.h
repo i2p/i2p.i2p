@@ -1,5 +1,5 @@
-#ifndef _LIME_ERRORS_H
-#define _LIME_ERRORS_h
+#ifndef _I2P_ERRORS_H
+#define _I2P_ERRORS_h
 
 
 #define ERROR_COULDNT_LOAD_JVM 6
@@ -8,4 +8,4 @@
 #define ERROR_STARTING_PROGRAM 9
 #define ERROR_COULDNT_FIND_JVM 10
 
-#endif /* _LIME_ERRORS_H */
+#endif /* _I2P_ERRORS_H */

@@ -1,8 +1,8 @@
 /** 
- * Customized LimeWire launcher.
+ * Customized I2P launcher.
  * Launches the JRE within the process, to allow Task Manager to show
- * "LimeWire.exe" as the process, and firewalls to control access of
- * "LimeWire.exe".
+ * "I2P.exe" as the process, and firewalls to control access of
+ * "I2P.exe".
  */
 
 #include "errors.h"
@@ -53,7 +53,7 @@ main(int argc, char** argv) {
 	for(i = 1; i <= read_options_size; i++)
 		new_argv[i] = read_options[i-1];
 	// copy argv arguments as arguments after the properties file
-	// (generally used as arguments for LimeWire)
+	// (generally used as arguments for I2P)
 	for(current_argc = 1; current_argc < argc; current_argc++)
 		new_argv[i++] = argv[current_argc];
 
@@ -69,20 +69,20 @@ main(int argc, char** argv) {
 	case ERROR_COULDNT_FIND_JVM:
 	case ERROR_COULDNT_INITIALIZE_JVM:
 	case ERROR_COULDNT_LOAD_JVM:
-		if (MessageBox(NULL, "MuWire needs the Java Runtime Environment 6.0 or above. Click OK to go to www.java.com, where you can install Java.", 
-		       "MuWire Launcher Error",
+		if (MessageBox(NULL, "I2P needs the Java Runtime Environment 5.0 or above. Click OK to go to www.java.com, where you can install Java.", 
+		       "I2P Launcher Error",
 		       MB_ICONWARNING | MB_OKCANCEL) == IDOK)
 			ShellExecute(NULL, NULL, "http://www.java.com/", "", "", SW_SHOWNORMAL);
 		break;
 	case ERROR_COULDNT_PARSE_ARGUMENTS:
-		MessageBox(NULL, "MuWire failed to parse the commandline arguments to Java.\n"
-			"Please download and install MuWire again.",
-			"MuWire Launcher Error", MB_OK);
+		MessageBox(NULL, "I2P failed to parse the commandline arguments to Java.\n"
+			"Please download and install I2P again.",
+			"I2P Launcher Error", MB_OK);
 		break;
 	case ERROR_STARTING_PROGRAM:
-		MessageBox(NULL, "MuWire was unable to load.\n"
-				"Please download and install MuWire again.",
-				"MuWire Launcher Error", MB_OK);
+		MessageBox(NULL, "I2P was unable to load.\n"
+				"Please download and install I2P again.",
+				"I2P Launcher Error", MB_OK);
 		break;
 	}
 	return ret;
@@ -128,7 +128,7 @@ void readOptions(char*** options, int* size) {
 #pragma message ("\n\n!!!!!!!!!!!!!! building ALPHA !!!!!!!!!!!!!!\n\n")
 		(*options)[(*size) - 3] = "-agentlib:yjpagent=port=11111";
 		(*options)[(*size) - 2] = "-jar";
-		(*options)[(*size) - 1] = "LimeWire.jar";
+		(*options)[(*size) - 1] = "I2P.jar";
 #endif
 		return;
 	}
@@ -165,7 +165,7 @@ void readOptions(char*** options, int* size) {
 }
 
 /*
- * Sets the current working directory to wherever LimeWire.exe is located
+ * Sets the current working directory to wherever I2P.exe is located
  */
 static void
 SetWorkingDirectory(char *path) {
