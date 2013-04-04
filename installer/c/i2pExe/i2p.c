@@ -126,24 +126,21 @@ void readOptions(char*** options, int* size) {
 	file = fopen("launch.properties", "r");
 	if(file == NULL) {
 		// default to certain values.
-		*size = 10;
-#ifdef ALPHA
-		*size = (*size) + 1;
-#endif
+		*size = 9;
 		
 		*options = (char**)MemAlloc(sizeof(char*) * (*size));
 		i = 0;
 		(*options)[i++] = "-Xms64m";
-		(*options)[i++] = "-Xmx256m";
-		(*options)[i++] = "-Dasdf=fdsa";
-		(*options)[i++] = "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.NoOpLog";
+		(*options)[i++] = "-Xmx128m";
 		//(*options)[i++] = "-Djava.net.preferIPv6Addresses=false";
-		(*options)[i++] = "-Djava.net.preferIPv4Stack=true";
-		(*options)[i++] = "-ea:com.limegroup...";
-		(*options)[i++] = "-ea:org.limewire...";
-		(*options)[i++] = "-Djava.library.path=lib";
-		(*options)[i++] = "-jar";
-		(*options)[i++] = "lib\\MuWire.jar";
+		//(*options)[i++] = "-Djava.net.preferIPv4Stack=true";
+		(*options)[i++] = "-Djava.library.path=.;lib";
+		(*options)[i++] = "-DloggerFilenameOverride=logs/log-router-@.txt";
+		(*options)[i++] = "-Dorg.mortbay.http.Version.paranoid=true";
+		(*options)[i++] = "-Dorg.mortbay.util.FileResource.checkAliases=false";
+		(*options)[i++] = "-cp";
+		(*options)[i++] = "lib/i2p.jar:lib/router.jar:lib/jbigi.jar:lib/BOB.jar:lib/sam.jar:lib/mstreaming.jar:lib/streaming.jar:lib/routerconsole.jar:lib/i2ptunnel.jar:lib/org.mortbay.jetty.jar:lib/javax.servlet.jar:lib/jasper-compiler.jar:lib/jasper-runtime.jar:lib/commons-logging.jar:lib/commons-el.jar:lib/wrapper.jar:lib/systray.jar:lib/systray4j.jar:lib/desktopgui.jar:lib/i2psnark.jar:lib/jrobin.jar:lib/jstl.jar:lib/standard.jar:lib/jetty-i2p.jar:lib/jetty-java5-threadpool.jar:lib/jetty-rewrite-handler.jar:lib/jetty-sslengine.jar:lib/jetty-start.jar:lib/jetty-util.jar";
+		(*options)[i++] = "net.i2p.router.RouterLaunch";
 #ifdef ALPHA
 #pragma message ("\n\n!!!!!!!!!!!!!! building ALPHA !!!!!!!!!!!!!!\n\n")
 		(*options)[(*size) - 3] = "-agentlib:yjpagent=port=11111";
