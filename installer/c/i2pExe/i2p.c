@@ -32,13 +32,13 @@ extern int launchJVM(int, char**);
 int
 main(int argc, char** argv) {
 
-	//int read_options_size;
-	//char** read_options;
+	int read_options_size;
+	char** read_options;
 	int ret = 0;
 	//int current_argc = 0;
-	//int new_argc;
-	//char** new_argv;
-	//int i;
+	int new_argc;
+	char** new_argv;
+	int i;
 #ifdef _WIN32
 	char currentDirectory[MAX_PATH+1];
 #endif
@@ -48,33 +48,37 @@ main(int argc, char** argv) {
 	SetWorkingDirectory(currentDirectory);
 #endif
 
-	// Read in options from disk (launch.properties)
-	// or the default ones (if no launch.properties existed)
-	//readOptions(&read_options, &read_options_size);
+	// If there are command-line arguments, just use them
+	if(argc > 1) {
+		ret = launchJVM(argc, argv);
+	} else {
+		// Read in options from disk (launch.properties)
+		// or the default ones (if no launch.properties existed)
+		readOptions(&read_options, &read_options_size);
 
-	// Construct a new argc & argv to pass to launchJVM
-	//new_argc = read_options_size + argc;
-	//new_argv = (char**)MemAlloc(sizeof(char*) * (new_argc+1));
+		// Construct a new argc & argv to pass to launchJVM
+		new_argc = read_options_size;
+		new_argv = (char**)MemAlloc(sizeof(char*) * (new_argc+1));
 
-	// copy process name
-	//new_argv[0] = argv[0];
-	// copy arguments from properties file
-	//for(i = 1; i <= read_options_size; i++)
-	//	new_argv[i] = read_options[i-1];
-	// copy argv arguments as arguments after the properties file
-	// (generally used as arguments for I2P)
-	//for(current_argc = 1; current_argc < argc; current_argc++)
-	//	new_argv[i++] = argv[current_argc];
+		// copy process name
+		new_argv[0] = argv[0];
+		// copy arguments from properties file
+		for(i = 1; i <= read_options_size; i++)
+			new_argv[i] = read_options[i-1];
+		// copy argv arguments as arguments after the properties file
+		// (generally used as arguments for I2P)
+		//for(current_argc = 1; current_argc < argc; current_argc++)
+		//	new_argv[i++] = argv[current_argc];
 
-	//new_argv[i] = NULL;
+		new_argv[i] = NULL;
 
-	// options are no longer necessary -- free them up.
-	//if(read_options != 0)
-	//	free(read_options);
+		// options are no longer necessary -- free them up.
+		if(read_options != 0)
+			free(read_options);
 
-    //ret = launchJVM(new_argc, new_argv);
-	//free(new_argv);
-	ret = launchJVM(argc, argv);
+		ret = launchJVM(new_argc, new_argv);
+		free(new_argv);
+	}
 	switch(ret) {
 	case ERROR_COULDNT_FIND_JVM:
 	case ERROR_COULDNT_INITIALIZE_JVM:
