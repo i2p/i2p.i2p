@@ -19,6 +19,7 @@
                 <pathelement location="../../ministreaming/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-servlet.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
             </classpath>
         </depend>
@@ -38,7 +39,7 @@
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jetty/jettylib/jetty-util.jar:../../ministreaming/java/build/mstreaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jetty/jettylib/jetty-servlet.jar:../../jetty/jettylib/jetty-util.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -103,9 +104,11 @@
         <copy todir="build/icons/.icons" >
             <fileset dir="../icons/" />
         </copy>
+        <!-- mime.properties must be in with the classes -->
+        <copy file="../mime.properties" todir="build/obj/org/klomp/snark/web" />
         <war destfile="../i2psnark.war" webxml="../web.xml" >
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
-          <classes dir="./build/obj" includes="**/web/*.class" />
+          <classes dir="./build/obj" includes="**/web/*" />
             <fileset dir="build/icons/" />
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />

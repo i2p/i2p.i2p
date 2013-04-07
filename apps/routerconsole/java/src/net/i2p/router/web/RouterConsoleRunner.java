@@ -42,30 +42,33 @@ import net.i2p.util.ShellCommand;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
-import org.mortbay.jetty.AbstractConnector;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.NCSARequestLog;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.handler.RequestLogHandler;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.Credential.MD5;
-import org.mortbay.jetty.security.DigestAuthenticator;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.security.SslSelectChannelConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.servlet.SessionHandler;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.thread.QueuedThreadPool;
-import org.mortbay.thread.concurrent.ThreadPool;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.authentication.DigestAuthenticator;
+import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.NCSARequestLog;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
+import org.eclipse.jetty.util.security.Credential.MD5;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
 
 /**
  *  Start the router console.
@@ -293,7 +296,7 @@ public class RouterConsoleRunner implements RouterApp {
         //    System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
         //}
         // This way it doesn't try to load Slf4jLog first
-        System.setProperty("org.mortbay.log.class", "net.i2p.jetty.I2PLogger");
+        System.setProperty("org.eclipse.jetty.util.log.class", "net.i2p.jetty.I2PLogger");
 
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");
@@ -302,7 +305,8 @@ public class RouterConsoleRunner implements RouterApp {
 
         try {
             ThreadPool ctp = new CustomThreadPoolExecutor();
-            ctp.prestartAllCoreThreads();
+            // Gone in Jetty 7
+            //ctp.prestartAllCoreThreads();
             _server.setThreadPool(ctp);
         } catch (Throwable t) {
             // class not found...
@@ -315,7 +319,9 @@ public class RouterConsoleRunner implements RouterApp {
 
         HandlerCollection hColl = new HandlerCollection();
         ContextHandlerCollection chColl = new ContextHandlerCollection();
-        _server.addHandler(hColl);
+        // gone in Jetty 7
+        //_server.addHandler(hColl);
+        _server.setHandler(hColl);
         hColl.addHandler(chColl);
         hColl.addHandler(new DefaultHandler());
 
@@ -351,7 +357,7 @@ public class RouterConsoleRunner implements RouterApp {
         if (!_webAppsDir.endsWith("/"))
             _webAppsDir += '/';
 
-        WebAppContext rootWebApp = null;
+        HandlerWrapper rootWebApp = null;
         ServletHandler rootServletHandler = null;
         List<Connector> connectors = new ArrayList(4);
         try {
@@ -507,17 +513,14 @@ public class RouterConsoleRunner implements RouterApp {
                 return;
             }
 
-            rootWebApp = new LocaleWebAppHandler(_context,
-                                                  "/", _webAppsDir + ROUTERCONSOLE + ".war");
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
-            rootWebApp.setTempDirectory(tmpdir);
-            rootWebApp.setExtractWAR(false);
-            rootWebApp.setSessionHandler(new SessionHandler());
             rootServletHandler = new ServletHandler();
-            rootWebApp.setServletHandler(rootServletHandler);
-            initialize(_context, rootWebApp);
+            rootWebApp = new LocaleWebAppHandler(_context,
+                                                  "/", _webAppsDir + ROUTERCONSOLE + ".war",
+                                                 tmpdir, rootServletHandler);
+            initialize(_context, (WebAppContext)(rootWebApp.getHandler()));
             chColl.addHandler(rootWebApp);
 
         } catch (Exception ioe) {
@@ -727,7 +730,7 @@ public class RouterConsoleRunner implements RouterApp {
      *  Add all users and passwords.
      */
     static void initialize(RouterContext ctx, WebAppContext context) {
-        SecurityHandler sec = new SecurityHandler();
+        ConstraintSecurityHandler sec = new ConstraintSecurityHandler();
         List<ConstraintMapping> constraints = new ArrayList(4);
         ConsolePasswordManager mgr = new ConsolePasswordManager(ctx);
         boolean enable = ctx.getBooleanProperty(PROP_PW_ENABLE);
@@ -737,14 +740,13 @@ public class RouterConsoleRunner implements RouterApp {
                 enable = false;
                 ctx.router().saveConfig(PROP_CONSOLE_PW, "false");
             } else {
-                HashUserRealm realm = new HashUserRealm(JETTY_REALM);
-                sec.setUserRealm(realm);
+                HashLoginService realm = new HashLoginService(JETTY_REALM);
+                sec.setLoginService(realm);
                 sec.setAuthenticator(authenticator);
                 for (Map.Entry<String, String> e : userpw.entrySet()) {
                     String user = e.getKey();
                     String pw = e.getValue();
-                    realm.put(user, MD5.__TYPE + pw);
-                    realm.addUserToRole(user, JETTY_ROLE);
+                    realm.putUser(user, Credential.getCredential(MD5.__TYPE + pw), new String[] {JETTY_ROLE});
                     Constraint constraint = new Constraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);
                     ConstraintMapping cm = new ConstraintMapping();
@@ -843,11 +845,13 @@ public class RouterConsoleRunner implements RouterApp {
      * Just to set the name and set Daemon
      * @since Jetty 6
      */
-    private static class CustomThreadPoolExecutor extends ThreadPool {
+    private static class CustomThreadPoolExecutor extends ExecutorThreadPool {
         public CustomThreadPoolExecutor() {
              super(MIN_THREADS, MAX_THREADS, MAX_IDLE_TIME, TimeUnit.MILLISECONDS,
-                   new SynchronousQueue(), new CustomThreadFactory(),
-                   new ThreadPoolExecutor.CallerRunsPolicy());
+                   new SynchronousQueue()  /** ,  following args not available in Jetty 7
+                   new CustomThreadFactory(),
+                   new ThreadPoolExecutor.CallerRunsPolicy() **/
+                  );
         }
     }
 

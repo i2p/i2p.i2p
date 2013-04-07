@@ -17,7 +17,7 @@ import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
 
-import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
 /**
  *  Saves changes to clients.config or webapps.config

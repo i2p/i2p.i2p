@@ -12,7 +12,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.RouterPasswordManager;
 
-//import org.mortbay.jetty.security.UnixCrypt;
+//import org.eclipse.jetty.util.security.UnixCrypt;
 
 /**
  *  Manage both plaintext and salted/hashed password storage in

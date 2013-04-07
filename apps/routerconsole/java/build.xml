@@ -63,9 +63,13 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-http.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-io.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-security.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-servlets.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-webapp.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />

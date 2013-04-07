@@ -177,10 +177,11 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 6.1.26:
-   Copyright 1995-2009 Mort Bay Consulting Pty Ltd
-   See licenses/LICENSE-Jetty.txt
+   Jetty 7.6.8.v20121106:
+   See licenses/ABOUT-Jetty.html
+   See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
+   See licenses/LICENSE-ECLIPSE-1.0.html
    See licenses/NOTICE-Commons-Logging.txt
 
    JRobin 1.5.9.1:
