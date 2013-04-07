@@ -152,12 +152,15 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long CLEAN_TIME = 63*1000;
     private static final long EXPLORE_TIME = 877*1000;
     private static final long BLACKLIST_CLEAN_TIME = 17*60*1000;
-    private static final String DHT_FILE = "i2psnark.dht.dat";
+    private static final String DHT_FILE_SUFFIX = ".dht.dat";
 
     private static final int SEND_CRYPTO_TAGS = 8;
     private static final int LOW_CRYPTO_TAGS = 4;
 
-    public KRPC (I2PAppContext ctx, I2PSession session) {
+    /**
+     *  @param baseName generally "i2psnark"
+     */
+    public KRPC (I2PAppContext ctx, String baseName, I2PSession session) {
         _context = ctx;
         _session = session;
         _log = ctx.logManager().getLog(KRPC.class);
@@ -182,7 +185,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             _myNID = new NID(_myID);
         }
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
-        _dhtFile = new File(ctx.getConfigDir(), DHT_FILE);
+        _dhtFile = new File(ctx.getConfigDir(), baseName + DHT_FILE_SUFFIX);
         _knownNodes = new DHTNodes(ctx, _myNID);
 
         start();
