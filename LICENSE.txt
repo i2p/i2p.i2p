@@ -177,7 +177,7 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 7.6.8.v20121106:
+   Jetty 7.6.10.v20130312:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.ver" value="7.6.8.v20121106" />
+    <property name="jetty.ver" value="7.6.10.v20130312" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="6fcdc3f532c5ab72843e12cbac3d7cb797cdb5b9" />
+    <property name="jetty.sha1" value="8c0ff0ad83756de118f5af71b88ca9c78ebf6420" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
@@ -12,16 +12,25 @@
 
     <target name="all" depends="build" />
 
-  <!--
+    <!--
+      - We now check in the jars we need to ${jetty.base}, so
+      - fetchJettylib, verifyJettylib, and extractJettylib are not used unless
+      - updating to a new Jetty version by changing ${jetty.ver} and ${jetty.sha1} above.
+     -->
+
     <target name="ensureJettylib" >
-        <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
-        <available property="jetty.zip.extracted" file="jettylib" type="dir" />
-        <ant target="fetchJettylib" />
-        <ant target="verifyJettylib" />
-        <ant target="extractJettylib" />
+        <available property="jetty.zip.extracted" file="${jetty.base}" type="dir" />
+        <condition property="jetty.zip.available" >
+            <or>
+                <istrue value="${jetty.zip.extracted}" />
+                <available file="${jetty.filename}" type="file" />
+            </or>
+        </condition>
+        <ant target="copyJettylib" />
     </target>
-   -->
+  <!--
     <target name="ensureJettylib" depends="extractJettylib" />
+   -->
 
     <target name="fetchJettylib" unless="jetty.zip.available" >
         <echo message="It seems that you don't have '${jetty.filename}' deployed." />
@@ -48,13 +57,16 @@
     </target>
 
     <condition property="verified.already" >
-        <and>
-            <available file="${jetty.filename}" />
-            <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
-        </and>
+        <or>
+            <istrue value="${jetty.zip.extracted}" />
+            <and>
+                <available file="${jetty.filename}" />
+                <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+            </and>
+        </or>
     </condition>
 
-    <target name="verifyJettylib" unless="verified.already" >
+    <target name="verifyJettylib" depends="fetchJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
                 <checksum file="${jetty.filename}" algorithm="SHA" property="${jetty.sha1}" />
         </condition>
@@ -68,23 +80,21 @@
         <touch file="${verified.filename}" />
     </target>
 
-  <!--
-    <target name="extractJettylib" unless="jetty.zip.extracted" >
-   -->
-    <target name="extractJettylib" >
+    <target name="extractJettylib" depends="verifyJettylib" unless="jetty.zip.extracted" >
       <!-- for .tgz -->
       <!--
         <gunzip src="${jetty.filename}" dest="jetty.tar" />
         <untar src="jetty.tar" dest="." />
       -->
       <!-- for .zip -->
-      <!--
         <unzip src="${jetty.filename}" dest="." />
-      -->
+    </target>
+
+    <target name="copyJettylib" depends="extractJettylib" >
         <mkdir dir="jettylib" />
       <!-- We copy everything to names without the version numbers so we
-           can update them later. Where there was something similar in Jetty 5,
-           we use the same names so they will overwrite the Jetty 5 jar on upgrade.
+           can update them later. Where there was something similar in Jetty 5/6,
+           we use the same names so they will overwrite the Jetty 5/6 jar on upgrade.
            Otherwise we use the same name as the symlink in Ubuntu /usr/share/java.
            Reasons for inclusion:
               start.jar: Needed for clients.config startup of eepsites
@@ -123,8 +133,8 @@
                 <attribute name="Note" value="Intentionally empty" />
             </manifest>
         </jar>
-        <delete file="jetty.tar" />
       <!--
+        <delete file="jetty.tar" />
         <delete dir="${jetty.base}" />
       -->
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over,
@@ -176,7 +186,29 @@
 
     <target name="builddep" />
 
-    <target name="compile" depends="builddep, ensureJettylib" >
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../build"
+            srcdir="./java/src" 
+            destdir="./build/obj" >
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="./jettylib/commons-logging.jar" />
+                <pathelement location="./jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jetty-http.jar" />
+                <pathelement location="./jettylib/jetty-io.jar" />
+                <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-xml.jar" />
+            </classpath>
+        </depend>
+    </target>
+
+    <target name="compile" depends="builddep, ensureJettylib, depend" >
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
