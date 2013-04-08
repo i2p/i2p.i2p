@@ -226,7 +226,7 @@
         <Arg>
           <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
             <Set name="monitoredDirName">./eepsite/contexts</Set>
-            <Set name="scanInterval">30</Set>
+            <Set name="scanInterval">120</Set>
           </New>
         </Arg>
       </Call>
@@ -245,33 +245,18 @@
     <!-- Normally only one type of deployer need be used.            -->
     <!--                                                             -->
     <!-- =========================================================== -->
-    <Call name="addLifeCycle">
-      <Arg>
-        <New class="org.eclipse.jetty.deploy.WebAppDeployer">
-          <Set name="contexts"><Ref id="Contexts"/></Set>
-          <Set name="webAppDir">./eepsite/webapps</Set>
-	  <Set name="parentLoaderPriority">false</Set>
-          <!-- set to true if you have uncompiled jsps in your wars -->
-	  <Set name="extract">false</Set>
-	  <Set name="allowDuplicates">false</Set>
-          <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
-        </New>
-      </Arg>
-    </Call>
-
-<!-- FIXME Above is deprecated, but this doesn't work 
-     java.lang.IllegalStateException: No Method: <Call name="addAppProvider"><New class="org.eclipse.jetty.deploy.providers.WebAppProvider"><Set name="monitoredDirName">./eepsite/webapps</Set><Set name="parentLoaderPriority">false</Set><Set name="extractWars">false</Set><Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set></New></Call> on class org.eclipse.jetty.deploy.DeploymentManager
     <Ref id="DeploymentManager">
       <Call id="webappprovider" name="addAppProvider">
-        <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
-          <Set name="monitoredDirName">./eepsite/webapps</Set>
-	  <Set name="parentLoaderPriority">false</Set>
-	  <Set name="extractWars">false</Set>
-          <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
-        </New>
+        <Arg>
+          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+            <Set name="monitoredDirName">./eepsite/webapps</Set>
+	    <Set name="parentLoaderPriority">false</Set>
+	    <Set name="extractWars">false</Set>
+            <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
+          </New>
+        </Arg>
       </Call>
     </Ref>
--->
 
     <!-- =========================================================== -->
     <!-- Configure Authentication Realms                             -->

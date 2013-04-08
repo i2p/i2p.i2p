@@ -63,6 +63,7 @@ import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.security.Credential.MD5;
@@ -527,6 +528,10 @@ public class RouterConsoleRunner implements RouterApp {
             ioe.printStackTrace();
         }
 
+        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=364936
+        // WARN:oejw.WebAppContext:Failed startup of context o.e.j.w.WebAppContext{/,jar:file:/.../webapps/routerconsole.war!/},/.../webapps/routerconsole.war
+        // java.lang.IllegalStateException: zip file closed
+        Resource.setDefaultUseCaches(false);
         try {
             // start does a mapContexts()
             _server.start();
