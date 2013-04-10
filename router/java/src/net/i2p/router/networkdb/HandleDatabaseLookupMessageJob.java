@@ -78,6 +78,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             return;
         }
 
+        // TODO only look up once, then check type
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
             // We have to be very careful here to decide whether or not to send out the leaseSet,
