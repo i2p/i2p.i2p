@@ -105,20 +105,19 @@ public class ElGamalAESEngine {
         boolean wasExisting = false;
         if (key != null) {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
-            long id = _context.random().nextLong();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(id + ": Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes " /* + Base64.encode(data, 0, 64) */ );
+                _log.debug("Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes " /* + Base64.encode(data, 0, 64) */ );
             
             decrypted = decryptExistingSession(data, key, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptExistingSession");
                 if ( (!foundTags.isEmpty()) && (_log.shouldLog(Log.DEBUG)) )
-                    _log.debug(id + ": ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
+                    _log.debug("ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
                 wasExisting = true;
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
                 if (_log.shouldLog(Log.WARN)) {
-                    _log.warn(id + ": ElG decrypt fail: known tag [" + st + "], failed decrypt");
+                    _log.warn("ElG decrypt fail: known tag [" + st + "], failed decrypt");
                 }
             }
         } else {
@@ -568,6 +567,7 @@ public class ElGamalAESEngine {
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
      * </pre>
      *
+     * @param target unused, this is AES encrypt only using the session key and tag
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      */
