@@ -1,3 +1,28 @@
+2013-04-10 zzz
+ * Jetty: Upgrade to Jetty 7.6.10.v20130312
+    - Jetty build.xml improvements
+    - MigrateJetty improvements
+    - Lots of changes in RouterConsoleRunner and WebApp classes
+    - Lots of eepsite config file changes
+    - Changes to I2PLogger and I2PRequestLog
+    - Use JettyStart class to start Jetty from clients.config
+ * i2psnark: Eliminate Jetty dependencies in i2psnark for good.
+    Required due to webapp classloader changes in Jetty 7,
+    we can no longer access or extend Jetty classes.
+    - Extend javax HttpServlet instead of Jetty's DefaultServlet
+    - Implement BasicServlet to replace functions of DefaultServlet
+    - Add MimeTypes implementation to add to servlet's defaults
+    - Add local mime.properties file, remove checks in I2PSnarkServlet for those
+      we were missing
+    - Eliminate all use of Jetty utility classes including MimeType, Resource,
+      Buffer, Cache, URIUtil, ...
+    - Use servlet path everywhere, so the war can be renamed
+    - Use servlet path as base for config file and data directory names,
+      so we may have multiple instances running together
+    - Don't override service(), use doGet() and doPost() instead
+ * I2NP: Ignore unused 7 bits of the Database Lookup Message,
+   so we can use them later
+
 * 2013-03-08 0.9.5 released
 
 2013-03-03 zzz
