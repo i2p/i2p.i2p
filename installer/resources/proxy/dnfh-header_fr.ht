@@ -19,10 +19,10 @@ Proxy-Connection: close
 <h3>Avertissement I2P: site eep non trouvé dans le carnet d'adresses</h3>
 <p>
 Le site eep n'était pas dans le carnet d'adresses de votre routeur.
-Vérifiez le lien ou trouvez l'adresse BASE64.
-Si vous avez l'adresse BASE64,  reportez-la dans votre fichier userhosts.txt en passant par
-<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
-utilisez un lien d'adresse BASE64, ou un service de saut (jump) en  lien ci-dessous.
+Vérifiez le lien ou trouvez l'adresse Base 64.
+Si vous avez l'adresse Base 64,  reportez-la dans votre fichier hosts.txt en passant par
+<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">SusiDNS</a>,
+utilisez un lien d'adresse Base 64, ou un service de saut (jump) en  lien ci-dessous.
 </p>
 <p>
 Si vous voyez cette page souvent: lisez la <a href="http://www.i2p2.i2p/faq_fr.html#subscriptions">faq</a> pour obtenir

@@ -49,10 +49,10 @@ public class PcapWriter {
                                                 0, 2, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,
                                                 0, 0, (byte) 0xff, (byte) 0xff, 0, 0, 0, 1 };
 
-    /** dummy macs and ethertype */
+    /** dummy macs, IPv4 ethertype */
     private static final byte[] MAC_HEADER = { 1, 2, 3, 4, 5, 6,
                                                1, 2, 3, 4, 5, 6,
-                                               (byte) 0x80, 0 };
+                                               (byte) 0x08, 0 };
     private static final byte[] IP_HEADER_1 = { 0x45, 0 };  // the length goes after this
     private static final byte[] IP_HEADER_2 = { 0x12, 0x34, 0x40, 0, 64, 6 };  // ID, flags, TTL and TCP
     private static final byte[] UNK_IP = { (byte) 0xff, 0, 0, 0};

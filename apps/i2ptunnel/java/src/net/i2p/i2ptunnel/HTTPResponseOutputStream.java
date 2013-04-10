@@ -65,10 +65,12 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         _buf1[0] = (byte)c;
         write(_buf1, 0, 1);
     }
+
     @Override
     public void write(byte buf[]) throws IOException { 
         write(buf, 0, buf.length); 
     }
+
     @Override
     public void write(byte buf[], int off, int len) throws IOException {
         if (_headerWritten) {
@@ -181,6 +183,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                 _gzip = true;
                             } else if ("proxy-authenticate".equals(lcKey)) {
                                 // filter this hop-by-hop header; outproxy authentication must be configured in I2PTunnelHTTPClient
+                                // see e.g. http://blog.c22.cc/2013/03/11/privoxy-proxy-authentication-credential-exposure-cve-2013-2503/
                             } else {
                                 if ("content-length".equals(lcKey)) {
                                     // save for compress decision on server side
@@ -272,7 +275,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 while ( (read = _in.read(buf)) != -1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Read " + read + " and writing it to the browser/streams");
-;                   _out.write(buf, 0, read);
+                    _out.write(buf, 0, read);
                     _out.flush();
                     written += read;
                 }

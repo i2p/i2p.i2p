@@ -20,8 +20,8 @@ Proxy-Connection: close
 <p>
 Die Eepseite konnte nicht im Adressbuch des Routers gefunden werden.
 Überprüfen Sie den Link oder finden Sie eine BASIS64-Adresse!
-Wenn Sie eine BASIS64-Adresse haben, fügen Sie diese unter folgendem Link zu Ihrer userhosts.txt hinzu:
-<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
+Wenn Sie eine BASIS64-Adresse haben, fügen Sie diese unter folgendem Link zu Ihrer hosts.txt hinzu:
+<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">SusiDNS</a>,
 benutzen Sie einen BASIS64-Adresshelfer oder einen der folgenden Sprungdienste:
 </p>
 <p>

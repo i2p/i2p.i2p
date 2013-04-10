@@ -19,10 +19,10 @@ Proxy-Connection: close
 <h3>Warning: Eepsite Not Found in Addressbook</h3>
 <p>
 The eepsite was not found in your router's addressbook.
-Check the link or find a BASE64 address.
-If you have the BASE64 address,  paste it into your userhosts.txt using
-<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
-use a BASE64 address helper, or use a jump service link below.
+Check the link or find a Base 32 or Base 64 address.
+If you have the Base 64 address,
+<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">add it to your addressbook</a>.
+Otherwise, find a Base 32 or address helper link, or use a jump service link below.
 </p>
 <p>
 Seeing this page often? See <a href="http://www.i2p2.i2p/faq.html#subscriptions">the FAQ</a>
