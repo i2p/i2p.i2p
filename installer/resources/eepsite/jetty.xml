@@ -74,10 +74,10 @@
            See RouterConsoleRunner.
        -->
       <New class="org.eclipse.jetty.util.thread.ExecutorThreadPool">
-        <!-- corePoolSize (must be at least 3) -->
-        <Arg type="int">3</Arg>
+        <!-- corePoolSize (must be at least 3, increase if Jetty hangs) -->
+        <Arg type="int">4</Arg>
         <!-- maximumPoolSize -->
-        <Arg type="int">16</Arg>
+        <Arg type="int">20</Arg>
         <!-- keepAliveTime (milliseconds) -->
         <Arg type="long">60000</Arg>
       </New>
