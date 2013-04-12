@@ -472,7 +472,7 @@
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*:net.i2p.kademlia" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
-            <group title="Jetty Logging" packages="net.i2p.jetty" />
+            <group title="Jetty Starter and Logging" packages="net.i2p.jetty" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
@@ -501,10 +501,13 @@
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
-                <pathelement location="apps/jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-http.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-security.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-start.jar" />
-                <pathelement location="apps/jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-webapp.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-xml.jar" />
                 <pathelement location="apps/jetty/jettylib/jsp-api.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
