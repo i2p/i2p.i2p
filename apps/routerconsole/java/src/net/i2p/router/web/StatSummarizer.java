@@ -245,7 +245,7 @@ public class StatSummarizer implements Runnable {
             if (lsnr.getRate().equals(rate)) {
                 lsnr.getData().exportXml(out);
                 out.write(("<!-- Rate: " + lsnr.getRate().getRateStat().getName() + " for period " + lsnr.getRate().getPeriod() + " -->\n").getBytes());
-                out.write(("<!-- Average data soure name: " + lsnr.getName() + " event count data source name: " + lsnr.getEventName() + " -->\n").getBytes());
+                out.write(("<!-- Average data source name: " + lsnr.getName() + " event count data source name: " + lsnr.getEventName() + " -->\n").getBytes());
                 return true;
             }
         }
@@ -254,19 +254,21 @@ public class StatSummarizer implements Runnable {
     
     /**
      *  This does the two-data bandwidth graph only.
-     *  For all other graphs see SummaryRenderer
+     *  For all other graphs see renderPng() above.
      *  Synchronized to conserve memory.
+     *
+     *  @param end number of periods before now
      *  @return success
      */
     public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend,
                                               boolean hideGrid, boolean hideTitle, boolean showEvents,
-                                              int periodCount, boolean showCredit) throws IOException {
+                                              int periodCount, int end, boolean showCredit) throws IOException {
         try {
             try {
                 _sem.acquire();
             } catch (InterruptedException ie) {}
             return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
-                                        periodCount, showCredit);
+                                        periodCount, end, showCredit);
         } finally {
             _sem.release();
         }
@@ -274,7 +276,7 @@ public class StatSummarizer implements Runnable {
 
     private boolean locked_renderRatePng(OutputStream out, int width, int height, boolean hideLegend,
                                               boolean hideGrid, boolean hideTitle, boolean showEvents,
-                                              int periodCount, boolean showCredit) throws IOException {
+                                              int periodCount, int end, boolean showCredit) throws IOException {
 
         // go to some trouble to see if we have the data for the combined bw graph
         SummaryListener txLsnr = null;
@@ -289,7 +291,6 @@ public class StatSummarizer implements Runnable {
         if (txLsnr == null || rxLsnr == null)
             throw new IOException("no rates for combined graph");
 
-        long end = _context.clock().now() - 75*1000;
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
         else if (width <= 0)
@@ -298,86 +299,9 @@ public class StatSummarizer implements Runnable {
             height = GraphHelper.MAX_Y;
         else if (height <= 0)
             height = GraphHelper.DEFAULT_Y;
-        if (periodCount <= 0 || periodCount > txLsnr.getRows())
-            periodCount = txLsnr.getRows();
-        long period = 60*1000;
-        long start = end - period*periodCount;
-        //long begin = System.currentTimeMillis();
-        ImageOutputStream ios = null;
-        try {
-            RrdGraphDef def = new RrdGraphDef();
-            def.setTimeSpan(start/1000, end/1000);
-            def.setMinValue(0d);
-            def.setBase(1024);
-            String title = _("Bandwidth usage");
-            if (!hideTitle)
-                def.setTitle(title);
-            long started = _context.router().getWhenStarted();
-            if (started > start && started < end)
-                def.vrule(started / 1000, SummaryRenderer.RESTART_BAR_COLOR, null, 4.0f);  // no room for legend
-            String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
-            String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
-            def.datasource(sendName, txLsnr.getData().getPath(), sendName, SummaryListener.CF, txLsnr.getBackendName());
-            def.datasource(recvName, rxLsnr.getData().getPath(), recvName, SummaryListener.CF, rxLsnr.getBackendName());
-            def.area(sendName, Color.BLUE, _("Outbound Bytes/sec"));
-            //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
-            def.line(recvName, Color.RED, _("Inbound Bytes/sec") + "\\r", 3);
-            //def.area(recvName, Color.RED, "Inbound bytes/sec@r");
-            if (!hideLegend) {
-                def.gprint(sendName, SummaryListener.CF, _("Out average") + ": %.2f %s" + _("Bps"));
-                def.gprint(sendName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
-                def.gprint(recvName, SummaryListener.CF, _("In average") + ": %.2f %S" + _("Bps"));
-                def.gprint(recvName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
-                // '07-Jul 21:09 UTC' with month name in the system locale
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
-                def.comment(sdf.format(new Date(start)) + " -- " + sdf.format(new Date(end)) + " UTC\\r");
-            }
-            if (!showCredit)
-                def.setShowSignature(false);
-            if (hideLegend) 
-                def.setNoLegend(true);
-            if (hideGrid) {
-                def.setDrawXGrid(false);
-                def.setDrawYGrid(false);
-            }
-            //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
-            def.setAntiAliasing(false);
-            //System.out.println("Rendering: \n" + def.exportXmlTemplate());
-            //System.out.println("*****************\nData: \n" + _listener.getData().dump());
-            def.setWidth(width);
-            def.setHeight(height);
-            def.setImageFormat("PNG");
-            def.setLazy(true);
-
-            RrdGraph graph = new RrdGraph(def);
-            //System.out.println("Graph created");
-            int totalWidth = graph.getRrdGraphInfo().getWidth();
-            int totalHeight = graph.getRrdGraphInfo().getHeight();
-            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
-            Graphics gfx = img.getGraphics();
-            graph.render(gfx);
-            ios = new MemoryCacheImageOutputStream(out);
-            ImageIO.write(img, "png", ios);
-
-            //File t = File.createTempFile("jrobinData", ".xml");
-            //_listener.getData().dumpXml(new FileOutputStream(t));
-            //System.out.println("plotted: " + (data != null ? data.length : 0) + " bytes in " + timeToPlot
-            //                   ); // + ", data written to " + t.getAbsolutePath());
-            return true;
-        } catch (RrdException re) {
-            _log.error("Error rendering", re);
-            throw new IOException("Error plotting: " + re.getMessage());
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error rendering", ioe);
-            throw ioe;
-        } catch (OutOfMemoryError oom) {
-            _log.error("Error rendering", oom);
-            throw new IOException("Error plotting: " + oom.getMessage());
-        } finally {
-            // this does not close the underlying stream
-            if (ios != null) try {ios.close();} catch (IOException ioe) {}
-        }
+        txLsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount,
+                         end, showCredit, rxLsnr, _("Bandwidth usage"));
+        return true;
     }
     
     /**

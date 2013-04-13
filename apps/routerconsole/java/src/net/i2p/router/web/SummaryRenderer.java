@@ -27,8 +27,7 @@ import org.jrobin.graph.RrdGraphDefTemplate;
 
 /**
  *  Generate the RRD graph png images,
- *  except for the combined rate graph, which is
- *  generated in StatSummarizer.
+ *  including the combined rate graph.
  *
  *  @since 0.6.1.13
  */
@@ -36,7 +35,7 @@ class SummaryRenderer {
     private final Log _log;
     private final SummaryListener _listener;
     private final I2PAppContext _context;
-    static final Color RESTART_BAR_COLOR = new Color(255, 144, 0, 224);
+    private static final Color RESTART_BAR_COLOR = new Color(255, 144, 0, 224);
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -51,8 +50,11 @@ class SummaryRenderer {
      * specify who can get it from where, etc.
      *
      * @deprecated unsed
+     * @throws UnsupportedOperationException always
      */
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
+        throw new UnsupportedOperationException();
+/*****
         long end = ctx.clock().now() - 60*1000;
         long start = end - 60*1000*SummaryListener.PERIODS;
         try {
@@ -80,17 +82,34 @@ class SummaryRenderer {
             //_log.error("Error rendering " + filename, ioe);
             throw ioe;
         }
+*****/
     }
 
     public void render(OutputStream out) throws IOException { render(out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
                                                                      false, false, false, false, -1, 0, false); }
 
     /**
+     *  Single graph.
+     *
      *  @param endp number of periods before now
      */
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
                        boolean hideTitle, boolean showEvents, int periodCount,
                        int endp, boolean showCredit) throws IOException {
+        render(out, width, height, hideLegend, hideGrid, hideTitle,
+               showEvents, periodCount, endp, showCredit, null, null);
+    }
+
+    /**
+     *  Single or two-data-source graph.
+     *
+     *  @param lsnr2 2nd data source to plot on same graph, or null. Not recommended for events.
+     *  @param titleOverride If non-null, overrides the title
+     *  @since 0.9.6 consolidated from StatSummarizer for bw.combined
+     */
+    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
+                       boolean hideTitle, boolean showEvents, int periodCount,
+                       int endp, boolean showCredit, SummaryListener lsnr2, String titleOverride) throws IOException {
         long end = _listener.now() - 75*1000;
         long period = _listener.getRate().getPeriod();
         if (endp > 0)
@@ -109,7 +128,9 @@ class SummaryRenderer {
             if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0 || name.indexOf("memory") >= 0)
                 && !showEvents)
                 def.setBase(1024);
-            if (!hideTitle) {
+            if (titleOverride != null) {
+                def.setTitle(titleOverride);
+            } else if (!hideTitle) {
                 String title;
                 String p;
                 // we want the formatting and translation of formatDuration2(), except not zh, and not the &nbsp;
@@ -146,14 +167,31 @@ class SummaryRenderer {
             //    def.vrule(started / 1000, RESTART_BAR_COLOR, _("Restart"), 4.0f);
 
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
-            if (descr.length() > 0)
+            if (descr.length() > 0) {
                 def.area(plotName, Color.BLUE, descr + "\\r");
-            else
+            } else {
                 def.area(plotName, Color.BLUE);
+            }
             if (!hideLegend) {
                 def.gprint(plotName, SummaryListener.CF, _("avg") + ": %.2f %s");
                 def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");
                 def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
+            }
+            String plotName2 = null;
+            if (lsnr2 != null) {
+                String dsNames2[] = lsnr2.getData().getDsNames();
+                plotName2 = dsNames2[0];
+                String path2 = lsnr2.getData().getPath();
+                String descr2 = _(lsnr2.getRate().getRateStat().getDescription());
+                def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendName());
+                def.line(plotName2, Color.RED, descr2 + "\\r", 3);
+                if (!hideLegend) {
+                    def.gprint(plotName2, SummaryListener.CF, _("avg") + ": %.2f %s");
+                    def.gprint(plotName2, "MAX", ' ' + _("max") + ": %.2f %S");
+                    def.gprint(plotName2, "LAST", ' ' + _("now") + ": %.2f %S\\r");
+                }
+            }
+            if (!hideLegend) {
                 // '07-Jul 21:09 UTC' with month name in the system locale
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
                 Map<Long, String> events = ((RouterContext)_context).router().eventLog().getEvents(EventLog.STARTED, start);

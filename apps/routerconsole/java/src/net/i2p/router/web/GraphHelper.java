@@ -126,6 +126,7 @@ public class GraphHelper extends FormHandler {
 
     /**
      *  For single stat page
+     *  @param "bw.combined" treated specially
      *  @since 0.9
      */
     public void setStat(String stat) {
@@ -151,10 +152,10 @@ public class GraphHelper extends FormHandler {
             }
 
             if (hasTx && hasRx && !_showEvents) {
-                _out.write("<a href=\"viewstat?stat=bw.combined"
-                           + "&amp;periodCount=" + (3 * _periodCount )
-                           + "&amp;width=" + (3 * _width)
-                           + "&amp;height=" + (3 * _height)
+                _out.write("<a href=\"graph?stat=bw.combined"
+                           + "&amp;c=" + (3 * _periodCount )
+                           + "&amp;w=" + (3 * _width)
+                           + "&amp;h=" + (3 * _height)
                            + "\">");
                 String title = _("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\""
@@ -200,7 +201,9 @@ public class GraphHelper extends FormHandler {
     }
 
     /**
-     *  For single stat page
+     *  For single stat page;
+     *  stat = "bw.combined" treated specially
+     *
      *  @since 0.9
      */
     public String getSingleStat() {
@@ -208,25 +211,36 @@ public class GraphHelper extends FormHandler {
             if (StatSummarizer.isDisabled())
                 return "";
             if (_stat == null) {
-                _out.write("No stat");
+                _out.write("No stat specified");
                 return "";
             }
-            List<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
-            if (rates.size() != 1) {
-                _out.write("Graphs not enabled for " + _stat);
-                return "";
+            long period;
+            String name, displayName;
+            if (_stat.equals("bw.combined")) {
+                period = 60000;
+                name = _stat;
+                displayName = _("Bandwidth usage");
+            } else {
+                List<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
+                if (rates.size() != 1) {
+                    _out.write("Graphs not enabled for " + _stat);
+                    return "";
+                }
+                Rate r = rates.get(0);
+                period = r.getPeriod();
+                name = r.getRateStat().getName();
+                displayName = name;
             }
-            Rate r = rates.get(0);
             _out.write("<h3>");
-            _out.write(_("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod())));
+            _out.write(_("{0} for {1}", displayName, DataHelper.formatDuration2(_periodCount * period)));
             if (_end > 0)
-                _out.write(' ' + _("ending {0} ago", DataHelper.formatDuration2(_end * r.getPeriod())));
+                _out.write(' ' + _("ending {0} ago", DataHelper.formatDuration2(_end * period)));
 
             _out.write("</h3><img class=\"statimage\" border=\"0\""
                        + " src=\"viewstat.jsp?stat="
-                       + r.getRateStat().getName() 
+                       + name
                        + "&amp;showEvents=" + _showEvents
-                       + "&amp;period=" + r.getPeriod() 
+                       + "&amp;period=" + period
                        + "&amp;periodCount=" + _periodCount 
                        + "&amp;end=" + _end 
                        + "&amp;width=" + _width
@@ -302,7 +316,8 @@ public class GraphHelper extends FormHandler {
 
             _out.write("<br>");
             _out.write(link(_stat, !_showEvents, _periodCount, _end, _width, _height));
-            _out.write(_showEvents ? _("Plot averages") : _("plot events"));
+            if (!_stat.equals("bw.combined"))
+                _out.write(_showEvents ? _("Plot averages") : _("plot events"));
             _out.write("</a>");
 
             _out.write("</p><p><i>" + _("All times are UTC.") + "</i></p>\n");
