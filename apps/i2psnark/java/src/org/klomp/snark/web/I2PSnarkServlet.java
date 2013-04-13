@@ -61,6 +61,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
+    private static final int PAGE_SIZE = 20;
  
     public I2PSnarkServlet() {
         super();
@@ -163,12 +164,19 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
 
         String peerParam = req.getParameter("p");
+        String stParam = req.getParameter("st");
         String peerString;
         if (peerParam == null || (!_manager.util().connected()) ||
             peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
             peerString = "";
         } else {
             peerString = "?p=" + peerParam;
+        }
+        if (stParam != null && !stParam.equals("0")) {
+            if (peerString.length() > 0)
+                peerString += "&amp;st=" + stParam;
+            else
+                peerString =  "?st="+ stParam;
         }
 
         // AJAX for mainsection
@@ -351,6 +359,7 @@ public class I2PSnarkServlet extends BasicServlet {
         /** dl, ul, down rate, up rate, peers, size */
         final long stats[] = {0,0,0,0,0,0};
         String peerParam = req.getParameter("p");
+        String stParam = req.getParameter("st");
 
         List<Snark> snarks = getSortedSnarks(req);
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
@@ -360,6 +369,9 @@ public class I2PSnarkServlet extends BasicServlet {
             // don't lose peer setting
             if (peerParam != null)
                 out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
+            // ...or st setting
+            if (stParam != null)
+                out.write("<input type=\"hidden\" name=\"st\" value=\"" + stParam + "\" >\n");
         }
         out.write(TABLE_HEADER);
         out.write("<img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
@@ -370,6 +382,10 @@ public class I2PSnarkServlet extends BasicServlet {
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"" + _contextPath + '/');
             if (peerParam != null) {
+                if (stParam != null) {
+                    out.write("?st=");
+                    out.write(stParam);
+                }
                 out.write("\">");
                 out.write("<img border=\"0\" src=\"" + _imgPath + "hidepeers.png\" title=\"");
                 out.write(_("Hide Peers"));
@@ -377,7 +393,12 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(_("Hide Peers"));
                 out.write("\">");
             } else {
-                out.write("?p=1\">");
+                out.write("?p=1");
+                if (stParam != null) {
+                    out.write("&amp;st=");
+                    out.write(stParam);
+                }
+                out.write("\">");
                 out.write("<img border=\"0\" src=\"" + _imgPath + "showpeers.png\" title=\"");
                 out.write(_("Show Peers"));
                 out.write("\" alt=\"");
@@ -478,10 +499,18 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</th></tr></thead>\n");
         String uri = _contextPath + '/';
         boolean showDebug = "2".equals(peerParam);
+
+        int start = 0;
+        if (stParam != null) {
+            try {
+                start = Math.max(0, Math.min(snarks.size() - 1, Integer.parseInt(stParam)));
+            } catch (NumberFormatException nfe) {}
+        }
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
-            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug);
+            boolean hide = i < start || i >= start + PAGE_SIZE;
+            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide);
         }
 
         if (snarks.isEmpty()) {
@@ -493,6 +522,27 @@ public class I2PSnarkServlet extends BasicServlet {
         } else /** if (snarks.size() > 1) */ {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
+            if (start > 0) {
+                int prev = Math.max(0, start - PAGE_SIZE);
+                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + prev);
+                if (peerParam != null)
+                    out.write("&p=" + peerParam);
+                out.write("\">" +
+                          "<img alt=\"" + _("Prev") + "\" title=\"" + _("Previous page") + "\" border=\"0\" src=\"" +
+                          _imgPath + "control_rewind_blue.png\">" +
+                          "</a>&nbsp;");
+            }
+            if (start + PAGE_SIZE < snarks.size()) {
+                int next = start + PAGE_SIZE;
+                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + next);
+                if (peerParam != null)
+                    out.write("&p=" + peerParam);
+                out.write("\">" +
+                          "<img alt=\"" + _("Next") + "\" title=\"" + _("Next page") + "\" border=\"0\" src=\"" +
+                          _imgPath + "control_fastforward_blue.png\">" +
+                          "</a>&nbsp;");
+            }
+            out.write("&nbsp;");
             out.write(_("Totals"));
             out.write(":&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
@@ -1015,8 +1065,34 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private static final int MAX_DISPLAYED_FILENAME_LENGTH = 50;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 43;
+
+    /**
+     *  Display one snark (one line in table, unless showPeers is true)
+     *
+     *  @param stats in/out param (totals)
+     *  @param statsOnly if true, output nothing, update stats only
+     */
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
-                              boolean isDegraded, boolean noThinsp, boolean showDebug) throws IOException {
+                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly) throws IOException {
+        // stats
+        long uploaded = snark.getUploaded();
+        stats[0] += snark.getDownloaded();
+        stats[1] += uploaded;
+        long downBps = snark.getDownloadRate();
+        long upBps = snark.getUploadRate();
+        boolean isRunning = !snark.isStopped();
+        if (isRunning) {
+            stats[2] += downBps;
+            stats[3] += upBps;
+        }
+        int curPeers = snark.getPeerCount();
+        stats[4] += curPeers;
+        long total = snark.getTotalLength();
+        if (total > 0)
+            stats[5] += total;
+        if (statsOnly)
+            return;
+
         String filename = snark.getName();
         if (snark.getMetaInfo() != null) {
             // Only do this if not a magnet or torrent download
@@ -1036,7 +1112,6 @@ public class I2PSnarkServlet extends BasicServlet {
                 filename = start + "&hellip;";
             }
         }
-        long total = snark.getTotalLength();
         // includes skipped files, -1 for magnet mode
         long remaining = snark.getRemainingLength(); 
         if (remaining > total)
@@ -1045,22 +1120,11 @@ public class I2PSnarkServlet extends BasicServlet {
         long needed = snark.getNeededLength(); 
         if (needed > total)
             needed = total;
-        long downBps = snark.getDownloadRate();
-        long upBps = snark.getUploadRate();
         long remainingSeconds;
         if (downBps > 0 && needed > 0)
             remainingSeconds = needed / downBps;
         else
             remainingSeconds = -1;
-        boolean isRunning = !snark.isStopped();
-        long uploaded = snark.getUploaded();
-        stats[0] += snark.getDownloaded();
-        stats[1] += uploaded;
-        if (isRunning) {
-            stats[2] += downBps;
-            stats[3] += upBps;
-        }
-        stats[5] += total;
         
         MetaInfo meta = snark.getMetaInfo();
         // isValid means isNotMagnet
@@ -1068,8 +1132,6 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean isMultiFile = isValid && meta.getFiles() != null;
         
         String err = snark.getTrackerProblems();
-        int curPeers = snark.getPeerCount();
-        stats[4] += curPeers;
         int knownPeers = Math.max(curPeers, snark.getTrackerSeenPeers());
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");

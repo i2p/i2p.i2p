@@ -161,8 +161,10 @@ public class SnarkManager implements CompleteListener {
         _connectionAcceptor = new ConnectionAcceptor(_util);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
-        // delay until UpdateManager is there
-        _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
+        // only if default instance
+        if ("i2psnark".equals(_contextName))
+            // delay until UpdateManager is there
+            _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
     }
