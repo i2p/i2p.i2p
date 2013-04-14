@@ -187,7 +187,7 @@ public class I2PLogger implements Logger
      */
     public void ignore(Throwable ignored)
     {
-            warn("IGNORED", ignored);
+            debug("IGNORED", ignored);
     }
     
     /**

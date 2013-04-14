@@ -29,6 +29,7 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
+import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
@@ -63,6 +64,7 @@ import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
@@ -75,6 +77,20 @@ import org.eclipse.jetty.util.thread.ThreadPool;
  *  Start the router console.
  */
 public class RouterConsoleRunner implements RouterApp {
+        
+    static {
+        // To take effect, must be set before any Jetty classes are loaded
+        try {
+            Log.setLog(new I2PLogger());
+        } catch (Throwable t) {
+            System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
+        }
+        // This way it doesn't try to load Slf4jLog first
+        // This causes an NPE in AbstractLifeCycle
+        // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg02587.html
+        //System.setProperty("org.eclipse.jetty.util.log.class", "net.i2p.jetty.I2PLogger");
+    }
+
     private final RouterContext _context;
     private final ClientAppManager _mgr;
     private volatile ClientAppState _state = UNINITIALIZED;
@@ -290,14 +306,6 @@ public class RouterConsoleRunner implements RouterApp {
         boolean workDirCreated = workDir.mkdirs();
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
-        
-        //try {
-        //    Log.setLog(new I2PLogger(_context));
-        //} catch (Throwable t) {
-        //    System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
-        //}
-        // This way it doesn't try to load Slf4jLog first
-        System.setProperty("org.eclipse.jetty.util.log.class", "net.i2p.jetty.I2PLogger");
 
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");

@@ -1,3 +1,10 @@
+2013-04-14 zzz
+ * i2psnark:
+   - Set unique tunnel nickname for additional instances
+   - Increase page size to 50
+ * Jetty logging: Fix logging using I2PLogger class;
+   log ignored messages at debug level
+
 2013-04-13 zzz
  * Console: Add /graph support for bw.combined, consolidate
             rendering code (ticket #890)

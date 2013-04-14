@@ -25,7 +25,7 @@
 <!-- eepsite on http://127.0.0.1:7657/configclients.jsp .                      -->
 <!--                                                                           -->
 <!-- Jetty now uses the I2P logging system rather than wrapper.log.            -->
-<!-- Use the log override org.mortbay.jetty.Server to adjust the log level.    -->
+<!-- Use the log override org.eclipse.jetty.server.Server to adjust the log level.  -->
 <!--                                                                           -->
 <!-- Note that the XML encoding for this file is UTF-8.                        -->
 <!--                                                                           -->
