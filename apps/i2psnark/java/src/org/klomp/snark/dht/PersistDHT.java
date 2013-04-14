@@ -57,6 +57,7 @@ abstract class PersistDHT {
     }
 
     /**
+     *  TODO - multiple instances overwrite each other
      *  @param saveAll if true, don't check last seen time
      */
     public static synchronized void saveDHT(DHTNodes nodes, boolean saveAll, File file) {

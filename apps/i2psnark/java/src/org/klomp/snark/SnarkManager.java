@@ -131,8 +131,17 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_TRACKERS = "i2psnark.trackers";
 
     /**
+     *  For embedded.
+     */
+    public SnarkManager(I2PAppContext ctx) {
+        this(ctx, "/i2psnark", "i2psnark");
+    }
+
+    /**
+     *  For webapp.
      *  @param ctxPath generally "/i2psnark"
      *  @param ctxName generally "i2psnark"
+     *  @since 0.9.6
      */
     public SnarkManager(I2PAppContext ctx, String ctxPath, String ctxName) {
         _snarks = new ConcurrentHashMap();

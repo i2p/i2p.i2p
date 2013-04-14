@@ -226,9 +226,9 @@ public class I2PSnarkUtil {
                 }
             }
             if (opts.getProperty("inbound.nickname") == null)
-                opts.setProperty("inbound.nickname", "I2PSnark");
+                opts.setProperty("inbound.nickname", _baseName.replace("i2psnark", "I2PSnark"));
             if (opts.getProperty("outbound.nickname") == null)
-                opts.setProperty("outbound.nickname", "I2PSnark");
+                opts.setProperty("outbound.nickname", _baseName.replace("i2psnark", "I2PSnark"));
             if (opts.getProperty("outbound.priority") == null)
                 opts.setProperty("outbound.priority", "-10");
             // Dont do this for now, it is set in I2PSocketEepGet for announces,

@@ -61,7 +61,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
-    private static final int PAGE_SIZE = 20;
+    private static final int PAGE_SIZE = 50;
  
     public I2PSnarkServlet() {
         super();
