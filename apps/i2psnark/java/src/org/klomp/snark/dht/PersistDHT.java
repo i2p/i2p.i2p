@@ -23,6 +23,17 @@ abstract class PersistDHT {
 
     private static final long MAX_AGE = 60*60*1000;
 
+    /**
+     *  @param backupFile may be null
+     *  @since 0.9.6
+     */
+    public static synchronized void loadDHT(KRPC krpc, File file, File backupFile) {
+        if (file.exists())
+            loadDHT(krpc, file);
+        else if (backupFile != null)
+            loadDHT(krpc, backupFile);
+    }
+
     public static synchronized void loadDHT(KRPC krpc, File file) {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistDHT.class);
         int count = 0;
@@ -57,7 +68,6 @@ abstract class PersistDHT {
     }
 
     /**
-     *  TODO - multiple instances overwrite each other
      *  @param saveAll if true, don't check last seen time
      */
     public static synchronized void saveDHT(DHTNodes nodes, boolean saveAll, File file) {

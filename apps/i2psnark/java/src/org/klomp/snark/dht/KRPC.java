@@ -114,6 +114,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /** signed dgrams */
     private final int _qPort;
     private final File _dhtFile;
+    private final File _backupDhtFile;
     private volatile boolean _isRunning;
     private volatile boolean _hasBootstrapped;
     /** stats */
@@ -160,7 +161,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     /**
      *  @param baseName generally "i2psnark"
      */
-    public KRPC (I2PAppContext ctx, String baseName, I2PSession session) {
+    public KRPC(I2PAppContext ctx, String baseName, I2PSession session) {
         _context = ctx;
         _session = session;
         _log = ctx.logManager().getLog(KRPC.class);
@@ -186,6 +187,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         }
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
         _dhtFile = new File(ctx.getConfigDir(), baseName + DHT_FILE_SUFFIX);
+        _backupDhtFile = baseName.equals("i2psnark") ? null : new File(ctx.getConfigDir(), "i2psnark" + DHT_FILE_SUFFIX);
         _knownNodes = new DHTNodes(ctx, _myNID);
 
         start();
@@ -550,7 +552,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _session.addMuxedSessionListener(this, I2PSession.PROTO_DATAGRAM, _qPort);
         _knownNodes.start();
         _tracker.start();
-        PersistDHT.loadDHT(this, _dhtFile);
+        PersistDHT.loadDHT(this, _dhtFile, _backupDhtFile);
         // start the explore thread
         _isRunning = true;
         // no need to keep ref, it will eventually stop
