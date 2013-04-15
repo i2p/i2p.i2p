@@ -2501,7 +2501,8 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
-                 mime.equals("application/x-tar"))
+                 mime.equals("application/x-7z-compressed") || mime.equals("application/x-rar-compresed") ||
+                 mime.equals("application/x-tar") || mime.equals("application/x-bzip2"))
             icon = "compress";
         else if (plc.endsWith(".exe"))
             icon = "application";
