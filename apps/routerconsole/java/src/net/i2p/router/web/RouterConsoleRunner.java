@@ -69,6 +69,7 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.security.Credential.MD5;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -453,6 +454,11 @@ public class RouterConsoleRunner implements RouterApp {
             if (sslPort > 0) {
                 File keyStore = new File(_context.getConfigDir(), "keystore/console.ks");
                 if (verifyKeyStore(keyStore)) {
+                    // the keystore path and password
+                    SslContextFactory sslFactory = new SslContextFactory(keyStore.getAbsolutePath());
+                    sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                    // the X.509 cert password (if not present, verifyKeyStore() returned false)
+                    sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
@@ -476,25 +482,14 @@ public class RouterConsoleRunner implements RouterApp {
                                 if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                             }
                             // TODO if class not found use SslChannelConnector
-                            // Sadly there's no common base class with the ssl methods in it
                             AbstractConnector ssll;
                             if (SystemVersion.isJava6() && !SystemVersion.isGNU()) {
-                                SslSelectChannelConnector sssll = new SslSelectChannelConnector();
-                                // the keystore path and password
-                                sssll.setKeystore(keyStore.getAbsolutePath());
-                                sssll.setPassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
-                                // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                                sssll.setKeyPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                SslSelectChannelConnector sssll = new SslSelectChannelConnector(sslFactory);
                                 sssll.setUseDirectBuffers(false);  // default true seems to be leaky
                                 ssll = sssll;
                             } else {
                                 // Jetty 6 and NIO on Java 5 don't get along that well
-                                SslSocketConnector sssll = new SslSocketConnector();
-                            // the keystore path and password
-                                sssll.setKeystore(keyStore.getAbsolutePath());
-                                sssll.setPassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
-                            // the X.509 cert password (if not present, verifyKeyStore() returned false)
-                                sssll.setKeyPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                                SslSocketConnector sssll = new SslSocketConnector(sslFactory);
                                 ssll = sssll;
                             }
                             ssll.setHost(host);
