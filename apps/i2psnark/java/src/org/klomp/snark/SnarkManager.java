@@ -465,6 +465,9 @@ public class SnarkManager implements CompleteListener {
         return defaultVal;
     }
     
+    /**
+     *  all params may be null or need trimming
+     */
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
@@ -487,12 +490,12 @@ public class SnarkManager implements CompleteListener {
         //}
         if (upLimit != null) {
             int limit = _util.getMaxUploaders();
-            try { limit = Integer.parseInt(upLimit); } catch (NumberFormatException nfe) {}
+            try { limit = Integer.parseInt(upLimit.trim()); } catch (NumberFormatException nfe) {}
             if ( limit != _util.getMaxUploaders()) {
                 if ( limit >= Snark.MIN_TOTAL_UPLOADERS ) {
                     _util.setMaxUploaders(limit);
                     changed = true;
-                    _config.setProperty(PROP_UPLOADERS_TOTAL, "" + limit);
+                    _config.setProperty(PROP_UPLOADERS_TOTAL, Integer.toString(limit));
                     addMessage(_("Total uploaders limit changed to {0}", limit));
                 } else {
                     addMessage(_("Minimum total uploaders limit is {0}", Snark.MIN_TOTAL_UPLOADERS));
@@ -501,12 +504,12 @@ public class SnarkManager implements CompleteListener {
         }
         if (upBW != null) {
             int limit = _util.getMaxUpBW();
-            try { limit = Integer.parseInt(upBW); } catch (NumberFormatException nfe) {}
+            try { limit = Integer.parseInt(upBW.trim()); } catch (NumberFormatException nfe) {}
             if ( limit != _util.getMaxUpBW()) {
                 if ( limit >= MIN_UP_BW ) {
                     _util.setMaxUpBW(limit);
                     changed = true;
-                    _config.setProperty(PROP_UPBW_MAX, "" + limit);
+                    _config.setProperty(PROP_UPBW_MAX, Integer.toString(limit));
                     addMessage(_("Up BW limit changed to {0}KBps", limit));
                 } else {
                     addMessage(_("Minimum up bandwidth limit is {0}KBps", MIN_UP_BW));
@@ -516,21 +519,21 @@ public class SnarkManager implements CompleteListener {
         
 	if (startDelay != null){
 		int minutes = _util.getStartupDelay();
-                try { minutes = Integer.parseInt(startDelay); } catch (NumberFormatException nfe) {}
+                try { minutes = Integer.parseInt(startDelay.trim()); } catch (NumberFormatException nfe) {}
 	        if ( minutes != _util.getStartupDelay()) {
                 	    _util.setStartupDelay(minutes);
 	                    changed = true;
-        	            _config.setProperty(PROP_STARTUP_DELAY, "" + minutes);
+        	            _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(minutes));
                 	    addMessage(_("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * 60 * 1000)));
                 }
 	}
 
 	if (refreshDelay != null) {
 	    try {
-                int secs = Integer.parseInt(refreshDelay);
+                int secs = Integer.parseInt(refreshDelay.trim());
 	        if (secs != getRefreshDelaySeconds()) {
 	            changed = true;
-	            _config.setProperty(PROP_REFRESH_DELAY, refreshDelay);
+	            _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(secs));
                     if (secs >= 0)
 	                addMessage(_("Refresh time changed to {0}", DataHelper.formatDuration2(secs * 1000)));
 	            else
@@ -541,7 +544,7 @@ public class SnarkManager implements CompleteListener {
 
         if (pageSize != null) {
             try {
-                int size = Integer.parseInt(pageSize);
+                int size = Integer.parseInt(pageSize.trim());
                 if (size <= 0)
                     size = 999999;
                 if (size != getPageSize() && size >= 5) {
@@ -554,6 +557,7 @@ public class SnarkManager implements CompleteListener {
         }
 
         if (dataDir != null && !dataDir.equals(getDataDir().getAbsolutePath())) {
+            dataDir = dataDir.trim();
             File dd = new File(dataDir);
             if (!dd.isAbsolute()) {
                 addMessage(_("Data directory must be an absolute path") + ": " + dataDir);
