@@ -92,6 +92,7 @@ public class SnarkManager implements CompleteListener {
     //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
     public static final String PROP_REFRESH_DELAY = "i2psnark.refreshSeconds";
+    public static final String PROP_PAGE_SIZE = "i2psnark.pageSize";
     public static final String RC_PROP_THEME = "routerconsole.theme";
     public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME = "i2psnark.theme";
@@ -105,6 +106,7 @@ public class SnarkManager implements CompleteListener {
     public static final int DEFAULT_MAX_UP_BW = 10;
     public static final int DEFAULT_STARTUP_DELAY = 3; 
     public static final int DEFAULT_REFRESH_DELAY_SECS = 60;
+    private static final int DEFAULT_PAGE_SIZE = 50;
 
     /**
      *  "name", "announceURL=websiteURL" pairs
@@ -270,6 +272,18 @@ public class SnarkManager implements CompleteListener {
         }
     }
 
+    /**
+     *  For GUI
+     *  @since 0.9.6
+     */
+    public int getPageSize() { 
+        try {
+            return Integer.parseInt(_config.getProperty(PROP_PAGE_SIZE));
+        } catch (NumberFormatException nfe) {
+            return DEFAULT_PAGE_SIZE;
+        }
+    }
+
     private int getStartupDelayMinutes() { 
         try {
 	    return Integer.parseInt(_config.getProperty(PROP_STARTUP_DELAY));
@@ -332,6 +346,8 @@ public class SnarkManager implements CompleteListener {
             _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(DEFAULT_REFRESH_DELAY_SECS));
         if (!_config.containsKey(PROP_STARTUP_DELAY))
             _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(DEFAULT_STARTUP_DELAY));
+        if (!_config.containsKey(PROP_PAGE_SIZE))
+            _config.setProperty(PROP_PAGE_SIZE, Integer.toString(DEFAULT_PAGE_SIZE));
         if (!_config.containsKey(PROP_THEME))
             _config.setProperty(PROP_THEME, DEFAULT_THEME);
         // no, so we can switch default to true later
@@ -450,10 +466,11 @@ public class SnarkManager implements CompleteListener {
     }
     
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
-                             String startDelay, String seedPct, String eepHost, 
+                             String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
         boolean changed = false;
+        boolean interruptMonitor = false;
         //if (eepHost != null) {
         //    // unused, we use socket eepget
         //    int port = _util.getEepProxyPort();
@@ -521,6 +538,39 @@ public class SnarkManager implements CompleteListener {
 	        }
 	    } catch (NumberFormatException nfe) {}
 	}
+
+        if (pageSize != null) {
+            try {
+                int size = Integer.parseInt(pageSize);
+                if (size <= 0)
+                    size = 999999;
+                if (size != getPageSize() && size >= 5) {
+                    changed = true;
+                    pageSize = Integer.toString(size);
+                    _config.setProperty(PROP_PAGE_SIZE, pageSize);
+                    addMessage(_("Page size changed to {0}", pageSize));
+                }
+            } catch (NumberFormatException nfe) {}
+        }
+
+        if (dataDir != null && !dataDir.equals(getDataDir().getAbsolutePath())) {
+            File dd = new File(dataDir);
+            if (!dd.isAbsolute()) {
+                addMessage(_("Data directory must be an absolute path") + ": " + dataDir);
+            } else if (!dd.exists()) {
+                addMessage(_("Data directory does not exist") + ": " + dataDir);
+            } else if (!dd.isDirectory()) {
+                addMessage(_("Not a directory") + ": " + dataDir);
+            } else if (!dd.canRead()) {
+                addMessage(_("Unreadable") + ": " + dataDir);
+            } else {
+                changed = true;
+                interruptMonitor = true;
+                _config.setProperty(PROP_DIR, dataDir);
+                addMessage(_("Data directory changed to {0}", dataDir));
+            }
+
+        }
 
 	// Start of I2CP stuff.
 	// i2cpHost will generally be null since it is hidden from the form if in router context.
@@ -656,6 +706,9 @@ public class SnarkManager implements CompleteListener {
         }
         if (changed) {
             saveConfig();
+            if (interruptMonitor)
+                // Data dir changed. this will stop and remove all old torrents, and add the new ones
+                _monitor.interrupt();
         } else {
             addMessage(_("Configuration unchanged."));
         }

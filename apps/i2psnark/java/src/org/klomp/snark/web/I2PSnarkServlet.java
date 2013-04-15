@@ -61,7 +61,6 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
-    private static final int PAGE_SIZE = 50;
  
     public I2PSnarkServlet() {
         super();
@@ -506,10 +505,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 start = Math.max(0, Math.min(snarks.size() - 1, Integer.parseInt(stParam)));
             } catch (NumberFormatException nfe) {}
         }
+        int pageSize = _manager.getPageSize();
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
-            boolean hide = i < start || i >= start + PAGE_SIZE;
+            boolean hide = i < start || i >= start + pageSize;
             displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide);
         }
 
@@ -523,7 +523,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
             if (start > 0) {
-                int prev = Math.max(0, start - PAGE_SIZE);
+                int prev = Math.max(0, start - pageSize);
                 out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + prev);
                 if (peerParam != null)
                     out.write("&p=" + peerParam);
@@ -532,8 +532,8 @@ public class I2PSnarkServlet extends BasicServlet {
                           _imgPath + "control_rewind_blue.png\">" +
                           "</a>&nbsp;");
             }
-            if (start + PAGE_SIZE < snarks.size()) {
-                int next = start + PAGE_SIZE;
+            if (start + pageSize < snarks.size()) {
+                int next = start + pageSize;
                 out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + next);
                 if (peerParam != null)
                     out.write("&p=" + peerParam);
@@ -792,11 +792,12 @@ public class I2PSnarkServlet extends BasicServlet {
             String upBW = req.getParameter("upBW");
             String refreshDel = req.getParameter("refreshDelay");
             String startupDel = req.getParameter("startupDelay");
+            String pageSize = req.getParameter("pageSize");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
             boolean useDHT = req.getParameter("useDHT") != null;
             //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
-            _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel,
+            _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
                                   upLimit, upBW, useOpenTrackers, useDHT, theme);
         } else if ("Save2".equals(action)) {
@@ -1719,10 +1720,7 @@ public class I2PSnarkServlet extends BasicServlet {
                   "<table border=\"0\"><tr><td>");
 
         out.write(_("Data directory"));
-        out.write(": <td><code>" + dataDir + "</code> <i>(");
-        // translators: parameter is a file name
-        out.write(_("Edit {0} and restart to change", _manager.getConfigFilename()));
-        out.write(")</i><br>\n" +
+        out.write(": <td><input name=\"dataDir\" size=\"80\" value=\"" + dataDir + "\"></td>\n" +
 
                   "<tr><td>");
         out.write(_("Files readable by all"));
@@ -1774,8 +1772,14 @@ public class I2PSnarkServlet extends BasicServlet {
 
                   "<tr><td>");
         out.write(_("Startup delay"));
-        out.write(": <td><input name=\"startupDelay\" size=\"3\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
+        out.write(": <td><input name=\"startupDelay\" size=\"4\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
         out.write(_("minutes"));
+        out.write("<br>\n" +
+
+                  "<tr><td>");
+        out.write(_("Page size"));
+        out.write(": <td><input name=\"pageSize\" size=\"4\" maxlength=\"6\" class=\"r\" value=\"" + _manager.getPageSize() + "\"> ");
+        out.write(_("torrents"));
         out.write("<br>\n"); 
 
 
@@ -1801,7 +1805,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<tr><td>");
         out.write(_("Total uploader limit"));
         out.write(": <td><input type=\"text\" name=\"upLimit\" class=\"r\" value=\""
-                  + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" > ");
+                  + _manager.util().getMaxUploaders() + "\" size=\"4\" maxlength=\"3\" > ");
         out.write(_("peers"));
         out.write("<br>\n" +
 
