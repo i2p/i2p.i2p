@@ -800,6 +800,10 @@ public class I2PSnarkServlet extends BasicServlet {
             _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
                                   upLimit, upBW, useOpenTrackers, useDHT, theme);
+            // update servlet
+            try {
+                setResourceBase(_manager.getDataDir());
+            } catch (ServletException se) {}
         } else if ("Save2".equals(action)) {
             String taction = req.getParameter("taction");
             if (taction != null)
