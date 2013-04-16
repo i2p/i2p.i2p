@@ -2,6 +2,7 @@
  * ClientAppManager: Add method to look up clients by class and args
  * Console: Implement stopping of clients using the ClientApp interface
             (ticket #347)
+ * SAM: Implement ClientApp interface (ticket #347)
 
 2013-04-15 zzz
  * Console: Move from deprecated Jetty SSL methods to SslContextFactory

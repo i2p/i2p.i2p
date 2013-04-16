@@ -39,7 +39,7 @@ public class RouterAppManager implements ClientAppManager {
      */
     public boolean addAndStart(ClientApp app, String[] args) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Adding and starting " + app + " with class " + app.getClass().getName() + " and args " + Arrays.toString(args));
+            _log.info("Client " + app.getDisplayName() + " ADDED");
         String[] old = _clients.put(app, args);
         if (old != null)
             throw new IllegalArgumentException("already added");
@@ -88,13 +88,13 @@ public class RouterAppManager implements ClientAppManager {
           case UNINITIALIZED:
           case INITIALIZED:
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Client " + app.getDisplayName() + " called notify for " + state);
+                _log.warn("Client " + app.getDisplayName() + " is now " + state);
             break;
 
           case STARTING:
           case RUNNING:
             if (_log.shouldLog(Log.INFO))
-                _log.info("Client " + app.getDisplayName() + " called notify for " + state);
+                _log.info("Client " + app.getDisplayName() + " is now " + state);
             break;
 
           case FORKED:
@@ -105,7 +105,7 @@ public class RouterAppManager implements ClientAppManager {
             if (message == null)
                 message = "";
             if (_log.shouldLog(Log.INFO))
-                _log.info("Client " + app.getDisplayName() + " called notify for " + state +
+                _log.info("Client " + app.getDisplayName() + " is now " + state +
                           ' ' + message, e);
             break;
 
