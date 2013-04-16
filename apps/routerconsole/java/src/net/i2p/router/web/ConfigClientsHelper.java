@@ -9,9 +9,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppState;
 import net.i2p.data.DataHelper;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
+import net.i2p.router.startup.LoadClientAppsJob;
+import net.i2p.router.startup.RouterAppManager;
 import net.i2p.util.Addresses;
 
 public class ConfigClientsHelper extends HelperBase {
@@ -94,17 +98,33 @@ public class ConfigClientsHelper extends HelperBase {
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
-            renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
+            boolean isConsole = ca.className.equals("net.i2p.router.web.RouterConsoleRunner");
+            boolean showStart;
+            boolean showStop;
+            if (isConsole) {
+                showStart = false;
+                showStop = false;
+            } else {
+                ClientApp clientApp = _context.clientAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
+                showStart = clientApp == null;
+                showStop = clientApp != null && clientApp.getState() == ClientAppState.RUNNING;
+            }
+            renderForm(buf, ""+cur, ca.clientName,
+                       // urlify, enabled
+                       false, !ca.disabled,
+                       // read only
                        // dangerous, but allow editing the console args too
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        false,
+                       // description, edit
                        ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
-                       true, false, 
-                       // Enable this one and comment out the false below once the stub is filled in.
-                       //!ca.disabled && !("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)),
-                       false,
-
-                       true, ca.disabled);
+                       // show edit button, show update button
+                       // Don't allow edit if it's running, or else we would lose the "handle" to the ClientApp to stop it.
+                       !showStop, false, 
+                       // show stop button
+                       showStop,
+                       // show delete button, show start button
+                       true, showStart);
         }
         
         if ("new".equals(_edit))
@@ -258,10 +278,10 @@ public class ConfigClientsHelper extends HelperBase {
         if (showStartButton && (!ro) && !edit) {
             buf.append("<button type=\"submit\" class=\"Xaccept\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
         }
-        if (showEditButton && (!edit) && !ro)
-            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
         if (showStopButton && (!edit))
             buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >" + _("Stop") + "<span class=hide> ").append(index).append("</span></button>");
+        if (showEditButton && (!edit) && !ro)
+            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
             buf.append("<button type=\"submit\" class=\"Xdownload\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");

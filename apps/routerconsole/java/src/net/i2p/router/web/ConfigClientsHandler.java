@@ -11,9 +11,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppState;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
+import net.i2p.router.startup.RouterAppManager;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
 
@@ -214,10 +217,12 @@ public class ConfigClientsHandler extends FormHandler {
 
         ClientAppConfig.writeClientAppConfig(_context, clients);
         addFormNotice(_("Client configuration saved successfully"));
-        addFormNotice(_("Restart required to take effect"));
+        //addFormNotice(_("Restart required to take effect"));
     }
 
-    // STUB for stopClient, not completed yet.
+    /**
+     *  @since Implemented in 0.9.6 using ClientAppManager
+     */
     private void stopClient(int i) {
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         if (i >= clients.size()) {
@@ -225,10 +230,23 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         ClientAppConfig ca = clients.get(i);
-        //
-        // What do we do here?
-        //
-        addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("stopped") + '.');
+        ClientApp clientApp = _context.clientAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
+        if (clientApp != null && clientApp.getState() == ClientAppState.RUNNING) {
+            try {
+                // todo parseArgs(ca.stopArgs) ?
+                clientApp.shutdown(null);
+                addFormNotice(_("Client {0} stopped", ca.clientName));
+                // Give a chance for status to update
+                try {
+                   Thread.sleep(1000);
+                } catch (InterruptedException ie) {}
+            } catch (Throwable t) {
+                addFormError("Cannot stop client " + ca.className + ": " + t);
+                _log.error("Error stopping client " + ca.className,  t);
+            }
+        } else {
+            addFormError("Cannot stop client " + i + ": " + ca.className);
+        }
     }
 
     private void startClient(int i) {
@@ -239,7 +257,11 @@ public class ConfigClientsHandler extends FormHandler {
         }
         ClientAppConfig ca = clients.get(i);
         LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _context, _log);
-        addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("started") + '.');
+        addFormNotice(_("Client {0} started", ca.clientName));
+        // Give a chance for status to update
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ie) {}
     }
 
     private void deleteClient(int i) {
@@ -250,7 +272,7 @@ public class ConfigClientsHandler extends FormHandler {
         }
         ClientAppConfig ca = clients.remove(i);
         ClientAppConfig.writeClientAppConfig(_context, clients);
-        addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("deleted") + '.');
+        addFormNotice(_("Client {0} deleted", ca.clientName));
     }
 
     private void saveWebAppChanges() {

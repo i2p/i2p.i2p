@@ -1,3 +1,17 @@
+2013-04-16 zzz
+ * ClientAppManager: Add method to look up clients by class and args
+ * Console: Implement stopping of clients using the ClientApp interface
+            (ticket #347)
+
+2013-04-15 zzz
+ * Console: Move from deprecated Jetty SSL methods to SslContextFactory
+ * i2psnark:
+   - Add data directory configuration to GUI (ticket #768)
+   - Add page size configuration to GUI
+   - Multiple instance DHT file cleanup
+   - Mime type fixes
+   - Remove web classes from jar
+
 2013-04-14 zzz
  * i2psnark:
    - Set unique tunnel nickname for additional instances
