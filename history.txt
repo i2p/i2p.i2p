@@ -1,3 +1,7 @@
+2013-04-17 zzz
+ * Console: Better handling of missing font for graphing (ticket #915)
+ * Systray: Better detection of 64-bit Windows (tickets #756, #912)
+
 2013-04-16 zzz
  * ClientAppManager: Add method to look up clients by class and args
  * Console: Implement stopping of clients using the ClientApp interface

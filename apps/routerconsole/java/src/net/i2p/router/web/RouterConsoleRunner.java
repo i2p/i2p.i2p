@@ -274,7 +274,9 @@ public class RouterConsoleRunner implements RouterApp {
             } else {
                 // required true for jrobin to work
           	System.setProperty("java.awt.headless", "true");
-                SysTray.getInstance();
+                // this check is in SysTray but do it here too
+                if (SystemVersion.isWindows() && (!Boolean.getBoolean("systray.disable")) && (!SystemVersion.is64Bit()))
+                    SysTray.getInstance();
             }
         } catch (Throwable t) {
             t.printStackTrace();

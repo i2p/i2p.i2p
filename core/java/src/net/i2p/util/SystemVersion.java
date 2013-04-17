@@ -18,14 +18,25 @@ public abstract class SystemVersion {
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
-    private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
-                                         System.getProperty("os.arch").contains("64");
+    private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
 
     private static final boolean _oneDotSix;
     private static final int _androidSDK;
 
     static {
+        boolean is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
+                       System.getProperty("os.arch").contains("64");
+        if (_isWin && !is64) {
+            // http://stackoverflow.com/questions/4748673/how-can-i-check-the-bitness-of-my-os-using-java-j2se-not-os-arch
+            // http://blogs.msdn.com/b/david.wang/archive/2006/03/26/howto-detect-process-bitness.aspx
+            String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+            is64 = (arch != null && arch.endsWith("64")) ||
+                   (wow64Arch != null && wow64Arch.endsWith("64"));
+        }
+        _is64 = is64;
+
         String vendor = System.getProperty("java.vendor");
         _isAndroid = vendor.contains("Android");
         _isApache = vendor.startsWith("Apache");
