@@ -74,7 +74,7 @@
 <%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
 </p>
 <p>
-<%=intl._("For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>.")%>
+<%=intl._("For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>.")%>
 </p>
 <h3><%=intl._("How does the addressbook application work?")%></h3>
 <p>
@@ -90,7 +90,7 @@
 </div>
 <div id="footer">
 <hr>
-<p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+<p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
 </div>
 </body>

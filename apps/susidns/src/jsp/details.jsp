@@ -83,25 +83,25 @@
 <table class="book" cellspacing="0" cellpadding="5">
 <tr class="list${book.trClass}">
 <td><%=intl._("Host Name")%></td>
-<td><a href="http://<%=addr.getName()%>/"><%=addr.getDisplayName()%></a></td>
+<td><a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getDisplayName()%></a></td>
 </tr><tr class="list${book.trClass}">
 <%
     if (addr.isIDN()) {
 %>
 <td><%=intl._("Encoded Name")%></td>
-<td><a href="http://<%=addr.getName()%>/"><%=addr.getName()%></a></td>
+<td><a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getName()%></a></td>
 </tr><tr class="list${book.trClass}">
 <%
     }
 %>
 <td><%=intl._("Base 32 Address")%></td>
-<td><a href="http://<%=b32%>/"><%=b32%></a></td>
+<td><a href="http://<%=b32%>/" target="_top"><%=b32%></a></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Base 64 Hash")%></td>
 <td><%=addr.getB64()%></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Address Helper")%></td>
-<td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>"><%=intl._("link")%></a></td>
+<td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>" target="_top"><%=intl._("link")%></a></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Public Key")%></td>
 <td><%=intl._("ElGamal 2048 bit")%></td>
@@ -145,7 +145,7 @@
 %>
 <div id="footer">
 <hr>
-<p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+<p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
 </div>
 </body>

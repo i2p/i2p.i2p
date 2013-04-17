@@ -83,12 +83,12 @@
 <%=intl._("Those URLs refer to published hosts.txt files.")%>
 <%=intl._("The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.")%>
 <%=intl._("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
-<a href="http://www.i2p2.i2p/faq.html#subscriptions"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
+<a href="http://www.i2p2.i2p/faq.html#subscriptions" target="_top"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
 </p>
 </div>
 <div id="footer">
 <hr>
-<p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+<p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
 </div>
 </body>
