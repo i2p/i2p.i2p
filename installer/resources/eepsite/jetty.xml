@@ -67,19 +67,22 @@
       <!-- Optional Java 5 bounded threadpool with job queue 
            Requests above the max will be rejected and logged.
            High-traffic sites should increase maximumPoolSize.
-           TODO: would be nice to use the 5-arg constructor but
-                 how do you use an Enum as the TimeUnit argument?
-           Alternatively, make a custom class where we can
-           set the thread name, set daemon, etc.
-           See RouterConsoleRunner.
        -->
       <New class="org.eclipse.jetty.util.thread.ExecutorThreadPool">
-        <!-- corePoolSize (must be at least 3, increase if Jetty hangs) -->
-        <Arg type="int">4</Arg>
+        <!-- corePoolSize (should be at least 3) -->
+        <Arg type="int">3</Arg>
         <!-- maximumPoolSize -->
         <Arg type="int">20</Arg>
         <!-- keepAliveTime (milliseconds) -->
         <Arg type="long">60000</Arg>
+        <Arg>
+            <Call class="java.util.concurrent.TimeUnit" name="valueOf" >
+                <Arg>MILLISECONDS</Arg>
+            </Call>
+        </Arg>
+        <Arg>
+            <New class="java.util.concurrent.SynchronousQueue" />
+        </Arg>
       </New>
     </Set>
 

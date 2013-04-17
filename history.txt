@@ -1,5 +1,6 @@
 2013-04-17 zzz
  * Console: Better handling of missing font for graphing (ticket #915)
+ * Eepsite: Fix jetty.xml configuration of ThreadPool
  * i2ptunnel: Fix default form action (ticket #882)
  * SusiDNS: Set target=_top in all external links to break out of console iframe
  * Systray: Better detection of 64-bit Windows (tickets #756, #912)
