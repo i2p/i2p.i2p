@@ -1,22 +1,13 @@
 package net.i2p.router.web;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
@@ -25,18 +16,13 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 
-import org.jrobin.core.RrdException;
-import org.jrobin.graph.RrdGraph;
-import org.jrobin.graph.RrdGraphDef;
-
 /**
  *  A thread started by RouterConsoleRunner that
  *  checks the configuration for stats to be tracked via jrobin,
  *  and adds or deletes RRDs as necessary.
  *
  *  This also contains methods to generate xml or png image output.
- *  The actual png rendering code is here for the special dual-rate graph;
- *  the rendering for standard graphs is in SummaryRenderer.
+ *  The rendering for graphs is in SummaryRenderer.
  *
  *  To control memory, the number of simultaneous renderings is limited.
  *
@@ -47,6 +33,7 @@ public class StatSummarizer implements Runnable {
     private final Log _log;
     /** list of SummaryListener instances */
     private final List<SummaryListener> _listeners;
+    // TODO remove static instance
     private static StatSummarizer _instance;
     private static final int MAX_CONCURRENT_PNG = 3;
     private final Semaphore _sem;
@@ -92,6 +79,18 @@ public class StatSummarizer implements Runnable {
     /** @since 0.8.7 */
     static boolean isDisabled() {
         return _instance == null || _instance._isDisabled;
+    }
+    
+    /**
+     * Disable graph generation until restart
+     * See SummaryRenderer.render()
+     * @since 0.9.6
+     */
+    static void setDisabled() {
+        if (_instance != null) {
+            _instance._isDisabled = true;
+            _instance._isRunning = false;
+        }
     }
 
     /** list of SummaryListener instances */

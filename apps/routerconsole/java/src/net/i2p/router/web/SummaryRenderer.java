@@ -229,7 +229,15 @@ class SummaryRenderer {
             def.setImageFormat("PNG");
             def.setLazy(true);
 
-            RrdGraph graph = new RrdGraph(def);
+            RrdGraph graph;
+            try {
+                // NPE here if system is missing fonts - see ticket #915
+                graph = new RrdGraph(def);
+            } catch (NullPointerException npe) {
+                _log.error("Error rendering", npe);
+                StatSummarizer.setDisabled();
+                throw new IOException("Error rendering - disabling graph generation. Missing font? See http://trac.i2p2.i2p/ticket/915");
+            }
             int totalWidth = graph.getRrdGraphInfo().getWidth();
             int totalHeight = graph.getRrdGraphInfo().getHeight();
             BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
