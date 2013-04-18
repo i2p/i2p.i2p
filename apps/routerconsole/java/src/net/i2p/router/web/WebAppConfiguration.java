@@ -3,7 +3,10 @@ package net.i2p.router.web;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -51,6 +54,31 @@ public class WebAppConfiguration implements Configuration {
         if (ctxPath.equals("/"))
             return;
         String appName = ctxPath.substring(1);
+
+        if (ctxPath.equals("/susimail")) {
+            // allow certain Jetty classes, restricted as of Jetty 7
+            // See http://wiki.eclipse.org/Jetty/Reference/Jetty_Classloading
+            //System.err.println("Allowing Jetty utils in classpath for " + appName);
+            //System.err.println("System classes before: " + Arrays.toString(wac.getSystemClasses()));
+            //System.err.println("Server classes before: " + Arrays.toString(wac.getServerClasses()));
+            wac.addSystemClass("org.eclipse.jetty.http.");
+            wac.addSystemClass("org.eclipse.jetty.io.");
+            wac.addSystemClass("org.eclipse.jetty.util.");
+            // org.eclipse.jetty.webapp.ClasspathPattern looks in-order, and
+            // WebAppContext doesn't provide a remove method, so we must
+            // convert to a list, remove the wildcard entry, add ours, then
+            // add the wildcard back, then reset.
+            List<String> classes = new ArrayList(16);
+            classes.addAll(Arrays.asList(wac.getServerClasses()));
+            classes.remove("org.eclipse.jetty.");
+            classes.add("-org.eclipse.jetty.http.");
+            classes.add("-org.eclipse.jetty.io.");
+            classes.add("-org.eclipse.jetty.util.");
+            classes.add("org.eclipse.jetty.");
+            wac.setServerClasses(classes.toArray(new String[classes.size()]));
+            //System.err.println("System classes after:  " + Arrays.toString(wac.getSystemClasses()));
+            //System.err.println("Server classes after:  " + Arrays.toString(wac.getServerClasses()));
+        }
 
         I2PAppContext i2pContext = I2PAppContext.getGlobalContext();
         File libDir = new File(i2pContext.getBaseDir(), "lib");
