@@ -906,7 +906,7 @@ public class I2PSnarkServlet extends BasicServlet {
             url = url.substring(0, url.length() - 5);
         buf.append(url);
         if (p.length() > 0)
-            buf.append('?').append(p);
+            buf.append(p);
         resp.setHeader("Location", buf.toString());
         resp.sendError(302, "Moved");
     }
