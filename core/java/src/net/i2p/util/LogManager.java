@@ -625,6 +625,9 @@ public class LogManager {
         rv.setProperty(PROP_FORMAT, new String(_format));
         rv.setProperty(PROP_DATEFORMAT, _dateFormatPattern);
         rv.setProperty(PROP_DISPLAYONSCREEN, Boolean.toString(_displayOnScreen));
+        rv.setProperty(PROP_DROP, Boolean.toString(_dropOnOverflow));
+        rv.setProperty(PROP_DUP, Boolean.toString(_dropDuplicates));
+        rv.setProperty(PROP_LOG_BUFFER_SIZE, Integer.toString(_logBufferSize));
 
         // prior to 0.9.5, override prop trumped config file
         // as of 0.9.5, override prop trumps config file only if config file is set to default,
