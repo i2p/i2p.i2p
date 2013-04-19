@@ -69,9 +69,13 @@ public class PluginStarter implements Runnable {
 
     public void run() {
         if (_context.getBooleanPropertyDefaultTrue("plugins.autoUpdate") &&
-            (!NewsHelper.isUpdateInProgress()) &&
-            (!RouterVersion.VERSION.equals(_context.getProperty("router.previousVersion"))))
-            updateAll(_context, true);
+            !NewsHelper.isUpdateInProgress()) {
+            String prev = _context.getProperty("router.previousVersion");
+            if (prev != null &&
+                (new VersionComparator()).compare(RouterVersion.VERSION, prev) > 0) {
+                updateAll(_context, true);
+            }
+        }
         startPlugins(_context);
     }
 

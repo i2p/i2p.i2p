@@ -101,6 +101,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         notifyInstalled(NEWS, "", Long.toString(NewsHelper.lastUpdated(_context)));
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
         // hack to init from the current news file... do this before we register Updaters
+        // This will not kick off any Updaters as none are yet registered
         (new NewsFetcher(_context, this, Collections.EMPTY_LIST)).checkForUpdates();
         for (String plugin : PluginStarter.getPlugins()) {
             Properties props = PluginStarter.pluginProperties(_context, plugin);
@@ -608,6 +609,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     
     /**
      *  Called by the Updater, either after check() was called, or it found out on its own.
+     *  Use this if there is only one UpdateMethod; otherwise use the Map method below.
      *
      *  @param newsSource who told us
      *  @param id plugin name for plugins, ignored otherwise
@@ -620,50 +622,95 @@ public class ConsoleUpdateManager implements UpdateManager {
                                           UpdateType type, String id,
                                           UpdateMethod method, List<URI> updateSources,
                                           String newVersion, String minVersion) {
+        return notifyVersionAvailable(task, newsSource, type, id,
+                                      Collections.singletonMap(method, updateSources),
+                                      newVersion, minVersion);
+    }
+
+    /**
+     *  Called by the Checker, either after check() was called, or it found out on its own.
+     *  Checkers must use this method if there are multiple UpdateMethods discoverd simultaneously.
+     *
+     *  @param newsSource who told us
+     *  @param id plugin name for plugins, ignored otherwise
+     *  @param sourceMap Mapping of methods to sources
+     *  @param newVersion The new version available
+     *  @param minVersion The minimum installed version to be able to update to newVersion
+     *  @return true if we didn't know already
+     *  @since 0.9.6
+     */
+    public boolean notifyVersionAvailable(UpdateTask task, URI newsSource,
+                                          UpdateType type, String id,
+                                          Map<UpdateMethod, List<URI>> sourceMap,
+                                          String newVersion, String minVersion) {
         if (type == NEWS) {
             // shortcut
             notifyInstalled(NEWS, "", newVersion);
             return true;
         }
         UpdateItem ui = new UpdateItem(type, id);
-        VersionAvailable newVA = new VersionAvailable(newVersion, minVersion, method, updateSources);
-        Version old = _installed.get(ui);
-        if (_log.shouldLog(Log.INFO))
-            _log.info("notifyVersionAvailable " + ui + ' ' + newVA + " old: " + old);
-        if (old != null && old.compareTo(newVA) >= 0) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(ui.toString() + ' ' + old + " already installed");
-            return false;
-        }
-        old = _downloaded.get(ui);
-        if (old != null && old.compareTo(newVA) >= 0) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(ui.toString() + ' ' + old + " already downloaded");
-            return false;
-        }
-        VersionAvailable oldVA = _available.get(ui);
-        if (oldVA != null)  {
-            int comp = oldVA.compareTo(newVA);
-            if (comp > 0) {
+        boolean shouldUpdate = false;
+        for (Map.Entry<UpdateMethod, List<URI>> e : sourceMap.entrySet()) {
+            UpdateMethod method = e.getKey();
+            List<URI> updateSources = e.getValue();
+
+            VersionAvailable newVA = new VersionAvailable(newVersion, minVersion, method, updateSources);
+            Version old = _installed.get(ui);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("notifyVersionAvailable " + ui + ' ' + newVA + " old: " + old);
+            if (old != null && old.compareTo(newVA) >= 0) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(ui.toString() + ' ' + oldVA + " already available");
+                    _log.warn(ui.toString() + ' ' + old + " already installed");
+                // don't bother updating sources
                 return false;
             }
-            if (comp == 0) {
-                if (oldVA.sourceMap.putIfAbsent(method, updateSources) == null) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn(ui.toString() + ' ' + oldVA + " updated with new source method");
-                } else {
+            old = _downloaded.get(ui);
+            if (old != null && old.compareTo(newVA) >= 0) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(ui.toString() + ' ' + old + " already downloaded");
+                // don't bother updating sources
+                return false;
+            }
+            VersionAvailable oldVA = _available.get(ui);
+            if (oldVA != null)  {
+                int comp = oldVA.compareTo(newVA);
+                if (comp > 0) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(ui.toString() + ' ' + oldVA + " already available");
-                }
-                return false;
+                    continue;
+                } else if (comp == 0) {
+                    List<URI> oldSources = oldVA.sourceMap.putIfAbsent(method, updateSources);
+                    if (oldSources == null) {
+                        // merge with existing VersionAvailable
+                        // new method
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(ui.toString() + ' ' + oldVA + " updated with new source method");
+                    } else if (!oldSources.containsAll(updateSources)) {
+                        // merge with existing VersionAvailable
+                        // new sources to existing method
+                        for (URI uri : updateSources) {
+                            if (!oldSources.contains(uri)) {
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn(ui.toString() + ' ' + oldVA + " adding " + uri + " to method " + method);
+                                oldSources.add(uri);
+                            }
+                        }
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(ui.toString() + ' ' + oldVA + " already available");
+                    }
+                    continue;
+                }  // else new version is newer
             }
-        }
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info(ui.toString() + ' ' + newVA + " now available");
-        _available.put(ui, newVA);
+            // Use the new VersionAvailable
+            if (_log.shouldLog(Log.INFO))
+                _log.info(ui.toString() + ' ' + newVA + " now available");
+            _available.put(ui, newVA);
+            shouldUpdate = true;
+        }
+        if (!shouldUpdate)
+            return false;
 
         String msg = null;
         switch (type) {
@@ -679,7 +726,12 @@ public class ConsoleUpdateManager implements UpdateManager {
                 if (shouldInstall() &&
                     !(isUpdateInProgress(ROUTER_SIGNED) ||
                       isUpdateInProgress(ROUTER_UNSIGNED))) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Updating " + ui + " after notify");
                     update_fromCheck(type, id, DEFAULT_MAX_TIME);
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Not updating " + ui + ", update disabled or in progress");
                 }
                 // ConfigUpdateHandler, SummaryHelper, SummaryBarRenderer handle status display
                 break;
@@ -890,7 +942,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     }
     
     /** from NewsFetcher */
-    private boolean shouldInstall() {
+    boolean shouldInstall() {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
         if ("notify".equals(policy) || NewsHelper.dontInstall(_context))
             return false;
@@ -1049,7 +1101,9 @@ public class ConsoleUpdateManager implements UpdateManager {
     }
 
     static String linkify(String url) {
-        return "<a target=\"_blank\" href=\"" + url + "\"/>" + url + "</a>";
+        String durl = url.length() <= 28 ? url :
+                                           url.substring(0, 25) + "&hellip;";
+        return "<a target=\"_blank\" href=\"" + url + "\"/>" + durl + "</a>";
     }
 
     /** translate a string */

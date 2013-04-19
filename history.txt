@@ -1,3 +1,17 @@
+2013-04-19 zzz
+ * AppManager: Register jetty, console, and SAM with manager
+ * i2psnark: Disable spellcheck in more form fields
+ * LogManager: Add support for saving properties added in recent releases
+ * Updates:
+   - Notify manager about all available update methods at once, so the priority
+     system works and it doesn't only update via HTTP
+   - Start router update download at startup if available
+   - Only check plugins when core version increases, not decreases, so we
+     don't update plugins when downgrading
+   - Limit length of URL shown on summary bar
+ * WorkingDir: Correctly strip DOS line endings while migrating,
+               to fix eepsite location on 0.9.5 Windows installs (ticket #919)
+
 2013-04-18 zzz
  * i2psnark: Fix params after P-R-G
  * i2ptunnel: Set target=_top in all external links to break out of console iframe
