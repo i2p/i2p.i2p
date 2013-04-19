@@ -484,6 +484,8 @@ public class SAMBridge implements Runnable, ClientApp {
     public void run() {
         if (serverSocket == null) return;
         changeState(RUNNING);
+        if (_mgr != null)
+            _mgr.register(this);
         try {
             while (acceptConnections) {
                 SocketChannel s = serverSocket.accept();

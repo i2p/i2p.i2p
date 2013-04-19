@@ -605,6 +605,8 @@ public class RouterConsoleRunner implements RouterApp {
                     }
                 }
                 changeState(RUNNING);
+                if (_mgr != null)
+                    _mgr.register(this);
             }
         } else {
             System.err.println("ERROR: Router console did not start, not starting webapps");

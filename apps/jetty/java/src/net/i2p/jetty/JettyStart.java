@@ -118,6 +118,7 @@ public class JettyStart implements ClientApp {
                 }
             }
             changeState(RUNNING);
+            _mgr.register(JettyStart.this);
         }
     }
 
