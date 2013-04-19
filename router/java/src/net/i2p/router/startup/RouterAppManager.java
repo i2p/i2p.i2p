@@ -132,6 +132,8 @@ public class RouterAppManager implements ClientAppManager {
     public boolean register(ClientApp app) {
         if (!_clients.containsKey(app))
             return false;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Client " + app.getDisplayName() + " REGISTERED AS " + app.getName());
         // TODO if old app in there is not running and != this app, allow replacement
         return _registered.putIfAbsent(app.getName(), app) == null;
     }
