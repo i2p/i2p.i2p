@@ -1,3 +1,7 @@
+2013-04-19 kytv
+ * Installer: Run fixperms.bat under any version of Windows that's not XP or
+   2003 to ensure it's run under Vista, 7, 8, and the upcoming "Blue"
+
 2013-04-19 zzz
  * AppManager: Register jetty, console, and SAM with manager
  * i2psnark: Disable spellcheck in more form fields
