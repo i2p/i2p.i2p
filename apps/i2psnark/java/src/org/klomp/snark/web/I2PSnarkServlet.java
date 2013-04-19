@@ -152,8 +152,8 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      */
     private void doGetAndPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';
@@ -1617,7 +1617,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
-        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\"");
+        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
         out.write(" title=\"");
         out.write(_("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
         out.write("\"> \n");
@@ -1658,7 +1658,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_("Data to seed"));
         out.write(":<td><code>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
                   + "</code><input type=\"text\" name=\"baseFile\" size=\"58\" value=\"" + baseFile 
-                  + "\" title=\"");
+                  + "\" spellcheck=\"false\" title=\"");
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
         out.write(_("Trackers"));
@@ -1724,7 +1724,7 @@ public class I2PSnarkServlet extends BasicServlet {
                   "<table border=\"0\"><tr><td>");
 
         out.write(_("Data directory"));
-        out.write(": <td><input name=\"dataDir\" size=\"80\" value=\"" + dataDir + "\"></td>\n" +
+        out.write(": <td><input name=\"dataDir\" size=\"80\" value=\"" + dataDir + "\" spellcheck=\"false\"></td>\n" +
 
                   "<tr><td>");
         out.write(_("Files readable by all"));
@@ -1953,11 +1953,11 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         buf.append("<tr><td><b>")
            .append(_("Add")).append(":</b></td>" +
-                   "<td><input type=\"text\" class=\"trackername\" name=\"tname\"></td>" +
-                   "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\"></td>" +
+                   "<td><input type=\"text\" class=\"trackername\" name=\"tname\" spellcheck=\"false\"></td>" +
+                   "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\" spellcheck=\"false\"></td>" +
                    "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
                    "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
-                   "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\"></td></tr>\n" +
+                   "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\" spellcheck=\"false\"></td></tr>\n" +
                    "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
                    "<tr><td colspan=\"2\"></td><td colspan=\"4\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
