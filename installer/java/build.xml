@@ -49,6 +49,7 @@
             <fileset dir="../../core/java/build/obj" includes="**/FileUtil.class"/>
             <fileset dir="./build/obj" includes="**" />
             <manifest>
+                <attribute name="Main-Class" value="net.i2p.installer.Main" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
