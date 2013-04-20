@@ -145,26 +145,28 @@
             <!-- postinstall stuff for windows -->
             <!-- Wrapper for 32bit Windows JVM -->
             <executable targetfile="$INSTALL_PATH/utility.jar"
-                type="jar" class="net.i2p.installer.Copy"
+                type="jar"
                 stage="postinstall"
                 keep="true"
                 failure="warn"
                 condition="!is64bit">
                 <os family="windows" />
                 <args>
+                    <arg value="copy" />
                     <arg value="$INSTALL_PATH\lib\wrapper\win32\I2Psvc.exe" />
                     <arg value="$INSTALL_PATH" />
                 </args>
             </executable>
 
             <executable targetfile="$INSTALL_PATH/utility.jar"
-                type="jar" class="net.i2p.installer.Copy"
+                type="jar"
                 stage="postinstall"
                 keep="true"
                 failure="warn"
                 condition="!is64bit">
                 <os family="windows" />
                 <args>
+                    <arg value="copy" />
                     <arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" />
                     <arg value="$INSTALL_PATH\lib" />
                 </args>
@@ -172,26 +174,28 @@
 
             <!-- wrapper for 64bit Windows JVM -->
             <executable targetfile="$INSTALL_PATH/utility.jar"
-                type="jar" class="net.i2p.installer.Copy"
+                type="jar"
                 stage="postinstall"
                 keep="true"
                 failure="warn"
                 condition="is64bit">
                 <os family="windows" />
                 <args>
+                    <arg value="copy" />
                     <arg value="$INSTALL_PATH\lib\wrapper\win64\I2Psvc.exe" />
                     <arg value="$INSTALL_PATH" />
                 </args>
             </executable>
 
             <executable targetfile="$INSTALL_PATH/utility.jar"
-                type="jar" class="net.i2p.installer.Copy"
+                type="jar"
                 stage="postinstall"
                 keep="true"
                 failure="warn"
                 condition="is64bit">
                 <os family="windows" />
                 <args>
+                    <arg value="copy" />
                     <arg value="$INSTALL_PATH\lib\wrapper\win64\wrapper.dll" />
                     <arg value="$INSTALL_PATH\lib" />
                 </args>
@@ -203,13 +207,14 @@
              nothing breaks.
             -->
              <executable targetfile="$INSTALL_PATH/utility.jar"
-                 type="jar" class="net.i2p.installer.Copy"
+                 type="jar"
                  stage="postinstall"
                  keep="true"
                  failure="warn"
                  condition="is64bit">
                  <os family="windows" />
                  <args>
+                     <arg value="copy" />
                      <arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" />
                      <arg value="$INSTALL_PATH\lib\wrapper-windows-x86-32.dll" />
                  </args>
@@ -217,20 +222,22 @@
 
              <!-- workaround for bad default path for wrapper.log in Windows. -->
              <executable targetfile="$INSTALL_PATH/utility.jar"
-                 type="jar" class="net.i2p.installer.FixWinPaths"
+                 type="jar"
                  stage="postinstall" keep="true">
                  <os family="windows" />
                  <args>
+                     <arg value="fixwinpaths" />
                      <arg value="$INSTALL_PATH\wrapper.config" />
                  </args>
              </executable>
 
              <!-- Now we'll get rid of the UNIX-only stuff -->
              <executable targetfile="$INSTALL_PATH/utility.jar"
-                 type="jar" class="net.i2p.installer.Delete"
+                 type="jar"
                  stage="postinstall" keep="true" failure="warn">
                  <os family="windows" />
                  <args>
+                     <arg value="delete" />
                      <arg value="$INSTALL_PATH\i2prouter" />
                      <arg value="$INSTALL_PATH\install_i2p_service_unix" />
                      <arg value="$INSTALL_PATH\install-headless.txt" />
@@ -262,20 +269,22 @@
             </executable>
             <!-- else delete it -->
             <executable targetfile="$INSTALL_PATH/utility.jar"
-                type="jar" class="net.i2p.installer.Delete"
+                type="jar"
                 stage="postinstall" keep="true" failure="warn" condition="izpack.windowsinstall.xp|izpack.windowsinstall.2003">
                 <os family="windows" />
                 <args>
+                    <arg value="delete" />
                     <arg value="$INSTALL_PATH\fixperms.bat" />
                 </args>
             </executable>
 
             <!--
             <executable targetfile="$INSTALL_PATH/utility.jar"
-                type="jar" class="net.i2p.installer.Exec"
+                type="jar"
                 stage="postinstall" keep="true" failure="warn">
                 <os family="windows" />
                     <args>
+                        <arg value="exec" />
                         <arg value="$INSTALL_PATH" />
                         <arg value="$INSTALL_PATH\I2Psvc.exe" />
                         <arg value="-c" />
@@ -293,10 +302,11 @@
                   This, however, works fine.
              -->
              <executable targetfile="$INSTALL_PATH/utility.jar"
-                 type="jar" class="net.i2p.installer.Delete"
+                 type="jar"
                  stage="postinstall" keep="false" failure="warn">
                  <os family="windows" />
                  <args>
+                     <arg value="delete" />
                      <arg value="$INSTALL_PATH/utility.jar" />
                  </args>
              </executable>
