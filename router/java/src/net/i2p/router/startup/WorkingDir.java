@@ -294,6 +294,9 @@ public class WorkingDir {
             String s = null;
             boolean isDaemon = DAEMON_USER.equals(System.getProperty("user.name"));
             while ((s = DataHelper.readLine(in)) != null) {
+                // readLine() doesn't strip \r
+                if (s.endsWith("\r"))
+                    s = s.substring(0, s.length() - 1);
                 if (s.endsWith("=\"eepsite/jetty.xml\"")) {
                     s = s.replace("=\"eepsite/jetty.xml\"", "=\"" + todir.getAbsolutePath() +
                                                             File.separatorChar + "eepsite" +
@@ -333,6 +336,9 @@ public class WorkingDir {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
+                // readLine() doesn't strip \r
+                if (s.endsWith("\r"))
+                    s = s.substring(0, s.length() - 1);
                 if (s.indexOf(oldString) >= 0) {
                     s = s.replace(oldString, newString);
                 }
