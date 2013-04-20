@@ -254,7 +254,8 @@
 
             <!-- workaround for vista permission problems - see comments above -->
             <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"
-                condition="izpack.windowsinstall.vista|izpack.windowsinstall.7" >
+                condition="!izpack.windowsinstall.xp+!izpack.windowsinstall.2003" >
+                <os family="windows" />
                 <args>
                     <arg value="$INSTALL_PATH" />
                 </args>
@@ -263,6 +264,7 @@
             <executable targetfile="$INSTALL_PATH/utility.jar"
                 type="jar" class="net.i2p.installer.Delete"
                 stage="postinstall" keep="true" failure="warn" condition="izpack.windowsinstall.xp|izpack.windowsinstall.2003">
+                <os family="windows" />
                 <args>
                     <arg value="$INSTALL_PATH\fixperms.bat" />
                 </args>
