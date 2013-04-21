@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  The central resource coordinating updates.
@@ -34,6 +35,7 @@ public interface UpdateManager {
 
     /**
      *  Called by the Checker, either after check() was called, or it found out on its own.
+     *  Use this if there is only one UpdateMethod; otherwise use the Map method below.
      *
      *  @param newsSource who told us
      *  @param id plugin name for plugins, ignored otherwise
@@ -46,6 +48,23 @@ public interface UpdateManager {
     public boolean notifyVersionAvailable(UpdateTask task, URI newsSource,
                                           UpdateType type, String id,
                                           UpdateMethod method, List<URI> updateSources,
+                                          String newVersion, String minVersion);
+
+    /**
+     *  Called by the Checker, either after check() was called, or it found out on its own.
+     *  Checkers must use this method if there are multiple UpdateMethods discoverd simultaneously.
+     *
+     *  @param newsSource who told us
+     *  @param id plugin name for plugins, ignored otherwise
+     *  @param sourceMap Mapping of methods to sources
+     *  @param newVersion The new version available
+     *  @param minVersion The minimum installed version to be able to update to newVersion
+     *  @return true if we didn't know already
+     *  @since 0.9.6
+     */
+    public boolean notifyVersionAvailable(UpdateTask task, URI newsSource,
+                                          UpdateType type, String id,
+                                          Map<UpdateMethod, List<URI>> sourceMap,
                                           String newVersion, String minVersion);
 
     /**

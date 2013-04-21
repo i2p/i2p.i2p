@@ -39,6 +39,7 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
     private final RouterContext _context;
     private final Log _log;
     private final ConsoleUpdateManager _mgr;
+    private boolean _firstRun = true;
 
     private static final long INITIAL_DELAY = 5*60*1000;
     private static final long RUN_DELAY = 10*60*1000;
@@ -64,7 +65,20 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
                     // nonblocking
                     fetchUnsignedHead();
             }
+        } else if (_firstRun) {
+            // This covers the case where we got a new news but then shut down before it
+            // was successfully downloaded, and then restarted within the 36 hour delay
+            // before fetching news again.
+            // If we already know about a new version (from ConsoleUpdateManager calling
+            // NewsFetcher.checkForUpdates() before any Updaters were registered),
+            // this will fire off an update.
+            // If disabled this does nothing.
+            // TODO unsigned too?
+            if (_mgr.shouldInstall() &&
+                !_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
+                _mgr.update(ROUTER_SIGNED);
         }
+        _firstRun = false;
     }
     
     private boolean shouldFetchNews() {

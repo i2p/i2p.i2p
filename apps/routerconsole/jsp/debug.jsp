@@ -27,6 +27,11 @@
     ctx.updateManager().renderStatusHTML(out);
 
     /*
+     *  Print out the status for the AppManager
+     */
+    ctx.clientAppManager().renderStatusHTML(out);
+
+    /*
      *  Print out the status for all the SessionKeyManagers
      */
     out.print("<h2>Router SKM</h2>");

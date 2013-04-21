@@ -87,8 +87,18 @@ public class LoadClientAppsJob extends JobImpl {
         }
     }
     
+    /**
+     *  Parse arg string into an array of args.
+     *  Spaces or tabs separate args.
+     *  Args may be single- or double-quoted if they contain spaces or tabs.
+     *  There is no provision for escaping quotes.
+     *  A quoted string may not contain a quote of any kind.
+     *
+     *  @param args may be null
+     *  @return non-null, 0-length if args is null
+     */
     public static String[] parseArgs(String args) {
-        List argList = new ArrayList(4);
+        List<String> argList = new ArrayList(4);
         if (args != null) {
             char data[] = args.toCharArray();
             StringBuilder buf = new StringBuilder(32);
@@ -130,8 +140,9 @@ public class LoadClientAppsJob extends JobImpl {
             }
         }
         String rv[] = new String[argList.size()];
-        for (int i = 0; i < argList.size(); i++) 
-            rv[i] = (String)argList.get(i);
+        for (int i = 0; i < argList.size(); i++) {
+            rv[i] = argList.get(i);
+        }
         return rv;
     }
 
@@ -151,6 +162,7 @@ public class LoadClientAppsJob extends JobImpl {
 
     /**
      *  Run client in this thread.
+     *  Used for plugin sub-clients only. Does not register with the ClientAppManager.
      *
      *  @param clientName can be null
      *  @param args can be null
@@ -163,6 +175,7 @@ public class LoadClientAppsJob extends JobImpl {
 
     /**
      *  Run client in this thread.
+     *  Used for plugin sub-clients only. Does not register with the ClientAppManager.
      *
      *  @param clientName can be null
      *  @param args can be null
@@ -249,13 +262,13 @@ public class LoadClientAppsJob extends JobImpl {
                     RouterAppManager mgr = _ctx.clientAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     RouterApp app = (RouterApp) con.newInstance(conArgs);
-                    mgr.addAndStart(app);
+                    mgr.addAndStart(app, _args);
                 } else if (isClientApp(cls)) {
                     Constructor con = cls.getConstructor(I2PAppContext.class, ClientAppManager.class, String[].class);
                     RouterAppManager mgr = _ctx.clientAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     ClientApp app = (ClientApp) con.newInstance(conArgs);
-                    mgr.addAndStart(app);
+                    mgr.addAndStart(app, _args);
                 } else {
                     Method method = cls.getMethod("main", new Class[] { String[].class });
                     method.invoke(cls, new Object[] { _args });

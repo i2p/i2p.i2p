@@ -1,89 +1,103 @@
 <?xml version="1.0"?>
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
+<!-- ============================================================================ -->
+<!-- To correctly start Jetty with JMX module enabled, this configuration         -->
+<!-- file must appear first in the list of the configuration files.               -->
+<!-- The simplest way to achieve this is to add etc/jetty-jmx.xml as the          -->
+<!-- first file in configuration file list at the end of start.ini file.          -->
+<!-- ============================================================================ -->
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-<!-- =============================================================== -->
-<!-- Configure the JVM JMX Server                                    -->
-<!-- this configuration file should be used in combination with      -->
-<!-- other configuration files.  e.g.                                -->
-<!--    java -jar start.jar etc/jetty-jmx.xml etc/jetty.xml          -->
-<!-- See jetty-jmx-mx4j.xml for a non JVM server solution            -->
-<!-- =============================================================== -->
-<Configure id="Server" class="org.mortbay.jetty.Server">
+  <!-- =========================================================== -->
+  <!-- Set the java.rmi.server.hostname property in case you've    -->
+  <!-- got a misconfigured /etc/hosts entry or the like.           -->
+  <!-- =========================================================== -->
+  <!-- 
+  <Call class="java.lang.System" name="setProperty">
+    <Arg>java.rmi.server.hostname</Arg>
+    <Arg>127.0.0.1</Arg>
+  </Call>
+  -->
+  
+  <!-- =========================================================== -->
+  <!-- Initialize an mbean server                                  -->
+  <!-- =========================================================== -->
+  <Call id="MBeanServer" class="java.lang.management.ManagementFactory"
+    name="getPlatformMBeanServer" />
 
-    <!-- =========================================================== -->
-    <!-- Initialize an mbean server                                  -->
-    <!-- =========================================================== -->
-    <!-- Use the jdk 1.5 platformMBeanServer -->
-    <Call id="MBeanServer" class="java.lang.management.ManagementFactory" name="getPlatformMBeanServer"/>
+  <!-- =========================================================== -->
+  <!-- Initialize the Jetty MBean container                        -->
+  <!-- =========================================================== -->
+  <New id="MBeanContainer" class="org.eclipse.jetty.jmx.MBeanContainer">
+    <Arg><Ref id="MBeanServer" /></Arg>
+    <Call name="start"/>
+  </New>
 
-    <!-- =========================================================== -->
-    <!-- Initialize the Jetty MBean container                        -->
-    <!-- =========================================================== -->
-    <Get id="Container" name="container">
-      <Call name="addEventListener">
-        <Arg>
-          <New class="org.mortbay.management.MBeanContainer">
-            <Arg><Ref id="MBeanServer"/></Arg>
-            <Call name="start" />
-          </New>
-        </Arg>
-      </Call>
-    </Get>
-
-    <!-- =========================================================== -->
-    <!-- Enable stats (why else are you using JMX?                                -->
-    <!-- Sneakily replace the top-level handler with a StatisticsHandler          -->
-    <!-- Note we could use AtomicStatisticsHandler in jetty-java5-stats.jar (4KB) -->
-    <!-- but it really isn't worth bundling it.                                   -->
-    <!-- http://blog.markfeeney.com/2010/10/jmx-statistics-in-jetty-6-6122.html   -->
-    <!-- =========================================================== -->
-    <Get id="oldhandler" name="handler"/>
-    <Set name="handler">
-      <New id="StatsHandler" class="org.mortbay.jetty.handler.StatisticsHandler">
-        <Set name="handler"><Ref id="oldhandler"/></Set>
-      </New>
-    </Set>
-
-
-    <!--
-    When setting up the JMXConnectorServer via RMI, two TCP ports are used to communicate with
-    the remote server:
-    * the rmiregistry port (by default 1099) from where the RMI stub is downloaded
-    * the rmi server port (by default randomly chosen) where the actual RMI communication happens
-    The JMXServiceURL for the default configuration is therefore:
-
-    service:jmx:rmi:///jndi/rmi://<remotehost>:1099/jmxrmi
-
-    In case a firewall is restricting port access, you need to make sure that the rmi server port
-    is not chosen randomly, and this can be specified with the following JMXServiceURL:
-
-    service:jmx:rmi://<host>:2100/jndi/rmi://<host>:2099/jmxrmi
-
-    where 2099 is the rmiregistry port and 2100 is the rmi server port.
-    Make sure the firewall allow access to those ports.
-
-    When using the XML configuration below, you don't need to specify any of the JMX system properties
-    on the command line (see http://java.sun.com/j2se/1.5.0/docs/guide/management/agent.html).
-    -->
-
-    <!-- Setup the RMIRegistry on a specific port
-    <Call id="rmiRegistry" class="java.rmi.registry.LocateRegistry" name="createRegistry">
-      <Arg type="int">2099</Arg>
+  <!-- Add to the Server to listen for object events -->
+  <Get id="Container" name="container">
+    <Call name="addEventListener">
+      <Arg><Ref id="MBeanContainer" /></Arg>
     </Call>
-    -->
-    <!-- Setup the JMXConnectorServer on a specific rmi server port
-    <Call id="jmxConnectorServer" class="javax.management.remote.JMXConnectorServerFactory" name="newJMXConnectorServer">
+  </Get>
+
+  <!-- Add to the Server as a managed lifecycle -->
+  <Call name="addBean">
+    <Arg><Ref id="MBeanContainer"/></Arg>
+    <Arg type="boolean">true</Arg>
+  </Call>
+
+  <!-- Add the static log -->
+  <Ref id="MBeanContainer">
+    <Call name="addBean">
       <Arg>
-        <New  class="javax.management.remote.JMXServiceURL">
-          <Arg>service:jmx:rmi://localhost:2100/jndi/rmi://localhost:2099/jmxrmi</Arg>
-        </New>
+        <New class="org.eclipse.jetty.util.log.Log"/>
       </Arg>
-      <Arg/>
-      <Arg><Ref id="MBeanServer"/></Arg>
-      <Call name="start"/>
     </Call>
-    -->
+  </Ref>
+  
+  <!-- In order to connect to the JMX server remotely from a different
+       process, possibly running on a different host, Jetty JMX module
+       can create a remote JMX connector. It requires RMI registry to
+       be started prior to creating the connector server because the
+       JMX specification uses RMI to facilitate connections.        
+   -->
 
+  <!-- Optionally start the RMI registry. Normally RMI registry runs on
+       port 1099. The argument below can be changed in order to comply
+       with the firewall requirements.
+  -->
+  <!--
+  <Call name="createRegistry" class="java.rmi.registry.LocateRegistry">
+    <Arg type="java.lang.Integer"><SystemProperty name="jetty.jmxrmiport" default="1099"/></Arg>
+    <Call name="sleep" class="java.lang.Thread">
+       <Arg type="java.lang.Integer">1000</Arg>
+    </Call>
+  </Call>
+  -->
+ 
+  <!-- Optionally add a remote JMX connector. The parameters of the constructor
+       below specify the JMX service URL, and the object name string for the
+       connector server bean. The parameters of the JMXServiceURL constructor 
+       specify the protocol that clients will use to connect to the remote JMX
+       connector (RMI), the hostname of the server (local hostname), port number
+       (automatically assigned), and the URL path. Note that URL path contains
+       the RMI registry hostname and port number, that may need to be modified
+       in order to comply with the firewall requirements. 
+  -->
+  <!--
+  <New id="ConnectorServer" class="org.eclipse.jetty.jmx.ConnectorServer">
+    <Arg>
+      <New class="javax.management.remote.JMXServiceURL">
+        <Arg type="java.lang.String">rmi</Arg>
+        <Arg type="java.lang.String" />
+        <Arg type="java.lang.Integer"><SystemProperty name="jetty.jmxrmiport" default="1099"/></Arg>
+        <Arg type="java.lang.String">/jndi/rmi://<SystemProperty name="jetty.jmxrmihost" default="localhost"/>:<SystemProperty name="jetty.jmxrmiport" default="1099"/>/jmxrmi</Arg>
+      </New>
+    </Arg>
+    <Arg>org.eclipse.jetty.jmx:name=rmiconnectorserver</Arg>
+    <Call name="start" />
+  </New>
+  -->
 </Configure>
 

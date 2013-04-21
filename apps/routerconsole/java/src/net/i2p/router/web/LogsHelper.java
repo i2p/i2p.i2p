@@ -7,7 +7,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.VersionComparator;
 
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Server;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 public class LogsHelper extends HelperBase {

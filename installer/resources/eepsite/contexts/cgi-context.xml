@@ -1,5 +1,5 @@
 <?xml version="1.0"  encoding="ISO-8859-1"?>
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!--
 Configure a custom context for the eepsite.
@@ -22,21 +22,15 @@ Configure a custom context for the eepsite.
  * parameter value.
 -->
 
-<Configure class="org.mortbay.jetty.servlet.Context">
+<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
   <Set name="contextPath">/cgi-bin</Set>
   <Set name="resourceBase">./eepsite/cgi-bin/</Set>
-  <Call name="setInitParams">
-    <Arg>
-      <Map>
-        <Entry>
-          <Item>Path</Item>
-          <Item>/usr/local/bin:/bin:/usr/bin</Item>
-        </Entry>
-      </Map>
-    </Arg>
+  <Call name="setInitParameter">
+    <Arg>Path</Arg>
+    <Arg>/usr/local/bin:/bin:/usr/bin</Arg>
   </Call>
   <Call name="addServlet">
-    <Arg>org.mortbay.servlet.CGI</Arg>
+    <Arg>org.eclipse.jetty.servlets.CGI</Arg>
     <Arg>/</Arg>
   </Call>
 </Configure>

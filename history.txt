@@ -1,3 +1,91 @@
+2013-04-21 str4d
+ * i2ptunnel: Return "Invalid Request URI" instead of "Non-HTTP Protocol" for
+              URIs with illegal characters (ticket #891)
+
+2013-04-19 kytv
+ * Installer: Run fixperms.bat under any version of Windows that's not XP or
+   2003 to ensure it's run under Vista, 7, 8, and the upcoming "Blue"
+
+2013-04-19 zzz
+ * AppManager: Register jetty, console, and SAM with manager
+ * i2psnark: Disable spellcheck in more form fields
+ * LogManager: Add support for saving properties added in recent releases
+ * Updates:
+   - Notify manager about all available update methods at once, so the priority
+     system works and it doesn't only update via HTTP
+   - Start router update download at startup if available
+   - Only check plugins when core version increases, not decreases, so we
+     don't update plugins when downgrading
+   - Limit length of URL shown on summary bar
+ * WorkingDir: Correctly strip DOS line endings while migrating,
+               to fix eepsite location on 0.9.5 Windows installs (ticket #919)
+
+2013-04-18 zzz
+ * i2psnark: Fix params after P-R-G
+ * i2ptunnel: Set target=_top in all external links to break out of console iframe
+ * SusiMail: Fix loading of Jetty classes
+
+2013-04-17 zzz
+ * Console: Better handling of missing font for graphing (ticket #915)
+ * Eepsite: Fix jetty.xml configuration of ThreadPool
+ * i2ptunnel: Fix default form action (ticket #882)
+ * SusiDNS: Set target=_top in all external links to break out of console iframe
+ * Systray: Better detection of 64-bit Windows (tickets #756, #912)
+
+2013-04-16 zzz
+ * ClientAppManager: Add method to look up clients by class and args
+ * Console: Implement stopping of clients using the ClientApp interface
+            (ticket #347)
+ * SAM: Implement ClientApp interface (ticket #347)
+
+2013-04-15 zzz
+ * Console: Move from deprecated Jetty SSL methods to SslContextFactory
+ * i2psnark:
+   - Add data directory configuration to GUI (ticket #768)
+   - Add page size configuration to GUI
+   - Multiple instance DHT file cleanup
+   - Mime type fixes
+   - Remove web classes from jar
+
+2013-04-14 zzz
+ * i2psnark:
+   - Set unique tunnel nickname for additional instances
+   - Increase page size to 50
+ * Jetty logging: Fix logging using I2PLogger class;
+   log ignored messages at debug level
+
+2013-04-13 zzz
+ * Console: Add /graph support for bw.combined, consolidate
+            rendering code (ticket #890)
+ * i2psnark:
+   - Limit number of torrents displayed; add previous/next page buttons
+   - Only register one instance with UpdateManager
+
+2013-04-10 zzz
+ * Jetty: Upgrade to Jetty 7.6.10.v20130312
+    - Jetty build.xml improvements
+    - MigrateJetty improvements
+    - Lots of changes in RouterConsoleRunner and WebApp classes
+    - Lots of eepsite config file changes
+    - Changes to I2PLogger and I2PRequestLog
+    - Use JettyStart class to start Jetty from clients.config
+ * i2psnark: Eliminate Jetty dependencies in i2psnark for good.
+    Required due to webapp classloader changes in Jetty 7,
+    we can no longer access or extend Jetty classes.
+    - Extend javax HttpServlet instead of Jetty's DefaultServlet
+    - Implement BasicServlet to replace functions of DefaultServlet
+    - Add MimeTypes implementation to add to servlet's defaults
+    - Add local mime.properties file, remove checks in I2PSnarkServlet for those
+      we were missing
+    - Eliminate all use of Jetty utility classes including MimeType, Resource,
+      Buffer, Cache, URIUtil, ...
+    - Use servlet path everywhere, so the war can be renamed
+    - Use servlet path as base for config file and data directory names,
+      so we may have multiple instances running together
+    - Don't override service(), use doGet() and doPost() instead
+ * I2NP: Ignore unused 7 bits of the Database Lookup Message,
+   so we can use them later
+
 * 2013-03-08 0.9.5 released
 
 2013-03-03 zzz

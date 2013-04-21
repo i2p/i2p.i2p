@@ -222,17 +222,9 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         //_fromHash = new Hash(fromData);
         
-        boolean tunnelSpecified = false;
-        switch (data[curIndex]) {
-            case DataHelper.BOOLEAN_TRUE:
-                tunnelSpecified = true;
-                break;
-            case DataHelper.BOOLEAN_FALSE:
-                tunnelSpecified = false;
-                break;
-            default:
-                throw new I2NPMessageException("Tunnel must be explicitly specified (or not)");
-        }
+        // as of 0.9.6, ignore other 7 bits of the flag byte
+        // TODO store the whole flag byte
+        boolean tunnelSpecified = (data[curIndex] & 0x01) != 0;
         curIndex++;
         
         if (tunnelSpecified) {
@@ -277,13 +269,14 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         System.arraycopy(_fromHash.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
+        // TODO allow specification of the other 7 bits of the flag byte
         if (_replyTunnel != null) {
-            out[curIndex++] = DataHelper.BOOLEAN_TRUE;
+            out[curIndex++] = 0x01;
             byte id[] = DataHelper.toLong(4, _replyTunnel.getTunnelId());
             System.arraycopy(id, 0, out, curIndex, 4);
             curIndex += 4;
         } else {
-            out[curIndex++] = DataHelper.BOOLEAN_FALSE;
+            out[curIndex++] = 0x00;
         }
         if ( (_dontIncludePeers == null) || (_dontIncludePeers.isEmpty()) ) {
             out[curIndex++] = 0x0;

@@ -9,6 +9,12 @@ Passe bitte in der Zwischenzeit <b>deine Einstellungen zur Bandbreite</b> auf de
 <a href="config.jsp">Einstellungsseite</a> an!
 </p>
 <p>
+Auch kannst Du gleich deinen Browser f&uuml;r die Nutzung von I2P einrichten. Setze in den 
+Einstellungen zum Browser ein HTTP Proxy ein mit 127.0.0.1 (oder localhost) mit Port 4444 als Ziel.
+Mehr Informationen gibt es auf der <a href="https://www.i2p2.de/htproxyports.html">I2P browser proxy Setup Seite</a>.
+</p>
+
+<p>
 Sobald auf der linken Seite eine Verbindung namens "versch. Klienten" aufgelistet ist, kannst Du unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a> besuchen.
 </p>
 <p>

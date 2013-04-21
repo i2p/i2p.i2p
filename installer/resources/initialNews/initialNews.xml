@@ -9,6 +9,11 @@ While you are waiting, please <b>adjust your bandwidth settings</b> on the
 <a href="config.jsp">configuration page</a>.
 </p>
 <p>
+Also you can setup your browser to use the I2P proxy to reach eepsites. Just enter 127.0.0.1 (or localhost)
+port 4444 as a http proxy into your browser settings. Do not use SOCKS for this. More information
+can be found on <a href="https://www.i2p2.de/htproxyports.html">I2P browser proxy setup page</a>.
+</p>
+<p>
 Once you have a "shared clients" destination listed on the left,
 please <b>check out</b> our
 <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.

@@ -155,9 +155,9 @@ ${book.loadBookMessages}
 <c:if test="${book.master || book.router || book.published || book.private}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
 </c:if>
-<td class="names"><a href="http://${addr.name}/">${addr.displayName}</a>
+<td class="names"><a href="http://${addr.name}/" target="_top">${addr.displayName}</a>
 </td><td class="names">
-<span class="addrhlpr"><a href="http://${addr.b32}/" title="<%=intl._("Base 32 address")%>">b32</a></span>
+<span class="addrhlpr"><a href="http://${addr.b32}/" target="_top" title="<%=intl._("Base 32 address")%>">b32</a></span>
 </td><td class="names">
 <span class="addrhlpr"><a href="details?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
 </td>
@@ -204,7 +204,7 @@ ${book.loadBookMessages}
 
 <div id="footer">
 <hr>
-<p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+<p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
 </div>
 </body>

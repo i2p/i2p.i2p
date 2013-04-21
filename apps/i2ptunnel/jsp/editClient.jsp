@@ -27,6 +27,9 @@
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
   %>
+<style type='text/css'>
+input.default { width: 1px; height: 1px; visibility: hidden; }
+</style>
 </head>
 <body id="tunnelEditPage">
     <div id="pageHeader">
@@ -55,6 +58,7 @@
                 <input type="hidden" name="tunnel" value="<%=request.getParameter("tunnel")%>" />
                 <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
+                <input type="submit" class="default" name="action" value="Save changes" />
             </div>
       
             <div class="separator">

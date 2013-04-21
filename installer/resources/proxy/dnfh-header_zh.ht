@@ -19,10 +19,10 @@ Proxy-Connection: close
 <h3>警告: 地址簿中的找不到此站点</h3>
 <p>
 您所访问的匿名站点(的目标密钥)不存在于您路由器的地址簿中。
-检查链接，或寻找对应的BASE64地址.
-如果您知道对应的BASE64地址请通过
-<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>
-将其复制入您的 userhosts.txt 中，直接使用 BASE64 地址访问，或使用下面的跳转链接。<br><br>
+检查链接，或寻找对应的Base 64地址.
+如果您知道对应的Base 64地址请通过
+<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">SusiDNS</a>
+将其复制入您的 hosts.txt 中，直接使用 Base 64 地址访问，或使用下面的跳转链接。<br><br>
 经常见到此页面? 请参见 <a href="http://www.i2p2.i2p/faq.html#subscriptions"> FAQ 常见问答</a>
 中的 <a href="http://127.0.0.1:7657/susidns/config.jsp">添加更多订阅到地址簿中</a>。
 </p>

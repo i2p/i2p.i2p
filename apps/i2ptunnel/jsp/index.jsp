@@ -115,7 +115,7 @@
         <%
             if (indexBean.isServerTargetLinkValid(curServer)) {
           %>
-            <a href="http://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTP server, bypassing I2P"><%=indexBean.getServerTarget(curServer)%></a>
+            <a href="http://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTP server, bypassing I2P" target="_top"><%=indexBean.getServerTarget(curServer)%></a>
         <%
             } else {
           %><%=indexBean.getServerTarget(curServer)%>
@@ -127,7 +127,7 @@
             <%
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label><%=intl._("Preview")%>:</label>    
-            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p" target="_parent"><%=intl._("Preview")%></a>
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p" target="_top"><%=intl._("Preview")%></a>
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><span class="text"><%=intl._("Base32 Address")%>:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>

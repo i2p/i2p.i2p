@@ -19,15 +19,16 @@ package net.i2p.jetty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
 
-import org.mortbay.component.LifeCycle;
-import org.mortbay.resource.Resource;
-import org.mortbay.xml.XmlConfiguration;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.xml.XmlConfiguration;
 
 /**
  *  Start Jetty where the args are one or more XML files.
@@ -73,8 +74,11 @@ public class JettyStart implements ClientApp {
                 XmlConfiguration configuration = new XmlConfiguration(Resource.newResource(args[i]).getURL());
                 if (last!=null)
                     configuration.getIdMap().putAll(last.getIdMap());
-                if (properties.size()>0)
-                    configuration.setProperties(properties);
+                if (properties.size()>0) {
+                    // to avoid compiler errror
+                    Map foo = configuration.getProperties();
+                    foo.putAll(properties);
+                }
                 Object o = configuration.configure();
                 if (o instanceof LifeCycle)
                     _jettys.add((LifeCycle)o);
@@ -114,6 +118,7 @@ public class JettyStart implements ClientApp {
                 }
             }
             changeState(RUNNING);
+            _mgr.register(JettyStart.this);
         }
     }
 

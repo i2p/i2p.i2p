@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.ver" value="6.1.26" />
-    <property name="jetty.base" value="jetty-${jetty.ver}" />
-    <property name="jetty.sha1" value="9485913f1a1945a849a90f1a34853d22350bc524" />
+    <property name="jetty.ver" value="7.6.10.v20130312" />
+    <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
+    <property name="jetty.sha1" value="8c0ff0ad83756de118f5af71b88ca9c78ebf6420" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
-    <property name="jetty.url" value="http://dist.codehaus.org/jetty/${jetty.base}/${jetty.filename}" />
+    <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
 
     <target name="all" depends="build" />
 
-  <!--
+    <!--
+      - We now check in the jars we need to ${jetty.base}, so
+      - fetchJettylib, verifyJettylib, and extractJettylib are not used unless
+      - updating to a new Jetty version by changing ${jetty.ver} and ${jetty.sha1} above.
+     -->
+
     <target name="ensureJettylib" >
-        <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
-        <available property="jetty.zip.extracted" file="jettylib" type="dir" />
-        <ant target="fetchJettylib" />
-        <ant target="verifyJettylib" />
-        <ant target="extractJettylib" />
+        <available property="jetty.zip.extracted" file="${jetty.base}" type="dir" />
+        <condition property="jetty.zip.available" >
+            <or>
+                <istrue value="${jetty.zip.extracted}" />
+                <available file="${jetty.filename}" type="file" />
+            </or>
+        </condition>
+        <ant target="copyJettylib" />
     </target>
-   -->
+  <!--
     <target name="ensureJettylib" depends="extractJettylib" />
+   -->
 
     <target name="fetchJettylib" unless="jetty.zip.available" >
         <echo message="It seems that you don't have '${jetty.filename}' deployed." />
@@ -48,13 +57,16 @@
     </target>
 
     <condition property="verified.already" >
-        <and>
-            <available file="${jetty.filename}" />
-            <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
-        </and>
+        <or>
+            <istrue value="${jetty.zip.extracted}" />
+            <and>
+                <available file="${jetty.filename}" />
+                <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+            </and>
+        </or>
     </condition>
 
-    <target name="verifyJettylib" unless="verified.already" >
+    <target name="verifyJettylib" depends="fetchJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
                 <checksum file="${jetty.filename}" algorithm="SHA" property="${jetty.sha1}" />
         </condition>
@@ -68,43 +80,61 @@
         <touch file="${verified.filename}" />
     </target>
 
-  <!--
-    <target name="extractJettylib" unless="jetty.zip.extracted" >
-   -->
-    <target name="extractJettylib" >
+    <target name="extractJettylib" depends="verifyJettylib" unless="jetty.zip.extracted" >
       <!-- for .tgz -->
       <!--
         <gunzip src="${jetty.filename}" dest="jetty.tar" />
         <untar src="jetty.tar" dest="." />
       -->
       <!-- for .zip -->
-      <!--
         <unzip src="${jetty.filename}" dest="." />
-      -->
+    </target>
+
+    <target name="copyJettylib" depends="extractJettylib" >
         <mkdir dir="jettylib" />
       <!-- We copy everything to names without the version numbers so we
-           can update them later. Where there was something similar in Jetty 5,
-           we use the same names so they will overwrite the Jetty 5 jar on upgrade.
+           can update them later. Where there was something similar in Jetty 5/6,
+           we use the same names so they will overwrite the Jetty 5/6 jar on upgrade.
            Otherwise we use the same name as the symlink in Ubuntu /usr/share/java.
            Reasons for inclusion:
               start.jar: Needed for clients.config startup of eepsites
               jetty-util-xxx.jar: LifeCycle (base class for stuff), URIUtil (used in i2psnark)
-              jetty-sslengine-xxx.jar: SSL NIO Connector for console
-              jetty-java5-threadpool-xxx.jar: Concurrent thread pool for eepsite
+              jetty-deploy, -http, -io, -security, -servlet, -webapp: All split out from main server jar in Jetty 7
+              jetty-continuation-xxx.jar: Needed? Useful?
+              jetty-servlets-xxx.jar: Needed for CGI for eepsite
+              jetty-sslengine-xxx.jar: Old Jetty 6, now a dummy
+              jetty-java5-threadpool-xxx.jar: Old Jetty 6, now a dummy
               glassfish 2.1: Not used, too old, see Tomcat below.
               jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
               jetty-management: Not used by I2P, but only 34KB and could be useful for eepsites, and we bundled it with Jetty 5
               All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
         -->
         <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
-        <copy file="${jetty.base}/lib/${jetty.base}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
+        <copy file="${jetty.base}/lib/jetty-server-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-continuation-${jetty.ver}.jar" tofile="jettylib/jetty-continuation.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-deploy-${jetty.ver}.jar" tofile="jettylib/jetty-deploy.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-http-${jetty.ver}.jar" tofile="jettylib/jetty-http.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-io-${jetty.ver}.jar" tofile="jettylib/jetty-io.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-jmx-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-rewrite-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-java5-threadpool-${jetty.ver}.jar" tofile="jettylib/jetty-java5-threadpool.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-rewrite-handler-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-sslengine-${jetty.ver}.jar" tofile="jettylib/jetty-sslengine.jar" />
-        <copy preservelastmodified="true" file="${jetty.base}/lib/management/jetty-management-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
-        <delete file="jetty.tar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-webapp-${jetty.ver}.jar" tofile="jettylib/jetty-webapp.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver}.jar" tofile="jettylib/jetty-xml.jar" />
+        <jar destfile="jettylib/jetty-java5-threadpool.jar" >
+            <manifest>
+                <attribute name="Note" value="Intentionally empty" />
+            </manifest>
+        </jar>
+        <jar destfile="jettylib/jetty-sslengine.jar" >
+            <manifest>
+                <attribute name="Note" value="Intentionally empty" />
+            </manifest>
+        </jar>
       <!--
+        <delete file="jetty.tar" />
         <delete dir="${jetty.base}" />
       -->
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over,
@@ -155,15 +185,38 @@
     <target name="build" depends="jar" />
 
     <target name="builddep" />
-    <target name="compile" depends="builddep, ensureJettylib" >
+
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../build"
+            srcdir="./java/src" 
+            destdir="./build/obj" >
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="./jettylib/commons-logging.jar" />
+                <pathelement location="./jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="./jettylib/javax.servlet.jar" />
+                <pathelement location="./jettylib/jetty-http.jar" />
+                <pathelement location="./jettylib/jetty-io.jar" />
+                <pathelement location="./jettylib/jetty-util.jar" />
+                <pathelement location="./jettylib/jetty-xml.jar" />
+            </classpath>
+        </depend>
+    </target>
+
+    <target name="compile" depends="builddep, ensureJettylib, depend" >
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./java/src" 
-            debug="true" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-util.jar" >
+            classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

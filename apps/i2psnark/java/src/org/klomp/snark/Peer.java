@@ -359,7 +359,7 @@ public class Peer implements Comparable
     String bittorrentProtocol = new String(bs, "UTF-8");
     if (!"BitTorrent protocol".equals(bittorrentProtocol))
       throw new IOException("Handshake failure, expected "
-                            + "'Bittorrent protocol', got '"
+                            + "'BitTorrent protocol', got '"
                             + bittorrentProtocol + "'");
     
     // Handshake read - options

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure 1.2//EN" "http://jetty.mortbay.org/configure_1_2.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!-- ========================================================================= -->
 <!-- This file configures the Jetty server.                                    -->
@@ -18,14 +18,14 @@
 <!--           war files placed in the webapps/ dir.                           -->
 <!--   * Uncomment the line to allow Jetty to follow symlinks                  -->
 <!--                                                                           -->
-<!-- I2P uses Jetty 6.1.26. If you need web server features not found          -->
-<!-- in Jetty 6, you may install and run Jetty 7 or 8 in a different JVM       -->
+<!-- I2P uses Jetty 7. If you need web server features not found               -->
+<!-- in Jetty 7, you may install and run Jetty 7 or 8 in a different JVM       -->
 <!-- or run any other web server such as Apache. If you do run another web     -->
 <!-- server instead, be sure and disable the Jetty 6 server for your           -->
 <!-- eepsite on http://127.0.0.1:7657/configclients.jsp .                      -->
 <!--                                                                           -->
 <!-- Jetty now uses the I2P logging system rather than wrapper.log.            -->
-<!-- Use the log override org.mortbay.jetty.Server to adjust the log level.    -->
+<!-- Use the log override org.eclipse.jetty.server.Server to adjust the log level.  -->
 <!--                                                                           -->
 <!-- Note that the XML encoding for this file is UTF-8.                        -->
 <!--                                                                           -->
@@ -44,7 +44,7 @@
 <!-- =============================================================== -->
 
 
-<Configure id="Server" class="org.mortbay.jetty.Server">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
 
     <!-- =========================================================== -->
     <!-- Server Thread Pool                                          -->
@@ -57,7 +57,7 @@
            Requests above the max will be queued
        -->
      <!--
-      <New class="org.mortbay.thread.QueuedThreadPool">
+      <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
         <Set name="minThreads">1</Set>
         <Set name="maxThreads">16</Set>
         <Set name="lowThreads">2</Set>
@@ -67,16 +67,22 @@
       <!-- Optional Java 5 bounded threadpool with job queue 
            Requests above the max will be rejected and logged.
            High-traffic sites should increase maximumPoolSize.
-           TODO: would be nice to use the 5-arg constructor but
-                 how do you use an Enum as the TimeUnit argument?
-           Alternatively, make a custom class where we can
-           set the thread name, set daemon, etc.
-           See RouterConsoleRunner.
        -->
-      <New class="org.mortbay.thread.concurrent.ThreadPool">
-        <Arg type="int">0</Arg>
-        <Set name="corePoolSize">1</Set>
-        <Set name="maximumPoolSize">24</Set>
+      <New class="org.eclipse.jetty.util.thread.ExecutorThreadPool">
+        <!-- corePoolSize (should be at least 3) -->
+        <Arg type="int">3</Arg>
+        <!-- maximumPoolSize -->
+        <Arg type="int">20</Arg>
+        <!-- keepAliveTime (milliseconds) -->
+        <Arg type="long">60000</Arg>
+        <Arg>
+            <Call class="java.util.concurrent.TimeUnit" name="valueOf" >
+                <Arg>MILLISECONDS</Arg>
+            </Call>
+        </Arg>
+        <Arg>
+            <New class="java.util.concurrent.SynchronousQueue" />
+        </Arg>
       </New>
     </Set>
 
@@ -97,7 +103,7 @@
     -->    
     <Call name="addConnector">
       <Arg>
-          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+          <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
             <Set name="host">127.0.0.1</Set>
             <Set name="port">7658</Set>
             <Set name="maxIdleTime">60000</Set>
@@ -106,7 +112,7 @@
             <Set name="confidentialPort">8443</Set>
 	    <Set name="lowResourcesConnections">5000</Set>
 	    <Set name="lowResourcesMaxIdleTime">5000</Set>
-            <Set name="useDirectBuffers">false</Set>
+	    <Set name="useDirectBuffers">false</Set>
           </New>
       </Arg>
     </Call>
@@ -117,7 +123,7 @@
     <!--
     <Call name="addConnector">
       <Arg>
-          <New class="org.mortbay.jetty.bio.SocketConnector">
+          <New class="org.eclipse.jetty.server.bio.SocketConnector">
             <Set name="host">127.0.0.1</Set>
             <Set name="port">7658</Set>
             <Set name="maxIdleTime">60000</Set>
@@ -155,7 +161,7 @@
     <!-- =========================================================== -->
     <!--
     <Set name="sessionIdManager">
-      <New class="org.mortbay.jetty.servlet.HashSessionIdManager">
+      <New class="org.eclipse.jetty.server.session.HashSessionIdManager">
         <Set name="workerName">node1</Set>
       </New>
     </Set>
@@ -165,23 +171,48 @@
     <!-- Set handler Collection Structure                            --> 
     <!-- =========================================================== -->
     <Set name="handler">
-      <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
+      <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
         <Set name="handlers">
-         <Array type="org.mortbay.jetty.Handler">
+         <Array type="org.eclipse.jetty.server.Handler">
            <Item>
-             <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
+             <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
            </Item>
            <Item>
-             <New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
+             <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
            </Item>
            <Item>
-             <New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
+             <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
            </Item>
          </Array>
         </Set>
       </New>
     </Set>
-    
+
+    <!-- =============================================================== -->
+    <!-- Create the deployment manager                                   -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- The deplyment manager handles the lifecycle of deploying web    -->
+    <!-- applications. Apps are provided by instances of the             -->
+    <!-- AppProvider interface.  Typically these are provided by         -->
+    <!-- one or more of:                                                 -->
+    <!--   jetty-webapps.xml       - monitors webapps for wars and dirs  -->
+    <!--   jetty-contexts.xml      - monitors contexts for context xml   -->
+    <!--   jetty-templates.xml     - monitors contexts and templates     -->
+    <!-- =============================================================== -->
+    <Call name="addBean">
+      <Arg>
+        <New id="DeploymentManager" class="org.eclipse.jetty.deploy.DeploymentManager">
+          <Set name="contexts">
+            <Ref id="Contexts" />
+          </Set>
+          <Call name="setContextAttribute">
+            <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
+            <Arg>.*/.*jsp-api-[^/]*\.jar$|.*/.*jsp-[^/]*\.jar$|.*/.*taglibs[^/]*\.jar$</Arg>
+          </Call>
+        </New>
+      </Arg>
+    </Call>
+
     <!-- =========================================================== -->
     <!-- Configure the context deployer                              -->
     <!-- A context deployer will deploy contexts described in        -->
@@ -193,16 +224,16 @@
     <!-- in the $JETTY_HOME/contexts directory                       -->
     <!--                                                             -->
     <!-- =========================================================== -->
-    <Call name="addLifeCycle">
-      <Arg>
-        <New class="org.mortbay.jetty.deployer.ContextDeployer">
-          <Set name="contexts"><Ref id="Contexts"/></Set>
-          <Set name="configurationDir">./eepsite/contexts</Set>
-          <!-- set to 60 to have it check for changes once a minute -->
-          <Set name="scanInterval">0</Set>
-        </New>
-      </Arg>
-    </Call>
+    <Ref id="DeploymentManager">
+      <Call name="addAppProvider">
+        <Arg>
+          <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
+            <Set name="monitoredDirName">./eepsite/contexts</Set>
+            <Set name="scanInterval">120</Set>
+          </New>
+        </Arg>
+      </Call>
+    </Ref>
 
     <!-- =========================================================== -->
     <!-- Configure the webapp deployer.                              -->
@@ -217,19 +248,18 @@
     <!-- Normally only one type of deployer need be used.            -->
     <!--                                                             -->
     <!-- =========================================================== -->
-    <Call name="addLifeCycle">
-      <Arg>
-        <New class="org.mortbay.jetty.deployer.WebAppDeployer">
-          <Set name="contexts"><Ref id="Contexts"/></Set>
-          <Set name="webAppDir">./eepsite/webapps</Set>
-	  <Set name="parentLoaderPriority">false</Set>
-          <!-- set to true if you have uncompiled jsps in your wars -->
-	  <Set name="extract">false</Set>
-	  <Set name="allowDuplicates">false</Set>
-          <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
-        </New>
-      </Arg>
-    </Call>
+    <Ref id="DeploymentManager">
+      <Call id="webappprovider" name="addAppProvider">
+        <Arg>
+          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+            <Set name="monitoredDirName">./eepsite/webapps</Set>
+	    <Set name="parentLoaderPriority">false</Set>
+	    <Set name="extractWars">false</Set>
+            <Set name="defaultsDescriptor">./eepsite/etc/webdefault.xml</Set>
+          </New>
+        </Arg>
+      </Call>
+    </Ref>
 
     <!-- =========================================================== -->
     <!-- Configure Authentication Realms                             -->
@@ -240,9 +270,9 @@
     <!-- =========================================================== -->
   <!-- UNCOMMENT TO ACTIVATE
     <Set name="UserRealms">
-      <Array type="org.mortbay.jetty.security.UserRealm">
+      <Array type="org.eclipse.jetty.security.LoginService">
         <Item>
-          <New class="org.mortbay.jetty.security.HashUserRealm">
+          <New class="org.eclipse.jetty.security.HashLoginService">
             <Set name="name">Test Realm</Set>
             <Set name="config">./eepsite/etc/realm.properties</Set>
             <Set name="refreshInterval">0</Set>

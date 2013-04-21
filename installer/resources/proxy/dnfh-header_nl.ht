@@ -19,10 +19,10 @@ Proxy-Connection: close
 <h3>Waarschuwing: Eepsite Niet Gevonden in Adresboek</h3>
 <p>
 De eepsite was niet gevonden in je router's adresboek.
-Controlleer de link of zoek een BASE64 adres.
-Indien je een BASE64 adres hebt, plak het in je userhosts.txt via
-<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
-gebruikt een BASE64 adres helper, of gebruik een jump service link hieronder.
+Controlleer de link of zoek een Base 64 adres.
+Indien je een Base 64 adres hebt, plak het in je hosts.txt via
+<a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">SusiDNS</a>,
+gebruikt een Base 64 adres helper, of gebruik een jump service link hieronder.
 </p>
 <p>
 Zie je deze pagina vaak? Lees <a href="http://www.i2p2.i2p/faq.html#subscriptions">de FAQ</a>

@@ -3,11 +3,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
     // Let's make this easy...
-    final Integer ERROR_CODE = (Integer) request.getAttribute(org.mortbay.jetty.servlet.ServletHandler.__J_S_ERROR_STATUS_CODE);
-    final String ERROR_URI = (String) request.getAttribute(org.mortbay.jetty.servlet.ServletHandler.__J_S_ERROR_REQUEST_URI);
-    final String ERROR_MESSAGE = (String) request.getAttribute(org.mortbay.jetty.servlet.ServletHandler.__J_S_ERROR_MESSAGE);
-    final Class ERROR_CLASS = (Class)request.getAttribute(org.mortbay.jetty.servlet.ServletHandler.__J_S_ERROR_EXCEPTION_TYPE);
-    final Throwable ERROR_THROWABLE = (Throwable)request.getAttribute(org.mortbay.jetty.servlet.ServletHandler.__J_S_ERROR_EXCEPTION);
+    final Integer ERROR_CODE = (Integer) request.getAttribute(org.eclipse.jetty.server.Dispatcher.ERROR_STATUS_CODE);
+    final String ERROR_URI = (String) request.getAttribute(org.eclipse.jetty.server.Dispatcher.ERROR_REQUEST_URI);
+    final String ERROR_MESSAGE = (String) request.getAttribute(org.eclipse.jetty.server.Dispatcher.ERROR_MESSAGE);
+    final Class ERROR_CLASS = (Class)request.getAttribute(org.eclipse.jetty.server.Dispatcher.ERROR_EXCEPTION_TYPE);
+    final Throwable ERROR_THROWABLE = (Throwable)request.getAttribute(org.eclipse.jetty.server.Dispatcher.ERROR_EXCEPTION);
     if (ERROR_CODE != null && ERROR_MESSAGE != null) {
         // this is deprecated but we don't want sendError()
         response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);

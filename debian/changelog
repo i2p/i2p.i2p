@@ -1,3 +1,31 @@
+i2p (0.9.5-2) UNRELEASED; urgency=low
+
+  * debian/i2p.postinst: Explicitly set permissions on /etc/i2p/wrapper.config
+    to compensate for stricter umasks.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 31 Mar 2013 12:50:17 +0000
+
+i2p (0.9.5-1) unstable; urgency=low
+
+  * New Upstream release
+  * Drop debian/patches/0007-backported-news-fix.patch and
+    debian/patches/#0006-remove-izpack.patch
+  * Spanish debconf update
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 08 Mar 2013 23:04:51 +0000
+
+i2p (0.9.4-3) unstable; urgency=low
+
+  * Backport fix from MTN for ticket #817
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 22 Dec 2012 13:07:47 +0000
+
+i2p (0.9.4-2) unstable; urgency=low
+
+  * Add missing build-dep on libservice-wrapper-java
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 17 Dec 2012 20:40:07 +0000
+
 i2p (0.9.4-1) stable; urgency=low
 
   * explicitly prefer openjdk-*-headless over default-jre-headless. Debian

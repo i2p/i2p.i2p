@@ -128,7 +128,8 @@ public class Router implements RouterClock.ClockShiftListener {
         // Fixed in Jetty 5.1.15 but we are running 5.1.12
         // The default is true, unfortunately it was previously
         // set to false in wrapper.config thru 0.7.10 so we must set it back here.
-        System.setProperty("org.mortbay.util.FileResource.checkAliases", "true");
+        // Not in Jetty 7
+        //System.setProperty("org.mortbay.util.FileResource.checkAliases", "true");
     }
     
     /**

@@ -472,7 +472,7 @@
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*:net.i2p.kademlia" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
-            <group title="Jetty Logging" packages="net.i2p.jetty" />
+            <group title="Jetty Starter and Logging" packages="net.i2p.jetty" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
@@ -501,10 +501,13 @@
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
-                <pathelement location="apps/jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-http.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-security.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-start.jar" />
-                <pathelement location="apps/jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-webapp.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-xml.jar" />
                 <pathelement location="apps/jetty/jettylib/jsp-api.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
@@ -1040,11 +1043,11 @@
         <!-- *nix here -->
         <exec executable="sh" osfamily="unix" failonerror="true">
             <arg value="-c" />
-            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <exec executable="sh" osfamily="mac" failonerror="true">
             <arg value="-c" />
-            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
         <exec executable="cmd" osfamily="windows" failonerror="true">
@@ -1153,13 +1156,13 @@
         <!--  We have to package the new eepsite files for MigrateJetty.java, but we
               can't overwrite an existing eepsite dir in a non-split configuration.
           -->
-        <copy todir="pkg-temp/eepsite-jetty6" >
+        <copy todir="pkg-temp/eepsite-jetty7" >
             <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
         </copy>
     </target>
 
     <target name="delete-j6-update">
-        <delete dir="pkg-temp/eepsite-jetty6" />
+        <delete dir="pkg-temp/eepsite-jetty7" />
     </target>
 
     <!-- Jetty 6 I2P logging addons, not really fixes -->

@@ -148,21 +148,21 @@ class NewsFetcher extends UpdateRunner {
                             // TODO if minversion > our version, continue
                             // and look for a second entry with clearnet URLs
                             // TODO clearnet URLs, notify with HTTP_CLEARNET and/or HTTPS_CLEARNET
-                            _mgr.notifyVersionAvailable(this, _currentURI,
-                                                        ROUTER_SIGNED, "", HTTP,
-                                                        _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP),
-                                                        ver, "");
+                            Map<UpdateMethod, List<URI>> sourceMap = new HashMap(4);
+                            sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP));
                             String key = FileUtil.isPack200Supported() ? SU2_KEY : SUD_KEY;
                             String murl = args.get(key);
                             if (murl != null) {
                                 List<URI> uris = tokenize(murl);
                                 if (!uris.isEmpty()) {
                                     Collections.shuffle(uris, _context.random());
-                                    _mgr.notifyVersionAvailable(this, _currentURI,
-                                                        ROUTER_SIGNED, "", TORRENT,
-                                                        uris, ver, "");
+                                    sourceMap.put(TORRENT, uris);
                                 }
                             }
+                            // notify about all sources at once
+                            _mgr.notifyVersionAvailable(this, _currentURI,
+                                                        ROUTER_SIGNED, "", sourceMap,
+                                                        ver, "");
                         } else {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is current");

@@ -36,23 +36,28 @@ public interface ClientApp {
      *  If previously running, client must call ClientAppManager.notify() at least once within this
      *  method to change the state to STOPPING or STOPPED.
      *  May be called multiple times on the same object, in any state.
+     *
+     *  @param args generally null but could be stopArgs from clients.config
      */
     public void shutdown(String[] args) throws Throwable;
 
     /**
      *  The current state of the ClientApp.
+     *  @return non-null
      */
     public ClientAppState getState();
 
     /**
      *  The generic name of the ClientApp, used for registration,
      *  e.g. "console". Do not translate.
+     *  @return non-null
      */
     public String getName();
 
     /**
      *  The dislplay name of the ClientApp, used in user interfaces.
      *  The app must translate.
+     *  @return non-null
      */
     public String getDisplayName();
 }
