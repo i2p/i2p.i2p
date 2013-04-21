@@ -162,6 +162,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "<html><body><H1>I2P ERROR: NON-HTTP PROTOCOL</H1>" +
             "The request uses a bad protocol. " +
             "The I2P HTTP Proxy supports http:// requests ONLY. Other protocols such as https:// and ftp:// are not allowed.<BR>").getBytes();
+    private final static byte[] ERR_BAD_URI =
+                                ("HTTP/1.1 403 Bad URI\r\n" +
+            "Content-Type: text/html; charset=iso-8859-1\r\n" +
+            "Cache-control: no-cache\r\n" +
+            "\r\n" +
+            "<html><body><H1>I2P ERROR: INVALID REQUEST URI</H1>" +
+            "The request URI is invalid, and probably contains illegal characters. " +
+            "If you clicked e.g. a forum link, check the end of the URI for any characters the browser has mistakenly added on.<BR>").getBytes();
     private final static byte[] ERR_LOCALHOST =
                                 ("HTTP/1.1 403 Access Denied\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -428,7 +436,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(_log.shouldLog(Log.WARN)) {
                             _log.warn(getPrefix(requestId) + "Bad request [" + request + "]", use);
                         }
-                        break;
+                        if(out != null) {
+                            out.write(getErrorPage("baduri", ERR_BAD_URI));
+                            writeFooter(out);
+                        }
+                        s.close();
+                        return;
                     }
                     method = params[0];
                     String protocolVersion = params[2];
