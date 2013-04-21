@@ -163,7 +163,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "The request uses a bad protocol. " +
             "The I2P HTTP Proxy supports http:// requests ONLY. Other protocols such as https:// and ftp:// are not allowed.<BR>").getBytes();
     private final static byte[] ERR_BAD_URI =
-                                ("HTTP/1.1 403 Bad URI\r\n" +
+                                ("HTTP/1.1 400 Bad URI\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
             "\r\n" +
