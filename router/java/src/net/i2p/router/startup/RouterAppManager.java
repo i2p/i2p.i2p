@@ -1,6 +1,11 @@
 package net.i2p.router.startup;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -159,5 +164,53 @@ public class RouterAppManager implements ClientAppManager {
      */
     public ClientApp getRegisteredApp(String name) {
         return _registered.get(name);
+    }
+
+    /**
+     *  debug
+     *  @since 0.9.6
+     */
+    public void renderStatusHTML(Writer out) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<h2>App Manager</h2>");
+        buf.append("<h3>Tracked</h3>");
+        toString1(buf);
+        buf.append("<h3>Registered</h3>");
+        toString2(buf);
+        out.write(buf.toString());
+    }
+
+    /**
+     *  debug
+     *  @since 0.9.6
+     */
+    private void toString1(StringBuilder buf) {
+        List<String> list = new ArrayList(_clients.size());
+        for (Map.Entry<ClientApp, String[]> entry : _clients.entrySet()) {
+            ClientApp key = entry.getKey();
+            String[] val = entry.getValue();
+            list.add("[" + key.getName() + "] = [" + key.getClass().getName() + ' ' + Arrays.toString(val) + "] " + key.getState() + "<br>");
+        }
+        Collections.sort(list);
+        for (String e : list) {
+            buf.append(e);
+        }
+    }
+
+    /**
+     *  debug
+     *  @since 0.9.6
+     */
+    private void toString2(StringBuilder buf) {
+        List<String> list = new ArrayList(_registered.size());
+        for (Map.Entry<String, ClientApp> entry : _registered.entrySet()) {
+            String key = entry.getKey();
+            ClientApp val = entry.getValue();
+            list.add("[" + key + "] = [" + val.getClass().getName() + "]<br>");
+        }
+        Collections.sort(list);
+        for (String e : list) {
+            buf.append(e);
+        }
     }
 }
