@@ -1,3 +1,9 @@
+2013-04-21 zzz
+ * AppManager: Add HTML debug output
+ * Installer: Fix installations to a different drive on Windows
+   (prop from i2p.i2p.zzz.winfix095; ticket #912)
+ * Streaming: Pcap window size fixes
+
 2013-04-21 str4d
  * i2ptunnel: Return "Invalid Request URI" instead of "Non-HTTP Protocol" for
               URIs with illegal characters (ticket #891)
