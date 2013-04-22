@@ -7,21 +7,16 @@
 
 #include "errors.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-#include <stdio.h>
+#include <windows.h> 
+#include <stdio.h>   
 #include <malloc.h>
 #include <sys/stat.h>
 
 //BOOL MoveFontPropertiesFile(const char *path);
-#ifdef _WIN32
 void SetWorkingDirectory(char *path);
-#endif
 void readOptions(char***, int*);
 //BOOL localJREExists(const char*);
-//BOOL exist(const char*);
+BOOL exist(const char*);
 
 // defined in java.c
 extern void* MemAlloc(size_t);
@@ -39,14 +34,10 @@ main(int argc, char** argv) {
 	//int new_argc;
 	//char** new_argv;
 	//int i;
-#ifdef _WIN32
 	char currentDirectory[MAX_PATH+1];
-#endif
 
 	// Set/get the correct working directory.
-#ifdef _WIN32
 	SetWorkingDirectory(currentDirectory);
-#endif
 
 	// Read in options from disk (launch.properties)
 	// or the default ones (if no launch.properties existed)
@@ -79,26 +70,20 @@ main(int argc, char** argv) {
 	case ERROR_COULDNT_FIND_JVM:
 	case ERROR_COULDNT_INITIALIZE_JVM:
 	case ERROR_COULDNT_LOAD_JVM:
-#ifdef _WIN32
 		if (MessageBox(NULL, "I2P needs the Java Runtime Environment 5.0 or above. Click OK to go to www.java.com, where you can install Java.", 
 		       "I2P Launcher Error",
 		       MB_ICONWARNING | MB_OKCANCEL) == IDOK)
 			ShellExecute(NULL, NULL, "http://www.java.com/", "", "", SW_SHOWNORMAL);
-#endif
 		break;
 	case ERROR_COULDNT_PARSE_ARGUMENTS:
-#ifdef _WIN32
 		MessageBox(NULL, "I2P failed to parse the commandline arguments to Java.\n"
 			"Please download and install I2P again.",
 			"I2P Launcher Error", MB_OK);
-#endif
 		break;
 	case ERROR_STARTING_PROGRAM:
-#ifdef _WIN32
 		MessageBox(NULL, "I2P was unable to load.\n"
 				"Please download and install I2P again.",
 				"I2P Launcher Error", MB_OK);
-#endif
 		break;
 	}
 	return ret;
@@ -183,7 +168,6 @@ void readOptions(char*** options, int* size) {
 /*
  * Sets the current working directory to wherever I2P.exe is located
  */
-#ifdef _WIN32
 static void
 SetWorkingDirectory(char *path) {
 	GetModuleFileName(NULL, path, MAX_PATH + 1);
@@ -191,7 +175,6 @@ SetWorkingDirectory(char *path) {
 	SetCurrentDirectory(path);
 	GetCurrentDirectory(MAX_PATH + 1, path);
 }
-#endif
 
 /**
  * Checks to see if an app-installed JRE exists.
@@ -225,14 +208,13 @@ MoveFontPropertiesFile(const char *path) {
 	return copySucceeded;
 }
 */
-/*
+
 BOOL exist(const char *filename) {
 	struct stat s;
 	return stat(filename, &s) == 0 ? TRUE : FALSE;
 }
-*/
 
-#ifdef _WIN32
+
 __declspec(dllimport) char **__initenv;
 
 int WINAPI
@@ -251,4 +233,3 @@ WinMain(HINSTANCE inst, HINSTANCE previnst, LPSTR cmdline, int cmdshow)
 
     return ret; 
 }
-#endif
