@@ -16,7 +16,7 @@
 //  ========================================================================
 //
 
-package org.eclipse.jetty.security.authentication;
+package net.i2p.jetty;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -25,7 +25,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -36,6 +35,8 @@ import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.ServerAuthException;
 import org.eclipse.jetty.security.UserAuthentication;
+import org.eclipse.jetty.security.authentication.DeferredAuthentication;
+import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Authentication.User;
 import org.eclipse.jetty.server.Request;
@@ -50,74 +51,110 @@ import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 
 /**
+ * I2P fixes for out-of-order nonce counts.
+ * Based on DigestAuthenticator in Jetty 7.6.10.
+ * Includes the nonce count verification code from Tomcat 7.0.35.
+ * ref: http://jira.codehaus.org/browse/JETTY-1468 which was closed not-a-bug.
+ * ref: https://bugs.eclipse.org/bugs/show_bug.cgi?id=336443 in which the
+ * Jetty implementation was introduced.
+ * 
+ * @since 0.9.6
+ * 
  * @version $Rev: 4793 $ $Date: 2009-03-19 00:00:01 +0100 (Thu, 19 Mar 2009) $
  * 
  * The nonce max age in ms can be set with the {@link SecurityHandler#setInitParameter(String, String)} 
  * using the name "maxNonceAge"
  */
-public class DigestAuthenticator extends LoginAuthenticator
+public class I2PDigestAuthenticator extends DigestAuthenticator
 {
-    private static final Logger LOG = Log.getLogger(DigestAuthenticator.class);
+    // shadows super
+    private static final Logger LOG = Log.getLogger(I2PDigestAuthenticator.class);
     SecureRandom _random = new SecureRandom();
-    private long _maxNonceAgeMs = 60*1000;
+    // shadows super
+    private long _maxNonceAgeMs = 60*60*1000L;
     private ConcurrentMap<String, Nonce> _nonceCount = new ConcurrentHashMap<String, Nonce>();
+    // shadows super
     private Queue<Nonce> _nonceQueue = new ConcurrentLinkedQueue<Nonce>();
+
+    /*
+     * Shadows super
+     *
+     * Contains code from Tomcat 7.0.35 DigestAuthenticator.NonceInfo
+     *
+     * Licensed to the Apache Software Foundation (ASF) under one or more
+     * contributor license agreements.  See the NOTICE file distributed with
+     * this work for additional information regarding copyright ownership.
+     * The ASF licenses this file to You under the Apache License, Version 2.0
+     * (the "License"); you may not use this file except in compliance with
+     * the License.  You may obtain a copy of the License at
+     *
+     *      http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     */
     private static class Nonce
     {
         final String _nonce;
         final long _ts;
-        AtomicInteger _nc=new AtomicInteger();
+        private volatile boolean seen[];
+        private volatile int offset;
+        private volatile int count = 0;
+        private static final int seenWindowSize = 100;
+
         public Nonce(String nonce, long ts)
         {
             _nonce=nonce;
             _ts=ts;
+            seen = new boolean[seenWindowSize];
+            offset = seenWindowSize / 2;
+        }
+
+        public synchronized boolean nonceCountValid(long nonceCount) {
+            if ((count - offset) >= nonceCount ||
+                    (nonceCount > count - offset + seen.length)) {
+                return false;
+            }
+            int checkIndex = (int) ((nonceCount + offset) % seen.length);
+            if (seen[checkIndex]) {
+                return false;
+            } else {
+                seen[checkIndex] = true;
+                seen[count % seen.length] = false;
+                count++;
+                return true;
+            }
         }
     }
 
     /* ------------------------------------------------------------ */
-    public DigestAuthenticator()
+    public I2PDigestAuthenticator()
     {
         super();
     }
 
-    /* ------------------------------------------------------------ */
-    /**
-     * @see org.eclipse.jetty.security.authentication.LoginAuthenticator#setConfiguration(org.eclipse.jetty.security.Authenticator.AuthConfiguration)
-     */
-    @Override
-    public void setConfiguration(AuthConfiguration configuration)
-    {
-        super.setConfiguration(configuration);
-        
-        String mna=configuration.getInitParameter("maxNonceAge");
-        if (mna!=null)
-        {
-            synchronized (this)
-            {
-                _maxNonceAgeMs=Long.valueOf(mna);
-            }
-        }
-    }
     
     /* ------------------------------------------------------------ */
+
+    /**
+     *  Store local copy since field in super is private
+     */
+    @Override
     public synchronized void setMaxNonceAge(long maxNonceAgeInMillis)
     {
+        super.setMaxNonceAge(maxNonceAgeInMillis);
         _maxNonceAgeMs = maxNonceAgeInMillis;
     }
 
     /* ------------------------------------------------------------ */
-    public String getAuthMethod()
-    {
-        return Constraint.__DIGEST_AUTH;
-    }
 
-    /* ------------------------------------------------------------ */
-    public boolean secureResponse(ServletRequest req, ServletResponse res, boolean mandatory, User validatedUser) throws ServerAuthException
-    {
-        return true;
-    }
-
-    /* ------------------------------------------------------------ */
+    /**
+     *  No changes from super
+     */
+    @Override
     public Authentication validateRequest(ServletRequest req, ServletResponse res, boolean mandatory) throws ServerAuthException
     {
         if (!mandatory)
@@ -224,6 +261,11 @@ public class DigestAuthenticator extends LoginAuthenticator
     }
 
     /* ------------------------------------------------------------ */
+
+    /**
+     *  No changes from super
+     */
+    @Override
     public String newNonce(Request request)
     {
         Nonce nonce;
@@ -247,6 +289,10 @@ public class DigestAuthenticator extends LoginAuthenticator
      * @return -1 for a bad nonce, 0 for a stale none, 1 for a good nonce
      */
     /* ------------------------------------------------------------ */
+
+    /**
+     *  Contains fixes
+     */
     private int checkNonce(Digest digest, Request request)
     {
         // firstly let's expire old nonces
@@ -274,12 +320,9 @@ public class DigestAuthenticator extends LoginAuthenticator
             long count = Long.parseLong(digest.nc,16);
             if (count>Integer.MAX_VALUE)
                 return 0;
-            int old=nonce._nc.get();
-            while (!nonce._nc.compareAndSet(old,(int)count))
-                old=nonce._nc.get();
-            if (count<=old)
+            if (!nonce.nonceCountValid(count)) {
                 return -1;
- 
+            }
             return 1;
         }
         catch (Exception e)
@@ -292,6 +335,11 @@ public class DigestAuthenticator extends LoginAuthenticator
     /* ------------------------------------------------------------ */
     /* ------------------------------------------------------------ */
     /* ------------------------------------------------------------ */
+
+    /**
+     *  Shadows super.
+     *  No changes from super
+     */
     private static class Digest extends Credential
     {
         private static final long serialVersionUID = -2484639019549527724L;
