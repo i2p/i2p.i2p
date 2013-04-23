@@ -1,3 +1,7 @@
+2013-04-23 zzz
+ * Console: Fix Jetty digest auth bug causing repeated password requests
+ * i2ptunnel: Block b32.i2p supercookies
+
 2013-04-21 zzz
  * AppManager: Add HTML debug output
  * Installer: Fix installations to a different drive on Windows
