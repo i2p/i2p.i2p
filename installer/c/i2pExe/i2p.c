@@ -30,7 +30,6 @@ main(int argc, char** argv) {
 	int read_options_size;
 	char** read_options;
 	int ret = 0;
-	//int current_argc = 0;
 	int new_argc;
 	char** new_argv;
 	int i;
@@ -56,10 +55,6 @@ main(int argc, char** argv) {
 		// copy arguments from properties file
 		for(i = 1; i <= read_options_size; i++)
 			new_argv[i] = read_options[i-1];
-		// copy argv arguments as arguments after the properties file
-		// (generally used as arguments for I2P)
-		//for(current_argc = 1; current_argc < argc; current_argc++)
-		//	new_argv[i++] = argv[current_argc];
 
 		new_argv[i] = NULL;
 
@@ -126,12 +121,6 @@ void readOptions(char*** options, int* size) {
 		(*options)[i++] = "-cp";
 		(*options)[i++] = "lib/i2p.jar:lib/router.jar:lib/jbigi.jar:lib/BOB.jar:lib/sam.jar:lib/mstreaming.jar:lib/streaming.jar:lib/routerconsole.jar:lib/i2ptunnel.jar:lib/org.mortbay.jetty.jar:lib/javax.servlet.jar:lib/jasper-compiler.jar:lib/jasper-runtime.jar:lib/commons-logging.jar:lib/commons-el.jar:lib/wrapper.jar:lib/systray.jar:lib/systray4j.jar:lib/desktopgui.jar:lib/i2psnark.jar:lib/jrobin.jar:lib/jstl.jar:lib/standard.jar:lib/jetty-i2p.jar:lib/jetty-java5-threadpool.jar:lib/jetty-rewrite-handler.jar:lib/jetty-sslengine.jar:lib/jetty-start.jar:lib/jetty-util.jar";
 		(*options)[i++] = "net.i2p.router.RouterLaunch";
-#ifdef ALPHA
-#pragma message ("\n\n!!!!!!!!!!!!!! building ALPHA !!!!!!!!!!!!!!\n\n")
-		(*options)[(*size) - 3] = "-agentlib:yjpagent=port=11111";
-		(*options)[(*size) - 2] = "-jar";
-		(*options)[(*size) - 1] = "I2P.jar";
-#endif
 		return;
 	}
 
