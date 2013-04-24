@@ -5,8 +5,10 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.app.*;
@@ -35,6 +37,7 @@ public class RouterAppManager implements ClientAppManager {
         _log = ctx.logManager().getLog(RouterAppManager.class);
         _clients = new ConcurrentHashMap(16);
         _registered = new ConcurrentHashMap(8);
+        ctx.addShutdownTask(new Shutdown());
     }
 
     /**
@@ -164,6 +167,32 @@ public class RouterAppManager implements ClientAppManager {
      */
     public ClientApp getRegisteredApp(String name) {
         return _registered.get(name);
+    }
+
+    /// end ClientAppManager interface
+
+    /**
+     *  @since 0.9.6
+     */
+    public synchronized void shutdown() {
+        Set<ClientApp> apps = new HashSet(_clients.keySet());
+        for (ClientApp app : apps) {
+            ClientAppState state = app.getState();
+            if (state == RUNNING || state == STARTING) {
+                try {
+                    app.shutdown(null);
+                } catch (Throwable t) {}
+            }
+        }
+    }
+
+    /**
+     *  @since 0.9.6
+     */
+    public class Shutdown implements Runnable {
+        public void run() {
+            shutdown();
+        }
     }
 
     /**

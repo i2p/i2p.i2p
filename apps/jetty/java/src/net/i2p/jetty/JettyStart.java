@@ -41,7 +41,6 @@ import org.eclipse.jetty.xml.XmlConfiguration;
  */
 public class JettyStart implements ClientApp {
 
-    private final I2PAppContext _context;
     private final ClientAppManager _mgr;
     private final String[] _args;
     private final List<LifeCycle> _jettys;
@@ -50,10 +49,12 @@ public class JettyStart implements ClientApp {
     /**
      *  All args must be XML file names.
      *  Does not support any of the other argument types from org.mortbay.start.Main.
+     *
+     *  @param context unused, may be null
+     *  @param mgr may be null e.g. for use in plugins
      */
     public JettyStart(I2PAppContext context, ClientAppManager mgr, String[] args) throws Exception {
         _state = UNINITIALIZED;
-        _context = context;
         _mgr = mgr;
         _args = args;
         _jettys = new ArrayList(args.length);
@@ -100,13 +101,13 @@ public class JettyStart implements ClientApp {
     private class Starter extends Thread {
         public Starter() {
             super("JettyStarter");
+            changeState(STARTING);
         }
 
         /**
          *  Modified from XmlConfiguration.main()
          */
         public void run() {
-            changeState(STARTING);
             for (LifeCycle lc : _jettys) {
                 if (!lc.isRunning()) {
                     try {
@@ -118,11 +119,12 @@ public class JettyStart implements ClientApp {
                 }
             }
             changeState(RUNNING);
-            _mgr.register(JettyStart.this);
+            if (_mgr != null)
+                _mgr.register(JettyStart.this);
         }
     }
 
-    public void shutdown(String[] args) {
+    public synchronized void shutdown(String[] args) {
         if (_state != RUNNING)
             return;
         if (_jettys.isEmpty()) {
@@ -135,10 +137,10 @@ public class JettyStart implements ClientApp {
     private class Stopper extends Thread {
         public Stopper() {
             super("JettyStopper");
+            changeState(STOPPING);
         }
 
         public void run() {
-            changeState(STOPPING);
             for (LifeCycle lc : _jettys) {
                 if (lc.isRunning()) {
                     try {
@@ -170,6 +172,22 @@ public class JettyStart implements ClientApp {
 
     private synchronized void changeState(ClientAppState state, Exception e) {
         _state = state;
-        _mgr.notify(this, state, null, e);
+        if (_mgr != null)
+            _mgr.notify(this, state, null, e);
+    }
+
+    /**
+     *  For use in a plugin clients.config
+     *  @param args passed to constructor
+     *  @since 0.9.6
+     */
+    public static void main(String[] args) {
+        try {
+            new JettyStart(null, null, args);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

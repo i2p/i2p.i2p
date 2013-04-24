@@ -214,15 +214,19 @@ public class RouterConsoleRunner implements RouterApp {
     /////// ClientApp methods
 
     /** @since 0.9.4 */
-    public void startup() {
+    public synchronized void startup() {
         changeState(STARTING);
         startTrayApp(_context);
         startConsole();
     }
 
     /** @since 0.9.4 */
-    public void shutdown(String[] args) {
+    public synchronized void shutdown(String[] args) {
+        if (_state == STOPPED)
+            return;
         changeState(STOPPING);
+        if (PluginStarter.pluginsEnabled(_context))
+            (new I2PAppThread(new PluginStopper(_context), "PluginStopper")).start();
         try {
             _server.stop();
         } catch (Exception ie) {}
@@ -653,10 +657,11 @@ public class RouterConsoleRunner implements RouterApp {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
                 t.setPriority(Thread.NORM_PRIORITY - 1);
                 t.start();
-                _context.addShutdownTask(new PluginStopper(_context));
             }
             // stat summarizer registers its own hook
-            _context.addShutdownTask(new ServerShutdown());
+            // RouterAppManager registers its own hook
+            if (_mgr == null)
+                _context.addShutdownTask(new ServerShutdown());
             ConfigServiceHandler.registerSignalHandler(_context);
     }
     

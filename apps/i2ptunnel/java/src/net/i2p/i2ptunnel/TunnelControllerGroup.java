@@ -125,7 +125,9 @@ public class TunnelControllerGroup implements ClientApp {
         loadControllers(_configFile);
         if (_mgr != null)
             _mgr.register(this);
-        _context.addShutdownTask(new Shutdown());
+            // RouterAppManager registers its own shutdown hook
+        else
+            _context.addShutdownTask(new Shutdown());
     }
 
     /**
@@ -194,7 +196,9 @@ public class TunnelControllerGroup implements ClientApp {
      *
      *  @since 0.8.8
      */
-    public void shutdown() {
+    public synchronized void shutdown() {
+        if (_state != STARTING && _state != RUNNING)
+            return;
         changeState(STOPPING);
         if (_mgr != null)
             _mgr.unregister(this);

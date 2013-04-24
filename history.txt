@@ -1,3 +1,8 @@
+2013-04-24 zzz
+ * Console, i2ptunnel: Don't register shutdown hook if ClientAppManager is present
+ * JettyStart: Fixes for use by plugins
+ * RouterAppManager: Add shutdown hook
+
 2013-04-23 zzz
  * Console: Fix Jetty digest auth bug causing repeated password requests
  * i2ptunnel: Block b32.i2p supercookies
