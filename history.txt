@@ -1,3 +1,7 @@
+2013-04-25 str4d
+ * i2ptunnel: Allow the "AUTHENTICATE" command in IRC tunnels to enable SASL
+              authentication (ticket #904)
+
 2013-04-24 zzz
  * Console, i2ptunnel: Don't register shutdown hook if ClientAppManager is present
  * JettyStart: Fixes for use by plugins

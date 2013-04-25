@@ -51,6 +51,7 @@ abstract class IRCFilter {
                 "KICK",
                 "H", // "hide operator status" (after kicking an op)
                 "TOPIC",
+                "AUTHENTICATE", // SASL, also requires CAP below
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CAP"
         };
@@ -152,6 +153,7 @@ abstract class IRCFilter {
                 // Commands that regular users might use
                 "ADMIN",
                 "AWAY",    // should be harmless
+                "AUTHENTICATE", // SASL, also requires CAP below
                 "CAP",     // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CYCLE",
                 "DCCALLOW",
