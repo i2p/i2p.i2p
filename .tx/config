@@ -57,7 +57,7 @@ trans.nb = apps/i2psnark/locale/messages_nb.po
 trans.nl = apps/i2psnark/locale/messages_nl.po
 trans.pl = apps/i2psnark/locale/messages_pl.po
 trans.pt = apps/i2psnark/locale/messages_pt.po
-trans.ru = apps/i2psnark/locale/messages_ru.po
+trans.ru_RU = apps/i2psnark/locale/messages_ru.po
 trans.sv_SE = apps/i2psnark/locale/messages_sv.po
 trans.vi = apps/i2psnark/locale/messages_vi.po
 trans.zh_CN = apps/i2psnark/locale/messages_zh.po
@@ -116,6 +116,7 @@ trans.nl = apps/susimail/locale/messages_nl.po
 trans.ru = apps/susimail/locale/messages_ru.po
 trans.sv_SE = apps/susimail/locale/messages_sv.po
 trans.pl = apps/susimail/locale/messages_pl.po
+trans.pt = apps/susimail/locale/messages_pt.po
 trans.uk_UA = apps/susimail/locale/messages_uk.po
 trans.vi = apps/susimail/locale/messages_vi.po
 trans.zh_CN = apps/susimail/locale/messages_zh.po
@@ -136,11 +137,13 @@ trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
 
 [I2P.i2prouter-script]
-source_file = installer/resources/locale/messages_en.po
+source_file = installer/resources/locale/po/messages_en.po
 source_lang = en
 trans.de = installer/resources/locale/po/messages_de.po
 trans.fr = installer/resources/locale/po/messages_fr.po
 trans.it = installer/resources/locale/po/messages_it.po
+trans.sv_SE = installer/resources/locale/po/messages_sv.po
+trans.ru_RU = installer/resources/locale/po/messages_ru.po
 
 [main]
 host = http://www.transifex.net

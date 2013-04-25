@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-17 13:09+0000\n"
+"POT-Creation-Date: 2013-04-25 14:49+0000\n"
 "PO-Revision-Date: 2012-12-21 23:24+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/I2P/language/"
@@ -22,15 +22,15 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "This seems to be a bad destination:"
 msgstr "Кажется это плохой адрес назначения:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "С таким адресом назначения i2paddresshelper вам не поможет!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:625
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -41,7 +41,7 @@ msgstr ""
 "\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a "
 "href=\"{1}\">здесь</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1029
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:410
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:426
@@ -49,21 +49,21 @@ msgstr ""
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1033
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
 msgid "Base 32"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продолжить переход к {0} без сохранения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1048
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr ""
@@ -71,31 +71,31 @@ msgstr ""
 "переход к eep-сайту"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr ""
 "Сохранить {0} в основную (master) адресную книгу и продолжить переход к eep-"
 "сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1052
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr ""
 "Сохранить {0} в приватную адресную книгу и продолжить переход к eep-сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1179
 msgid "HTTP Outproxy"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
 "Jump-сервисы, которые, возможно, знают нужную Вам addresshelper-ссылку:"
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1207
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1220
 #, java-format
 msgid "{0} jump service"
 msgstr ""

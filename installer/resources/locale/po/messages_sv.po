@@ -1,0 +1,199 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# hottuna <i2p@robertfoss.se>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-04-25 14:51+0000\n"
+"PO-Revision-Date: 2013-01-19 17:03+0000\n"
+"Last-Translator: hottuna <i2p@robertfoss.se>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
+"language/sv_SE/)\n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../i2prouter:195
+msgid "Failed to load the wrapper"
+msgstr "Misslyckades vid laddning av wrapper"
+
+#: ../i2prouter:892 ../i2prouter:919 ../i2prouter:993 ../i2prouter:1021
+#: ../i2prouter:1045
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr "$APP_LONG_NAME körs redan."
+
+#: ../i2prouter:903
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr "Kör $APP_LONG_NAME"
+
+#: ../i2prouter:926
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr "Väntar på $APP_LONG_NAME"
+
+#: ../i2prouter:973
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr "VARNING: $APP_LONG_NAME kan ha misslyckats att starta."
+
+#: ../i2prouter:987 ../i2prouter:1015 ../i2prouter:1224 ../i2prouter:1513
+msgid "Must be root to perform this action."
+msgstr "Handlingen måste göras av root."
+
+#: ../i2prouter:1031
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr "Startar $APP_LONG_NAME"
+
+#: ../i2prouter:1056
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr "Stannar $APP_LONG_NAME"
+
+#: ../i2prouter:1060 ../i2prouter:1128 ../i2prouter:1681
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr "$APP_LONG_NAME kördes inte."
+
+#: ../i2prouter:1073 ../i2prouter:1081 ../i2prouter:1143 ../i2prouter:1151
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr "Kan inte stoppa $APP_LONG_NAME."
+
+#: ../i2prouter:1099
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr "Väntar på att $APP_LONG_NAME ska avslutas"
+
+#: ../i2prouter:1113
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr "Misslyckades med att stanna $APP_LONG_NAME."
+
+#: ../i2prouter:1116
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr "Stannad $APP_LONG_NAME."
+
+#: ../i2prouter:1124
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr "Stannar $APP_LONG_NAME graciöst"
+
+#: ../i2prouter:1170
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr "$APP_LONG_NAME körs inte."
+
+#: ../i2prouter:1175
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr "$APP_LONG_NAME kör: PID$pid"
+
+#: ../i2prouter:1178
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME kör:  PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+
+#: ../i2prouter:1231 ../i2prouter:1243 ../i2prouter:1262 ../i2prouter:1279
+#: ../i2prouter:1346 ../i2prouter:1366 ../i2prouter:1380 ../i2prouter:1394
+#: ../i2prouter:1422 ../i2prouter:1460 ../i2prouter:1495
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr "$APP_LONG_NAME demonen är redan installerad."
+
+#: ../i2prouter:1234 ../i2prouter:1249 ../i2prouter:1351 ../i2prouter:1383
+#: ../i2prouter:1397 ../i2prouter:1411 ../i2prouter:1425 ../i2prouter:1463
+#: ../i2prouter:1498
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr "Installerar $APP_LONG_NAME demon"
+
+#: ../i2prouter:1505
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "Installation stöds inte för $DIST_OS"
+
+#: ../i2prouter:1521 ../i2prouter:1534 ../i2prouter:1548 ../i2prouter:1557
+#: ../i2prouter:1567 ../i2prouter:1591 ../i2prouter:1604 ../i2prouter:1616
+#: ../i2prouter:1634 ../i2prouter:1647 ../i2prouter:1661
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr "Tar bort $APP_LONG_NAME demon"
+
+#: ../i2prouter:1527 ../i2prouter:1542 ../i2prouter:1551 ../i2prouter:1561
+#: ../i2prouter:1572 ../i2prouter:1585 ../i2prouter:1597 ../i2prouter:1610
+#: ../i2prouter:1628 ../i2prouter:1641 ../i2prouter:1655 ../i2prouter:1666
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr "$APP_LONG_NAME demonen är inte installerad"
+
+#: ../i2prouter:1670
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr "Borttagning stöds inte för $DIST_OS"
+
+#: ../i2prouter:1757
+msgid "Commands:"
+msgstr "Kommandon:"
+
+#: ../i2prouter:1758
+msgid "Launch in the current console."
+msgstr "Kör in nuvarande konsoll."
+
+#: ../i2prouter:1759
+msgid "Start in the background as a daemon process."
+msgstr "Starta i bakgrunden som en demon-process."
+
+#: ../i2prouter:1760
+msgid "Stop if running as a daemon or in another console."
+msgstr "Stanna om demon körs i annan konsoll."
+
+#: ../i2prouter:1761
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr "Stanna graciöst, kan ta upp till 11 minuter."
+
+#: ../i2prouter:1762
+msgid "Stop if running and then start."
+msgstr "Stanna vid drift och starta sedan."
+
+#: ../i2prouter:1763
+msgid "Restart only if already running."
+msgstr "Starta om vid drift."
+
+#: ../i2prouter:1764
+msgid "Query the current status."
+msgstr "Fråga efter nuvarande status."
+
+#: ../i2prouter:1765
+msgid "Install to start automatically when system boots."
+msgstr "Installera så att programmet startar vid systemstart."
+
+#: ../i2prouter:1766
+msgid "Uninstall."
+msgstr "Avinstallera."
+
+#: ../i2prouter:1767
+msgid "Request a Java thread dump if running."
+msgstr "Fråga efter en Java thread dump vid drift."
+
+#: ../i2prouter:1780
+msgid "Please edit $0 and set the variable RUN_AS_USER"
+msgstr "Var god ändra $0 och sätt variabeln RUN_AS_USER"
+
+#: ../i2prouter:1785
+msgid "Running I2P as the root user is *not* recommended."
+msgstr "Att köra I2P som användare root är *inte* rekommenderat."
+
+#: ../i2prouter:1788
+msgid "To run as root anyway, edit $0 and set ALLOW_ROOT=true."
+msgstr "För att köra som root iallafall, ändra $0 och sätt ALLOW_ROOT=true"

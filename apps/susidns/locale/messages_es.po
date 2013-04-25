@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 02:32+0000\n"
+"POT-Creation-Date: 2013-04-25 14:49+0000\n"
 "PO-Revision-Date: 2013-01-20 09:38+0000\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/"
@@ -117,7 +117,7 @@ msgstr "Mostrando {0} de {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:258
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:227
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:412
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
 msgid "Add"
 msgstr "Agregar"
 
@@ -125,7 +125,7 @@ msgstr "Agregar"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:227
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:239
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
 msgid "Replace"
 msgstr "Reemplazar"
 
@@ -186,13 +186,13 @@ msgstr "Por favor, ¡introduce un nombre de host y destino!"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:274
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:267
 msgid "Delete Entry"
 msgstr "Borrar entrada"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
 msgid "Delete Selected"
 msgstr "Eliminar seleccionados"
 
@@ -423,8 +423,8 @@ msgid "Links"
 msgstr "Vínculos"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:404
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:266
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:402
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:259
 msgid "Destination"
 msgstr "Destino"
 
@@ -432,32 +432,32 @@ msgstr "Destino"
 msgid "Mark for deletion"
 msgstr "Marcar para eliminar"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:305
 msgid "Base 32 address"
 msgstr "Dirección a base de 32"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:309
 msgid "More information on this entry"
 msgstr "Más información sobre esta entrada"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
 msgid "details"
 msgstr "detalles"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:347
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:406
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:383
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:381
 msgid "This address book is empty."
 msgstr "Esta libreta de direcciones está vacía."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "Add new destination"
 msgstr "Añadir nuevo destino"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:400
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:165
 msgid "Host Name"
 msgstr "Nombre de Host"
@@ -588,59 +588,59 @@ msgstr "Nombre del tema escogido (por defecto: 'luminoso')"
 msgid "addressbook"
 msgstr "libreta de direcciones"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:181
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:179
 msgid "Encoded Name"
 msgstr "Nombre codificado"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:197
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:193
 msgid "Base 32 Address"
 msgstr "Dirección a base de 32"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:201
 msgid "Base 64 Hash"
 msgstr "Hash en base 64"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
 msgid "Address Helper"
 msgstr "Manejador de direcciones"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
 msgid "link"
 msgstr "vínculo"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:224
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:217
 msgid "Public Key"
 msgstr "Clave pública"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
 msgid "ElGamal 2048 bit"
 msgstr "ElGamal de 2048 bits"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:230
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:223
 msgid "Signing Key"
 msgstr "Clave de firmado"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:225
 msgid "DSA 1024 bit"
 msgstr "DSA de 1024 bits"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:229
 msgid "Certificate"
 msgstr "Certificado"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:242
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:235
 msgid "Added Date"
 msgstr "Fecha añadida"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:241
 msgid "Source"
 msgstr "Fuente"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:254
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:247
 msgid "Last Modified"
 msgstr "Modificado por última vez"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:260
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:253
 msgid "Notes"
 msgstr "Notas"
 
@@ -682,9 +682,10 @@ msgstr ""
 "\"subscriptions\">subscripciones</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
+#, fuzzy
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
-"naming.html\">the overview on www.i2p2.i2p</a>."
+"naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>."
 msgstr ""
 "Para mayor información acerca del nombrado en I2P, consulta <a href=\"http://"
 "www.i2p2.i2p/naming.html\">la información general en www.i2p2.i2p</a>."

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 02:33+0000\n"
+"POT-Creation-Date: 2013-04-25 14:51+0000\n"
 "PO-Revision-Date: 2012-07-23 16:33+0000\n"
 "Last-Translator: Martin Svensson <digitalmannen@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
@@ -109,7 +109,7 @@ msgstr "Visar {0} av {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:258
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:227
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:412
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
 msgid "Add"
 msgstr "Lägg till"
 
@@ -117,7 +117,7 @@ msgstr "Lägg till"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:227
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:239
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
 msgid "Replace"
 msgstr "Ersätt "
 
@@ -175,13 +175,13 @@ msgstr "Ange värdnamn och destination"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:274
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:267
 msgid "Delete Entry"
 msgstr "Ta bort post"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
 msgid "Delete Selected"
 msgstr "Radera valda"
 
@@ -406,8 +406,8 @@ msgid "Links"
 msgstr "Länkar"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:404
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:266
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:402
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:259
 msgid "Destination"
 msgstr "Mål"
 
@@ -415,32 +415,32 @@ msgstr "Mål"
 msgid "Mark for deletion"
 msgstr "Markera för att raderas"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:305
 msgid "Base 32 address"
 msgstr "Base 32 adress"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:309
 msgid "More information on this entry"
 msgstr "Mer information om den här posten"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
 msgid "details"
 msgstr "detaljer"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:347
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:406
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:383
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:381
 msgid "This address book is empty."
 msgstr "Denna adressbok är tom"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "Add new destination"
 msgstr "Lägg till nytt mål"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:400
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:165
 msgid "Host Name"
 msgstr "Värdnamn"
@@ -567,59 +567,59 @@ msgstr "Namn på temat som används  (förvalt som 'ljus')"
 msgid "addressbook"
 msgstr "adressbok"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:181
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:179
 msgid "Encoded Name"
 msgstr "Kodat namn"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:197
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:193
 msgid "Base 32 Address"
 msgstr "Base 32 Adress"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:201
 msgid "Base 64 Hash"
 msgstr "Bas 64 Hash"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
 msgid "Address Helper"
 msgstr "Adress hjälp"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
 msgid "link"
 msgstr "länk"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:224
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:217
 msgid "Public Key"
 msgstr "Publik nyckel"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
 msgid "ElGamal 2048 bit"
 msgstr "ElGamal 2048 bit"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:230
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:223
 msgid "Signing Key"
 msgstr "Signeringsnyckel"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:225
 msgid "DSA 1024 bit"
 msgstr "DSA 1024 bit"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:229
 msgid "Certificate"
 msgstr "Certifikat"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:242
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:235
 msgid "Added Date"
 msgstr "Datum för tillagd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:241
 msgid "Source"
 msgstr "Källa"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:254
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:247
 msgid "Last Modified"
 msgstr "Senast modifierad"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:260
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:253
 msgid "Notes"
 msgstr "Anteckningar"
 
@@ -659,9 +659,10 @@ msgstr ""
 "href=\"subscriptions\">subscriptions</a> fil. "
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
+#, fuzzy
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
-"naming.html\">the overview on www.i2p2.i2p</a>."
+"naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>."
 msgstr ""
 "För mer information om namngivning i I2P, se <a href=\"http://www.i2p2.i2p/"
 "naming.html\"> översikten på www.i2p2.i2p </a>."

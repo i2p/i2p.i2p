@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 02:33+0000\n"
+"POT-Creation-Date: 2013-04-25 14:50+0000\n"
 "PO-Revision-Date: 2013-01-03 09:01+0000\n"
 "Last-Translator: mon <mattias.ohlsson@inprose.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
@@ -32,7 +32,7 @@ msgstr ""
 #. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1424
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1425
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
@@ -41,7 +41,7 @@ msgstr[1] "{0,number,####} ms"
 
 #. seconds
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1428
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1429
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
@@ -50,7 +50,7 @@ msgstr[1] "{0} sek"
 
 #. minutes
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1432
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1433
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
@@ -59,20 +59,20 @@ msgstr[1] "{0} min"
 
 #. hours
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1436
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1437
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
 msgstr[0] "1 timme"
 msgstr[1] "{0} timmar"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1438
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1439
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:344
 msgid "n/a"
 msgstr "n/a"
 
 #. days
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1441
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1442
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -175,36 +175,36 @@ msgstr "Avvisar tunnlar: Stänger ner"
 msgid "Rejecting tunnels"
 msgstr "Avvisar tunnlar"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:154
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:156
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:22
 msgid "Reseeding"
 msgstr "Reseedar"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:166
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:168
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
 msgstr[0] "Reseed hämtad endast en router."
 msgstr[1] "Reseed hämtad endast {0} routrar."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:173
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:175
 msgid "Reseed failed."
 msgstr "Reseed misslyckades."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:174
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:176
 #, java-format
 msgid "See {0} for help."
 msgstr "Se {0} för hjälp"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:175
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:177
 msgid "reseed configuration page"
 msgstr "sida för konfiguration av omseedning"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:320
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:322
 msgid "Reseeding: fetching seed URL."
 msgstr "Reseed: hämtar seed URL."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:378
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:380
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
@@ -966,832 +966,836 @@ msgid "Cape Verde"
 msgstr "Kap Verde"
 
 #: ../java/build/Countries.java:57
+msgid "Curaçao"
+msgstr ""
+
+#: ../java/build/Countries.java:58
 msgid "Christmas Island"
 msgstr "Julön"
 
-#: ../java/build/Countries.java:58
+#: ../java/build/Countries.java:59
 msgid "Cyprus"
 msgstr "Cypern"
 
-#: ../java/build/Countries.java:59
+#: ../java/build/Countries.java:60
 msgid "Czech Republic"
 msgstr "Tjeckien"
 
-#: ../java/build/Countries.java:60
+#: ../java/build/Countries.java:61
 msgid "Germany"
 msgstr "Tyskland"
 
-#: ../java/build/Countries.java:61
+#: ../java/build/Countries.java:62
 msgid "Djibouti"
 msgstr "Djibouti"
 
-#: ../java/build/Countries.java:62
+#: ../java/build/Countries.java:63
 msgid "Denmark"
 msgstr "Danmark"
 
-#: ../java/build/Countries.java:63
+#: ../java/build/Countries.java:64
 msgid "Dominica"
 msgstr "Dominica"
 
-#: ../java/build/Countries.java:64
+#: ../java/build/Countries.java:65
 msgid "Dominican Republic"
 msgstr "Dominikanska republiken"
 
-#: ../java/build/Countries.java:65
+#: ../java/build/Countries.java:66
 msgid "Algeria"
 msgstr "Algeriet"
 
-#: ../java/build/Countries.java:66
+#: ../java/build/Countries.java:67
 msgid "Ecuador"
 msgstr "Ecuador"
 
-#: ../java/build/Countries.java:67
+#: ../java/build/Countries.java:68
 msgid "Estonia"
 msgstr "Estland"
 
-#: ../java/build/Countries.java:68
+#: ../java/build/Countries.java:69
 msgid "Egypt"
 msgstr "Egypten"
 
-#: ../java/build/Countries.java:69
+#: ../java/build/Countries.java:70
 msgid "Western Sahara"
 msgstr "Västsahara"
 
-#: ../java/build/Countries.java:70
+#: ../java/build/Countries.java:71
 msgid "Eritrea"
 msgstr "Eritrea"
 
-#: ../java/build/Countries.java:71
+#: ../java/build/Countries.java:72
 msgid "Spain"
 msgstr "Spanien"
 
-#: ../java/build/Countries.java:72
+#: ../java/build/Countries.java:73
 msgid "Ethiopia"
 msgstr "Etiopien"
 
-#: ../java/build/Countries.java:73
+#: ../java/build/Countries.java:74
 msgid "European Union"
 msgstr "Europeiska unionen"
 
-#: ../java/build/Countries.java:74
+#: ../java/build/Countries.java:75
 msgid "Finland"
 msgstr "Finland"
 
-#: ../java/build/Countries.java:75
+#: ../java/build/Countries.java:76
 msgid "Fiji"
 msgstr "Fiji"
 
-#: ../java/build/Countries.java:76
+#: ../java/build/Countries.java:77
 msgid "Falkland Islands (Malvinas)"
 msgstr "Falklandsöarna (Malvinas)"
 
-#: ../java/build/Countries.java:77
+#: ../java/build/Countries.java:78
 msgid "Federated States of Micronesia"
 msgstr "Mikronesiska federationen"
 
-#: ../java/build/Countries.java:78
+#: ../java/build/Countries.java:79
 msgid "Faroe Islands"
 msgstr "Färöarna"
 
-#: ../java/build/Countries.java:79
+#: ../java/build/Countries.java:80
 msgid "France"
 msgstr "Frankrike"
 
-#: ../java/build/Countries.java:80
+#: ../java/build/Countries.java:81
 msgid "Gabon"
 msgstr "Gabon"
 
-#: ../java/build/Countries.java:81
+#: ../java/build/Countries.java:82
 msgid "United Kingdom"
 msgstr "Storbritannien"
 
-#: ../java/build/Countries.java:82
+#: ../java/build/Countries.java:83
 msgid "Grenada"
 msgstr "Grenada"
 
-#: ../java/build/Countries.java:83
+#: ../java/build/Countries.java:84
 msgid "Georgia"
 msgstr "Georgia"
 
-#: ../java/build/Countries.java:84
+#: ../java/build/Countries.java:85
 msgid "French Guiana"
 msgstr "Franska Guyana"
 
-#: ../java/build/Countries.java:85
+#: ../java/build/Countries.java:86
 msgid "Guernsey"
 msgstr "Guernsey"
 
-#: ../java/build/Countries.java:86
+#: ../java/build/Countries.java:87
 msgid "Ghana"
 msgstr "Ghana"
 
-#: ../java/build/Countries.java:87
+#: ../java/build/Countries.java:88
 msgid "Gibraltar"
 msgstr "Gibraltar"
 
-#: ../java/build/Countries.java:88
+#: ../java/build/Countries.java:89
 msgid "Greenland"
 msgstr "Grönland"
 
-#: ../java/build/Countries.java:89
+#: ../java/build/Countries.java:90
 msgid "Gambia"
 msgstr "Gambia"
 
-#: ../java/build/Countries.java:90
+#: ../java/build/Countries.java:91
 msgid "Guinea"
 msgstr "Guinea"
 
-#: ../java/build/Countries.java:91
+#: ../java/build/Countries.java:92
 msgid "Guadeloupe"
 msgstr "Guadeloupe"
 
-#: ../java/build/Countries.java:92
+#: ../java/build/Countries.java:93
 msgid "Equatorial Guinea"
 msgstr "Ekvatorialguinea"
 
-#: ../java/build/Countries.java:93
+#: ../java/build/Countries.java:94
 msgid "Greece"
 msgstr "Grekland"
 
-#: ../java/build/Countries.java:94
+#: ../java/build/Countries.java:95
 msgid "South Georgia and the South Sandwich Islands"
 msgstr "Sydgeorgien och Sydsandwichöarna"
 
-#: ../java/build/Countries.java:95
+#: ../java/build/Countries.java:96
 msgid "Guatemala"
 msgstr "Guatemala"
 
-#: ../java/build/Countries.java:96
+#: ../java/build/Countries.java:97
 msgid "Guam"
 msgstr "Guam"
 
-#: ../java/build/Countries.java:97
+#: ../java/build/Countries.java:98
 msgid "Guinea-Bissau"
 msgstr "Guinea-Bissau"
 
-#: ../java/build/Countries.java:98
+#: ../java/build/Countries.java:99
 msgid "Guyana"
 msgstr "Guyana"
 
-#: ../java/build/Countries.java:99
+#: ../java/build/Countries.java:100
 msgid "Hong Kong"
 msgstr "Hong Kong"
 
-#: ../java/build/Countries.java:100
+#: ../java/build/Countries.java:101
 msgid "Honduras"
 msgstr "Honduras"
 
-#: ../java/build/Countries.java:101
+#: ../java/build/Countries.java:102
 msgid "Croatia"
 msgstr "Kroatien"
 
-#: ../java/build/Countries.java:102
+#: ../java/build/Countries.java:103
 msgid "Haiti"
 msgstr "Haiti"
 
-#: ../java/build/Countries.java:103
+#: ../java/build/Countries.java:104
 msgid "Hungary"
 msgstr "Ungern"
 
-#: ../java/build/Countries.java:104
+#: ../java/build/Countries.java:105
 msgid "Indonesia"
 msgstr "Indonesien"
 
-#: ../java/build/Countries.java:105
+#: ../java/build/Countries.java:106
 msgid "Ireland"
 msgstr "Irland"
 
-#: ../java/build/Countries.java:106
+#: ../java/build/Countries.java:107
 msgid "Israel"
 msgstr "Israel"
 
-#: ../java/build/Countries.java:107
+#: ../java/build/Countries.java:108
 msgid "Isle of Man"
 msgstr "Isle of Man"
 
-#: ../java/build/Countries.java:108
+#: ../java/build/Countries.java:109
 msgid "India"
 msgstr "Indien"
 
-#: ../java/build/Countries.java:109
+#: ../java/build/Countries.java:110
 msgid "British Indian Ocean Territory"
 msgstr "Brittiska Indiska Oceanöarna"
 
-#: ../java/build/Countries.java:110
+#: ../java/build/Countries.java:111
 msgid "Iraq"
 msgstr "Irak"
 
-#: ../java/build/Countries.java:111
+#: ../java/build/Countries.java:112
 msgid "Islamic Republic of Iran"
 msgstr "Islamiska republiken Iran"
 
-#: ../java/build/Countries.java:112
+#: ../java/build/Countries.java:113
 msgid "Iceland"
 msgstr "Island"
 
-#: ../java/build/Countries.java:113
+#: ../java/build/Countries.java:114
 msgid "Italy"
 msgstr "Italien"
 
-#: ../java/build/Countries.java:114
+#: ../java/build/Countries.java:115
 msgid "Jersey"
 msgstr "Jersey"
 
-#: ../java/build/Countries.java:115
+#: ../java/build/Countries.java:116
 msgid "Jamaica"
 msgstr "Jamaica"
 
-#: ../java/build/Countries.java:116
+#: ../java/build/Countries.java:117
 msgid "Jordan"
 msgstr "Jordan"
 
-#: ../java/build/Countries.java:117
+#: ../java/build/Countries.java:118
 msgid "Japan"
 msgstr "Japan"
 
-#: ../java/build/Countries.java:118
+#: ../java/build/Countries.java:119
 msgid "Kenya"
 msgstr "Kenya"
 
-#: ../java/build/Countries.java:119
+#: ../java/build/Countries.java:120
 msgid "Kyrgyzstan"
 msgstr "Kirgizistan"
 
-#: ../java/build/Countries.java:120
+#: ../java/build/Countries.java:121
 msgid "Cambodia"
 msgstr "Kambodja"
 
-#: ../java/build/Countries.java:121
+#: ../java/build/Countries.java:122
 msgid "Kiribati"
 msgstr "Kiribati"
 
-#: ../java/build/Countries.java:122
+#: ../java/build/Countries.java:123
 msgid "Comoros"
 msgstr "Komorerna"
 
-#: ../java/build/Countries.java:123
+#: ../java/build/Countries.java:124
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts och Nevis"
 
-#: ../java/build/Countries.java:124
+#: ../java/build/Countries.java:125
 msgid "The Democratic People's Republic of Korea"
 msgstr "Demokratiska folkrepubliken Korea (Nordkorea)"
 
-#: ../java/build/Countries.java:125
+#: ../java/build/Countries.java:126
 msgid "Republic of Korea"
 msgstr "Sydkorea"
 
-#: ../java/build/Countries.java:126
+#: ../java/build/Countries.java:127
 msgid "Kuwait"
 msgstr "Kuwait"
 
-#: ../java/build/Countries.java:127
+#: ../java/build/Countries.java:128
 msgid "Cayman Islands"
 msgstr "Caymanöarna"
 
-#: ../java/build/Countries.java:128
+#: ../java/build/Countries.java:129
 msgid "Kazakhstan"
 msgstr "Kazakstan"
 
-#: ../java/build/Countries.java:129
+#: ../java/build/Countries.java:130
 msgid "Lao People's Democratic Republic"
 msgstr "Laos Demokratiska folkrepublik"
 
-#: ../java/build/Countries.java:130
+#: ../java/build/Countries.java:131
 msgid "Lebanon"
 msgstr "Libanon"
 
-#: ../java/build/Countries.java:131
+#: ../java/build/Countries.java:132
 msgid "Saint Lucia"
 msgstr "Saint Lucia"
 
-#: ../java/build/Countries.java:132
+#: ../java/build/Countries.java:133
 msgid "Liechtenstein"
 msgstr "Liechtenstein"
 
-#: ../java/build/Countries.java:133
+#: ../java/build/Countries.java:134
 msgid "Sri Lanka"
 msgstr "Sri Lanka"
 
-#: ../java/build/Countries.java:134
+#: ../java/build/Countries.java:135
 msgid "Liberia"
 msgstr "Liberia"
 
-#: ../java/build/Countries.java:135
+#: ../java/build/Countries.java:136
 msgid "Lesotho"
 msgstr "Lesotho"
 
-#: ../java/build/Countries.java:136
+#: ../java/build/Countries.java:137
 msgid "Lithuania"
 msgstr "Litauen"
 
-#: ../java/build/Countries.java:137
+#: ../java/build/Countries.java:138
 msgid "Luxembourg"
 msgstr "Luxemburg"
 
-#: ../java/build/Countries.java:138
+#: ../java/build/Countries.java:139
 msgid "Latvia"
 msgstr "Lettland"
 
-#: ../java/build/Countries.java:139
+#: ../java/build/Countries.java:140
 msgid "Libyan Arab Jamahiriya"
 msgstr "Libyen"
 
-#: ../java/build/Countries.java:140
+#: ../java/build/Countries.java:141
 msgid "Morocco"
 msgstr "Marocko"
 
-#: ../java/build/Countries.java:141
+#: ../java/build/Countries.java:142
 msgid "Monaco"
 msgstr "Monaco"
 
-#: ../java/build/Countries.java:142
+#: ../java/build/Countries.java:143
 msgid "Republic of Moldova"
 msgstr "Moldavien"
 
-#: ../java/build/Countries.java:143
+#: ../java/build/Countries.java:144
 msgid "Montenegro"
 msgstr "Montenegro"
 
-#: ../java/build/Countries.java:144
+#: ../java/build/Countries.java:145
 msgid "Saint Martin"
 msgstr "Saint Martin"
 
-#: ../java/build/Countries.java:145
+#: ../java/build/Countries.java:146
 msgid "Madagascar"
 msgstr "Madagaskar"
 
-#: ../java/build/Countries.java:146
+#: ../java/build/Countries.java:147
 msgid "Marshall Islands"
 msgstr "Marshallöarna"
 
-#: ../java/build/Countries.java:147
+#: ../java/build/Countries.java:148
 msgid "The Former Yugoslav Republic of Macedonia"
 msgstr "Föredetta jugoslaviska republiken Makedonien"
 
-#: ../java/build/Countries.java:148
+#: ../java/build/Countries.java:149
 msgid "Mali"
 msgstr "Mali"
 
-#: ../java/build/Countries.java:149
+#: ../java/build/Countries.java:150
 msgid "Myanmar"
 msgstr "Myanmar"
 
-#: ../java/build/Countries.java:150
+#: ../java/build/Countries.java:151
 msgid "Mongolia"
 msgstr "Mongoliet"
 
-#: ../java/build/Countries.java:151
+#: ../java/build/Countries.java:152
 msgid "Macao"
 msgstr "Macao"
 
-#: ../java/build/Countries.java:152
+#: ../java/build/Countries.java:153
 msgid "Northern Mariana Islands"
 msgstr "Nordmarianerna"
 
-#: ../java/build/Countries.java:153
+#: ../java/build/Countries.java:154
 msgid "Martinique"
 msgstr "Martinique"
 
-#: ../java/build/Countries.java:154
+#: ../java/build/Countries.java:155
 msgid "Mauritania"
 msgstr "Mauretanien"
 
-#: ../java/build/Countries.java:155
+#: ../java/build/Countries.java:156
 msgid "Montserrat"
 msgstr "Montserrat"
 
-#: ../java/build/Countries.java:156
+#: ../java/build/Countries.java:157
 msgid "Malta"
 msgstr "Malta"
 
-#: ../java/build/Countries.java:157
+#: ../java/build/Countries.java:158
 msgid "Mauritius"
 msgstr "Mauritius"
 
-#: ../java/build/Countries.java:158
+#: ../java/build/Countries.java:159
 msgid "Maldives"
 msgstr "Maldiverna"
 
-#: ../java/build/Countries.java:159
+#: ../java/build/Countries.java:160
 msgid "Malawi"
 msgstr "Malawi"
 
-#: ../java/build/Countries.java:160
+#: ../java/build/Countries.java:161
 msgid "Mexico"
 msgstr "Mexiko"
 
-#: ../java/build/Countries.java:161
+#: ../java/build/Countries.java:162
 msgid "Malaysia"
 msgstr "Malaysia"
 
-#: ../java/build/Countries.java:162
+#: ../java/build/Countries.java:163
 msgid "Mozambique"
 msgstr "Moçambique"
 
-#: ../java/build/Countries.java:163
+#: ../java/build/Countries.java:164
 msgid "Namibia"
 msgstr "Namibia"
 
-#: ../java/build/Countries.java:164
+#: ../java/build/Countries.java:165
 msgid "New Caledonia"
 msgstr "Nya Kaledonien"
 
-#: ../java/build/Countries.java:165
+#: ../java/build/Countries.java:166
 msgid "Niger"
 msgstr "Niger"
 
-#: ../java/build/Countries.java:166
+#: ../java/build/Countries.java:167
 msgid "Norfolk Island"
 msgstr "Norfolkön"
 
-#: ../java/build/Countries.java:167
+#: ../java/build/Countries.java:168
 msgid "Nigeria"
 msgstr "Nigeria"
 
-#: ../java/build/Countries.java:168
+#: ../java/build/Countries.java:169
 msgid "Nicaragua"
 msgstr "Nicaragua"
 
-#: ../java/build/Countries.java:169
+#: ../java/build/Countries.java:170
 msgid "Netherlands"
 msgstr "Nederländerna"
 
-#: ../java/build/Countries.java:170
+#: ../java/build/Countries.java:171
 msgid "Norway"
 msgstr "Norge"
 
-#: ../java/build/Countries.java:171
+#: ../java/build/Countries.java:172
 msgid "Nepal"
 msgstr "Nepal"
 
-#: ../java/build/Countries.java:172
+#: ../java/build/Countries.java:173
 msgid "Nauru"
 msgstr "Nauru"
 
-#: ../java/build/Countries.java:173
+#: ../java/build/Countries.java:174
 msgid "Niue"
 msgstr "Niue"
 
-#: ../java/build/Countries.java:174
+#: ../java/build/Countries.java:175
 msgid "New Zealand"
 msgstr "Nya Zeeland"
 
-#: ../java/build/Countries.java:175
+#: ../java/build/Countries.java:176
 msgid "Oman"
 msgstr "Oman"
 
-#: ../java/build/Countries.java:176
+#: ../java/build/Countries.java:177
 msgid "Panama"
 msgstr "Panama"
 
-#: ../java/build/Countries.java:177
+#: ../java/build/Countries.java:178
 msgid "Peru"
 msgstr "Peru"
 
-#: ../java/build/Countries.java:178
+#: ../java/build/Countries.java:179
 msgid "French Polynesia"
 msgstr "Franska Polynesien"
 
-#: ../java/build/Countries.java:179
+#: ../java/build/Countries.java:180
 msgid "Papua New Guinea"
 msgstr "Papua Nya Guinea"
 
-#: ../java/build/Countries.java:180
+#: ../java/build/Countries.java:181
 msgid "Philippines"
 msgstr "Filippinerna"
 
-#: ../java/build/Countries.java:181
+#: ../java/build/Countries.java:182
 msgid "Pakistan"
 msgstr "Pakistan"
 
-#: ../java/build/Countries.java:182
+#: ../java/build/Countries.java:183
 msgid "Poland"
 msgstr "Polen"
 
-#: ../java/build/Countries.java:183
+#: ../java/build/Countries.java:184
 msgid "Saint Pierre and Miquelon"
 msgstr "Saint Pierre och Miquelon"
 
-#: ../java/build/Countries.java:184
+#: ../java/build/Countries.java:185
 msgid "Pitcairn Islands"
 msgstr "Pitcairnöarna"
 
-#: ../java/build/Countries.java:185
+#: ../java/build/Countries.java:186
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
 
-#: ../java/build/Countries.java:186
+#: ../java/build/Countries.java:187
 msgid "Palestinian Territory"
 msgstr "Palestinska territoriet"
 
-#: ../java/build/Countries.java:187
+#: ../java/build/Countries.java:188
 msgid "Portugal"
 msgstr "Portugal"
 
-#: ../java/build/Countries.java:188
+#: ../java/build/Countries.java:189
 msgid "Palau"
 msgstr "Palau"
 
-#: ../java/build/Countries.java:189
+#: ../java/build/Countries.java:190
 msgid "Paraguay"
 msgstr "Paraguay"
 
-#: ../java/build/Countries.java:190
+#: ../java/build/Countries.java:191
 msgid "Qatar"
 msgstr "Qatar"
 
-#: ../java/build/Countries.java:191
+#: ../java/build/Countries.java:192
 msgid "Réunion"
 msgstr "Réunion"
 
-#: ../java/build/Countries.java:192
+#: ../java/build/Countries.java:193
 msgid "Romania"
 msgstr "Rumänien"
 
-#: ../java/build/Countries.java:193
+#: ../java/build/Countries.java:194
 msgid "Serbia"
 msgstr "Serbien"
 
-#: ../java/build/Countries.java:194
+#: ../java/build/Countries.java:195
 msgid "Russian Federation"
 msgstr "Ryssland"
 
-#: ../java/build/Countries.java:195
+#: ../java/build/Countries.java:196
 msgid "Rwanda"
 msgstr "Rwanda"
 
-#: ../java/build/Countries.java:196
+#: ../java/build/Countries.java:197
 msgid "Saudi Arabia"
 msgstr "Saudiarabien"
 
-#: ../java/build/Countries.java:197
+#: ../java/build/Countries.java:198
 msgid "Solomon Islands"
 msgstr "Salomonöarna"
 
-#: ../java/build/Countries.java:198
+#: ../java/build/Countries.java:199
 msgid "Seychelles"
 msgstr "Seychellerna"
 
-#: ../java/build/Countries.java:199
+#: ../java/build/Countries.java:200
 msgid "Sudan"
 msgstr "Sudan"
 
-#: ../java/build/Countries.java:200
+#: ../java/build/Countries.java:201
 msgid "Sweden"
 msgstr "Sverige"
 
-#: ../java/build/Countries.java:201
+#: ../java/build/Countries.java:202
 msgid "Singapore"
 msgstr "Singapore"
 
-#: ../java/build/Countries.java:202
+#: ../java/build/Countries.java:203
 msgid "Saint Helena"
 msgstr "Sankta Helena"
 
-#: ../java/build/Countries.java:203
+#: ../java/build/Countries.java:204
 msgid "Slovenia"
 msgstr "Slovenien"
 
-#: ../java/build/Countries.java:204
+#: ../java/build/Countries.java:205
 msgid "Svalbard and Jan Mayen"
 msgstr "Svalbard och Jan Mayen "
 
-#: ../java/build/Countries.java:205
+#: ../java/build/Countries.java:206
 msgid "Slovakia"
 msgstr "Slovakien"
 
-#: ../java/build/Countries.java:206
+#: ../java/build/Countries.java:207
 msgid "Sierra Leone"
 msgstr "Sierra Leone"
 
-#: ../java/build/Countries.java:207
+#: ../java/build/Countries.java:208
 msgid "San Marino"
 msgstr "San Marino"
 
-#: ../java/build/Countries.java:208
+#: ../java/build/Countries.java:209
 msgid "Senegal"
 msgstr "Senegal"
 
-#: ../java/build/Countries.java:209
+#: ../java/build/Countries.java:210
 msgid "Somalia"
 msgstr "Somalia"
 
-#: ../java/build/Countries.java:210
+#: ../java/build/Countries.java:211
 msgid "Suriname"
 msgstr "Surinam"
 
-#: ../java/build/Countries.java:211
+#: ../java/build/Countries.java:212
 msgid "Sao Tome and Principe"
 msgstr "Sao Tomé och Principe"
 
-#: ../java/build/Countries.java:212
+#: ../java/build/Countries.java:213
 msgid "El Salvador"
 msgstr "El Salvador"
 
-#: ../java/build/Countries.java:213
+#: ../java/build/Countries.java:214
 msgid "Syrian Arab Republic"
 msgstr "Syrien"
 
-#: ../java/build/Countries.java:214
+#: ../java/build/Countries.java:215
 msgid "Swaziland"
 msgstr "Swaziland"
 
-#: ../java/build/Countries.java:215
+#: ../java/build/Countries.java:216
 msgid "Turks and Caicos Islands"
 msgstr "Turks-och Caicosöarna"
 
-#: ../java/build/Countries.java:216
+#: ../java/build/Countries.java:217
 msgid "Chad"
 msgstr "Tchad"
 
-#: ../java/build/Countries.java:217
+#: ../java/build/Countries.java:218
 msgid "French Southern Territories"
 msgstr "Franska Sydterritorierna"
 
-#: ../java/build/Countries.java:218
+#: ../java/build/Countries.java:219
 msgid "Togo"
 msgstr "Togo"
 
-#: ../java/build/Countries.java:219
+#: ../java/build/Countries.java:220
 msgid "Thailand"
 msgstr "Thailand"
 
-#: ../java/build/Countries.java:220
+#: ../java/build/Countries.java:221
 msgid "Tajikistan"
 msgstr "Tadzjikistan"
 
-#: ../java/build/Countries.java:221
+#: ../java/build/Countries.java:222
 msgid "Tokelau"
 msgstr "Tokelau"
 
-#: ../java/build/Countries.java:222
+#: ../java/build/Countries.java:223
 msgid "Timor-Leste"
 msgstr "Östtimor"
 
-#: ../java/build/Countries.java:223
+#: ../java/build/Countries.java:224
 msgid "Turkmenistan"
 msgstr "Turkmenistan"
 
-#: ../java/build/Countries.java:224
+#: ../java/build/Countries.java:225
 msgid "Tunisia"
 msgstr "Tunisien"
 
-#: ../java/build/Countries.java:225
+#: ../java/build/Countries.java:226
 msgid "Tonga"
 msgstr "Tonga"
 
-#: ../java/build/Countries.java:226
+#: ../java/build/Countries.java:227
 msgid "Turkey"
 msgstr "Turkiet"
 
-#: ../java/build/Countries.java:227
+#: ../java/build/Countries.java:228
 msgid "Trinidad and Tobago"
 msgstr "Trinidad och Tobago"
 
-#: ../java/build/Countries.java:228
+#: ../java/build/Countries.java:229
 msgid "Tuvalu"
 msgstr "Tuvalu"
 
-#: ../java/build/Countries.java:229
+#: ../java/build/Countries.java:230
 msgid "Taiwan"
 msgstr "Taiwan"
 
-#: ../java/build/Countries.java:230
+#: ../java/build/Countries.java:231
 msgid "United Republic of Tanzania"
 msgstr "Förenade republiken Tanzania"
 
-#: ../java/build/Countries.java:231
+#: ../java/build/Countries.java:232
 msgid "Ukraine"
 msgstr "Ukraina"
 
-#: ../java/build/Countries.java:232
+#: ../java/build/Countries.java:233
 msgid "Uganda"
 msgstr "Uganda"
 
-#: ../java/build/Countries.java:233
+#: ../java/build/Countries.java:234
 msgid "United States Minor Outlying Islands"
 msgstr "Förenta staternas avlägset belägna öar"
 
-#: ../java/build/Countries.java:234
+#: ../java/build/Countries.java:235
 msgid "United States"
 msgstr "USA"
 
-#: ../java/build/Countries.java:235
+#: ../java/build/Countries.java:236
 msgid "Uruguay"
 msgstr "Uruguay"
 
-#: ../java/build/Countries.java:236
+#: ../java/build/Countries.java:237
 msgid "Uzbekistan"
 msgstr "Uzbekistan"
 
-#: ../java/build/Countries.java:237
+#: ../java/build/Countries.java:238
 msgid "Holy See (Vatican City State)"
 msgstr "Heliga stolen (Vatikanstaten)"
 
-#: ../java/build/Countries.java:238
+#: ../java/build/Countries.java:239
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent och Grenadinerna"
 
-#: ../java/build/Countries.java:239
+#: ../java/build/Countries.java:240
 msgid "Venezuela"
 msgstr "Venezuela"
 
-#: ../java/build/Countries.java:240 ../java/build/Countries.java:241
+#: ../java/build/Countries.java:241 ../java/build/Countries.java:242
 msgid "Virgin Islands"
 msgstr "Jungfruöarna"
 
-#: ../java/build/Countries.java:242
+#: ../java/build/Countries.java:243
 msgid "Viet Nam"
 msgstr "Vietnam"
 
-#: ../java/build/Countries.java:243
+#: ../java/build/Countries.java:244
 msgid "Vanuatu"
 msgstr "Vanuatu"
 
-#: ../java/build/Countries.java:244
+#: ../java/build/Countries.java:245
 msgid "Wallis and Futuna"
 msgstr "Wallis och Futuna"
 
-#: ../java/build/Countries.java:245
+#: ../java/build/Countries.java:246
 msgid "Samoa"
 msgstr "Samoa"
 
-#: ../java/build/Countries.java:246
+#: ../java/build/Countries.java:247
 msgid "Yemen"
 msgstr "Jemen"
 
-#: ../java/build/Countries.java:247
+#: ../java/build/Countries.java:248
 msgid "Mayotte"
 msgstr "Mayotte"
 
-#: ../java/build/Countries.java:248
+#: ../java/build/Countries.java:249
 msgid "South Africa"
 msgstr "Sydafrika"
 
-#: ../java/build/Countries.java:249
+#: ../java/build/Countries.java:250
 msgid "Zambia"
 msgstr "Zambia"
 
-#: ../java/build/Countries.java:250
+#: ../java/build/Countries.java:251
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:687
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:740
 #, java-format
 msgid "New plugin version {0} is available"
 msgstr "Ny version för plugin {0} finns tillgänglig"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:717
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:770
 #, java-format
 msgid "Update check failed for plugin {0}"
 msgstr "Uppdateringskontroll misslyckades för plugin {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:719
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:772
 #, java-format
 msgid "No new version is available for plugin {0}"
 msgstr "Ingen ny version tillgänglig för plugin {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:742
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:795
 #, java-format
 msgid "{0}B transferred"
 msgstr "{0}B överfört"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:795
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:848
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:211
 #, java-format
 msgid "Transfer failed from {0}"
 msgstr "Överföring misslyckades från {0}"
 
 #. Process the .sud/.su2 file
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:963
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:998
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1022
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1016
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1051
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1075
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:672
 msgid "Update downloaded"
 msgstr "Uppdatering hämtad"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:978
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1022
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1031
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1075
 msgid "Restarting"
 msgstr "Startar om"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:978
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1031
 msgid "Update verified"
 msgstr "Update verifierad"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:987
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1040
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:144
 #, java-format
 msgid "from {0}"
 msgstr "från {0}"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1002
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1055
 #, java-format
 msgid "Unsigned update file from {0} is corrupt"
 msgstr "Osignerad uppdateringsfil från {0} är korrumperad"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1031
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1084
 #, java-format
 msgid "Failed copy to {0}"
 msgstr "Misslyckades med att kopiera till {0}"
@@ -1825,7 +1829,7 @@ msgid "Failed to install from file {0}, copy failed."
 msgstr "Det gick inte att installera från {0}, misslyckades kopiera."
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:104
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:363
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:385
 #, java-format
 msgid "Downloading plugin from {0}"
 msgstr "Laddar ner plugin från {0}"
@@ -2097,7 +2101,7 @@ msgid "Configuration saved successfully"
 msgstr "Konfigurationen sparades utan problem"
 
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:63
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:431
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:453
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:325
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:85
 msgid ""
@@ -2107,66 +2111,66 @@ msgstr ""
 "Fel vid sparning ab konfigurationen (tillämpad men inte sparat) - se "
 "felloggar"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:38
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:41
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:476
 msgid "Save Client Configuration"
 msgstr "Spara klientkonfiguration"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:42
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:45
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:542
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:546
 msgid "Save Interface Configuration"
 msgstr "Spara gränssnittskonfiguration"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:46
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:49
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:562
 msgid "Save WebApp Configuration"
 msgstr "Spara WebApp konfiguration"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:50
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:53
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:576
 msgid "Save Plugin Configuration"
 msgstr "Spara pluginkonfiguration"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:54
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:57
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:584
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:588
 msgid "Install Plugin"
 msgstr "Installera plugin"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:58
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:61
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:590
 msgid "Update All Installed Plugins"
 msgstr "Uppdatera alla installerade insticksprogram"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:98
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:127
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:101
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:130
 #, java-format
 msgid "Error stopping plugin {0}"
 msgstr "Problem när plugin {0} stoppades"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:103
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:106
 #, java-format
 msgid "Deleted plugin {0}"
 msgstr "Tog bort plugin {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:105
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:108
 #, java-format
 msgid "Error deleting plugin {0}"
 msgstr "Problem vid borttagning av plugin {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:125
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:128
 #, java-format
 msgid "Stopped plugin {0}"
 msgstr "Stoppade plugin {0}"
 
 #. label (IE)
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:149
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:259
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:152
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:279
 msgid "Start"
 msgstr "Start"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:168
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:171
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:102
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:49
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:61
@@ -2175,16 +2179,109 @@ msgstr "Start"
 msgid "Unsupported"
 msgstr "Stöds inte"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:212
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:215
 msgid "New client added"
 msgstr "Ny klient las till"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:216
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:219
 msgid "Client configuration saved successfully"
 msgstr "Inställningar för clienten sparades."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:217
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:429
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:229
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:255
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:270
+msgid "Bad client index."
+msgstr "Felaktigt klientindex"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:238
+#, fuzzy, java-format
+msgid "Client {0} stopped"
+msgstr "Plugin {0} installerad"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:260
+#, fuzzy, java-format
+msgid "Client {0} started"
+msgstr "Plugin {0} installerad"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:275
+#, fuzzy, java-format
+msgid "Client {0} deleted"
+msgstr "Ta bort valda"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:291
+msgid "WebApp configuration saved."
+msgstr "WebApp konfiguration sparad."
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:306
+msgid "Plugin configuration saved."
+msgstr "lugin konfiguration sparad."
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:321
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:140
+msgid "WebApp"
+msgstr "WebApp"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:321
+msgid "started"
+msgstr "startade"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:323
+msgid "Failed to start"
+msgstr "Misslyckades med att starta"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:328
+msgid "Failed to find server."
+msgstr "Det gick inte att hitta servern."
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:334
+msgid "No plugin URL specified."
+msgstr "Ingen plugin URL angiven."
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:344
+#, java-format
+msgid "No update URL specified for {0}"
+msgstr "Ingen uppdaterings-URL specificerad för {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:353
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:374
+msgid "Plugin or update download already in progress."
+msgstr "Plugin- eller uppdateringsnerladdning pågår redan"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:356
+msgid "Updating all plugins"
+msgstr "Uppdatera alla insticksprogram"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:381
+#, java-format
+msgid "Bad URL {0}"
+msgstr "Dålig URL {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:401
+#, java-format
+msgid "Checking plugin {0} for updates"
+msgstr "Kontrollerar uppdateringar för {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:411
+#, java-format
+msgid "Started plugin {0}"
+msgstr "Startade plugin {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:413
+#, java-format
+msgid "Error starting plugin {0}"
+msgstr "Fel när plugin {0} startades"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:435
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:89
+#, java-format
+msgid "Added user {0}"
+msgstr "Användare {0} tillagd"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:450
+msgid "Interface configuration saved"
+msgstr "Gränssnittsinställningar sparade"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:451
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:286
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:122
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:90
@@ -2192,196 +2289,102 @@ msgstr "Inställningar för clienten sparades."
 msgid "Restart required to take effect"
 msgstr "Omstart krävs för att verkställa"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:224
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:237
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:248
-msgid "Bad client index."
-msgstr "Felaktigt klientindex"
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:78
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:284
+msgid "Edit"
+msgstr "Redigera"
 
-#.
-#. What do we do here?
-#.
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:231
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:242
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:253
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:92
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:87
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:472
+msgid "Add Client"
+msgstr "Lägg till Klient"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:96
+msgid "Class and arguments"
+msgstr "Klass och argmument"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:96
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:508
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:428
 msgid "Client"
 msgstr "Klient"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:231
-msgid "stopped"
-msgstr "stoppad "
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:242
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:299
-msgid "started"
-msgstr "startade"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:253
-msgid "deleted"
-msgstr "borttagen"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:269
-msgid "WebApp configuration saved."
-msgstr "WebApp konfiguration sparad."
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:284
-msgid "Plugin configuration saved."
-msgstr "lugin konfiguration sparad."
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:299
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:120
-msgid "WebApp"
-msgstr "WebApp"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:301
-msgid "Failed to start"
-msgstr "Misslyckades med att starta"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:306
-msgid "Failed to find server."
-msgstr "Det gick inte att hitta servern."
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:312
-msgid "No plugin URL specified."
-msgstr "Ingen plugin URL angiven."
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:322
-#, java-format
-msgid "No update URL specified for {0}"
-msgstr "Ingen uppdaterings-URL specificerad för {0}"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:331
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:352
-msgid "Plugin or update download already in progress."
-msgstr "Plugin- eller uppdateringsnerladdning pågår redan"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:334
-msgid "Updating all plugins"
-msgstr "Uppdatera alla insticksprogram"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:359
-#, java-format
-msgid "Bad URL {0}"
-msgstr "Dålig URL {0}"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:379
-#, java-format
-msgid "Checking plugin {0} for updates"
-msgstr "Kontrollerar uppdateringar för {0}"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:389
-#, java-format
-msgid "Started plugin {0}"
-msgstr "Startade plugin {0}"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:391
-#, java-format
-msgid "Error starting plugin {0}"
-msgstr "Fel när plugin {0} startades"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:413
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:89
-#, java-format
-msgid "Added user {0}"
-msgstr "Användare {0} tillagd"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:428
-msgid "Interface configuration saved"
-msgstr "Gränssnittsinställningar sparade"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:74
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:262
-msgid "Edit"
-msgstr "Redigera"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:83
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:472
-msgid "Add Client"
-msgstr "Lägg till Klient"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:92
-msgid "Class and arguments"
-msgstr "Klass och argmument"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:92
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:120
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:145
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:96
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:140
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:165
 msgid "Control"
 msgstr "Kontroll"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:92
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:120
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:145
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:96
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:140
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:165
 msgid "Run at Startup?"
 msgstr "Kör vid uppstart?"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:120
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:145
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:194
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:140
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:165
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:214
 msgid "Description"
 msgstr "Beskrivning"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:145
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:165
 msgid "Plugin"
 msgstr "Plugin"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:158
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:178
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:290
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:293
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:319
 msgid "Version"
 msgstr "Version"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:160
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:180
 msgid "Signed by"
 msgstr "Undertecknat av"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:177
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:197
 msgid "Date"
 msgstr "Datum"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:183
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:203
 msgid "Author"
 msgstr "Författare"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:199
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:219
 msgid "License"
 msgstr "Licens"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:204
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:224
 #: ../java/src/net/i2p/router/web/HomeHelper.java:35
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:174
 msgid "Website"
 msgstr "Webbplats"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:209
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:229
 msgid "Update link"
 msgstr "Uppdateringslänk"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:264
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:282
 msgid "Stop"
 msgstr "Stoppa"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:266
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:286
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:98
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:436
 msgid "Check for updates"
 msgstr "Kontrollera efter uppdateringar"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:267
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:287
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20
 msgid "Update"
 msgstr "Uppdatera"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:272
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:292
 #, java-format
 msgid "Are you sure you want to delete {0}?"
 msgstr "Är du säker på att du vill ta bort {0}?"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:274
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:294
 msgid "Delete"
 msgstr "Ta bort"
 
@@ -2878,7 +2881,7 @@ msgstr "Starta om omedelbart"
 #. ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
 #. give the UI time to respond
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:46
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:163
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:201
 msgid "Restart"
 msgstr "Omstart"
 
@@ -3388,7 +3391,7 @@ msgstr "Uppdaterar uppdateringsfrekvensen till {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:163
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:111
-#: ../java/src/net/i2p/router/web/GraphHelper.java:361
+#: ../java/src/net/i2p/router/web/GraphHelper.java:376
 msgid "Never"
 msgstr "Aldrig"
 
@@ -3440,124 +3443,129 @@ msgid ""
 "browser."
 msgstr "Om problemet kvarstår, bekräfta att cookies är påslaget i din browser."
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:159
+#: ../java/src/net/i2p/router/web/GraphHelper.java:160
 msgid "Combined bandwidth graph"
 msgstr "Kombinerad bandbreddsgraf"
 
 #. e.g. "statname for 60m"
-#: ../java/src/net/i2p/router/web/GraphHelper.java:172
-#: ../java/src/net/i2p/router/web/GraphHelper.java:221
+#: ../java/src/net/i2p/router/web/GraphHelper.java:173
+#: ../java/src/net/i2p/router/web/GraphHelper.java:235
 #, java-format
 msgid "{0} for {1}"
 msgstr "{0} för {1}"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:223
+#: ../java/src/net/i2p/router/web/GraphHelper.java:222
+#: ../java/src/net/i2p/router/web/StatSummarizer.java:302
+msgid "Bandwidth usage"
+msgstr "Bandbreddsanvändning"
+
+#: ../java/src/net/i2p/router/web/GraphHelper.java:237
 #, java-format
 msgid "ending {0} ago"
 msgstr "Slutade för {0} sen"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:238
+#: ../java/src/net/i2p/router/web/GraphHelper.java:252
 msgid "Larger"
 msgstr "Större"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:244
+#: ../java/src/net/i2p/router/web/GraphHelper.java:258
 msgid "Smaller"
 msgstr "Mindre"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:250
+#: ../java/src/net/i2p/router/web/GraphHelper.java:264
 msgid "Taller"
 msgstr "Längre "
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:256
+#: ../java/src/net/i2p/router/web/GraphHelper.java:270
 msgid "Shorter"
 msgstr "Kortare"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:262
+#: ../java/src/net/i2p/router/web/GraphHelper.java:276
 msgid "Wider"
 msgstr "Bredare"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:268
+#: ../java/src/net/i2p/router/web/GraphHelper.java:282
 msgid "Narrower"
 msgstr "Smalare"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:275
+#: ../java/src/net/i2p/router/web/GraphHelper.java:289
 msgid "Larger interval"
 msgstr "Större intervall"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:281
+#: ../java/src/net/i2p/router/web/GraphHelper.java:295
 msgid "Smaller interval"
 msgstr "Mindre intervall"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:288
+#: ../java/src/net/i2p/router/web/GraphHelper.java:302
 msgid "Previous interval"
 msgstr "Föregående intervall"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:299
+#: ../java/src/net/i2p/router/web/GraphHelper.java:313
 msgid "Next interval"
 msgstr "Nästa intervall"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:305
-#: ../java/src/net/i2p/router/web/GraphHelper.java:345
+#: ../java/src/net/i2p/router/web/GraphHelper.java:320
+#: ../java/src/net/i2p/router/web/GraphHelper.java:360
 msgid "Plot averages"
 msgstr "Graggenomsnitt"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:305
-#: ../java/src/net/i2p/router/web/GraphHelper.java:346
+#: ../java/src/net/i2p/router/web/GraphHelper.java:320
+#: ../java/src/net/i2p/router/web/GraphHelper.java:361
 msgid "plot events"
 msgstr "grafhändelser"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:308
+#: ../java/src/net/i2p/router/web/GraphHelper.java:323
 msgid "All times are UTC."
 msgstr "Alla tidsangivelser är i UTC."
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:340
+#: ../java/src/net/i2p/router/web/GraphHelper.java:355
 msgid "Configure Graph Display"
 msgstr "Konfigurera Grafvisning"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:340
+#: ../java/src/net/i2p/router/web/GraphHelper.java:355
 msgid "Select Stats"
 msgstr "Vald statistik"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:344
+#: ../java/src/net/i2p/router/web/GraphHelper.java:359
 msgid "Periods"
 msgstr "Perioder"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:346
+#: ../java/src/net/i2p/router/web/GraphHelper.java:361
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:492
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:485
 msgid "or"
 msgstr "eller"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:347
+#: ../java/src/net/i2p/router/web/GraphHelper.java:362
 msgid "Image sizes"
 msgstr "Bildstorlekar"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:347
+#: ../java/src/net/i2p/router/web/GraphHelper.java:362
 msgid "width"
 msgstr "bredd"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:348
+#: ../java/src/net/i2p/router/web/GraphHelper.java:363
 msgid "height"
 msgstr "höjd"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:348
-#: ../java/src/net/i2p/router/web/GraphHelper.java:349
+#: ../java/src/net/i2p/router/web/GraphHelper.java:363
+#: ../java/src/net/i2p/router/web/GraphHelper.java:364
 msgid "pixels"
 msgstr "pixlar"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:350
+#: ../java/src/net/i2p/router/web/GraphHelper.java:365
 msgid "Refresh delay"
 msgstr "Uppdaterings fördröjning"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:365
+#: ../java/src/net/i2p/router/web/GraphHelper.java:380
 msgid "Store graph data on disk?"
 msgstr "Lagra graf data på disk?"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:371
+#: ../java/src/net/i2p/router/web/GraphHelper.java:386
 msgid "Save settings and redraw graphs"
 msgstr "Spara inställningar och rita om grafer"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:426
+#: ../java/src/net/i2p/router/web/GraphHelper.java:441
 msgid "Graph settings saved"
 msgstr "Grafinställningar sparade"
 
@@ -3990,18 +3998,18 @@ msgstr "Dölj nyheter"
 msgid "Show news"
 msgstr "Visa nyheter"
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:128
+#: ../java/src/net/i2p/router/web/PluginStarter.java:132
 msgid "Checking for plugin updates"
 msgstr "Sök efter uppdateringar för insticksprogram "
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:170
+#: ../java/src/net/i2p/router/web/PluginStarter.java:174
 #, java-format
 msgid "1 plugin updated"
 msgid_plural "{0} plugins updated"
 msgstr[0] "1 insticksprogram uppdaterat"
 msgstr[1] "{0} insticksprogram uppdaterade"
 
-#: ../java/src/net/i2p/router/web/PluginStarter.java:172
+#: ../java/src/net/i2p/router/web/PluginStarter.java:176
 msgid "Plugin update check complete"
 msgstr "Sökning efter uppdateringar för insticksprogram slutförd"
 
@@ -4227,40 +4235,6 @@ msgstr "Alla"
 #: ../java/src/net/i2p/router/web/SearchHelper.java:74
 msgid "Select search engine"
 msgstr "Välj sökmotor"
-
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:312
-msgid "Bandwidth usage"
-msgstr "Bandbreddsanvändning"
-
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:322
-msgid "Outbound Bytes/sec"
-msgstr "Utgående Bytes/sek"
-
-#. def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:324
-msgid "Inbound Bytes/sec"
-msgstr "Inkommande Bytes/sek"
-
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:327
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:328
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:329
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:330
-msgid "Bps"
-msgstr "Bps"
-
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:327
-msgid "Out average"
-msgstr "Genomsnittligt ut"
-
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:328
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:330
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:155
-msgid "max"
-msgstr "max"
-
-#: ../java/src/net/i2p/router/web/StatSummarizer.java:329
-msgid "In average"
-msgstr "Genomsnittligt in"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:58
 msgid "GO"
@@ -4832,25 +4806,32 @@ msgstr "Botten"
 msgid "Select a section to add"
 msgstr "Välj ett avsnitt för att lägga till det"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:121
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:142
 #, java-format
 msgid "events in {0}"
 msgstr "händelser i {0}"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:123
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:144
 #, java-format
 msgid "averaged for {0}"
 msgstr "genomsnittad för {0}"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:133
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:154
 msgid "Events per period"
 msgstr "Händelser per period"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:154
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:176
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:189
 msgid "avg"
 msgstr "genomsnitt"
 
-#: ../java/src/net/i2p/router/web/SummaryRenderer.java:156
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:177
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:190
+msgid "max"
+msgstr "max"
+
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:178
+#: ../java/src/net/i2p/router/web/SummaryRenderer.java:191
 msgid "now"
 msgstr "nu"
 
@@ -7121,3 +7102,24 @@ msgstr "webmail"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:328
 msgid "I2P Webmail"
 msgstr "I2P Webmail"
+
+#~ msgid "stopped"
+#~ msgstr "stoppad "
+
+#~ msgid "deleted"
+#~ msgstr "borttagen"
+
+#~ msgid "Outbound Bytes/sec"
+#~ msgstr "Utgående Bytes/sek"
+
+#~ msgid "Inbound Bytes/sec"
+#~ msgstr "Inkommande Bytes/sek"
+
+#~ msgid "Bps"
+#~ msgstr "Bps"
+
+#~ msgid "Out average"
+#~ msgstr "Genomsnittligt ut"
+
+#~ msgid "In average"
+#~ msgstr "Genomsnittligt in"

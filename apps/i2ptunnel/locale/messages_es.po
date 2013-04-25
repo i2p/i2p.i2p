@@ -4,20 +4,21 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-# "blabla", 2011.
-#   <blabla@trash-mail.com>, 2011, 2012.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2012-2013.
-# ducki2p <ducki2p@gmail.com>, 2011.
-# foo <foo@bar>, 2009.
-#   <punkibastardo@gmail.com>, 2011, 2012.
-# punkibastardo <punkibastardo@gmail.com>, 2011.
+# "blabla", 2011
+# blabla <blabla@trash-mail.com>, 2011, 2012
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2012-2013
+# ducki2p <ducki2p@gmail.com>, 2011
+# foo <foo@bar>, 2009
+# punkibastardo <punkibastardo@gmail.com>, 2011, 2012
+# punkibastardo <punkibastardo@gmail.com>, 2011
+# trolly <trolly@fastmail.fm>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 02:32+0000\n"
-"PO-Revision-Date: 2013-01-20 09:54+0000\n"
-"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
+"POT-Creation-Date: 2013-04-25 14:49+0000\n"
+"PO-Revision-Date: 2013-04-15 10:42+0000\n"
+"Last-Translator: trolly <trolly@fastmail.fm>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/"
 "es/)\n"
 "Language: es\n"
@@ -26,15 +27,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "This seems to be a bad destination:"
 msgstr "Éste parece ser un destino falso:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "El ayudante de direcciones no te puede ayudar con un destino así."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:625
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -45,7 +46,7 @@ msgstr ""
 "\"{0}\">aquí</a>! Para visitar el destino del ayudante de direcciones en "
 "conflicto, ¡pincha <a href=\"{1}\">aquí</a>!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1029
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:410
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:426
@@ -53,44 +54,44 @@ msgstr ""
 msgid "Host"
 msgstr "Host"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1033
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
 msgid "Destination"
 msgstr "Destino"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Acceder a {0} sin guardar"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1048
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr ""
 "Guardar {0} a la libreta de direcciones del router y acceder al sitio i2p."
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr ""
 "Guardar {0} a la libreta de direcciones principal y acceder al sitio i2p."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1052
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr ""
 "Guardar {0} a la libreta de direcciones privada y acceder al sitio i2p."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1179
 msgid "HTTP Outproxy"
 msgstr "Puerta de salida HTTP"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
@@ -98,7 +99,7 @@ msgstr ""
 "mediante el uso de un servicio de \"salto\":"
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1207
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1220
 #, java-format
 msgid "{0} jump service"
 msgstr "servicio saltador {0}"
@@ -718,15 +719,15 @@ msgstr "Firma del Hostname"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:353
 msgid "4 in, 4 out (high traffic server)"
-msgstr ""
+msgstr "4 de entrada, 4 de salida (servidor con mucho tráfico)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:357
 msgid "5 in, 5 out (high traffic server)"
-msgstr ""
+msgstr "5 de entrada, 5 de salida (servidor con mucho tráfico)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:361
 msgid "6 in, 6 out (high traffic server)"
-msgstr ""
+msgstr "6 de entrada, 6 de salida (servidor con mucho tráfico)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:442
 msgid "Encrypt Leaseset"

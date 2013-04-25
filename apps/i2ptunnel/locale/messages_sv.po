@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-06 02:33+0000\n"
+"POT-Creation-Date: 2013-04-25 14:50+0000\n"
 "PO-Revision-Date: 2013-01-19 16:53+0000\n"
 "Last-Translator: hottuna <i2p@robertfoss.se>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
@@ -22,15 +22,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "This seems to be a bad destination:"
 msgstr "Detta verkar vara ett felaktigt mål"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2padresshjälp kan inte hjälpa dig med ett sådant  mål!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:625
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -41,7 +41,7 @@ msgstr ""
 "För att besöka de motstridiga hjälpaddresserna,<a href=\"{1}\"> klicka <a "
 "här </ a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1029
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:410
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:426
@@ -49,41 +49,41 @@ msgstr ""
 msgid "Host"
 msgstr "Värd"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1033
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
 msgid "Base 32"
 msgstr "Bas 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
 msgid "Destination"
 msgstr "Mål"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Fortsätt till {0} utan att spara"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1048
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "Spara {0} till routeradressboken och fortsätt till eepsite "
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "Spara {0} till huvudadressboken och fortsätt till eepsite "
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1052
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "Spara {0} till privatadressbok och fortsätt till eepsite "
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1179
 msgid "HTTP Outproxy"
 msgstr "HTTP Utproxy"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
@@ -91,7 +91,7 @@ msgstr ""
 "en \"hopp\" tjänst"
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1207
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1220
 #, java-format
 msgid "{0} jump service"
 msgstr "{0} hopptjänst"
