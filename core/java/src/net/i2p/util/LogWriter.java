@@ -135,8 +135,13 @@ class LogWriter implements Runnable {
         return Translate.getString(a, b, c, _manager.getContext(), BUNDLE_NAME);
     }
 
+    /**
+     *  File may not exist or have old logs in it if not opened yet
+     */
     public String currentFile() {
-        return _currentFile != null ? _currentFile.getAbsolutePath() : "uninitialized";
+        return _currentFile != null ? _currentFile.getAbsolutePath()
+                                    //: "uninitialized";
+                                    : getNextFile(_manager.getBaseLogfilename()).getAbsolutePath();
     }
 
     private void rereadConfig() {

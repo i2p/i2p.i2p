@@ -1,4 +1,5 @@
 2013-04-26 zzz
+ * Console: Show log location on /logs even if not opened yet (ticket #905)
  * HTTP proxy: Verify nonce count in digest auth
  * i2psnark: Use smaller piece size for small torrents
 
