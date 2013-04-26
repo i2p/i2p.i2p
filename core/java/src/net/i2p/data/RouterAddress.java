@@ -30,6 +30,11 @@ import net.i2p.util.OrderedProperties;
  * To ensure integrity of the RouterInfo, methods that change an element of the
  * RouterInfo will throw an IllegalStateException after the RouterInfo is signed.
  *
+ * As of 0.9.3, expiration MUST be all zeros as it is ignored on
+ * readin and the signature will fail.
+ * If we implement expiration, or other use for the field, we must allow
+ * several releases for the change to propagate as it is backwards-incompatible.
+ *
  * @author jrandom
  */
 public class RouterAddress extends DataStructureImpl {
@@ -73,6 +78,8 @@ public class RouterAddress extends DataStructureImpl {
     /**
      * Retrieve the date after which the address should not be used.  If this
      * is null, then the address never expires.
+     * As of 0.9.3, expiration MUST be all zeros as it is ignored on
+     * readin and the signature will fail.
      *
      * @deprecated unused for now
      * @return null always
@@ -84,6 +91,8 @@ public class RouterAddress extends DataStructureImpl {
 
     /**
      * Configure the expiration date of the address (null for no expiration)
+     * As of 0.9.3, expiration MUST be all zeros as it is ignored on
+     * readin and the signature will fail.
      *
      * Unused for now, always null
      * @deprecated unused for now
@@ -196,6 +205,8 @@ public class RouterAddress extends DataStructureImpl {
     }
 
     /**
+     *  As of 0.9.3, expiration MUST be all zeros as it is ignored on
+     *  readin and the signature will fail.
      *  @throws IllegalStateException if was already read in
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
@@ -213,6 +224,10 @@ public class RouterAddress extends DataStructureImpl {
         DataHelper.readProperties(in, _options);
     }
     
+    /**
+     *  As of 0.9.3, expiration MUST be all zeros as it is ignored on
+     *  readin and the signature will fail.
+     */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_cost < 0) || (_transportStyle == null))
             throw new DataFormatException("Not enough data to write a router address");
