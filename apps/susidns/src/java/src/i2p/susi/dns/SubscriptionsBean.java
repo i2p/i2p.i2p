@@ -24,16 +24,20 @@
 
 package i2p.susi.dns;
 
+import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 public class SubscriptionsBean extends BaseBean
 {
@@ -55,6 +59,7 @@ public class SubscriptionsBean extends BaseBean
 		
 		return fileName;
 	}
+
 	private void reload()
 	{
 		File file = new File( getFileName() );
@@ -69,9 +74,6 @@ public class SubscriptionsBean extends BaseBean
 					buf.append( "\n" );
 				}
 				content = buf.toString();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -86,15 +88,27 @@ public class SubscriptionsBean extends BaseBean
 	{
 		File file = new File( getFileName() );
 		try {
+			// trim and sort
+			List<String> urls = new ArrayList();
+                        InputStream in = new ByteArrayInputStream(content.getBytes("UTF-8"));
+                        String line;
+                        while ((line = DataHelper.readLine(in)) != null) {
+				line = line.trim();
+                                if (line.length() > 0)
+                                    urls.add(line);
+			}
+			Collections.sort(urls);
 			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
-			out.print( content );
-			out.flush();
+			for (String url : urls) {
+				out.println(url);
+			}
 			out.close();
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 	public String getMessages() {
 		String message = "";
 		if( action != null ) {
@@ -134,25 +148,23 @@ public class SubscriptionsBean extends BaseBean
 			message = "<p class=\"messages\">" + message + "</p>";
 		return message;
 	}
+
 	public String getSerial()
 	{
 		lastSerial = "" + Math.random();
 		action = null;
 		return lastSerial;
 	}
+
 	public void setSerial(String serial ) {
 		this.serial = serial;
 	}
+
 	public void setContent(String content) {
+		// will come from form with \r\n line endings
 		this.content = content;
-		
-		/*
-		 * as this is a property file we need a newline at the end of the last line!
-		 */
-		if( ! this.content.endsWith( "\n" ) ) {
-			this.content += "\n";
-		}
 	}
+
 	public String getContent()
 	{
 		if( content != null )

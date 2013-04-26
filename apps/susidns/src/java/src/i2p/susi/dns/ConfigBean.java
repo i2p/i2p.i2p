@@ -24,15 +24,16 @@
 
 package i2p.susi.dns;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureFileOutputStream;
 
 public class ConfigBean implements Serializable {
@@ -84,25 +85,19 @@ public class ConfigBean implements Serializable {
 		File file = new File( configFileName );
 		if( file != null && file.isFile() ) {
 			StringBuilder buf = new StringBuilder();
-			BufferedReader br = null;
 			try {
-				br = new BufferedReader( new FileReader( file ) );
-				String line;
-				while( ( line = br.readLine() ) != null ) {
-					buf.append( line );
-					buf.append( "\n" );
+				// use loadProps to trim
+				Properties props = new OrderedProperties();
+				DataHelper.loadProps(props, file);
+				for (Map.Entry e : props.entrySet()) {
+					buf.append((String) e.getKey()).append('=')
+					   .append((String) e.getValue()).append('\n');
 				}
 				config = buf.toString();
 				saved = true;
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} finally {
-				if (br != null)
-					try { br.close(); } catch (IOException ioe) {}
 			}
 		}
 	}
@@ -111,27 +106,23 @@ public class ConfigBean implements Serializable {
 	{
 		File file = new File( configFileName );
 		try {
-			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
-			out.print( config );
-			out.flush();
-			out.close();
+			// use loadProps to trim, use storeProps to sort and get line endings right
+			Properties props = new OrderedProperties();
+			DataHelper.loadProps(props, new ByteArrayInputStream(config.getBytes("UTF-8")));
+			DataHelper.storeProps(props, file);
 			saved = true;
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 	public void setConfig(String config) {
+		// will come from form with \r\n line endings
 		this.config = config;
 		this.saved = false;
-		
-		/*
-		 * as this is a property file we need a newline at the end of the last line!
-		 */
-		if( ! this.config.endsWith( "\n" ) ) {
-			this.config += "\n";
-		}
 	}
+
 	public String getMessages() {
 		String message = "";
 		if( action != null ) {
@@ -155,12 +146,14 @@ public class ConfigBean implements Serializable {
 			message = "<p class=\"messages\">" + message + "</p>";
 		return message;
 	}
+
 	public String getSerial()
 	{
 		lastSerial = "" + Math.random();
 		action = null;
 		return lastSerial;
 	}
+
 	public void setSerial(String serial ) {
 		this.serial = serial;
 	}
