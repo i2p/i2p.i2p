@@ -10,10 +10,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.io.File;
+import java.util.BitSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -36,7 +40,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static final int MD5_BYTES = 16;
     /** 24 */
     private static final int NONCE_BYTES = DataHelper.DATE_LENGTH + MD5_BYTES;
-    private static final long MAX_NONCE_AGE = 30*24*60*60*1000L;
+    private static final long MAX_NONCE_AGE = 60*60*1000L;
+    private static final int MAX_NONCE_COUNT = 1024;
 
     private static final String ERR_AUTH1 =
             "HTTP/1.1 407 Proxy Authentication Required\r\n" +
@@ -67,6 +72,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     protected static volatile long __clientId = 0;
 
     private final byte[] _proxyNonce;
+    private final ConcurrentHashMap<String, NonceInfo> _nonces;
+    private final AtomicInteger _nonceCleanCounter = new AtomicInteger();
 
     protected String getPrefix(long requestId) { return "Client[" + _clientId + "/" + requestId + "]: "; }
     
@@ -91,6 +98,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         _proxyList = new ArrayList(4);
         _proxyNonce = new byte[PROXYNONCE_BYTES];
         _context.random().nextBytes(_proxyNonce);
+        _nonces = new ConcurrentHashMap();
     }
 
     /**
@@ -106,6 +114,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         _proxyList = new ArrayList(4);
         _proxyNonce = new byte[PROXYNONCE_BYTES];
         _context.random().nextBytes(_proxyNonce);
+        _nonces = new ConcurrentHashMap();
     }
 
     //////// Authorization stuff
@@ -131,6 +140,36 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     protected abstract String getRealm();
 
     protected enum AuthResult {AUTH_BAD_REQ, AUTH_BAD, AUTH_STALE, AUTH_GOOD}
+
+    /**
+     *  @since 0.9.6
+     */
+    private static class NonceInfo {
+        private final long expires;
+        private final BitSet counts;
+
+        public NonceInfo(long exp) {
+            expires = exp;
+            counts = new BitSet(MAX_NONCE_COUNT);
+        }
+
+        public long getExpires() {
+            return expires;
+        }
+
+        public AuthResult isValid(int nc) {
+            if (nc <= 0)
+                return AuthResult.AUTH_BAD;
+            if (nc >= MAX_NONCE_COUNT)
+                return AuthResult.AUTH_STALE;
+            synchronized(counts) {
+                if (counts.get(nc))
+                    return AuthResult.AUTH_BAD;
+                counts.set(nc);
+            }
+            return AuthResult.AUTH_GOOD;
+        }
+    }
 
     /**
      *  @since 0.9.4
@@ -246,7 +285,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             return AuthResult.AUTH_BAD_REQ;
         }
         // nonce check
-        AuthResult check = verifyNonce(nonce);
+        AuthResult check = verifyNonce(nonce, nc);
         if (check != AuthResult.AUTH_GOOD) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Bad digest nonce: " + check + ' ' + DataHelper.toString(args));
@@ -289,20 +328,32 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         System.arraycopy(b, 0, n, 0, DataHelper.DATE_LENGTH);
         byte[] md5 = PasswordManager.md5Sum(b);
         System.arraycopy(md5, 0, n, DataHelper.DATE_LENGTH, MD5_BYTES);
-        return Base64.encode(n);
+        String rv = Base64.encode(n);
+        _nonces.putIfAbsent(rv, new NonceInfo(now + MAX_NONCE_AGE));
+        return rv;
     }
 
     /**
      *  Verify the Base 64 of 24 bytes: (now, md5 of (now, proxy nonce))
+     *  and the nonce count.
+     *  @param b64 nonce non-null
+     *  @param ncs nonce count string non-null
      *  @since 0.9.4
      */
-    private AuthResult verifyNonce(String b64) {
+    private AuthResult verifyNonce(String b64, String ncs) {
+        if (_nonceCleanCounter.incrementAndGet() % 16 == 0)
+            cleanNonces();
         byte[] n = Base64.decode(b64);
         if (n == null || n.length != NONCE_BYTES)
             return AuthResult.AUTH_BAD;
         long now = _context.clock().now();
         long stamp = DataHelper.fromLong(n, 0, DataHelper.DATE_LENGTH);
-        if (now - stamp > MAX_NONCE_AGE)
+        if (now - stamp > MAX_NONCE_AGE) {
+            _nonces.remove(b64);
+            return AuthResult.AUTH_STALE;
+        }
+        NonceInfo info = _nonces.get(b64);
+        if (info == null)
             return AuthResult.AUTH_STALE;
         byte[] b = new byte[DataHelper.DATE_LENGTH + PROXYNONCE_BYTES];
         System.arraycopy(n, 0, b, 0, DataHelper.DATE_LENGTH);
@@ -310,7 +361,26 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         byte[] md5 = PasswordManager.md5Sum(b);
         if (!DataHelper.eq(md5, 0, n, DataHelper.DATE_LENGTH, MD5_BYTES))
             return AuthResult.AUTH_BAD;
-        return AuthResult.AUTH_GOOD;
+        try {
+            int nc = Integer.parseInt(ncs, 16);
+            return info.isValid(nc);
+        } catch (NumberFormatException nfe) {
+            return AuthResult.AUTH_BAD;
+        }
+    }
+
+
+    /**
+     *  Remove expired nonces from map
+     *  @since 0.9.6
+     */
+    private void cleanNonces() {
+        long now = _context.clock().now();
+        for (Iterator<NonceInfo> iter = _nonces.values().iterator(); iter.hasNext(); ) {
+            NonceInfo info = iter.next();
+            if (info.getExpires() <= now)
+                iter.remove();
+        }
     }
 
     /**
