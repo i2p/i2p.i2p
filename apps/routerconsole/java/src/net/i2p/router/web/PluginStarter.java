@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.startup.ClientAppConfig;
@@ -31,6 +30,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
@@ -55,7 +55,8 @@ public class PluginStarter implements Runnable {
     private static final String[] STANDARD_THEMES = { "images", "light", "dark", "classic",
                                                       "midnight" };
     private static Map<String, ThreadGroup> pluginThreadGroups = new ConcurrentHashMap<String, ThreadGroup>();   // one thread group per plugin (map key=plugin name)
-    private static Map<String, Collection<Job>> pluginJobs = new ConcurrentHashMap<String, Collection<Job>>();
+    private static Map<String, Collection<SimpleTimer2.TimedEvent>> _pendingPluginClients =
+                   new ConcurrentHashMap<String, Collection<SimpleTimer2.TimedEvent>>();
     private static Map<String, ClassLoader> _clCache = new ConcurrentHashMap();
     private static Map<String, Collection<String>> pluginWars = new ConcurrentHashMap<String, Collection<String>>();
 
@@ -592,13 +593,13 @@ public class PluginStarter implements Runnable {
     private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         
-        // initialize pluginThreadGroup and pluginJobs
+        // initialize pluginThreadGroup and _pendingPluginClients
         String pluginName = pluginDir.getName();
         if (!pluginThreadGroups.containsKey(pluginName))
             pluginThreadGroups.put(pluginName, new ThreadGroup(pluginName));
         ThreadGroup pluginThreadGroup = pluginThreadGroups.get(pluginName);
         if (action.equals("start"))
-            pluginJobs.put(pluginName, new ConcurrentHashSet<Job>());
+            _pendingPluginClients.put(pluginName, new ConcurrentHashSet<SimpleTimer2.TimedEvent>());
         
         for(ClientAppConfig app : apps) {
             if (action.equals("start") && app.disabled)
@@ -675,26 +676,57 @@ public class PluginStarter implements Runnable {
                 try {
                     // quick check
                     LoadClientAppsJob.testClient(app.className, cl);
-               } catch(ClassNotFoundException ex) {
-                   // Try again 1 or 2 seconds later. 
-                   // This should be enough time. Although it is a lousy hack
-                   // it should work for most cases.
-                   // Perhaps it may be even better to delay a percentage
-                   // if > 1, and reduce the delay time.
-                   // Under normal circumstances there will be no delay at all.
-                   if(app.delay > 1) {
-                       Thread.sleep(2000);
-                   } else {
-                       Thread.sleep(1000);
-                   }
-               }
-               // quick check, will throw ClassNotFoundException on error
-               LoadClientAppsJob.testClient(app.className, cl);
-               // wait before firing it up
-               Job job = new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay, pluginThreadGroup, cl);
-               ctx.jobQueue().addJob(job);
-               pluginJobs.get(pluginName).add(job);
+                } catch (ClassNotFoundException ex) {
+                    // Try again 1 or 2 seconds later. 
+                    // This should be enough time. Although it is a lousy hack
+                    // it should work for most cases.
+                    // Perhaps it may be even better to delay a percentage
+                    // if > 1, and reduce the delay time.
+                    // Under normal circumstances there will be no delay at all.
+                    try {
+                        if (app.delay > 1) {
+                            Thread.sleep(2000);
+                        } else {
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException ie) {}
+                    // quick check, will throw ClassNotFoundException on error
+                    LoadClientAppsJob.testClient(app.className, cl);
+                }
+                // wait before firing it up
+                SimpleTimer2.TimedEvent evt = new TrackedDelayedClient(pluginName, ctx.simpleTimer2(), ctx, app.className,
+                                                                       app.clientName, argVal, pluginThreadGroup, cl);
+                evt.schedule(app.delay);
             }
+        }
+    }
+
+    /**
+     *  Simple override to track whether a plugin's client is delayed and queued
+     *  @since 0.9.6
+     */
+    private static class TrackedDelayedClient extends LoadClientAppsJob.DelayedRunClient {
+        private final String _pluginName;
+
+        public TrackedDelayedClient(String pluginName,
+                                    SimpleTimer2 pool, RouterContext enclosingContext, String className, String clientName,
+                                    String args[], ThreadGroup threadGroup, ClassLoader cl) {
+            super(pool, enclosingContext, className, clientName, args, threadGroup, cl);
+            _pluginName = pluginName;
+            _pendingPluginClients.get(pluginName).add(this);
+        }
+
+        @Override
+        public boolean cancel() {
+            boolean rv = super.cancel();
+            _pendingPluginClients.get(_pluginName).remove(this);
+            return rv;
+        }
+
+        @Override
+        public void timeReached() {
+            super.timeReached();
+            _pendingPluginClients.get(_pluginName).remove(this);
         }
     }
 
@@ -702,12 +734,11 @@ public class PluginStarter implements Runnable {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         
         boolean isJobRunning = false;
-        if (pluginJobs.containsKey(pluginName))
-            for (Job job: pluginJobs.get(pluginName))
-                if (ctx.jobQueue().isJobActive(job)) {
-                    isJobRunning = true;
-                    break;
-                }
+        Collection<SimpleTimer2.TimedEvent> pending = _pendingPluginClients.get(pluginName);
+        if (pending != null && !pending.isEmpty()) {
+            // TODO have a pending indication too
+            isJobRunning = true;
+        }
         boolean isWarRunning = false;
         if(pluginWars.containsKey(pluginName)) {
             Iterator <String> it = pluginWars.get(pluginName).iterator();

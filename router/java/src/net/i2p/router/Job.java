@@ -12,6 +12,7 @@ package net.i2p.router;
 /**
  * Defines an executable task
  *
+ * For use by the router only. Not to be used by applications or plugins.
  */
 public interface Job {
     /**

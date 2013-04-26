@@ -13,6 +13,7 @@ import net.i2p.util.Clock;
 /**
  * Define the timing requirements and statistics for a particular job
  *
+ * For use by the router only. Not to be used by applications or plugins.
  */
 public class JobTiming implements Clock.ClockUpdateListener {
     private long _start;

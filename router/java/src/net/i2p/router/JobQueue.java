@@ -31,6 +31,7 @@ import net.i2p.util.Log;
  * Manage the pending jobs according to whatever algorithm is appropriate, giving
  * preference to earlier scheduled jobs.
  *
+ * For use by the router only. Not to be used by applications or plugins.
  */
 public class JobQueue {
     private final Log _log;

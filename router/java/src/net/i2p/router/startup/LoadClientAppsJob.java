@@ -14,6 +14,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Run any client applications specified in clients.config.  If any clientApp
@@ -51,12 +52,18 @@ public class LoadClientAppsJob extends JobImpl {
                 runClient(app.className, app.clientName, argVal, getContext(), _log);
             } else {
                 // wait before firing it up
-                getContext().jobQueue().addJob(new DelayedRunClient(getContext(), app.className, app.clientName, argVal, app.delay));
+                DelayedRunClient drc = new DelayedRunClient(getContext().simpleTimer2(), getContext(), app.className,
+                                                            app.clientName, argVal);
+                drc.schedule(app.delay);
             }
         }
     }
 
-    public static class DelayedRunClient extends JobImpl {
+    /**
+     *  Public for router console only, not for use by others, subject to change
+     */
+    public static class DelayedRunClient extends SimpleTimer2.TimedEvent {
+        private final RouterContext _ctx;
         private final String _className;
         private final String _clientName;
         private final String _args[];
@@ -64,26 +71,27 @@ public class LoadClientAppsJob extends JobImpl {
         private final ThreadGroup _threadGroup;
         private final ClassLoader _cl;
 
-        public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay) {
-            this(enclosingContext, className, clientName, args, delay, null, null);
+        /** caller MUST call schedule() */
+        public DelayedRunClient(SimpleTimer2 pool, RouterContext enclosingContext, String className,
+                                String clientName, String args[]) {
+            this(pool, enclosingContext, className, clientName, args, null, null);
         }
         
-        public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[],
-                                long delay, ThreadGroup threadGroup, ClassLoader cl) {
-            super(enclosingContext);
+        /** caller MUST call schedule() */
+        public DelayedRunClient(SimpleTimer2 pool, RouterContext enclosingContext, String className, String clientName,
+                                String args[], ThreadGroup threadGroup, ClassLoader cl) {
+            super(pool);
+            _ctx = enclosingContext;
             _className = className;
             _clientName = clientName;
             _args = args;
             _log = enclosingContext.logManager().getLog(LoadClientAppsJob.class);
             _threadGroup = threadGroup;
             _cl = cl;
-            getTiming().setStartAfter(getContext().clock().now() + delay);
         }
 
-        public String getName() { return "Delayed client job"; }
-
-        public void runJob() {
-            runClient(_className, _clientName, _args, getContext(), _log, _threadGroup, _cl);
+        public void timeReached() {
+            runClient(_className, _clientName, _args, _ctx, _log, _threadGroup, _cl);
         }
     }
     

@@ -2,6 +2,8 @@
  * Console: Show log location on /logs even if not opened yet (ticket #905)
  * HTTP proxy: Verify nonce count in digest auth
  * i2psnark: Use smaller piece size for small torrents
+ * Plugins: Track pending plugin clients better, don't hold references,
+            start delayed clients from SimpleTimer2 instead of Job queue (ticket #670)
 
 2013-04-25 kytv
  * Portuguese, Russian, Spanish, and Swedish translation updates from Transifex

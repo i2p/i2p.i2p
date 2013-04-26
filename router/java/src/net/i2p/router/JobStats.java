@@ -5,6 +5,7 @@ import net.i2p.data.DataHelper;
 /**
  *  Glorified struct to contain basic job stats.
  *  Public for router console only.
+ *  For use by the router only. Not to be used by applications or plugins.
  */
 public class JobStats {
     private final String _job;

@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Base implementation of a Job
+ *
+ * For use by the router only. Not to be used by applications or plugins.
  */
 public abstract class JobImpl implements Job {
     private final RouterContext _context;
