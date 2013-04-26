@@ -77,7 +77,7 @@ public class Storage
   private final AtomicInteger _allocateCount = new AtomicInteger();
 
   /** The default piece size. */
-  private static final int MIN_PIECE_SIZE = 256*1024;
+  private static final int DEFAULT_PIECE_SIZE = 256*1024;
   /** note that we start reducing max number of peer connections above 1MB */
   public static final int MAX_PIECE_SIZE = 2*1024*1024;
   /** The maximum number of pieces in a torrent. */
@@ -146,7 +146,13 @@ public class Storage
     if (total > MAX_TOTAL_SIZE)
         throw new IOException("Torrent too big (" + total + " bytes), max is " + MAX_TOTAL_SIZE);
 
-    int pc_size = MIN_PIECE_SIZE;
+    int pc_size;
+    if (total <= 5*1024*1024)
+        pc_size = DEFAULT_PIECE_SIZE / 4;
+    else if (total <= 10*1024*1024)
+        pc_size = DEFAULT_PIECE_SIZE / 2;
+    else
+        pc_size = DEFAULT_PIECE_SIZE;
     int pcs = (int) ((total - 1)/pc_size) + 1;
     while (pcs > MAX_PIECES && pc_size < MAX_PIECE_SIZE)
       {
