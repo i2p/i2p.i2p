@@ -222,7 +222,7 @@ public class JobQueue {
      * Returns <code>true</code> if a given job is waiting or running;
      * <code>false</code> if the job is finished or doesn't exist in the queue.
      *
-     * Only used by PluginStarter, candidate for deprecation
+     * @deprecated unused
      */
     public boolean isJobActive(Job job) {
         synchronized (_jobLock) {
