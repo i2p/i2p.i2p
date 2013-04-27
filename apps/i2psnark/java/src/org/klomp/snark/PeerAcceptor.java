@@ -40,7 +40,7 @@ import net.i2p.util.Log;
  * protocol connection. The PeerAcceptor will then create a new peer
  * if the PeerCoordinator wants more peers.
  */
-public class PeerAcceptor
+class PeerAcceptor
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerAcceptor.class);
   private final PeerCoordinator coordinator;

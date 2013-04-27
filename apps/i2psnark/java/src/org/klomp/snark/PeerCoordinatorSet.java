@@ -12,7 +12,7 @@ import net.i2p.crypto.SHA1Hash;
  * Each PeerCoordinator is added to the set from within the Snark (and removed
  * from it there too)
  */
-public class PeerCoordinatorSet {
+class PeerCoordinatorSet {
     private final Map<SHA1Hash, PeerCoordinator> _coordinators;
     
     public PeerCoordinatorSet() {

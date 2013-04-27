@@ -39,7 +39,7 @@ import net.i2p.util.SimpleTimer;
 /**
  * Accepts connections on a TCP port and routes them to sub-acceptors.
  */
-public class ConnectionAcceptor implements Runnable
+class ConnectionAcceptor implements Runnable
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ConnectionAcceptor.class);
   private I2PServerSocket serverSocket;

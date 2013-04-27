@@ -43,7 +43,7 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
  *  and the PeerID is not required.
  *  Equality is now determined solely by the dest hash.
  */
-public class PeerID implements Comparable
+class PeerID implements Comparable
 {
   private byte[] id;
   private Destination address;
