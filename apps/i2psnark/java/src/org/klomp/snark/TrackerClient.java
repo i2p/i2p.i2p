@@ -439,31 +439,37 @@ public class TrackerClient implements Runnable {
    *  @return max peers seen
    */
   private int getPeersFromTrackers(List<TCTracker> trckrs) {
-            long uploaded = coordinator.getUploaded();
-            long downloaded = coordinator.getDownloaded();
             long left = coordinator.getLeft();   // -1 in magnet mode
             
             // First time we got a complete download?
-            String event;
-            if (!completed && left == 0)
-              {
+            boolean newlyCompleted;
+            if (!completed && left == 0) {
                 completed = true;
-                event = COMPLETED_EVENT;
-              }
-            else
-              event = NO_EVENT;
+                newlyCompleted = true;
+            } else {
+                newlyCompleted = false;
+            }
 
             // *** loop once for each tracker
             int maxSeenPeers = 0;
             for (TCTracker tr : trckrs) {
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needOutboundPeers() || !tr.started) &&
-                  (event.equals(COMPLETED_EVENT) || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
+                  (newlyCompleted || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
               {
                 try
                   {
-                    if (!tr.started)
-                      event = STARTED_EVENT;
+                    long uploaded = coordinator.getUploaded();
+                    long downloaded = coordinator.getDownloaded();
+                    left = coordinator.getLeft();
+                    String event;
+                    if (!tr.started) {
+                        event = STARTED_EVENT;
+                    } else if (newlyCompleted) {
+                        event = COMPLETED_EVENT;
+                    } else {
+                        event = NO_EVENT;
+                    }
                     TrackerInfo info = doRequest(tr, infoHash, peerID,
                                                  uploaded, downloaded, left,
                                                  event);
