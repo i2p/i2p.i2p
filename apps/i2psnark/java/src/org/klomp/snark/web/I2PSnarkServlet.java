@@ -507,11 +507,12 @@ public class I2PSnarkServlet extends BasicServlet {
             } catch (NumberFormatException nfe) {}
         }
         int pageSize = Math.max(_manager.getPageSize(), 5);
+        String stParamStr = stParam == null ? "" : "&amp;st=" + stParam;
         for (int i = 0; i < total; i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
-            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide);
+            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, stParam);
         }
 
         if (total == 0) {
@@ -943,7 +944,7 @@ public class I2PSnarkServlet extends BasicServlet {
             url = url.substring(0, url.length() - 5);
         buf.append(url);
         if (p.length() > 0)
-            buf.append(p);
+            buf.append(p.replace("&amp;", "&"));  // no you don't html escape the redirect header
         resp.setHeader("Location", buf.toString());
         resp.sendError(302, "Moved");
     }
@@ -1113,9 +1114,11 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @param stats in/out param (totals)
      *  @param statsOnly if true, output nothing, update stats only
+     *  @param stParam non null; empty or e.g. &amp;st=10
      */
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
-                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly) throws IOException {
+                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly,
+                              String stParam) throws IOException {
         // stats
         long uploaded = snark.getUploaded();
         stats[0] += snark.getDownloaded();
@@ -1225,7 +1228,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (curPeers > 0 && !showPeers)
                     statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\"></td>" +
                                "<td class=\"snarkTorrentStatus " + rowClass + "\">" + txt +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
                 else
@@ -1241,7 +1244,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\"></td>" +
                                "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
@@ -1252,7 +1255,7 @@ public class I2PSnarkServlet extends BasicServlet {
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\"></td>" +
                                "<td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
@@ -1366,16 +1369,13 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction " + rowClass + "\">");
-        String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.getInfoHash());
         String b64 = Base64.encode(snark.getInfoHash());
-        if (showPeers)
-            parameters = parameters + "&p=1";
         if (snark.isChecking()) {
             // show no buttons
         } else if (isRunning) {
             // Stop Button
             if (isDegraded)
-                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Stop_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Stop the torrent"));
@@ -1389,7 +1389,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
-                    out.write("<a href=\"/" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                    out.write("<a href=\"/" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Start the torrent"));
@@ -1403,7 +1403,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
@@ -1423,7 +1423,7 @@ public class I2PSnarkServlet extends BasicServlet {
             // Delete Button
             // Doesnt work with Opera so use noThinsp instead of isDegraded
             if (noThinsp)
-                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
