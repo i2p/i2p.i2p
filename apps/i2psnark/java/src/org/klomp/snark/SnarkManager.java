@@ -547,7 +547,9 @@ public class SnarkManager implements CompleteListener {
                 int size = Integer.parseInt(pageSize.trim());
                 if (size <= 0)
                     size = 999999;
-                if (size != getPageSize() && size >= 5) {
+                else if (size < 5)
+                    size = 5;
+                if (size != getPageSize()) {
                     changed = true;
                     pageSize = Integer.toString(size);
                     _config.setProperty(PROP_PAGE_SIZE, pageSize);

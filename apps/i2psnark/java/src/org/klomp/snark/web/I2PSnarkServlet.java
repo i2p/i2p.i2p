@@ -522,23 +522,60 @@ public class I2PSnarkServlet extends BasicServlet {
         } else /** if (snarks.size() > 1) */ {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
+            // Page nav
             if (start > 0) {
-                int prev = Math.max(0, start - pageSize);
-                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + prev);
+                // First
+                out.write("&nbsp;<a href=\"" + _contextPath);
                 if (peerParam != null)
-                    out.write("&p=" + peerParam);
+                    out.write("?p=" + peerParam);
                 out.write("\">" +
-                          "<img alt=\"" + _("Prev") + "\" title=\"" + _("Previous page") + "\" border=\"0\" src=\"" +
+                          "<img alt=\"" + _("First") + "\" title=\"" + _("First page") + "\" border=\"0\" src=\"" +
                           _imgPath + "control_rewind_blue.png\">" +
                           "</a>&nbsp;");
+                int prev = Math.max(0, start - pageSize);
+                if (prev > 0) {
+                    // Back
+                    out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + prev);
+                    if (peerParam != null)
+                        out.write("&p=" + peerParam);
+                    out.write("\">" +
+                          "<img alt=\"" + _("Prev") + "\" title=\"" + _("Previous page") + "\" border=\"0\" src=\"" +
+                          _imgPath + "control_back_blue.png\">" +
+                          "</a>&nbsp;");
+                }
             }
-            if (start + pageSize < snarks.size()) {
+            // Page count
+            int total = snarks.size();
+            int pages = 1 + (total / pageSize);
+            if (pages == 1 && start > 0)
+                pages = 2;
+            if (pages > 1) {
+                int page;
+                if (start + pageSize >= total)
+                    page = pages;
+                else
+                    page = 1 + (start / pageSize);
+                out.write("&nbsp;" + _("Page {0}", page) + thinsp(noThinsp) + pages + "&nbsp;");
+            }
+            if (start + pageSize < total) {
                 int next = start + pageSize;
-                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + next);
+                if (next + pageSize < total) {
+                    // Next
+                    out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + next);
+                    if (peerParam != null)
+                        out.write("&p=" + peerParam);
+                    out.write("\">" +
+                          "<img alt=\"" + _("Next") + "\" title=\"" + _("Next page") + "\" border=\"0\" src=\"" +
+                          _imgPath + "control_play_blue.png\">" +
+                          "</a>&nbsp;");
+                }
+                // Last
+                int last = ((total - 1) / pageSize) * pageSize;
+                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + last);
                 if (peerParam != null)
                     out.write("&p=" + peerParam);
                 out.write("\">" +
-                          "<img alt=\"" + _("Next") + "\" title=\"" + _("Next page") + "\" border=\"0\" src=\"" +
+                          "<img alt=\"" + _("Last") + "\" title=\"" + _("Last page") + "\" border=\"0\" src=\"" +
                           _imgPath + "control_fastforward_blue.png\">" +
                           "</a>&nbsp;");
             }
