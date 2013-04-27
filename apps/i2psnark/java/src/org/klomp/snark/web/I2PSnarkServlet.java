@@ -500,20 +500,21 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showDebug = "2".equals(peerParam);
 
         int start = 0;
+        int total = snarks.size();
         if (stParam != null) {
             try {
-                start = Math.max(0, Math.min(snarks.size() - 1, Integer.parseInt(stParam)));
+                start = Math.max(0, Math.min(total - 1, Integer.parseInt(stParam)));
             } catch (NumberFormatException nfe) {}
         }
-        int pageSize = _manager.getPageSize();
-        for (int i = 0; i < snarks.size(); i++) {
+        int pageSize = Math.max(_manager.getPageSize(), 5);
+        for (int i = 0; i < total; i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
             displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide);
         }
 
-        if (snarks.isEmpty()) {
+        if (total == 0) {
             out.write("<tr class=\"snarkTorrentNoneLoaded\">" +
                       "<td class=\"snarkTorrentNoneLoaded\"" +
                       " colspan=\"11\"><i>");
@@ -545,8 +546,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
             // Page count
-            int total = snarks.size();
-            int pages = 1 + (total / pageSize);
+            int pages = 1 + ((total - 1) / pageSize);
             if (pages == 1 && start > 0)
                 pages = 2;
             if (pages > 1) {
@@ -582,7 +582,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("&nbsp;");
             out.write(_("Totals"));
             out.write(":&nbsp;");
-            out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
+            out.write(ngettext("1 torrent", "{0} torrents", total));
             out.write(", ");
             out.write(DataHelper.formatSize2(stats[5]) + "B, ");
             out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
