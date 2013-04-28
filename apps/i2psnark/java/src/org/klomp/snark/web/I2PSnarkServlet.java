@@ -319,13 +319,15 @@ public class I2PSnarkServlet extends BasicServlet {
             writeConfigForm(out, req);
             writeTrackerForm(out, req);
         } else {
-            writeTorrents(out, req);
+            boolean pageOne = writeTorrents(out, req);
             // end of mainsection div
-            out.write("</div><div id=\"lowersection\">\n");
-            writeAddForm(out, req);
-            writeSeedForm(out, req, sortedTrackers);
-            writeConfigLink(out);
-            // end of lowersection div
+            if (pageOne) {
+                out.write("</div><div id=\"lowersection\">\n");
+                writeAddForm(out, req);
+                writeSeedForm(out, req, sortedTrackers);
+                writeConfigLink(out);
+                // end of lowersection div
+            }
             out.write("</div>\n");
         }
         out.write(FOOTER);
@@ -354,7 +356,10 @@ public class I2PSnarkServlet extends BasicServlet {
         }
     }
 
-    private void writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
+    /**
+     *  @return true if on first page
+     */
+    private boolean writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
         /** dl, ul, down rate, up rate, peers, size */
         final long stats[] = {0,0,0,0,0,0};
         String peerParam = req.getParameter("p");
@@ -585,8 +590,11 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(":&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", total));
             out.write(", ");
-            out.write(DataHelper.formatSize2(stats[5]) + "B, ");
-            out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
+            out.write(DataHelper.formatSize2(stats[5]) + "B");
+            if (_manager.util().connected() && total > 0) {
+                out.write(", ");
+                out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
+            }
             DHT dht = _manager.util().getDHT();
             if (dht != null) {
                 int dhts = dht.size();
@@ -598,7 +606,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write(dht.renderStatusHTML());
             }
             out.write("</th>\n");
-            if (_manager.util().connected()) {
+            if (_manager.util().connected() && total > 0) {
                 out.write("    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[1]) + "</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[2]) + "ps</th>\n" +
@@ -613,6 +621,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</table>");
         if (isForm)
             out.write("</form>\n");
+        return start == 0;
     }
     
     /**

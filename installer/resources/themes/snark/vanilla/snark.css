@@ -401,12 +401,12 @@ td:first-child {
 
 .snarkTorrentInfo img {
      max-height: 16px !important;
-     margin: 1px 0 1px 2px !important;    
+     margin: 1px 2px 2px 10px !important;    
 }
 
 .snarkTorrentInfo td {
      text-align: left !important;
-     padding: 0 1px !important;
+     padding: 2px 0 1px 1px !important;
 }
 
 table.SnarkTorrentInfo {
@@ -421,6 +421,7 @@ table.SnarkDirInfo {
 
 .snarkDirInfo thead img {
      margin: 0 -1px 0 0 !important;
+     padding: 0 3px !important;
 }
 
 .SnarkDirInfo td {

@@ -437,12 +437,19 @@ table.snarkTorrentInfo, table.snarkDirInfo {
      margin: 0 !important;
 }
 
+.snarkDirInfo thead img {
+     margin: 0 -1px 0 0 !important;
+     padding: 0 3px !important;
+}
+
 .snarkTorrentInfo td {
      text-align: left !important;
+     padding: 2px 0 1px 1px !important;
 }
 
 .snarkTorrentInfo img {
      max-height: 16px;
+     margin: 1px 2px 2px 10px !important;    
 }
 
 .snarkDirInfo td {
