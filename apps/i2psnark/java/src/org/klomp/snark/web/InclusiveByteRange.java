@@ -16,15 +16,12 @@
 //  ========================================================================
 //
 
-package org.eclipse.jetty.server;
+package org.klomp.snark.web;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import org.eclipse.jetty.util.LazyList;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.Logger;
 
 /* ------------------------------------------------------------ */
 /** Byte range inclusive of end points.
@@ -49,8 +46,6 @@ import org.eclipse.jetty.util.log.Logger;
  */
 public class InclusiveByteRange 
 {
-    private static final Logger LOG = Log.getLogger(InclusiveByteRange.class);
-
     long first = 0;
     long last  = 0;    
 
@@ -76,11 +71,11 @@ public class InclusiveByteRange
     /** 
      * @param headers Enumeration of Range header fields.
      * @param size Size of the resource.
-     * @return LazyList of satisfiable ranges
+     * @return List of satisfiable ranges
      */
-    public static List satisfiableRanges(Enumeration headers, long size)
+    public static List<InclusiveByteRange> satisfiableRanges(Enumeration headers, long size)
     {
-        Object satRanges=null;
+        List<InclusiveByteRange> satRanges = null;
         
         // walk through all Range headers
     headers:
@@ -105,7 +100,6 @@ public class InclusiveByteRange
                         {
                             if ("bytes".equals(t))
                                 continue;
-                            LOG.warn("Bad range format: {}",t);
                             continue headers;
                         }
                         else if (d == 0)
@@ -114,7 +108,6 @@ public class InclusiveByteRange
                                 last = Long.parseLong(t.substring(d + 1).trim());
                             else
                             {
-                                LOG.warn("Bad range format: {}",t);
                                 continue;
                             }
                         }
@@ -134,25 +127,23 @@ public class InclusiveByteRange
 
                         if (first < size)
                         {
+                            if (satRanges == null)
+                                satRanges = new ArrayList(4);
                             InclusiveByteRange range = new InclusiveByteRange(first,last);
-                            satRanges = LazyList.add(satRanges,range);
+                            satRanges.add(range);
                         }
                     }
                     catch (NumberFormatException e)
                     {
-                        LOG.warn("Bad range format: {}",t);
-                        LOG.ignore(e);
                         continue;
                     }
                 }
             }
             catch(Exception e)
             {
-                LOG.warn("Bad range format: {}",t);
-                LOG.ignore(e);
             }    
         }
-        return LazyList.getList(satRanges,true);
+        return satRanges;
     }
 
     /* ------------------------------------------------------------ */

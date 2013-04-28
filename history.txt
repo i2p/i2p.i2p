@@ -1,3 +1,12 @@
+2013-04-28 zzz
+ * i2psnark:
+   - Improve page nav
+   - Ensure current stats and correct event delivered in announce
+   - Only show lower section on first page
+   - Dir page CSS tweaks
+   - Parameter fixes
+   - Support HTTP request ranges
+
 2013-04-26 zzz
  * Console: Show log location on /logs even if not opened yet (ticket #905)
  * HTTP proxy: Verify nonce count in digest auth

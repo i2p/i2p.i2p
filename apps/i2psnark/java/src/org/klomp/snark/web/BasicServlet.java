@@ -23,6 +23,8 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -318,19 +320,47 @@ class BasicServlet extends HttpServlet
             out = new WriterOutputStream(response.getWriter());
         }
 
-        // Write content normally
         long content_length = content.getContentLength();
-        writeHeaders(response,content,content_length);
-        if (content_length >= 0  && request.getMethod().equals("HEAD")) {
-            // if we know the content length, don't send it to be counted
-            if (_log.shouldLog(Log.INFO))
-                _log.info("HEAD: " + content);
-        } else {
-            // GET or unknown size for HEAD
-            copy(in, out);
+
+        // see if there are any range headers
+        Enumeration reqRanges = request.getHeaders("Range");
+
+        if (reqRanges == null || !reqRanges.hasMoreElements()) {
+            // if there were no ranges, send entire entity
+            // Write content normally
+            writeHeaders(response,content,content_length);
+            if (content_length >= 0  && request.getMethod().equals("HEAD")) {
+                // if we know the content length, don't send it to be counted
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("HEAD: " + content);
+            } else {
+                // GET or unknown size for HEAD
+                copy(in, out);
+            }
+            return;
         }
 
-        return;
+
+        // Parse the satisfiable ranges
+        List<InclusiveByteRange> ranges = InclusiveByteRange.satisfiableRanges(reqRanges, content_length);
+
+        // if there are no satisfiable ranges, send 416 response
+        // Completely punt on multiple ranges (unlike Default)
+        if (ranges == null || ranges.size() != 1) {
+            writeHeaders(response, content, content_length);
+            response.setStatus(416);
+            response.setHeader("Content-Range", InclusiveByteRange.to416HeaderRangeString(content_length));
+            return;
+        }
+
+        // if there is only a single valid range (must be satisfiable
+        // since were here now), send that range with a 216 response
+        InclusiveByteRange singleSatisfiableRange = ranges.get(0);
+        long singleLength = singleSatisfiableRange.getSize(content_length);
+        writeHeaders(response, content, singleLength);
+        response.setStatus(206);
+        response.setHeader("Content-Range", singleSatisfiableRange.toHeaderRangeString(content_length));
+        copy(in, singleSatisfiableRange.getFirst(content_length), out, singleLength);
     }
     
     /* ------------------------------------------------------------ */
@@ -532,11 +562,29 @@ class BasicServlet extends HttpServlet
      *  Write from in to out
      */
     private void copy(InputStream in, OutputStream out) throws IOException {
+        copy(in, 0, out, -1);
+    }
+
+    /**
+     *  Write from in to out
+     */
+    private void copy(InputStream in, long skip, OutputStream out, final long len) throws IOException {
         ByteArray ba = _cache.acquire();
         byte[] buf = ba.getData();
         try {
+            if (skip > 0)
+                in.skip(skip);
             int read = 0;
-            while ( (read = in.read(buf)) != -1) {
+            long tot = 0;
+            boolean done = false;
+            while ( (read = in.read(buf)) != -1 && !done) {
+                if (len >= 0) {
+                    tot += read;
+                    if (tot >= len) {
+                        read -= (int) (tot - len);
+                        done = true;
+                    }
+                }
                 out.write(buf, 0, read);
             }
         } finally {
