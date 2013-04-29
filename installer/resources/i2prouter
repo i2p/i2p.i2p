@@ -29,7 +29,15 @@
 # should have been replaced by the izpack installer.
 # If you did not run the installer, replace them with the appropriate paths.
 I2P="%INSTALL_PATH"
-I2P_CONFIG_DIR="%USER_HOME/.i2p"
+if [ "`uname -s`" == "Darwin" ]; then
+   if [ -d "%USER_HOME/Library/Application Support" ]; then
+       I2P_CONFIG_DIR="%USER_HOME/Library/Application Support/i2p"
+   else
+       I2P_CONFIG_DIR="%USER_HOME/.i2p"
+   fi
+else
+    I2P_CONFIG_DIR="%USER_HOME/.i2p"
+fi
 I2PTEMP="%SYSTEM_java_io_tmpdir"
 # PORTABLE installation:
 # Use the following instead.
