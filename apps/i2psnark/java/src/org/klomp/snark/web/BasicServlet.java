@@ -49,13 +49,14 @@ import net.i2p.util.Log;
  * Supports files and resource only.
  * Supports MIME types with local overrides and additions.
  * Supports Last-Modified.
+ * Supports single request ranges.
  *
  * Does not support directories or "welcome files".
  * Does not support gzip.
- * Does not support request ranges.
+ * Does not support multiple request ranges.
  * Does not cache.
  *
- * HEAD and POST return 405.
+ * POST returns 405.
  * Directories return 403.
  * Jar resources are sent with a long cache directive.
  *
