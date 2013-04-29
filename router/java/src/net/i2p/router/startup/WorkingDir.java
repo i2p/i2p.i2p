@@ -71,6 +71,7 @@ public class WorkingDir {
             dir = envProps.getProperty(PROP_WORKING_DIR);
         if (dir == null)
             dir = System.getProperty(PROP_WORKING_DIR);
+
         boolean isWindows = SystemVersion.isWindows();
         File dirf = null;
         if (dir != null) {
@@ -84,11 +85,12 @@ public class WorkingDir {
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else if (SystemVersion.isMac()) {
                 String appdata = "/Library/Application Support/";
-                if (new File(home,appdata).exists()&&false==(new File(home,WORKING_DIR_DEFAULT).exists())) {
+		File old = new File(home,WORKING_DIR_DEFAULT);
+		if (old.exists() && old.isDirectory()) 
+                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
+                else {
                     home = home+appdata;
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_MAC);
-                } else {
-                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
                 }
             } else {
                 if (DAEMON_USER.equals(System.getProperty("user.name")))
