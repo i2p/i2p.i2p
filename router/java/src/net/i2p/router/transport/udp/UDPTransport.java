@@ -1286,25 +1286,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
             // Validate his SSU address
-            RouterAddress addr = toAddress.getTargetAddress(STYLE);
+            RouterAddress addr = getTargetAddress(toAddress);
             if (addr == null) {
                 markUnreachable(to);
                 return null;
             }
 
-            // don't do this - object churn parsing the whole thing
-            //UDPAddress ua = new UDPAddress(addr);
-            //if (ua.getIntroducerCount() <= 0) {
-            if (addr.getOption("ihost0") == null) {
-                byte[] ip = addr.getIP();
-                int port = addr.getPort();
-                if (ip == null || port < MIN_PEER_PORT ||
-                    (!isValid(ip)) ||
-                    Arrays.equals(ip, getExternalIP())) {
-                    markUnreachable(to);
-                    return null;
-                }
-            }
             if (!allowConnection())
                 return _cachedBid[TRANSIENT_FAIL_BID];
 
@@ -1335,6 +1322,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return _cachedBid[NEAR_CAPACITY_BID];
             }
         }
+    }
+
+    /**
+     *  Get first available address we can use.
+     *  @return address or null
+     *  @since 0.9.6
+     */
+    RouterAddress getTargetAddress(RouterInfo target) {
+        List<RouterAddress> addrs = target.getTargetAddresses(STYLE);
+        for (int i = 0; i < addrs.size(); i++) {
+            RouterAddress addr = addrs.get(i);
+            if (addr.getOption("ihost0") == null) {
+                byte[] ip = addr.getIP();
+                int port = addr.getPort();
+                if (ip == null || port < MIN_PEER_PORT ||
+                    (!isValid(ip)) ||
+                    Arrays.equals(ip, getExternalIP())) {
+                    continue;
+                }
+            }
+            return addr;
+        }
+        return null;
     }
 
     private boolean preferUDP() {

@@ -1,3 +1,8 @@
+2013-04-29 zzz
+ * Transports:
+   - Initial prep for multiple addresses per style
+   - Simplify NTCP send pool
+
 2013-04-28 zzz
  * i2psnark:
    - Improve page nav

@@ -252,12 +252,14 @@ public class RouterAddress extends DataStructureImpl {
     }
     
     /**
-     * Just use style and hashCode for speed (expiration is always null).
-     * If we add multiple addresses of the same style, this may need to be changed.
+     * Just use a few items for speed (expiration is always null).
      */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(_transportStyle) ^ _cost;
+        return DataHelper.hashCode(_transportStyle) ^
+               DataHelper.hashCode(getIP()) ^
+               getPort() ^
+               _cost;
     }
     
     /**
