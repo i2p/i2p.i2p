@@ -1,3 +1,6 @@
+2013-04-30 str4d
+ * Console: Updates to readme_ar and a CSS tweak from hamada (ticket #489)
+
 2013-04-29 zzz
  * Transports:
    - Initial prep for multiple addresses per style
