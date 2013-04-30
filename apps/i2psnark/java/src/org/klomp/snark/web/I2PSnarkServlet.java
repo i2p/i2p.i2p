@@ -263,7 +263,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + _("Router is down") + "<\\/b><\\/div>\";\n" +
-                          "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
+                          "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" +
+                          peerString.replace("&amp;", "&") +  // don't html escape in js
+                          "\", \"mainsection\", " + (delay*1000) + "); }\n" +
                           "function initAjax() { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
                           "</script>\n");
             }
