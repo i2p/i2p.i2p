@@ -123,7 +123,7 @@ public class FileDumpHelper extends HelperBase {
         if (s != null && s.length() > 20) {
             if (iv != null)
                 buf.append("<br>");
-            buf.append("<a href=\"http://stats.i2p/cgi-bin/viewmtn/revision/info/").append(s)
+            buf.append("<a href=\"killyourtv.i2p/viewmtn/revision/info/").append(s)
                .append("\">" +
                        "<tt>").append(s.substring(0, 20)).append("</tt>" +
                        "<br>" +
