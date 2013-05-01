@@ -35,7 +35,7 @@ span.addrhlpr {
 h3 {
      color:black;
      font-size:12pt;
-     letter-spacing:2pt;
+     letter-spacing: 0.08em;
      line-height:18pt;
      font-weight:bold;
 }
