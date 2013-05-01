@@ -1,4 +1,4 @@
-i2p (0.9.5-2) UNRELEASED; urgency=low
+i2p (0.9.5-2) unstable; urgency=low
 
   * debian/i2p.postinst: Explicitly set permissions on /etc/i2p/wrapper.config
     to compensate for stricter umasks.
