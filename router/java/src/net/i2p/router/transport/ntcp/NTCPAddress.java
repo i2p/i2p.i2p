@@ -88,16 +88,6 @@ public class NTCPAddress {
     public int getPort() { return _port; }
     //public void setPort(int port) { _port = port; }
     
-    public boolean isPubliclyRoutable() {
-        return isPubliclyRoutable(_host);
-    }
-
-    public static boolean isPubliclyRoutable(String host) {
-        if (host == null) return false;
-        byte quad[] = Addresses.getIP(host);
-        return TransportImpl.isPubliclyRoutable(quad);
-    }
-    
     @Override
     public String toString() { return _host + ":" + _port; }
     

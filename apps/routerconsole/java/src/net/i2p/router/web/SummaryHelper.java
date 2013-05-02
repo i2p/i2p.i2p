@@ -24,7 +24,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.transport.ntcp.NTCPAddress;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.PortMapper;
@@ -159,7 +159,8 @@ public class SummaryHelper extends HelperBase {
         switch (status) {
             case CommSystemFacade.STATUS_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
-                if (ra == null || (new NTCPAddress(ra)).isPubliclyRoutable())
+                // TODO set IPv6 arg based on configuration?
+                if (ra == null || TransportUtil.isPubliclyRoutable(ra.getIP(), true))
                     return _("OK");
                 return _("ERR-Private TCP Address");
             case CommSystemFacade.STATUS_DIFFERENT:

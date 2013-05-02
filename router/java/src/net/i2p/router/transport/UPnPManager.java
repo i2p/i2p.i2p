@@ -156,7 +156,7 @@ class UPnPManager {
             if (ips != null) {
                 for (DetectedIP ip : ips) {
                     // store the first public one and tell the transport manager if it changed
-                    if (TransportImpl.isPubliclyRoutable(ip.publicAddress.getAddress())) {
+                    if (TransportUtil.isPubliclyRoutable(ip.publicAddress.getAddress(), false)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("External address: " + ip.publicAddress + " type: " + ip.natType);
                         if (!ip.publicAddress.equals(_detectedAddress)) {

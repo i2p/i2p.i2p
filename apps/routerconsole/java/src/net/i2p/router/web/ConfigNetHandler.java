@@ -7,7 +7,7 @@ import java.util.Map;
 
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
-import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler;
@@ -370,7 +370,8 @@ public class ConfigNetHandler extends FormHandler {
             addFormError(_("Invalid address") + ": " + addr);
             return false;
         }
-        boolean rv = TransportImpl.isPubliclyRoutable(iab);
+        // TODO set IPv6 arg based on configuration?
+        boolean rv = TransportUtil.isPubliclyRoutable(iab, true);
         if (!rv)
             addFormError(_("The hostname or IP {0} is not publicly routable", addr));
         return rv;

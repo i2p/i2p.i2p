@@ -668,26 +668,18 @@ public abstract class TransportImpl implements Transport {
         }
     }
 
-    /** @param addr non-null */
-    public static boolean isPubliclyRoutable(byte addr[]) {
-        if (addr.length == 4) {
-            int a0 = addr[0] & 0xFF;
-            if (a0 == 127) return false;
-            if (a0 == 10) return false;
-            int a1 = addr[1] & 0xFF;
-            if (a0 == 172 && a1 >= 16 && a1 <= 31) return false;
-            if (a0 == 192 && a1 == 168) return false;
-            if (a0 >= 224) return false; // no multicast
-            if (a0 == 0) return false;
-            if (a0 == 169 && a1 == 254) return false;
-            // 5/8 allocated to RIPE (30 November 2010)
-            //if ((addr[0]&0xFF) == 5) return false;  // Hamachi
-            return true; // or at least possible to be true
-        } else if (addr.length == 16) {
-            return false;
-        } else {
-            // ipv?
-            return false;
-        }
+    /**
+     *  @since IPv6
+     */
+    protected TransportUtil.IPv6Config getIPv6Config() {
+        return TransportUtil.getIPv6Config(_context, getStyle());
+    }
+
+    /**
+     *  @param addr non-null
+     */
+    protected boolean isPubliclyRoutable(byte addr[]) {
+        return TransportUtil.isPubliclyRoutable(addr,
+                                                getIPv6Config() != TransportUtil.IPv6Config.IPV6_DISABLED);
     }
 }

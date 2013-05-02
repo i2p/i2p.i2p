@@ -146,7 +146,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			InetAddress detectedIP = InetAddress.getByName(natAddress);
 
 			short status = DetectedIP.NOT_SUPPORTED;
-			thinksWeAreDoubleNatted = !TransportImpl.isPubliclyRoutable(detectedIP.getAddress());
+			thinksWeAreDoubleNatted = !TransportUtil.isPubliclyRoutable(detectedIP.getAddress(), false);
 			// If we have forwarded a port AND we don't have a private address
 			if (_log.shouldLog(Log.WARN))
 				_log.warn("NATAddress: \"" + natAddress + "\" detectedIP: " + detectedIP + " double? " + thinksWeAreDoubleNatted);
