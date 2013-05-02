@@ -72,6 +72,11 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
          "\r\n")
          .getBytes();
 
+    private static final String[] BAD_PROTOCOLS = {
+        "GET ", "HEAD ", "POST ", "GNUTELLA CONNECT", "\023BitTorrent protocol"
+    };
+
+
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -193,6 +198,12 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             String s = DataHelper.readLine(in);
             if (s == null)
                 throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+            if (lineCount == 0) {
+                for (int i = 0; i < BAD_PROTOCOLS.length; i++) {
+                    if (s.startsWith(BAD_PROTOCOLS[i]))
+                        throw new IOException("Bad protocol " + BAD_PROTOCOLS[i]);
+                }
+            }
             if (++lineCount > 10)
                 throw new IOException("Too many lines before USER or SERVER, giving up");
             if (System.currentTimeMillis() > expire)
