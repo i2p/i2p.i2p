@@ -32,10 +32,29 @@ public interface Transport {
      *
      */
     public void send(OutNetMessage msg);
-    public RouterAddress startListening();
+    public void startListening();
     public void stopListening();
-    public RouterAddress getCurrentAddress();
-    public RouterAddress updateAddress();
+
+    /**
+     *  What addresses are we currently listening to?
+     *  Replaces getCurrentAddress()
+     *  @return all addresses, non-null
+     *  @since IPv6
+     */
+    public List<RouterAddress> getCurrentAddresses();
+
+    /**
+     *  Do we have any current address?
+     *  @since IPv6
+     */
+    public boolean hasCurrentAddress();
+
+    /**
+     *  Ask the transport to update its addresses based on current information and return them
+     *  @return all addresses, non-null
+     */
+    public List<RouterAddress> updateAddress();
+
     public static final String SOURCE_UPNP = "upnp";
     public static final String SOURCE_INTERFACE = "local";
     public static final String SOURCE_CONFIG = "config"; // unused
@@ -51,7 +70,7 @@ public interface Transport {
     public boolean haveCapacity();
     public boolean haveCapacity(int pct);
     public Vector getClockSkews();
-    public List getMostRecentErrorMessages();
+    public List<String> getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
     public short getReachabilityStatus();

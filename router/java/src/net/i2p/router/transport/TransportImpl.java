@@ -10,7 +10,6 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +22,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -50,7 +50,7 @@ import net.i2p.util.SimpleTimer;
 public abstract class TransportImpl implements Transport {
     private final Log _log;
     private TransportEventListener _listener;
-    private RouterAddress _currentAddress;
+    protected final List<RouterAddress> _currentAddresses;
     // Only used by NTCP. SSU does not use. See send() below.
     private final BlockingQueue<OutNetMessage> _sendPool;
     protected final RouterContext _context;
@@ -87,6 +87,8 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         //_context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
+
+        _currentAddresses = new CopyOnWriteArrayList();
         if (getStyle().equals("NTCP"))
             _sendPool = new ArrayBlockingQueue(8);
         else
@@ -166,7 +168,7 @@ public abstract class TransportImpl implements Transport {
      */
     public Vector getClockSkews() { return new Vector(); }
 
-    public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
+    public List<String> getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
 
     /**
      * Nonblocking call to pull the next outbound message
@@ -464,27 +466,61 @@ public abstract class TransportImpl implements Transport {
     /** Do we increase the advertised cost when approaching conn limits? */
     public static final boolean ADJUST_COST = true;
 
-    /** What addresses are we currently listening to? */
-    public RouterAddress getCurrentAddress() {
-        return _currentAddress;
+    /**
+     *  What addresses are we currently listening to?
+     *  Replaces getCurrentAddress()
+     *  @return all addresses, non-null
+     *  @since IPv6
+     */
+    public List<RouterAddress> getCurrentAddresses() {
+        return _currentAddresses;
+    }
+
+    /**
+     *  Do we have any current address?
+     *  @since IPv6
+     */
+    public boolean hasCurrentAddress() {
+        return !_currentAddresses.isEmpty();
     }
 
     /**
      * Ask the transport to update its address based on current information and return it
      * Transports should override.
+     * @return all addresses, non-null
      * @since 0.7.12
      */
-    public RouterAddress updateAddress() {
-        return _currentAddress;
+    public List<RouterAddress> updateAddress() {
+        return _currentAddresses;
     }
 
     /**
-     * Replace any existing addresses for the current transport with the given
-     * one.
+     *  Replace any existing addresses for the current transport
+     *  with the same IP length (4 or 16) with the given one.
+     *  TODO: Allow multiple addresses of the same length.
+     *  Calls listener.transportAddressChanged()
+     *
+     *  @param address null to remove all
      */
     protected void replaceAddress(RouterAddress address) {
-        // _log.error("Replacing address for " + getStyle() + " was " + _currentAddress + " now " + address);
-        _currentAddress = address;
+        if (_log.shouldLog(Log.WARN))
+             _log.warn("Replacing address with " + address);
+        if (address == null) {
+            _currentAddresses.clear();
+        } else {
+            byte[] ip = address.getIP();
+            if (ip == null) {
+                _log.error("WTF null ip for " + address);
+                return;
+            }
+            int len = ip.length;
+            for (RouterAddress ra : _currentAddresses) {
+                byte[] ipx = ra.getIP();
+                if (ipx != null && ipx.length == len)
+                    _currentAddresses.remove(ra);
+            }
+            _currentAddresses.add(address);
+        }
         if (_listener != null)
             _listener.transportAddressChanged();
     }

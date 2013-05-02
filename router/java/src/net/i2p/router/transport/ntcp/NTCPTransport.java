@@ -458,30 +458,28 @@ public class NTCPTransport extends TransportImpl {
      *  verify stopped with isAlive()
      *  Unfortunately TransportManager doesn't do that, so we
      *  check here to prevent two pumpers.
-     *  @return appears to be ignored by caller
      */
-    public synchronized RouterAddress startListening() {
+    public synchronized void startListening() {
         // try once again to prevent two pumpers which is fatal
         if (_pumper.isAlive())
-            return _myAddress != null ? _myAddress.toRouterAddress() : null;
+            return;
         if (_log.shouldLog(Log.WARN)) _log.warn("Starting ntcp transport listening");
 
         startIt();
         configureLocalAddress();
-        return bindAddress();
+        bindAddress();
     }
 
     /**
      *  Only called by CSFI.
      *  Caller should stop the transport first, then
      *  verify stopped with isAlive()
-     *  @return appears to be ignored by caller
      */
-    public synchronized RouterAddress restartListening(RouterAddress addr) {
+    public synchronized void restartListening(RouterAddress addr) {
         // try once again to prevent two pumpers which is fatal
         // we could just return null since the return value is ignored
         if (_pumper.isAlive())
-            return _myAddress != null ? _myAddress.toRouterAddress() : null;
+            return;
         if (_log.shouldLog(Log.WARN)) _log.warn("Restarting ntcp transport listening");
 
         startIt();
@@ -489,7 +487,7 @@ public class NTCPTransport extends TransportImpl {
             _myAddress = null;
         else
             _myAddress = new NTCPAddress(addr);
-        return bindAddress();
+        bindAddress();
     }
 
     /**

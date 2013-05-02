@@ -1446,9 +1446,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // we don't need the following, since we have our own queueing
     protected void outboundMessageReady() { throw new UnsupportedOperationException("Not used for UDP"); }
     
-    public RouterAddress startListening() {
+    public void startListening() {
         startup();
-        return _externalAddress;
     }
     
     public void stopListening() {
@@ -1470,9 +1469,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @since 0.7.12
      */
     @Override
-    public RouterAddress updateAddress() {
+    public List<RouterAddress> updateAddress() {
         rebuildExternalAddress(false);
-        return getCurrentAddress();
+        return getCurrentAddresses();
     }
 
     private void rebuildExternalAddress() { rebuildExternalAddress(true); }

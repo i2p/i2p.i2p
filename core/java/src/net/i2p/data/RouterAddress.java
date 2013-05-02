@@ -238,14 +238,18 @@ public class RouterAddress extends DataStructureImpl {
         DataHelper.writeProperties(out, _options);
     }
     
+    /**
+     * Transport, IP, and port only.
+     * Never look at cost or other properties.
+     */
     @Override
     public boolean equals(Object object) {
         if (object == this) return true;
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
-        // let's keep this fast as we are putting an address into the RouterInfo set frequently
         return
-               _cost == addr._cost &&
+               getPort() == addr.getPort() &&
+               DataHelper.eq(getIP(), addr.getIP()) &&
                DataHelper.eq(_transportStyle, addr._transportStyle);
                //DataHelper.eq(_options, addr._options) &&
                //DataHelper.eq(_expiration, addr._expiration);
@@ -253,13 +257,13 @@ public class RouterAddress extends DataStructureImpl {
     
     /**
      * Just use a few items for speed (expiration is always null).
+     * Never look at cost or other properties.
      */
     @Override
     public int hashCode() {
         return DataHelper.hashCode(_transportStyle) ^
                DataHelper.hashCode(getIP()) ^
-               getPort() ^
-               _cost;
+               getPort();
     }
     
     /**

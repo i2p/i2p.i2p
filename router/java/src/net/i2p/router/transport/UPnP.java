@@ -52,6 +52,7 @@ import org.freenetproject.ForwardPortStatus;
  *
  * @see "http://www.upnp.org/"
  * @see "http://en.wikipedia.org/wiki/Universal_Plug_and_Play"
+ * @since 0.7.4
  */
 
 /* 

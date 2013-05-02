@@ -28,8 +28,8 @@ public abstract class CommSystemFacade implements Service {
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { }
     public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, null, 0); }
     
-    /** Create the set of RouterAddress structures based on the router's config */
-    public Set<RouterAddress> createAddresses() { return Collections.EMPTY_SET; }
+    /** Create the list of RouterAddress structures based on the router's config */
+    public List<RouterAddress> createAddresses() { return Collections.EMPTY_LIST; }
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }

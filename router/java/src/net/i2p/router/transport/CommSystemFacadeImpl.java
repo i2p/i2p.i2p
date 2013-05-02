@@ -10,15 +10,14 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Vector;
 
 import net.i2p.data.Hash;
@@ -167,7 +166,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     @Override
-    public List getMostRecentErrorMessages() { 
+    public List<String> getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
     }
 
@@ -190,26 +189,29 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     /** @return non-null, possibly empty */
     @Override
-    public Set<RouterAddress> createAddresses() {
+    public List<RouterAddress> createAddresses() {
         // No, don't do this, it makes it almost impossible to build inbound tunnels
         //if (_context.router().isHidden())
         //    return Collections.EMPTY_SET;
-        Map<String, RouterAddress> addresses = _manager.getAddresses();
+        List<RouterAddress> addresses = new ArrayList(_manager.getAddresses());
+
+        Transport ntcp = _manager.getTransport(NTCPTransport.STYLE);
+        boolean hasNTCP = ntcp != null && ntcp.hasCurrentAddress();
+
         boolean newCreated = false;
-        
-        if (!addresses.containsKey(NTCPTransport.STYLE)) {
+        if (!hasNTCP) {
             RouterAddress addr = createNTCPAddress(_context);
             if (_log.shouldLog(Log.INFO))
                 _log.info("NTCP address: " + addr);
             if (addr != null) {
-                addresses.put(NTCPTransport.STYLE, addr);
+                addresses.add(addr);
                 newCreated = true;
             }
         }
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses + " isNew? " + newCreated, new Exception("creator"));
-        return new HashSet(addresses.values());
+        return addresses;
     }
     
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
@@ -278,9 +280,20 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
         if (t == null)
             return;
-        RouterAddress oldAddr = t.getCurrentAddress();
+
+        //////// FIXME just take first IPv4 address for now
+        List<RouterAddress> oldAddrs = t.getCurrentAddresses();
+        RouterAddress oldAddr = null;
+        for (RouterAddress ra : oldAddrs) {
+            byte[] ipx = ra.getIP();
+            if (ipx != null && ipx.length == 4) {
+                oldAddr = ra;
+                break;
+            }
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Changing NTCP Address? was " + oldAddr);
+
         RouterAddress newAddr = new RouterAddress();
         newAddr.setTransportStyle(NTCPTransport.STYLE);
         Properties newProps = new Properties();

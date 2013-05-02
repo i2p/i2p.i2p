@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -248,7 +249,7 @@ public class TransportManager implements TransportEventListener {
       */
     public boolean haveInboundCapacity(int pct) { 
         for (Transport t : _transports.values()) {
-            if (t.getCurrentAddress() != null && t.haveCapacity(pct))
+            if (t.hasCurrentAddress() && t.haveCapacity(pct))
                 return true;
         }
         return false;
@@ -332,43 +333,67 @@ public class TransportManager implements TransportEventListener {
     /**
      *  This forces a rebuild
      */
-    public Map<String, RouterAddress> getAddresses() {
-        Map<String, RouterAddress> rv = new HashMap(_transports.size());
+    public List<RouterAddress> getAddresses() {
+        List<RouterAddress> rv = new ArrayList(4);
         // do this first since SSU may force a NTCP change
         for (Transport t : _transports.values())
             t.updateAddress();
         for (Transport t : _transports.values()) {
-            if (t.getCurrentAddress() != null)
-                rv.put(t.getStyle(), t.getCurrentAddress());
+            rv.addAll(t.getCurrentAddresses());
         }
         return rv;
     }
     
     /**
+     *  @since IPv6
+     */
+    static class Port {
+        public final String style;
+        public final int port;
+
+        public Port(String style, int port) {
+            this.style = style;
+            this.port = port;
+        }
+
+        @Override
+        public int hashCode() {
+            return style.hashCode() ^ port;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null)
+                return false;
+            if (! (o instanceof Port))
+                return false;
+            Port p = (Port) o;
+            return port == p.port && style.equals(p.style);
+        }
+    }
+
+    /**
      * Include the published port, or the requested port, for each transport
      * which we will pass along to UPnP
      */
-    private Map<String, Integer> getPorts() {
-        Map<String, Integer> rv = new HashMap(_transports.size());
+    private Set<Port> getPorts() {
+        Set<Port> rv = new HashSet(4);
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
-            if (t.getCurrentAddress() != null) {
-                    String s = t.getCurrentAddress().getOption("port");
-                    if (s != null) {
-                        try {
-                            port = Integer.parseInt(s);
-                        } catch (NumberFormatException nfe) {}
-                    }
+            for (RouterAddress ra : t.getCurrentAddresses()) {
+                int p = ra.getPort();
+                if (p > 0)
+                    port = p;
+                // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
+                if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
+                    _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
+                    Transport udp = getTransport(UDPTransport.STYLE);
+                    if (udp != null)
+                        port = t.getRequestedPort();
+                }
+                if (port > 0)
+                    rv.add(new Port(t.getStyle(), port));
             }
-            // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
-            if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
-                _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
-                Transport udp = getTransport(UDPTransport.STYLE);
-                if (udp != null)
-                    port = t.getRequestedPort();
-            }
-            if (port > 0)
-                rv.put(t.getStyle(), Integer.valueOf(port));
         }
         return rv;
     }
@@ -485,8 +510,8 @@ public class TransportManager implements TransportEventListener {
             _upnpManager.update(getPorts());
     }
 
-    public List getMostRecentErrorMessages() { 
-        List rv = new ArrayList(16);
+    public List<String> getMostRecentErrorMessages() { 
+        List<String> rv = new ArrayList(16);
         for (Transport t : _transports.values()) {
             rv.addAll(t.getMostRecentErrorMessages());
         }
@@ -510,11 +535,15 @@ public class TransportManager implements TransportEventListener {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h3>").append(_("Router Transport Addresses")).append("</h3><pre>\n");
         for (Transport t : _transports.values()) {
-            if (t.getCurrentAddress() != null)
-                buf.append(t.getCurrentAddress());
-            else
+            if (t.hasCurrentAddress()) {
+                for (RouterAddress ra : t.getCurrentAddresses()) {
+                    buf.append(ra.toString());
+                    buf.append("\n\n");
+                }
+            } else {
                 buf.append(_("{0} is used for outbound connections only", t.getStyle()));
-            buf.append("\n\n");
+                buf.append("\n\n");
+            }
         }
         buf.append("</pre>\n");
         out.write(buf.toString());

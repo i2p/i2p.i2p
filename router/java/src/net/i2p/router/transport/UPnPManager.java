@@ -25,6 +25,7 @@ import org.freenetproject.ForwardPortStatus;
  * Bridge from the I2P RouterAddress data structure to
  * the freenet data structures
  *
+ * @since 0.7.4
  * @author zzz
  */
 class UPnPManager {
@@ -106,7 +107,7 @@ class UPnPManager {
      * which can have multiple UPnP threads running at once, but
      * that should be ok.
      */
-    public void update(Map<String, Integer> ports) {
+    public void update(Set<TransportManager.Port> ports) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Update with " + ports.size() + " ports");
 
@@ -121,9 +122,9 @@ class UPnPManager {
         //}
 
         Set<ForwardPort> forwards = new HashSet(ports.size());
-        for (Map.Entry<String, Integer> entry : ports.entrySet()) {
-            String style = entry.getKey();
-            int port = entry.getValue().intValue();
+        for (TransportManager.Port entry : ports) {
+            String style = entry.style;
+            int port = entry.port;
             int protocol = -1;
             if ("SSU".equals(style))
                 protocol = ForwardPort.PROTOCOL_UDP_IPV4;
