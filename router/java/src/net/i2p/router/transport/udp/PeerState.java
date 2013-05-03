@@ -267,6 +267,7 @@ class PeerState {
      * and so PacketBuilder.buildPacket() works correctly.
      */
     public static final int MIN_MTU = 620;
+    public static final int MIN_IPV6_MTU = 1280;
     private static final int DEFAULT_MTU = MIN_MTU;
 
     /* 
@@ -315,8 +316,13 @@ class PeerState {
         _receivePeriodBegin = now;
         _lastCongestionOccurred = -1;
         _remotePort = remotePort;
-        _mtu = DEFAULT_MTU;
-        _mtuReceive = DEFAULT_MTU;
+        if (remoteIP.length == 4) {
+            _mtu = DEFAULT_MTU;
+            _mtuReceive = DEFAULT_MTU;
+        } else {
+            _mtu = MIN_IPV6_MTU;
+            _mtuReceive = MIN_IPV6_MTU;
+        }
         _largeMTU = transport.getMTU();
         //_mtuLastChecked = -1;
         _lastACKSend = -1;
@@ -1145,12 +1151,12 @@ class PeerState {
                     _context.statManager().addRateData("udp.mtuIncrease", _mtuIncreases);
 		}
 	    } else if (!wantLarge && _mtu == _largeMTU) {
-                _mtu = MIN_MTU;
+                _mtu = _remoteIP.length == 4 ? MIN_MTU : MIN_IPV6_MTU;
                 _mtuDecreases++;
                 _context.statManager().addRateData("udp.mtuDecrease", _mtuDecreases);
 	    }
         } else {
-            _mtu = DEFAULT_MTU;
+            _mtu = _remoteIP.length == 4 ? DEFAULT_MTU : MIN_IPV6_MTU;
         }
     }
 
@@ -1158,7 +1164,8 @@ class PeerState {
      *  @since 0.9.2
      */
     public synchronized void setHisMTU(int mtu) {
-        if (mtu <= MIN_MTU || mtu >= _largeMTU)
+        if (mtu <= MIN_MTU || mtu >= _largeMTU ||
+            (_remoteIP.length == 16 && mtu <= MIN_IPV6_MTU))
             return;
         _largeMTU = mtu;
         if (mtu < _mtu)
@@ -1225,17 +1232,27 @@ class PeerState {
     /** 60 */
     private static final int OVERHEAD_SIZE = PacketBuilder.IP_HEADER_SIZE + PacketBuilder.UDP_HEADER_SIZE +
                                              UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+    /** 80 */
+    private static final int IPV6_OVERHEAD_SIZE = PacketBuilder.IPV6_HEADER_SIZE + PacketBuilder.UDP_HEADER_SIZE +
+                                             UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
 
     /** 
      *  @param size not including IP header, UDP header, MAC or IV
      */
     public void packetReceived(int size) { 
         _packetsReceived++; 
-        size += OVERHEAD_SIZE;
-        if (size <= MIN_MTU) {
+        int minMTU;
+        if (_remoteIP.length == 4) {
+            size += OVERHEAD_SIZE;
+            minMTU = MIN_MTU;
+        } else {
+            size += IPV6_OVERHEAD_SIZE;
+            minMTU = MIN_IPV6_MTU;
+        }
+        if (size <= minMTU) {
             _consecutiveSmall++;
             if (_consecutiveSmall >= MTU_RCV_DISPLAY_THRESHOLD)
-                _mtuReceive = MIN_MTU;
+                _mtuReceive = minMTU;
         } else {
             _consecutiveSmall = 0;
             if (size > _mtuReceive)
@@ -1289,7 +1306,7 @@ class PeerState {
     private int countMaxACKData() {
         return Math.min(PacketBuilder.ABSOLUTE_MAX_ACKS * 4,
                 _mtu 
-                - PacketBuilder.IP_HEADER_SIZE
+                - (_remoteIP.length == 4 ? PacketBuilder.IP_HEADER_SIZE : PacketBuilder.IPV6_HEADER_SIZE)
                 - PacketBuilder.UDP_HEADER_SIZE
                 - UDPPacket.IV_SIZE 
                 - UDPPacket.MAC_SIZE
@@ -1630,11 +1647,14 @@ class PeerState {
 
     /**
      *  how much payload data can we shove in there?
-     *  @return MTU - 87, i.e. 533 or 1397
+     *  @return MTU - 87, i.e. 533 or 1397 (IPv4), MTU - 107 (IPv6)
      */
-    private static final int fragmentSize(int mtu) {
-        // 46 + 20 + 8 + 13 = 74 + 13 = 87
-        return mtu - (PacketBuilder.MIN_DATA_PACKET_OVERHEAD + MIN_ACK_SIZE);
+    private int fragmentSize() {
+        // 46 + 20 + 8 + 13 = 74 + 13 = 87 (IPv4)
+        // 46 + 40 + 8 + 13 = 74 + 13 = 107 (IPv6)
+        return _mtu -
+               (_remoteIP.length == 4 ? PacketBuilder.MIN_DATA_PACKET_OVERHEAD : PacketBuilder.MIN_IPV6_DATA_PACKET_OVERHEAD) -
+               MIN_ACK_SIZE;
     }
     
     private enum ShouldSend { YES, NO, NO_BW };
@@ -1647,7 +1667,7 @@ class PeerState {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
             if (!state.isFragmented()) {
-                state.fragment(fragmentSize(_mtu));
+                state.fragment(fragmentSize());
                 if (state.getMessage() != null)
                     state.getMessage().timestamp("fragment into " + state.getFragmentCount());
 

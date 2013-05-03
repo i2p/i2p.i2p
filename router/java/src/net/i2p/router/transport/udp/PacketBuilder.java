@@ -137,6 +137,10 @@ class PacketBuilder {
     /** 74 */
     public static final int MIN_DATA_PACKET_OVERHEAD = IP_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE;
 
+    public static final int IPV6_HEADER_SIZE = 40;
+    /** 94 */
+    public static final int MIN_IPV6_DATA_PACKET_OVERHEAD = IPV6_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE;
+
     /** one byte field */
     public static final int ABSOLUTE_MAX_ACKS = 255;
 
@@ -237,7 +241,15 @@ class PacketBuilder {
         }
 
         int currentMTU = peer.getMTU();
-        int availableForAcks = currentMTU - MIN_DATA_PACKET_OVERHEAD - dataSize;
+        int availableForAcks = currentMTU - dataSize;
+        int ipHeaderSize;
+        if (peer.getRemoteIP().length == 4) {
+            availableForAcks -= MIN_DATA_PACKET_OVERHEAD;
+            ipHeaderSize = IP_HEADER_SIZE;
+        } else {
+            availableForAcks -= MIN_IPV6_DATA_PACKET_OVERHEAD;
+            ipHeaderSize = IPV6_HEADER_SIZE;
+        }
         int availableForExplicitAcks = availableForAcks;
 
         // ok, now for the body...
@@ -398,16 +410,16 @@ class PacketBuilder {
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         
         if (_log.shouldLog(Log.INFO)) {
-            msg.append(" pkt size ").append(off + (IP_HEADER_SIZE + UDP_HEADER_SIZE));
+            msg.append(" pkt size ").append(off + (ipHeaderSize + UDP_HEADER_SIZE));
             _log.info(msg.toString());
         }
         // the packet could have been built before the current mtu got lowered, so
         // compare to LARGE_MTU
-        if (off + (IP_HEADER_SIZE + UDP_HEADER_SIZE) > PeerState.LARGE_MTU) {
+        if (off + (ipHeaderSize + UDP_HEADER_SIZE) > PeerState.LARGE_MTU) {
             _log.error("Size is " + off + " for " + packet +
                        " fragment " + fragment +
                        " data size " + dataSize +
-                       " pkt size " + (off + (IP_HEADER_SIZE + UDP_HEADER_SIZE)) +
+                       " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
                        " MTU " + currentMTU +
                        ' ' + availableForAcks + " for all acks " +
                        availableForExplicitAcks + " for full acks " + 
