@@ -3,9 +3,11 @@ package net.i2p.router.transport.udp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
@@ -26,7 +28,6 @@ class PacketHandler {
     private final RouterContext _context;
     private final Log _log;
     private final UDPTransport _transport;
-    private final UDPEndpoint _endpoint;
     private final EstablishmentManager _establisher;
     private final InboundMessageFragments _inbound;
     private final PeerTestManager _testManager;
@@ -34,19 +35,22 @@ class PacketHandler {
     private volatile boolean _keepReading;
     private final Handler[] _handlers;
     private final Map<RemoteHostId, Object> _failCache;
+    private final BlockingQueue<UDPPacket> _inboundQueue;
     private static final Object DUMMY = new Object();
     
+    private static final int TYPE_POISON = -99999;
+    private static final int MIN_QUEUE_SIZE = 16;
+    private static final int MAX_QUEUE_SIZE = 192;
     private static final int MIN_NUM_HANDLERS = 1;  // unless < 32MB
     private static final int MAX_NUM_HANDLERS = 1;
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     
-    PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher,
+    PacketHandler(RouterContext ctx, UDPTransport transport, EstablishmentManager establisher,
                   InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _transport = transport;
-        _endpoint = endpoint;
         _establisher = establisher;
         _inbound = inbound;
         _testManager = testManager;
@@ -56,6 +60,8 @@ class PacketHandler {
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
+        int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
+        _inboundQueue = new CoDelBlockingQueue(ctx, "UDP-Receiver", qsize);
         int num_handlers;
         if (maxMemory < 32*1024*1024)
             num_handlers = 1;
@@ -107,6 +113,7 @@ class PacketHandler {
     
     public synchronized void shutdown() { 
         _keepReading = false; 
+        stopQueue();
     }
 
     String getHandlerStatus() {
@@ -119,9 +126,55 @@ class PacketHandler {
         return rv.toString();
     }
 
-    /** @since 0.8.8 */
-    int getHandlerCount() {
-        return _handlers.length;
+    /**
+     * Blocking call to retrieve the next inbound packet, or null if we have
+     * shut down.
+     *
+     * @since IPv6 moved from UDPReceiver
+     */
+    public void queueReceived(UDPPacket packet) throws InterruptedException {
+        _inboundQueue.put(packet);
+    }
+
+
+    /**
+     * Blocking for a while
+     *
+     * @since IPv6 moved from UDPReceiver
+     */
+    private void stopQueue() {
+        _inboundQueue.clear();
+        for (int i = 0; i < _handlers.length; i++) {
+            UDPPacket poison = UDPPacket.acquire(_context, false);
+            poison.setMessageType(TYPE_POISON);
+            _inboundQueue.offer(poison);
+        }
+        for (int i = 1; i <= 5 && !_inboundQueue.isEmpty(); i++) {
+            try {
+                Thread.sleep(i * 50);
+            } catch (InterruptedException ie) {}
+        }
+        _inboundQueue.clear();
+    }
+
+    /**
+     * Blocking call to retrieve the next inbound packet, or null if we have
+     * shut down.
+     *
+     * @since IPv6 moved from UDPReceiver
+     */
+    public UDPPacket receiveNext() {
+        UDPPacket rv = null;
+        //int remaining = 0;
+        while (_keepReading && rv == null) {
+            try {
+                rv = _inboundQueue.take();
+            } catch (InterruptedException ie) {}
+            if (rv != null && rv.getMessageType() == TYPE_POISON)
+                return null;
+        }
+        //_context.statManager().addRateData("udp.receiveRemaining", remaining, 0);
+        return rv;
     }
 
     /** the packet is from a peer we are establishing an outbound con to, but failed validation, so fallback */
@@ -144,7 +197,7 @@ class PacketHandler {
             _state = 1;
             while (_keepReading) {
                 _state = 2;
-                UDPPacket packet = _endpoint.receive();
+                UDPPacket packet = receiveNext();
                 _state = 3;
                 if (packet == null) break; // keepReading is probably false, or bind failed...
 

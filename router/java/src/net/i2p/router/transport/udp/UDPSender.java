@@ -14,6 +14,9 @@ import net.i2p.util.Log;
 /**
  * Lowest level packet sender, pushes anything on its queue ASAP.
  *
+ * There is a UDPSender for each UDPEndpoint.
+ * It contains a thread and a queue. Packet to be sent are queued
+ * by the PacketPusher.
  */
 class UDPSender {
     private final RouterContext _context;

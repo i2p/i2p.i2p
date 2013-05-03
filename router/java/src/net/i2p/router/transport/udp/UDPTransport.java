@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -51,7 +53,7 @@ import net.i2p.util.Translate;
  */
 public class UDPTransport extends TransportImpl implements TimedWeightedPriorityMessageQueue.FailedListener {
     private final Log _log;
-    private UDPEndpoint _endpoint;
+    private final List<UDPEndpoint> _endpoints;
     private final Object _addDropLock = new Object();
     /** Peer (Hash) to PeerState */
     private final Map<Hash, PeerState> _peersByIdent;
@@ -206,6 +208,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent = new ConcurrentHashMap(128);
         _peersByRemoteHost = new ConcurrentHashMap(128);
         _dropList = new ConcurrentHashSet(2);
+        _endpoints = new CopyOnWriteArrayList();
         
         // See comments in DummyThrottle.java
         if (USE_PRIORITY) {
@@ -263,8 +266,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _pusher.shutdown();
         if (_handler != null) 
             _handler.shutdown();
-        if (_endpoint != null)
-            _endpoint.shutdown();
+        for (UDPEndpoint endpoint : _endpoints) {
+            endpoint.shutdown();
+            // should we remove?
+            _endpoints.remove(endpoint);
+        }
         if (_establisher != null)
             _establisher.shutdown();
         if (_refiller != null)
@@ -327,14 +333,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn("Binding only to " + bindToAddr);
         if (_log.shouldLog(Log.INFO))
             _log.info("Binding to the port: " + port);
-        if (_endpoint == null) {
-            _endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
+        if (_endpoints.isEmpty()) {
+            // will always be empty since we are removing them above
+            UDPEndpoint endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
+            _endpoints.add(endpoint);
+            // TODO add additional endpoints for additional addresses/ports
         } else {
-            // todo, set bind address too
-            _endpoint.setListenPort(port);
+            // unused for now
+            for (UDPEndpoint endpoint : _endpoints) {
+                if (endpoint.isIPv4()) {
+                    // hack, first IPv4 endpoint, FIXME
+                    // todo, set bind address too
+                    endpoint.setListenPort(port);
+                    break;
+                }
+            }
         }
         setMTU(bindToAddr);
-        
+
         if (_establisher == null)
             _establisher = new EstablishmentManager(_context, this);
         
@@ -342,7 +358,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _testManager = new PeerTestManager(_context, this);
         
         if (_handler == null)
-            _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager, _introManager);
+            _handler = new PacketHandler(_context, this, _establisher, _inboundFragments, _testManager, _introManager);
         
         // See comments in DummyThrottle.java
         if (USE_PRIORITY && _refiller == null)
@@ -353,15 +369,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // Startup the endpoint with the requested port, check the actual port, and
         // take action if it failed or was different than requested or it needs to be saved
-        _endpoint.startup();
-        int newPort = _endpoint.getListenPort();
-        _externalListenPort = newPort;
-        if (newPort <= 0) {
+        int newPort = -1;
+        for (UDPEndpoint endpoint : _endpoints) {
+            try {
+                endpoint.startup();
+                // hack, first IPv4 endpoint, FIXME
+                if (newPort < 0 && endpoint.isIPv4()) {
+                    newPort = endpoint.getListenPort();
+                    _externalListenPort = newPort;
+                }
+            } catch (SocketException se) {
+                _endpoints.remove(endpoint);
+            }
+        }
+        if (_endpoints.isEmpty()) {
             _log.log(Log.CRIT, "Unable to open UDP port");
             setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
             return;
         }
-        if (newPort != port || newPort != oldIPort || newPort != oldEPort) {
+        if (newPort > 0 &&
+            (newPort != port || newPort != oldIPort || newPort != oldEPort)) {
             // attempt to use it as our external port - this will be overridden by
             // externalAddressReceived(...)
             Map<String, String> changes = new HashMap();
@@ -374,7 +401,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _handler.startup();
         _fragments.startup();
         _inboundFragments.startup();
-        _pusher = new PacketPusher(_context, _fragments, _endpoint.getSender());
+        _pusher = new PacketPusher(_context, _fragments, _endpoints);
         _pusher.startup();
         if (USE_PRIORITY)
             _refiller.startup();
@@ -387,8 +414,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public synchronized void shutdown() {
         destroyAll();
-        if (_endpoint != null)
-            _endpoint.shutdown();
+        for (UDPEndpoint endpoint : _endpoints) {
+            endpoint.shutdown();
+            // should we remove?
+            _endpoints.remove(endpoint);
+        }
         //if (_flooder != null)
         //    _flooder.shutdown();
         if (_refiller != null)
@@ -415,11 +445,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     SessionKey getIntroKey() { return _introKey; }
-
-    /** @deprecated unused */
-    public int getLocalPort() {
-        return _endpoint != null ? _endpoint.getListenPort() : -1;
-    }
 
     public InetAddress getLocalAddress() { return _externalListenHost; }
     public int getExternalPort() { return _externalListenPort; }
@@ -1205,7 +1230,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     void send(UDPPacket packet) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending packet " + packet);
-        _endpoint.send(packet); 
+        _pusher.send(packet); 
     }
     
     /**
@@ -1231,7 +1256,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.8.9
      */
     private void destroyAll() {
-        _endpoint.clearOutbound();
+        for (UDPEndpoint endpoint : _endpoints) {
+            endpoint.clearOutbound();
+        }
         int howMany = _peersByIdent.size();
         // use no more than 1/4 of configured bandwidth
         final int burst = 8;
@@ -1662,13 +1689,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return "";
     }
 
-    /** @since 0.8.8 */
-    int getPacketHandlerCount() {
-        PacketHandler handler = _handler;
-        if (handler != null)
-            return handler.getHandlerCount();
-        else
-            return 0;
+    /** @since IPv6 */
+    PacketHandler getPacketHandler() {
+        return _handler;
     }
 
     public void failed(OutboundMessageState msg) { failed(msg, true); }
@@ -2521,7 +2544,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
             boolean shouldPingFirewall = _reachabilityStatus != CommSystemFacade.STATUS_OK;
-            boolean pingOneOnly = shouldPingFirewall && _externalListenPort == _endpoint.getListenPort();
+            int currentListenPort = -1;
+            for (UDPEndpoint endpoint : _endpoints) {
+                // hack, first IPv4 endpoint, FIXME
+                if (endpoint.isIPv4()) {
+                    currentListenPort = endpoint.getListenPort();
+                    break;
+                }
+            }
+            boolean pingOneOnly = shouldPingFirewall && _externalListenPort == currentListenPort;
             boolean shortLoop = shouldPingFirewall;
             _expireBuffer.clear();
             _runCount++;

@@ -2,14 +2,16 @@ package net.i2p.router.transport.udp;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.SocketException;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Coordinate the low level datagram socket, managing the UDPSender and
- * UDPReceiver
+ * Coordinate the low-level datagram socket, creating and managing the UDPSender and
+ * UDPReceiver.
  */
 class UDPEndpoint {
     private final RouterContext _context;
@@ -20,6 +22,7 @@ class UDPEndpoint {
     private UDPReceiver _receiver;
     private DatagramSocket _socket;
     private final InetAddress _bindAddress;
+    private final boolean _isIPv4, _isIPv6;
     
     /**
      *  @param listenPort -1 or the requested port, may not be honored
@@ -31,17 +34,19 @@ class UDPEndpoint {
         _transport = transport;
         _bindAddress = bindAddress;
         _listenPort = listenPort;
+        _isIPv4 = bindAddress == null || bindAddress instanceof Inet4Address;
+        _isIPv6 = bindAddress == null || bindAddress instanceof Inet6Address;
     }
     
     /** caller should call getListenPort() after this to get the actual bound port and determine success */
-    public synchronized void startup() {
+    public synchronized void startup() throws SocketException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up the UDP endpoint");
         shutdown();
         _socket = getSocket();
         if (_socket == null) {
             _log.log(Log.CRIT, "UDP Unable to open a port");
-            return;
+            throw new SocketException("SSU Unable to bind to a port on " + _bindAddress);
         }
         _sender = new UDPSender(_context, _socket, "UDPSender");
         _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver");
@@ -145,21 +150,27 @@ class UDPEndpoint {
     }
     
     /**
-     * Blocking call to receive the next inbound UDP packet from any peer.
-     * @return null if we have shut down
-     */
-    public UDPPacket receive() { 
-        if (_receiver == null)
-            return null;
-        return _receiver.receiveNext(); 
-    }
-    
-    /**
      *  Clear outbound queue, probably in preparation for sending destroy() to everybody.
      *  @since 0.9.2
      */
     public void clearOutbound() {
         if (_sender != null)
             _sender.clear();
+    }
+
+    /**
+     *  @return true for wildcard too
+     *  @since IPv6
+     */
+    public boolean isIPv4() {
+        return _isIPv4;
+    }
+
+    /**
+     *  @return true for wildcard too
+     *  @since IPv6
+     */
+    public boolean isIPv6() {
+        return _isIPv6;
     }
 }

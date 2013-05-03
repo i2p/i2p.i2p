@@ -3,11 +3,9 @@ package net.i2p.router.transport.udp;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.util.Arrays;
-import java.util.concurrent.BlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
-import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -20,37 +18,34 @@ import net.i2p.util.SystemVersion;
  * waiting around too long, they are dropped.  Packets should be pulled off
  * from the queue ASAP by a {@link PacketHandler}
  *
+ * There is a UDPReceiver for each UDPEndpoint.
+ * It contains a thread but no queue. Received packets are queued
+ * in the common PacketHandler queue.
  */
 class UDPReceiver {
     private final RouterContext _context;
     private final Log _log;
     private final DatagramSocket _socket;
     private String _name;
-    private final BlockingQueue<UDPPacket> _inboundQueue;
     private volatile boolean _keepRunning;
     private final Runner _runner;
     private final UDPTransport _transport;
+    private final PacketHandler _handler;
     private static int __id;
     private final int _id;
 
     private static final boolean _isAndroid = SystemVersion.isAndroid();
-
-    private static final int TYPE_POISON = -99999;
-    private static final int MIN_QUEUE_SIZE = 16;
-    private static final int MAX_QUEUE_SIZE = 192;
 
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
         _id = ++__id;
         _name = name;
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
-        int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
-        _inboundQueue = new CoDelBlockingQueue(ctx, "UDP-Receiver", qsize);
         _socket = socket;
         _transport = transport;
+        _handler = transport.getPacketHandler();
+        if (_handler == null)
+            throw new IllegalStateException();
         _runner = new Runner();
         //_context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.receiveRemaining", "How many packets are left sitting on the receiver's queue", "udp", UDPTransport.RATES);
@@ -68,18 +63,6 @@ class UDPReceiver {
     
     public synchronized void shutdown() {
         _keepRunning = false;
-        _inboundQueue.clear();
-        for (int i = 0; i < _transport.getPacketHandlerCount(); i++) {
-            UDPPacket poison = UDPPacket.acquire(_context, false);
-            poison.setMessageType(TYPE_POISON);
-            _inboundQueue.offer(poison);
-        }
-        for (int i = 1; i <= 5 && !_inboundQueue.isEmpty(); i++) {
-            try {
-                Thread.sleep(i * 50);
-            } catch (InterruptedException ie) {}
-        }
-        _inboundQueue.clear();
     }
     
 /*********
@@ -194,7 +177,7 @@ class UDPReceiver {
             if (!rejected) {
 ****/
                 try {
-                    _inboundQueue.put(packet);
+                    _handler.queueReceived(packet);
                 } catch (InterruptedException ie) {
                     packet.release();
                     _keepRunning = false;
@@ -229,24 +212,6 @@ class UDPReceiver {
     }
   ****/
     
-    /**
-     * Blocking call to retrieve the next inbound packet, or null if we have
-     * shut down.
-     *
-     */
-    public UDPPacket receiveNext() {
-        UDPPacket rv = null;
-        //int remaining = 0;
-        while (_keepRunning && rv == null) {
-            try {
-                rv = _inboundQueue.take();
-            } catch (InterruptedException ie) {}
-            if (rv != null && rv.getMessageType() == TYPE_POISON)
-                return null;
-        }
-        //_context.statManager().addRateData("udp.receiveRemaining", remaining, 0);
-        return rv;
-    }
     
     private class Runner implements Runnable {
         //private volatile boolean _socketChanged;
