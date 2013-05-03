@@ -101,19 +101,21 @@ public class TransportManager implements TransportEventListener {
         return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP);
     }
     
+    /**
+     *  Notify transport of ALL routable local addresses, including IPv6.
+     *  It's the transport's job to ignore what it can't handle.
+     */
     private void initializeAddress(Transport t) {
-        String ips = Addresses.getAnyAddress();
-        if (ips == null)
-            return;
-        InetAddress ia;
-        try {
-            ia = InetAddress.getByName(ips);
-        } catch (UnknownHostException e) {
-            _log.error("UDP failed to bind to local address", e);
-            return;
+        Set<String> ipset = Addresses.getAddresses(false, true);  // non-local, include IPv6
+        for (String ips : ipset) {
+            try {
+                InetAddress ia = InetAddress.getByName(ips);
+                byte[] ip = ia.getAddress();
+                t.externalAddressReceived(Transport.SOURCE_INTERFACE, ip, 0);
+            } catch (UnknownHostException e) {
+                _log.error("UDP failed to bind to local address", e);
+            }
         }
-        byte[] ip = ia.getAddress();
-        t.externalAddressReceived(Transport.SOURCE_INTERFACE, ip, 0);
     }
 
     /**

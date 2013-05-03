@@ -529,22 +529,27 @@ public abstract class TransportImpl implements Transport {
      *  Notify a transport of an external address change.
      *  This may be from a local interface, UPnP, a config change, etc.
      *  This should not be called if the ip didn't change
-     *  (from that source's point of view), or is a local address,
-     *  or if the ip is IPv6, but the transport should check anyway.
+     *  (from that source's point of view), or is a local address.
+     *  May be called multiple times for IPv4 or IPv6.
      *  The transport should also do its own checking on whether to accept
      *  notifications from this source.
      *
      *  This can be called before startListening() to set an initial address,
      *  or after the transport is running.
      *
+     *  This implementation does nothing. Transports should override if they want notification.
+     *
      *  @param source defined in Transport.java
-     *  @param ip typ. IPv4 non-local
+     *  @param ip typ. IPv4 or IPv6 non-local
      *  @param port 0 for unknown or unchanged
      */
     public void externalAddressReceived(String source, byte[] ip, int port) {}
 
     /**
      *  Notify a transport of the results of trying to forward a port.
+     *
+     *  This implementation does nothing. Transports should override if they want notification.
+     *
      *  @param port the internal port
      *  @param externalPort the external port, which for now should always be the same as
      *                      the internal port if the forwarding was successful.

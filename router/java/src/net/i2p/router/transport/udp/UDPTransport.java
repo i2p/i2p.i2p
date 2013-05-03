@@ -511,11 +511,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _lastInboundReceivedOn = System.currentTimeMillis(); 
     }
     
+    // temp prevent multiples
+    private boolean gotIPv4Addr = false;
+    private boolean gotIPv6Addr = false;
+
     /**
      * From config, UPnP, local i/f, ...
      *
      * @param source used for logging only
-     * @param ip publicly routable IPv4 only
+     * @param ip publicly routable IPv4 or IPv6
      * @param port 0 if unknown
      */
     @Override
@@ -527,10 +531,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
         if (!sources.contains(source))
             return;
+        if (!isValid(ip))
+            return;
+        if (source.equals(Transport.SOURCE_INTERFACE)) {
+            // temp prevent multiples
+            if (ip.length == 4 && !gotIPv4Addr) {
+                gotIPv4Addr = true;
+                return;
+            } else if (ip.length == 16 && !gotIPv6Addr) {
+                gotIPv6Addr = true;
+                return;
+            }
+        }
         boolean changed = changeAddress(ip, port);
         // Assume if we have an interface with a public IP that we aren't firewalled.
         // If this is wrong, the peer test will figure it out and change the status.
-        if (changed && source.equals(Transport.SOURCE_INTERFACE))
+        if (changed && ip.length == 4 && source.equals(Transport.SOURCE_INTERFACE))
             setReachabilityStatus(CommSystemFacade.STATUS_OK);
     }
 
@@ -620,6 +636,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
+     * @param ourIP MUST have been previously validated with isValid()
      * @param ourPort >= 1024 or 0 for no change
      */
     private boolean changeAddress(byte ourIP[], int ourPort) {
