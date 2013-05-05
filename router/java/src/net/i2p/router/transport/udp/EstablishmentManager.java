@@ -940,7 +940,7 @@ class EstablishmentManager {
     }
 
     /**
-     *  Are IP and port valid?
+     *  Are IP and port valid? This is only for relay response.
      *  Refuse anybody in the same /16
      *  @since 0.9.3
      */

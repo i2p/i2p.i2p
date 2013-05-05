@@ -38,6 +38,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Addresses;
@@ -446,8 +447,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     SessionKey getIntroKey() { return _introKey; }
 
-    public InetAddress getLocalAddress() { return _externalListenHost; }
-    public int getExternalPort() { return _externalListenPort; }
+    int getExternalPort() { return _externalListenPort; }
 
     /**
      *  @return IP or null
@@ -517,8 +517,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      * From config, UPnP, local i/f, ...
+     * Not for info received from peers - see externalAddressReceived(Hash, ip, port)
      *
-     * @param source used for logging only
+     * @param source as defined in Transport.SOURCE_xxx
      * @param ip publicly routable IPv4 or IPv6
      * @param port 0 if unknown
      */
@@ -535,12 +536,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return;
         if (source.equals(Transport.SOURCE_INTERFACE)) {
             // temp prevent multiples
-            if (ip.length == 4 && !gotIPv4Addr) {
-                gotIPv4Addr = true;
-                return;
-            } else if (ip.length == 16 && !gotIPv6Addr) {
-                gotIPv6Addr = true;
-                return;
+            if (ip.length == 4) {
+                if (gotIPv4Addr)
+                    return;
+                else
+                    gotIPv4Addr = true;
+            } else if (ip.length == 16) {
+                if (gotIPv6Addr)
+                    return;
+                else
+                    gotIPv6Addr = true;
             }
         }
         boolean changed = changeAddress(ip, port);
@@ -585,6 +590,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ourPort >= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
+        if (ourIP.length != 4)
+            return;
         boolean isValid = isValid(ourIP) &&
                           ((ourPort >= MIN_EXTERNAL_PORT && ourPort <= MAX_EXTERNAL_PORT) ||
                            ourPort == _externalListenPort || _externalListenPort <= 0);
@@ -616,27 +623,36 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // leaving us thinking the second IP is still good.
             if (_log.shouldLog(Log.INFO))
                 _log.info("Ignoring IP address suggestion, since we have received an inbound con recently");
-        } else if (from.equals(_lastFrom) || !eq(_lastOurIP, _lastOurPort, ourIP, ourPort)) {
-            _lastFrom = from;
-            _lastOurIP = ourIP;
-            _lastOurPort = ourPort;
-            if (_log.shouldLog(Log.INFO))
-                _log.info("The router " + from + " told us we have a new IP - " 
-                           + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(from + " and " + _lastFrom + " agree we have a new IP - " 
-                           + Addresses.toString(ourIP, ourPort) + ".  Changing address.");
-            _lastFrom = from;
-            _lastOurIP = ourIP;
-            _lastOurPort = ourPort;
-            changeAddress(ourIP, ourPort);
+            // New IP
+            boolean changeIt = false;
+            synchronized(this) {
+                if (from.equals(_lastFrom) || !eq(_lastOurIP, _lastOurPort, ourIP, ourPort)) {
+                    _lastFrom = from;
+                    _lastOurIP = ourIP;
+                    _lastOurPort = ourPort;
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("The router " + from + " told us we have a new IP - " 
+                                  + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
+                } else {
+                    _lastFrom = from;
+                    _lastOurIP = ourIP;
+                    _lastOurPort = ourPort;
+                    changeIt = true;
+                }
+            }
+            if (changeIt) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(from + " and " + _lastFrom + " agree we have a new IP - " 
+                              + Addresses.toString(ourIP, ourPort) + ".  Changing address.");
+                changeAddress(ourIP, ourPort);
+            }
         }
-        
     }
     
     /**
      * @param ourIP MUST have been previously validated with isValid()
+     *              IPv4 or IPv6 OK
      * @param ourPort >= 1024 or 0 for no change
      */
     private boolean changeAddress(byte ourIP[], int ourPort) {
@@ -2702,24 +2718,50 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         return _reachabilityStatus; 
     }
+
     @Override
     public void recheckReachability() {
         _testEvent.runTest();
     }
     
-    PeerState pickTestPeer(RemoteHostId dontInclude) {
+    /**
+     *  Pick a Bob (if we are Alice) or a Charlie (if we are Bob).
+     *
+     *  For Bob (as called from PeerTestEvent below), returns an established IPv4 peer.
+     *  While the protocol allows Alice to select an unestablished Bob, we don't support that.
+     *
+     *  For Charlie (as called from PeerTestManager), returns an established IPv4 or IPv6 peer.
+     *  (doesn't matter how Bob and Charlie communicate)
+     *
+     *  Any returned peer must advertise an IPv4 address to prove it is IPv4-capable.
+     *
+     *  @param peerRole BOB or CHARLIE only
+     *  @param dontInclude may be null
+     *  @return IPv4 peer or null
+     */
+    PeerState pickTestPeer(PeerTestState.Role peerRole, RemoteHostId dontInclude) {
+        if (peerRole == ALICE)
+            throw new IllegalArgumentException();
         List<PeerState> peers = new ArrayList(_peersByIdent.values());
         for (Iterator<PeerState> iter = new RandomIterator(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
+            // enforce IPv4 connection for BOB
+            byte[] ip = peer.getRemoteIP();
+            if (peerRole == BOB && ip.length != 4)
+                continue;
+            // enforce IPv4 advertised for all
             RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
             if (peerInfo == null)
                 continue;
-            RouterAddress addr = peerInfo.getTargetAddress(STYLE);
-            if (addr == null)
-                continue;
-            byte[] ip = addr.getIP();
+            ip = null;
+            List<RouterAddress> addrs = peerInfo.getTargetAddresses(STYLE);
+            for (RouterAddress addr : addrs) {
+                ip = addr.getIP();
+                if (ip != null && ip.length == 4)
+                    break;
+            }
             if (ip == null)
                 continue;
             if (DataHelper.eq(ip, 0, getExternalIP(), 0, 2))
@@ -2735,6 +2777,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //return ( (val != null) && ("true".equals(val)) );
     }
     
+    /**
+     *  Initiate a test (we are Alice)
+     */
     private class PeerTestEvent extends SimpleTimer2.TimedEvent {
         private volatile boolean _alive;
         /** when did we last test our reachability */
@@ -2761,7 +2806,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
         private void runTest() {
-            PeerState bob = pickTestPeer(null);
+            PeerState bob = pickTestPeer(BOB, null);
             if (bob != null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Running periodic test with bob = " + bob);
