@@ -1,4 +1,5 @@
 2013-05-06 zzz
+ * Console: Fix Jetty thread pool policy and thread name
  * Transports: Clean up internal/external port confusion (ticket #873)
    - Bind SSU to configured internal, not external, port at startup
    - Use only internal ports for UPnP (getRequestedPort() fixups)
