@@ -345,21 +345,13 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
-     * Include the published port, or the requested port, for each transport
-     * which we will pass along to UPnP
+     * The actual or requested INTERNAL ports, for each transport,
+     * which we will pass along to UPnP to be forwarded.
      */
     private Map<String, Integer> getPorts() {
         Map<String, Integer> rv = new HashMap(_transports.size());
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
-            if (t.getCurrentAddress() != null) {
-                    String s = t.getCurrentAddress().getOption("port");
-                    if (s != null) {
-                        try {
-                            port = Integer.parseInt(s);
-                        } catch (NumberFormatException nfe) {}
-                    }
-            }
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
             if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
                 _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {

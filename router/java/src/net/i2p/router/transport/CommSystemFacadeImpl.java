@@ -272,8 +272,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
     @Override
-    public synchronized void notifyReplaceAddress(RouterAddress UDPAddr) {
-        if (UDPAddr == null)
+    public synchronized void notifyReplaceAddress(RouterAddress udpAddr) {
+        if (udpAddr == null)
             return;
         NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
         if (t == null)
@@ -296,19 +296,38 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         // Auto Port Setting
         // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
         // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
+        // TODO rewrite this to operate on ints instead of strings
         String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
         String nport = null;
         String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
         if (cport != null && cport.length() > 0) {
             nport = cport;
         } else if (_context.getBooleanPropertyDefaultTrue(PROP_I2NP_NTCP_AUTO_PORT)) {
-            nport = UDPAddr.getOption(UDPAddress.PROP_PORT);
+            // 0.9.6 change
+            // This wasn't quite right, as udpAddr is the EXTERNAL port and we really
+            // want NTCP to bind to the INTERNAL port the first time,
+            // because if they are different, the NAT is changing them, and
+            // it probably isn't mapping UDP and TCP the same.
+            Transport udp = _manager.getTransport(UDPTransport.STYLE);
+            if (udp != null) {
+                int udpIntPort = udp.getRequestedPort();
+                if (udpIntPort > 0)
+                    // should always be true
+                    nport = Integer.toString(udpIntPort);
+            }
+            if (nport == null)
+                // fallback
+                nport = udpAddr.getOption(UDPAddress.PROP_PORT);
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("old: " + oport + " config: " + cport + " new: " + nport);
         if (nport == null || nport.length() <= 0)
             return;
-        if (oport == null || ! oport.equals(nport)) {
+        // 0.9.6 change
+        // Don't have NTCP "chase" SSU's external port,
+        // as it may change, possibly frequently.
+        //if (oport == null || ! oport.equals(nport)) {
+        if (oport == null) {
             newProps.setProperty(NTCPAddress.PROP_PORT, nport);
             changed = true;
         }
@@ -335,7 +354,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
         if (enabled.equals("always") ||
             (Boolean.parseBoolean(enabled) && status == STATUS_OK)) {
-            String nhost = UDPAddr.getOption(UDPAddress.PROP_HOST);
+            String nhost = udpAddr.getOption(UDPAddress.PROP_HOST);
             if (_log.shouldLog(Log.INFO))
                 _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
             if (nhost == null || nhost.length() <= 0)
