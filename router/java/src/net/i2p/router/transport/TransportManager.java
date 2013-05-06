@@ -382,19 +382,12 @@ public class TransportManager implements TransportEventListener {
         Set<Port> rv = new HashSet(4);
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
-            for (RouterAddress ra : t.getCurrentAddresses()) {
-                int p = ra.getPort();
-                if (p > 0)
-                    port = p;
-                // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
-                if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
-                    _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
-                    Transport udp = getTransport(UDPTransport.STYLE);
-                    if (udp != null)
-                        port = t.getRequestedPort();
-                }
-                if (port > 0)
-                    rv.add(new Port(t.getStyle(), port));
+            // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
+            if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
+                _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
+                Transport udp = getTransport(UDPTransport.STYLE);
+                if (udp != null)
+                    port = t.getRequestedPort();
             }
         }
         return rv;

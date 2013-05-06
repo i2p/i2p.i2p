@@ -636,6 +636,7 @@ public class NTCPTransport extends TransportImpl {
 
     //private boolean bindAllInterfaces() { return true; }
 
+    /** caller must synch on this */
     private void configureLocalAddress() {
         RouterContext ctx = getContext();
         if (ctx == null) {
@@ -682,8 +683,17 @@ public class NTCPTransport extends TransportImpl {
         }
     }
 
+    /**
+     *  @return current port, else NTCP configured port, else -1 (but not UDP port if auto)
+     */
     @Override
     public int getRequestedPort() {
+        NTCPAddress addr = _myAddress;
+        if (addr != null) {
+            int port = addr.getPort();
+            if (port > 0)
+                return port;
+        }
         // would be nice to do this here but we can't easily get to the UDP transport.getRequested_Port()
         // from here, so we do it in TransportManager.
         // if (Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue())
