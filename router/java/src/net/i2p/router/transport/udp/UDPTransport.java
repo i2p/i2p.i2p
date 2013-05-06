@@ -88,7 +88,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private RouterAddress _externalAddress;
     /**
      * Port number on which we can be reached, or -1 for error, or 0 for unset
-     * Do NOT use this for current internal port - use _endpoint.getListenPort()
+     * Do NOT use this for current internal port - use UDPEndpoint.getListenPort()
      */
     private int _externalListenPort;
     /** IP address of externally reachable host, or null */
@@ -324,7 +324,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // we will check below after starting up the endpoint.
         int port;
         int oldIPort = _context.getProperty(PROP_INTERNAL_PORT, -1);
-        int oldBindPort = _endpoint != null ? _endpoint.getListenPort() : -1;
+        int oldBindPort = getIPv4ListenPort();
         int oldEPort = _context.getProperty(PROP_EXTERNAL_PORT, -1);
         if (oldIPort > 0)
             port = oldIPort;
@@ -463,6 +463,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
+     *  The current port of the first IPv4 endpoint.
+     *  To be enhanced to handle multiple IPv4 endpoints.
+     *  @return port or -1
+     *  @since IPv6
+     */
+    private int getIPv4ListenPort() {
+        for (UDPEndpoint endpoint : _endpoints) {
+            if (endpoint.isIPv4())
+                return endpoint.getListenPort();
+       }
+       return -1;
+    }
+
+    /**
      *  The current or configured internal port.
      *  UDPEndpoint should always be instantiated (and a random port picked if not configured)
      *  before this is called, so the returned value should be > 0
@@ -470,13 +484,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     @Override
     public int getRequestedPort() {
-        if (_endpoint != null) {
-            int rv = _endpoint.getListenPort();
-            if (rv > 0)
-                return rv;
-        }
+        int rv = getIPv4ListenPort();
+        if (rv > 0)
+            return rv;
         // fallbacks
-        int rv = _context.getProperty(PROP_INTERNAL_PORT, -1);
+        rv = _context.getProperty(PROP_INTERNAL_PORT, -1);
         if (rv > 0)
             return rv;
         return _context.getProperty(PROP_EXTERNAL_PORT, -1);
@@ -2588,14 +2600,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
             boolean shouldPingFirewall = _reachabilityStatus != CommSystemFacade.STATUS_OK;
-            int currentListenPort = -1;
-            for (UDPEndpoint endpoint : _endpoints) {
-                // hack, first IPv4 endpoint, FIXME
-                if (endpoint.isIPv4()) {
-                    currentListenPort = endpoint.getListenPort();
-                    break;
-                }
-            }
+            int currentListenPort = getIPv4ListenPort();
             boolean pingOneOnly = shouldPingFirewall && _externalListenPort == currentListenPort;
             boolean shortLoop = shouldPingFirewall;
             _expireBuffer.clear();
