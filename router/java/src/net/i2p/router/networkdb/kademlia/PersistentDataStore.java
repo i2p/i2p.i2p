@@ -42,7 +42,6 @@ import net.i2p.util.SecureFileOutputStream;
  *
  */
 class PersistentDataStore extends TransientDataStore {
-    private final Log _log;
     private final File _dbDir;
     private final KademliaNetworkDatabaseFacade _facade;
     private final Writer _writer;
@@ -60,7 +59,6 @@ class PersistentDataStore extends TransientDataStore {
      */
     public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) throws IOException {
         super(ctx);
-        _log = ctx.logManager().getLog(PersistentDataStore.class);
         _flat = ctx.getBooleanProperty(PROP_FLAT);
         _dbDir = getDbDir(dbDir);
         _facade = facade;
