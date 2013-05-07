@@ -465,10 +465,13 @@ class MessageInputStream extends InputStream {
     }
     
     private void throwAnyError() throws IOException {
-        if (_streamError != null) {
-            IOException ioe = _streamError;
+        IOException ioe = _streamError;
+        if (ioe != null) {
             _streamError = null;
-            throw ioe;
+            // constructor with cause not until Java 6
+            IOException ioe2 = new IOException("Input stream error");
+            ioe2.initCause(ioe);
+            throw ioe2;
         }
     }
 }
