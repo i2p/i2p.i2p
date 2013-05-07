@@ -78,9 +78,10 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             return;
         }
 
-        // TODO only look up once, then check type
-        LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_message.getSearchKey());
-        if (ls != null) {
+        // only lookup once, then cast to correct type
+        DatabaseEntry dbe = getContext().netDb().lookupLocally(_message.getSearchKey());
+        if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            LeaseSet ls = (LeaseSet) dbe;
             // We have to be very careful here to decide whether or not to send out the leaseSet,
             // to avoid anonymity vulnerabilities.
             // As this is complex, lots of comments follow...
@@ -105,7 +106,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // so we don't check the answerAllQueries() flag.
                 // Local leasesets are not handled here
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("We have the published LS " + _message.getSearchKey().toBase64() + ", answering query");
+                    _log.info("We have the published LS " + _message.getSearchKey() + ", answering query");
                 getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
                 sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
             } else if (shouldPublishLocal && answerAllQueries()) {
@@ -118,13 +119,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 if (weAreClosest(closestHashes)) {
                     // It's in our keyspace, so give it to them
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("We have local LS " + _message.getSearchKey().toBase64() + ", answering query, in our keyspace");
+                        _log.info("We have local LS " + _message.getSearchKey() + ", answering query, in our keyspace");
                     getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
                     sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
                 } else {
                     // Lie, pretend we don't have it
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("We have local LS " + _message.getSearchKey().toBase64() + ", NOT answering query, out of our keyspace");
+                        _log.info("We have local LS " + _message.getSearchKey() + ", NOT answering query, out of our keyspace");
                     getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
                     Set<Hash> routerHashSet = getNearestRouters();
                     sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
@@ -135,16 +136,16 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // or it's local and we don't publish it.
                 // Lie, pretend we don't have it
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("We have LS " + _message.getSearchKey().toBase64() +
+                    _log.info("We have LS " + _message.getSearchKey() +
                                ", NOT answering query - local? " + isLocal + " shouldPublish? " + shouldPublishLocal +
                                " RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
                 getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1, 0);
                 Set<Hash> routerHashSet = getNearestRouters();
                 sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
-        } else {
-            RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_message.getSearchKey());
-            if ( (info != null) && (info.isCurrent(EXPIRE_DELAY)) ) {
+        } else if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            RouterInfo info = (RouterInfo) dbe;
+            if (info.isCurrent(EXPIRE_DELAY)) {
                 if ( (info.getIdentity().isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Not answering a query for a netDb peer who isn't reachable");
@@ -162,12 +163,12 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 } else {
                     // send that routerInfo to the _message.getFromHash peer
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We do have key " + _message.getSearchKey().toBase64() 
-                                   + " locally as a router info.  sending to " + fromKey.toBase64());
+                        _log.debug("We do have key " + _message.getSearchKey()
+                                   + " locally as a router info.  sending to " + fromKey);
                     sendData(_message.getSearchKey(), info, fromKey, _message.getReplyTunnel());
                 }
             } else {
-                // not found locally - return closest peer hashes
+                // expired locally - return closest peer hashes
                 Set<Hash> routerHashSet = getNearestRouters();
 
                 // ERR: see above
@@ -180,10 +181,17 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // }
 
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("We do not have key " + _message.getSearchKey().toBase64() + 
-                               " locally.  sending back " + routerHashSet.size() + " peers to " + fromKey.toBase64());
+                    _log.debug("Expired " + _message.getSearchKey() + 
+                               " locally.  sending back " + routerHashSet.size() + " peers to " + fromKey);
                 sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
+        } else {
+            // not found locally - return closest peer hashes
+            Set<Hash> routerHashSet = getNearestRouters();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("We do not have key " + _message.getSearchKey() + 
+                           " locally.  sending back " + routerHashSet.size() + " peers to " + fromKey);
+            sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
         }
     }
     
@@ -230,7 +238,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             return;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending data matching key " + key.toBase64() + " to peer " + toPeer.toBase64() 
+            _log.debug("Sending data matching key " + key + " to peer " + toPeer
                        + " tunnel " + replyTunnel);
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
@@ -244,7 +252,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     
     protected void sendClosest(Hash key, Set<Hash> routerHashes, Hash toPeer, TunnelId replyTunnel) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending closest routers to key " + key.toBase64() + ": # peers = " 
+            _log.debug("Sending closest routers to key " + key + ": # peers = " 
                        + routerHashes.size() + " tunnel " + replyTunnel);
         DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage(getContext());
         msg.setFromHash(getContext().routerHash());
