@@ -23,22 +23,25 @@ import net.i2p.util.Log;
  */
 class GetBidsJob extends JobImpl {
     private final Log _log;
-    private final CommSystemFacadeImpl _facade;
+    private final TransportManager _tmgr;
     private final OutNetMessage _msg;
     
-    public GetBidsJob(RouterContext ctx, CommSystemFacadeImpl facade, OutNetMessage msg) {
+    /**
+     *  @deprecated unused, see static getBids()
+     */
+    public GetBidsJob(RouterContext ctx, TransportManager tmgr, OutNetMessage msg) {
         super(ctx);
         _log = ctx.logManager().getLog(GetBidsJob.class);
-        _facade = facade;
+        _tmgr = tmgr;
         _msg = msg;
     }
     
     public String getName() { return "Fetch bids for a message to be delivered"; }
     public void runJob() {
-        getBids(getContext(), _facade, _msg);
+        getBids(getContext(), _tmgr, _msg);
     }
     
-    static void getBids(RouterContext context, CommSystemFacadeImpl facade, OutNetMessage msg) {
+    static void getBids(RouterContext context, TransportManager tmgr, OutNetMessage msg) {
         Log log = context.logManager().getLog(GetBidsJob.class);
         Hash to = msg.getTarget().getIdentity().getHash();
         msg.timestamp("bid");
@@ -61,14 +64,14 @@ class GetBidsJob extends JobImpl {
             return;
         }
         
-        TransportBid bid = facade.getNextBid(msg);
+        TransportBid bid = tmgr.getNextBid(msg);
         if (bid == null) {
             int failedCount = msg.getFailedTransports().size();
             if (failedCount == 0) {
                 context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime());
                 // This used to be "no common transports" but it is almost always no transports at all
                 context.banlist().banlistRouter(to, _x("No transports (hidden or starting up?)"));
-            } else if (failedCount >= facade.getTransportCount()) {
+            } else if (failedCount >= tmgr.getTransportCount()) {
                 context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime());
                 // fail after all transports were unsuccessful
                 context.netDb().fail(to);
@@ -82,7 +85,7 @@ class GetBidsJob extends JobImpl {
     }
     
     
-    private static void fail(RouterContext context, OutNetMessage msg) {
+    static void fail(RouterContext context, OutNetMessage msg) {
         if (msg.getOnFailedSendJob() != null) {
             context.jobQueue().addJob(msg.getOnFailedSendJob());
         }

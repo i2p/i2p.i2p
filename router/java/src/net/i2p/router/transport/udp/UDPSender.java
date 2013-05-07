@@ -179,6 +179,12 @@ class UDPSender {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet);
             return;
         }
+        if (_context.commSystem().isDummy()) {
+            // testing
+            // back to the cache
+            packet.release();
+            return;
+        }
         try {
             _outboundQueue.put(packet);
         } catch (InterruptedException ie) {

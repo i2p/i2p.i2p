@@ -253,7 +253,10 @@ class UDPReceiver {
                         // DatagramSocket javadocs: If the message is longer than the packet's length, the message is truncated.
                         throw new IOException("packet too large! truncated and dropped from: " + packet.getRemoteHost());
                     }
-                    if (size > 0) {
+                    if (_context.commSystem().isDummy()) {
+                        // testing
+                        packet.release();
+                    } else if (size > 0) {
                         //FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
                         FIFOBandwidthLimiter.Request req =

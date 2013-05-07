@@ -123,6 +123,9 @@ public abstract class TransportImpl implements Transport {
 
     /** Per-transport connection limit */
     public int getMaxConnections() {
+        if (_context.commSystem().isDummy())
+            // testing
+            return 0;
         String style = getStyle();
         // object churn
         String maxProp;

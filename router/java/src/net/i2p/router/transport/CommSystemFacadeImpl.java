@@ -44,6 +44,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private final GeoIP _geoIP;
     private volatile boolean _netMonitorStatus;
     private boolean _wasStarted;
+
+    /**
+     *  Disable connections for testing
+     *  @since IPv6
+     */
+    private static final String PROP_DISABLED = "i2np.disable";
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
@@ -124,23 +130,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return sum * 1000 / frameSize;
     }
     
-    public List<TransportBid> getBids(OutNetMessage msg) {
-        return _manager.getBids(msg);
-    }
-    public TransportBid getBid(OutNetMessage msg) {
-        return _manager.getBid(msg);
-    }
-    public TransportBid getNextBid(OutNetMessage msg) {
-        return _manager.getNextBid(msg);
-    }
-    int getTransportCount() { return _manager.getTransportCount(); }
-    
     /** Send the message out */
     public void processMessage(OutNetMessage msg) {	
+        if (isDummy()) {
+            // testing
+            GetBidsJob.fail(_context, msg);
+            return;
+        }
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
         //j.runJob();
         //long before = _context.clock().now();
-        GetBidsJob.getBids(_context, this, msg);
+        GetBidsJob.getBids(_context, _manager, msg);
         // < 0.4 ms
         //_context.statManager().addRateData("transport.getBidsJobTime", _context.clock().now() - before);
     }
@@ -569,9 +569,14 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return buf.toString();
     }
 
-    /** @since 0.8.13 */
+    /**
+     *  Is everything disabled for testing?
+     *  @since 0.8.13
+     */
     @Override
-    public boolean isDummy() { return false; }
+    public boolean isDummy() {
+        return _context.getBooleanProperty(PROP_DISABLED);
+    }
 
     /**
      *  Translate
