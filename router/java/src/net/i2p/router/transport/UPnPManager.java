@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.Transport.AddressSource.SOURCE_UPNP;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
@@ -161,7 +162,7 @@ class UPnPManager {
                             _log.debug("External address: " + ip.publicAddress + " type: " + ip.natType);
                         if (!ip.publicAddress.equals(_detectedAddress)) {
                             _detectedAddress = ip.publicAddress;
-                            _manager.externalAddressReceived(Transport.SOURCE_UPNP, _detectedAddress.getAddress(), 0);
+                            _manager.externalAddressReceived(SOURCE_UPNP, _detectedAddress.getAddress(), 0);
                         }
                         break;
                     }

@@ -30,6 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.Transport.AddressSource.SOURCE_INTERFACE;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -111,7 +112,7 @@ public class TransportManager implements TransportEventListener {
             try {
                 InetAddress ia = InetAddress.getByName(ips);
                 byte[] ip = ia.getAddress();
-                t.externalAddressReceived(Transport.SOURCE_INTERFACE, ip, 0);
+                t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
             } catch (UnknownHostException e) {
                 _log.error("UDP failed to bind to local address", e);
             }
@@ -123,7 +124,7 @@ public class TransportManager implements TransportEventListener {
      * Only tell SSU, it will tell NTCP
      *
      */
-    public void externalAddressReceived(String source, byte[] ip, int port) {
+    public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
         Transport t = getTransport(UDPTransport.STYLE);
         if (t != null)
             t.externalAddressReceived(source, ip, port);

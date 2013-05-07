@@ -36,6 +36,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.Transport;
+import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
@@ -155,7 +156,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /** allowed sources of address updates */
     public static final String PROP_SOURCES = "i2np.udp.addressSources";
-    public static final String DEFAULT_SOURCES = "local,upnp,ssu";
+    public static final String DEFAULT_SOURCES = SOURCE_INTERFACE.toConfigString() + ',' +
+                                                 SOURCE_UPNP.toConfigString() + ',' +
+                                                 SOURCE_SSU_PEER.toConfigString();
     /** remember IP changes */
     public static final String PROP_IP= "i2np.lastIP";
     public static final String PROP_IP_CHANGE = "i2np.lastIPChange";
@@ -547,17 +550,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param port 0 if unknown
      */
     @Override
-    public void externalAddressReceived(String source, byte[] ip, int port) {
+    public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
         if (explicitAddressSpecified())
             return;
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
-        if (!sources.contains(source))
+        if (!sources.contains(source.toConfigString()))
             return;
         if (!isValid(ip))
             return;
-        if (source.equals(Transport.SOURCE_INTERFACE)) {
+        if (source == SOURCE_INTERFACE) {
             // temp prevent multiples
             if (ip.length == 4) {
                 if (gotIPv4Addr)
@@ -574,7 +577,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean changed = changeAddress(ip, port);
         // Assume if we have an interface with a public IP that we aren't firewalled.
         // If this is wrong, the peer test will figure it out and change the status.
-        if (changed && ip.length == 4 && source.equals(Transport.SOURCE_INTERFACE))
+        if (changed && ip.length == 4 && source == SOURCE_INTERFACE)
             setReachabilityStatus(CommSystemFacade.STATUS_OK);
     }
 
@@ -1414,6 +1417,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     RouterAddress getTargetAddress(RouterInfo target) {
         List<RouterAddress> addrs = target.getTargetAddresses(STYLE);
+        // Shuffle so everybody doesn't use the first one
+        if (addrs.size() > 1)
+            Collections.shuffle(addrs, _context.random());
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
             if (addr.getOption("ihost0") == null) {

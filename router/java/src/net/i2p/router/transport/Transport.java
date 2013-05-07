@@ -55,10 +55,29 @@ public interface Transport {
      */
     public List<RouterAddress> updateAddress();
 
-    public static final String SOURCE_UPNP = "upnp";
-    public static final String SOURCE_INTERFACE = "local";
-    public static final String SOURCE_CONFIG = "config"; // unused
-    public void externalAddressReceived(String source, byte[] ip, int port);
+    /**
+     *  @since IPv6
+     */
+    public enum AddressSource {
+        SOURCE_UPNP("upnp"),
+        SOURCE_INTERFACE("local"),
+        /** unused */
+        SOURCE_CONFIG("config"),
+        /** unused */
+        SOURCE_SSU_PEER("ssu");
+
+        private final String cfgstr;
+
+        AddressSource(String cfgstr) {
+            this.cfgstr = cfgstr;
+        }
+
+        public String toConfigString() {
+            return cfgstr;
+        }
+    }
+
+    public void externalAddressReceived(AddressSource source, byte[] ip, int port);
     public void forwardPortStatus(int port, int externalPort, boolean success, String reason);
     public int getRequestedPort();
     public void setListener(TransportEventListener listener);

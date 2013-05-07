@@ -546,7 +546,7 @@ public abstract class TransportImpl implements Transport {
      *  @param ip typ. IPv4 or IPv6 non-local
      *  @param port 0 for unknown or unchanged
      */
-    public void externalAddressReceived(String source, byte[] ip, int port) {}
+    public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}
 
     /**
      *  Notify a transport of the results of trying to forward a port.
