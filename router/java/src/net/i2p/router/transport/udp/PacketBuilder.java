@@ -1058,6 +1058,7 @@ class PacketBuilder {
 
     // specify these if we know what our external receive ip/port is and if its different
     // from what bob is going to think
+    // FIXME IPv4 addr must be specified when sent over IPv6
     private byte[] getOurExplicitIP() { return null; }
     private int getOurExplicitPort() { return 0; }
     
@@ -1077,6 +1078,8 @@ class PacketBuilder {
             // let's not use an introducer on a privileged port, sounds like trouble
             if (ikey == null || iport < 1024 || iport > 65535 ||
                 iaddr == null || tag <= 0 ||
+                // must be IPv4 for now as we don't send Alice IP/port, see below
+                iaddr.getAddress().length != 4 ||
                 (!_transport.isValid(iaddr.getAddress())) ||
                 Arrays.equals(iaddr.getAddress(), _transport.getExternalIP())) {
                 if (_log.shouldLog(_log.WARN))
@@ -1090,11 +1093,17 @@ class PacketBuilder {
         return rv;
     }
     
+    /**
+     *  TODO Alice IP/port in packet will always be null/0, must be fixed to
+     *  send a RelayRequest over IPv6
+     *
+     */
     public UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[], long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
         UDPPacket packet = buildPacketHeader(PEER_RELAY_REQUEST_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
         int off = HEADER_SIZE;
         
+        // FIXME must specify these if request is going over IPv6
         byte ourIP[] = getOurExplicitIP();
         int ourPort = getOurExplicitPort();
         
@@ -1218,6 +1227,7 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 2, charlie.getRemotePort());
         off += 2;
         
+        // Alice IP/Port currently ignored on receive - see UDPPacketReader
         byte aliceIP[] = alice.getIP();
         DataHelper.toLong(data, off, 1, aliceIP.length);
         off++;

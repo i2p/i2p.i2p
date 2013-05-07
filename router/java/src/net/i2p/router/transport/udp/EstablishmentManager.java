@@ -459,8 +459,10 @@ class EstablishmentManager {
 
         if (isNew) {
             // Don't offer to relay to privileged ports.
+            // Only offer for an IPv4 session.
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
-            if (_transport.canIntroduce() && state.getSentPort() >= 1024) {
+            if (_transport.canIntroduce() && state.getSentPort() >= 1024 &&
+                state.getSentIP().length == 4) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
@@ -884,6 +886,9 @@ class EstablishmentManager {
         state.introSent();
     }
 
+    /**
+     *  We are Alice, we sent a RelayRequest to Bob and got a response back.
+     */
     void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
         long nonce = reader.getRelayResponseReader().readNonce();
         OutboundEstablishState state = _liveIntroductions.remove(Long.valueOf(nonce));
@@ -893,6 +898,7 @@ class EstablishmentManager {
             return; // already established
         }
         
+        // Note that we ignore the Alice (us) IP/Port in the RelayResponse
         int sz = reader.getRelayResponseReader().readCharlieIPSize();
         byte ip[] = new byte[sz];
         reader.getRelayResponseReader().readCharlieIP(ip, 0);
@@ -940,13 +946,15 @@ class EstablishmentManager {
     }
 
     /**
-     *  Are IP and port valid? This is only for relay response.
+     *  Are IP and port valid? This is only for checking the relay response.
+     *  Reject all IPv6, for now, even if we are configured for it.
      *  Refuse anybody in the same /16
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
         return port >= 1024 &&
                port <= 65535 &&
+               ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
                (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
                (!_context.blocklist().isBlocklisted(ip));

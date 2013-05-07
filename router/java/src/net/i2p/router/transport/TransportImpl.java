@@ -684,6 +684,8 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
+     *  Allows IPv6 only if the transport is configured for it.
+     *  Caller must check if we actually have a public IPv6 address.
      *  @param addr non-null
      */
     protected boolean isPubliclyRoutable(byte addr[]) {

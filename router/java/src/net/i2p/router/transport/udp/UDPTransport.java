@@ -81,6 +81,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private int _mtu;
+    /**
+     *  Do we have a public IPv6 address?
+     *  TODO periodically update via CSFI.NetMonitor?
+     */
+    private boolean _haveIPv6Address;
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
@@ -553,6 +558,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
+        if (source == SOURCE_INTERFACE && ip.length == 16) {
+            // must be set before isValid() call
+            _haveIPv6Address = true;
+        }
         if (explicitAddressSpecified())
             return;
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
@@ -790,10 +799,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (rport == lport) && DataHelper.eq(laddr, raddr);
     }
     
-    /** @param addr may be null */
+    /**
+     * An IPv6 address is only valid if we are configured to support IPv6
+     * AND we have a public IPv6 address.
+     *
+     * @param addr may be null, returns false
+     */
     public final boolean isValid(byte addr[]) {
         if (addr == null) return false;
-        if (isPubliclyRoutable(addr)) 
+        if (isPubliclyRoutable(addr) &&
+            (addr.length != 16 || _haveIPv6Address))
             return true;
         return _context.getBooleanProperty("i2np.udp.allowLocal");
     }

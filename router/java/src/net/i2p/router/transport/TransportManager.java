@@ -103,7 +103,7 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
-     *  Notify transport of ALL routable local addresses, including IPv6.
+     *  Notify transport of ALL routable interface addresses, including IPv6.
      *  It's the transport's job to ignore what it can't handle.
      */
     private void initializeAddress(Transport t) {
