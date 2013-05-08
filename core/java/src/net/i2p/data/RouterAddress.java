@@ -55,6 +55,17 @@ public class RouterAddress extends DataStructureImpl {
     }
 
     /**
+     *  For efficiency when created by a Transport.
+     *  @param options not copied; do not reuse or modify
+     *  @since IPv6
+     */
+    public RouterAddress(String style, OrderedProperties options, int cost) {
+        _transportStyle = style;
+        _options = options;
+        _cost = cost;
+    }
+
+    /**
      * Retrieve the weighted cost of this address, relative to other methods of
      * contacting this router.  The value 0 means free and 255 means really expensive.
      * No value above 255 is allowed.
@@ -171,7 +182,7 @@ public class RouterAddress extends DataStructureImpl {
         if (_ip != null)
             return _ip;
         byte[] rv = null;
-        String host = _options.getProperty(PROP_HOST);
+        String host = getHost();
         if (host != null) {
             rv = Addresses.getIP(host);
             if (rv != null &&
@@ -181,6 +192,17 @@ public class RouterAddress extends DataStructureImpl {
             }
         }
         return rv;
+    }
+    
+    /**
+     *  Convenience, same as getOption("host").
+     *  Does no parsing, so faster than getIP().
+     *
+     *  @return host string or null
+     *  @since IPv6
+     */
+    public String getHost() {
+        return _options.getProperty(PROP_HOST);
     }
     
     /**
@@ -239,7 +261,7 @@ public class RouterAddress extends DataStructureImpl {
     }
     
     /**
-     * Transport, IP, and port only.
+     * Transport, host, and port only.
      * Never look at cost or other properties.
      */
     @Override
@@ -249,10 +271,22 @@ public class RouterAddress extends DataStructureImpl {
         RouterAddress addr = (RouterAddress) object;
         return
                getPort() == addr.getPort() &&
-               DataHelper.eq(getIP(), addr.getIP()) &&
+               DataHelper.eq(getHost(), addr.getHost()) &&
                DataHelper.eq(_transportStyle, addr._transportStyle);
                //DataHelper.eq(_options, addr._options) &&
                //DataHelper.eq(_expiration, addr._expiration);
+    }
+    
+    /**
+     *  Everything, including Transport, host, port, options, and cost
+     *  @param addr may be null
+     *  @since IPv6
+     */
+    public boolean deepEquals(RouterAddress addr) {
+        return
+               equals(addr) &&
+               _cost == addr._cost &&
+               _options.equals(addr._options);
     }
     
     /**

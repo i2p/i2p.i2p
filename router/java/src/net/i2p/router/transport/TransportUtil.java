@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.data.RouterAddress;
 import net.i2p.router.RouterContext;
 
 /**
@@ -76,6 +77,16 @@ public abstract class TransportUtil {
         if (c != null)
             return c;
         return IPv6Config.IPV6_DISABLED;
+    }
+
+    /**
+     *  Addresses without a host (i.e. w/introducers)
+     *  are assumed to be IPv4
+     */
+    public static boolean isIPv6(RouterAddress addr) {
+        // do this the fast way, without calling getIP() to parse the host string
+        String host = addr.getOption(RouterAddress.PROP_HOST);
+        return host != null && host.contains(":");
     }
 
     /**

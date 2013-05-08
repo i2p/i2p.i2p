@@ -480,6 +480,21 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
+     *  What address are we currently listening to?
+     *  Replaces getCurrentAddress()
+     *  @param ipv6 true for IPv6 only; false for IPv4 only
+     *  @return first matching address or null
+     *  @since IPv6
+     */
+    public RouterAddress getCurrentAddress(boolean ipv6) {
+        for (RouterAddress ra : _currentAddresses) {
+            if (ipv6 == TransportUtil.isIPv6(ra))
+                return ra;
+        }
+        return null;
+    }
+
+    /**
      *  Do we have any current address?
      *  @since IPv6
      */
@@ -511,15 +526,9 @@ public abstract class TransportImpl implements Transport {
         if (address == null) {
             _currentAddresses.clear();
         } else {
-            byte[] ip = address.getIP();
-            if (ip == null) {
-                _log.error("WTF null ip for " + address);
-                return;
-            }
-            int len = ip.length;
+            boolean isIPv6 = TransportUtil.isIPv6(address);
             for (RouterAddress ra : _currentAddresses) {
-                byte[] ipx = ra.getIP();
-                if (ipx != null && ipx.length == len)
+                if (isIPv6 == TransportUtil.isIPv6(ra))
                     _currentAddresses.remove(ra);
             }
             _currentAddresses.add(address);

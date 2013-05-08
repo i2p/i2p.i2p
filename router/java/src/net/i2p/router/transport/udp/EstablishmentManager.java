@@ -447,7 +447,9 @@ class EstablishmentManager {
                 }
                 if (!_transport.allowConnection())
                     return; // drop the packet
-                state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getExternalPort(),
+                byte[] fromIP = from.getIP();
+                state = new InboundEstablishState(_context, fromIP, from.getPort(),
+                                                  _transport.getExternalPort(fromIP.length == 16),
                                                   _transport.getDHBuilder());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
                 InboundEstablishState oldState = _inboundStates.putIfAbsent(from, state);
@@ -835,7 +837,9 @@ class EstablishmentManager {
             _inboundStates.remove(state.getRemoteHostId());
             return;
         }
-        _transport.send(_builder.buildSessionCreatedPacket(state, _transport.getExternalPort(), _transport.getIntroKey()));
+        _transport.send(_builder.buildSessionCreatedPacket(state,
+                                                           _transport.getExternalPort(state.getSentIP().length == 16),
+                                                           _transport.getIntroKey()));
         state.createdPacketSent();
     }
 

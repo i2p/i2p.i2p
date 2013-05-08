@@ -2,10 +2,12 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.SessionKey;
+import net.i2p.util.LHMCache;
 
 /**
  * basic helper to parse out peer info from a udp address
@@ -133,13 +135,8 @@ public class UDPAddress {
     public String getHost() { return _host; }
 
     InetAddress getHostAddress() {
-        if (_hostAddress == null) {
-            try {
-                _hostAddress = InetAddress.getByName(_host);
-            } catch (UnknownHostException uhe) {
-                _hostAddress = null;
-            }
-        }
+        if (_hostAddress == null)
+            _hostAddress = getByName(_host);
         return _hostAddress;
     }
 
@@ -153,13 +150,8 @@ public class UDPAddress {
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
 
     InetAddress getIntroducerHost(int i) { 
-        if (_introAddresses[i] == null) {
-            try {
-                _introAddresses[i] = InetAddress.getByName(_introHosts[i]);
-            } catch (UnknownHostException uhe) {
-                _introAddresses[i] = null;
-            }
-        }
+        if (_introAddresses[i] == null)
+            _introAddresses[i] = getByName(_introHosts[i]);
         return _introAddresses[i];
     }
 
@@ -196,5 +188,72 @@ public class UDPAddress {
                 rv.append("ssu://autodetect.not.yet.complete:").append(_port);
         }
         return rv.toString();
+    }
+
+    ////////////////
+    // cache copied from Addresses.java but caching InetAddress instead of byte[]
+
+
+    /**
+     *  Textual IP to InetAddress, because InetAddress.getByName() is slow.
+     *
+     *  @since IPv6
+     */
+    private static final Map<String, InetAddress> _inetAddressCache;
+
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        long min = 128;
+        long max = 2048;
+        // 512 nominal for 128 MB
+        int size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
+        _inetAddressCache = new LHMCache(size);
+    }
+
+    /**
+     *  Caching version of InetAddress.getByName(host), which is slow.
+     *  Caches numeric host names only.
+     *  Will resolve but not cache DNS host names.
+     *
+     *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
+     *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
+     *
+     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @return InetAddress or null
+     *  @since IPv6
+     */
+    private static InetAddress getByName(String host) {
+        if (host == null)
+            return null;
+        InetAddress rv;
+        synchronized (_inetAddressCache) {
+            rv = _inetAddressCache.get(host);
+        }
+        if (rv == null) {
+            try {
+                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
+                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
+                    return null;
+                rv = InetAddress.getByName(host);
+                if (isIPv4 ||
+                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                    synchronized (_inetAddressCache) {
+                        _inetAddressCache.put(host, rv);
+                    }
+                }
+            } catch (UnknownHostException uhe) {}
+        }
+        return rv;
+    }
+
+    /**
+     *  @since IPv6
+     */
+    static void clearCache() {
+        synchronized(_inetAddressCache) {
+            _inetAddressCache.clear();
+        }
     }
 }
