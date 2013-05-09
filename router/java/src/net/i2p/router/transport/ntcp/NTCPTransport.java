@@ -55,7 +55,6 @@ public class NTCPTransport extends TransportImpl {
     private final SharedBid _transientFail;
     private final Object _conLock;
     private final Map<Hash, NTCPConnection> _conByIdent;
-    private NTCPAddress _myAddress;
     private final EventPumper _pumper;
     private final Reader _reader;
     private net.i2p.router.transport.ntcp.Writer _writer;
@@ -69,6 +68,7 @@ public class NTCPTransport extends TransportImpl {
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
+    public static final int DEFAULT_COST = 10;
     
     /** this is rarely if ever used, default is to bind to wildcard address */
     public static final String PROP_BIND_INTERFACE = "i2np.ntcp.bindInterface";
@@ -203,10 +203,9 @@ public class NTCPTransport extends TransportImpl {
                     isNew = true;
                     RouterAddress addr = getTargetAddress(target);
                     if (addr != null) {
-                        NTCPAddress naddr = new NTCPAddress(addr);
-                        con = new NTCPConnection(_context, this, ident, naddr);
+                        con = new NTCPConnection(_context, this, ident, addr);
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih.toBase64());
+                            _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
                         _conByIdent.put(ih, con);
                     } else {
                         _log.error("we bid on a peer who doesn't have an ntcp address? " + target);
@@ -326,12 +325,12 @@ public class NTCPTransport extends TransportImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("slow bid when trying to send to " + peer);
         if (haveCapacity()) {
-            if (addr.getCost() > NTCPAddress.DEFAULT_COST)
+            if (addr.getCost() > DEFAULT_COST)
                 return _slowCostBid;
             else
                 return _slowBid;
         } else {
-            if (addr.getCost() > NTCPAddress.DEFAULT_COST)
+            if (addr.getCost() > DEFAULT_COST)
                 return _nearCapacityCostBid;
             else
                 return _nearCapacityBid;
@@ -474,14 +473,17 @@ public class NTCPTransport extends TransportImpl {
         if (_log.shouldLog(Log.WARN)) _log.warn("Starting ntcp transport listening");
 
         startIt();
-        configureLocalAddress();
-        bindAddress();
+        RouterAddress addr = configureLocalAddress();
+        if (addr != null)
+        bindAddress(addr);
     }
 
     /**
      *  Only called by externalAddressReceived().
      *  Caller should stop the transport first, then
      *  verify stopped with isAlive()
+     *
+     *  @param addr may be null
      */
     private synchronized void restartListening(RouterAddress addr) {
         // try once again to prevent two pumpers which is fatal
@@ -491,11 +493,8 @@ public class NTCPTransport extends TransportImpl {
         if (_log.shouldLog(Log.WARN)) _log.warn("Restarting ntcp transport listening");
 
         startIt();
-        if (addr == null)
-            _myAddress = null;
-        else
-            _myAddress = new NTCPAddress(addr);
-        bindAddress();
+        if (addr != null)
+            bindAddress(addr);
     }
 
     /**
@@ -526,9 +525,13 @@ public class NTCPTransport extends TransportImpl {
         return _pumper.isAlive();
     }
 
-    /** call from synchronized method */
-    private RouterAddress bindAddress() {
-        if (_myAddress != null) {
+    /**
+     *  call from synchronized method
+     *  @param myAddress new address, may be null
+     *  @return new address or null
+     */
+    private RouterAddress bindAddress(RouterAddress myAddress) {
+        if (myAddress != null) {
             InetAddress bindToAddr = null;
             String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
 
@@ -564,7 +567,7 @@ public class NTCPTransport extends TransportImpl {
                 ServerSocketChannel chan = ServerSocketChannel.open();
                 chan.configureBlocking(false);
 
-                int port = _myAddress.getPort();
+                int port = myAddress.getPort();
                 if (port > 0 && port < 1024)
                     _log.logAlways(Log.WARN, "Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
                 InetSocketAddress addr = null;
@@ -587,11 +590,9 @@ public class NTCPTransport extends TransportImpl {
                 _log.info("Outbound NTCP connections only - no listener configured");
         }
 
-        if (_myAddress != null) {
-            RouterAddress rv = _myAddress.toRouterAddress();
-            if (rv != null)
-                replaceAddress(rv);
-            return rv;
+        if (myAddress != null) {
+            replaceAddress(myAddress);
+            return myAddress;
         } else {
             return null;
         }
@@ -644,26 +645,27 @@ public class NTCPTransport extends TransportImpl {
 
     //private boolean bindAllInterfaces() { return true; }
 
-    /** caller must synch on this */
-    private void configureLocalAddress() {
+    /**
+     *  Generally returns null
+     *  caller must synch on this
+     */
+    private RouterAddress configureLocalAddress() {
             // this generally returns null -- see javadoc
-            RouterAddress ra = createNTCPAddress();
-            if (ra != null) {
-                NTCPAddress addr = new NTCPAddress(ra);
+            RouterAddress addr = createNTCPAddress();
+            if (addr != null) {
                 if (addr.getPort() <= 0) {
-                    _myAddress = null;
+                    addr = null;
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("NTCP address is outbound only, since the NTCP configuration is invalid");
                 } else {
-                    _myAddress = addr;
-                    replaceAddress(ra);
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("NTCP address configured: " + _myAddress);
+                        _log.info("NTCP address configured: " + addr);
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("NTCP address is outbound only");
             }
+            return addr;
     }
 
     /**
@@ -682,9 +684,9 @@ public class NTCPTransport extends TransportImpl {
         if (p <= 0 || p >= 64*1024)
             return null;
         OrderedProperties props = new OrderedProperties();
-        props.setProperty(NTCPAddress.PROP_HOST, name);
-        props.setProperty(NTCPAddress.PROP_PORT, Integer.toString(p));
-        RouterAddress addr = new RouterAddress(STYLE, props, NTCPAddress.DEFAULT_COST);
+        props.setProperty(RouterAddress.PROP_HOST, name);
+        props.setProperty(RouterAddress.PROP_PORT, Integer.toString(p));
+        RouterAddress addr = new RouterAddress(STYLE, props, DEFAULT_COST);
         return addr;
     }
     
@@ -720,7 +722,7 @@ public class NTCPTransport extends TransportImpl {
         OrderedProperties newProps = new OrderedProperties();
         int cost;
         if (oldAddr == null) {
-            cost = NTCPAddress.DEFAULT_COST;
+            cost = DEFAULT_COST;
         } else {
             cost = oldAddr.getCost();
             newProps.putAll(oldAddr.getOptionsMap());
@@ -733,7 +735,7 @@ public class NTCPTransport extends TransportImpl {
         // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
         // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
         // TODO rewrite this to operate on ints instead of strings
-        String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
+        String oport = newProps.getProperty(RouterAddress.PROP_PORT);
         String nport = null;
         String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
         if (cport != null && cport.length() > 0) {
@@ -757,7 +759,7 @@ public class NTCPTransport extends TransportImpl {
         // as it may change, possibly frequently.
         //if (oport == null || ! oport.equals(nport)) {
         if (oport == null) {
-            newProps.setProperty(NTCPAddress.PROP_PORT, nport);
+            newProps.setProperty(RouterAddress.PROP_PORT, nport);
             changed = true;
         }
 
@@ -769,7 +771,7 @@ public class NTCPTransport extends TransportImpl {
         //                          and only takes effect if reachability is OK.
         //                          And new "always" setting ignores reachability status, like
         //                          "true" was in 0.7.3
-        String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
+        String ohost = newProps.getProperty(RouterAddress.PROP_HOST);
         String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true").toLowerCase(Locale.US);
         String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
         // hostname config trumps auto config
@@ -790,7 +792,7 @@ public class NTCPTransport extends TransportImpl {
             if (nhost == null || nhost.length() <= 0)
                 return;
             if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
-                newProps.setProperty(NTCPAddress.PROP_HOST, nhost);
+                newProps.setProperty(RouterAddress.PROP_HOST, nhost);
                 changed = true;
             }
         } else if (enabled.equals("false") &&
@@ -802,7 +804,7 @@ public class NTCPTransport extends TransportImpl {
             // otherwise createNTCPAddress() would have done it already
             if (_log.shouldLog(Log.INFO))
                 _log.info("old: " + ohost + " config: " + name + " new: " + name);
-            newProps.setProperty(NTCPAddress.PROP_HOST, name);
+            newProps.setProperty(RouterAddress.PROP_HOST, name);
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
             return;
@@ -820,7 +822,7 @@ public class NTCPTransport extends TransportImpl {
         if (!changed) {
             if (oldAddr != null) {
                 int oldCost = oldAddr.getCost();
-                int newCost = NTCPAddress.DEFAULT_COST;
+                int newCost = DEFAULT_COST;
                 if (TransportImpl.ADJUST_COST && !haveCapacity())
                     newCost++;
                 if (newCost != oldCost) {
@@ -879,11 +881,11 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
-     *  @return current port, else NTCP configured port, else -1 (but not UDP port if auto)
+     *  @return current IPv4 port, else NTCP configured port, else -1 (but not UDP port if auto)
      */
     @Override
     public int getRequestedPort() {
-        NTCPAddress addr = _myAddress;
+        RouterAddress addr = getCurrentAddress(false);
         if (addr != null) {
             int port = addr.getPort();
             if (port > 0)
@@ -907,7 +909,8 @@ public class NTCPTransport extends TransportImpl {
      */
     @Override
     public short getReachabilityStatus() { 
-        if (isAlive() && _myAddress != null) {
+        // If we have an IPv4 address
+        if (isAlive() && getCurrentAddress(false) != null) {
                 for (NTCPConnection con : _conByIdent.values()) {
                     if (con.isInbound())
                         return CommSystemFacade.STATUS_OK;
@@ -936,7 +939,6 @@ public class NTCPTransport extends TransportImpl {
             con.close();
         }
         NTCPConnection.releaseResources();
-        // will this work?
         replaceAddress(null);
     }
 

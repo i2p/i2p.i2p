@@ -16,6 +16,7 @@ import java.util.zip.Adler32;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -86,7 +87,7 @@ class NTCPConnection {
     private final NTCPTransport _transport;
     private final boolean _isInbound;
     private volatile boolean _closed;
-    private NTCPAddress _remAddr;
+    private RouterAddress _remAddr;
     private RouterIdentity _remotePeer;
     private long _clockSkew; // in seconds
     /**
@@ -182,7 +183,7 @@ class NTCPConnection {
      * Create an outbound unconnected NTCP connection
      *
      */
-    public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer, NTCPAddress remAddr) {
+    public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer, RouterAddress remAddr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _created = System.currentTimeMillis();
@@ -219,7 +220,7 @@ class NTCPConnection {
     public boolean isInbound() { return _isInbound; }
     public boolean isEstablished() { return _established; }
     public EstablishState getEstablishState() { return _establishState; }
-    public NTCPAddress getRemoteAddress() { return _remAddr; }
+    public RouterAddress getRemoteAddress() { return _remAddr; }
     public RouterIdentity getRemotePeer() { return _remotePeer; }
     public void setRemotePeer(RouterIdentity ident) { _remotePeer = ident; }
 

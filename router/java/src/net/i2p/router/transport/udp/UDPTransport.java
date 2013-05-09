@@ -1577,7 +1577,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public void stopListening() {
         shutdown();
-        // will this work?
         replaceAddress(null);
     }
     

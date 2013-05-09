@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
@@ -778,9 +779,9 @@ class EventPumper implements Runnable {
                 key.attach(con);
                 con.setKey(key);
                 try {
-                    NTCPAddress naddr = con.getRemoteAddress();
-		            if (naddr.getPort() <= 0)
-		                throw new IOException("Invalid NTCP address: " + naddr);
+                    RouterAddress naddr = con.getRemoteAddress();
+                    if (naddr.getPort() <= 0)
+                        throw new IOException("Invalid NTCP address: " + naddr);
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {
