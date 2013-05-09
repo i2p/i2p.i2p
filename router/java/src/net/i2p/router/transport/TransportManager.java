@@ -30,7 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import static net.i2p.router.transport.Transport.AddressSource.SOURCE_INTERFACE;
+import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -120,14 +120,16 @@ public class TransportManager implements TransportEventListener {
     }
 
     /**
-     * callback from UPnP
+     * callback from UPnP or SSU
      * Only tell SSU, it will tell NTCP
      *
      */
     public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
-        Transport t = getTransport(UDPTransport.STYLE);
-        if (t != null)
-            t.externalAddressReceived(source, ip, port);
+        for (Transport t : _transports.values()) {
+            // don't loop
+            if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
+                t.externalAddressReceived(source, ip, port);
+        }
     }
 
     /**
@@ -385,7 +387,7 @@ public class TransportManager implements TransportEventListener {
             int port = t.getRequestedPort();
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
             if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
-                _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
+                _context.getBooleanProperty(NTCPTransport.PROP_I2NP_NTCP_AUTO_PORT)) {
                 Transport udp = getTransport(UDPTransport.STYLE);
                 if (udp != null)
                     port = t.getRequestedPort();

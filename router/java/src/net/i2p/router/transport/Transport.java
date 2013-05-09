@@ -63,8 +63,7 @@ public interface Transport {
         SOURCE_INTERFACE("local"),
         /** unused */
         SOURCE_CONFIG("config"),
-        /** unused */
-        SOURCE_SSU_PEER("ssu");
+        SOURCE_SSU("ssu");
 
         private final String cfgstr;
 

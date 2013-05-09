@@ -552,7 +552,7 @@ public abstract class TransportImpl implements Transport {
      *  This implementation does nothing. Transports should override if they want notification.
      *
      *  @param source defined in Transport.java
-     *  @param ip typ. IPv4 or IPv6 non-local
+     *  @param ip typ. IPv4 or IPv6 non-local; may be null to indicate IPv4 failure or port info only
      *  @param port 0 for unknown or unchanged
      */
     public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}

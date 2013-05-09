@@ -155,7 +155,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_SOURCES = "i2np.udp.addressSources";
     public static final String DEFAULT_SOURCES = SOURCE_INTERFACE.toConfigString() + ',' +
                                                  SOURCE_UPNP.toConfigString() + ',' +
-                                                 SOURCE_SSU_PEER.toConfigString();
+                                                 SOURCE_SSU.toConfigString();
     /** remember IP changes */
     public static final String PROP_IP= "i2np.lastIP";
     public static final String PROP_IP_CHANGE = "i2np.lastIPChange";
@@ -563,13 +563,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Not for info received from peers - see externalAddressReceived(Hash, ip, port)
      *
      * @param source as defined in Transport.SOURCE_xxx
-     * @param ip publicly routable IPv4 or IPv6
+     * @param ip publicly routable IPv4 or IPv6, null ok
      * @param port 0 if unknown
      */
     @Override
     public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
+        if (ip == null)
+            return;
         if (source == SOURCE_INTERFACE && ip.length == 16) {
             // must be set before isValid() call
             _haveIPv6Address = true;

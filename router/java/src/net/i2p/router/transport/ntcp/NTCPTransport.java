@@ -30,12 +30,15 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.Transport;
+import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.Translate;
 
 /**
@@ -62,6 +65,11 @@ public class NTCPTransport extends TransportImpl {
      */
     private final Set<NTCPConnection> _establishing;
 
+    public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
+    public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
+    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
+    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
+    
     /** this is rarely if ever used, default is to bind to wildcard address */
     public static final String PROP_BIND_INTERFACE = "i2np.ntcp.bindInterface";
 
@@ -471,11 +479,11 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
-     *  Only called by CSFI.
+     *  Only called by externalAddressReceived().
      *  Caller should stop the transport first, then
      *  verify stopped with isAlive()
      */
-    public synchronized void restartListening(RouterAddress addr) {
+    private synchronized void restartListening(RouterAddress addr) {
         // try once again to prevent two pumpers which is fatal
         // we could just return null since the return value is ignored
         if (_pumper.isAlive())
@@ -528,9 +536,9 @@ public class NTCPTransport extends TransportImpl {
                 // If we are configured with a fixed IP address,
                 // AND it's one of our local interfaces,
                 // bind only to that.
-                boolean isFixed = _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_IP, "true")
+                boolean isFixed = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true")
                                   .toLowerCase(Locale.US).equals("false");
-                String fixedHost = _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_HOSTNAME);
+                String fixedHost = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
                 if (isFixed && fixedHost != null) {
                     try {
                         String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
@@ -638,12 +646,8 @@ public class NTCPTransport extends TransportImpl {
 
     /** caller must synch on this */
     private void configureLocalAddress() {
-        RouterContext ctx = getContext();
-        if (ctx == null) {
-            System.err.println("NIO transport has no context?");
-        } else {
             // this generally returns null -- see javadoc
-            RouterAddress ra = CommSystemFacadeImpl.createNTCPAddress(ctx);
+            RouterAddress ra = createNTCPAddress();
             if (ra != null) {
                 NTCPAddress addr = new NTCPAddress(ra);
                 if (addr.getPort() <= 0) {
@@ -660,8 +664,199 @@ public class NTCPTransport extends TransportImpl {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("NTCP address is outbound only");
             }
-        }
     }
+
+    /**
+     * This only creates an address if the hostname AND port are set in router.config,
+     * which should be rare.
+     * Otherwise, notifyReplaceAddress() below takes care of it.
+     * Note this is called both from above and from NTCPTransport.startListening()
+     *
+     * @since IPv6 moved from CSFI
+     */
+    private RouterAddress createNTCPAddress() {
+        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        if ( (name == null) || (name.trim().length() <= 0) || ("null".equals(name)) )
+            return null;
+        int p = _context.getProperty(PROP_I2NP_NTCP_PORT, -1);
+        if (p <= 0 || p >= 64*1024)
+            return null;
+        OrderedProperties props = new OrderedProperties();
+        props.setProperty(NTCPAddress.PROP_HOST, name);
+        props.setProperty(NTCPAddress.PROP_PORT, Integer.toString(p));
+        RouterAddress addr = new RouterAddress(STYLE, props, NTCPAddress.DEFAULT_COST);
+        return addr;
+    }
+    
+    /**
+     *  UDP changed addresses, tell NTCP and restart
+     *
+     *  @since IPv6 moved from CSFI.notifyReplaceAddress()
+     */
+    @Override
+    public void externalAddressReceived(AddressSource source, byte[] ip, int port) {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
+        // ignore UPnP for now, get everything from SSU
+        if (source != SOURCE_SSU)
+            return;
+        externalAddressReceived(ip, port);
+    }
+    
+    /**
+     *  UDP changed addresses, tell NTCP and restart
+     *  Port may be set to indicate requested port even if ip is null;
+     *  see CSFI.notifyReplaceAddress()
+     *
+     *  @since IPv6 moved from CSFI.notifyReplaceAddress()
+     */
+    private synchronized void externalAddressReceived(byte[] ip, int port) {
+        // FIXME just take first IPv4 address for now
+        // FIXME if SSU set to hostname, NTCP will be set to IP
+        RouterAddress oldAddr = getCurrentAddress(false);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Changing NTCP Address? was " + oldAddr);
+
+        OrderedProperties newProps = new OrderedProperties();
+        int cost;
+        if (oldAddr == null) {
+            cost = NTCPAddress.DEFAULT_COST;
+        } else {
+            cost = oldAddr.getCost();
+            newProps.putAll(oldAddr.getOptionsMap());
+        }
+        RouterAddress newAddr = new RouterAddress(STYLE, newProps, cost);
+
+        boolean changed = false;
+
+        // Auto Port Setting
+        // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
+        // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
+        // TODO rewrite this to operate on ints instead of strings
+        String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
+        String nport = null;
+        String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
+        if (cport != null && cport.length() > 0) {
+            nport = cport;
+        } else if (_context.getBooleanPropertyDefaultTrue(PROP_I2NP_NTCP_AUTO_PORT)) {
+            // 0.9.6 change
+            // This wasn't quite right, as udpAddr is the EXTERNAL port and we really
+            // want NTCP to bind to the INTERNAL port the first time,
+            // because if they are different, the NAT is changing them, and
+            // it probably isn't mapping UDP and TCP the same.
+            if (port > 0)
+                // should always be true
+                nport = Integer.toString(port);
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("old: " + oport + " config: " + cport + " new: " + nport);
+        if (nport == null || nport.length() <= 0)
+            return;
+        // 0.9.6 change
+        // Don't have NTCP "chase" SSU's external port,
+        // as it may change, possibly frequently.
+        //if (oport == null || ! oport.equals(nport)) {
+        if (oport == null) {
+            newProps.setProperty(NTCPAddress.PROP_PORT, nport);
+            changed = true;
+        }
+
+        // Auto IP Setting
+        // old behavior (<= 0.7.3): auto-ip defaults to false, and trumps configured hostname,
+        //                          and ignores reachability status - leading to
+        //                          "firewalled with inbound TCP enabled" warnings.
+        // new behavior (>= 0.7.4): auto-ip defaults to true, and explicit setting trumps auto,
+        //                          and only takes effect if reachability is OK.
+        //                          And new "always" setting ignores reachability status, like
+        //                          "true" was in 0.7.3
+        String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true").toLowerCase(Locale.US);
+        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        // hostname config trumps auto config
+        if (name != null && name.length() > 0)
+            enabled = "false";
+
+        // assume SSU is happy if the address is non-null
+        // TODO is this sufficient?
+        boolean ssuOK = ip != null;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " ssuOK? " + ssuOK);
+        if (enabled.equals("always") ||
+            (Boolean.parseBoolean(enabled) && ssuOK)) {
+            // ip non-null
+            String nhost = Addresses.toString(ip);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
+            if (nhost == null || nhost.length() <= 0)
+                return;
+            if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
+                newProps.setProperty(NTCPAddress.PROP_HOST, nhost);
+                changed = true;
+            }
+        } else if (enabled.equals("false") &&
+                   name != null && name.length() > 0 &&
+                   !name.equals(ohost) &&
+                   nport != null) {
+            // Host name is configured, and we have a port (either auto or configured)
+            // but we probably only get here if the port is auto,
+            // otherwise createNTCPAddress() would have done it already
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: " + name);
+            newProps.setProperty(NTCPAddress.PROP_HOST, name);
+            changed = true;
+        } else if (ohost == null || ohost.length() <= 0) {
+            return;
+        } else if (Boolean.parseBoolean(enabled) && !ssuOK) {
+            // UDP transitioned to not-OK, turn off NTCP address
+            // This will commonly happen at startup if we were initially OK
+            // because UPnP was successful, but a subsequent SSU Peer Test determines
+            // we are still firewalled (SW firewall, bad UPnP indication, etc.)
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: null");
+            newAddr = null;
+            changed = true;
+        }
+
+        if (!changed) {
+            if (oldAddr != null) {
+                int oldCost = oldAddr.getCost();
+                int newCost = NTCPAddress.DEFAULT_COST;
+                if (TransportImpl.ADJUST_COST && !haveCapacity())
+                    newCost++;
+                if (newCost != oldCost) {
+                    oldAddr.setCost(newCost);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Changing NTCP cost from " + oldCost + " to " + newCost);
+                } else {
+                    _log.info("No change to NTCP Address");
+                }
+            } else {
+                _log.info("No change to NTCP Address");
+            }
+            return;
+        }
+
+        // stopListening stops the pumper, readers, and writers, so required even if
+        // oldAddr == null since startListening starts them all again
+        //
+        // really need to fix this so that we can change or create an inbound address
+        // without tearing down everything
+        // Especially on disabling the address, we shouldn't tear everything down.
+        //
+        _log.warn("Halting NTCP to change address");
+        stopListening();
+        if (newAddr != null)
+            newAddr.setOptions(newProps);
+        // Wait for NTCP Pumper to stop so we don't end up with two...
+        while (isAlive()) {
+            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        }
+        restartListening(newAddr);
+        _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
+        return;     	
+    }
+    
+
 
     /**
      *  If we didn't used to be forwarded, and we have an address,
@@ -698,7 +893,7 @@ public class NTCPTransport extends TransportImpl {
         // from here, so we do it in TransportManager.
         // if (Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue())
         //    return foo;
-        return _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_PORT, -1);
+        return _context.getProperty(PROP_I2NP_NTCP_PORT, -1);
     }
 
     /**
