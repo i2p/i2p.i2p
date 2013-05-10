@@ -272,8 +272,8 @@ public class TransportManager implements TransportEventListener {
             if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Transport manager returning " + skews.size() + " peer clock skews.");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Transport manager returning " + skews.size() + " peer clock skews.");
         return skews;
     }
     
@@ -392,6 +392,8 @@ public class TransportManager implements TransportEventListener {
                 if (udp != null)
                     port = t.getRequestedPort();
             }
+            if (port > 0)
+                rv.add(new Port(t.getStyle(), port));
         }
         return rv;
     }
@@ -492,11 +494,11 @@ public class TransportManager implements TransportEventListener {
      */
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));
+            _log.debug("I2NPMessage received: " + message.getClass().getSimpleName() /*, new Exception("Where did I come from again?") */ );
         try {
             _context.inNetMessagePool().add(message, fromRouter, fromRouterHash);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Added to in pool");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Added to in pool");
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error receiving message", iae);

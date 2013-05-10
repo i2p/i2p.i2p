@@ -1603,6 +1603,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @return the new address if changed, else null
      */
     private RouterAddress rebuildExternalAddress() {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("REA1");
         return rebuildExternalAddress(true);
     }
 
@@ -1613,19 +1615,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @return the new address if changed, else null
      */
     private RouterAddress rebuildExternalAddress(boolean allowRebuildRouterInfo) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("REA2 " + allowRebuildRouterInfo);
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         int port = _context.getProperty(PROP_EXTERNAL_PORT, -1);
         
         byte[] ip = null;
+        String host = null;
         if (explicitAddressSpecified()) {
-            String host = _context.getProperty(PROP_EXTERNAL_HOST);
-            return rebuildExternalAddress(host, port, allowRebuildRouterInfo);
+            host = _context.getProperty(PROP_EXTERNAL_HOST);
+        } else {
+            RouterAddress cur = getCurrentAddress(false);
+            if (cur != null)
+                host = cur.getHost();
         }
-        return rebuildExternalAddress(ip, port, allowRebuildRouterInfo);
+        return rebuildExternalAddress(host, port, allowRebuildRouterInfo);
     }
             
-
     /**
      *  Update our IPv4 or IPv6 address and optionally tell the router to rebuild and republish the router info.
      *
@@ -1636,7 +1643,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since IPv6
      */
     private RouterAddress rebuildExternalAddress(byte[] ip, int port, boolean allowRebuildRouterInfo) {
-        if (ip == null || isValid(ip))
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("REA3 " + Addresses.toString(ip, port));
+        if (ip == null)
+            return rebuildExternalAddress((String) null, port, allowRebuildRouterInfo);
+        if (isValid(ip))
             return rebuildExternalAddress(Addresses.toString(ip), port, allowRebuildRouterInfo);
         return null;
     }
@@ -1644,13 +1655,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  Update our IPv4 or IPv6 address and optionally tell the router to rebuild and republish the router info.
      *
-     *  @param host new valid IPv4 or IPv6 or DNS hostname or null
-     *  @param port new valid port or -1
+     *  @param host new validated IPv4 or IPv6 or DNS hostname or null
+     *  @param port new validated port or 0/-1
      *  @param allowRebuildRouterInfo whether to tell the router
      *  @return the new address if changed, else null
      *  @since IPv6
      */
     private RouterAddress rebuildExternalAddress(String host, int port, boolean allowRebuildRouterInfo) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("REA4 " + host + ':' + port);
         if (_context.router().isHidden())
             return null;
         
@@ -1670,7 +1683,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int found = _introManager.pickInbound(options, PUBLIC_RELAY_COUNT);
             if (found > 0) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Picked peers: " + found);
+                    _log.info("Direct? " + directIncluded + " reqd? " + introducersRequired +
+                              " picked introducers: " + found);
                 _introducersSelectedOn = _context.clock().now();
                 introducersIncluded = true;
             } else {
@@ -1678,7 +1692,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // maybe we should fail to publish an address at all in this case?
                 // YES that would be better
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Need introducers but we don't know any");
+                    _log.warn("Direct? " + directIncluded + " reqd? " + introducersRequired +
+                              " no introducers");
             }
         }
         
@@ -1710,7 +1725,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             if (wantsRebuild) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Address rebuilt: " + addr);
+                    _log.info("Address rebuilt: " + addr, new Exception());
                 replaceAddress(addr);
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();

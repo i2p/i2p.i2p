@@ -821,7 +821,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 					fps = new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber);
 				}
 				Map map = Collections.singletonMap(port, fps);
-				forwardCallback.portForwardStatus(map);
+				try {
+					forwardCallback.portForwardStatus(map);
+				} catch (Exception e) {
+                                    _log.error("UPnP RPT error", e);
+				}
 			}
 		}
 	}

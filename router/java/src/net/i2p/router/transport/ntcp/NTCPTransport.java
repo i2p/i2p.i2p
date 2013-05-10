@@ -845,16 +845,16 @@ public class NTCPTransport extends TransportImpl {
         // without tearing down everything
         // Especially on disabling the address, we shouldn't tear everything down.
         //
-        _log.warn("Halting NTCP to change address");
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Halting NTCP to change address");
         stopListening();
-        if (newAddr != null)
-            newAddr.setOptions(newProps);
         // Wait for NTCP Pumper to stop so we don't end up with two...
         while (isAlive()) {
             try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
         }
         restartListening(newAddr);
-        _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
         return;     	
     }
     
