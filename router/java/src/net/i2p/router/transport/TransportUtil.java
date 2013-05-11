@@ -57,6 +57,8 @@ public abstract class TransportUtil {
         for (IPv6Config cfg : IPv6Config.values()) {
             BY_NAME.put(cfg.toConfigString(), cfg);
         }
+        // alias
+        BY_NAME.put("true", IPv6Config.IPV6_ENABLED);
     }
 
     public static IPv6Config getIPv6Config(RouterContext ctx, String transportStyle) {

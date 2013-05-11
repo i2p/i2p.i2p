@@ -10,6 +10,9 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -57,6 +60,7 @@ public abstract class TransportImpl implements Transport {
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
     private final Set<Hash> _wasUnreachableEntries;
+    private final Set<InetAddress> _localAddresses;
     /** global router ident -> IP */
     private static final Map<Hash, byte[]> _IPMap;
 
@@ -95,6 +99,7 @@ public abstract class TransportImpl implements Transport {
             _sendPool = null;
         _unreachableEntries = new HashMap(16);
         _wasUnreachableEntries = new ConcurrentHashSet(16);
+        _localAddresses = new ConcurrentHashSet(4);
         _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
@@ -538,6 +543,26 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
+     *  Save a local address we were notified about before we started.
+     *
+     *  @since IPv6
+     */
+    protected void saveLocalAddress(InetAddress address) {
+        _localAddresses.add(address);
+    }
+
+    /**
+     *  Return and then clear all saved local addresses.
+     *
+     *  @since IPv6
+     */
+    protected Collection<InetAddress> getSavedLocalAddresses() {
+        List<InetAddress> rv = new ArrayList(_localAddresses);
+        _localAddresses.clear();
+        return rv;
+    }
+
+    /**
      *  Notify a transport of an external address change.
      *  This may be from a local interface, UPnP, a config change, etc.
      *  This should not be called if the ip didn't change
@@ -569,9 +594,9 @@ public abstract class TransportImpl implements Transport {
     public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {}
 
     /**
-     * What port would the transport like to have forwarded by UPnP.
+     * What INTERNAL port would the transport like to have forwarded by UPnP.
      * This can't be passed via getCurrentAddress(), as we have to open the port
-     * before we can publish the address.
+     * before we can publish the address, and that's the external port anyway.
      *
      * @return port or -1 for none or 0 for any
      */
@@ -590,6 +615,7 @@ public abstract class TransportImpl implements Transport {
     public boolean isEstablished(Hash dest) { return false; }
 
     private static final long UNREACHABLE_PERIOD = 5*60*1000;
+
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
         synchronized (_unreachableEntries) {
@@ -603,6 +629,7 @@ public abstract class TransportImpl implements Transport {
             }
         }
     }
+
     /** called when we can't reach a peer */
     /** This isn't very useful since it is cleared when they contact us */
     public void markUnreachable(Hash peer) {
@@ -612,6 +639,7 @@ public abstract class TransportImpl implements Transport {
         }
         markWasUnreachable(peer, true);
     }
+
     /** called when we establish a peer connection (outbound or inbound) */
     public void markReachable(Hash peer, boolean isInbound) {
         // if *some* transport can reach them, then we shouldn't banlist 'em

@@ -243,6 +243,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
         _mtu = PeerState.LARGE_MTU;
+        setupPort();
         _needsRebuild = true;
         
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", RATES);
@@ -264,7 +265,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
-    public synchronized void startup() {
+    /**
+     *  Pick a port if not previously configured, so that TransportManager may
+     *  call getRequestedPort() before we've started to get a best-guess of what our
+     *  port is going to be, and pass that to NTCP
+     *
+     *  @since IPv6
+     */
+    private void setupPort() {
+        int port = getRequestedPort();
+        if (port < 0) {
+            port = UDPEndpoint.selectRandomPort(_context);
+            Map<String, String> changes = new HashMap();
+            changes.put(PROP_INTERNAL_PORT, Integer.toString(port));
+            changes.put(PROP_EXTERNAL_PORT, Integer.toString(port));
+            _context.router().saveConfig(changes, null);
+            _log.logAlways(Log.INFO, "UDP selected random port " + port);
+        }
+    }
+
+    private synchronized void startup() {
         _fragments.shutdown();
         if (_pusher != null)
             _pusher.shutdown();
@@ -285,11 +305,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager.reset();
         UDPPacket.clearCache();
         
+        if (_log.shouldLog(Log.WARN)) _log.warn("Starting SSU transport listening");
         _introKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
         
-        rebuildExternalAddress();
-
         // bind host
         String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
 
@@ -312,9 +331,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             try {
                 bindToAddr = InetAddress.getByName(bindTo);
             } catch (UnknownHostException uhe) {
-                _log.log(Log.CRIT, "Invalid SSU bind interface specified [" + bindTo + "]", uhe);
-                setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
-                return;
+                _log.error("Invalid SSU bind interface specified [" + bindTo + "]", uhe);
+                //setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+                //return;
+                // fall thru...
             }
         }
         
@@ -412,6 +432,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireEvent.setIsAlive(true);
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
         _testEvent.reschedule(10*1000); // lets requeue it for Real Soon
+
+        // set up external addresses
+        // REA param is false;
+        // TransportManager.startListening() calls router.rebuildRouterInfo()
+        if (newPort > 0 && bindToAddr == null) {
+            for (InetAddress ia : getSavedLocalAddresses()) {
+                rebuildExternalAddress(ia.getHostAddress(), newPort, false);
+            }
+        }
+        rebuildExternalAddress(false);
     }
     
     public synchronized void shutdown() {
@@ -441,6 +471,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager.reset();
         UDPPacket.clearCache();
         UDPAddress.clearCache();
+    }
+
+    /** @since IPv6 */
+    private boolean isAlive() {
+        return _inboundFragments.isAlive();
     }
     
     /**
@@ -581,8 +616,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
         if (!sources.contains(source.toConfigString()))
             return;
-        if (!isValid(ip))
+        if (!isValid(ip)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
             return;
+        }
+        if (!isAlive()) {
+            if (source == SOURCE_INTERFACE) {
+                try {
+                    InetAddress ia = InetAddress.getByAddress(ip);
+                    saveLocalAddress(ia);
+                } catch (UnknownHostException uhe) {}
+            }
+            return;
+        }
         if (source == SOURCE_INTERFACE) {
             // temp prevent multiples
             if (ip.length == 4) {

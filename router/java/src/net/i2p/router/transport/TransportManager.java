@@ -87,13 +87,24 @@ public class TransportManager implements TransportEventListener {
 
     private void configTransports() {
         boolean enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
+        Transport udp = null;
         if (enableUDP) {
-            UDPTransport udp = new UDPTransport(_context, _dhThread);
+            udp = new UDPTransport(_context, _dhThread);
             addTransport(udp);
             initializeAddress(udp);
         }
-        if (isNTCPEnabled(_context))
-            addTransport(new NTCPTransport(_context, _dhThread));
+        if (isNTCPEnabled(_context)) {
+            Transport ntcp = new NTCPTransport(_context, _dhThread);
+            addTransport(ntcp);
+            initializeAddress(ntcp);
+            if (udp != null) {
+                // pass along the port SSU is probably going to use
+                // so that NTCP may bind early
+                int port = udp.getRequestedPort();
+                if (port > 0)
+                    ntcp.externalAddressReceived(SOURCE_CONFIG, null, port);
+            }
+        }
         if (_transports.isEmpty())
             _log.log(Log.CRIT, "No transports are enabled");
     }
@@ -120,8 +131,8 @@ public class TransportManager implements TransportEventListener {
     }
 
     /**
-     * callback from UPnP or SSU
-     * Only tell SSU, it will tell NTCP
+     * Initialize from interfaces, and callback from UPnP or SSU.
+     * Tell all transports... but don't loop
      *
      */
     public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
@@ -154,7 +165,17 @@ public class TransportManager implements TransportEventListener {
             _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");
-        for (Transport t : _transports.values()) {
+        // Let's do this in a predictable order to make testing easier
+        // Start NTCP first so it can get notified from SSU
+        List<Transport> tps = new ArrayList();
+        Transport tp = getTransport(NTCPTransport.STYLE);
+        if (tp != null)
+            tps.add(tp);
+        tp = getTransport(UDPTransport.STYLE);
+        if (tp != null)
+            tps.add(tp);
+        //for (Transport t : _transports.values()) {
+        for (Transport t : tps) {
             t.startListening();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Transport " + t.getStyle() + " started");

@@ -26,9 +26,6 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.ntcp.NTCPAddress;
-import net.i2p.router.transport.ntcp.NTCPTransport;
-import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
@@ -203,6 +200,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * UDP changed addresses, tell NTCP and restart
      *
      * All the work moved to NTCPTransport.externalAddressReceived()
+     *
+     * @param udpAddr may be null; or udpAddr's host/IP may be null
      */
     @Override
     public void notifyReplaceAddress(RouterAddress udpAddr) {

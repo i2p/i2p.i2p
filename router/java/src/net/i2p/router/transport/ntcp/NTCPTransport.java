@@ -8,9 +8,11 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -58,6 +60,10 @@ public class NTCPTransport extends TransportImpl {
     private final EventPumper _pumper;
     private final Reader _reader;
     private net.i2p.router.transport.ntcp.Writer _writer;
+    private int _ssuPort;
+    /** synch on this */
+    private final Set<InetSocketAddress> _endpoints;
+
     /**
      * list of NTCPConnection of connections not yet established that we
      * want to remove on establishment or close on timeout
@@ -155,6 +161,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.wantsQueuedWrite", "", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.write", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.writeError", "", "ntcp", RATES);
+        _endpoints = new HashSet(4);
         _establishing = new ConcurrentHashSet(16);
         _conLock = new Object();
         _conByIdent = new ConcurrentHashMap(64);
@@ -474,27 +481,47 @@ public class NTCPTransport extends TransportImpl {
 
         startIt();
         RouterAddress addr = configureLocalAddress();
+        int port;
         if (addr != null)
-        bindAddress(addr);
+            // probably not set
+            port = addr.getPort();
+        else
+            // received by externalAddressReceived() from TransportManager
+            port = _ssuPort;
+        RouterAddress myAddress = bindAddress(port);
+        if (myAddress != null) {
+            replaceAddress(myAddress);
+        } else if (port > 0) {
+            for (InetAddress ia : getSavedLocalAddresses()) {
+                OrderedProperties props = new OrderedProperties();
+                props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());
+                props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
+                myAddress = new RouterAddress(STYLE, props, DEFAULT_COST);
+                replaceAddress(myAddress);
+            }
+        }
+        // TransportManager.startListening() calls router.rebuildRouterInfo()
     }
 
     /**
      *  Only called by externalAddressReceived().
-     *  Caller should stop the transport first, then
-     *  verify stopped with isAlive()
+     *
+     *  Doesn't actually restart unless addr is non-null and
+     *  the port is different from the current listen port.
+     *
+     *  If we had interface addresses before, we lost them.
      *
      *  @param addr may be null
      */
     private synchronized void restartListening(RouterAddress addr) {
-        // try once again to prevent two pumpers which is fatal
-        // we could just return null since the return value is ignored
-        if (_pumper.isAlive())
-            return;
-        if (_log.shouldLog(Log.WARN)) _log.warn("Restarting ntcp transport listening");
-
-        startIt();
-        if (addr != null)
-            bindAddress(addr);
+        if (addr != null) {
+            RouterAddress myAddress = bindAddress(addr.getPort());
+            if (myAddress != null)
+                replaceAddress(myAddress);
+            else
+                replaceAddress(addr);
+            // UDPTransport.rebuildExternalAddress() calls router.rebuildRouterInfo()
+        }
     }
 
     /**
@@ -526,12 +553,18 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     *  Only does something if myPort > 0 and myPort != current bound port
+     *  (or there's no current port, or the configured interface or hostname changed).
+     *  If we are changing the bound port, this restarts everything, which takes a long time.
+     *
      *  call from synchronized method
-     *  @param myAddress new address, may be null
-     *  @return new address or null
+     *
+     *  @param myPort does nothing if <= 0
+     *  @return new address ONLY if bound to specific address, otherwise null
      */
-    private RouterAddress bindAddress(RouterAddress myAddress) {
-        if (myAddress != null) {
+    private RouterAddress bindAddress(int port) {
+        RouterAddress myAddress = null;
+        if (port > 0) {
             InetAddress bindToAddr = null;
             String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
 
@@ -539,16 +572,7 @@ public class NTCPTransport extends TransportImpl {
                 // If we are configured with a fixed IP address,
                 // AND it's one of our local interfaces,
                 // bind only to that.
-                boolean isFixed = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true")
-                                  .toLowerCase(Locale.US).equals("false");
-                String fixedHost = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
-                if (isFixed && fixedHost != null) {
-                    try {
-                        String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
-                        if (Addresses.getAddresses().contains(testAddr))
-                            bindTo = testAddr;
-                    } catch (UnknownHostException uhe) {}
-                }
+                bindTo = getFixedHost();
             }
 
             if (bindTo != null) {
@@ -564,43 +588,104 @@ public class NTCPTransport extends TransportImpl {
             }
 
             try {
-                ServerSocketChannel chan = ServerSocketChannel.open();
-                chan.configureBlocking(false);
-
-                int port = myAddress.getPort();
-                if (port > 0 && port < 1024)
-                    _log.logAlways(Log.WARN, "Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
-                InetSocketAddress addr = null;
+                InetSocketAddress addr;
                 if(bindToAddr==null) {
                     addr = new InetSocketAddress(port);
                 } else {
                     addr = new InetSocketAddress(bindToAddr, port);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Binding only to " + bindToAddr);
+                    OrderedProperties props = new OrderedProperties();
+                    props.setProperty(RouterAddress.PROP_HOST, bindTo);
+                    props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
+                    myAddress = new RouterAddress(STYLE, props, DEFAULT_COST);
                 }
+                if (!_endpoints.isEmpty()) {
+                    // If we are already bound to the new address, OR
+                    // if the host is specified and we are bound to the wildcard on the same port,
+                    // do nothing. Changing config from wildcard to a specified host will
+                    // require a restart.
+                    if (_endpoints.contains(addr) ||
+                        (bindToAddr != null && _endpoints.contains(new InetSocketAddress(port)))) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Already listening on " + addr);
+                        return null;
+                    }
+                    // FIXME support multiple binds
+                    // FIXME just close and unregister
+                    stopWaitAndRestart();
+                }
+                if (port < 1024)
+                    _log.logAlways(Log.WARN, "Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
+                ServerSocketChannel chan = ServerSocketChannel.open();
+                chan.configureBlocking(false);
                 chan.socket().bind(addr);
+                _endpoints.add(addr);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Listening on " + addr);
                 _pumper.register(chan);
             } catch (IOException ioe) {
                 _log.error("Error listening", ioe);
+                myAddress = null;
             }
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Outbound NTCP connections only - no listener configured");
         }
-
-        if (myAddress != null) {
-            replaceAddress(myAddress);
-            return myAddress;
-        } else {
-            return null;
-        }
+        return myAddress;
     }
 
+    /**
+     *  @return configured host or null. Must be one of our local interfaces.
+     *  @since IPv6 moved from bindAddress()
+     */
+    private String getFixedHost() {
+        boolean isFixed = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true")
+                          .toLowerCase(Locale.US).equals("false");
+        String fixedHost = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        if (isFixed && fixedHost != null) {
+            try {
+                String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
+                // FIXME range of IPv6 addresses
+                if (Addresses.getAddresses().contains(testAddr))
+                    return testAddr;
+            } catch (UnknownHostException uhe) {}
+        }
+        return null;
+    }
+
+    /**
+     *  Caller must sync
+     *  @since IPv6 moved from externalAddressReceived()
+     */
+    private void stopWaitAndRestart() {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Halting NTCP to change address");
+        stopListening();
+        // Wait for NTCP Pumper to stop so we don't end up with two...
+        while (isAlive()) {
+            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Restarting NTCP transport listening");
+        startIt();
+    }
+
+    /**
+     *  Hook for NTCPConnection
+     */
     Reader getReader() { return _reader; }
+
+    /**
+     *  Hook for NTCPConnection
+     */
     net.i2p.router.transport.ntcp.Writer getWriter() { return _writer; }
+
     public String getStyle() { return STYLE; }
+
+    /**
+     *  Hook for NTCPConnection
+     */
     EventPumper getPumper() { return _pumper; }
 
     /**
@@ -677,6 +762,7 @@ public class NTCPTransport extends TransportImpl {
      * @since IPv6 moved from CSFI
      */
     private RouterAddress createNTCPAddress() {
+        // Fixme doesn't check PROP_BIND_INTERFACE
         String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
         if ( (name == null) || (name.trim().length() <= 0) || ("null".equals(name)) )
             return null;
@@ -691,7 +777,7 @@ public class NTCPTransport extends TransportImpl {
     }
     
     /**
-     *  UDP changed addresses, tell NTCP and restart
+     *  UDP changed addresses, tell NTCP and (possibly) restart
      *
      *  @since IPv6 moved from CSFI.notifyReplaceAddress()
      */
@@ -699,6 +785,23 @@ public class NTCPTransport extends TransportImpl {
     public void externalAddressReceived(AddressSource source, byte[] ip, int port) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
+        if (ip != null && !isPubliclyRoutable(ip)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
+            return;
+        }
+        if (!isAlive()) {
+            if (source == SOURCE_INTERFACE) {
+                try {
+                    InetAddress ia = InetAddress.getByAddress(ip);
+                    saveLocalAddress(ia);
+                } catch (UnknownHostException uhe) {}
+            } else if (source == SOURCE_CONFIG) {
+                // save for startListening()
+                _ssuPort = port;
+            }
+            return;
+        }
         // ignore UPnP for now, get everything from SSU
         if (source != SOURCE_SSU)
             return;
@@ -706,10 +809,10 @@ public class NTCPTransport extends TransportImpl {
     }
     
     /**
-     *  UDP changed addresses, tell NTCP and restart
-     *  Port may be set to indicate requested port even if ip is null;
-     *  see CSFI.notifyReplaceAddress()
+     *  UDP changed addresses, tell NTCP and restart.
+     *  Port may be set to indicate requested port even if ip is null.
      *
+     *  @param ip previously validated
      *  @since IPv6 moved from CSFI.notifyReplaceAddress()
      */
     private synchronized void externalAddressReceived(byte[] ip, int port) {
@@ -845,16 +948,16 @@ public class NTCPTransport extends TransportImpl {
         // without tearing down everything
         // Especially on disabling the address, we shouldn't tear everything down.
         //
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Halting NTCP to change address");
-        stopListening();
+        //if (_log.shouldLog(Log.WARN))
+        //    _log.warn("Halting NTCP to change address");
+        //stopListening();
         // Wait for NTCP Pumper to stop so we don't end up with two...
-        while (isAlive()) {
-            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
-        }
+        //while (isAlive()) {
+        //    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        //}
         restartListening(newAddr);
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
+            _log.warn("Updating NTCP Address with " + newAddr);
         return;     	
     }
     
@@ -929,17 +1032,17 @@ public class NTCPTransport extends TransportImpl {
         _writer.stopWriting();
         _reader.stopReading();
         _finisher.stop();
-        Map cons = null;
+        List<NTCPConnection> cons;
         synchronized (_conLock) {
-            cons = new HashMap(_conByIdent);
+            cons = new ArrayList(_conByIdent.values());
             _conByIdent.clear();
         }
-        for (Iterator iter = cons.values().iterator(); iter.hasNext(); ) {
-            NTCPConnection con = (NTCPConnection)iter.next();
+        for (NTCPConnection con : cons) {
             con.close();
         }
         NTCPConnection.releaseResources();
         replaceAddress(null);
+        _endpoints.clear();
     }
 
     public static final String STYLE = "NTCP";

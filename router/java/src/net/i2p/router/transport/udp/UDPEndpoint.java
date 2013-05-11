@@ -108,9 +108,7 @@ class UDPEndpoint {
              if (port <= 0) {
                  // try random ports rather than just do new DatagramSocket()
                  // so we stay out of the way of other I2P stuff
-                 int minPort = _context.getProperty(PROP_MIN_PORT, MIN_RANDOM_PORT);
-                 int maxPort = _context.getProperty(PROP_MAX_PORT, MAX_RANDOM_PORT);
-                 port = minPort + _context.random().nextInt(maxPort - minPort);
+                 port = selectRandomPort(_context);
              }
              try {
                  if (_bindAddress == null)
@@ -135,6 +133,17 @@ class UDPEndpoint {
         _listenPort = port;
         return socket;
     }
+
+    /**
+     *  Pick a random port between the configured boundaries
+     *  @since IPv6
+     */
+    public static int selectRandomPort(RouterContext ctx) {
+        int minPort = Math.min(65535, Math.max(1, ctx.getProperty(PROP_MIN_PORT, MIN_RANDOM_PORT)));
+        int maxPort = Math.min(65535, Math.max(minPort, ctx.getProperty(PROP_MAX_PORT, MAX_RANDOM_PORT)));
+        return minPort + ctx.random().nextInt(1 + maxPort - minPort);
+    }
+
 
     /** call after startup() to get actual port or -1 on startup failure */
     public int getListenPort() { return _listenPort; }
