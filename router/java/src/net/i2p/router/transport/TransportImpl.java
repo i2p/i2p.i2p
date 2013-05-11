@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -49,7 +51,8 @@ public abstract class TransportImpl implements Transport {
     private final Log _log;
     private TransportEventListener _listener;
     private RouterAddress _currentAddress;
-    private final List _sendPool;
+    // Only used by NTCP. SSU does not use. See send() below.
+    private final BlockingQueue<OutNetMessage> _sendPool;
     protected final RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
@@ -84,7 +87,10 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         //_context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
-        _sendPool = new ArrayList(16);
+        if (getStyle().equals("NTCP"))
+            _sendPool = new ArrayBlockingQueue(8);
+        else
+            _sendPool = null;
         _unreachableEntries = new HashMap(16);
         _wasUnreachableEntries = new ConcurrentHashSet(16);
         _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
@@ -166,15 +172,14 @@ public abstract class TransportImpl implements Transport {
      * Nonblocking call to pull the next outbound message
      * off the queue.
      *
+     * Only used by NTCP. SSU does not call.
+     *
      * @return the next message or null if none are available
      */
-    public OutNetMessage getNextMessage() {
-        OutNetMessage msg = null;
-        synchronized (_sendPool) {
-            if (_sendPool.isEmpty()) return null;
-            msg = (OutNetMessage)_sendPool.remove(0); // use priority queues later
-        }
-        msg.beginSend();
+    protected OutNetMessage getNextMessage() {
+        OutNetMessage msg = _sendPool.poll();
+        if (msg != null)
+            msg.beginSend();
         return msg;
     }
 
@@ -361,6 +366,12 @@ public abstract class TransportImpl implements Transport {
      * with the OutboundMessageRegistry (if it has a reply selector).  If the
      * send fails, queue up any msg.getOnFailedSendJob
      *
+     * Only used by NTCP. SSU overrides.
+     *
+     * Note that this adds to the queue and then takes it back off in the same thread,
+     * so it actually blocks, and we don't need a big queue.
+     *
+     * TODO: Override in NTCP also and get rid of queue?
      */
     public void send(OutNetMessage msg) {
         if (msg.getTarget() == null) {
@@ -368,29 +379,26 @@ public abstract class TransportImpl implements Transport {
                 _log.error("Error - bad message enqueued [target is null]: " + msg, new Exception("Added by"));
             return;
         }
-        boolean duplicate = false;
-        synchronized (_sendPool) {
-            if (_sendPool.contains(msg))
-                duplicate = true;
-            else
-                _sendPool.add(msg);
-        }
-        if (duplicate) {
+        try {
+            _sendPool.put(msg);
+        } catch (InterruptedException ie) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Message already is in the queue?  wtf.  msg = " + msg,
-                           new Exception("wtf, requeued?"));
+                _log.error("Interrupted during send " + msg);
+            return;
         }
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Message added to send pool");
-        msg.timestamp("send on " + getStyle());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Message added to send pool");
+        //msg.timestamp("send on " + getStyle());
         outboundMessageReady();
-        if (_log.shouldLog(Log.INFO))
-            _log.debug("OutboundMessageReady called");
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.debug("OutboundMessageReady called");
     }
     /**
      * This message is called whenever a new message is added to the send pool,
      * and it should not block
+     *
+     * Only used by NTCP. SSU throws UOE.
      */
     protected abstract void outboundMessageReady();
 

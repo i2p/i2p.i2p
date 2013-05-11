@@ -225,7 +225,7 @@ class EstablishmentManager {
      */
     private void establish(OutNetMessage msg, boolean queueIfMaxExceeded) {
         RouterInfo toRouterInfo = msg.getTarget();
-        RouterAddress ra = toRouterInfo.getTargetAddress(_transport.getStyle());
+        RouterAddress ra = _transport.getTargetAddress(toRouterInfo);
         if (ra == null) {
             _transport.failed(msg, "Remote peer has no address, cannot establish");
             return;
@@ -668,7 +668,7 @@ class EstablishmentManager {
         // Perhaps netdb should notify transport when it gets a new RI...
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(remote.calculateHash());
         if (info != null) {
-            RouterAddress addr = info.getTargetAddress(UDPTransport.STYLE);
+            RouterAddress addr = _transport.getTargetAddress(info);
             if (addr != null) {
                 String smtu = addr.getOption(UDPAddress.PROP_MTU);
                 if (smtu != null) {

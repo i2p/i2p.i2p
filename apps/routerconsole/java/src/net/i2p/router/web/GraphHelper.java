@@ -126,7 +126,6 @@ public class GraphHelper extends FormHandler {
 
     /**
      *  For single stat page
-     *  @param "bw.combined" treated specially
      *  @since 0.9
      */
     public void setStat(String stat) {

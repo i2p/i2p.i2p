@@ -727,7 +727,7 @@ class PeerTestManager {
             aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
             testInfo.readIntroKey(aliceIntroKey.getData(), 0);
 
-            RouterAddress raddr = charlieInfo.getTargetAddress(UDPTransport.STYLE);
+            RouterAddress raddr = _transport.getTargetAddress(charlieInfo);
             if (raddr == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to pick a charlie");

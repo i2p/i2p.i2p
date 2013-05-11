@@ -138,6 +138,9 @@ abstract class BuildRequestor {
             if (log.shouldLog(Log.ERROR))
                 log.error("Tunnel build failed, as we couldn't find a paired tunnel for " + cfg);
             exec.buildComplete(cfg, pool);
+            // Not even a zero-hop exploratory tunnel? We are in big trouble.
+            // Let's not spin through here too fast.
+            try { Thread.sleep(250); } catch (InterruptedException ie) {}
             return;
         }
         

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -98,8 +99,8 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.attemptUnreachablePeer", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.closeOnBacklog", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedIOE", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.connectFailedInvalidPort", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.bidRejectedLocalAddress", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.connectFailedInvalidPort", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.bidRejectedLocalAddress", "", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.bidRejectedNoNTCPAddress", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedTimeout", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedTimeoutIOE", "", "ntcp", RATES);
@@ -183,7 +184,8 @@ public class NTCPTransport extends TransportImpl {
     protected void outboundMessageReady() {
         OutNetMessage msg = getNextMessage();
         if (msg != null) {
-            RouterIdentity ident = msg.getTarget().getIdentity();
+            RouterInfo target = msg.getTarget();
+            RouterIdentity ident = target.getIdentity();
             Hash ih = ident.calculateHash();
             NTCPConnection con = null;
             boolean isNew = false;
@@ -191,7 +193,7 @@ public class NTCPTransport extends TransportImpl {
                 con = _conByIdent.get(ih);
                 if (con == null) {
                     isNew = true;
-                    RouterAddress addr = msg.getTarget().getTargetAddress(STYLE);
+                    RouterAddress addr = getTargetAddress(target);
                     if (addr != null) {
                         NTCPAddress naddr = new NTCPAddress(addr);
                         con = new NTCPConnection(_context, this, ident, naddr);
@@ -199,7 +201,7 @@ public class NTCPTransport extends TransportImpl {
                             _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih.toBase64());
                         _conByIdent.put(ih, con);
                     } else {
-                        _log.error("we bid on a peer who doesn't have an ntcp address? " + msg.getTarget());
+                        _log.error("we bid on a peer who doesn't have an ntcp address? " + target);
                         return;
                     }
                 }
@@ -297,33 +299,11 @@ public class NTCPTransport extends TransportImpl {
                 _log.debug("fast bid when trying to send to " + peer + " as its already established");
             return _fastBid;
         }
-        RouterAddress addr = toAddress.getTargetAddress(STYLE);
 
+        RouterAddress addr = getTargetAddress(toAddress);
         if (addr == null) {
             markUnreachable(peer);
-            //_context.statManager().addRateData("ntcp.bidRejectedNoNTCPAddress", 1);
-            //_context.banlist().banlistRouter(toAddress.getIdentity().calculateHash(), "No NTCP address", STYLE);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("no bid when trying to send to " + peer + " as they don't have an ntcp address");
             return null;
-        }
-        byte[] ip = addr.getIP();
-        if ( (addr.getPort() < MIN_PEER_PORT) || (ip == null) ) {
-            _context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
-            markUnreachable(peer);
-            //_context.banlist().banlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("no bid when trying to send to " + peer + " as they don't have a valid ntcp address");
-            return null;
-        }
-        if (!isPubliclyRoutable(ip)) {
-            if (! _context.getProperty("i2np.ntcp.allowLocal", "false").equals("true")) {
-                _context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1);
-                markUnreachable(peer);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("no bid when trying to send to " + peer + " as they have a private ntcp address");
-                return null;
-            }
         }
 
         if (!allowConnection()) {
@@ -348,6 +328,36 @@ public class NTCPTransport extends TransportImpl {
             else
                 return _nearCapacityBid;
         }
+    }
+
+    /**
+     *  Get first available address we can use.
+     *  @return address or null
+     *  @since 0.9.6
+     */
+    private RouterAddress getTargetAddress(RouterInfo target) {
+        List<RouterAddress> addrs = target.getTargetAddresses(STYLE);
+        for (int i = 0; i < addrs.size(); i++) {
+            RouterAddress addr = addrs.get(i);
+            byte[] ip = addr.getIP();
+            if (addr.getPort() < MIN_PEER_PORT || ip == null) {
+                //_context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
+                //_context.banlist().banlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("no bid when trying to send to " + peer + " as they don't have a valid ntcp address");
+                continue;
+            }
+            if (!isPubliclyRoutable(ip)) {
+                if (! _context.getBooleanProperty("i2np.ntcp.allowLocal")) {
+                    //_context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("no bid when trying to send to " + peer + " as they have a private ntcp address");
+                    continue;
+                }
+            }
+            return addr;
+        }
+        return null;
     }
 
     public boolean allowConnection() {
@@ -628,6 +638,7 @@ public class NTCPTransport extends TransportImpl {
 
     //private boolean bindAllInterfaces() { return true; }
 
+    /** caller must synch on this */
     private void configureLocalAddress() {
         RouterContext ctx = getContext();
         if (ctx == null) {
@@ -674,8 +685,17 @@ public class NTCPTransport extends TransportImpl {
         }
     }
 
+    /**
+     *  @return current port, else NTCP configured port, else -1 (but not UDP port if auto)
+     */
     @Override
     public int getRequestedPort() {
+        NTCPAddress addr = _myAddress;
+        if (addr != null) {
+            int port = addr.getPort();
+            if (port > 0)
+                return port;
+        }
         // would be nice to do this here but we can't easily get to the UDP transport.getRequested_Port()
         // from here, so we do it in TransportManager.
         // if (Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue())

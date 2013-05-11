@@ -446,10 +446,13 @@ class MessageOutputStream extends OutputStream {
     public boolean getClosed() { return _closed; }
     
     private void throwAnyError() throws IOException {
-        if (_streamError != null) {
-            IOException ioe = _streamError;
+        IOException ioe = _streamError;
+        if (ioe != null) {
             _streamError = null;
-            throw ioe;
+            // constructor with cause not until Java 6
+            IOException ioe2 = new IOException("Output stream error");
+            ioe2.initCause(ioe);
+            throw ioe2;
         }
     }
     

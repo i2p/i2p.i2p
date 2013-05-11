@@ -83,7 +83,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /** summary info to distribute */
     private RouterAddress _externalAddress;
-    /** port number on which we can be reached, or -1 for error, or 0 for unset */
+    /**
+     * Port number on which we can be reached, or -1 for error, or 0 for unset
+     * Do NOT use this for current internal port - use _endpoint.getListenPort()
+     */
     private int _externalListenPort;
     /** IP address of externally reachable host, or null */
     private InetAddress _externalListenHost;
@@ -310,19 +313,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // Requested bind port
         // This may be -1 or may not be honored if busy,
+        // Priority: Configured internal, then already used, then configured external
         // we will check below after starting up the endpoint.
         int port;
         int oldIPort = _context.getProperty(PROP_INTERNAL_PORT, -1);
+        int oldBindPort = _endpoint != null ? _endpoint.getListenPort() : -1;
         int oldEPort = _context.getProperty(PROP_EXTERNAL_PORT, -1);
-        if (_externalListenPort <= 0) {
-            // no explicit external port, so lets try an internal one
-            if (oldIPort > 0)
-                port = oldIPort;
-            else
-                port = oldEPort;
-        } else {
-            port = _externalListenPort;
-        }
+        if (oldIPort > 0)
+            port = oldIPort;
+        else if (oldBindPort > 0)
+            port = oldBindPort;
+        else
+            port = oldEPort;
         if (bindToAddr != null && _log.shouldLog(Log.WARN))
             _log.warn("Binding only to " + bindToAddr);
         if (_log.shouldLog(Log.INFO))
@@ -436,14 +438,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
-     *  _externalListenPort should always be set (by startup()) before this is called,
-     *  so the returned value should be > 0
+     *  The current or configured internal port.
+     *  UDPEndpoint should always be instantiated (and a random port picked if not configured)
+     *  before this is called, so the returned value should be > 0
+     *  unless the endpoint failed to bind.
      */
     @Override
     public int getRequestedPort() {
-        if (_externalListenPort > 0)
-            return _externalListenPort;
-        return _context.getProperty(PROP_INTERNAL_PORT, -1);
+        if (_endpoint != null) {
+            int rv = _endpoint.getListenPort();
+            if (rv > 0)
+                return rv;
+        }
+        // fallbacks
+        int rv = _context.getProperty(PROP_INTERNAL_PORT, -1);
+        if (rv > 0)
+            return rv;
+        return _context.getProperty(PROP_EXTERNAL_PORT, -1);
     }
 
     /**
@@ -1286,25 +1297,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
             // Validate his SSU address
-            RouterAddress addr = toAddress.getTargetAddress(STYLE);
+            RouterAddress addr = getTargetAddress(toAddress);
             if (addr == null) {
                 markUnreachable(to);
                 return null;
             }
 
-            // don't do this - object churn parsing the whole thing
-            //UDPAddress ua = new UDPAddress(addr);
-            //if (ua.getIntroducerCount() <= 0) {
-            if (addr.getOption("ihost0") == null) {
-                byte[] ip = addr.getIP();
-                int port = addr.getPort();
-                if (ip == null || port < MIN_PEER_PORT ||
-                    (!isValid(ip)) ||
-                    Arrays.equals(ip, getExternalIP())) {
-                    markUnreachable(to);
-                    return null;
-                }
-            }
             if (!allowConnection())
                 return _cachedBid[TRANSIENT_FAIL_BID];
 
@@ -1335,6 +1333,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return _cachedBid[NEAR_CAPACITY_BID];
             }
         }
+    }
+
+    /**
+     *  Get first available address we can use.
+     *  @return address or null
+     *  @since 0.9.6
+     */
+    RouterAddress getTargetAddress(RouterInfo target) {
+        List<RouterAddress> addrs = target.getTargetAddresses(STYLE);
+        for (int i = 0; i < addrs.size(); i++) {
+            RouterAddress addr = addrs.get(i);
+            if (addr.getOption("ihost0") == null) {
+                byte[] ip = addr.getIP();
+                int port = addr.getPort();
+                if (ip == null || port < MIN_PEER_PORT ||
+                    (!isValid(ip)) ||
+                    Arrays.equals(ip, getExternalIP())) {
+                    continue;
+                }
+            }
+            return addr;
+        }
+        return null;
     }
 
     private boolean preferUDP() {

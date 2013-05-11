@@ -284,6 +284,14 @@ public abstract class Addresses {
         a = getAddresses(true, false, false);
         for (String s : a)
             System.err.println(s);
+        System.err.println("\nAll External Addresses:");
+        a = getAddresses(false, false, true);
+        for (String s : a)
+            System.err.println(s);
+        System.err.println("\nAll External and Local Addresses:");
+        a = getAddresses(true, false, true);
+        for (String s : a)
+            System.err.println(s);
         System.err.println("\nAll addresses:");
         a = getAddresses(true, true, true);
         for (String s : a)

@@ -50,7 +50,12 @@ public class ConfigNetHelper extends HelperBase {
         return ua.getHost();
     }
 
+    /**
+     *  To reduce confusion caused by NATs, this is the current internal SSU port,
+     *  not the external port.
+     */
     public String getUdpPort() {
+      /****
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
             return _("unknown");
@@ -58,8 +63,17 @@ public class ConfigNetHelper extends HelperBase {
         if (ua.getPort() <= 0)
             return _("unknown");
         return "" + ua.getPort();
+      ****/
+        // Since we can't get to UDPTransport.getRequestedPort() from here, just use
+        // configured port. If UDPTransport is changed such that the actual port
+        // could be different, fix this.
+        return getConfiguredUdpPort();
     }
 
+    /**
+     *  This should always be the actual internal SSU port, as UDPTransport udpates
+     *  the config when it changes.
+     */
     public String getConfiguredUdpPort() {
         return _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
     }
