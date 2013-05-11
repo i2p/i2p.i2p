@@ -635,7 +635,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return;
         }
         if (!isAlive()) {
-            if (source == SOURCE_INTERFACE) {
+            if (source == SOURCE_INTERFACE || source == SOURCE_UPNP) {
                 try {
                     InetAddress ia = InetAddress.getByAddress(ip);
                     saveLocalAddress(ia);
@@ -1797,7 +1797,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             if (wantsRebuild) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Address rebuilt: " + addr, new Exception());
+                    _log.info("Address rebuilt: " + addr);
                 replaceAddress(addr);
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();

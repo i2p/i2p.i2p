@@ -527,7 +527,7 @@ public abstract class TransportImpl implements Transport {
      */
     protected void replaceAddress(RouterAddress address) {
         if (_log.shouldLog(Log.WARN))
-             _log.warn("Replacing address with " + address);
+             _log.warn("Replacing address with " + address, new Exception());
         if (address == null) {
             _currentAddresses.clear();
         } else {
@@ -538,6 +538,8 @@ public abstract class TransportImpl implements Transport {
             }
             _currentAddresses.add(address);
         }
+        if (_log.shouldLog(Log.WARN))
+             _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
         if (_listener != null)
             _listener.transportAddressChanged();
     }

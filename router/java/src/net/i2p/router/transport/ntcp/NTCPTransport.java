@@ -791,7 +791,7 @@ public class NTCPTransport extends TransportImpl {
             return;
         }
         if (!isAlive()) {
-            if (source == SOURCE_INTERFACE) {
+            if (source == SOURCE_INTERFACE || source == SOURCE_UPNP) {
                 try {
                     InetAddress ia = InetAddress.getByAddress(ip);
                     saveLocalAddress(ia);
