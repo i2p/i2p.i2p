@@ -72,11 +72,29 @@ abstract class MTU {
 
 /****
     public static void main(String args[]) {
+        System.out.println("Cmd line interfaces:");
+        for (int i = 0; i < args.length; i++) {
+            try {
+                InetAddress test = InetAddress.getByName(args[i]);
+                System.out.println("MTU of " + args[i] + " is " + getMTU(test));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("All interfaces:");
         try {
-            InetAddress test = InetAddress.getByName(args[0]);
-            System.out.println("MTU is " + getMTU(test));
-        } catch (Exception e) {
-            e.printStackTrace();
+            Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
+            if (ifcs != null) {
+                while (ifcs.hasMoreElements()) {
+                    NetworkInterface ifc = ifcs.nextElement();
+                    for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
+                        InetAddress addr = addrs.nextElement();
+                        System.out.println("MTU of " + addr.getHostAddress() + " is " + getMTU(addr));
+                    }
+                }
+            }
+        } catch (SocketException se) {
+             System.out.println("no interfaces");
         }
     }
 ****/

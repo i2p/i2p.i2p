@@ -267,7 +267,8 @@ class PeerState {
      * and so PacketBuilder.buildPacket() works correctly.
      */
     public static final int MIN_MTU = 620;
-    public static final int MIN_IPV6_MTU = 1280;
+    /** 1276 */
+    public static final int MIN_IPV6_MTU = MTU.rectify(1280);
     private static final int DEFAULT_MTU = MIN_MTU;
 
     /* 
@@ -319,11 +320,12 @@ class PeerState {
         if (remoteIP.length == 4) {
             _mtu = DEFAULT_MTU;
             _mtuReceive = DEFAULT_MTU;
+            _largeMTU = transport.getMTU(false);
         } else {
             _mtu = MIN_IPV6_MTU;
             _mtuReceive = MIN_IPV6_MTU;
+            _largeMTU = transport.getMTU(true);
         }
-        _largeMTU = transport.getMTU();
         //_mtuLastChecked = -1;
         _lastACKSend = -1;
         _rto = INIT_RTO;

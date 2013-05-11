@@ -82,6 +82,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _lastInboundReceivedOn;
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private int _mtu;
+    private int _mtu_ipv6;
+
     /**
      *  Do we have a public IPv6 address?
      *  TODO periodically update via CSFI.NetMonitor?
@@ -243,6 +245,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
         _mtu = PeerState.LARGE_MTU;
+        _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
         setupPort();
         _needsRebuild = true;
         
@@ -552,20 +555,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  Set the MTU for the socket interface at addr.
      *  @param addr null ok
+     *  @return the mtu
      *  @since 0.9.2
      */
-    private void setMTU(InetAddress addr) {
+    private int setMTU(InetAddress addr) {
         String p = _context.getProperty(PROP_DEFAULT_MTU);
         if (p != null) {
             try {
                 _mtu = MTU.rectify(Integer.parseInt(p));
-                return;
+                _mtu_ipv6 = Math.max(_mtu, PeerState.MIN_IPV6_MTU);
+                return _mtu;
             } catch (NumberFormatException nfe) {}
         }
         int mtu = MTU.getMTU(addr);
-        if (mtu <= 0)
-            mtu = PeerState.LARGE_MTU;
-        _mtu = mtu;
+        if (addr != null && addr.getAddress().length == 16) {
+            if (mtu <= 0)
+                mtu = PeerState.MIN_IPV6_MTU;
+            _mtu_ipv6 = mtu;
+        } else {
+            if (mtu <= 0)
+                mtu = PeerState.LARGE_MTU;
+            _mtu = mtu;
+        }
+        return mtu;
     }
 
     /**
@@ -574,8 +586,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @return limited to range PeerState.MIN_MTU to PeerState.LARGE_MTU.
      * @since 0.9.2
      */
-    int getMTU() {
-        return _mtu;
+    int getMTU(boolean ipv6) {
+        // TODO multiple interfaces of each type
+        return ipv6 ? _mtu_ipv6 : _mtu;
     }
 
     /**
@@ -1751,11 +1764,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
 
         // MTU since 0.9.2
-        if (_mtu < PeerState.LARGE_MTU)
-            options.setProperty(UDPAddress.PROP_MTU, Integer.toString(_mtu));
+        int mtu;
+        if (host == null) {
+            mtu = _mtu;
+        } else {
+            try {
+                InetAddress ia = InetAddress.getByName(host);
+                mtu = setMTU(ia);
+            } catch (UnknownHostException uhe) {
+                mtu = _mtu;
+            }
+        }
+        if (mtu < PeerState.LARGE_MTU)
+            options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
 
         if (directIncluded || introducersIncluded) {
             // This is called via TransportManager.configTransports() before startup(), prevent NPE
+            // Note that peers won't connect to us without this - see EstablishmentManager
             if (_introKey != null)
                 options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
 
