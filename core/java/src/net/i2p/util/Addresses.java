@@ -34,7 +34,7 @@ public abstract class Addresses {
         return !getAddresses(true, false, false).isEmpty();
     }
 
-    /** @return the first non-local address it finds, or null */
+    /** @return the first non-local address IPv4 address it finds, or null */
     public static String getAnyAddress() {
         SortedSet<String> a = getAddresses();
         if (!a.isEmpty())

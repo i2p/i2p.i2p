@@ -111,6 +111,9 @@ public abstract class TransportUtil {
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             if (allowIPv6) {
+                // disallow 2002::/16 (6to4 RFC 3056)
+                if (addr[0] == 0x20 && addr[1] == 0x02)
+                    return false;
                 try {
                     InetAddress ia = InetAddress.getByAddress(addr);
                     return

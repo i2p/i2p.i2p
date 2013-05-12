@@ -46,6 +46,7 @@ Friend of the Chinese Floodfill Flooder:159.226.40.3
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:172.16.0.0/12
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.0.0.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.0.2.0/24
+<a href="http://tools.ietf.org/html/rfc3068">6to4 Anycast</a>:192.88.99.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.168.0.0/16
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.18.0.0/15
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.51.100.0/24
