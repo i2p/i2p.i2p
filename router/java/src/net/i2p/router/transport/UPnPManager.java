@@ -153,6 +153,7 @@ class UPnPManager {
             if (_log.shouldLog(Log.DEBUG))
                  _log.debug("UPnP Callback:");
 
+            byte[] ipaddr = null;
             DetectedIP[] ips = _upnp.getAddress();
             if (ips != null) {
                 for (DetectedIP ip : ips) {
@@ -164,6 +165,7 @@ class UPnPManager {
                             _detectedAddress = ip.publicAddress;
                             _manager.externalAddressReceived(SOURCE_UPNP, _detectedAddress.getAddress(), 0);
                         }
+                        ipaddr = ip.publicAddress.getAddress();
                         break;
                     }
                 }
@@ -186,7 +188,7 @@ class UPnPManager {
                 else
                     continue;
                 boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
-                _manager.forwardPortStatus(style, fp.portNumber, fps.externalPort, success, fps.reasonString);
+                _manager.forwardPortStatus(style, ipaddr, fp.portNumber, fps.externalPort, success, fps.reasonString);
             }
         }
     }

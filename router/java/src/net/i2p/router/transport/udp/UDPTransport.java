@@ -671,14 +671,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Don't do anything if UPnP claims failure.
      */
     @Override
-    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {
+    public void forwardPortStatus(byte[] ip, int port, int externalPort, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {
             if (success)
-                _log.warn("UPnP has opened the SSU port: " + port + " via external port: " + externalPort);
+                _log.warn("UPnP has opened the SSU port: " + port + " via " + Addresses.toString(ip, externalPort));
             else
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
-        if (success && getExternalIP() != null)
+        if (success && ip != null && getExternalIP() != null)
             setReachabilityStatus(CommSystemFacade.STATUS_OK);
     }
 

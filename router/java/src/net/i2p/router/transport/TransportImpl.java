@@ -589,11 +589,12 @@ public abstract class TransportImpl implements Transport {
      *
      *  This implementation does nothing. Transports should override if they want notification.
      *
+     *  @param ip may be null
      *  @param port the internal port
      *  @param externalPort the external port, which for now should always be the same as
      *                      the internal port if the forwarding was successful.
      */
-    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {}
+    public void forwardPortStatus(byte[] ip, int port, int externalPort, boolean success, String reason) {}
 
     /**
      * What INTERNAL port would the transport like to have forwarded by UPnP.
@@ -691,6 +692,11 @@ public abstract class TransportImpl implements Transport {
             _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
     }
 
+    /**
+     * IP of the peer from the last connection (in or out, any transport).
+     *
+     * @param IPv4 or IPv6, non-null
+     */
     public void setIP(Hash peer, byte[] ip) {
         byte[] old;
         synchronized (_IPMap) {
@@ -700,6 +706,11 @@ public abstract class TransportImpl implements Transport {
             _context.commSystem().queueLookup(ip);
     }
 
+    /**
+     * IP of the peer from the last connection (in or out, any transport).
+     *
+     * @return IPv4 or IPv6 or null
+     */
     public static byte[] getIP(Hash peer) {
         synchronized (_IPMap) {
             return _IPMap.get(peer);

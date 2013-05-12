@@ -579,17 +579,18 @@ public class NTCPTransport extends TransportImpl {
                 try {
                     bindToAddr = InetAddress.getByName(bindTo);
                 } catch (UnknownHostException uhe) {
-                    _log.log(Log.CRIT, "Invalid NTCP bind interface specified [" + bindTo + "]", uhe);
+                    _log.error("Invalid NTCP bind interface specified [" + bindTo + "]", uhe);
                     // this can be implemented later, just updates some stats
                     // see udp/UDPTransport.java
                     //setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
-                    return null;
+                    //return null;
+                    // fall thru
                 }
             }
 
             try {
                 InetSocketAddress addr;
-                if(bindToAddr==null) {
+                if (bindToAddr == null) {
                     addr = new InetSocketAddress(port);
                 } else {
                     addr = new InetSocketAddress(bindToAddr, port);
@@ -974,10 +975,10 @@ public class NTCPTransport extends TransportImpl {
      *  NTCP address when it transitions to OK.
      */
     @Override
-    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {
+    public void forwardPortStatus(byte[] ip, int port, int externalPort, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {
             if (success)
-                _log.warn("UPnP has opened the NTCP port: " + port);
+                _log.warn("UPnP has opened the NTCP port: " + port + " via " + Addresses.toString(ip, externalPort));
             else
                 _log.warn("UPnP has failed to open the NTCP port: " + port + " reason: " + reason);
         }

@@ -240,10 +240,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(iter.next());
                 if (ri == null)
                     continue;
-                String host = getIPString(ri);
-                if (host == null)
+                byte[] ip = getIP(ri);
+                if (ip == null)
                     continue;
-                _geoIP.add(host);
+                _geoIP.add(ip);
             }
             _context.simpleScheduler().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
         }
@@ -287,24 +287,27 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
-        if (ip != null)
+        // Assume IPv6 doesn't have geoIP for now
+        if (ip != null && ip.length == 4)
             return _geoIP.get(ip);
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return null;
-        String s = getIPString(ri);
-        if (s != null)
-            return _geoIP.get(s);
+        ip = getIP(ri);
+        if (ip != null)
+            return _geoIP.get(ip);
         return null;
     }
 
-    private String getIPString(RouterInfo ri) {
-        // use SSU only, it is likely to be an IP not a hostname,
-        // we don't want to generate a lot of DNS queries at startup
-        RouterAddress ra = ri.getTargetAddress("SSU");
-        if (ra == null)
-            return null;
-        return ra.getOption("host");
+    private static byte[] getIP(RouterInfo ri) {
+        // Return first IPv4 we find, any transport
+        // Assume IPv6 doesn't have geoIP for now
+        for (RouterAddress ra : ri.getAddresses()) {
+            byte[] rv = ra.getIP();
+            if (rv != null && rv.length == 4)
+                return rv;
+        }
+        return null;
     }
 
     /** full name for a country code, or the code if we don't know the name */

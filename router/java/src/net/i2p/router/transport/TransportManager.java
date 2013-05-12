@@ -147,10 +147,10 @@ public class TransportManager implements TransportEventListener {
      * callback from UPnP
      *
      */
-    public void forwardPortStatus(String style, int port, int externalPort, boolean success, String reason) {
+    public void forwardPortStatus(String style, byte[] ip, int port, int externalPort, boolean success, String reason) {
         Transport t = getTransport(style);
         if (t != null)
-            t.forwardPortStatus(port, externalPort, success, reason);
+            t.forwardPortStatus(ip, port, externalPort, success, reason);
     }
 
     public synchronized void startListening() {
@@ -351,6 +351,8 @@ public class TransportManager implements TransportEventListener {
      *
      * For blocking purposes, etc. it's worth checking both
      * the netDb addresses and this address.
+     *
+     * @return IPv4 or IPv6 or null
      */
     public byte[] getIP(Hash dest) {
         return TransportImpl.getIP(dest);

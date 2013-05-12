@@ -97,11 +97,12 @@ public interface Transport {
     /**
      *  Notify a transport of the results of trying to forward a port.
      *
+     *  @param ip may be null
      *  @param port the internal port
      *  @param externalPort the external port, which for now should always be the same as
      *                      the internal port if the forwarding was successful.
      */
-    public void forwardPortStatus(int port, int externalPort, boolean success, String reason);
+    public void forwardPortStatus(byte[] ip, int port, int externalPort, boolean success, String reason);
 
     /**
      * What INTERNAL port would the transport like to have forwarded by UPnP.
