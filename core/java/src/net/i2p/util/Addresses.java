@@ -95,7 +95,7 @@ public abstract class Addresses {
                         haveIPv6 = true;
                     if (shouldInclude(allMyIps[i], includeSiteLocal,
                                       includeLoopbackAndWildcard, includeIPv6))
-                        rv.add(allMyIps[i].getHostAddress());
+                        rv.add(stripScope(allMyIps[i].getHostAddress()));
                 }
             }
         } catch (UnknownHostException e) {}
@@ -113,7 +113,7 @@ public abstract class Addresses {
                             haveIPv6 = true;
                         if (shouldInclude(addr, includeSiteLocal,
                                           includeLoopbackAndWildcard, includeIPv6))
-                            rv.add(addr.getHostAddress());
+                            rv.add(stripScope(addr.getHostAddress()));
                     }
                 }
             }
@@ -126,6 +126,17 @@ public abstract class Addresses {
                 rv.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
         }
         return rv;
+    }
+
+    /**
+     *  Strip the trailing "%nn" from Inet6Address.getHostAddress()
+     *  @since IPv6
+     */
+    private static String stripScope(String ip) {
+        int pct = ip.indexOf("%");
+        if (pct > 0)
+            ip = ip.substring(0, pct);
+        return ip;
     }
 
     private static boolean shouldInclude(InetAddress ia, boolean includeSiteLocal,
