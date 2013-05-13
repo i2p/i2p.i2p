@@ -611,7 +611,6 @@ public abstract class TransportImpl implements Transport {
     public void renderStatusHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
 
-    public RouterContext getContext() { return _context; }
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
     public void recheckReachability() {}
     public boolean isBacklogged(Hash dest) { return false; }
