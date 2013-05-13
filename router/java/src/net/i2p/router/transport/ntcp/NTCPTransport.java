@@ -1052,7 +1052,7 @@ public class NTCPTransport extends TransportImpl {
 
     @Override
     public void renderStatusHTML(java.io.Writer out, String urlBase, int sortFlags) throws IOException {
-        TreeSet peers = new TreeSet(getComparator(sortFlags));
+        TreeSet<NTCPConnection> peers = new TreeSet(getComparator(sortFlags));
         peers.addAll(_conByIdent.values());
 
         long offsetTotal = 0;
@@ -1070,6 +1070,7 @@ public class NTCPTransport extends TransportImpl {
                    "<table>\n" +
                    "<tr><th><a href=\"#def.peer\">").append(_("Peer")).append("</a></th>" +
                    "<th>").append(_("Dir")).append("</th>" +
+                   "<th>").append(_("IPv6")).append("</th>" +
                    "<th align=\"right\"><a href=\"#def.idle\">").append(_("Idle")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.rate\">").append(_("In/Out")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.up\">").append(_("Up")).append("</a></th>" +
@@ -1082,8 +1083,7 @@ public class NTCPTransport extends TransportImpl {
                    " </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            NTCPConnection con = (NTCPConnection)iter.next();
+        for (NTCPConnection con : peers) {
             buf.append("<tr><td class=\"cells\" align=\"left\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(con.getRemotePeer().calculateHash()));
             //byte[] ip = getIP(con.getRemotePeer().calculateHash());
@@ -1094,6 +1094,11 @@ public class NTCPTransport extends TransportImpl {
                 buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_("Inbound")).append("\"/>");
             else
                 buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\"/>");
+            buf.append("</td><td class=\"cells\" align=\"center\">");
+            if (con.isIPv6())
+                buf.append("&#x2713;");
+            else
+                buf.append("&nbsp;");
             buf.append("</td><td class=\"cells\" align=\"right\">");
             buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive()));
             buf.append(THINSP).append(DataHelper.formatDuration2(con.getTimeSinceSend()));
@@ -1142,7 +1147,8 @@ public class NTCPTransport extends TransportImpl {
 
         if (!peers.isEmpty()) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
-            buf.append("<tr class=\"tablefooter\"><td align=\"center\"><b>").append(peers.size()).append(' ').append(_("peers")).append("</b></td><td>&nbsp;</td><td>&nbsp;");
+            buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>").append(_("SUMMARY"))
+               .append("</b>");
             buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append(THINSP).append(formatRate(bpsSend/1024)).append("</b>");
             buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration2(totalUptime/peers.size()));
             buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(offsetTotal*1000/peers.size()));

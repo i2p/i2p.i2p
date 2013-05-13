@@ -2449,6 +2449,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             appendSortLinks(buf, urlBase, sortFlags, _("Sort by peer hash"), FLAG_ALPHA);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dir\" title=\"")
            .append(_("Direction/Introduction")).append("\">").append(_("Dir"))
+           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.ipv6\">").append(_("IPv6"))
            .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">").append(_("Idle")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _("Sort by idle inbound"), FLAG_IDLE_IN);
         buf.append(" / ");
@@ -2491,8 +2492,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         out.write(buf.toString());
         buf.setLength(0);
         long now = _context.clock().now();
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            PeerState peer = (PeerState)iter.next();
+        for (PeerState peer : peers) {
             if (now-peer.getLastReceiveTime() > 60*60*1000)
                 continue; // don't include old peers
             
@@ -2535,6 +2535,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //byte[] ip = getIP(peer.getRemotePeer());
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
+            buf.append("</td>");
+
+            buf.append("<td class=\"cells\" align=\"center\">");
+            if (peer.isIPv6())
+                buf.append("&#x2713;");
+            else
+                buf.append("&nbsp;");
             buf.append("</td>");
             
             long idleIn = Math.max(now-peer.getLastReceiveTime(), 0);
@@ -2660,23 +2667,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             numPeers++;
         }
         
+      if (numPeers > 0) {
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-        buf.append("<tr class=\"tablefooter\"><td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
+        buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
         buf.append(formatKBps(bpsIn)).append(THINSP).append(formatKBps(bpsOut));
-        long x = numPeers > 0 ? uptimeMsTotal/numPeers : 0;
+        long x = uptimeMsTotal/numPeers;
         buf.append("</b></td>" +
                    "<td align=\"center\"><b>").append(DataHelper.formatDuration2(x));
-        x = numPeers > 0 ? offsetTotal/numPeers : 0;
+        x = offsetTotal/numPeers;
         buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(x)).append("</b></td>\n" +
                    "<td align=\"center\"><b>");
-        buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
+        buf.append(cwinTotal/(numPeers*1024) + "K");
         buf.append("</b></td><td>&nbsp;</td>\n" +
                    "<td align=\"center\"><b>");
-        buf.append(numPeers > 0 ? DataHelper.formatDuration2(rttTotal/numPeers) : '0');
+        buf.append(DataHelper.formatDuration2(rttTotal/numPeers));
         //buf.append("</b></td><td>&nbsp;</td><td align=\"center\"><b>");
         buf.append("</b></td><td align=\"center\"><b>");
-        buf.append(numPeers > 0 ? DataHelper.formatDuration2(rtoTotal/numPeers) : '0');
+        buf.append(DataHelper.formatDuration2(rtoTotal/numPeers));
         buf.append("</b></td><td align=\"center\"><b>").append(_mtu).append("</b></td><td align=\"center\"><b>");
         buf.append(sendTotal).append("</b></td><td align=\"center\"><b>").append(recvTotal).append("</b></td>\n" +
                    "<td align=\"center\"><b>").append(resentTotal);
@@ -2696,6 +2704,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(" pBRH direct: ").append(dir).append(" indirect: ").append(indir);
             buf.append("</td></tr>");
         }
+     }  // numPeers > 0
         buf.append("</table>\n");
 
       /*****

@@ -694,6 +694,12 @@ class PeerState {
     public int getConcurrentSendWindow() { return _concurrentMessagesAllowed; }
     public int getConsecutiveSendRejections() { return _consecutiveRejections; }
     public boolean isInbound() { return _isInbound; }
+
+    /** @since IPv6 */
+    public boolean isIPv6() {
+        return _remoteIP.length == 16;
+    }
+
     public long getIntroducerTime() { return _lastIntroducerTime; }
     public void setIntroducerTime() { _lastIntroducerTime = _context.clock().now(); }
     

@@ -1264,7 +1264,7 @@ public class ProfileOrganizer {
       * @return an opaque set of masked IPs for this peer
       */
     private Set<Integer> maskedIPSet(Hash peer, int mask) {
-        Set<Integer> rv = new HashSet(2);
+        Set<Integer> rv = new HashSet(4);
         byte[] commIP = _context.commSystem().getIP(peer);
         if (commIP != null)
             rv.add(maskedIP(commIP, mask));
@@ -1282,11 +1282,23 @@ public class ProfileOrganizer {
         return rv;
     }
 
-    /** generate an arbitrary unique value for this ip/mask (mask = 1-4) */
+    /**
+     * generate an arbitrary unique value for this ip/mask (mask = 1-4)
+     * If IPv6, force mask = 8.
+     */
     private static Integer maskedIP(byte[] ip, int mask) {
-        int rv = 0;
-        for (int i = 0; i < mask; i++)
-             rv = (rv << 8) | (ip[i] & 0xff);
+        int rv = ip[0];
+        if (ip.length == 16) {
+            for (int i = 1; i < 8; i++) {
+                rv <<= i * 4;
+                rv ^= ip[i];
+            }
+        } else {
+            for (int i = 1; i < mask; i++) {
+                rv <<= 8;
+                rv ^= ip[i];
+            }
+        }
         return Integer.valueOf(rv);
     }
 
