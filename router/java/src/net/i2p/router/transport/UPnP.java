@@ -73,6 +73,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private Device _router;
 	private Service _service;
 	private boolean isDisabled = false; // We disable the plugin if more than one IGD is found
+	private volatile boolean _serviceLacksAPM;
 	private final Object lock = new Object();
 	// FIXME: detect it for real and deal with it! @see #2524
 	private volatile boolean thinksWeAreDoubleNatted = false;
@@ -120,6 +121,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		super.stop();
 		_router = null;
 		_service = null;
+		_serviceLacksAPM = false;
 	}
 	
 	public DetectedIP[] getAddress() {
@@ -254,20 +256,21 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 							_log.error(_router.getFriendlyName()+ " doesn't export WAN_IP_CONNECTION either: we won't be able to use it!");
 					}
 					
+					_serviceLacksAPM = false;
 					return;
 				}
 			}
 		}
 	}
 	
-	public boolean tryAddMapping(String protocol, int port, String description, ForwardPort fp) {
+	private boolean tryAddMapping(String protocol, int port, String description, ForwardPort fp) {
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("Registering a port mapping for " + port + "/" + protocol);
 		int nbOfTries = 0;
 		boolean isPortForwarded = false;
-		while(nbOfTries++ < 5) {
+		while ((!_serviceLacksAPM) && nbOfTries++ < 5) {
 			isPortForwarded = addMapping(protocol, port, "I2P " + description, fp);
-			if(isPortForwarded)
+			if(isPortForwarded || _serviceLacksAPM)
 				break;
 			try {
 				Thread.sleep(5000);	
@@ -306,6 +309,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 					_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
 				_router = null;
 				_service = null;
+				_serviceLacksAPM = false;
 			}
 		}
 	}
@@ -564,7 +568,13 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		
 		Action add = _service.getAction("AddPortMapping");
 		if(add == null) {
-		    _log.error("Couldn't find AddPortMapping action!");
+                    if (_serviceLacksAPM) {
+			if (_log.shouldLog(Log.WARN))
+			    _log.warn("Couldn't find AddPortMapping action!");
+		    } else {	
+			_serviceLacksAPM = true;
+			_log.logAlways(Log.WARN, "UPnP device does not support port forwarding");
+		    }
 		    return false;
 		}
 		    
@@ -694,7 +704,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		
 		Action remove = _service.getAction("DeletePortMapping");
 		if(remove == null) {
-			 _log.error("Couldn't find DeletePortMapping action!");
+		    if (_log.shouldLog(Log.WARN))
+			_log.warn("Couldn't find DeletePortMapping action!");
 		    return false;
 	    }
 		
@@ -793,6 +804,18 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
          *  so throw this in a thread.
          */
 	private void registerPorts(Set<ForwardPort> portsToForwardNow) {
+		if (_serviceLacksAPM) {
+                    if (_log.shouldLog(Log.WARN))
+			_log.warn("UPnP device does not support port forwarding");
+		    for (ForwardPort port : portsToForwardNow) {
+			ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
+                                                                      "UPnP device does not support port forwarding",
+                                                                      port.portNumber);
+			Map map = Collections.singletonMap(port, fps);
+			forwardCallback.portForwardStatus(map);
+		    }
+		    return;
+		}
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
 	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));

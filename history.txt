@@ -1,3 +1,13 @@
+2013-05-13 zzz
+ * i2psnark:
+   - Adjust target piece size calculation
+   - Tweak to make it easier for new peers to connect
+ * NetDB: Increase floodfill count for good
+ * UPnP: Detect devices without port forwarding capability (ticket #930)
+
+2013-05-07 zzz
+ * Streaming: Chain stored IOE to get correct location
+
 2013-05-06 zzz
  * Console: Fix Jetty thread pool policy and thread name
  * Transports: Clean up internal/external port confusion (ticket #873)
