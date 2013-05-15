@@ -4,21 +4,21 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-# blabla, 2011.
-#   <blabla@trash-mail.com>, 2011-2012.
-# D.A. Loader <>, 2012.
-#   <driz@i2pmail.org>, 2012.
-# ducki2p <ducki2p@gmail.com>, 2011.
-# foo <foo@bar>, 2009.
-# mixxy, 2011.
-#   <pirr@tormail.org>, 2012.
-#  <zeroflag@i2pmail.org>, 2013.
+# blabla, 2011
+# blabla <blabla@trash-mail.com>, 2011-2012
+# D.A. Loader <>, 2012
+# driz <driz@i2pmail.org>, 2012
+# ducki2p <ducki2p@gmail.com>, 2011
+# foo <foo@bar>, 2009
+# mixxy, 2011
+# pirr <pirr@tormail.org>, 2012
+# zeroflag <zeroflag@i2pmail.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-22 13:13+0000\n"
-"PO-Revision-Date: 2013-02-07 20:04+0000\n"
+"POT-Creation-Date: 2013-05-15 22:00+0000\n"
+"PO-Revision-Date: 2013-05-08 13:15+0000\n"
 "Last-Translator: zeroflag <zeroflag@i2pmail.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
@@ -28,15 +28,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "This seems to be a bad destination:"
 msgstr "Dies scheint kein gültiges Ziel zu sein:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:558
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "Der I2P-Adresshelfer kann dir bei solch einem Ziel nicht helfen."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:625
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -47,7 +47,7 @@ msgstr ""
 "\"{0}\">hier</a>, und um das Ziel aus der kollidierenden Adresshelfer-"
 "Anfrage zu besuchen, <a href=\"{1}\">hier</a>!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1029
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:410
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:426
@@ -55,41 +55,41 @@ msgstr ""
 msgid "Host"
 msgstr "Host"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1033
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:376
 msgid "Destination"
 msgstr "Ziel"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Weiter zu {0}, ohne zu speichern"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1048
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "{0} im Router-Adressbuch speichern und auf die Eepseite weiterleiten"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "{0} im Master-Adressbuch speichern und auf die Eepseite weiterleiten"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1052
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "{0} im privaten Adressbuch speichern und auf die Eepseite weiterleiten"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1179
 msgid "HTTP Outproxy"
 msgstr "HTTP-Outproxy"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
@@ -97,7 +97,7 @@ msgstr ""
 "Adresshelfer von einem \"Sprung\"-Service:"
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1207
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1220
 #, java-format
 msgid "{0} jump service"
 msgstr "Weiterleitungsdienst {0}"
@@ -265,7 +265,7 @@ msgid "HTTP bidir"
 msgstr "HTTP Bidir"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:603
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:302
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:301
 msgid "Host not set"
 msgstr "Host nicht gesetzt"
 
@@ -289,23 +289,23 @@ msgstr "Neue Proxyeinstellungen"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:129
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:126
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:140
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:260
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:275
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:259
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:274
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:326
 msgid "Name"
 msgstr "Name"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:133
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:133
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:264
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:291
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:263
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:290
 msgid "Type"
 msgstr "Typ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:137
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:137
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:244
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:402
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:243
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:401
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:330
 msgid "Description"
 msgstr "Beschreibung"
@@ -572,8 +572,8 @@ msgstr "I2CP-Adresse des Routers"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:418
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:165
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:434
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:262
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:284
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:261
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:283
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:431
 msgid "Port"
 msgstr "Port"
@@ -717,15 +717,15 @@ msgstr "Signatur des Namens"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:353
 msgid "4 in, 4 out (high traffic server)"
-msgstr ""
+msgstr "4 eingehend, 4 ausgehend (Server mit großem Datenverkehr)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:357
 msgid "5 in, 5 out (high traffic server)"
-msgstr ""
+msgstr "5 eingehend, 5 ausgehend (Server mit großem Datenverkehr)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:361
 msgid "6 in, 6 out (high traffic server)"
-msgstr ""
+msgstr "6 eingehend, 6 ausgehend (Server mit großem Datenverkehr)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:442
 msgid "Encrypt Leaseset"
@@ -861,65 +861,65 @@ msgid "I2P Server Tunnels"
 msgstr "I2P-Servertunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:128
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:149
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:148
 msgid "Points at"
 msgstr "Läuft auf"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:130
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:171
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:175
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:170
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:174
 msgid "Preview"
 msgstr "Vorschau"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:132
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:195
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:268
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:309
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:194
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:267
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:308
 msgid "Status"
 msgstr "Status"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:181
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:180
 msgid "Base32 Address"
 msgstr "Basis-32-Adresse"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:189
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:188
 msgid "No Preview"
 msgstr "Keine Vorschau"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:202
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:316
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:201
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:315
 msgid "Starting..."
 msgstr "Starte ..."
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:209
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:223
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:323
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:337
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:351
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:208
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:222
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:322
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:336
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:350
 msgid "Stop"
 msgstr "Stopp"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:216
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:344
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:215
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:343
 msgid "Running"
 msgstr "Aktiv"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:230
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:358
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:229
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:357
 msgid "Stopped"
 msgstr "Gestoppt"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:237
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:365
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:236
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:364
 msgid "Start"
 msgstr "Start"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:252
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:251
 msgid "New server tunnel"
 msgstr "Neuer Servertunnel"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:254
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:412
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:253
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:411
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:295
@@ -928,33 +928,33 @@ msgstr "Neuer Servertunnel"
 msgid "Standard"
 msgstr "Standard"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:256
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:414
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:255
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:413
 msgid "Create"
 msgstr "Erstellen"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:258
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:257
 msgid "I2P Client Tunnels"
 msgstr "I2P-Klienten-Tunnel"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:266
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:295
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:265
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:294
 msgid "Interface"
 msgstr "Interface"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:330
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:329
 msgid "Standby"
 msgstr "Wartestellung"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:374
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:373
 msgid "Outproxy"
 msgstr "Ausgehender Proxy"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:397
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:396
 msgid "none"
 msgstr "Keiner"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:410
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:409
 msgid "New client tunnel"
 msgstr "Neuer Kliententunnel"
 

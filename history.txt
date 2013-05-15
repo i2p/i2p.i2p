@@ -1,3 +1,7 @@
+2013-05-13 kytv
+ * Misc. fixes to i2prouter script
+ * German translation updates from Transifex
+
 2013-05-13 zzz
  * i2psnark:
    - Adjust target piece size calculation
