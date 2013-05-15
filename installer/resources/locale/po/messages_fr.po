@@ -187,7 +187,7 @@ msgid "Request a Java thread dump if running."
 msgstr ""
 
 #: ../i2prouter:1780
-msgid "Please edit $0 and set the variable RUN_AS_USER"
+msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 msgstr ""
 
 #: ../i2prouter:1785
@@ -196,5 +196,5 @@ msgstr ""
 "Faire fonctionner I2P en tant qu'utilisateur root n'est *pas* recommandé."
 
 #: ../i2prouter:1788
-msgid "To run as root anyway, edit $0 and set ALLOW_ROOT=true."
+msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 msgstr ""
