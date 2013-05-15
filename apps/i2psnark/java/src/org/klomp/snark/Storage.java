@@ -154,7 +154,7 @@ public class Storage
     else
         pc_size = DEFAULT_PIECE_SIZE;
     int pcs = (int) ((total - 1)/pc_size) + 1;
-    while (pcs > MAX_PIECES && pc_size < MAX_PIECE_SIZE)
+    while (pcs > (MAX_PIECES * 2 / 3) && pc_size < MAX_PIECE_SIZE)
       {
         pc_size *= 2;
         pcs = (int) ((total - 1)/pc_size) +1;
