@@ -38,7 +38,8 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
  */
 public class RouterContext extends I2PAppContext {
     private final Router _router;
-    private ClientManagerFacadeImpl _clientManagerFacade;
+    private ClientManagerFacade _clientManagerFacade;
+    private InternalClientManager _internalClientManager;
     private ClientMessagePool _clientMessagePool;
     private JobQueue _jobQueue;
     private InNetMessagePool _inNetMessagePool;
@@ -152,15 +153,29 @@ public class RouterContext extends I2PAppContext {
     }
 
 
+    /**
+     *  The following properties may be used to replace various parts
+     *  of the context with dummy implementations for testing, by setting
+     *  the property to "true":
+     *<pre>
+     *  i2p.dummyClientFacade
+     *  i2p.dummyNetDb
+     *  i2p.dummyPeerManager
+     *  i2p.dummyTunnelManager
+     *  i2p.vmCommSystem (transport)
+     *</pre>
+     */
     public synchronized void initAll() {
         if (_initialized)
             throw new IllegalStateException();
-        if (getBooleanProperty("i2p.dummyClientFacade"))
-            System.err.println("i2p.dummyClientFacade currently unsupported");
-        _clientManagerFacade = new ClientManagerFacadeImpl(this);
-        // removed since it doesn't implement InternalClientManager for now
-        //else
-        //    _clientManagerFacade = new DummyClientManagerFacade(this);
+        if (!getBooleanProperty("i2p.dummyClientFacade")) {
+            ClientManagerFacadeImpl cmfi = new ClientManagerFacadeImpl(this);
+            _clientManagerFacade = cmfi;
+            _internalClientManager = cmfi;
+        } else {
+            _clientManagerFacade = new DummyClientManagerFacade(this);
+            // internal client manager is null
+        }
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
         _inNetMessagePool = new InNetMessagePool(this);
@@ -168,23 +183,23 @@ public class RouterContext extends I2PAppContext {
         _messageHistory = new MessageHistory(this);
         _messageRegistry = new OutboundMessageRegistry(this);
         //_messageStateMonitor = new MessageStateMonitor(this);
-        if ("false".equals(getProperty("i2p.dummyNetDb", "false")))
+        if (!getBooleanProperty("i2p.dummyNetDb"))
             _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
         else
             _netDb = new DummyNetworkDatabaseFacade(this);
         _keyManager = new KeyManager(this);
-        if ("false".equals(getProperty("i2p.vmCommSystem", "false")))
+        if (!getBooleanProperty("i2p.vmCommSystem"))
             _commSystem = new CommSystemFacadeImpl(this);
         else
             _commSystem = new VMCommSystem(this);
         _profileOrganizer = new ProfileOrganizer(this);
-        if ("false".equals(getProperty("i2p.dummyPeerManager", "false")))
+        if (!getBooleanProperty("i2p.dummyPeerManager"))
             _peerManagerFacade = new PeerManagerFacadeImpl(this);
         else
             _peerManagerFacade = new DummyPeerManagerFacade();
         _profileManager = new ProfileManagerImpl(this);
         _bandwidthLimiter = new FIFOBandwidthLimiter(this);
-        if ("false".equals(getProperty("i2p.dummyTunnelManager", "false")))
+        if (!getBooleanProperty("i2p.dummyTunnelManager"))
             _tunnelManager = new TunnelPoolManager(this);
         else
             _tunnelManager = new DummyTunnelManagerFacade();
@@ -529,7 +544,7 @@ public class RouterContext extends I2PAppContext {
      */
     @Override
     public InternalClientManager internalClientManager() {
-        return _clientManagerFacade;
+        return _internalClientManager;
     }
 
     /**
