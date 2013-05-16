@@ -31,6 +31,8 @@ import net.i2p.util.Log;
 /**
  *  Generate compressed geoipv6.dat.gz file, and
  *  lookup entries in it.
+ *
+ *  @since IPv6
  */
 class GeoIPv6 {
 

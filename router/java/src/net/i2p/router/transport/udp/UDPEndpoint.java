@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Inet4Address;
@@ -25,6 +26,7 @@ class UDPEndpoint {
     private final boolean _isIPv4, _isIPv6;
     
     /**
+     *  @param transport may be null for unit testing ONLY
      *  @param listenPort -1 or the requested port, may not be honored
      *  @param bindAddress null ok
      */
@@ -49,9 +51,11 @@ class UDPEndpoint {
             throw new SocketException("SSU Unable to bind to a port on " + _bindAddress);
         }
         _sender = new UDPSender(_context, _socket, "UDPSender");
-        _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver");
         _sender.startup();
-        _receiver.startup();
+        if (_transport != null) {
+            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver");
+            _receiver.startup();
+        }
     }
     
     public synchronized void shutdown() {
@@ -156,6 +160,25 @@ class UDPEndpoint {
      */
     public void send(UDPPacket packet) { 
         _sender.add(packet); 
+    }
+     
+    /**
+     * Blocking call to receive the next inbound UDP packet from any peer.
+     *
+     * UNIT TESTING ONLY. Direct from the socket.
+     * In normal operation, UDPReceiver thread injects to PacketHandler queue.
+     *
+     * @return null if we have shut down, or on failure
+     */
+    public UDPPacket receive() { 
+        UDPPacket packet = UDPPacket.acquire(_context, true);
+        try {
+            _socket.receive(packet.getPacket());
+            return packet; 
+        } catch (IOException ioe) {
+            packet.release();
+            return null;
+        }
     }
     
     /**

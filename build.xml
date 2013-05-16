@@ -1292,20 +1292,29 @@
     <!-- end custom installers -->
 
     <!-- unit tests -->
-    <target name="updateTest" depends="prepupdate">
+    <target name="buildTest">
         <ant dir="core/java/" target="jarTest" />
-        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+        <ant dir="router/java/" target="jarTest" />
+        <copy file="core/java/build/i2ptest.jar" todir="build" />
+        <copy file="router/java/build/routertest.jar" todir="build" />
     </target>
+    <target name="prepTest" depends="prepupdate, buildTest">
+        <!-- overwrite i2p.jar and router.jar with the test versions -->
+        <copy file="build/i2ptest.jar" tofile="pkg-temp/lib/i2p.jar" overwrite="true" />
+        <copy file="build/routertest.jar" tofile="pkg-temp/lib/router.jar" overwrite="true" />
+    </target>
+    <target name="updateTest" depends="prepTest, zipit" />
     <target name="junit.test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="junit.test" />
         <ant dir="router/java/" target="junit.test" />
     </target>
     <target name="scalatest.test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="scalatest.test" />
+        <!-- note there are no router scala tests yet -->
         <ant dir="router/java/" target="scalatest.test" />
     </target>
     <target name="test" depends="buildProperties, jbigi" >
+        <!-- both junit and scala -->
         <ant dir="core/java/" target="test" />
         <ant dir="router/java/" target="test" />
     </target>

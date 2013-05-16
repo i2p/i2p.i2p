@@ -38,7 +38,11 @@ public class UDPEndpointTestStandalone {
             _log.debug("Building " + i);
             UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
             _endpoints[i] = endpoint;
-            endpoint.startup();
+            try {
+                endpoint.startup();
+            } catch (SocketException se) {
+                throw new RuntimeException(se);
+            }
             I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);
             I2PThread write = new I2PThread(new TestWrite(endpoint), "Test write " + i);
             //read.setDaemon(true);
