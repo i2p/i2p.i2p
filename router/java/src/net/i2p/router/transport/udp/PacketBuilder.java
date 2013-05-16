@@ -156,6 +156,9 @@ class PacketBuilder {
      */
     private static final int MAX_RESEND_ACKS_SMALL = 4;
 
+    /**
+     *  @param transport may be null for unit testing only
+     */
     public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
         _transport = transport;
@@ -571,7 +574,7 @@ class PacketBuilder {
         state.prepareSessionCreated();
         
         byte sentIP[] = state.getSentIP();
-        if ( (sentIP == null) || (sentIP.length <= 0) || ( (_transport != null) && (!_transport.isValid(sentIP)) ) ) {
+        if ( (sentIP == null) || (sentIP.length <= 0) || (!_transport.isValid(sentIP))) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did our sent IP become invalid? " + state);
             state.fail();
@@ -651,7 +654,7 @@ class PacketBuilder {
         int off = HEADER_SIZE;
 
         byte toIP[] = state.getSentIP();
-        if ( (_transport !=null) && (!_transport.isValid(toIP)) ) {
+        if (!_transport.isValid(toIP)) {
             packet.release();
             return null;
         }
@@ -1252,7 +1255,7 @@ class PacketBuilder {
     }
     
     /**
-     *  Sends an empty unauthenticated packet for hole punching.
+     *  Creates an empty unauthenticated packet for hole punching.
      *  Parameters must be validated previously.
      */
     public UDPPacket buildHolePunch(InetAddress to, int port) {
@@ -1266,6 +1269,23 @@ class PacketBuilder {
         setTo(packet, to, port);
         
         packet.setMessageType(TYPE_PUNCH);
+        return packet;
+    }
+    
+    /**
+     *  TESTING ONLY.
+     *  Creates an arbitrary packet for unit testing.
+     *  Null transport in constructor OK.
+     *
+     *  @param type 0-15
+     *  @since IPv6
+     */
+    public UDPPacket buildPacket(byte[] data, InetAddress to, int port) {
+        UDPPacket packet = UDPPacket.acquire(_context, false);
+        byte d[] = packet.getPacket().getData();
+        System.arraycopy(data, 0, d, 0, data.length);
+        packet.getPacket().setLength(data.length);
+        setTo(packet, to, port);
         return packet;
     }
     

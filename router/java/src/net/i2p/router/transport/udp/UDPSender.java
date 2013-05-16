@@ -26,13 +26,16 @@ class UDPSender {
     private final BlockingQueue<UDPPacket> _outboundQueue;
     private volatile boolean _keepRunning;
     private final Runner _runner;
+    private final boolean _dummy;
+
     private static final int TYPE_POISON = 99999;
-    
+
     private static final int MIN_QUEUE_SIZE = 64;
     private static final int MAX_QUEUE_SIZE = 384;
     
     public UDPSender(RouterContext ctx, DatagramSocket socket, String name) {
         _context = ctx;
+        _dummy = false; // ctx.commSystem().isDummy();
         _log = ctx.logManager().getLog(UDPSender.class);
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
@@ -179,7 +182,7 @@ class UDPSender {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet);
             return;
         }
-        if (_context.commSystem().isDummy()) {
+        if (_dummy) {
             // testing
             // back to the cache
             packet.release();

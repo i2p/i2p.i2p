@@ -91,8 +91,13 @@ public class MessageHistory {
      */
     public synchronized void initialize(boolean forceReinitialize) {
         if (!forceReinitialize) return;
+        Router router = _context.router();
+        if (router == null) {
+            // unit testing, presumably
+            return;
+        }
 
-        if (_context.router().getRouterInfo() == null) {
+        if (router.getRouterInfo() == null) {
             _reinitializeJob.getTiming().setStartAfter(_context.clock().now() + 15*1000);
             _context.jobQueue().addJob(_reinitializeJob);
         } else {

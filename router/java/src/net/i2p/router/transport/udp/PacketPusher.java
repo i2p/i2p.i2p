@@ -59,7 +59,6 @@ class PacketPusher implements Runnable {
      *  @since IPv6
      */
     public void send(UDPPacket packet) {
-        boolean handled = false;
         boolean isIPv4 = packet.getPacket().getAddress().getAddress().length == 4;
         for (int j = 0; j < _endpoints.size(); j++) {
             // Find the best endpoint (socket) to send this out.
@@ -77,13 +76,11 @@ class PacketPusher implements Runnable {
                 ((!isIPv4) && ep.isIPv6())) {
                 // BLOCKING if queue is full
                 ep.getSender().add(packet);
-                handled = true;
-                break;
+                return;
             }
         }
-        if (!handled) {
-            _log.error("No endpoint to send " + packet);
-            packet.release();
-        }
+        // not handled
+        _log.error("No endpoint to send " + packet);
+        packet.release();
     }
 }

@@ -1,6 +1,8 @@
 package net.i2p.router.transport.udp;
 
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,11 +20,11 @@ import net.i2p.util.Log;
  * --zab
  */
 public class UDPEndpointTestStandalone {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private UDPEndpoint _endpoints[];
-    private boolean _beginTest;
-    private List _sentNotReceived;
+    private volatile boolean _beginTest;
+    private final List _sentNotReceived;
     
     public UDPEndpointTestStandalone(RouterContext ctx) {
         _context = ctx;
@@ -33,7 +35,7 @@ public class UDPEndpointTestStandalone {
     public void runTest(int numPeers) {
         _log.debug("Run test("+numPeers+")");
         _endpoints = new UDPEndpoint[numPeers];
-        int base = 2000 + _context.random().nextInt(10000);
+        int base = 44000 + _context.random().nextInt(10000);
         for (int i = 0; i < numPeers; i++) {
             _log.debug("Building " + i);
             UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
@@ -41,6 +43,7 @@ public class UDPEndpointTestStandalone {
             try {
                 endpoint.startup();
             } catch (SocketException se) {
+                _log.error("die", se);
                 throw new RuntimeException(se);
             }
             I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);
@@ -55,7 +58,7 @@ public class UDPEndpointTestStandalone {
     }
     
     private class TestRead implements Runnable {
-        private UDPEndpoint _endpoint;
+        private final UDPEndpoint _endpoint;
         public TestRead(UDPEndpoint peer) {
             _endpoint = peer;
         }
@@ -87,7 +90,7 @@ public class UDPEndpointTestStandalone {
     }
     
     private class TestWrite implements Runnable {
-        private UDPEndpoint _endpoint;
+        private final UDPEndpoint _endpoint;
         public TestWrite(UDPEndpoint peer) {
             _endpoint = peer;
         }
@@ -96,8 +99,16 @@ public class UDPEndpointTestStandalone {
                 try { Thread.sleep(2000); } catch (InterruptedException ie) {}
             }
                 try { Thread.sleep(2000); } catch (InterruptedException ie) {}
+            PacketBuilder builder = new PacketBuilder(_context, null);
+            InetAddress localhost = null;
+            try {
+                localhost = InetAddress.getLocalHost();
+            } catch (UnknownHostException uhe) {
+                _log.error("die", uhe);
+                System.exit(0);
+            }
             _log.debug("Beginning to write");
-            for (int curPacket = 0; curPacket < 10000; curPacket++) {
+            for (int curPacket = 0; curPacket < 2000; curPacket++) {
                 byte data[] = new byte[1024];
                 _context.random().nextBytes(data);
                 int curPeer = (curPacket % _endpoints.length);
@@ -105,27 +116,21 @@ public class UDPEndpointTestStandalone {
                     curPeer++;
                 if (curPeer >= _endpoints.length)
                     curPeer = 0;
-                short priority = 1;
-                long expiration = -1;
-                UDPPacket packet = UDPPacket.acquire(_context, true);
-                //try {
-                    if (true) throw new RuntimeException("fixme");
-                    //packet.initialize(priority, expiration, InetAddress.getLocalHost(), _endpoints[curPeer].getListenPort());
-                    // Following method is commented out in UDPPacket
-                    //packet.writeData(data, 0, 1024);
-                    packet.getPacket().setLength(1024);
+                UDPPacket packet = builder.buildPacket(data, localhost, _endpoints[curPeer].getListenPort());
                     int outstanding = _sentNotReceived.size() + 1;
                     _sentNotReceived.add(new ByteArray(data, 0, 1024));
                     _log.debug("Sending packet " + curPacket + " with outstanding " + outstanding);
+                try {
                     _endpoint.send(packet);
-                    //try { Thread.sleep(10); } catch (InterruptedException ie) {}
-                //} catch (UnknownHostException uhe) {
-                //    _log.error("foo!", uhe);
-                //}
-                //if (_log.shouldLog(Log.DEBUG)) {
+                } catch (Exception e) {
+                    _log.error("die", e);
+                    break;
+                }
+                try { Thread.sleep(3); } catch (InterruptedException ie) {}
+                //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Sent to " + _endpoints[curPeer].getListenPort() + " from " + _endpoint.getListenPort());
-                //}
             }
+            _log.debug("Done sending packets");
             try { Thread.sleep(10*1000); } catch (InterruptedException e) {}
             System.exit(0);
         }
@@ -137,7 +142,16 @@ public class UDPEndpointTestStandalone {
         Properties props = new Properties();
         props.setProperty("stat.logFile", "udpEndpointTest.stats");
         props.setProperty("stat.logFilters", "*");
-        UDPEndpointTestStandalone test = new UDPEndpointTestStandalone(new RouterContext(null, props));
+        props.setProperty("i2p.dummyClientFacade", "true");
+        props.setProperty("i2p.dummyNetDb", "true");
+        props.setProperty("i2p.dummyPeerManager", "true");
+        props.setProperty("i2p.dummyTunnelManager", "true");
+        props.setProperty("i2p.vmCommSystem", "true");
+        props.setProperty("i2np.bandwidth.inboundKBytesPerSecond", "9999");
+        props.setProperty("i2np.bandwidth.outboundKBytesPerSecond", "9999");
+        RouterContext ctx = new RouterContext(null, props);
+        ctx.initAll();
+        UDPEndpointTestStandalone test = new UDPEndpointTestStandalone(ctx);
         test.runTest(2);
     }
 }
