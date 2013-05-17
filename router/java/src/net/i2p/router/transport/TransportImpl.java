@@ -39,7 +39,6 @@ import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
@@ -145,7 +144,7 @@ public abstract class TransportImpl implements Transport {
         if (ri != null) {
             char bw = ri.getBandwidthTier().charAt(0);
             if (bw != 'U' &&
-                ! ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
+                !_context.netDb().floodfillEnabled())
                 def = MAX_CONNECTION_FACTOR * (1 + bw - Router.CAPABILITY_BW12);
         }
         // increase limit for SSU, for now

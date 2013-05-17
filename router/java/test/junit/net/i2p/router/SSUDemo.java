@@ -32,6 +32,7 @@ public class SSUDemo {
     }
     
     public SSUDemo() {}
+
     public void run() {
         String cfgFile = "router.config";
         Properties envProps = getEnv();
@@ -50,10 +51,10 @@ public class SSUDemo {
         loadPeers();
     }
     
-    private Properties getEnv() {
+    private static Properties getEnv() {
         Properties envProps = System.getProperties();
-        // disable the TCP transport, as its deprecated
-        envProps.setProperty("i2np.tcp.disable", "true");
+        // disable the NTCP transport
+        envProps.setProperty("i2np.ntcp.enable", "false");
         // we want SNTP synchronization for replay prevention
         envProps.setProperty("time.disabled", "false");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
@@ -73,11 +74,11 @@ public class SSUDemo {
         envProps.setProperty("i2p.dummyTunnelManager", "true");
         // set to false if you want to use HMAC-SHA256-128 instead of HMAC-MD5-128 as
         // the SSU MAC
-        envProps.setProperty("i2p.HMACMD5", "true");
+        //envProps.setProperty("i2p.HMACMD5", "true");
         // if you're using the HMAC MD5, by default it will use a 32 byte MAC field,
         // which is a bug, as it doesn't generate the same values as a 16 byte MAC field.
         // set this to false if you don't want the bug
-        envProps.setProperty("i2p.HMACBrokenSize", "false");
+        //envProps.setProperty("i2p.HMACBrokenSize", "false");
         // no need to include any stats in the routerInfo we send to people on SSU
         // session establishment
         envProps.setProperty("router.publishPeerRankings", "false");
@@ -98,9 +99,9 @@ public class SSUDemo {
     }
     
     /** random place for storing router info files - written as $dir/base64(SHA256(info.getIdentity)) */
-    private File getInfoDir() { return new File("/tmp/ssuDemoInfo/"); }
+    private static File getInfoDir() { return new File("/tmp/ssuDemoInfo/"); }
     
-    private void storeMyInfo(RouterInfo info) {
+    private static void storeMyInfo(RouterInfo info) {
         File infoDir = getInfoDir();
         if (!infoDir.exists())
             infoDir.mkdirs();
@@ -198,16 +199,20 @@ public class SSUDemo {
         public FooJobBuilder() {
             I2NPMessageImpl.registerBuilder(new FooBuilder(), FooMessage.MESSAGE_TYPE);
         }
+
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             return new FooHandleJob(_us, receivedMessage, from, fromHash);
         }
     }
-    private class FooHandleJob extends JobImpl {
-        private I2NPMessage _msg;
+
+    private static class FooHandleJob extends JobImpl {
+        private final I2NPMessage _msg;
+
         public FooHandleJob(RouterContext ctx, I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             super(ctx);
             _msg = receivedMessage;
         }
+
         public void runJob() {
             // we know its a FooMessage, since thats the type of message that the handler
             // is registered as
@@ -216,27 +221,33 @@ public class SSUDemo {
         }
         public String getName() { return "Handle Foo message"; }
     }
-    private class FooBuilder implements I2NPMessageImpl.Builder {
+
+    private static class FooBuilder implements I2NPMessageImpl.Builder {
         public I2NPMessage build(I2PAppContext ctx) { return new FooMessage(ctx, null); }
     }
     
     /**
      * Just carry some data...
      */
-    class FooMessage extends I2NPMessageImpl {
+    private static class FooMessage extends I2NPMessageImpl {
         private byte[] _data;
         public static final int MESSAGE_TYPE = 17;
+
         public FooMessage(I2PAppContext ctx, byte data[]) {
             super(ctx);
             _data = data;
         }
+
         /** pull the read data off */
         public byte[] getData() { return _data; }
+
         /** specify the payload to be sent */
         public void setData(byte data[]) { _data = data; }
         
         public int getType() { return MESSAGE_TYPE; }
+
         protected int calculateWrittenLength() { return _data.length; }
+
         public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
             _data = new byte[dataSize];
             System.arraycopy(data, offset, _data, 0, dataSize);
@@ -260,12 +271,15 @@ public class SSUDemo {
             return new HandleJob(_us, receivedMessage, from, fromHash);
         }
     }
+
     private class HandleJob extends JobImpl {
-        private I2NPMessage _msg;
+        private final I2NPMessage _msg;
+
         public HandleJob(RouterContext ctx, I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             super(ctx);
             _msg = receivedMessage;
         }
+
         public void runJob() {
             // we know its a DatabaseStoreMessage, since thats the type of message that the handler
             // is registered as
@@ -276,6 +290,7 @@ public class SSUDemo {
                 iae.printStackTrace();
             }
         }
+
         public String getName() { return "Handle netDb store"; }
     }
 }

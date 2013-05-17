@@ -34,7 +34,6 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.Transport;
 import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
@@ -1907,7 +1906,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             (!_context.router().isHidden()) &&
             (!introducersRequired()) &&
             haveCapacity() &&
-            (!((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) &&
+            (!_context.netDb().floodfillEnabled()) &&
             _introManager.introducedCount() < IntroductionManager.MAX_OUTBOUND &&
             _introManager.introducedCount() < getMaxConnections() / 4;
     }

@@ -38,7 +38,7 @@ class ExploreKeySelectorJob extends JobImpl {
     
     public String getName() { return "Explore Key Selector Job"; }
     public void runJob() {
-        if (((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled()) {
+        if (_facade.floodfillEnabled()) {
             requeue(30*RERUN_DELAY_MS);
             return;
         }
