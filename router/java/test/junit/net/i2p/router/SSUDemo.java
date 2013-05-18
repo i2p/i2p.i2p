@@ -52,7 +52,7 @@ public class SSUDemo {
     }
     
     private static Properties getEnv() {
-        Properties envProps = System.getProperties();
+        Properties envProps = new Properties();
         // disable the NTCP transport and UPnP
         envProps.setProperty("i2np.ntcp.enable", "false");
         envProps.setProperty("i2np.upnp.enable", "false");
@@ -61,10 +61,13 @@ public class SSUDemo {
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
         // peers who say they're on an invalid IP are banlisted
         envProps.setProperty("i2np.udp.allowLocal", "true");
+        // IPv6
+        envProps.setProperty("i2np.udp.ipv6", "enable");
         // explicit IP+port.  at least one router on the net has to have their IP+port
         // set, since there has to be someone to detect one's IP off.  most don't need
         // to set these though
-        envProps.setProperty("i2np.udp.host", "127.0.0.1");
+        //envProps.setProperty("i2np.udp.host", "127.0.0.1");
+        envProps.setProperty("i2np.udp.host", "::1");
         // we don't have a context yet to use its random
         String port = Integer.toString(44000 + (((int) System.currentTimeMillis()) & (16384 - 1)));
         envProps.setProperty("i2np.udp.internalPort", port);
