@@ -509,6 +509,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
+     *  Is this IP too close to ours to trust it for
+     *  things like relaying?
+     *  @param ip IPv4 or IPv6
+     *  @since IPv6
+     */
+    boolean isTooClose(byte[] ip) {
+        if (allowLocal())
+            return false;
+        for (RouterAddress addr : getCurrentAddresses()) {
+            byte[] myip = addr.getIP();
+            if (myip == null || ip.length != myip.length)
+                continue;
+            if (ip.length == 4) {
+                if (DataHelper.eq(ip, 0, myip, 0, 2))
+                    return true;
+            } else if (ip.length == 16) {
+                if (DataHelper.eq(ip, 0, myip, 0, 8))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      *  The current port of the first matching endpoint.
      *  To be enhanced to handle multiple endpoints of the same type.
      *  @return port or -1
@@ -2980,7 +3004,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (ip == null)
                 continue;
-            if (DataHelper.eq(ip, 0, getExternalIP(), 0, 2))
+            if (isTooClose(ip))
                 continue;
             return peer;
         }

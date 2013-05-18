@@ -182,7 +182,7 @@ class PeerTestManager {
                 _log.warn("We are already running a test: " + _currentTest + ", aborting test with bob = " + bobIP);
             return;
         }
-        if (DataHelper.eq(bobIP.getAddress(), 0, _transport.getExternalIP(), 0, 2)) {
+        if (_transport.isTooClose(bobIP.getAddress())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not running test with Bob too close to us " + bobIP);
             return;
@@ -496,7 +496,7 @@ class PeerTestManager {
         int fromPort = from.getPort();
         if (fromPort < 1024 || fromPort > 65535 ||
             (!_transport.isValid(fromIP)) ||
-            DataHelper.eq(fromIP, 0, _transport.getExternalIP(), 0, 2) ||
+            _transport.isTooClose(fromIP) ||
             _context.blocklist().isBlocklisted(fromIP)) {
             // spoof check, and don't respond to privileged ports
             if (_log.shouldLog(Log.WARN))
@@ -556,7 +556,7 @@ class PeerTestManager {
         Long lNonce = Long.valueOf(nonce);
         PeerTestState state = _activeTests.get(lNonce);
 
-        if (testIP != null && DataHelper.eq(testIP, 0, _transport.getExternalIP(), 0, 2)) {
+        if (testIP != null && _transport.isTooClose(testIP)) {
             // spoof check - have to do this after receiveTestReply(), since
             // the field should be us there.
             // Let's also eliminate anybody in the same /16

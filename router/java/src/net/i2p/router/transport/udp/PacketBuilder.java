@@ -1084,7 +1084,7 @@ class PacketBuilder {
                 // must be IPv4 for now as we don't send Alice IP/port, see below
                 iaddr.getAddress().length != 4 ||
                 (!_transport.isValid(iaddr.getAddress())) ||
-                Arrays.equals(iaddr.getAddress(), _transport.getExternalIP())) {
+                (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 if (_log.shouldLog(_log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);

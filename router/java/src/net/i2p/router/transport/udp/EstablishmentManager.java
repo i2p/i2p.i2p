@@ -960,7 +960,7 @@ class EstablishmentManager {
                port <= 65535 &&
                ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
-               (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
+               (!_transport.isTooClose(ip)) &&
                (!_context.blocklist().isBlocklisted(ip));
     }
 
