@@ -39,6 +39,23 @@ public class UDPAddress {
     public static final String PROP_INTRO_KEY_PREFIX = "ikey";
     public static final String PROP_INTRO_TAG_PREFIX = "itag";
     static final int MAX_INTRODUCERS = 3;
+    private static final String[] PROP_INTRO_HOST;
+    private static final String[] PROP_INTRO_PORT;
+    private static final String[] PROP_INTRO_IKEY;
+    private static final String[] PROP_INTRO_TAG;
+    static {
+        // object churn
+        PROP_INTRO_HOST = new String[MAX_INTRODUCERS];
+        PROP_INTRO_PORT = new String[MAX_INTRODUCERS];
+        PROP_INTRO_IKEY = new String[MAX_INTRODUCERS];
+        PROP_INTRO_TAG = new String[MAX_INTRODUCERS];
+        for (int i = 0; i < MAX_INTRODUCERS; i++) {
+            PROP_INTRO_HOST[i] = PROP_INTRO_HOST_PREFIX + i;
+            PROP_INTRO_PORT[i] = PROP_INTRO_PORT_PREFIX + i;
+            PROP_INTRO_IKEY[i] = PROP_INTRO_KEY_PREFIX + i;
+            PROP_INTRO_TAG[i] = PROP_INTRO_TAG_PREFIX + i;
+        }
+    }
 
     public UDPAddress(RouterAddress addr) {
         // TODO make everything final
@@ -55,29 +72,32 @@ public class UDPAddress {
                 _mtu = MTU.rectify(Integer.parseInt(mtu));
         } catch (NumberFormatException nfe) {}
         String key = addr.getOption(PROP_INTRO_KEY);
-        if (key != null)
-            _introKey = Base64.decode(key.trim());
+        if (key != null) {
+            byte[] ik = Base64.decode(key.trim());
+            if (ik != null && ik.length == SessionKey.KEYSIZE_BYTES)
+                _introKey = ik;
+        }
         
-        for (int i = MAX_INTRODUCERS; i >= 0; i--) {
-            String host = addr.getOption(PROP_INTRO_HOST_PREFIX + i);
+        for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
+            String host = addr.getOption(PROP_INTRO_HOST[i]);
             if (host == null) continue;
-            String port = addr.getOption(PROP_INTRO_PORT_PREFIX + i);
+            String port = addr.getOption(PROP_INTRO_PORT[i]);
             if (port == null) continue;
-            String k = addr.getOption(PROP_INTRO_KEY_PREFIX + i);
+            String k = addr.getOption(PROP_INTRO_IKEY[i]);
             if (k == null) continue;
             byte ikey[] = Base64.decode(k);
             if ( (ikey == null) || (ikey.length != SessionKey.KEYSIZE_BYTES) )
                 continue;
-            String t = addr.getOption(PROP_INTRO_TAG_PREFIX + i);
+            String t = addr.getOption(PROP_INTRO_TAG[i]);
             if (t == null) continue;
-            int p = -1;
+            int p;
             try { 
                 p = Integer.parseInt(port); 
-                if (p <= 0 || p > 65535) continue;
+                if (p < UDPTransport.MIN_PEER_PORT || p > 65535) continue;
             } catch (NumberFormatException nfe) {
                 continue;
             }
-            long tag = -1;
+            long tag;
             try {
                 tag = Long.parseLong(t);
                 if (tag <= 0) continue;

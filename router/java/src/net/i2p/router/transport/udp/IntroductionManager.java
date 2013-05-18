@@ -429,7 +429,7 @@ class IntroductionManager {
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
-        return port >= 1024 &&
+        return port >= UDPTransport.MIN_PEER_PORT &&
                port <= 65535 &&
                ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
