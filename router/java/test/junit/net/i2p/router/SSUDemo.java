@@ -53,8 +53,9 @@ public class SSUDemo {
     
     private static Properties getEnv() {
         Properties envProps = System.getProperties();
-        // disable the NTCP transport
+        // disable the NTCP transport and UPnP
         envProps.setProperty("i2np.ntcp.enable", "false");
+        envProps.setProperty("i2np.upnp.enable", "false");
         // we want SNTP synchronization for replay prevention
         envProps.setProperty("time.disabled", "false");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
@@ -64,8 +65,10 @@ public class SSUDemo {
         // set, since there has to be someone to detect one's IP off.  most don't need
         // to set these though
         envProps.setProperty("i2np.udp.host", "127.0.0.1");
-        envProps.setProperty("i2np.udp.internalPort", "12000");
-        envProps.setProperty("i2np.udp.port", "12000");
+        // we don't have a context yet to use its random
+        String port = Integer.toString(44000 + (((int) System.currentTimeMillis()) & (16384 - 1)));
+        envProps.setProperty("i2np.udp.internalPort", port);
+        envProps.setProperty("i2np.udp.port", port);
         // disable I2CP, the netDb, peer testing/profile persistence, and tunnel
         // creation/management
         envProps.setProperty("i2p.dummyClientFacade", "true");
@@ -85,7 +88,17 @@ public class SSUDemo {
         // write the logs to ./logs/log-router-*.txt (logger configured with the file
         // ./logger.config, or another config file specified as
         // -Dlogger.configLocation=blah)
-        envProps.setProperty("loggerFilenameOverride", "logs/log-router-@.txt");
+        // avoid conflicts over log
+        envProps.setProperty("loggerFilenameOverride", "logs/log-router-" + port + "-@.txt");
+        System.setProperty("wrapper.logfile", "wrapper-" + port + ".log");
+        // avoid conflicts over key backup etc. so we don't all use the same keys
+        envProps.setProperty("router.keyBackupDir", "keyBackup/router-" + port);
+        envProps.setProperty("router.info.location", "router-" + port + ".info");
+        envProps.setProperty("router.keys.location", "router-" + port + ".keys");
+        envProps.setProperty("router.configLocation", "router-" + port + ".config");
+        envProps.setProperty("router.pingFile", "router-" + port + ".ping");
+        // avoid conflicts over blockfile
+        envProps.setProperty("i2p.naming.impl", "net.i2p.client.naming.HostsTxtNamingService");
         return envProps;
     }
     
@@ -107,6 +120,7 @@ public class SSUDemo {
             infoDir.mkdirs();
         FileOutputStream fos = null;
         File infoFile = new File(infoDir, info.getIdentity().calculateHash().toBase64());
+        infoFile.deleteOnExit();
         try {
             fos = new FileOutputStream(infoFile);
             info.writeBytes(fos);
@@ -166,7 +180,8 @@ public class SSUDemo {
         out.setPriority(100);
         out.setTarget(ri);
         FooMessage data = new FooMessage(_us, new byte[] { 0x0, 0x1, 0x2, 0x3 });
-        System.out.println("SEND: " + Base64.encode(data.getData()));
+        System.out.println("SEND: " + Base64.encode(data.getData()) + " to " +
+                           ri.getIdentity().calculateHash());
         out.setMessage(data);
         // job fired if we can't contact them, or if it takes too long to get an ACK
         out.setOnFailedSendJob(null); 
@@ -207,17 +222,19 @@ public class SSUDemo {
 
     private static class FooHandleJob extends JobImpl {
         private final I2NPMessage _msg;
+        private final Hash _from;
 
         public FooHandleJob(RouterContext ctx, I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             super(ctx);
             _msg = receivedMessage;
+            _from = fromHash;
         }
 
         public void runJob() {
             // we know its a FooMessage, since thats the type of message that the handler
             // is registered as
             FooMessage m = (FooMessage)_msg;
-            System.out.println("RECV: " + Base64.encode(m.getData()));
+            System.out.println("RECV: " + Base64.encode(m.getData()) + " from " + _from);
         }
         public String getName() { return "Handle Foo message"; }
     }
