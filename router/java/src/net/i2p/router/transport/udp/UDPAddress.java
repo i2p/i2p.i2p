@@ -11,9 +11,8 @@ import net.i2p.util.LHMCache;
 
 /**
  * basic helper to parse out peer info from a udp address
- * FIXME public for ConfigNetHelper
  */
-public class UDPAddress {
+class UDPAddress {
     private final String _host;
     private InetAddress _hostAddress;
     private final int _port;
