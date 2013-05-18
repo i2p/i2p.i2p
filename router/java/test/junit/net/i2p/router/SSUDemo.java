@@ -234,7 +234,7 @@ public class SSUDemo {
             // we know its a FooMessage, since thats the type of message that the handler
             // is registered as
             FooMessage m = (FooMessage)_msg;
-            System.out.println("RECV: " + Base64.encode(m.getData()) + " from " + _from);
+            System.out.println("RECV FooMessage: " + Base64.encode(m.getData()) + " from " + _from);
         }
         public String getName() { return "Handle Foo message"; }
     }
@@ -301,6 +301,7 @@ public class SSUDemo {
             // we know its a DatabaseStoreMessage, since thats the type of message that the handler
             // is registered as
             DatabaseStoreMessage m = (DatabaseStoreMessage)_msg;
+            System.out.println("RECV: " + m);
             try {
                 _us.netDb().store(m.getKey(), (RouterInfo) m.getEntry());
             } catch (IllegalArgumentException iae) {

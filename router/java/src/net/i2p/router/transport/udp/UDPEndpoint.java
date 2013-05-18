@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.SocketException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -24,6 +25,7 @@ class UDPEndpoint {
     private DatagramSocket _socket;
     private final InetAddress _bindAddress;
     private final boolean _isIPv4, _isIPv6;
+    private static final AtomicInteger _counter = new AtomicInteger();
     
     /**
      *  @param transport may be null for unit testing ONLY
@@ -50,10 +52,11 @@ class UDPEndpoint {
             _log.log(Log.CRIT, "UDP Unable to open a port");
             throw new SocketException("SSU Unable to bind to a port on " + _bindAddress);
         }
-        _sender = new UDPSender(_context, _socket, "UDPSender");
+        int count = _counter.incrementAndGet();
+        _sender = new UDPSender(_context, _socket, "UDPSender " + count);
         _sender.startup();
         if (_transport != null) {
-            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver");
+            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver " + count);
             _receiver.startup();
         }
     }

@@ -888,6 +888,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (isPubliclyRoutable(addr) &&
             (addr.length != 16 || _haveIPv6Address))
             return true;
+        return allowLocal();
+    }
+    
+    /**
+     * Are we allowed to connect to local addresses?
+     *
+     * @since IPv6
+     */
+    boolean allowLocal() {
         return _context.getBooleanProperty("i2np.udp.allowLocal");
     }
     
@@ -1522,7 +1531,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 int port = addr.getPort();
                 if (ip == null || port < MIN_PEER_PORT ||
                     (!isValid(ip)) ||
-                    Arrays.equals(ip, getExternalIP())) {
+                    (Arrays.equals(ip, getExternalIP()) && !allowLocal())) {
                     continue;
                 }
             }
@@ -1960,6 +1969,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //    dropPeer(msg.getPeer(), false);
             //else if (consecutive > 2 * MAX_CONSECUTIVE_FAILED) // they're sending us data, but we cant reply?
             //    dropPeer(msg.getPeer(), false);
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Failed sending " + msg + " to " + msg.getPeer());
         }
         noteSend(msg, false);
         if (m != null)

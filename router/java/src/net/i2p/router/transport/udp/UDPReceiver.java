@@ -31,15 +31,12 @@ class UDPReceiver {
     private final Runner _runner;
     private final UDPTransport _transport;
     private final PacketHandler _handler;
-    private static int __id;
-    private final int _id;
 
     private static final boolean _isAndroid = SystemVersion.isAndroid();
 
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
-        _id = ++__id;
         _name = name;
         _socket = socket;
         _transport = transport;
@@ -57,7 +54,7 @@ class UDPReceiver {
     public synchronized void startup() {
         //adjustDropProbability();
         _keepRunning = true;
-        I2PThread t = new I2PThread(_runner, _name + '.' + _id, true);
+        I2PThread t = new I2PThread(_runner, _name, true);
         t.start();
     }
     
@@ -154,7 +151,7 @@ class UDPReceiver {
         }
 
         // drop anything apparently from our IP (any port)
-        if (Arrays.equals(from.getIP(), _transport.getExternalIP())) {
+        if (Arrays.equals(from.getIP(), _transport.getExternalIP()) && !_transport.allowLocal()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping (spoofed?) packet from ourselves");
             packet.release();

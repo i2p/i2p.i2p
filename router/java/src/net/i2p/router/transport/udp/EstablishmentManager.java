@@ -249,7 +249,7 @@ class EstablishmentManager {
             maybeTo = new RemoteHostId(remAddr.getAddress(), port);
 
             if ((!_transport.isValid(maybeTo.getIP())) ||
-                Arrays.equals(maybeTo.getIP(), _transport.getExternalIP())) {
+                (Arrays.equals(maybeTo.getIP(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
                 _transport.markUnreachable(toHash);
                 //_context.banlist().banlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);

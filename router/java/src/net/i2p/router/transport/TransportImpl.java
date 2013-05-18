@@ -687,7 +687,8 @@ public abstract class TransportImpl implements Transport {
         else
             _wasUnreachableEntries.remove(peer);
         if (_log.shouldLog(Log.INFO))
-            _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
+            _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer,
+                      yes ? new Exception() : null);
     }
 
     /**
