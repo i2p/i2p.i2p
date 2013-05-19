@@ -3,6 +3,7 @@ package net.i2p.router.transport.ntcp;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
+import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -35,6 +36,8 @@ import net.i2p.router.transport.Transport;
 import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.TransportUtil;
+import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
@@ -350,7 +353,7 @@ public class NTCPTransport extends TransportImpl {
      *  @since 0.9.6
      */
     private RouterAddress getTargetAddress(RouterInfo target) {
-        List<RouterAddress> addrs = target.getTargetAddresses(STYLE);
+        List<RouterAddress> addrs = getTargetAddresses(target);
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
             byte[] ip = addr.getIP();
@@ -501,7 +504,8 @@ public class NTCPTransport extends TransportImpl {
                 OrderedProperties props = new OrderedProperties();
                 props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());
                 props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
-                myAddress = new RouterAddress(STYLE, props, DEFAULT_COST);
+                int cost = getDefaultCost(ia instanceof Inet6Address);
+                myAddress = new RouterAddress(STYLE, props, cost);
                 replaceAddress(myAddress);
             }
         }
@@ -604,7 +608,8 @@ public class NTCPTransport extends TransportImpl {
                     OrderedProperties props = new OrderedProperties();
                     props.setProperty(RouterAddress.PROP_HOST, bindTo);
                     props.setProperty(RouterAddress.PROP_PORT, Integer.toString(port));
-                    myAddress = new RouterAddress(STYLE, props, DEFAULT_COST);
+                    int cost = getDefaultCost(false);
+                    myAddress = new RouterAddress(STYLE, props, cost);
                 }
                 if (!_endpoints.isEmpty()) {
                     // If we are already bound to the new address, OR
@@ -778,10 +783,23 @@ public class NTCPTransport extends TransportImpl {
         OrderedProperties props = new OrderedProperties();
         props.setProperty(RouterAddress.PROP_HOST, name);
         props.setProperty(RouterAddress.PROP_PORT, Integer.toString(p));
-        RouterAddress addr = new RouterAddress(STYLE, props, DEFAULT_COST);
+        int cost = getDefaultCost(false);
+        RouterAddress addr = new RouterAddress(STYLE, props, cost);
         return addr;
     }
     
+    private int getDefaultCost(boolean isIPv6) {
+        int rv = DEFAULT_COST;
+        if (isIPv6) {
+            TransportUtil.IPv6Config config = getIPv6Config();
+            if (config == IPV6_PREFERRED)
+                rv--;
+            else if (config == IPV6_NOT_PREFERRED)
+                rv++;
+        }
+        return rv;
+    }
+
     /**
      *  UDP changed addresses, tell NTCP and (possibly) restart
      *
@@ -831,7 +849,7 @@ public class NTCPTransport extends TransportImpl {
         OrderedProperties newProps = new OrderedProperties();
         int cost;
         if (oldAddr == null) {
-            cost = DEFAULT_COST;
+            cost = getDefaultCost(ip != null && ip.length == 16);
         } else {
             cost = oldAddr.getCost();
             newProps.putAll(oldAddr.getOptionsMap());
@@ -930,21 +948,24 @@ public class NTCPTransport extends TransportImpl {
 
         if (!changed) {
             if (oldAddr != null) {
+                // change cost only?
                 int oldCost = oldAddr.getCost();
-                int newCost = DEFAULT_COST;
-                if (TransportImpl.ADJUST_COST && !haveCapacity())
-                    newCost++;
+                int newCost = getDefaultCost(ohost != null && ohost.contains(":"));
+                if (ADJUST_COST && !haveCapacity())
+                    newCost += CONGESTION_COST_ADJUSTMENT;
                 if (newCost != oldCost) {
-                    oldAddr.setCost(newCost);
+                    newAddr.setCost(newCost);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Changing NTCP cost from " + oldCost + " to " + newCost);
+                    // fall thru and republish
                 } else {
                     _log.info("No change to NTCP Address");
+                    return;
                 }
             } else {
                 _log.info("No change to NTCP Address");
+                return;
             }
-            return;
         }
 
         // stopListening stops the pumper, readers, and writers, so required even if

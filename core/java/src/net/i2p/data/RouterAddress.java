@@ -38,7 +38,7 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class RouterAddress extends DataStructureImpl {
-    private int _cost;
+    private short _cost;
     //private Date _expiration;
     private String _transportStyle;
     private final Properties _options;
@@ -50,19 +50,21 @@ public class RouterAddress extends DataStructureImpl {
     public static final String PROP_PORT = "port";
 
     public RouterAddress() {
-        _cost = -1;
         _options = new OrderedProperties();
     }
 
     /**
      *  For efficiency when created by a Transport.
      *  @param options not copied; do not reuse or modify
+     *  @param cost 0-255
      *  @since IPv6
      */
     public RouterAddress(String style, OrderedProperties options, int cost) {
         _transportStyle = style;
         _options = options;
-        _cost = cost;
+        if (cost < 0 || cost > 255)
+            throw new IllegalArgumentException();
+        _cost = (short) cost;
     }
 
     /**
@@ -71,6 +73,7 @@ public class RouterAddress extends DataStructureImpl {
      * No value above 255 is allowed.
      *
      * Unused before 0.7.12
+     * @return 0-255
      */
     public int getCost() {
         return _cost;
@@ -78,12 +81,18 @@ public class RouterAddress extends DataStructureImpl {
 
     /**
      * Configure the weighted cost of using the address.
-     * No value above 255 is allowed.
+     * No value negative or above 255 is allowed.
+     *
+     * WARNING - do not change cost on a published address or it will break the RI sig.
+     * There is no check here.
+     * Rarely used, use 3-arg constructor.
      *
      * NTCP is set to 10 and SSU to 5 by default, unused before 0.7.12
      */
     public void setCost(int cost) {
-        _cost = cost;
+        if (cost < 0 || cost > 255)
+            throw new IllegalArgumentException();
+        _cost = (short) cost;
     }
 
     /**
@@ -124,6 +133,7 @@ public class RouterAddress extends DataStructureImpl {
      * Configure the type of transport that must be used to communicate on this address
      *
      * @throws IllegalStateException if was already set
+     * @deprecated unused, use 3-arg constructor
      */
     public void setTransportStyle(String transportStyle) {
         if (_transportStyle != null)
@@ -163,6 +173,7 @@ public class RouterAddress extends DataStructureImpl {
      * Makes a copy.
      * @param options non-null
      * @throws IllegalStateException if was already set
+     * @deprecated unused, use 3-arg constructor
      */
     public void setOptions(Properties options) {
         if (!_options.isEmpty())
@@ -234,7 +245,7 @@ public class RouterAddress extends DataStructureImpl {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_transportStyle != null)
             throw new IllegalStateException();
-        _cost = (int) DataHelper.readLong(in, 1);
+        _cost = (short) DataHelper.readLong(in, 1);
         //_expiration = DataHelper.readDate(in);
         DataHelper.readDate(in);
         _transportStyle = DataHelper.readString(in);
@@ -251,8 +262,8 @@ public class RouterAddress extends DataStructureImpl {
      *  readin and the signature will fail.
      */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ((_cost < 0) || (_transportStyle == null))
-            throw new DataFormatException("Not enough data to write a router address");
+        if (_transportStyle == null)
+            throw new DataFormatException("uninitialized");
         DataHelper.writeLong(out, 1, _cost);
         //DataHelper.writeDate(out, _expiration);
         DataHelper.writeDate(out, null);

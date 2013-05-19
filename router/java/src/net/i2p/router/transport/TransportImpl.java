@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -471,7 +472,8 @@ public abstract class TransportImpl implements Transport {
     }
 
     /** Do we increase the advertised cost when approaching conn limits? */
-    public static final boolean ADJUST_COST = true;
+    protected static final boolean ADJUST_COST = true;
+    protected static final int CONGESTION_COST_ADJUSTMENT = 2;
 
     /**
      *  What addresses are we currently listening to?
@@ -561,6 +563,67 @@ public abstract class TransportImpl implements Transport {
         List<InetAddress> rv = new ArrayList(_localAddresses);
         _localAddresses.clear();
         return rv;
+    }
+
+    /**
+     *  Get all available address we can use,
+     *  shuffled and then sorted by cost/preference.
+     *  Lowest cost (most preferred) first.
+     *  @return non-null, possibly empty
+     *  @since IPv6
+     */
+    protected List<RouterAddress> getTargetAddresses(RouterInfo target) {
+        List<RouterAddress> rv = target.getTargetAddresses(getStyle());
+        // Shuffle so everybody doesn't use the first one
+        if (rv.size() > 1) {
+            Collections.shuffle(rv, _context.random());
+            TransportUtil.IPv6Config config = getIPv6Config();
+            int adj;
+            switch (config) {
+              case IPV6_DISABLED:
+                adj = 10; break;
+              case IPV6_NOT_PREFERRED:
+                adj = 1; break;
+              default:
+              case IPV6_ENABLED:
+                adj = 0; break;
+              case IPV6_PREFERRED:
+                adj = -1; break;
+              case IPV6_ONLY:
+                adj = -10; break;
+            }
+            Collections.sort(rv, new AddrComparator(adj));
+        }
+        return rv;
+    }
+
+    /**
+     *  Compare based on published cost, adjusting for our IPv6 preference.
+     *  Lowest cost (most preferred) first.
+     *  @since IPv6
+     */
+    private static class AddrComparator implements Comparator<RouterAddress> {
+        private final int adj;
+
+        public AddrComparator(int ipv6Adjustment) {
+            adj = ipv6Adjustment;
+        }
+
+        public int compare(RouterAddress l, RouterAddress r) {
+            int lc = l.getCost();
+            int rc = r.getCost();
+            byte[] lip = l.getIP();
+            byte[] rip = r.getIP();
+            if (lip != null && lip.length == 16)
+                lc += adj;
+            if (rip != null && rip.length == 16)
+                rc += adj;
+            if (lc > rc)
+                return 1;
+            if (lc < rc)
+                return -1;
+            return 0;
+        }
     }
 
     /**

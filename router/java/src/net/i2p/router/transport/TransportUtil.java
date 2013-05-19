@@ -52,6 +52,7 @@ public abstract class TransportUtil {
     }
 
     private static final Map<String, IPv6Config> BY_NAME = new HashMap<String, IPv6Config>();
+    private static final IPv6Config DEFAULT_IPV6_CONFIG = IPv6Config.IPV6_DISABLED;
 
     static {
         for (IPv6Config cfg : IPv6Config.values()) {
@@ -68,17 +69,17 @@ public abstract class TransportUtil {
         else if (transportStyle.equals("SSU"))
             cfg = ctx.getProperty(SSU_IPV6_CONFIG);
         else
-            return IPv6Config.IPV6_DISABLED;
+            return DEFAULT_IPV6_CONFIG;
         return getIPv6Config(cfg);
     }
 
     public static IPv6Config getIPv6Config(String cfg) {
         if (cfg == null)
-            return IPv6Config.IPV6_DISABLED;
+            return DEFAULT_IPV6_CONFIG;
         IPv6Config c = BY_NAME.get(cfg);
         if (c != null)
             return c;
-        return IPv6Config.IPV6_DISABLED;
+        return DEFAULT_IPV6_CONFIG;
     }
 
     /**

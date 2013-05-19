@@ -38,6 +38,8 @@ import net.i2p.router.transport.Transport;
 import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.TransportUtil;
+import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.util.RandomIterator;
@@ -1544,10 +1546,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.6
      */
     RouterAddress getTargetAddress(RouterInfo target) {
-        List<RouterAddress> addrs = target.getTargetAddresses(STYLE);
-        // Shuffle so everybody doesn't use the first one
-        if (addrs.size() > 1)
-            Collections.shuffle(addrs, _context.random());
+        List<RouterAddress> addrs = getTargetAddresses(target);
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
             if (addr.getOption("ihost0") == null) {
@@ -1821,7 +1820,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // the whole mechanism is not helpful.
             int cost = DEFAULT_COST;
             if (ADJUST_COST && !haveCapacity(91))
-                cost++;
+                cost += CONGESTION_COST_ADJUSTMENT;
+            if (introducersIncluded)
+                cost += 2;
+            if (isIPv6) {
+                TransportUtil.IPv6Config config = getIPv6Config();
+                if (config == IPV6_PREFERRED)
+                    cost--;
+                else if (config == IPV6_NOT_PREFERRED)
+                    cost++;
+            }
             RouterAddress addr = new RouterAddress(STYLE, options, cost);
 
             RouterAddress current = getCurrentAddress(isIPv6);
@@ -2996,7 +3004,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (peerInfo == null)
                 continue;
             ip = null;
-            List<RouterAddress> addrs = peerInfo.getTargetAddresses(STYLE);
+            List<RouterAddress> addrs = getTargetAddresses(peerInfo);
             for (RouterAddress addr : addrs) {
                 ip = addr.getIP();
                 if (ip != null && ip.length == 4)
