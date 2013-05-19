@@ -309,10 +309,10 @@ public class RouterAddress extends DataStructureImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[RouterAddress: ");
-        buf.append("\n\tTransportStyle: ").append(_transportStyle);
+        buf.append("\n\tType: ").append(_transportStyle);
         buf.append("\n\tCost: ").append(_cost);
         //buf.append("\n\tExpiration: ").append(_expiration);
-            buf.append("\n\tOptions: #: ").append(_options.size());
+            buf.append("\n\tOptions (").append(_options.size()).append("):");
             for (Map.Entry e : _options.entrySet()) {
                 String key = (String) e.getKey();
                 String val = (String) e.getValue();

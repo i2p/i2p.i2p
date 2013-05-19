@@ -490,8 +490,13 @@ public class NTCPTransport extends TransportImpl {
             port = _ssuPort;
         RouterAddress myAddress = bindAddress(port);
         if (myAddress != null) {
+            // fixed interface, or bound to the specified host
             replaceAddress(myAddress);
+        } else if (addr != null) {
+            // specified host, bound to wildcard
+            replaceAddress(addr);
         } else if (port > 0) {
+            // all detected interfaces
             for (InetAddress ia : getSavedLocalAddresses()) {
                 OrderedProperties props = new OrderedProperties();
                 props.setProperty(RouterAddress.PROP_HOST, ia.getHostAddress());

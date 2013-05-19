@@ -27,15 +27,16 @@ public class SSUDemo {
     RouterContext _us;
 
     public static void main(String args[]) {
+        boolean testNTCP = args.length > 0 && args[0].equals("ntcp");
         SSUDemo demo = new SSUDemo();
-        demo.run();
+        demo.run(testNTCP);
     }
     
     public SSUDemo() {}
 
-    public void run() {
+    public void run(boolean testNTCP) {
         String cfgFile = "router.config";
-        Properties envProps = getEnv();
+        Properties envProps = getEnv(testNTCP);
         Router r = new Router(cfgFile, envProps);
         r.runRouter();
         _us = r.getContext();
@@ -51,27 +52,36 @@ public class SSUDemo {
         loadPeers();
     }
     
-    private static Properties getEnv() {
+    private static Properties getEnv(boolean testNTCP) {
         Properties envProps = new Properties();
-        // disable the NTCP transport and UPnP
-        envProps.setProperty("i2np.ntcp.enable", "false");
+        // disable one of the transports and UPnP
+        if (testNTCP)
+            envProps.setProperty("i2np.udp.enable", "false");
+        else
+            envProps.setProperty("i2np.ntcp.enable", "false");
         envProps.setProperty("i2np.upnp.enable", "false");
         // we want SNTP synchronization for replay prevention
         envProps.setProperty("time.disabled", "false");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
         // peers who say they're on an invalid IP are banlisted
         envProps.setProperty("i2np.udp.allowLocal", "true");
+        envProps.setProperty("i2np.ntcp.allowLocal", "true");
         // IPv6
         envProps.setProperty("i2np.udp.ipv6", "enable");
+        envProps.setProperty("i2np.ntcp.ipv6", "enable");
         // explicit IP+port.  at least one router on the net has to have their IP+port
         // set, since there has to be someone to detect one's IP off.  most don't need
         // to set these though
         //envProps.setProperty("i2np.udp.host", "127.0.0.1");
         envProps.setProperty("i2np.udp.host", "::1");
+        envProps.setProperty("i2np.ntcp.autoip", "false");
+        envProps.setProperty("i2np.ntcp.hostname", "::1");
         // we don't have a context yet to use its random
         String port = Integer.toString(44000 + (((int) System.currentTimeMillis()) & (16384 - 1)));
         envProps.setProperty("i2np.udp.internalPort", port);
         envProps.setProperty("i2np.udp.port", port);
+        envProps.setProperty("i2np.ntcp.autoport", "false");
+        envProps.setProperty("i2np.ntcp.port", port);
         // disable I2CP, the netDb, peer testing/profile persistence, and tunnel
         // creation/management
         envProps.setProperty("i2p.dummyClientFacade", "true");
