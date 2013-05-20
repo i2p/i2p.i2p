@@ -331,6 +331,7 @@
     <target name="jbigi" depends="buildProperties, jbigi-list-changes" >
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
+        <mkdir dir="./build" />
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.dll *.jnilib" />
             <manifest>
