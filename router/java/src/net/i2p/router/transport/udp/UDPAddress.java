@@ -67,8 +67,10 @@ class UDPAddress {
         _port = addr.getPort();
         try { 
             String mtu = addr.getOption(PROP_MTU);
-            if (mtu != null)
-                _mtu = MTU.rectify(Integer.parseInt(mtu));
+            if (mtu != null) {
+                boolean isIPv6 = _host != null && _host.contains(":");
+                _mtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
+            }
         } catch (NumberFormatException nfe) {}
         String key = addr.getOption(PROP_INTRO_KEY);
         if (key != null) {

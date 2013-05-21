@@ -267,8 +267,12 @@ class PeerState {
      * and so PacketBuilder.buildPacket() works correctly.
      */
     public static final int MIN_MTU = 620;
-    /** 1276 */
-    public static final int MIN_IPV6_MTU = MTU.rectify(1280);
+
+    /**
+     * IPv6/UDP header is 48 bytes, so we want MTU % 16 == 0.
+     */
+    public static final int MIN_IPV6_MTU = 1280;
+    public static final int MAX_IPV6_MTU = 1472;  // TODO 1488
     private static final int DEFAULT_MTU = MIN_MTU;
 
     /* 

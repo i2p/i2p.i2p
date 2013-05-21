@@ -587,8 +587,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String p = _context.getProperty(PROP_DEFAULT_MTU);
         if (p != null) {
             try {
-                _mtu = MTU.rectify(Integer.parseInt(p));
-                _mtu_ipv6 = Math.max(_mtu, PeerState.MIN_IPV6_MTU);
+                int pmtu = Integer.parseInt(p);
+                _mtu = MTU.rectify(false, pmtu);
+                _mtu_ipv6 = MTU.rectify(true, pmtu);
                 return _mtu;
             } catch (NumberFormatException nfe) {}
         }

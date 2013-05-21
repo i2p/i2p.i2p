@@ -677,7 +677,8 @@ class EstablishmentManager {
                 String smtu = addr.getOption(UDPAddress.PROP_MTU);
                 if (smtu != null) {
                     try { 
-                        int mtu = MTU.rectify(Integer.parseInt(smtu));
+                        boolean isIPv6 = state.getSentIP().length == 16;
+                        int mtu = MTU.rectify(isIPv6, Integer.parseInt(smtu));
                         peer.setHisMTU(mtu);
                     } catch (NumberFormatException nfe) {}
                 }

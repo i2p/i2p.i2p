@@ -614,9 +614,13 @@ public abstract class TransportImpl implements Transport {
             int rc = r.getCost();
             byte[] lip = l.getIP();
             byte[] rip = r.getIP();
-            if (lip != null && lip.length == 16)
+            if (lip == null)
+                lc += 20;
+            else if (lip.length == 16)
                 lc += adj;
-            if (rip != null && rip.length == 16)
+            if (rip == null)
+                rc += 20;
+            else if (rip.length == 16)
                 rc += adj;
             if (lc > rc)
                 return 1;

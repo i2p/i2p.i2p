@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
+import java.net.Inet6Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -41,7 +42,8 @@ abstract class MTU {
                         try {
                             // testing
                             //return ifc.getMTU();
-                            return rectify(ifc.getMTU());
+                            boolean isIPv6 = addr instanceof Inet6Address;
+                            return rectify(isIPv6, ifc.getMTU());
                         } catch (SocketException se) {
                             // ignore
                         } catch (Throwable t) {
@@ -58,11 +60,16 @@ abstract class MTU {
 
     /**
      * @return min of PeerState.MIN_MTU, max of PeerState.LARGE_MTU,
-     *         rectified so rv % 16 == 12
+     *         rectified so rv % 16 == 12 (IPv4)
+     *         or rv % 16 == 0 (IPv6)
      */
-    public static int rectify(int mtu) {
+    public static int rectify(boolean isIPv6, int mtu) {
         int rv = mtu;
         int mod = rv % 16;
+        if (isIPv6) {
+            rv -= mod;
+            return Math.max(PeerState.MIN_IPV6_MTU, Math.min(PeerState.MAX_IPV6_MTU, rv));
+        }
         if (mod > 12)
             rv -= mod - 12;
         else if (mod < 12)
