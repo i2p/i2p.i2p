@@ -7,9 +7,9 @@
     <key>OnDemand</key>
     <false/>
     <key>StandardOutPath</key>
-    <string>~/.i2p/wrapper.log</string>
+    <string>~/Library/Application Support/i2p/wrapper.log</string>
     <key>StandardErrorPath</key>
-    <string>~/.i2p/wrapper.log</string>
+    <string>~/Library/Application Support/i2p/wrapper.log</string>
     <key>ProgramArguments</key>
     <array>
         <string>COMMAND</string>
