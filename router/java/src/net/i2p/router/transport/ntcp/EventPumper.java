@@ -692,7 +692,8 @@ class EventPumper implements Runnable {
                     }
                 } else {
                     // Nothing more to write
-                    key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+		    if (key.isValid())
+                    	key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
                     break;
                 }
             }
