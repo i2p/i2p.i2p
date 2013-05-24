@@ -1121,7 +1121,9 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
-       <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <!-- small enough to include for now -->
+        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
     </target>
 
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
@@ -1137,6 +1139,7 @@
     <!-- GeoIP files and flag icons -->
     <target name="prepgeoupdate">
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
         <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />

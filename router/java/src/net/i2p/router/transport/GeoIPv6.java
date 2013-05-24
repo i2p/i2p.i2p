@@ -151,7 +151,9 @@ class GeoIPv6 {
             int count = 0;
             InputStream in = null;
             try {
-                in = new FileInputStream(geoFile);
+                in = new BufferedInputStream(new FileInputStream(geoFile));
+                if (geoFile.getName().endsWith(".gz"))
+                    in = new GZIPInputStream(in);
                 String buf = null;
                 BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
                 while ((buf = br.readLine()) != null) {
@@ -314,6 +316,13 @@ class GeoIPv6 {
         return rv;
     }
 
+    /**
+     *  Merge and compress CSV files to I2P compressed format
+     *
+     *  GeoIP infile1.csv[.gz] [infile2.csv[.gz]...] outfile.dat.gz
+     *
+     *  Used to create the file for distribution, do not comment out
+     */
     public static void main(String args[]) {
         if (args.length < 2) {
             System.err.println("Usage: GeoIP infile1.csv [infile2.csv...] outfile.dat.gz");

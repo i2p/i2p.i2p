@@ -207,7 +207,7 @@ Applications:
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
 
        GeoIP Data:
-       Copyright (c) 2008 MaxMind, Inc.  All Rights Reserved.
+       This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/
        See licenses/LICENSE-GeoIP.txt
 
    Router Console and I2PSnark themes:
