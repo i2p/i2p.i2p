@@ -1,3 +1,6 @@
+2013-05-24 kytv
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2013-05-08
+
 2013-05-13 kytv
  * Misc. fixes to i2prouter script
  * German translation updates from Transifex
