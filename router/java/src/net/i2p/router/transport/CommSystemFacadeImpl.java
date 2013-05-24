@@ -280,15 +280,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     /**
      *  Uses the transport IP first because that lookup is fast,
-     *  then the SSU IP from the netDb.
+     *  then the IP from the netDb.
      *
      *  @return two-letter lower-case country code or null
      */
     @Override
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
-        // Assume IPv6 doesn't have geoIP for now
-        if (ip != null && ip.length == 4)
+        //if (ip != null && ip.length == 4)
+        if (ip != null)
             return _geoIP.get(ip);
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
@@ -300,11 +300,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     private static byte[] getIP(RouterInfo ri) {
-        // Return first IPv4 we find, any transport
+        // Return first IP (v4 or v6) we find, any transport
         // Assume IPv6 doesn't have geoIP for now
         for (RouterAddress ra : ri.getAddresses()) {
             byte[] rv = ra.getIP();
-            if (rv != null && rv.length == 4)
+            //if (rv != null && rv.length == 4)
+            if (rv != null)
                 return rv;
         }
         return null;
