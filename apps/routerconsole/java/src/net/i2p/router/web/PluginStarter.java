@@ -73,7 +73,7 @@ public class PluginStarter implements Runnable {
             !NewsHelper.isUpdateInProgress()) {
             String prev = _context.getProperty("router.previousVersion");
             if (prev != null &&
-                (new VersionComparator()).compare(RouterVersion.VERSION, prev) > 0) {
+                VersionComparator.comp(RouterVersion.VERSION, prev) > 0) {
                 updateAll(_context, true);
             }
         }
@@ -236,7 +236,7 @@ public class PluginStarter implements Runnable {
 
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
-            (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
+            VersionComparator.comp(CoreVersion.VERSION, minVersion) < 0) {
             String foo = "Plugin " + appName + " requires I2P version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);
@@ -245,7 +245,7 @@ public class PluginStarter implements Runnable {
 
         minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
         if (minVersion != null &&
-            (new VersionComparator()).compare(System.getProperty("java.version"), minVersion) < 0) {
+            VersionComparator.comp(System.getProperty("java.version"), minVersion) < 0) {
             String foo = "Plugin " + appName + " requires Java version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);
@@ -255,7 +255,7 @@ public class PluginStarter implements Runnable {
         String jVersion = LogsHelper.jettyVersion();
         minVersion = ConfigClientsHelper.stripHTML(props, "min-jetty-version");
         if (minVersion != null &&
-            (new VersionComparator()).compare(minVersion, jVersion) > 0) {
+            VersionComparator.comp(minVersion, jVersion) > 0) {
             String foo = "Plugin " + appName + " requires Jetty version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);
@@ -264,7 +264,7 @@ public class PluginStarter implements Runnable {
 
         String maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
         if (maxVersion != null &&
-            (new VersionComparator()).compare(maxVersion, jVersion) < 0) {
+            VersionComparator.comp(maxVersion, jVersion) < 0) {
             String foo = "Plugin " + appName + " requires Jetty version " + maxVersion + " or lower";
             log.error(foo);
             disablePlugin(appName);

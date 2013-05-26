@@ -56,7 +56,7 @@ public abstract class SystemVersion {
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
         } else {
-            _oneDotSix = (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0;
+            _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
         }
     }
 

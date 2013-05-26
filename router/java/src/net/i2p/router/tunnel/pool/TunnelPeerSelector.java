@@ -345,7 +345,6 @@ public abstract class TunnelPeerSelector {
     
     /** 0.7.8 and earlier had major message corruption bugs */
     private static final String MIN_VERSION = "0.7.9";
-    private static final VersionComparator _versionComparator = new VersionComparator();
 
     private static boolean shouldExclude(RouterContext ctx, Log log, RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
@@ -371,7 +370,7 @@ public abstract class TunnelPeerSelector {
 
         // minimum version check
         String v = peer.getOption("router.version");
-        if (v == null || _versionComparator.compare(v, MIN_VERSION) < 0)
+        if (v == null || VersionComparator.comp(v, MIN_VERSION) < 0)
             return true;
 
         // uptime is always spoofed to 90m, so just remove all this

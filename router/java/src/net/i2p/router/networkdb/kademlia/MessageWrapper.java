@@ -17,14 +17,16 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
+import net.i2p.router.util.RemovableSingletonSet;
 
 /**
  *  Method and class for garlic encrypting outbound netdb traffic,
- *  including management of the ElGamal/AES tags
+ *  and sending keys and tags for others to encrypt inbound netdb traffic,
+ *  including management of the ElGamal/AES tags.
  *
  *  @since 0.7.10
  */
-class MessageWrapper {
+public class MessageWrapper {
 
     //private static final Log _log = RouterContext.getGlobalContext().logManager().getLog(MessageWrapper.class);
 
@@ -140,6 +142,63 @@ class MessageWrapper {
         PublicKey key = to.getIdentity().getPublicKey();
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
                                                               key, sentKey, null);
+        return msg;
+    }
+
+    /**
+     *  A single key and tag, for receiving a single message.
+     *
+     *  @since 0.9.7
+     */
+    public static class OneTimeSession {
+        public final SessionKey key;
+        public final SessionTag tag;
+
+        public OneTimeSession(SessionKey key, SessionTag tag) {
+            this.key = key; this.tag = tag;
+        }
+    }
+
+    /**
+     *  Create a single key and tag, for receiving a single encrypted message,
+     *  and register it with the router's session key manager, to expire in two minutes.
+     *  The recipient can then send us an AES-encrypted message,
+     *  avoiding ElGamal.
+     *
+     *  @since 0.9.7
+     */
+    public static OneTimeSession generateSession(RouterContext ctx) {
+        SessionKey key = ctx.keyGenerator().generateSessionKey();
+        SessionTag tag = new SessionTag(true);
+        Set<SessionTag> tags = new RemovableSingletonSet(tag);
+        ctx.sessionKeyManager().tagsReceived(key, tags, 2*60*1000);
+        return new OneTimeSession(key, tag);
+    }
+
+    /**
+     *  Garlic wrap a message from nobody, destined for an unknown router,
+     *  to hide the contents from the IBGW.
+     *  Uses a supplied session key and session tag for AES encryption,
+     *  avoiding ElGamal.
+     *
+     *  @param encryptKey non-null
+     *  @param encryptTag non-null
+     *  @return null on encrypt failure
+     *  @since 0.9.7
+     */
+    public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, SessionKey encryptKey, SessionTag encryptTag) {
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
+
+        PayloadGarlicConfig payload = new PayloadGarlicConfig();
+        payload.setCertificate(Certificate.NULL_CERT);
+        payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        payload.setPayload(m);
+        payload.setDeliveryInstructions(instructions);
+        payload.setExpiration(m.getMessageExpiration());
+
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 
+                                                              null, encryptKey, encryptTag);
         return msg;
     }
 }    

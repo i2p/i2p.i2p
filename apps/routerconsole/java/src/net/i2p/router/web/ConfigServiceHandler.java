@@ -144,7 +144,7 @@ public class ConfigServiceHandler extends FormHandler {
         if (ctx.hasWrapper() && _wrapperListener == null &&
             !SystemVersion.isWindows()) {
             String wv = System.getProperty("wrapper.version");
-            if (wv != null && (new VersionComparator()).compare(wv, LISTENER_AVAILABLE) >= 0) {
+            if (wv != null && VersionComparator.comp(wv, LISTENER_AVAILABLE) >= 0) {
                 try {
                    _wrapperListener = new WrapperListener(ctx);
                 } catch (Throwable t) {}

@@ -184,7 +184,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_isPartial) {
             // Compare version with what we have now
             String newVersion = TrustedUpdate.getVersionString(new ByteArrayInputStream(_baos.toByteArray()));
-            boolean newer = (new VersionComparator()).compare(newVersion, RouterVersion.VERSION) > 0;
+            boolean newer = VersionComparator.comp(newVersion, RouterVersion.VERSION) > 0;
             if (newer) {
                 _newVersion = newVersion;
             } else {
