@@ -1,3 +1,5 @@
+* 2013-05-28 0.9.6 released
+
 2013-05-24 kytv
  * Update geoip.txt based on Maxmind GeoLite Country database from 2013-05-08
 
