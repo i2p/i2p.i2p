@@ -2185,7 +2185,7 @@
   * Tunnels:
     - Make most classes package private
     - Final, static, logs, cleanups
-    - Consolideate createRateStat calls
+    - Consolidate createRateStat calls
     - Add getTotalLength()
     - Remove unused lengthOverride()
   * UDP: Mark only first fragment as a duplicate
