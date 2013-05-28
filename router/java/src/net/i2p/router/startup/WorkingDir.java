@@ -49,6 +49,7 @@ public class WorkingDir {
     private final static String PROP_BASE_DIR = "i2p.dir.base";
     private final static String PROP_WORKING_DIR = "i2p.dir.config";
     private final static String WORKING_DIR_DEFAULT_WINDOWS = "I2P";
+    private final static String WORKING_DIR_DEFAULT_MAC = "i2p";
     private final static String WORKING_DIR_DEFAULT = ".i2p";
     private final static String WORKING_DIR_DEFAULT_DAEMON = "i2p-config";
     /** we do a couple of things differently if this is the username */
@@ -70,6 +71,7 @@ public class WorkingDir {
             dir = envProps.getProperty(PROP_WORKING_DIR);
         if (dir == null)
             dir = System.getProperty(PROP_WORKING_DIR);
+
         boolean isWindows = SystemVersion.isWindows();
         File dirf = null;
         if (dir != null) {
@@ -81,6 +83,15 @@ public class WorkingDir {
                 if (appdata != null)
                     home = appdata;
                 dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
+            } else if (SystemVersion.isMac()) {
+                String appdata = "/Library/Application Support/";
+		File old = new File(home,WORKING_DIR_DEFAULT);
+		if (old.exists() && old.isDirectory()) 
+                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
+                else {
+                    home = home+appdata;
+                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_MAC);
+                }
             } else {
                 if (DAEMON_USER.equals(System.getProperty("user.name")))
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_DAEMON);
