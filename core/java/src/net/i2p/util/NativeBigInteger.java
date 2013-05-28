@@ -757,6 +757,9 @@ public class NativeBigInteger extends BigInteger {
             else if (sCPUType.equals(JBIGI_OPTIMIZATION_COREI) && (!_is64) && ((_isKFreebsd) || (_isNetbsd) || (_isOpenbsd)))
                 // corei and core2 are identical on 32bit kfreebsd, openbsd, and netbsd
                 sAppend = JBIGI_OPTIMIZATION_CORE2;
+            else if (sCPUType.equals(JBIGI_OPTIMIZATION_PENTIUM2) && _isSunos && _isX86)
+                // pentium2 and pentium3 identical on X86 Solaris
+                sAppend = JBIGI_OPTIMIZATION_PENTIUM3;
             else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC32))
                 // viac32 and pentium3 identical
                 sAppend = JBIGI_OPTIMIZATION_PENTIUM3;
