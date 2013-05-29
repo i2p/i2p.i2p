@@ -187,7 +187,11 @@ class EventPumper implements Runnable {
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Error selecting", ioe);
-                }
+                } catch (CancelledKeyException cke) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error selecting", cke);
+		    continue;
+		}
                 
                 if (lastFailsafeIteration + FAILSAFE_ITERATION_FREQ < System.currentTimeMillis()) {
                     // in the *cough* unthinkable possibility that there are bugs in
@@ -688,7 +692,8 @@ class EventPumper implements Runnable {
                     }
                 } else {
                     // Nothing more to write
-                    key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+		    if (key.isValid())
+                    	key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
                     break;
                 }
             }

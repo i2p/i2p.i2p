@@ -136,7 +136,7 @@ class IntroductionManager {
                     _log.info("Picked peer has no local routerInfo: " + cur);
                 continue;
             }
-            RouterAddress ra = ri.getTargetAddress(UDPTransport.STYLE);
+            RouterAddress ra = _transport.getTargetAddress(ri);
             if (ra == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Picked peer has no SSU address: " + ri);

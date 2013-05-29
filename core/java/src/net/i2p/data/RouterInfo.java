@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
@@ -450,8 +449,9 @@ public class RouterInfo extends DatabaseEntry {
     
     
     /**
-     * Pull the first workable target address for the given transport
-     *
+     * Pull the first workable target address for the given transport.
+     * Use to check for any address. For all addresses, use getTargetAddresses(),
+     * which you probably want if you care about IPv6.
      */
     public RouterAddress getTargetAddress(String transportStyle) {
         for (RouterAddress addr :  _addresses) {
@@ -462,11 +462,12 @@ public class RouterInfo extends DatabaseEntry {
     }
     
     /**
-     *  For future multiple addresses per-transport (IPV6), currently unused
+     *  For multiple addresses per-transport (IPv4 or IPv6)
+     *  @return non-null
      *  @since 0.7.11
      */
     public List<RouterAddress> getTargetAddresses(String transportStyle) {
-        List<RouterAddress> ret = new Vector<RouterAddress>();
+        List<RouterAddress> ret = new ArrayList<RouterAddress>(_addresses.size());
         for (RouterAddress addr :  _addresses) {
             if(addr.getTransportStyle().equals(transportStyle))
                 ret.add(addr);

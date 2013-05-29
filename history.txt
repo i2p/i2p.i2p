@@ -1,3 +1,44 @@
+* 2013-05-28 0.9.6 released
+
+2013-05-24 kytv
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2013-05-08
+
+2013-05-13 kytv
+ * Misc. fixes to i2prouter script
+ * German translation updates from Transifex
+
+2013-05-13 zzz
+ * i2psnark:
+   - Adjust target piece size calculation
+   - Tweak to make it easier for new peers to connect
+ * NetDB: Increase floodfill count for good
+ * UPnP: Detect devices without port forwarding capability (ticket #930)
+
+2013-05-07 zzz
+ * Streaming: Chain stored IOE to get correct location
+
+2013-05-06 zzz
+ * Console: Fix Jetty thread pool policy and thread name
+ * Transports: Clean up internal/external port confusion (ticket #873)
+   - Bind SSU to configured internal, not external, port at startup
+   - Use only internal ports for UPnP (getRequestedPort() fixups)
+   - Don't have NTCP follow frequent SSU port changes
+   - Don't use external SSU port for internal NTCP port
+   - Display internal SSU port on /confignet
+
+2013-05-01 zzz
+ * BuildRequestor: Slow down build loop if we have no exploratory tunnels
+                   (ticket #926)
+ * IRC Server tunnel: Reject bad protocols immediately
+
+2013-04-30 str4d
+ * Console: Updates to readme_ar and a CSS tweak from hamada (ticket #489)
+
+2013-04-29 zzz
+ * Transports:
+   - Initial prep for multiple addresses per style
+   - Simplify NTCP send pool
+
 2013-04-28 zzz
  * i2psnark:
    - Improve page nav
@@ -2146,7 +2187,7 @@
   * Tunnels:
     - Make most classes package private
     - Final, static, logs, cleanups
-    - Consolideate createRateStat calls
+    - Consolidate createRateStat calls
     - Add getTotalLength()
     - Remove unused lengthOverride()
   * UDP: Mark only first fragment as a duplicate

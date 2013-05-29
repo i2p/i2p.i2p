@@ -572,6 +572,10 @@ input[type=image], thead img {
      opacity: 0.8;
 }
 
+thead img.disable, img.disable:hover {
+     opacity: 0.2;
+}
+
 input[type=image]:hover, thead img:hover {
      opacity: 1;
 }

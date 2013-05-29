@@ -22,14 +22,17 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
+/**
+ *  Stores in-memory only. See extension.
+ */
 class TransientDataStore implements DataStore {
-    private Log _log;
-    private ConcurrentHashMap<Hash, DatabaseEntry> _data;
-    protected RouterContext _context;
+    protected final Log _log;
+    private final ConcurrentHashMap<Hash, DatabaseEntry> _data;
+    protected final RouterContext _context;
     
     public TransientDataStore(RouterContext ctx) {
         _context = ctx;
-        _log = ctx.logManager().getLog(TransientDataStore.class);
+        _log = ctx.logManager().getLog(getClass());
         _data = new ConcurrentHashMap(1024);
         if (_log.shouldLog(Log.INFO))
             _log.info("Data Store initialized");
@@ -191,7 +194,7 @@ class TransientDataStore implements DataStore {
 
     public DatabaseEntry remove(Hash key) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Removing key " + key.toBase64());
+            _log.debug("Removing key " + key);
         return _data.remove(key);
     }
 }

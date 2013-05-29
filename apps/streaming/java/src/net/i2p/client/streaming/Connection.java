@@ -542,8 +542,9 @@ class Connection {
             _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         _resetReceived = true;
-        _outputStream.streamErrorOccurred(new IOException("Reset received"));
-        _inputStream.streamErrorOccurred(new IOException("Reset received"));
+        IOException ioe = new IOException("Reset received");
+        _outputStream.streamErrorOccurred(ioe);
+        _inputStream.streamErrorOccurred(ioe);
         _connectionError = "Connection reset";
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
@@ -998,8 +999,9 @@ class Connection {
                         _log.debug(buf.toString());
                     }
                     
-                    _inputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
-                    _outputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
+                    IOException ioe = new IOException("Inactivity timeout");
+                    _inputStream.streamErrorOccurred(ioe);
+                    _outputStream.streamErrorOccurred(ioe);
                     // Clean disconnect if we have already scheduled one
                     // (generally because we already sent a close)
                     disconnect(_disconnectScheduledOn >= 0);

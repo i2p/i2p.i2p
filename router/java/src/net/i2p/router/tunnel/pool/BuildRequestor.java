@@ -138,6 +138,9 @@ abstract class BuildRequestor {
             if (log.shouldLog(Log.ERROR))
                 log.error("Tunnel build failed, as we couldn't find a paired tunnel for " + cfg);
             exec.buildComplete(cfg, pool);
+            // Not even a zero-hop exploratory tunnel? We are in big trouble.
+            // Let's not spin through here too fast.
+            try { Thread.sleep(250); } catch (InterruptedException ie) {}
             return;
         }
         
@@ -157,7 +160,7 @@ abstract class BuildRequestor {
         if (cfg.isInbound()) {
             if (log.shouldLog(Log.INFO))
                 log.info("Sending the tunnel build request " + msg.getUniqueId() + " out the tunnel " + pairedTunnel + " to " 
-                          + cfg.getPeer(0).toBase64() + " for " + cfg + " waiting for the reply of "
+                          + cfg.getPeer(0) + " for " + cfg + " waiting for the reply of "
                           + cfg.getReplyMessageId());
             // send it out a tunnel targetting the first hop
             // TODO - would be nice to have a TunnelBuildFirstHopFailJob queued if the
@@ -165,7 +168,7 @@ abstract class BuildRequestor {
             ctx.tunnelDispatcher().dispatchOutbound(msg, pairedTunnel.getSendTunnelId(0), cfg.getPeer(0));
         } else {
             if (log.shouldLog(Log.INFO))
-                log.info("Sending the tunnel build request directly to " + cfg.getPeer(1).toBase64() 
+                log.info("Sending the tunnel build request directly to " + cfg.getPeer(1)
                           + " for " + cfg + " waiting for the reply of " + cfg.getReplyMessageId() 
                           + " with msgId=" + msg.getUniqueId());
             // send it directly to the first hop
@@ -180,8 +183,8 @@ abstract class BuildRequestor {
             outMsg.setPriority(PRIORITY);
             RouterInfo peer = ctx.netDb().lookupRouterInfoLocally(cfg.getPeer(1));
             if (peer == null) {
-                if (log.shouldLog(Log.ERROR))
-                    log.error("Could not find the next hop to send the outbound request to: " + cfg);
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Could not find the next hop to send the outbound request to: " + cfg);
                 exec.buildComplete(cfg, pool);
                 return;
             }
@@ -297,7 +300,7 @@ abstract class BuildRequestor {
                 if (peerInfo == null) {
                     if (log.shouldLog(Log.WARN))
                         log.warn("Peer selected for hop " + i + "/" + hop + " was not found locally: " 
-                                  + peer.toBase64() + " for " + cfg);
+                                  + peer + " for " + cfg);
                     return null;
                 } else {
                     key = peerInfo.getIdentity().getPublicKey();
@@ -340,9 +343,9 @@ abstract class BuildRequestor {
      *  Can't do this for inbound tunnels since the msg goes out an expl. tunnel.
      */
     private static class TunnelBuildFirstHopFailJob extends JobImpl {
-        final TunnelPool _pool;
-        final PooledTunnelCreatorConfig _cfg;
-        final BuildExecutor _exec;
+        private final TunnelPool _pool;
+        private final PooledTunnelCreatorConfig _cfg;
+        private final BuildExecutor _exec;
         private TunnelBuildFirstHopFailJob(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
             super(ctx);
             _cfg = cfg;

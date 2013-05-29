@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-25 14:51+0000\n"
+"POT-Creation-Date: 2013-05-15 21:58+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -209,42 +209,42 @@ msgid "ERROR: Could not write addressbook file."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:340
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:149
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:142
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or \"reload"
 "\" button on your browser. Please resubmit."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:342
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:151
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:313
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:130
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:103
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:131
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:117
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:153
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:145
 msgid "Save"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:133
 msgid "Configuration saved."
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:143
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:122
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:134
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:136
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:143
 msgid "Reload"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:145
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:136
 msgid "Configuration reloaded."
 msgstr ""
 
@@ -267,16 +267,16 @@ msgstr ""
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:115
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:120
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:134
 msgid "Subscriptions saved."
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:124
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
 msgid "Subscriptions reloaded."
 msgstr ""
 

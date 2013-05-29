@@ -424,6 +424,10 @@ table.SnarkDirInfo {
      padding: 0 3px !important;
 }
 
+thead img.disable, img.disable:hover {
+     opacity: 0.4;
+}
+
 .SnarkDirInfo td {
      min-width: 0px !important;     
 }

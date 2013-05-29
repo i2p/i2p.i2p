@@ -1,4 +1,11 @@
-i2p (0.9.5-2) UNRELEASED; urgency=low
+i2p (0.9.6-1) unstable; urgency=low
+
+  * New upstream release
+  * i2prouter: allow overrides to be set in /etc/default/i2p
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 May 2013 00:00:00 +0000
+
+i2p (0.9.5-2) unstable; urgency=low
 
   * debian/i2p.postinst: Explicitly set permissions on /etc/i2p/wrapper.config
     to compensate for stricter umasks.
