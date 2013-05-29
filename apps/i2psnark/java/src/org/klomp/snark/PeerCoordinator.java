@@ -376,10 +376,10 @@ class PeerCoordinator implements PeerListener
    */
   public boolean needOutboundPeers() {
         //return wantedBytes != 0 && needPeers();
-        // minus one to make it a little easier for new peers to get in on large swarms
+        // minus two to make it a little easier for new peers to get in on large swarms
         return wantedBytes != 0 &&
                !halted &&
-               peers.size() < getMaxConnections() - 1 &&
+               peers.size() < getMaxConnections() - 2 &&
                (storage == null || !storage.isChecking());
   }
   

@@ -869,10 +869,11 @@ public class RouterConsoleRunner implements RouterApp {
      */
     private static class CustomThreadPoolExecutor extends ExecutorThreadPool {
         public CustomThreadPoolExecutor() {
-             super(MIN_THREADS, MAX_THREADS, MAX_IDLE_TIME, TimeUnit.MILLISECONDS,
-                   new SynchronousQueue()  /** ,  following args not available in Jetty 7
-                   new CustomThreadFactory(),
-                   new ThreadPoolExecutor.CallerRunsPolicy() **/
+             super(new ThreadPoolExecutor(
+                      MIN_THREADS, MAX_THREADS, MAX_IDLE_TIME, TimeUnit.MILLISECONDS,
+                      new SynchronousQueue(),
+                      new CustomThreadFactory(),
+                      new ThreadPoolExecutor.CallerRunsPolicy())
                   );
         }
     }

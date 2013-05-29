@@ -2,7 +2,7 @@
 # When executed in Mingw: Produces a jbigi.dll
 # When executed in Linux/FreeBSD: Produces a libjbigi.so
 # When executed in OSX: Produces a libjbigi.jnilib
-CC="gcc"
+[ -z "$CC" ] && CC="gcc"
 
 # If JAVA_HOME isn't set we'll try to figure it out
 [ -z $JAVA_HOME ] && . ../find-java-home
@@ -38,7 +38,7 @@ SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
         elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
             UNIXTYPE="linux"
         fi
-        COMPILEFLAGS="-fPIC -Wall"
+        COMPILEFLAGS="-fPIC -Wall $CFLAGS"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;

@@ -19,7 +19,7 @@ esac
 rm -rf lib
 mkdir -p lib/freenet/support/CPUInformation
 
-CC="gcc"
+[ -z $CC ] && CC="gcc"
 
 case `uname -s` in
     MINGW*|CYGWIN*)
@@ -62,6 +62,14 @@ case `uname -s` in
                 ARCH="ia64";;
             i?86*)
                 ARCH="x86";;
+            # Solaris x86
+            i86pc)
+                if $(echo $CC | grep -q '\-m64') ; then
+                    ARCH="x86_64"
+                else
+                    ARCH="x86"
+                fi
+                ;;
             *)
                 echo "Unsupported build environment. jcpuid is only used on x86 systems."
                 exit 0;;

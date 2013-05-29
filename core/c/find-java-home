@@ -5,6 +5,15 @@ if [ $UNIXTYPE = "freebsd" ]; then
     elif [ -d /usr/local/openjdk7 ]; then
         JAVA_HOME="/usr/local/openjdk7"
     fi
+elif [ $UNIXTYPE = "sunos" ]; then
+    UNIXTYPE="solaris"
+    if [ -d /usr/jdk/latest/ ]; then
+        JAVA_HOME="/usr/jdk/latest"
+    elif [ -d /usr/jdk/instances/jdk1.7.0/ ]; then
+        JAVA_HOME="/usr/jdk/instances/jdk1.7.0"
+    elif [ -d /usr/jdk/instances/jdk1.6.0 ]; then
+        JAVA_HOME="/usr/jdk/instances/jdk1.6.0"
+    fi
 elif [ $UNIXTYPE = "openbsd" ]; then
     if [ -d /usr/local/jdk-1.7.0 ]; then
         JAVA_HOME="/usr/local/jdk-1.7.0"
@@ -26,9 +35,10 @@ elif [ $UNIXTYPE = "linux" ] && [ -e /etc/arch-release ]; then
 elif [ $UNIXTYPE = "darwin" ]; then
     JAVA_HOME=$(/usr/libexec/java_home)
 elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
+    UNIXTYPE="linux"
     if [ -d /usr/lib/jvm/java-gcj ]; then
         JAVA_HOME="/usr/lib/jvm/java-gcj"
     fi
 fi
 
-export JAVA_HOME
+export JAVA_HOME UNIXTYPE

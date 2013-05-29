@@ -2178,6 +2178,23 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String FOOTER = "</div></center></body></html>";
 
     /**
+     *  Sort alphabetically in current locale, ignore case,
+     *  directories first
+     *  @since 0.9.6
+     */
+    private static class ListingComparator implements Comparator<File> {
+        private final Comparator collator = Collator.getInstance();
+
+        public int compare(File l, File r) {
+            if (l.isDirectory() && !r.isDirectory())
+                return -1;
+            if (r.isDirectory() && !l.isDirectory())
+                return 1;
+            return collator.compare(l.getName(), r.getName());
+        }
+    }
+
+    /**
      * Modded heavily from the Jetty version in Resource.java,
      * pass Resource as 1st param
      * All the xxxResource constructors are package local so we can't extend them.
@@ -2210,10 +2227,10 @@ public class I2PSnarkServlet extends BasicServlet {
     private String getListHTML(File r, String base, boolean parent, Map postParams)
         throws IOException
     {
-        String[] ls = null;
+        File[] ls = null;
         if (r.isDirectory()) {
-            ls = r.list();
-            Arrays.sort(ls, Collator.getInstance());
+            ls = r.listFiles();
+            Arrays.sort(ls, new ListingComparator());
         }  // if r is not a directory, we are only showing torrent info section
         
         String title = decodePath(base);
@@ -2289,7 +2306,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 List<List<String>> alist = meta.getAnnounceList();
                 if (alist != null) {
-                    buf.append("<tr><td><b>");
+                    buf.append("<tr><td>" +
+                               "<img alt=\"\" border=\"0\" src=\"")
+                       .append(_imgPath).append("details.png\"> <b>");
                     buf.append(_("Tracker List")).append(":</b> ");
                     for (List<String> alist2 : alist) {
                         buf.append('[');
@@ -2421,12 +2440,12 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
-            String encoded = encodePath(ls[i]);
+            String encoded = encodePath(ls[i].getName());
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
             //Resource item = addPath(encoded);
-            File item = new File(r, ls[i]);
+            File item = ls[i];
             
             String rowClass = (i % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
             buf.append("<TR class=\"").append(rowClass).append("\">");
@@ -2437,7 +2456,7 @@ public class I2PSnarkServlet extends BasicServlet {
             long length = item.length();
             if (item.isDirectory()) {
                 complete = true;
-                status = toImg("tick") + ' ' + _("Directory");
+                //status = toImg("tick") + ' ' + _("Directory");
             } else {
                 if (snark == null || snark.getStorage() == null) {
                     // Assume complete, perhaps he removed a completed torrent but kept a bookmark
@@ -2501,7 +2520,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(rowClass).append("\">");
             if (complete)
                 buf.append("<a href=\"").append(path).append("\">");
-            buf.append(ls[i]);
+            buf.append(item.getName());
             if (complete)
                 buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"").append(rowClass).append(" snarkFileSize\">");
