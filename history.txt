@@ -1,3 +1,9 @@
+2013-05-29 zzz
+ * Console: Remove I2PDigestAuthenticator workaround, as Jetty 7.6.11 has the fix
+ * i2ptunnel: Default to 3 hops (ticket #936)
+ * Jetty 7.6.11
+ * Tomcat 6.0.37
+
 * 2013-05-28 0.9.6 released
 
 2013-05-24 kytv
