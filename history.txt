@@ -1,3 +1,6 @@
+2013-05-30 kytv
+ * Allow themes to be used in IE >= 10
+
 2013-05-29 zzz
  * Console: Remove I2PDigestAuthenticator workaround, as Jetty 7.6.11 has the fix
  * i2ptunnel: Default to 3 hops (ticket #936)
