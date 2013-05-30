@@ -1,4 +1,11 @@
 2013-05-30 kytv
+ * Update Java Service Wrapper to v3.5.19
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - Linux ARMv6: Compiled on a RaspberryPi using gcc 4.6.3-14+rpi1,
+      Icedtea6 6b27-1.12.5-1+rpi1 and stripped
+    - All other binaries are from the "community edition" deltapack offered by
+      Tanuki.
  * Allow themes to be used in IE >= 10
 
 2013-05-29 zzz
@@ -287,7 +294,7 @@
       changed from Tanuki's default to Itoopie.
     - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
       compat6x port.
-    - Linux x86, Linux x64, Linux ARMv5, Linux-PPC32, MacOSX & Solaris: Binares
+    - Linux x86, Linux x64, Linux ARMv5, Linux-PPC32, MacOSX & Solaris: Binaries
       are from the "community edition" deltapack offered by Tanuki. The Linux
       binaries have been stripped.
 
