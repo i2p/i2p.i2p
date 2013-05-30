@@ -489,7 +489,7 @@ class StoreJob extends JobImpl {
         String v = ri.getOption("router.version");
         if (v == null)
             return false;
-        return (new VersionComparator()).compare(v, MIN_ENCRYPTION_VERSION) >= 0;
+        return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
     }
 
     /**

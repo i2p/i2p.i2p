@@ -24,6 +24,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * A traditional Kademlia search that continues to search
@@ -233,6 +234,11 @@ class IterativeSearchJob extends FloodSearchJob {
                 // if we have the ff RI, garlic encrypt it
                 RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
                 if (ri != null) {
+                    // request encrypted reply
+                    if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
+                        MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(getContext());
+                        dlm.setReplySession(sess.key, sess.tag);
+                    }
                     outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(getJobId() + ": Encrypted DLM for " + _key + " to " + peer);

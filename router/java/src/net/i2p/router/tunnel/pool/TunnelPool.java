@@ -1114,8 +1114,7 @@ public class TunnelPool {
                 return null;
             }
         } else {
-            peers = new ArrayList(1);
-            peers.add(_context.routerHash());
+            peers = Collections.singletonList(_context.routerHash());
         }
 
         PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, peers.size(), settings.isInbound(), settings.getDestination());

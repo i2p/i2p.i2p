@@ -212,7 +212,7 @@ public abstract class TunnelPeerSelector {
             if (caps != null)
                 peers.addAll(caps);
         }
-        if (filterSlow(ctx, isInbound, isExploratory)) {
+        if (filterSlow(isInbound, isExploratory)) {
             // NOTE: filterSlow always returns true
             Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
             char excl[] = getExcludeCaps(ctx);
@@ -345,7 +345,6 @@ public abstract class TunnelPeerSelector {
     
     /** 0.7.8 and earlier had major message corruption bugs */
     private static final String MIN_VERSION = "0.7.9";
-    private static final VersionComparator _versionComparator = new VersionComparator();
 
     private static boolean shouldExclude(RouterContext ctx, Log log, RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
@@ -371,7 +370,7 @@ public abstract class TunnelPeerSelector {
 
         // minimum version check
         String v = peer.getOption("router.version");
-        if (v == null || _versionComparator.compare(v, MIN_VERSION) < 0)
+        if (v == null || VersionComparator.comp(v, MIN_VERSION) < 0)
             return true;
 
         // uptime is always spoofed to 90m, so just remove all this
@@ -435,34 +434,28 @@ public abstract class TunnelPeerSelector {
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.inboundExploratoryExcludeUnreachable";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.inboundClientExcludeUnreachable";
     
-    private static final String DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "false";
-    private static final String DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = "false";
+    private static final boolean DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
+    private static final boolean DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
     // see comments at getExclude() above
-    private static final String DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "true";
-    private static final String DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "true";
+    private static final boolean DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = true;
+    private static final boolean DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = true;
     
     /**
      * do we want to skip peers who haven't been up for long?
      * @return true for inbound, false for outbound, unless configured otherwise
      */
     protected boolean filterUnreachable(boolean isInbound, boolean isExploratory) {
-        boolean def = false;
-        String val = null;
-        
-        if (isExploratory)
+        if (isExploratory) {
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
+                return ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
             else
-                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
-        else
+                return ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
+        } else {
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+                return ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
             else 
-                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
-        
-        boolean rv = (val != null ? Boolean.parseBoolean(val) : def);
-        //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
-        return rv;
+                return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+        }
     }
 
     
@@ -475,56 +468,50 @@ public abstract class TunnelPeerSelector {
      * do we want to skip peers that are slow?
      * @return true unless configured otherwise
      */
-    protected boolean filterSlow(RouterContext ctx, boolean isInbound, boolean isExploratory) {
-        boolean def = true;
-        String val = null;
-        
-        if (isExploratory)
+    protected boolean filterSlow(boolean isInbound, boolean isExploratory) {
+        if (isExploratory) {
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW);
+                return ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW, true);
             else
-                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_SLOW);
-        else
+                return ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_SLOW, true);
+        } else {
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_SLOW);
+                return ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_SLOW, true);
             else 
-                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW);
-        
-        boolean rv = (val != null ? Boolean.parseBoolean(val) : def);
-        //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
-        return rv;
+                return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW, true);
+        }        
     }
     
+/****
     private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.outboundExploratoryExcludeUptime";
     private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME = "router.outboundClientExcludeUptime";
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.inboundExploratoryExcludeUptime";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UPTIME = "router.inboundClientExcludeUptime";
+****/
     
     /**
      * do we want to skip peers who haven't been up for long?
      * @return true unless configured otherwise
      */
-    protected boolean filterUptime(RouterContext ctx, boolean isInbound, boolean isExploratory) {
-        boolean def = true;
-        String val = null;
-        
-        if (isExploratory)
+/****
+    protected boolean filterUptime(boolean isInbound, boolean isExploratory) {
+        if (isExploratory) {
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME);
+                return ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME, true);
             else
-                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UPTIME);
-        else
+                return ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UPTIME, true);
+        } else {
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UPTIME);
+                return ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UPTIME, true);
             else 
-                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME);
-        
-        boolean rv = (val != null ? Boolean.parseBoolean(val) : def);
-        //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
-        return rv;
+                return ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME, true);
+        }
     }
+****/
 
+    /** see HashComparator */
     protected void orderPeers(List rv, Hash hash) {
+        if (rv.size() > 1)
             Collections.sort(rv, new HashComparator(hash));
     }
 

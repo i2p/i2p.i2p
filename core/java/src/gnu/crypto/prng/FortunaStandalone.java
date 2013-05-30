@@ -48,7 +48,7 @@ import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import net.i2p.crypto.CryptixAESKeyCache;
@@ -131,8 +131,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   }
 
   public void seed(byte val[]) {
-      Map props = new HashMap(1);
-      props.put(SEED, val);
+      Map props = Collections.singletonMap(SEED, val);
       init(props);
       fillBlock();
   }

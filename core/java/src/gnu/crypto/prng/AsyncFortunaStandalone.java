@@ -1,6 +1,6 @@
 package gnu.crypto.prng;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -77,8 +77,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     /** the seed is only propogated once the prng is started with startup() */
     @Override
     public void seed(byte val[]) {
-        Map props = new HashMap(1);
-        props.put(SEED, val);
+        Map props = Collections.singletonMap(SEED, val);
         init(props);
         //fillBlock();
     }

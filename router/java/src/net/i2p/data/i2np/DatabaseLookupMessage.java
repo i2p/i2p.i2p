@@ -17,8 +17,12 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.TunnelId;
 //import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Defines the message a router sends to another router to search for a
@@ -34,6 +38,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     private TunnelId _replyTunnel;
     /** this must be kept as a list to preserve the order and not break the checksum */
     private List<Hash> _dontIncludePeers;
+    private SessionKey _replyKey;
+    private SessionTag _replyTag;
     
     //private static volatile long _currentLookupPeriod = 0;
     //private static volatile int _currentLookupCount = 0;
@@ -45,6 +51,11 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         Have to prevent a huge alloc on rcv of a malicious msg though */
     private static final int MAX_NUM_PEERS = 512;
     
+    private static final byte FLAG_TUNNEL = 0x01;
+    private static final byte FLAG_ENCRYPT = 0x02;
+
+    private static final String MIN_ENCRYPTION_VERSION = "0.9.8";
+
     public DatabaseLookupMessage(I2PAppContext context) {
         this(context, false);
     }
@@ -145,6 +156,49 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     }
     
     /**
+     *  Does this router support encrypted replies?
+     *
+     *  @param to null OK
+     *  @since 0.9.7
+     */
+    public static boolean supportsEncryptedReplies(RouterInfo to) {
+        if (to == null)
+            return false;
+        String v = to.getOption("router.version");
+        return v != null &&
+               VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
+    }
+    
+    /**
+     *  The included session key or null if unset
+     *
+     *  @since 0.9.7
+     */
+    public SessionKey getReplyKey() { return _replyKey; }
+    
+    /**
+     *  The included session tag or null if unset
+     *
+     *  @since 0.9.7
+     */
+    public SessionTag getReplyTag() { return _replyTag; }
+
+    /**
+     *  Only worthwhile if sending reply via tunnel
+     *
+     *  @throws IllegalStateException if key or tag previously set, to protect saved checksum
+     *  @param encryptKey non-null
+     *  @param encryptTag non-null
+     *  @since 0.9.7
+     */
+    public void setReplySession(SessionKey encryptKey, SessionTag encryptTag) {
+        if (_replyKey != null || _replyTag != null)
+            throw new IllegalStateException();
+        _replyKey = encryptKey;
+        _replyTag = encryptTag;
+    }
+    
+    /**
      * Set of peers that a lookup reply should NOT include.
      * WARNING - returns a copy.
      *
@@ -224,7 +278,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         
         // as of 0.9.6, ignore other 7 bits of the flag byte
         // TODO store the whole flag byte
-        boolean tunnelSpecified = (data[curIndex] & 0x01) != 0;
+        boolean tunnelSpecified = (data[curIndex] & FLAG_TUNNEL) != 0;
+        boolean replyKeySpecified = (data[curIndex] & FLAG_ENCRYPT) != 0;
         curIndex++;
         
         if (tunnelSpecified) {
@@ -246,6 +301,15 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             peers.add(p);
         }
         _dontIncludePeers = peers;
+        if (replyKeySpecified) {
+            byte[] rk = new byte[SessionKey.KEYSIZE_BYTES];
+            System.arraycopy(data, curIndex, rk, 0, SessionKey.KEYSIZE_BYTES);
+            _replyKey = new SessionKey(rk);
+            curIndex += SessionKey.KEYSIZE_BYTES;
+            byte[] rt = new byte[SessionTag.BYTE_LENGTH];
+            System.arraycopy(data, curIndex, rt, 0, SessionTag.BYTE_LENGTH);
+            _replyTag = new SessionTag(rt);
+        }
     }
 
     
@@ -258,6 +322,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         totalLength += 2; // numPeers
         if (_dontIncludePeers != null) 
             totalLength += Hash.HASH_LENGTH * _dontIncludePeers.size();
+        if (_replyKey != null)
+            totalLength += SessionKey.KEYSIZE_BYTES + SessionTag.BYTE_LENGTH;
         return totalLength;
     }
     
@@ -269,12 +335,17 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         System.arraycopy(_fromHash.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
-        // TODO allow specification of the other 7 bits of the flag byte
+        // Generate the flag byte
         if (_replyTunnel != null) {
-            out[curIndex++] = 0x01;
+            byte flag = FLAG_TUNNEL;
+            if (_replyKey != null)
+                flag |= FLAG_ENCRYPT;
+            out[curIndex++] = flag;
             byte id[] = DataHelper.toLong(4, _replyTunnel.getTunnelId());
             System.arraycopy(id, 0, out, curIndex, 4);
             curIndex += 4;
+        } else if (_replyKey != null) {
+            out[curIndex++] = FLAG_ENCRYPT;
         } else {
             out[curIndex++] = 0x00;
         }
@@ -292,6 +363,12 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
                 System.arraycopy(peer.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
                 curIndex += Hash.HASH_LENGTH;
             }
+        }
+        if (_replyKey != null) {
+            System.arraycopy(_replyKey.getData(), 0, out, curIndex, SessionKey.KEYSIZE_BYTES);
+            curIndex += SessionKey.KEYSIZE_BYTES;
+            System.arraycopy(_replyTag.getData(), 0, out, curIndex, SessionTag.BYTE_LENGTH);
+            curIndex += SessionTag.BYTE_LENGTH;
         }
         return curIndex;
     }
@@ -326,6 +403,10 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         buf.append("\n\tSearch Key: ").append(_key);
         buf.append("\n\tFrom: ").append(_fromHash);
         buf.append("\n\tReply Tunnel: ").append(_replyTunnel);
+        if (_replyKey != null)
+            buf.append("\n\tReply Key: ").append(_replyKey);
+        if (_replyTag != null)
+            buf.append("\n\tReply Tag: ").append(_replyTag);
         buf.append("\n\tDont Include Peers: ");
         if (_dontIncludePeers != null)
             buf.append(_dontIncludePeers.size());

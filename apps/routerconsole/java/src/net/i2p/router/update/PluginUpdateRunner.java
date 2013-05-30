@@ -252,7 +252,7 @@ class PluginUpdateRunner extends UpdateRunner {
 
             String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
             if (minVersion != null &&
-                (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
+                VersionComparator.comp(CoreVersion.VERSION, minVersion) < 0) {
                 to.delete();
                 statusDone("<b>" + _("This plugin requires I2P version {0} or higher", minVersion) + "</b>");
                 return;
@@ -260,7 +260,7 @@ class PluginUpdateRunner extends UpdateRunner {
 
             minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
             if (minVersion != null &&
-                (new VersionComparator()).compare(System.getProperty("java.version"), minVersion) < 0) {
+                VersionComparator.comp(System.getProperty("java.version"), minVersion) < 0) {
                 to.delete();
                 statusDone("<b>" + _("This plugin requires Java version {0} or higher", minVersion) + "</b>");
                 return;
@@ -295,21 +295,21 @@ class PluginUpdateRunner extends UpdateRunner {
                 }
                 String oldVersion = oldProps.getProperty("version");
                 if (oldVersion == null ||
-                    (new VersionComparator()).compare(oldVersion, version) >= 0) {
+                    VersionComparator.comp(oldVersion, version) >= 0) {
                     to.delete();
                     statusDone("<b>" + _("Downloaded plugin version {0} is not newer than installed plugin", version) + "</b>");
                     return;
                 }
                 minVersion = ConfigClientsHelper.stripHTML(props, "min-installed-version");
                 if (minVersion != null &&
-                    (new VersionComparator()).compare(minVersion, oldVersion) > 0) {
+                    VersionComparator.comp(minVersion, oldVersion) > 0) {
                     to.delete();
                     statusDone("<b>" + _("Plugin update requires installed plugin version {0} or higher", minVersion) + "</b>");
                     return;
                 }
                 String maxVersion = ConfigClientsHelper.stripHTML(props, "max-installed-version");
                 if (maxVersion != null &&
-                    (new VersionComparator()).compare(maxVersion, oldVersion) < 0) {
+                    VersionComparator.comp(maxVersion, oldVersion) < 0) {
                     to.delete();
                     statusDone("<b>" + _("Plugin update requires installed plugin version {0} or lower", maxVersion) + "</b>");
                     return;
@@ -317,14 +317,14 @@ class PluginUpdateRunner extends UpdateRunner {
                 oldVersion = LogsHelper.jettyVersion();
                 minVersion = ConfigClientsHelper.stripHTML(props, "min-jetty-version");
                 if (minVersion != null &&
-                    (new VersionComparator()).compare(minVersion, oldVersion) > 0) {
+                    VersionComparator.comp(minVersion, oldVersion) > 0) {
                     to.delete();
                     statusDone("<b>" + _("Plugin requires Jetty version {0} or higher", minVersion) + "</b>");
                     return;
                 }
                 maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
                 if (maxVersion != null &&
-                    (new VersionComparator()).compare(maxVersion, oldVersion) < 0) {
+                    VersionComparator.comp(maxVersion, oldVersion) < 0) {
                     to.delete();
                     statusDone("<b>" + _("Plugin requires Jetty version {0} or lower", maxVersion) + "</b>");
                     return;
