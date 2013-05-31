@@ -471,7 +471,7 @@
                 <%=intl._("The wizard will set reasonably sensible default values for these, but you can view and/or edit these by clicking on the tunnel's name in the main I2PTunnel page.")%>
             </p>
 
-            <input type="hidden" name="tunnelDepth" value="2" />
+            <input type="hidden" name="tunnelDepth" value="3" />
             <input type="hidden" name="tunnelVariance" value="0" />
             <input type="hidden" name="tunnelQuantity" value="2" />
             <input type="hidden" name="tunnelBackupQuantity" value="0" />
