@@ -54,7 +54,12 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     private static final byte FLAG_TUNNEL = 0x01;
     private static final byte FLAG_ENCRYPT = 0x02;
 
-    private static final String MIN_ENCRYPTION_VERSION = "0.9.8";
+    /**
+     *  It's not supported until 0.9.7, but as of
+     *  0.9.6 we can specify the bit in the flags without
+     *  the receiver rejecting the whole message as invalid.
+     */
+    private static final String MIN_ENCRYPTION_VERSION = "0.9.7";
 
     public DatabaseLookupMessage(I2PAppContext context) {
         this(context, false);

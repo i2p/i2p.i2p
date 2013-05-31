@@ -10,6 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
@@ -61,6 +62,8 @@ class IterativeSearchJob extends FloodSearchJob {
     private final Hash _rkey;
     /** this is a marker to register with the MessageRegistry, it is never sent */
     private OutNetMessage _out;
+    /** testing */
+    private static Hash _alwaysQueryHash;
 
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
@@ -111,6 +114,19 @@ class IterativeSearchJob extends FloodSearchJob {
             floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, TOTAL_SEARCH_LIMIT, ks);
         } else {
             floodfillPeers = new ArrayList(TOTAL_SEARCH_LIMIT);
+        }
+
+        // For testing or local networks... we will
+        // pretend that the specified router is floodfill, and always closest-to-the-key.
+        // May be set after startup but can't be changed or unset later.
+        // Warning - experts only!
+        String alwaysQuery = getContext().getProperty("netDb.alwaysQuery");
+        if (alwaysQuery != null) {
+            if (_alwaysQueryHash == null) {
+                byte[] b = Base64.decode(alwaysQuery);
+                if (b != null && b.length == Hash.HASH_LENGTH)
+                    _alwaysQueryHash = Hash.create(b);
+            }
         }
 
         if (floodfillPeers.isEmpty()) {
@@ -184,11 +200,21 @@ class IterativeSearchJob extends FloodSearchJob {
                 // coming via newPeerToTry()
                 if (done + pend >= TOTAL_SEARCH_LIMIT)
                     return;
-                if (_toTry.isEmpty())
-                    return;
-                Iterator<Hash> iter = _toTry.iterator();
-                peer = iter.next();
-                iter.remove();
+                if (_alwaysQueryHash != null &&
+                    !_unheardFrom.contains(_alwaysQueryHash) &&
+                    !_failedPeers.contains(_alwaysQueryHash)) {
+                    // For testing or local networks... we will
+                    // pretend that the specified router is floodfill, and always closest-to-the-key.
+                    // May be set after startup but can't be changed or unset later.
+                    // Warning - experts only!
+                    peer = _alwaysQueryHash;
+                } else {
+                    if (_toTry.isEmpty())
+                        return;
+                    Iterator<Hash> iter = _toTry.iterator();
+                    peer = iter.next();
+                    iter.remove();
+                }
                 _unheardFrom.add(peer);
             }
             sendQuery(peer);
@@ -237,6 +263,8 @@ class IterativeSearchJob extends FloodSearchJob {
                     // request encrypted reply
                     if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
                         MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(getContext());
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Requesting encrypted reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
                         dlm.setReplySession(sess.key, sess.tag);
                     }
                     outMsg = MessageWrapper.wrap(getContext(), dlm, ri);

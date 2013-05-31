@@ -41,6 +41,7 @@ import net.i2p.util.Log;
 public class HandleDatabaseLookupMessageJob extends JobImpl {
     private final Log _log;
     private final DatabaseLookupMessage _message;
+    private boolean _replyKeyConsumed;
 
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
@@ -294,13 +295,19 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             getContext().tunnelDispatcher().dispatch(m);
         } else {
             // if we aren't the gateway, forward it on
-            SessionKey replyKey = _message.getReplyKey();
-            if (replyKey != null) {
-                // encrypt the reply
-                message = MessageWrapper.wrap(getContext(), message, replyKey, _message.getReplyTag());
-                if (message == null) {
-                    _log.error("Encryption error");
-                    return;
+            if (!_replyKeyConsumed) {
+                // if we send a followup DSM w/ our RI, don't reuse key
+                SessionKey replyKey = _message.getReplyKey();
+                if (replyKey != null) {
+                    // encrypt the reply
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Sending encrypted reply to " + toPeer + ' ' + replyKey + ' ' + _message.getReplyTag());
+                    message = MessageWrapper.wrap(getContext(), message, replyKey, _message.getReplyTag());
+                    if (message == null) {
+                        _log.error("Encryption error");
+                        return;
+                    }
+                    _replyKeyConsumed = true;
                 }
             }
             TunnelGatewayMessage m = new TunnelGatewayMessage(getContext());

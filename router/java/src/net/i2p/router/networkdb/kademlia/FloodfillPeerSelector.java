@@ -37,7 +37,10 @@ import net.i2p.util.Log;
  *
  */
 class FloodfillPeerSelector extends PeerSelector {
-    public FloodfillPeerSelector(RouterContext ctx) { super(ctx); }
+
+    public FloodfillPeerSelector(RouterContext ctx) {
+        super(ctx);
+    }
     
     /**
      * Pick out peers with the floodfill capacity set, returning them first, but then
@@ -96,6 +99,7 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     /**
+     *  @param kbuckets now unused
      *  @return all floodfills not banlisted forever.
      *  List will not include our own hash.
      *  List is not sorted and not shuffled.
@@ -106,6 +110,7 @@ class FloodfillPeerSelector extends PeerSelector {
     }
 
     /**
+     *  @param kbuckets now unused
      *  @param toIgnore can be null
      *  @return all floodfills not banlisted forever.
      *  List MAY INCLUDE our own hash.
@@ -140,6 +145,8 @@ class FloodfillPeerSelector extends PeerSelector {
      *  @return floodfills closest to the key that are not banlisted forever
      *  @param key the ROUTING key (NOT the original key)
      *  @param maxNumRouters max to return
+     *  @param kbuckets now unused
+     *
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
      *  The list is in 3 groups - sorted by routing key within each group.
      *  Group 1: No store or lookup failure in a long time, and
@@ -166,6 +173,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List will not include our own hash
      *  @param key the ROUTING key (NOT the original key)
      *  @param toIgnore can be null
+     *  @param kbuckets now unused
      */
     List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         if (toIgnore == null) {
@@ -183,6 +191,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List MAY CONTAIN our own hash unless included in toIgnore
      *  @param key the ROUTING key (NOT the original key)
      *  @param toIgnore can be null
+     *  @param kbuckets now unused
      */
     private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);

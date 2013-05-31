@@ -511,6 +511,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      * Accept the given tags and associate them with the given key for decryption
      *
      * @param sessionTags modifiable; NOT copied
+     * @param expire time from now
+     * @since 0.9.7
      */
     @Override
     public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags, long expire) {
