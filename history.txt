@@ -1,5 +1,5 @@
 2013-05-31 zzz
- * configclients.jsp: Allow more hops and tunnels when routerconsole.advanced=true
+ * configtunnels.jsp: Allow more hops and tunnels when routerconsole.advanced=true
  * i2psnark: Fix details page on Windows
  * NetDB:
    - Add DLM fields for requesting an encrypted reply
