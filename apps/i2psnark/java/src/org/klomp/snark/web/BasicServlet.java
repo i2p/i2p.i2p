@@ -38,6 +38,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 
 /* ------------------------------------------------------------ */
@@ -528,7 +529,10 @@ class BasicServlet extends HttpServlet
     protected static String addPaths(String base, String path) {
         if (path == null)
             return base;
-        return (new File(base, path)).toString();
+        String rv = (new File(base, path)).toString();
+        if (SystemVersion.isWindows())
+            rv = rv.replace("\\", "/");
+        return rv;
     }
 
     /**
