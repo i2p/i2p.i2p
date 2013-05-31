@@ -14,8 +14,8 @@ public class ConfigTunnelsHelper extends HelperBase {
     private static final String HOPS = ngettext("1 hop", "{0} hops");
     private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
 
-    public ConfigTunnelsHelper() {}
-    
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
+
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);
         // HTML: <input> cannot be inside a <table>
@@ -58,13 +58,18 @@ public class ConfigTunnelsHelper extends HelperBase {
 
     private static final int WARN_LENGTH = 4;
     private static final int MAX_LENGTH = 4;
+    private static final int MAX_ADVANCED_LENGTH = 7;
     private static final int WARN_QUANTITY = 5;
     private static final int MAX_QUANTITY = 6;
+    private static final int MAX_ADVANCED_QUANTITY = 16;
     private static final int MAX_BACKUP_QUANTITY = 3;
+    private static final int MAX_ADVANCED_BACKUP_QUANTITY = 16;
     private static final int MAX_VARIANCE = 2;
     private static final int MIN_NEG_VARIANCE = -1;
 
     private void renderForm(StringBuilder buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
+
+        boolean advanced = _context.getBooleanProperty(PROP_ADVANCED);
 
         buf.append("<tr><th colspan=\"3\"><a name=\"").append(prefix).append("\">");
         buf.append(name).append("</a></th></tr>\n");
@@ -90,18 +95,19 @@ public class ConfigTunnelsHelper extends HelperBase {
 //        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
         // tunnel depth
+        int maxLength = advanced ? MAX_ADVANCED_LENGTH : MAX_LENGTH;
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Length") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthInbound\">\n");
         int now = in.getLength();
-        renderOptions(buf, 0, MAX_LENGTH, now, "", HOP);
-        if (now > MAX_LENGTH)
+        renderOptions(buf, 0, maxLength, now, "", HOP);
+        if (now > maxLength)
             renderOptions(buf, now, now, now, "", HOP);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthOutbound\">\n");
         now = out.getLength();
-        renderOptions(buf, 0, MAX_LENGTH, now, "", HOP);
-        if (now > MAX_LENGTH)
+        renderOptions(buf, 0, maxLength, now, "", HOP);
+        if (now > maxLength)
             renderOptions(buf, now, now, now, "", HOP);
         buf.append("</select></td>\n");
         buf.append("</tr>\n");
@@ -131,35 +137,37 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("</select></td>\n");
 
         // tunnel quantity
+        int maxQuantity = advanced ? MAX_ADVANCED_QUANTITY : MAX_QUANTITY;
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Quantity") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityInbound\">\n");
         now = in.getQuantity();
-        renderOptions(buf, 1, MAX_QUANTITY, now, "", TUNNEL);
-        if (now > MAX_QUANTITY)
+        renderOptions(buf, 1, maxQuantity, now, "", TUNNEL);
+        if (now > maxQuantity)
             renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityOutbound\">\n");
         now = out.getQuantity();
-        renderOptions(buf, 1, MAX_QUANTITY, now, "", TUNNEL);
-        if (now > MAX_QUANTITY)
+        renderOptions(buf, 1, maxQuantity, now, "", TUNNEL);
+        if (now > maxQuantity)
             renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
         // tunnel backup quantity
+        int maxBQuantity = advanced ? MAX_ADVANCED_BACKUP_QUANTITY : MAX_BACKUP_QUANTITY;
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Backup quantity") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupInbound\">\n");
         now = in.getBackupQuantity();
-        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", TUNNEL);
-        if (now > MAX_BACKUP_QUANTITY)
+        renderOptions(buf, 0, maxBQuantity, now, "", TUNNEL);
+        if (now > maxBQuantity)
             renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupOutbound\">\n");
         now = out.getBackupQuantity();
-        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", TUNNEL);
-        if (now > MAX_BACKUP_QUANTITY)
+        renderOptions(buf, 0, maxBQuantity, now, "", TUNNEL);
+        if (now > maxBQuantity)
             renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
         buf.append("</tr>\n");
