@@ -37,8 +37,20 @@ interface CoordinatorListener
    */
   void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo);
 
+  /**
+   * Is this number of uploaders over the per-torrent limit?
+   */
   public boolean overUploadLimit(int uploaders);
+
+  /**
+   * Are we currently over the upstream bandwidth limit?
+   */
   public boolean overUpBWLimit();
+
+  /**
+   * Is the total (in Bps) over the upstream bandwidth limit?
+   */
   public boolean overUpBWLimit(long total);
+
   public void addMessage(String message);
 }

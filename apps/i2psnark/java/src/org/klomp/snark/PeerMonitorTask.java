@@ -27,6 +27,8 @@ import net.i2p.data.DataHelper;
 /**
  * TimerTask that monitors the peers and total up/download speeds.
  * Works together with the main Snark class to report periodical statistics.
+ *
+ * @deprecated unused, for command line client only, commented out in Snark.java
  */
 class PeerMonitorTask implements Runnable
 {
@@ -45,6 +47,7 @@ class PeerMonitorTask implements Runnable
 
   public void run()
   {
+/*****
     // Get some statistics
     int peers = 0;
     int uploaders = 0;
@@ -117,5 +120,6 @@ class PeerMonitorTask implements Runnable
 
     lastDownloaded = downloaded;
     lastUploaded = uploaded;
+****/
   }
 }

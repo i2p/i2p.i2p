@@ -158,7 +158,7 @@ public class I2PSnarkUtil {
     }
     
     /**
-     *  This updates the session options and tells the router
+     *  This updates ALL the session options (not just the bw) and tells the router
      *  @param limit KBps
      */
     public void setMaxUpBW(int limit) {

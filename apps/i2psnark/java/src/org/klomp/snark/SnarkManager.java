@@ -37,6 +37,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 import org.klomp.snark.dht.DHT;
 
@@ -70,6 +71,7 @@ public class SnarkManager implements CompleteListener {
     private final Map<String, Tracker> _trackerMap;
     private UpdateManager _umgr;
     private UpdateHandler _uhandler;
+    private SimpleTimer2.TimedEvent _idleChecker;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -178,6 +180,8 @@ public class SnarkManager implements CompleteListener {
             _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
+        _idleChecker = new IdleChecker(_util, _peerCoordinatorSet);
+        _idleChecker.schedule(5*60*1000);
     }
 
     /** @since 0.9.4 */
@@ -210,6 +214,7 @@ public class SnarkManager implements CompleteListener {
         _running = false;
         _monitor.interrupt();
         _connectionAcceptor.halt();
+        _idleChecker.cancel();
         stopAllTorrents(true);
     }
     
@@ -635,6 +640,7 @@ public class SnarkManager implements CompleteListener {
                     addMessage(_("I2CP options changed to {0}", i2cpOpts));
                     _util.setI2CPConfig(oldI2CPHost, oldI2CPPort, opts);
                 } else {
+                    // Won't happen, I2CP host/port, are hidden in the GUI if in router context
                     if (_util.connected()) {
                         _util.disconnect();
                         addMessage(_("Disconnecting old I2CP destination"));
@@ -658,6 +664,8 @@ public class SnarkManager implements CompleteListener {
                         for (Snark snark : _snarks.values()) {
                             if (snark.restartAcceptor()) {
                                 addMessage(_("I2CP listener restarted for \"{0}\"", snark.getBaseName()));
+                                // this is the common ConnectionAcceptor, so we only need to do it once
+                                break;
                             }
                         }
                     }
