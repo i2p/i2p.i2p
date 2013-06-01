@@ -167,10 +167,10 @@ class ConnectionAcceptor implements Runnable
                     continue;
                 }
                 int bad = _badCounter.count(socket.getPeerDestination().calculateHash());
-                if (count >= MAX_BAD) {
+                if (bad >= MAX_BAD) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Rejecting connection from " + socket.getPeerDestination().calculateHash() +
-                                  " after " + count + " failures, max is " + MAX_BAD);
+                                  " after " + bad + " failures, max is " + MAX_BAD);
                     try { socket.close(); } catch (IOException ioe) {}
                     continue;
                 }
