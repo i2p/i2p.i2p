@@ -1,3 +1,12 @@
+2013-06-01 zzz
+ * EepGet: Used cached byte array in uncompressor
+ * i2psnark:
+   - Add idle detector, reduce tunnel count when idle (prep for torrent updates)
+   - Cancel CoordinatorAcceptor cleaner when halted
+   - Make PeerCoordinatorSet an Iterable
+   - Reduce max protocol errors to 1
+   - Disable unused PeerMonitorTask
+
 2013-05-31 zzz
  * configtunnels.jsp: Allow more hops and tunnels when routerconsole.advanced=true
  * i2psnark: Fix details page on Windows
