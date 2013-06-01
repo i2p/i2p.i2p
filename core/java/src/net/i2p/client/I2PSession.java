@@ -222,7 +222,10 @@ public interface I2PSession {
     public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException;
 
     /**
+     *  Pass updated options to the router.
      *  Does not remove properties previously present but missing from this options parameter.
+     *  Fails silently if session is not connected.
+     *
      *  @param options non-null
      *  @since 0.8.4
      */
