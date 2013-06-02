@@ -29,7 +29,6 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
-import net.i2p.jetty.I2PDigestAuthenticator;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
@@ -106,7 +105,7 @@ public class RouterConsoleRunner implements RouterApp {
     private static final String DEFAULT_WEBAPP_CONFIG_FILENAME = "webapps.config";
 
     // Jetty Auth
-    private static final DigestAuthenticator authenticator = new I2PDigestAuthenticator();
+    private static final DigestAuthenticator authenticator = new DigestAuthenticator();
     static {
         // default changed from 0 (forever) in Jetty 6 to 60*1000 ms in Jetty 7
         authenticator.setMaxNonceAge(7*24*60*60*1000L);

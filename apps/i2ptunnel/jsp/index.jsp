@@ -107,7 +107,7 @@
       %>
         <div class="nameField rowItem">
             <label><%=intl._("Name")%>:</label>
-            <span class="text"><a href="edit?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>" target="_top"><%=indexBean.getTunnelName(curServer)%></a></span>
+            <span class="text"><a href="edit?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
         </div>
         <div class="previewField rowItem">
             <label><%=intl._("Points at")%>:</label>

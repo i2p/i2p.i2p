@@ -111,6 +111,12 @@ class FloodfillVerifyStoreJob extends JobImpl {
             _facade.verifyFinished(_key);
             return;
         }
+        if (DatabaseLookupMessage.supportsEncryptedReplies(peer)) {
+            MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(getContext());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Requesting encrypted reply from " + _target + ' ' + sess.key + ' ' + sess.tag);
+            lookup.setReplySession(sess.key, sess.tag);
+        }
         Hash fromKey;
         if (_isRouterInfo)
             fromKey = null;

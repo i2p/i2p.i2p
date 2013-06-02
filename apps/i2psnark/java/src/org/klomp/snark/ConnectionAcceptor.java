@@ -33,11 +33,10 @@ import net.i2p.data.Hash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
- * Accepts connections on a TCP port and routes them to sub-acceptors.
+ * Accepts connections on a I2PServerSocket and routes them to PeerAcceptors.
  */
 class ConnectionAcceptor implements Runnable
 {
@@ -47,14 +46,22 @@ class ConnectionAcceptor implements Runnable
   private Thread thread;
   private final I2PSnarkUtil _util;
   private final ObjectCounter<Hash> _badCounter = new ObjectCounter();
+  private final SimpleTimer2.TimedEvent _cleaner;
 
-  private boolean stop;
+  private volatile boolean stop;
   private boolean socketChanged;
 
-  private static final int MAX_BAD = 2;
+  // protocol errors before blacklisting.
+  private static final int MAX_BAD = 1;
   private static final long BAD_CLEAN_INTERVAL = 30*60*1000;
 
-  public ConnectionAcceptor(I2PSnarkUtil util) { _util = util; }
+  /**
+   *  Multitorrent
+   */
+  public ConnectionAcceptor(I2PSnarkUtil util) {
+      _util = util;
+      _cleaner = new Cleaner();
+  }
   
   public synchronized void startAccepting(PeerCoordinatorSet set, I2PServerSocket socket) {
     if (serverSocket != socket) {
@@ -67,11 +74,14 @@ class ConnectionAcceptor implements Runnable
           thread = new I2PAppThread(this, "I2PSnark acceptor");
           thread.setDaemon(true);
           thread.start();
-          _util.getContext().simpleScheduler().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
+          _cleaner.schedule(BAD_CLEAN_INTERVAL);
       }
     }
   }
   
+  /**
+   *  Unused (single torrent)
+   */
   public ConnectionAcceptor(I2PSnarkUtil util, I2PServerSocket serverSocket,
                             PeerAcceptor peeracceptor)
   {
@@ -82,7 +92,7 @@ class ConnectionAcceptor implements Runnable
     thread = new I2PAppThread(this, "I2PSnark acceptor");
     thread.setDaemon(true);
     thread.start();
-    _util.getContext().simpleScheduler().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
+    _cleaner = new Cleaner();
   }
 
   public void halt()
@@ -101,14 +111,20 @@ class ConnectionAcceptor implements Runnable
     Thread t = thread;
     if (t != null)
       t.interrupt();
+    _cleaner.cancel();
   }
   
+  /**
+   *  Effectively unused, would only be called if we changed
+   *  I2CP host/port, which is hidden in the gui if in router context
+   */
   public void restart() {
       serverSocket = _util.getServerSocket();
       socketChanged = true;
       Thread t = thread;
       if (t != null)
           t.interrupt();
+      _cleaner.schedule(BAD_CLEAN_INTERVAL);
   }
 
   public int getPort()
@@ -150,9 +166,11 @@ class ConnectionAcceptor implements Runnable
                     try { socket.close(); } catch (IOException ioe) {}
                     continue;
                 }
-                if (_badCounter.count(socket.getPeerDestination().calculateHash()) >= MAX_BAD) {
+                int bad = _badCounter.count(socket.getPeerDestination().calculateHash());
+                if (bad >= MAX_BAD) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Rejecting connection from " + socket.getPeerDestination().calculateHash() + " after " + MAX_BAD + " failures");
+                        _log.warn("Rejecting connection from " + socket.getPeerDestination().calculateHash() +
+                                  " after " + bad + " failures, max is " + MAX_BAD);
                     try { socket.close(); } catch (IOException ioe) {}
                     continue;
                 }
@@ -214,7 +232,17 @@ class ConnectionAcceptor implements Runnable
   }
 
     /** @since 0.9.1 */    
-    private class Cleaner implements SimpleTimer.TimedEvent {
-        public void timeReached() { _badCounter.clear(); }
+    private class Cleaner extends SimpleTimer2.TimedEvent {
+
+        public Cleaner() {
+            super(_util.getContext().simpleTimer2());
+        }
+
+        public void timeReached() {
+            if (stop)
+                return;
+            _badCounter.clear();
+            schedule(BAD_CLEAN_INTERVAL);
+        }
     }
 }

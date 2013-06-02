@@ -70,7 +70,6 @@ public class ConsoleUpdateManager implements UpdateManager {
     /** downloaded AND installed */
     private final Map<UpdateItem, Version> _installed;
     private static final DecimalFormat _pct = new DecimalFormat("0.0%");
-    private static final VersionComparator _versionComparator = new VersionComparator();
 
     private volatile String _status;
 
@@ -1289,7 +1288,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
 
         public int compareTo(Version r) {
-            return _versionComparator.compare(version, r.version);
+            return VersionComparator.comp(version, r.version);
         }
 
         @Override

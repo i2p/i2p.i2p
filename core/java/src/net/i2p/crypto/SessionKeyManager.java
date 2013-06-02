@@ -150,11 +150,20 @@ public class SessionKeyManager {
     }
 
     /**
-     * Accept the given tags and associate them with the given key for decryption
-     *
+     * Accept the given tags and associate them with the given key for decryption,
+     * with the default expiration.
      */
-    public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags) { // nop
-    }
+    public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags) {}
+
+    /**
+     * Accept the given tags and associate them with the given key for decryption,
+     * with specified expiration.
+     *
+     * @param sessionTags modifiable; NOT copied
+     * @param expire time from now
+     * @since 0.9.7
+     */
+    public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags, long expire) {}
 
     /**
      * Determine if we have received a session key associated with the given session tag,

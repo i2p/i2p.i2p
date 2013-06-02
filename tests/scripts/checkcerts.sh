@@ -154,7 +154,7 @@ fi
 
 cd `dirname $0`/../../installer/resources/certificates
 
-for i in *.crt
+for i in *.crt *.cert
 do
     echo "Checking $i ..."
     EXPIRES=`checkcert $i`

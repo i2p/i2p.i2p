@@ -48,7 +48,7 @@ public class LogsHelper extends HelperBase {
         File f = null;
         if (ctx.hasWrapper()) {
             String wv = System.getProperty("wrapper.version");
-            if (wv != null && (new VersionComparator()).compare(wv, LOCATION_AVAILABLE) >= 0) {
+            if (wv != null && VersionComparator.comp(wv, LOCATION_AVAILABLE) >= 0) {
                 try {
                    f = WrapperManager.getWrapperLogFile();
                 } catch (Throwable t) {}

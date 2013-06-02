@@ -302,7 +302,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
      *         version, otherwise <code>false</code>.
      */
     public static final boolean needsUpdate(String currentVersion, String newVersion) {
-        return (new VersionComparator()).compare(currentVersion, newVersion) < 0;
+        return VersionComparator.comp(currentVersion, newVersion) < 0;
     }
 
     /** @return success */

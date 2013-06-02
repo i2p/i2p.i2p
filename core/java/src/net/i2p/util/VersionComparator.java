@@ -11,9 +11,15 @@ import java.util.Comparator;
  */
 public class VersionComparator implements Comparator<String> {
 
-    @Override
     public int compare(String l, String r) {
+        return comp(l, r);
+    }
         
+    /**
+     *  To avoid churning comparators
+     *  @since 0.9.7
+     */
+    public static int comp(String l, String r) {
         if (l.equals(r))
             return 0;
         

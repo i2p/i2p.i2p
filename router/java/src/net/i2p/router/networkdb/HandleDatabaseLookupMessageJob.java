@@ -8,6 +8,7 @@ package net.i2p.router.networkdb;
  *
  */
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -27,6 +29,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.MessageWrapper;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 
@@ -36,8 +39,10 @@ import net.i2p.util.Log;
  * Unused directly - see kademlia/ for extension
  */
 public class HandleDatabaseLookupMessageJob extends JobImpl {
-    private Log _log;
-    private DatabaseLookupMessage _message;
+    private final Log _log;
+    private final DatabaseLookupMessage _message;
+    private boolean _replyKeyConsumed;
+
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
     private final static int REPLY_TIMEOUT = 60*1000;
@@ -149,8 +154,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 if ( (info.getIdentity().isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Not answering a query for a netDb peer who isn't reachable");
-                    Set<Hash> us = new HashSet<Hash>(1);
-                    us.add(getContext().routerHash());
+                    Set<Hash> us = Collections.singleton(getContext().routerHash());
                     sendClosest(_message.getSearchKey(), us, fromKey, _message.getReplyTunnel());
                 //} else if (info.isHidden()) {
                 //    // Don't return hidden nodes
@@ -203,9 +207,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
      */
     private Set<Hash> getNearestRouters() {
         Set<Hash> dontInclude = _message.getDontIncludePeers();
+        Hash us = getContext().routerHash();
         if (dontInclude == null)
-            dontInclude = new HashSet(1);
-        dontInclude.add(getContext().routerHash());
+            dontInclude = Collections.singleton(us);
+        else
+            dontInclude.add(us);
         // Honor flag to exclude all floodfills
         //if (dontInclude.contains(Hash.FAKE_HASH)) {
         // This is handled in FloodfillPeerSelector
@@ -289,6 +295,21 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             getContext().tunnelDispatcher().dispatch(m);
         } else {
             // if we aren't the gateway, forward it on
+            if (!_replyKeyConsumed) {
+                // if we send a followup DSM w/ our RI, don't reuse key
+                SessionKey replyKey = _message.getReplyKey();
+                if (replyKey != null) {
+                    // encrypt the reply
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Sending encrypted reply to " + toPeer + ' ' + replyKey + ' ' + _message.getReplyTag());
+                    message = MessageWrapper.wrap(getContext(), message, replyKey, _message.getReplyTag());
+                    if (message == null) {
+                        _log.error("Encryption error");
+                        return;
+                    }
+                    _replyKeyConsumed = true;
+                }
+            }
             TunnelGatewayMessage m = new TunnelGatewayMessage(getContext());
             m.setMessage(message);
             m.setMessageExpiration(message.getMessageExpiration());

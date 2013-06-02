@@ -132,7 +132,7 @@ Installer:
 
 
 
-Java Service Wrapper Community Edition 32-bit 3.5.13:
+Java Service Wrapper Community Edition 32-bit 3.5.19:
    Copyright (C) 1999-2011 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
@@ -177,7 +177,7 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 7.6.10.v20130312:
+   Jetty 7.6.11.v20130520:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
@@ -243,8 +243,8 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 6.0.36:
-   Copyright 1999-2012 The Apache Software Foundation
+   Tomcat 6.0.37:
+   Copyright 1999-2013 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 

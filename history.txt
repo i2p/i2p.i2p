@@ -1,3 +1,43 @@
+2013-06-01 zzz
+ * EepGet: Used cached byte array in uncompressor
+ * i2psnark:
+   - Add idle detector, reduce tunnel count when idle (prep for torrent updates)
+   - Cancel CoordinatorAcceptor cleaner when halted
+   - Make PeerCoordinatorSet an Iterable
+   - Reduce max protocol errors to 1
+   - Disable unused PeerMonitorTask
+
+2013-05-31 zzz
+ * configtunnels.jsp: Allow more hops and tunnels when routerconsole.advanced=true
+ * i2psnark: Fix details page on Windows
+ * NetDB:
+   - Add DLM fields for requesting an encrypted reply
+   - Add support for encrypted DSRM and DSM in response to a DLM
+   - Fix netDb.alwaysQuery debug setting so it works again, and always
+     sends to that router first (move from FNDF to IterativeSearchJob)
+ * PRNG: Cleanups using Collections.singletonMap()
+ * Router utils: New RemovableSingletonSet
+ * TransientSessionKeyManager:
+   - Support variable expiration for inbound tag sets
+   - Several efficiency improvements
+ * VersionComparator: Add static method, use most places
+
+2013-05-30 kytv
+ * Update Java Service Wrapper to v3.5.19
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - Linux ARMv6: Compiled on a RaspberryPi using gcc 4.6.3-14+rpi1,
+      Icedtea6 6b27-1.12.5-1+rpi1 and stripped
+    - All other binaries are from the "community edition" deltapack offered by
+      Tanuki.
+ * Allow themes to be used in IE >= 10
+
+2013-05-29 zzz
+ * Console: Remove I2PDigestAuthenticator workaround, as Jetty 7.6.11 has the fix
+ * i2ptunnel: Default to 3 hops (ticket #936)
+ * Jetty 7.6.11
+ * Tomcat 6.0.37
+
 * 2013-05-28 0.9.6 released
 
 2013-05-24 kytv
@@ -278,7 +318,7 @@
       changed from Tanuki's default to Itoopie.
     - FreeBSD: Self-compiled in FreeBSD 7.4 to eliminate the dependency on the
       compat6x port.
-    - Linux x86, Linux x64, Linux ARMv5, Linux-PPC32, MacOSX & Solaris: Binares
+    - Linux x86, Linux x64, Linux ARMv5, Linux-PPC32, MacOSX & Solaris: Binaries
       are from the "community edition" deltapack offered by Tanuki. The Linux
       binaries have been stripped.
 

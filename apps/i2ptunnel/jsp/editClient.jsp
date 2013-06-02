@@ -216,7 +216,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <%=intl._("Length")%>(<span class="accessKey">t</span>):
                 </label>
                 <select id="tunnelDepth" name="tunnelDepth" title="Length of each Tunnel" class="selectbox">
-                    <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 2);
+                    <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 3);
                   %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>><%=intl._("0 hop tunnel (low anonymity, low latency)")%></option>
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl._("1 hop tunnel (medium anonymity, medium latency)")%></option>
                     <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>><%=intl._("2 hop tunnel (high anonymity, high latency)")%></option>

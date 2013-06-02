@@ -1793,7 +1793,7 @@ showUsage() {
 }
 
 showsetusermesg()  {
-    echo "`gettext 'Please edit i2prouter and set the variable RUN_AS_USER'`."
+    echo "`gettext \"Please edit $0 and set the variable RUN_AS_USER\"`."
 }
 
 checkifstartingasroot() {
@@ -1801,7 +1801,7 @@ checkifstartingasroot() {
         echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
         showsetusermesg
         echo
-        echo "`gettext 'To run as root anyway, edit i2prouter and set ALLOW_ROOT=true.'`"
+        echo "`gettext \"To run as root anyway, edit $0 and set ALLOW_ROOT=true.\"`"
         exit 1
     fi
 }

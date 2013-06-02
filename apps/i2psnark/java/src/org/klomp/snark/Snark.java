@@ -1226,8 +1226,7 @@ public class Snark
     if (_peerCoordinatorSet == null || uploaders <= 0)
       return false;
     int totalUploaders = 0;
-    for (Iterator<PeerCoordinator> iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
-      PeerCoordinator c = iter.next();
+    for (PeerCoordinator c : _peerCoordinatorSet) {
       if (!c.halted())
         totalUploaders += c.uploaders;
     }
@@ -1240,8 +1239,7 @@ public class Snark
     if (_peerCoordinatorSet == null)
       return false;
     long total = 0;
-    for (Iterator<PeerCoordinator> iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
-      PeerCoordinator c = iter.next();
+    for (PeerCoordinator c : _peerCoordinatorSet) {
       if (!c.halted())
         total += c.getCurrentUploadRate();
     }

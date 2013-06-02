@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.ver" value="7.6.10.v20130312" />
+    <property name="jetty.ver" value="7.6.11.v20130520" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="8c0ff0ad83756de118f5af71b88ca9c78ebf6420" />
+    <property name="jetty.sha1" value="d32ee389ed711a0655de0432810b75b57ad3e500" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />

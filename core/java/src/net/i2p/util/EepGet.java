@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.util.InternalSocket;
 
@@ -1240,6 +1241,8 @@ public class EepGet {
     protected class Gunzipper implements Runnable {
         private final InputStream _inRaw;
         private final OutputStream _out;
+        private static final int CACHE_SIZE = 8*1024;
+        private final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
 
         public Gunzipper(InputStream in, OutputStream out) {
             _inRaw = in;
@@ -1247,13 +1250,14 @@ public class EepGet {
         }
 
         public void run() {
-            ReusableGZIPInputStream in = null;
+            ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
+            ByteArray ba = null;
             long written = 0;
             try {
-                in = ReusableGZIPInputStream.acquire();
                 // blocking
                 in.initialize(_inRaw);
-                byte buf[] = new byte[8*1024];
+                ba = _cache.acquire();
+                byte buf[] = ba.getData();
                 int read = -1;
                 while ( (read = in.read(buf)) != -1) {
                     _out.write(buf, 0, read);
@@ -1269,8 +1273,9 @@ public class EepGet {
                 if (_out != null) try { 
                     _out.close(); 
                 } catch (IOException ioe) {}
-                if (in != null)
-                    ReusableGZIPInputStream.release(in);
+                ReusableGZIPInputStream.release(in);
+                if (ba != null)
+                    _cache.release(ba);
             }
         }
     }

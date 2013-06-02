@@ -36,7 +36,7 @@ input.default {
  <input type="hidden" name="action" value="blah" >
 <%
  String userAgent = request.getHeader("User-Agent");
- if (userAgent == null || !userAgent.contains("MSIE")) {
+ if (userAgent == null || userAgent.contains("Trident/6") || !userAgent.contains("MSIE")) {
 %>
  <jsp:getProperty name="uihelper" property="settings" />
 <% } else { %>

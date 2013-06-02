@@ -58,10 +58,10 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
    protected final String name;
 
    /** Indicate if this instance has already been initialised or not. */
-   protected boolean initialised;
+   protected volatile boolean initialised;
 
    /** A temporary buffer to serve random bytes. */
-   protected byte[] buffer;
+   protected volatile byte[] buffer;
 
    /** The index into buffer of where the next byte will come from. */
    protected int ndx;

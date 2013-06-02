@@ -202,7 +202,6 @@ abstract class BuildRequestor {
     private static final boolean SEND_VARIABLE = true;
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
     private static final int SHORT_RECORDS = 5;
-    private static final VersionComparator _versionComparator = new VersionComparator();
     private static final List<Integer> SHORT_ORDER = new ArrayList(SHORT_RECORDS);
     static {
         for (int i = 0; i < SHORT_RECORDS; i++)
@@ -217,7 +216,7 @@ abstract class BuildRequestor {
         String v = ri.getOption("router.version");
         if (v == null)
             return false;
-        return _versionComparator.compare(v, MIN_VARIABLE_VERSION) >= 0;
+        return VersionComparator.comp(v, MIN_VARIABLE_VERSION) >= 0;
     }
 
     /**

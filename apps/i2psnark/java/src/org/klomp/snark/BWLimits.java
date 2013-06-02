@@ -37,7 +37,9 @@ class BWLimits {
         return rv;
     }
 
+/****
     public static void main(String args[]) {
         System.out.println(Arrays.toString(getBWLimits("127.0.0.1", 7654)));
     }
+****/
 }

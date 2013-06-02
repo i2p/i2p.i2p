@@ -37,7 +37,7 @@ public class CSSHelper extends HelperBase {
 
     public String getTheme(String userAgent) {
         String url = BASE_THEME_PATH;
-        if (userAgent != null && userAgent.contains("MSIE")) {
+        if (userAgent != null && (userAgent.contains("MSIE") && !userAgent.contains("Trident/6"))) {
             url += FORCE + "/";
         } else {
             // This is the first thing to use _context on most pages

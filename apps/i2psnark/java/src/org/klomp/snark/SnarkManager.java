@@ -37,6 +37,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 import org.klomp.snark.dht.DHT;
 
@@ -70,6 +71,7 @@ public class SnarkManager implements CompleteListener {
     private final Map<String, Tracker> _trackerMap;
     private UpdateManager _umgr;
     private UpdateHandler _uhandler;
+    private SimpleTimer2.TimedEvent _idleChecker;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -126,7 +128,7 @@ public class SnarkManager implements CompleteListener {
        ,"Welterde", "http://tracker.welterde.i2p/a=http://tracker.welterde.i2p/stats?mode=top5"
        ,"Diftracker", "http://diftracker.i2p/announce.php=http://diftracker.i2p/"
 //       , "CRSTRACK", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
-//       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
+       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
     };
     
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */
@@ -178,6 +180,8 @@ public class SnarkManager implements CompleteListener {
             _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
+        _idleChecker = new IdleChecker(_util, _peerCoordinatorSet);
+        _idleChecker.schedule(5*60*1000);
     }
 
     /** @since 0.9.4 */
@@ -210,6 +214,7 @@ public class SnarkManager implements CompleteListener {
         _running = false;
         _monitor.interrupt();
         _connectionAcceptor.halt();
+        _idleChecker.cancel();
         stopAllTorrents(true);
     }
     
@@ -635,6 +640,7 @@ public class SnarkManager implements CompleteListener {
                     addMessage(_("I2CP options changed to {0}", i2cpOpts));
                     _util.setI2CPConfig(oldI2CPHost, oldI2CPPort, opts);
                 } else {
+                    // Won't happen, I2CP host/port, are hidden in the GUI if in router context
                     if (_util.connected()) {
                         _util.disconnect();
                         addMessage(_("Disconnecting old I2CP destination"));
@@ -658,6 +664,8 @@ public class SnarkManager implements CompleteListener {
                         for (Snark snark : _snarks.values()) {
                             if (snark.restartAcceptor()) {
                                 addMessage(_("I2CP listener restarted for \"{0}\"", snark.getBaseName()));
+                                // this is the common ConnectionAcceptor, so we only need to do it once
+                                break;
                             }
                         }
                     }
