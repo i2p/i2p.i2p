@@ -109,7 +109,12 @@ public class LeaseSet extends DatabaseEntry {
         return _destination;
     }
 
+    /**
+     * @throws IllegalStateException if already signed
+     */
     public void setDestination(Destination dest) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _destination = dest;
     }
 
@@ -117,7 +122,12 @@ public class LeaseSet extends DatabaseEntry {
         return _encryptionKey;
     }
 
+    /**
+     * @throws IllegalStateException if already signed
+     */
     public void setEncryptionKey(PublicKey encryptionKey) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _encryptionKey = encryptionKey;
     }
 
@@ -136,6 +146,7 @@ public class LeaseSet extends DatabaseEntry {
      * Default false.
      */
     public boolean getReceivedAsPublished() { return _receivedAsPublished; }
+
     /** Default false */
     public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
 
@@ -145,14 +156,20 @@ public class LeaseSet extends DatabaseEntry {
      * @since 0.7.14
      */
     public boolean getReceivedAsReply() { return _receivedAsReply; }
+
     /** set to true @since 0.7.14 */
     public void setReceivedAsReply() { _receivedAsReply = true; }
 
+    /**
+     * @throws IllegalStateException if already signed
+     */
     public void addLease(Lease lease) {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");
         if (lease.getGateway() == null) throw new IllegalArgumentException("erm, lease has no gateway");
         if (lease.getTunnelId() == null) throw new IllegalArgumentException("erm, lease has no tunnel");
-        if (_leases.size() > MAX_LEASES)
+        if (_signature != null)
+            throw new IllegalStateException();
+        if (_leases.size() >= MAX_LEASES)
             throw new IllegalArgumentException("Too many leases - max is " + MAX_LEASES);
         _leases.add(lease);
         long expire = lease.getEndDate().getTime();
@@ -163,7 +180,7 @@ public class LeaseSet extends DatabaseEntry {
     }
 
     /**
-     *  @return 0-6
+     *  @return 0-16
      *  A LeaseSet with no leases is revoked.
      */
     public int getLeaseCount() {
