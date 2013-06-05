@@ -17,8 +17,8 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 
 /**
- * Defines the message a client sends to a router when destroying
- * existing session.
+ * Defines the message a router sends to a client indicating the
+ * status of the session.
  *
  * @author jrandom
  */

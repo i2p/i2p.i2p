@@ -22,15 +22,15 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 
 /**
- * Defines the message a client sends to a router when destroying
- * existing session.
+ * Defines the message a router sends to a client to request that
+ * a leaseset be created and signed. The reply is a CreateLeaseSetMessage.
  *
  * @author jrandom
  */
 public class RequestLeaseSetMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 21;
     private SessionId _sessionId;
-    private List<TunnelEndpoint> _endpoints;
+    private final List<TunnelEndpoint> _endpoints;
     private Date _end;
 
     public RequestLeaseSetMessage() {
@@ -101,9 +101,9 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
 
     @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if ((_sessionId == null) || (_endpoints == null))
+        if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(64);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(256);
         try {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 1, _endpoints.size());
@@ -127,7 +127,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("[RequestLeaseMessage: ");
+        buf.append("[RequestLeaseSetMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tTunnels:");
         for (int i = 0; i < getEndpoints(); i++) {
@@ -140,8 +140,8 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     }
 
     private static class TunnelEndpoint {
-        private Hash _router;
-        private TunnelId _tunnelId;
+        private final Hash _router;
+        private final TunnelId _tunnelId;
 
         public TunnelEndpoint(Hash router, TunnelId id) {
             _router = router;
