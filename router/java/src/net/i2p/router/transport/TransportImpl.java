@@ -574,9 +574,8 @@ public abstract class TransportImpl implements Transport {
         public void timeReached() {
             long now = _context.clock().now();
             synchronized (_unreachableEntries) {
-                for (Iterator iter = _unreachableEntries.keySet().iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
-                    Long when = _unreachableEntries.get(peer);
+                for (Iterator<Long> iter = _unreachableEntries.values().iterator(); iter.hasNext(); ) {
+                    Long when = iter.next();
                     if (when.longValue() + UNREACHABLE_PERIOD < now)
                         iter.remove();
                 }
