@@ -85,6 +85,8 @@ class IterativeSearchJob extends FloodSearchJob {
      */
     private static final int MAX_CONCURRENT = 1;
 
+    private static final boolean ENCRYPT_RI_SEARCHES = false;
+
     public IterativeSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx, facade, key, onFind, onFailed, timeoutMs, isLease);
         // these override the settings in super
@@ -255,7 +257,7 @@ class IterativeSearchJob extends FloodSearchJob {
             _sentTime.put(peer, Long.valueOf(now));
 
             I2NPMessage outMsg = null;
-            if (_isLease) {
+            if (_isLease || ENCRYPT_RI_SEARCHES) {
                 // Full ElG is fairly expensive so only do it for LS lookups
                 // if we have the ff RI, garlic encrypt it
                 RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
@@ -264,7 +266,7 @@ class IterativeSearchJob extends FloodSearchJob {
                     if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
                         MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(getContext());
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("Requesting encrypted reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
+                            _log.info(getJobId() + ": Requesting encrypted reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
                         dlm.setReplySession(sess.key, sess.tag);
                     }
                     outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
