@@ -134,7 +134,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private void handleGetDate(I2CPMessageReader reader, GetDateMessage message) {
         // sent by clients >= 0.8.7
         String clientVersion = message.getVersion();
-        // TODO - save client's version string for future reference
+        if (clientVersion != null)
+            _runner.setClientVersion(clientVersion);
         try {
             // only send version if the client can handle it (0.8.7 or greater)
             _runner.doSend(new SetDateMessage(clientVersion != null ? CoreVersion.VERSION : null));

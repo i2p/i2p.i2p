@@ -67,6 +67,7 @@ class ClientConnectionRunner {
     private SessionId _sessionId;
     /** user's config */
     private SessionConfig _config;
+    private String _clientVersion;
     /** static mapping of MessageId to Payload, storing messages for retrieval */
     private final Map<MessageId, Payload> _messages; 
     /** lease set request state, or null if there is no request pending on at the moment */
@@ -177,6 +178,24 @@ class ClientConnectionRunner {
     
     /** current client's config */
     public SessionConfig getConfig() { return _config; }
+
+    /**
+     *  The client version.
+     *  @since 0.9.7
+     */
+    public void setClientVersion(String version) {
+        _clientVersion = version;
+    }
+
+    /**
+     *  The client version.
+     *  @return null if unknown or less than 0.8.7
+     *  @since 0.9.7
+     */
+    public String getClientVersion() {
+        return _clientVersion;
+    }
+
     /** current client's sessionkeymanager */
     public SessionKeyManager getSessionKeyManager() { return _sessionKeyManager; }
 

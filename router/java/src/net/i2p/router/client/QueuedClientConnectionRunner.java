@@ -1,5 +1,6 @@
 package net.i2p.router.client;
 
+import net.i2p.CoreVersion;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.I2CPMessageQueue;
@@ -68,5 +69,21 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
         if (!success)
             throw new I2CPMessageException("I2CP write to queue failed");
     }
-    
+
+    /**
+     *  Does nothing. Client version is the core version.
+     *  @since 0.9.7
+     */
+    @Override
+    public void setClientVersion(String version) {}
+
+    /**
+     *  The client version.
+     *  @return CoreVersion.VERSION
+     *  @since 0.9.7
+     */
+    @Override
+    public String getClientVersion() {
+        return CoreVersion.VERSION;
+    }
 }
