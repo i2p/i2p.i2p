@@ -311,6 +311,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             System.arraycopy(data, curIndex, rk, 0, SessionKey.KEYSIZE_BYTES);
             _replyKey = new SessionKey(rk);
             curIndex += SessionKey.KEYSIZE_BYTES;
+            // number of tags, assume always 1 for now
+            curIndex++;
             byte[] rt = new byte[SessionTag.BYTE_LENGTH];
             System.arraycopy(data, curIndex, rt, 0, SessionTag.BYTE_LENGTH);
             _replyTag = new SessionTag(rt);
@@ -328,7 +330,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         if (_dontIncludePeers != null) 
             totalLength += Hash.HASH_LENGTH * _dontIncludePeers.size();
         if (_replyKey != null)
-            totalLength += SessionKey.KEYSIZE_BYTES + SessionTag.BYTE_LENGTH;
+            // number of tags, assume always 1 for now
+            totalLength += SessionKey.KEYSIZE_BYTES + 1 + SessionTag.BYTE_LENGTH;
         return totalLength;
     }
     
@@ -372,6 +375,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         if (_replyKey != null) {
             System.arraycopy(_replyKey.getData(), 0, out, curIndex, SessionKey.KEYSIZE_BYTES);
             curIndex += SessionKey.KEYSIZE_BYTES;
+            // number of tags, always 1 for now
+            out[curIndex++] = 1;
             System.arraycopy(_replyTag.getData(), 0, out, curIndex, SessionTag.BYTE_LENGTH);
             curIndex += SessionTag.BYTE_LENGTH;
         }

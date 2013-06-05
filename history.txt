@@ -1,3 +1,13 @@
+2013-06-05 zzz
+ * DatabaseLookupMessage: Change format for encrypted reply request
+   to allow multiple bundled reply tags
+ * I2CP: Save client version for future reference
+ * InboundMessageDistributor: Cleanups
+ * LeaseSet: Don't allow changes after signature added
+ * NetDB:
+   - Debugging option for encrypting RI lookups
+   - Remove unused classes
+
 2013-06-01 zzz
  * EepGet: Used cached byte array in uncompressor
  * i2psnark:
