@@ -32,7 +32,7 @@ Debian wrapper.config to try to prevent confusion.
  #
  # This software is the proprietary information of Tanuki Software.
  # You shall use it only in accordance with the terms of the
-@@ -24,16 +24,12 @@
+@@ -24,21 +24,12 @@
  # These settings can be modified to fit the needs of your application
  # Optimized for use with version 3.5.17 of the Wrapper.
  
@@ -41,21 +41,26 @@ Debian wrapper.config to try to prevent confusion.
 -# should have been replaced by the izpack installer.
 -# If you did not run the installer, replace them with the appropriate paths.
 -I2P="%INSTALL_PATH"
--I2P_CONFIG_DIR="%USER_HOME/.i2p"
+-if [ "`uname -s`" == "Darwin" ]; then
+-   if [ -d "%USER_HOME/Library/Application Support" ]; then
+-       I2P_CONFIG_DIR="%USER_HOME/Library/Application Support/i2p"
+-   else
+-       I2P_CONFIG_DIR="%USER_HOME/.i2p"
+-   fi
+-else
+-    I2P_CONFIG_DIR="%USER_HOME/.i2p"
+-fi
 -I2PTEMP="%SYSTEM_java_io_tmpdir"
--# PORTABLE installation:
--# Use the following instead.
--#I2PTEMP="%INSTALL_PATH"
 +# Read config file if found
 +[ -f /etc/default/i2p ] && . /etc/default/i2p
 +
 +I2P="/usr/share/i2p"
 +I2P_CONFIG_DIR="$HOME/.i2p"
 +I2PTEMP="/tmp"
- 
- # Application
- APP_NAME="i2p"
-@@ -61,8 +57,8 @@
+ # PORTABLE installation:
+ # Use the following instead.
+ #I2PTEMP="%INSTALL_PATH"
+@@ -69,8 +60,8 @@
  #RUN_AS_USER=
  
  # Wrapper
@@ -66,7 +71,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -167,48 +163,6 @@
+@@ -175,48 +166,6 @@
  # Workaround for Gentoo
  JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
  
@@ -115,7 +120,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -920,9 +874,6 @@
+@@ -928,9 +877,6 @@
          # The string passed to eval must handles spaces in paths correctly.
          COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.17 $ADDITIONAL_PARA"
          eval $COMMAND_LINE
@@ -125,7 +130,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1046,9 +997,6 @@
+@@ -1054,9 +1000,6 @@
          # The string passed to eval must handles spaces in paths correctly.
          COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.17 $ADDITIONAL_PARA"
          eval $COMMAND_LINE
@@ -135,7 +140,7 @@ Debian wrapper.config to try to prevent confusion.
      else
          eval echo `gettext '$APP_LONG_NAME is already running.'`
          exit 1
-@@ -1785,7 +1733,7 @@
+@@ -1793,7 +1736,7 @@
  }
  
  showsetusermesg()  {
@@ -144,7 +149,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1793,7 +1741,7 @@
+@@ -1801,7 +1744,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -153,7 +158,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1858,23 +1806,9 @@
+@@ -1866,23 +1809,9 @@
              status
              ;;
  
