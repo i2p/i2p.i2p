@@ -60,7 +60,6 @@
       <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
         <Set name="minThreads">1</Set>
         <Set name="maxThreads">16</Set>
-        <Set name="lowThreads">2</Set>
       </New>
      -->
 
