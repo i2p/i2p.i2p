@@ -90,7 +90,8 @@ public class BlockFile {
 	/** I2P was the file locked when we opened it? */
 	private final boolean _wasMounted;
 
-	private BSkipList metaIndex;
+	private final BSkipList metaIndex;
+	private boolean _isClosed;
 	/** cached list of free pages, only valid if freListStart > 0 */
 	private FreeListBlock flb;
 	private final HashMap openIndices = new HashMap();
@@ -120,7 +121,12 @@ public class BlockFile {
 	}
 
 	/**
-	 *  Run an integrity check on the blockfile and all the skiplists in it
+	 *  Run an integrity check on the blockfile and all the skiplists in it.
+	 *
+	 *  WARNING:
+	 *  This only works on skiplists using UTF8StringBytes as a key
+	 *  serializer, unless the exception has been coded in bfck below.
+	 *  Will CORRUPT other skiplists.
 	 */
 	public static void main(String args[]) {
 		if (args.length != 1) {
@@ -470,11 +476,10 @@ public class BlockFile {
 	 */
 	public void close() throws IOException {
 		// added I2P
-		if (metaIndex == null)
+		if (_isClosed)
 			return;
-
+		_isClosed = true;
 		metaIndex.close();
-		metaIndex = null;
 
 		Set oi = openIndices.keySet();
 		Iterator i = oi.iterator();
@@ -497,27 +502,34 @@ public class BlockFile {
 	 *  @return true if the levels were modified.
 	 */
 	public boolean bfck(boolean fix) {
-		log.info("magic bytes " + magicBytes);
-		log.info("fileLen " + fileLen);
-		log.info("freeListStart " + freeListStart);
-		log.info("mounted " + mounted);
-		log.info("spanSize " + spanSize);
-		log.info("Metaindex");
-		log.info("Checking meta index in blockfile " + file);
+		if (log.shouldLog(Log.INFO)) {
+			log.info("magic bytes " + magicBytes);
+			log.info("fileLen " + fileLen);
+			log.info("freeListStart " + freeListStart);
+			log.info("mounted " + mounted);
+			log.info("spanSize " + spanSize);
+			log.info("Metaindex");
+			log.info("Checking meta index in blockfile " + file);
+		}
 		boolean rv = metaIndex.bslck(fix, true);
-		if (rv)
-			log.warn("Repaired meta index in blockfile " + file);
-		else
-			log.info("No errors in meta index in blockfile " + file);
+		if (rv) {
+			if (log.shouldLog(Log.WARN))
+				log.warn("Repaired meta index in blockfile " + file);
+		} else {
+			if (log.shouldLog(Log.INFO))
+				log.info("No errors in meta index in blockfile " + file);
+		}
 		int items = 0;
 		for (SkipIterator iter = metaIndex.iterator(); iter.hasNext(); ) {
 			String slname = (String) iter.nextKey();
 			Integer page = (Integer) iter.next();
-			log.info("List " + slname + " page " + page);
+			if (log.shouldLog(Log.INFO))
+				log.info("List " + slname + " page " + page);
 			try {
-				// This uses IdentityBytes, so the value class won't be right
-				//Serializer ser = slname.equals("%%__REVERSE__%%") ? new IntBytes() : new UTF8StringBytes();
-				BSkipList bsl = getIndex(slname, new UTF8StringBytes(), new IdentityBytes());
+				// This uses IdentityBytes, so the value class won't be right, but at least
+				// it won't fail the out-of-order check
+				Serializer keyser = slname.equals("%%__REVERSE__%%") ? new IntBytes() : new UTF8StringBytes();
+				BSkipList bsl = getIndex(slname, keyser, new IdentityBytes());
 				if (bsl == null) {
 					log.error("Can't find list? " + slname);
 					continue;
@@ -530,6 +542,18 @@ public class BlockFile {
 			}
 		}
 		log.info("Checked meta index and " + items + " skiplists");
+		if(freeListStart != 0) {
+			try {
+			       if (flb == null)
+					flb = new FreeListBlock(file, freeListStart);
+				flb.flbck(true);
+			} catch (IOException ioe) {
+				log.error("Free list error", ioe);
+			}
+		} else {
+			if (log.shouldLog(Log.INFO))
+				log.info("No freelist");
+		}
 		return rv;
 	}
 }

@@ -197,6 +197,18 @@ class FreeListBlock {
 		file.writeInt(0);
 	}
 
+	/**
+	 * Recursive.
+	 * @since 0.9.7
+	 */
+	public boolean flbck(boolean fix) throws IOException {
+		Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
+		log.info(toString());
+		if (nextPage > 0)
+			(new FreeListBlock(file, nextPage)).flbck(fix);
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "FLB with " + len + " / " + MAX_SIZE + " page " + page + " next page " + nextPage;

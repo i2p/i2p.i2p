@@ -32,6 +32,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.VersionComparator;
 
 import net.metanotion.io.RAIFile;
 import net.metanotion.io.Serializer;
@@ -112,8 +113,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String PROP_LISTS = "lists";
     private static final String PROP_CREATED = "created";
     private static final String PROP_UPGRADED = "upgraded";
-    private static final String VERSION = "2";
-    private static final String OLD_VERSION = "1";
+    private static final String VERSION = "3";
 
     private static final String PROP_ADDED = "a";
     private static final String PROP_SOURCE = "s";
@@ -331,10 +331,8 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @since 0.8.9
      */
     private boolean needsUpgrade(BlockFile bf, String version) throws IOException {
-        if (VERSION.equals(version))
+        if (version != null && VersionComparator.comp(version, VERSION) >= 0)
             return false;
-        if (!OLD_VERSION.equals(version))
-            throw new IOException("Bad db version: " + version);
         if (!bf.file.canWrite()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not upgrading read-only database version " + version);
@@ -345,15 +343,23 @@ public class BlockfileNamingService extends DummyNamingService {
 
     /**
      *  Blockfile must be writable of course.
+     *
+     *  Version 1->2: Add reverse skiplist and populate
+     *  Version 2->3: Re-populate reverse skiplist as version 2 didn't keep it updated
+     *                after the upgrade. No change to format.
+     *
      *  @return true if upgraded successfully
      *  @since 0.8.9
      */
     private boolean upgrade() {
         try {
-            // shouldn't ever be there...
+            // wasn't there in version 1, is there in version 2
             SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
-            if (rev == null)
+            if (rev == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Created reverse index");
                 rev = _bf.makeIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            }
             Map<String, Destination> entries = getEntries();
             long start = System.currentTimeMillis();
             int i = 0;
@@ -361,8 +367,9 @@ public class BlockfileNamingService extends DummyNamingService {
                  addReverseEntry(entry.getKey(), entry.getValue());
                  i++;
             }
+            // i may be greater than skiplist keys if there are dups
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Created reverse index with " + i + " entries");
+                _log.warn("Updated reverse index with " + i + " entries");
             SkipList hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
             if (hdr == null)
                 throw new IOException("No db header");
@@ -723,8 +730,9 @@ public class BlockfileNamingService extends DummyNamingService {
                 addEntry(sl, key, d, props);
                 if (changed) {
                     removeCache(hostname);
-                    addReverseEntry(key, d);
+                    // removeReverseEntry(key, oldDest) ???
                 }
+                addReverseEntry(key, d);
                 for (NamingServiceListener nsl : _listeners) { 
                     if (changed)
                         nsl.entryChanged(this, hostname, d, options);
@@ -1188,13 +1196,13 @@ public class BlockfileNamingService extends DummyNamingService {
      *  BlockfileNamingService [force]
      *  force = force writable
      */
-/****
     public static void main(String[] args) {
         Properties ctxProps = new Properties();
         if (args.length > 0 && args[0].equals("force"))
             ctxProps.setProperty(PROP_FORCE, "true");
         I2PAppContext ctx = new I2PAppContext(ctxProps);
         BlockfileNamingService bns = new BlockfileNamingService(ctx);
+/****
         List<String> names = null;
         Properties props = new Properties();
         try {
@@ -1268,7 +1276,9 @@ public class BlockfileNamingService extends DummyNamingService {
 
 
         //bns.dumpDB();
+****/
         bns.close();
+/****
         if (true) return;
 
         HostsTxtNamingService htns = new HostsTxtNamingService(I2PAppContext.getGlobalContext());
@@ -1284,6 +1294,6 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         System.out.println("HTNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
         System.out.println("found " + found + " notfound " + notfound);
-    }
 ****/
+    }
 }

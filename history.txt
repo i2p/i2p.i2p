@@ -1,3 +1,13 @@
+2013-06-07 zzz
+ * BlockfileNamingService:
+   - Fix bug that kept reverse index from being updated
+   - Bump DB version to 3 to trigger repopulation of the reverse index
+   - Make metaindex final
+   - Add freelist check to the main() test
+
+2013-06-06 zzz
+ * BuildRequestRecord: Don't waste entropy on bytes we will overwrite
+
 2013-06-05 zzz
  * DatabaseLookupMessage: Change format for encrypted reply request
    to allow multiple bundled reply tags
