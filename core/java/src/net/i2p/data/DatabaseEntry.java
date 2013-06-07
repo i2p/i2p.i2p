@@ -12,15 +12,28 @@ package net.i2p.data;
 import net.i2p.crypto.DSAEngine;
 
 /**
+ *<p>
  * Base implementation of common methods for the two data structures
  * that are stored in the netDb, i.e. LeaseSet and RouterInfo.
  * Implemented in 0.8.2 and retrofitted over LeaseSet and RouterInfo.
  *
  * This consolidates some common code and makes it easier to
  * implement the NetDB and I2NP without doing instanceof all over the place.
- *
+ *</p><p>
  * DatabaseEntries have a SHA256 hash, a routing key, a timestamp, and
  * signatures.
+ *</p><p>
+ * Do not reuse objects.
+ * Many of the setters and other methods contain checks to prevent
+ * altering a DatabaseEntry after it is signed. This protects the netdb,
+ * messages that contain DatabaseEntries,
+ * and the object itself from simple causes of corruption, by
+ * throwing IllegalStateExceptions.
+ * These checks are not necessarily thread-safe, and are not guaranteed
+ * to catch all possible means of corruption.
+ * Beware of other avenues of corruption, such as directly modifying data
+ * stored in byte[] objects.
+ *</p>
  *
  * @author zzz
  * @since 0.8.2

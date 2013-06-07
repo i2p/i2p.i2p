@@ -16,6 +16,18 @@ import java.io.OutputStream;
 /**
  * Defines the class as a standard object with particular bit representation,
  * exposing methods to read and write that representation.
+ *<p>
+ * Do not reuse objects.
+ * Many of modifying methods contain checks to prevent
+ * altering a DataStructure after it is initialized. This protects the netdb,
+ * messages that contain DataStructures,
+ * caches, and the object itself from simple causes of corruption, by
+ * throwing IllegalStateExceptions.
+ * These checks are not necessarily thread-safe, and are not guaranteed
+ * to catch all possible means of corruption.
+ * Beware of other avenues of corruption, such as directly modifying data
+ * stored in byte[] objects.
+ *</p>
  * 
  * @author jrandom
  */
