@@ -16,6 +16,7 @@ import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
+import net.i2p.data.i2cp.RequestVariableLeaseSetMessage;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
 
@@ -40,6 +41,7 @@ class I2PClientMessageHandlerMap {
         highest = Math.max(highest, SetDateMessage.MESSAGE_TYPE);
         highest = Math.max(highest, DestReplyMessage.MESSAGE_TYPE);
         highest = Math.max(highest, BandwidthLimitsMessage.MESSAGE_TYPE);
+        highest = Math.max(highest, RequestVariableLeaseSetMessage.MESSAGE_TYPE);
         
         _handlers = new I2CPMessageHandler[highest+1];
         _handlers[DisconnectMessage.MESSAGE_TYPE] = new DisconnectMessageHandler(context);
@@ -50,6 +52,7 @@ class I2PClientMessageHandlerMap {
         _handlers[SetDateMessage.MESSAGE_TYPE] = new SetDateMessageHandler(context);
         _handlers[DestReplyMessage.MESSAGE_TYPE] = new DestReplyMessageHandler(context);
         _handlers[BandwidthLimitsMessage.MESSAGE_TYPE] = new BWLimitsMessageHandler(context);
+        _handlers[RequestVariableLeaseSetMessage.MESSAGE_TYPE] = new RequestVariableLeaseSetMessageHandler(context);
     }
 
     public I2CPMessageHandler getHandler(int messageTypeId) {

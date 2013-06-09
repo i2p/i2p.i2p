@@ -96,10 +96,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** don't probe or broadcast data, just respond and search when explicitly needed */
     private static final boolean QUIET = false;
     
-    public static final String PROP_ENFORCE_NETID = "router.networkDatabase.enforceNetId";
-    private static final boolean DEFAULT_ENFORCE_NETID = false;
-    private boolean _enforceNetId = DEFAULT_ENFORCE_NETID;
-    
     public final static String PROP_DB_DIR = "router.networkDatabase.dbDir";
     public final static String DEFAULT_DB_DIR = "netDb";
     
@@ -143,7 +139,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap(8);
         _activeRequests = new HashMap(8);
-        _enforceNetId = DEFAULT_ENFORCE_NETID;
         _reseedChecker = new ReseedChecker(context);
         context.statManager().createRateStat("netDb.lookupDeferred", "how many lookups are deferred?", "NetworkDatabase", new long[] { 60*60*1000 });
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 60*60*1000 });
@@ -223,11 +218,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.info("No DB dir specified [" + PROP_DB_DIR + "], using [" + DEFAULT_DB_DIR + "]");
             _dbDir = DEFAULT_DB_DIR;
         }
-        String enforce = _context.getProperty(PROP_ENFORCE_NETID);
-        if (enforce != null) 
-            _enforceNetId = Boolean.parseBoolean(enforce);
-        else
-            _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
         _exploreKeys.clear();
 
@@ -249,12 +239,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _log.info("Starting up the kademlia network database");
         RouterInfo ri = _context.router().getRouterInfo();
         String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
-        String enforce = _context.getProperty(PROP_ENFORCE_NETID);
-        if (enforce != null) 
-            _enforceNetId = Boolean.parseBoolean(enforce);
-        else
-            _enforceNetId = DEFAULT_ENFORCE_NETID;
-        
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
         try {
             _ds = new PersistentDataStore(_context, dbDir, this);
@@ -443,7 +427,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 fail(key);
         } else if (rv.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             try {
-                if (validate(key, (RouterInfo)rv) == null)
+                if (validate((RouterInfo)rv) == null)
                     return rv;
             } catch (IllegalArgumentException iae) {}
             fail(key);
@@ -512,7 +496,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 // startup allows some lax rules).
                 boolean valid = true;
                 try {
-                    valid = (null == validate(key, (RouterInfo)ds));
+                    valid = (null == validate((RouterInfo)ds));
                 } catch (IllegalArgumentException iae) {
                     valid = false;
                 }
@@ -531,6 +515,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     private static final long PUBLISH_DELAY = 3*1000;
+
     public void publish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
@@ -564,6 +549,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // remove first since queue is a TreeSet now...
         _context.jobQueue().removeJob(j);
         j.getTiming().setStartAfter(nextTime);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Queueing to publish at " + (new Date(nextTime)) + ' ' + localLeaseSet);
         _context.jobQueue().addJob(j);
     }
     
@@ -627,34 +614,46 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Determine whether this leaseSet will be accepted as valid and current
      * given what we know now.
      *
-     * TODO this is called several times, only check the key and signature once
+     * Unlike for RouterInfos, this is only called once, when stored.
+     * After that, LeaseSet.isCurrent() is used.
      *
      * @return reason why the entry is not valid, or null if it is valid
      */
-    String validate(Hash key, LeaseSet leaseSet) {
+    private String validate(Hash key, LeaseSet leaseSet) {
         if (!key.equals(leaseSet.getDestination().calculateHash())) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid store attempt! key does not match leaseSet.destination!  key = "
                           + key + ", leaseSet = " + leaseSet);
             return "Key does not match leaseSet.destination - " + key.toBase64();
-        } else if (!leaseSet.verifySignature()) {
+        }
+        if (!leaseSet.verifySignature()) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid leaseSet signature!  leaseSet = " + leaseSet);
             return "Invalid leaseSet signature on " + leaseSet.getDestination().calculateHash().toBase64();
-        } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now() - 2*Router.CLOCK_FUDGE_FACTOR) {
-            long age = _context.clock().now() - leaseSet.getEarliestLeaseDate();
+        }
+        long earliest = leaseSet.getEarliestLeaseDate();
+        long latest = leaseSet.getLatestLeaseDate();
+        long now = _context.clock().now();
+        if (earliest <= now - 2*Router.CLOCK_FUDGE_FACTOR ||
+            // same as the isCurrent(Router.CLOCK_FUDGE_FACTOR) test in
+            // lookupLeaseSetLocally()
+            latest <= now - Router.CLOCK_FUDGE_FACTOR) {
+            long age = now - earliest;
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
-                          + leaseSet.getDestination().calculateHash().toBase64() 
-                          + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
+                          + leaseSet.getDestination().calculateHash()
+                          + " first exp. " + new Date(earliest)
+                          + " last exp. " + new Date(latest),
+                          new Exception("Rejecting store"));
             return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
                    + " expired " + DataHelper.formatDuration(age) + " ago";
-        } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
-            long age = leaseSet.getEarliestLeaseDate() - _context.clock().now();
+        }
+        if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
+            long age = latest - now;
             // let's not make this an error, it happens when peers have bad clocks
             if (_log.shouldLog(Log.WARN))
                 _log.warn("LeaseSet expires too far in the future: " 
-                          + leaseSet.getDestination().calculateHash().toBase64() 
+                          + leaseSet.getDestination().calculateHash()
                           + " expires " + DataHelper.formatDuration(age) + " from now");
             return "Future expiring leaseSet for " + leaseSet.getDestination().calculateHash()
                    + " expiring in " + DataHelper.formatDuration(age);
@@ -720,11 +719,40 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Determine whether this routerInfo will be accepted as valid and current
      * given what we know now.
      *
-     * TODO this is called several times, only check the key and signature once
+     * Call this only on first store, to check the key and signature once
      *
      * @return reason why the entry is not valid, or null if it is valid
      */
-    String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
+    private String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
+        if (!key.equals(routerInfo.getIdentity().getHash())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
+            return "Key does not match routerInfo.identity";
+        }
+        if (!routerInfo.isValid()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
+            return "Invalid routerInfo signature";
+        }
+        if (routerInfo.getNetworkId() != Router.NETWORK_ID){
+            _context.banlist().banlistRouter(key, "Not in our network");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad network: " + routerInfo);
+            return "Not in our network";
+        }
+        return validate(routerInfo);
+    }
+
+    /**
+     * Determine whether this routerInfo will be accepted as valid and current
+     * given what we know now.
+     *
+     * Call this before each use, to check expiration
+     *
+     * @return reason why the entry is not valid, or null if it is valid
+     * @since 0.9.7
+     */
+    private String validate(RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
         boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
         // Once we're over MIN_ROUTERS routers, reduce the expiration time down from the default,
@@ -743,59 +771,44 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                                           ROUTER_INFO_EXPIRATION_MIN +
                                           ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * MIN_ROUTERS / (_kb.size() + 1)));
 
-        if (!key.equals(routerInfo.getIdentity().getHash())) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
-            return "Key does not match routerInfo.identity - " + key.toBase64();
-        } else if (!routerInfo.isValid()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
-            return "Invalid routerInfo signature on " + key.toBase64();
-        } else if (upLongEnough && !routerInfo.isCurrent(adjustedExpiration)) {
-            if (routerInfo.getNetworkId() != Router.NETWORK_ID) {
-                _context.banlist().banlistRouter(key, "Peer is not in our network");
-                return "Peer is not in our network (" + routerInfo.getNetworkId() + ", wants " 
-                       + Router.NETWORK_ID + "): " + routerInfo.calculateHash().toBase64();
-            }
+        if (upLongEnough && !routerInfo.isCurrent(adjustedExpiration)) {
             long age = _context.clock().now() - routerInfo.getPublished();
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Not storing expired router for " + key.toBase64(), new Exception("Rejecting store"));
-                return "Peer " + key.toBase64() + " expired " + DataHelper.formatDuration(age) + " ago";
+                    _log.info("Not storing expired RI " + routerInfo.getIdentity().getHash(), new Exception("Rejecting store"));
+                return "Peer expired " + DataHelper.formatDuration(age) + " ago";
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Even though the peer is old, we have only " + existing
-                    + " peers left (curPeer: " + key.toBase64() + " published on "
-                    + new Date(routerInfo.getPublished()));
+                              + " peers left " + routerInfo);
             }
-        } else if (routerInfo.getPublished() > now + 2*Router.CLOCK_FUDGE_FACTOR) {
+        }
+        if (routerInfo.getPublished() > now + 2*Router.CLOCK_FUDGE_FACTOR) {
             long age = routerInfo.getPublished() - _context.clock().now();
             if (_log.shouldLog(Log.INFO))
-                _log.info("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
+                _log.info("Peer " + routerInfo.getIdentity().getHash() + " published their routerInfo in the future?! [" 
                           + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
-            return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " in the future?!";
-        } else if (_enforceNetId && (routerInfo.getNetworkId() != Router.NETWORK_ID) ){
-            String rv = "Peer " + key.toBase64() + " is from another network, not accepting it (id=" 
-                        + routerInfo.getNetworkId() + ", want " + Router.NETWORK_ID + ")";
-            return rv;
-        } else if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
+            return "Peer published " + DataHelper.formatDuration(age) + " in the future?!";
+        }
+        if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
             long age = _context.clock().now() - routerInfo.getPublished();
-            return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
-        } else if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
+            return "Peer published " + DataHelper.formatDuration(age) + " ago";
+        }
+        if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
             if (routerInfo.getAddresses().isEmpty())
-                return "Peer " + key.toBase64() + " published > 75m ago with no addresses";
+                return "Peer published > 75m ago with no addresses";
             // This should cover the introducers case below too
             // And even better, catches the case where the router is unreachable but knows no introducers
             if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
-                return "Peer " + key.toBase64() + " published > 75m ago and thinks it is unreachable";
+                return "Peer published > 75m ago and thinks it is unreachable";
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
             if (ra != null) {
                 // Introducers change often, introducee will ping introducer for 2 hours
                 if (ra.getOption("ihost0") != null)
-                    return "Peer " + key.toBase64() + " published > 75m ago with SSU Introducers";
+                    return "Peer published > 75m ago with SSU Introducers";
                 if (routerInfo.getTargetAddress("NTCP") == null)
-                    return "Peer " + key.toBase64() + " published > 75m ago, SSU only without introducers";
+                    return "Peer published > 75m ago, SSU only without introducers";
             }
         }
         return null;

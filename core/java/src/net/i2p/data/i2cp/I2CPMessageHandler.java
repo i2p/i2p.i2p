@@ -77,6 +77,8 @@ public class I2CPMessageHandler {
             return new ReportAbuseMessage();
         case RequestLeaseSetMessage.MESSAGE_TYPE:
             return new RequestLeaseSetMessage();
+        case RequestVariableLeaseSetMessage.MESSAGE_TYPE:
+            return new RequestVariableLeaseSetMessage();
         case SendMessageMessage.MESSAGE_TYPE:
             return new SendMessageMessage();
         case SendMessageExpiresMessage.MESSAGE_TYPE:

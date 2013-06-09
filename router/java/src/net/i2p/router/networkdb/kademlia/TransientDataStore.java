@@ -81,9 +81,11 @@ class TransientDataStore implements DataStore {
         return Collections.unmodifiableSet(_data.entrySet());
     }
 
-    /** for PersistentDataStore only - don't use here @throws IAE always */
+    /** for PersistentDataStore only - don't use here
+      * @throws UnsupportedOperationException always
+      */
     public DatabaseEntry get(Hash key, boolean persist) {
-        throw new IllegalArgumentException("no");
+        throw new UnsupportedOperationException();
     }
 
     public DatabaseEntry get(Hash key) {
@@ -103,9 +105,11 @@ class TransientDataStore implements DataStore {
         return count;
     }
     
-    /** for PersistentDataStore only - don't use here @throws IAE always */
+    /** for PersistentDataStore only - don't use here
+      * @throws UnsupportedOperationException always
+      */
     public boolean put(Hash key, DatabaseEntry data, boolean persist) {
-        throw new IllegalArgumentException("no");
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -116,8 +120,7 @@ class TransientDataStore implements DataStore {
         if (data == null) return false;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Storing key " + key);
-        DatabaseEntry old = null;
-        old = _data.putIfAbsent(key, data);
+        DatabaseEntry old = _data.putIfAbsent(key, data);
         boolean rv = false;
         if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             // Don't do this here so we don't reset it at router startup;
@@ -128,13 +131,15 @@ class TransientDataStore implements DataStore {
                 RouterInfo ori = (RouterInfo)old;
                 if (ri.getPublished() < ori.getPublished()) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Almost clobbered an old router! " + key + ": [old published on " + new Date(ori.getPublished()) + " new on " + new Date(ri.getPublished()) + "]");
+                        _log.info("Almost clobbered an old router! " + key + ": [old published on " + new Date(ori.getPublished()) +
+                                  " new on " + new Date(ri.getPublished()) + ']');
                 } else if (ri.getPublished() == ori.getPublished()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Duplicate " + key);
                 } else {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Updated the old router for " + key + ": [old published on " + new Date(ori.getPublished()) + " new on " + new Date(ri.getPublished()) + "]");
+                        _log.info("Updated the old router for " + key + ": [old published on " + new Date(ori.getPublished()) +
+                                  " new on " + new Date(ri.getPublished()) + ']');
                     _data.put(key, data);
                     rv = true;
                 }
@@ -149,13 +154,15 @@ class TransientDataStore implements DataStore {
                 LeaseSet ols = (LeaseSet)old;
                 if (ls.getEarliestLeaseDate() < ols.getEarliestLeaseDate()) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Almost clobbered an old leaseSet! " + key + ": [old published on " + new Date(ols.getEarliestLeaseDate()) + " new on " + new Date(ls.getEarliestLeaseDate()) + "]");
+                        _log.info("Almost clobbered an old leaseSet! " + key + ": [old expires " + new Date(ols.getEarliestLeaseDate()) +
+                                  " new on " + new Date(ls.getEarliestLeaseDate()) + ']');
                 } else if (ls.getEarliestLeaseDate() == ols.getEarliestLeaseDate()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Duplicate " + key);
                 } else {
                     if (_log.shouldLog(Log.INFO)) {
-                        _log.info("Updated old leaseSet " + key + ": [old published on " + new Date(ols.getEarliestLeaseDate()) + " new on " + new Date(ls.getEarliestLeaseDate()) + "]");
+                        _log.info("Updated old leaseSet " + key + ": [old expires " + new Date(ols.getEarliestLeaseDate()) +
+                                  " new on " + new Date(ls.getEarliestLeaseDate()) + ']');
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
                     }
@@ -164,7 +171,7 @@ class TransientDataStore implements DataStore {
                 }
             } else {
                 if (_log.shouldLog(Log.INFO)) {
-                    _log.info("New leaseset for " + key + ": published on " + new Date(ls.getEarliestLeaseDate()));
+                    _log.info("New leaseset for " + key + ": expires " + new Date(ls.getEarliestLeaseDate()));
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
                 }
@@ -187,9 +194,11 @@ class TransientDataStore implements DataStore {
         return buf.toString();
     }
     
-    /** for PersistentDataStore only - don't use here */
+    /** for PersistentDataStore only - don't use here
+      * @throws UnsupportedOperationException always
+      */
     public DatabaseEntry remove(Hash key, boolean persist) {
-        throw new IllegalArgumentException("no");
+        throw new UnsupportedOperationException();
     }
 
     public DatabaseEntry remove(Hash key) {

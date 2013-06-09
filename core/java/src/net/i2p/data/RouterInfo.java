@@ -592,9 +592,10 @@ public class RouterInfo extends DatabaseEntry {
         if (object == this) return true;
         if ((object == null) || !(object instanceof RouterInfo)) return false;
         RouterInfo info = (RouterInfo) object;
-        return DataHelper.eq(_identity, info.getIdentity())
+        return
+               _published == info.getPublished()
                && DataHelper.eq(_signature, info.getSignature())
-               && _published == info.getPublished();
+               && DataHelper.eq(_identity, info.getIdentity());
                // Let's speed up the NetDB
                //&& DataHelper.eq(_addresses, info.getAddresses())
                //&& DataHelper.eq(_options, info.getOptions()) 

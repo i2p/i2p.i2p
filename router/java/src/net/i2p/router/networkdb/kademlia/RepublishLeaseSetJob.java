@@ -47,12 +47,12 @@ public class RepublishLeaseSetJob extends JobImpl {
             if (getContext().clientManager().isLocal(_dest)) {
                 LeaseSet ls = _facade.lookupLeaseSetLocally(_dest);
                 if (ls != null) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Client " + _dest + " is local, so we're republishing it");
                     if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Publishing " + ls);
                         getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1, 0);
                         _facade.sendStore(_dest, ls, new OnRepublishSuccess(getContext()), new OnRepublishFailure(getContext(), this), REPUBLISH_LEASESET_TIMEOUT, null);
                         _lastPublished = getContext().clock().now();

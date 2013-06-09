@@ -304,7 +304,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     // it (due to failure for example) we won't continue to use it.
                     for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
                         Lease lease = _leaseSet.getLease(i);
-                        if (_lease.equals(lease)) {
+                        // Don't use Lease.equals(), as that compares expiration time too,
+                        // and that time may change in subsequent publication
+                        //if (_lease.equals(lease)) {
+                        if (_lease.getTunnelId().equals(lease.getTunnelId()) &&
+                            _lease.getGateway().equals(lease.getGateway())) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info(getJobId() + ": Found in cache - lease for " + _toString); 
                             return true;

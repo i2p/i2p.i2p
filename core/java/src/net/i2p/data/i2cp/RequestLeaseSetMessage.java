@@ -50,18 +50,18 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     }
 
     public Hash getRouter(int endpoint) {
-        if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
+        if ((endpoint < 0) || (_endpoints.size() <= endpoint)) return null;
         return _endpoints.get(endpoint).getRouter();
     }
 
     public TunnelId getTunnelId(int endpoint) {
-        if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
+        if ((endpoint < 0) || (_endpoints.size() <= endpoint)) return null;
         return _endpoints.get(endpoint).getTunnelId();
     }
 
     /** @deprecated unused - presumably he meant remove? */
     public void remoteEndpoint(int endpoint) {
-        if ((endpoint >= 0) && (endpoint < _endpoints.size())) _endpoints.remove(endpoint);
+        if ((endpoint >= 0) && (endpoint <= _endpoints.size())) _endpoints.remove(endpoint);
     }
 
     public void addEndpoint(Hash router, TunnelId tunnel) {

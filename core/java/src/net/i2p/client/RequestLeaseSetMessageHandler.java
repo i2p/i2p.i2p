@@ -29,7 +29,8 @@ import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.util.Log;
 
 /**
- * Handle I2CP RequestLeaseSetMessage from the router by granting all leases
+ * Handle I2CP RequestLeaseSetMessage from the router by granting all leases,
+ * using the specified expiration time for each lease.
  *
  * @author jrandom
  */
@@ -37,7 +38,15 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     private final Map<Destination, LeaseInfo> _existingLeaseSets;
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
-        super(context, RequestLeaseSetMessage.MESSAGE_TYPE);
+        this(context, RequestLeaseSetMessage.MESSAGE_TYPE);
+    }
+
+    /**
+     *  For extension
+     *  @since 0.9.7
+     */
+    protected RequestLeaseSetMessageHandler(I2PAppContext context, int messageType) {
+        super(context, messageType);
         // not clear why there would ever be more than one
         _existingLeaseSets = new ConcurrentHashMap(4);
     }
@@ -55,6 +64,14 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             //lease.setStartDate(msg.getStartDate());
             leaseSet.addLease(lease);
         }
+        signLeaseSet(leaseSet, session);
+    }
+
+    /**
+     *  Finish creating and signing the new LeaseSet
+     *  @since 0.9.7
+     */
+    protected void signLeaseSet(LeaseSet leaseSet, I2PSessionImpl session) {
         // also, if this session is connected to multiple routers, include other leases here
         leaseSet.setDestination(session.getMyDestination());
 

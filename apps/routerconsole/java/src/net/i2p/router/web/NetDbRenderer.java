@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +26,7 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
@@ -79,9 +79,8 @@ public class NetDbRenderer {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
             boolean notFound = true;
-            Set routers = _context.netDb().getRouters();
-            for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
-                RouterInfo ri = (RouterInfo)iter.next();
+            Set<RouterInfo> routers = _context.netDb().getRouters();
+            for (RouterInfo ri : routers) {
                 Hash key = ri.getIdentity().getHash();
                 if (key.toBase64().startsWith(routerPrefix)) {
                     renderRouterInfo(buf, ri, false, true);
@@ -152,11 +151,12 @@ public class NetDbRenderer {
                     buf.append(dest.toBase64().substring(0, 6));
             }
             buf.append(")</b><br>\n");
-            long exp = ls.getEarliestLeaseDate()-now;
+            long exp = ls.getLatestLeaseDate()-now;
             if (exp > 0)
-                buf.append(_("Expires in {0}", DataHelper.formatDuration2(exp))).append("<br>\n");
+                buf.append(_("Expires in {0}", DataHelper.formatDuration2(exp)));
             else
-                buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exp))).append("<br>\n");
+                buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
+            buf.append("<br>\n");
             if (debug) {
                 buf.append("RAP? " + ls.getReceivedAsPublished());
                 buf.append(" RAR? " + ls.getReceivedAsReply());
@@ -171,9 +171,18 @@ public class NetDbRenderer {
                 buf.append("Encryption Key: ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("...<br>");
             }
             for (int i = 0; i < ls.getLeaseCount(); i++) {
-                buf.append(_("Lease")).append(' ').append(i + 1).append(": " + _("Gateway") + ' ');
-                buf.append(_context.commSystem().renderPeerHTML(ls.getLease(i).getGateway()));
-                buf.append(' ' + _("Tunnel") + ' ').append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
+                Lease lease = ls.getLease(i);
+                buf.append(_("Lease")).append(' ').append(i + 1).append(": ").append(_("Gateway")).append(' ');
+                buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
+                buf.append(' ').append(_("Tunnel")).append(' ').append(lease.getTunnelId().getTunnelId()).append(' ');
+                if (debug) {
+                    long exl = lease.getEndDate().getTime() - now;
+                    if (exl > 0)
+                        buf.append(_("Expires in {0}", DataHelper.formatDuration2(exl)));
+                    else
+                        buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exl)));
+                }
+                buf.append("<br>\n");
             }
             buf.append("<hr>\n");
             out.write(buf.toString());
@@ -253,8 +262,7 @@ public class NetDbRenderer {
         
         Set<RouterInfo> routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
-        for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
-            RouterInfo ri = (RouterInfo)iter.next();
+        for (RouterInfo ri : routers) {
             Hash key = ri.getIdentity().getHash();
             boolean isUs = key.equals(us);
             if (!isUs) {
@@ -391,8 +399,7 @@ public class NetDbRenderer {
             buf.append(" title=\"").append(_(_context.commSystem().getCountryName(country))).append('\"');
             buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
         }
-        for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
-            RouterAddress addr = (RouterAddress)iter.next();
+        for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();
             buf.append("<b>").append(DataHelper.stripHTML(style)).append(":</b> ");
             int cost = addr.getCost();

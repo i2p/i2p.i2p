@@ -1,3 +1,20 @@
+2013-06-09 zzz
+ * NetDB: Prep for leasesets with different expire times
+   - Add new I2CP RequestVariableLeaseSetMessage
+   - Send RVLSM if client supports it; handle on client side;
+     disabled by default for the moment.
+   - Add LeaseSet.getLatestLeaseDate()
+   - Check latest, not earliest, date too far in future in KNDF.validate()
+   - Check latest date too far in past in KNDF.validate()
+   - Only check gateway and tunnel ID for equality in OCMOSJ lease caching to reduce churn
+   - Split up KNDF.validate(RI) for efficiency, don't need to check
+     signature, netid, etc. before lookups, only on store
+   - Remove enforeNetID config
+   - Fix major bug causing newer leasesets to be treated as older, and not stored or published
+   - Increase max adjustment time of earliest lease
+   - TransientDataStore cleanups
+   - RouterInfo and LeaseSet equals() speedups
+
 2013-06-07 zzz
  * BlockfileNamingService:
    - Fix bug that kept reverse index from being updated
