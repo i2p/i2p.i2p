@@ -61,7 +61,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
 
     /** @deprecated unused - presumably he meant remove? */
     public void remoteEndpoint(int endpoint) {
-        if ((endpoint >= 0) && (endpoint <= _endpoints.size())) _endpoints.remove(endpoint);
+        if ((endpoint >= 0) && (endpoint < _endpoints.size())) _endpoints.remove(endpoint);
     }
 
     public void addEndpoint(Hash router, TunnelId tunnel) {
