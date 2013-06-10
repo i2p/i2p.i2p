@@ -776,7 +776,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Not storing expired RI " + routerInfo.getIdentity().getHash(), new Exception("Rejecting store"));
+                    _log.info("Expired RI " + routerInfo.getIdentity().getHash(), new Exception());
                 return "Peer expired " + DataHelper.formatDuration(age) + " ago";
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -788,7 +788,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             long age = routerInfo.getPublished() - _context.clock().now();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Peer " + routerInfo.getIdentity().getHash() + " published their routerInfo in the future?! [" 
-                          + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
+                          + new Date(routerInfo.getPublished()) + "]", new Exception());
             return "Peer published " + DataHelper.formatDuration(age) + " in the future?!";
         }
         if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
