@@ -1,3 +1,8 @@
+2013-06-10 zzz
+ * Installer: Don't install Windows service by default
+ * NetDB: Let class N routers become floodfill; scale max connections for non-O floodfills
+ * Transports: Reduce idle timeouts to mitigate conn limit issues
+
 2013-06-09 zzz
  * NetDB: Prep for leasesets with different expire times
    - Add new I2CP RequestVariableLeaseSetMessage
@@ -1783,7 +1788,7 @@
   * i2psnark: Escape fixes
   * netdb.jsp: Fix debug median calculation
 
-20112-02-17 kytv
+2012-02-17 kytv
   * Add Czech language from Transifex (thanks Waseihou)
 
 2012-02-12 str4d

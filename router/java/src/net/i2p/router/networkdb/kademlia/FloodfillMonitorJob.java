@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -74,8 +75,12 @@ class FloodfillMonitorJob extends JobImpl {
         if (getContext().router().getUptime() < MIN_UPTIME)
             return false;
 
-        // Only if class O...
-        if (getContext().router().getRouterInfo().getCapabilities().indexOf("O") < 0)
+        RouterInfo ri = getContext().router().getRouterInfo();
+        if (ri == null)
+            return false;
+        char bw = ri.getBandwidthTier().charAt(0);
+        // Only if class N or O...
+        if (bw < Router.CAPABILITY_BW128 || bw > Router.CAPABILITY_BW256)
             return false;
 
         // This list will not include ourselves...

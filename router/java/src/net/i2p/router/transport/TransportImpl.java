@@ -42,6 +42,7 @@ import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SystemVersion;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages
@@ -113,9 +114,6 @@ public abstract class TransportImpl implements Transport {
      */
     public int countActiveSendPeers() { return 0; }
 
-    /** Default for floodfills... */
-    private static final int DEFAULT_MAX_CONNECTIONS = 425;
-
     /** ...and 50/100/150/200/250 for BW Tiers K/L/M/N/O */
     private static final int MAX_CONNECTION_FACTOR = 50;
 
@@ -130,13 +128,16 @@ public abstract class TransportImpl implements Transport {
             maxProp = "i2np.ntcp.maxConnections";
         else // shouldn't happen
             maxProp = "i2np." + style.toLowerCase(Locale.US) + ".maxConnections";
-        int def = DEFAULT_MAX_CONNECTIONS;
+        int def = MAX_CONNECTION_FACTOR;
         RouterInfo ri = _context.router().getRouterInfo();
         if (ri != null) {
             char bw = ri.getBandwidthTier().charAt(0);
-            if (bw != 'U' &&
-                ! ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
-                def = MAX_CONNECTION_FACTOR * (1 + bw - Router.CAPABILITY_BW12);
+            if (bw > Router.CAPABILITY_BW12 && bw <= Router.CAPABILITY_BW256)
+                def *= (1 + bw - Router.CAPABILITY_BW12);
+        }
+        if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
+            // && !SystemVersion.isWindows()) {
+            def *= 17; def /= 10;  // 425 for Class O ff
         }
         // increase limit for SSU, for now
         if (style.equals("SSU"))
