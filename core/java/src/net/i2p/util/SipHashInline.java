@@ -47,7 +47,7 @@ abstract class SipHashInline {
         long v2 = 0x6c7967656e657261L ^ k0;
         long v3 = 0x7465646279746573L ^ k1;
         long m;
-        int last = len / 8 * 8;
+        int last = off + (len / 8 * 8);
         int i = off;
 
         // processing 8 bytes blocks in data
