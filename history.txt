@@ -1,3 +1,8 @@
+2013-06-10 kytv
+ * Translations (from Transifex)
+   - Start of Turkish language translation
+   - Update to French translation
+
 2013-06-10 zzz
  * Installer: Don't install Windows service by default
  * NetDB: Let class N routers become floodfill; scale max connections for non-O floodfills

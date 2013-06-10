@@ -39,6 +39,7 @@ trans.pl = apps/routerconsole/locale/messages_pl.po
 trans.pt = apps/routerconsole/locale/messages_pt.po
 trans.ru = apps/routerconsole/locale/messages_ru.po
 trans.sv_SE = apps/routerconsole/locale/messages_sv.po
+trans.tr_TR = apps/routerconsole/locale/messages_tr.po
 trans.uk_UA = apps/routerconsole/locale/messages_uk.po
 trans.vi = apps/routerconsole/locale/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale/messages_zh.po
@@ -100,6 +101,7 @@ trans.pl = apps/desktopgui/locale/messages_pl.po
 trans.ru = apps/desktopgui/locale/messages_ru.po
 trans.sv_SE = apps/desktopgui/locale/messages_sv.po
 trans.uk_UA = apps/desktopgui/locale/messages_uk.po
+trans.tr_TR = apps/desktopgui/locale/messages_tr.po
 trans.vi = apps/desktopgui/locale/messages_vi.po
 trans.zh_CN = apps/desktopgui/locale/messages_zh.po
 
@@ -135,6 +137,7 @@ trans.pl = debian/po/pl.po
 trans.ru = debian/po/ru.po
 trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
+trans.tr_TR = debian/po/tr.po
 
 [I2P.i2prouter-script]
 source_file = installer/resources/locale/po/messages_en.po
