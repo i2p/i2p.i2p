@@ -14,7 +14,7 @@ package net.i2p.util;
  *
  */
 class LogLimit {
-    private String _rootName;
+    private final String _rootName;
     private int _limit;
 
     public LogLimit(String name, int limit) {

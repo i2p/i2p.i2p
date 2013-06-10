@@ -60,7 +60,9 @@ class LogRecordFormatter {
                 buf.append(getPriority(rec, manager.getContext()));
                 break;
             case LogManager.MESSAGE:
-                buf.append(getWhat(rec));
+                String msg = getWhat(rec);
+                if (msg != null)
+                    buf.append(msg);
                 break;
             default:
                 buf.append(format[i]);
