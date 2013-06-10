@@ -75,7 +75,7 @@ class EventPumper implements Runnable {
 
     /** tunnel test now disabled, but this should be long enough to allow an active tunnel to get started */
     private static final long MIN_EXPIRE_IDLE_TIME = 135*1000l;
-    private static final long MAX_EXPIRE_IDLE_TIME = 15*60*1000l;
+    private static final long MAX_EXPIRE_IDLE_TIME = 11*60*1000l;
 
     /**
      *  Do we use direct buffers for reading? Default false.

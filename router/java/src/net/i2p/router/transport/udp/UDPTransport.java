@@ -1374,7 +1374,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // in the IntroductionManager a chance to work.
     public static final int EXPIRE_TIMEOUT = 20*60*1000;
     private static final int MAX_IDLE_TIME = EXPIRE_TIMEOUT;
-    public static final int MIN_EXPIRE_TIMEOUT = 6*60*1000;
+    public static final int MIN_EXPIRE_TIMEOUT = 270*1000;  // 4 1/2 minutes
     
     public String getStyle() { return STYLE; }
 
