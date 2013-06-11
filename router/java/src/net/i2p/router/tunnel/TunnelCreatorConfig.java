@@ -25,7 +25,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private final HopConfig _config[];
     /** gateway first */
     private final Hash _peers[];
-    private long _expiration;
+    private volatile long _expiration;
     private List<Integer> _order;
     private long _replyMessageId;
     private final boolean _isInbound;
