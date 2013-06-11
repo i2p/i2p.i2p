@@ -166,6 +166,8 @@ public class SAMUtils {
             }
             param = token.substring(0, pos);
             value.append(token.substring(pos+1));
+            if (value.length() == 0)
+                throw new SAMException("Empty value for param "+param);
             if (value.charAt(0) == '"') {
                 while ( (i < ntoks) && (value.lastIndexOf("\"") <= 0) ) {
                     value.append(' ').append(tok.nextToken());
