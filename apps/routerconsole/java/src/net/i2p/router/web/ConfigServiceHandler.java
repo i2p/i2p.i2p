@@ -177,7 +177,7 @@ public class ConfigServiceHandler extends FormHandler {
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_HARD, false);
             _context.router().shutdown(Router.EXIT_HARD);
-            addFormNotice(_("Shutdown immediately!  boom bye bye bad bwoy"));
+            addFormNotice(_("Shutdown immediately"));
         } else if (_("Cancel graceful shutdown").equals(_action)) {
             _context.router().cancelGracefulShutdown();
             addFormNotice(_("Graceful shutdown cancelled"));
