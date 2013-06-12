@@ -175,7 +175,6 @@
         <copy file="../../jetty/jettylib/commons-logging.jar" tofile="./dist/lib/commons-logging.jar" />
         <copy file="../../jetty/jettylib/javax.servlet.jar" tofile="./dist/lib/javax.servlet.jar" />
         <copy file="../../jetty/jettylib/org.mortbay.jetty.jar" tofile="./dist/lib/org.mortbay.jetty.jar" />
-        <copy file="../../jetty/jettylib/jasper-compiler.jar" tofile="./dist/lib/jasper-compiler.jar" />
         <copy file="../../jetty/jettylib/jasper-runtime.jar" tofile="./dist/lib/jasper-runtime.jar" />
         <copy file="../../ministreaming/java/build/mstreaming.jar" tofile="./dist/lib/mstreaming.jar" />
         <copy file="../../streaming/java/build/streaming.jar" tofile="./dist/lib/streaming.jar" />

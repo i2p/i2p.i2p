@@ -14,10 +14,8 @@
 		<pathelement location="${lib}/org.mortbay.jetty.jar"/>
         <pathelement location="WEB-INF/lib/jstl.jar" />
         <pathelement location="WEB-INF/lib/standard.jar" />
-        <pathelement location="${lib}/jasper-compiler.jar" />
         <pathelement location="${lib}/jasper-runtime.jar" />
         <pathelement location="${lib}/javax.servlet.jar" />
-        <pathelement location="${lib}/jsp-api.jar" />
         <pathelement location="${lib}/commons-logging.jar" />
         <pathelement location="${lib}/commons-el.jar" />
         <pathelement location="${ant.home}/lib/ant.jar" />

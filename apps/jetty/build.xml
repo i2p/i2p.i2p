@@ -250,6 +250,8 @@
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
+                <!-- needed by JettyStart for pre-0.7.5 wrapper.config -->
+                <attribute name="Class-Path" value="jetty-deploy.jar jetty-xml.jar" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
             </manifest>
         </jar>

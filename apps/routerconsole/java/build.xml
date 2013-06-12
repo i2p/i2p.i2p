@@ -25,10 +25,7 @@
                 <pathelement location="../../../router/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
-                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
@@ -71,7 +68,6 @@
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-webapp.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
-                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
@@ -109,7 +105,8 @@
                 <!-- top level installer will rename to jrobin.jar -->
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <!-- very old installs don't have i2psnark,jstl,standard in the classpath... not added in WebAppConfiguration any more -->
-                <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar i2psnark.jar jstl.jar standard.jar" />
+                <!-- All new jetty 7 jars should have been in 0.9.6, added in 0.9.7 -->
+                <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar i2psnark.jar jstl.jar standard.jar jetty-continuation.jar jetty-http.jar jetty-io.jar jetty-security.jar jetty-servlet.jar jetty-servlets.jar jetty-webapp.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
@@ -252,12 +249,10 @@
         -->
         <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
             <classpath>
-                <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
-                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
@@ -293,9 +288,6 @@
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
-                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />

@@ -173,12 +173,10 @@
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
         <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
             <classpath>
-                <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
-                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
@@ -203,7 +201,6 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
-                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
