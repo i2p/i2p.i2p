@@ -247,14 +247,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <%=intl._("Count")%>(<span class="accessKey">C</span>):
                 </label>
                 <select id="tunnelQuantity" name="tunnelQuantity" title="Number of Tunnels in Group" class="selectbox">
-                    <% int tunnelQuantity = editBean.getTunnelQuantity(curTunnel, 2);
-                  %><option value="1"<%=(tunnelQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._("1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)")%></option>
-                    <option value="2"<%=(tunnelQuantity == 2 ? " selected=\"selected\"" : "") %>><%=intl._("2 inbound, 2 outbound tunnels (standard bandwidth usage, standard reliability)")%></option>
-                    <option value="3"<%=(tunnelQuantity == 3 ? " selected=\"selected\"" : "") %>><%=intl._("3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)")%></option>
-                <% if (tunnelQuantity > 3) {
-                %>    <option value="<%=tunnelQuantity%>" selected="selected"><%=tunnelQuantity%>&nbsp;<%=intl._("tunnels")%></option>
-                <% }
-              %></select>                
+                    <%=editBean.getQuantityOptions(curTunnel)%>
+                </select>                
             </div>
             <div id="backupField" class="rowItem">
                 <label for="tunnelBackupQuantity" accesskey="b">

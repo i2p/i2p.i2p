@@ -378,4 +378,42 @@ public class EditBean extends IndexBean {
         if (controller == null) return null;
         return controller.getClientOptionProps();
     }
+
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
+    private static final int DFLT_QUANTITY = 2;
+    private static final int MAX_CLIENT_QUANTITY = 3;
+    private static final int MAX_SERVER_QUANTITY = 6;
+    private static final int MAX_ADVANCED_QUANTITY = 16;
+
+    /**
+     *  @since 0.9.7
+     */
+    public String getQuantityOptions(int tunnel) {
+        int tunnelQuantity = getTunnelQuantity(tunnel, DFLT_QUANTITY);
+        boolean advanced = _context.getBooleanProperty(PROP_ADVANCED);
+        int maxQuantity = advanced ? MAX_ADVANCED_QUANTITY :
+                                     (isClient(tunnel) ? MAX_CLIENT_QUANTITY : MAX_SERVER_QUANTITY);
+        if (tunnelQuantity > maxQuantity)
+            maxQuantity = tunnelQuantity;
+        StringBuilder buf = new StringBuilder(256);
+        for (int i = 1; i <= maxQuantity; i++) {
+             buf.append("<option value=\"").append(i).append('"');
+             if (i == tunnelQuantity)
+                 buf.append(" selected=\"selected\"");
+             buf.append('>');
+             buf.append(ngettext("{0} inbound, {0} outbound tunnel", "{0} inbound, {0} outbound tunnels", i));
+             if (i <= 3) {
+                 buf.append(" (");
+                 if (i == 1)
+                     buf.append(_("lower bandwidth and reliability"));
+                 else if (i == 2)
+                     buf.append(_("standard bandwidth and reliability"));
+                 else if (i == 3)
+                     buf.append(_("higher bandwidth and reliability"));
+                 buf.append(')');
+             }
+             buf.append("</option>\n");
+        }
+        return buf.toString();
+    }
 }

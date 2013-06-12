@@ -39,4 +39,11 @@ public class Messages {
     public String _(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
+
+    /** translate (ngettext)
+     *  @since 0.9.7
+     */
+    public static String ngettext(String s, String p, int n, I2PAppContext ctx) {
+        return Translate.getString(n, s, p, ctx, BUNDLE_NAME);
+    }
 }

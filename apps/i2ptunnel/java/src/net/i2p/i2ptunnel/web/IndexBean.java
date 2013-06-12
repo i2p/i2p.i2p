@@ -1293,4 +1293,11 @@ public class IndexBean {
     protected String _(String key) {
         return Messages._(key, _context);
     }
+
+    /** translate (ngettext)
+     *  @since 0.9.7
+     */
+    protected String ngettext(String s, String p, int n) {
+        return Messages.ngettext(s, p, n, _context);
+    }
 }
