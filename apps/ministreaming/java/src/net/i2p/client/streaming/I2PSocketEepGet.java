@@ -213,6 +213,7 @@ public class I2PSocketEepGet extends EepGet {
      * Real command line apps should use EepGet.main(),
      * which has more options, and you don't have to wait for tunnels to be built.
      */ 
+/****
     public static void main(String args[]) {
         int numRetries = 0;
         long inactivityTimeout = INACTIVITY_TIMEOUT;
@@ -265,4 +266,5 @@ public class I2PSocketEepGet extends EepGet {
     private static void usage() {
         System.err.println("I2PSocketEepGet [-n #retries] [-t timeout] url");
     }
+****/
 }
