@@ -83,38 +83,53 @@ public class MultiRouter {
         _defaultContext = new I2PAppContext(buildRouterProps(0));
         _defaultContext.clock().setOffset(0);
         
+        _out.println("RouterConsole for Router 0 is listening on: 127.0.0.1:" + (BASE_PORT-1));
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
             	_out.println("Shutting down in a few moments..");
             	for(Router r : _routers) {
-            		r.shutdown(-1);
+            		r.shutdown(0);
             	}
                 try { Thread.sleep(1500); } catch (InterruptedException ie) {}
                 Runtime.getRuntime().halt(0);
             }
         });
-        
+
         for (int i = 0; i < nbrRouters; i++) {
             Router router = new Router(buildRouterProps(i));
             router.setKillVMOnEnd(false);
             _routers.add(router);
             _out.println("Router " + i + " was created");
+            try { Thread.sleep(100); } catch (InterruptedException ie) {}
         }
         
         for (int i = 0; i < nbrRouters; i++) {
-        	Router r = _routers.get(i);
+        	final Router r = _routers.get(i);
             long offset = r.getContext().random().nextLong(Router.CLOCK_FUDGE_FACTOR/2);
             if (r.getContext().random().nextBoolean())
                 offset = 0 - offset;
             r.getContext().clock().setOffset(offset, true);
-            r.runRouter();
+            
+            /* Start the routers in separate threads since it takes some time. */
+            (new Thread() {
+            	  public void run() {
+            		  r.runRouter();
+            	  }
+            }).start();
+            try { Thread.sleep(100); } catch (InterruptedException ie) {}
+            
             _out.println("Router " + i + " was started with time offset " + offset);
         }
         _out.println("All routers have been started");
         
-        /* Wait for routers to start services and generate keys.. */
-        try { Thread.sleep(1000); } catch (InterruptedException ie) {}   
+        /* Wait for routers to start services and generate keys
+         * before doing the internal reseed. */
+        int waitForRouters = (nbrRouters/10)*1000;
+        _out.println("Waiting " + waitForRouters/1000 +  " seconds for routers to start" + 
+                     "before doing the internal reseed");
+        try { Thread.sleep(waitForRouters); } catch (InterruptedException ie) {}   
         internalReseed();
         
         waitForCompletion();
@@ -137,8 +152,8 @@ public class MultiRouter {
     private static Properties buildRouterProps(int id) {
         Properties props = getRouterProps(id);
         File f = new File(props.getProperty("router.configLocation"));
-        f.getParentFile().mkdirs();
         if (!f.exists()) {
+        	f.getParentFile().mkdirs();
             try {
 				DataHelper.storeProps(props, f);
 			} catch (IOException e) {
@@ -189,8 +204,8 @@ public class MultiRouter {
     	Properties rProps = getRouterProps(id);
         Properties props = getClientProps();
         File f = new File(rProps.getProperty("router.clientConfigFile"));
-        f.getParentFile().mkdirs();
         if (!f.exists()) {
+        	f.getParentFile().mkdirs();
             try {
 				DataHelper.storeProps(props, f);
 			} catch (IOException e) {
