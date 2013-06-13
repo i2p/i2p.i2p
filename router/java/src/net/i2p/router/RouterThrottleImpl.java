@@ -27,6 +27,8 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final int DEFAULT_MAX_TUNNELS = 5000;
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
+    private static final long DEFAULT_REJECT_STARTUP_TIME = 20*60*1000;
+    private static final String PROP_REJECT_STARTUP_TIME = "router.rejectStartupTime";
 
     /**
      *  TO BE FIXED - SEE COMMENTS BELOW
@@ -39,13 +41,12 @@ class RouterThrottleImpl implements RouterThrottle {
     /** = TrivialPreprocessor.PREPROCESSED_SIZE */
     private static final int PREPROCESSED_SIZE = 1024;
 
-    private static final long REJECT_STARTUP_TIME = 20*60*1000;
     
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
         setTunnelStatus();
-        _context.simpleScheduler().addEvent(new ResetStatus(), REJECT_STARTUP_TIME + 120*1000);
+        _context.simpleScheduler().addEvent(new ResetStatus(), 5*1000 + _context.getProperty(PROP_REJECT_STARTUP_TIME, DEFAULT_REJECT_STARTUP_TIME));
         _context.statManager().createRateStat("router.throttleNetworkCause", "How lagged the jobQueue was when an I2NP was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleNetDbCause", "How lagged the jobQueue was when a networkDb request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -114,7 +115,7 @@ class RouterThrottleImpl implements RouterThrottle {
         }
         
         // Don't use CRIT because we don't want peers to think we're failing
-        if (_context.router().getUptime() < REJECT_STARTUP_TIME) {
+        if (_context.router().getUptime() < DEFAULT_REJECT_STARTUP_TIME) {
             setTunnelStatus(_x("Rejecting tunnels: Starting up"));
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
