@@ -179,8 +179,7 @@ public class Storage
         files.add(file);
       }
 
-    if (files.size() == 1) // FIXME: ...and if base file not a directory or should this be the only check?
-                           // this makes a bad metainfo if the directory has only one file in it
+    if (files.size() == 1 && !baseFile.isDirectory())
       {
         files = null;
         lengthsList = null;
