@@ -101,7 +101,7 @@ msgstr "$APP_LONG_NAME fait tourner: PID:$pid"
 #: ../i2prouter:1186
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
-msgstr "$APP_LONG_NAME fait tourner: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATU"
+msgstr "$APP_LONG_NAME fait tourner: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
 
 #: ../i2prouter:1239 ../i2prouter:1251 ../i2prouter:1270 ../i2prouter:1287
 #: ../i2prouter:1354 ../i2prouter:1374 ../i2prouter:1388 ../i2prouter:1402

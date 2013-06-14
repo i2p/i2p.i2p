@@ -15,6 +15,7 @@ DIRS="\
   apps/susidns/locale \
   apps/susimail/locale \
   apps/desktopgui/locale \
+  installer/resources/locale/po \
   debian/po"
 
 for i in `find $DIRS -maxdepth 1 -type f -name *.po`
