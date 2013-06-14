@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.Transport.AddressSource.SOURCE_UPNP;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
@@ -25,6 +26,7 @@ import org.freenetproject.ForwardPortStatus;
  * Bridge from the I2P RouterAddress data structure to
  * the freenet data structures
  *
+ * @since 0.7.4
  * @author zzz
  */
 class UPnPManager {
@@ -106,7 +108,7 @@ class UPnPManager {
      * which can have multiple UPnP threads running at once, but
      * that should be ok.
      */
-    public void update(Map<String, Integer> ports) {
+    public void update(Set<TransportManager.Port> ports) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Update with " + ports.size() + " ports");
 
@@ -121,9 +123,9 @@ class UPnPManager {
         //}
 
         Set<ForwardPort> forwards = new HashSet(ports.size());
-        for (Map.Entry<String, Integer> entry : ports.entrySet()) {
-            String style = entry.getKey();
-            int port = entry.getValue().intValue();
+        for (TransportManager.Port entry : ports) {
+            String style = entry.style;
+            int port = entry.port;
             int protocol = -1;
             if ("SSU".equals(style))
                 protocol = ForwardPort.PROTOCOL_UDP_IPV4;
@@ -151,17 +153,19 @@ class UPnPManager {
             if (_log.shouldLog(Log.DEBUG))
                  _log.debug("UPnP Callback:");
 
+            byte[] ipaddr = null;
             DetectedIP[] ips = _upnp.getAddress();
             if (ips != null) {
                 for (DetectedIP ip : ips) {
                     // store the first public one and tell the transport manager if it changed
-                    if (TransportImpl.isPubliclyRoutable(ip.publicAddress.getAddress())) {
+                    if (TransportUtil.isPubliclyRoutable(ip.publicAddress.getAddress(), false)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("External address: " + ip.publicAddress + " type: " + ip.natType);
                         if (!ip.publicAddress.equals(_detectedAddress)) {
                             _detectedAddress = ip.publicAddress;
-                            _manager.externalAddressReceived(Transport.SOURCE_UPNP, _detectedAddress.getAddress(), 0);
+                            _manager.externalAddressReceived(SOURCE_UPNP, _detectedAddress.getAddress(), 0);
                         }
+                        ipaddr = ip.publicAddress.getAddress();
                         break;
                     }
                 }
@@ -184,7 +188,7 @@ class UPnPManager {
                 else
                     continue;
                 boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
-                _manager.forwardPortStatus(style, fp.portNumber, fps.externalPort, success, fps.reasonString);
+                _manager.forwardPortStatus(style, ipaddr, fp.portNumber, fps.externalPort, success, fps.reasonString);
             }
         }
     }

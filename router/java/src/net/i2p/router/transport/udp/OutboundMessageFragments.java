@@ -309,8 +309,8 @@ class OutboundMessageFragments {
                         // use max of 1 second so finishMessages() and/or PeerState.finishMessages()
                         // gets called regularly
                         int toWait = Math.min(Math.max(nextSendDelay, 10), MAX_WAIT);
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("wait for " + toWait);
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug("wait for " + toWait);
                         // wait.. or somethin'
                         synchronized (_activePeers) {
                             try {

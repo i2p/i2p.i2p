@@ -260,10 +260,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
+    @Override
     public boolean floodfillEnabled() { return _floodfillEnabled; }
-    public static boolean floodfillEnabled(RouterContext ctx) {
-        return ((FloodfillNetworkDatabaseFacade)ctx.netDb()).floodfillEnabled();
-    }
     
     /**
      *  @param peer may be null, returns false if null

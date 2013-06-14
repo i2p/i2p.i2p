@@ -24,6 +24,13 @@ import net.i2p.util.SimpleTimer;
  *  Entry points are runTest() to start a new test as Alice,
  *  and receiveTest() for all received test packets.
  *
+ *  IPv6 info: All Alice-Bob and Alice-Charlie communication is via IPv4.
+ *  The Bob-Charlie communication may be via IPv6, however Charlie must
+ *  be IPv4-capable.
+ *  The IP address (of Alice) in the message must be IPv4 if present,
+ *  as we only support testing of IPv4.
+ *  Testing of IPv6 could be added in the future.
+ *
  *  From udp.html on the website:
 
 <p>The automation of collaborative reachability testing for peers is
@@ -166,6 +173,8 @@ class PeerTestManager {
 
     /**
      *  The next few methods are for when we are Alice
+     *
+     *  @param bobIP IPv4 only
      */
     public synchronized void runTest(InetAddress bobIP, int bobPort, SessionKey bobCipherKey, SessionKey bobMACKey) {
         if (_currentTest != null) {
@@ -173,7 +182,7 @@ class PeerTestManager {
                 _log.warn("We are already running a test: " + _currentTest + ", aborting test with bob = " + bobIP);
             return;
         }
-        if (DataHelper.eq(bobIP.getAddress(), 0, _transport.getExternalIP(), 0, 2)) {
+        if (_transport.isTooClose(bobIP.getAddress())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not running test with Bob too close to us " + bobIP);
             return;
@@ -304,7 +313,7 @@ class PeerTestManager {
             // The reply is from Bob
 
             int ipSize = testInfo.readIPSize();
-            if (ipSize != 4 && ipSize != 16) {
+            if (ipSize != 4) {
                 // There appears to be a bug where Bob is sending us a zero-length IP.
                 // We could proceed without setting the IP, but then when Charlie
                 // sends us his message, we will think we are behind a symmetric NAT
@@ -366,6 +375,8 @@ class PeerTestManager {
                         throw new UnknownHostException("port 0");
                     test.setAlicePortFromCharlie(testPort);
                     byte ip[] = new byte[testInfo.readIPSize()];
+                    if (ip.length != 4)
+                        throw new UnknownHostException("not IPv4");
                     testInfo.readIP(ip, 0);
                     InetAddress addr = InetAddress.getByAddress(ip);
                     test.setAliceIPFromCharlie(addr);
@@ -485,7 +496,7 @@ class PeerTestManager {
         int fromPort = from.getPort();
         if (fromPort < 1024 || fromPort > 65535 ||
             (!_transport.isValid(fromIP)) ||
-            DataHelper.eq(fromIP, 0, _transport.getExternalIP(), 0, 2) ||
+            _transport.isTooClose(fromIP) ||
             _context.blocklist().isBlocklisted(fromIP)) {
             // spoof check, and don't respond to privileged ports
             if (_log.shouldLog(Log.WARN))
@@ -505,6 +516,7 @@ class PeerTestManager {
         if ((testPort > 0 && (testPort < 1024 || testPort > 65535)) ||
             (testIP != null &&
                                ((!_transport.isValid(testIP)) ||
+                                testIP.length != 4 ||
                                 _context.blocklist().isBlocklisted(testIP)))) {
             // spoof check, and don't respond to privileged ports
             if (_log.shouldLog(Log.WARN))
@@ -544,7 +556,7 @@ class PeerTestManager {
         Long lNonce = Long.valueOf(nonce);
         PeerTestState state = _activeTests.get(lNonce);
 
-        if (testIP != null && DataHelper.eq(testIP, 0, _transport.getExternalIP(), 0, 2)) {
+        if (testIP != null && _transport.isTooClose(testIP)) {
             // spoof check - have to do this after receiveTestReply(), since
             // the field should be us there.
             // Let's also eliminate anybody in the same /16
@@ -641,6 +653,8 @@ class PeerTestManager {
         byte aliceIPData[] = new byte[sz];
         try {
             testInfo.readIP(aliceIPData, 0);
+            if (sz != 4)
+                throw new UnknownHostException("not IPv4");
             int alicePort = testInfo.readPort();
             if (alicePort == 0)
                 throw new UnknownHostException("port 0");
@@ -706,7 +720,12 @@ class PeerTestManager {
         PeerState charlie;
         RouterInfo charlieInfo = null;
         if (state == null) { // pick a new charlie
-            charlie = _transport.pickTestPeer(from);
+            if (from.getIP().length != 4) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("PeerTest over IPv6 from Alice as Bob? " + from);
+                return;
+            }
+            charlie = _transport.pickTestPeer(CHARLIE, from);
         } else {
             charlie = _transport.getPeerState(new RemoteHostId(state.getCharlieIP().getAddress(), state.getCharliePort()));
         }

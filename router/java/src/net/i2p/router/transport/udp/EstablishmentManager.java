@@ -249,7 +249,7 @@ class EstablishmentManager {
             maybeTo = new RemoteHostId(remAddr.getAddress(), port);
 
             if ((!_transport.isValid(maybeTo.getIP())) ||
-                Arrays.equals(maybeTo.getIP(), _transport.getExternalIP())) {
+                (Arrays.equals(maybeTo.getIP(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
                 _transport.markUnreachable(toHash);
                 //_context.banlist().banlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
@@ -447,7 +447,9 @@ class EstablishmentManager {
                 }
                 if (!_transport.allowConnection())
                     return; // drop the packet
-                state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getExternalPort(),
+                byte[] fromIP = from.getIP();
+                state = new InboundEstablishState(_context, fromIP, from.getPort(),
+                                                  _transport.getExternalPort(fromIP.length == 16),
                                                   _transport.getDHBuilder());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
                 InboundEstablishState oldState = _inboundStates.putIfAbsent(from, state);
@@ -459,8 +461,10 @@ class EstablishmentManager {
 
         if (isNew) {
             // Don't offer to relay to privileged ports.
+            // Only offer for an IPv4 session.
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
-            if (_transport.canIntroduce() && state.getSentPort() >= 1024) {
+            if (_transport.canIntroduce() && state.getSentPort() >= 1024 &&
+                state.getSentIP().length == 4) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
@@ -673,7 +677,8 @@ class EstablishmentManager {
                 String smtu = addr.getOption(UDPAddress.PROP_MTU);
                 if (smtu != null) {
                     try { 
-                        int mtu = MTU.rectify(Integer.parseInt(smtu));
+                        boolean isIPv6 = state.getSentIP().length == 16;
+                        int mtu = MTU.rectify(isIPv6, Integer.parseInt(smtu));
                         peer.setHisMTU(mtu);
                     } catch (NumberFormatException nfe) {}
                 }
@@ -833,7 +838,9 @@ class EstablishmentManager {
             _inboundStates.remove(state.getRemoteHostId());
             return;
         }
-        _transport.send(_builder.buildSessionCreatedPacket(state, _transport.getExternalPort(), _transport.getIntroKey()));
+        _transport.send(_builder.buildSessionCreatedPacket(state,
+                                                           _transport.getExternalPort(state.getSentIP().length == 16),
+                                                           _transport.getIntroKey()));
         state.createdPacketSent();
     }
 
@@ -884,6 +891,9 @@ class EstablishmentManager {
         state.introSent();
     }
 
+    /**
+     *  We are Alice, we sent a RelayRequest to Bob and got a response back.
+     */
     void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
         long nonce = reader.getRelayResponseReader().readNonce();
         OutboundEstablishState state = _liveIntroductions.remove(Long.valueOf(nonce));
@@ -893,6 +903,7 @@ class EstablishmentManager {
             return; // already established
         }
         
+        // Note that we ignore the Alice (us) IP/Port in the RelayResponse
         int sz = reader.getRelayResponseReader().readCharlieIPSize();
         byte ip[] = new byte[sz];
         reader.getRelayResponseReader().readCharlieIP(ip, 0);
@@ -940,15 +951,17 @@ class EstablishmentManager {
     }
 
     /**
-     *  Are IP and port valid?
+     *  Are IP and port valid? This is only for checking the relay response.
+     *  Reject all IPv6, for now, even if we are configured for it.
      *  Refuse anybody in the same /16
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
-        return port >= 1024 &&
+        return port >= UDPTransport.MIN_PEER_PORT &&
                port <= 65535 &&
+               ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
-               (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
+               (!_transport.isTooClose(ip)) &&
                (!_context.blocklist().isBlocklisted(ip));
     }
 

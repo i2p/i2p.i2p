@@ -1,15 +1,19 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.SocketException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Coordinate the low level datagram socket, managing the UDPSender and
- * UDPReceiver
+ * Coordinate the low-level datagram socket, creating and managing the UDPSender and
+ * UDPReceiver.
  */
 class UDPEndpoint {
     private final RouterContext _context;
@@ -20,8 +24,11 @@ class UDPEndpoint {
     private UDPReceiver _receiver;
     private DatagramSocket _socket;
     private final InetAddress _bindAddress;
+    private final boolean _isIPv4, _isIPv6;
+    private static final AtomicInteger _counter = new AtomicInteger();
     
     /**
+     *  @param transport may be null for unit testing ONLY
      *  @param listenPort -1 or the requested port, may not be honored
      *  @param bindAddress null ok
      */
@@ -31,22 +38,27 @@ class UDPEndpoint {
         _transport = transport;
         _bindAddress = bindAddress;
         _listenPort = listenPort;
+        _isIPv4 = bindAddress == null || bindAddress instanceof Inet4Address;
+        _isIPv6 = bindAddress == null || bindAddress instanceof Inet6Address;
     }
     
     /** caller should call getListenPort() after this to get the actual bound port and determine success */
-    public synchronized void startup() {
+    public synchronized void startup() throws SocketException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up the UDP endpoint");
         shutdown();
         _socket = getSocket();
         if (_socket == null) {
             _log.log(Log.CRIT, "UDP Unable to open a port");
-            return;
+            throw new SocketException("SSU Unable to bind to a port on " + _bindAddress);
         }
-        _sender = new UDPSender(_context, _socket, "UDPSender");
-        _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver");
+        int count = _counter.incrementAndGet();
+        _sender = new UDPSender(_context, _socket, "UDPSender " + count);
         _sender.startup();
-        _receiver.startup();
+        if (_transport != null) {
+            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver " + count);
+            _receiver.startup();
+        }
     }
     
     public synchronized void shutdown() {
@@ -103,9 +115,7 @@ class UDPEndpoint {
              if (port <= 0) {
                  // try random ports rather than just do new DatagramSocket()
                  // so we stay out of the way of other I2P stuff
-                 int minPort = _context.getProperty(PROP_MIN_PORT, MIN_RANDOM_PORT);
-                 int maxPort = _context.getProperty(PROP_MAX_PORT, MAX_RANDOM_PORT);
-                 port = minPort + _context.random().nextInt(maxPort - minPort);
+                 port = selectRandomPort(_context);
              }
              try {
                  if (_bindAddress == null)
@@ -131,6 +141,17 @@ class UDPEndpoint {
         return socket;
     }
 
+    /**
+     *  Pick a random port between the configured boundaries
+     *  @since IPv6
+     */
+    public static int selectRandomPort(RouterContext ctx) {
+        int minPort = Math.min(65535, Math.max(1, ctx.getProperty(PROP_MIN_PORT, MIN_RANDOM_PORT)));
+        int maxPort = Math.min(65535, Math.max(minPort, ctx.getProperty(PROP_MAX_PORT, MAX_RANDOM_PORT)));
+        return minPort + ctx.random().nextInt(1 + maxPort - minPort);
+    }
+
+
     /** call after startup() to get actual port or -1 on startup failure */
     public int getListenPort() { return _listenPort; }
     public UDPSender getSender() { return _sender; }
@@ -143,15 +164,24 @@ class UDPEndpoint {
     public void send(UDPPacket packet) { 
         _sender.add(packet); 
     }
-    
+     
     /**
      * Blocking call to receive the next inbound UDP packet from any peer.
-     * @return null if we have shut down
+     *
+     * UNIT TESTING ONLY. Direct from the socket.
+     * In normal operation, UDPReceiver thread injects to PacketHandler queue.
+     *
+     * @return null if we have shut down, or on failure
      */
     public UDPPacket receive() { 
-        if (_receiver == null)
+        UDPPacket packet = UDPPacket.acquire(_context, true);
+        try {
+            _socket.receive(packet.getPacket());
+            return packet; 
+        } catch (IOException ioe) {
+            packet.release();
             return null;
-        return _receiver.receiveNext(); 
+        }
     }
     
     /**
@@ -161,5 +191,21 @@ class UDPEndpoint {
     public void clearOutbound() {
         if (_sender != null)
             _sender.clear();
+    }
+
+    /**
+     *  @return true for wildcard too
+     *  @since IPv6
+     */
+    public boolean isIPv4() {
+        return _isIPv4;
+    }
+
+    /**
+     *  @return true for wildcard too
+     *  @since IPv6
+     */
+    public boolean isIPv6() {
+        return _isIPv6;
     }
 }

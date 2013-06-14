@@ -62,7 +62,7 @@ class ACKSender implements Runnable {
     
     public synchronized void shutdown() { 
         _alive = false;
-        PeerState poison = new PeerState(_context, _transport, null, 0, null, false);
+        PeerState poison = new PeerState(_context, _transport, new byte[4], 0, null, false);
         poison.setTheyRelayToUsAs(POISON_PS);
         _peersToACK.offer(poison);
         for (int i = 1; i <= 5 && !_peersToACK.isEmpty(); i++) {

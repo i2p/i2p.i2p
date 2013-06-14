@@ -51,7 +51,7 @@ class StartExplorersJob extends JobImpl {
     
     public String getName() { return "Start Explorers Job"; }
     public void runJob() {
-        if (! (((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled() ||
+        if (! (_facade.floodfillEnabled() ||
                getContext().router().gracefulShutdownInProgress())) {
             int num = MAX_PER_RUN;
             if (_facade.getDataStore().size() < LOW_ROUTERS)
@@ -93,7 +93,7 @@ class StartExplorersJob extends JobImpl {
      */
     private long getNextRunDelay() {
         // we don't explore if floodfill
-        if (((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled())
+        if (_facade.floodfillEnabled())
             return MAX_RERUN_DELAY_MS;
 
         // If we don't know too many peers, or just started, explore aggressively

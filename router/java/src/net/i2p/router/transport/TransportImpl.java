@@ -10,8 +10,11 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +26,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -36,7 +40,6 @@ import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
@@ -51,13 +54,14 @@ import net.i2p.util.SystemVersion;
 public abstract class TransportImpl implements Transport {
     private final Log _log;
     private TransportEventListener _listener;
-    private RouterAddress _currentAddress;
+    protected final List<RouterAddress> _currentAddresses;
     // Only used by NTCP. SSU does not use. See send() below.
     private final BlockingQueue<OutNetMessage> _sendPool;
     protected final RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
     private final Set<Hash> _wasUnreachableEntries;
+    private final Set<InetAddress> _localAddresses;
     /** global router ident -> IP */
     private static final Map<Hash, byte[]> _IPMap;
 
@@ -88,12 +92,15 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         //_context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
+
+        _currentAddresses = new CopyOnWriteArrayList();
         if (getStyle().equals("NTCP"))
             _sendPool = new ArrayBlockingQueue(8);
         else
             _sendPool = null;
         _unreachableEntries = new HashMap(16);
         _wasUnreachableEntries = new ConcurrentHashSet(16);
+        _localAddresses = new ConcurrentHashSet(4);
         _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
@@ -119,6 +126,9 @@ public abstract class TransportImpl implements Transport {
 
     /** Per-transport connection limit */
     public int getMaxConnections() {
+        if (_context.commSystem().isDummy())
+            // testing
+            return 0;
         String style = getStyle();
         // object churn
         String maxProp;
@@ -135,7 +145,7 @@ public abstract class TransportImpl implements Transport {
             if (bw > Router.CAPABILITY_BW12 && bw <= Router.CAPABILITY_BW256)
                 def *= (1 + bw - Router.CAPABILITY_BW12);
         }
-        if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
+        if (_context.netDb().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {
             def *= 17; def /= 10;  // 425 for Class O ff
         }
@@ -167,7 +177,7 @@ public abstract class TransportImpl implements Transport {
      */
     public Vector getClockSkews() { return new Vector(); }
 
-    public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
+    public List<String> getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
 
     /**
      * Nonblocking call to pull the next outbound message
@@ -463,63 +473,200 @@ public abstract class TransportImpl implements Transport {
     }
 
     /** Do we increase the advertised cost when approaching conn limits? */
-    public static final boolean ADJUST_COST = true;
+    protected static final boolean ADJUST_COST = true;
+    protected static final int CONGESTION_COST_ADJUSTMENT = 2;
 
-    /** What addresses are we currently listening to? */
-    public RouterAddress getCurrentAddress() {
-        return _currentAddress;
+    /**
+     *  What addresses are we currently listening to?
+     *  Replaces getCurrentAddress()
+     *  @return all addresses, non-null
+     *  @since IPv6
+     */
+    public List<RouterAddress> getCurrentAddresses() {
+        return _currentAddresses;
+    }
+
+    /**
+     *  What address are we currently listening to?
+     *  Replaces getCurrentAddress()
+     *  @param ipv6 true for IPv6 only; false for IPv4 only
+     *  @return first matching address or null
+     *  @since IPv6
+     */
+    public RouterAddress getCurrentAddress(boolean ipv6) {
+        for (RouterAddress ra : _currentAddresses) {
+            if (ipv6 == TransportUtil.isIPv6(ra))
+                return ra;
+        }
+        return null;
+    }
+
+    /**
+     *  Do we have any current address?
+     *  @since IPv6
+     */
+    public boolean hasCurrentAddress() {
+        return !_currentAddresses.isEmpty();
     }
 
     /**
      * Ask the transport to update its address based on current information and return it
      * Transports should override.
+     * @return all addresses, non-null
      * @since 0.7.12
      */
-    public RouterAddress updateAddress() {
-        return _currentAddress;
+    public List<RouterAddress> updateAddress() {
+        return _currentAddresses;
     }
 
     /**
-     * Replace any existing addresses for the current transport with the given
-     * one.
+     *  Replace any existing addresses for the current transport
+     *  with the same IP length (4 or 16) with the given one.
+     *  TODO: Allow multiple addresses of the same length.
+     *  Calls listener.transportAddressChanged()
+     *
+     *  @param address null to remove all
      */
     protected void replaceAddress(RouterAddress address) {
-        // _log.error("Replacing address for " + getStyle() + " was " + _currentAddress + " now " + address);
-        _currentAddress = address;
+        if (_log.shouldLog(Log.WARN))
+             _log.warn("Replacing address with " + address, new Exception());
+        if (address == null) {
+            _currentAddresses.clear();
+        } else {
+            boolean isIPv6 = TransportUtil.isIPv6(address);
+            for (RouterAddress ra : _currentAddresses) {
+                if (isIPv6 == TransportUtil.isIPv6(ra))
+                    _currentAddresses.remove(ra);
+            }
+            _currentAddresses.add(address);
+        }
+        if (_log.shouldLog(Log.WARN))
+             _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
         if (_listener != null)
             _listener.transportAddressChanged();
+    }
+
+    /**
+     *  Save a local address we were notified about before we started.
+     *
+     *  @since IPv6
+     */
+    protected void saveLocalAddress(InetAddress address) {
+        _localAddresses.add(address);
+    }
+
+    /**
+     *  Return and then clear all saved local addresses.
+     *
+     *  @since IPv6
+     */
+    protected Collection<InetAddress> getSavedLocalAddresses() {
+        List<InetAddress> rv = new ArrayList(_localAddresses);
+        _localAddresses.clear();
+        return rv;
+    }
+
+    /**
+     *  Get all available address we can use,
+     *  shuffled and then sorted by cost/preference.
+     *  Lowest cost (most preferred) first.
+     *  @return non-null, possibly empty
+     *  @since IPv6
+     */
+    protected List<RouterAddress> getTargetAddresses(RouterInfo target) {
+        List<RouterAddress> rv = target.getTargetAddresses(getStyle());
+        // Shuffle so everybody doesn't use the first one
+        if (rv.size() > 1) {
+            Collections.shuffle(rv, _context.random());
+            TransportUtil.IPv6Config config = getIPv6Config();
+            int adj;
+            switch (config) {
+              case IPV6_DISABLED:
+                adj = 10; break;
+              case IPV6_NOT_PREFERRED:
+                adj = 1; break;
+              default:
+              case IPV6_ENABLED:
+                adj = 0; break;
+              case IPV6_PREFERRED:
+                adj = -1; break;
+              case IPV6_ONLY:
+                adj = -10; break;
+            }
+            Collections.sort(rv, new AddrComparator(adj));
+        }
+        return rv;
+    }
+
+    /**
+     *  Compare based on published cost, adjusting for our IPv6 preference.
+     *  Lowest cost (most preferred) first.
+     *  @since IPv6
+     */
+    private static class AddrComparator implements Comparator<RouterAddress> {
+        private final int adj;
+
+        public AddrComparator(int ipv6Adjustment) {
+            adj = ipv6Adjustment;
+        }
+
+        public int compare(RouterAddress l, RouterAddress r) {
+            int lc = l.getCost();
+            int rc = r.getCost();
+            byte[] lip = l.getIP();
+            byte[] rip = r.getIP();
+            if (lip == null)
+                lc += 20;
+            else if (lip.length == 16)
+                lc += adj;
+            if (rip == null)
+                rc += 20;
+            else if (rip.length == 16)
+                rc += adj;
+            if (lc > rc)
+                return 1;
+            if (lc < rc)
+                return -1;
+            return 0;
+        }
     }
 
     /**
      *  Notify a transport of an external address change.
      *  This may be from a local interface, UPnP, a config change, etc.
      *  This should not be called if the ip didn't change
-     *  (from that source's point of view), or is a local address,
-     *  or if the ip is IPv6, but the transport should check anyway.
+     *  (from that source's point of view), or is a local address.
+     *  May be called multiple times for IPv4 or IPv6.
      *  The transport should also do its own checking on whether to accept
      *  notifications from this source.
      *
      *  This can be called before startListening() to set an initial address,
      *  or after the transport is running.
      *
+     *  This implementation does nothing. Transports should override if they want notification.
+     *
      *  @param source defined in Transport.java
-     *  @param ip typ. IPv4 non-local
+     *  @param ip typ. IPv4 or IPv6 non-local; may be null to indicate IPv4 failure or port info only
      *  @param port 0 for unknown or unchanged
      */
-    public void externalAddressReceived(String source, byte[] ip, int port) {}
+    public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}
 
     /**
      *  Notify a transport of the results of trying to forward a port.
+     *
+     *  This implementation does nothing. Transports should override if they want notification.
+     *
+     *  @param ip may be null
      *  @param port the internal port
      *  @param externalPort the external port, which for now should always be the same as
      *                      the internal port if the forwarding was successful.
      */
-    public void forwardPortStatus(int port, int externalPort, boolean success, String reason) {}
+    public void forwardPortStatus(byte[] ip, int port, int externalPort, boolean success, String reason) {}
 
     /**
-     * What port would the transport like to have forwarded by UPnP.
+     * What INTERNAL port would the transport like to have forwarded by UPnP.
      * This can't be passed via getCurrentAddress(), as we have to open the port
-     * before we can publish the address.
+     * before we can publish the address, and that's the external port anyway.
      *
      * @return port or -1 for none or 0 for any
      */
@@ -531,13 +678,13 @@ public abstract class TransportImpl implements Transport {
     public void renderStatusHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
 
-    public RouterContext getContext() { return _context; }
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
     public void recheckReachability() {}
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
 
     private static final long UNREACHABLE_PERIOD = 5*60*1000;
+
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
         synchronized (_unreachableEntries) {
@@ -551,6 +698,7 @@ public abstract class TransportImpl implements Transport {
             }
         }
     }
+
     /** called when we can't reach a peer */
     /** This isn't very useful since it is cleared when they contact us */
     public void markUnreachable(Hash peer) {
@@ -560,6 +708,7 @@ public abstract class TransportImpl implements Transport {
         }
         markWasUnreachable(peer, true);
     }
+
     /** called when we establish a peer connection (outbound or inbound) */
     public void markReachable(Hash peer, boolean isInbound) {
         // if *some* transport can reach them, then we shouldn't banlist 'em
@@ -605,9 +754,15 @@ public abstract class TransportImpl implements Transport {
         else
             _wasUnreachableEntries.remove(peer);
         if (_log.shouldLog(Log.INFO))
-            _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
+            _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer,
+                      yes ? new Exception() : null);
     }
 
+    /**
+     * IP of the peer from the last connection (in or out, any transport).
+     *
+     * @param IPv4 or IPv6, non-null
+     */
     public void setIP(Hash peer, byte[] ip) {
         byte[] old;
         synchronized (_IPMap) {
@@ -617,6 +772,11 @@ public abstract class TransportImpl implements Transport {
             _context.commSystem().queueLookup(ip);
     }
 
+    /**
+     * IP of the peer from the last connection (in or out, any transport).
+     *
+     * @return IPv4 or IPv6 or null
+     */
     public static byte[] getIP(Hash peer) {
         synchronized (_IPMap) {
             return _IPMap.get(peer);
@@ -632,26 +792,20 @@ public abstract class TransportImpl implements Transport {
         }
     }
 
-    /** @param addr non-null */
-    public static boolean isPubliclyRoutable(byte addr[]) {
-        if (addr.length == 4) {
-            int a0 = addr[0] & 0xFF;
-            if (a0 == 127) return false;
-            if (a0 == 10) return false;
-            int a1 = addr[1] & 0xFF;
-            if (a0 == 172 && a1 >= 16 && a1 <= 31) return false;
-            if (a0 == 192 && a1 == 168) return false;
-            if (a0 >= 224) return false; // no multicast
-            if (a0 == 0) return false;
-            if (a0 == 169 && a1 == 254) return false;
-            // 5/8 allocated to RIPE (30 November 2010)
-            //if ((addr[0]&0xFF) == 5) return false;  // Hamachi
-            return true; // or at least possible to be true
-        } else if (addr.length == 16) {
-            return false;
-        } else {
-            // ipv?
-            return false;
-        }
+    /**
+     *  @since IPv6
+     */
+    protected TransportUtil.IPv6Config getIPv6Config() {
+        return TransportUtil.getIPv6Config(_context, getStyle());
+    }
+
+    /**
+     *  Allows IPv6 only if the transport is configured for it.
+     *  Caller must check if we actually have a public IPv6 address.
+     *  @param addr non-null
+     */
+    protected boolean isPubliclyRoutable(byte addr[]) {
+        return TransportUtil.isPubliclyRoutable(addr,
+                                                getIPv6Config() != TransportUtil.IPv6Config.IPV6_DISABLED);
     }
 }

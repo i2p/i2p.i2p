@@ -52,6 +52,7 @@ import org.freenetproject.ForwardPortStatus;
  *
  * @see "http://www.upnp.org/"
  * @see "http://en.wikipedia.org/wiki/Universal_Plug_and_Play"
+ * @since 0.7.4
  */
 
 /* 
@@ -147,7 +148,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			InetAddress detectedIP = InetAddress.getByName(natAddress);
 
 			short status = DetectedIP.NOT_SUPPORTED;
-			thinksWeAreDoubleNatted = !TransportImpl.isPubliclyRoutable(detectedIP.getAddress());
+			thinksWeAreDoubleNatted = !TransportUtil.isPubliclyRoutable(detectedIP.getAddress(), false);
 			// If we have forwarded a port AND we don't have a private address
 			if (_log.shouldLog(Log.WARN))
 				_log.warn("NATAddress: \"" + natAddress + "\" detectedIP: " + detectedIP + " double? " + thinksWeAreDoubleNatted);
@@ -843,7 +844,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 					fps = new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber);
 				}
 				Map map = Collections.singletonMap(port, fps);
-				forwardCallback.portForwardStatus(map);
+				try {
+					forwardCallback.portForwardStatus(map);
+				} catch (Exception e) {
+                                    _log.error("UPnP RPT error", e);
+				}
 			}
 		}
 	}

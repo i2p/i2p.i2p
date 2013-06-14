@@ -11,10 +11,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +33,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
@@ -62,6 +65,8 @@ import net.i2p.util.Translate;
  * banlist it forever, then go back to the file to get the original
  * entry so we can add the reason to the banlist text.
  *
+ * On-disk blocklist supports IPv4 only.
+ * In-memory supports both IPv4 and IPv6.
  */
 public class Blocklist {
     private final Log _log;
@@ -72,8 +77,20 @@ public class Blocklist {
     private Entry _wrapSave;
     private final Set<Hash> _inProcess = new HashSet(4);
     private Map<Hash, String> _peerBlocklist = new HashMap(4);
+
+    /**
+     *  Limits of transient (in-memory) blocklists.
+     *  Note that it's impossible to prevent clogging up
+     *  the tables by a determined attacker, esp. on IPv6
+     */
+    private static final int MAX_IPV4_SINGLES = 256;
+    private static final int MAX_IPV6_SINGLES = 512;
+
     private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet(4);
-    
+    private final Map<BigInteger, Object> _singleIPv6Blocklist = new LHMCache(MAX_IPV6_SINGLES);
+
+    private static final Object DUMMY = Integer.valueOf(0);    
+
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
@@ -437,6 +454,8 @@ public class Blocklist {
      * Maintain a simple in-memory single-IP blocklist
      * This is used for new additions, NOT for the main list
      * of IP ranges read in from the file.
+     *
+     * @param ip IPv4 or IPv6
      */
     public void add(String ip) {
         byte[] pib = Addresses.getIP(ip);
@@ -448,16 +467,24 @@ public class Blocklist {
      * Maintain a simple in-memory single-IP blocklist
      * This is used for new additions, NOT for the main list
      * of IP ranges read in from the file.
+     *
+     * @param ip IPv4 or IPv6
      */
     public void add(byte ip[]) {
-        if (ip.length != 4)
-            return;
-        if (add(toInt(ip)))
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Adding IP to blocklist: " + Addresses.toString(ip));
+        boolean rv;
+        if (ip.length == 4)
+            rv = add(toInt(ip));
+        else if (ip.length == 16)
+            rv = add(new BigInteger(1, ip));
+        else
+            rv = false;
+        if (rv && _log.shouldLog(Log.WARN))
+            _log.warn("Adding IP to blocklist: " + Addresses.toString(ip));
     }
 
     private boolean add(int ip) {
+        if (_singleIPBlocklist.size() >= MAX_IPV4_SINGLES)
+            return false;
         return _singleIPBlocklist.add(Integer.valueOf(ip));
     }
 
@@ -466,20 +493,41 @@ public class Blocklist {
     }
 
     /**
-     * this tries to not return duplicates
-     * but I suppose it could.
+     * @param ip IPv6 non-negative
+     * @since IPv6
+     */
+    private boolean add(BigInteger ip) {
+        synchronized(_singleIPv6Blocklist) {
+            return _singleIPv6Blocklist.put(ip, DUMMY) == null;
+        }
+    }
+
+    /**
+     * @param ip IPv6 non-negative
+     * @since IPv6
+     */
+    private boolean isOnSingleList(BigInteger ip) {
+        synchronized(_singleIPv6Blocklist) {
+            return _singleIPv6Blocklist.get(ip) != null;
+        }
+    }
+
+    /**
+     * Will not contain duplicates.
      */
     private List<byte[]> getAddresses(Hash peer) {
-        List<byte[]> rv = new ArrayList(1);
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
-        if (pinfo == null) return rv;
-        byte[] oldpib = null;
+        if (pinfo == null)
+            return Collections.EMPTY_LIST;
+        List<byte[]> rv = new ArrayList(4);
         // for each peer address
         for (RouterAddress pa : pinfo.getAddresses()) {
             byte[] pib = pa.getIP();
             if (pib == null) continue;
-            if (DataHelper.eq(oldpib, pib)) continue;
-            oldpib = pib;
+            // O(n**2)
+            for (int i = 0; i < rv.size(); i++) {
+                if (DataHelper.eq(rv.get(i), pib)) continue;
+            }
             rv.add(pib);
          }
          return rv;
@@ -491,8 +539,9 @@ public class Blocklist {
      */
     public boolean isBlocklisted(Hash peer) {
         List<byte[]> ips = getAddresses(peer);
-        for (Iterator<byte[]> iter = ips.iterator(); iter.hasNext(); ) {
-            byte ip[] = iter.next();
+        if (ips.isEmpty())
+            return false;
+        for (byte[] ip : ips) {
             if (isBlocklisted(ip)) {
                 if (! _context.banlist().isBanlisted(peer))
                     // nice knowing you...
@@ -505,6 +554,8 @@ public class Blocklist {
 
     /**
      * calling this externally won't banlist the peer, this is just an IP check
+     *
+     * @param ip IPv4 or IPv6
      */
     public boolean isBlocklisted(String ip) {
         byte[] pib = Addresses.getIP(ip);
@@ -514,11 +565,15 @@ public class Blocklist {
 
     /**
      * calling this externally won't banlist the peer, this is just an IP check
+     *
+     * @param ip IPv4 or IPv6
      */
     public boolean isBlocklisted(byte ip[]) {
-        if (ip.length != 4)
-            return false;
-        return isBlocklisted(toInt(ip));
+        if (ip.length == 4)
+            return isBlocklisted(toInt(ip));
+        if (ip.length == 16)
+            return isOnSingleList(new BigInteger(1, ip));
+        return false;
     }
 
     /**
@@ -760,7 +815,7 @@ public class Blocklist {
         //out.write("<h2>Banned IPs</h2>");
         Set<Integer> singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
-        if (!singles.isEmpty()) {
+        if (!(singles.isEmpty() && _singleIPv6Blocklist.isEmpty())) {
             out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
             out.write(_("IPs Banned Until Restart"));
             out.write("</b></td></tr>");
@@ -781,6 +836,19 @@ public class Blocklist {
                  out.write("<tr><td align=\"center\" width=\"50%\">");
                  out.write(toStr(ip));
                  out.write("</td><td width=\"50%\">&nbsp;</td></tr>\n");
+            }
+            // then IPv6
+            if (!_singleIPv6Blocklist.isEmpty()) {
+                List<BigInteger> s6;
+                synchronized(_singleIPv6Blocklist) {
+                    s6 = new ArrayList(_singleIPv6Blocklist.keySet());
+                }
+                Collections.sort(s6);
+                for (BigInteger bi : s6) {
+                     out.write("<tr><td align=\"center\" width=\"50%\">");
+                     out.write(Addresses.toString(toIPBytes(bi)));
+                     out.write("</td><td width=\"50%\">&nbsp;</td></tr>\n");
+                }
             }
             out.write("</table>");
         }
@@ -830,6 +898,23 @@ public class Blocklist {
             out.write("</i>");
         }
         out.flush();
+    }
+
+    /**
+     *  Convert a (non-negative) two's complement IP to exactly 16 bytes
+     *  @since IPv6
+     */
+    private static byte[] toIPBytes(BigInteger bi) {
+        byte[] ba = bi.toByteArray();
+        int len = ba.length;
+        if (len == 16)
+            return ba;
+        byte[] rv = new byte[16];
+        if (len < 16)
+            System.arraycopy(ba, 0, rv, 16 - len, len);
+        else
+            System.arraycopy(ba, len - 16, rv, 0, 16);
+        return rv;
     }
 
     /**
