@@ -38,7 +38,7 @@ class RequestLeaseSetJob extends JobImpl {
 
     /** temp for testing */
     private static final String PROP_VARIABLE = "router.variableLeaseExpiration";
-    private static final boolean DFLT_VARIABLE = false;
+    private static final boolean DFLT_VARIABLE = true;
 
     public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseRequestState state) {
         super(ctx);

@@ -77,7 +77,7 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
     @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
-            if (_sessionId == null)
+            if (_sessionId != null)
                 throw new IllegalStateException();
             _sessionId = new SessionId();
             _sessionId.readBytes(in);

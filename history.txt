@@ -1,3 +1,11 @@
+2013-06-14 zzz
+ * I2CP: Fix deserialization of new RVLSM; enable by default
+ * i2psnark: Fix bug creating torrent with a single file in a directory
+
+2013-06-12 zzz
+ * Console: Add missing jetty jars to classpath (ticket #952)
+ * I2PTunnel: Add advanced quantity options
+
 2013-06-10 kytv
  * Translations (from Transifex)
    - Start of Turkish language translation
