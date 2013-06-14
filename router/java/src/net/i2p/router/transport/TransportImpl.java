@@ -474,7 +474,8 @@ public abstract class TransportImpl implements Transport {
 
     /** Do we increase the advertised cost when approaching conn limits? */
     protected static final boolean ADJUST_COST = true;
-    protected static final int CONGESTION_COST_ADJUSTMENT = 2;
+    /** TODO change to 2 */
+    protected static final int CONGESTION_COST_ADJUSTMENT = 1;
 
     /**
      *  What addresses are we currently listening to?
