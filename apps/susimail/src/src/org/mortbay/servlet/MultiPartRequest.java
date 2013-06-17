@@ -29,9 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 
 //import org.apache.commons.logging.Log;
 //import org.mortbay.log.LogFactory;
-import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.util.MultiMap;
-import org.eclipse.jetty.util.StringUtil;
 import org.mortbay.util.LineInput;
 
 /* ------------------------------------------------------------ */
@@ -78,7 +76,7 @@ public class MultiPartRequest
         throws IOException
     {
         _request=request;
-        String content_type = request.getHeader(HttpHeaders.CONTENT_TYPE);
+        String content_type = request.getHeader("Content-Type");
         if (!content_type.startsWith("multipart/form-data"))
             throw new IOException("Not multipart/form-data request");
 
@@ -94,7 +92,7 @@ public class MultiPartRequest
             value(content_type.substring(content_type.indexOf("boundary=")));
         
         //if(log.isDebugEnabled())log.debug("Boundary="+_boundary);
-        _byteBoundary= (_boundary+"--").getBytes(StringUtil.__ISO_8859_1);
+        _byteBoundary= (_boundary+"--").getBytes("ISO-8859-1");
         
         loadAllParts();
     }

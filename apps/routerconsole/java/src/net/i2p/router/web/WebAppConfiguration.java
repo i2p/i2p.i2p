@@ -88,7 +88,11 @@ public class WebAppConfiguration implements Configuration {
 
         File dir = libDir;
         String cp;
-        if (pluginDir.exists()) {
+        if (ctxPath.equals("/susimail")) {
+            // Ticket #957... don't know why...
+            // Only really required if started manually, but we don't know that from here
+            cp = "jetty-util.jar";
+        } else if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
@@ -123,7 +127,9 @@ public class WebAppConfiguration implements Configuration {
             if (systemCP.contains(jfile.toURI().toURL()) ||
                 (jdir != null && systemCP.contains(jdir.toURI().toURL()))) {
                 //System.err.println("Not adding " + path + " to classpath for " + appName + ", already in system classpath");
-                continue;
+                // Ticket #957... don't know why...
+                if (!ctxPath.equals("/susimail"))
+                    continue;
             }
             System.err.println("Adding " + path + " to classpath for " + appName);
             buf.append(path);
