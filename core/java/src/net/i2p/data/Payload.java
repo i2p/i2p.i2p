@@ -119,13 +119,12 @@ public class Payload extends DataStructureImpl {
     
     @Override
     public String toString() {
-        if (true) return "[Payload]";
-        StringBuilder buf = new StringBuilder(128);
+        StringBuilder buf = new StringBuilder(32);
         buf.append("[Payload: ");
-        if (_unencryptedData != null)
-            buf.append("\n\tData: ").append(DataHelper.toString(_unencryptedData, 16));
+        if (_encryptedData != null)
+            buf.append(_encryptedData.length).append(" bytes");
         else
-            buf.append("\n\tData: *encrypted* = [").append(DataHelper.toString(_encryptedData, 16)).append("]");
+            buf.append("null");
         buf.append("]");
         return buf.toString();
     }
