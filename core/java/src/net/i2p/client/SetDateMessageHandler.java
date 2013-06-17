@@ -35,6 +35,6 @@ class SetDateMessageHandler extends HandlerImpl {
         if (!_context.isRouterContext())
             Clock.getInstance().setNow(msg.getDate().getTime());
         // TODO - save router's version string for future reference
-        session.dateUpdated();
+        session.dateUpdated(msg.getVersion());
     }
 }

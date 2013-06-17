@@ -47,6 +47,7 @@ import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.VersionComparator;
 
 /**
  * Implementation of an I2P session running over TCP.  This class is NOT thread safe -
@@ -137,6 +138,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private long _lastActivity;
     private boolean _isReduced;
     private final boolean _fastReceive;
+    private volatile boolean _routerSupportsFastReceive;
 
     /**
      *  @since 0.8.9
@@ -150,7 +152,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private static final long MAX_SEND_WAIT = 10*1000;
 
-    void dateUpdated() {
+    private static final String MIN_FAST_VERSION = "0.9.4";
+
+    /** @param routerVersion as rcvd in the SetDateMessage, may be null for very old routers */
+    void dateUpdated(String routerVersion) {
+        _routerSupportsFastReceive = _context.isRouterContext() ||
+                                     (routerVersion != null && routerVersion.length() > 0 &&
+                                      VersionComparator.comp(routerVersion, MIN_FAST_VERSION) >= 0);
         _dateReceived = true;
         synchronized (_dateReceivedLock) {
             _dateReceivedLock.notifyAll();
@@ -290,7 +298,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @since 0.9.4
      */
     public boolean getFastReceive() {
-        return _fastReceive;
+        return _fastReceive && _routerSupportsFastReceive;
     }
 
     void setLeaseSet(LeaseSet ls) {

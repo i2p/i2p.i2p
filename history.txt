@@ -1,3 +1,13 @@
+2013-06-17 zzz
+ * Console: Don't display 'unsupported' message when restart button clicked
+ * I2CP: Don't send SendMessageEndMessages from client to router if
+         in fast receive mode and the router doesn't require them.
+ * NetDB:
+   - Don't instantiate unused success job for republish LS
+   - Add debug setting to encrypt RI lookups
+ * NTCP: Extend interval for sending time sync messages
+ * SusiMail: Fix classpath problem when started manually (ticket #957)
+
 2013-06-14 zzz
  * I2CP: Fix deserialization of new RVLSM; enable by default
  * i2psnark: Fix bug creating torrent with a single file in a directory

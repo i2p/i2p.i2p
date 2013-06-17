@@ -44,15 +44,15 @@ class MessagePayloadMessageHandler extends HandlerImpl {
             // if we are a new I2P lib talking to an old router
             // and we don't send this, the router will OOM as it has
             // no cleaner for old messages.
-            // TODO after 0.9.4 is out, check router version from handshake
+            // Check router version from handshake
             // and send it all the time if 0.9.3 or less
             // (needs router version saving support in SetDateMessageHandler)
-            //if (!session.getFastReceive()) {
+            if (!session.getFastReceive()) {
                 ReceiveMessageEndMessage m = new ReceiveMessageEndMessage();
                 m.setMessageId(id);
                 m.setSessionId(msg.getSessionId());
                 session.sendMessage(m);
-            //}
+            }
         } catch (DataFormatException dfe) {
             session.propogateError("Error handling a new payload message", dfe);
         } catch (I2PSessionException ise) {
