@@ -525,6 +525,8 @@ class ConnectionManager {
             _context.statManager().addRateData("stream.con.lifetimeRTT", con.getOptions().getRTT(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeCongestionSeenAt", con.getLastCongestionSeenAt(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeSendWindowSize", con.getOptions().getWindowSize(), con.getLifetime());
+            if (I2PSocketManagerFull.pcapWriter != null)
+                I2PSocketManagerFull.pcapWriter.flush();
         }
     }
     
