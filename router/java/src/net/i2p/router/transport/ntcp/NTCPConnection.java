@@ -134,7 +134,12 @@ class NTCPConnection {
      */
     private static final long STAT_UPDATE_TIME_MS = 30*1000;
 
-    private static final int META_FREQUENCY = 10*60*1000;
+    /*
+     *  Should be longer than 2 * EventPumper.MAX_EXPIRE_IDLE_TIME so it doesn't
+     *  interfere with the timeout, at least at first
+     */
+    private static final int META_FREQUENCY = 45*60*1000;
+
     /** how often we send our routerinfo unsolicited */
     private static final int INFO_FREQUENCY = 90*60*1000;
     /**
@@ -672,7 +677,7 @@ class NTCPConnection {
         
         if (_nextMetaTime <= System.currentTimeMillis()) {
             sendMeta();
-            _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
+            _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY / 2);
         }
       
         OutNetMessage msg = null;
