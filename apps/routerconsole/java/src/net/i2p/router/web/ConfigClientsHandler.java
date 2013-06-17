@@ -168,7 +168,7 @@ public class ConfigClientsHandler extends FormHandler {
                     startWebApp(app);
             }
         } else {
-            addFormError(_("Unsupported") + ' ' + _action + '.');
+            //addFormError(_("Unsupported") + ' ' + _action + '.');
         }
 
     }

@@ -137,7 +137,7 @@ public class ConfigSummaryHandler extends FormHandler {
             addFormNotice(_("Saved order of sections.") + " " +
                           _("Summary bar will refresh shortly."));
         } else {
-            addFormError(_("Unsupported"));
+            //addFormError(_("Unsupported"));
         }
     }
 

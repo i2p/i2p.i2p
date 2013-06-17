@@ -99,7 +99,7 @@ public class ConfigHomeHandler extends FormHandler {
             }
             HomeHelper.saveApps(_context, prop, apps, !("3".equals(group)));
         } else {
-            addFormError(_("Unsupported"));
+            //addFormError(_("Unsupported"));
         }
     }
 }

@@ -60,7 +60,7 @@ public class ConfigPeerHandler extends FormHandler {
         } else if (_action.startsWith("Check")) {
             addFormError(_("Unsupported"));
         } else {
-            addFormError("Unknown action \"" + _action + '"');
+            //addFormError(_("Unsupported") + ' ' + _action + '.');
         }
     }
     

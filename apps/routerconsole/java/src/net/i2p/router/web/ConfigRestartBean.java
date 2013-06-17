@@ -25,6 +25,7 @@ public class ConfigRestartBean {
         return _systemNonce;
     }
 
+    /** this also initiates the restart/shutdown based on action */
     public static String renderStatus(String urlBase, String action, String nonce) {
         RouterContext ctx = ContextHelper.getContext(null);
         String systemNonce = getNonce();

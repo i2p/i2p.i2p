@@ -31,7 +31,7 @@ public class ConfigReseedHandler extends FormHandler {
             saveChanges();
             return;
         }
-        addFormError(_("Unsupported") + ' ' + _action + '.');
+        //addFormError(_("Unsupported") + ' ' + _action + '.');
     }
 
     /** @since 0.8.9 */

@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * property is retrieved - either getAll(), getNotices() or getErrors().
  *
  */
-public class FormHandler {
+public abstract class FormHandler {
     protected RouterContext _context;
     protected Log _log;
     protected Map _settings;

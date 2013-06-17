@@ -46,7 +46,7 @@ public class ConfigKeyringHandler extends FormHandler {
                 }
             }
         } else {
-            addFormError(_("Unsupported"));
+            //addFormError(_("Unsupported"));
         }
     }
 
