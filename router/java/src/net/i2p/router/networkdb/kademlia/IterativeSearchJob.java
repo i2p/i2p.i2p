@@ -85,7 +85,8 @@ class IterativeSearchJob extends FloodSearchJob {
      */
     private static final int MAX_CONCURRENT = 1;
 
-    private static final boolean ENCRYPT_RI_SEARCHES = false;
+    /** testing */
+    private static final String PROP_ENCRYPT_RI = "router.encryptRouterLookups";
 
     public IterativeSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx, facade, key, onFind, onFailed, timeoutMs, isLease);
@@ -257,7 +258,7 @@ class IterativeSearchJob extends FloodSearchJob {
             _sentTime.put(peer, Long.valueOf(now));
 
             I2NPMessage outMsg = null;
-            if (_isLease || ENCRYPT_RI_SEARCHES) {
+            if (_isLease || getContext().getBooleanProperty(PROP_ENCRYPT_RI)) {
                 // Full ElG is fairly expensive so only do it for LS lookups
                 // if we have the ff RI, garlic encrypt it
                 RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
