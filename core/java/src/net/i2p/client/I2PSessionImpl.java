@@ -68,7 +68,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** this session's Id */
     private SessionId _sessionId;
     /** currently granted lease set, or null */
-    private LeaseSet _leaseSet;
+    private volatile LeaseSet _leaseSet;
 
     /** hostname of router - will be null if in RouterContext */
     protected String _hostname;
@@ -101,7 +101,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** hashes of lookups we are waiting for */
     protected final LinkedBlockingQueue<LookupWaiter> _pendingLookups = new LinkedBlockingQueue();
     protected final Object _bwReceivedLock = new Object();
-    protected int[] _bwLimits;
+    protected volatile int[] _bwLimits;
     
     protected I2PClientMessageHandlerMap _handlerMap;
     
