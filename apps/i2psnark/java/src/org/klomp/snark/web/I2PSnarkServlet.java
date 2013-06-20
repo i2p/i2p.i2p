@@ -502,6 +502,23 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("\">");
             if (isDegraded)
                 out.write("</a>");
+            for (Snark s : snarks) {
+                if (s.isStopped()) {
+                    // show startall too
+                    out.write("<br>");
+                    if (isDegraded)
+                        out.write("<a href=\"/" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                    else
+                        out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
+                    out.write(_("Start all stopped torrents"));
+                    out.write("\" src=\"" + _imgPath + "start_all.png\" alt=\"");
+                    out.write(_("Start All"));
+                    out.write("\">");
+                    if (isDegraded)
+                        out.write("</a>");
+                    break;
+                }
+            }
         } else if ((!_manager.util().isConnecting()) && !snarks.isEmpty()) {
             if (isDegraded)
                 out.write("<a href=\"/" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
