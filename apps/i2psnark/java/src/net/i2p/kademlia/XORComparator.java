@@ -2,7 +2,6 @@ package net.i2p.kademlia;
 
 import java.util.Comparator;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.SimpleDataStructure;
 
 /**
@@ -21,8 +20,20 @@ class XORComparator<T extends SimpleDataStructure> implements Comparator<T> {
     }
 
     public int compare(T lhs, T rhs) {
-        byte lhsDelta[] = DataHelper.xor(lhs.getData(), _base);
-        byte rhsDelta[] = DataHelper.xor(rhs.getData(), _base);
-        return DataHelper.compareTo(lhsDelta, rhsDelta);
+        // same as the following but byte-by-byte for efficiency
+        //byte lhsDelta[] = DataHelper.xor(lhs.getData(), _base);
+        //byte rhsDelta[] = DataHelper.xor(rhs.getData(), _base);
+        //return DataHelper.compareTo(lhsDelta, rhsDelta);
+        byte lhsb[] = lhs.getData();
+        byte rhsb[] = rhs.getData();
+        for (int i = 0; i < _base.length; i++) {
+            int ld = (lhsb[i] ^ _base[i]) & 0xff;
+            int rd = (rhsb[i] ^ _base[i]) & 0xff;
+            if (ld < rd)
+                return -1;
+            if (ld > rd)
+                return 1;
+        }
+        return 0;
     }
 }
