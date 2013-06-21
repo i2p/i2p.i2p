@@ -380,7 +380,7 @@ class IterativeSearchJob extends FloodSearchJob {
                       ", peers queried: " + tries);
         }
         getContext().statManager().addRateData("netDb.failedTime", time, 0);
-        getContext().statManager().addRateData("netDb.retries", Math.max(0, tries - 1), 0);
+        getContext().statManager().addRateData("netDb.failedRetries", Math.max(0, tries - 1), 0);
         for (Job j : _onFailed) {
             getContext().jobQueue().addJob(j);
         }
@@ -414,7 +414,7 @@ class IterativeSearchJob extends FloodSearchJob {
             _log.info(getJobId() + ": Iterative search for " + _key + " successful after " + time +
                       ", peers queried: " + tries);
         getContext().statManager().addRateData("netDb.successTime", time, 0);
-        getContext().statManager().addRateData("netDb.retries", tries - 1, 0);
+        getContext().statManager().addRateData("netDb.successRetries", tries - 1, 0);
         for (Job j : _onFind) {
             getContext().jobQueue().addJob(j);
         }
