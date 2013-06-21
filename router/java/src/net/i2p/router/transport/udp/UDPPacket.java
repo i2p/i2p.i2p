@@ -202,7 +202,7 @@ class UDPPacket implements CDQEntry {
             off += payloadLength;
             System.arraycopy(_data, _packet.getOffset() + MAC_SIZE, _validateBuf, off, IV_SIZE);
             off += IV_SIZE;
-            DataHelper.toLong(_validateBuf, off, 2, payloadLength ^ PacketBuilder.PROTOCOL_VERSION);
+            DataHelper.toLong(_validateBuf, off, 2, payloadLength /* ^ PacketBuilder.PROTOCOL_VERSION */ );
             off += 2;
 
             eq = _context.hmac().verify(macKey, _validateBuf, 0, off, _data, _packet.getOffset(), MAC_SIZE);
@@ -241,10 +241,18 @@ class UDPPacket implements CDQEntry {
      */
     public void decrypt(SessionKey cipherKey) {
         verifyNotReleased(); 
-        Arrays.fill(_ivBuf, (byte)0);
         System.arraycopy(_data, MAC_SIZE, _ivBuf, 0, IV_SIZE);
         int len = _packet.getLength();
-        _context.aes().decrypt(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _data, _packet.getOffset() + MAC_SIZE + IV_SIZE, cipherKey, _ivBuf, len - MAC_SIZE - IV_SIZE);
+        // As of 0.9.7, ignore padding beyond the last mod 16,
+        // it could otherwise blow up in decryption.
+        // This allows for better obfuscation.
+        // Probably works without this since _data is bigger than necessary, but let's not
+        // bother decrypting and risk overrun.
+        int rem = len & 0x0f;
+        if (rem != 0)
+            len -= rem;
+        int off = _packet.getOffset() + MAC_SIZE + IV_SIZE;
+        _context.aes().decrypt(_data, off, _data, off, cipherKey, _ivBuf, len - MAC_SIZE - IV_SIZE);
     }
 
     /**

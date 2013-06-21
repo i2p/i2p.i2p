@@ -127,6 +127,7 @@ public class CryptixAESEngine extends AESEngine {
     
     /**
      *  @param iv 16 bytes
+     *  @param length must be a multiple of 16 (will overrun to next mod 16 if not)
      */
     @Override
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
@@ -135,6 +136,7 @@ public class CryptixAESEngine extends AESEngine {
 
     /**
      *  @param iv 16 bytes starting at ivOffset
+     *  @param length must be a multiple of 16 (will overrun to next mod 16 if not)
      */
     @Override
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
@@ -169,16 +171,25 @@ public class CryptixAESEngine extends AESEngine {
 ****/
 
         int numblock = length / 16;
-        if (length % 16 != 0) numblock++;
+        if (length % 16 != 0) {
+            // may not work, it will overrun payload length and could AIOOBE
+            numblock++;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("not %16 " + length, new Exception());
+        }
 
         byte prev[] = SimpleByteCache.acquire(16);
         byte cur[] = SimpleByteCache.acquire(16);
         System.arraycopy(iv, ivOffset, prev, 0, 16);
         
         for (int x = 0; x < numblock; x++) {
-            System.arraycopy(payload, payloadIndex + (x * 16), cur, 0, 16);
-            decryptBlock(payload, payloadIndex + (x * 16), sessionKey, out, outIndex + (x * 16));
-            DataHelper.xor(out, outIndex + x * 16, prev, 0, out, outIndex + x * 16, 16);
+            System.arraycopy(payload, payloadIndex, cur, 0, 16);
+            decryptBlock(payload, payloadIndex, sessionKey, out, outIndex);
+            payloadIndex += 16;
+            //DataHelper.xor(out, outIndex + x * 16, prev, 0, out, outIndex + x * 16, 16);
+            for (int i = 0; i < 16; i++) {
+                out[outIndex++] ^= prev[i];
+            }
             iv = prev; // just use IV to switch 'em around
             prev = cur;
             cur = iv;

@@ -121,8 +121,11 @@ class PacketBuilder {
     static final int TYPE_SREQ = 52;
     static final int TYPE_CREAT = 53;
 
-    /** we only talk to people of the right version */
+    /** we only talk to people of the right version
+     *  Commented out to prevent findbugs noop complaint
+     *  If we ever change this, uncomment below and in UDPPacket
     static final int PROTOCOL_VERSION = 0;
+     */
     
     /** if no extended options or rekey data, which we don't support  = 37 */
     public static final int HEADER_SIZE = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE + 1 + 4;
@@ -1317,7 +1320,7 @@ class PacketBuilder {
         off += encryptSize;
         System.arraycopy(iv, 0, data, off, UDPPacket.IV_SIZE);
         off += UDPPacket.IV_SIZE;
-        DataHelper.toLong(data, off, 2, encryptSize ^ PROTOCOL_VERSION);
+        DataHelper.toLong(data, off, 2, encryptSize /* ^ PROTOCOL_VERSION */ );
         
         int hmacOff = packet.getPacket().getOffset();
         int hmacLen = encryptSize + UDPPacket.IV_SIZE + 2;
