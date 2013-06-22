@@ -1,3 +1,6 @@
+2013-06-22 meeh
+ * I2PTunnel: Change connect proxy default to outproxy-tor.meeh.i2p after h2ik's AWOL
+
 2013-06-17 zzz
  * Console: Don't display 'unsupported' message when restart button clicked
  * I2CP: Don't send SendMessageEndMessages from client to router if
