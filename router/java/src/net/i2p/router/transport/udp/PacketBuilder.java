@@ -614,8 +614,14 @@ class PacketBuilder {
         _context.aes().encrypt(data, sigBegin, data, sigBegin, state.getCipherKey(), iv, encrWrite);
         
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
+        int rem = off & 0x0f;
+        if (rem != 0) {
+            // typ. 12 for IPv4 and 0 for IPv6
+            int pad = 16 - rem;
+            //_log.debug("Adding padding: " + pad);
+            _context.random().nextBytes(data, off, pad);
+            off += pad;
+        }
         packet.getPacket().setLength(off);
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());

@@ -1,5 +1,17 @@
+2013-06-22 zzz
+ * SSU: Pad session created message with random data instead of zeros
+
 2013-06-22 meeh
  * I2PTunnel: Change connect proxy default to outproxy-tor.meeh.i2p after h2ik's AWOL
+
+2013-06-21 zzz
+ * Crypto: AES decrypt speedups
+ * NetDB, i2psnark: Speed up XORComparators
+ * SSU: Ignore non-mod-16 padding
+
+2013-06-20 zzz
+ * i2psnark: Show start-all button even if tunnel is open,
+   if at least one torrent is stopped (ticket #808)
 
 2013-06-17 zzz
  * Console: Don't display 'unsupported' message when restart button clicked
