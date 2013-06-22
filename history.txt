@@ -1,5 +1,7 @@
 2013-06-22 zzz
- * SSU: Pad session created message with random data instead of zeros
+ * SSU:
+   - Pad messages with random data instead of zeros
+   - Implement non-mod-16 padding, disabled for now
 
 2013-06-22 meeh
  * I2PTunnel: Change connect proxy default to outproxy-tor.meeh.i2p after h2ik's AWOL

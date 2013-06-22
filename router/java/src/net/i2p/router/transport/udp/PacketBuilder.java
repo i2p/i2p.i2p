@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -155,6 +156,8 @@ class PacketBuilder {
      */
     private static final int MAX_RESEND_ACKS_SMALL = 4;
 
+    private static final String PROP_PADDING = "i2np.udp.padding";
+
     public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
         _transport = transport;
@@ -222,7 +225,8 @@ class PacketBuilder {
                                  List<Long> ackIdsRemaining, int newAckCount,
                                  List<ACKBitfield> partialACKsRemaining) {
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
 
         StringBuilder msg = null;
@@ -388,14 +392,9 @@ class PacketBuilder {
 
         
         // pad up so we're on the encryption boundary
-        // we could do additional random padding here if desired
-        int mod = off % 16;
-        if (mod > 0) {
-            int padSize = 16 - mod;
-            _context.random().nextBytes(data, off, padSize);
-            off += padSize;
-        }
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off, currentMTU);
+        pkt.setLength(off);
 
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
@@ -444,7 +443,8 @@ class PacketBuilder {
      */
     public UDPPacket buildACK(PeerState peer, List<ACKBitfield> ackBitfields) {
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
         StringBuilder msg = null;
@@ -521,12 +521,10 @@ class PacketBuilder {
         if (msg != null)
             _log.debug(msg.toString());
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
@@ -546,7 +544,8 @@ class PacketBuilder {
      */
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState state, int externalPort, SessionKey ourIntroKey) {
         UDPPacket packet = buildPacketHeader(SESSION_CREATED_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
         InetAddress to = null;
@@ -614,15 +613,9 @@ class PacketBuilder {
         _context.aes().encrypt(data, sigBegin, data, sigBegin, state.getCipherKey(), iv, encrWrite);
         
         // pad up so we're on the encryption boundary
-        int rem = off & 0x0f;
-        if (rem != 0) {
-            // typ. 12 for IPv4 and 0 for IPv6
-            int pad = 16 - rem;
-            //_log.debug("Adding padding: " + pad);
-            _context.random().nextBytes(data, off, pad);
-            off += pad;
-        }
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());
         SimpleByteCache.release(iv);
@@ -644,7 +637,8 @@ class PacketBuilder {
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
         UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
 
         byte toIP[] = state.getSentIP();
@@ -679,9 +673,9 @@ class PacketBuilder {
         // we can pad here if we want, maybe randomized?
         
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
         setTo(packet, to, port);
         packet.setMessageType(TYPE_SREQ);
@@ -727,9 +721,10 @@ class PacketBuilder {
      * 
      * @return ready to send packets, or null if there was a problem
      */
-    public UDPPacket buildSessionConfirmedPacket(OutboundEstablishState state, int fragmentNum, int numFragments, byte identity[]) {
+    private UDPPacket buildSessionConfirmedPacket(OutboundEstablishState state, int fragmentNum, int numFragments, byte identity[]) {
         UDPPacket packet = buildPacketHeader(SESSION_CONFIRMED_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
 
         InetAddress to = null;
@@ -764,33 +759,28 @@ class PacketBuilder {
             DataHelper.toLong(data, off, 4, state.getSentSignedOnTime());
             off += 4;
             
-            int paddingRequired = 0;
             // we need to pad this so we're at the encryption boundary
-            if ( (off + Signature.SIGNATURE_BYTES) % 16 != 0)
-                paddingRequired += 16 - ((off + Signature.SIGNATURE_BYTES) % 16);
-            
-            // add an arbitrary number of 16byte pad blocks too...
-            
-            for (int i = 0; i < paddingRequired; i++) {
-                data[off] = (byte)_context.random().nextInt(255);
-                off++;
+            int mod = (off + Signature.SIGNATURE_BYTES) & 0x0f;
+            if (mod != 0) {
+                int paddingRequired = 16 - mod;
+                // add an arbitrary number of 16byte pad blocks too ???
+                _context.random().nextBytes(data, off, paddingRequired);
+                off += paddingRequired;
             }
             
             // BUG: NPE here if null signature
             System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
             off += Signature.SIGNATURE_BYTES;
         } else {
-            // nothing more to add beyond the identity fragment, though we can
-            // pad here if we want.  maybe randomized?
+            // We never get here (see above)
 
+            // nothing more to add beyond the identity fragment
             // pad up so we're on the encryption boundary
-            // TODO: why not random data?
-            if ( (off % 16) != 0)
-                off += 16 - (off % 16);
+            off = pad1(data, off);
         } 
-        packet.getPacket().setLength(off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, state.getCipherKey(), state.getMACKey());
-        
         setTo(packet, to, state.getSentPort());
         packet.setMessageType(TYPE_CONF);
         return packet;
@@ -882,9 +872,11 @@ class PacketBuilder {
         // no body in this message
         
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, cipherKey, macKey);
         setTo(packet, addr, port);
         return packet;
@@ -905,9 +897,18 @@ class PacketBuilder {
     public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toIntroKey, long nonce, SessionKey aliceIntroKey) {
         return buildPeerTestFromAlice(toIP, toPort, toIntroKey, toIntroKey, nonce, aliceIntroKey);
     }
-    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toCipherKey, SessionKey toMACKey, long nonce, SessionKey aliceIntroKey) {
+
+    /**
+     * Build a packet as if we are Alice and we either want Bob to begin a 
+     * peer test or Charlie to finish a peer test.
+     * 
+     * @return ready to send packet, or null if there was a problem
+     */
+    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toCipherKey, SessionKey toMACKey,
+                                            long nonce, SessionKey aliceIntroKey) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending peer test " + nonce + " to Bob");
@@ -922,12 +923,10 @@ class PacketBuilder {
         System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, toCipherKey, toMACKey);
         setTo(packet, toIP, toPort);
         packet.setMessageType(TYPE_TFA);
@@ -941,7 +940,8 @@ class PacketBuilder {
      */
     public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending peer test " + nonce + " to Alice");
@@ -959,12 +959,10 @@ class PacketBuilder {
         System.arraycopy(charlieIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, aliceIntroKey, aliceIntroKey);
         setTo(packet, aliceIP, alicePort);
         packet.setMessageType(TYPE_TTA);
@@ -980,7 +978,8 @@ class PacketBuilder {
                                             InetAddress charlieIP, int charliePort, 
                                             SessionKey charlieCipherKey, SessionKey charlieMACKey) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending peer test " + nonce + " to Charlie");
@@ -998,12 +997,10 @@ class PacketBuilder {
         System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, charlieCipherKey, charlieMACKey);
         setTo(packet, charlieIP, charliePort);
         packet.setMessageType(TYPE_TBC);
@@ -1017,7 +1014,8 @@ class PacketBuilder {
      */
     public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, SessionKey bobCipherKey, SessionKey bobMACKey) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending peer test " + nonce + " to Bob");
@@ -1035,12 +1033,10 @@ class PacketBuilder {
         System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, bobCipherKey, bobMACKey);
         setTo(packet, bobIP, bobPort);
         packet.setMessageType(TYPE_TCB);
@@ -1087,9 +1083,11 @@ class PacketBuilder {
         return rv;
     }
     
-    public UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[], long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
+    private UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[],
+                                        long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
         UDPPacket packet = buildPacketHeader(PEER_RELAY_REQUEST_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
         byte ourIP[] = getOurExplicitIP();
@@ -1130,12 +1128,10 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 4, introNonce);
         off += 4;
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         if (encrypt)
             authenticate(packet, new SessionKey(introKey), new SessionKey(introKey));
         setTo(packet, introHost, introPort);
@@ -1151,7 +1147,8 @@ class PacketBuilder {
     
     UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
         UDPPacket packet = buildPacketHeader(PEER_RELAY_INTRO_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending intro to " + charlie + " for " + alice);
@@ -1173,12 +1170,10 @@ class PacketBuilder {
             off += sz;
         }
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, charlie.getCurrentCipherKey(), charlie.getCurrentMACKey());
         setTo(packet, charlie.getRemoteIPAddress(), charlie.getRemotePort());
         packet.setMessageType(TYPE_INTRO);
@@ -1200,7 +1195,8 @@ class PacketBuilder {
         }
         
         UDPPacket packet = buildPacketHeader(PEER_RELAY_RESPONSE_FLAG_BYTE);
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
         if (_log.shouldLog(Log.INFO))
@@ -1226,12 +1222,10 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 4, nonce);
         off += 4;
         
-        // we can pad here if we want, maybe randomized?
-        
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
-        packet.getPacket().setLength(off);
+        off = pad1(data, off);
+        off = pad2(data, off);
+        pkt.setLength(off);
         authenticate(packet, aliceIntroKey, aliceIntroKey);
         setTo(packet, aliceAddr, alice.getPort());
         packet.setMessageType(TYPE_RESP);
@@ -1281,10 +1275,71 @@ class PacketBuilder {
     }
 
     private static void setTo(UDPPacket packet, InetAddress ip, int port) {
-        packet.getPacket().setAddress(ip);
-        packet.getPacket().setPort(port);
+        DatagramPacket pkt = packet.getPacket();
+        pkt.setAddress(ip);
+        pkt.setPort(port);
     }
-    
+
+    /**
+     * Pad up to next 16 byte boundary and return new offset.
+     * These bytes will be encrypted.
+     * This must be called before encryption.
+     *
+     * @return new offset
+     * @since 0.9.7
+     */
+    private int pad1(byte[] data, int off) {
+        int mod = off & 0x0f;
+        if (mod == 0)
+            return off;
+        int padSize = 16 - mod;
+        _context.random().nextBytes(data, off, padSize);
+        return off + padSize;
+    }
+
+    /** max is one less */
+    private static final int MAX_PAD2 = 16;
+
+    /**
+     * Pad a random amount (not mod 16) and return new offset.
+     * Packet must be well under the max length (MTU).
+     * These bytes will be included in the MAC calculation but not encrypted.
+     * This must be called before encryption.
+     *
+     * @return new offset
+     * @since 0.9.7
+     */
+    private int pad2(byte[] data, int off) {
+        if (!_context.getBooleanProperty(PROP_PADDING))
+            return off;
+        int padSize = _context.random().nextInt(MAX_PAD2);
+        if (padSize == 0)
+            return off;
+        _context.random().nextBytes(data, off, padSize);
+        return off + padSize;
+    }
+
+    /**
+     * Pad a random amount (not mod 16) and return new offset,
+     * while honoring the max length.
+     * These bytes will be included in the MAC calculation but not encrypted.
+     * This must be called before encryption.
+     *
+     * @return new offset
+     * @since 0.9.7
+     */
+    private int pad2(byte[] data, int off, int maxLen) {
+        if (!_context.getBooleanProperty(PROP_PADDING))
+            return off;
+        if (off >= maxLen)
+            return off;
+        int padSize = _context.random().nextInt(Math.min(MAX_PAD2, 1 + maxLen - off));
+        if (padSize == 0)
+            return off;
+        _context.random().nextBytes(data, off, padSize);
+        return off + padSize;
+    }
+
     /**
      * Encrypt the packet with the cipher key and a new random IV, generate a 
      * MAC for that encrypted data and IV, and store the result in the packet.
@@ -1308,43 +1363,52 @@ class PacketBuilder {
      *     HMAC-SHA256(payload || IV || (payloadLength ^ protocolVersion), macKey)[0:15]
      *
      * @param packet prepared packet with the first 32 bytes empty and a length
-     *               whose size is mod 16
+     *               whose size is mod 16.
+     *               As of 0.9.7, length non-mod-16 is allowed; the
+     *               last 1-15 bytes are included in the MAC calculation but are not encrypted.
      * @param cipherKey key to encrypt the payload 
      * @param macKey key to generate the, er, MAC
      * @param iv IV to deliver
      */
     private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, byte[] iv) {
         long before = System.currentTimeMillis();
-        int encryptOffset = packet.getPacket().getOffset() + UDPPacket.IV_SIZE + UDPPacket.MAC_SIZE;
-        int encryptSize = packet.getPacket().getLength() - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
-        byte data[] = packet.getPacket().getData();
+        DatagramPacket pkt = packet.getPacket();
+        int off = pkt.getOffset();
+        int hmacOff = off;
+        int encryptOffset = off + UDPPacket.IV_SIZE + UDPPacket.MAC_SIZE;
+        // including 1-15 pad
+        int totalSize = pkt.getLength() - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - off;
+        int mod = totalSize & 0x0f;
+        // not including 1-15 pad
+        int encryptSize = totalSize - mod;
+        byte data[] = pkt.getData();
         _context.aes().encrypt(data, encryptOffset, data, encryptOffset, cipherKey, iv, encryptSize);
         
         // ok, now we need to prepare things for the MAC, which requires reordering
-        int off = packet.getPacket().getOffset();
-        System.arraycopy(data, encryptOffset, data, off, encryptSize);
-        off += encryptSize;
+        // Payload + IV + payloadLength
+        System.arraycopy(data, encryptOffset, data, off, totalSize);
+        off += totalSize;
         System.arraycopy(iv, 0, data, off, UDPPacket.IV_SIZE);
         off += UDPPacket.IV_SIZE;
-        DataHelper.toLong(data, off, 2, encryptSize /* ^ PROTOCOL_VERSION */ );
+        DataHelper.toLong(data, off, 2, totalSize /* ^ PROTOCOL_VERSION */ );
         
-        int hmacOff = packet.getPacket().getOffset();
-        int hmacLen = encryptSize + UDPPacket.IV_SIZE + 2;
+        int hmacLen = totalSize + UDPPacket.IV_SIZE + 2;
         //Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);
         byte[] ba = SimpleByteCache.acquire(Hash.HASH_LENGTH);
         _context.hmac().calculate(macKey, data, hmacOff, hmacLen, ba, 0);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Authenticating " + packet.getPacket().getLength() +
+            _log.debug("Authenticating " + pkt.getLength() +
                        "\nIV: " + Base64.encode(iv) +
                        "\nraw mac: " + Base64.encode(ba) +
                        "\nMAC key: " + macKey);
         // ok, now lets put it back where it belongs...
-        System.arraycopy(data, hmacOff, data, encryptOffset, encryptSize);
+        // MAC + IV + payload
+        System.arraycopy(data, hmacOff, data, encryptOffset, totalSize);
         //System.arraycopy(hmac.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
         System.arraycopy(ba, 0, data, hmacOff, UDPPacket.MAC_SIZE);
-        System.arraycopy(iv, 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
         SimpleByteCache.release(ba);
+        System.arraycopy(iv, 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
         long timeToAuth = System.currentTimeMillis() - before;
         _context.statManager().addRateData("udp.packetAuthTime", timeToAuth, timeToAuth);
         if (timeToAuth > 100)
