@@ -50,7 +50,7 @@ class FloodfillMonitorJob extends JobImpl {
         // there's a lot of eligible non-floodfills, keep them from all jumping in at once
         // To do: somehow assess the size of the network to make this adaptive?
         if (!ff)
-            delay *= 7;
+            delay *= 4; // this was 7, reduced for moar FFs --zab
         requeue(delay);
     }
 
