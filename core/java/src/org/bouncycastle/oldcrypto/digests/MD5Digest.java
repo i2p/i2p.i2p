@@ -11,7 +11,7 @@ public class MD5Digest
 
     private int     H1, H2, H3, H4;         // IV's
 
-    private int[]   X = new int[16];
+    private final int[]   X = new int[16];
     private int     xOff;
 
     /**
@@ -74,7 +74,7 @@ public class MD5Digest
         X[15] = (int)(bitLength >>> 32);
     }
 
-    private void unpackWord(
+    private static void unpackWord(
         int     word,
         byte[]  out,
         int     outOff)
@@ -157,7 +157,7 @@ public class MD5Digest
     /*
      * rotate int x left n bits.
      */
-    private int rotateLeft(
+    private static int rotateLeft(
         int x,
         int n)
     {
@@ -167,7 +167,7 @@ public class MD5Digest
     /*
      * F, G, H and I are the basic MD5 functions.
      */
-    private int F(
+    private static int F(
         int u,
         int v,
         int w)
@@ -175,7 +175,7 @@ public class MD5Digest
         return (u & v) | (~u & w);
     }
 
-    private int G(
+    private static int G(
         int u,
         int v,
         int w)
@@ -183,7 +183,7 @@ public class MD5Digest
         return (u & w) | (v & ~w);
     }
 
-    private int H(
+    private static int H(
         int u,
         int v,
         int w)
@@ -191,7 +191,7 @@ public class MD5Digest
         return u ^ v ^ w;
     }
 
-    private int K(
+    private static int K(
         int u,
         int v,
         int w)

@@ -35,7 +35,7 @@ import org.bouncycastle.oldcrypto.Digest;
 public abstract class GeneralDigest
     implements Digest
 {
-    private byte[]  xBuf;
+    private final byte[]  xBuf;
     private int     xBufOff;
 
     private long    byteCount;
