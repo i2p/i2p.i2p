@@ -221,46 +221,51 @@ public class BDecoder
       {
         c = read();
         if (c == 'e')
-          return new BEValue(BigInteger.ZERO);
+          return new BEValue(Integer.valueOf(0));
         else
           throw new InvalidBEncodingException("'e' expected after zero,"
                                               + " not '" + (char)c + "'");
       }
 
     // XXX - We don't support more the 255 char big integers
-    char[] chars = new char[256];
-    int off = 0;
+    StringBuilder chars = new StringBuilder(16);
 
     if (c == '-')
       {
         c = read();
         if (c == '0')
           throw new InvalidBEncodingException("Negative zero not allowed");
-        chars[off] = (char)c;
-        off++;
+        chars.append((char)c);
       }
 
     if (c < '1' || c > '9')
       throw new InvalidBEncodingException("Invalid Integer start '"
                                           + (char)c + "'");
-    chars[off] = (char)c;
-    off++;
+    chars.append((char)c);
 
     c = read();
-    int i = c - '0';
-    while(i >= 0 && i <= 9)
+    while(c >= '0' && c <= '9')
       {
-        chars[off] = (char)c;
-        off++;
+        chars.append((char)c);
         c = read();
-        i = c - '0';
       }
 
     if (c != 'e')
       throw new InvalidBEncodingException("Integer should end with 'e'");
 
-    String s = new String(chars, 0, off);
-    return new BEValue(new BigInteger(s));
+    String s = chars.toString();
+    int len = s.length();
+    // save a little space if we're sure it will fit
+    Number num;
+    if (len < 10)
+        num = Integer.valueOf(s);
+    else if (len < 19)
+        num = Long.valueOf(s);
+    else if (len > 256)
+        throw new InvalidBEncodingException("Too many digits: " + len);
+    else
+        num = new BigInteger(s);
+    return new BEValue(num);
   }
 
   /**
