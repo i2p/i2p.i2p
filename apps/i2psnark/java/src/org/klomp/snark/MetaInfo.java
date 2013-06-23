@@ -501,12 +501,17 @@ public class MetaInfo
    * Creates a copy of this MetaInfo that shares everything except the
    * announce URL.
    * Drops any announce-list.
+   * Preserves infohash and info map, including any non-standard fields.
+   * @param announce may be null
    */
-  public MetaInfo reannounce(String announce)
+  public MetaInfo reannounce(String announce) throws InvalidBEncodingException
   {
-    return new MetaInfo(announce, name, name_utf8, files,
-                        lengths, piece_length,
-                        piece_hashes, length, privateTorrent, null);
+        Map<String, BEValue> m = new HashMap();
+        if (announce != null)
+            m.put("announce", new BEValue(DataHelper.getUTF8(announce)));
+        Map info = createInfoMap();
+        m.put("info", new BEValue(info));
+        return new MetaInfo(m);
   }
 
   /**
@@ -539,6 +544,9 @@ public class MetaInfo
     // or else we will lose any non-standard keys and corrupt the infohash.
     if (infoMap != null)
         return Collections.unmodifiableMap(infoMap);
+    // we should only get here if serving a magnet on a torrent we created
+    if (_log.shouldLog(Log.WARN))
+        _log.warn("Creating new infomap", new Exception());
     // otherwise we must create it
     Map info = new HashMap();
     info.put("name", name);
