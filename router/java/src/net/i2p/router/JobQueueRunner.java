@@ -6,13 +6,13 @@ import net.i2p.util.Log;
 class JobQueueRunner implements Runnable {
     private final Log _log;
     private final RouterContext _context;
-    private boolean _keepRunning;
+    private volatile boolean _keepRunning;
     private final int _id;
-    private Job _currentJob;
-    private Job _lastJob;
-    private long _lastBegin;
-    private long _lastEnd;
-    private int _state;
+    private volatile Job _currentJob;
+    private volatile Job _lastJob;
+    private volatile long _lastBegin;
+    private volatile long _lastEnd;
+    private volatile int _state;
     
     public JobQueueRunner(RouterContext context, int id) {
         _context = context;

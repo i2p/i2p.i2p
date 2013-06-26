@@ -53,7 +53,7 @@ public class JobQueue {
     /** will we allow the # job runners to grow beyond 1? */
     private boolean _allowParallelOperation;
     /** have we been killed or are we alive? */
-    private boolean _alive;
+    private volatile boolean _alive;
     
     private final Object _jobLock;
     private volatile long _nextPumperRun;
