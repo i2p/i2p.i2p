@@ -18,10 +18,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class JobImpl implements Job {
     private final RouterContext _context;
     private final JobTiming _timing;
-    private static AtomicLong _idSrc = new AtomicLong();
+    private static final AtomicLong _idSrc = new AtomicLong();
     private final long _id;
     //private Exception _addedBy;
-    private long _madeReadyOn;
+    private volatile long _madeReadyOn;
     
     public JobImpl(RouterContext context) {
         _context = context;

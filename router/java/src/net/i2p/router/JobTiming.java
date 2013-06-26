@@ -16,9 +16,9 @@ import net.i2p.util.Clock;
  * For use by the router only. Not to be used by applications or plugins.
  */
 public class JobTiming implements Clock.ClockUpdateListener {
-    private long _start;
-    private long _actualStart;
-    private long _actualEnd;
+    private volatile long _start;
+    private volatile long _actualStart;
+    private volatile long _actualEnd;
     private final RouterContext _context;
     
     public JobTiming(RouterContext context) {
