@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
@@ -40,18 +41,16 @@ public class JobQueue {
     /** Integer (runnerId) to JobQueueRunner for created runners */
     private final Map<Integer, JobQueueRunner> _queueRunners;
     /** a counter to identify a job runner */
-    private volatile static int _runnerId = 0;
+    private final static AtomicInteger _runnerId = new AtomicInteger(0);
     /** list of jobs that are ready to run ASAP */
     private final BlockingQueue<Job> _readyJobs;
     /** SortedSet of jobs that are scheduled for running in the future, earliest first */
     private final Set<Job> _timedJobs;
     /** job name to JobStat for that job */
     private final Map<String, JobStats> _jobStats;
-    /** how many job queue runners can go concurrently */
-    private int _maxRunners = 1; 
     private final QueuePumper _pumper;
     /** will we allow the # job runners to grow beyond 1? */
-    private boolean _allowParallelOperation;
+    private volatile boolean _allowParallelOperation;
     /** have we been killed or are we alive? */
     private volatile boolean _alive;
     
@@ -141,11 +140,11 @@ public class JobQueue {
         //_context.statManager().createRateStat("jobQueue.jobRunnerInactive", "How long are runners inactive?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         _alive = true;
-        _readyJobs = new LinkedBlockingQueue();
-        _timedJobs = new TreeSet(new JobComparator());
+        _readyJobs = new LinkedBlockingQueue<Job>();
+        _timedJobs = new TreeSet<Job>(new JobComparator());
         _jobLock = new Object();
-        _queueRunners = new ConcurrentHashMap(RUNNERS);
-        _jobStats = new ConcurrentHashMap();
+        _queueRunners = new ConcurrentHashMap<Integer,JobQueueRunner>(RUNNERS);
+        _jobStats = new ConcurrentHashMap<String,JobStats>();
         _pumper = new QueuePumper();
         I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
         //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
@@ -317,7 +316,7 @@ public class JobQueue {
         }
         _queueRunners.clear();
         _jobStats.clear();
-        _runnerId = 0;
+        _runnerId.set(0);
 
       /********
         if (_log.shouldLog(Log.WARN)) {
@@ -440,7 +439,7 @@ public class JobQueue {
                 for (int i = _queueRunners.size(); i < numThreads; i++) {
                     JobQueueRunner runner = new JobQueueRunner(_context, i);
                     _queueRunners.put(Integer.valueOf(i), runner);
-                    Thread t = new I2PThread(runner, "JobQueue " + (++_runnerId) + '/' + numThreads, false);
+                    Thread t = new I2PThread(runner, "JobQueue " + _runnerId.incrementAndGet() + '/' + numThreads, false);
                     //t.setPriority(I2PThread.MAX_PRIORITY-1);
                     t.start();
                 }
