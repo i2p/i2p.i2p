@@ -141,6 +141,23 @@ class FloodfillMonitorJob extends JobImpl {
                    happy = false;
             }
         }
+        
+        if (_log.shouldLog(Log.DEBUG)) {
+            final RouterContext rc = getContext();
+            final String log = String.format(
+                    "FF criteria breakdown: happy=%b, capabilities=%s, maxLag=%d, known=%d, " +
+                    "active=%d, participating=%d, offset=%d, ssuAddr=%b",
+                    happy, 
+                    rc.router().getRouterInfo().getCapabilities(),
+                    rc.jobQueue().getMaxLag(),
+                    _facade.getKnownRouters(),
+                    rc.commSystem().countActivePeers(),
+                    rc.tunnelManager().getParticipatingCount(),
+                    Math.abs(rc.clock().getOffset()),
+                    rc.router().getRouterInfo().getTargetAddress("SSU")
+                    );
+            _log.debug(log);
+        }
 
 
         // Too few, and we're reachable, let's volunteer
