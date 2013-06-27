@@ -2,7 +2,7 @@
 #
 # Run 'openssl x509' or 'certtool -i' on all certificate files
 # Returns nonzero on failure. Fails if cert cannot be read or is older than
-# $SOON (default 30).
+# $SOON (default 60).
 #
 # Hard dependency: OpenSSL OR gnutls
 # Recommended: GNU date
@@ -13,9 +13,9 @@
 #
 
 # How soon is too soon for a cert to expire?
-# By default <= 30 will fail. 60 < x < 30 will warn.
-WARN=60
-SOON=30
+# By default <= 60 will fail. 90 < x < 60 will warn.
+WARN=90
+SOON=60
 
 
 date2julian() {
