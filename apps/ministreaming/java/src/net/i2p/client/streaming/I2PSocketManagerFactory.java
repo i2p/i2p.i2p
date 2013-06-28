@@ -180,7 +180,9 @@ public class I2PSocketManagerFactory {
         I2PAppContext context = I2PAppContext.getGlobalContext();
         String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
         try {
-            Class cls = Class.forName(classname);
+            Class<?> cls = Class.forName(classname);
+            if (!I2PSocketManager.class.isAssignableFrom(cls))
+                throw new IllegalArgumentException(classname + " is not an I2PSocketManager");
             Constructor<I2PSocketManager> con = (Constructor<I2PSocketManager>)
                   cls.getConstructor(new Class[] {I2PAppContext.class, I2PSession.class, Properties.class, String.class});
             I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
