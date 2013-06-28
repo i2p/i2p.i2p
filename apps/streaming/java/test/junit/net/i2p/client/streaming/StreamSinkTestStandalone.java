@@ -3,7 +3,7 @@ package net.i2p.client.streaming;
 /**
  * Usage: StreamSinkTest [(old|new) [#hops [#kb]]]
  */
-public class StreamSinkTest {
+public class StreamSinkTestStandalone {
 /*    private static String HOST1 = "dev.i2p.net";
     private static String HOST2 = "dev.i2p.net";
     private static String PORT1 = "4101";
