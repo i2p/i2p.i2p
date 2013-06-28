@@ -24,7 +24,6 @@ import net.i2p.util.Log;
  *
  */
 public class I2PSocketManagerFactory {
-    private final static Log _log = new Log(I2PSocketManagerFactory.class);
 
     public static final String PROP_MANAGER = "i2p.streaming.manager";
     //public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerImpl";
@@ -33,6 +32,8 @@ public class I2PSocketManagerFactory {
     /**
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the local machine on the default port (7654).
+     * 
+     * Blocks for a long time while the router builds tunnels.
      * 
      * @return the newly created socket manager, or null if there were errors
      */
@@ -44,6 +45,8 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the local machine on the default port (7654).
      * 
+     * Blocks for a long time while the router builds tunnels.
+     * 
      * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
@@ -53,7 +56,9 @@ public class I2PSocketManagerFactory {
 
     /**
      * Create a socket manager using a brand new destination connected to the
-     * I2CP router on the specified host and port
+     * I2CP router on the specified host and port.
+     * 
+     * Blocks for a long time while the router builds tunnels.
      * 
      * @param host I2CP host
      * @param port I2CP port
@@ -66,6 +71,8 @@ public class I2PSocketManagerFactory {
     /**
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the given machine reachable through the given port.
+     * 
+     * Blocks for a long time while the router builds tunnels.
      *
      * @param i2cpHost I2CP host
      * @param i2cpPort I2CP port
@@ -80,10 +87,10 @@ public class I2PSocketManagerFactory {
             ByteArrayInputStream in = new ByteArrayInputStream(keyStream.toByteArray());
             return createManager(in, i2cpHost, i2cpPort, opts);
         } catch (IOException ioe) {
-            _log.error("Error creating the destination for socket manager", ioe);
+            getLog().error("Error creating the destination for socket manager", ioe);
             return null;
         } catch (I2PException ie) {
-            _log.error("Error creating the destination for socket manager", ie);
+            getLog().error("Error creating the destination for socket manager", ie);
             return null;
         }
     }
@@ -91,6 +98,8 @@ public class I2PSocketManagerFactory {
     /**
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
+     * 
+     * Blocks for a long time while the router builds tunnels.
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @return the newly created socket manager, or null if there were errors
@@ -102,6 +111,8 @@ public class I2PSocketManagerFactory {
     /**
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
+     * 
+     * Blocks for a long time while the router builds tunnels.
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param opts I2CP options
@@ -114,7 +125,9 @@ public class I2PSocketManagerFactory {
     /**
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the I2CP router on the specified machine on the given
-     * port
+     * port.
+     * 
+     * Blocks for a long time while the router builds tunnels.
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param i2cpHost I2CP host
@@ -158,7 +171,7 @@ public class I2PSocketManagerFactory {
             I2PSocketManager sockMgr = createManager(session, opts, "manager");
             return sockMgr;
         } catch (I2PSessionException ise) {
-            _log.error("Error creating session for socket manager", ise);
+            getLog().error("Error creating session for socket manager", ise);
             return null;
         }
     }
@@ -173,7 +186,7 @@ public class I2PSocketManagerFactory {
             I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
             return mgr;
         } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error loading " + classname, t);
+            getLog().log(Log.CRIT, "Error loading " + classname, t);
             throw new IllegalStateException(t);
         }
 
@@ -182,6 +195,7 @@ public class I2PSocketManagerFactory {
     private static String getHost() {
         return System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     }
+
     private static int getPort() {
         int i2cpPort = 7654;
         String i2cpPortStr = System.getProperty(I2PClient.PROP_TCP_PORT);
@@ -193,5 +207,10 @@ public class I2PSocketManagerFactory {
             }
         }
         return i2cpPort;
+    }
+
+    /** @since 0.9.7 */
+    private static Log getLog() {
+        return I2PAppContext.getGlobalContext().logManager().getLog(I2PSocketManagerFactory.class);
     }
 }
