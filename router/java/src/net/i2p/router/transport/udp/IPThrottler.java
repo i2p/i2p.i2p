@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SipHash;
 
 /**
  * Count IPs
@@ -21,12 +22,16 @@ class IPThrottler {
 
     /**
      *  Increments before checking
-     *  @return true if ip.length != 4
      */
     public boolean shouldThrottle(byte[] ip) {
-        if (ip.length != 4)
-            return true;
-        return _counter.increment(toInt(ip)) > _max;
+        // for IPv4 we simply use the IP;
+        // for IPv6 we use a secure hash as an attacker could select the lower bytes
+        Integer key;
+        if (ip.length == 4)
+            key = toInt(ip);
+        else
+            key = Integer.valueOf(SipHash.hashCode(ip));
+        return _counter.increment(key) > _max;
     }
 
     private static Integer toInt(byte ip[]) {

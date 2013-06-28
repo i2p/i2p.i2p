@@ -27,14 +27,16 @@ public class SSUDemo {
     RouterContext _us;
 
     public static void main(String args[]) {
+        boolean testNTCP = args.length > 0 && args[0].equals("ntcp");
         SSUDemo demo = new SSUDemo();
-        demo.run();
+        demo.run(testNTCP);
     }
     
     public SSUDemo() {}
-    public void run() {
+
+    public void run(boolean testNTCP) {
         String cfgFile = "router.config";
-        Properties envProps = getEnv();
+        Properties envProps = getEnv(testNTCP);
         Router r = new Router(cfgFile, envProps);
         r.runRouter();
         _us = r.getContext();
@@ -50,21 +52,36 @@ public class SSUDemo {
         loadPeers();
     }
     
-    private Properties getEnv() {
-        Properties envProps = System.getProperties();
-        // disable the TCP transport, as its deprecated
-        envProps.setProperty("i2np.tcp.disable", "true");
+    private static Properties getEnv(boolean testNTCP) {
+        Properties envProps = new Properties();
+        // disable one of the transports and UPnP
+        if (testNTCP)
+            envProps.setProperty("i2np.udp.enable", "false");
+        else
+            envProps.setProperty("i2np.ntcp.enable", "false");
+        envProps.setProperty("i2np.upnp.enable", "false");
         // we want SNTP synchronization for replay prevention
         envProps.setProperty("time.disabled", "false");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
         // peers who say they're on an invalid IP are banlisted
         envProps.setProperty("i2np.udp.allowLocal", "true");
+        envProps.setProperty("i2np.ntcp.allowLocal", "true");
+        // IPv6
+        envProps.setProperty("i2np.udp.ipv6", "enable");
+        envProps.setProperty("i2np.ntcp.ipv6", "enable");
         // explicit IP+port.  at least one router on the net has to have their IP+port
         // set, since there has to be someone to detect one's IP off.  most don't need
         // to set these though
-        envProps.setProperty("i2np.udp.host", "127.0.0.1");
-        envProps.setProperty("i2np.udp.internalPort", "12000");
-        envProps.setProperty("i2np.udp.port", "12000");
+        //envProps.setProperty("i2np.udp.host", "127.0.0.1");
+        envProps.setProperty("i2np.udp.host", "::1");
+        envProps.setProperty("i2np.ntcp.autoip", "false");
+        envProps.setProperty("i2np.ntcp.hostname", "::1");
+        // we don't have a context yet to use its random
+        String port = Integer.toString(44000 + (((int) System.currentTimeMillis()) & (16384 - 1)));
+        envProps.setProperty("i2np.udp.internalPort", port);
+        envProps.setProperty("i2np.udp.port", port);
+        envProps.setProperty("i2np.ntcp.autoport", "false");
+        envProps.setProperty("i2np.ntcp.port", port);
         // disable I2CP, the netDb, peer testing/profile persistence, and tunnel
         // creation/management
         envProps.setProperty("i2p.dummyClientFacade", "true");
@@ -73,18 +90,28 @@ public class SSUDemo {
         envProps.setProperty("i2p.dummyTunnelManager", "true");
         // set to false if you want to use HMAC-SHA256-128 instead of HMAC-MD5-128 as
         // the SSU MAC
-        envProps.setProperty("i2p.HMACMD5", "true");
+        //envProps.setProperty("i2p.HMACMD5", "true");
         // if you're using the HMAC MD5, by default it will use a 32 byte MAC field,
         // which is a bug, as it doesn't generate the same values as a 16 byte MAC field.
         // set this to false if you don't want the bug
-        envProps.setProperty("i2p.HMACBrokenSize", "false");
+        //envProps.setProperty("i2p.HMACBrokenSize", "false");
         // no need to include any stats in the routerInfo we send to people on SSU
         // session establishment
         envProps.setProperty("router.publishPeerRankings", "false");
         // write the logs to ./logs/log-router-*.txt (logger configured with the file
         // ./logger.config, or another config file specified as
         // -Dlogger.configLocation=blah)
-        envProps.setProperty("loggerFilenameOverride", "logs/log-router-@.txt");
+        // avoid conflicts over log
+        envProps.setProperty("loggerFilenameOverride", "logs/log-router-" + port + "-@.txt");
+        System.setProperty("wrapper.logfile", "wrapper-" + port + ".log");
+        // avoid conflicts over key backup etc. so we don't all use the same keys
+        envProps.setProperty("router.keyBackupDir", "keyBackup/router-" + port);
+        envProps.setProperty("router.info.location", "router-" + port + ".info");
+        envProps.setProperty("router.keys.location", "router-" + port + ".keys");
+        envProps.setProperty("router.configLocation", "router-" + port + ".config");
+        envProps.setProperty("router.pingFile", "router-" + port + ".ping");
+        // avoid conflicts over blockfile
+        envProps.setProperty("i2p.naming.impl", "net.i2p.client.naming.HostsTxtNamingService");
         return envProps;
     }
     
@@ -98,14 +125,15 @@ public class SSUDemo {
     }
     
     /** random place for storing router info files - written as $dir/base64(SHA256(info.getIdentity)) */
-    private File getInfoDir() { return new File("/tmp/ssuDemoInfo/"); }
+    private static File getInfoDir() { return new File("/tmp/ssuDemoInfo/"); }
     
-    private void storeMyInfo(RouterInfo info) {
+    private static void storeMyInfo(RouterInfo info) {
         File infoDir = getInfoDir();
         if (!infoDir.exists())
             infoDir.mkdirs();
         FileOutputStream fos = null;
         File infoFile = new File(infoDir, info.getIdentity().calculateHash().toBase64());
+        infoFile.deleteOnExit();
         try {
             fos = new FileOutputStream(infoFile);
             info.writeBytes(fos);
@@ -165,7 +193,8 @@ public class SSUDemo {
         out.setPriority(100);
         out.setTarget(ri);
         FooMessage data = new FooMessage(_us, new byte[] { 0x0, 0x1, 0x2, 0x3 });
-        System.out.println("SEND: " + Base64.encode(data.getData()));
+        System.out.println("SEND: " + Base64.encode(data.getData()) + " to " +
+                           ri.getIdentity().calculateHash());
         out.setMessage(data);
         // job fired if we can't contact them, or if it takes too long to get an ACK
         out.setOnFailedSendJob(null); 
@@ -198,45 +227,57 @@ public class SSUDemo {
         public FooJobBuilder() {
             I2NPMessageImpl.registerBuilder(new FooBuilder(), FooMessage.MESSAGE_TYPE);
         }
+
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             return new FooHandleJob(_us, receivedMessage, from, fromHash);
         }
     }
-    private class FooHandleJob extends JobImpl {
-        private I2NPMessage _msg;
+
+    private static class FooHandleJob extends JobImpl {
+        private final I2NPMessage _msg;
+        private final Hash _from;
+
         public FooHandleJob(RouterContext ctx, I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             super(ctx);
             _msg = receivedMessage;
+            _from = fromHash;
         }
+
         public void runJob() {
             // we know its a FooMessage, since thats the type of message that the handler
             // is registered as
             FooMessage m = (FooMessage)_msg;
-            System.out.println("RECV: " + Base64.encode(m.getData()));
+            System.out.println("RECV FooMessage: " + Base64.encode(m.getData()) + " from " + _from);
         }
         public String getName() { return "Handle Foo message"; }
     }
-    private class FooBuilder implements I2NPMessageImpl.Builder {
+
+    private static class FooBuilder implements I2NPMessageImpl.Builder {
         public I2NPMessage build(I2PAppContext ctx) { return new FooMessage(ctx, null); }
     }
     
     /**
      * Just carry some data...
      */
-    class FooMessage extends I2NPMessageImpl {
+    private static class FooMessage extends I2NPMessageImpl {
         private byte[] _data;
         public static final int MESSAGE_TYPE = 17;
+
         public FooMessage(I2PAppContext ctx, byte data[]) {
             super(ctx);
             _data = data;
         }
+
         /** pull the read data off */
         public byte[] getData() { return _data; }
+
         /** specify the payload to be sent */
         public void setData(byte data[]) { _data = data; }
         
         public int getType() { return MESSAGE_TYPE; }
+
         protected int calculateWrittenLength() { return _data.length; }
+
         public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
             _data = new byte[dataSize];
             System.arraycopy(data, offset, _data, 0, dataSize);
@@ -260,22 +301,27 @@ public class SSUDemo {
             return new HandleJob(_us, receivedMessage, from, fromHash);
         }
     }
+
     private class HandleJob extends JobImpl {
-        private I2NPMessage _msg;
+        private final I2NPMessage _msg;
+
         public HandleJob(RouterContext ctx, I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             super(ctx);
             _msg = receivedMessage;
         }
+
         public void runJob() {
             // we know its a DatabaseStoreMessage, since thats the type of message that the handler
             // is registered as
             DatabaseStoreMessage m = (DatabaseStoreMessage)_msg;
+            System.out.println("RECV: " + m);
             try {
                 _us.netDb().store(m.getKey(), (RouterInfo) m.getEntry());
             } catch (IllegalArgumentException iae) {
                 iae.printStackTrace();
             }
         }
+
         public String getName() { return "Handle netDb store"; }
     }
 }

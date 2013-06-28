@@ -1,6 +1,7 @@
 package net.i2p.router.transport.ntcp;
 
 import java.io.IOException;
+import java.net.Inet6Address;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -16,6 +17,7 @@ import java.util.zip.Adler32;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -86,7 +88,7 @@ class NTCPConnection {
     private final NTCPTransport _transport;
     private final boolean _isInbound;
     private volatile boolean _closed;
-    private NTCPAddress _remAddr;
+    private final RouterAddress _remAddr;
     private RouterIdentity _remotePeer;
     private long _clockSkew; // in seconds
     /**
@@ -165,6 +167,7 @@ class NTCPConnection {
         _log = ctx.logManager().getLog(getClass());
         _created = System.currentTimeMillis();
         _transport = transport;
+        _remAddr = null;
         _chan = chan;
         _readBufs = new ConcurrentLinkedQueue();
         _writeBufs = new ConcurrentLinkedQueue();
@@ -187,7 +190,7 @@ class NTCPConnection {
      * Create an outbound unconnected NTCP connection
      *
      */
-    public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer, NTCPAddress remAddr) {
+    public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer, RouterAddress remAddr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _created = System.currentTimeMillis();
@@ -216,15 +219,42 @@ class NTCPConnection {
         _prevReadBlock = new byte[BLOCK_SIZE];
         _transport.establishing(this);
     }
-    
+
+    /**
+     *  Valid for inbound; valid for outbound shortly after creation
+     */
     public SocketChannel getChannel() { return _chan; }
+
+    /**
+     *  Valid for inbound; valid for outbound shortly after creation
+     */
     public SelectionKey getKey() { return _conKey; }
     public void setChannel(SocketChannel chan) { _chan = chan; }
     public void setKey(SelectionKey key) { _conKey = key; }
     public boolean isInbound() { return _isInbound; }
     public boolean isEstablished() { return _established; }
+
+    /**
+     *  @since IPv6
+     */
+    public boolean isIPv6() {
+        return _chan != null &&
+               _chan.socket().getInetAddress() instanceof Inet6Address;
+    }
+
+    /**
+     *  Only valid during establishment; null later
+     */
     public EstablishState getEstablishState() { return _establishState; }
-    public NTCPAddress getRemoteAddress() { return _remAddr; }
+
+    /**
+     *  Only valid for outbound; null for inbound
+     */
+    public RouterAddress getRemoteAddress() { return _remAddr; }
+
+    /**
+     *  Valid for outbound; valid for inbound after handshake
+     */
     public RouterIdentity getRemotePeer() { return _remotePeer; }
     public void setRemotePeer(RouterIdentity ident) { _remotePeer = ident; }
 

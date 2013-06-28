@@ -61,7 +61,7 @@ public class RouterInfo extends DatabaseEntry {
     private final Properties _options;
     private volatile boolean _validated;
     private volatile boolean _isValid;
-    private volatile String _stringified;
+    //private volatile String _stringified;
     private volatile byte _byteified[];
     private volatile int _hashCode;
     private volatile boolean _hashCodeInitialized;
@@ -613,30 +613,34 @@ public class RouterInfo extends DatabaseEntry {
     
     @Override
     public String toString() {
-        if (_stringified != null) return _stringified;
-        StringBuilder buf = new StringBuilder(5*1024);
+        //if (_stringified != null) return _stringified;
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("[RouterInfo: ");
         buf.append("\n\tIdentity: ").append(_identity);
         buf.append("\n\tSignature: ").append(_signature);
-        buf.append("\n\tPublished on: ").append(new Date(_published));
-        buf.append("\n\tAddresses: #: ").append(_addresses.size());
-        for (RouterAddress addr : _addresses) {
-            buf.append("\n\t\tAddress: ").append(addr);
+        buf.append("\n\tPublished: ").append(new Date(_published));
+        if (_peers != null) {
+            buf.append("\n\tPeers (").append(_peers.size()).append("):");
+            for (Hash hash : _peers) {
+                buf.append("\n\t\tPeer hash: ").append(hash);
+            }
         }
-        Set<Hash> peers = getPeers();
-        buf.append("\n\tPeers: #: ").append(peers.size());
-        for (Hash hash : peers) {
-            buf.append("\n\t\tPeer hash: ").append(hash);
-        }
-        buf.append("\n\tOptions: #: ").append(_options.size());
+        buf.append("\n\tOptions (").append(_options.size()).append("):");
         for (Map.Entry e : _options.entrySet()) {
             String key = (String) e.getKey();
             String val = (String) e.getValue();
             buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
         }
+        if (!_addresses.isEmpty()) {
+            buf.append("\n\tAddresses (").append(_addresses.size()).append("):");
+            for (RouterAddress addr : _addresses) {
+                buf.append("\n\t").append(addr);
+            }
+        }
         buf.append("]");
-        _stringified = buf.toString();
-        return _stringified;
+        String rv = buf.toString();
+        //_stringified = rv;
+        return rv;
     }
 
     /**

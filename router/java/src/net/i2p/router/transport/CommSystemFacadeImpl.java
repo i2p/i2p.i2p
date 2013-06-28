@@ -10,15 +10,14 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Vector;
 
 import net.i2p.data.Hash;
@@ -27,9 +26,6 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.ntcp.NTCPAddress;
-import net.i2p.router.transport.ntcp.NTCPTransport;
-import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
@@ -45,6 +41,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private final GeoIP _geoIP;
     private volatile boolean _netMonitorStatus;
     private boolean _wasStarted;
+
+    /**
+     *  Disable connections for testing
+     *  @since IPv6
+     */
+    private static final String PROP_DISABLED = "i2np.disable";
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
@@ -125,23 +127,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return sum * 1000 / frameSize;
     }
     
-    public List<TransportBid> getBids(OutNetMessage msg) {
-        return _manager.getBids(msg);
-    }
-    public TransportBid getBid(OutNetMessage msg) {
-        return _manager.getBid(msg);
-    }
-    public TransportBid getNextBid(OutNetMessage msg) {
-        return _manager.getNextBid(msg);
-    }
-    int getTransportCount() { return _manager.getTransportCount(); }
-    
     /** Send the message out */
     public void processMessage(OutNetMessage msg) {	
+        if (isDummy()) {
+            // testing
+            GetBidsJob.fail(_context, msg);
+            return;
+        }
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
         //j.runJob();
         //long before = _context.clock().now();
-        GetBidsJob.getBids(_context, this, msg);
+        GetBidsJob.getBids(_context, _manager, msg);
         // < 0.4 ms
         //_context.statManager().addRateData("transport.getBidsJobTime", _context.clock().now() - before);
     }
@@ -167,7 +163,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     @Override
-    public List getMostRecentErrorMessages() { 
+    public List<String> getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
     }
 
@@ -190,240 +186,33 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     /** @return non-null, possibly empty */
     @Override
-    public Set<RouterAddress> createAddresses() {
+    public List<RouterAddress> createAddresses() {
         // No, don't do this, it makes it almost impossible to build inbound tunnels
         //if (_context.router().isHidden())
         //    return Collections.EMPTY_SET;
-        Map<String, RouterAddress> addresses = _manager.getAddresses();
-        boolean newCreated = false;
-        
-        if (!addresses.containsKey(NTCPTransport.STYLE)) {
-            RouterAddress addr = createNTCPAddress(_context);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("NTCP address: " + addr);
-            if (addr != null) {
-                addresses.put(NTCPTransport.STYLE, addr);
-                newCreated = true;
-            }
-        }
-        
+        List<RouterAddress> addresses = new ArrayList(_manager.getAddresses());
         if (_log.shouldLog(Log.INFO))
-            _log.info("Creating addresses: " + addresses + " isNew? " + newCreated, new Exception("creator"));
-        return new HashSet(addresses.values());
+            _log.info("Creating addresses: " + addresses, new Exception("creator"));
+        return addresses;
     }
     
-    public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
-    public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
-    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
-    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
-    
-    /**
-     * This only creates an address if the hostname AND port are set in router.config,
-     * which should be rare.
-     * Otherwise, notifyReplaceAddress() below takes care of it.
-     * Note this is called both from above and from NTCPTransport.startListening()
-     *
-     * This should really be moved to ntcp/NTCPTransport.java, why is it here?
-     */
-    public static RouterAddress createNTCPAddress(RouterContext ctx) {
-        if (!TransportManager.isNTCPEnabled(ctx)) return null;
-        String name = ctx.router().getConfigSetting(PROP_I2NP_NTCP_HOSTNAME);
-        String port = ctx.router().getConfigSetting(PROP_I2NP_NTCP_PORT);
-        /*
-        boolean isNew = false;
-        if (name == null) {
-            name = "localhost";
-            isNew = true;
-        }
-        if (port == null) {
-            port = String.valueOf(ctx.random().nextInt(10240)+1024);
-            isNew = true;
-        }
-         */
-        if ( (name == null) || (port == null) || (name.trim().length() <= 0) || ("null".equals(name)) )
-            return null;
-        try {
-            int p = Integer.parseInt(port);
-            if ( (p <= 0) || (p > 64*1024) )
-                return null;
-        } catch (NumberFormatException nfe) {
-            return null;
-        }
-        Properties props = new Properties();
-        props.setProperty(NTCPAddress.PROP_HOST, name);
-        props.setProperty(NTCPAddress.PROP_PORT, port);
-        RouterAddress addr = new RouterAddress();
-        addr.setCost(NTCPAddress.DEFAULT_COST);
-        //addr.setExpiration(null);
-        addr.setOptions(props);
-        addr.setTransportStyle(NTCPTransport.STYLE);
-        //if (isNew) {
-            // why save the same thing?
-            Map<String, String> changes = new HashMap();
-            changes.put(PROP_I2NP_NTCP_HOSTNAME, name);
-            changes.put(PROP_I2NP_NTCP_PORT, port);
-            ctx.router().saveConfig(changes, null);
-        //}
-        return addr;
-    }
-
     /**
      * UDP changed addresses, tell NTCP and restart
-     * This should really be moved to ntcp/NTCPTransport.java, why is it here?
+     *
+     * All the work moved to NTCPTransport.externalAddressReceived()
+     *
+     * @param udpAddr may be null; or udpAddr's host/IP may be null
      */
     @Override
-    public synchronized void notifyReplaceAddress(RouterAddress udpAddr) {
-        if (udpAddr == null)
-            return;
-        NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
-        if (t == null)
-            return;
-        RouterAddress oldAddr = t.getCurrentAddress();
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Changing NTCP Address? was " + oldAddr);
-        RouterAddress newAddr = new RouterAddress();
-        newAddr.setTransportStyle(NTCPTransport.STYLE);
-        Properties newProps = new Properties();
-        if (oldAddr == null) {
-            newAddr.setCost(NTCPAddress.DEFAULT_COST);
-        } else {
-            newAddr.setCost(oldAddr.getCost());
-            newProps.putAll(oldAddr.getOptionsMap());
-        }
-
-        boolean changed = false;
-
-        // Auto Port Setting
-        // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
-        // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
-        // TODO rewrite this to operate on ints instead of strings
-        String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
-        String nport = null;
-        String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
-        if (cport != null && cport.length() > 0) {
-            nport = cport;
-        } else if (_context.getBooleanPropertyDefaultTrue(PROP_I2NP_NTCP_AUTO_PORT)) {
-            // 0.9.6 change
-            // This wasn't quite right, as udpAddr is the EXTERNAL port and we really
-            // want NTCP to bind to the INTERNAL port the first time,
-            // because if they are different, the NAT is changing them, and
-            // it probably isn't mapping UDP and TCP the same.
+    public void notifyReplaceAddress(RouterAddress udpAddr) {
+        byte[] ip = udpAddr != null ? udpAddr.getIP() : null;
+        int port = udpAddr != null ? udpAddr.getPort() : 0;
+        if (port < 0) {
             Transport udp = _manager.getTransport(UDPTransport.STYLE);
-            if (udp != null) {
-                int udpIntPort = udp.getRequestedPort();
-                if (udpIntPort > 0)
-                    // should always be true
-                    nport = Integer.toString(udpIntPort);
-            }
-            if (nport == null)
-                // fallback
-                nport = udpAddr.getOption(UDPAddress.PROP_PORT);
+            if (udp != null)
+                port = udp.getRequestedPort();
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("old: " + oport + " config: " + cport + " new: " + nport);
-        if (nport == null || nport.length() <= 0)
-            return;
-        // 0.9.6 change
-        // Don't have NTCP "chase" SSU's external port,
-        // as it may change, possibly frequently.
-        //if (oport == null || ! oport.equals(nport)) {
-        if (oport == null) {
-            newProps.setProperty(NTCPAddress.PROP_PORT, nport);
-            changed = true;
-        }
-
-        // Auto IP Setting
-        // old behavior (<= 0.7.3): auto-ip defaults to false, and trumps configured hostname,
-        //                          and ignores reachability status - leading to
-        //                          "firewalled with inbound TCP enabled" warnings.
-        // new behavior (>= 0.7.4): auto-ip defaults to true, and explicit setting trumps auto,
-        //                          and only takes effect if reachability is OK.
-        //                          And new "always" setting ignores reachability status, like
-        //                          "true" was in 0.7.3
-        String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true").toLowerCase(Locale.US);
-        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
-        // hostname config trumps auto config
-        if (name != null && name.length() > 0)
-            enabled = "false";
-        Transport udp = _manager.getTransport(UDPTransport.STYLE);
-        short status = STATUS_UNKNOWN;
-        if (udp != null)
-            status = udp.getReachabilityStatus();
-        if (_log.shouldLog(Log.INFO))
-            _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
-        if (enabled.equals("always") ||
-            (Boolean.parseBoolean(enabled) && status == STATUS_OK)) {
-            String nhost = udpAddr.getOption(UDPAddress.PROP_HOST);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
-            if (nhost == null || nhost.length() <= 0)
-                return;
-            if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
-                newProps.setProperty(NTCPAddress.PROP_HOST, nhost);
-                changed = true;
-            }
-        } else if (enabled.equals("false") &&
-                   name != null && name.length() > 0 &&
-                   !name.equals(ohost) &&
-                   nport != null) {
-            // Host name is configured, and we have a port (either auto or configured)
-            // but we probably only get here if the port is auto,
-            // otherwise createNTCPAddress() would have done it already
-            if (_log.shouldLog(Log.INFO))
-                _log.info("old: " + ohost + " config: " + name + " new: " + name);
-            newProps.setProperty(NTCPAddress.PROP_HOST, name);
-            changed = true;
-        } else if (ohost == null || ohost.length() <= 0) {
-            return;
-        } else if (Boolean.parseBoolean(enabled) && status != STATUS_OK) {
-            // UDP transitioned to not-OK, turn off NTCP address
-            // This will commonly happen at startup if we were initially OK
-            // because UPnP was successful, but a subsequent SSU Peer Test determines
-            // we are still firewalled (SW firewall, bad UPnP indication, etc.)
-            if (_log.shouldLog(Log.INFO))
-                _log.info("old: " + ohost + " config: " + name + " new: null");
-            newAddr = null;
-            changed = true;
-        }
-
-        if (!changed) {
-            if (oldAddr != null) {
-                int oldCost = oldAddr.getCost();
-                int newCost = NTCPAddress.DEFAULT_COST;
-                if (TransportImpl.ADJUST_COST && !t.haveCapacity())
-                    newCost++;
-                if (newCost != oldCost) {
-                    oldAddr.setCost(newCost);
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Changing NTCP cost from " + oldCost + " to " + newCost);
-                } else {
-                    _log.info("No change to NTCP Address");
-                }
-            } else {
-                _log.info("No change to NTCP Address");
-            }
-            return;
-        }
-
-        // stopListening stops the pumper, readers, and writers, so required even if
-        // oldAddr == null since startListening starts them all again
-        //
-        // really need to fix this so that we can change or create an inbound address
-        // without tearing down everything
-        // Especially on disabling the address, we shouldn't tear everything down.
-        //
-        _log.warn("Halting NTCP to change address");
-        t.stopListening();
-        if (newAddr != null)
-            newAddr.setOptions(newProps);
-        // Wait for NTCP Pumper to stop so we don't end up with two...
-        while (t.isAlive()) {
-            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
-        }
-        t.restartListening(newAddr);
-        _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
-        return;     	
+        _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
     }
     
     /*
@@ -451,10 +240,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(iter.next());
                 if (ri == null)
                     continue;
-                String host = getIPString(ri);
-                if (host == null)
+                byte[] ip = getIP(ri);
+                if (ip == null)
                     continue;
-                _geoIP.add(host);
+                _geoIP.add(ip);
             }
             _context.simpleScheduler().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
         }
@@ -491,31 +280,35 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     /**
      *  Uses the transport IP first because that lookup is fast,
-     *  then the SSU IP from the netDb.
+     *  then the IP from the netDb.
      *
      *  @return two-letter lower-case country code or null
      */
     @Override
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
+        //if (ip != null && ip.length == 4)
         if (ip != null)
             return _geoIP.get(ip);
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return null;
-        String s = getIPString(ri);
-        if (s != null)
-            return _geoIP.get(s);
+        ip = getIP(ri);
+        if (ip != null)
+            return _geoIP.get(ip);
         return null;
     }
 
-    private String getIPString(RouterInfo ri) {
-        // use SSU only, it is likely to be an IP not a hostname,
-        // we don't want to generate a lot of DNS queries at startup
-        RouterAddress ra = ri.getTargetAddress("SSU");
-        if (ra == null)
-            return null;
-        return ra.getOption("host");
+    private static byte[] getIP(RouterInfo ri) {
+        // Return first IP (v4 or v6) we find, any transport
+        // Assume IPv6 doesn't have geoIP for now
+        for (RouterAddress ra : ri.getAddresses()) {
+            byte[] rv = ra.getIP();
+            //if (rv != null && rv.length == 4)
+            if (rv != null)
+                return rv;
+        }
+        return null;
     }
 
     /** full name for a country code, or the code if we don't know the name */
@@ -556,9 +349,14 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return buf.toString();
     }
 
-    /** @since 0.8.13 */
+    /**
+     *  Is everything disabled for testing?
+     *  @since 0.8.13
+     */
     @Override
-    public boolean isDummy() { return false; }
+    public boolean isDummy() {
+        return _context.getBooleanProperty(PROP_DISABLED);
+    }
 
     /**
      *  Translate

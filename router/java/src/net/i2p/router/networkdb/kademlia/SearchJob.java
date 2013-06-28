@@ -134,7 +134,7 @@ class SearchJob extends JobImpl {
         // The other two places this was called (one below and one in FNDF)
         // have been commented out.
         // Returning false essentially enables kademlia as a backup to floodfill for search responses.
-        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(ctx))
+        if (ctx.netDb().floodfillEnabled())
             return false;
         return ctx.getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY);
     }

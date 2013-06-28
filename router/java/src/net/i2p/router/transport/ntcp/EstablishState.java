@@ -261,8 +261,8 @@ class EstablishState {
 
             // ok, we are onto the encrypted area
             while (src.hasRemaining() && !_corrupt) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(prefix()+"Encrypted bytes available (" + src.hasRemaining() + ")");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug(prefix()+"Encrypted bytes available (" + src.hasRemaining() + ")");
                 while (_curEncryptedOffset < _curEncrypted.length && src.hasRemaining()) {
                     _curEncrypted[_curEncryptedOffset++] = src.get();
                     _received++;
@@ -299,8 +299,8 @@ class EstablishState {
                         } catch (IOException ioe) {
                             if (_log.shouldLog(Log.ERROR)) _log.error(prefix()+"Error writing to the baos?", ioe);
                         }
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
 
                         if (_sz_aliceIdent_tsA_padding_aliceSig.size() >= _sz_aliceIdent_tsA_padding_aliceSigSize) {
                             verifyInbound();

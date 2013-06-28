@@ -7,7 +7,6 @@ import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
 import net.i2p.router.transport.TransportManager;
-import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 
@@ -32,22 +31,15 @@ public class ConfigNetHelper extends HelperBase {
         return _context.getProperty(PROP_I2NP_NTCP_PORT, ""); 
     }
     
-    public String getUdpAddress() {
-        RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
-        if (addr == null)
-            return _("unknown");
-        UDPAddress ua = new UDPAddress(addr);
-        return ua.toString();
-    }
-    
+    /** @return host or "unknown" */
     public String getUdpIP() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
             return _("unknown");
-        UDPAddress ua = new UDPAddress(addr);
-        if (ua.getHost() == null)
+        String rv = addr.getHost();
+        if (rv == null)
             return _("unknown");
-        return ua.getHost();
+        return rv;
     }
 
     /**

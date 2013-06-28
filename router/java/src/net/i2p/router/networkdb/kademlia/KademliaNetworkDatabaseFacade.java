@@ -763,7 +763,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // As the net grows this won't be sufficient, and we'll have to implement
         // flushing some from memory, while keeping all on disk.
         long adjustedExpiration;
-        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
+        if (floodfillEnabled())
             adjustedExpiration = ROUTER_INFO_EXPIRATION_FLOODFILL;
         else
             // _kb.size() includes leasesets but that's ok

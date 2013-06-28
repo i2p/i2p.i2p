@@ -141,6 +141,10 @@ class PacketBuilder {
     /** 74 */
     public static final int MIN_DATA_PACKET_OVERHEAD = IP_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE;
 
+    public static final int IPV6_HEADER_SIZE = 40;
+    /** 94 */
+    public static final int MIN_IPV6_DATA_PACKET_OVERHEAD = IPV6_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE;
+
     /** one byte field */
     public static final int ABSOLUTE_MAX_ACKS = 255;
 
@@ -158,6 +162,9 @@ class PacketBuilder {
 
     private static final String PROP_PADDING = "i2np.udp.padding";
 
+    /**
+     *  @param transport may be null for unit testing only
+     */
     public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
         _transport = transport;
@@ -244,7 +251,15 @@ class PacketBuilder {
         }
 
         int currentMTU = peer.getMTU();
-        int availableForAcks = currentMTU - MIN_DATA_PACKET_OVERHEAD - dataSize;
+        int availableForAcks = currentMTU - dataSize;
+        int ipHeaderSize;
+        if (peer.getRemoteIP().length == 4) {
+            availableForAcks -= MIN_DATA_PACKET_OVERHEAD;
+            ipHeaderSize = IP_HEADER_SIZE;
+        } else {
+            availableForAcks -= MIN_IPV6_DATA_PACKET_OVERHEAD;
+            ipHeaderSize = IPV6_HEADER_SIZE;
+        }
         int availableForExplicitAcks = availableForAcks;
 
         // ok, now for the body...
@@ -400,16 +415,16 @@ class PacketBuilder {
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         
         if (_log.shouldLog(Log.INFO)) {
-            msg.append(" pkt size ").append(off + (IP_HEADER_SIZE + UDP_HEADER_SIZE));
+            msg.append(" pkt size ").append(off + (ipHeaderSize + UDP_HEADER_SIZE));
             _log.info(msg.toString());
         }
         // the packet could have been built before the current mtu got lowered, so
         // compare to LARGE_MTU
-        if (off + (IP_HEADER_SIZE + UDP_HEADER_SIZE) > PeerState.LARGE_MTU) {
+        if (off + (ipHeaderSize + UDP_HEADER_SIZE) > PeerState.LARGE_MTU) {
             _log.error("Size is " + off + " for " + packet +
                        " fragment " + fragment +
                        " data size " + dataSize +
-                       " pkt size " + (off + (IP_HEADER_SIZE + UDP_HEADER_SIZE)) +
+                       " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
                        " MTU " + currentMTU +
                        ' ' + availableForAcks + " for all acks " +
                        availableForExplicitAcks + " for full acks " + 
@@ -561,7 +576,7 @@ class PacketBuilder {
         state.prepareSessionCreated();
         
         byte sentIP[] = state.getSentIP();
-        if ( (sentIP == null) || (sentIP.length <= 0) || ( (_transport != null) && (!_transport.isValid(sentIP)) ) ) {
+        if ( (sentIP == null) || (sentIP.length <= 0) || (!_transport.isValid(sentIP))) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did our sent IP become invalid? " + state);
             state.fail();
@@ -642,7 +657,7 @@ class PacketBuilder {
         int off = HEADER_SIZE;
 
         byte toIP[] = state.getSentIP();
-        if ( (_transport !=null) && (!_transport.isValid(toIP)) ) {
+        if (!_transport.isValid(toIP)) {
             packet.release();
             return null;
         }
@@ -1051,6 +1066,7 @@ class PacketBuilder {
 
     // specify these if we know what our external receive ip/port is and if its different
     // from what bob is going to think
+    // FIXME IPv4 addr must be specified when sent over IPv6
     private byte[] getOurExplicitIP() { return null; }
     private int getOurExplicitPort() { return 0; }
     
@@ -1070,8 +1086,10 @@ class PacketBuilder {
             // let's not use an introducer on a privileged port, sounds like trouble
             if (ikey == null || iport < 1024 || iport > 65535 ||
                 iaddr == null || tag <= 0 ||
+                // must be IPv4 for now as we don't send Alice IP/port, see below
+                iaddr.getAddress().length != 4 ||
                 (!_transport.isValid(iaddr.getAddress())) ||
-                Arrays.equals(iaddr.getAddress(), _transport.getExternalIP())) {
+                (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 if (_log.shouldLog(_log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
@@ -1083,6 +1101,11 @@ class PacketBuilder {
         return rv;
     }
     
+    /**
+     *  TODO Alice IP/port in packet will always be null/0, must be fixed to
+     *  send a RelayRequest over IPv6
+     *
+     */
     private UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[],
                                         long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
         UDPPacket packet = buildPacketHeader(PEER_RELAY_REQUEST_FLAG_BYTE);
@@ -1090,6 +1113,7 @@ class PacketBuilder {
         byte data[] = pkt.getData();
         int off = HEADER_SIZE;
         
+        // FIXME must specify these if request is going over IPv6
         byte ourIP[] = getOurExplicitIP();
         int ourPort = getOurExplicitPort();
         
@@ -1211,6 +1235,7 @@ class PacketBuilder {
         DataHelper.toLong(data, off, 2, charlie.getRemotePort());
         off += 2;
         
+        // Alice IP/Port currently ignored on receive - see UDPPacketReader
         byte aliceIP[] = alice.getIP();
         DataHelper.toLong(data, off, 1, aliceIP.length);
         off++;
@@ -1233,7 +1258,7 @@ class PacketBuilder {
     }
     
     /**
-     *  Sends an empty unauthenticated packet for hole punching.
+     *  Creates an empty unauthenticated packet for hole punching.
      *  Parameters must be validated previously.
      */
     public UDPPacket buildHolePunch(InetAddress to, int port) {
@@ -1247,6 +1272,23 @@ class PacketBuilder {
         setTo(packet, to, port);
         
         packet.setMessageType(TYPE_PUNCH);
+        return packet;
+    }
+    
+    /**
+     *  TESTING ONLY.
+     *  Creates an arbitrary packet for unit testing.
+     *  Null transport in constructor OK.
+     *
+     *  @param type 0-15
+     *  @since IPv6
+     */
+    public UDPPacket buildPacket(byte[] data, InetAddress to, int port) {
+        UDPPacket packet = UDPPacket.acquire(_context, false);
+        byte d[] = packet.getPacket().getData();
+        System.arraycopy(data, 0, d, 0, data.length);
+        packet.getPacket().setLength(data.length);
+        setTo(packet, to, port);
         return packet;
     }
     
