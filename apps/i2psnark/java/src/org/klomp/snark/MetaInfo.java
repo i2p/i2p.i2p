@@ -62,6 +62,9 @@ public class MetaInfo
   private final long length;
   private final boolean privateTorrent;
   private final List<List<String>> announce_list;
+  private final String comment;
+  private final String created_by;
+  private final long creation_date;
   private Map<String, BEValue> infoMap;
 
   /**
@@ -87,6 +90,9 @@ public class MetaInfo
     this.length = length;
     this.privateTorrent = privateTorrent;
     this.announce_list = announce_list;
+    this.comment = null;
+    this.created_by = null;
+    this.creation_date = 0;
 
     // TODO if we add a parameter for other keys
     //if (other != null) {
@@ -161,6 +167,32 @@ public class MetaInfo
             this.announce_list.add(sl2);
         }
     }
+
+    // misc. optional  top-level stuff
+    val = m.get("comment");
+    String st = null;
+    if (val != null) {
+        try {
+            st = val.getString();
+        } catch (InvalidBEncodingException ibee) {}
+    }
+    this.comment = st;
+    val = m.get("created by");
+    st = null;
+    if (val != null) {
+        try {
+            st = val.getString();
+        } catch (InvalidBEncodingException ibee) {}
+    }
+    this.created_by = st;
+    val = m.get("creation date");
+    long time = 0;
+    if (val != null) {
+        try {
+            time = val.getLong() * 1000;
+        } catch (InvalidBEncodingException ibee) {}
+    }
+    this.creation_date = time;
 
     val = m.get("info");
     if (val == null)
@@ -379,6 +411,33 @@ public class MetaInfo
   public List<Long> getLengths()
   {
     return lengths;
+  }
+
+  /**
+   * The comment string or null.
+   * Not available for locally-created torrents.
+   * @since 0.9.7
+   */
+  public String getComment() {
+      return this.comment;
+  }
+
+  /**
+   * The created-by string or null.
+   * Not available for locally-created torrents.
+   * @since 0.9.7
+   */
+  public String getCreatedBy() {
+      return this.created_by;
+  }
+
+  /**
+   * The creation date (ms) or zero.
+   * Not available for locally-created torrents.
+   * @since 0.9.7
+   */
+  public long getCreationDate() {
+      return this.creation_date;
   }
 
   /**

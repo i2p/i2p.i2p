@@ -241,7 +241,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 td {
-     padding: 1px;
+     padding: 2px 4px;
      color: #ddd !important;
      opacity: 1;
      font-size: 8pt;

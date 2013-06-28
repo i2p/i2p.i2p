@@ -9,10 +9,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.Collator;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -2181,7 +2183,8 @@ public class I2PSnarkServlet extends BasicServlet {
     
     /** @since 0.8.13 */
     private static String urlEncode(String s) {
-        return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20");
+        return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20")
+                .replace("[", "%5B").replace("]", "%5D");
     }
 
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
@@ -2343,6 +2346,38 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
+            if (meta != null) {
+                String com = meta.getComment();
+                if (com != null) {
+                    if (com.length() > 1024)
+                        com = com.substring(0, 1024);
+                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
+                       .append(_imgPath).append("details.png\"> <b>")
+                       .append(_("Comment")).append(":</b> ")
+                       .append(DataHelper.stripHTML(com))
+                       .append("</td></tr>\n");
+                }
+                long dat = meta.getCreationDate();
+                if (dat > 0) {
+                    String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(dat));
+                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
+                       .append(_imgPath).append("details.png\"> <b>")
+                       .append(_("Created")).append(":</b> ")
+                       .append(date).append(" UTC")
+                       .append("</td></tr>\n");
+                }
+                String cby = meta.getCreatedBy();
+                if (cby != null) {
+                    if (cby.length() > 128)
+                        cby = com.substring(0, 128);
+                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
+                       .append(_imgPath).append("details.png\"> <b>")
+                       .append(_("Created By")).append(":</b> ")
+                       .append(DataHelper.stripHTML(cby))
+                       .append("</td></tr>\n");
+                }
+            }
+
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td><a href=\"")
@@ -2357,6 +2392,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(_("Private torrent"))
                    .append("</td></tr>\n");
             }
+
             // We don't have the hash of the torrent file
             //buf.append("<tr><td>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
@@ -2625,7 +2661,7 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
-                 mime.equals("application/x-7z-compressed") || mime.equals("application/x-rar-compresed") ||
+                 mime.equals("application/x-7z-compressed") || mime.equals("application/x-rar-compressed") ||
                  mime.equals("application/x-tar") || mime.equals("application/x-bzip2"))
             icon = "compress";
         else if (plc.endsWith(".exe"))
