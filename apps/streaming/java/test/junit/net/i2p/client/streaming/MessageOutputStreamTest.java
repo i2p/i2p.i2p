@@ -1,33 +1,34 @@
 package net.i2p.client.streaming;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+
+import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
-import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
-/**
- *
- */
-public class MessageOutputStreamTest {
+public class MessageOutputStreamTest extends TestCase {
     private I2PAppContext _context;
-    private Log _log;
+    private SimpleTimer2 _st2;
     
-    public MessageOutputStreamTest() {
+    @Before
+    public void setUp() {
         _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(MessageOutputStreamTest.class);
+        _st2 = _context.simpleTimer2();
     }
     
-    public void test() {
+    @Test
+    public void test() throws Exception {
         Receiver receiver = new Receiver();
-        MessageOutputStream out = new MessageOutputStream(_context, receiver);
+        MessageOutputStream out = new MessageOutputStream(_context, _st2, receiver, 100);
         byte buf[] = new byte[128*1024];
         _context.random().nextBytes(buf);
-        try {
-            out.write(buf);
-            out.flush();
-        } catch (IOException ioe) { ioe.printStackTrace(); }
+        out.write(buf);
+        out.flush();
         byte read[] = receiver.getData();
         int firstOff = -1;
         for (int k = 0; k < buf.length; k++) {
@@ -36,14 +37,12 @@ public class MessageOutputStreamTest {
                 break;
             }
         }
-        if (firstOff < 0) {
-            System.out.println("** Read match");
-        } else {
-            System.out.println("** Read does not match: first off = " + firstOff);
-            _log.error("read does not match (first off = " + firstOff + "): \n"
-                        + Base64.encode(buf) + "\n" 
-                        + Base64.encode(read));
-        }
+        assertTrue(
+                "read does not match (first off = " + firstOff + "): \n"
+                    + Base64.encode(buf) + "\n" 
+                    + Base64.encode(read)
+                ,
+                firstOff < 0);
     }
     
     private class Receiver implements MessageOutputStream.DataReceiver {
@@ -65,10 +64,5 @@ public class MessageOutputStreamTest {
         public boolean writeAccepted() { return true; }
         public boolean writeFailed() { return false; }
         public boolean writeSuccessful() { return true; }
-    }
-    
-    public static void main(String args[]) {
-        MessageOutputStreamTest t = new MessageOutputStreamTest();
-        t.test();
     }
 }
