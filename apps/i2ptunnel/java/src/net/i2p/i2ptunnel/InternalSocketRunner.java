@@ -14,20 +14,23 @@ import net.i2p.util.Log;
  * @author zzz
  * @since 0.7.9
  */
-class InternalSocketRunner implements Runnable {
+class InternalSocketRunner extends I2PAppThread {
     private final I2PTunnelClientBase client;
     private final int port;
     private ServerSocket ss;
     private volatile boolean open;
 
-    /** starts the runner */
+    /**
+     * Does not start the runner, caller must call start()
+     */
     InternalSocketRunner(I2PTunnelClientBase client) {
+        super("Internal socket port " + client.getLocalPort());
+        setDaemon(true);
         this.client = client;
         this.port = client.getLocalPort();
-        Thread t = new I2PAppThread(this, "Internal socket port " + this.port, true);
-        t.start();
     }
     
+    @Override
     public final void run() {
         try {
             this.ss = new InternalServerSocket(this.port);

@@ -287,6 +287,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "I2PTunnel", new long[] { 60*60*1000 });
         super.startRunning();
         this.isr = new InternalSocketRunner(this);
+        this.isr.start();
         _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, getLocalPort());
     }
 
