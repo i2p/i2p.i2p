@@ -38,7 +38,18 @@
         <ant dir="../../../apps/ministreaming/java/" target="jarTest" />
     </target>
     <target name="junit.compileTest" depends="builddeptest, compile">
-        <javac 
+
+	<echo message="[DEBUG] ant home is ${ant.home}" />
+	<echo message="[DEBUG] junit home before override is ${junit.home}" />
+	<echo message="[DEBUG] hamcrest home before override is ${hamcrest.home}" />
+    
+	<property name="junit.home" value="${ant.home}/lib" />
+	<property name="hamcrest.home" value="${ant.home}/lib" />
+   
+	<echo message="[DEBUG] junit home after override is ${junit.home}" />
+	<echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
+ 
+       <javac 
             srcdir="./test/junit" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             includeAntRuntime="false"
@@ -47,7 +58,8 @@
 		<pathelement location="../../../core/java/build/i2p.jar" />
 		<pathelement location="../../ministreaming/java/build/mstreaming.jar" />
 		<pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
-		<pathelement location="${ant.home}/lib/junit4.jar" />
+		<pathelement location="${junit.home}/junit4.jar" />
+		<pathelement location="${hamcrest.home}/hamcrest.jar" />
 	   </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
