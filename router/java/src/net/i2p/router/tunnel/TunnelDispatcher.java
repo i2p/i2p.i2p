@@ -789,6 +789,8 @@ public class TunnelDispatcher implements Service {
         int used = Math.min(usedIn, usedOut);
      ****/
         int used = _context.bandwidthLimiter().getCurrentParticipatingBandwidth();
+        if (used <= 0)
+            return false;
 
         int maxKBps = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                                _context.bandwidthLimiter().getOutboundKBytesPerSecond());
