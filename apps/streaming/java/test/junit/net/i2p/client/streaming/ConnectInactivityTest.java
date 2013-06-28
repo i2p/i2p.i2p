@@ -1,24 +1,19 @@
 package net.i2p.client.streaming;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 
 import org.junit.Test;
 
-import junit.framework.TestCase;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
-import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
-import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 /**
  *
  */
-public class ConnectInactivityTest extends TestCase{
+public class ConnectInactivityTest extends StreamingTestBase {
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
@@ -37,28 +32,19 @@ public class ConnectInactivityTest extends TestCase{
         runClient(context, _client);
     }
     
-    private void runClient(I2PAppContext ctx, I2PSession session) {
-        Thread t = new Thread(new ClientRunner(ctx, session));
-        t.setName("client");
-        t.setDaemon(false);
-        t.start();
+    @Override
+    protected Runnable getClient(I2PAppContext ctx, I2PSession session) {
+        return new ClientRunner(ctx,session);
     }
     
-    private void runServer(I2PAppContext ctx, I2PSession session) {
-        Thread t = new Thread(new ServerRunner(ctx, session));
-        t.setName("server");
-        t.setDaemon(false);
-        t.start();
+    @Override
+    protected Runnable getServer(I2PAppContext ctx, I2PSession session) {
+        return new ServerRunner(ctx,session);
     }
     
-    private class ServerRunner implements Runnable {
-        private I2PAppContext _context;
-        private I2PSession _session;
-        private Log _log;
+    private class ServerRunner extends RunnerBase {
         public ServerRunner(I2PAppContext ctx, I2PSession session) {
-            _context = ctx;
-            _session = session;
-            _log = ctx.logManager().getLog(ServerRunner.class);
+            super(ctx,session);
         }
         
         public void run() {
@@ -81,14 +67,9 @@ public class ConnectInactivityTest extends TestCase{
         
     }
     
-    private class ClientRunner implements Runnable {
-        private I2PAppContext _context;
-        private I2PSession _session;
-        private Log _log;
+    private class ClientRunner extends RunnerBase {
         public ClientRunner(I2PAppContext ctx, I2PSession session) {
-            _context = ctx;
-            _session = session;
-            _log = ctx.logManager().getLog(ClientRunner.class);
+            super(ctx,session);
         }
         
         public void run() {
@@ -98,7 +79,7 @@ public class ConnectInactivityTest extends TestCase{
                 _log.debug("manager created");
                 I2PSocket socket = mgr.connect(_server.getMyDestination());
                 _log.debug("socket created");
-                try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}
+                Thread.sleep(10*60*1000); 
                 socket.close();
                 _log.debug("socket closed");
                 //_session.destroySession();
@@ -109,20 +90,11 @@ public class ConnectInactivityTest extends TestCase{
         
     }
     
-    private I2PSession createSession() {
-        try {
-            I2PClient client = I2PClientFactory.createClient();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-            Destination dest = client.createDestination(baos);
-            Properties p = new Properties();
-            p.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-            p.setProperty(I2PClient.PROP_TCP_PORT, "10001");
-            I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), p);
-            sess.connect();
-            return sess;
-        } catch (Exception e) {
-            _log.error("error running", e);
-            throw new RuntimeException("b0rk b0rk b0rk");
-        }
+    @Override
+    protected Properties getProperties() {
+        Properties p = new Properties();
+        p.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        p.setProperty(I2PClient.PROP_TCP_PORT, "10001");
+        return p;
     }
 }

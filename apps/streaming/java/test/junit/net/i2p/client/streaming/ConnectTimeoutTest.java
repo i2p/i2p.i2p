@@ -1,12 +1,9 @@
 package net.i2p.client.streaming;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 
 import org.junit.Test;
-
-import junit.framework.TestCase;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
@@ -19,10 +16,9 @@ import net.i2p.util.Log;
  * Try to connect to a new nonexistant peer and, of course,
  * timeout.
  */
-public class ConnectTimeoutTest  extends TestCase {
+public class ConnectTimeoutTest  extends StreamingTestBase {
     private Log _log;
     private I2PSession _client;
-    private I2PSession _server;
     private Destination _serverDest;
     
     @Test
@@ -37,26 +33,18 @@ public class ConnectTimeoutTest  extends TestCase {
         runClient(context, _client);
     }
     
-    private void runClient(I2PAppContext ctx, I2PSession session) {
-        Thread t = new Thread(new ClientRunner(ctx, session));
-        t.setName("client");
-        t.setDaemon(true);
-        t.start();
+    protected Runnable getClient(I2PAppContext ctx, I2PSession session) {
+        return new ClientRunner(ctx,session);
     }
     
-    private class ClientRunner implements Runnable {
-        private I2PAppContext _context;
-        private I2PSession _session;
-        private Log _log;
+    private class ClientRunner extends RunnerBase {
         public ClientRunner(I2PAppContext ctx, I2PSession session) {
-            _context = ctx;
-            _session = session;
-            _log = ctx.logManager().getLog(ClientRunner.class);
+            super(ctx,session);
         }
         
         public void run() {
             try {
-                I2PSocketManager mgr = I2PSocketManagerFactory.createManager("localhost", 10001, getProps());
+                I2PSocketManager mgr = I2PSocketManagerFactory.createManager("localhost", 10001, getProperties());
                 _log.debug("manager created");
                 _log.debug("options: " + mgr.getDefaultOptions());
                 I2PSocket socket = mgr.connect(_serverDest);
@@ -73,18 +61,13 @@ public class ConnectTimeoutTest  extends TestCase {
         
     }
     
-    private I2PSession createSession() throws Exception {
-        I2PClient client = I2PClientFactory.createClient();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        Destination dest = client.createDestination(baos);
-        Properties p = getProps();
-
-        I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), p);
-        sess.connect();
-        return sess;
+    @Override
+    protected Runnable getServer(I2PAppContext ctx, I2PSession session) {
+        return null;
     }
     
-    private static Properties getProps() {
+    @Override
+    protected Properties getProperties() {
         Properties p = new Properties();
         p.setProperty(I2PSocketManagerFactory.PROP_MANAGER, I2PSocketManagerFull.class.getName());
         p.setProperty("tunnels.depthInbound", "0");

@@ -1,27 +1,21 @@
 package net.i2p.client.streaming;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
 import org.junit.Test;
 
-import junit.framework.TestCase;
 
 import net.i2p.I2PAppContext;
-import net.i2p.client.I2PClient;
-import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base64;
-import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 /**
  *
  */
-public class EchoLargeTest extends TestCase {
+public class EchoLargeTest extends StreamingTestBase {
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
@@ -40,28 +34,28 @@ public class EchoLargeTest extends TestCase {
         runClient(context, _client);
     }
     
-    private void runClient(I2PAppContext ctx, I2PSession session) {
-        Thread t = new Thread(new ClientRunner(ctx, session));
-        t.setName("client");
-        t.setDaemon(true);
-        t.start();
-    }
     
-    private void runServer(I2PAppContext ctx, I2PSession session) {
-        Thread t = new Thread(new ServerRunner(ctx, session));
-        t.setName("server");
-        t.setDaemon(true);
-        t.start();
-    }
     
-    private class ServerRunner implements Runnable {
-        private I2PAppContext _context;
-        private I2PSession _session;
-        private Log _log;
+    @Override
+    protected Properties getProperties() {
+        return new Properties();
+    }
+
+    @Override
+    protected Runnable getClient(I2PAppContext ctx, I2PSession session) {
+        return new ClientRunner(ctx,session);
+    }
+
+    @Override
+    protected Runnable getServer(I2PAppContext ctx, I2PSession session) {
+        return new ServerRunner(ctx,session);
+    }
+
+
+
+    private class ServerRunner extends RunnerBase {
         public ServerRunner(I2PAppContext ctx, I2PSession session) {
-            _context = ctx;
-            _session = session;
-            _log = ctx.logManager().getLog(ServerRunner.class);
+            super(ctx,session);
         }
         
         public void run() {
@@ -105,14 +99,9 @@ public class EchoLargeTest extends TestCase {
         
     }
     
-    private class ClientRunner implements Runnable {
-        private I2PAppContext _context;
-        private I2PSession _session;
-        private Log _log;
+    private class ClientRunner extends RunnerBase {
         public ClientRunner(I2PAppContext ctx, I2PSession session) {
-            _context = ctx;
-            _session = session;
-            _log = ctx.logManager().getLog(ClientRunner.class);
+            super(ctx,session);
         }
         
         public void run() {
@@ -177,19 +166,5 @@ public class EchoLargeTest extends TestCase {
             }
         }
         
-    }
-    
-    private I2PSession createSession() {
-        try {
-            I2PClient client = I2PClientFactory.createClient();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-            Destination dest = client.createDestination(baos);
-            I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), new Properties());
-            sess.connect();
-            return sess;
-        } catch (Exception e) {
-            _log.error("error running", e);
-            throw new RuntimeException("b0rk b0rk b0rk");
-        }
     }
 }
