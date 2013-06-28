@@ -6,6 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.junit.Test;
+
+import junit.framework.TestCase;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
@@ -17,27 +21,23 @@ import net.i2p.util.Log;
 /**
  *
  */
-public class EchoLargeTest {
+public class EchoLargeTest extends TestCase {
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
     
-    public void test() {
-        try {
-            I2PAppContext context = I2PAppContext.getGlobalContext();
-            _log = context.logManager().getLog(ConnectTest.class);
-            _log.debug("creating server session");
-            _server = createSession();
-            _log.debug("running server");
-            runServer(context, _server);
-            _log.debug("creating client session");
-            _client = createSession();
-            _log.debug("running client");
-            runClient(context, _client);
-        } catch (Exception e) {
-            _log.error("error running", e);
-        }
-        try { Thread.sleep(300*1000); } catch (Exception e) {}
+    @Test
+    public void test() throws Exception {
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        _log = context.logManager().getLog(ConnectTest.class);
+        _log.debug("creating server session");
+        _server = createSession();
+        _log.debug("running server");
+        runServer(context, _server);
+        _log.debug("creating client session");
+        _client = createSession();
+        _log.debug("running client");
+        runClient(context, _client);
     }
     
     private void runClient(I2PAppContext ctx, I2PSession session) {
@@ -191,10 +191,5 @@ public class EchoLargeTest {
             _log.error("error running", e);
             throw new RuntimeException("b0rk b0rk b0rk");
         }
-    }
-    
-    public static void main(String args[]) {
-        EchoLargeTest et = new EchoLargeTest();
-        et.test();
     }
 }

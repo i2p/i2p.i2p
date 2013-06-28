@@ -5,6 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.junit.Test;
+
+import junit.framework.TestCase;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
@@ -18,23 +22,20 @@ import net.i2p.util.Log;
  * EOF.
  *
  */
-public class ConnectCloseTest {
+public class ConnectCloseTest extends TestCase {
     private Log _log;
     private I2PSession _server;
-    public void test() {
-        try {
-            I2PAppContext context = I2PAppContext.getGlobalContext();
-            _log = context.logManager().getLog(ConnectCloseTest.class);
-            _log.debug("creating server session");
-            _server = createSession();
-            _log.debug("running server");
-            runServer(context, _server);
-            _log.debug("running client");
-            runClient(context, createSession());
-        } catch (Exception e) {
-            _log.error("error running", e);
-        }
-        try { Thread.sleep(10*60*1000); } catch (Exception e) {}
+    
+    @Test
+    public void test() throws Exception {
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        _log = context.logManager().getLog(ConnectCloseTest.class);
+        _log.debug("creating server session");
+        _server = createSession();
+        _log.debug("running server");
+        runServer(context, _server);
+        _log.debug("running client");
+        runClient(context, createSession());
     }
     
     private void runClient(I2PAppContext ctx, I2PSession session) {
@@ -129,10 +130,5 @@ public class ConnectCloseTest {
             _log.error("error running", e);
             throw new RuntimeException("b0rk b0rk b0rk");
         }
-    }
-    
-    public static void main(String args[]) {
-        ConnectCloseTest ct = new ConnectCloseTest();
-        ct.test();
     }
 }

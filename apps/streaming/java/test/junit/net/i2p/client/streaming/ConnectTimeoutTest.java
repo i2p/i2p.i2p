@@ -4,6 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 
+import org.junit.Test;
+
+import junit.framework.TestCase;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
@@ -15,28 +19,24 @@ import net.i2p.util.Log;
  * Try to connect to a new nonexistant peer and, of course,
  * timeout.
  */
-public class ConnectTimeoutTest {
+public class ConnectTimeoutTest  extends TestCase {
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
     private Destination _serverDest;
     
-    public void testNonexistant() {
+    @Test
+    public void testNonexistant() throws Exception {
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        _log = context.logManager().getLog(ConnectTest.class);
+        _log.debug("creating server dest");
         try {
-            I2PAppContext context = I2PAppContext.getGlobalContext();
-            _log = context.logManager().getLog(ConnectTest.class);
-            _log.debug("creating server dest");
-            try {
-                _serverDest = I2PClientFactory.createClient().createDestination(new ByteArrayOutputStream());
-            } catch (Exception e) {}
-            _log.debug("creating client session");
-            _client = createSession();
-            _log.debug("running client");
-            runClient(context, _client);
-        } catch (Exception e) {
-            _log.error("error running", e);
-        }
-        while (true) { synchronized (this) { try { wait(); } catch (Exception e) {} } }
+            _serverDest = I2PClientFactory.createClient().createDestination(new ByteArrayOutputStream());
+        } catch (Exception e) {}
+        _log.debug("creating client session");
+        _client = createSession();
+        _log.debug("running client");
+        runClient(context, _client);
     }
     
     private void runClient(I2PAppContext ctx, I2PSession session) {
@@ -89,11 +89,6 @@ public class ConnectTimeoutTest {
             _log.error("error running", e);
             throw new RuntimeException("b0rk b0rk b0rk");
         }
-    }
-    
-    public static void main(String args[]) {
-        ConnectTimeoutTest ct = new ConnectTimeoutTest();
-        ct.testNonexistant();
     }
     
     private static Properties getProps() {

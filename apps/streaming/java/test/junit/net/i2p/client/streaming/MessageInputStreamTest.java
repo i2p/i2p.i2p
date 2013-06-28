@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import junit.framework.TestCase;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -12,15 +17,17 @@ import net.i2p.util.Log;
 /**
  * Stress test the MessageInputStream
  */
-public class MessageInputStreamTest {
+public class MessageInputStreamTest extends TestCase {
     private I2PAppContext _context;
     private Log _log;
     
-    public MessageInputStreamTest() {
+    @Before
+    public void setUp() {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(MessageInputStreamTest.class);
     }
     
+    @Test
     public void testInOrder() {
         byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
@@ -46,6 +53,7 @@ public class MessageInputStreamTest {
         }
     }
     
+    @Test
     public void testRandomOrder() {
         byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
@@ -77,6 +85,7 @@ public class MessageInputStreamTest {
         }
     }
     
+    @Test
     public void testRandomDups() {
         byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
@@ -110,6 +119,7 @@ public class MessageInputStreamTest {
         }
     }
     
+    @Test
     public void testStaggered() {
         byte orig[] = new byte[256*1024];
         byte read[] = new byte[orig.length];
@@ -147,18 +157,5 @@ public class MessageInputStreamTest {
             throw new RuntimeException("Failed test: data read is not equal");
 
         _log.info("Passed test: staggered");
-    }
-    
-    public static void main(String args[]) {
-        MessageInputStreamTest t = new MessageInputStreamTest();
-        try {
-            t.testInOrder();
-            t.testRandomOrder();
-            t.testRandomDups();
-            t.testStaggered();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
     }
 }
