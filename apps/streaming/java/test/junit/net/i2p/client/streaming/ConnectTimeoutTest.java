@@ -30,9 +30,7 @@ public class ConnectTimeoutTest  extends TestCase {
         I2PAppContext context = I2PAppContext.getGlobalContext();
         _log = context.logManager().getLog(ConnectTest.class);
         _log.debug("creating server dest");
-        try {
-            _serverDest = I2PClientFactory.createClient().createDestination(new ByteArrayOutputStream());
-        } catch (Exception e) {}
+        _serverDest = I2PClientFactory.createClient().createDestination(new ByteArrayOutputStream());
         _log.debug("creating client session");
         _client = createSession();
         _log.debug("running client");
@@ -75,20 +73,15 @@ public class ConnectTimeoutTest  extends TestCase {
         
     }
     
-    private I2PSession createSession() {
-        try {
-            I2PClient client = I2PClientFactory.createClient();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-            Destination dest = client.createDestination(baos);
-            Properties p = getProps();
+    private I2PSession createSession() throws Exception {
+        I2PClient client = I2PClientFactory.createClient();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
+        Destination dest = client.createDestination(baos);
+        Properties p = getProps();
 
-            I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), p);
-            sess.connect();
-            return sess;
-        } catch (Exception e) {
-            _log.error("error running", e);
-            throw new RuntimeException("b0rk b0rk b0rk");
-        }
+        I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), p);
+        sess.connect();
+        return sess;
     }
     
     private static Properties getProps() {
