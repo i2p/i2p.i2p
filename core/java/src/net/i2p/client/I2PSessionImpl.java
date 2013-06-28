@@ -58,22 +58,22 @@ import net.i2p.util.VersionComparator;
 abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
     protected final Log _log;
     /** who we are */
-    private Destination _myDestination;
+    private final Destination _myDestination;
     /** private key for decryption */
-    private PrivateKey _privateKey;
+    private final PrivateKey _privateKey;
     /** private key for signing */
-    private SigningPrivateKey _signingPrivateKey;
+    private final SigningPrivateKey _signingPrivateKey;
     /** configuration options */
-    private Properties _options;
+    private final Properties _options;
     /** this session's Id */
     private SessionId _sessionId;
     /** currently granted lease set, or null */
     private volatile LeaseSet _leaseSet;
 
     /** hostname of router - will be null if in RouterContext */
-    protected String _hostname;
+    protected final String _hostname;
     /** port num to router - will be 0 if in RouterContext */
-    protected int _portNum;
+    protected final int _portNum;
     /** socket for comm */
     protected Socket _socket;
     /** reader that always searches for messages */
@@ -169,15 +169,36 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private static final int BUF_SIZE = 32*1024;
     
-    /** for extension */
+    /**
+     * for extension by SimpleSession (no dest)
+     */
     protected I2PSessionImpl(I2PAppContext context, Properties options) {
+        this(context, options, false);
+    }
+    
+    /**
+     * Basic setup of finals
+     * @since 0.9.7
+     */
+    private I2PSessionImpl(I2PAppContext context, Properties options, boolean hasDest) {
         _context = context;
         _log = context.logManager().getLog(getClass());
         _closed = true;
         if (options == null)
             options = (Properties) System.getProperties().clone();
-        loadConfig(options);
+        _options = loadConfig(options);
+        _hostname = getHost();
+        _portNum = getPort();
         _fastReceive = Boolean.parseBoolean(_options.getProperty(I2PClient.PROP_FAST_RECEIVE));
+        if (hasDest) {
+            _myDestination = new Destination();
+            _privateKey = new PrivateKey();
+            _signingPrivateKey = new SigningPrivateKey();
+        } else {
+            _myDestination = null;
+            _privateKey = null;
+            _signingPrivateKey = null;
+        }
     }
 
     /**
@@ -190,7 +211,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */
     public I2PSessionImpl(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {
-        this(context, options);
+        this(context, options, true);
         _handlerMap = new I2PClientMessageHandlerMap(context);
         _producer = new I2CPMessageProducer(context);
         _availabilityNotifier = new AvailabilityNotifier();
@@ -208,40 +229,56 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Parse the config for anything we know about.
      * Also fill in the authorization properties if missing.
      */
-    private void loadConfig(Properties options) {
-        _options = new Properties();
-        _options.putAll(filter(options));
-        if (_context.isRouterContext()) {
-            // just for logging
-            _hostname = "[internal connection]";
-        } else {
-            _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
-            String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
-            try {
-                _portNum = Integer.parseInt(portNum);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
-                              + LISTEN_PORT, nfe);
-                _portNum = LISTEN_PORT;
-            }
-        }
+    private final Properties loadConfig(Properties opts) {
+        Properties options = new Properties();
+        options.putAll(filter(opts));
 
         // auto-add auth if required, not set in the options, and we are not in the same JVM
         if ((!_context.isRouterContext()) &&
             _context.getBooleanProperty("i2cp.auth") &&
-            ((!options.containsKey("i2cp.username")) || (!options.containsKey("i2cp.password")))) {
+            ((!opts.containsKey("i2cp.username")) || (!opts.containsKey("i2cp.password")))) {
             String configUser = _context.getProperty("i2cp.username");
             String configPW = _context.getProperty("i2cp.password");
             if (configUser != null && configPW != null) {
-                _options.setProperty("i2cp.username", configUser);
-                _options.setProperty("i2cp.password", configPW);
+                options.setProperty("i2cp.username", configUser);
+                options.setProperty("i2cp.password", configPW);
             }
         }
-        if (_options.getProperty(I2PClient.PROP_FAST_RECEIVE) == null)
-            _options.setProperty(I2PClient.PROP_FAST_RECEIVE, "true");
-        if (_options.getProperty(I2PClient.PROP_RELIABILITY) == null)
-            _options.setProperty(I2PClient.PROP_RELIABILITY, "none");
+        if (options.getProperty(I2PClient.PROP_FAST_RECEIVE) == null)
+            options.setProperty(I2PClient.PROP_FAST_RECEIVE, "true");
+        if (options.getProperty(I2PClient.PROP_RELIABILITY) == null)
+            options.setProperty(I2PClient.PROP_RELIABILITY, "none");
+        return options;
+    }
+
+    /**
+     * Get I2CP host from the config
+     * @since 0.9.7 was in loadConfig()
+     */
+    private String getHost() {
+        if (_context.isRouterContext())
+            // just for logging
+            return "[internal connection]";
+        return _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
+    }
+
+    /**
+     * Get I2CP port from the config
+     * @since 0.9.7 was in loadConfig()
+     */
+    private int getPort() {
+        if (_context.isRouterContext())
+            // just for logging
+            return 0;
+        String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
+        try {
+            return Integer.parseInt(portNum);
+        } catch (NumberFormatException nfe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
+                          + LISTEN_PORT, nfe);
+            return LISTEN_PORT;
+        }
     }
 
     /** save some memory, don't pass along the pointless properties */
@@ -332,9 +369,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws IOException if there is a problem reading the file
      */
     private void readDestination(InputStream destKeyStream) throws DataFormatException, IOException {
-        _myDestination = new Destination();
-        _privateKey = new PrivateKey();
-        _signingPrivateKey = new SigningPrivateKey();
         _myDestination.readBytes(destKeyStream);
         _privateKey.readBytes(destKeyStream);
         _signingPrivateKey.readBytes(destKeyStream);

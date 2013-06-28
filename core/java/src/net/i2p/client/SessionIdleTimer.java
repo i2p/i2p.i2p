@@ -22,60 +22,67 @@ class SessionIdleTimer implements SimpleTimer.TimedEvent {
     public static final long MINIMUM_TIME = 5*60*1000;
     private static final long DEFAULT_REDUCE_TIME = 20*60*1000;
     private static final long DEFAULT_CLOSE_TIME = 30*60*1000;
-    private final static Log _log = new Log(SessionIdleTimer.class);
+    private final Log _log;
     private final I2PAppContext _context;
     private final I2PSessionImpl _session;
-    private boolean _reduceEnabled;
-    private int _reduceQuantity;
-    private long _reduceTime;
-    private boolean _shutdownEnabled;
-    private long _shutdownTime;
-    private long _minimumTime;
+    private final boolean _reduceEnabled;
+    private final int _reduceQuantity;
+    private final long _reduceTime;
+    private final boolean _shutdownEnabled;
+    private final long _shutdownTime;
+    private final long _minimumTime;
     private long _lastActive;
 
     /**
      *  reduce, shutdown, or both must be true
      */
     public SessionIdleTimer(I2PAppContext context, I2PSessionImpl session, boolean reduce, boolean shutdown) {
-        _context = context;
-        _session = session;
-        _reduceEnabled = reduce;
-        _shutdownEnabled = shutdown;
         if (! (reduce || shutdown))
             throw new IllegalArgumentException("At least one must be enabled");
+        _context = context;
+        _log = context.logManager().getLog(SessionIdleTimer.class);
+        _session = session;
         Properties props = session.getOptions();
-        _minimumTime = Long.MAX_VALUE;
-        _lastActive = 0;
+        long minimumTime = Long.MAX_VALUE;
+        long reduceTime = 0;
+        long shutdownTime = 0;
+        int reduceQuantity = 0;
         if (reduce) {
-            _reduceQuantity = 1;
+            reduceQuantity = 1;
             String p = props.getProperty("i2cp.reduceQuantity");
             if (p != null) {
                 try {
-                    _reduceQuantity = Math.max(Integer.parseInt(p), 1);
+                    reduceQuantity = Math.max(Integer.parseInt(p), 1);
                     // also check vs. configured quantities?
                 } catch (NumberFormatException nfe) {}
             }
-            _reduceTime = DEFAULT_REDUCE_TIME;
+            reduceTime = DEFAULT_REDUCE_TIME;
             p = props.getProperty("i2cp.reduceIdleTime");
             if (p != null) {
                 try {
-                    _reduceTime = Math.max(Long.parseLong(p), MINIMUM_TIME);
+                    reduceTime = Math.max(Long.parseLong(p), MINIMUM_TIME);
                 } catch (NumberFormatException nfe) {}
             }
-            _minimumTime = _reduceTime;
+            minimumTime = reduceTime;
         }
         if (shutdown) {
-            _shutdownTime = DEFAULT_CLOSE_TIME;
+            shutdownTime = DEFAULT_CLOSE_TIME;
             String p = props.getProperty("i2cp.closeIdleTime");
             if (p != null) {
                 try {
-                    _shutdownTime = Math.max(Long.parseLong(p), MINIMUM_TIME);
+                    shutdownTime = Math.max(Long.parseLong(p), MINIMUM_TIME);
                 } catch (NumberFormatException nfe) {}
             }
-            _minimumTime = Math.min(_minimumTime, _shutdownTime);
-            if (reduce && _shutdownTime <= _reduceTime)
+            minimumTime = Math.min(minimumTime, shutdownTime);
+            if (reduce && shutdownTime <= reduceTime)
                 reduce = false;
         }
+        _reduceEnabled = reduce;
+        _reduceQuantity = reduceQuantity;
+        _reduceTime = reduceTime;
+        _shutdownEnabled = shutdown;
+        _shutdownTime = shutdownTime;
+        _minimumTime = minimumTime;
     }
 
     public void timeReached() {
