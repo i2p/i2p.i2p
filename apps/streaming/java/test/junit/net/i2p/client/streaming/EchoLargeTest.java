@@ -27,11 +27,12 @@ public class EchoLargeTest extends StreamingTestBase {
         _log.debug("creating server session");
         _server = createSession();
         _log.debug("running server");
-        runServer(context, _server);
+        Thread server = runServer(context, _server);
         _log.debug("creating client session");
         _client = createSession();
         _log.debug("running client");
-        runClient(context, _client);
+        Thread client = runClient(context, _client);
+        client.join();
     }
     
     
@@ -144,14 +145,7 @@ public class EchoLargeTest extends StreamingTestBase {
                                 break;
                             }
                         }
-                        if (firstOff < 0) {
-                            System.out.println("** Read match");
-                        } else {
-                            System.out.println("** Read does not match: first off = " + firstOff);
-                            _log.error("read does not match (first off = " + firstOff + "): \n"
-                                        + Base64.encode(orig) + "\n" 
-                                        + Base64.encode(rbuf));
-                        }
+                        assertTrue(firstOff < 0);
                     }
                 }
                 if (_log.shouldLog(Log.DEBUG))
@@ -160,7 +154,6 @@ public class EchoLargeTest extends StreamingTestBase {
                 _log.debug("socket closed");
                 
                 Thread.sleep(5*1000);
-                System.exit(0);
             } catch (Exception e) {
                 _log.error("error running", e);
             }
