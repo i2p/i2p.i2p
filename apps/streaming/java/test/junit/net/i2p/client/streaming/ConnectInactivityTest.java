@@ -14,6 +14,12 @@ import net.i2p.util.Log;
  *
  */
 public class ConnectInactivityTest extends StreamingTestBase {
+    private static final long LONG_TIME = 60 * 1000;
+    
+    private static void sleep() throws Exception {
+        Thread.sleep(LONG_TIME);
+    }
+    
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
@@ -28,8 +34,10 @@ public class ConnectInactivityTest extends StreamingTestBase {
         runServer(context, _server);
         _log.debug("creating client session");
         _client = createSession();
+        
         _log.debug("running client");
-        runClient(context, _client);
+        Thread client = runClient(context, _client);
+        client.join(LONG_TIME + 1000);
     }
     
     @Override
@@ -55,12 +63,13 @@ public class ConnectInactivityTest extends StreamingTestBase {
                 I2PServerSocket ssocket = mgr.getServerSocket();
                 _log.debug("server socket created");
                 I2PSocket socket = ssocket.accept();
+                sleep();
                 _log.debug("socket accepted: " + socket);
-                try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}
                 socket.close();
                 ssocket.close();
                 _session.destroySession();
             } catch (Exception e) {
+                fail(e.getMessage());
                 _log.error("error running", e);
             }
         }
@@ -79,11 +88,12 @@ public class ConnectInactivityTest extends StreamingTestBase {
                 _log.debug("manager created");
                 I2PSocket socket = mgr.connect(_server.getMyDestination());
                 _log.debug("socket created");
-                Thread.sleep(10*60*1000); 
+                sleep();
                 socket.close();
                 _log.debug("socket closed");
                 //_session.destroySession();
             } catch (Exception e) {
+                fail(e.getMessage());
                 _log.error("error running", e);
             }
         }
@@ -93,8 +103,8 @@ public class ConnectInactivityTest extends StreamingTestBase {
     @Override
     protected Properties getProperties() {
         Properties p = new Properties();
-        p.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        p.setProperty(I2PClient.PROP_TCP_PORT, "10001");
+//        p.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+//        p.setProperty(I2PClient.PROP_TCP_PORT, "10001");
         return p;
     }
 }
