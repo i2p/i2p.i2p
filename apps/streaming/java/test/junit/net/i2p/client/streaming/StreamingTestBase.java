@@ -29,11 +29,12 @@ abstract class StreamingTestBase extends TestCase {
     
     protected abstract Runnable getClient(I2PAppContext ctx, I2PSession session);
     
-    protected final void runClient(I2PAppContext ctx, I2PSession session) {
+    protected final Thread runClient(I2PAppContext ctx, I2PSession session) {
         Thread t = new Thread(getClient(ctx,session));
         t.setName("client");
         t.setDaemon(true);
         t.start();
+        return t;
     }
     
     protected abstract class RunnerBase implements Runnable {
@@ -51,10 +52,11 @@ abstract class StreamingTestBase extends TestCase {
     
     protected abstract Runnable getServer(I2PAppContext ctx, I2PSession session);
    
-    protected final void runServer(I2PAppContext ctx, I2PSession session) {
+    protected final Thread runServer(I2PAppContext ctx, I2PSession session) {
         Thread t = new Thread(getServer(ctx,session));
         t.setName("servert");
         t.setDaemon(false);
         t.start();
+        return t;
     }
 }
