@@ -30,7 +30,7 @@ public class ConnectTimeoutTest  extends StreamingTestBase {
         _log.debug("creating client session");
         _client = createSession();
         _log.debug("running client");
-        runClient(context, _client);
+        runClient(context, _client).join();
     }
     
     protected Runnable getClient(I2PAppContext ctx, I2PSession session) {
@@ -43,22 +43,10 @@ public class ConnectTimeoutTest  extends StreamingTestBase {
         }
         
         public void run() {
-            try {
-                I2PSocketManager mgr = I2PSocketManagerFactory.createManager("localhost", 10001, getProperties());
-                _log.debug("manager created");
-                _log.debug("options: " + mgr.getDefaultOptions());
-                I2PSocket socket = mgr.connect(_serverDest);
-                _log.debug("socket created");
-                socket.getOutputStream().write("you smell".getBytes());
-                socket.getOutputStream().flush();
-                _log.error("wtf, shouldn't have flushed");
-                socket.close();
-                _log.debug("socket closed");
-            } catch (Exception e) {
-                _log.error("error running (yay!)", e);
-            }
+            I2PSocketManager mgr = I2PSocketManagerFactory.createManager("localhost", 10001, getProperties());
+            assertNull(mgr);
         }
-        
+
     }
     
     @Override
@@ -71,8 +59,6 @@ public class ConnectTimeoutTest  extends StreamingTestBase {
         Properties p = new Properties();
         p.setProperty(I2PSocketManagerFactory.PROP_MANAGER, I2PSocketManagerFull.class.getName());
         p.setProperty("tunnels.depthInbound", "0");
-        p.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        p.setProperty(I2PClient.PROP_TCP_PORT, "10001");
         p.setProperty(ConnectionOptions.PROP_CONNECT_TIMEOUT, "30000");
         //p.setProperty(ConnectionOptions.PROP_CONNECT_DELAY, "10000");
         p.setProperty(ConnectionOptions.PROP_CONNECT_DELAY, "0");
