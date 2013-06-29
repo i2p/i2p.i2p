@@ -19,8 +19,8 @@ public class ConnectTest extends StreamingTestBase {
     
     @Before
     public void setUp() throws Exception {
-        System.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        System.setProperty(I2PClient.PROP_TCP_PORT, "11001");  
+//        System.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+//        System.setProperty(I2PClient.PROP_TCP_PORT, "11001");  
     }
     
     @Test
@@ -30,11 +30,14 @@ public class ConnectTest extends StreamingTestBase {
         _log.debug("creating server session");
         _server = createSession();
         _log.debug("running server");
-        runServer(context, _server);
+        Thread server = runServer(context, _server);
+        Thread [] clients = new Thread[5];
         for (int i = 0; i < 5; i++) {
             _log.debug("running client");
-            runClient(context, createSession());
+            clients[i] = runClient(context, createSession());
         }
+        for (Thread c : clients)
+            c.join();
     }
     
     
@@ -66,7 +69,7 @@ public class ConnectTest extends StreamingTestBase {
                 while (true) {
                     I2PSocket socket = ssocket.accept();
                     _log.debug("socket accepted: " + socket);
-                    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                    Thread.sleep(5*1000); 
                     socket.close();
                 }
             } catch (Exception e) {
@@ -88,7 +91,7 @@ public class ConnectTest extends StreamingTestBase {
                 _log.debug("manager created");
                 I2PSocket socket = mgr.connect(_server.getMyDestination());
                 _log.debug("socket created");
-                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                Thread.sleep(5*1000); 
                 socket.close();
                 _log.debug("socket closed");
                 mgr.destroySocketManager();
