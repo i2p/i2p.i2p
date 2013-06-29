@@ -7,8 +7,8 @@ import java.util.Map;
 
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
-import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.TransportManager;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.util.Addresses;
@@ -17,6 +17,7 @@ import net.i2p.util.Addresses;
  * Handler to deal with form submissions from the main config form and act
  * upon the values.
  *
+ * Used for both /config and /confignet
  */
 public class ConfigNetHandler extends FormHandler {
     private String _hostname;
@@ -45,6 +46,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _sharePct;
     private boolean _ratesOnly;
     private boolean _udpDisabled;
+    private String _ipv6Mode;
     private final Map<String, String> changes = new HashMap();
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
@@ -130,6 +132,11 @@ public class ConfigNetHandler extends FormHandler {
         _udpDisabled = true;
     }
     
+    /** @since IPv6 */
+    public void setIpv6(String mode) {
+        _ipv6Mode = mode;
+    }
+    
     private void recheckReachability() {
         _context.commSystem().recheckReachability();
         addFormNotice(_("Rechecking router reachability..."));
@@ -176,6 +183,26 @@ public class ConfigNetHandler extends FormHandler {
                    addFormNotice(_("Updating IP address"));
                    restartRequired = true;
                 }
+            }
+            if (_ipv6Mode != null) {
+                // take care not to set default, as it will change
+                String tcp6 = _context.getProperty(TransportUtil.NTCP_IPV6_CONFIG);
+                if (tcp6 == null)
+                    tcp6 = TransportUtil.DEFAULT_IPV6_CONFIG.toConfigString();
+                String udp6 = _context.getProperty(TransportUtil.SSU_IPV6_CONFIG);
+                if (udp6 == null)
+                    udp6 = TransportUtil.DEFAULT_IPV6_CONFIG.toConfigString();
+                boolean ch = false;
+                if (!_ipv6Mode.equals(tcp6)) {
+                    changes.put(TransportUtil.NTCP_IPV6_CONFIG, _ipv6Mode);
+                    ch = true;
+                }
+                if (!_ipv6Mode.equals(udp6)) {
+                    changes.put(TransportUtil.SSU_IPV6_CONFIG, _ipv6Mode);
+                    ch = true;
+                }
+                if (ch)
+                    addFormNotice(_("Updating IPv6 setting"));
             }
 
             // NTCP Settings

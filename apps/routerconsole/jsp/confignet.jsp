@@ -64,6 +64,18 @@
     <input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >
     <%=intl._("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
     (<i><%=intl._("Experimental")%></i>)
+ </p><p>
+ <%=intl._("IPv6 Configuration")%>:<br>
+    <input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
+    <%=intl._("Disable IPv6")%><br>
+    <input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >
+    <%=intl._("Enable IPv6")%><br>
+    <input type="radio" class="optbox" name="ipv6" value="preferIPv4" <%=nethelper.getIPv6Checked("preferIPv4") %> >
+    <%=intl._("Prefer IPv4 over IPv6")%><br>
+    <input type="radio" class="optbox" name="ipv6" value="preferIPv6" <%=nethelper.getIPv6Checked("preferIPv6") %> >
+    <%=intl._("Prefer IPv6 over IPv4")%><br>
+    <input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
+    <%=intl._("Use IPv6 only (disable IPv4)")%><br>
  </p><p><b><%=intl._("UDP Configuration:")%></b><br>
  <%=intl._("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" ><br>
