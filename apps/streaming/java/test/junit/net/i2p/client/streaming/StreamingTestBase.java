@@ -14,6 +14,8 @@ import junit.framework.TestCase;
 
 abstract class StreamingTestBase extends TestCase {
 
+    // TODO: this may need to start a full router
+    
     protected abstract Properties getProperties();
     
     protected I2PSession createSession() throws Exception {
@@ -55,7 +57,7 @@ abstract class StreamingTestBase extends TestCase {
     protected final Thread runServer(I2PAppContext ctx, I2PSession session) {
         Thread t = new Thread(getServer(ctx,session));
         t.setName("servert");
-        t.setDaemon(false);
+        t.setDaemon(true);
         t.start();
         return t;
     }
