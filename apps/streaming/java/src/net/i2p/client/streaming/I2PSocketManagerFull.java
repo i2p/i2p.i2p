@@ -65,10 +65,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * This is what I2PSocketManagerFactory.createManager() returns.
      * Direct instantiation by others is deprecated.
      * 
-     * @param context
-     * @param session
-     * @param opts
-     * @param name
+     * @param context non-null
+     * @param session non-null
+     * @param opts may be null
+     * @param name non-null
      */
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
@@ -103,6 +103,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return curOpts;
     }
     
+    /**
+     *  @return the session, non-null
+     */
     public I2PSession getSession() {
         return _session;
     }
