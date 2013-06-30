@@ -547,6 +547,12 @@ class BuildHandler implements Runnable {
         boolean isInGW = req.readIsInboundGateway();
         boolean isOutEnd = req.readIsOutboundEndpoint();
 
+        if (isInGW && isOutEnd) {
+            _context.statManager().addRateData("tunnel.rejectHostile", 1);
+            _log.error("Dropping build request, IBGW+OBEP");
+            return;
+        }
+
         // Loop checks
         if ((!isOutEnd) && _context.routerHash().equals(nextPeer)) {
             _context.statManager().addRateData("tunnel.rejectHostile", 1);
