@@ -440,7 +440,7 @@ public class POP3MailBox {
 	/**
 	 * 
 	 * @param cmd
-	 * @return
+	 * @return buffer
 	 */
 	private ReadBuffer sendCmdN(String cmd )
 	{
@@ -448,7 +448,7 @@ public class POP3MailBox {
 	}
 	/**
 	 * @param cmd
-	 * @return
+	 * @return buffer
 	 */
 	private ReadBuffer sendCmdN(String cmd, int bufSize )
 	{
@@ -491,7 +491,7 @@ public class POP3MailBox {
 	 * 
 	 * @param src
 	 * @param newSize
-	 * @return
+	 * @return new array
 	 */
 	private byte[] resizeArray( byte src[], int newSize )
 	{
@@ -516,8 +516,8 @@ public class POP3MailBox {
 	}
 	/**
 	 * @param id
-	 * @return @throws
-	 *         IOException
+	 * @return buffer
+	 * @throws IOException
 	 */
 	private ReadBuffer sendCmdNa(String cmd, int bufSize ) throws IOException
 	{

@@ -365,7 +365,7 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @param name
 	 * @param label
-	 * @return
+	 * @return the string
 	 */
 	private static String sortHeader( String name, String label, String imgPath )
 	{
@@ -376,7 +376,7 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @param request
 	 * @param key
-	 * @return
+	 * @return true if pressed
 	 */
 	private static boolean buttonPressed( RequestWrapper request, String key )
 	{
@@ -530,7 +530,7 @@ public class WebMail extends HttpServlet
 	 * - quote html tags
 	 * 
 	 * @param line
-	 * @return
+	 * @return escaped string
 	 */
 	private static String quoteHTML( String line )
 	{
@@ -870,7 +870,7 @@ public class WebMail extends HttpServlet
 	}
 	/**
 	 * @param request
-	 * @return
+	 * @return message number or -1
 	 */
 	private static int getCheckedMessage(RequestWrapper request) {
 		for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); ) {
@@ -1039,7 +1039,7 @@ public class WebMail extends HttpServlet
 	}
 	/**
 	 * @param hashCode
-	 * @return
+	 * @return the part or null
 	 */
 	private static MailPart getMailPartFromHashCode( MailPart part, int hashCode )
 	{
@@ -1171,7 +1171,7 @@ public class WebMail extends HttpServlet
 	}
 	/**
 	 * @param httpSession
-	 * @return
+	 * @return non-null
 	 */
 	private synchronized SessionObject getSessionObject( HttpSession httpSession )
 	{
@@ -1324,7 +1324,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * @param sessionObject
 	 * @param response
-	 * @return
+	 * @return success
 	 */
 	private static boolean sendAttachment(SessionObject sessionObject, HttpServletResponse response)
 	{
@@ -1383,7 +1383,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * @param sessionObject
 	 * @param request
-	 * @return
+	 * @return success
 	 */
 	private static boolean sendMail( SessionObject sessionObject, RequestWrapper request )
 	{

@@ -763,7 +763,7 @@ public class PluginStarter implements Runnable {
     /**
      * Returns <code>true</code> if one or more client threads are running in a given plugin.
      * @param pluginName
-     * @return
+     * @return true if running
      */
     private static boolean isClientThreadRunning(String pluginName) {
         ThreadGroup group = pluginThreadGroups.get(pluginName);
