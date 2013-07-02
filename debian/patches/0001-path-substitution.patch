@@ -158,7 +158,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1858,24 +1806,9 @@
+@@ -1866,24 +1809,9 @@
              status
              ;;
  
