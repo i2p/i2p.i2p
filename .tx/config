@@ -134,6 +134,7 @@ trans.fr = debian/po/fr.po
 trans.it = debian/po/it.po
 trans.hu = debian/po/hu.po
 trans.pl = debian/po/pl.po
+trans.pt = debian/po/pt.po
 trans.ru = debian/po/ru.po
 trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
