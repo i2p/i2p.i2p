@@ -1,4 +1,5 @@
 2013-07-03 zzz
+ * Console: Hide dead tunnel pools on /tunnels
  * Updater: Fix plugin update checker (ticket #897)
  * Utils: Reduce logging in wrapper log when extracting zip files
 
