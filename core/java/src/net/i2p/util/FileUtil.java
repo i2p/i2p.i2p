@@ -89,8 +89,19 @@ public class FileUtil {
     /**
      *  As of release 0.7.12, any files inside the zip that have a .jar.pack or .war.pack suffix
      *  are transparently unpacked to a .jar or .war file using unpack200.
+     *  Logs at WARN level to wrapper.log
      */
     public static boolean extractZip(File zipfile, File targetDir) {
+        return extractZip(zipfile, targetDir, Log.WARN);
+    }
+
+    /**
+      * @param logLevel Log.WARN, etc.
+      * @return true if it was copied successfully
+      * @since 0.9.7
+      */
+    public static boolean extractZip(File zipfile, File targetDir, int logLevel) {
+        int files = 0;
         ZipFile zip = null;
         try {
             byte buf[] = new byte[16*1024];
@@ -107,7 +118,8 @@ public class FileUtil {
                 if ( (parent != null) && (!parent.exists()) ) {
                     boolean parentsOk = parent.mkdirs();
                     if (!parentsOk) {
-                        System.err.println("ERROR: Unable to create the parent dir for " + entry.getName() + ": [" + parent.getAbsolutePath() + "]");
+                        if (logLevel <= Log.ERROR)
+                            System.err.println("ERROR: Unable to create the parent dir for " + entry.getName() + ": [" + parent.getAbsolutePath() + "]");
                         return false;
                     }
                 }
@@ -115,9 +127,10 @@ public class FileUtil {
                     if (!target.exists()) {
                         boolean created = target.mkdirs();
                         if (!created) {
-                            System.err.println("ERROR: Unable to create the directory [" + entry.getName() + "]");
+                            if (logLevel <= Log.ERROR)
+                                System.err.println("ERROR: Unable to create the directory [" + entry.getName() + "]");
                             return false;
-                        } else {
+                        } else if (logLevel <= Log.INFO) {
                             System.err.println("INFO: Creating directory [" + entry.getName() + "]");
                         }
                     }
@@ -131,28 +144,35 @@ public class FileUtil {
                             target = new File(targetDir, entry.getName().substring(0, entry.getName().length() - ".pack".length()));
                             jos = new JarOutputStream(new FileOutputStream(target));
                             unpack(in, jos);
-                            System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
+                            if (logLevel <= Log.INFO)
+                                System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
                         } else {
                             fos = new FileOutputStream(target);
                             int read = 0;
                             while ( (read = in.read(buf)) != -1) {
                                 fos.write(buf, 0, read);
                             }
-                            System.err.println("INFO: File [" + entry.getName() + "] extracted");
+                            if (logLevel <= Log.INFO)
+                                System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
+                        files++;
                     } catch (IOException ioe) {
-                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
-                        if (ioe.getMessage() != null && ioe.getMessage().indexOf("CAFED00D") >= 0)
-                            System.err.println("This may be caused by a packed library that requires Java 1.6, your Java version is: " +
-                                               System.getProperty("java.version"));
-                        ioe.printStackTrace();
+                        if (logLevel <= Log.ERROR) {
+                            System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
+                            if (ioe.getMessage() != null && ioe.getMessage().indexOf("CAFED00D") >= 0)
+                                System.err.println("This may be caused by a packed library that requires Java 1.6, your Java version is: " +
+                                                   System.getProperty("java.version"));
+                            ioe.printStackTrace();
+                        }
                         return false;
                     } catch (Exception e) {
                         // Oracle unpack() should throw an IOE but other problems can happen, e.g:
                         // java.lang.reflect.InvocationTargetException
                         // Caused by: java.util.zip.ZipException: duplicate entry: xxxxx
-                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
-                        e.printStackTrace();
+                        if (logLevel <= Log.ERROR) {
+                            System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
+                            e.printStackTrace();
+                        }
                         return false;
                     } finally {
                         try { if (in != null) in.close(); } catch (IOException ioe) {}
@@ -163,13 +183,17 @@ public class FileUtil {
             }
             return true;
         } catch (IOException ioe) {
-            System.err.println("ERROR: Unable to extract the zip file");
-            ioe.printStackTrace();
+            if (logLevel <= Log.ERROR) {
+                System.err.println("ERROR: Unable to extract the zip file");
+                ioe.printStackTrace();
+            }
             return false;
         } finally {
             if (zip != null) {
                 try { zip.close(); } catch (IOException ioe) {}
             }
+            if (files > 0 && logLevel <= Log.WARN)
+                System.err.println("INFO: " + files + " files extracted to " + targetDir);
         }
     }
     

@@ -30,14 +30,12 @@ import net.i2p.util.VersionComparator;
  *  @since 0.7.12
  */
 class PluginUpdateChecker extends UpdateRunner {
-    private final ByteArrayOutputStream _baos;
     private final String _appName;
     private final String _oldVersion;
 
     public PluginUpdateChecker(RouterContext ctx, ConsoleUpdateManager mgr,
                                List<URI> uris, String appName, String oldVersion ) { 
-        super(ctx, mgr, uris);
-        _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
+        super(ctx, mgr, uris, oldVersion);
         if (!uris.isEmpty())
             _currentURI = uris.get(0);
         _appName = appName;
@@ -85,7 +83,10 @@ class PluginUpdateChecker extends UpdateRunner {
         }
 
         @Override
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining,
+                                     String url, String outputFile, boolean notModified) {
+            super.transferComplete(alreadyTransferred, bytesTransferred, bytesRemaining,
+                                   url, outputFile, notModified);
             // super sets _newVersion if newer
             boolean newer = _newVersion != null;
             if (newer) {

@@ -1,3 +1,7 @@
+2013-07-03 zzz
+ * Updater: Fix plugin update checker (ticket #897)
+ * Utils: Reduce logging in wrapper log when extracting zip files
+
 2013-06-30 zzz
  * BuildHandler: Drop build request with bad flags
 

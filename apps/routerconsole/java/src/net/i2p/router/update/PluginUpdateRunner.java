@@ -21,6 +21,7 @@ import net.i2p.update.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
@@ -147,7 +148,7 @@ class PluginUpdateRunner extends UpdateRunner {
                 return;
             }
             File tempDir = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + "-unzip");
-            if (!FileUtil.extractZip(to, tempDir)) {
+            if (!FileUtil.extractZip(to, tempDir, Log.ERROR)) {
                 f.delete();
                 to.delete();
                 FileUtil.rmdir(tempDir, false);
@@ -374,7 +375,7 @@ class PluginUpdateRunner extends UpdateRunner {
             }
 
             // Finally, extract the zip to the plugin directory
-            if (!FileUtil.extractZip(to, destDir)) {
+            if (!FileUtil.extractZip(to, destDir, Log.WARN)) {
                 to.delete();
                 statusDone("<b>" + _("Failed to install plugin in {0}", destDir.getAbsolutePath()) + "</b>");
                 return;
