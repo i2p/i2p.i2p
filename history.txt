@@ -1,3 +1,12 @@
+2013-06-30 zzz
+ * BuildHandler: Drop build request with bad flags
+
+2013-06-28 zzz
+ * i2psnark:
+   - Show more metadata on details page
+   - Fix rar icon
+   - More URL escaping
+
 2013-06-23 zzz
  * i2psnark: When receiving a metainfo via magnet and saving it to disk,
    preserve all non-standard fields (such as those created by Robert) so the
