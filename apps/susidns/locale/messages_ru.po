@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susidns package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
@@ -11,16 +11,18 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2013-05-15 21:58+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-04 16:45+0000\n"
 "PO-Revision-Date: 2013-07-02 07:06+0000\n"
 "Last-Translator: gmind <grvmind@gmail.com>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
+"language/ru_RU/)\n"
+"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru_RU\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:130
 #, java-format
@@ -48,9 +50,11 @@ msgstr "Имя хоста не может содержать \"{0}\""
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:157
 #, java-format
 msgid ""
-"Host name \"{0}\" requires conversion to ASCII but the conversion library is"
-" unavailable in this JVM"
-msgstr "Имя хоста \"{0}\" требует преобразования в ASCII, но библиотека преобразований недоступна в этой JVM"
+"Host name \"{0}\" requires conversion to ASCII but the conversion library is "
+"unavailable in this JVM"
+msgstr ""
+"Имя хоста \"{0}\" требует преобразования в ASCII, но библиотека "
+"преобразований недоступна в этой JVM"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:218
 msgid "None"
@@ -134,9 +138,11 @@ msgstr "Для узла {0} уже существует запись с совп
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:240
 #, java-format
 msgid ""
-"Host name {0} is already in address book with a different destination. Click"
-" \"Replace\" to overwrite."
-msgstr "Для узла {0} уже существует запись с другим адресом назначения. Нажмите \"Заменить\" для перезаписи."
+"Host name {0} is already in address book with a different destination. Click "
+"\"Replace\" to overwrite."
+msgstr ""
+"Для узла {0} уже существует запись с другим адресом назначения. Нажмите "
+"\"Заменить\" для перезаписи."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:283
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:253
@@ -222,9 +228,12 @@ msgstr "ОШИБКА: Не удалось сохранить файл адрес
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:142
 msgid ""
-"Invalid form submission, probably because you used the \"back\" or "
-"\"reload\" button on your browser. Please resubmit."
-msgstr "Форма не принята, скорее всего это произошло из-за того, что Вы нажимали кнопку \"Назад\" или \"Обновить\" в браузере. Пожалуйста, заполните форму заново."
+"Invalid form submission, probably because you used the \"back\" or \"reload"
+"\" button on your browser. Please resubmit."
+msgstr ""
+"Форма не принята, скорее всего это произошло из-за того, что Вы нажимали "
+"кнопку \"Назад\" или \"Обновить\" в браузере. Пожалуйста, заполните форму "
+"заново."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:342
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
@@ -233,7 +242,8 @@ msgstr "Форма не принята, скорее всего это прои�
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr "Если проблема сохраняется, проверьте, что в Вашем браузере разрешены cookies"
+msgstr ""
+"Если проблема сохраняется, проверьте, что в Вашем браузере разрешены cookies"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:131
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:117
@@ -279,7 +289,8 @@ msgstr "Не удалось удалить адрес назначения дл�
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
-msgstr "Подписки сохранены, запущена загрузка подписок и обновление адресной книги."
+msgstr ""
+"Подписки сохранены, запущена загрузка подписок и обновление адресной книги."
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:134
 msgid "Subscriptions saved."
@@ -455,33 +466,44 @@ msgstr "Примечания"
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:157
 msgid ""
 "File and directory paths here are relative to the addressbook's working "
-"directory, which is normally ~/.i2p/addressbook/ (Linux) or "
-"%APPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr "Пути указываются относительно домашней директории адресной книги, которая обычно расположена в ~/.i2p/addressbook/ (под Linux) или в %APPDATA%\\I2P\\addressbook\\ (под Windows)."
+"directory, which is normally ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P"
+"\\addressbook\\ (Windows)."
+msgstr ""
+"Пути указываются относительно домашней директории адресной книги, которая "
+"обычно расположена в ~/.i2p/addressbook/ (под Linux) или в %APPDATA%\\I2P"
+"\\addressbook\\ (под Windows)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:159
 msgid ""
-"If you want to manually add lines to an addressbook, add them to the private"
-" or master addressbooks."
-msgstr "Если Вы хотите вручную добавлять записи в адресную книгу, то добавляйте их в «приватную» или «основную»."
+"If you want to manually add lines to an addressbook, add them to the private "
+"or master addressbooks."
+msgstr ""
+"Если Вы хотите вручную добавлять записи в адресную книгу, то добавляйте их в "
+"«приватную» или «основную»."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 msgid ""
 "The router addressbook and the published addressbook are updated by the "
 "addressbook application."
-msgstr "Адресные книги «маршрутизатор» и «публикуемая» создаются/перезаписываются автоматически."
+msgstr ""
+"Адресные книги «маршрутизатор» и «публикуемая» создаются/перезаписываются "
+"автоматически."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:162
 msgid ""
 "When you publish your addressbook, ALL destinations from the master and "
 "router addressbooks appear there."
-msgstr "Когда Вы публикуете свою адресную книгу, то публикуются ВСЕ записи из адресных книг «основная» и «маршрутизатор»."
+msgstr ""
+"Когда Вы публикуете свою адресную книгу, то публикуются ВСЕ записи из "
+"адресных книг «основная» и «маршрутизатор»."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:163
 msgid ""
 "Use the private addressbook for private destinations, these are not "
 "published."
-msgstr "Пользуйтесь «приватной» адресной книгой для адресов, которые Вы не хотите публиковать."
+msgstr ""
+"Пользуйтесь «приватной» адресной книгой для адресов, которые Вы не хотите "
+"публиковать."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:165
 msgid "Options"
@@ -489,7 +511,8 @@ msgstr "Параметры"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:167
 msgid "File containing the list of subscriptions URLs (no need to change)"
-msgstr "Файл для хранения списка URL подписок (перенастраивать нет необходимости)"
+msgstr ""
+"Файл для хранения списка URL подписок (перенастраивать нет необходимости)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:169
 msgid "Update interval in hours"
@@ -499,7 +522,9 @@ msgstr "Интервал обновления (часы)"
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
-msgstr "hosts.txt для публикации (по умолчанию сохраняется в корневой директории встроенного в I2P маршутизатор вебсервера)"
+msgstr ""
+"hosts.txt для публикации (по умолчанию сохраняется в корневой директории "
+"встроенного в I2P маршутизатор вебсервера)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:173
 msgid "Your hosts.txt (don't change)"
@@ -527,15 +552,19 @@ msgstr "Обновлять ли публикуемую адресную книг
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:185
 msgid ""
-"File containing the etags header from the fetched subscription URLs (no need"
-" to change)"
-msgstr "Файл для хранения etags-заголовков от загруженных адресов подписок (перенастраивать нет необходимости)"
+"File containing the etags header from the fetched subscription URLs (no need "
+"to change)"
+msgstr ""
+"Файл для хранения etags-заголовков от загруженных адресов подписок "
+"(перенастраивать нет необходимости)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:187
 msgid ""
-"File containing the modification timestamp for each fetched subscription URL"
-" (no need to change)"
-msgstr "Файл для хранения даты/времени модификации каждого загруженного адреса подписки (перенастраивать нет необходимости)"
+"File containing the modification timestamp for each fetched subscription URL "
+"(no need to change)"
+msgstr ""
+"Файл для хранения даты/времени модификации каждого загруженного адреса "
+"подписки (перенастраивать нет необходимости)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:189
 msgid "File to log activity to (change to /dev/null if you like)"
@@ -621,26 +650,32 @@ msgstr "Адресная книга - это приложение в соста�
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
-msgstr "Его задача регулярно пополнять ваш hosts.txt адресами из настраиваемых источников (\"подписок\")."
+msgstr ""
+"Его задача регулярно пополнять ваш hosts.txt адресами из настраиваемых "
+"источников (\"подписок\")."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:137
 msgid ""
-"In the default configuration, the address book is only subscribed to "
-"www.i2p2.i2p."
-msgstr "По умолчанию в адресной книге настроена лишь одна подписка - на www.i2p2.i2p."
+"In the default configuration, the address book is only subscribed to www."
+"i2p2.i2p."
+msgstr ""
+"По умолчанию в адресной книге настроена лишь одна подписка - на www.i2p2.i2p."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:138
 msgid ""
-"Subscribing to additional sites is easy, just add them to your <a "
-"href=\"subscriptions\">subscriptions</a> file."
-msgstr "Чтобы подписаться на дополнительные сайты, добавьте их в Ваш <a href=\"subscriptions\">файл</a> подписок."
+"Subscribing to additional sites is easy, just add them to your <a href="
+"\"subscriptions\">subscriptions</a> file."
+msgstr ""
+"Чтобы подписаться на дополнительные сайты, добавьте их в Ваш <a href="
+"\"subscriptions\">файл</a> подписок."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
 msgid ""
-"For more information on naming in I2P, see <a "
-"href=\"http://www.i2p2.i2p/naming.html\" target=\"_top\">the overview on "
-"www.i2p2.i2p</a>."
-msgstr "Подробнее о механизме доменных имен в I2P читайте <a href=\"http://www.i2p2.i2p/naming.html\">обзор на www.i2p2.i2p</a>."
+"For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
+"naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>."
+msgstr ""
+"Подробнее о механизме доменных имен в I2P читайте <a href=\"http://www.i2p2."
+"i2p/naming.html\">обзор на www.i2p2.i2p</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142
 msgid "How does the addressbook application work?"
@@ -650,38 +685,50 @@ msgstr "Как работает адресная книга?"
 msgid ""
 "The addressbook application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
-msgstr "Адресная книга периодически опрашивает ваши подписки и добавляет их содержимое в вашу \"маршрутизаторную\" адресную книгу."
+msgstr ""
+"Адресная книга периодически опрашивает ваши подписки и добавляет их "
+"содержимое в вашу \"маршрутизаторную\" адресную книгу."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:145
 msgid ""
 "Then it merges your \"master\" address book into the router address book as "
 "well."
-msgstr "Затем она добавляет содержимое вашей \"основной\" (\"master\") адресной книги."
+msgstr ""
+"Затем она добавляет содержимое вашей \"основной\" (\"master\") адресной "
+"книги."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:146
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
-"address book, which will be publicly available if you are running an "
-"eepsite."
-msgstr "Если настроена публикация, то \"маршрутизаторная\" адресная книга копируется в \"публикуемую\" адресную книгу, которая будет доступна публично, если у вас настроена работа eep-сайта через встроенный веб-сервер jetty."
+"address book, which will be publicly available if you are running an eepsite."
+msgstr ""
+"Если настроена публикация, то \"маршрутизаторная\" адресная книга копируется "
+"в \"публикуемую\" адресную книгу, которая будет доступна публично, если у "
+"вас настроена работа eep-сайта через встроенный веб-сервер jetty."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:148
 msgid ""
 "The router also uses a private address book (not shown in the picture), "
 "which is not merged or published."
-msgstr "Маршрутизатор также использует приватную адресную книгу (не показано на картинке), которая никуда не копируется и не публикуется."
+msgstr ""
+"Маршрутизатор также использует приватную адресную книгу (не показано на "
+"картинке), которая никуда не копируется и не публикуется."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:149
 msgid ""
-"Hosts in the private address book can be accessed by you but their addresses"
-" are never distributed to others."
-msgstr "Хосты в приватной адресной книге могут быть доступны вам, но их адреса никогда не будут опубликованы для других."
+"Hosts in the private address book can be accessed by you but their addresses "
+"are never distributed to others."
+msgstr ""
+"Хосты в приватной адресной книге могут быть доступны вам, но их адреса "
+"никогда не будут опубликованы для других."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:150
 msgid ""
-"The private address book can also be used for aliases of hosts in your other"
-" address books."
-msgstr "Приватная адресная книга также может быть использована для хранения альтернативных (alias) и/или коротких адресов."
+"The private address book can also be used for aliases of hosts in your other "
+"address books."
+msgstr ""
+"Приватная адресная книга также может быть использована для хранения "
+"альтернативных (alias) и/или коротких адресов."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:111
 msgid "subscriptions"
@@ -694,7 +741,9 @@ msgstr "Файл подписок содержит список i2p URL."
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:148
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
-msgstr "Адресная книга периодически проверяет этот список на наличие новых адресов I2P-сайтов."
+msgstr ""
+"Адресная книга периодически проверяет этот список на наличие новых адресов "
+"I2P-сайтов."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Those URLs refer to published hosts.txt files."
@@ -704,13 +753,17 @@ msgstr "Каждый URL указывает на опубликованный ho
 msgid ""
 "The default subscription is the hosts.txt from www.i2p2.i2p, which is "
 "updated infrequently."
-msgstr "По умолчанию в списке задана только ссылка на hosts.txt с www.i2p2.i2p, который обновляется очень редко."
+msgstr ""
+"По умолчанию в списке задана только ссылка на hosts.txt с www.i2p2.i2p, "
+"который обновляется очень редко."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid ""
 "So it is a good idea to add additional subscriptions to sites that have the "
 "latest addresses."
-msgstr "Поэтому не помешает дополнительно подписаться на hosts.txt с более часто обновляемых сайтов."
+msgstr ""
+"Поэтому не помешает дополнительно подписаться на hosts.txt с более часто "
+"обновляемых сайтов."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:153
 msgid "See the FAQ for a list of subscription URLs."
