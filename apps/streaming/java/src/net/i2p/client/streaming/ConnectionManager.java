@@ -484,6 +484,7 @@ class ConnectionManager {
      * Something b0rked hard, so kill all of our connections without mercy.
      * Don't bother sending close packets.
      *
+     * CAN continue to use the manager.
      */
     public void disconnectAllHard() {
         for (Iterator<Connection> iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
@@ -491,6 +492,18 @@ class ConnectionManager {
             con.disconnect(false, false);
             iter.remove();
         }
+    }
+    
+    /**
+     * Kill all connections and the timers.
+     * Don't bother sending close packets.
+     *
+     * CANNOT continue to use the manager or restart.
+     *
+     * @since 0.9.7
+     */
+    public void shutdown() {
+        disconnectAllHard();
         _tcbShare.stop();
         _timer.stop();
     }

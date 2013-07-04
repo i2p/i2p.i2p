@@ -41,8 +41,12 @@ class TCBShare {
         _cleaner.schedule(CLEAN_TIME);
     }
 
+    /**
+     *  Cannot be restarted.
+     */
     public void stop() {
         _cleaner.cancel();
+        _cache.clear();
     }
 
     /** retrieve from cache */

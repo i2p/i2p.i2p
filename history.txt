@@ -1,3 +1,8 @@
+2013-07-04 zzz
+ * Streaming:
+   - Don't stop timers when session disconnects (tickets #644, #810)
+   - Throw exception on attempt to use destroyed socket manager
+
 2013-07-03 zzz
  * Console: Hide dead tunnel pools on /tunnels
  * Updater: Fix plugin update checker (ticket #897)

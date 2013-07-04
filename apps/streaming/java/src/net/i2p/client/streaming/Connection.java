@@ -990,7 +990,7 @@ class Connection {
                     // fall through
                 default:
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Closing connection due to inactivity");
+                        _log.warn("Closing (inactivity) " + toString());
                     if (_log.shouldLog(Log.DEBUG)) {
                         StringBuilder buf = new StringBuilder(128);
                         buf.append("last sent was: ").append(_context.clock().now() - _lastSendTime);

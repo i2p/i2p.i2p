@@ -38,6 +38,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private String _name;
     private static int __managerId = 0;
     private final ConnectionManager _connectionManager;
+    private volatile boolean _isDestroyed;
     
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
@@ -200,6 +201,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     private void verifySession() throws I2PException {
+        if (_isDestroyed)
+            throw new I2PException("destroyed");
         if (!_connectionManager.getSession().isClosed())
             return;
         _connectionManager.getSession().connect();
@@ -304,12 +307,14 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      * Destroy the socket manager, freeing all the associated resources.  This
-     * method will block untill all the managed sockets are closed.
+     * method will block until all the managed sockets are closed.
      *
+     * CANNOT be restarted.
      */
     public void destroySocketManager() {
+        _isDestroyed = true;
         _connectionManager.setAllowIncomingConnections(false);
-        _connectionManager.disconnectAllHard();
+        _connectionManager.shutdown();
         // should we destroy the _session too?
         // yes, since the old lib did (and SAM wants it to, and i dont know why not)
         if ( (_session != null) && (!_session.isClosed()) ) {
