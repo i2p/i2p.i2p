@@ -36,7 +36,7 @@ class TCBShare {
     public TCBShare(I2PAppContext ctx, SimpleTimer2 timer) {
         _context = ctx;
         _log = ctx.logManager().getLog(TCBShare.class);
-        _cache = new ConcurrentHashMap(4);
+        _cache = new ConcurrentHashMap<Destination,Entry>(4);
         _cleaner = new CleanEvent(timer);
         _cleaner.schedule(CLEAN_TIME);
     }
@@ -111,21 +111,21 @@ class TCBShare {
             _wdw = wdw;
             _updated = _context.clock().now();
         }
-        public int getRTT() { return _rtt; }
-        public void setRTT(int ms) {
+        public synchronized int getRTT() { return _rtt; }
+        public synchronized void setRTT(int ms) {
             _rtt = (int)(RTT_DAMPENING*_rtt + (1-RTT_DAMPENING)*ms);        
             if (_rtt > MAX_RTT)
                 _rtt = MAX_RTT;
             _updated = _context.clock().now();
         }
-        public int getWindowSize() { return _wdw; }
-        public void setWindowSize(int wdw) {
+        public synchronized int getWindowSize() { return _wdw; }
+        public synchronized void setWindowSize(int wdw) {
             _wdw = (int)(0.5 + WDW_DAMPENING*_wdw + (1-WDW_DAMPENING)*wdw);       
             if (_wdw > MAX_WINDOW_SIZE)
                 _wdw = MAX_WINDOW_SIZE;
             _updated = _context.clock().now();
         }
-        public boolean isExpired() {
+        public synchronized boolean isExpired() {
             return _updated < _context.clock().now() - EXPIRE_TIME;
         }
     }
