@@ -5,14 +5,15 @@
 #
 # Translators:
 # rafaelbf, 2013
+# tuliouel, 2013
 # wicked, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-02 17:25+0000\n"
-"PO-Revision-Date: 2013-06-20 16:09+0000\n"
-"Last-Translator: rafaelbf\n"
+"POT-Creation-Date: 2013-07-05 22:28+0000\n"
+"PO-Revision-Date: 2013-07-04 19:15+0000\n"
+"Last-Translator: tuliouel\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/"
 "pt/)\n"
 "Language: pt\n"
@@ -148,23 +149,20 @@ msgstr "interno"
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} túnel de entrada, {0} de saída"
+msgstr[1] "{0} túneis de entrada, {0} de saída"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:408
 msgid "lower bandwidth and reliability"
-msgstr ""
+msgstr "Baixar largura de banda e confiabilidade"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:410
-#, fuzzy
 msgid "standard bandwidth and reliability"
-msgstr ""
-"2 entrada, 2 túneis de saída  (uso de largura de banda padrão, confiança "
-"padrão)"
+msgstr "largura de banda e confiabilidade padrão"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:412
 msgid "higher bandwidth and reliability"
-msgstr ""
+msgstr "aumentar largura de banda e confiabilidade"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:119
 msgid "Tunnels are not initialized yet, please reload in two minutes."
@@ -1339,27 +1337,3 @@ msgstr "Finalizar"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
 msgstr "Próximo"
-
-#~ msgid ""
-#~ "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
-#~ msgstr ""
-#~ "1 entrada, 1 túnel de saída  (baixo uso de largura de banda, menor "
-#~ "confiança)"
-
-#~ msgid ""
-#~ "3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
-#~ msgstr ""
-#~ "3 entrada, 3 túneis de saída  (uso de largura de banda alto, alta "
-#~ "confiança)"
-
-#~ msgid "tunnels"
-#~ msgstr "túneis"
-
-#~ msgid "4 in, 4 out (high traffic server)"
-#~ msgstr "4 entr, 4 sai (servidor de alto tráfego)"
-
-#~ msgid "5 in, 5 out (high traffic server)"
-#~ msgstr "5 entr, 5 sai (servidor de alto tráfego)"
-
-#~ msgid "6 in, 6 out (high traffic server)"
-#~ msgstr "6 entr, 6 sai (servidor de alto tráfego)"

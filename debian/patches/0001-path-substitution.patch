@@ -404,7 +404,7 @@ Debian wrapper.config to try to prevent confusion.
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
 @@ -188,7 +188,7 @@
- msgstr ""
+ msgstr "Запросить дамп нитей Java, если запущено."
  
  #: ../i2prouter:1796
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
@@ -413,7 +413,7 @@ Debian wrapper.config to try to prevent confusion.
  
  #: ../i2prouter:1801
 @@ -196,5 +196,5 @@
- msgstr ""
+ msgstr "Запуск I2P от имени root НЕ рекомендовано."
  
  #: ../i2prouter:1804
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."

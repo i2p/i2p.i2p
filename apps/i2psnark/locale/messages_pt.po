@@ -11,15 +11,15 @@
 # wtfisthis <low_fps11@yahoo.com>, 2013
 # rafaelbf, 2013
 # Ruthein <rutweiller@hotmail.com>, 2012
-# tuliouel <tuliouel@gmail.com>, 2013
+# tuliouel, 2013
 # wicked, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-02 17:25+0000\n"
-"PO-Revision-Date: 2013-06-17 21:29+0000\n"
-"Last-Translator: rafaelbf\n"
+"POT-Creation-Date: 2013-07-05 22:28+0000\n"
+"PO-Revision-Date: 2013-07-04 19:09+0000\n"
+"Last-Translator: tuliouel\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/"
 "pt/)\n"
 "Language: pt\n"
@@ -596,9 +596,8 @@ msgid "Stop All"
 msgstr "Deter tudos"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:515
-#, fuzzy
 msgid "Start all stopped torrents"
-msgstr "Iniciar o torrente"
+msgstr "Iniciar todos os torrents interrompidos"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:517
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
@@ -1204,15 +1203,15 @@ msgstr "Lista de Rastreadores"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2356
 msgid "Comment"
-msgstr ""
+msgstr "Commentar"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2365
 msgid "Created"
-msgstr ""
+msgstr "Criado"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2375
 msgid "Created By"
-msgstr ""
+msgstr "Criado por"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2385
 msgid "Magnet link"

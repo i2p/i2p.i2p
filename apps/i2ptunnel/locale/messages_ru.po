@@ -4,17 +4,20 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
+# sfix <anon-9b36b2e@lycos.com>, 2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
+# gmind <grvmind@gmail.com>, 2012-2013
 # gmind <grvmind@gmail.com>, 2013
 # gmind <grvmind@gmail.com>, 2012
+# sfix <anon-9b36b2e@lycos.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-04 16:45+0000\n"
-"PO-Revision-Date: 2013-07-02 10:52+0000\n"
-"Last-Translator: gmind <grvmind@gmail.com>\n"
+"POT-Creation-Date: 2013-07-05 22:28+0000\n"
+"PO-Revision-Date: 2013-07-05 08:09+0000\n"
+"Last-Translator: Roman Azarenko <x12ozmouse@ya.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
 "language/ru_RU/)\n"
 "Language: ru_RU\n"
@@ -53,7 +56,7 @@ msgstr "Адрес"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1047
 msgid "Base 32"
-msgstr ""
+msgstr "Base 32"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
@@ -100,12 +103,12 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1221
 #, java-format
 msgid "{0} jump service"
-msgstr ""
+msgstr "{0} jump service"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:163
 #, java-format
 msgid "Added via address helper from {0}"
-msgstr ""
+msgstr "Добавлено через address helper из {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:165
 msgid "Added via address helper"
@@ -164,11 +167,8 @@ msgid "lower bandwidth and reliability"
 msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:410
-#, fuzzy
 msgid "standard bandwidth and reliability"
 msgstr ""
-"2 входящих, 2 исходящих туннеля (стандартная пропускная способность, "
-"стандартная надежность)"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:412
 msgid "higher bandwidth and reliability"
@@ -177,6 +177,7 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:119
 msgid "Tunnels are not initialized yet, please reload in two minutes."
 msgstr ""
+"Туннели ещё не инициализированы, перезагрузите страницу через 2 минуты."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:192
 msgid ""
@@ -227,11 +228,11 @@ msgstr "Порт не задан"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:485
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:611
 msgid "Invalid port"
-msgstr ""
+msgstr "неверный порт"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:488
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Внимание - порты с номером менее чем 1024 не рекомендуются"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:504
 msgid "Standard client"
@@ -290,7 +291,7 @@ msgstr "Хост не задан"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:605
 msgid "Invalid address"
-msgstr ""
+msgstr "Некорректный адрес"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:82
 msgid "I2P Tunnel Manager - Edit Client Tunnel"
@@ -998,6 +999,8 @@ msgid ""
 "If you need to connect to a remote service, such as an IRC server inside I2P "
 "or a code repository, then you will require a CLIENT tunnel."
 msgstr ""
+"Если вам необходимо подключаться к внешнему сервису, такому как IRC сервер "
+"внутри I2P или репозиторий с кодом, вам необходим КЛИЕНТСКИЙ туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
 msgid ""
@@ -1019,7 +1022,7 @@ msgstr "Несколько типов туннелей на выбор"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:225
 msgid "Basic tunnel for connecting to a single service inside I2P."
-msgstr ""
+msgstr "Базовый туннель для подключения к одиночному сервису внутри I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:227
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:269
@@ -1038,6 +1041,8 @@ msgid ""
 "\"http_proxy\" environment variable for command-line applications in GNU/"
 "Linux."
 msgstr ""
+"Установите этот туннель как HTTP-прокси в вашем браузере, или установите "
+"переменную \"http_proxy\" для консольных приложений в GNU/Linux."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
 msgid ""
@@ -1063,7 +1068,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:241
 msgid "A tunnel that implements the SOCKS protocol."
-msgstr ""
+msgstr "Туннель, реализующий протокол SOCKS."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:243
 msgid ""
@@ -1093,6 +1098,8 @@ msgid ""
 "This means that only one I2P tunnel is required rather than a separate "
 "tunnel per IRC network."
 msgstr ""
+"Это означает, что необходим лишь один I2P туннель, вместо отдельных туннелей "
+"для каждой IRC сети."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:251
 msgid ""
@@ -1103,13 +1110,15 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:253
 msgid "A client tunnel that implements the HTTP CONNECT command."
-msgstr ""
+msgstr "Клиентский туннель, поддерживающий команду HTTP CONNECT."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:255
 msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
 msgstr ""
+"Это позволяет TCP соединениям идти через HTTP outproxy, если прокси "
+"поддерживает метод CONNECT."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:257
 msgid "A customised client tunnel for Streamr."
@@ -1169,7 +1178,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:356
 msgid "Separate multiple proxies with commas."
-msgstr ""
+msgstr "Разделяйте несколько прокси запятыми."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:374
 msgid ""
@@ -1188,6 +1197,8 @@ msgid ""
 "This is the IP that your service is running on, this is usually on the same "
 "machine so 127.0.0.1 is autofilled."
 msgstr ""
+"IP-адрес, на котором запущен ваш сервис. Обычно это тот же компьютер, "
+"значение 127.0.0.1 будет вставлено автоматически."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:429
 msgid "This is the port that the service is accepting connections on."
@@ -1249,6 +1260,8 @@ msgid ""
 "Because you chose not to automatically start the tunnel, you will have to "
 "manually start it."
 msgstr ""
+"Поскольку вы выбрали не запускать туннель автоматически, вы необходимо будет "
+"запустить его вручную."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:558
 msgid ""
@@ -1279,7 +1292,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:712
 msgid "Save Tunnel"
-msgstr ""
+msgstr "Сохранить"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:718
 msgid "Finish"
@@ -1288,18 +1301,3 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
 msgstr ""
-
-#~ msgid ""
-#~ "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
-#~ msgstr ""
-#~ "1 входящий, 1 исходящий туннель (низкая пропускная способность, низкая "
-#~ "надежность) "
-
-#~ msgid ""
-#~ "3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
-#~ msgstr ""
-#~ "3 входящих, 3 исходящих туннеля (высокая пропускная способность, высокая "
-#~ "надежность)"
-
-#~ msgid "tunnels"
-#~ msgstr "туннелей"

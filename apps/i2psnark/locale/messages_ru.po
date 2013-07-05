@@ -9,12 +9,13 @@
 # foo <foo@bar>, 2009
 # mama__1 <cupivan+trans@ya.ru>, 2013
 # Roman Azarenko <x12ozmouse@ya.ru>, 2013
+# Roman Azarenko <x12ozmouse@ya.ru>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-04 16:45+0000\n"
-"PO-Revision-Date: 2013-07-02 07:51+0000\n"
+"POT-Creation-Date: 2013-07-05 22:27+0000\n"
+"PO-Revision-Date: 2013-07-05 08:09+0000\n"
 "Last-Translator: Roman Azarenko <x12ozmouse@ya.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
 "language/ru_RU/)\n"
@@ -169,7 +170,7 @@ msgstr "DHT выключено."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:710
 msgid "DHT change requires tunnel shutdown and reopen"
-msgstr ""
+msgstr "Изменение DHT требует повторного открытия туннеля"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:717
 #, java-format
@@ -237,6 +238,8 @@ msgid ""
 "Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and "
 "DHT only."
 msgstr ""
+"Предупреждение - Нет I2P трекеров в \"{0}\", анонсирование будет выполняться "
+"только на открытых трекерах и в DHT."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:957
 #, java-format
@@ -244,6 +247,8 @@ msgid ""
 "Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will "
 "announce to DHT only."
 msgstr ""
+"Предупреждение - Нет I2P трекеров в \"{0}\" и использование открытых "
+"трекеров запрещено, анонсирование будет выполняться только в DHT."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:959
 #, java-format
@@ -251,6 +256,9 @@ msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
 "disabled, you should enable open trackers or DHT before starting the torrent."
 msgstr ""
+"Предупреждение - Нет I2P трекеров в \"{0}\" и использование открытых "
+"трекеров и DHT запрещено. Следует разрешить их использование перед запуском "
+"торрента."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:981
 #, java-format
@@ -285,6 +293,9 @@ msgid ""
 "Open trackers are disabled and we have no DHT peers. Fetch of {0} may not "
 "succeed until you start another torrent, enable open trackers, or enable DHT."
 msgstr ""
+"Использование открытых трекеров запрещено и нет DHT-пиров. Передача {0} не "
+"может быть завершена. Запустите другой торрент или разрешите использование "
+"открытых трекеров и/или DHT."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1067
 #, java-format
@@ -416,7 +427,7 @@ msgstr "Останавливаем все торренты и закрываем
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1922
 msgid "Closing I2P tunnel after notifying trackers."
-msgstr ""
+msgstr "Закрытие туннеля I2P после уведомления трекеров"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1929
 #: ../java/src/org/klomp/snark/SnarkManager.java:1940
@@ -583,9 +594,8 @@ msgid "Stop All"
 msgstr "Остановить все"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:515
-#, fuzzy
 msgid "Start all stopped torrents"
-msgstr "Запустить торрент"
+msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:517
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
@@ -786,7 +796,7 @@ msgstr "Проверка"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1250
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1251
 msgid "Allocating"
-msgstr ""
+msgstr "Выделение места"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1265
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1272
