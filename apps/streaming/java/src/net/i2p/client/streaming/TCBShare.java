@@ -87,10 +87,12 @@ class TCBShare {
             e = new Entry(opts.getRTT(), opts.getWindowSize());
             _cache.put(dest, e);
         } else {
-            old = e.getRTT();
-            oldw = e.getWindowSize();
-            e.setRTT(opts.getRTT());
-            e.setWindowSize(opts.getWindowSize());
+            synchronized(e) {
+                old = e.getRTT();
+                oldw = e.getWindowSize();
+                e.setRTT(opts.getRTT());
+                e.setWindowSize(opts.getWindowSize());
+            }
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("To cache: " +
