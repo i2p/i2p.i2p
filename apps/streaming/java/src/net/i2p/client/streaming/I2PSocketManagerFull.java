@@ -130,7 +130,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             _log.debug("receiveSocket() called: " + con);
         }
         if (con != null) {
-            I2PSocketFull sock = new I2PSocketFull(con);
+            I2PSocketFull sock = new I2PSocketFull(con,_context);
             con.setSocket(sock);
             return sock;
         } else { 
@@ -242,7 +242,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         Connection con = _connectionManager.connect(peer, opts);
         if (con == null)
             throw new TooManyStreamsException("Too many streams, max " + _defaultOptions.getMaxConns());
-        I2PSocketFull socket = new I2PSocketFull(con);
+        I2PSocketFull socket = new I2PSocketFull(con,_context);
         con.setSocket(socket);
         if (con.getConnectionError() != null) { 
             con.disconnect(false);
