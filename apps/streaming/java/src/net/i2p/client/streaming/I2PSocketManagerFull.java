@@ -8,6 +8,8 @@ import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -36,9 +38,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final ConnectionOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
-    private static int __managerId = 0;
+    private static final AtomicInteger __managerId = new AtomicInteger(0);
     private final ConnectionManager _connectionManager;
-    private volatile boolean _isDestroyed;
+    private final AtomicBoolean _isDestroyed = new AtomicBoolean(false);
     
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
@@ -76,7 +78,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _session = session;
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
         
-        _name = name + " " + (++__managerId);
+        _name = name + " " + (__managerId.incrementAndGet());
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
         _connectionManager = new ConnectionManager(_context, _session, _defaultOptions);
@@ -201,7 +203,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     private void verifySession() throws I2PException {
-        if (_isDestroyed)
+        if (_isDestroyed.get())
             throw new I2PException("destroyed");
         if (!_connectionManager.getSession().isClosed())
             return;
@@ -312,7 +314,14 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * CANNOT be restarted.
      */
     public void destroySocketManager() {
-        _isDestroyed = true;
+        if (!_isDestroyed.compareAndSet(false,true)) {
+            // shouldn't happen, log a stack trace to find out why it happened
+            if (_log.shouldLog(Log.WARN)) {
+                String log = "over-destroying manager "+getName();
+                _log.log(Log.WARN,log,new Exception("check stack trace"));
+            }
+            return;
+        }
         _connectionManager.setAllowIncomingConnections(false);
         _connectionManager.shutdown();
         // should we destroy the _session too?
@@ -323,8 +332,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             } catch (I2PSessionException ise) {
                 _log.warn("Unable to destroy the session", ise);
             }
-            if (pcapWriter != null)
-                pcapWriter.flush();
+            PcapWriter pcap = null;
+            synchronized(_pcapInitLock) {
+                pcap = pcapWriter;
+            }
+            if (pcap != null)
+                pcap.flush();
         }
     }
 
@@ -335,7 +348,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public Set<I2PSocket> listSockets() {
         Set<Connection> connections = _connectionManager.listConnections();
-        Set<I2PSocket> rv = new HashSet(connections.size());
+        Set<I2PSocket> rv = new HashSet<I2PSocket>(connections.size());
         for (Connection con : connections) {
             if (con.getSocket() != null)
                 rv.add(con.getSocket());
