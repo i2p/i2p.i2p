@@ -316,10 +316,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public void destroySocketManager() {
         if (!_isDestroyed.compareAndSet(false,true)) {
             // shouldn't happen, log a stack trace to find out why it happened
-            if (_log.shouldLog(Log.WARN)) {
-                String log = "over-destroying manager "+getName();
-                _log.log(Log.WARN,log,new Exception("check stack trace"));
-            }
+            LogUtil.logCloseLoop(_log, "I2PSocketManager", getName());
             return;
         }
         _connectionManager.setAllowIncomingConnections(false);
