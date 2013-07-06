@@ -69,7 +69,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final OutboundMessageFragments _fragments;
     private final OutboundMessageFragments.ActiveThrottle _activeThrottle;
     private OutboundRefiller _refiller;
-    private PacketPusher _pusher;
+    private volatile PacketPusher _pusher;
     private final InboundMessageFragments _inboundFragments;
     //private UDPFlooder _flooder;
     private PeerTestManager _testManager;
@@ -423,12 +423,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.router().saveConfig(changes, null);
         }
 
-        _establisher.startup();
         _handler.startup();
         _fragments.startup();
         _inboundFragments.startup();
         _pusher = new PacketPusher(_context, _fragments, _endpoints);
         _pusher.startup();
+        // must be after pusher
+        _establisher.startup();
         if (USE_PRIORITY)
             _refiller.startup();
         //if (SHOULD_FLOOD_PEERS)
@@ -1413,14 +1414,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     *  This sends it directly out, bypassing OutboundMessageFragments
-     *  and the PacketPusher. The only queueing is for the bandwidth limiter.
+     *  This sends it directly out, bypassing OutboundMessageFragments.
+     *  The only queueing is for the bandwidth limiter.
      *  BLOCKING if OB queue is full.
      */
     void send(UDPPacket packet) { 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending packet " + packet);
-        _pusher.send(packet); 
+        if (_pusher != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Sending packet " + packet);
+            _pusher.send(packet); 
+        } else {
+            _log.error("No pusher", new Exception());
+        }
     }
     
     /**
