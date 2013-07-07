@@ -157,10 +157,10 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         final int cnt = _nackCount.incrementAndGet();
         SimpleTimer2.TimedEvent evt = _resendEvent;
         if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && evt != null && (!_retransmitted) &&
-            (_numSends == 1 || _lastSend < _context.clock().now() + 4*1000)) {  // Don't fast retx if we recently resent it
+            (_numSends == 1 || _lastSend < _context.clock().now() - 4*1000)) {  // Don't fast retx if we recently resent it
             _retransmitted = true;
             evt.reschedule(0);
-            // shouldn't ^^^ be clock.now() - 4000 ??? --zab
+            // the predicate used to be '+', changing to '-' --zab
             
             if (_log.shouldLog(Log.DEBUG)) {
                 final String log = String.format("%s nacks and retransmits. Criteria: nacks=%d, retransmitted=%b,"+
