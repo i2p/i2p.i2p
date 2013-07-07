@@ -449,7 +449,15 @@ class Packet {
             try {
                 System.arraycopy(_payload.getData(), _payload.getOffset(), buffer, cur, _payload.getValid());
             } catch (ArrayIndexOutOfBoundsException aioobe) {
-                System.err.println("payload.length: " + _payload.getValid() + " buffer.length: " + buffer.length + " cur: " + cur);
+                String error = "payload.length: " + _payload.getValid() + " buffer.length: " + buffer.length + " cur: " + cur;
+                I2PAppContext context = I2PAppContext.getCurrentContext();
+                if (context != null) {
+                    Log l = context.logManager().getLog(Packet.class);
+                    l.log(Log.ERROR,error,aioobe);
+                } else {
+                    System.err.println(error);
+                    aioobe.printStackTrace(System.out);
+                }
                 throw aioobe;
             }
             cur += _payload.getValid();
