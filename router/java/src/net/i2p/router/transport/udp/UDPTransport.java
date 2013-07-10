@@ -44,7 +44,6 @@ import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
-import net.i2p.util.Translate;
 
 /**
  *  The SSU transport
@@ -2414,7 +2413,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-        buf.append("<tr class=\"tablefooter\"><td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
+        buf.append("<tr class=\"tablefooter\"><td colspan=\"3\" align=\"left\"><b>")
+           .append(ngettext("{0} peer", "{0} peers", peers.size()))
+           .append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
         buf.append(formatKBps(bpsIn)).append(THINSP).append(formatKBps(bpsOut));
         long x = numPeers > 0 ? uptimeMsTotal/numPeers : 0;
@@ -2474,21 +2475,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     private static final DecimalFormat _pctFmt = new DecimalFormat("#0.0%");
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
-
-    /**
-     *  Translate
-     */
-    private final String _(String s) {
-        return Translate.getString(s, _context, BUNDLE_NAME);
-    }
-
-    /**
-     *  Translate
-     */
-    private final String _(String s, Object o) {
-        return Translate.getString(s, o, _context, BUNDLE_NAME);
-    }
 
     /*
      * Cache the bid to reduce object churn

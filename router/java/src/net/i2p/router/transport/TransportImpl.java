@@ -43,6 +43,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.Translate;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages
@@ -653,5 +654,31 @@ public abstract class TransportImpl implements Transport {
             // ipv?
             return false;
         }
+    }
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /**
+     *  Translate
+     *  @since 0.9.8 moved from transports
+     */
+    protected String _(String s) {
+        return Translate.getString(s, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  Translate
+     *  @since 0.9.8 moved from transports
+     */
+    protected String _(String s, Object o) {
+        return Translate.getString(s, o, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  Translate
+     *  @since 0.9.8
+     */
+    protected String ngettext(String s, String p, int n) {
+        return Translate.getString(n, s, p, _context, BUNDLE_NAME);
     }
 }
