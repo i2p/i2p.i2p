@@ -10,6 +10,7 @@ package net.i2p.router.client;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,7 +45,7 @@ import net.i2p.util.Log;
  */
 class ClientManager {
     private final Log _log;
-    private ClientListenerRunner _listener;
+    protected ClientListenerRunner _listener;
     // Destination --> ClientConnectionRunner
     // Locked for adds/removes but not lookups
     private final Map<Destination, ClientConnectionRunner>  _runners;
@@ -53,8 +54,9 @@ class ClientManager {
     private final Map<Hash, ClientConnectionRunner>  _runnersByHash;
     // ClientConnectionRunner for clients w/out a Dest yet
     private final Set<ClientConnectionRunner> _pendingRunners;
-    private final RouterContext _ctx;
-    private volatile boolean _isStarted;
+    protected final RouterContext _ctx;
+    protected final int _port;
+    protected volatile boolean _isStarted;
 
     /** Disable external interface, allow internal clients only @since 0.8.3 */
     private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
@@ -65,6 +67,10 @@ class ClientManager {
 
     private static final long REQUEST_LEASESET_TIMEOUT = 60*1000;
 
+    /**
+     *  Does not start the listeners.
+     *  Caller must call start()
+     */
     public ClientManager(RouterContext context, int port) {
         _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);
@@ -75,22 +81,27 @@ class ClientManager {
         _runners = new ConcurrentHashMap();
         _runnersByHash = new ConcurrentHashMap();
         _pendingRunners = new HashSet();
-        startListeners(port);
+        _port = port;
         // following are for RequestLeaseSetJob
         _ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 60*60*1000 });
         _ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 60*60*1000 });
         _ctx.statManager().createRateStat("client.requestLeaseSetDropped", "How frequently the router requests a new leaseSet but the client drops?", "ClientMessages", new long[] { 60*60*1000 });
     }
 
+    /** @since 0.9.8 */
+    public synchronized void start() {
+        startListeners();
+    }
+
     /** Todo: Start a 3rd listener for IPV6? */
-    private void startListeners(int port) {
+    protected void startListeners() {
         if (!_ctx.getBooleanProperty(PROP_DISABLE_EXTERNAL)) {
             // there's no option to start both an SSL and non-SSL listener
             if (_ctx.getBooleanProperty(PROP_ENABLE_SSL))
-                _listener = new SSLClientListenerRunner(_ctx, this, port);
+                _listener = new SSLClientListenerRunner(_ctx, this, _port);
             else
-                _listener = new ClientListenerRunner(_ctx, this, port);
-            Thread t = new I2PThread(_listener, "ClientListener:" + port, true);
+                _listener = new ClientListenerRunner(_ctx, this, _port);
+            Thread t = new I2PThread(_listener, "ClientListener:" + _port, true);
             t.start();
         }
         _isStarted = true;
@@ -102,9 +113,7 @@ class ClientManager {
         // to let the old listener die
         try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
         
-        int port = _ctx.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT,
-                                    ClientManagerFacadeImpl.DEFAULT_PORT);
-        startListeners(port);
+        startListeners();
     }
     
     /**
@@ -404,12 +413,18 @@ class ClientManager {
         }
     }
     
+    /**
+     *  @return unmodifiable, not a copy
+     */
     Set<Destination> getRunnerDestinations() {
-        Set<Destination> dests = new HashSet();
-        dests.addAll(_runners.keySet());
-        return dests;
+        return Collections.unmodifiableSet(_runners.keySet());
     }
     
+    /**
+     *  Unused
+     *
+     *  @param dest null for all local destinations
+     */
     public void reportAbuse(Destination dest, String reason, int severity) {
         if (dest != null) {
             ClientConnectionRunner runner = getRunner(dest);
@@ -417,9 +432,7 @@ class ClientManager {
                 runner.reportAbuse(reason, severity);
             }
         } else {
-            Set dests = getRunnerDestinations();
-            for (Iterator iter = dests.iterator(); iter.hasNext(); ) {
-                Destination d = (Destination)iter.next();
+            for (Destination d : _runners.keySet()) {
                 reportAbuse(d, reason, severity);
             }
         }
