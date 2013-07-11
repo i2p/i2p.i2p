@@ -1,5 +1,6 @@
 2013-07-11 kytv
  * Chinese, Russian, Spanish, and Turkish updates from Transifex
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2013-07-02
 
 2013-07-11 str4d
  * susimail: Improvements to layout in mobile browsers
