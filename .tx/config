@@ -139,6 +139,7 @@ trans.ru_RU = debian/po/ru.po
 trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
 trans.tr_TR = debian/po/tr.po
+trans.zh_CN = debian/po/zh.po
 
 [I2P.i2prouter-script]
 source_file = installer/resources/locale/po/messages_en.po
@@ -148,6 +149,8 @@ trans.fr = installer/resources/locale/po/messages_fr.po
 trans.it = installer/resources/locale/po/messages_it.po
 trans.sv_SE = installer/resources/locale/po/messages_sv.po
 trans.ru_RU = installer/resources/locale/po/messages_ru.po
+trans.tr_TR = installer/resources/locale/po/messages_tr.po
+trans.zh_CN = installer/resources/locale/po/messages_zh.po
 
 [main]
 host = http://www.transifex.net

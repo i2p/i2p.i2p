@@ -1,0 +1,198 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Kaya Zeren <kayazeren@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2013-07-04 16:43+0000\n"
+"PO-Revision-Date: 2013-07-11 20:20+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
+"Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/I2P/language/tr_TR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../i2prouter:203
+msgid "Failed to load the wrapper"
+msgstr "Sarıcı yüklenemedi"
+
+#: ../i2prouter:908 ../i2prouter:935 ../i2prouter:1009 ../i2prouter:1037
+#: ../i2prouter:1061
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr "$APP_LONG_NAME zaten çalışıyor."
+
+#: ../i2prouter:919
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME çalışıyor"
+
+#: ../i2prouter:942
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME bekleniyor"
+
+#: ../i2prouter:989
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr "DİKKAT: $APP_LONG_NAME başlatılamamış olabilir."
+
+#: ../i2prouter:1003 ../i2prouter:1031 ../i2prouter:1240 ../i2prouter:1529
+msgid "Must be root to perform this action."
+msgstr "Bu işlemi ancak root yapabilir."
+
+#: ../i2prouter:1047
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME başlatılıyor"
+
+#: ../i2prouter:1072
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME durduruluyor"
+
+#: ../i2prouter:1076 ../i2prouter:1144 ../i2prouter:1697
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr "$APP_LONG_NAME çalışmıyordu."
+
+#: ../i2prouter:1089 ../i2prouter:1097 ../i2prouter:1159 ../i2prouter:1167
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME durdurulamıyor."
+
+#: ../i2prouter:1115
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr "$APP_LONG_NAME kapanması bekleniyor"
+
+#: ../i2prouter:1129
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME durdurulamadı."
+
+#: ../i2prouter:1132
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME durduruldu."
+
+#: ../i2prouter:1140
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr "$APP_LONG_NAME düzgün şekilde kapatıldı"
+
+#: ../i2prouter:1186
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr "$APP_LONG_NAME çalışmıyor."
+
+#: ../i2prouter:1191
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr "$APP_LONG_NAME çalışıyor: PID:$pid"
+
+#: ../i2prouter:1194
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME çalışıyor: PID:$pid, Sarıcı:$STATUS, Java:$JAVASTATUS"
+
+#: ../i2prouter:1247 ../i2prouter:1259 ../i2prouter:1278 ../i2prouter:1295
+#: ../i2prouter:1362 ../i2prouter:1382 ../i2prouter:1396 ../i2prouter:1410
+#: ../i2prouter:1438 ../i2prouter:1476 ../i2prouter:1511
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr "$APP_LONG_NAME arka plan hizmeti zaten yüklenmiş."
+
+#: ../i2prouter:1250 ../i2prouter:1265 ../i2prouter:1367 ../i2prouter:1399
+#: ../i2prouter:1413 ../i2prouter:1427 ../i2prouter:1441 ../i2prouter:1479
+#: ../i2prouter:1514
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr "$APP_LONG_NAME arka plan hizmeti yükleniyor"
+
+#: ../i2prouter:1521
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "$DIST_OS üzerine yükleme desteklenmiyor"
+
+#: ../i2prouter:1537 ../i2prouter:1550 ../i2prouter:1564 ../i2prouter:1573
+#: ../i2prouter:1583 ../i2prouter:1607 ../i2prouter:1620 ../i2prouter:1632
+#: ../i2prouter:1650 ../i2prouter:1663 ../i2prouter:1677
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr "$APP_LONG_NAME arka plan hizmeti kaldırılıyor"
+
+#: ../i2prouter:1543 ../i2prouter:1558 ../i2prouter:1567 ../i2prouter:1577
+#: ../i2prouter:1588 ../i2prouter:1601 ../i2prouter:1613 ../i2prouter:1626
+#: ../i2prouter:1644 ../i2prouter:1657 ../i2prouter:1671 ../i2prouter:1682
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr "$APP_LONG_NAME arka plan hizmeti yüklü değil."
+
+#: ../i2prouter:1686
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr "$DIST_OS üzerinden kaldırma desteklenmiyor"
+
+#: ../i2prouter:1773
+msgid "Commands:"
+msgstr "Komutlar:"
+
+#: ../i2prouter:1774
+msgid "Launch in the current console."
+msgstr "Geçerli konsolda başlatın."
+
+#: ../i2prouter:1775
+msgid "Start in the background as a daemon process."
+msgstr "Arka plan hizmeti olarak başlatın."
+
+#: ../i2prouter:1776
+msgid "Stop if running as a daemon or in another console."
+msgstr "Arka plan hizmeti olarak ya da başka bir konsolda çalışıyorsa durdurun."
+
+#: ../i2prouter:1777
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr "Uygun şekilde kapatın. 11 dakika sürebilir."
+
+#: ../i2prouter:1778
+msgid "Stop if running and then start."
+msgstr "Çalışıyorsa durdurun ve başlatın."
+
+#: ../i2prouter:1779
+msgid "Restart only if already running."
+msgstr "Yalnız zaten çalışıyorsa yeniden başlatın."
+
+#: ../i2prouter:1780
+msgid "Query the current status."
+msgstr "Geçerli durumu öğrenin."
+
+#: ../i2prouter:1781
+msgid "Install to start automatically when system boots."
+msgstr "Sistem açılırken kendiliğinden yüklensin."
+
+#: ../i2prouter:1782
+msgid "Uninstall."
+msgstr "Kaldırın."
+
+#: ../i2prouter:1783
+msgid "Request a Java thread dump if running."
+msgstr "Çalışıyorsa Java iş parçacığı dökümü isteyin."
+
+#: ../i2prouter:1796
+msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+msgstr "i2prouter dosyasını düzenleyin ve RUN_AS_USER değişkenini ayarlayın"
+
+#: ../i2prouter:1801
+msgid "Running I2P as the root user is *not* recommended."
+msgstr "I2P yazılımının root olarak çalıştırmanız *önerilmez*."
+
+#: ../i2prouter:1804
+msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+msgstr "Root olarak çalıştırmak için i2prouter dosyasını düzenleyin ve ALLOW_ROOT=true ayarını yapın."

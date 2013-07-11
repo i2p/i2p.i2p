@@ -439,3 +439,43 @@ Debian wrapper.config to try to prevent confusion.
 -msgstr "För att köra som root iallafall, ändra i2prouter och sätt ALLOW_ROOT=true"
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
 +msgstr "För att köra som root iallafall, ändra /etc/default/i2p och sätt ALLOW_ROOT=true"
+--- a/installer/resources/locale/po/messages_zh.po
++++ b/installer/resources/locale/po/messages_zh.po
+@@ -187,13 +187,13 @@
+ msgstr "请求Java转储(如果在运行)。"
+ 
+ #: ../i2prouter:1796
+-msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+-msgstr "请编辑 i2prouter 设置 RUN_AS_USER 变量"
++msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
++msgstr "请编辑 /etc/default/i2p 设置 RUN_AS_USER 变量"
+ 
+ #: ../i2prouter:1801
+ msgid "Running I2P as the root user is *not* recommended."
+ msgstr "推荐 *不要* 以 root 身份运行 I2P 。"
+ 
+ #: ../i2prouter:1804
+-msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "要以root运行，请编辑 i2prouter 并设置 ALLOW_ROOT=true。"
++msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
++msgstr "要以root运行，请编辑 /etc/default/i2p 并设置 ALLOW_ROOT=true。"
+--- a/installer/resources/locale/po/messages_tr.po
++++ b/installer/resources/locale/po/messages_tr.po
+@@ -186,13 +186,13 @@
+ msgstr "Çalışıyorsa Java iş parçacığı dökümü isteyin."
+ 
+ #: ../i2prouter:1796
+-msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+-msgstr "i2prouter dosyasını düzenleyin ve RUN_AS_USER değişkenini ayarlayın"
++msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
++msgstr "/etc/default/i2p dosyasını düzenleyin ve RUN_AS_USER değişkenini ayarlayın"
+ 
+ #: ../i2prouter:1801
+ msgid "Running I2P as the root user is *not* recommended."
+ msgstr "I2P yazılımının root olarak çalıştırmanız *önerilmez*."
+ 
+ #: ../i2prouter:1804
+-msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "Root olarak çalıştırmak için i2prouter dosyasını düzenleyin ve ALLOW_ROOT=true ayarını yapın."
++msgid "To run as root anyway, edit /etc/defalt/i2p and set ALLOW_ROOT=true."
++msgstr "Root olarak çalıştırmak için /etc/default/i2p dosyasını düzenleyin ve ALLOW_ROOT=true ayarını yapın."
