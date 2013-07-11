@@ -170,6 +170,7 @@ public class WebMail extends HttpServlet
 
 	private static final String RC_PROP_THEME = "routerconsole.theme";
 	private static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
+	private static final String RC_PROP_FORCE_MOBILE_CONSOLE = "routerconsole.forceMobileConsole";
 	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
 
@@ -324,6 +325,7 @@ public class WebMail extends HttpServlet
 		public ArrayList attachments;
 		public boolean reallyDelete;
 		String themePath, imgPath;
+		boolean isMobile;
 		
 		
 		SessionObject()
@@ -1183,6 +1185,36 @@ public class WebMail extends HttpServlet
 		}
 		return sessionObject;
 	}
+    /**
+     * Copied from net.i2p.router.web.CSSHelper
+     * @since 0.9.7
+     */
+    private static boolean isMobile(String ua) {
+        return
+                               // text
+                              (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
+                               ua.startsWith("ELinks") || ua.startsWith("Links") ||
+                               ua.startsWith("Dillo") ||
+                               // mobile
+                               // http://www.zytrax.com/tech/web/mobile_ids.html
+                               // Android tablet UAs don't have "Mobile" in them
+                               (ua.contains("Android") && ua.contains("Mobile")) ||
+                               ua.contains("iPhone") ||
+                               ua.contains("iPod") || ua.contains("iPad") ||
+                               ua.contains("Kindle") || ua.contains("Mobile") ||
+                               ua.contains("Nintendo Wii") ||
+                               ua.contains("Opera Mini") || ua.contains("Opera Mobi") ||
+                               ua.contains("Palm") ||
+                               ua.contains("PLAYSTATION") || ua.contains("Playstation") ||
+                               ua.contains("Profile/MIDP-") || ua.contains("SymbianOS") ||
+                               ua.contains("Windows CE") || ua.contains("Windows Phone") ||
+                               ua.startsWith("BlackBerry") || ua.startsWith("DoCoMo") ||
+                               ua.startsWith("Nokia") || ua.startsWith("OPWV-SDK") ||
+                               ua.startsWith("MOT-") || ua.startsWith("SAMSUNG-") ||
+                               ua.startsWith("nook") || ua.startsWith("SCH-") ||
+                               ua.startsWith("SEC-") || ua.startsWith("SonyEricsson") ||
+                               ua.startsWith("Vodafone"));
+    }
 	/**
 	 * 
 	 * @param httpRequest
@@ -1210,6 +1242,8 @@ public class WebMail extends HttpServlet
 				theme = DEFAULT_THEME;
 			}
 		}
+		boolean forceMobileConsole = ctx.getBooleanProperty(RC_PROP_FORCE_MOBILE_CONSOLE);
+		boolean isMobile = (forceMobileConsole || isMobile(httpRequest.getHeader("User-Agent")));
 
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
@@ -1232,6 +1266,7 @@ public class WebMail extends HttpServlet
 			sessionObject.showAttachment = null;
 			sessionObject.themePath = "/themes/susimail/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
+			sessionObject.isMobile = isMobile;
 			
 			processStateChangeButtons( sessionObject, request );
 			
@@ -1290,8 +1325,12 @@ public class WebMail extends HttpServlet
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
 					"<title>susimail - " + subtitle + "</title>\n" +
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css\">\n" +
-					"</head>\n<body>\n" +
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css\">\n" );
+				if (sessionObject.isMobile ) {
+					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
+						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
+				}
+				out.println( "</head>\n<body>\n" +
 					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
 
@@ -1635,7 +1674,7 @@ public class WebMail extends HttpServlet
 			button( DELETE, _("Delete") ) + spacer +
 			button( REFRESH, _("Check Mail") ) + spacer +
 			button( RELOAD, _("Reload Config") ) + spacer +
-			button( LOGOUT, _("Logout") ) + "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
+			button( LOGOUT, _("Logout") ) + "<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"8\"><hr></td></tr>\n<tr>" +
 			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("Sender"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +

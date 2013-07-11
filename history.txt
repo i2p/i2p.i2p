@@ -1,3 +1,6 @@
+2013-07-11 str4d
+ * susimail: Improvements to layout in mobile browsers
+
 2013-07-06 zzz
  * TunnelPool: Don't reuse peers for exploratory tunnels
 
