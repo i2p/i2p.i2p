@@ -10,8 +10,8 @@
 #
 # zzz - public domain
 #
-CLASS=net.i2p.i2ptunnel.web.messages
-TMPFILE=build/javafiles.txt
+CLASS=net.i2p.i2ptunnel.proxy.messages
+TMPFILE=build/javafiles-proxy.txt
 export TZ=UTC
 RC=0
 
@@ -29,11 +29,11 @@ fi
 # set LG2 to the language you need in envrionment varibales to enable this
 
 # add ../java/ so the refs will work in the po file
-JPATHS="../java/src/net/i2p/i2ptunnel/web ../jsp/WEB-INF"
-for i in ../locale/messages_*.po
+JPATHS="../java/build/Proxy.java ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java"
+for i in ../locale-proxy/messages_*.po
 do
 	# get language
-	LG=${i#../locale/messages_}
+	LG=${i#../locale-proxy/messages_}
 	LG=${LG%.po}
 
 	# skip, if specified
@@ -46,8 +46,8 @@ do
 		# make list of java files newer than the .po file
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
-	if [ -s ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web/messages_$LG.class -a \
-	     ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web/messages_$LG.class -nt $i -a \
+	if [ -s build/obj/net/i2p/i2ptunnel/proxy/messages_$LG.class -a \
+	     build/obj/net/i2p/i2ptunnel/proxy/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue
@@ -67,7 +67,7 @@ do
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
+	                 --keyword=_ \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then
@@ -95,12 +95,12 @@ do
         echo "Generating ${CLASS}_$LG ResourceBundle..."
 
         # convert to class files in build/obj
-        msgfmt --java --statistics -r $CLASS -l $LG -d ../jsp/WEB-INF/classes $i
+        msgfmt --java --statistics -r $CLASS -l $LG -d build/obj $i
         if [ $? -ne 0 ]
         then
             echo "ERROR - msgfmt failed on ${i}, not updating translations"
             # msgfmt leaves the class file there so the build would work the next time
-            find src/WEB-INF/classes -name messages_${LG}.class -exec rm -f {} \;
+            find build/obj -name messages_${LG}.class -exec rm -f {} \;
             RC=1
             break
         fi

@@ -1409,8 +1409,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
     }
      ****/
-    /** */
-    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.web.messages";
+
+    /** these strings go in the jar, not the war */
+    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.proxy.messages";
 
     /** lang in routerconsole.lang property, else current locale */
     protected static String _(String key) {

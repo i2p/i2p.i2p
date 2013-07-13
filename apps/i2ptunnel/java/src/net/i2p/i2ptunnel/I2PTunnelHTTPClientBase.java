@@ -3,9 +3,9 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 import net.i2p.util.PasswordManager;
+import net.i2p.util.TranslateReader;
 
 /**
  * Common things for HTTPClient and ConnectClient
@@ -496,44 +497,35 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      */
     protected static byte[] getErrorPage(I2PAppContext ctx, String base, byte[] backup) {
         File errorDir = new File(ctx.getBaseDir(), "docs");
-        String lang = ctx.getProperty("routerconsole.lang", Locale.getDefault().getLanguage());
-        if(lang != null && lang.length() > 0 && !lang.equals("en")) {
-            File file = new File(errorDir, base + "-header_" + lang + ".ht");
-            try {
-                return readFile(file);
-            } catch(IOException ioe) {
-                // try the english version now
-            }
-        }
         File file = new File(errorDir, base + "-header.ht");
         try {
-            return readFile(file);
+            return readFile(ctx, file);
         } catch(IOException ioe) {
             return backup;
         }
     }
 
+    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.proxy.messages";
+
     /**
      *  @since 0.9.4 moved from I2PTunnelHTTPClient
      */
-    private static byte[] readFile(File file) throws IOException {
-        FileInputStream fis = null;
-        byte[] buf = new byte[2048];
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
+    private static byte[] readFile(I2PAppContext ctx, File file) throws IOException {
+        Reader reader = null;
+        char[] buf = new char[512];
+        StringBuilder out = new StringBuilder(2048);
         try {
-            int len = 0;
-            fis = new FileInputStream(file);
-            while((len = fis.read(buf)) > 0) {
-                baos.write(buf, 0, len);
+            int len;
+            reader = new TranslateReader(ctx, BUNDLE_NAME, new FileInputStream(file));
+            while((len = reader.read(buf)) > 0) {
+                out.append(buf, 0, len);
             }
-            return baos.toByteArray();
+            return out.toString().getBytes("UTF-8");
         } finally {
             try {
-                if(fis != null) {
-                    fis.close();
-                }
-            } catch(IOException foo) {
-            }
+                if(reader != null)
+                    reader.close();
+            } catch(IOException foo) {}
         }
         // we won't ever get here
     }

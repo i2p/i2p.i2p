@@ -434,7 +434,10 @@
         <echo message=" will restrict language update to the language you specified, leaving other language untact." />
         <ant dir="apps/routerconsole/java/" target="poupdate" />
         <ant dir="apps/i2psnark/java/" target="poupdate" />
-        <ant dir="apps/i2ptunnel/java/" target="poupdate" />
+        <ant dir="apps/i2ptunnel/java/" >
+            <target name="poupdate" />
+            <target name="poupdate-proxy" />
+        </ant>
         <ant dir="apps/susidns/src/" target="poupdate" />
         <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
