@@ -64,6 +64,18 @@ trans.uk_UA = apps/routerconsole/locale/messages_uk.po
 trans.vi = apps/routerconsole/locale/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale/messages_zh.po
 
+[I2P.news]
+source_file = apps/routerconsole/locale-news/messages_en.po
+source_lang = en
+trans.ar = apps/routerconsole/locale-news/messages_ar.po
+trans.de = apps/routerconsole/locale-news/messages_de.po
+trans.es = apps/routerconsole/locale-news/messages_es.po
+trans.fr = apps/routerconsole/locale-news/messages_fr.po
+trans.nl = apps/routerconsole/locale-news/messages_nl.po
+trans.pt = apps/routerconsole/locale-news/messages_pt.po
+trans.ru_RU = apps/routerconsole/locale-news/messages_ru.po
+trans.sv_SE = apps/routerconsole/locale-news/messages_sv.po
+
 [I2P.i2psnark]
 source_file = apps/i2psnark/locale/messages_en.po
 source_lang = en

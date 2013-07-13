@@ -1,0 +1,64 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P routerconsole\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2011-03-04 14:02-0000\n"
+"Last-Translator: hamada <hamada@mail.i2p>\n"
+"Language-Team: hamada@mail.i2p\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Virtaal 0.6.1\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr ""
+
+msgid "Welcome to I2P!"
+msgstr "!I2P مرحبا بك في شبكة"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "انتظر قليلا بينما يتم ربط الإتصال بباقي أعضاء الشبكة."
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
+"configuration page{3}."
+msgstr "بسنما يتم الإتصال <b>بتغير بيانات سرعة الشبكة في</b> قم <a href=\"config.jsp\">صفحة الخيارات</a>."
+
+msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr ""
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr ""
+
+msgid "Do not use SOCKS for this."
+msgstr ""
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr ""
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please {0}"
+"check out{1} our {2}FAQ{3}."
+msgstr "عندما عندما تظهر عبارة \"shared clients\" على اليسار يمكنك حينها <b>زيارة</b> <a href=\"http://www.i2p2.i2p/faq.html\">الأسئلة الشائعة</a>."
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
+"help{3} or {4}#i2p{5}."
+msgstr "IRC اتصل بخادم الدردشة الفورية  على <b>localhost:6668</b> <a href=\"irc://127.0.0.1:6668/i2p-help\">#i2p-help</a> or <a href=\"irc://127.0.0.1:6668/i2p\">#i2p</a>."

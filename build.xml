@@ -432,7 +432,10 @@
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui" >
         <echo message="Setting environment variable LG2 to a lang code (eg: de,zh,nl etc)" />
         <echo message=" will restrict language update to the language you specified, leaving other language untact." />
-        <ant dir="apps/routerconsole/java/" target="poupdate" />
+        <ant dir="apps/routerconsole/java/" >
+            <target name="poupdate" />
+            <target name="poupdate-news" />
+        </ant>
         <ant dir="apps/i2psnark/java/" target="poupdate" />
         <ant dir="apps/i2ptunnel/java/" >
             <target name="poupdate" />

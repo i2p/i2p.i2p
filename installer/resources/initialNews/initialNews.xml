@@ -1,25 +1,22 @@
-<div lang="en">
-<h3>Congratulations on getting I2P installed!</h3>
+<div>
+<h3>_("Congratulations on getting I2P installed!")</h3>
 <p>
-<b>Welcome to I2P!</b>
-Please <b>have patience</b> as I2P boots up and finds peers.
+<b>_("Welcome to I2P!")</b>
+_("Please {0}have patience{1} as I2P boots up and finds peers.", "<b>", "</b>")
 </p>
 <p>
-While you are waiting, please <b>adjust your bandwidth settings</b> on the
-<a href="config.jsp">configuration page</a>.
+_("While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}configuration page{3}.", "<b>", "</b>", "<a href=\"config.jsp\">", "</a>")
 </p>
 <p>
-Also you can setup your browser to use the I2P proxy to reach eepsites. Just enter 127.0.0.1 (or localhost)
-port 4444 as a http proxy into your browser settings. Do not use SOCKS for this. More information
-can be found on <a href="https://www.i2p2.de/htproxyports.html">I2P browser proxy setup page</a>.
+_("Also you can setup your browser to use the I2P proxy to reach eepsites.")
+_("Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your browser settings.")
+_("Do not use SOCKS for this.")
+_("More information can be found on the {0}I2P browser proxy setup page{1}.", "<a href=\"https://www.i2p2.de/htproxyports.html\">", "</a>")
 </p>
 <p>
-Once you have a "shared clients" destination listed on the left,
-please <b>check out</b> our
-<a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+_("Once you have a \"shared clients\" destination listed on the left, please {0}check out{1} our {2}FAQ{3}.", "<b>", "</b>", "<a href=\"http://www.i2p2.i2p/faq.html\">", "</a>")
 </p>
 <p>
-Point your IRC client to <b>localhost:6668</b> and say hi to us on 
-<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> or <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
+_("Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-help{3} or {4}#i2p{5}.", "<b>", "</b>", "<a href=\"irc://127.0.0.1:6668/i2p-help\">", "</a>", "<a href=\"irc://127.0.0.1:6668/i2p\">", "</a>")
 </p>
 </div>
