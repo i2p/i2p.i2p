@@ -3,3 +3,4 @@
 certificates/r31453.ovh.net
 certificates/75.145.125.59.crt
 certificates/forum.i2p2.de.crt
+certificates/cowpuncher.drollette.com.crt
