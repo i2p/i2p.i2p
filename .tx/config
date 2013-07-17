@@ -64,7 +64,7 @@ trans.uk_UA = apps/routerconsole/locale/messages_uk.po
 trans.vi = apps/routerconsole/locale/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale/messages_zh.po
 
-[I2P.news]
+[I2P.welcome]
 source_file = apps/routerconsole/locale-news/messages_en.po
 source_lang = en
 trans.ar = apps/routerconsole/locale-news/messages_ar.po
