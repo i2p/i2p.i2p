@@ -38,8 +38,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
      * @throws I2PSessionException if there is a problem
      */
     public I2PSimpleSession(I2PAppContext context, Properties options) throws I2PSessionException {
-        super(context, options);
-        _handlerMap = new SimpleMessageHandlerMap(context);
+        super(context, options, new SimpleMessageHandlerMap(context));
     }
 
     /**
