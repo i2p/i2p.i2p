@@ -517,7 +517,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public int getRTT() { return _rtt; }
     public void setRTT(int ms) { 
-        if (_rto == 0) {
+        if (_rto == 0) { // TODO: move this out
             _rttDev = ms / 2;
             _rto = ms + ms / 2;
         }
@@ -539,8 +539,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
 
     public int getRTO() { return _rto; }
 
-    /** for debugging @since 0.7.13 */
+    /** used in TCB @since 0.9.8 */
     int getRTTDev() { return _rttDev; }
+    /** used in TCB @since 0.9.8 */
+    void setRTTDev(int rttDev) { _rttDev = rttDev; }
     
     /**
      * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have
