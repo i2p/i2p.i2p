@@ -572,21 +572,23 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
 
     /** used in TCB @since 0.9.8 */
     int getRTTDev() { return _rttDev; }
-    /** used in TCB @since 0.9.8 */
-    void setRTTDev(int rttDev) { _rttDev = rttDev; }
+    private void setRTTDev(int rttDev) { _rttDev = rttDev; }
     
     /** 
-     * mark these options as loaded from cache.
-     * affects the calculation of RTO
+     * Loads options from TCB cache.
      */
-    synchronized void loadedFromCache() {
+    synchronized void loadFromCache(int rtt, int rttDev, int wdw) {
         _initState = AckInit.STEADY;
+        setRTT(rtt);
+        setRTTDev(rttDev);
+        setWindowSize(wdw);
+        computeRTO();
     }
     
     /** 
      * computes RTO based on formula in RFC
      */
-    synchronized void computeRTO() {
+    private synchronized void computeRTO() {
         switch(_initState) {
         case INIT :
             throw new IllegalStateException();

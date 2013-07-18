@@ -99,11 +99,7 @@ class TCBShare {
                        " RTTDev: "+ rttDev +
                        " wdw: " + wdw );
         }
-        opts.loadedFromCache();
-        opts.setRTT(rtt);
-        opts.setRTTDev(rttDev);
-        opts.setWindowSize(wdw);
-        opts.computeRTO();
+        opts.loadFromCache(rtt,rttDev,wdw);
     }
 
     /** store to cache */
