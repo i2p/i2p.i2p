@@ -1,3 +1,8 @@
+2012-07-19 zab
+* Streaming:
+  - initialize streaming RTT from sample, trac #979, RFC 6298
+  - store rttDev in TCBCache
+
 * 2013-07-15 0.9.7 released
 
 2013-07-11 kytv
