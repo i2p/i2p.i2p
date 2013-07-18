@@ -582,7 +582,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         case INIT :
             throw new IllegalStateException();
         case FIRST :
-            _rttDev = _rtt / 2;
             _rto = _rtt + _rtt / 2;
             break;
         case STEADY :
@@ -617,6 +616,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         case INIT:
             _initState = AckInit.FIRST;
             setRTT(measuredValue); // no smoothing first sample
+            _rttDev = _rtt / 2;
             break;
         case FIRST:
             _initState = AckInit.STEADY; // fall through
