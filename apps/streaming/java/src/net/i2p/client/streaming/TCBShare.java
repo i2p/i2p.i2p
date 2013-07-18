@@ -2,6 +2,7 @@ package net.i2p.client.streaming;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
@@ -48,9 +49,10 @@ class TCBShare {
         _context = ctx;
         _log = ctx.logManager().getLog(TCBShare.class);
         
-        _rttDampening = getDouble(ctx.getProperties(), RTT_DAMP_PROP, RTT_DAMPENING);
-        _wdwDampening = getDouble(ctx.getProperties(), WDW_DAMP_PROP, WDW_DAMPENING);
-        _rttDevDampening = getDouble(ctx.getProperties(), RTTDEV_DAMP_PROP, RTTDEV_DAMPENING);
+        final Properties props = ctx.getProperties();
+        _rttDampening = getDouble(props, RTT_DAMP_PROP, RTT_DAMPENING);
+        _wdwDampening = getDouble(props, WDW_DAMP_PROP, WDW_DAMPENING);
+        _rttDevDampening = getDouble(props, RTTDEV_DAMP_PROP, RTTDEV_DAMPENING);
         
         _cache = new ConcurrentHashMap<Destination,Entry>(4);
         _cleaner = new CleanEvent(timer);

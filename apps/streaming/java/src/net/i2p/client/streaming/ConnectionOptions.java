@@ -27,7 +27,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _profile;
     private int _rtt;
     private int _rttDev;
-    private int _rto;
+    private int _rto = INITIAL_RTO;
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
@@ -51,12 +51,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _maxTotalConnsPerDay;
     private int _maxConns;
     private boolean _disableRejectLog;
-    private double _alpha;
-    private double _beta;
-    private double _kappa;
     
     /** state of a connection */
-    enum AckInit {
+    private enum AckInit {
         INIT, // just created
         FIRST, // first received ack
         STEADY 
@@ -85,9 +82,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final double TCP_ALPHA = 1.0/8;
     private static final double TCP_BETA = 1.0/4; 
     private static final double TCP_KAPPA = 4;
-    private static final String PROP_TCP_ALPHA= "i2p.streaming.alpha";
-    private static final String PROP_TCP_BETA= "i2p.streaming.beta";
-    private static final String PROP_TCP_KAPPA = "i2p.streaming.kappa";
     
     private static final String PROP_INITIAL_RTO = "i2p.streaming.initialRTO";
     private static final int INITIAL_RTO = 12000;
@@ -387,10 +381,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
         _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
         
-        _alpha = getDouble(opts, PROP_TCP_ALPHA, TCP_ALPHA);
-        _beta = getDouble(opts, PROP_TCP_BETA, TCP_BETA);
-        _kappa = getDouble(opts, PROP_TCP_KAPPA, TCP_KAPPA);
-        
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
     }
     
@@ -458,9 +448,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_MAX_STREAMS))
             _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
         
-        _alpha = getDouble(opts, PROP_TCP_ALPHA, TCP_ALPHA);
-        _beta = getDouble(opts, PROP_TCP_BETA, TCP_BETA);
-        _kappa = getDouble(opts, PROP_TCP_KAPPA, TCP_KAPPA);
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
     }
     
@@ -599,7 +586,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _rto = _rtt + _rtt / 2;
             break;
         case STEADY :
-            _rto = _rtt + (int) (_rttDev * _kappa);
+            _rto = _rtt + (int) (_rttDev * TCP_KAPPA);
             break;
         }
         
@@ -632,11 +619,11 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setRTT(measuredValue); // no smoothing first sample
             break;
         case FIRST:
-            _initState = AckInit.STEADY; 
+            _initState = AckInit.STEADY; // fall through
         case STEADY:
             // calculation matches that recommended in RFC 6298
-            _rttDev = (int) ((1-_beta) *_rttDev  + _beta * Math.abs(measuredValue-_rtt));
-            int smoothed = (int)((1-_alpha)*_rtt + _alpha*measuredValue);        
+            _rttDev = (int) ((1-TCP_BETA) *_rttDev  + TCP_BETA * Math.abs(measuredValue-_rtt));
+            int smoothed = (int)((1-TCP_ALPHA)*_rtt + TCP_ALPHA*measuredValue);        
             setRTT(smoothed);
         }
         computeRTO();
