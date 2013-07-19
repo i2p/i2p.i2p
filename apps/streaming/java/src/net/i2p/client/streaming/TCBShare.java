@@ -39,7 +39,7 @@ class TCBShare {
     private static final double WDW_DAMPENING = 0.75;
     private static final String RTT_DAMP_PROP="i2p.streaming.tcbcache.rttDampening";
     private static final String WDW_DAMP_PROP="i2p.streaming.tcbcache.wdwDampening";
-    private static final String RTTDEV_DAMP_PROP="i2p.streaming.tcbcache.rttDampening";
+    private static final String RTTDEV_DAMP_PROP="i2p.streaming.tcbcache.rttdevDampening";
     /////
     private static final int MAX_RTT = ((int) Connection.MAX_RESEND_DELAY) / 2;
     private static final int MAX_RTT_DEV = (int) (MAX_RTT * 1.5);
