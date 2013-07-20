@@ -27,13 +27,13 @@ msgstr "!I2P مرحبا بك في شبكة"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "انتظر قليلا بينما يتم ربط الإتصال بباقي أعضاء الشبكة."
+msgstr "انتظر قليلا بينما يتم ربط الإتصال بباقي أعضاء الشبكة.{0}{1}"
 
 #, java-format
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
 "configuration page{3}."
-msgstr "بسنما يتم الإتصال <b>بتغير بيانات سرعة الشبكة في</b> قم <a href=\"config.jsp\">صفحة الخيارات</a>."
+msgstr "بسنما يتم الإتصال {0}بتغير بيانات سرعة الشبكة في{1} قم {2}صفحة الخيارات{3}."
 
 msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
 msgstr ""
@@ -55,10 +55,10 @@ msgstr ""
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please {0}"
 "check out{1} our {2}FAQ{3}."
-msgstr "عندما عندما تظهر عبارة \"shared clients\" على اليسار يمكنك حينها <b>زيارة</b> <a href=\"http://www.i2p2.i2p/faq.html\">الأسئلة الشائعة</a>."
+msgstr "عندما عندما تظهر عبارة \"shared clients\" على اليسار يمكنك حينها {0}زيارة{1} {2}الأسئلة الشائعة{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
 "help{3} or {4}#i2p{5}."
-msgstr "IRC اتصل بخادم الدردشة الفورية  على <b>localhost:6668</b> <a href=\"irc://127.0.0.1:6668/i2p-help\">#i2p-help</a> or <a href=\"irc://127.0.0.1:6668/i2p\">#i2p</a>."
+msgstr "IRC اتصل بخادم الدردشة الفورية  على {0}localhost:6668{1} {2}#i2p-help{3} or {4}#i2p{5}."

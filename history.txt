@@ -1,3 +1,40 @@
+2012-07-20 zzz
+ * DHSessionKeyBuilder: Fix for session and mac keys if DH key is between 32 and 63 bytes.
+   Was: NPE. Now: mac key is hash of session key. Won't ever happen. (Ticket #963)
+ * I2CP/I2PTunnel locking fixes (partial fixes for tickets 650. 722, 815, 946, 947, 953):
+   - I2PSocketManagerFactory: New createDisconnectedManager(), javadocs
+   - I2PSessionImpl: Rewrite state management and locking, prevent multiple
+     connect() calls, but allow disconnect() to interrupt connect()
+   - I2PSimpleSession: Changes to match I2PSessionImpl
+   - I2PTunnelServer: Don't connect in constructor, use createDisconnectedManager()
+     for a final manager, finals and cleanups
+ * ClientManager:
+   - Make classes extensible for router-side test stubs
+   - Add router-side local-only test implementation, no full router required.
+     Only tested with external clients, probably doesn't work in-JVM.
+   - Don't start threads in ClientManager constructor
+   - Remove unused Reader param in ClientMessageEventListener methods
+   - Cleanups, volatiles, finals, javadocs
+ * Translations:
+   - New varargs method in Translate
+   - New TranslateReader to translate static files on-the-fly using _("") tagging
+   - Tag proxy error pages for TranslateReader
+   - Drop static translated proxy error pages
+   - Add new i2ptunnel bundle for the proxy alone, shipped in the jar.
+   - Use TranslateReader in HTTP proxy for error pages
+   - Move HTTP proxy strings from the web (war) to proxy (jar) bundle so they will be loaded
+     Fixes translations for the lower half of the proxy pages that weren't accessible in the war.
+   - Initial translations created by msgmerge from i2ptunnel and routerconsole po files, un-fuzzied
+   - Tag initialNews.xml for TranslateReader
+   - Drop static translated initialNews pages
+   - Add new routerconsole bundle for the news alone, shipped in the jar
+   - Use TranslateReader in HTTP proxy for initial news
+   - Initial translations created manually from translated xml filesx
+   - Add translated proxy error pages and initial news to deletelist.txt
+ * Transports: Consolidate translation methods in TransportImpl;
+   ngettext fix for "peers" string
+
+
 2012-07-19 zzz
  * PRNG:
    - Don't delay the refiller if we need more (don't limit max output)
