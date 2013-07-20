@@ -82,7 +82,6 @@ class NTCPConnection {
     /** Requests that were not granted immediately */
     private final Set<FIFOBandwidthLimiter.Request> _bwInRequests;
     private final Set<FIFOBandwidthLimiter.Request> _bwOutRequests;
-    private boolean _established;
     private long _establishedOn;
     private EstablishState _establishState;
     private final NTCPTransport _transport;
@@ -209,6 +208,7 @@ class NTCPConnection {
         _inboundListener = new InboundListener();
         _outboundListener = new OutboundListener();
         initialize();
+        _establishState = new EstablishState(ctx, transport, this);
     }
 
     private void initialize() {
@@ -232,7 +232,7 @@ class NTCPConnection {
     public void setChannel(SocketChannel chan) { _chan = chan; }
     public void setKey(SelectionKey key) { _conKey = key; }
     public boolean isInbound() { return _isInbound; }
-    public boolean isEstablished() { return _established; }
+    public synchronized boolean isEstablished() { return _establishState.isComplete(); }
 
     /**
      *  @since IPv6
@@ -269,12 +269,11 @@ class NTCPConnection {
         System.arraycopy(prevReadEnd, prevReadEnd.length - BLOCK_SIZE, _prevReadBlock, 0, BLOCK_SIZE);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Inbound established, prevWriteEnd: " + Base64.encode(prevWriteEnd) + " prevReadEnd: " + Base64.encode(prevReadEnd));
-        _established = true;
         _establishedOn = System.currentTimeMillis();
         _transport.inboundEstablished(this);
-        _establishState = null;
         _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
         _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
+        _establishState = EstablishState.VERIFIED;
     }
 
     /** @return seconds */
@@ -282,7 +281,7 @@ class NTCPConnection {
 
     /** @return milliseconds */
     public long getUptime() { 
-        if (!_established)
+        if (!isEstablished())
             return getTimeSinceCreated();
         else
             return System.currentTimeMillis()-_establishedOn; 
@@ -333,7 +332,7 @@ class NTCPConnection {
         _closed = true;
         if (_chan != null) try { _chan.close(); } catch (IOException ioe) { }
         if (_conKey != null) _conKey.cancel();
-        _establishState = null;
+        _establishState = EstablishState.VERIFIED;
         _transport.removeCon(this);
         _transport.getReader().connectionClosed(this);
         _transport.getWriter().connectionClosed(this);
@@ -409,7 +408,7 @@ class NTCPConnection {
         //_context.statManager().addRateData("ntcp.sendQueueSize", enqueued);
         boolean noOutbound = (_currentOutbound == null);
         //if (_log.shouldLog(Log.DEBUG)) _log.debug("messages enqueued on " + toString() + ": " + enqueued + " new one: " + msg.getMessageId() + " of " + msg.getMessageType());
-        if (_established && noOutbound)
+        if (isEstablished() && noOutbound)
             _transport.getWriter().wantsWrite(this, "enqueued");
     }
 
@@ -541,9 +540,8 @@ class NTCPConnection {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Outbound established, prevWriteEnd: " + Base64.encode(prevWriteEnd) + " prevReadEnd: " + Base64.encode(prevReadEnd));
 
-        _established = true;
         _establishedOn = System.currentTimeMillis();
-        _establishState = null;
+        _establishState = EstablishState.VERIFIED;
         _transport.markReachable(getRemotePeer().calculateHash(), false);
         //_context.banlist().unbanlistRouter(getRemotePeer().calculateHash(), NTCPTransport.STYLE);
         boolean msgs = !_outbound.isEmpty();
@@ -693,15 +691,7 @@ class NTCPConnection {
             return;
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("prepare next write w/ isInbound? " + _isInbound + " established? " + _established);
-        if (!_isInbound && !_established) {
-            if (_establishState == null) {
-                // shouldn't happen
-                _establishState = new EstablishState(_context, _transport, this);
-                _establishState.prepareOutbound();
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("prepare next write, but we have already prepared the first outbound and we are not yet established..." + toString());
-            }
+        if (!_isInbound && !isEstablished()) {
             return;
         }
         
@@ -1535,7 +1525,7 @@ class NTCPConnection {
         return "NTCP conn " +
                (_isInbound ? "from " : "to ") +
                (_remotePeer == null ? "unknown" : _remotePeer.calculateHash().toBase64().substring(0,6)) +
-               (_established ? "" : " not established") +
+               (isEstablished() ? "" : " not established") +
                " created " + DataHelper.formatDuration(getTimeSinceCreated()) + " ago";
     }
 }

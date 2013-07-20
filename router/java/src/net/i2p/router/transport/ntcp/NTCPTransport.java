@@ -231,6 +231,7 @@ public class NTCPTransport extends TransportImpl {
                     con.setChannel(channel);
                     channel.configureBlocking(false);
                     _pumper.registerConnect(con);
+                    con.getEstablishState().prepareOutbound();
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Error opening a channel", ioe);

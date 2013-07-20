@@ -132,30 +132,24 @@ class Reader {
      * Return read buffers back to the pool as we process them.
      */
     private void processRead(NTCPConnection con) {
-        if (con.isClosed())
-            return;
         ByteBuffer buf = null;
-        while (!con.isClosed() && !con.isEstablished() && ( (buf = con.getNextReadBuf()) != null) ) {
+        while(true) {
+            synchronized(con) {
+                if (con.isClosed())
+                    return;
+                if (con.isEstablished())
+                    break;
+            }
+            if ((buf = con.getNextReadBuf()) == null)
+                return;
             EstablishState est = con.getEstablishState();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Processing read buffer as an establishment for " + con + " with [" + est + "]");
-            if (est == null) {
-                EventPumper.releaseBuf(buf);
-                if (!con.isEstablished()) {
-                    // establish state is only removed when the connection is fully established,
-                    // yet if that happens, con.isEstablished() should return true...
-                    throw new RuntimeException("connection was not established, yet the establish state is null for " + con);
-                } else {
-                    // hmm, there shouldn't be a race here - only one reader should 
-                    // be running on a con at a time...
-                    _log.error("no establishment state but " + con + " is established... race?");
-                    break;
-                }
-            }
+            
             if (est.isComplete()) {
                 // why is it complete yet !con.isEstablished?
-                    _log.error("establishment state [" + est + "] is complete, yet the connection isn't established? " 
-                               + con.isEstablished() + " (inbound? " + con.isInbound() + " " + con + ")");
+                _log.error("establishment state [" + est + "] is complete, yet the connection isn't established? " 
+                        + con.isEstablished() + " (inbound? " + con.isInbound() + " " + con + ")");
                 EventPumper.releaseBuf(buf);
                 break;
             }
@@ -172,9 +166,6 @@ class Reader {
             if (est.isComplete() && est.getExtraBytes() != null)
                 con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
         }
-        // catch race?
-        if (!con.isEstablished())
-            return;
         while (!con.isClosed() && (buf = con.getNextReadBuf()) != null) {
             // decrypt the data and push it into an i2np message
             if (_log.shouldLog(Log.DEBUG))

@@ -59,6 +59,9 @@ import net.i2p.util.Log;
  *
  */
 class EstablishState {
+    
+    public static final VerifiedEstablishState VERIFIED = new VerifiedEstablishState();
+    
     private final RouterContext _context;
     private final Log _log;
 
@@ -107,6 +110,17 @@ class EstablishState {
     private boolean _verified;
     private boolean _confirmWritten;
     private boolean _failedBySkew;
+    
+    private EstablishState() {
+        _context = null;
+        _log = null;
+        _X = null;
+        _hX_xor_bobIdentHash = null;
+        _curDecrypted = null;
+        _dh = null;
+        _transport = null;
+        _con = null;
+    }
 
     public EstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
         _context = ctx;
@@ -772,6 +786,10 @@ class EstablishState {
                 log.debug("Not a checkInfo connection");
             return false;
         }
+    }
+    
+    private static class VerifiedEstablishState extends EstablishState {
+        @Override public boolean isComplete() { return true; }
     }
 
     /** @deprecated unused */

@@ -749,8 +749,10 @@ class EventPumper implements Runnable {
         if (!_wantsWrite.isEmpty()) {
             for (Iterator<NTCPConnection> iter = _wantsWrite.iterator(); iter.hasNext(); ) {
                 con = iter.next();
-                iter.remove();
                 SelectionKey key = con.getKey();
+                if (key == null)
+                    continue;
+                iter.remove();
                 try {
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                 } catch (CancelledKeyException cke) {
