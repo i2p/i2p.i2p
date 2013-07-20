@@ -542,12 +542,11 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        TreeMap transports = new TreeMap();
+        TreeMap<String, Transport> transports = new TreeMap();
         for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);
         }
-        for (Iterator iter = transports.values().iterator(); iter.hasNext(); ) {
-            Transport t= (Transport)iter.next();
+        for (Transport t : transports.values()) {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         
