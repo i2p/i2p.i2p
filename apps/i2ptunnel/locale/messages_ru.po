@@ -4,20 +4,21 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
+# tengo <akin@rbcmail.ru>, 2013
 # sfix <anon-9b36b2e@lycos.com>, 2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
-# gmind <grvmind@gmail.com>, 2012-2013
-# gmind <grvmind@gmail.com>, 2013
-# gmind <grvmind@gmail.com>, 2012
+# gmind, 2012-2013
+# gmind, 2013
+# gmind, 2012
 # sfix <anon-9b36b2e@lycos.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-05 22:28+0000\n"
-"PO-Revision-Date: 2013-07-05 08:09+0000\n"
-"Last-Translator: Roman Azarenko <x12ozmouse@ya.ru>\n"
+"POT-Creation-Date: 2013-07-11 21:40+0000\n"
+"PO-Revision-Date: 2013-07-09 18:45+0000\n"
+"Last-Translator: tengo <akin@rbcmail.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
 "language/ru_RU/)\n"
 "Language: ru_RU\n"
@@ -164,15 +165,15 @@ msgstr[2] ""
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:408
 msgid "lower bandwidth and reliability"
-msgstr ""
+msgstr "меньшая пропускная способность и надёжность"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:410
 msgid "standard bandwidth and reliability"
-msgstr ""
+msgstr "обычная пропускная способность и надёжность"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:412
 msgid "higher bandwidth and reliability"
-msgstr ""
+msgstr "более высокая пропускная способность и надёжность"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:119
 msgid "Tunnels are not initialized yet, please reload in two minutes."
@@ -1075,6 +1076,8 @@ msgid ""
 "This enables both TCP and UDP connections to be made through a SOCKS "
 "outproxy within I2P."
 msgstr ""
+"Это позволяет устанавливать как TCP так и UDP соединения через SOCKS "
+"outproxy в I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:245
 msgid ""
@@ -1107,6 +1110,8 @@ msgid ""
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
 msgstr ""
+"IRC-сети вне I2P также могут быть доступны, если известен SOCKS outproxy в "
+"I2P, но это зависит от того, заблокирован или нет outproxy IRC-сетью."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:253
 msgid "A client tunnel that implements the HTTP CONNECT command."
