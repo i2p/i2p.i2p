@@ -1219,15 +1219,6 @@ public class NTCPTransport extends TransportImpl {
         }
     }
 
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
-
-    /**
-     *  Translate
-     */
-    private final String _(String s) {
-        return Translate.getString(s, _context, BUNDLE_NAME);
-    }
-
     /**
      * Cache the bid to reduce object churn
      */

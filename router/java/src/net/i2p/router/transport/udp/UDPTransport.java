@@ -2780,21 +2780,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     private static final DecimalFormat _pctFmt = new DecimalFormat("#0.0%");
-    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
-
-    /**
-     *  Translate
-     */
-    private final String _(String s) {
-        return Translate.getString(s, _context, BUNDLE_NAME);
-    }
-
-    /**
-     *  Translate
-     */
-    private final String _(String s, Object o) {
-        return Translate.getString(s, o, _context, BUNDLE_NAME);
-    }
 
     /*
      * Cache the bid to reduce object churn

@@ -46,6 +46,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.Translate;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages
