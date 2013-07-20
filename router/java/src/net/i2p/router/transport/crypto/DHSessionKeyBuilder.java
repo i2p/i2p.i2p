@@ -261,7 +261,9 @@ public class DHSessionKeyBuilder {
     /**
      * Retrieve the extra bytes beyond the session key resulting from the DH exchange.
      * If there aren't enough bytes (with all of them being consumed by the 32 byte key),
-     * the SHA256 of the key itself is used.
+     * the SHA256 of the key itself is used - but that won't ever happen.
+     *
+     * Used only by UDP. getData() will be non-null and have at least 32 bytes after call to getSessionKey()
      *
      * @return non-null (but rv.getData() may be null)
      */
@@ -270,23 +272,35 @@ public class DHSessionKeyBuilder {
     }
 
     /**
-     * Calculate a session key based on the private value and the public peer value
+     * Calculate a session key based on the private value and the public peer value.
      *
+     * This is the first 32 bytes of the exchanged key (nominally 256 bytes),
+     * EXCEPT that the first byte will be zero if the most significant bit was a 1
+     * (Java BigInteger.toByteArray() format)
+     *
+     * Side effect - sets extraExchangedBytes to the next 32 bytes.
      */
     private final SessionKey calculateSessionKey(BigInteger myPrivateValue, BigInteger publicPeerValue) {
         //long start = System.currentTimeMillis();
         SessionKey key = new SessionKey();
         BigInteger exchangedKey = publicPeerValue.modPow(myPrivateValue, CryptoConstants.elgp);
+        // surprise! leading zero byte half the time!
+        // probably was a mistake, too late now...
         byte buf[] = exchangedKey.toByteArray();
-        byte val[] = new byte[32];
-        if (buf.length < val.length) {
-            System.arraycopy(buf, 0, val, 0, buf.length);
-            byte remaining[] = SHA256Generator.getInstance().calculateHash(val).getData();
+        byte val[] = new byte[SessionKey.KEYSIZE_BYTES];
+        if (buf.length < 2 * SessionKey.KEYSIZE_BYTES) {
+            // UDP requires at least 32 bytes in _extraExchangedBytes for the mac key
+            // Won't ever happen, typ buf is 256 or 257 bytes
+            System.arraycopy(buf, 0, val, 0, Math.min(buf.length, SessionKey.KEYSIZE_BYTES));
+            byte remaining[] = new byte[SessionKey.KEYSIZE_BYTES];  // == Hash.HASH_LENGTH
+            // non-caching version
+            SHA256Generator.getInstance().calculateHash(buf, 0, buf.length, remaining, 0);
             _extraExchangedBytes.setData(remaining);
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Storing " + remaining.length + " bytes from the DH exchange by SHA256 the session key");
-        } else { // (buf.length >= val.length) 
-            System.arraycopy(buf, 0, val, 0, val.length);
+        } else {
+            // Will always be here, typ buf is 256 or 257 bytes
+            System.arraycopy(buf, 0, val, 0, SessionKey.KEYSIZE_BYTES);
             // feed the extra bytes into the PRNG
             RandomSource.getInstance().harvester().feedEntropy("DH", buf, val.length, buf.length-val.length); 
             byte remaining[] = new byte[buf.length - val.length];

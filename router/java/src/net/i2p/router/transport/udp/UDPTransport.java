@@ -50,7 +50,6 @@ import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
-import net.i2p.util.Translate;
 
 /**
  *  The SSU transport
@@ -2718,7 +2717,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
       if (numPeers > 0) {
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-        buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
+        buf.append("<tr class=\"tablefooter\"><td colspan=\"3\" align=\"left\"><b>")
+           .append(ngettext("{0} peer", "{0} peers", peers.size()))
+           .append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
         buf.append(formatKBps(bpsIn)).append(THINSP).append(formatKBps(bpsOut));
         long x = uptimeMsTotal/numPeers;

@@ -62,6 +62,8 @@ ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 else
 	@echo "Already found deb in version, not doing anything"
 endif
+	sh -n installer/resources/i2prouter || exit 1
+	sh -n installer/resources/runplain.sh || exit 1
 	TZ=UTC ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper

@@ -4,29 +4,41 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SelectableChannel;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
 /**
  * Bridge between the full streaming lib and the I2PSocket API
  *
  */
 class I2PSocketFull implements I2PSocket {
-    private Connection _connection;
-    private Destination _remotePeer;
-    private Destination _localPeer;
+    private final Log log;
+    private volatile Connection _connection;
+    private final Destination _remotePeer;
+    private final Destination _localPeer;
     private volatile MessageChannel _channel;
+    private final AtomicBoolean _closed = new AtomicBoolean(false);
     
-    public I2PSocketFull(Connection con) {
+    public I2PSocketFull(Connection con, I2PAppContext context) {
+        log = context.logManager().getLog(I2PSocketFull.class);
         _connection = con;
         if (con != null) {
             _remotePeer = con.getRemotePeer();
             _localPeer = con.getSession().getMyDestination();
-        }
+        } else
+            _remotePeer = _localPeer = null;
     }
     
     public void close() throws IOException {
+        if (!_closed.compareAndSet(false,true)) {
+            // log a trace to find out why
+            LogUtil.logCloseLoop(log, "I2PSocket",_localPeer,"-->",_remotePeer,_connection);
+            return;
+        }
         Connection c = _connection;
         if (c == null) return;
         if (c.getIsConnected()) {

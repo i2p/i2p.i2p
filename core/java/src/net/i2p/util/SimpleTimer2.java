@@ -87,6 +87,7 @@ public class SimpleTimer2 {
     /**
      * Stops the SimpleTimer.
      * Subsequent executions should not throw a RejectedExecutionException.
+     * Cannot be restarted.
      */
     public void stop() {
         _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());

@@ -139,13 +139,18 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                 long before = System.currentTimeMillis();
                 doFill(aBuff.buffer);
                 long after = System.currentTimeMillis();
+                boolean shouldWait = _fullBuffers.size() > 1;
                 _fullBuffers.offer(aBuff);
                 _context.statManager().addRateData("prng.bufferFillTime", after - before, 0);
-                Thread.yield();
-                long waitTime = (after-before)*5;
-                if (waitTime <= 0) // somehow postman saw waitTime show up as negative
-                    waitTime = 50;
-                try { Thread.sleep(waitTime); } catch (InterruptedException ie) {}
+                if (shouldWait) {
+                    Thread.yield();
+                    long waitTime = (after-before)*5;
+                    if (waitTime <= 0) // somehow postman saw waitTime show up as negative
+                        waitTime = 50;
+                    else if (waitTime > 5000)
+                        waitTime = 5000;
+                    try { Thread.sleep(waitTime); } catch (InterruptedException ie) {}
+                }
         }
     }
 

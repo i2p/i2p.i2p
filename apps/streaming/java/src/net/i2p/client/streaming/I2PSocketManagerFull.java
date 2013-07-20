@@ -8,6 +8,8 @@ import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -36,8 +38,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final ConnectionOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
-    private static int __managerId = 0;
+    private static final AtomicInteger __managerId = new AtomicInteger(0);
     private final ConnectionManager _connectionManager;
+    private final AtomicBoolean _isDestroyed = new AtomicBoolean(false);
     
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
@@ -65,17 +68,17 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * This is what I2PSocketManagerFactory.createManager() returns.
      * Direct instantiation by others is deprecated.
      * 
-     * @param context
-     * @param session
-     * @param opts
-     * @param name
+     * @param context non-null
+     * @param session non-null
+     * @param opts may be null
+     * @param name non-null
      */
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
         _session = session;
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
         
-        _name = name + " " + (++__managerId);
+        _name = name + " " + (__managerId.incrementAndGet());
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
         _connectionManager = new ConnectionManager(_context, _session, _defaultOptions);
@@ -103,6 +106,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return curOpts;
     }
     
+    /**
+     *  @return the session, non-null
+     */
     public I2PSession getSession() {
         return _session;
     }
@@ -124,7 +130,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             _log.debug("receiveSocket() called: " + con);
         }
         if (con != null) {
-            I2PSocketFull sock = new I2PSocketFull(con);
+            I2PSocketFull sock = new I2PSocketFull(con,_context);
             con.setSocket(sock);
             return sock;
         } else { 
@@ -197,6 +203,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     private void verifySession() throws I2PException {
+        if (_isDestroyed.get())
+            throw new I2PException("destroyed");
         if (!_connectionManager.getSession().isClosed())
             return;
         _connectionManager.getSession().connect();
@@ -234,7 +242,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         Connection con = _connectionManager.connect(peer, opts);
         if (con == null)
             throw new TooManyStreamsException("Too many streams, max " + _defaultOptions.getMaxConns());
-        I2PSocketFull socket = new I2PSocketFull(con);
+        I2PSocketFull socket = new I2PSocketFull(con,_context);
         con.setSocket(socket);
         if (con.getConnectionError() != null) { 
             con.disconnect(false);
@@ -301,12 +309,18 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      * Destroy the socket manager, freeing all the associated resources.  This
-     * method will block untill all the managed sockets are closed.
+     * method will block until all the managed sockets are closed.
      *
+     * CANNOT be restarted.
      */
     public void destroySocketManager() {
+        if (!_isDestroyed.compareAndSet(false,true)) {
+            // shouldn't happen, log a stack trace to find out why it happened
+            LogUtil.logCloseLoop(_log, "I2PSocketManager", getName());
+            return;
+        }
         _connectionManager.setAllowIncomingConnections(false);
-        _connectionManager.disconnectAllHard();
+        _connectionManager.shutdown();
         // should we destroy the _session too?
         // yes, since the old lib did (and SAM wants it to, and i dont know why not)
         if ( (_session != null) && (!_session.isClosed()) ) {
@@ -315,8 +329,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             } catch (I2PSessionException ise) {
                 _log.warn("Unable to destroy the session", ise);
             }
-            if (pcapWriter != null)
-                pcapWriter.flush();
+            PcapWriter pcap = null;
+            synchronized(_pcapInitLock) {
+                pcap = pcapWriter;
+            }
+            if (pcap != null)
+                pcap.flush();
         }
     }
 
@@ -327,7 +345,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public Set<I2PSocket> listSockets() {
         Set<Connection> connections = _connectionManager.listConnections();
-        Set<I2PSocket> rv = new HashSet(connections.size());
+        Set<I2PSocket> rv = new HashSet<I2PSocket>(connections.size());
         for (Connection con : connections) {
             if (con.getSocket() != null)
                 rv.add(con.getSocket());

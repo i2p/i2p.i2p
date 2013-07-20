@@ -4,19 +4,20 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-# ducki2p <ducki2p@gmail.com>, 2011.
-# foo <foo@bar>, 2009.
-# Андрей Лукьяненко <operru32@yandex.ru>, 2012.
+# ducki2p <ducki2p@gmail.com>, 2011
+# foo <foo@bar>, 2009
+# gmind <grvmind@gmail.com>, 2013
+# gmind <grvmind@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-25 14:49+0000\n"
-"PO-Revision-Date: 2012-12-24 19:51+0000\n"
-"Last-Translator: Андрей Лукьяненко <operru32@yandex.ru>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/I2P/language/"
-"ru/)\n"
-"Language: ru\n"
+"POT-Creation-Date: 2013-07-04 16:45+0000\n"
+"PO-Revision-Date: 2013-07-02 07:06+0000\n"
+"Last-Translator: gmind <grvmind@gmail.com>\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
+"language/ru_RU/)\n"
+"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -223,9 +224,9 @@ msgid "ERROR: Could not write addressbook file."
 msgstr "ОШИБКА: Не удалось сохранить файл адресной книги."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:340
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:149
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:142
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or \"reload"
 "\" button on your browser. Please resubmit."
@@ -235,33 +236,34 @@ msgstr ""
 "заново."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:342
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:151
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:313
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:130
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr "Если проблема остается, проверьте, что у вас включены cookie-файлы."
+msgstr ""
+"Если проблема сохраняется, проверьте, что в Вашем браузере разрешены cookies"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:103
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:131
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:117
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:153
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:145
 msgid "Save"
 msgstr "Сохранить"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:133
 msgid "Configuration saved."
 msgstr "Настройки сохранены."
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:143
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:122
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:134
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:136
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:143
 msgid "Reload"
 msgstr "Перезагрузить"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:145
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:136
 msgid "Configuration reloaded."
 msgstr "Настройки перезагружены."
 
@@ -284,17 +286,17 @@ msgstr "Не удалось добавить адрес назначения д�
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "Не удалось удалить адрес назначения для {0} из сервиса именования {1}"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:115
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr ""
 "Подписки сохранены, запущена загрузка подписок и обновление адресной книги."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:120
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:134
 msgid "Subscriptions saved."
 msgstr "Подписки сохранены."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:124
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
 msgid "Subscriptions reloaded."
 msgstr "Подписки перезагружены."
 
@@ -570,7 +572,7 @@ msgstr "Файл для записи журнала действий"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:191
 msgid "Name of the theme to use (defaults to 'light')"
-msgstr "Название используемой темы ('light' по умолчанию)"
+msgstr "Название используемой темы (по умолчанию 'light')"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:110
 msgid "addressbook"
@@ -586,7 +588,7 @@ msgstr "Base 32 адрес"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:201
 msgid "Base 64 Hash"
-msgstr "Base64-хеш"
+msgstr "Base 64 Hash"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
 msgid "Address Helper"
@@ -664,17 +666,16 @@ msgid ""
 "Subscribing to additional sites is easy, just add them to your <a href="
 "\"subscriptions\">subscriptions</a> file."
 msgstr ""
-"Для добавления дополнительных подписок добавьте их в ваш <a href="
-"\"subscriptions\">файл подписок\"</a>."
+"Чтобы подписаться на дополнительные сайты, добавьте их в Ваш <a href="
+"\"subscriptions\">файл</a> подписок."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
-#, fuzzy
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
 "naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>."
 msgstr ""
-"Подробнее о механизме доменных имен в I2P читайте на странице <a href="
-"\"http://www.i2p2.i2p/naming.html\">Naming in I2P</a>."
+"Подробнее о механизме доменных имен в I2P читайте <a href=\"http://www.i2p2."
+"i2p/naming.html\">обзор на www.i2p2.i2p</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142
 msgid "How does the addressbook application work?"

@@ -1,3 +1,81 @@
+2012-07-20 zzz
+ * DHSessionKeyBuilder: Fix for session and mac keys if DH key is between 32 and 63 bytes.
+   Was: NPE. Now: mac key is hash of session key. Won't ever happen. (Ticket #963)
+ * I2CP/I2PTunnel locking fixes (partial fixes for tickets 650. 722, 815, 946, 947, 953):
+   - I2PSocketManagerFactory: New createDisconnectedManager(), javadocs
+   - I2PSessionImpl: Rewrite state management and locking, prevent multiple
+     connect() calls, but allow disconnect() to interrupt connect()
+   - I2PSimpleSession: Changes to match I2PSessionImpl
+   - I2PTunnelServer: Don't connect in constructor, use createDisconnectedManager()
+     for a final manager, finals and cleanups
+ * ClientManager:
+   - Make classes extensible for router-side test stubs
+   - Add router-side local-only test implementation, no full router required.
+     Only tested with external clients, probably doesn't work in-JVM.
+   - Don't start threads in ClientManager constructor
+   - Remove unused Reader param in ClientMessageEventListener methods
+   - Cleanups, volatiles, finals, javadocs
+ * Translations:
+   - New varargs method in Translate
+   - New TranslateReader to translate static files on-the-fly using _("") tagging
+   - Tag proxy error pages for TranslateReader
+   - Drop static translated proxy error pages
+   - Add new i2ptunnel bundle for the proxy alone, shipped in the jar.
+   - Use TranslateReader in HTTP proxy for error pages
+   - Move HTTP proxy strings from the web (war) to proxy (jar) bundle so they will be loaded
+     Fixes translations for the lower half of the proxy pages that weren't accessible in the war.
+   - Initial translations created by msgmerge from i2ptunnel and routerconsole po files, un-fuzzied
+   - Tag initialNews.xml for TranslateReader
+   - Drop static translated initialNews pages
+   - Add new routerconsole bundle for the news alone, shipped in the jar
+   - Use TranslateReader in HTTP proxy for initial news
+   - Initial translations created manually from translated xml filesx
+   - Add translated proxy error pages and initial news to deletelist.txt
+ * Transports: Consolidate translation methods in TransportImpl;
+   ngettext fix for "peers" string
+
+
+2012-07-19 zzz
+ * PRNG:
+   - Don't delay the refiller if we need more (don't limit max output)
+   - Add FortunaRandomSource.main() to output to stdout for testing e.g. with dieharder
+
+2012-07-19 zab
+ * Streaming:
+   - initialize streaming RTT from sample, trac #979, RFC 6298
+   - store rttDev in TCBCache
+
+* 2013-07-15 0.9.7 released
+
+2013-07-11 kytv
+ * Chinese, Russian, Spanish, and Turkish updates from Transifex
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2013-07-02
+
+2013-07-11 str4d
+ * susimail: Improvements to layout in mobile browsers
+
+2013-07-06 zzz
+ * TunnelPool: Don't reuse peers for exploratory tunnels
+
+2013-07-04 zzz
+ * Streaming:
+   - Don't stop timers when session disconnects (tickets #644, #810)
+   - Throw exception on attempt to use destroyed socket manager
+
+2013-07-03 zzz
+ * Console: Hide dead tunnel pools on /tunnels
+ * Updater: Fix plugin update checker (ticket #897)
+ * Utils: Reduce logging in wrapper log when extracting zip files
+
+2013-06-30 zzz
+ * BuildHandler: Drop build request with bad flags
+
+2013-06-28 zzz
+ * i2psnark:
+   - Show more metadata on details page
+   - Fix rar icon
+   - More URL escaping
+
 2013-06-23 zzz
  * i2psnark: When receiving a metainfo via magnet and saving it to disk,
    preserve all non-standard fields (such as those created by Robert) so the

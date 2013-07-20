@@ -13,11 +13,31 @@ trans.nb = apps/i2ptunnel/locale/messages_nb.po
 trans.nl = apps/i2ptunnel/locale/messages_nl.po
 trans.pl = apps/i2ptunnel/locale/messages_pl.po
 trans.pt = apps/i2ptunnel/locale/messages_pt.po
-trans.ru = apps/i2ptunnel/locale/messages_ru.po
+trans.ru_RU = apps/i2ptunnel/locale/messages_ru.po
 trans.sv_SE = apps/i2ptunnel/locale/messages_sv.po
 trans.uk_UA = apps/i2ptunnel/locale/messages_uk.po
 trans.vi = apps/i2ptunnel/locale/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale/messages_zh.po
+
+[I2P.proxy]
+source_file = apps/i2ptunnel/locale-proxy/messages_en.po
+source_lang = en
+trans.ar = apps/i2ptunnel/locale-proxy/messages_ar.po
+trans.cs = apps/i2ptunnel/locale-proxy/messages_cs.po
+trans.de = apps/i2ptunnel/locale-proxy/messages_de.po
+trans.es = apps/i2ptunnel/locale-proxy/messages_es.po
+trans.fr = apps/i2ptunnel/locale-proxy/messages_fr.po
+trans.hu = apps/i2ptunnel/locale-proxy/messages_hu.po
+trans.it = apps/i2ptunnel/locale-proxy/messages_it.po
+trans.nb = apps/i2ptunnel/locale-proxy/messages_nb.po
+trans.nl = apps/i2ptunnel/locale-proxy/messages_nl.po
+trans.pl = apps/i2ptunnel/locale-proxy/messages_pl.po
+trans.pt = apps/i2ptunnel/locale-proxy/messages_pt.po
+trans.ru_RU = apps/i2ptunnel/locale-proxy/messages_ru.po
+trans.sv_SE = apps/i2ptunnel/locale-proxy/messages_sv.po
+trans.uk_UA = apps/i2ptunnel/locale-proxy/messages_uk.po
+trans.vi = apps/i2ptunnel/locale-proxy/messages_vi.po
+trans.zh_CN = apps/i2ptunnel/locale-proxy/messages_zh.po
 
 [I2P.routerconsole]
 source_file = apps/routerconsole/locale/messages_en.po
@@ -37,12 +57,24 @@ trans.nb = apps/routerconsole/locale/messages_nb.po
 trans.nl = apps/routerconsole/locale/messages_nl.po
 trans.pl = apps/routerconsole/locale/messages_pl.po
 trans.pt = apps/routerconsole/locale/messages_pt.po
-trans.ru = apps/routerconsole/locale/messages_ru.po
+trans.ru_RU = apps/routerconsole/locale/messages_ru.po
 trans.sv_SE = apps/routerconsole/locale/messages_sv.po
 trans.tr_TR = apps/routerconsole/locale/messages_tr.po
 trans.uk_UA = apps/routerconsole/locale/messages_uk.po
 trans.vi = apps/routerconsole/locale/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale/messages_zh.po
+
+[I2P.welcome]
+source_file = apps/routerconsole/locale-news/messages_en.po
+source_lang = en
+trans.ar = apps/routerconsole/locale-news/messages_ar.po
+trans.de = apps/routerconsole/locale-news/messages_de.po
+trans.es = apps/routerconsole/locale-news/messages_es.po
+trans.fr = apps/routerconsole/locale-news/messages_fr.po
+trans.nl = apps/routerconsole/locale-news/messages_nl.po
+trans.pt = apps/routerconsole/locale-news/messages_pt.po
+trans.ru_RU = apps/routerconsole/locale-news/messages_ru.po
+trans.sv_SE = apps/routerconsole/locale-news/messages_sv.po
 
 [I2P.i2psnark]
 source_file = apps/i2psnark/locale/messages_en.po
@@ -78,7 +110,7 @@ trans.it = apps/susidns/locale/messages_it.po
 trans.nl = apps/susidns/locale/messages_nl.po
 trans.pl = apps/susidns/locale/messages_pl.po
 trans.pt = apps/susidns/locale/messages_pt.po
-trans.ru = apps/susidns/locale/messages_ru.po
+trans.ru_RU = apps/susidns/locale/messages_ru.po
 trans.sv_SE = apps/susidns/locale/messages_sv.po
 trans.uk_UA = apps/susidns/locale/messages_uk.po
 trans.vi = apps/susidns/locale/messages_vi.po
@@ -98,7 +130,7 @@ trans.hu = apps/desktopgui/locale/messages_hu.po
 trans.it = apps/desktopgui/locale/messages_it.po
 trans.nl = apps/desktopgui/locale/messages_nl.po
 trans.pl = apps/desktopgui/locale/messages_pl.po
-trans.ru = apps/desktopgui/locale/messages_ru.po
+trans.ru_RU = apps/desktopgui/locale/messages_ru.po
 trans.sv_SE = apps/desktopgui/locale/messages_sv.po
 trans.uk_UA = apps/desktopgui/locale/messages_uk.po
 trans.tr_TR = apps/desktopgui/locale/messages_tr.po
@@ -115,7 +147,7 @@ trans.fr = apps/susimail/locale/messages_fr.po
 trans.hu = apps/susimail/locale/messages_hu.po
 trans.it = apps/susimail/locale/messages_it.po
 trans.nl = apps/susimail/locale/messages_nl.po
-trans.ru = apps/susimail/locale/messages_ru.po
+trans.ru_RU = apps/susimail/locale/messages_ru.po
 trans.sv_SE = apps/susimail/locale/messages_sv.po
 trans.pl = apps/susimail/locale/messages_pl.po
 trans.pt = apps/susimail/locale/messages_pt.po
@@ -134,10 +166,12 @@ trans.fr = debian/po/fr.po
 trans.it = debian/po/it.po
 trans.hu = debian/po/hu.po
 trans.pl = debian/po/pl.po
-trans.ru = debian/po/ru.po
+trans.pt = debian/po/pt.po
+trans.ru_RU = debian/po/ru.po
 trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
 trans.tr_TR = debian/po/tr.po
+trans.zh_CN = debian/po/zh.po
 
 [I2P.i2prouter-script]
 source_file = installer/resources/locale/po/messages_en.po
@@ -147,6 +181,8 @@ trans.fr = installer/resources/locale/po/messages_fr.po
 trans.it = installer/resources/locale/po/messages_it.po
 trans.sv_SE = installer/resources/locale/po/messages_sv.po
 trans.ru_RU = installer/resources/locale/po/messages_ru.po
+trans.tr_TR = installer/resources/locale/po/messages_tr.po
+trans.zh_CN = installer/resources/locale/po/messages_zh.po
 
 [main]
 host = http://www.transifex.net

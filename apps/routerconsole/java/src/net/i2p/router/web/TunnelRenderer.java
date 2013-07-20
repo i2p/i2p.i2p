@@ -39,8 +39,12 @@ public class TunnelRenderer {
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         Map<Hash, TunnelPool> clientOutboundPools = _context.tunnelManager().getOutboundClientPools();
         destinations = new ArrayList(clientInboundPools.keySet());
+        boolean debug = _context.getBooleanProperty(ConfigTunnelsHelper.PROP_ADVANCED);
         for (int i = 0; i < destinations.size(); i++) {
             Hash client = destinations.get(i);
+            boolean isLocal = _context.clientManager().isLocal(client);
+            if ((!isLocal) && (!debug))
+                continue;
             TunnelPool in = null;
             TunnelPool outPool = null;
             in = clientInboundPools.get(client);
@@ -53,7 +57,7 @@ public class TunnelRenderer {
                 name = client.toBase64().substring(0,4);
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
                       + "\" ></a>" + _("Client tunnels for") + ' ' + _(name));
-            if (_context.clientManager().isLocal(client))
+            if (isLocal)
                 out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _("configure") + "</a>)</h2>\n");
             else
                 out.write(" (" + _("dead") + ")</h2>\n");

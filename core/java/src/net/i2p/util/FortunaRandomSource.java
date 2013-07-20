@@ -262,27 +262,23 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         }
     }
     
-/*****
+    /**
+     *  Outputs to stdout for dieharder:
+     *  <code>
+     *  java -cp build/i2p.jar net.i2p.util.FortunaRandomSource | dieharder -a -g 200
+     *  </code>
+     */
     public static void main(String args[]) {
         try {
-            RandomSource rand = I2PAppContext.getGlobalContext().random();
-            if (true) {
-                for (int i = 0; i < 1000; i++)
-                    if (rand.nextFloat() < 0)
-                        throw new RuntimeException("negative!");
-                System.out.println("All positive");
-                return;
+            java.util.Properties props = new java.util.Properties();
+            props.setProperty("prng.buffers", "12");
+            I2PAppContext ctx = new I2PAppContext(props);
+            RandomSource rand = ctx.random();
+            byte[] buf = new byte[65536];
+            while (true) {
+                rand.nextBytes(buf);
+                System.out.write(buf);
             }
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            java.util.zip.GZIPOutputStream gos = new java.util.zip.GZIPOutputStream(baos);
-            for (int i = 0; i < 1024*1024; i++) {
-                int c = rand.nextInt(256);
-                gos.write((byte)c);
-            }
-            gos.finish();
-            byte compressed[] = baos.toByteArray();
-            System.out.println("Compressed size of 1MB: " + compressed.length);
         } catch (Exception e) { e.printStackTrace(); }
     }
-*****/
 }

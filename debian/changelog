@@ -1,3 +1,19 @@
+i2p (0.9.7-2) unstable; urgency=low
+
+  * Bugfix: Add missing ; to i2prouter script.
+  * Test scripts with "sh -n" in the build target
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 16 Jul 2013 11:08:48 +0000
+
+i2p (0.9.7-1) unstable; urgency=low
+
+  * New upstream release
+  * debconf:
+    - New Chinese, Portuguese, and Turkish translations
+    - Russian translation updates
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 15 Jul 2013 19:35:09 +0000
+
 i2p (0.9.6-1) unstable; urgency=low
 
   * New upstream release

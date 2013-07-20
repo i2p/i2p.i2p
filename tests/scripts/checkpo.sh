@@ -10,7 +10,9 @@ cd `dirname $0`/../..
 
 DIRS="\
   apps/routerconsole/locale \
+  apps/routerconsole/locale-news \
   apps/i2ptunnel/locale \
+  apps/i2ptunnel/locale-proxy \
   apps/i2psnark/locale \
   apps/susidns/locale \
   apps/susimail/locale \

@@ -28,6 +28,10 @@ import net.i2p.data.Destination;
  *
  */
 public interface I2PSocketManager {
+
+    /**
+     *  @return the session, non-null
+     */
     public I2PSession getSession();
     
     /**

@@ -1,5 +1,6 @@
 package net.i2p.client.streaming;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +13,7 @@ import net.i2p.data.Destination;
  * Note that this interface is a "subinterface" of the interface
  * defined in the "official" streaming api.
  */
-public interface I2PSocket {
+public interface I2PSocket extends Closeable {
     /**
      * @return the Destination of this side of the socket.
      */
@@ -67,12 +68,6 @@ public interface I2PSocket {
      */
     public void setReadTimeout(long ms);
 
-    /**
-     * Closes the socket if not closed yet
-     * @throws IOException on failure
-     */
-    public void close() throws IOException;
-    
     public boolean isClosed();
 
     public void setSocketErrorListener(SocketErrorListener lsnr);

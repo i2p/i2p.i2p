@@ -39,9 +39,10 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected boolean _isPartial;
     /** set by the listeners on completion */
     protected String _newVersion;
-    // 56 byte header, only used for suds
-    private final ByteArrayOutputStream _baos;
+    /** 56 byte header, only used for suds */
+    protected final ByteArrayOutputStream _baos;
     protected URI _currentURI;
+    private final String _currentVersion;
 
     private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
@@ -49,7 +50,18 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
     protected static final long NOPROXY_INACTIVITY_TIMEOUT = 60*1000;
 
+    /**
+     *  Uses router version for partial checks
+     */
     public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
+        this(ctx, mgr, uris, RouterVersion.VERSION);
+    }
+
+    /**
+     *  @param currentVersion used for partial checks
+     *  @since 0.9.7
+     */
+    public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris, String currentVersion) { 
         super("Update Runner");
         setDaemon(true);
         _context = ctx;
@@ -58,6 +70,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         _urls = uris;
         _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
         _updateFile = (new File(ctx.getTempDir(), "update" + ctx.random().nextInt() + ".tmp")).getAbsolutePath();
+        _currentVersion = currentVersion;
     }
 
     //////// begin UpdateTask methods
@@ -184,7 +197,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_isPartial) {
             // Compare version with what we have now
             String newVersion = TrustedUpdate.getVersionString(new ByteArrayInputStream(_baos.toByteArray()));
-            boolean newer = VersionComparator.comp(newVersion, RouterVersion.VERSION) > 0;
+            boolean newer = VersionComparator.comp(newVersion, _currentVersion) > 0;
             if (newer) {
                 _newVersion = newVersion;
             } else {

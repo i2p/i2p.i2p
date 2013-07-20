@@ -14,7 +14,7 @@ public class ConfigTunnelsHelper extends HelperBase {
     private static final String HOPS = ngettext("1 hop", "{0} hops");
     private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
 
-    private static final String PROP_ADVANCED = "routerconsole.advanced";
+    static final String PROP_ADVANCED = "routerconsole.advanced";
 
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);

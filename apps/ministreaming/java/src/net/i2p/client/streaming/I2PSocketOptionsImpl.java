@@ -93,6 +93,20 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
         }
     }
     
+    protected static double getDouble(Properties opts, String name, double defaultVal) {
+        if (opts == null) return defaultVal;
+        String val = opts.getProperty(name);
+        if (val == null) {
+            return defaultVal;
+        } else {
+            try {
+                return Double.parseDouble(val);
+            } catch (NumberFormatException nfe) {
+                return defaultVal;
+            }
+        }
+    }
+    
     /**
      * How long we will wait for the ACK from a SYN, in milliseconds.
      *

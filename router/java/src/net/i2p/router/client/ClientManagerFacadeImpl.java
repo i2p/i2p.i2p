@@ -56,6 +56,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         _log.info("Starting up the client subsystem");
         int port = _context.getProperty(PROP_CLIENT_PORT, DEFAULT_PORT);
         _manager = new ClientManager(_context, port);
+        _manager.start();
     }    
     
     public synchronized void shutdown() {
@@ -82,12 +83,12 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     public boolean isAlive() { return _manager != null && _manager.isAlive(); }
 
     private static final long MAX_TIME_TO_REBUILD = 10*60*1000;
+
     @Override
     public boolean verifyClientLiveliness() {
         if (_manager == null) return true;
         boolean lively = true;
-        for (Iterator iter = _manager.getRunnerDestinations().iterator(); iter.hasNext(); ) {
-            Destination dest = (Destination)iter.next();
+        for (Destination dest : _manager.getRunnerDestinations()) {
             ClientConnectionRunner runner = _manager.getRunner(dest);
             if ( (runner == null) || (runner.getIsDead())) continue;
             LeaseSet ls = runner.getLeaseSet();

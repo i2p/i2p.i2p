@@ -255,9 +255,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 newManager = true;
             } else {
                 I2PSession sess = sockMgr.getSession();
-                if (sess == null) {
-                    newManager = true;
-                } else if (sess.isClosed() &&
+                if (sess.isClosed() &&
                            Boolean.parseBoolean(getTunnel().getClientOptions().getProperty("i2cp.closeOnIdle")) &&
                            Boolean.parseBoolean(getTunnel().getClientOptions().getProperty("i2cp.newDestOnResume"))) {
                     // build a new socket manager and a new dest if the session is closed.
@@ -317,7 +315,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         Log _log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
         if (socketManager != null) {
             I2PSession s = socketManager.getSession();
-            if ( (s == null) || (s.isClosed()) ) {
+            if (s.isClosed()) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since the old one closed [s=" + s + "]");
                 if (s != null)
@@ -709,9 +707,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
                 if (!chained) {
                     I2PSession session = sockMgr.getSession();
-                    if (session != null) {
-                        getTunnel().removeSession(session);
-                    }
+                    getTunnel().removeSession(session);
                 } // else the app chaining to this one closes it!
             }
             l.log("Stopping client " + toString());

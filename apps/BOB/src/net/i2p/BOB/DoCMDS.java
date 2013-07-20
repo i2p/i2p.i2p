@@ -388,7 +388,7 @@ public class DoCMDS implements Runnable {
 	 * Does the base64 information look OK
 	 *
 	 * @param data
-	 * @return
+	 * @return OK
 	 */
 	private boolean is64ok(String data) {
 		try {

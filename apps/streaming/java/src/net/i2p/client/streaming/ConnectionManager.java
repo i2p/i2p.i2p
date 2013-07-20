@@ -49,7 +49,7 @@ class ConnectionManager {
     private final SimpleTimer2 _timer;
     /** cache of the property to detect changes */
     private static volatile String _currentBlacklist = "";
-    private static final Set<Hash> _globalBlacklist = new ConcurrentHashSet();
+    private static final Set<Hash> _globalBlacklist = new ConcurrentHashSet<Hash>();
     
     /** @since 0.9.3 */
     public static final String PROP_BLACKLIST = "i2p.streaming.blacklist";
@@ -62,8 +62,8 @@ class ConnectionManager {
         _session = session;
         _defaultOptions = defaultOptions;
         _log = _context.logManager().getLog(ConnectionManager.class);
-        _connectionByInboundId = new ConcurrentHashMap(32);
-        _pendingPings = new ConcurrentHashMap(4);
+        _connectionByInboundId = new ConcurrentHashMap<Long,Connection>(32);
+        _pendingPings = new ConcurrentHashMap<Long,PingRequest>(4);
         _messageHandler = new MessageHandler(_context, this);
         _packetHandler = new PacketHandler(_context, this);
         _connectionHandler = new ConnectionHandler(_context, this);
@@ -443,7 +443,7 @@ class ConnectionManager {
             // rebuild _globalBlacklist when property changes
             synchronized(_globalBlacklist) {
                 if (hashes.length() > 0) {
-                    Set<Hash> newSet = new HashSet();
+                    Set<Hash> newSet = new HashSet<Hash>();
                     StringTokenizer tok = new StringTokenizer(hashes, ",; ");
                     while (tok.hasMoreTokens()) {
                         String hashstr = tok.nextToken();
@@ -484,6 +484,7 @@ class ConnectionManager {
      * Something b0rked hard, so kill all of our connections without mercy.
      * Don't bother sending close packets.
      *
+     * CAN continue to use the manager.
      */
     public void disconnectAllHard() {
         for (Iterator<Connection> iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
@@ -491,6 +492,18 @@ class ConnectionManager {
             con.disconnect(false, false);
             iter.remove();
         }
+    }
+    
+    /**
+     * Kill all connections and the timers.
+     * Don't bother sending close packets.
+     *
+     * CANNOT continue to use the manager or restart.
+     *
+     * @since 0.9.7
+     */
+    public void shutdown() {
+        disconnectAllHard();
         _tcbShare.stop();
         _timer.stop();
     }
@@ -534,7 +547,7 @@ class ConnectionManager {
      * @return set of Connection objects
      */
     public Set<Connection> listConnections() {
-            return new HashSet(_connectionByInboundId.values());
+            return new HashSet<Connection>(_connectionByInboundId.values());
     }
 
     /** blocking */
@@ -550,7 +563,7 @@ class ConnectionManager {
      * @param keyToUse ignored
      * @param tagsToSend ignored
      */
-    public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set tagsToSend, PingNotifier notifier) {
+    public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set<?> tagsToSend, PingNotifier notifier) {
         return ping(peer, timeoutMs, blocking, notifier);
     }
 
@@ -565,8 +578,13 @@ class ConnectionManager {
         //    packet.setKeyUsed(keyToUse);
         //    packet.setTagsSent(tagsToSend);
         //}
+        if (_log.shouldLog(Log.INFO)) {
+            _log.info(String.format("about to ping %s timeout=%d blocking=%b",
+                    peer,timeoutMs,blocking));
+        }
+            
         
-        PingRequest req = new PingRequest(peer, packet, notifier);
+        PingRequest req = new PingRequest(notifier);
         
         _pendingPings.put(id, req);
         
@@ -617,7 +635,7 @@ class ConnectionManager {
         private boolean _ponged;
         private final PingNotifier _notifier;
 
-        public PingRequest(Destination peer, PacketLocal packet, PingNotifier notifier) { 
+        public PingRequest(PingNotifier notifier) { 
             _notifier = notifier;
         }
 
@@ -625,14 +643,14 @@ class ConnectionManager {
             // static, no log
             //_log.debug("Ping successful");
             //_context.sessionKeyManager().tagsDelivered(_peer.getPublicKey(), _packet.getKeyUsed(), _packet.getTagsSent());
-            synchronized (ConnectionManager.PingRequest.this) {
+            synchronized (this) {
                 _ponged = true; 
-                ConnectionManager.PingRequest.this.notifyAll();
+                notifyAll();
             }
             if (_notifier != null)
                 _notifier.pingComplete(true);
         }
-        public boolean pongReceived() { return _ponged; }
+        public synchronized boolean pongReceived() { return _ponged; }
     }
     
     void receivePong(long pingId) {
