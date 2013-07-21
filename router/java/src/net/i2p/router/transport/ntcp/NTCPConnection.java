@@ -203,12 +203,12 @@ class NTCPConnection {
         //_outbound = new CoDelPriorityBlockingQueue(ctx, "NTCP-Connection", 32);
         _outbound = new PriBlockingQueue(ctx, "NTCP-Connection", 32);
         _isInbound = false;
+        _establishState = new EstablishState(ctx, transport, this);
         _decryptBlockBuf = new byte[BLOCK_SIZE];
         _curReadState = new ReadState();
         _inboundListener = new InboundListener();
         _outboundListener = new OutboundListener();
         initialize();
-        _establishState = new EstablishState(ctx, transport, this);
     }
 
     private void initialize() {
