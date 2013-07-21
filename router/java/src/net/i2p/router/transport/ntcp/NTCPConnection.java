@@ -83,7 +83,7 @@ class NTCPConnection {
     private final Set<FIFOBandwidthLimiter.Request> _bwInRequests;
     private final Set<FIFOBandwidthLimiter.Request> _bwOutRequests;
     private long _establishedOn;
-    private EstablishState _establishState;
+    private volatile EstablishState _establishState;
     private final NTCPTransport _transport;
     private final boolean _isInbound;
     private volatile boolean _closed;
@@ -232,7 +232,7 @@ class NTCPConnection {
     public void setChannel(SocketChannel chan) { _chan = chan; }
     public void setKey(SelectionKey key) { _conKey = key; }
     public boolean isInbound() { return _isInbound; }
-    public synchronized boolean isEstablished() { return _establishState.isComplete(); }
+    public boolean isEstablished() { return _establishState.isComplete(); }
 
     /**
      *  @since IPv6
