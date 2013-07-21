@@ -1,3 +1,10 @@
+2012-07-21 zzz
+ * I2CP:
+   - Don't NPE when loglevel=warn
+   - Don't enforce property length limits when inside router JVM
+ * I2PSnark: Log uncaught error in ThreadedStarter to router log
+ * I2PThread: Log uncaught error to wrapper log
+
 2012-07-20 zzz
  Prop from i2p.i2p.zzz.ipv6:
  * Addresses:

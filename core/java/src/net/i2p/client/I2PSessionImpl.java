@@ -309,11 +309,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 continue;
             }
             String val = options.getProperty(key);
-            if ((key.length() > 255) || (val.length() > 255)) {
+            // not serializing (no limit) in router ctx
+            // fixme, bytes could still be over 255 (unlikely)
+            if ((!_context.isRouterContext()) &&
+                (key.length() > 255 || val.length() > 255)) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(getPrefix() + "Not passing on property ["
+                    _log.warn("Not passing on property ["
                               + key
-                              + "] in the session configuration as the value is too long (max = 255): "
+                              + "] in the session config, key or value is too long (max = 255): "
                               + val);
             } else {
                 rv.setProperty(key, val);

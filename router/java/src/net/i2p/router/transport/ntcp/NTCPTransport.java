@@ -1173,10 +1173,9 @@ public class NTCPTransport extends TransportImpl {
 
         if (!peers.isEmpty()) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
-            buf.append("<tr class=\"tablefooter\"><td align=\"center\"><b>")
-               .append(ngettext("{0} peer", "{0} peers", peers.size()))
-               .append("</b></td><td>&nbsp;</td><td>&nbsp;");
-            buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append(THINSP).append(formatRate(bpsSend/1024)).append("</b>");
+            buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
+               .append(ngettext("{0} peer", "{0} peers", peers.size()));
+            buf.append("</b></td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append(THINSP).append(formatRate(bpsSend/1024)).append("</b>");
             buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration2(totalUptime/peers.size()));
             buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(offsetTotal*1000/peers.size()));
             buf.append("</b></td><td align=\"center\"><b>").append(totalSend).append("</b></td><td align=\"center\"><b>").append(totalRecv);

@@ -2717,7 +2717,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
       if (numPeers > 0) {
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-        buf.append("<tr class=\"tablefooter\"><td colspan=\"3\" align=\"left\"><b>")
+        buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
            .append(ngettext("{0} peer", "{0} peers", peers.size()))
            .append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
