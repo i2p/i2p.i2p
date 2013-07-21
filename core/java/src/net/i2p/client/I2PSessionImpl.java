@@ -309,10 +309,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 continue;
             }
             String val = options.getProperty(key);
-            // not serializing (no limit) in router ctx
+            // Long strings MUST be removed, even in router context,
+            // as the session config properties must be serialized to be signed.
             // fixme, bytes could still be over 255 (unlikely)
-            if ((!_context.isRouterContext()) &&
-                (key.length() > 255 || val.length() > 255)) {
+            if (key.length() > 255 || val.length() > 255) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Not passing on property ["
                               + key
