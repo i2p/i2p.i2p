@@ -6,12 +6,12 @@ class LogUtil {
     private LogUtil() {}
     
     /**
-     * logs a loop when closing a resource with level WARN
+     * logs a loop when closing a resource with level INFO
      * @param desc vararg description
      * @param log logger for the class we're intersted in
      */
     static void logCloseLoop(Log log, Object... desc) {
-        logCloseLoop(log, Log.WARN, desc);
+        logCloseLoop(log, Log.INFO, desc);
     }
     
     /**
