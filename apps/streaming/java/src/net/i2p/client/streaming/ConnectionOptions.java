@@ -84,7 +84,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final double TCP_KAPPA = 4;
     
     private static final String PROP_INITIAL_RTO = "i2p.streaming.initialRTO";
-    private static final int INITIAL_RTO = 12000;
+    private static final int INITIAL_RTO = 9000; 
     
     public static final String PROP_CONNECT_DELAY = "i2p.streaming.connectDelay";
     public static final String PROP_PROFILE = "i2p.streaming.profile";
