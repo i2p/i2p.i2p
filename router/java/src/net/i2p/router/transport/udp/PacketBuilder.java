@@ -1280,7 +1280,6 @@ class PacketBuilder {
      *  Creates an arbitrary packet for unit testing.
      *  Null transport in constructor OK.
      *
-     *  @param type 0-15
      *  @since IPv6
      */
     public UDPPacket buildPacket(byte[] data, InetAddress to, int port) {

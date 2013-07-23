@@ -763,7 +763,7 @@ public abstract class TransportImpl implements Transport {
     /**
      * IP of the peer from the last connection (in or out, any transport).
      *
-     * @param IPv4 or IPv6, non-null
+     * @param ip IPv4 or IPv6, non-null
      */
     public void setIP(Hash peer, byte[] ip) {
         byte[] old;
