@@ -394,7 +394,15 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	
 	/** debug only */
 	private static void listStateTable(Service serv, StringBuilder sb) {
-		ServiceStateTable table = serv.getServiceStateTable();
+		ServiceStateTable table;
+		try {
+			table = serv.getServiceStateTable();
+		} catch (Exception e) {
+			// getSCPDNode() returns null,
+			// NPE at org.cybergarage.upnp.Service.getServiceStateTable(Service.java:526)
+			sb.append(" : no state");
+			return;
+		}
 		sb.append("<ul><small>");
 		for(int i=0; i<table.size(); i++) {
 			StateVariable current = table.getStateVariable(i);
@@ -928,7 +936,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		I2PAppContext ctx = new I2PAppContext(props);
 		UPnP upnp = new UPnP(ctx);
 		ControlPoint cp = new ControlPoint();
-		System.out.println("Searching for up&p devices:");
+		System.out.println("Searching for UPnP devices:");
 		cp.start();
 		cp.search();
 		Thread.sleep(10000);
