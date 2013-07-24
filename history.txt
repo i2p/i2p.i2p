@@ -1,6 +1,8 @@
 2012-07-24 zzz
  * GeoIP: Fix lookups, broken in IPv6 branch
- * UPnP: main() tweaks for debugging
+ * UPnP:
+   - main() tweaks for debugging
+   - Fix for devices that return base URLs with trailing '/' (ticket #986)
 
 2012-07-22 zzz
  * BuildReplyHandler:
