@@ -143,6 +143,7 @@ class GeoIP {
                 Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
                 _pendingSearch.clear();
                 if (search.length > 0) {
+                    Arrays.sort(search);
                     String[] countries = readGeoIPFile(search);
                     for (int i = 0; i < countries.length; i++) {
                         if (countries[i] != null)
@@ -155,6 +156,7 @@ class GeoIP {
                 search = _pendingSearch.toArray(new Long[_pendingIPv6Search.size()]);
                 _pendingIPv6Search.clear();
                 if (search.length > 0) {
+                    Arrays.sort(search);
                     String[] countries = GeoIPv6.readGeoIPFile(_context, search, _codeCache);
                     for (int i = 0; i < countries.length; i++) {
                         if (countries[i] != null)

@@ -46,6 +46,10 @@ class GeoIPv6 {
     /**
      * Lookup search items in the geoip file.
      * See below for format.
+     *
+     * @param search a sorted array of IPs to search
+     * @return an array of country codes, same order as the search param,
+     *         or a zero-length array on failure
      */
     public static String[] readGeoIPFile(I2PAppContext context, Long[] search, Map<String, String> codeCache) {
         Log log = context.logManager().getLog(GeoIPv6.class);
@@ -62,6 +66,10 @@ class GeoIPv6 {
     /**
      * Lookup search items in the geoip file.
      * See below for format.
+     *
+     * @param search a sorted array of IPs to search
+     * @return an array of country codes, same order as the search param,
+     *         or a zero-length array on failure
      */
     private static String[] readGeoIPFile(File geoFile, Long[] search, Map<String, String> codeCache, Log log) {
         String[] rv = new String[search.length];
