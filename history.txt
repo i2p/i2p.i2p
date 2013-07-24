@@ -1,3 +1,17 @@
+2012-07-24 zzz
+ * GeoIP: Fix lookups, broken in IPv6 branch
+ * UPnP: main() tweaks for debugging
+
+2012-07-22 zzz
+ * BuildReplyHandler:
+   - Make non-static
+   - Don't pollute Hash cache with build response record hashes
+   - Use SimpleByteCache
+   - cleanups
+ * HashComparator:
+   - Don't pollute Hash cache with hashes
+   - cleanups
+
 2012-07-21 zzz
  * I2CP:
    - Don't NPE when loglevel=warn
