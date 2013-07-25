@@ -52,7 +52,7 @@ public abstract class TransportUtil {
     }
 
     private static final Map<String, IPv6Config> BY_NAME = new HashMap<String, IPv6Config>();
-    public static final IPv6Config DEFAULT_IPV6_CONFIG = IPv6Config.IPV6_DISABLED;
+    public static final IPv6Config DEFAULT_IPV6_CONFIG = IPv6Config.IPV6_PREFERRED;
 
     static {
         for (IPv6Config cfg : IPv6Config.values()) {
@@ -60,6 +60,7 @@ public abstract class TransportUtil {
         }
         // alias
         BY_NAME.put("true", IPv6Config.IPV6_ENABLED);
+        BY_NAME.put("disable", IPv6Config.IPV6_DISABLED);
     }
 
     public static IPv6Config getIPv6Config(RouterContext ctx, String transportStyle) {

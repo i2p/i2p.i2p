@@ -243,8 +243,8 @@ public abstract class TransportImpl implements Transport {
         if (!sendSuccessful)
             msg.transportFailed(getStyle());
 
-        if (msToSend > 1000) {
-            if (_log.shouldLog(Log.WARN))
+        if (msToSend > 1500) {
+            if (_log.shouldLog(Log.INFO))
                 _log.warn(getStyle() + " afterSend slow: " + (sendSuccessful ? "success " : "FAIL ")
                           + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + ' ' + msg.getMessageId() + " to "
@@ -577,14 +577,24 @@ public abstract class TransportImpl implements Transport {
      */
     protected List<RouterAddress> getTargetAddresses(RouterInfo target) {
         List<RouterAddress> rv = target.getTargetAddresses(getStyle());
+        if (rv.isEmpty())
+            return rv;
         // Shuffle so everybody doesn't use the first one
-        if (rv.size() > 1) {
+        if (rv.size() > 1)
             Collections.shuffle(rv, _context.random());
-            TransportUtil.IPv6Config config = getIPv6Config();
-            int adj;
-            switch (config) {
+        TransportUtil.IPv6Config config = getIPv6Config();
+        int adj;
+        switch (config) {
               case IPV6_DISABLED:
-                adj = 10; break;
+                adj = 10;
+              /**** IPv6 addresses will be rejected in isPubliclyRoutable()
+                for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
+                    byte[] ip = iter.next().getIP();
+                    if (ip != null && ip.length == 16)
+                        iter.remove();
+                }
+               ****/
+                break;
               case IPV6_NOT_PREFERRED:
                 adj = 1; break;
               default:
@@ -593,10 +603,17 @@ public abstract class TransportImpl implements Transport {
               case IPV6_PREFERRED:
                 adj = -1; break;
               case IPV6_ONLY:
-                adj = -10; break;
-            }
-            Collections.sort(rv, new AddrComparator(adj));
+                adj = -10;
+                // IPv4 addresses not rejected in isPubliclyRoutable()
+                for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
+                    byte[] ip = iter.next().getIP();
+                    if (ip != null && ip.length == 4)
+                        iter.remove();
+                }
+                break;
         }
+        if (rv.size() > 1)
+            Collections.sort(rv, new AddrComparator(adj));
         return rv;
     }
 

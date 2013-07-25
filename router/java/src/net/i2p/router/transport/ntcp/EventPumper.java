@@ -25,6 +25,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -781,8 +782,8 @@ class EventPumper implements Runnable {
                 SelectionKey key = con.getChannel().register(_selector, SelectionKey.OP_CONNECT);
                 key.attach(con);
                 con.setKey(key);
+                RouterAddress naddr = con.getRemoteAddress();
                 try {
-                    RouterAddress naddr = con.getRemoteAddress();
                     if (naddr.getPort() <= 0)
                         throw new IOException("Invalid NTCP address: " + naddr);
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
@@ -794,7 +795,8 @@ class EventPumper implements Runnable {
                         processConnect(key);
                     }
                 } catch (IOException ioe) {
-                    if (_log.shouldLog(Log.WARN)) _log.warn("error connecting", ioe);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("error connecting to " + Addresses.toString(naddr.getIP(), naddr.getPort()), ioe);
                     _context.statManager().addRateData("ntcp.connectFailedIOE", 1);
                     _transport.markUnreachable(con.getRemotePeer().calculateHash());
                     //if (ntcpOnly(con)) {

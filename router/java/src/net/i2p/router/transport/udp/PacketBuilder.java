@@ -161,6 +161,7 @@ class PacketBuilder {
     private static final int MAX_RESEND_ACKS_SMALL = 4;
 
     private static final String PROP_PADDING = "i2np.udp.padding";
+    private static final boolean DEFAULT_ENABLE_PADDING = true;
 
     /**
      *  @param transport may be null for unit testing only
@@ -408,7 +409,7 @@ class PacketBuilder {
         
         // pad up so we're on the encryption boundary
         off = pad1(data, off);
-        off = pad2(data, off, currentMTU);
+        off = pad2(data, off, currentMTU - (ipHeaderSize + UDP_HEADER_SIZE));
         pkt.setLength(off);
 
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
@@ -782,6 +783,9 @@ class PacketBuilder {
                 _context.random().nextBytes(data, off, paddingRequired);
                 off += paddingRequired;
             }
+            // We cannot have non-mod16 (pad2) padding here, since the signature
+            // is at the end. As of 0.9.7 we won't decrypt past the end of the packet
+            // so trailing non-mod-16 data is ignored. That truncates the sig.
             
             // BUG: NPE here if null signature
             System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
@@ -792,8 +796,9 @@ class PacketBuilder {
             // nothing more to add beyond the identity fragment
             // pad up so we're on the encryption boundary
             off = pad1(data, off);
+            // allowed but untested
+            //off = pad2(data, off);
         } 
-        off = pad2(data, off);
         pkt.setLength(off);
         authenticate(packet, state.getCipherKey(), state.getMACKey());
         setTo(packet, to, state.getSentPort());
@@ -1351,7 +1356,7 @@ class PacketBuilder {
      * @since 0.9.7
      */
     private int pad2(byte[] data, int off) {
-        if (!_context.getBooleanProperty(PROP_PADDING))
+        if (!_context.getProperty(PROP_PADDING, DEFAULT_ENABLE_PADDING))
             return off;
         int padSize = _context.random().nextInt(MAX_PAD2);
         if (padSize == 0)
@@ -1370,7 +1375,7 @@ class PacketBuilder {
      * @since 0.9.7
      */
     private int pad2(byte[] data, int off, int maxLen) {
-        if (!_context.getBooleanProperty(PROP_PADDING))
+        if (!_context.getProperty(PROP_PADDING, DEFAULT_ENABLE_PADDING))
             return off;
         if (off >= maxLen)
             return off;

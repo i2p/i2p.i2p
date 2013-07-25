@@ -72,6 +72,12 @@ public class NTCPTransport extends TransportImpl {
      */
     private final Set<NTCPConnection> _establishing;
 
+    /**
+     *  Do we have a public IPv6 address?
+     *  TODO periodically update via CSFI.NetMonitor?
+     */
+    private boolean _haveIPv6Address;
+
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
@@ -364,7 +370,7 @@ public class NTCPTransport extends TransportImpl {
                 //    _log.debug("no bid when trying to send to " + peer + " as they don't have a valid ntcp address");
                 continue;
             }
-            if (!isPubliclyRoutable(ip)) {
+            if (!isValid(ip)) {
                 if (! _context.getBooleanProperty("i2np.ntcp.allowLocal")) {
                     //_context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1);
                     //if (_log.shouldLog(Log.DEBUG))
@@ -375,6 +381,21 @@ public class NTCPTransport extends TransportImpl {
             return addr;
         }
         return null;
+    }
+    
+    /**
+     * An IPv6 address is only valid if we are configured to support IPv6
+     * AND we have a public IPv6 address.
+     *
+     * @param addr may be null, returns false
+     * @since 0.9.8
+     */
+    private boolean isValid(byte addr[]) {
+        if (addr == null) return false;
+        if (isPubliclyRoutable(addr) &&
+            (addr.length != 16 || _haveIPv6Address))
+            return true;
+        return false;
     }
 
     public boolean allowConnection() {
@@ -809,7 +830,12 @@ public class NTCPTransport extends TransportImpl {
     public void externalAddressReceived(AddressSource source, byte[] ip, int port) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
-        if (ip != null && !isPubliclyRoutable(ip)) {
+        if ((source == SOURCE_INTERFACE || source == SOURCE_SSU)
+             && ip != null && ip.length == 16) {
+            // must be set before isValid() call
+            _haveIPv6Address = true;
+        }
+        if (ip != null && !isValid(ip)) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
             return;

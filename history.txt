@@ -1,3 +1,13 @@
+2012-07-25 zzz
+ * Transports:
+   - Prefer IPv6 by default
+   - Fix IPv6-only option
+   - Don't try NTCP IPv6 addresses unless we have one
+   - Fix non-%16 SSU padding; enable by default
+ * Tunnels:
+   - Make expl. default 3 hops  (ticket #966)
+   - Allow expl. fallback up to -2 hops
+
 2012-07-24 zzz
  * GeoIP: Fix lookups, broken in IPv6 branch
  * UPnP:
