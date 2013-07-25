@@ -50,7 +50,8 @@ public class TunnelPool {
     /** if less than one success in this many, reduce quantity (exploratory only) */
     private static final int BUILD_TRIES_QUANTITY_OVERRIDE = 12;
     /** if less than one success in this many, reduce length (exploratory only) */
-    private static final int BUILD_TRIES_LENGTH_OVERRIDE = 18;
+    private static final int BUILD_TRIES_LENGTH_OVERRIDE_1 = 10;
+    private static final int BUILD_TRIES_LENGTH_OVERRIDE_2 = 18;
     
     TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -374,10 +375,15 @@ public class TunnelPool {
                     long rc = rr.computeAverages(ra, false).getTotalEventCount();
                     long sc = sr.computeAverages(ra, false).getTotalEventCount();
                     long tot = ec + rc + sc;
-                    if (tot >= BUILD_TRIES_LENGTH_OVERRIDE) {
-                        if (1000 * sc / tot <=  1000 / BUILD_TRIES_LENGTH_OVERRIDE)
-                            _settings.setLengthOverride(len - 1);
+                    if (tot >= BUILD_TRIES_LENGTH_OVERRIDE_1) {
+                        long succ = 1000 * sc / tot;
+                        if (succ <=  1000 / BUILD_TRIES_LENGTH_OVERRIDE_1) {
+                            if (len > 2 && succ <= 1000 / BUILD_TRIES_LENGTH_OVERRIDE_2)
+                                _settings.setLengthOverride(len - 2);
+                            else
+                                _settings.setLengthOverride(len - 1);
                             return;
+                        }
                     }
                 }
             }
