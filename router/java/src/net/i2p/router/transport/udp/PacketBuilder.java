@@ -672,7 +672,7 @@ class PacketBuilder {
             return null;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending request");
+            _log.debug("Sending request to " + Addresses.toString(toIP));
         
         // now for the body
         byte[] x = state.getSentX();

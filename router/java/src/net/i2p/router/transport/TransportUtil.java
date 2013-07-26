@@ -98,7 +98,17 @@ public abstract class TransportUtil {
      *  @since IPv6 moved from TransportImpl
      */
     public static boolean isPubliclyRoutable(byte addr[], boolean allowIPv6) {
+        return isPubliclyRoutable(addr, true, allowIPv6);
+    }
+
+    /**
+     *  @param addr non-null
+     *  @since IPv6
+     */
+    public static boolean isPubliclyRoutable(byte addr[], boolean allowIPv4, boolean allowIPv6) {
         if (addr.length == 4) {
+            if (!allowIPv4)
+                return false;
             int a0 = addr[0] & 0xFF;
             if (a0 == 127) return false;
             if (a0 == 10) return false;
@@ -115,6 +125,10 @@ public abstract class TransportUtil {
             if (allowIPv6) {
                 // disallow 2002::/16 (6to4 RFC 3056)
                 if (addr[0] == 0x20 && addr[1] == 0x02)
+                    return false;
+                // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+                // not recognized as local by InetAddress
+                if ((addr[0] & 0xfe) == 0xfc)
                     return false;
                 try {
                     InetAddress ia = InetAddress.getByAddress(addr);

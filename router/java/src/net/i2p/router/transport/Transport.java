@@ -19,7 +19,10 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.OutNetMessage;
 
 /**
- * Defines a way to send a message to another peer and start listening for messages
+ * Defines a way to send a message to another peer and start listening for messages.
+ *
+ * To implement a new or pluggable I2P transport, implement this interface,
+ * and add it to TransportManager.startListening().
  *
  */
 public interface Transport {
@@ -116,6 +119,7 @@ public interface Transport {
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener);
 
+    /** The unique identity of this Transport */
     public String getStyle();
     
     public int countPeers();    
@@ -129,13 +133,13 @@ public interface Transport {
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
     public short getReachabilityStatus();
     public void recheckReachability();
-    public boolean isBacklogged(Hash dest);
+    public boolean isBacklogged(Hash peer);
 
     /**
      * Was the peer UNreachable (outbound only) the last time we tried it?
      * This is NOT reset if the peer contacts us and it is never expired.
      */
-    public boolean wasUnreachable(Hash dest);
+    public boolean wasUnreachable(Hash peer);
     
     public boolean isUnreachable(Hash peer);
     public boolean isEstablished(Hash peer);

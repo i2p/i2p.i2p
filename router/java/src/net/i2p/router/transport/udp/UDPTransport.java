@@ -1562,6 +1562,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     (Arrays.equals(ip, getExternalIP()) && !allowLocal())) {
                     continue;
                 }
+            } else {
+                // introducers
+                if (getIPv6Config() == IPV6_ONLY)
+                    continue;
             }
             return addr;
         }
@@ -2056,7 +2060,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void failed(OutNetMessage msg, String reason) {
         if (msg == null) return;
         if (_log.shouldLog(Log.INFO))
-            _log.info("Sending message failed: " + msg, new Exception("failed from"));
+            _log.info("Send failed: " + reason + " msg: " + msg, new Exception("failed from"));
         
         if (_context.messageHistory().getDoLog())
             _context.messageHistory().sendMessage(msg.getMessageType(), msg.getMessageId(), msg.getExpiration(), 

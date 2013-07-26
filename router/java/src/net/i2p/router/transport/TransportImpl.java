@@ -341,7 +341,7 @@ public abstract class TransportImpl implements Transport {
         long allTime = now - msg.getCreated();
         if (allTime > 5*1000) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Took too long from preperation to afterSend(ok? " + sendSuccessful
+                _log.info("Took too long from preparation to afterSend(ok? " + sendSuccessful
                           + "): " + allTime + "ms/" + sendTime + "ms after failing on: "
                           + msg.getFailedTransports() + " and succeeding on " + getStyle());
             if ( (allTime > 60*1000) && (sendSuccessful) ) {
@@ -604,12 +604,13 @@ public abstract class TransportImpl implements Transport {
                 adj = -1; break;
               case IPV6_ONLY:
                 adj = -10;
-                // IPv4 addresses not rejected in isPubliclyRoutable()
+              /**** IPv6 addresses will be rejected in isPubliclyRoutable()
                 for (Iterator<RouterAddress> iter = rv.iterator(); iter.hasNext(); ) {
                     byte[] ip = iter.next().getIP();
                     if (ip != null && ip.length == 4)
                         iter.remove();
                 }
+               ****/
                 break;
         }
         if (rv.size() > 1)
@@ -824,8 +825,10 @@ public abstract class TransportImpl implements Transport {
      *  @param addr non-null
      */
     protected boolean isPubliclyRoutable(byte addr[]) {
+        TransportUtil.IPv6Config cfg = getIPv6Config();
         return TransportUtil.isPubliclyRoutable(addr,
-                                                getIPv6Config() != TransportUtil.IPv6Config.IPV6_DISABLED);
+                                                cfg != TransportUtil.IPv6Config.IPV6_ONLY,
+                                                cfg != TransportUtil.IPv6Config.IPV6_DISABLED);
     }
 
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
