@@ -148,7 +148,10 @@ public abstract class Addresses {
              ((!ia.isAnyLocalAddress()) &&
               (!ia.isLoopbackAddress()))) &&
             (includeSiteLocal ||
-              !ia.isSiteLocalAddress()) &&
+             ((!ia.isSiteLocalAddress()) &&
+              // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+              // not recognized as local by InetAddress
+              (ia.getAddress().length != 16 || (ia.getAddress()[0] & 0xfe) != 0xfc))) &&
             // Hamachi 5/8 allocated to RIPE (30 November 2010)
             // Removed from TransportImpl.isPubliclyRoutable()
             // Check moved to here, for now, but will eventually need to
