@@ -2,6 +2,10 @@ package net.i2p.client.streaming;
 
 import net.i2p.util.Log;
 
+/**
+ *  Debug logging utility
+ *  @since 0.9.7
+ */
 class LogUtil {
     private LogUtil() {}
     
