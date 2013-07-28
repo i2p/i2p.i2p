@@ -24,6 +24,8 @@ import net.i2p.util.Log;
 class FloodfillStoreJob extends StoreJob {    
     private final FloodfillNetworkDatabaseFacade _facade;
 
+    private static final String PROP_RI_VERIFY = "router.verifyRouterInfoStore";
+
     /**
      * Send a data structure to the floodfills
      * 
@@ -64,6 +66,10 @@ class FloodfillStoreJob extends StoreJob {
             // it finds something stamped with that time or newer.
             DatabaseEntry data = _state.getData();
             boolean isRouterInfo = data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO;
+            // default false
+            if (isRouterInfo && !getContext().getBooleanProperty(PROP_RI_VERIFY))
+                return;
+
             long published = data.getDate();
 
             // we should always have exactly one successful entry
