@@ -153,7 +153,7 @@ class GeoIP {
                     }
                 }
                 // IPv6
-                search = _pendingSearch.toArray(new Long[_pendingIPv6Search.size()]);
+                search = _pendingIPv6Search.toArray(new Long[_pendingIPv6Search.size()]);
                 _pendingIPv6Search.clear();
                 if (search.length > 0) {
                     Arrays.sort(search);
