@@ -31,17 +31,13 @@ import net.i2p.crypto.SHA256Generator;
  */
 public abstract class SimpleDataStructure extends DataStructureImpl {
     protected byte[] _data;
-    /** this is just to avoid lots of calls to length() */
-    protected final int _length;
     
     /** A new instance with the data set to null. Call readBytes(), setData(), or fromByteArray() after this to set the data */
     public SimpleDataStructure() {
-        _length = length();
     }
     
     /** @throws IllegalArgumentException if data is not the legal number of bytes (but null is ok) */
     public SimpleDataStructure(byte data[]) {
-        _length = length();
         setData(data);
     }
 
@@ -68,8 +64,8 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     public void setData(byte[] data) {
         if (_data != null)
             throw new RuntimeException("Data already set");
-        if (data != null && data.length != _length)
-            throw new IllegalArgumentException("Bad data length: " + data.length + "; required: " + _length);
+        if (data != null && data.length != length())
+            throw new IllegalArgumentException("Bad data length: " + data.length + "; required: " + length());
         _data = data;
     }
 
@@ -81,9 +77,10 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_data != null)
             throw new RuntimeException("Data already set");
-        _data = new byte[_length];
+        int length = length();
+        _data = new byte[length];
         int read = read(in, _data);
-        if (read != _length) throw new DataFormatException("Not enough bytes to read the data");
+        if (read != length) throw new DataFormatException("Not enough bytes to read the data");
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -109,8 +106,8 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         byte[] d = Base64.decode(data);
         if (d == null)
             throw new DataFormatException("Bad Base64 encoded data");
-        if (d.length != _length)
-            throw new DataFormatException("Bad decoded data length, expected " + _length + " got " + d.length);
+        if (d.length != length())
+            throw new DataFormatException("Bad decoded data length, expected " + length() + " got " + d.length);
         // call setData() instead of _data = data in case overridden
         setData(d);
     }
@@ -141,8 +138,8 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     @Override
     public void fromByteArray(byte data[]) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
-        if (data.length != _length)
-            throw new DataFormatException("Bad data length: " + data.length + "; required: " + _length);
+        if (data.length != length())
+            throw new DataFormatException("Bad data length: " + data.length + "; required: " + length());
         // call setData() instead of _data = data in case overridden
         setData(data);
     }
@@ -151,12 +148,13 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append('[').append(getClass().getSimpleName()).append(": ");
+        int length = length();
         if (_data == null) {
             buf.append("null");
-        } else if (_length <= 32) {
+        } else if (length <= 32) {
             buf.append(toBase64());
         } else {
-            buf.append("size: ").append(Integer.toString(_length));
+            buf.append("size: ").append(Integer.toString(length));
         }
         buf.append(']');
         return buf.toString();

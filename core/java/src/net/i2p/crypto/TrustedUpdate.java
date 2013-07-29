@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -207,6 +208,13 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    Map<SigningPublicKey, String> getKeys() {
+        return Collections.unmodifiableMap(_trustedKeys);
     }
 
     /**

@@ -12,6 +12,8 @@ package net.i2p.data;
 import java.io.InputStream;
 import java.io.IOException;
 
+import net.i2p.crypto.SigType;
+
 /**
  * Defines the SigningPublicKey as defined by the I2P data structure spec.
  * A signing public key is 128 byte Integer. The public key represents only the 
@@ -21,10 +23,13 @@ import java.io.IOException;
  * @author jrandom
  */
 public class SigningPublicKey extends SimpleDataStructure {
-    public final static int KEYSIZE_BYTES = 128;
+    private static final SigType DEF_TYPE = SigType.DSA_SHA1;
+    public final static int KEYSIZE_BYTES = DEF_TYPE.getPubkeyLen();
     private static final int CACHE_SIZE = 1024;
 
     private static final SDSCache<SigningPublicKey> _cache = new SDSCache(SigningPublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
+
+    private final SigType _type;
 
     /**
      * Pull from cache or return new
@@ -44,11 +49,28 @@ public class SigningPublicKey extends SimpleDataStructure {
     }
 
     public SigningPublicKey() {
+        this(DEF_TYPE);
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigningPublicKey(SigType type) {
         super();
+        _type = type;
     }
 
     public SigningPublicKey(byte data[]) {
-        super(data);
+        this(DEF_TYPE, data);
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigningPublicKey(SigType type, byte data[]) {
+        super();
+        _type = type;
+        setData(data);
     }
 
     /** constructs from base64
@@ -56,11 +78,18 @@ public class SigningPublicKey extends SimpleDataStructure {
      * on a prior instance of SigningPublicKey
      */
     public SigningPublicKey(String base64Data)  throws DataFormatException {
-        super();
+        this();
         fromBase64(base64Data);
     }
 
     public int length() {
-        return KEYSIZE_BYTES;
+        return _type.getPubkeyLen();
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigType getType() {
+        return _type;
     }
 }

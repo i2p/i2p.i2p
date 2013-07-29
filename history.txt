@@ -1,3 +1,11 @@
+2012-07-29 zzz
+ * Signatures:
+   - Prep for new signature algorithms; new SigType enum;
+     Signature, SigningPublicKey, SigningPrivateKey store type
+   - New Hash384 and Hash512 classes
+   - Remove length field in SimpleDataStructure
+   - New SU3File generator/verifier/extractor
+
 2012-07-28 zzz
  * Addresses: Treat RFC 4193 addresses fc00::/7 as local
  * NetDB: Disable RI verifies for now

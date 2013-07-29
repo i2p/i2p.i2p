@@ -9,6 +9,8 @@ package net.i2p.data;
  *
  */
 
+import net.i2p.crypto.SigType;
+
 /**
  * Defines the signature as defined by the I2P data structure spec.
  * A signature is a 40-byte array verifying the authenticity of some data 
@@ -20,19 +22,47 @@ package net.i2p.data;
  * @author jrandom
  */
 public class Signature extends SimpleDataStructure {
-    public final static int SIGNATURE_BYTES = 40;
+    private static final SigType DEF_TYPE = SigType.DSA_SHA1;
+    /** 40 */
+    public final static int SIGNATURE_BYTES = DEF_TYPE.getSigLen();
     /** all zeros */
     public final static byte[] FAKE_SIGNATURE = new byte[SIGNATURE_BYTES];
 
+    private final SigType _type;
+
     public Signature() {
+        this(DEF_TYPE);
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public Signature(SigType type) {
         super();
+        _type = type;
     }
 
     public Signature(byte data[]) {
-        super(data);
+        this(DEF_TYPE, data);
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public Signature(SigType type, byte data[]) {
+        super();
+        _type = type;
+        setData(data);
     }
 
     public int length() {
-        return SIGNATURE_BYTES;
+        return _type.getSigLen();
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigType getType() {
+        return _type;
     }
 }
