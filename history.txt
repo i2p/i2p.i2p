@@ -1,3 +1,8 @@
+2012-07-30 zzz
+ * i2psnark: Increase max piece size to 4 MB (ticket #993)
+ * Tunnels: Extend local expiration of IB tunnels, to allow for
+   more clock skew and not drop valid messages at their destination
+
 2012-07-29 zzz
  * Signatures:
    - Prep for new signature algorithms; new SigType enum;
