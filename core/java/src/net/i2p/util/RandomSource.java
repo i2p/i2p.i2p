@@ -176,8 +176,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
             SecureRandom.getInstance("SHA1PRNG").nextBytes(buf);
             ok = true;
         } catch (NoSuchAlgorithmException e) {}
-        // why urandom?  because /dev/random blocks, and there are arguments
-        // suggesting such blockages are largely meaningless
+        // why urandom?  because /dev/random blocks
         ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
         File localFile = new File(_context.getConfigDir(), SEEDFILE);
@@ -186,6 +185,8 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     }
     
     /**
+     *  XORs the seed into buf
+     *
      *  @param f absolute path
      *  @return success
      */

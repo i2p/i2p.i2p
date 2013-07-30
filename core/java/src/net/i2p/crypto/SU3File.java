@@ -358,9 +358,9 @@ public class SU3File {
     }
 
     private static final void showUsageCLI() {
-        System.err.println("Usage: SU3File showversion   signedFile");
-        System.err.println("       SU3File sign          inputFile signedFile privateKeyFile version signerName");
-        System.err.println("       SU3File verifysig     signedFile");
+        System.err.println("Usage: SU3File showversion   signedFile.su3");
+        System.err.println("       SU3File sign          inputFile.zip signedFile.su3 privateKeyFile version signerName@mail.i2p");
+        System.err.println("       SU3File verifysig     signedFile.su3");
     }
 
     /** @return success */

@@ -13,6 +13,13 @@ package net.i2p.data;
  * Defines an end point in the I2P network.  The Destination may move around
  * in the network, but messages sent to the Destination will find it
  *
+ * Note that the public (encryption) key is essentially unused, since
+ * "end-to-end" encryption was removed in 0.6. The public key in the
+ * LeaseSet is used instead.
+ *
+ * The first bytes of the public key are used for the IV for leaseset encryption,
+ * but that encryption is poorly designed and should be deprecated.
+ *
  * @author jrandom
  */
 public class Destination extends KeysAndCert {

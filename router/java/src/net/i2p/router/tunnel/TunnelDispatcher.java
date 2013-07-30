@@ -491,11 +491,11 @@ public class TunnelDispatcher implements Service {
         boolean removed = (null != _participatingConfig.remove(recvId));
         if (removed) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing " + cfg, new Exception());
+                _log.debug("removing " + cfg /* , new Exception() */ );
         } else {
             // this is normal, this can get called twice
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Participating tunnel, but no longer listed in participatingConfig? " + cfg, new Exception());
+                _log.debug("Participating tunnel, but no longer listed in participatingConfig? " + cfg /* , new Exception() */ );
         }
         
         removed = (null != _participants.remove(recvId));

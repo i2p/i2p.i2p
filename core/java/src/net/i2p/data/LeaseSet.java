@@ -31,6 +31,10 @@ import net.i2p.util.RandomSource;
  * Only the gateways and tunnel IDs in the individual
  * leases are encrypted.
  *
+ * WARNING:
+ * Encryption is poorly designed and probably insecure.
+ * Not recommended.
+ *
  * Encrypted leases are not indicated as such.
  * The only way to tell a lease is encrypted is to
  * determine that the listed gateways do not exist.
