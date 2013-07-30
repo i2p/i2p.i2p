@@ -790,6 +790,10 @@ class EstablishState {
     
     private static class VerifiedEstablishState extends EstablishState {
         @Override public boolean isComplete() { return true; }
+        @Override public void prepareOutbound() {
+            Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
+            log.warn("prepareOutbound() on verified state, doing nothing!");
+        }
     }
 
     /** @deprecated unused */
