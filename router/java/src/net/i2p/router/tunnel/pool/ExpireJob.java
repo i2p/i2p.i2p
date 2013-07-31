@@ -1,5 +1,7 @@
 package net.i2p.router.tunnel.pool;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -13,7 +15,7 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
 class ExpireJob extends JobImpl {
     private final TunnelPool _pool;
     private final TunnelCreatorConfig _cfg;
-    private boolean _leaseUpdated;
+    private final AtomicBoolean _leaseUpdated = new AtomicBoolean(false);
     private final long _dropAfter;
 
     private static final long OB_EARLY_EXPIRE = 30*1000;
@@ -48,10 +50,9 @@ class ExpireJob extends JobImpl {
     }
 
     public void runJob() {
-        if (!_leaseUpdated) {
+        if (_leaseUpdated.compareAndSet(false,true)) {
             // First run
             _pool.removeTunnel(_cfg);
-            _leaseUpdated = true;
             // noop for outbound
             _pool.refreshLeaseSet();
             long timeToDrop = _dropAfter - getContext().clock().now();
