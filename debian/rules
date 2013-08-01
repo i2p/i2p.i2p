@@ -106,7 +106,7 @@ override_dh_dhlibdeps:
 #	dh_installinit -r
 
 override_dh_builddeb:
-	dh_builddeb -- -Zbzip2
+	dh_builddeb -- -Zxz
 
 get-orig-source:
 	uscan --verbose --rename --destdir $(CURDIR)/.. --watchfile debian/watch --force-download
