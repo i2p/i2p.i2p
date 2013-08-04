@@ -4,7 +4,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/i2p_sdk"/>
 	<classpathentry kind="lib" path="jettylib/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="jettylib/jetty-http.jar"/>
+	<classpathentry kind="lib" path="jettylib/jetty-io.jar"/>
 	<classpathentry kind="lib" path="jettylib/jetty-util.jar"/>
+	<classpathentry kind="lib" path="jettylib/jetty-xml.jar"/>
 	<classpathentry kind="lib" path="jettylib/org.mortbay.jetty.jar"/>
 	<classpathentry kind="output" path="build/obj"/>
 </classpath>
