@@ -567,8 +567,9 @@ public class ConsoleUpdateManager implements UpdateManager {
         // For 0.9.4 update, only for dev builds
         // For 0.9.5 update, only for dev builds and 1% more
         // For 0.9.6 update, only for dev builds and 3% more
-        // Remove this in 0.9.6 or 0.9.7
-        if (method == TORRENT && RouterVersion.BUILD == 0 && _context.random().nextInt(100) > 2) {
+        // For 0.9.8 update, only for dev builds and 30% more
+        // Remove this for 100%
+        if (method == TORRENT && RouterVersion.BUILD == 0 && _context.random().nextInt(100) > 29) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Ignoring torrent registration");
             return;
