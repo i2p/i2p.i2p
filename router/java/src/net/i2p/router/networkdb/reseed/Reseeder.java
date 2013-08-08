@@ -69,6 +69,7 @@ public class Reseeder {
               "http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," +
               "http://reseed.info/"  + "," +
+              "http://reseed.pkol.de/" + "," +
               "http://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"http://i2p.feared.eu/";
@@ -83,6 +84,7 @@ public class Reseeder {
               "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," +
               "https://reseed.info/"  + "," +
+              "https://reseed.pkol.de/" + "," +
               "https://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"https://i2p.feared.eu/";

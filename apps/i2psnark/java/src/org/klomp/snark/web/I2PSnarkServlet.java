@@ -1542,7 +1542,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 float pct;
                 if (isValid) {
                     pct = (float) (100.0 * peer.completed() / meta.getPieces());
-                    if (pct == 100.0)
+                    if (pct >= 100.0)
                         out.write(_("Seed"));
                     else {
                         String ps = String.valueOf(pct);
@@ -2644,7 +2644,8 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "html";
         else if (mime.equals("text/plain") ||
                  mime.equals("application/rtf") ||
-                 mime.equals("application/epub+zip"))
+                 mime.equals("application/epub+zip") ||
+                 mime.equals("application/x-mobipocket-ebook"))
             icon = "page";
         else if (mime.equals("application/java-archive") ||
                  plc.endsWith(".deb"))

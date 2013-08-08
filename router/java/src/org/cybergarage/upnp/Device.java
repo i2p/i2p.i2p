@@ -283,6 +283,9 @@ public class Device implements org.cybergarage.http.HTTPRequestListener, SearchL
 		}
 
 		urlString = HTTP.toRelativeURL(urlString);
+		// I2P fix for devices that return a base URL with trailing /
+		if (urlBaseStr.endsWith("/") && urlString.startsWith("/"))
+			urlString = urlString.substring(1);
 		String absUrl = urlBaseStr + urlString;
 		try {
 			URL url = new URL(absUrl);
