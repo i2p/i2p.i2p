@@ -258,7 +258,10 @@
             <fileset dir="../../reports/router/junit/" />
         </replaceregexp>
     </target>
+
+    <!-- both junit and scala, but we have no scala tests yet -->
     <target name="test" depends="junit.test"/>
+
     <!-- test reports -->
     <target name="scalatest.report">
         <junitreport todir="../../reports/router/scalatest">

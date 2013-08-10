@@ -1,6 +1,7 @@
 package net.i2p.util;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -64,43 +65,33 @@ public abstract class Translate {
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
     public static String getString(String s, Object o, I2PAppContext ctx, String bun) {
-        String lang = getLanguage(ctx);
-        if (lang.equals(TEST_LANG))
-            return TEST_STRING + '(' + o + ')' + TEST_STRING;
-        String x = getString(s, ctx, bun);
-        Object[] oArray = new Object[1];
-        oArray[0] = o;
-        try {
-            MessageFormat fmt = new MessageFormat(x, new Locale(lang));
-            return fmt.format(oArray, new StringBuffer(), null).toString();
-        } catch (IllegalArgumentException iae) {
-            System.err.println("Bad format: orig: \"" + s +
-                               "\" trans: \"" + x +
-                               "\" param: \"" + o +
-                               "\" lang: " + lang);
-            return "FIXME: " + x + ' ' + o;
-        }
+        return getString(s, ctx, bun, o);
     }
 
     /** for {0} and {1} */
     public static String getString(String s, Object o, Object o2, I2PAppContext ctx, String bun) {
+        return getString(s, ctx, bun, o, o2);
+    }
+
+    /**
+     *  Varargs
+     *  @param oArray parameters
+     *  @since 0.9.8
+     */
+    public static String getString(String s, I2PAppContext ctx, String bun, Object... oArray) {
         String lang = getLanguage(ctx);
         if (lang.equals(TEST_LANG))
-            return TEST_STRING + '(' + o + ',' + o2 + ')' + TEST_STRING;
+            return TEST_STRING + Arrays.toString(oArray) + TEST_STRING;
         String x = getString(s, ctx, bun);
-        Object[] oArray = new Object[2];
-        oArray[0] = o;
-        oArray[1] = o2;
         try {
             MessageFormat fmt = new MessageFormat(x, new Locale(lang));
             return fmt.format(oArray, new StringBuffer(), null).toString();
         } catch (IllegalArgumentException iae) {
             System.err.println("Bad format: orig: \"" + s +
                                "\" trans: \"" + x +
-                               "\" param1: \"" + o +
-                               "\" param2: \"" + o2 +
-                               "\" lang: " + lang);
-            return "FIXME: " + x + ' ' + o + ',' + o2;
+                               "\" params: " + Arrays.toString(oArray) +
+                               " lang: " + lang);
+            return "FIXME: " + x + ' ' + Arrays.toString(oArray);
         }
     }
 

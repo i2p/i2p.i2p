@@ -113,7 +113,7 @@ public class BuildMessageTestStandalone extends TestCase {
         for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
             reply.setRecord(i, msg.getRecord(i));
 
-        int statuses[] = BuildReplyHandler.decrypt(ctx, reply, cfg, order);
+        int statuses[] = (new BuildReplyHandler(ctx)).decrypt(reply, cfg, order);
         if (statuses == null) throw new RuntimeException("bar");
         boolean allAgree = true;
         for (int i = 0; i < cfg.getLength(); i++) {

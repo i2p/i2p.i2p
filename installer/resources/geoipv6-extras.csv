@@ -1,0 +1,9 @@
+# Local geoIPv6 additions
+# Format: from IP,to IP,,,country code[,"country name"]
+####
+# common tunnel brokers
+2001:5c0:1000:a::,2001:5c0:1000:a::,,,X1,"Freenet6 anonymous"
+2001:5c0:1000:b::,2001:5c0:1000:b::,,,X2,"Freenet6 authenticated"
+2001:5c0:1100::,2001:5c0:11ff:ffff:ffff:ffff:ffff:ffff,,,X3,"Freenet6 delegated"
+# other interesting addresses
+2002::,2002:ffff:ffff:ffff:ffff:ffff:ffff:ffff,,,X4,"IPv4 compatibility"

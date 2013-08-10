@@ -156,7 +156,7 @@ public class RouterClock extends Clock {
             (stratum >= _lastStratum || _startedOn - System.currentTimeMillis() > 60*1000)) {
             // Update the target offset, slewing will take care of the rest
             if (delta > 15*1000)
-                getLog().error("Warning - Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
+                getLog().logAlways(Log.WARN, "Warning - Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
             else if (getLog().shouldLog(Log.INFO))
                 getLog().info("Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
             

@@ -158,7 +158,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1866,24 +1809,9 @@
+@@ -1866,24 +1809,10 @@
              status
              ;;
  
@@ -183,6 +183,7 @@ Debian wrapper.config to try to prevent confusion.
 +        'install' | 'remove' | 'uninstall')
 +            echo "Use \"dpkg-reconfigure i2p\" to configure the initscript."
 +            exit 1
++	    ;;
  
          'dump')
              checkUser "" "$COMMAND"

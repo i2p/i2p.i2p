@@ -10,6 +10,7 @@ package net.i2p.data;
  */
 
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SigType;
 
 /**
  * Defines the SigningPrivateKey as defined by the I2P data structure spec.
@@ -20,14 +21,34 @@ import net.i2p.crypto.KeyGenerator;
  * @author jrandom
  */
 public class SigningPrivateKey extends SimpleDataStructure {
-    public final static int KEYSIZE_BYTES = 20;
+    private static final SigType DEF_TYPE = SigType.DSA_SHA1;
+    public final static int KEYSIZE_BYTES = DEF_TYPE.getPrivkeyLen();
+
+    private final SigType _type;
 
     public SigningPrivateKey() {
+        this(DEF_TYPE);
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigningPrivateKey(SigType type) {
         super();
+        _type = type;
     }
 
     public SigningPrivateKey(byte data[]) {
-        super(data);
+        this(DEF_TYPE, data);
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigningPrivateKey(SigType type, byte data[]) {
+        super();
+        _type = type;
+        setData(data);
     }
 
     /** constructs from base64
@@ -35,12 +56,20 @@ public class SigningPrivateKey extends SimpleDataStructure {
      * on a prior instance of SigningPrivateKey
      */
     public SigningPrivateKey(String base64Data)  throws DataFormatException {
-        super();
+        this();
         fromBase64(base64Data);
     }
 
+
     public int length() {
-        return KEYSIZE_BYTES;
+        return _type.getPrivkeyLen();
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public SigType getType() {
+        return _type;
     }
 
     /** converts this signing private key to its public equivalent

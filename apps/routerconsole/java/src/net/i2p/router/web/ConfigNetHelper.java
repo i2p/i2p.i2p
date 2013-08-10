@@ -7,12 +7,15 @@ import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
 import net.i2p.router.transport.TransportManager;
-import net.i2p.router.transport.udp.UDPAddress;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 
+/**
+ *
+ * Used for both /config and /confignet
+ */
 public class ConfigNetHelper extends HelperBase {
-    public ConfigNetHelper() {}
     
     /** copied from various private components */
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
@@ -20,6 +23,7 @@ public class ConfigNetHelper extends HelperBase {
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
     private final static String CHECKED = " checked=\"checked\" ";
+
     public String getUdphostname() {
         return _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, ""); 
     }
@@ -32,22 +36,15 @@ public class ConfigNetHelper extends HelperBase {
         return _context.getProperty(PROP_I2NP_NTCP_PORT, ""); 
     }
     
-    public String getUdpAddress() {
-        RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
-        if (addr == null)
-            return _("unknown");
-        UDPAddress ua = new UDPAddress(addr);
-        return ua.toString();
-    }
-    
+    /** @return host or "unknown" */
     public String getUdpIP() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
             return _("unknown");
-        UDPAddress ua = new UDPAddress(addr);
-        if (ua.getHost() == null)
+        String rv = addr.getHost();
+        if (rv == null)
             return _("unknown");
-        return ua.getHost();
+        return rv;
     }
 
     /**
@@ -159,6 +156,23 @@ public class ConfigNetHelper extends HelperBase {
             default:
                 return CHECKED;
         }
+    }
+
+    /**
+     * Combined SSU/NTCP
+     * Use SSU setting, then NTCP setting, then default
+     * @since IPv6
+     */
+    public String getIPv6Checked(String mode) {
+        String s = _context.getProperty(TransportUtil.SSU_IPV6_CONFIG);
+        if (s == null) {
+            s = _context.getProperty(TransportUtil.NTCP_IPV6_CONFIG);
+            if (s == null)
+                s = TransportUtil.DEFAULT_IPV6_CONFIG.toConfigString();
+        }
+        if (s.equals(mode))
+            return CHECKED;
+        return "";
     }
     
     public String[] getAddresses() {

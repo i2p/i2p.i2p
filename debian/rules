@@ -62,6 +62,8 @@ ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 else
 	@echo "Already found deb in version, not doing anything"
 endif
+	sh -n installer/resources/i2prouter || exit 1
+	sh -n installer/resources/runplain.sh || exit 1
 	TZ=UTC ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
@@ -104,7 +106,7 @@ override_dh_dhlibdeps:
 #	dh_installinit -r
 
 override_dh_builddeb:
-	dh_builddeb -- -Zbzip2
+	dh_builddeb -- -Zxz
 
 get-orig-source:
 	uscan --verbose --rename --destdir $(CURDIR)/.. --watchfile debian/watch --force-download

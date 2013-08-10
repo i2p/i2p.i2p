@@ -92,8 +92,12 @@ public class I2PThread extends Thread {
                 t.printStackTrace();
             }
           ****/
-            if (t instanceof OutOfMemoryError)
+            if (t instanceof OutOfMemoryError) {
                 fireOOM((OutOfMemoryError)t);
+            } else {
+                System.out.println ("Thread terminated unexpectedly: " + getName());
+                t.printStackTrace();
+            }
         }
         // This creates a new I2PAppContext after it was deleted
         // in Router.finalShutdown() via RouterContext.killGlobalContext()

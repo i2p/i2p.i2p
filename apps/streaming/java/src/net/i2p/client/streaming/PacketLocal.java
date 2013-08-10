@@ -32,7 +32,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private long _cancelledOn;
     private final AtomicInteger _nackCount = new AtomicInteger(0);
     private volatile boolean _retransmitted;
-    private SimpleTimer2.TimedEvent _resendEvent;
+    private volatile SimpleTimer2.TimedEvent _resendEvent;
     
     /** not bound to a connection */
     public PacketLocal(I2PAppContext ctx, Destination to) {
@@ -112,6 +112,13 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         _numSends++;
         _lastSend = _context.clock().now();
     }
+    
+    private void cancelResend() {
+        SimpleTimer2.TimedEvent ev = _resendEvent;
+        if (ev != null) 
+            ev.cancel();
+    }
+    
     public void ackReceived() {
         final long now = _context.clock().now();
         synchronized (this) {
@@ -120,15 +127,16 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
             releasePayload();
             notifyAll();
         }
-        _resendEvent.cancel();
+        cancelResend();
     }
+    
     public void cancelled() { 
         synchronized (this) {
             _cancelledOn = _context.clock().now();
             releasePayload();
             notifyAll();
         }
-        _resendEvent.cancel();
+       cancelResend();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }

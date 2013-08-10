@@ -10,22 +10,34 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Decrypt the layers of a tunnel build reply message, determining whether the individual 
  * hops agreed to participate in the tunnel, or if not, why not.
  *
  */
-public abstract class BuildReplyHandler {
+public class BuildReplyHandler {
+
+    private final I2PAppContext ctx;
+    private final Log log;
 
     /**
-     * Decrypt the tunnel build reply records.  This overwrites the contents of the reply
+     *  @since 0.9.8 (methods were static before)
+     */
+    public BuildReplyHandler(I2PAppContext context) {
+        ctx = context;
+        log = ctx.logManager().getLog(BuildReplyHandler.class);
+    }
+
+    /**
+     * Decrypt the tunnel build reply records.  This overwrites the contents of the reply.
+     * Thread safe (no state).
      *
      * @return status for the records (in record order), or null if the replies were not valid.  Fake records
      *         always have 0 as their value
      */
-    public static int[] decrypt(I2PAppContext ctx, TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, List<Integer> recordOrder) {
-        Log log = ctx.logManager().getLog(BuildReplyHandler.class);
+    public int[] decrypt(TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, List<Integer> recordOrder) {
         if (reply.getRecordCount() != recordOrder.size()) {
             // somebody messed with us
             log.error("Corrupted build reply, expected " + recordOrder.size() + " records, got " + reply.getRecordCount());
@@ -40,7 +52,7 @@ public abstract class BuildReplyHandler {
                     log.debug(reply.getUniqueId() + ": no need to decrypt record " + i + "/" + hop + ", as its out of range: " + cfg);
                 rv[i] = 0;
             } else {
-                int ok = decryptRecord(ctx, reply, cfg, i, hop);
+                int ok = decryptRecord(reply, cfg, i, hop);
                 if (ok == -1) {
                     if (log.shouldLog(Log.WARN))
                         log.warn(reply.getUniqueId() + ": decrypt record " + i + "/" + hop + " was not ok: " + cfg);
@@ -60,14 +72,14 @@ public abstract class BuildReplyHandler {
      *
      * @return -1 on decrypt failure
      */
-    private static int decryptRecord(I2PAppContext ctx, TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
-        Log log = ctx.logManager().getLog(BuildReplyHandler.class);
+    private int decryptRecord(TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
         if (BuildMessageGenerator.isBlank(cfg, hop)) {
             if (log.shouldLog(Log.DEBUG))
                 log.debug(reply.getUniqueId() + ": Record " + recordNum + "/" + hop + " is fake, so consider it valid...");
             return 0;
         }
         ByteArray rec = reply.getRecord(recordNum);
+        byte[] data = rec.getData();
         int off = rec.getOffset();
         int start = cfg.getLength() - 1;
         if (cfg.isInbound())
@@ -78,29 +90,33 @@ public abstract class BuildReplyHandler {
             SessionKey replyKey = hopConfig.getReplyKey();
             byte replyIV[] = hopConfig.getReplyIV().getData();
             int replyIVOff = hopConfig.getReplyIV().getOffset();
-            if (log.shouldLog(Log.DEBUG))
+            if (log.shouldLog(Log.DEBUG)) {
                 log.debug(reply.getUniqueId() + ": Decrypting record " + recordNum + "/" + hop + "/" + j + " with replyKey " 
                           + replyKey.toBase64() + "/" + Base64.encode(replyIV, replyIVOff, 16) + ": " + cfg);
+                log.debug(reply.getUniqueId() + ": before decrypt("+ off + "-"+(off+rec.getValid())+"): " + Base64.encode(data, off, rec.getValid()));
+                log.debug(reply.getUniqueId() + ": Full reply rec: offset=" + off + ", sz=" + data.length + "/" + rec.getValid() + ", data=" + Base64.encode(data, off, TunnelBuildReplyMessage.RECORD_SIZE));
+            }
+            ctx.aes().decrypt(data, off, data, off, replyKey, replyIV, replyIVOff, TunnelBuildReplyMessage.RECORD_SIZE);
             if (log.shouldLog(Log.DEBUG))
-                log.debug(reply.getUniqueId() + ": before decrypt("+ off + "-"+(off+rec.getValid())+"): " + Base64.encode(rec.getData(), off, rec.getValid()));
-            
-            if (log.shouldLog(Log.DEBUG))
-                log.debug(reply.getUniqueId() + ": Full reply rec: offset=" + off + ", sz=" + rec.getData().length + "/" + rec.getValid() + ", data=" + Base64.encode(rec.getData(), off, TunnelBuildReplyMessage.RECORD_SIZE));
-            ctx.aes().decrypt(rec.getData(), off, rec.getData(), off, replyKey, replyIV, replyIVOff, TunnelBuildReplyMessage.RECORD_SIZE);
-            if (log.shouldLog(Log.DEBUG))
-                log.debug(reply.getUniqueId() + ": after decrypt: " + Base64.encode(rec.getData(), off, rec.getValid()));
+                log.debug(reply.getUniqueId() + ": after decrypt: " + Base64.encode(data, off, rec.getValid()));
         }
         // ok, all of the layered encryption is stripped, so lets verify it 
         // (formatted per BuildResponseRecord.create)
-        Hash h = ctx.sha().calculateHash(rec.getData(), off + Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH);
-        if (!DataHelper.eq(h.getData(), 0, rec.getData(), off, Hash.HASH_LENGTH)) {
+        // don't cache the result
+        //Hash h = ctx.sha().calculateHash(data, off + Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH);
+        byte[] h = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        ctx.sha().calculateHash(data, off + Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH, h, 0);
+        boolean ok = DataHelper.eq(h, 0, data, off, Hash.HASH_LENGTH);
+        if (!ok) {
             if (log.shouldLog(Log.DEBUG))
-                log.debug(reply.getUniqueId() + ": Failed verification on " + recordNum + "/" + hop + ": " + h.toBase64() + " calculated, " +
-                          Base64.encode(rec.getData(), off, Hash.HASH_LENGTH) + " expected\n" +
-                          "Record: " + Base64.encode(rec.getData(), off+Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH));
+                log.debug(reply.getUniqueId() + ": Failed verification on " + recordNum + "/" + hop + ": " + Base64.encode(h) + " calculated, " +
+                          Base64.encode(data, off, Hash.HASH_LENGTH) + " expected\n" +
+                          "Record: " + Base64.encode(data, off+Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE-Hash.HASH_LENGTH));
+            SimpleByteCache.release(h);
             return -1;
         } else {
-            int rv = (int)DataHelper.fromLong(rec.getData(), off + TunnelBuildReplyMessage.RECORD_SIZE - 1, 1);
+            SimpleByteCache.release(h);
+            int rv = (int)DataHelper.fromLong(data, off + TunnelBuildReplyMessage.RECORD_SIZE - 1, 1);
             if (log.shouldLog(Log.DEBUG))
                 log.debug(reply.getUniqueId() + ": Verified: " + rv + " for record " + recordNum + "/" + hop);
             return rv;

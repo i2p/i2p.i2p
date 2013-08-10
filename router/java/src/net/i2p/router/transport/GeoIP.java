@@ -48,8 +48,12 @@ class GeoIP {
     private final Map<String, String> _codeToName;
     /** code to itself to prevent String proliferation */
     private final Map<String, String> _codeCache;
+
+    // In the following structures, an IPv4 IP is stored as a non-negative long, 0 to 2**32 - 1,
+    // and the first 8 bytes of an IPv6 IP are stored as a signed long.
     private final Map<Long, String> _IPToCountry;
     private final Set<Long> _pendingSearch;
+    private final Set<Long> _pendingIPv6Search;
     private final Set<Long> _notFound;
     private final AtomicBoolean _lock;
     private int _lookupRunCount;
@@ -58,10 +62,11 @@ class GeoIP {
     public GeoIP(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(GeoIP.class);
-        _codeToName = new ConcurrentHashMap(256);
-        _codeCache = new ConcurrentHashMap(256);
+        _codeToName = new ConcurrentHashMap(512);
+        _codeCache = new ConcurrentHashMap(512);
         _IPToCountry = new ConcurrentHashMap();
         _pendingSearch = new ConcurrentHashSet();
+        _pendingIPv6Search = new ConcurrentHashSet();
         _notFound = new ConcurrentHashSet();
         _lock = new AtomicBoolean();
         readCountryFile();
@@ -81,6 +86,7 @@ class GeoIP {
         _codeCache.clear();
         _IPToCountry.clear();
         _pendingSearch.clear();
+        _pendingIPv6Search.clear();
         _notFound.clear();
     }
 
@@ -107,6 +113,7 @@ class GeoIP {
     public void blockingLookup() {
         if (! _context.getBooleanPropertyDefaultTrue(PROP_GEOIP_ENABLED)) {
             _pendingSearch.clear();
+            _pendingIPv6Search.clear();
             return;
         }
         int pri = Thread.currentThread().getPriority();
@@ -132,18 +139,31 @@ class GeoIP {
                 // clear the negative cache every few runs, to prevent it from getting too big
                 if (((++_lookupRunCount) % CLEAR) == 0)
                     _notFound.clear();
+                // IPv4
                 Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
-                if (search.length <= 0)
-                    return;
                 _pendingSearch.clear();
-                Arrays.sort(search);
-                String[] countries = readGeoIPFile(search);
-    
-                for (int i = 0; i < countries.length; i++) {
-                    if (countries[i] != null)
-                        _IPToCountry.put(search[i], countries[i]);
-                    else
-                        _notFound.add(search[i]);
+                if (search.length > 0) {
+                    Arrays.sort(search);
+                    String[] countries = readGeoIPFile(search);
+                    for (int i = 0; i < countries.length; i++) {
+                        if (countries[i] != null)
+                            _IPToCountry.put(search[i], countries[i]);
+                        else
+                            _notFound.add(search[i]);
+                    }
+                }
+                // IPv6
+                search = _pendingIPv6Search.toArray(new Long[_pendingIPv6Search.size()]);
+                _pendingIPv6Search.clear();
+                if (search.length > 0) {
+                    Arrays.sort(search);
+                    String[] countries = GeoIPv6.readGeoIPFile(_context, search, _codeCache);
+                    for (int i = 0; i < countries.length; i++) {
+                        if (countries[i] != null)
+                            _IPToCountry.put(search[i], countries[i]);
+                        else
+                            _notFound.add(search[i]);
+                    }
                 }
             } finally {
                 _lock.set(false);
@@ -169,16 +189,16 @@ class GeoIP {
     *
     */
     private void readCountryFile() {
-        File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
-        GeoFile = new File(GeoFile, COUNTRY_FILE_DEFAULT);
-        if (!GeoFile.exists()) {
+        File geoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        geoFile = new File(geoFile, COUNTRY_FILE_DEFAULT);
+        if (!geoFile.exists()) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Country file not found: " + GeoFile.getAbsolutePath());
+                _log.warn("Country file not found: " + geoFile.getAbsolutePath());
             return;
         }
         FileInputStream in = null;
         try {
-            in = new FileInputStream(GeoFile);
+            in = new FileInputStream(geoFile);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = null;
             while ( (line = br.readLine()) != null) {
@@ -228,11 +248,11 @@ class GeoIP {
     *
     */
     private String[] readGeoIPFile(Long[] search) {
-        File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
-        GeoFile = new File(GeoFile, GEOIP_FILE_DEFAULT);
-        if (!GeoFile.exists()) {
+        File geoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        geoFile = new File(geoFile, GEOIP_FILE_DEFAULT);
+        if (!geoFile.exists()) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("GeoIP file not found: " + GeoFile.getAbsolutePath());
+                _log.warn("GeoIP file not found: " + geoFile.getAbsolutePath());
             return new String[0];
         }
         String[] rv = new String[search.length];
@@ -240,7 +260,7 @@ class GeoIP {
         long start = _context.clock().now();
         FileInputStream in = null;
         try {
-            in = new FileInputStream(GeoFile);
+            in = new FileInputStream(geoFile);
             String buf = null;
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
             while ((buf = br.readLine()) != null && idx < search.length) {
@@ -268,7 +288,7 @@ class GeoIP {
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error reading the GeoFile", ioe);
+                _log.error("Error reading the geoFile", ioe);
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
@@ -307,6 +327,7 @@ class GeoIP {
 
     /**
      * Add to the list needing lookup
+     * @param ip IPv4 or IPv6
      */
     public void add(String ip) {
         byte[] pib = Addresses.getIP(ip);
@@ -314,20 +335,28 @@ class GeoIP {
         add(pib);
     }
 
+    /**
+     * Add to the list needing lookup
+     * @param ip IPv4 or IPv6
+     */
     public void add(byte ip[]) {
-        if (ip.length != 4)
-            return;
         add(toLong(ip));
     }
 
+    /** see above for ip-to-long mapping */
     private void add(long ip) {
         Long li = Long.valueOf(ip);
-        if (!(_IPToCountry.containsKey(li) || _notFound.contains(li)))
-            _pendingSearch.add(li);
+        if (!(_IPToCountry.containsKey(li) || _notFound.contains(li))) {
+            if (ip >= 0 && ip < (1L << 32))
+                _pendingSearch.add(li);
+            else
+                _pendingIPv6Search.add(li);
+        }
     }
 
     /**
      * Get the country for an IP from the cache.
+     * @param ip IPv4 or IPv6
      * @return lower-case code, generally two letters, or null.
      */
     public String get(String ip) {
@@ -338,23 +367,30 @@ class GeoIP {
 
     /**
      * Get the country for an IP from the cache.
+     * @param ip IPv4 or IPv6
      * @return lower-case code, generally two letters, or null.
      */
     public String get(byte ip[]) {
-        if (ip.length != 4)
-            return null;
         return get(toLong(ip));
     }
 
+    /** see above for ip-to-long mapping */
     private String get(long ip) {
         return _IPToCountry.get(Long.valueOf(ip));
     }
 
+    /** see above for ip-to-long mapping */
     private static long toLong(byte ip[]) {
         int rv = 0;
-        for (int i = 0; i < 4; i++)
-            rv |= (ip[i] & 0xff) << ((3-i)*8);
-        return rv & 0xffffffffl;
+        if (ip.length == 16) {
+            for (int i = 0; i < 8; i++)
+                rv |= (ip[i] & 0xffL) << ((7-i)*8);
+            return rv;
+        } else {
+            for (int i = 0; i < 4; i++)
+                rv |= (ip[i] & 0xff) << ((3-i)*8);
+            return rv & 0xffffffffl;
+        }
     }
 
     /**

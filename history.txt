@@ -1,16 +1,230 @@
-* 2013-08-10 0.9.7.1 released
+2012-07-30 zzz
+ * i2psnark: Increase max piece size to 4 MB (ticket #993)
+ * Tunnels: Extend local expiration of IB tunnels, to allow for
+   more clock skew and not drop valid messages at their destination
 
-2013-08-08 zzz
-  * New update hosts, thx Meeh and dg
-  * Updater: Increase update-via-torrent to 30%
-  * Plucks from trunk for 0.9.7.1:
-    - Disable RI verifies
-    - Extend IB tunnel expiration
-    - i2prouter: bashism fix
-    - i2psnark: increase max piece size, mime type updates
-    - New reseed host
-    - Streaming: RTO changes
-    - UPnP fix for some hardware
+2012-07-29 zzz
+ * Signatures:
+   - Prep for new signature algorithms; new SigType enum;
+     Signature, SigningPublicKey, SigningPrivateKey store type
+   - New Hash384 and Hash512 classes
+   - Remove length field in SimpleDataStructure
+   - New SU3File generator/verifier/extractor
+ * GeoIPv6: Fix NPE (ticket #992)
+
+2012-07-28 zzz
+ * Addresses: Treat RFC 4193 addresses fc00::/7 as local
+ * NetDB: Disable RI verifies for now
+
+2012-07-26 zzz
+ * Transports:
+   - Fix IPv6-only option 2nd try
+   - Treat RFC 4193 addresses fc00::/7 as local
+
+2012-07-25 zzz
+ * Transports:
+   - Prefer IPv6 by default
+   - Fix IPv6-only option
+   - Don't try NTCP IPv6 addresses unless we have one
+   - Fix non-%16 SSU padding; enable by default
+ * Tunnels:
+   - Make expl. default 3 hops  (ticket #966)
+   - Allow expl. fallback up to -2 hops
+
+2012-07-24 zzz
+ * GeoIP: Fix lookups, broken in IPv6 branch
+ * UPnP:
+   - main() tweaks for debugging
+   - Fix for devices that return base URLs with trailing '/' (ticket #986)
+
+2012-07-22 zzz
+ * BuildReplyHandler:
+   - Make non-static
+   - Don't pollute Hash cache with build response record hashes
+   - Use SimpleByteCache
+   - cleanups
+ * HashComparator:
+   - Don't pollute Hash cache with hashes
+   - cleanups
+
+2012-07-21 zzz
+ * I2CP:
+   - Don't NPE when loglevel=warn
+   - Don't enforce property length limits when inside router JVM
+ * I2PSnark: Log uncaught error in ThreadedStarter to router log
+ * I2PThread: Log uncaught error to wrapper log
+
+2012-07-20 zzz
+ Prop from i2p.i2p.zzz.ipv6:
+ * Addresses:
+   - blocklist 192.88.88.0/24 6to4 anycast
+   - invalidate 2002::/16
+   - Strip scope from returned IPv6 addresses
+ * Blocklist:
+   - Add IPv6 in-memory single list
+   - Limit in-memory single list size
+   - Fix dup check in getAddresses()
+ * CSFI: Pass TransportManager instead of CSFI to GetBidsJob; remove unused methods
+ * Console:
+   - Add IPv6 column on /peers
+   - Other minor /peers cleanup
+ * FloodfillPeerSelector, ProfileOrganizer: Use 8 bytes for IPv6 check
+ * GeoIP:
+   - Use cached IP in RouterAddresses
+   - Use both NTCP and SSU addresses
+ * GeoIPv6:
+   - Handle gzipped input data in merge tool
+   - Add script to generate compressed data
+   - Add local additions
+   - Add compressed data file, generated from Maxmind data fetched 2013-05-24
+   - Include data in installer and updater
+   - Update Maxmind license info, now CC-SA 3.0
+   - Enable GeoIPv6 lookup in CSFI
+ * NetDb:
+   - Add floodfillEnabled() to NetworkDatabaseFacade so callers don't
+     have to cast to FNDF, and Dummy NDF will work
+   - Remove static FNDF.floodfillEnabled()
+ * NTCP:
+   - Move SSU address notification handling from CSFI to NTCPTransport
+   - Drop NTCPAddress, just use RouterAddress
+   - Drop _myAddress field, use super's currentAddress
+   - Bad bind config not fatal
+   - Fix publishing address when host specified but interface is not
+   - Republish even if only changing cost
+ * PacketPusher: Minor optimization
+ * Peer tests:
+   - Use only IPv4 peer for Alice and Bob in peer tests; Charlie may be an IPv6 peer.
+   - Enforce IPv4 (Alice's) address inside PeerTest packet
+ * RouterAddress and RouterInfo toString() cleanups; don't cache RI in _stringified
+ * RouterAddress:
+   - hashCode/equals tweaks
+   - Add new constructor
+   - Add add getHost() and deepEquals()
+   - Compare host string, not IP, in equals()
+   - Deprecate some setters
+   - Add warning about setCost()
+   - Change cost storage from int to short
+   - Cost range checks
+ * RouterContext: Fix disabling client manager with i2p.dummyClientFacade=true
+ * SSU:
+   - Change from single UDPEndpoint to a List of UDPEndpoints
+   - Move (single) receive queue from UDPReceiver to PacketHandler
+   - Multiple transmit queues (one for each UDPEndpoint/UDPSender),
+     select queue in PacketPusher
+   - Throw exception on UDPEndpoint.startup() failure
+   - Remove all _external* fields; use _currentAddresses in super
+   - Big rework of externalAddressReceived(), rebuildExternalAddress(),
+     needsRebuild(), and replaceAddress() for multiple addresses and IPv6
+   - Add caching in UDPAddress
+   - More IPv6 flavors of utility methods
+   - Remove two-arg replaceAddress()
+   - Fixes for i2np.udp.allowLocal, log tweaks, sender/receiver thread name tweaks
+   - Handle IPv6 in too-close checks
+   - IPv6 SSU MTU adjustments
+   - Hash IPv6 addresses in IPThrottler
+ * SSU Introduction:
+   - Document that Alice-Bob RelayRequest/RelayResponse may be IPv4 or IPv6,
+     but don't implement IPv6 yet.
+     Changes required in IntroductionManager and PacketBuilder to send Alice's
+     IPv4 address in the RelayRequest packet over IPv6, and to publish
+     IPv6 introducer IPs.
+   - Bob-Charlie RelayIntro must be IPv4
+   - Only offer/accept relay tags as Bob or Charlie if the Bob-Charlie session is IPv4
+   - Alice-Charlie communication must be IPv4
+ * SSUDemo:
+   - Configuration fixes, delete RI on exit, log tweaks, cleanups
+   - Use IPv6; don't use System properties
+   - Adapt for NTCP testing too
+ * Tests:
+   - New buildTest and prepTest targets
+   - Fix UDPEndpoint usage in unit tests: Restore receive(); Handle null UDPTransport
+   - Fix UDPEndpointTestStandalone: init context; Add unit test buildPacket() method to PacketBuilder;
+     Fix NPE in MessageHistory
+ * Transports:
+   - Add new TransportUtil for getting/setting IPv6 config
+   - Prep for supporting multiple RouterAddresses per-transport
+   - Prep for multiple address discovery
+   - Fix multiple-detection code in externalAddressReceived()
+   - Synchronize tracking of last IP/port
+   - Don't accept IPv6 address changes from peers
+   - Remove unused getLocalAddress()
+   - Pkg private getLocalPort()
+   - Start transports in a standard order to make testing easier
+   - When transports learn of interface addresses before being started, save them
+     and use them at startup
+   - Pick SSU random port before startListening() and have the TransportManager
+     pass it to NTCP before starting
+   - Only restart NTCP after changing addresses when necessary;
+     prevent thrashing at startup (ticket #459)
+   - Always bind NTCP if we have port; not just when not firewalled
+   - Only call rebuildRouterInfo() once at startup
+   - More checking of min/max SSU port config
+   - Invalid SSU bind config no longer fatal
+   - Allow "true" for ipv6 config
+   - SSU fixes for per-address and IPv6 MTU
+   - MTU.main() print all interfaces
+   - Add i2np.disable property for testing
+ * Transports:
+   - Sort multiple peer addresses by cost, with adjustment for local IPv6 preference
+   - Add default IPv6Config for ease of changing later
+   - Only treat IPv6 addresses as valid if we have a public IPv6 address
+ * Tunnel GW pumper: Limit threads when testing
+ * UDPAddress:
+   - Reduce object churn, check intro key length,
+     don't look for ihost3, reject ports < 1024, cleanups
+   - Remove dependency in console; make package private
+ * UPnP:
+   - Fix UPnP address received before startListening(), broken by isAlive() check
+   - Pass device IP back in forward port callback
+   - Only declare success if forwarded IP is public
+
+2012-07-20 zzz
+ Prop from i2p.i2p.zzz.test2:
+ * DHSessionKeyBuilder: Fix for session and mac keys if DH key is between 32 and 63 bytes.
+   Was: NPE. Now: mac key is hash of session key. Won't ever happen. (Ticket #963)
+ * I2CP/I2PTunnel locking fixes (partial fixes for tickets 650. 722, 815, 946, 947, 953):
+   - I2PSocketManagerFactory: New createDisconnectedManager(), javadocs
+   - I2PSessionImpl: Rewrite state management and locking, prevent multiple
+     connect() calls, but allow disconnect() to interrupt connect()
+   - I2PSimpleSession: Changes to match I2PSessionImpl
+   - I2PTunnelServer: Don't connect in constructor, use createDisconnectedManager()
+     for a final manager, finals and cleanups
+ * ClientManager:
+   - Make classes extensible for router-side test stubs
+   - Add router-side local-only test implementation, no full router required.
+     Only tested with external clients, probably doesn't work in-JVM.
+   - Don't start threads in ClientManager constructor
+   - Remove unused Reader param in ClientMessageEventListener methods
+   - Cleanups, volatiles, finals, javadocs
+ * Translations:
+   - New varargs method in Translate
+   - New TranslateReader to translate static files on-the-fly using _("") tagging
+   - Tag proxy error pages for TranslateReader
+   - Drop static translated proxy error pages
+   - Add new i2ptunnel bundle for the proxy alone, shipped in the jar.
+   - Use TranslateReader in HTTP proxy for error pages
+   - Move HTTP proxy strings from the web (war) to proxy (jar) bundle so they will be loaded
+     Fixes translations for the lower half of the proxy pages that weren't accessible in the war.
+   - Initial translations created by msgmerge from i2ptunnel and routerconsole po files, un-fuzzied
+   - Tag initialNews.xml for TranslateReader
+   - Drop static translated initialNews pages
+   - Add new routerconsole bundle for the news alone, shipped in the jar
+   - Use TranslateReader in HTTP proxy for initial news
+   - Initial translations created manually from translated xml filesx
+   - Add translated proxy error pages and initial news to deletelist.txt
+ * Transports: Consolidate translation methods in TransportImpl;
+   ngettext fix for "peers" string
+
+
+2012-07-19 zzz
+ * PRNG:
+   - Don't delay the refiller if we need more (don't limit max output)
+   - Add FortunaRandomSource.main() to output to stdout for testing e.g. with dieharder
+
+2012-07-19 zab
+ * Streaming:
+   - initialize streaming RTT from sample, trac #979, RFC 6298
+   - store rttDev in TCBCache
 
 * 2013-07-15 0.9.7 released
 

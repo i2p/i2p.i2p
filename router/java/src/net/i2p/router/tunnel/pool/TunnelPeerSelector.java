@@ -528,21 +528,27 @@ public abstract class TunnelPeerSelector {
      *  Now:
      *     d((H(l+h), h) - d(H(r+h), h)
      */
-    private static class HashComparator implements Comparator {
-        private Hash _hash;
+    private static class HashComparator implements Comparator<Hash> {
+        private final Hash _hash, tmp;
+        private final byte[] data;
 
+        /** not thread safe */
         private HashComparator(Hash h) {
             _hash = h;
-        }
-        public int compare(Object l, Object r) {
-            byte[] data = new byte[2*Hash.HASH_LENGTH];
+            tmp = new Hash(new byte[Hash.HASH_LENGTH]);
+            data = new byte[2*Hash.HASH_LENGTH];
             System.arraycopy(_hash.getData(), 0, data, Hash.HASH_LENGTH, Hash.HASH_LENGTH);
-            System.arraycopy(((Hash) l).getData(), 0, data, 0, Hash.HASH_LENGTH);
-            Hash lh = SHA256Generator.getInstance().calculateHash(data);
-            System.arraycopy(((Hash) r).getData(), 0, data, 0, Hash.HASH_LENGTH);
-            Hash rh = SHA256Generator.getInstance().calculateHash(data);
-            BigInteger ll = HashDistance.getDistance(_hash, lh);
-            BigInteger rr = HashDistance.getDistance(_hash, rh);
+        }
+
+        public int compare(Hash l, Hash r) {
+            System.arraycopy(l.getData(), 0, data, 0, Hash.HASH_LENGTH);
+            byte[] tb = tmp.getData();
+            // don't use caching version of calculateHash()
+            SHA256Generator.getInstance().calculateHash(data, 0, 2*Hash.HASH_LENGTH, tb, 0);
+            BigInteger ll = HashDistance.getDistance(_hash, tmp);
+            System.arraycopy(r.getData(), 0, data, 0, Hash.HASH_LENGTH);
+            SHA256Generator.getInstance().calculateHash(data, 0, 2*Hash.HASH_LENGTH, tb, 0);
+            BigInteger rr = HashDistance.getDistance(_hash, tmp);
             return ll.compareTo(rr);
         }
     }

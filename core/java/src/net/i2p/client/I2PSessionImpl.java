@@ -80,12 +80,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2CPMessageReader _reader;
     /** writer message queue */
     protected ClientWriterRunner _writer;
-    /** where we pipe our messages */
-    protected /* FIXME final FIXME */OutputStream _out;
 
     /**
      *  Used for internal connections to the router.
-     *  If this is set, _socket, _writer, and _out will be null.
+     *  If this is set, _socket and _writer will be null.
      *  @since 0.8.3
      */
     protected I2CPMessageQueue _queue;
@@ -94,7 +92,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2PSessionListener _sessionListener;
 
     /** class that generates new messages */
-    protected I2CPMessageProducer _producer;
+    protected final I2CPMessageProducer _producer;
     /** map of Long --> MessagePayloadMessage */
     protected Map<Long, MessagePayloadMessage> _availableMessages;
 
@@ -103,7 +101,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected final Object _bwReceivedLock = new Object();
     protected volatile int[] _bwLimits;
     
-    protected I2PClientMessageHandlerMap _handlerMap;
+    protected final I2PClientMessageHandlerMap _handlerMap;
     
     /** used to seperate things out so we can get rid of singletons */
     protected final I2PAppContext _context;
@@ -111,22 +109,24 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** monitor for waiting until a lease set has been granted */
     private final Object _leaseSetWait = new Object();
 
-    /** whether the session connection has already been closed (or not yet opened) */
-    protected volatile boolean _closed;
+    /**
+     *  @since 0.9.8
+     */
+    protected enum State {
+        OPENING,
+        OPEN,
+        CLOSING,
+        CLOSED
+    }
 
-    /** whether the session connection is in the process of being closed */
-    protected volatile boolean _closing;
+    private State _state = State.CLOSED;
+    protected final Object _stateLock = new Object();
 
     /** have we received the current date from the router yet? */
     private volatile boolean _dateReceived;
     /** lock that we wait upon, that the SetDateMessageHandler notifies */
     private final Object _dateReceivedLock = new Object();
 
-    /** whether the session connection is in the process of being opened */
-    protected volatile boolean _opening;
-
-    /** monitor for waiting until opened */
-    private final Object _openingWait = new Object();
     /** 
      * thread that we tell when new messages are available who then tells us 
      * to fetch them.  The point of this is so that the fetch doesn't block the
@@ -168,22 +168,24 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     public static final int LISTEN_PORT = 7654;
 
     private static final int BUF_SIZE = 32*1024;
-    
+
     /**
      * for extension by SimpleSession (no dest)
      */
-    protected I2PSessionImpl(I2PAppContext context, Properties options) {
-        this(context, options, false);
+    protected I2PSessionImpl(I2PAppContext context, Properties options,
+                             I2PClientMessageHandlerMap handlerMap) {
+        this(context, options, handlerMap, false);
     }
     
     /**
      * Basic setup of finals
      * @since 0.9.7
      */
-    private I2PSessionImpl(I2PAppContext context, Properties options, boolean hasDest) {
+    private I2PSessionImpl(I2PAppContext context, Properties options,
+                           I2PClientMessageHandlerMap handlerMap, boolean hasDest) {
         _context = context;
+        _handlerMap = handlerMap;
         _log = context.logManager().getLog(getClass());
-        _closed = true;
         if (options == null)
             options = (Properties) System.getProperties().clone();
         _options = loadConfig(options);
@@ -191,10 +193,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _portNum = getPort();
         _fastReceive = Boolean.parseBoolean(_options.getProperty(I2PClient.PROP_FAST_RECEIVE));
         if (hasDest) {
+            _producer = new I2CPMessageProducer(context);
+            _availableMessages = new ConcurrentHashMap();
             _myDestination = new Destination();
             _privateKey = new PrivateKey();
             _signingPrivateKey = new SigningPrivateKey();
         } else {
+            _producer = null;
+            _availableMessages = null;
             _myDestination = null;
             _privateKey = null;
             _signingPrivateKey = null;
@@ -211,11 +217,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */
     public I2PSessionImpl(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {
-        this(context, options, true);
-        _handlerMap = new I2PClientMessageHandlerMap(context);
-        _producer = new I2CPMessageProducer(context);
+        this(context, options, new I2PClientMessageHandlerMap(context), true);
         _availabilityNotifier = new AvailabilityNotifier();
-        _availableMessages = new ConcurrentHashMap();
         try {
             readDestination(destKeyStream);
         } catch (DataFormatException dfe) {
@@ -306,11 +309,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 continue;
             }
             String val = options.getProperty(key);
-            if ((key.length() > 255) || (val.length() > 255)) {
+            // Long strings MUST be removed, even in router context,
+            // as the session config properties must be serialized to be signed.
+            // fixme, bytes could still be over 255 (unlikely)
+            if (key.length() > 255 || val.length() > 255) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(getPrefix() + "Not passing on property ["
+                    _log.warn("Not passing on property ["
                               + key
-                              + "] in the session configuration as the value is too long (max = 255): "
+                              + "] in the session config, key or value is too long (max = 255): "
                               + val);
             } else {
                 rv.setProperty(key, val);
@@ -351,15 +357,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         return _leaseSet;
     }
 
-    void setOpening(boolean ls) {
-        _opening = ls;
-        synchronized (_openingWait) {
-            _openingWait.notifyAll();
+    protected void changeState(State state) {
+        synchronized (_stateLock) {
+            _state = state;
+            _stateLock.notifyAll();
         }
-    }
-
-    boolean getOpening() {
-        return _opening;
     }
 
     /**
@@ -378,12 +380,41 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Connect to the router and establish a session.  This call blocks until 
      * a session is granted.
      *
+     * Should be threadsafe, other threads will block until complete.
+     * Disconnect / destroy from another thread may be called simultaneously and
+     * will (should?) interrupt the connect.
+     *
      * @throws I2PSessionException if there is a configuration error or the router is
      *                             not reachable
      */
     public void connect() throws I2PSessionException {
-        setOpening(true);
-        _closed = false;
+        synchronized(_stateLock) {
+            boolean wasOpening = false;
+            boolean loop = true;
+            while (loop) {
+                switch (_state) {
+                    case CLOSED:
+                        if (wasOpening)
+                            throw new I2PSessionException("connect by other thread failed");
+                        loop = false;
+                        break;
+                    case OPENING:
+                        wasOpening = true;
+                        try {
+                            _stateLock.wait(10*1000);
+                        } catch (InterruptedException ie) {
+                            throw new I2PSessionException("Interrupted", ie);
+                        }
+                        break;
+                    case CLOSING:
+                        throw new I2PSessionException("close in progress");
+                    case OPEN:
+                        return;
+                }
+            }
+            changeState(State.OPENING);
+        }
+
         _availabilityNotifier.stopNotifying();
         
         if ( (_options != null) && 
@@ -392,32 +423,34 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _log.error("I2CP guaranteed delivery mode has been removed, using best effort.");
         }
             
+        boolean success = false;
         long startConnect = _context.clock().now();
         try {
-            // If we are in the router JVM, connect using the interal queue
-            if (_context.isRouterContext()) {
-                // _socket, _out, and _writer remain null
-                InternalClientManager mgr = _context.internalClientManager();
-                if (mgr == null)
-                    throw new I2PSessionException("Router is not ready for connections");
-                // the following may throw an I2PSessionException
-                _queue = mgr.connect();
-                _reader = new QueuedI2CPMessageReader(_queue, this);
-            } else {
-                if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL)))
-                    _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
-                else
-                    _socket = new Socket(_hostname, _portNum);
-                // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
-                _out = _socket.getOutputStream();
-                _out.write(I2PClient.PROTOCOL_BYTE);
-                _out.flush();
-                _writer = new ClientWriterRunner(_out, this);
-                InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
-                _reader = new I2CPMessageReader(in, this);
+            // protect w/ closeSocket()
+            synchronized(_stateLock) {
+                // If we are in the router JVM, connect using the interal queue
+                if (_context.isRouterContext()) {
+                    // _socket and _writer remain null
+                    InternalClientManager mgr = _context.internalClientManager();
+                    if (mgr == null)
+                        throw new I2PSessionException("Router is not ready for connections");
+                    // the following may throw an I2PSessionException
+                    _queue = mgr.connect();
+                    _reader = new QueuedI2CPMessageReader(_queue, this);
+                } else {
+                    if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL)))
+                        _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
+                    else
+                        _socket = new Socket(_hostname, _portNum);
+                    // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
+                    OutputStream out = _socket.getOutputStream();
+                    out.write(I2PClient.PROTOCOL_BYTE);
+                    out.flush();
+                    _writer = new ClientWriterRunner(out, this);
+                    InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
+                    _reader = new I2CPMessageReader(in, this);
+                }
             }
-            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
-            notifier.start();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
@@ -426,55 +459,60 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             int waitcount = 0;
             while (!_dateReceived) {
                 if (waitcount++ > 30) {
-                    closeSocket();
                     throw new IOException("No handshake received from the router");
                 }
-                try {
-                    synchronized (_dateReceivedLock) {
-                        _dateReceivedLock.wait(1000);
-                    }
-                } catch (InterruptedException ie) { // nop
+                synchronized (_dateReceivedLock) {
+                    // InterruptedException caught below
+                    _dateReceivedLock.wait(1000);
                 }
             }
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After received a SetDate response");
 
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before producer.connect()");
             _producer.connect(this);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After  producer.connect()");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After producer.connect()");
 
             // wait until we have created a lease set
             waitcount = 0;
             while (_leaseSet == null) {
                 if (waitcount++ > 5*60) {
+                    throw new IOException("No tunnels built after waiting 5 minutes. Your network connection may be down, or there is severe network congestion.");
+                }
+                synchronized (_leaseSetWait) {
+                    // InterruptedException caught below
+                    _leaseSetWait.wait(1000);
+                }
+            }
+            if (_log.shouldLog(Log.INFO)) {
+                long connected = _context.clock().now();
+                 _log.info(getPrefix() + "Lease set created with inbound tunnels after "
+                           + (connected - startConnect)
+                           + "ms - ready to participate in the network!");
+            }
+            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
+            notifier.start();
+            startIdleMonitor();
+            startVerifyUsage();
+            success = true;
+        } catch (InterruptedException ie) {
+            throw new I2PSessionException("Interrupted", ie);
+        } catch (UnknownHostException uhe) {
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
+        } catch (IOException ioe) {
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
+        } finally {
+            if (success) {
+                changeState(State.OPEN);
+            } else {
+                _availabilityNotifier.stopNotifying();
+                synchronized(_stateLock) {
+                    changeState(State.CLOSING);
                     try {
                         _producer.disconnect(this);
                     } catch (I2PSessionException ipe) {}
                     closeSocket();
-                    throw new IOException("No tunnels built after waiting 5 minutes. Your network connection may be down, or there is severe network congestion.");
-                }
-                synchronized (_leaseSetWait) {
-                    try {
-                        _leaseSetWait.wait(1000);
-                    } catch (InterruptedException ie) { // nop
-                    }
                 }
             }
-            long connected = _context.clock().now();
-            if (_log.shouldLog(Log.INFO))
-                 _log.info(getPrefix() + "Lease set created with inbound tunnels after "
-                           + (connected - startConnect)
-                           + "ms - ready to participate in the network!");
-            startIdleMonitor();
-            startVerifyUsage();
-             setOpening(false);
-        } catch (UnknownHostException uhe) {
-            _closed = true;
-            setOpening(false);
-            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
-        } catch (IOException ioe) {
-            _closed = true;
-            setOpening(false);
-            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
         }
     }
 
@@ -570,8 +608,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  Needs work.
      */
     protected class AvailabilityNotifier implements Runnable {
-        private final List _pendingIds;
-        private final List _pendingSizes;
+        private final List<Long> _pendingIds;
+        private final List<Integer> _pendingSizes;
         private volatile boolean _alive;
  
         public AvailabilityNotifier() {
@@ -606,8 +644,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         }
                     }
                     if (!_pendingIds.isEmpty()) {
-                        msgId = (Long)_pendingIds.remove(0);
-                        size = (Integer)_pendingSizes.remove(0);
+                        msgId = _pendingIds.remove(0);
+                        size = _pendingSizes.remove(0);
                     }
                 }
                 if ( (msgId != null) && (size != null) ) {
@@ -695,8 +733,15 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** configure the listener */
     public void setSessionListener(I2PSessionListener lsnr) { _sessionListener = lsnr; }
 
-    /** has the session been closed (or not yet connected)? */
-    public boolean isClosed() { return _closed; }
+    /**
+     *  Has the session been closed (or not yet connected)?
+     *  False when open and during transitions. Unsynchronized.
+     */
+    public boolean isClosed() {
+        synchronized (_stateLock) {
+            return _state == State.CLOSED;
+        }
+    }
 
     /**
      * Deliver an I2CP message to the router
@@ -713,7 +758,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 if (!_queue.offer(message, MAX_SEND_WAIT))
                     throw new I2PSessionException("Timed out waiting while write queue was full");
             } catch (InterruptedException ie) {
-                throw new I2PSessionException("Interrupted while write queue was full", ie);
+                throw new I2PSessionException("Interrupted", ie);
             }
         } else if (_writer == null) {
             throw new I2PSessionException("Already closed");
@@ -756,21 +801,16 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Tear down the session, and do NOT reconnect.
      * 
-     * Blocks if session has not been fully started.
+     * Will interrupt an open in progress.
      */
     public void destroySession(boolean sendDisconnect) {
-        while (_opening) {
-            synchronized (_openingWait) {
-                try {
-                    _openingWait.wait(1000);
-                } catch (InterruptedException ie) { // nop
-                }
-            }
+        synchronized(_stateLock) {
+            if (_state == State.CLOSING || _state == State.CLOSED)
+                return;
+            changeState(State.CLOSING);
         }
-        if (_closed) return;
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
-        _closing = true;   // we use this to prevent a race
         if (sendDisconnect && _producer != null) {    // only null if overridden by I2PSimpleSession
             try {
                 _producer.disconnect(this);
@@ -783,19 +823,27 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         // SimpleSession does not initialize
         if (_availabilityNotifier != null)
             _availabilityNotifier.stopNotifying();
-        _closed = true;
-        _closing = false;
         closeSocket();
         if (_sessionListener != null) _sessionListener.disconnected(this);
     }
 
     /**
-     * Close the socket carefully
-     *
+     * Close the socket carefully.
      */
     private void closeSocket() {
+        synchronized(_stateLock) {
+            changeState(State.CLOSING);
+            locked_closeSocket();
+            changeState(State.CLOSED);
+        }
+    }
+
+    /**
+     * Close the socket carefully.
+     * Caller must change state.
+     */
+    private void locked_closeSocket() {
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Closing the socket", new Exception("closeSocket"));
-        _closed = true;
         if (_reader != null) {
             _reader.stopReading();
             _reader = null;
@@ -830,8 +878,15 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         disconnect();
     }
 
+    /**
+     * Will interrupt a connect in progress.
+     */
     protected void disconnect() {
-        if (_closed || _closing) return;
+        synchronized(_stateLock) {
+            if (_state == State.CLOSING || _state == State.CLOSED)
+                return;
+            changeState(State.CLOSING);
+        }
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnect() called", new Exception("Disconnect"));
         if (shouldReconnect()) {
             if (reconnect()) {
@@ -842,11 +897,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
 
         if (_log.shouldLog(Log.ERROR))
-            _log.error(getPrefix() + "Disconned from the router, and not trying to reconnect further.  I hope you're not hoping anything else will happen");
+            _log.error(getPrefix() + "Disconned from the router, and not trying to reconnect");
         if (_sessionListener != null) _sessionListener.disconnected(this);
 
-        _closed = true;
         closeSocket();
+        changeState(State.CLOSED);
     }
 
     private final static int MAX_RECONNECT_DELAY = 320*1000;
@@ -865,7 +920,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             i++;
             if ( (delay > MAX_RECONNECT_DELAY) || (delay <= 0) )
                 delay = MAX_RECONNECT_DELAY;
-            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException ie) {
+                return false;
+            }
             
             try {
                 connect();
@@ -970,7 +1029,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (rv != null)
                 return rv;
         }
-        if (_closed)
+        if (isClosed())
             return null;
         LookupWaiter waiter = new LookupWaiter(h);
         _pendingLookups.offer(waiter);
@@ -980,7 +1039,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 synchronized (waiter) {
                     waiter.wait(maxWait);
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) {
+                throw new I2PSessionException("Interrupted", ie);
+            }
         } finally {
             _pendingLookups.remove(waiter);
         }
@@ -996,14 +1057,16 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @return null on failure
      */
     public int[] bandwidthLimits() throws I2PSessionException {
-        if (_closed)
+        if (isClosed())
             return null;
         sendMessage(new GetBandwidthLimitsMessage());
         try {
             synchronized (_bwReceivedLock) {
                 _bwReceivedLock.wait(5*1000);
             }
-        } catch (InterruptedException ie) {}
+        } catch (InterruptedException ie) {
+            throw new I2PSessionException("Interrupted", ie);
+        }
         return _bwLimits;
     }
 

@@ -59,6 +59,7 @@ class BuildHandler implements Runnable {
     private final BuildMessageProcessor _processor;
     private final RequestThrottler _requestThrottler;
     private final ParticipatingThrottler _throttler;
+    private final BuildReplyHandler _buildReplyHandler;
     private final AtomicInteger _currentLookups = new AtomicInteger();
     private volatile boolean _isRunning;
 
@@ -134,6 +135,7 @@ class BuildHandler implements Runnable {
         _requestThrottler = new RequestThrottler(ctx);
         // used for previous and next hops, for successful builds only
         _throttler = new ParticipatingThrottler(ctx);
+        _buildReplyHandler = new BuildReplyHandler(ctx);
         _buildMessageHandlerJob = new TunnelBuildMessageHandlerJob(ctx);
         _buildReplyMessageHandlerJob = new TunnelBuildReplyMessageHandlerJob(ctx);
         TunnelBuildMessageHandlerJobBuilder tbmhjb = new TunnelBuildMessageHandlerJobBuilder();
@@ -246,7 +248,7 @@ class BuildHandler implements Runnable {
             _log.info(msg.getUniqueId() + ": Handling the reply after " + rtt + ", delayed " + delay + " waiting for " + cfg);
         
         List<Integer> order = cfg.getReplyOrder();
-        int statuses[] = BuildReplyHandler.decrypt(_context, msg, cfg, order);
+        int statuses[] = _buildReplyHandler.decrypt(msg, cfg, order);
         if (statuses != null) {
             boolean allAgree = true;
             // For each peer in the tunnel

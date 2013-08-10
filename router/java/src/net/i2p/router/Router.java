@@ -601,7 +601,7 @@ public class Router implements RouterClock.ClockShiftListener {
         }
         
         // if prop set to true, don't tell people we are ff even if we are
-        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context) &&
+        if (_context.netDb().floodfillEnabled() &&
             !_context.getBooleanProperty("router.hideFloodfillParticipant"))
             ri.addCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         

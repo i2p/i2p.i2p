@@ -46,8 +46,8 @@ import net.i2p.util.RandomSource;
  */
 class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventListener {
     private final Log _log;
-    private final RouterContext _context;
-    private final ClientConnectionRunner _runner;
+    protected final RouterContext _context;
+    protected final ClientConnectionRunner _runner;
     private final boolean  _enforceAuth;
     
     private static final String PROP_AUTH = "i2cp.auth";
@@ -73,40 +73,40 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.debug("Message received: \n" + message);
         switch (message.getType()) {
             case GetDateMessage.MESSAGE_TYPE:
-                handleGetDate(reader, (GetDateMessage)message);
+                handleGetDate((GetDateMessage)message);
                 break;
             case SetDateMessage.MESSAGE_TYPE:
-                handleSetDate(reader, (SetDateMessage)message);
+                handleSetDate((SetDateMessage)message);
                 break;
             case CreateSessionMessage.MESSAGE_TYPE:
-                handleCreateSession(reader, (CreateSessionMessage)message);
+                handleCreateSession((CreateSessionMessage)message);
                 break;
             case SendMessageMessage.MESSAGE_TYPE:
-                handleSendMessage(reader, (SendMessageMessage)message);
+                handleSendMessage((SendMessageMessage)message);
                 break;
             case SendMessageExpiresMessage.MESSAGE_TYPE:
-                handleSendMessage(reader, (SendMessageExpiresMessage)message);
+                handleSendMessage((SendMessageExpiresMessage)message);
                 break;
             case ReceiveMessageBeginMessage.MESSAGE_TYPE:
-                handleReceiveBegin(reader, (ReceiveMessageBeginMessage)message);
+                handleReceiveBegin((ReceiveMessageBeginMessage)message);
                 break;
             case ReceiveMessageEndMessage.MESSAGE_TYPE:
-                handleReceiveEnd(reader, (ReceiveMessageEndMessage)message);
+                handleReceiveEnd((ReceiveMessageEndMessage)message);
                 break;
             case CreateLeaseSetMessage.MESSAGE_TYPE:
-                handleCreateLeaseSet(reader, (CreateLeaseSetMessage)message);
+                handleCreateLeaseSet((CreateLeaseSetMessage)message);
                 break;
             case DestroySessionMessage.MESSAGE_TYPE:
-                handleDestroySession(reader, (DestroySessionMessage)message);
+                handleDestroySession((DestroySessionMessage)message);
                 break;
             case DestLookupMessage.MESSAGE_TYPE:
-                handleDestLookup(reader, (DestLookupMessage)message);
+                handleDestLookup((DestLookupMessage)message);
                 break;
             case ReconfigureSessionMessage.MESSAGE_TYPE:
-                handleReconfigureSession(reader, (ReconfigureSessionMessage)message);
+                handleReconfigureSession((ReconfigureSessionMessage)message);
                 break;
             case GetBandwidthLimitsMessage.MESSAGE_TYPE:
-                handleGetBWLimits(reader, (GetBandwidthLimitsMessage)message);
+                handleGetBWLimits((GetBandwidthLimitsMessage)message);
                 break;
             default:
                 if (_log.shouldLog(Log.ERROR))
@@ -131,7 +131,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _runner.disconnected();
     }
     
-    private void handleGetDate(I2CPMessageReader reader, GetDateMessage message) {
+    private void handleGetDate(GetDateMessage message) {
         // sent by clients >= 0.8.7
         String clientVersion = message.getVersion();
         if (clientVersion != null)
@@ -148,7 +148,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     /**
      *  As of 0.8.7, does nothing. Do not allow a client to set the router's clock.
      */
-    private void handleSetDate(I2CPMessageReader reader, SetDateMessage message) {
+    private void handleSetDate(SetDateMessage message) {
         //_context.clock().setNow(message.getDate().getTime());
     }
 	
@@ -160,7 +160,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * DisconnectMessage in return, and not wait around for our DisconnectMessage.
      * So keep it simple.
      */
-    private void handleCreateSession(I2CPMessageReader reader, CreateSessionMessage message) {
+    private void handleCreateSession(CreateSessionMessage message) {
         SessionConfig in = message.getSessionConfig();
         if (in.verifySignature()) {
             if (_log.shouldLog(Log.DEBUG))
@@ -209,17 +209,24 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
-
-        _context.jobQueue().addJob(new CreateSessionJob(_context, _runner));
+        startCreateSessionJob();
     }
     
+    /**
+     *  Override for testing
+     *  @since 0.9.8
+     *
+     */
+    protected void startCreateSessionJob() {
+        _context.jobQueue().addJob(new CreateSessionJob(_context, _runner));
+    }
     
     /**
      * Handle a SendMessageMessage: give it a message Id, have the ClientManager distribute
      * it, and send the client an ACCEPTED message
      *
      */
-    private void handleSendMessage(I2CPMessageReader reader, SendMessageMessage message) {
+    private void handleSendMessage(SendMessageMessage message) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("handleSendMessage called");
         long beforeDistribute = _context.clock().now();
@@ -236,7 +243,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * The client asked for a message, so we send it to them.  
      *
      */
-    private void handleReceiveBegin(I2CPMessageReader reader, ReceiveMessageBeginMessage message) {
+    private void handleReceiveBegin(ReceiveMessageBeginMessage message) {
         if (_runner.isDead()) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling recieve begin: id = " + message.getMessageId());
@@ -266,17 +273,18 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * pending queue, though it should.
      *
      */
-    private void handleReceiveEnd(I2CPMessageReader reader, ReceiveMessageEndMessage message) {
+    private void handleReceiveEnd(ReceiveMessageEndMessage message) {
         _runner.removePayload(new MessageId(message.getMessageId()));
     }
     
-    private void handleDestroySession(I2CPMessageReader reader, DestroySessionMessage message) {
+    private void handleDestroySession(DestroySessionMessage message) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Destroying client session " + _runner.getSessionId());
         _runner.stopRunning();
     }
     
-    private void handleCreateLeaseSet(I2CPMessageReader reader, CreateLeaseSetMessage message) {	
+    /** override for testing */
+    protected void handleCreateLeaseSet(CreateLeaseSetMessage message) {	
         if ( (message.getLeaseSet() == null) || (message.getPrivateKey() == null) || (message.getSigningPrivateKey() == null) ) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null lease set granted: " + message);
@@ -293,7 +301,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _runner.leaseSetCreated(message.getLeaseSet());
     }
 
-    private void handleDestLookup(I2CPMessageReader reader, DestLookupMessage message) {
+    /** override for testing */
+    protected void handleDestLookup(DestLookupMessage message) {
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash()));
     }
 
@@ -305,7 +314,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * Note that this does NOT update the few options handled in
      * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
      */
-    private void handleReconfigureSession(I2CPMessageReader reader, ReconfigureSessionMessage message) {
+    private void handleReconfigureSession(ReconfigureSessionMessage message) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Updating options - old: " + _runner.getConfig() + " new: " + message.getSessionConfig());
         if (!message.getSessionConfig().getDestination().equals(_runner.getConfig().getDestination())) {
@@ -343,7 +352,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * This could someday give a different answer to each client.
      * But it's not enforced anywhere.
      */
-    private void handleGetBWLimits(I2CPMessageReader reader, GetBandwidthLimitsMessage message) {
+    protected void handleGetBWLimits(GetBandwidthLimitsMessage message) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Got BW Limits request");
         int in = _context.bandwidthLimiter().getInboundKBytesPerSecond() * 4 / 7;

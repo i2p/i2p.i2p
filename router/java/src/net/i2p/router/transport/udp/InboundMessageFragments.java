@@ -66,6 +66,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         _ackSender.shutdown();
         _messageReceiver.shutdown();
     }
+
     public boolean isAlive() { return _alive; }
 
     /**

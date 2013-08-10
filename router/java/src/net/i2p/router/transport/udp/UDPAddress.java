@@ -2,16 +2,17 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.SessionKey;
+import net.i2p.util.LHMCache;
 
 /**
  * basic helper to parse out peer info from a udp address
- * FIXME public for ConfigNetHelper
  */
-public class UDPAddress {
+class UDPAddress {
     private final String _host;
     private InetAddress _hostAddress;
     private final int _port;
@@ -37,6 +38,23 @@ public class UDPAddress {
     public static final String PROP_INTRO_KEY_PREFIX = "ikey";
     public static final String PROP_INTRO_TAG_PREFIX = "itag";
     static final int MAX_INTRODUCERS = 3;
+    private static final String[] PROP_INTRO_HOST;
+    private static final String[] PROP_INTRO_PORT;
+    private static final String[] PROP_INTRO_IKEY;
+    private static final String[] PROP_INTRO_TAG;
+    static {
+        // object churn
+        PROP_INTRO_HOST = new String[MAX_INTRODUCERS];
+        PROP_INTRO_PORT = new String[MAX_INTRODUCERS];
+        PROP_INTRO_IKEY = new String[MAX_INTRODUCERS];
+        PROP_INTRO_TAG = new String[MAX_INTRODUCERS];
+        for (int i = 0; i < MAX_INTRODUCERS; i++) {
+            PROP_INTRO_HOST[i] = PROP_INTRO_HOST_PREFIX + i;
+            PROP_INTRO_PORT[i] = PROP_INTRO_PORT_PREFIX + i;
+            PROP_INTRO_IKEY[i] = PROP_INTRO_KEY_PREFIX + i;
+            PROP_INTRO_TAG[i] = PROP_INTRO_TAG_PREFIX + i;
+        }
+    }
 
     public UDPAddress(RouterAddress addr) {
         // TODO make everything final
@@ -49,33 +67,38 @@ public class UDPAddress {
         _port = addr.getPort();
         try { 
             String mtu = addr.getOption(PROP_MTU);
-            if (mtu != null)
-                _mtu = MTU.rectify(Integer.parseInt(mtu));
+            if (mtu != null) {
+                boolean isIPv6 = _host != null && _host.contains(":");
+                _mtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
+            }
         } catch (NumberFormatException nfe) {}
         String key = addr.getOption(PROP_INTRO_KEY);
-        if (key != null)
-            _introKey = Base64.decode(key.trim());
+        if (key != null) {
+            byte[] ik = Base64.decode(key.trim());
+            if (ik != null && ik.length == SessionKey.KEYSIZE_BYTES)
+                _introKey = ik;
+        }
         
-        for (int i = MAX_INTRODUCERS; i >= 0; i--) {
-            String host = addr.getOption(PROP_INTRO_HOST_PREFIX + i);
+        for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
+            String host = addr.getOption(PROP_INTRO_HOST[i]);
             if (host == null) continue;
-            String port = addr.getOption(PROP_INTRO_PORT_PREFIX + i);
+            String port = addr.getOption(PROP_INTRO_PORT[i]);
             if (port == null) continue;
-            String k = addr.getOption(PROP_INTRO_KEY_PREFIX + i);
+            String k = addr.getOption(PROP_INTRO_IKEY[i]);
             if (k == null) continue;
             byte ikey[] = Base64.decode(k);
             if ( (ikey == null) || (ikey.length != SessionKey.KEYSIZE_BYTES) )
                 continue;
-            String t = addr.getOption(PROP_INTRO_TAG_PREFIX + i);
+            String t = addr.getOption(PROP_INTRO_TAG[i]);
             if (t == null) continue;
-            int p = -1;
+            int p;
             try { 
                 p = Integer.parseInt(port); 
-                if (p <= 0 || p > 65535) continue;
+                if (p < UDPTransport.MIN_PEER_PORT || p > 65535) continue;
             } catch (NumberFormatException nfe) {
                 continue;
             }
-            long tag = -1;
+            long tag;
             try {
                 tag = Long.parseLong(t);
                 if (tag <= 0) continue;
@@ -131,14 +154,10 @@ public class UDPAddress {
     }
     
     public String getHost() { return _host; }
+
     InetAddress getHostAddress() {
-        if (_hostAddress == null) {
-            try {
-                _hostAddress = InetAddress.getByName(_host);
-            } catch (UnknownHostException uhe) {
-                _hostAddress = null;
-            }
-        }
+        if (_hostAddress == null)
+            _hostAddress = getByName(_host);
         return _hostAddress;
     }
 
@@ -150,18 +169,17 @@ public class UDPAddress {
     byte[] getIntroKey() { return _introKey; }
     
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
+
     InetAddress getIntroducerHost(int i) { 
-        if (_introAddresses[i] == null) {
-            try {
-                _introAddresses[i] = InetAddress.getByName(_introHosts[i]);
-            } catch (UnknownHostException uhe) {
-                _introAddresses[i] = null;
-            }
-        }
+        if (_introAddresses[i] == null)
+            _introAddresses[i] = getByName(_introHosts[i]);
         return _introAddresses[i];
     }
+
     int getIntroducerPort(int i) { return _introPorts[i]; }
+
     byte[] getIntroducerKey(int i) { return _introKeys[i]; }
+
     long getIntroducerTag(int i) { return _introTags[i]; }
         
     /**
@@ -191,5 +209,72 @@ public class UDPAddress {
                 rv.append("ssu://autodetect.not.yet.complete:").append(_port);
         }
         return rv.toString();
+    }
+
+    ////////////////
+    // cache copied from Addresses.java but caching InetAddress instead of byte[]
+
+
+    /**
+     *  Textual IP to InetAddress, because InetAddress.getByName() is slow.
+     *
+     *  @since IPv6
+     */
+    private static final Map<String, InetAddress> _inetAddressCache;
+
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        long min = 128;
+        long max = 2048;
+        // 512 nominal for 128 MB
+        int size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
+        _inetAddressCache = new LHMCache(size);
+    }
+
+    /**
+     *  Caching version of InetAddress.getByName(host), which is slow.
+     *  Caches numeric host names only.
+     *  Will resolve but not cache DNS host names.
+     *
+     *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
+     *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
+     *
+     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @return InetAddress or null
+     *  @since IPv6
+     */
+    private static InetAddress getByName(String host) {
+        if (host == null)
+            return null;
+        InetAddress rv;
+        synchronized (_inetAddressCache) {
+            rv = _inetAddressCache.get(host);
+        }
+        if (rv == null) {
+            try {
+                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
+                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
+                    return null;
+                rv = InetAddress.getByName(host);
+                if (isIPv4 ||
+                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                    synchronized (_inetAddressCache) {
+                        _inetAddressCache.put(host, rv);
+                    }
+                }
+            } catch (UnknownHostException uhe) {}
+        }
+        return rv;
+    }
+
+    /**
+     *  @since IPv6
+     */
+    static void clearCache() {
+        synchronized(_inetAddressCache) {
+            _inetAddressCache.clear();
+        }
     }
 }

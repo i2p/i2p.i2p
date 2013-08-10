@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -85,13 +87,24 @@ public class TransportManager implements TransportEventListener {
 
     private void configTransports() {
         boolean enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
+        Transport udp = null;
         if (enableUDP) {
-            UDPTransport udp = new UDPTransport(_context, _dhThread);
+            udp = new UDPTransport(_context, _dhThread);
             addTransport(udp);
             initializeAddress(udp);
         }
-        if (isNTCPEnabled(_context))
-            addTransport(new NTCPTransport(_context, _dhThread));
+        if (isNTCPEnabled(_context)) {
+            Transport ntcp = new NTCPTransport(_context, _dhThread);
+            addTransport(ntcp);
+            initializeAddress(ntcp);
+            if (udp != null) {
+                // pass along the port SSU is probably going to use
+                // so that NTCP may bind early
+                int port = udp.getRequestedPort();
+                if (port > 0)
+                    ntcp.externalAddressReceived(SOURCE_CONFIG, null, port);
+            }
+        }
         if (_transports.isEmpty())
             _log.log(Log.CRIT, "No transports are enabled");
     }
@@ -100,40 +113,44 @@ public class TransportManager implements TransportEventListener {
         return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP);
     }
     
+    /**
+     *  Notify transport of ALL routable interface addresses, including IPv6.
+     *  It's the transport's job to ignore what it can't handle.
+     */
     private void initializeAddress(Transport t) {
-        String ips = Addresses.getAnyAddress();
-        if (ips == null)
-            return;
-        InetAddress ia;
-        try {
-            ia = InetAddress.getByName(ips);
-        } catch (UnknownHostException e) {
-            _log.error("UDP failed to bind to local address", e);
-            return;
+        Set<String> ipset = Addresses.getAddresses(false, true);  // non-local, include IPv6
+        for (String ips : ipset) {
+            try {
+                InetAddress ia = InetAddress.getByName(ips);
+                byte[] ip = ia.getAddress();
+                t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
+            } catch (UnknownHostException e) {
+                _log.error("UDP failed to bind to local address", e);
+            }
         }
-        byte[] ip = ia.getAddress();
-        t.externalAddressReceived(Transport.SOURCE_INTERFACE, ip, 0);
+    }
+
+    /**
+     * Initialize from interfaces, and callback from UPnP or SSU.
+     * Tell all transports... but don't loop
+     *
+     */
+    public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
+        for (Transport t : _transports.values()) {
+            // don't loop
+            if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
+                t.externalAddressReceived(source, ip, port);
+        }
     }
 
     /**
      * callback from UPnP
-     * Only tell SSU, it will tell NTCP
      *
      */
-    public void externalAddressReceived(String source, byte[] ip, int port) {
-        Transport t = getTransport(UDPTransport.STYLE);
-        if (t != null)
-            t.externalAddressReceived(source, ip, port);
-    }
-
-    /**
-     * callback from UPnP
-     *
-     */
-    public void forwardPortStatus(String style, int port, int externalPort, boolean success, String reason) {
+    public void forwardPortStatus(String style, byte[] ip, int port, int externalPort, boolean success, String reason) {
         Transport t = getTransport(style);
         if (t != null)
-            t.forwardPortStatus(port, externalPort, success, reason);
+            t.forwardPortStatus(ip, port, externalPort, success, reason);
     }
 
     public synchronized void startListening() {
@@ -148,7 +165,17 @@ public class TransportManager implements TransportEventListener {
             _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");
-        for (Transport t : _transports.values()) {
+        // Let's do this in a predictable order to make testing easier
+        // Start NTCP first so it can get notified from SSU
+        List<Transport> tps = new ArrayList();
+        Transport tp = getTransport(NTCPTransport.STYLE);
+        if (tp != null)
+            tps.add(tp);
+        tp = getTransport(UDPTransport.STYLE);
+        if (tp != null)
+            tps.add(tp);
+        //for (Transport t : _transports.values()) {
+        for (Transport t : tps) {
             t.startListening();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Transport " + t.getStyle() + " started");
@@ -248,7 +275,7 @@ public class TransportManager implements TransportEventListener {
       */
     public boolean haveInboundCapacity(int pct) { 
         for (Transport t : _transports.values()) {
-            if (t.getCurrentAddress() != null && t.haveCapacity(pct))
+            if (t.hasCurrentAddress() && t.haveCapacity(pct))
                 return true;
         }
         return false;
@@ -266,8 +293,8 @@ public class TransportManager implements TransportEventListener {
             if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Transport manager returning " + skews.size() + " peer clock skews.");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Transport manager returning " + skews.size() + " peer clock skews.");
         return skews;
     }
     
@@ -324,6 +351,8 @@ public class TransportManager implements TransportEventListener {
      *
      * For blocking purposes, etc. it's worth checking both
      * the netDb addresses and this address.
+     *
+     * @return IPv4 or IPv6 or null
      */
     public byte[] getIP(Hash dest) {
         return TransportImpl.getIP(dest);
@@ -332,35 +361,62 @@ public class TransportManager implements TransportEventListener {
     /**
      *  This forces a rebuild
      */
-    public Map<String, RouterAddress> getAddresses() {
-        Map<String, RouterAddress> rv = new HashMap(_transports.size());
+    public List<RouterAddress> getAddresses() {
+        List<RouterAddress> rv = new ArrayList(4);
         // do this first since SSU may force a NTCP change
         for (Transport t : _transports.values())
             t.updateAddress();
         for (Transport t : _transports.values()) {
-            if (t.getCurrentAddress() != null)
-                rv.put(t.getStyle(), t.getCurrentAddress());
+            rv.addAll(t.getCurrentAddresses());
         }
         return rv;
     }
     
     /**
-     * The actual or requested INTERNAL ports, for each transport,
-     * which we will pass along to UPnP to be forwarded.
+     *  @since IPv6
      */
-    private Map<String, Integer> getPorts() {
-        Map<String, Integer> rv = new HashMap(_transports.size());
+    static class Port {
+        public final String style;
+        public final int port;
+
+        public Port(String style, int port) {
+            this.style = style;
+            this.port = port;
+        }
+
+        @Override
+        public int hashCode() {
+            return style.hashCode() ^ port;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null)
+                return false;
+            if (! (o instanceof Port))
+                return false;
+            Port p = (Port) o;
+            return port == p.port && style.equals(p.style);
+        }
+    }
+
+    /**
+     * Include the published port, or the requested port, for each transport
+     * which we will pass along to UPnP
+     */
+    private Set<Port> getPorts() {
+        Set<Port> rv = new HashSet(4);
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
             if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
-                _context.getBooleanProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)) {
+                _context.getBooleanProperty(NTCPTransport.PROP_I2NP_NTCP_AUTO_PORT)) {
                 Transport udp = getTransport(UDPTransport.STYLE);
                 if (udp != null)
                     port = t.getRequestedPort();
             }
             if (port > 0)
-                rv.put(t.getStyle(), Integer.valueOf(port));
+                rv.add(new Port(t.getStyle(), port));
         }
         return rv;
     }
@@ -461,11 +517,11 @@ public class TransportManager implements TransportEventListener {
      */
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));
+            _log.debug("I2NPMessage received: " + message.getClass().getSimpleName() /*, new Exception("Where did I come from again?") */ );
         try {
             _context.inNetMessagePool().add(message, fromRouter, fromRouterHash);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Added to in pool");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Added to in pool");
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error receiving message", iae);
@@ -477,8 +533,8 @@ public class TransportManager implements TransportEventListener {
             _upnpManager.update(getPorts());
     }
 
-    public List getMostRecentErrorMessages() { 
-        List rv = new ArrayList(16);
+    public List<String> getMostRecentErrorMessages() { 
+        List<String> rv = new ArrayList(16);
         for (Transport t : _transports.values()) {
             rv.addAll(t.getMostRecentErrorMessages());
         }
@@ -486,12 +542,11 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        TreeMap transports = new TreeMap();
+        TreeMap<String, Transport> transports = new TreeMap();
         for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);
         }
-        for (Iterator iter = transports.values().iterator(); iter.hasNext(); ) {
-            Transport t= (Transport)iter.next();
+        for (Transport t : transports.values()) {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         
@@ -502,11 +557,15 @@ public class TransportManager implements TransportEventListener {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h3>").append(_("Router Transport Addresses")).append("</h3><pre>\n");
         for (Transport t : _transports.values()) {
-            if (t.getCurrentAddress() != null)
-                buf.append(t.getCurrentAddress());
-            else
+            if (t.hasCurrentAddress()) {
+                for (RouterAddress ra : t.getCurrentAddresses()) {
+                    buf.append(ra.toString());
+                    buf.append("\n\n");
+                }
+            } else {
                 buf.append(_("{0} is used for outbound connections only", t.getStyle()));
-            buf.append("\n\n");
+                buf.append("\n\n");
+            }
         }
         buf.append("</pre>\n");
         out.write(buf.toString());

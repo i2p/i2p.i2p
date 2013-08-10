@@ -23,6 +23,52 @@ import net.i2p.util.Log;
 
 /**
  *  Keep track of inbound and outbound introductions.
+ *
+ *  IPv6 info: Alice-Bob communication may be via IPv4 or IPv6.
+ *  Bob-Charlie communication must be via established IPv4 session as that's the only way
+ *  that Bob knows Charlie's IPv4 address to give it to Alice.
+ *  Alice-Charlie communication is via IPv4.
+ *  If Alice-Bob is over IPv6, Alice must include her IPv4 address in
+ *  the RelayRequest message.
+ *
+ *  From udp.html on the website:
+
+<p>Indirect session establishment by means of a third party introduction
+is necessary for efficient NAT traversal.  Charlie, a router behind a
+NAT or firewall which does not allow unsolicited inbound UDP packets,
+first contacts a few peers, choosing some to serve as introducers.  Each
+of these peers (Bob, Bill, Betty, etc) provide Charlie with an introduction
+tag - a 4 byte random number - which he then makes available to the public
+as methods of contacting him.  Alice, a router who has Charlie's published
+contact methods, first sends a RelayRequest packet to one or more of the 
+introducers, asking each to introduce her to Charlie (offering the 
+introduction tag to identify Charlie).  Bob then forwards a RelayIntro
+packet to Charlie including Alice's public IP and port number, then sends
+Alice back a RelayResponse packet containing Charlie's public IP and port
+number.  When Charlie receives the RelayIntro packet, he sends off a small
+random packet to Alice's IP and port (poking a hole in his NAT/firewall),
+and when Alice receives Bob's RelayResponse packet, she begins a new 
+full direction session establishment with the specified IP and port.</p>
+<p>
+Alice first connects to introducer Bob, who relays the request to Charlie.
+</p>
+<pre>
+        Alice                         Bob                  Charlie
+    RelayRequest ----------------------&gt;
+         &lt;-------------- RelayResponse    RelayIntro -----------&gt;
+         &lt;-------------------------------------------- HolePunch (data ignored)
+    SessionRequest --------------------------------------------&gt;
+         &lt;-------------------------------------------- SessionCreated
+    SessionConfirmed ------------------------------------------&gt;
+         &lt;-------------------------------------------- DeliveryStatusMessage
+         &lt;-------------------------------------------- DatabaseStoreMessage
+    DatabaseStoreMessage --------------------------------------&gt;
+    Data &lt;--------------------------------------------------&gt; Data
+</pre>
+
+<p>
+After the hole punch, the session is established between Alice and Charlie as in a direct establishment.
+</p>
  */
 class IntroductionManager {
     private final RouterContext _context;
@@ -76,6 +122,9 @@ class IntroductionManager {
         if (peer == null) return;
         // let's not use an introducer on a privileged port, sounds like trouble
         if (peer.getRemotePort() < 1024)
+            return;
+        // Only allow relay as Bob or Charlie if the Bob-Charlie session is IPv4
+        if (peer.getRemoteIP().length != 4)
             return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
@@ -136,6 +185,8 @@ class IntroductionManager {
                     _log.info("Picked peer has no local routerInfo: " + cur);
                 continue;
             }
+            // FIXME we can include all his addresses including IPv6 even if we don't support IPv6 (isValid() is false)
+            // but requires RelayRequest support, see below
             RouterAddress ra = _transport.getTargetAddress(ri);
             if (ra == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -159,6 +210,8 @@ class IntroductionManager {
                     _log.info("Peer is idle too long: " + cur);
                 continue;
             }
+            // FIXME we can include all his addresses including IPv6 even if we don't support IPv6 (isValid() is false)
+            // but requires RelayRequest support, see below
             byte[] ip = cur.getRemoteIP();
             int port = cur.getRemotePort();
             if (!isValid(ip, port))
@@ -331,6 +384,9 @@ class IntroductionManager {
 
         // ip/port inside message should be 0:0, as it's unimplemented on send -
         // see PacketBuilder.buildRelayRequest()
+        // and we don't read it here.
+        // FIXME implement for getting Alice's IPv4 in RelayRequest sent over IPv6?
+        // or is that just too easy to spoof?
         if (!isValid(alice.getIP(), alice.getPort()) || ipSize != 0 || port != 0) {
             if (_log.shouldLog(Log.WARN)) {
                 byte ip[] = new byte[ipSize];
@@ -368,14 +424,16 @@ class IntroductionManager {
 
     /**
      *  Are IP and port valid?
+     *  Reject all IPv6, for now, even if we are configured for it.
      *  Refuse anybody in the same /16
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
-        return port >= 1024 &&
+        return port >= UDPTransport.MIN_PEER_PORT &&
                port <= 65535 &&
+               ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
-               (!DataHelper.eq(ip, 0, _transport.getExternalIP(), 0, 2)) &&
+               (!_transport.isTooClose(ip)) &&
                (!_context.blocklist().isBlocklisted(ip));
     }
 }

@@ -1863,6 +1863,14 @@ public class SnarkManager implements CompleteListener {
         private final Snark snark;
         public ThreadedStarter(Snark s) { snark = s; }
         public void run() {
+            try {
+                run2();
+            } catch (Exception e) {
+                _log.error("Error starting", e);
+            }
+        }
+
+        private void run2() {
             if (snark != null) {
                 if (snark.isStopped())
                     snark.startTorrent();

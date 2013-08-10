@@ -34,7 +34,7 @@ public abstract class Addresses {
         return !getAddresses(true, false, false).isEmpty();
     }
 
-    /** @return the first non-local address it finds, or null */
+    /** @return the first non-local address IPv4 address it finds, or null */
     public static String getAnyAddress() {
         SortedSet<String> a = getAddresses();
         if (!a.isEmpty())
@@ -95,7 +95,7 @@ public abstract class Addresses {
                         haveIPv6 = true;
                     if (shouldInclude(allMyIps[i], includeSiteLocal,
                                       includeLoopbackAndWildcard, includeIPv6))
-                        rv.add(allMyIps[i].getHostAddress());
+                        rv.add(stripScope(allMyIps[i].getHostAddress()));
                 }
             }
         } catch (UnknownHostException e) {}
@@ -113,7 +113,7 @@ public abstract class Addresses {
                             haveIPv6 = true;
                         if (shouldInclude(addr, includeSiteLocal,
                                           includeLoopbackAndWildcard, includeIPv6))
-                            rv.add(addr.getHostAddress());
+                            rv.add(stripScope(addr.getHostAddress()));
                     }
                 }
             }
@@ -128,6 +128,17 @@ public abstract class Addresses {
         return rv;
     }
 
+    /**
+     *  Strip the trailing "%nn" from Inet6Address.getHostAddress()
+     *  @since IPv6
+     */
+    private static String stripScope(String ip) {
+        int pct = ip.indexOf("%");
+        if (pct > 0)
+            ip = ip.substring(0, pct);
+        return ip;
+    }
+
     private static boolean shouldInclude(InetAddress ia, boolean includeSiteLocal,
                                          boolean includeLoopbackAndWildcard, boolean includeIPv6) {
         return
@@ -137,7 +148,10 @@ public abstract class Addresses {
              ((!ia.isAnyLocalAddress()) &&
               (!ia.isLoopbackAddress()))) &&
             (includeSiteLocal ||
-              !ia.isSiteLocalAddress()) &&
+             ((!ia.isSiteLocalAddress()) &&
+              // disallow fc00::/8 and fd00::/8 (Unique local addresses RFC 4193)
+              // not recognized as local by InetAddress
+              (ia.getAddress().length != 16 || (ia.getAddress()[0] & 0xfe) != 0xfc))) &&
             // Hamachi 5/8 allocated to RIPE (30 November 2010)
             // Removed from TransportImpl.isPubliclyRoutable()
             // Check moved to here, for now, but will eventually need to

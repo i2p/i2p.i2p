@@ -97,7 +97,7 @@
         </exec>
     </target>
 
-    <target name="jar1" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+    <target name="jar1" depends="compile, bundle-news, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
@@ -134,7 +134,6 @@
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
 
-
     <target name="jarUpToDate">
         <uptodate property="jar.uptodate" targetfile="build/routerconsole.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
@@ -162,6 +161,44 @@
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
+    <target name="bundle-news" unless="no.bundle">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages-news.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages-news.sh" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages-news.sh" />
+        </exec>
+    </target>
+
+    <target name="extractProxyTags">
+        <java classname="net.i2p.util.TranslateReader" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="../../../build/i2p.jar" />
+            </classpath>
+            <arg value="tag" />
+            <arg value="../../../installer/resources/initialNews/initialNews.xml" />
+            <arg value="build/News.java" />
+        </java>
+    </target>
+
+    <target name="poupdate-news" depends="extractProxyTags">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-news.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-news.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-news.sh" />
             <arg value="-p" />
         </exec>
     </target>

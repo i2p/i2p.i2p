@@ -1,6 +1,9 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -8,6 +11,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
+import net.i2p.util.TranslateReader;
 
 /**
  *  If news file does not exist, use file from the initialNews directory
@@ -138,11 +142,36 @@ public class NewsHelper extends ContentHelper {
         return mgr.getStatus();
     }
 
+    private static final String BUNDLE_NAME = "net.i2p.router.news.messages";
+
+    /**
+     *  If we haven't downloaded news yet, use the translated initial news file
+     */
     @Override
     public String getContent() {
         File news = new File(_page);
-        if (!news.exists())
+        if (!news.exists()) {
             _page = (new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml")).getAbsolutePath();
+            // don't use super, translate on-the-fly
+            Reader reader = null;
+            try {
+                char[] buf = new char[512];
+                StringBuilder out = new StringBuilder(2048);
+                reader = new TranslateReader(_context, BUNDLE_NAME, new FileInputStream(_page));
+                int len;
+                while((len = reader.read(buf)) > 0) {
+                    out.append(buf, 0, len);
+                }
+                return out.toString();
+            } catch (IOException ioe) {
+                return "";
+            } finally {
+                try {
+                    if (reader != null)
+                        reader.close();
+                } catch (IOException foo) {}
+            }
+        }
         return super.getContent();
     }
 

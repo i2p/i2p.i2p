@@ -20,10 +20,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -748,8 +750,10 @@ class EventPumper implements Runnable {
         if (!_wantsWrite.isEmpty()) {
             for (Iterator<NTCPConnection> iter = _wantsWrite.iterator(); iter.hasNext(); ) {
                 con = iter.next();
-                iter.remove();
                 SelectionKey key = con.getKey();
+                if (key == null)
+                    continue;
+                iter.remove();
                 try {
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                 } catch (CancelledKeyException cke) {
@@ -778,10 +782,10 @@ class EventPumper implements Runnable {
                 SelectionKey key = con.getChannel().register(_selector, SelectionKey.OP_CONNECT);
                 key.attach(con);
                 con.setKey(key);
+                RouterAddress naddr = con.getRemoteAddress();
                 try {
-                    NTCPAddress naddr = con.getRemoteAddress();
-		            if (naddr.getPort() <= 0)
-		                throw new IOException("Invalid NTCP address: " + naddr);
+                    if (naddr.getPort() <= 0)
+                        throw new IOException("Invalid NTCP address: " + naddr);
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {
@@ -791,7 +795,8 @@ class EventPumper implements Runnable {
                         processConnect(key);
                     }
                 } catch (IOException ioe) {
-                    if (_log.shouldLog(Log.WARN)) _log.warn("error connecting", ioe);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("error connecting to " + Addresses.toString(naddr.getIP(), naddr.getPort()), ioe);
                     _context.statManager().addRateData("ntcp.connectFailedIOE", 1);
                     _transport.markUnreachable(con.getRemotePeer().calculateHash());
                     //if (ntcpOnly(con)) {

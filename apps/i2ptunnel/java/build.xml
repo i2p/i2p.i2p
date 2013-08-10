@@ -56,7 +56,7 @@
 
 
     <!-- The web classes are now in the war not the jar - they are not part of the API -->
-    <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+    <target name="jar" depends="builddep, compile, bundle-proxy, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/EditBean.class **/IndexBean.class" >
@@ -87,6 +87,7 @@
         </condition>
     </target>
 
+    <!-- servlet translations go in the war, not the jar -->
     <target name="bundle" depends="compile, precompilejsp" unless="no.bundle">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
@@ -114,6 +115,49 @@
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
+    <!-- proxy error page translations go in the jar, not the war -->
+    <target name="bundle-proxy" unless="no.bundle">
+        <!-- Update the messages_*.po files.
+             We need to supply the bat file for windows, and then change the fail property to true -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages-proxy.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages-proxy.sh" />
+        </exec>
+		<!-- multi-lang is optional -->
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages-proxy.sh" />
+        </exec>
+    </target>
+
+    <target name="extractProxyTags">
+        <java classname="net.i2p.util.TranslateReader" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="../../../build/i2p.jar" />
+            </classpath>
+            <arg value="tag" />
+            <arg value="../../../installer/resources/proxy/" />
+            <arg value="build/Proxy.java" />
+        </java>
+    </target>
+
+    <target name="poupdate-proxy" depends="extractProxyTags">
+        <!-- Update the messages_*.po files. -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-proxy.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-proxy.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-proxy.sh" />
             <arg value="-p" />
         </exec>
     </target>

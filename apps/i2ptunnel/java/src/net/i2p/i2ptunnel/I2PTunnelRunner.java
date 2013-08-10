@@ -39,7 +39,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private final Socket s;
     private final I2PSocket i2ps;
     private final Object slock, finishLock = new Object();
-    boolean finished = false;
+    volatile boolean finished = false;
     private final byte[] initialI2PData;
     private final byte[] initialSocketData;
     /** when the last data was sent/received (or -1 if never) */

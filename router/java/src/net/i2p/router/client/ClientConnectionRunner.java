@@ -58,7 +58,7 @@ import net.i2p.util.SimpleTimer;
 class ClientConnectionRunner {
     protected final Log _log;
     protected final RouterContext _context;
-    private final ClientManager _manager;
+    protected final ClientManager _manager;
     /** socket for this particular peer connection */
     private final Socket _socket;
     /** output stream of the socket that I2CP messages bound to the client should be written to */
@@ -137,7 +137,7 @@ class ClientConnectionRunner {
             if (_dead || _reader != null)
                 throw new IllegalStateException();
             _reader = new I2CPMessageReader(new BufferedInputStream(_socket.getInputStream(), BUF_SIZE),
-                                            new ClientMessageEventListener(_context, this, true));
+                                            createListener());
             _writer = new ClientWriterRunner(_context, this);
             I2PThread t = new I2PThread(_writer);
             t.setName("I2CP Writer " + __id.incrementAndGet());
@@ -148,6 +148,14 @@ class ClientConnectionRunner {
             // TODO need a cleaner for unclaimed items in _messages, but we have no timestamps...
     }
     
+    /**
+     *  Allow override for testing
+     *  @since 0.9.8
+     */
+    protected I2CPMessageReader.I2CPMessageEventListener createListener() {
+        return new ClientMessageEventListener(_context, this, true);
+    }
+
     /**
      *  Die a horrible death. Cannot be restarted.
      */
@@ -460,8 +468,8 @@ class ClientConnectionRunner {
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases)
      * @param expirationTime ms to wait before failing
-     * @param onCreateJob Job to run after the LeaseSet is authorized
-     * @param onFailedJob Job to run after the timeout passes without receiving authorization
+     * @param onCreateJob Job to run after the LeaseSet is authorized, null OK
+     * @param onFailedJob Job to run after the timeout passes without receiving authorization, null OK
      */
     void requestLeaseSet(LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
         if (_dead) {

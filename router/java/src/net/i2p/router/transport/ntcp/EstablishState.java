@@ -59,6 +59,9 @@ import net.i2p.util.Log;
  *
  */
 class EstablishState {
+    
+    public static final VerifiedEstablishState VERIFIED = new VerifiedEstablishState();
+    
     private final RouterContext _context;
     private final Log _log;
 
@@ -107,6 +110,17 @@ class EstablishState {
     private boolean _verified;
     private boolean _confirmWritten;
     private boolean _failedBySkew;
+    
+    private EstablishState() {
+        _context = null;
+        _log = null;
+        _X = null;
+        _hX_xor_bobIdentHash = null;
+        _curDecrypted = null;
+        _dh = null;
+        _transport = null;
+        _con = null;
+    }
 
     public EstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
         _context = ctx;
@@ -261,8 +275,8 @@ class EstablishState {
 
             // ok, we are onto the encrypted area
             while (src.hasRemaining() && !_corrupt) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(prefix()+"Encrypted bytes available (" + src.hasRemaining() + ")");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug(prefix()+"Encrypted bytes available (" + src.hasRemaining() + ")");
                 while (_curEncryptedOffset < _curEncrypted.length && src.hasRemaining()) {
                     _curEncrypted[_curEncryptedOffset++] = src.get();
                     _received++;
@@ -299,8 +313,8 @@ class EstablishState {
                         } catch (IOException ioe) {
                             if (_log.shouldLog(Log.ERROR)) _log.error(prefix()+"Error writing to the baos?", ioe);
                         }
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
 
                         if (_sz_aliceIdent_tsA_padding_aliceSig.size() >= _sz_aliceIdent_tsA_padding_aliceSigSize) {
                             verifyInbound();
@@ -771,6 +785,14 @@ class EstablishState {
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Not a checkInfo connection");
             return false;
+        }
+    }
+    
+    private static class VerifiedEstablishState extends EstablishState {
+        @Override public boolean isComplete() { return true; }
+        @Override public void prepareOutbound() {
+            Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
+            log.warn("prepareOutbound() on verified state, doing nothing!");
         }
     }
 

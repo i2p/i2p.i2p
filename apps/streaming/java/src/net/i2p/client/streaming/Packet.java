@@ -61,6 +61,8 @@ import net.i2p.util.Log;
  * <p>If the sequenceNum is 0 and the SYN is not set, this is a plain ACK 
  * packet that should not be ACKed</p>
  *
+ * NOTE: All setters unsynchronized.
+ *
  */
 class Packet {
     private long _sendStreamId;
@@ -209,7 +211,7 @@ class Packet {
      * connection packet (where receiveStreamId is the unknown id) or
      * if FLAG_NO_ACK is set.
      *
-     * @return The highest packet sequence number received on receiveStreamId
+     * @return The highest packet sequence number received on receiveStreamId, or -1 if FLAG_NO_ACK
      */
     public long getAckThrough() { 
         if (isFlagSet(FLAG_NO_ACK))
@@ -217,6 +219,10 @@ class Packet {
         else
             return _ackThrough; 
     }
+
+    /** 
+     * @param id if < 0, sets FLAG_NO_ACK
+     */
     public void setAckThrough(long id) { 
         if (id < 0)
             setFlag(FLAG_NO_ACK);
@@ -672,7 +678,7 @@ class Packet {
         return size;
     }
     
-	@Override
+    @Override
     public String toString() {
         StringBuilder str = formatAsString();
         return str.toString();
@@ -689,7 +695,10 @@ class Packet {
         //    buf.append('\t');
         buf.append(' ');
         buf.append(toFlagString());
-        buf.append(" ACK ").append(getAckThrough());
+        if (isFlagSet(FLAG_NO_ACK))
+            buf.append(" NO_ACK ");
+        else
+            buf.append(" ACK ").append(getAckThrough());
         if (_nacks != null) {
             buf.append(" NACK");
             for (int i = 0; i < _nacks.length; i++) {

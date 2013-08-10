@@ -10,6 +10,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.router.util.CDQEntry;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -300,8 +301,7 @@ class UDPPacket implements CDQEntry {
         StringBuilder buf = new StringBuilder(256);
         buf.append(_packet.getLength());
         buf.append(" byte pkt with ");
-        buf.append(_packet.getAddress().getHostAddress()).append(":");
-        buf.append(_packet.getPort());
+        buf.append(Addresses.toString(_packet.getAddress().getAddress(), _packet.getPort()));
         //buf.append(" id=").append(System.identityHashCode(this));
         if (_messageType >= 0)
             buf.append(" msgType=").append(_messageType);

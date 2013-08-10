@@ -29,7 +29,7 @@ fi
 # set LG2 to the language you need in envrionment varibales to enable this
 
 # add ../java/ so the refs will work in the po file
-JPATHS="../java/src ../jsp/WEB-INF"
+JPATHS="../java/src/net/i2p/i2ptunnel/web ../jsp/WEB-INF"
 for i in ../locale/messages_*.po
 do
 	# get language

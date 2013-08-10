@@ -44,9 +44,12 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     /** Don't expect any MSMs from the router for outbound traffic @since 0.8.1 */
     protected boolean _noEffort;
 
-    /** for extension */
-    protected I2PSessionImpl2(I2PAppContext context, Properties options) {
-        super(context, options);
+     /**
+      * for extension by SimpleSession (no dest)
+      */
+    protected I2PSessionImpl2(I2PAppContext context, Properties options,
+                              I2PClientMessageHandlerMap handlerMap) {
+        super(context, options, handlerMap);
     }
 
     /**

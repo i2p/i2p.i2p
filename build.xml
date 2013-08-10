@@ -432,9 +432,15 @@
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui" >
         <echo message="Setting environment variable LG2 to a lang code (eg: de,zh,nl etc)" />
         <echo message=" will restrict language update to the language you specified, leaving other language untact." />
-        <ant dir="apps/routerconsole/java/" target="poupdate" />
+        <ant dir="apps/routerconsole/java/" >
+            <target name="poupdate" />
+            <target name="poupdate-news" />
+        </ant>
         <ant dir="apps/i2psnark/java/" target="poupdate" />
-        <ant dir="apps/i2ptunnel/java/" target="poupdate" />
+        <ant dir="apps/i2ptunnel/java/" >
+            <target name="poupdate" />
+            <target name="poupdate-proxy" />
+        </ant>
         <ant dir="apps/susidns/src/" target="poupdate" />
         <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
@@ -1121,7 +1127,9 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
-       <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <!-- small enough to include for now -->
+        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
     </target>
 
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
@@ -1137,6 +1145,7 @@
     <!-- GeoIP files and flag icons -->
     <target name="prepgeoupdate">
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
         <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />
@@ -1292,11 +1301,18 @@
     <!-- end custom installers -->
 
     <!-- unit tests -->
-    <target name="updateTest" depends="prepupdate">
+    <target name="buildTest">
         <ant dir="core/java/" target="jarTest" />
-        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+        <ant dir="router/java/" target="jarTest" />
+        <copy file="core/java/build/i2ptest.jar" todir="build" />
+        <copy file="router/java/build/routertest.jar" todir="build" />
     </target>
+    <target name="prepTest" depends="prepupdate, buildTest">
+        <!-- overwrite i2p.jar and router.jar with the test versions -->
+        <copy file="build/i2ptest.jar" tofile="pkg-temp/lib/i2p.jar" overwrite="true" />
+        <copy file="build/routertest.jar" tofile="pkg-temp/lib/router.jar" overwrite="true" />
+    </target>
+    <target name="updateTest" depends="prepTest, zipit" />
     <target name="junit.test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="junit.test" />
         <ant dir="router/java/" target="junit.test" />
@@ -1304,9 +1320,11 @@
     </target>
     <target name="scalatest.test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="scalatest.test" />
+        <!-- note there are no router scala tests yet -->
         <ant dir="router/java/" target="scalatest.test" />
     </target>
     <target name="test" depends="buildProperties, jbigi" >
+        <!-- both junit and scala -->
         <ant dir="core/java/" target="test" />
         <ant dir="router/java/" target="test" />
         <ant dir="apps/streaming/java/" target="test" />

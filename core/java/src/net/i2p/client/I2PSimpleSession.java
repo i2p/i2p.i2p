@@ -8,6 +8,7 @@ package net.i2p.client;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Properties;
@@ -37,53 +38,57 @@ class I2PSimpleSession extends I2PSessionImpl2 {
      * @throws I2PSessionException if there is a problem
      */
     public I2PSimpleSession(I2PAppContext context, Properties options) throws I2PSessionException {
-        super(context, options);
-        _handlerMap = new SimpleMessageHandlerMap(context);
+        super(context, options, new SimpleMessageHandlerMap(context));
     }
 
     /**
      * Connect to the router and establish a session.  This call blocks until 
      * a session is granted.
      *
+     * NOT threadsafe, do not call from multiple threads.
+     *
      * @throws I2PSessionException if there is a configuration error or the router is
      *                             not reachable
      */
     @Override
     public void connect() throws I2PSessionException {
-        _closed = false;
-        
+        changeState(State.OPENING);
+        boolean success = false;
         try {
-            // If we are in the router JVM, connect using the interal queue
-            if (_context.isRouterContext()) {
-                // _socket, _out, and _writer remain null
-                InternalClientManager mgr = _context.internalClientManager();
-                if (mgr == null)
-                    throw new I2PSessionException("Router is not ready for connections");
-                // the following may throw an I2PSessionException
-                _queue = mgr.connect();
-                _reader = new QueuedI2CPMessageReader(_queue, this);
-            } else {
-                if (Boolean.parseBoolean(getOptions().getProperty(PROP_ENABLE_SSL)))
-                    _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
-                else
-                    _socket = new Socket(_hostname, _portNum);
-                _out = _socket.getOutputStream();
-                _out.write(I2PClient.PROTOCOL_BYTE);
-                _out.flush();
-                _writer = new ClientWriterRunner(_out, this);
-                InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
-                _reader = new I2CPMessageReader(in, this);
+            // protect w/ closeSocket()
+            synchronized(_stateLock) {
+                // If we are in the router JVM, connect using the interal queue
+                if (_context.isRouterContext()) {
+                    // _socket and _writer remain null
+                    InternalClientManager mgr = _context.internalClientManager();
+                    if (mgr == null)
+                        throw new I2PSessionException("Router is not ready for connections");
+                    // the following may throw an I2PSessionException
+                    _queue = mgr.connect();
+                    _reader = new QueuedI2CPMessageReader(_queue, this);
+                } else {
+                    if (Boolean.parseBoolean(getOptions().getProperty(PROP_ENABLE_SSL)))
+                        _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
+                    else
+                        _socket = new Socket(_hostname, _portNum);
+                    OutputStream out = _socket.getOutputStream();
+                    out.write(I2PClient.PROTOCOL_BYTE);
+                    out.flush();
+                    _writer = new ClientWriterRunner(out, this);
+                    InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
+                    _reader = new I2CPMessageReader(in, this);
+                }
             }
             // we do not receive payload messages, so we do not need an AvailabilityNotifier
             // ... or an Idle timer, or a VerifyUsage
             _reader.startReading();
-
+            success = true;
         } catch (UnknownHostException uhe) {
-            _closed = true;
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
-            _closed = true;
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
+        } finally {
+            changeState(success ? State.OPEN : State.CLOSED);
         }
     }
 

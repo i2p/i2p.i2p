@@ -77,4 +77,13 @@ public abstract class NetworkDatabaseFacade implements Service {
 
     /** @since 0.9 */
     public ReseedChecker reseedChecker() { return null; };
+
+    /**
+     *  For convenience, so users don't have to cast to FNDF, and unit tests using
+     *  Dummy NDF will work.
+     *
+     *  @return false; FNDF overrides to return actual setting
+     *  @since IPv6
+     */
+    public boolean floodfillEnabled() { return false; };
 }

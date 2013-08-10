@@ -29,6 +29,7 @@ class OutboundTunnelEndpoint {
         _handler = new RouterFragmentHandler(ctx, new DefragmentedHandler());
         _outDistributor = new OutboundMessageDistributor(ctx, OutNetMessage.PRIORITY_PARTICIPATING);
     }
+
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
         _config.incrementProcessedMessages();
         boolean ok = _processor.process(msg.getData(), 0, msg.getData().length, recvFrom);
@@ -65,5 +66,11 @@ class OutboundTunnelEndpoint {
                 _context.bandwidthLimiter().sentParticipatingMessage(size);
             _outDistributor.distribute(msg, toRouter, toTunnel);
         }
+    }
+
+    /** @since 0.9.8 */
+    @Override
+    public String toString() {
+        return "OBEP " + _config.getReceiveTunnel();
     }
 }
