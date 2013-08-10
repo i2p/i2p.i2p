@@ -1,3 +1,11 @@
+* 2013-08-10 0.9.7.1 released
+
+2012-08-10 zzz
+ * Prop from i2p.i2p.0971
+ * Update:
+   - New update hosts, thanks Meeh and dg
+   - Increase update-via-torrent to 30%
+
 2012-07-30 zzz
  * i2psnark: Increase max piece size to 4 MB (ticket #993)
  * Tunnels: Extend local expiration of IB tunnels, to allow for
