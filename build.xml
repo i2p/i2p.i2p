@@ -1548,8 +1548,6 @@
         <delete dir="../i2p-${release.number}" />
         <exec executable="mtn" failonerror="true">
             <arg value="co" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
             <!-- w: is the revision of the current workspace -->
             <arg value="-r" />
             <arg value="w:" />
