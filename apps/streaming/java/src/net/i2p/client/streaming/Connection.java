@@ -30,7 +30,7 @@ class Connection {
     private Destination _remotePeer;
     private long _sendStreamId;
     private long _receiveStreamId;
-    private long _lastSendTime;
+    private volatile long _lastSendTime;
     private final AtomicLong _lastSendId;
     private boolean _resetReceived;
     private boolean _resetSent;
