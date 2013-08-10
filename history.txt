@@ -1,3 +1,8 @@
+2013-08-11 zab
+ * Streaming:
+   - reduce initial ack delay 2000->1000
+   - rework the logic of acking duplicate packets
+
 * 2013-08-10 0.9.7.1 released
 
 2012-08-10 zzz
