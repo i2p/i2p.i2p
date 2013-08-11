@@ -34,7 +34,7 @@ Debian wrapper.config to try to prevent confusion.
  # You shall use it only in accordance with the terms of the
 @@ -24,21 +24,12 @@
  # These settings can be modified to fit the needs of your application
- # Optimized for use with version 3.5.19 of the Wrapper.
+ # Optimized for use with version 3.5.20 of the Wrapper.
  
 -# Paths
 -# Note that (percent)INSTALL_PATH, (percent)USER_HOME,  and (percent)SYSTEM_java_io_tmpdir
@@ -122,7 +122,7 @@ Debian wrapper.config to try to prevent confusion.
      COMMAND="$FIXED_COMMAND"
 @@ -928,9 +877,6 @@
          # The string passed to eval must handles spaces in paths correctly.
-         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.19 $ADDITIONAL_PARA"
+         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.20 $ADDITIONAL_PARA"
          eval $COMMAND_LINE
 -        if [ "$?" -ne "0" ]; then
 -                failed
@@ -132,7 +132,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
 @@ -1054,9 +1000,6 @@
          # The string passed to eval must handles spaces in paths correctly.
-         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.19 $ADDITIONAL_PARA"
+         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.20 $ADDITIONAL_PARA"
          eval $COMMAND_LINE
 -        if [ "$?" -ne "0" ]; then
 -                failed
