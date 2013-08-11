@@ -3,6 +3,8 @@ i2p (0.9.7.1-1) unstable; urgency=low
   * New upstream version 0.9.7.1
   * Compress packages with xz
 
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 10 Aug 2013 22:10:08 +0000
+
 i2p (0.9.7-2) unstable; urgency=low
 
   * Bugfix: Add missing ; to i2prouter script.
