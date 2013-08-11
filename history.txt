@@ -1,3 +1,6 @@
+2013-08-11 zzz
+ * Jetty 7.6.12.v20130726
+
 2013-08-11 kytv
  * Update Java Service Wrapper to v3.5.20
     - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
