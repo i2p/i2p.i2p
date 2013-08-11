@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-11 21:40+0000\n"
+"POT-Creation-Date: 2013-08-11 14:30+0000\n"
 "PO-Revision-Date: 2013-07-10 09:44+0000\n"
 "Last-Translator: trolly\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/"
@@ -425,16 +425,16 @@ msgstr "Abriendo el túnel I2P"
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "Abriendo el túnel I2P e iniciando los torrents ..."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1903
+#: ../java/src/org/klomp/snark/SnarkManager.java:1911
 msgid "Stopping all torrents and closing the I2P tunnel."
 msgstr "Deteniendo todos los torrents y cerrando el túnel I2P"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1922
+#: ../java/src/org/klomp/snark/SnarkManager.java:1930
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Cerrando túnel I2P después de avisar a los rastreadores."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1929
-#: ../java/src/org/klomp/snark/SnarkManager.java:1940
+#: ../java/src/org/klomp/snark/SnarkManager.java:1937
+#: ../java/src/org/klomp/snark/SnarkManager.java:1948
 msgid "I2P tunnel closed."
 msgstr "Túnel I2P cerrado"
 

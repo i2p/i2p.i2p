@@ -7,6 +7,7 @@
 # tengo <akin@rbcmail.ru>, 2013
 # sfix <anon-9b36b2e@lycos.com>, 2013
 # ducki2p <ducki2p@gmail.com>, 2011
+# varnav, 2013
 # foo <foo@bar>, 2009
 # gmind, 2012-2013
 # gmind, 2013
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-11 21:40+0000\n"
-"PO-Revision-Date: 2013-07-09 18:45+0000\n"
-"Last-Translator: tengo <akin@rbcmail.ru>\n"
+"POT-Creation-Date: 2013-08-11 14:27+0000\n"
+"PO-Revision-Date: 2013-07-12 16:19+0000\n"
+"Last-Translator: varnav\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
 "language/ru_RU/)\n"
 "Language: ru_RU\n"
@@ -27,128 +28,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:572
-msgid "This seems to be a bad destination:"
-msgstr "Кажется это плохой адрес назначения:"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:572
-msgid "i2paddresshelper cannot help you with a destination like that!"
-msgstr "С таким адресом назначения i2paddresshelper вам не поможет!"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:639
-#, java-format
-msgid ""
-"To visit the destination in your host database, click <a href=\"{0}\">here</"
-"a>. To visit the conflicting addresshelper destination, click <a href="
-"\"{1}\">here</a>."
-msgstr ""
-"Для перехода по ссылке из локальной адресной книги, нажмите <a href="
-"\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a "
-"href=\"{1}\">здесь</a>."
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:389
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
-msgid "Host"
-msgstr "Адрес"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1047
-msgid "Base 32"
-msgstr "Base 32"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
-msgid "Destination"
-msgstr "Адрес назначения"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1057
-#, java-format
-msgid "Continue to {0} without saving"
-msgstr "Продолжить переход к {0} без сохранения"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1062
-#, java-format
-msgid "Save {0} to router address book and continue to eepsite"
-msgstr ""
-"Сохранить {0} в адресную книгу роутера (router address book) и продолжить "
-"переход к eep-сайту"
-
-#. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
-#, java-format
-msgid "Save {0} to master address book and continue to eepsite"
-msgstr ""
-"Сохранить {0} в основную (master) адресную книгу и продолжить переход к eep-"
-"сайту"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1066
-#, java-format
-msgid "Save {0} to private address book and continue to eepsite"
-msgstr ""
-"Сохранить {0} в приватную адресную книгу и продолжить переход к eep-сайту"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1180
-msgid "HTTP Outproxy"
-msgstr "HTTP Outproxy"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
-msgid ""
-"Click a link below to look for an address helper by using a \"jump\" service:"
-msgstr ""
-"Jump-сервисы, которые, возможно, знают нужную Вам addresshelper-ссылку:"
-
-#. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1221
-#, java-format
-msgid "{0} jump service"
-msgstr "{0} jump service"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:163
-#, java-format
-msgid "Added via address helper from {0}"
-msgstr "Добавлено через address helper из {0}"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:165
-msgid "Added via address helper"
-msgstr "Добавлен через address helper"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
-#, java-format
-msgid "Redirecting to {0}"
-msgstr "Перенаправляем к {0}"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
-msgid "Router Console"
-msgstr "Консоль маршрутизатора I2P"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Addressbook"
-msgstr "Адресная книга"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Configuration"
-msgstr "Настройки"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Help"
-msgstr "Помощь"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:202
-#, java-format
-msgid "Saved {0} to the {1} addressbook, redirecting now."
-msgstr "{0} сохранён в {1}, перенаправляем."
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
-#, java-format
-msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr "Не удалось сохранить {0} в {1} адресную книгу, перенаправляем."
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
-msgid "Click here if you are not redirected automatically."
-msgstr "Нажмите сюда если автоматическое перенаправление не сработало"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:325
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:335
@@ -159,9 +38,9 @@ msgstr "внутренний"
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} входящий, {0} исходящий туннель"
+msgstr[1] "{0} входящих, {0} исходящих туннеля"
+msgstr[2] "{0} входящих, {0} исходящих туннелей"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:408
 msgid "lower bandwidth and reliability"
@@ -193,6 +72,7 @@ msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr ""
+"Если проблема сохраняется, проверьте, что в Вашем браузере разрешены cookies."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:240
 msgid "Configuration reloaded for all tunnels"
@@ -568,6 +448,13 @@ msgstr ""
 msgid "Router I2CP Address"
 msgstr "I2CP Адрес Роутера"
 
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:389
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
+msgid "Host"
+msgstr "Адрес"
+
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:393
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:165
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:397
@@ -937,6 +824,10 @@ msgstr "Режим ожидания"
 msgid "Outproxy"
 msgstr "Outproxy"
 
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
+msgid "Destination"
+msgstr "Адрес назначения"
+
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:397
 msgid "none"
 msgstr "нет"
@@ -988,12 +879,16 @@ msgid ""
 "This wizard will take you through the various options available for creating "
 "tunnels in I2P."
 msgstr ""
+"Мастер проведет вас через всевозможные опции, доступные для создания "
+"туннелей в I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:191
 msgid ""
 "The first thing to decide is whether you want to create a server or a client "
 "tunnel."
 msgstr ""
+"Сперва вам нужно выбрать, хотите ли вы создать клиентский или серверный "
+"туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
@@ -1008,6 +903,8 @@ msgid ""
 "On the other hand, if you wish to host a service for others to connect to "
 "you'll need to create a SERVER tunnel."
 msgstr ""
+"С другой стороны, если вы собираетесь размещать службу для других, то вы "
+"должны создать СЕРВЕРНЫЙ туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:197
 msgid "Server Tunnel"
@@ -1031,10 +928,14 @@ msgid ""
 "Try this if none of the tunnel types below fit your requirements, or you "
 "don't know what type of tunnel you need."
 msgstr ""
+"Попробуйте если ни один тип туннеля из перечисленных вам не подходит или вы "
+"не знаете какой тип вам нужен."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:229
 msgid "Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P."
 msgstr ""
+"Туннель который действует как HTTP прокси для доступа к eep-сайтам внутри "
+"I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 msgid ""
@@ -1053,19 +954,23 @@ msgstr "На сайты вне I2P также можно попасть, есл�
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:235
 msgid "Customised client tunnel specific for IRC connections."
-msgstr ""
+msgstr "Настраиваемый клиентский туннель для IRC."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:237
 msgid ""
 "With this tunnel type, your IRC client will be able to connect to an IRC "
 "network inside I2P."
 msgstr ""
+"С помощью этого туннеля ваш IRC клиент сможет соединяться с сетью IRC внутри "
+"I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:239
 msgid ""
 "Each IRC network in I2P that you wish to connect to will require its own "
 "tunnel. (See Also, SOCKS IRC)"
 msgstr ""
+"Каждая сеть IRC внутри I2P, с которой вы захотите соединиться, потребует "
+"отдельного туннеля. (см. SOCKS IRC)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:241
 msgid "A tunnel that implements the SOCKS protocol."
@@ -1127,15 +1032,15 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:257
 msgid "A customised client tunnel for Streamr."
-msgstr ""
+msgstr "Настраиваемый клиентский туннель для Streamr."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:267
 msgid "A basic server tunnel for hosting a generic service inside I2P."
-msgstr ""
+msgstr "Базовый туннель для подключения к одиночному сервису внутри I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:271
 msgid "A server tunnel that is customised for HTTP connections."
-msgstr ""
+msgstr "Серверный туннель, настроенный для http соединений."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:273
 msgid "Use this tunnel type if you want to host an eepsite."
@@ -1146,24 +1051,28 @@ msgid ""
 "A customised server tunnel that can both serve HTTP data and connect to "
 "other server tunnels."
 msgstr ""
+"Настроенный серверный туннель который может передавать данные HTTP и "
+"соединяться с другими серверными туннелями."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:277
 msgid "This tunnel type is predominantly used when running a Seedless server."
-msgstr ""
+msgstr "Этот тип туннеля обычно используется вместе с Seedless сервером."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:279
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
-msgstr ""
+msgstr "Настроенный туннель для подключения к одиночной службе внутри I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:281
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
 msgstr ""
+"Обычно для каждого IRC сервера, который должен быть доступен внутри I2P, "
+"нужен отдельный туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:283
 msgid "A customised server tunnel for Streamr."
-msgstr ""
+msgstr "Настраиваемый серверный туннель для Streamr."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:322
 msgid "Choose a name and description for your tunnel."
@@ -1174,12 +1083,16 @@ msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
 msgstr ""
+"Здесь может быть что угодно - просто для удобства идентификации тунеля в "
+"консоли."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:354
 msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
 msgstr ""
+"Если вам известны какие-либо внешние прокси для этого типа туннеля (HTTP "
+"либо SOCKS), введите их ниже."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:356
 msgid "Separate multiple proxies with commas."
@@ -1190,12 +1103,14 @@ msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
 msgstr ""
+"Введите адрес назначения для службы внутри I2P к которой должен подключаться "
+"клиентский туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:376
 msgid ""
 "This could be the full base 64 destination key, or an I2P URL from your "
 "address book."
-msgstr ""
+msgstr "Это может быть base64 ключ или I2P URL из вашей адресной книги."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:406
 msgid ""
@@ -1207,31 +1122,34 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:429
 msgid "This is the port that the service is accepting connections on."
-msgstr ""
+msgstr "Это порт по которому служба принимает соединения."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:450
 msgid "This is the port that the client tunnel will be accessed from locally."
-msgstr ""
+msgstr "Это порт по которому клиентский туннель будет доступен локально."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:452
 msgid "This is also the client port for the HTTPBidir server tunnel."
-msgstr ""
+msgstr "Это также клиентский порт для серверного туннеля HTTPBidir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:471
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
 msgstr ""
+"Кому вы бы хотели открыть доступ к этому туннелю? Вашей машине, всей подсети "
+"или внешнему интернету?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:473
 msgid "You will most likely want to just allow 127.0.0.1"
-msgstr ""
+msgstr "Скорее всего здесь нужно разрешить только 127.0.0.1"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:515
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
 msgstr ""
+"Маршрутизатор I2P может автоматически запустить этот туннель при запуске."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:517
 msgid ""
@@ -1239,26 +1157,33 @@ msgid ""
 "but for tunnels that are only used occassionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
 msgstr ""
+"Это может быть полезно для часто используемых туннелей (особенно серверных "
+"туннелей), но для туннелей которые используются только иногда это будет "
+"означать что маршрутизатор I2P создаёт и поддерживает лишние туннели."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:543
 msgid "The wizard has now collected enough information to create your tunnel."
-msgstr ""
+msgstr "Мастер собрал достаточно информации чтобы создать туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:545
 msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
 msgstr ""
+"После нажатия кнопки \"Сохранить\" мастер создаст туннель и вернёт вас на "
+"главную страницу."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:550
 msgid ""
 "Because you chose to automatically start the tunnel when the router starts, "
 "you don't have to do anything further."
 msgstr ""
+"Поскольку вы выбрали запускать туннель автоматически при запуске роутера, "
+"больше ничего делать не требуется."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:552
 msgid "The router will start the tunnel once it has been set up."
-msgstr ""
+msgstr " Маршрутизатор запустится как только будет создан туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:556
 msgid ""
@@ -1273,16 +1198,20 @@ msgid ""
 "You can do this by clicking the Start button on the main page which "
 "corresponds to the new tunnel."
 msgstr ""
+"Вы можете это сделать нажав кнопку \"Пуск\" на главной странице, которая "
+"отвечает за новый туннель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:562
 msgid "Below is a summary of the options you chose:"
-msgstr ""
+msgstr "Вот итог опций которые вы выбрали:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:660
 msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
 msgstr ""
+"Кроме этих основных настроек существует и некоторый набор расширенных "
+"настроек для конфигурации туннеля."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:662
 msgid ""
@@ -1290,10 +1219,12 @@ msgid ""
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
 msgstr ""
+"Мастер установит разумные параметры по умолчанию, но вы можете их "
+"отредактировать нажав на название туннеля на главной странице туннелей I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:704
 msgid "Previous"
-msgstr ""
+msgstr "Предыдущее"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:712
 msgid "Save Tunnel"
@@ -1301,8 +1232,85 @@ msgstr "Сохранить"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:718
 msgid "Finish"
-msgstr ""
+msgstr "Закончить"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
-msgstr ""
+msgstr "Следующее"
+
+#~ msgid "This seems to be a bad destination:"
+#~ msgstr "Кажется это плохой адрес назначения:"
+
+#~ msgid "i2paddresshelper cannot help you with a destination like that!"
+#~ msgstr "С таким адресом назначения i2paddresshelper вам не поможет!"
+
+#~ msgid ""
+#~ "To visit the destination in your host database, click <a href="
+#~ "\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+#~ "click <a href=\"{1}\">here</a>."
+#~ msgstr ""
+#~ "Для перехода по ссылке из локальной адресной книги, нажмите <a href="
+#~ "\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a "
+#~ "href=\"{1}\">здесь</a>."
+
+#~ msgid "Base 32"
+#~ msgstr "Base 32"
+
+#~ msgid "Continue to {0} without saving"
+#~ msgstr "Продолжить переход к {0} без сохранения"
+
+#~ msgid "Save {0} to router address book and continue to eepsite"
+#~ msgstr ""
+#~ "Сохранить {0} в адресную книгу роутера (router address book) и продолжить "
+#~ "переход к eep-сайту"
+
+#~ msgid "Save {0} to master address book and continue to eepsite"
+#~ msgstr ""
+#~ "Сохранить {0} в основную (master) адресную книгу и продолжить переход к "
+#~ "eep-сайту"
+
+#~ msgid "Save {0} to private address book and continue to eepsite"
+#~ msgstr ""
+#~ "Сохранить {0} в приватную адресную книгу и продолжить переход к eep-сайту"
+
+#~ msgid "HTTP Outproxy"
+#~ msgstr "HTTP Outproxy"
+
+#~ msgid ""
+#~ "Click a link below to look for an address helper by using a \"jump\" "
+#~ "service:"
+#~ msgstr ""
+#~ "Jump-сервисы, которые, возможно, знают нужную Вам addresshelper-ссылку:"
+
+#~ msgid "{0} jump service"
+#~ msgstr "{0} jump service"
+
+#~ msgid "Added via address helper from {0}"
+#~ msgstr "Добавлено через address helper из {0}"
+
+#~ msgid "Added via address helper"
+#~ msgstr "Добавлен через address helper"
+
+#~ msgid "Redirecting to {0}"
+#~ msgstr "Перенаправляем к {0}"
+
+#~ msgid "Router Console"
+#~ msgstr "Консоль маршрутизатора I2P"
+
+#~ msgid "Addressbook"
+#~ msgstr "Адресная книга"
+
+#~ msgid "Configuration"
+#~ msgstr "Настройки"
+
+#~ msgid "Help"
+#~ msgstr "Помощь"
+
+#~ msgid "Saved {0} to the {1} addressbook, redirecting now."
+#~ msgstr "{0} сохранён в {1}, перенаправляем."
+
+#~ msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+#~ msgstr "Не удалось сохранить {0} в {1} адресную книгу, перенаправляем."
+
+#~ msgid "Click here if you are not redirected automatically."
+#~ msgstr "Нажмите сюда если автоматическое перенаправление не сработало"

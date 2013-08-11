@@ -7,7 +7,7 @@
 # Waseihou Watashi <waseihou@gmail.com>, 2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P\n"
+"Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 18:48+0000\n"
 "PO-Revision-Date: 2012-02-17 11:26+0000\n"

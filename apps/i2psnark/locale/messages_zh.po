@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-11 21:39+0000\n"
+"POT-Creation-Date: 2013-08-11 14:28+0000\n"
 "PO-Revision-Date: 2013-07-11 06:48+0000\n"
 "Last-Translator: xtoaster <zhazhenzhong@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/"
@@ -400,16 +400,16 @@ msgstr "正在建立 I2P 隧道"
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "正在打开I2P隧道并启动所有种子"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1903
+#: ../java/src/org/klomp/snark/SnarkManager.java:1911
 msgid "Stopping all torrents and closing the I2P tunnel."
 msgstr "正在停用所有种子并关闭I2P隧道。"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1922
+#: ../java/src/org/klomp/snark/SnarkManager.java:1930
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "正在关闭 I2P 隧道，已通知 Tracker。"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1929
-#: ../java/src/org/klomp/snark/SnarkManager.java:1940
+#: ../java/src/org/klomp/snark/SnarkManager.java:1937
+#: ../java/src/org/klomp/snark/SnarkManager.java:1948
 msgid "I2P tunnel closed."
 msgstr "I2P隧道已关闭"
 

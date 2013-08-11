@@ -1,8 +1,7 @@
-i2p (0.9.7-3) UNRELEASED; urgency=low
+i2p (0.9.7.1-1) unstable; urgency=low
 
-  * debian/rules: compress with xz
-
- -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 01 Aug 2013 23:26:52 +0000
+  * New upstream version 0.9.7.1
+  * Compress packages with xz
 
 i2p (0.9.7-2) unstable; urgency=low
 

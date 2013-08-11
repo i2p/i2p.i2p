@@ -1,0 +1,65 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Kaya Zeren <kayazeren@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2013-07-20 20:23+0000\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
+"Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/I2P/language/tr_TR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "Tebrikler, I2P yüklendi!"
+
+msgid "Welcome to I2P!"
+msgstr "I2P Yazılımına Hoşgeldiniz!"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "Lütfen I2P yüklenip eşleri bulana kadar {0}sabırlı olun{1}."
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "Beklerken, lütfen {2}ayarlar sayfasından{3} {0}bant genişliği ayarlarınızı{1} yapın."
+
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "Ayrıca eepsitelerine erişmek için web tarayıcınızı I2P vekil sunucusunu kullanacak şekilde ayarlayabilirsiniz."
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "web tarayıcınıza vekil sunucu adresi olarak 127.0.0.1 (ya da localhost) kapı numarası olarak 4444 yazın."
+
+msgid "Do not use SOCKS for this."
+msgstr "SOCKS kullanmayın."
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "Ayrıntılı bilgi için {0}I2P web tarayıcı vekil sunucu ayarları sayfasına{1} bakın."
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "Sol tarafta \"paylaşılmış istemci\" hedefi listelendiğinde, lütfen {2}SSS{3} bölümümüze {0}bakın{1}."
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
+"help{3} or {4}#i2p{5}."
+msgstr "IRC istemcinizi {0}localhost:6668{1} adresine yönlendirin ve bize merhaba demek için {2}#i2p-help{3} ya da {4}#i2p{5} kanallarını açın."

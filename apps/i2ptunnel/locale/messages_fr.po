@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
+# Boxoa590, 2012-2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
@@ -12,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-02 17:24+0000\n"
-"PO-Revision-Date: 2013-05-29 21:00+0000\n"
+"POT-Creation-Date: 2013-08-11 14:30+0000\n"
+"PO-Revision-Date: 2013-07-16 15:35+0000\n"
 "Last-Translator: Boxoa590\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
@@ -22,125 +23,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:572
-msgid "This seems to be a bad destination:"
-msgstr "Cela semble être une mauvaise destination"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:572
-msgid "i2paddresshelper cannot help you with a destination like that!"
-msgstr ""
-"i2paddresshelper ne peut pas vous aider avec une destination comme cela !"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:639
-#, java-format
-msgid ""
-"To visit the destination in your host database, click <a href=\"{0}\">here</"
-"a>. To visit the conflicting addresshelper destination, click <a href="
-"\"{1}\">here</a>."
-msgstr ""
-"Pour aller à la destination de votre base de données d''hôtes, cliquez <a "
-"href=\"{0}\">here</a>. Pour aller à la destination de l''aide d''adresse en "
-"conflit, cliquez <a href=\"{1}\">ici</a>."
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:389
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
-msgid "Host"
-msgstr "Hôte"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1047
-msgid "Base 32"
-msgstr "Base 32"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
-msgid "Destination"
-msgstr "Destination"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1057
-#, java-format
-msgid "Continue to {0} without saving"
-msgstr "Aller sur le site i2p {0} sans enregistrer dans un carnet d'adresses. "
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1062
-#, java-format
-msgid "Save {0} to router address book and continue to eepsite"
-msgstr "Ajouter au carnet d''adresse du routeur {0} et aller sur le site i2p"
-
-#. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
-#, java-format
-msgid "Save {0} to master address book and continue to eepsite"
-msgstr "Ajouter au carnet d''adresse principal {0} et aller sur le site i2p"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1066
-#, java-format
-msgid "Save {0} to private address book and continue to eepsite"
-msgstr "Ajouter au carnet d''adresse privé {0} et aller sur le site i2p"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1180
-msgid "HTTP Outproxy"
-msgstr "proxy sortant HTTP"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
-msgid ""
-"Click a link below to look for an address helper by using a \"jump\" service:"
-msgstr ""
-"Cliquez sur un des liens ci-dessous pour chercher une aide d'adresse en "
-"utilisant un \"service de saut\":"
-
-#. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1221
-#, java-format
-msgid "{0} jump service"
-msgstr "{0} jump service"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:163
-#, java-format
-msgid "Added via address helper from {0}"
-msgstr "Ajouté via assistant d''adresse depuis {0}"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:165
-msgid "Added via address helper"
-msgstr "Ajouté via assitant d'adresse"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
-#, java-format
-msgid "Redirecting to {0}"
-msgstr "Redirection vers {0}"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
-msgid "Router Console"
-msgstr "Console du routeur"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Addressbook"
-msgstr "Carnet d'adresses"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Configuration"
-msgstr "Configuration"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Help"
-msgstr "Aide"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:202
-#, java-format
-msgid "Saved {0} to the {1} addressbook, redirecting now."
-msgstr "{0} ajouté au carnet d''adresses {1}. Redirection en cours."
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
-#, java-format
-msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr "{0} non ajouté au carnet d''adresses {1}. Redirection en cours."
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
-msgid "Click here if you are not redirected automatically."
-msgstr "Cliquez ici si vous n'êtes pas redirigé automatiquement."
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:325
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:335
@@ -156,18 +38,15 @@ msgstr[1] ""
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:408
 msgid "lower bandwidth and reliability"
-msgstr ""
+msgstr "bande passante et fiabilité plus basses"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:410
-#, fuzzy
 msgid "standard bandwidth and reliability"
-msgstr ""
-"Tunnels à 2 entrants/2 sortants (consommation de bande passante standard, "
-"fiabilité standard)"
+msgstr "basse passante et fiabilité standards"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:412
 msgid "higher bandwidth and reliability"
-msgstr ""
+msgstr "basse passante et fiabilité plus élevées"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:119
 msgid "Tunnels are not initialized yet, please reload in two minutes."
@@ -559,6 +438,13 @@ msgstr "pour les connexions de demandes/réponses"
 msgid "Router I2CP Address"
 msgstr "Adresse I2CP du routeur"
 
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:389
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
+msgid "Host"
+msgstr "Hôte"
+
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:393
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:165
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:397
@@ -927,6 +813,10 @@ msgstr "Pause"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:374
 msgid "Outproxy"
 msgstr "Mandataire sortant"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
+msgid "Destination"
+msgstr "Destination"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:397
 msgid "none"
@@ -1358,26 +1248,78 @@ msgstr "Terminer"
 msgid "Next"
 msgstr "Suivant"
 
-#~ msgid ""
-#~ "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
+#~ msgid "This seems to be a bad destination:"
+#~ msgstr "Cela semble être une mauvaise destination"
+
+#~ msgid "i2paddresshelper cannot help you with a destination like that!"
 #~ msgstr ""
-#~ "Tunnel à 1 entrant/1 sortant (faible consommation de bande passante, "
-#~ "moins fiable)"
+#~ "i2paddresshelper ne peut pas vous aider avec une destination comme cela !"
 
 #~ msgid ""
-#~ "3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
+#~ "To visit the destination in your host database, click <a href="
+#~ "\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+#~ "click <a href=\"{1}\">here</a>."
 #~ msgstr ""
-#~ "Tunnels à 3 entrants/3 sortants (consommation de bande passante plus "
-#~ "élevée, fiabilité élevée)"
+#~ "Pour aller à la destination de votre base de données d''hôtes, cliquez <a "
+#~ "href=\"{0}\">here</a>. Pour aller à la destination de l''aide d''adresse "
+#~ "en conflit, cliquez <a href=\"{1}\">ici</a>."
 
-#~ msgid "tunnels"
-#~ msgstr "tunnels"
+#~ msgid "Base 32"
+#~ msgstr "Base 32"
 
-#~ msgid "4 in, 4 out (high traffic server)"
-#~ msgstr "4 entrants, 4 sortants (serveur à traffic élevé)"
+#~ msgid "Continue to {0} without saving"
+#~ msgstr ""
+#~ "Aller sur le site i2p {0} sans enregistrer dans un carnet d'adresses. "
 
-#~ msgid "5 in, 5 out (high traffic server)"
-#~ msgstr "5 entrants, 5 sortants (serveur à traffic élevé)"
+#~ msgid "Save {0} to router address book and continue to eepsite"
+#~ msgstr ""
+#~ "Ajouter au carnet d''adresse du routeur {0} et aller sur le site i2p"
 
-#~ msgid "6 in, 6 out (high traffic server)"
-#~ msgstr "6 entrants, 6 sortants (serveur à traffic élevé)"
+#~ msgid "Save {0} to master address book and continue to eepsite"
+#~ msgstr "Ajouter au carnet d''adresse principal {0} et aller sur le site i2p"
+
+#~ msgid "Save {0} to private address book and continue to eepsite"
+#~ msgstr "Ajouter au carnet d''adresse privé {0} et aller sur le site i2p"
+
+#~ msgid "HTTP Outproxy"
+#~ msgstr "proxy sortant HTTP"
+
+#~ msgid ""
+#~ "Click a link below to look for an address helper by using a \"jump\" "
+#~ "service:"
+#~ msgstr ""
+#~ "Cliquez sur un des liens ci-dessous pour chercher une aide d'adresse en "
+#~ "utilisant un \"service de saut\":"
+
+#~ msgid "{0} jump service"
+#~ msgstr "{0} jump service"
+
+#~ msgid "Added via address helper from {0}"
+#~ msgstr "Ajouté via assistant d''adresse depuis {0}"
+
+#~ msgid "Added via address helper"
+#~ msgstr "Ajouté via assitant d'adresse"
+
+#~ msgid "Redirecting to {0}"
+#~ msgstr "Redirection vers {0}"
+
+#~ msgid "Router Console"
+#~ msgstr "Console du routeur"
+
+#~ msgid "Addressbook"
+#~ msgstr "Carnet d'adresses"
+
+#~ msgid "Configuration"
+#~ msgstr "Configuration"
+
+#~ msgid "Help"
+#~ msgstr "Aide"
+
+#~ msgid "Saved {0} to the {1} addressbook, redirecting now."
+#~ msgstr "{0} ajouté au carnet d''adresses {1}. Redirection en cours."
+
+#~ msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+#~ msgstr "{0} non ajouté au carnet d''adresses {1}. Redirection en cours."
+
+#~ msgid "Click here if you are not redirected automatically."
+#~ msgstr "Cliquez ici si vous n'êtes pas redirigé automatiquement."

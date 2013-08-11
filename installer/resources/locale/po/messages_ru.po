@@ -4,13 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
+# varnav, 2013
 # nefelim4ag <nefelim4ag@gmail.com>, 2012
+# Roman Azarenko <x12ozmouse@ya.ru>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-05 22:35+0000\n"
-"PO-Revision-Date: 2013-07-05 08:10+0000\n"
+"POT-Creation-Date: 2013-08-11 14:28+0000\n"
+"PO-Revision-Date: 2013-07-20 15:44+0000\n"
 "Last-Translator: Roman Azarenko <x12ozmouse@ya.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
 "language/ru_RU/)\n"
@@ -29,17 +31,17 @@ msgstr "Не удалось загрузить оболочку"
 #: ../i2prouter:1061
 #, sh-format
 msgid "$APP_LONG_NAME is already running."
-msgstr "$APP_LONG_NAME уже запущено."
+msgstr "Приложение $APP_LONG_NAME уже запущено."
 
 #: ../i2prouter:919
 #, sh-format
 msgid "Running $APP_LONG_NAME"
-msgstr "Запущено $APP_LONG_NAME"
+msgstr "Приложение $APP_LONG_NAME запущено"
 
 #: ../i2prouter:942
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME"
-msgstr "Ожидание $APP_LONG_NAME"
+msgstr "Ожидание приложения $APP_LONG_NAME"
 
 #: ../i2prouter:989
 #, sh-format
@@ -48,32 +50,32 @@ msgstr "Внимание: возможно, не удалось запустит
 
 #: ../i2prouter:1003 ../i2prouter:1031 ../i2prouter:1240 ../i2prouter:1529
 msgid "Must be root to perform this action."
-msgstr "Должно быть выполнено от имени root"
+msgstr "Для выполнения этого действия необходимо быть root-пользователем."
 
 #: ../i2prouter:1047
 #, sh-format
 msgid "Starting $APP_LONG_NAME"
-msgstr "Запуск $APP_LONG_NAME"
+msgstr "Запуск приложения $APP_LONG_NAME"
 
 #: ../i2prouter:1072
 #, sh-format
 msgid "Stopping $APP_LONG_NAME"
-msgstr "Остановка $APP_LONG_NAME"
+msgstr "Остановка приложения $APP_LONG_NAME"
 
 #: ../i2prouter:1076 ../i2prouter:1144 ../i2prouter:1697
 #, sh-format
 msgid "$APP_LONG_NAME was not running."
-msgstr "$APP_LONG_NAME не запущено"
+msgstr "Приложение $APP_LONG_NAME не было запущено."
 
 #: ../i2prouter:1089 ../i2prouter:1097 ../i2prouter:1159 ../i2prouter:1167
 #, sh-format
 msgid "Unable to stop $APP_LONG_NAME."
-msgstr "Невозможно остановить $APP_LONG_NAME."
+msgstr "Невозможно остановить приложение $APP_LONG_NAME."
 
 #: ../i2prouter:1115
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME to exit"
-msgstr "Ожидание $APP_LONG_NAME для завершения"
+msgstr "Ожидание завершения работы приложения $APP_LONG_NAME"
 
 #: ../i2prouter:1129
 #, sh-format
@@ -190,6 +192,7 @@ msgstr "Запросить дамп нитей Java, если запущено."
 #: ../i2prouter:1796
 msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 msgstr ""
+"Пожалуйста отредактируйте i2prouter и установите переменную RUN_AS_USER"
 
 #: ../i2prouter:1801
 msgid "Running I2P as the root user is *not* recommended."
@@ -198,3 +201,5 @@ msgstr "Запуск I2P от имени root НЕ рекомендовано."
 #: ../i2prouter:1804
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 msgstr ""
+"Чтобы всё равно запустить из-под root, отредактируйте i2prouter и установите "
+"ALLOW_ROOT=true."

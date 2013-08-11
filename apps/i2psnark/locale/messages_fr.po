@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
+# Boxoa590, 2012-2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # jackjack <root@waka.site40.net>, 2011
@@ -14,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-02 17:24+0000\n"
-"PO-Revision-Date: 2013-06-03 07:10+0000\n"
+"POT-Creation-Date: 2013-08-11 14:29+0000\n"
+"PO-Revision-Date: 2013-07-16 15:32+0000\n"
 "Last-Translator: Boxoa590\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
@@ -423,16 +424,16 @@ msgstr "Ouverture du tunnel I2P"
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "Ouverture du tunnel I2P and démarrage de tous les torrents."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1903
+#: ../java/src/org/klomp/snark/SnarkManager.java:1911
 msgid "Stopping all torrents and closing the I2P tunnel."
 msgstr "Arrêt de tous les torrents et fermeture du tunnel I2P."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1922
+#: ../java/src/org/klomp/snark/SnarkManager.java:1930
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Fermeture du tunnel I2P après notification aux trackers."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1929
-#: ../java/src/org/klomp/snark/SnarkManager.java:1940
+#: ../java/src/org/klomp/snark/SnarkManager.java:1937
+#: ../java/src/org/klomp/snark/SnarkManager.java:1948
 msgid "I2P tunnel closed."
 msgstr "Tunnel I2P fermé."
 
@@ -595,9 +596,8 @@ msgid "Stop All"
 msgstr "Arrêter tout"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:515
-#, fuzzy
 msgid "Start all stopped torrents"
-msgstr "Démarrer le torrent"
+msgstr "Démarrer tous les torrents arrêtés"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:517
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
@@ -1202,15 +1202,15 @@ msgstr "Liste tracker"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2356
 msgid "Comment"
-msgstr ""
+msgstr "Commentaire"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2365
 msgid "Created"
-msgstr ""
+msgstr "Créé"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2375
 msgid "Created By"
-msgstr ""
+msgstr "Créé par"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2385
 msgid "Magnet link"

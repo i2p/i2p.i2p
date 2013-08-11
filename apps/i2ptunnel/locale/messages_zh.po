@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-11 21:39+0000\n"
+"POT-Creation-Date: 2013-08-11 14:28+0000\n"
 "PO-Revision-Date: 2013-07-11 06:46+0000\n"
 "Last-Translator: xtoaster <zhazhenzhong@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/"
@@ -22,124 +22,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:572
-msgid "This seems to be a bad destination:"
-msgstr "目标似乎无效："
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:572
-msgid "i2paddresshelper cannot help you with a destination like that!"
-msgstr "i2paddresshelper 对您输入的目标无能为力！"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:639
-#, java-format
-msgid ""
-"To visit the destination in your host database, click <a href=\"{0}\">here</"
-"a>. To visit the conflicting addresshelper destination, click <a href="
-"\"{1}\">here</a>."
-msgstr ""
-"域名冲突：要访问您本地【地址簿】中设置的目标主机(相当与IP)，请点击<a href="
-"\"{0}\">这里</a>。要访问【地址助手】返回的目标主机请点<a href=\"{1}\">这里</"
-"a>。"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1043
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:389
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
-msgid "Host"
-msgstr "主机"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1047
-msgid "Base 32"
-msgstr "Base32"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1051
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
-msgid "Destination"
-msgstr "目标"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1057
-#, java-format
-msgid "Continue to {0} without saving"
-msgstr "继续{0}，而不保存"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1062
-#, java-format
-msgid "Save {0} to router address book and continue to eepsite"
-msgstr "保存{0}至“路由器地址簿”并访问该eepsite。"
-
-#. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
-#, java-format
-msgid "Save {0} to master address book and continue to eepsite"
-msgstr "保存{0}至“主地址簿”并访问该eepsite。"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1066
-#, java-format
-msgid "Save {0} to private address book and continue to eepsite"
-msgstr "保存{0}至“私有地址簿”并访问该eepsite。"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1180
-msgid "HTTP Outproxy"
-msgstr "HTTP 出口代理"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
-msgid ""
-"Click a link below to look for an address helper by using a \"jump\" service:"
-msgstr ""
-"请点击下面的链接通过【跳转(Jump)】服务提供的【地址助手】链接跳转至域名对应的"
-"主机："
-
-#. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1221
-#, java-format
-msgid "{0} jump service"
-msgstr "{0} 跳转服务"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:163
-#, java-format
-msgid "Added via address helper from {0}"
-msgstr "已通过地址助手从{0}处添加"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:165
-msgid "Added via address helper"
-msgstr "已通过地址助手添加"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
-#, java-format
-msgid "Redirecting to {0}"
-msgstr "正在重定向至{0}"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:196
-msgid "Router Console"
-msgstr "路由控制台"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Addressbook"
-msgstr "地址簿"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Configuration"
-msgstr "配置"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:197
-msgid "Help"
-msgstr "帮助"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:202
-#, java-format
-msgid "Saved {0} to the {1} addressbook, redirecting now."
-msgstr "目标{0}已保存至{1}地址簿中，正在重定向至此目标。"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
-#, java-format
-msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr "目标{0}在{1}地址簿中保存失败，，正在重定向至此目标。"
-
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
-msgid "Click here if you are not redirected automatically."
-msgstr "如果未能自动重定向，请点击这里。"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:325
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:335
@@ -539,6 +421,13 @@ msgstr "单请求/响应连接"
 msgid "Router I2CP Address"
 msgstr "路由器I2CP地址"
 
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:389
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:410
+msgid "Host"
+msgstr "主机"
+
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:393
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:165
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:397
@@ -908,6 +797,10 @@ msgstr "等待"
 msgid "Outproxy"
 msgstr "出口代理"
 
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
+msgid "Destination"
+msgstr "目标"
+
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:397
 msgid "none"
 msgstr "无"
@@ -1271,3 +1164,76 @@ msgstr "完成"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
 msgstr "下一步"
+
+#~ msgid "This seems to be a bad destination:"
+#~ msgstr "目标似乎无效："
+
+#~ msgid "i2paddresshelper cannot help you with a destination like that!"
+#~ msgstr "i2paddresshelper 对您输入的目标无能为力！"
+
+#~ msgid ""
+#~ "To visit the destination in your host database, click <a href="
+#~ "\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+#~ "click <a href=\"{1}\">here</a>."
+#~ msgstr ""
+#~ "域名冲突：要访问您本地【地址簿】中设置的目标主机(相当与IP)，请点击<a href="
+#~ "\"{0}\">这里</a>。要访问【地址助手】返回的目标主机请点<a href=\"{1}\">这里"
+#~ "</a>。"
+
+#~ msgid "Base 32"
+#~ msgstr "Base32"
+
+#~ msgid "Continue to {0} without saving"
+#~ msgstr "继续{0}，而不保存"
+
+#~ msgid "Save {0} to router address book and continue to eepsite"
+#~ msgstr "保存{0}至“路由器地址簿”并访问该eepsite。"
+
+#~ msgid "Save {0} to master address book and continue to eepsite"
+#~ msgstr "保存{0}至“主地址簿”并访问该eepsite。"
+
+#~ msgid "Save {0} to private address book and continue to eepsite"
+#~ msgstr "保存{0}至“私有地址簿”并访问该eepsite。"
+
+#~ msgid "HTTP Outproxy"
+#~ msgstr "HTTP 出口代理"
+
+#~ msgid ""
+#~ "Click a link below to look for an address helper by using a \"jump\" "
+#~ "service:"
+#~ msgstr ""
+#~ "请点击下面的链接通过【跳转(Jump)】服务提供的【地址助手】链接跳转至域名对应"
+#~ "的主机："
+
+#~ msgid "{0} jump service"
+#~ msgstr "{0} 跳转服务"
+
+#~ msgid "Added via address helper from {0}"
+#~ msgstr "已通过地址助手从{0}处添加"
+
+#~ msgid "Added via address helper"
+#~ msgstr "已通过地址助手添加"
+
+#~ msgid "Redirecting to {0}"
+#~ msgstr "正在重定向至{0}"
+
+#~ msgid "Router Console"
+#~ msgstr "路由控制台"
+
+#~ msgid "Addressbook"
+#~ msgstr "地址簿"
+
+#~ msgid "Configuration"
+#~ msgstr "配置"
+
+#~ msgid "Help"
+#~ msgstr "帮助"
+
+#~ msgid "Saved {0} to the {1} addressbook, redirecting now."
+#~ msgstr "目标{0}已保存至{1}地址簿中，正在重定向至此目标。"
+
+#~ msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+#~ msgstr "目标{0}在{1}地址簿中保存失败，，正在重定向至此目标。"
+
+#~ msgid "Click here if you are not redirected automatically."
+#~ msgstr "如果未能自动重定向，请点击这里。"

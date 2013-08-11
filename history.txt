@@ -9,6 +9,9 @@
       Icedtea6 6b27-1.12.5-1+rpi1 and stripped
     - All other binaries are from the "community edition" deltapack offered by
       Tanuki.
+ * Translations
+   - French, Portugeuse, Russian, Spanish, and Turkish updates from Transifex
+   - Start of Romanian translation from Transifex
 
 2013-08-11 zab
  * Streaming:
