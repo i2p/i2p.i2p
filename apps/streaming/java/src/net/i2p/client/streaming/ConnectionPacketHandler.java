@@ -5,8 +5,6 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.Destination;
-import net.i2p.stat.FrequencyStat;
-import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -202,9 +200,7 @@ class ConnectionPacketHandler {
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("immediate ack");
                     con.ackImmediately();
-                    FrequencyStat fs = _context.statManager().getFrequency("stream.ack.dup.immediate");
-                    if (fs != null)
-                        fs.eventOccurred();
+                    _context.statManager().updateFrequency("stream.ack.dup.immediate");
                 } else {
                     final long delay = nextSendTime - now;
                     if (_log.shouldLog(Log.DEBUG)) 
@@ -583,9 +579,7 @@ class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Ack dup on " + _con + ", but we have sent (" + (_con.getLastSendTime()-_created) + ")");
             }
-            RateStat rs = _context.statManager().getRate("stream.ack.dup.sent");
-            if (rs != null)
-                rs.addData(sent ? 1 : 0);
+            _context.statManager().addRateData("stream.ack.dup.sent", sent ? 1 : 0);
         }
     }
 }
