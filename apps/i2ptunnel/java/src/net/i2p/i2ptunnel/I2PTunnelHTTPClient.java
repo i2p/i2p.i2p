@@ -1181,10 +1181,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     out.write((":</b> " + wwwProxy).getBytes());
                 }
                 if(jumpServers != null && jumpServers.length() > 0) {
-                    out.write("<br><br>".getBytes());
-                    out.write(_("Click a link below to look for an address helper by using a \"jump\" service:").getBytes("UTF-8"));
-                    out.write("<br>\n".getBytes());
-
+                    boolean first = true;
                     if(uri.startsWith("http://")) {
                         uri = uri.substring(7);
                     }
@@ -1213,6 +1210,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             }
                         }
 
+                        if (first) {
+                            first = false;
+                            out.write("<br><br>".getBytes());
+                            out.write(_("Click a link below to look for an address helper by using a \"jump\" service:").getBytes("UTF-8"));
+                            out.write("<br>\n".getBytes());
+                        }
                         out.write("<br><a href=\"".getBytes());
                         out.write(jurl.getBytes());
                         out.write(uri.getBytes());
