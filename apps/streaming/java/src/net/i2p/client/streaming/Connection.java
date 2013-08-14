@@ -777,7 +777,7 @@ class Connection {
      *  this may make the next time sooner but will not make it later.
      *  If the next send time is currently < 0 (i.e. "never"),
      *  this will set it to the time specified, but not later than
-     *  options.getSendAckDelay() from now (2000 ms)
+     *  options.getSendAckDelay() from now (1000 ms)
      */
     public void setNextSendTime(long when) { 
         if (_nextSendTime >= 0) {
