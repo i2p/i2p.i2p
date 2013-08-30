@@ -1,3 +1,8 @@
+2013-08-30 zzz
+ * Addresses: Treat Teredo addresses 2001:0::/32 as local
+ * SSU, confignet: Add support for specifiying multiple addresses
+ * SusiDNS: Don't require last subscription to be terminated by newline (ticket #1000)
+
 2013-08-11 zzz
  * Jetty 7.6.12.v20130726
 

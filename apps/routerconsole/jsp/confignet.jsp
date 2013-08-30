@@ -40,25 +40,11 @@
     <%=intl._("Ignore local interface IP address")%><br>
     <input type="radio" class="optbox" name="udpAutoIP" value="ssu" <%=nethelper.getUdpAutoIPChecked(0) %> >
     <%=intl._("Use SSU IP address detection only")%><br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> >
-    <%=intl._("Specify hostname or IP")%>:
-    <input name ="udpHost1" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" >
-    <% String[] ips = nethelper.getAddresses();
-       if (ips.length > 0) {
-           out.print(intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"selected\">"+intl._("Select Interface")+"</option>\n");
-           for (int i = 0; i < ips.length; i++) {
-               out.print("<option value=\"");
-               out.print(ips[i]);
-               out.print("\">");
-               out.print(ips[i]);
-               out.print("</option>\n");
-           }
-           out.print("</select>\n");
-       }
-    %>
-    <br>
     <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> >
     <%=intl._("Hidden mode - do not publish IP")%> <i><%=intl._("(prevents participating traffic)")%></i><br>
+    <input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> >
+    <%=intl._("Specify hostname or IP")%>:<br>
+    <%=nethelper.getAddressSelector() %>
  </p><p>
  <%=intl._("Action when IP changes")%>:<br>
     <input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >

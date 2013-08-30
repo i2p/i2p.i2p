@@ -1,6 +1,9 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
@@ -18,10 +21,10 @@ import net.i2p.util.Addresses;
 public class ConfigNetHelper extends HelperBase {
     
     /** copied from various private components */
-    public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
-    public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
-    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
-    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
+    final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
+    final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
+    final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
+    final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
     private final static String CHECKED = " checked=\"checked\" ";
 
     public String getUdphostname() {
@@ -175,9 +178,48 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
     
-    public String[] getAddresses() {
-        ArrayList<String> al = new ArrayList(Addresses.getAddresses());
-        return al.toArray(new String[al.size()]);
+    public Set<String> getAddresses() {
+        // exclude local, include IPv6
+        return Addresses.getAddresses(false, true);
+    }
+
+    /** @since IPv6 */
+    public String getAddressSelector() {
+        Set<String> addrs = getAddresses();
+        Set<String> configs;
+        String cs = getUdphostname();
+        if (cs.length() <= 0) {
+            configs = Collections.EMPTY_SET;
+        } else {
+            configs = new HashSet(4);
+            String[] ca = cs.split("[,; \r\n\t]");
+            for (int i = 0; i < ca.length; i++) {
+                String c = ca[i];
+                if (c.length() > 0) {
+                    configs.add(c);
+                    addrs.add(c);
+                }
+            }
+        }
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("<div class=\"indent\">");
+        for (String addr : addrs) {
+            buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                       "<input type=\"checkbox\" class=\"optbox\" value=\"foo\" name=\"addr_");
+            buf.append(addr);
+            buf.append('"');
+            if (addrs.size() == 1 || configs.contains(addr))
+                buf.append(CHECKED);
+            buf.append("> ");
+            buf.append(addr);
+            buf.append("<br>");
+        }
+        buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                   "<input type=\"checkbox\" class=\"optbox\" name=\"addrnew\"");
+        buf.append(CHECKED);
+        buf.append("><input name =\"udpHost1\" type=\"text\" size=\"16\" />" +
+                   "</div>");
+        return buf.toString();
     }
 
     public String getInboundRate() {

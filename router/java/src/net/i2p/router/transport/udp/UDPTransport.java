@@ -329,15 +329,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
 
-        InetAddress bindToAddr = null;
+        List<InetAddress> bindToAddrs = new ArrayList(4);
         if (bindTo != null) {
-            try {
-                bindToAddr = InetAddress.getByName(bindTo);
-            } catch (UnknownHostException uhe) {
-                _log.error("Invalid SSU bind interface specified [" + bindTo + "]", uhe);
-                //setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
-                //return;
-                // fall thru...
+            String[] bta = bindTo.split("[,; \r\n\t]");
+            for (int i = 0; i < bta.length; i++) {
+                String bt = bta[i];
+                if (bt.length() <= 0)
+                    continue;
+                try {
+                    bindToAddrs.add(InetAddress.getByName(bt));
+                } catch (UnknownHostException uhe) {
+                    _log.error("Invalid SSU bind interface specified [" + bt + "]", uhe);
+                    //setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+                    //return;
+                    // fall thru...
+                }
             }
         }
         
@@ -355,15 +361,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             port = oldBindPort;
         else
             port = oldEPort;
-        if (bindToAddr != null && _log.shouldLog(Log.WARN))
-            _log.warn("Binding only to " + bindToAddr);
+        if (!bindToAddrs.isEmpty() && _log.shouldLog(Log.WARN))
+            _log.warn("Binding only to " + bindToAddrs);
         if (_log.shouldLog(Log.INFO))
             _log.info("Binding to the port: " + port);
         if (_endpoints.isEmpty()) {
             // will always be empty since we are removing them above
-            UDPEndpoint endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
-            _endpoints.add(endpoint);
-            // TODO add additional endpoints for additional addresses/ports
+            if (bindToAddrs.isEmpty()) {
+                UDPEndpoint endpoint = new UDPEndpoint(_context, this, port, null);
+                _endpoints.add(endpoint);
+                setMTU(null);
+            } else {
+                for (InetAddress bindToAddr : bindToAddrs) {
+                    UDPEndpoint endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
+                    _endpoints.add(endpoint);
+                    setMTU(bindToAddr);
+                }
+            }
         } else {
             // unused for now
             for (UDPEndpoint endpoint : _endpoints) {
@@ -375,7 +389,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
         }
-        setMTU(bindToAddr);
 
         if (_establisher == null)
             _establisher = new EstablishmentManager(_context, this);
@@ -440,7 +453,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // set up external addresses
         // REA param is false;
         // TransportManager.startListening() calls router.rebuildRouterInfo()
-        if (newPort > 0 && bindToAddr == null) {
+        if (newPort > 0 && bindToAddrs.isEmpty()) {
             for (InetAddress ia : getSavedLocalAddresses()) {
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
@@ -1725,6 +1738,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String host = null;
         if (explicitAddressSpecified()) {
             host = _context.getProperty(PROP_EXTERNAL_HOST);
+            if (host != null) {
+                String[] hosts = host.split("[,; \r\n\t]");
+                RouterAddress rv = null;
+                for (int i = 0; i < hosts.length; i++) {
+                    String h = hosts[i];
+                    if (h.length() <= 0)
+                        continue;
+                    rv = rebuildExternalAddress(h, port, allowRebuildRouterInfo);
+                }
+                return rv;
+            }
         } else {
             RouterAddress cur = getCurrentAddress(false);
             if (cur != null)

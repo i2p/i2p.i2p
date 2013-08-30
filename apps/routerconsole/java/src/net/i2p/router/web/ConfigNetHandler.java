@@ -1,9 +1,12 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
@@ -94,9 +97,6 @@ public class ConfigNetHandler extends FormHandler {
     public void setUdpHost1(String host) { 
         _udpHost1 = (host != null ? host.trim() : null); 
     }
-    public void setUdpHost2(String host) { 
-        _udpHost2 = (host != null ? host.trim() : null); 
-    }
     public void setUdpPort(String port) { 
         _udpPort = (port != null ? port.trim() : null); 
     }
@@ -160,26 +160,48 @@ public class ConfigNetHandler extends FormHandler {
             if (_udpAutoIP != null) {
                 String uhost = "";
                 if (_udpAutoIP.equals("fixed")) {
-                    if (_udpHost1 != null && _udpHost1.length() > 0)
-                        uhost =  _udpHost1;
-                    else if (_udpHost2 != null && _udpHost2.length() > 0)
-                        uhost =  _udpHost2;
-                    else
-                        _udpAutoIP = UDPTransport.DEFAULT_SOURCES;
-                }
-                changes.put(UDPTransport.PROP_SOURCES, _udpAutoIP);
-                boolean valid = true;
-                if (uhost.length() > 0) {
-                    valid = verifyAddress(uhost);
-                    if (valid) {
+                    if (_settings == null)
+                        _settings = Collections.EMPTY_MAP;
+                    Set<String> addrs = new TreeSet();
+                    for (Object o : _settings.keySet()) {
+                        String k = (String) o;
+                        if (k.startsWith("addr_")) {
+                            String v = k.substring(5);
+                            if (v.length() > 0)
+                                addrs.add(v);
+                        }
+                    }
+                    if (getJettyString("addrnew") != null) {
+                        if (_udpHost1 != null && _udpHost1.length() > 0) {
+                            if (verifyAddress(_udpHost1)) {
+                                addrs.add(_udpHost1);
+                            } else {
+                                error = true;
+                            }
+                        }
+                    }
+                    int tot = addrs.size();
+                    int i = 0;
+                    if (tot > 0) {
+                        StringBuilder buf = new StringBuilder(128);
+                        for (String addr : addrs) {
+                            buf.append(addr);
+                            if (++i < tot)
+                                buf.append(',');
+                        }
+                        uhost = buf.toString();
                         changes.put(UDPTransport.PROP_EXTERNAL_HOST, uhost);
                     } else {
-                        error = true;
+                        _udpAutoIP = UDPTransport.DEFAULT_SOURCES;
+                        removes.add(UDPTransport.PROP_EXTERNAL_HOST);
                     }
                 } else {
-                    removes.add(UDPTransport.PROP_EXTERNAL_HOST);
+                    // not fixed
+                    if (oldUHost.length() > 0)
+                        removes.add(UDPTransport.PROP_EXTERNAL_HOST);
                 }
-                if (valid && ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost)))) {
+                changes.put(UDPTransport.PROP_SOURCES, _udpAutoIP);
+                if ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost))) {
                    addFormNotice(_("Updating IP address"));
                    restartRequired = true;
                 }
