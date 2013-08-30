@@ -1,6 +1,7 @@
 package net.i2p.router;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
@@ -16,7 +17,7 @@ import net.i2p.util.SimpleTimer;
 class RouterThrottleImpl implements RouterThrottle {
     protected final RouterContext _context;
     private final Log _log;
-    private String _tunnelStatus;
+    private volatile String _tunnelStatus;
     
     /** 
      * arbitrary hard limit - if it's taking this long to get 
@@ -503,7 +504,16 @@ class RouterThrottleImpl implements RouterThrottle {
 
     /** @since 0.8.12 */
     public void cancelShutdownStatus() {
-        setTunnelStatus(_x("Rejecting tunnels"));
+        // try hard to guess the state, before we actually get a request
+        int maxTunnels = _context.getProperty(PROP_MAX_TUNNELS, DEFAULT_MAX_TUNNELS);
+        RouterInfo ri = _context.router().getRouterInfo();
+        if (maxTunnels > 0 &&
+            !_context.router().isHidden() &&
+            ri != null && !ri.getBandwidthTier().equals("K")) {
+            setTunnelStatus(_x("Accepting tunnels"));
+        } else {
+            setTunnelStatus(_x("Rejecting tunnels"));
+        }
     }
 
     public void setTunnelStatus(String msg) {

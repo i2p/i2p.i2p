@@ -1,5 +1,8 @@
 2013-08-30 zzz
  * Addresses: Treat Teredo addresses 2001:0::/32 as local
+ * Console: Display "accepting tunnels" instead of "rejecting tunnels"
+            after 20 minutes (ticket #902)
+ * NTCP: Handle race where peer's NTCP address goes away
  * SSU, confignet: Add support for specifiying multiple addresses
  * SusiDNS: Don't require last subscription to be terminated by newline (ticket #1000)
 
