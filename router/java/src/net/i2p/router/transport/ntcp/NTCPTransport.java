@@ -212,6 +212,7 @@ public class NTCPTransport extends TransportImpl {
             Hash ih = ident.calculateHash();
             NTCPConnection con = null;
             boolean isNew = false;
+            boolean fail = false;
             synchronized (_conLock) {
                 con = _conByIdent.get(ih);
                 if (con == null) {
@@ -223,10 +224,18 @@ public class NTCPTransport extends TransportImpl {
                             _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
                         _conByIdent.put(ih, con);
                     } else {
-                        _log.error("we bid on a peer who doesn't have an ntcp address? " + target);
-                        return;
+                        // race, RI changed out from under us
+                        // call afterSend below outside of conLock
+                        fail = true;
                     }
                 }
+            }
+            if (fail) {
+                // race, RI changed out from under us, maybe SSU can handle it
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("we bid on a peer who doesn't have an ntcp address? " + target);
+                afterSend(msg, false);
+                return;
             }
             if (isNew) {
                 con.enqueueInfoMessage(); // enqueues a netDb store of our own info
