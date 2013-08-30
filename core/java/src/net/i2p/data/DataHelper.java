@@ -1170,10 +1170,12 @@ public class DataHelper {
     
     /**
      * Read a newline delimited line from the stream, returning the line (without
-     * the newline), or null if EOF reached before the newline was found
+     * the newline), or null if EOF reached on an empty line
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     *
+     * @return null on EOF
      */
     public static String readLine(InputStream in) throws IOException { return readLine(in, (MessageDigest) null); }
 
@@ -1182,6 +1184,9 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     *
+     * @param hash null OK
+     * @return null on EOF
      * @deprecated use MessageDigest version
      */
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
@@ -1198,6 +1203,9 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     *
+     * @param hash null OK
+     * @return null on EOF
      * @since 0.8.8
      */
     public static String readLine(InputStream in, MessageDigest hash) throws IOException {
@@ -1214,10 +1222,10 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
-     * @deprecated use StringBuilder version
      *
-     * @return true if the line was read, false if eof was reached before a 
-     *              newline was found
+     * @deprecated use StringBuilder version
+     * @return true if the line was read, false if eof was reached on an empty line
+     *              (returns true for non-empty last line without a newline)
      */
     @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
@@ -1232,6 +1240,9 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     *
+     * @return true if the line was read, false if eof was reached on an empty line
+     *              (returns true for non-empty last line without a newline)
      * @deprecated use StringBuilder / MessageDigest version
      */
     @Deprecated
@@ -1246,10 +1257,7 @@ public class DataHelper {
                 break;
             buf.append((char)c);
         }
-        if (c == -1) 
-            return false;
-        else
-            return true;
+        return c != -1 || i > 0;
     }
     
     /**
@@ -1258,8 +1266,8 @@ public class DataHelper {
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
      *
-     * @return true if the line was read, false if eof was reached before a 
-     *              newline was found
+     * @return true if the line was read, false if eof was reached on an empty line
+     *              (returns true for non-empty last line without a newline)
      */
     public static boolean readLine(InputStream in, StringBuilder buf) throws IOException {
         return readLine(in, buf, (MessageDigest) null);
@@ -1270,6 +1278,11 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     *
+     *
+     * @param hash null OK
+     * @return true if the line was read, false if eof was reached on an empty line
+     *              (returns true for non-empty last line without a newline)
      * @deprecated use MessageDigest version
      */
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
@@ -1283,7 +1296,7 @@ public class DataHelper {
                 break;
             buf.append((char)c);
         }
-        return c != -1; 
+        return c != -1 || i > 0;
     }
     
     /**
@@ -1291,6 +1304,10 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     *
+     * @param hash null OK
+     * @return true if the line was read, false if eof was reached on an empty line
+     *              (returns true for non-empty last line without a newline)
      * @since 0.8.8
      */
     public static boolean readLine(InputStream in, StringBuilder buf, MessageDigest hash) throws IOException {
@@ -1304,7 +1321,7 @@ public class DataHelper {
                 break;
             buf.append((char)c);
         }
-        return c != -1; 
+        return c != -1 || i > 0;
     }
     
     /**
