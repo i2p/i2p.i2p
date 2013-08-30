@@ -130,6 +130,9 @@ public abstract class TransportUtil {
                 // not recognized as local by InetAddress
                 if ((addr[0] & 0xfe) == 0xfc)
                     return false;
+                // disallow 2001:0::/32 (Teredo RFC 4380)
+                if (addr[0] == 0x20 && addr[1] == 0x01 && addr[2] == 0x00 && addr[3] == 0x00)
+                    return false;
                 try {
                     InetAddress ia = InetAddress.getByAddress(addr);
                     return
