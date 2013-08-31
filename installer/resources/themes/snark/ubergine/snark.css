@@ -353,8 +353,13 @@ td:first-child {
      border-left: 0 !important;
      border-right: 0 !important;
 }
+
 .snarkTorrentOdd td, .snarkTorrentEven td {
      border-top: 1px dotted #313 !important;
+}
+
+table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
+     background: #382010 !important;
 }
 
 .snarkFileIcon {
