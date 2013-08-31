@@ -1,6 +1,6 @@
 2013-08-31 zab
  * Streaming: Use only non-retransmitted packets when sampling RTT
-   (Ticket 1006, RFC 6298)
+   (Ticket 1007, RFC 6298)
 
 2013-08-30 zzz
  * Addresses: Treat Teredo addresses 2001:0::/32 as local
