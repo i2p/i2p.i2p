@@ -290,17 +290,21 @@ class ConnectionPacketHandler {
                 _log.debug(acked.size() + " of our packets acked with " + packet);
             // use the highest RTT, since these would likely be bunched together,
             // and the highest rtt lets us set our resend delay properly
+            // RFC 6298 part 3 dictates only use packets that haven't been re-sent.
             int highestRTT = -1;
             for (int i = 0; i < acked.size(); i++) {
                 PacketLocal p = acked.get(i);
-                if (p.getAckTime() > highestRTT) {
-                    //if (p.getNumSends() <= 1)
-                    highestRTT = p.getAckTime();
-                }
-                _context.statManager().addRateData("stream.sendsBeforeAck", p.getNumSends(), p.getAckTime());
                 
-                if (p.getNumSends() > 1)
+                final int numSends = p.getNumSends();
+                final int ackTime = p.getAckTime();
+                
+                if (numSends > 1)
                     numResends++;
+                else if (ackTime > highestRTT) 
+                    highestRTT = ackTime;
+                
+                _context.statManager().addRateData("stream.sendsBeforeAck", numSends, ackTime);
+                
                 
                 // ACK the tags we delivered so we can use them
                 //if ( (p.getKeyUsed() != null) && (p.getTagsSent() != null) 
@@ -310,7 +314,7 @@ class ConnectionPacketHandler {
                 //                                               p.getTagsSent());
                 //}
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Packet acked after " + p.getAckTime() + "ms: " + p);
+                    _log.debug("Packet acked after " + ackTime + "ms: " + p);
             }
             if (highestRTT > 0) {
                 int oldrtt = con.getOptions().getRTT();
