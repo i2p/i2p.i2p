@@ -37,6 +37,7 @@ import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.SystemVersion;
 
 /**
  * Main class of addressbook.  Performs updates, and runs the main loop.
@@ -168,7 +169,7 @@ public class Daemon {
                                 if (publishedNS == null)
                                     publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
                                 success = publishedNS.putIfAbsent(key, dest);
-                                if (!success) {
+                                if (log != null && !success) {
                                     try {
                                         log.append("Save to published address book " + published.getCanonicalPath() + " failed for new key " + key);
                                     } catch (IOException ioe) {}
@@ -257,7 +258,7 @@ public class Daemon {
         SubscriptionList subscriptions = new SubscriptionList(subscriptionFile,
                 etagsFile, lastModifiedFile, lastFetchedFile, delay, defaultSubs, settings
                 .get("proxy_host"), Integer.parseInt(settings.get("proxy_port")));
-        Log log = new Log(logFile);
+        Log log = SystemVersion.isAndroid() ? null : new Log(logFile);
 
         // If false, add hosts via naming service; if true, write hosts.txt file directly
         // Default false

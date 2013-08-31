@@ -260,7 +260,7 @@ class AddressBook {
      *            An AddressBook to merge with.
      * @param overwrite True to overwrite
      * @param log
-     *            The log to write messages about new addresses or conflicts to.
+     *            The log to write messages about new addresses or conflicts to. May be null.
      *
      * @throws IllegalStateException if this was created with the Subscription constructor.
      */
