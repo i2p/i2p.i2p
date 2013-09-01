@@ -20,17 +20,18 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;
 
 /**
- * Wrap up the keys given to the router when a destination connects to it
- *
+ * Wrap up the keys given to the router when a destination connects to it.
+ * Used only by KeyManager.
  */
 public class LeaseSetKeys extends DataStructureImpl {
     private Destination _dest;
     private SigningPrivateKey _revocationKey;
     private PrivateKey _decryptionKey;
 
-    public LeaseSetKeys() {
-	this(null, null, null);
-    }
+    /** @deprecated unused */
+    public LeaseSetKeys() {}
+
+    /** @param revocationKey unused */
     public LeaseSetKeys(Destination dest, SigningPrivateKey revocationKey, PrivateKey decryptionKey) {
 	_dest = dest;
 	_revocationKey = revocationKey;
@@ -39,13 +40,18 @@ public class LeaseSetKeys extends DataStructureImpl {
 
     /**
      * Destination in question
+     *
+     * @deprecated unused
      */
     public Destination getDestination() { return _dest; }
+
     /**
      * Key with which a LeaseSet can be revoked (by republishing it with no Leases)
      *
+     * @deprecated unused
      */
     public SigningPrivateKey getRevocationKey() { return _revocationKey; }
+
     /**
      * Decryption key which can open up garlic messages encrypted to the 
      * LeaseSet's public key.  This is used because the general public does not
@@ -55,6 +61,7 @@ public class LeaseSetKeys extends DataStructureImpl {
      */
     public PrivateKey getDecryptionKey() { return _decryptionKey; }
     
+    /** @deprecated unused */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
 	_dest = new Destination();
 	_dest.readBytes(in);
@@ -64,6 +71,7 @@ public class LeaseSetKeys extends DataStructureImpl {
 	_revocationKey.readBytes(in);
     }
     
+    /** @deprecated unused */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_dest == null) throw new DataFormatException("Null destination");
         if (_decryptionKey == null) throw new DataFormatException("Null decryption key");
@@ -73,15 +81,16 @@ public class LeaseSetKeys extends DataStructureImpl {
 	_revocationKey.writeBytes(out);
     }
     
+    /** @deprecated unused */
     @Override
     public int hashCode() {
-	int rv = 0;
-	rv += DataHelper.hashCode(_dest);
+	int rv = DataHelper.hashCode(_dest);
 	rv += DataHelper.hashCode(_revocationKey);
 	rv += DataHelper.hashCode(_decryptionKey);
 	return rv;
     }
     
+    /** @deprecated unused */
     @Override
     public boolean equals(Object obj) {
 	if ( (obj != null) && (obj instanceof LeaseSetKeys) ) {
