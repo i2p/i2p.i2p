@@ -26,12 +26,10 @@ import net.i2p.stat.RateStat;
 class ProfileOrganizerRenderer {
     private final RouterContext _context;
     private final ProfileOrganizer _organizer;
-    private final ProfileComparator _comparator;
     
     public ProfileOrganizerRenderer(ProfileOrganizer organizer, RouterContext context) {
         _context = context;
         _organizer = organizer;
-        _comparator = new ProfileComparator();
     }
 
     /**
@@ -44,21 +42,19 @@ class ProfileOrganizerRenderer {
         long now = _context.clock().now();
         long hideBefore = now - 90*60*1000;
         
-        TreeSet<PeerProfile> order = new TreeSet(_comparator);
-        TreeSet<PeerProfile> integratedPeers = new TreeSet(_comparator);
+        Set<PeerProfile> order = new TreeSet(mode == 2 ? new HashComparator() : new ProfileComparator());
         int older = 0;
         int standard = 0;
         for (Iterator<Hash> iter = peers.iterator(); iter.hasNext();) {
             Hash peer = iter.next();
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
-            //if (_organizer.isWellIntegrated(peer)) {
-            //    integratedPeers.add(prof);
-            //} else {
+            if (mode == 2) {
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null && info.getCapabilities().indexOf("f") >= 0)
-                    integratedPeers.add(prof);
-            //}
+                    order.add(prof);
+                continue;
+            }
             if (prof.getLastSendSuccessful() <= hideBefore) {
                 older++;
                 continue;
@@ -221,7 +217,7 @@ class ProfileOrganizerRenderer {
         buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
         buf.append("</tr>");
         RateAverages ra = RateAverages.getTemp();
-        for (Iterator<PeerProfile> iter = integratedPeers.iterator(); iter.hasNext();) {
+        for (Iterator<PeerProfile> iter = order.iterator(); iter.hasNext();) {
             PeerProfile prof = iter.next();
             Hash peer = prof.getPeer();
 
@@ -297,11 +293,11 @@ class ProfileOrganizerRenderer {
         out.flush();
     }
     
-    private class ProfileComparator implements Comparator<PeerProfile> {
+    private class ProfileComparator extends HashComparator {
         public int compare(PeerProfile left, PeerProfile right) {
             if (_context.profileOrganizer().isFast(left.getPeer())) {
                 if (_context.profileOrganizer().isFast(right.getPeer())) {
-                    return compareHashes(left, right);
+                    return super.compare(left, right);
                 } else {
                     return -1; // fast comes first
                 }
@@ -309,13 +305,13 @@ class ProfileOrganizerRenderer {
                 if (_context.profileOrganizer().isFast(right.getPeer())) {
                     return 1; 
                 } else if (_context.profileOrganizer().isHighCapacity(right.getPeer())) {
-                    return compareHashes(left, right);
+                    return super.compare(left, right);
                 } else {
                     return -1;
                 }
             } else if (_context.profileOrganizer().isFailing(left.getPeer())) {
                 if (_context.profileOrganizer().isFailing(right.getPeer())) {
-                    return compareHashes(left, right);
+                    return super.compare(left, right);
                 } else {
                     return 1;
                 }
@@ -328,12 +324,18 @@ class ProfileOrganizerRenderer {
                 } else if (_context.profileOrganizer().isFailing(right.getPeer())) {
                     return -1;
                 } else {
-                    return compareHashes(left, right);
+                    return super.compare(left, right);
                 }
             }
         }
+    }
         
-        private int compareHashes(PeerProfile left, PeerProfile right) {
+    /**
+     *  Used for floodfill-only page
+     *  @since 0.9.8
+     */
+    private static class HashComparator implements Comparator<PeerProfile> {
+        public int compare(PeerProfile left, PeerProfile right) {
             return left.getPeer().toBase64().compareTo(right.getPeer().toBase64());
         }
         
