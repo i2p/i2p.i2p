@@ -61,9 +61,7 @@ public class SimpleTimer {
         runner.setName(name);
         runner.setDaemon(true);
         runner.start();
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 128*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         int threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
         for (int i = 1; i <= threads ; i++) {
             I2PThread executor = new I2PThread(new Executor(context, _log, _readyEvents, runn));

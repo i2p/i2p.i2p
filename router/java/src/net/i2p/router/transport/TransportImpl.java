@@ -67,9 +67,7 @@ public abstract class TransportImpl implements Transport {
     private static final Map<Hash, byte[]> _IPMap;
 
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         long min = 512;
         long max = 4096;
         // 1024 nominal for 128 MB

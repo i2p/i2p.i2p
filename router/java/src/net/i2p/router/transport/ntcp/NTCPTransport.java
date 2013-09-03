@@ -44,6 +44,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SystemVersion;
 
 /**
  *  The NIO TCP transport
@@ -571,9 +572,7 @@ public class NTCPTransport extends TransportImpl {
         _finisher.start();
         _pumper.startPumping();
 
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 128*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         int nr, nw;
         if (maxMemory < 32*1024*1024) {
             nr = nw = 1;

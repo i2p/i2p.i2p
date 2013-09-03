@@ -26,6 +26,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SystemVersion;
 
 /**
  * Generate a new session key through a diffie hellman exchange.  This uses the
@@ -458,9 +459,7 @@ public class DHSessionKeyBuilder {
             ctx.statManager().createRateStat("crypto.DHEmpty", "DH queue empty", "Encryption", new long[] { 60*60*1000 });
 
             // add to the defaults for every 128MB of RAM, up to 512MB
-            long maxMemory = Runtime.getRuntime().maxMemory();
-            if (maxMemory == Long.MAX_VALUE)
-                maxMemory = 127*1024*1024l;
+            long maxMemory = SystemVersion.getMaxMemory();
             int factor = (int) Math.max(1l, Math.min(4l, 1 + (maxMemory / (128*1024*1024l))));
             int defaultMin = DEFAULT_DH_PRECALC_MIN * factor;
             int defaultMax = DEFAULT_DH_PRECALC_MAX * factor;

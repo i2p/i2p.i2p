@@ -11,6 +11,7 @@ import java.util.Map;
 import net.i2p.I2PAppContext;
 import net.i2p.util.LHMCache;
 import net.i2p.util.SimpleByteCache;
+import net.i2p.util.SystemVersion;
 
 /**
  *  A least recently used cache with a max size, for SimpleDataStructures.
@@ -49,9 +50,7 @@ public class SDSCache<V extends SimpleDataStructure> {
     private static final double MAX_FACTOR = 5.0;
     private static final double FACTOR;
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         FACTOR = Math.max(MIN_FACTOR, Math.min(MAX_FACTOR, maxMemory / (128*1024*1024d)));
     }
 

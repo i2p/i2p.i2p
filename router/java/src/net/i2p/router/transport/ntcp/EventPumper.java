@@ -29,6 +29,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  *  The main NTCP NIO thread.
@@ -90,9 +91,7 @@ class EventPumper implements Runnable {
     private static final int MAX_MINB = 12;
     private static final int MIN_BUFS;
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         MIN_BUFS = (int) Math.max(MIN_MINB, Math.min(MAX_MINB, 1 + (maxMemory / (16*1024*1024))));
     }
 

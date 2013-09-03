@@ -27,6 +27,7 @@ import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Manage the pending jobs according to whatever algorithm is appropriate, giving
@@ -60,9 +61,7 @@ public class JobQueue {
     /** how many when we go parallel */
     private static final int RUNNERS;
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 128*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         if (maxMemory < 64*1024*1024)
             RUNNERS = 3;
         else if (maxMemory < 256*1024*1024)

@@ -14,6 +14,7 @@ import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Pull fully completed fragments off the {@link InboundMessageFragments} queue,
@@ -41,9 +42,7 @@ class MessageReceiver {
         _log = ctx.logManager().getLog(MessageReceiver.class);
         _transport = transport;
 
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         int qsize;
         if (maxMemory < 32*1024*1024) {
             _threadCount = 1;

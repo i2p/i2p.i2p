@@ -6,6 +6,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.SimpleByteCache;
+import net.i2p.util.SystemVersion;
 
 /**
  * Manage the IV validation for all of the router's tunnels by way of a big
@@ -38,9 +39,7 @@ class BloomFilterIVValidator implements IVValidator {
         // Note that at rates above 512KB, we increase the filter size
         // to keep acceptable false positive rates.
         // See DBF, BloomSHA1, and KeySelector for details.
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         if (_context.getBooleanProperty(PROP_FORCE))
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV");  // 2MB fixed
         else if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM || maxMemory < MIN_MEM_TO_USE_BLOOM)

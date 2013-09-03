@@ -126,4 +126,16 @@ public abstract class SystemVersion {
     public static boolean hasWrapper() {
         return _hasWrapper;
     }
+
+    /**
+     *  Runtime.getRuntime().maxMemory() but check for
+     *  bogus values
+     *  @since 0.9.8
+     */
+    public static long getMaxMemory() {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory >= Long.MAX_VALUE / 2)
+            maxMemory = 96*1024*1024l;
+        return maxMemory;
+    }
 }

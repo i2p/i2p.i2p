@@ -35,6 +35,7 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate the connection to a single peer.
@@ -840,9 +841,7 @@ class NTCPConnection {
     private static final int MAX_BUFS = 16;
     private static int NUM_PREP_BUFS;
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         NUM_PREP_BUFS = (int) Math.max(MIN_BUFS, Math.min(MAX_BUFS, 1 + (maxMemory / (16*1024*1024))));
     }
 

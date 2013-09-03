@@ -12,6 +12,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.util.CDQEntry;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Basic delivery unit containing the datagram.  This also maintains a cache
@@ -48,9 +49,7 @@ class UDPPacket implements CDQEntry {
     private static final int MAX_CACHE_SIZE = 256;
     static {
         if (CACHE) {
-            long maxMemory = Runtime.getRuntime().maxMemory();
-            if (maxMemory == Long.MAX_VALUE)
-                maxMemory = 96*1024*1024l;
+            long maxMemory = SystemVersion.getMaxMemory();
             int csize = (int) Math.max(MIN_CACHE_SIZE, Math.min(MAX_CACHE_SIZE, maxMemory / (1024*1024)));
             _packetCache = new LinkedBlockingQueue(csize);
         } else {

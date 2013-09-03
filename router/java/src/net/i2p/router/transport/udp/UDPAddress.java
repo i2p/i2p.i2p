@@ -8,6 +8,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.SessionKey;
 import net.i2p.util.LHMCache;
+import net.i2p.util.SystemVersion;
 
 /**
  * basic helper to parse out peer info from a udp address
@@ -223,9 +224,7 @@ class UDPAddress {
     private static final Map<String, InetAddress> _inetAddressCache;
 
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         long min = 128;
         long max = 2048;
         // 512 nominal for 128 MB

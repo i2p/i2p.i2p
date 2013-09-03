@@ -12,6 +12,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Pull inbound packets from the inbound receiver's queue, figure out what
@@ -57,9 +58,7 @@ class PacketHandler {
         _introManager = introManager;
         _failCache = new LHMCache(24);
 
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
         _inboundQueue = new CoDelBlockingQueue(ctx, "UDP-Receiver", qsize);
         int num_handlers;

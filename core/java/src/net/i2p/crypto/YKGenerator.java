@@ -15,6 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.NativeBigInteger;
+import net.i2p.util.SystemVersion;
 
 /**
  * Precalculate the Y and K for ElGamal encryption operations.
@@ -55,9 +56,7 @@ class YKGenerator {
         ctx = context;
 
         // add to the defaults for every 128MB of RAM, up to 1GB
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 127*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         int factor = (int) Math.max(1l, Math.min(8l, 1 + (maxMemory / (128*1024*1024l))));
         int defaultMin = DEFAULT_YK_PRECALC_MIN * factor;
         int defaultMax = DEFAULT_YK_PRECALC_MAX * factor;

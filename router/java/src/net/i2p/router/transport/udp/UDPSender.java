@@ -10,6 +10,7 @@ import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.util.CoDelBlockingQueue;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Lowest level packet sender, pushes anything on its queue ASAP.
@@ -37,9 +38,7 @@ class UDPSender {
         _context = ctx;
         _dummy = false; // ctx.commSystem().isDummy();
         _log = ctx.logManager().getLog(UDPSender.class);
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (1024*1024)));
         _outboundQueue = new CoDelBlockingQueue(ctx, "UDP-Sender", qsize);
         _socket = socket;

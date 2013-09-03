@@ -20,6 +20,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  *  The network database
@@ -417,9 +418,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     /** @since 0.8.7 */
     private static final int MAX_DB_BEFORE_SKIPPING_SEARCH;
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 128*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         // 250 for every 32 MB, min of 250, max of 1250
         MAX_DB_BEFORE_SKIPPING_SEARCH = (int) Math.max(250l, Math.min(1250l, maxMemory / ((32 * 1024 * 1024l) / 250)));
     }

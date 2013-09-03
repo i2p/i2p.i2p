@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadFactory;
 import net.i2p.I2PAppContext;
 import net.i2p.router.OutNetMessage;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Previously, NTCP was using SimpleTimer with a delay of 0, which
@@ -33,9 +34,7 @@ class NTCPSendFinisher {
     private ThreadPoolExecutor _executor;
     private static final int THREADS;
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        if (maxMemory == Long.MAX_VALUE)
-            maxMemory = 96*1024*1024l;
+        long maxMemory = SystemVersion.getMaxMemory();
         THREADS = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
     }
 
