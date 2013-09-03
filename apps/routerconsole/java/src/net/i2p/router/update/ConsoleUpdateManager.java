@@ -1075,7 +1075,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                 updateStatus("<b>" + _("Update downloaded") + "</b><br>" + _("Restarting"));
                 restart();
             } else {
-                _log.log(Log.CRIT, "Update was downloaded, will be installed at next restart");
+                _log.logAlways(Log.WARN, "Update was downloaded, will be installed at next restart");
                 // SummaryHelper will display restart info separately
                 updateStatus("");
             }
