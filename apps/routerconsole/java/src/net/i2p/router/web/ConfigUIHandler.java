@@ -87,7 +87,7 @@ public class ConfigUIHandler extends FormHandler {
             if (!_context.getBooleanProperty(RouterConsoleRunner.PROP_PW_ENABLE))
                 _context.router().saveConfig(RouterConsoleRunner.PROP_PW_ENABLE, "true");
             addFormNotice(_("Added user {0}", name));
-            addFormNotice(_("Restart required to take effect"));
+            addFormError(_("Restart required to take effect"));
         } else {
             addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
@@ -111,6 +111,6 @@ public class ConfigUIHandler extends FormHandler {
             }
         }
         if (success)
-            addFormNotice(_("Restart required to take effect"));
+            addFormError(_("Restart required to take effect"));
     }
 }
