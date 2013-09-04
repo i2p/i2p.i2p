@@ -105,7 +105,7 @@
           <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
             <Set name="host">127.0.0.1</Set>
             <Set name="port">7658</Set>
-            <Set name="maxIdleTime">60000</Set>
+            <Set name="maxIdleTime">600000</Set>
             <Set name="Acceptors">1</Set>
             <Set name="statsOn">false</Set>
             <Set name="confidentialPort">8443</Set>
@@ -125,7 +125,7 @@
           <New class="org.eclipse.jetty.server.bio.SocketConnector">
             <Set name="host">127.0.0.1</Set>
             <Set name="port">7658</Set>
-            <Set name="maxIdleTime">60000</Set>
+            <Set name="maxIdleTime">600000</Set>
             <Set name="Acceptors">1</Set>
             <Set name="statsOn">false</Set>
             <Set name="confidentialPort">8443</Set>

@@ -26,7 +26,7 @@
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg><Ref id="sslContextFactory" /></Arg>
         <Set name="Port">8443</Set>
-        <Set name="maxIdleTime">30000</Set>
+        <Set name="maxIdleTime">600000</Set>
         <Set name="useDirectBuffers">false</Set>
         <Set name="Acceptors">2</Set>
         <Set name="AcceptQueueSize">100</Set>

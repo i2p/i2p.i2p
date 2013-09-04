@@ -1,11 +1,21 @@
+2013-09-03 zzz
+ * configui: Change pw restart warning to error so people dont miss it
+ * Data: deprecate most of LeaseSetKeys
+ * i2ptunnel: Reduce buffer size and use cache in HTTPServer
+ * Jetty: Increase maxIdleTime
+ * profiles: use different sort for floodfill profiles display
+ * Utils: Consolidate maxMemory() calls
+
 2013-08-31 zab
  * Streaming: Use only non-retransmitted packets when sampling RTT
    (Ticket 1007, RFC 6298)
 
 2013-08-30 zzz
+ * Addressbook: Don't write to log file on Android (ticket #859)
  * Addresses: Treat Teredo addresses 2001:0::/32 as local
  * Console: Display "accepting tunnels" instead of "rejecting tunnels"
             after 20 minutes (ticket #902)
+ * i2psnark: Highlight table rows on hover
  * NTCP: Handle race where peer's NTCP address goes away
  * SSU, confignet: Add support for specifiying multiple addresses
  * SusiDNS: Don't require last subscription to be terminated by newline (ticket #1000)
