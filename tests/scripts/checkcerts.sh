@@ -114,7 +114,7 @@ print_status() {
         elif [ $DAYS -le $SOON ] && [ $DAYS -gt 0 ]; then
             echo "****** Check for $i failed, expires in $DAYS days (<= ${SOON}d) ($EXPIRES) ******"
             FAIL=1
-        elif [ $DAYS -lt $WARN ] && [ $DAYS -gt $SOON ]; then
+        elif [ $DAYS -le $WARN ] && [ $DAYS -gt $SOON ]; then
             echo "****** WARNING: $i expires in $DAYS days (<= ${WANT}d) ($EXPIRES) ******"
         elif [ $DAYS -lt 0 ]; then
             DAYS=$(echo $DAYS | sed 's/^-//')
