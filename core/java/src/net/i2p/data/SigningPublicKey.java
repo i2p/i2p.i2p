@@ -92,4 +92,20 @@ public class SigningPublicKey extends SimpleDataStructure {
     public SigType getType() {
         return _type;
     }
+
+    /**
+     *  @since 0.9.8
+     */
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append('[').append(getClass().getSimpleName()).append(' ').append(_type).append(": ");
+        if (_data == null) {
+            buf.append("null");
+        } else {
+            buf.append("size: ").append(Integer.toString(length()));
+        }
+        buf.append(']');
+        return buf.toString();
+    }
 }
