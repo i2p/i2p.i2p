@@ -14,6 +14,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.ProviderException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
@@ -26,6 +27,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 
 // main()
@@ -188,8 +190,41 @@ public class KeyGenerator {
         if (type == SigType.DSA_SHA1)
             return generateSigningKeys();
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
-        kpg.initialize(type.getParams(), _context.random());
-        KeyPair kp = kpg.generateKeyPair();
+        KeyPair kp;
+        try {
+            kpg.initialize(type.getParams(), _context.random());
+            kp = kpg.generateKeyPair();
+        } catch (ProviderException pe) {
+            // This is a RuntimeException, thx Sun
+            // Fails for P-192 only, on Ubuntu
+            Log log = _context.logManager().getLog(KeyGenerator.class);
+            String pname = kpg.getProvider().getName();
+            if ("BC".equals(pname)) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("BC KPG failed", pe);
+                throw new GeneralSecurityException("BC KPG", pe);
+            }
+            if (!ECConstants.isBCAvailable())
+                throw new GeneralSecurityException(pname + " KPG", pe);
+            if (log.shouldLog(Log.WARN))
+                log.warn(pname + " KPG failed, trying BC", pe);
+            try {
+                kpg = KeyPairGenerator.getInstance("EC", "BC");
+                kpg.initialize(type.getParams(), _context.random());
+                kp = kpg.generateKeyPair();
+            } catch (ProviderException pe2) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("BC KPG failed too", pe2);
+                // throw original exception
+                throw new GeneralSecurityException(pname + " KPG", pe);
+            } catch (GeneralSecurityException gse) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("BC KPG failed too", gse);
+                gse.printStackTrace();
+                // throw original exception
+                throw new GeneralSecurityException(pname + " KPG", pe);
+            }
+        }
         ECPublicKey pubkey = (ECPublicKey) kp.getPublic();
         ECPrivateKey privkey = (ECPrivateKey) kp.getPrivate();
         SimpleDataStructure[] keys = new SimpleDataStructure[2];

@@ -22,7 +22,7 @@ import net.i2p.util.NativeBigInteger;
  *
  * @since 0.9.9
  */
-public class ECConstants {
+class ECConstants {
 
     private static final boolean DEBUG = true;
 
@@ -38,7 +38,10 @@ public class ECConstants {
         }
     }
 
+    private static final boolean BC_AVAILABLE;
+
     static {
+        boolean loaded;
         if (Security.getProvider("BC") == null) {
             try {
                 Class cls = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
@@ -46,14 +49,19 @@ public class ECConstants {
                 Provider bc = (Provider)con.newInstance(new Object[0]);
                 Security.addProvider(bc);
                 log("Added BC provider");
+                loaded = true;
             } catch (Exception e) {
                 log("Unable to add BC provider", e);
+                loaded = false;
             }
         } else {
             log("BC provider already loaded");
+            loaded = true;
         }
+        BC_AVAILABLE = true;
     }
 
+    public static boolean isBCAvailable() { return BC_AVAILABLE; }
 
     private static class ECParms {
         public final String ps, ns, ss, bs, gxs, gys;
