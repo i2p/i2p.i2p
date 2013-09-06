@@ -266,7 +266,7 @@ class ECConstants {
 
     /**
      *  Generate a spec from a curve name
-     *  @return null iffail
+     *  @return null if fail
      */
     private static ECParameterSpec genSpec(String name) {
         // convert the ECGenParameterSpecs to ECParameterSpecs for several reasons:
@@ -276,7 +276,18 @@ class ECConstants {
         //    to convert a I2P key to a Java key. Sadly, a ECGenParameterSpec
         //    is not a ECParameterSpec.
         try {
-            AlgorithmParameters ap = AlgorithmParameters.getInstance("EC");
+            AlgorithmParameters ap;
+            try {
+                ap = AlgorithmParameters.getInstance("EC");
+            } catch (Exception e) {
+                if (BC_AVAILABLE) {
+                    log("Named curve " + name + " is not available, trying BC", e);
+                    ap = AlgorithmParameters.getInstance("EC", "BC");
+                    log("Fallback to BC worked for named curve " + name);
+                } else {
+                    throw e;
+                }
+            }
             ECGenParameterSpec ecgps = new ECGenParameterSpec(name);
             ap.init(ecgps);
             ECParameterSpec rv = ap.getParameterSpec(ECParameterSpec.class);
