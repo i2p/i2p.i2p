@@ -62,6 +62,12 @@ import net.i2p.util.NativeBigInteger;
  *
  *  Params and rv's changed from Hash to SHA1Hash for version 0.8.1
  *  Hash variants of sign() and verifySignature() restored in 0.8.3, required by Syndie.
+ *
+ *  As of 0.9.9, certain methods support ECDSA keys and signatures, i.e. all types
+ *  specified in SigType. The type is specified by the getType() method in
+ *  Signature, SigningPublicKey, and SigningPrivateKey. See Javadocs for individual
+ *  methods for the supported types. Methods encountering an unsupported type
+ *  will throw an IllegalArgumentException.
  */
 public class DSAEngine {
     private final Log _log;
@@ -80,11 +86,26 @@ public class DSAEngine {
     }
 
     /**
-     *  Verify using DSA-SHA1.
-     *  Uses TheCrypto code unless configured to use the java.security libraries.
+     *  Verify using DSA-SHA1 or ECDSA.
+     *  Uses TheCrypto code for DSA-SHA1 unless configured to use the java.security libraries.
      */
     public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
         boolean rv;
+        SigType type = signature.getType();
+        if (type != verifyingKey.getType())
+            throw new IllegalArgumentException("type mismatch sig=" + signature.getType() + " key=" + verifyingKey.getType());
+        if (type != SigType.DSA_SHA1) {
+            try {
+                rv = altVerifySig(signature, signedData, verifyingKey);
+                if ((!rv) && _log.shouldLog(Log.WARN))
+                    _log.warn(type + " Sig Verify Fail");
+                return rv;
+            } catch (GeneralSecurityException gse) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(type + " Sig Verify Fail", gse);
+                return false;
+            }
+        }
         if (_useJavaLibs) {
             try {
                 rv = altVerifySigSHA1(signature, signedData, verifyingKey);
@@ -104,25 +125,29 @@ public class DSAEngine {
     }
 
     /**
-     *  Verify using DSA-SHA1
+     *  Verify using DSA-SHA1 ONLY
      */
     public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
         return verifySignature(signature, calculateHash(signedData, offset, size), verifyingKey);
     }
 
     /**
-     *  Verify using DSA-SHA1
+     *  Verify using DSA-SHA1 ONLY
      */
     public boolean verifySignature(Signature signature, InputStream in, SigningPublicKey verifyingKey) {
         return verifySignature(signature, calculateHash(in), verifyingKey);
     }
 
-    /** @param hash SHA-1 hash, NOT a SHA-256 hash */
+    /**
+     *  Verify using DSA-SHA1 ONLY
+     *  @param hash SHA-1 hash, NOT a SHA-256 hash
+     */
     public boolean verifySignature(Signature signature, SHA1Hash hash, SigningPublicKey verifyingKey) {
         return verifySig(signature, hash, verifyingKey);
     }
 
     /**
+     *  Nonstandard.
      *  Used by Syndie.
      *  @since 0.8.3 (restored, was removed in 0.8.1 and 0.8.2)
      */
@@ -131,10 +156,15 @@ public class DSAEngine {
     }
 
     /**
+     *  Verify using DSA-SHA1 or Syndie DSA-SHA256 ONLY.
      *  @param hash either a Hash or a SHA1Hash
      *  @since 0.8.3
      */
     private boolean verifySig(Signature signature, SimpleDataStructure hash, SigningPublicKey verifyingKey) {
+        if (signature.getType() != SigType.DSA_SHA1)
+            throw new IllegalArgumentException("Bad sig type " + signature.getType());
+        if (verifyingKey.getType() != SigType.DSA_SHA1)
+            throw new IllegalArgumentException("Bad key type " + verifyingKey.getType());
         long start = _context.clock().now();
 
         try {
@@ -184,10 +214,22 @@ public class DSAEngine {
     }
 
     /**
-     *  Sign using DSA-SHA1.
+     *  Sign using DSA-SHA1 or ECDSA.
      *  Uses TheCrypto code unless configured to use the java.security libraries.
+     *
+     *  @return null on error
      */
     public Signature sign(byte data[], SigningPrivateKey signingKey) {
+        SigType type = signingKey.getType();
+        if (type != SigType.DSA_SHA1) {
+            try {
+                return altSign(data, signingKey);
+            } catch (GeneralSecurityException gse) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(type + " Sign Fail", gse);
+                return null;
+            }
+        }
         if (_useJavaLibs) {
             try {
                 return altSignSHA1(data, signingKey);
@@ -201,7 +243,9 @@ public class DSAEngine {
     }
 
     /**
-     *  Sign using DSA-SHA1
+     *  Sign using DSA-SHA1 ONLY
+     *
+     *  @return null on error
      */
     public Signature sign(byte data[], int offset, int length, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
@@ -210,8 +254,10 @@ public class DSAEngine {
     }
     
     /**
-     *  Sign using DSA-SHA1.
+     *  Sign using DSA-SHA1 ONLY.
      *  Reads the stream until EOF. Does not close the stream.
+     *
+     *  @return null on error
      */
     public Signature sign(InputStream in, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (in == null) ) return null;
@@ -219,13 +265,21 @@ public class DSAEngine {
         return sign(h, signingKey);
     }
 
-    /** @param hash SHA-1 hash, NOT a SHA-256 hash */
+    /**
+     *  Sign using DSA-SHA1 ONLY.
+     *
+     *  @param hash SHA-1 hash, NOT a SHA-256 hash
+     *  @return null on error
+     */
     public Signature sign(SHA1Hash hash, SigningPrivateKey signingKey) {
         return signIt(hash, signingKey);
     }
 
     /**
+     *  Nonstandard.
      *  Used by Syndie.
+     *
+     *  @return null on error
      *  @since 0.8.3 (restored, was removed in 0.8.1 and 0.8.2)
      */
     public Signature sign(Hash hash, SigningPrivateKey signingKey) {
@@ -233,11 +287,16 @@ public class DSAEngine {
     }
 
     /**
+     *  Sign using DSA-SHA1 or Syndie DSA-SHA256 ONLY.
+     *
      *  @param hash either a Hash or a SHA1Hash
+     *  @return null on error
      *  @since 0.8.3
      */
     private Signature signIt(SimpleDataStructure hash, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (hash == null)) return null;
+        if (signingKey.getType() != SigType.DSA_SHA1)
+            throw new IllegalArgumentException("Bad key type " + signingKey.getType());
         long start = _context.clock().now();
 
         Signature sig = new Signature();
@@ -338,6 +397,27 @@ public class DSAEngine {
     }
 
     /**
+     *  Generic verify DSA_SHA1 or ECDSA
+     *  @throws GeneralSecurityException if algorithm unvailable or on other errors
+     *  @since 0.9.9
+     */
+    private boolean altVerifySig(Signature signature, byte[] data, SigningPublicKey verifyingKey)
+                        throws GeneralSecurityException {
+        SigType type = signature.getType();
+        if (type != verifyingKey.getType())
+            throw new IllegalArgumentException("type mismatch sig=" + signature.getType() + " key=" + verifyingKey.getType());
+        if (type == SigType.DSA_SHA1)
+            return altVerifySigSHA1(signature, data, verifyingKey);
+
+        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        PublicKey pubKey = SigUtil.toJavaECKey(verifyingKey);
+        jsig.initVerify(pubKey);
+        jsig.update(data);
+        boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
+        return rv;
+    }
+
+    /**
      *  Alternate to verifySignature() using java.security libraries.
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.8.7
@@ -353,12 +433,29 @@ public class DSAEngine {
         PublicKey pubKey = keyFact.generatePublic(spec);
         jsig.initVerify(pubKey);
         jsig.update(data);
-        boolean rv = jsig.verify(sigBytesToASN1(signature.getData()));
+        boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
         //if (!rv) {
         //    System.out.println("BAD SIG\n" + net.i2p.util.HexDump.dump(signature.getData()));
         //    System.out.println("BAD SIG\n" + net.i2p.util.HexDump.dump(sigBytesToASN1(signature.getData())));
         //}
         return rv;
+    }
+
+    /**
+     *  Generic sign DSA_SHA1 or ECDSA
+     *  @throws GeneralSecurityException if algorithm unvailable or on other errors
+     *  @since 0.9.9
+     */
+    private Signature altSign(byte[] data, SigningPrivateKey privateKey) throws GeneralSecurityException {
+        SigType type = privateKey.getType();
+        if (type == SigType.DSA_SHA1)
+            return altSignSHA1(data, privateKey);
+
+        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        PrivateKey privKey = SigUtil.toJavaECKey(privateKey);
+        jsig.initSign(privKey, _context.random());
+        jsig.update(data);
+        return SigUtil.fromJavaSig(jsig.sign(), type);
     }
 
     /**
@@ -377,81 +474,7 @@ public class DSAEngine {
         PrivateKey privKey = keyFact.generatePrivate(spec);
         jsig.initSign(privKey, _context.random());
         jsig.update(data);
-        return new Signature(aSN1ToSigBytes(jsig.sign()));
-    }
-
-    /**
-     *  http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html
-     *  Signature Format	ASN.1 sequence of two INTEGER values: r and s, in that order:
-     *                                SEQUENCE ::= { r INTEGER, s INTEGER }
-     *
-     *  http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
-     *  30 -- tag indicating SEQUENCE
-     *  xx - length in octets
-     *
-     *  02 -- tag indicating INTEGER
-     *  xx - length in octets
-     *  xxxxxx - value
-     *
-     *  Convert to BigInteger and back so we have the minimum length representation, as required.
-     *  r and s are always non-negative.
-     *
-     *  @since 0.8.7
-     */
-    private static byte[] sigBytesToASN1(byte[] sig) {
-        //System.out.println("pre TO asn1\n" + net.i2p.util.HexDump.dump(sig));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(48);
-        baos.write(0x30);
-        baos.write(0);  // length to be filled in below
-
-        byte[] tmp = new byte[20];
-        baos.write(2);
-        System.arraycopy(sig, 0, tmp, 0, 20);
-        BigInteger r = new BigInteger(1, tmp);
-        byte[] b = r.toByteArray();
-        baos.write(b.length);
-        baos.write(b, 0, b.length);
-
-        baos.write(2);
-        System.arraycopy(sig, 20, tmp, 0, 20);
-        BigInteger s = new BigInteger(1, tmp);
-        b = s.toByteArray();
-        baos.write(b.length);
-        baos.write(b, 0, b.length);
-        byte[] rv = baos.toByteArray();
-        rv[1] = (byte) (rv.length - 2);
-        //System.out.println("post TO asn1\n" + net.i2p.util.HexDump.dump(rv));
-        return rv;
-    }
-
-    /**
-     *  See above.
-     *  @since 0.8.7
-     */
-    private static byte[] aSN1ToSigBytes(byte[] asn) {
-        //System.out.println("pre from asn1\n" + net.i2p.util.HexDump.dump(asn));
-        byte[] rv = new byte[40];
-        int rlen = asn[3];
-        if ((asn[4] & 0x80) != 0)
-            throw new IllegalArgumentException("R is negative");
-        if (rlen > 21)
-            throw new IllegalArgumentException("R too big " + rlen);
-        else if (rlen == 21) {
-            System.arraycopy(asn, 5, rv, 0, 20);
-        } else
-            System.arraycopy(asn, 4, rv, 20 - rlen, rlen);
-        int slenloc = 25 + rlen - 20;
-        int slen = asn[slenloc];
-        if ((asn[slenloc + 1] & 0x80) != 0)
-            throw new IllegalArgumentException("S is negative");
-        if (slen > 21)
-            throw new IllegalArgumentException("S too big " + slen);
-        else if (slen == 21) {
-            System.arraycopy(asn, slenloc + 2, rv, 20, 20);
-        } else
-            System.arraycopy(asn, slenloc + 1, rv, 40 - slen, slen);
-        //System.out.println("post from asn1\n" + net.i2p.util.HexDump.dump(rv));
-        return rv;
+        return SigUtil.fromJavaSig(jsig.sign(), SigType.DSA_SHA1);
     }
 
     //private static final int RUNS = 1000;
