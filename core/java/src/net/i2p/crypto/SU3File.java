@@ -14,6 +14,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
@@ -218,6 +219,7 @@ public class SU3File {
         OutputStream out = null;
         boolean rv = false;
         try {
+            ////// fixme NPE we don't know the type yet
             MessageDigest md = _sigType.getDigestInstance();
             in = new DigestInputStream(new BufferedInputStream(new FileInputStream(_file)), md);
             if (!_headerVerified)
@@ -357,6 +359,11 @@ public class SU3File {
                     ok = signCLI(args[1], args[2], args[3], args[4], args[5]);
             } else if ("verifysig".equals(args[0])) {
                 ok = verifySigCLI(args[1]);
+            } else if ("keygen".equals(args[0])) {
+                if (args[1].equals("-t"))
+                    ok = genKeysCLI(args[2], args[3], args[4]);
+                else
+                    ok = genKeysCLI(args[1], args[2]);
             } else {
                 showUsageCLI();
             }
@@ -368,9 +375,10 @@ public class SU3File {
     }
 
     private static final void showUsageCLI() {
-        System.err.println("Usage: SU3File showversion   signedFile.su3");
-        System.err.println("       SU3File sign [-t type|code] inputFile.zip signedFile.su3 privateKeyFile version signerName@mail.i2p");
-        System.err.println("       SU3File verifysig     signedFile.su3");
+        System.err.println("Usage: SU3File keygen       [-t type|code] publicKeyFile privateKeyFile");
+        System.err.println("       SU3File showversion  signedFile.su3");
+        System.err.println("       SU3File sign         [-t type|code] inputFile.zip signedFile.su3 privateKeyFile version signerName@mail.i2p");
+        System.err.println("       SU3File verifysig    signedFile.su3");
         System.err.println(dumpSigTypes());
     }
 
@@ -385,6 +393,24 @@ public class SU3File {
             buf.append('\n');
         }
         return buf.toString();
+    }
+
+    /**
+     *  @param stype number or name
+     *  @return null if not found
+     *  @since 0.9.9
+     */
+    private static SigType parseSigType(String stype) {
+        try {
+            return SigType.valueOf(stype.toUpperCase(Locale.US));
+        } catch (IllegalArgumentException iae) {
+            try {
+                int code = Integer.parseInt(stype);
+                return SigType.getByCode(code);
+            } catch (NumberFormatException nfe) {
+                return null;
+             }
+        }
     }
 
     /** @return success */
@@ -422,15 +448,7 @@ public class SU3File {
      */
     private static final boolean signCLI(String stype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName) {
-        SigType type = null;
-        try {
-            type = SigType.valueOf(stype);
-        } catch (IllegalArgumentException iae) {
-            try {
-                int code = Integer.parseInt(stype);
-                type = SigType.getByCode(code);
-            } catch (NumberFormatException nfe) {}
-        }
+        SigType type = parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
@@ -472,6 +490,7 @@ public class SU3File {
         InputStream in = null;
         try {
             SU3File file = new SU3File(signedFile);
+            //// fixme
             boolean isValidSignature = file.verifyAndMigrate(new File("/dev/null"));
             if (isValidSignature)
                 System.out.println("Signature VALID (signed by " + file.getSignerString() + ')');
@@ -483,5 +502,62 @@ public class SU3File {
             ioe.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean genKeysCLI(String publicKeyFile, String privateKeyFile) {
+        return genKeysCLI(DEFAULT_TYPE, publicKeyFile, privateKeyFile);
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean genKeysCLI(String stype, String publicKeyFile, String privateKeyFile) {
+        SigType type = parseSigType(stype);
+        if (type == null) {
+            System.out.println("Signature type " + stype + " is not supported");
+            return false;
+        }
+        return genKeysCLI(type, publicKeyFile, privateKeyFile);
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean genKeysCLI(SigType type, String publicKeyFile, String privateKeyFile) {
+        FileOutputStream fileOutputStream = null;
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        try {
+            SimpleDataStructure signingKeypair[] = context.keyGenerator().generateSigningKeys(type);
+            SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
+            SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
+
+            fileOutputStream = new FileOutputStream(publicKeyFile);
+            signingPublicKey.writeBytes(fileOutputStream);
+            fileOutputStream.close();
+            fileOutputStream = null;
+
+            fileOutputStream = new FileOutputStream(privateKeyFile);
+            signingPrivateKey.writeBytes(fileOutputStream);
+
+            System.out.println("\r\n" + type + " Private key written to: " + privateKeyFile);
+            System.out.println(type + " Public key written to: " + publicKeyFile);
+            System.out.println("\r\nPublic key: " + signingPublicKey.toBase64() + "\r\n");
+        } catch (Exception e) {
+            System.err.println("Error writing keys:");
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (fileOutputStream != null)
+                try {
+                    fileOutputStream.close();
+                } catch (IOException ioe) {}
+        }
+        return true;
     }
 }

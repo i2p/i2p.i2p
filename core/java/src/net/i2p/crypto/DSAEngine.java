@@ -170,9 +170,8 @@ public class DSAEngine {
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " sig=" + type);
         if (type == SigType.DSA_SHA1)
             return verifySig(signature, hash, verifyingKey);
-        // FIXME hash of hash
         try {
-            return altVerifySig(signature, hash.getData(), verifyingKey);
+            return altVerifySigRaw(signature, hash, verifyingKey);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(type + " Sig Verify Fail", gse);
@@ -325,9 +324,8 @@ public class DSAEngine {
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
         if (type == SigType.DSA_SHA1)
             return signIt(hash, signingKey);
-        // FIXME hash of hash
         try {
-            return altSign(hash.getData(), signingKey);
+            return altSignRaw(hash, signingKey);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(type + " Sign Fail", gse);
@@ -473,6 +471,30 @@ public class DSAEngine {
     }
 
     /**
+     *  Generic raw verify ECDSA only
+     *  @throws GeneralSecurityException if algorithm unvailable or on other errors
+     *  @since 0.9.9
+     */
+    private boolean altVerifySigRaw(Signature signature, SimpleDataStructure hash, SigningPublicKey verifyingKey)
+                        throws GeneralSecurityException {
+        SigType type = signature.getType();
+        if (type != verifyingKey.getType())
+            throw new IllegalArgumentException("type mismatch sig=" + type + " key=" + verifyingKey.getType());
+        int hashlen = hash.length();
+        if (type.getHashLen() != hashlen)
+            throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
+        if (type == SigType.DSA_SHA1)
+            throw new UnsupportedOperationException();
+
+        java.security.Signature jsig = java.security.Signature.getInstance("NONEwithECDSA");
+        PublicKey pubKey = SigUtil.toJavaECKey(verifyingKey);
+        jsig.initVerify(pubKey);
+        jsig.update(hash.getData());
+        boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
+        return rv;
+    }
+
+    /**
      *  Alternate to verifySignature() using java.security libraries.
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.8.7
@@ -510,6 +532,27 @@ public class DSAEngine {
         PrivateKey privKey = SigUtil.toJavaECKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(data);
+        return SigUtil.fromJavaSig(jsig.sign(), type);
+    }
+
+    /**
+     *  Generic raw sign ECDSA only.
+     *  @param hash SHA1Hash, Hash, Hash384, or Hash512
+     *  @throws GeneralSecurityException if algorithm unvailable or on other errors
+     *  @since 0.9.9
+     */
+    private Signature altSignRaw(SimpleDataStructure hash, SigningPrivateKey privateKey) throws GeneralSecurityException {
+        SigType type = privateKey.getType();
+        if (type == SigType.DSA_SHA1)
+            throw new UnsupportedOperationException();
+        int hashlen = hash.length();
+        if (type.getHashLen() != hashlen)
+            throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
+
+        java.security.Signature jsig = java.security.Signature.getInstance("NONEwithECDSA");
+        PrivateKey privKey = SigUtil.toJavaECKey(privateKey);
+        jsig.initSign(privKey, _context.random());
+        jsig.update(hash.getData());
         return SigUtil.fromJavaSig(jsig.sign(), type);
     }
 
