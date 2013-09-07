@@ -282,7 +282,8 @@ public class KeyGenerator {
 
     private static void testSig(SigType type, int runs) throws GeneralSecurityException {
         byte src[] = new byte[512];
-        long time = 0;
+        long stime = 0;
+        long vtime = 0;
         SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
         //System.out.println("pubkey " + keys[0]);
         //System.out.println("privkey " + keys[1]);
@@ -290,14 +291,19 @@ public class KeyGenerator {
             RandomSource.getInstance().nextBytes(src);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, (SigningPrivateKey) keys[1]);
+            long mid = System.nanoTime();
             boolean ok = DSAEngine.getInstance().verifySignature(sig, src, (SigningPublicKey) keys[0]);
             long end = System.nanoTime();
-            time += end - start;
+            stime += mid - start;
+            vtime += end - mid;
             if (!ok)
                 throw new GeneralSecurityException(type + " V(S(data)) fail");
         }
-        time /= 1000*1000;
-        System.out.println("Signing Keygen " + runs + " times: " + time + " ms = " + (((double) time) / runs) + " each");
+        stime /= 1000*1000;
+        vtime /= 1000*1000;
+        System.out.println("Sign/verify " + runs + " times: " + (vtime+stime) + " ms = " +
+                           (((double) stime) / runs) + " each sign, " +
+                           (((double) vtime) / runs) + " each verify");
     }
 
 /******

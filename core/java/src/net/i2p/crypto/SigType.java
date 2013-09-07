@@ -7,6 +7,9 @@ import java.security.spec.InvalidParameterSpecException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.data.Hash;
+import net.i2p.data.SimpleDataStructure;
+
 /**
  * Defines the properties for various signature types
  * that I2P supports or may someday support.
@@ -35,7 +38,7 @@ public enum SigType {
 
     // TESTING....................
 
-    ECDSA_SHA256_P192(5, 48, 24, 20, 48, "SHA-1", "SHA256withECDSA", ECConstants.P192_SPEC),
+    ECDSA_SHA256_P192(5, 48, 24, 32, 48, "SHA-256", "SHA256withECDSA", ECConstants.P192_SPEC),
     ECDSA_SHA256_P384(6, 96, 48, 32, 96, "SHA-256", "SHA256withECDSA", ECConstants.P384_SPEC),
     ECDSA_SHA256_P521(7, 132, 66, 32, 132, "SHA-256", "SHA256withECDSA", ECConstants.P521_SPEC),
 
@@ -109,6 +112,25 @@ public enum SigType {
             return MessageDigest.getInstance(digestName);
         } catch (NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException(e);
+        }
+    }
+
+    /**
+     *  @since 0.9.9
+     *  @throws UnsupportedOperationException if not supported
+     */
+    public SimpleDataStructure getHashInstance() {
+        switch (getHashLen()) {
+            case 20:
+                return new SHA1Hash();
+            case 32:
+                return new Hash();
+            case 48:
+                return new Hash384();
+            case 64:
+                return new Hash512();
+            default:
+                throw new UnsupportedOperationException("Unsupported hash length: " + getHashLen());
         }
     }
 

@@ -156,6 +156,31 @@ public class DSAEngine {
     }
 
     /**
+     *  Generic signature type.
+     *
+     *  @param hash SHA1Hash, Hash, Hash384, or Hash512
+     *  @since 0.9.9
+     */
+    public boolean verifySignature(Signature signature, SimpleDataStructure hash, SigningPublicKey verifyingKey) {
+        SigType type = signature.getType();
+        if (type != verifyingKey.getType())
+            throw new IllegalArgumentException("type mismatch sig=" + type + " key=" + verifyingKey.getType());
+        int hashlen = type.getHashLen();
+        if (hash.length() != hashlen)
+            throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " sig=" + type);
+        if (type == SigType.DSA_SHA1)
+            return verifySig(signature, hash, verifyingKey);
+        // FIXME hash of hash
+        try {
+            return altVerifySig(signature, hash.getData(), verifyingKey);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(type + " Sig Verify Fail", gse);
+            return false;
+        }
+    }
+
+    /**
      *  Verify using DSA-SHA1 or Syndie DSA-SHA256 ONLY.
      *  @param hash either a Hash or a SHA1Hash
      *  @since 0.8.3
@@ -287,6 +312,30 @@ public class DSAEngine {
     }
 
     /**
+     *  Generic signature type.
+     *
+     *  @param hash SHA1Hash, Hash, Hash384, or Hash512
+     *  @return null on error
+     *  @since 0.9.9
+     */
+    public Signature sign(SimpleDataStructure hash, SigningPrivateKey signingKey) {
+        SigType type = signingKey.getType();
+        int hashlen = type.getHashLen();
+        if (hash.length() != hashlen)
+            throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
+        if (type == SigType.DSA_SHA1)
+            return signIt(hash, signingKey);
+        // FIXME hash of hash
+        try {
+            return altSign(hash.getData(), signingKey);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(type + " Sign Fail", gse);
+            return null;
+        }
+    }
+
+    /**
      *  Sign using DSA-SHA1 or Syndie DSA-SHA256 ONLY.
      *
      *  @param hash either a Hash or a SHA1Hash
@@ -334,6 +383,9 @@ public class DSAEngine {
             for (int i = 0; i < 20; i++) {
                 out[i] = rbytes[i + 1];
             }
+        } else if (rbytes.length > 21) {
+            _log.error("Bad R length " + rbytes.length);
+            return null;
         } else {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Using short rbytes.length [" + rbytes.length + "]");
             //System.arraycopy(rbytes, 0, out, 20 - rbytes.length, rbytes.length);
@@ -350,6 +402,9 @@ public class DSAEngine {
             for (int i = 0; i < 20; i++) {
                 out[i + 20] = sbytes[i + 1];
             }
+        } else if (sbytes.length > 21) {
+            _log.error("Bad S length " + sbytes.length);
+            return null;
         } else {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Using short sbytes.length [" + sbytes.length + "]");
             //System.arraycopy(sbytes, 0, out, 40 - sbytes.length, sbytes.length);
@@ -405,7 +460,7 @@ public class DSAEngine {
                         throws GeneralSecurityException {
         SigType type = signature.getType();
         if (type != verifyingKey.getType())
-            throw new IllegalArgumentException("type mismatch sig=" + signature.getType() + " key=" + verifyingKey.getType());
+            throw new IllegalArgumentException("type mismatch sig=" + type + " key=" + verifyingKey.getType());
         if (type == SigType.DSA_SHA1)
             return altVerifySigSHA1(signature, data, verifyingKey);
 
