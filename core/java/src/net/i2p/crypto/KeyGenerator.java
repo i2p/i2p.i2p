@@ -20,6 +20,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.NativeBigInteger;
+import net.i2p.util.SystemVersion;
 
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
@@ -79,7 +80,35 @@ public class KeyGenerator {
      * (damn commercial access to http://www.springerlink.com/(xrkdvv45w0cmnur4aimsxx55)/app/home/contribution.asp?referrer=parent&backto=issue,13,31;journal,893,3280;linkingpublicationresults,1:105633,1 )
      */
     private static final int PUBKEY_EXPONENT_SIZE_SHORT = 226;
-    public static final int PUBKEY_EXPONENT_SIZE = PUBKEY_EXPONENT_SIZE_SHORT;
+
+    /** @since 0.9.8 */
+    private static final boolean DEFAULT_USE_LONG_EXPONENT =
+                                                   NativeBigInteger.isNative() &&
+                                                   SystemVersion.is64Bit() &&
+                                                   !SystemVersion.isGNU() &&
+                                                   !SystemVersion.isApache() &&
+                                                   !SystemVersion.isARM();
+
+    /**
+     *  @deprecated use getElGamalExponentSize() which allows override in the properties
+     */
+    public static final int PUBKEY_EXPONENT_SIZE = DEFAULT_USE_LONG_EXPONENT ?
+                                                   PUBKEY_EXPONENT_SIZE_FULL :
+                                                   PUBKEY_EXPONENT_SIZE_SHORT;
+
+    private static final String PROP_LONG_EXPONENT = "crypto.elGamal.useLongKey";
+
+    /** @since 0.9.8 */
+    public boolean useLongElGamalExponent() {
+        return _context.getProperty(PROP_LONG_EXPONENT, DEFAULT_USE_LONG_EXPONENT);
+    }
+
+    /** @since 0.9.8 */
+    public int getElGamalExponentSize() {
+        return useLongElGamalExponent() ?
+               PUBKEY_EXPONENT_SIZE_FULL :
+               PUBKEY_EXPONENT_SIZE_SHORT;
+    }
 
     /** Generate a pair of keys, where index 0 is a PublicKey, and
      * index 1 is a PrivateKey
@@ -94,7 +123,7 @@ public class KeyGenerator {
      *  @since 0.8.7
      */
     public SimpleDataStructure[] generatePKIKeys() {
-        BigInteger a = new NativeBigInteger(PUBKEY_EXPONENT_SIZE, _context.random());
+        BigInteger a = new NativeBigInteger(getElGamalExponentSize(), _context.random());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
 
         SimpleDataStructure[] keys = new SimpleDataStructure[2];

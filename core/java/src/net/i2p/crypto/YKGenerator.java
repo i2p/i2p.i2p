@@ -119,7 +119,7 @@ class YKGenerator {
         //long t1 = 0;
         while (k == null) {
             //t0 = Clock.getInstance().now();
-            k = new NativeBigInteger(KeyGenerator.PUBKEY_EXPONENT_SIZE, ctx.random());
+            k = new NativeBigInteger(ctx.keyGenerator().getElGamalExponentSize(), ctx.random());
             //t1 = Clock.getInstance().now();
             if (BigInteger.ZERO.compareTo(k) == 0) {
                 k = null;

@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
+import net.i2p.crypto.KeyGenerator;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -91,6 +92,14 @@ public class LoadRouterInfoJob extends JobImpl {
                 fis2 = new BufferedInputStream(new FileInputStream(rkf));
                 PrivateKey privkey = new PrivateKey();
                 privkey.readBytes(fis2);
+                if (shouldRebuild(privkey)) {
+                    _us = null;
+                    rif.delete();
+                    rkf.delete();
+                    _infoExists = false;
+                    _keysExist = false;
+                    return;
+                }
                 SigningPrivateKey signingPrivKey = new SigningPrivateKey();
                 signingPrivKey.readBytes(fis2);
                 PublicKey pubkey = new PublicKey();
@@ -118,5 +127,30 @@ public class LoadRouterInfoJob extends JobImpl {
             if (fis1 != null) try { fis1.close(); } catch (IOException ioe) {}
             if (fis2 != null) try { fis2.close(); } catch (IOException ioe) {}
         }
+    }
+
+    /**
+     *  Does our RI private key length match the configuration?
+     *  If not, return true.
+     *  @since 0.9.8
+     */
+    private boolean shouldRebuild(PrivateKey privkey) {
+        byte[] pkd = privkey.getData();
+        boolean haslong = false;
+        for (int i = 0; i < 8; i++) {
+            if (pkd[i] != 0) {
+                haslong = true;
+                break;
+            }
+        }
+        boolean uselong = getContext().keyGenerator().useLongElGamalExponent();
+        // transition to a longer key (update to 0.9.8)
+        if (uselong && !haslong)
+            _log.logAlways(Log.WARN, "Rebuilding RouterInfo with longer key");
+        // transition to a shorter key, should be rare (copy files to different hardware,
+        // jbigi broke, user overrides in advanced config, ...)
+        if (!uselong && haslong)
+            _log.logAlways(Log.WARN, "Rebuilding RouterInfo with faster key");
+        return uselong != haslong;
     }
 }

@@ -71,7 +71,7 @@ public class DHSessionKeyBuilder {
      * Others should get instances from PrecalcRunner.getBuilder()
      */
     DHSessionKeyBuilder() {
-        this(RandomSource.getInstance());
+        this(I2PAppContext.getGlobalContext());
     }
 
     /**
@@ -79,8 +79,8 @@ public class DHSessionKeyBuilder {
      * Only for internal use and unit tests.
      * Others should get instances from PrecalcRunner.getBuilder()
      */
-    DHSessionKeyBuilder(RandomSource random) {
-        _myPrivateValue = new NativeBigInteger(KeyGenerator.PUBKEY_EXPONENT_SIZE, random);
+    DHSessionKeyBuilder(I2PAppContext ctx) {
+        _myPrivateValue = new NativeBigInteger(ctx.keyGenerator().getElGamalExponentSize(), ctx.random());
         _myPublicValue = CryptoConstants.elgg.modPow(_myPrivateValue, CryptoConstants.elgp);
         _extraExchangedBytes = new ByteArray();
     }
@@ -547,7 +547,7 @@ public class DHSessionKeyBuilder {
 
         private DHSessionKeyBuilder precalc() {
             long start = System.currentTimeMillis();
-            DHSessionKeyBuilder builder = new DHSessionKeyBuilder(_context.random());
+            DHSessionKeyBuilder builder = new DHSessionKeyBuilder(_context);
             long end = System.currentTimeMillis();
             long diff = end - start;
             _context.statManager().addRateData("crypto.dhGeneratePublicTime", diff, diff);

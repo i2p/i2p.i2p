@@ -15,6 +15,7 @@ public abstract class SystemVersion {
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
+    private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
@@ -84,6 +85,13 @@ public abstract class SystemVersion {
      */
     public static boolean isGNU() {
         return _isGNU;
+    }
+
+    /**
+     *  @since 0.9.8
+     */
+    public static boolean isARM() {
+        return _isArm;
     }
 
     /**
