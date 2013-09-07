@@ -215,13 +215,33 @@ public class SU3File {
      *  @return true if signature is good
      */
     public boolean verifyAndMigrate(File migrateTo) throws IOException {
-        DigestInputStream in = null;
+        InputStream in = null;
         OutputStream out = null;
         boolean rv = false;
         try {
-            ////// fixme NPE we don't know the type yet
+            in = new BufferedInputStream(new FileInputStream(_file));
+            // read 10 bytes to get the sig type
+            in.mark(10);
+            // following is a dup of that in verifyHeader()
+            byte[] magic = new byte[MAGIC.length];
+            DataHelper.read(in, magic);
+            if (!DataHelper.eq(magic, MAGIC))
+                throw new IOException("Not an su3 file");
+            skip(in, 1);
+            int foo = in.read();
+            if (foo != FILE_VERSION)
+                throw new IOException("bad file version");
+            skip(in, 1);
+            int sigTypeCode = in.read();
+            _sigType = SigType.getByCode(sigTypeCode);
+            if (_sigType == null)
+                throw new IOException("unknown sig type: " + sigTypeCode);
+            // end duplicate code
+            // rewind
+            in.reset();
             MessageDigest md = _sigType.getDigestInstance();
-            in = new DigestInputStream(new BufferedInputStream(new FileInputStream(_file)), md);
+            DigestInputStream din = new DigestInputStream(in, md);
+            in = din;
             if (!_headerVerified)
                 verifyHeader(in);
             else
@@ -239,7 +259,7 @@ public class SU3File {
                 tot += read;
             }
             byte[] sha = md.digest();
-            in.on(false);
+            din.on(false);
             Signature signature = new Signature(_sigType);
             signature.readBytes(in);
             SimpleDataStructure hash = _sigType.getHashInstance();
