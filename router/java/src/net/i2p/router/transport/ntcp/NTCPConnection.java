@@ -88,7 +88,7 @@ class NTCPConnection {
     private volatile EstablishState _establishState;
     private final NTCPTransport _transport;
     private final boolean _isInbound;
-    private final AtomicBoolean _closed = new AtomicBoolean(false);
+    private final AtomicBoolean _closed = new AtomicBoolean();
     private final RouterAddress _remAddr;
     private RouterIdentity _remotePeer;
     private long _clockSkew; // in seconds
