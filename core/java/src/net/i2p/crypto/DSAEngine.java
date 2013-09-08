@@ -38,9 +38,6 @@ import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.DSAPrivateKeySpec;
-import java.security.spec.DSAPublicKeySpec;
-import java.security.spec.KeySpec;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -501,13 +498,7 @@ public class DSAEngine {
      */
     private boolean altVerifySigSHA1(Signature signature, byte[] data, SigningPublicKey verifyingKey) throws GeneralSecurityException {
         java.security.Signature jsig = java.security.Signature.getInstance("SHA1withDSA");
-        KeyFactory keyFact = KeyFactory.getInstance("DSA");
-        // y p q g
-        KeySpec spec = new DSAPublicKeySpec(new NativeBigInteger(1, verifyingKey.getData()),
-                                            CryptoConstants.dsap,
-                                            CryptoConstants.dsaq,
-                                            CryptoConstants.dsag);
-        PublicKey pubKey = keyFact.generatePublic(spec);
+        PublicKey pubKey = SigUtil.toJavaDSAKey(verifyingKey);
         jsig.initVerify(pubKey);
         jsig.update(data);
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
@@ -563,13 +554,7 @@ public class DSAEngine {
      */
     private Signature altSignSHA1(byte[] data, SigningPrivateKey privateKey) throws GeneralSecurityException {
         java.security.Signature jsig = java.security.Signature.getInstance("SHA1withDSA");
-        KeyFactory keyFact = KeyFactory.getInstance("DSA");
-        // y p q g
-        KeySpec spec = new DSAPrivateKeySpec(new NativeBigInteger(1, privateKey.getData()),
-                                            CryptoConstants.dsap,
-                                            CryptoConstants.dsaq,
-                                            CryptoConstants.dsag);
-        PrivateKey privKey = keyFact.generatePrivate(spec);
+        PrivateKey privKey = SigUtil.toJavaDSAKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(data);
         return SigUtil.fromJavaSig(jsig.sign(), SigType.DSA_SHA1);

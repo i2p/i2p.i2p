@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
@@ -547,6 +549,7 @@ public class SU3File {
     }
 
     /**
+     *  Writes Java-encoded keys (X.509 for public and PKCS#8 for private)
      *  @return success
      *  @since 0.9.9
      */
@@ -564,17 +567,20 @@ public class SU3File {
         FileOutputStream fileOutputStream = null;
         I2PAppContext context = I2PAppContext.getGlobalContext();
         try {
+            // inefficiently go from Java to I2P to Java formats
             SimpleDataStructure signingKeypair[] = context.keyGenerator().generateSigningKeys(type);
             SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
             SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
+            PublicKey pubkey = SigUtil.toJavaKey(signingPublicKey);
+            PrivateKey privkey = SigUtil.toJavaKey(signingPrivateKey);
 
             fileOutputStream = new SecureFileOutputStream(pubFile);
-            signingPublicKey.writeBytes(fileOutputStream);
+            fileOutputStream.write(pubkey.getEncoded());
             fileOutputStream.close();
             fileOutputStream = null;
 
             fileOutputStream = new SecureFileOutputStream(privFile);
-            signingPrivateKey.writeBytes(fileOutputStream);
+            fileOutputStream.write(privkey.getEncoded());
 
             System.out.println("\r\n" + type + " Private key written to: " + privateKeyFile);
             System.out.println(type + " Public key written to: " + publicKeyFile);

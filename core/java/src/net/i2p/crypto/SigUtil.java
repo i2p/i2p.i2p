@@ -7,8 +7,12 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.DSAPrivateKeySpec;
+import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECField;
 import java.security.spec.ECFieldFp;
 import java.security.spec.ECGenParameterSpec;
@@ -17,12 +21,14 @@ import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
+import java.security.spec.KeySpec;
 import java.util.Map;
 
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.LHMCache;
+import net.i2p.util.NativeBigInteger;
 
 
 /**
@@ -43,7 +49,7 @@ class SigUtil {
     public static PublicKey toJavaKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
         if (pk.getType() == SigType.DSA_SHA1)
-            throw new UnsupportedOperationException();
+            return toJavaDSAKey(pk);
         else
             return toJavaECKey(pk);
     }
@@ -54,7 +60,7 @@ class SigUtil {
     public static PrivateKey toJavaKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         if (pk.getType() == SigType.DSA_SHA1)
-            throw new UnsupportedOperationException();
+            return toJavaDSAKey(pk);
         else
             return toJavaECKey(pk);
     }
@@ -65,7 +71,7 @@ class SigUtil {
     public static SigningPublicKey fromJavaKey(PublicKey pk, SigType type)
                               throws GeneralSecurityException {
         if (type == SigType.DSA_SHA1)
-            throw new UnsupportedOperationException();
+            return fromJavaKey((DSAPublicKey) pk);
         else
             return fromJavaKey((ECPublicKey) pk, type);
     }
@@ -76,7 +82,7 @@ class SigUtil {
     public static SigningPrivateKey fromJavaKey(PrivateKey pk, SigType type)
                               throws GeneralSecurityException {
         if (type == SigType.DSA_SHA1)
-            throw new UnsupportedOperationException();
+            return fromJavaKey((DSAPrivateKey) pk);
         else
             return fromJavaKey((ECPrivateKey) pk, type);
     }
@@ -170,6 +176,46 @@ class SigUtil {
         int len = type.getPrivkeyLen();
         byte[] bs = rectify(s, len);
         return new SigningPrivateKey(type, bs);
+    }
+
+    public static DSAPublicKey toJavaDSAKey(SigningPublicKey pk)
+                              throws GeneralSecurityException {
+        KeyFactory kf = KeyFactory.getInstance("DSA");
+        // y p q g
+        KeySpec ks = new DSAPublicKeySpec(new NativeBigInteger(1, pk.getData()),
+                                            CryptoConstants.dsap,
+                                            CryptoConstants.dsaq,
+                                            CryptoConstants.dsag);
+        return (DSAPublicKey) kf.generatePublic(ks);
+    }
+
+    public static DSAPrivateKey toJavaDSAKey(SigningPrivateKey pk)
+                              throws GeneralSecurityException {
+        KeyFactory kf = KeyFactory.getInstance("DSA");
+        // x p q g
+        KeySpec ks = new DSAPrivateKeySpec(new NativeBigInteger(1, pk.getData()),
+                                            CryptoConstants.dsap,
+                                            CryptoConstants.dsaq,
+                                            CryptoConstants.dsag);
+        return (DSAPrivateKey) kf.generatePrivate(ks);
+    }
+
+    public static SigningPublicKey fromJavaKey(DSAPublicKey pk)
+                              throws GeneralSecurityException {
+        BigInteger y = pk.getY();
+        SigType type = SigType.DSA_SHA1;
+        int len = type.getPubkeyLen();
+        byte[] by = rectify(y, len);
+        return new SigningPublicKey(type, by);
+    }
+
+    public static SigningPrivateKey fromJavaKey(DSAPrivateKey pk)
+                              throws GeneralSecurityException {
+        BigInteger x = pk.getX();
+        SigType type = SigType.DSA_SHA1;
+        int len = type.getPrivkeyLen();
+        byte[] bx = rectify(x, len);
+        return new SigningPrivateKey(type, bx);
     }
 
     /**
