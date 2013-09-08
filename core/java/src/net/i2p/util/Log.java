@@ -187,7 +187,10 @@ public class Log {
     
     /**
      * logs a loop when closing a resource with level INFO
+     * This method is for debugging purposes only and 
+     * as such subject to change or removal w/o notice.
      * @param desc vararg description
+     * @since 0.9.8
      */
     public void logCloseLoop(Object... desc) {
         logCloseLoop(Log.INFO, desc);
@@ -195,8 +198,11 @@ public class Log {
     
     /**
      * Logs a close loop when closing a resource
+     * This method is for debugging purposes only and 
+     * as such subject to change or removal w/o notice.
      * @param desc vararg description of the resource
      * @param level level at which to log
+     * @since 0.9.8
      */
     public void logCloseLoop(int level, Object... desc) {
         if (!shouldLog(level)) 
