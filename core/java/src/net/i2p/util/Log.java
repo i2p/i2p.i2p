@@ -184,6 +184,34 @@ public class Log {
     public boolean shouldLog(int priority) {
         return priority >= _minPriority;
     }
+    
+    /**
+     * logs a loop when closing a resource with level INFO
+     * @param desc vararg description
+     */
+    public void logCloseLoop(Object... desc) {
+        logCloseLoop(Log.INFO, desc);
+    }
+    
+    /**
+     * Logs a close loop when closing a resource
+     * @param desc vararg description of the resource
+     * @param level level at which to log
+     */
+    public void logCloseLoop(int level, Object... desc) {
+        if (!shouldLog(level)) 
+            return;
+        
+        // catenate all toString()s
+        String descString = "close() loop in";
+        for (Object o : desc) {
+            descString += " ";
+            descString += String.valueOf(o);
+        }
+        
+        Exception e = new Exception("check stack trace");
+        log(level,descString,e);
+    }
 
     public String getName() {
         if (_className != null) return _className;

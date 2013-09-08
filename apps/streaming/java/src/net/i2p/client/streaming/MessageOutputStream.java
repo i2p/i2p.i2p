@@ -372,7 +372,7 @@ class MessageOutputStream extends OutputStream {
     public void close() throws IOException {
         if (!_closed.compareAndSet(false,true)) {
             synchronized (_dataLock) { _dataLock.notifyAll(); }
-            LogUtil.logCloseLoop(_log, "MOS");
+            _log.logCloseLoop("MOS");
             return;
         }
         // setting _closed before flush() will force flush() to send a CLOSE packet
@@ -410,7 +410,7 @@ class MessageOutputStream extends OutputStream {
      */
     public void closeInternal() {
         if (!_closed.compareAndSet(false,true)) {
-            LogUtil.logCloseLoop(_log, "close internal");
+            _log.logCloseLoop("close internal");
             return;
         }
         _flusher.cancel();
@@ -501,7 +501,7 @@ class MessageOutputStream extends OutputStream {
     
     void destroy() {
         if (!_closed.compareAndSet(false,true)) {
-            LogUtil.logCloseLoop(_log, "destroy()");
+            _log.logCloseLoop("destroy()");
             return;
         }
         _flusher.cancel();

@@ -36,7 +36,7 @@ class I2PSocketFull implements I2PSocket {
     public void close() throws IOException {
         if (!_closed.compareAndSet(false,true)) {
             // log a trace to find out why
-            LogUtil.logCloseLoop(log, "I2PSocket",_localPeer,"-->",_remotePeer,_connection);
+            log.logCloseLoop("I2PSocket",_localPeer,"-->",_remotePeer,_connection);
             return;
         }
         Connection c = _connection;
