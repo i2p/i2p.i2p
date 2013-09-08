@@ -189,7 +189,11 @@ public class NTCPTransport extends TransportImpl {
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
     }
 
-    void inboundEstablished(NTCPConnection con) {
+    /**
+     * @param con that is established
+     * @return the previous connection to the same peer, null if no such.
+     */
+    NTCPConnection inboundEstablished(NTCPConnection con) {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1);
         markReachable(con.getRemotePeer().calculateHash(), true);
         //_context.banlist().unbanlistRouter(con.getRemotePeer().calculateHash());
@@ -197,12 +201,7 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_conLock) {
             old = _conByIdent.put(con.getRemotePeer().calculateHash(), con);
         }
-        if (old != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Old connection closed: " + old + " replaced by " + con);
-            _context.statManager().addRateData("ntcp.inboundEstablishedDuplicate", old.getUptime());
-            old.close();
-        }
+        return old;
     }
 
     protected void outboundMessageReady() {
@@ -431,7 +430,7 @@ public class NTCPTransport extends TransportImpl {
             return (con != null) && con.isEstablished() && con.tooBacklogged();
     }
 
-    void removeCon(NTCPConnection con) {
+    NTCPConnection removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
         RouterIdentity ident = con.getRemotePeer();
         if (ident != null) {
@@ -439,12 +438,7 @@ public class NTCPTransport extends TransportImpl {
                 removed = _conByIdent.remove(ident.calculateHash());
             }
         }
-        if ( (removed != null) && (removed != con) ) {// multiple cons, close 'em both
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Multiple connections on remove, closing " + removed + " (already closed " + con + ")");
-            _context.statManager().addRateData("ntcp.multipleCloseOnRemove", removed.getUptime());
-            removed.close();
-        }
+        return removed;
     }
 
     /**

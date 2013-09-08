@@ -263,7 +263,18 @@ class NTCPConnection {
      * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      */
-    public synchronized void finishInboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
+    public void finishInboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
+        NTCPConnection toClose = locked_finishInboundEstablishment(key, clockSkew, prevWriteEnd, prevReadEnd);
+        if (toClose != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Old connection closed: " + toClose + " replaced by " + this);
+            _context.statManager().addRateData("ntcp.inboundEstablishedDuplicate", toClose.getUptime());
+            toClose.close();
+        }
+    }
+    
+    private synchronized NTCPConnection locked_finishInboundEstablishment(
+            SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         _sessionKey = key;
         _clockSkew = clockSkew;
         _prevWriteEnd = prevWriteEnd;
@@ -271,10 +282,11 @@ class NTCPConnection {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Inbound established, prevWriteEnd: " + Base64.encode(prevWriteEnd) + " prevReadEnd: " + Base64.encode(prevReadEnd));
         _establishedOn = System.currentTimeMillis();
-        _transport.inboundEstablished(this);
+        NTCPConnection rv = _transport.inboundEstablished(this);
         _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
         _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         _establishState = EstablishState.VERIFIED;
+        return rv;
     }
 
     /** @return seconds */
@@ -327,14 +339,24 @@ class NTCPConnection {
 
     public void close() { close(false); }
 
-    public synchronized void close(boolean allowRequeue) {
+    public void close(boolean allowRequeue) {
+        NTCPConnection toClose = locked_close(allowRequeue);
+        if (toClose != null && toClose != this) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Multiple connections on remove, closing " + toClose + " (already closed " + this + ")");
+            _context.statManager().addRateData("ntcp.multipleCloseOnRemove", toClose.getUptime());
+            toClose.close();
+        }
+    }
+    
+    private synchronized NTCPConnection locked_close(boolean allowRequeue) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Closing connection " + toString(), new Exception("cause"));
         _closed = true;
         if (_chan != null) try { _chan.close(); } catch (IOException ioe) { }
         if (_conKey != null) _conKey.cancel();
         _establishState = EstablishState.VERIFIED;
-        _transport.removeCon(this);
+        NTCPConnection old = _transport.removeCon(this);
         _transport.getReader().connectionClosed(this);
         _transport.getWriter().connectionClosed(this);
 
@@ -372,6 +394,8 @@ class NTCPConnection {
                 releaseBuf((PrepBuffer)buf);
             _transport.afterSend(msg, false, allowRequeue, msg.getLifetime());
         }
+        
+        return old;
     }
     
     /**
