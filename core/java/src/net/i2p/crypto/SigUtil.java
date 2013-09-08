@@ -17,10 +17,12 @@ import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
+import java.util.Map;
 
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.util.LHMCache;
 
 
 /**
@@ -29,6 +31,11 @@ import net.i2p.data.SigningPublicKey;
  * @since 0.9.9
  */
 class SigUtil {
+
+    private static final Map<SigningPublicKey, ECPublicKey> _pubkeyCache = new LHMCache(64);
+    private static final Map<SigningPrivateKey, ECPrivateKey> _privkeyCache = new LHMCache(16);
+
+    private SigUtil() {}
 
     /**
      *  @return JAVA key!
@@ -74,7 +81,43 @@ class SigUtil {
             return fromJavaKey((ECPrivateKey) pk, type);
     }
 
+    /**
+     *  @return JAVA key!
+     */
     public static ECPublicKey toJavaECKey(SigningPublicKey pk)
+                              throws GeneralSecurityException {
+        ECPublicKey rv;
+        synchronized (_pubkeyCache) {
+            rv = _pubkeyCache.get(pk);
+        }
+        if (rv != null)
+            return rv;
+        rv = cvtToJavaECKey(pk);
+        synchronized (_pubkeyCache) {
+            _pubkeyCache.put(pk, rv);
+        }
+        return rv;
+    }
+
+    /**
+     *  @return JAVA key!
+     */
+    public static ECPrivateKey toJavaECKey(SigningPrivateKey pk)
+                              throws GeneralSecurityException {
+        ECPrivateKey rv;
+        synchronized (_privkeyCache) {
+            rv = _privkeyCache.get(pk);
+        }
+        if (rv != null)
+            return rv;
+        rv = cvtToJavaECKey(pk);
+        synchronized (_privkeyCache) {
+            _privkeyCache.put(pk, rv);
+        }
+        return rv;
+    }
+
+    private static ECPublicKey cvtToJavaECKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
         SigType type = pk.getType();
         int len = type.getPubkeyLen();
@@ -93,7 +136,7 @@ class SigUtil {
         return (ECPublicKey) kf.generatePublic(ks);
     }
 
-    public static ECPrivateKey toJavaECKey(SigningPrivateKey pk)
+    public static ECPrivateKey cvtToJavaECKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         SigType type = pk.getType();
         int len = type.getPubkeyLen();
@@ -290,4 +333,12 @@ class SigUtil {
         return rv;
     }
 
+    public static void clearCaches() {
+        synchronized(_pubkeyCache) {
+            _pubkeyCache.clear();
+        }
+        synchronized(_privkeyCache) {
+            _privkeyCache.clear();
+        }
+    }
 }
