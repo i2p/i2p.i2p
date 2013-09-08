@@ -24,6 +24,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  *  Succesor to the ".sud" format used in TrustedUpdate.
@@ -550,6 +551,16 @@ public class SU3File {
      *  @since 0.9.9
      */
     private static final boolean genKeysCLI(SigType type, String publicKeyFile, String privateKeyFile) {
+        File pubFile = new File(publicKeyFile);
+        File privFile = new File(privateKeyFile);
+        if (pubFile.exists()) {
+            System.out.println("Error: Not overwriting file " + publicKeyFile);
+            return false;
+        }
+        if (privFile.exists()) {
+            System.out.println("Error: Not overwriting file " + privateKeyFile);
+            return false;
+        }
         FileOutputStream fileOutputStream = null;
         I2PAppContext context = I2PAppContext.getGlobalContext();
         try {
@@ -557,12 +568,12 @@ public class SU3File {
             SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
             SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
 
-            fileOutputStream = new FileOutputStream(publicKeyFile);
+            fileOutputStream = new SecureFileOutputStream(pubFile);
             signingPublicKey.writeBytes(fileOutputStream);
             fileOutputStream.close();
             fileOutputStream = null;
 
-            fileOutputStream = new FileOutputStream(privateKeyFile);
+            fileOutputStream = new SecureFileOutputStream(privFile);
             signingPrivateKey.writeBytes(fileOutputStream);
 
             System.out.println("\r\n" + type + " Private key written to: " + privateKeyFile);
