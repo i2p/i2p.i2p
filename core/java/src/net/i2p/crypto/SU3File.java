@@ -27,6 +27,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.HexDump;
 import net.i2p.util.SecureFileOutputStream;
 
 /**
@@ -76,7 +77,8 @@ public class SU3File {
      *  Uses TrustedUpdate's default keys for verification.
      */
     public SU3File(File file) {
-        this(file, (new TrustedUpdate()).getKeys());
+        //this(file, (new TrustedUpdate()).getKeys());
+        this(file, null);
     }
 
     /**
@@ -190,9 +192,19 @@ public class SU3File {
                     break;
                 }
             }
-            if (_signerPubkey == null)
-                throw new IOException("unknown signer: " + _signer);
+        } else {
+            // testing
+            KeyRing ring = new DirKeyRing(new File("su3keyring"));
+            try {
+                _signerPubkey = ring.getKey(_signer, "default", _sigType);
+            } catch (GeneralSecurityException gse) {
+                IOException ioe = new IOException("keystore error");
+                ioe.initCause(gse);
+                throw ioe;
+            }
         }
+        if (_signerPubkey == null)
+            throw new IOException("unknown signer: " + _signer);
         _headerVerified = true;
     }
 
@@ -268,6 +280,8 @@ public class SU3File {
             signature.readBytes(in);
             SimpleDataStructure hash = _sigType.getHashInstance();
             hash.setData(sha);
+            //System.out.println("hash\n" + HexDump.dump(sha));
+            //System.out.println("sig\n" + HexDump.dump(signature.getData()));
             rv = _context.dsa().verifySignature(signature, hash, _signerPubkey);
         } catch (DataFormatException dfe) {
             IOException ioe = new IOException("foo");
@@ -350,6 +364,8 @@ public class SU3File {
             SimpleDataStructure hash = sigType.getHashInstance();
             hash.setData(sha);
             Signature signature = _context.dsa().sign(hash, privkey);
+            //System.out.println("hash\n" + HexDump.dump(sha));
+            //System.out.println("sig\n" + HexDump.dump(signature.getData()));
             signature.writeBytes(out);
             ok = true;
         } catch (DataFormatException dfe) {
@@ -513,9 +529,9 @@ public class SU3File {
             //// fixme
             boolean isValidSignature = file.verifyAndMigrate(new File("/dev/null"));
             if (isValidSignature)
-                System.out.println("Signature VALID (signed by " + file.getSignerString() + ')');
+                System.out.println("Signature VALID (signed by " + file.getSignerString() + ' ' + file._sigType + ')');
             else
-                System.out.println("Signature INVALID (signed by " + file.getSignerString() + ')');
+                System.out.println("Signature INVALID (signed by " + file.getSignerString() + ' ' + file._sigType +')');
             return isValidSignature;
         } catch (IOException ioe) {
             System.out.println("Error verifying input file '" + signedFile + "'");
