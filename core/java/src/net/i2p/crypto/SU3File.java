@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -485,26 +486,22 @@ public class SU3File {
      */
     private static final boolean signCLI(SigType type, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName) {
-        InputStream in = null;
         try {
-            in = new FileInputStream(privateKeyFile);
-            SigningPrivateKey spk = new SigningPrivateKey(type);
-            spk.readBytes(in);
-            in.close();
+            File pkfile = new File(privateKeyFile);
+            PrivateKey pk = SigUtil.importJavaPrivateKey(pkfile, type);
+            SigningPrivateKey spk = SigUtil.fromJavaKey(pk, type);
             SU3File file = new SU3File(signedFile);
             file.write(new File(inputFile), CONTENT_ROUTER, version, signerName, spk);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
             return true;
-        } catch (DataFormatException dfe) {
+        } catch (GeneralSecurityException gse) {
             System.out.println("Error signing input file '" + inputFile + "'");
-            dfe.printStackTrace();
+            gse.printStackTrace();
             return false;
         } catch (IOException ioe) {
             System.out.println("Error signing input file '" + inputFile + "'");
             ioe.printStackTrace();
             return false;
-        } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
 

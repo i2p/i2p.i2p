@@ -1,5 +1,11 @@
 package net.i2p.crypto;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -22,6 +28,8 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
 import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Map;
 
 import net.i2p.data.Signature;
@@ -232,6 +240,52 @@ class SigUtil {
     public static Signature fromJavaSig(byte[] asn, SigType type)
                               throws SignatureException {
         return new Signature(type, aSN1ToSigBytes(asn, type.getSigLen()));
+    }
+
+    /**
+     *  @return JAVA key!
+     */
+    public static PublicKey importJavaPublicKey(File file, SigType type)
+                              throws GeneralSecurityException, IOException {
+        byte[] data = getData(file);
+        KeySpec ks = new X509EncodedKeySpec(data);
+        String algo = type == SigType.DSA_SHA1 ? "DSA" : "EC";
+        KeyFactory kf = KeyFactory.getInstance(algo);
+        return kf.generatePublic(ks);
+    }
+
+    /**
+     *  @return JAVA key!
+     */
+    public static PrivateKey importJavaPrivateKey(File file, SigType type)
+                              throws GeneralSecurityException, IOException {
+        byte[] data = getData(file);
+        KeySpec ks = new PKCS8EncodedKeySpec(data);
+        String algo = type == SigType.DSA_SHA1 ? "DSA" : "EC";
+        KeyFactory kf = KeyFactory.getInstance(algo);
+        return kf.generatePrivate(ks);
+    }
+
+    /** 16 KB max */
+    private static byte[] getData(File file) throws IOException {
+        byte buf[] = new byte[1024];
+        InputStream in = null;
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+        try {
+            in = new FileInputStream(file);
+            int read = 0;
+            int tot = 0;
+            while ( (read = in.read(buf)) != -1) {
+                out.write(buf, 0, read);
+                tot += read;
+                if (tot > 16*1024)
+                    throw new IOException("too big");
+            }
+            return out.toByteArray();
+        } finally {
+            if (in != null) 
+                try { in.close(); } catch (IOException ioe) {}
+        }
     }
 
     /**
