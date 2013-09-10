@@ -31,7 +31,6 @@ class I2CPSSLSocketFactory {
 
     private static final Object _initLock = new Object();
     private static SSLSocketFactory _factory;
-    private static Log _log;
 
     private static final String CERT_DIR = "certificates";
 
@@ -45,11 +44,10 @@ class I2CPSSLSocketFactory {
     public static Socket createSocket(I2PAppContext ctx, String host, int port) throws IOException {
         synchronized(_initLock) {
             if (_factory == null) {
-                _log = ctx.logManager().getLog(I2CPSSLSocketFactory.class);
                 initSSLContext(ctx);
                 if (_factory == null)
                     throw new IOException("Unable to create SSL Context for I2CP Client");
-                _log.info("I2CP Client-side SSL Context initialized");
+                info(ctx, "I2CP Client-side SSL Context initialized");
             }
         }
         return _factory.createSocket(host, port);
@@ -65,34 +63,33 @@ class I2CPSSLSocketFactory {
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
             ks.load(null, "".toCharArray());
         } catch (GeneralSecurityException gse) {
-            _log.error("Key Store init error", gse);
+            error(context, "Key Store init error", gse);
             return;
         } catch (IOException ioe) {
-            _log.error("Key Store init error", ioe);
+            error(context, "Key Store init error", ioe);
             return;
         }
 
         File dir = new File(context.getConfigDir(), CERT_DIR);
         int adds = addCerts(dir, ks);
         int totalAdds = adds;
-        if (adds > 0 && _log.shouldLog(Log.INFO))
-            _log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
+        if (adds > 0)
+            info(context, "Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
 
         File dir2 = new File(System.getProperty("user.dir"), CERT_DIR);
         if (!dir.getAbsolutePath().equals(dir2.getAbsolutePath())) {
             adds = addCerts(dir2, ks);
             totalAdds += adds;
-            if (adds > 0 && _log.shouldLog(Log.INFO))
-                _log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
+            if (adds > 0)
+                info(context, "Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
         }
         if (totalAdds > 0) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Loaded total of " + totalAdds + " new trusted certificates");
+            info(context, "Loaded total of " + totalAdds + " new trusted certificates");
         } else {
-            _log.error("No trusted certificates loaded (looked in " +
+            error(context, "No trusted certificates loaded (looked in " +
                        dir.getAbsolutePath() + (dir.getAbsolutePath().equals(dir2.getAbsolutePath()) ? "" : (" and " + dir2.getAbsolutePath())) +
                        ", I2CP SSL client connections will fail. " +
-                       "Copy the file certificates/i2cp.local.crt from the router to the directory.");
+                       "Copy the file certificates/i2cp.local.crt from the router to the directory.", null);
             // don't continue, since we didn't load the system keystore, we have nothing.
             return;
         }
@@ -104,7 +101,7 @@ class I2CPSSLSocketFactory {
             sslc.init(null, tmf.getTrustManagers(), context.random());
             _factory = sslc.getSocketFactory();
         } catch (GeneralSecurityException gse) {
-            _log.error("SSL context init error", gse);
+            error(context, "SSL context init error", gse);
         }
     }
 
@@ -115,8 +112,7 @@ class I2CPSSLSocketFactory {
      *  @return number successfully added
      */
     private static int addCerts(File dir, KeyStore ks) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Looking for X509 Certificates in " + dir.getAbsolutePath());
+        info("Looking for X509 Certificates in " + dir.getAbsolutePath());
         int added = 0;
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
@@ -148,33 +144,56 @@ class I2CPSSLSocketFactory {
             fis = new FileInputStream(file);
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            if (_log.shouldLog(Log.INFO)) {
-                _log.info("Read X509 Certificate from " + file.getAbsolutePath() +
+            info("Read X509 Certificate from " + file.getAbsolutePath() +
                           " Issuer: " + cert.getIssuerX500Principal() +
                           "; Valid From: " + cert.getNotBefore() +
                           " To: " + cert.getNotAfter());
-            }
             try {
                 cert.checkValidity();
             } catch (CertificateExpiredException cee) {
-                _log.error("Rejecting expired X509 Certificate: " + file.getAbsolutePath(), cee);
+                error("Rejecting expired X509 Certificate: " + file.getAbsolutePath(), cee);
                 return false;
             } catch (CertificateNotYetValidException cnyve) {
-                _log.error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
+                error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
                 return false;
             }
             ks.setCertificateEntry(alias, cert);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
+            info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
         } catch (GeneralSecurityException gse) {
-            _log.error("Error reading X509 Certificate: " + file.getAbsolutePath(), gse);
+            error("Error reading X509 Certificate: " + file.getAbsolutePath(), gse);
             return false;
         } catch (IOException ioe) {
-            _log.error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
+            error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
             return false;
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
         return true;
+    }
+
+    /** @since 0.9.8 */
+    private static void info(String msg) {
+        log(I2PAppContext.getGlobalContext(), Log.INFO, msg, null);
+    }
+
+    /** @since 0.9.8 */
+    private static void error(String msg, Throwable t) {
+        log(I2PAppContext.getGlobalContext(), Log.ERROR, msg, t);
+    }
+
+    /** @since 0.9.8 */
+    private static void info(I2PAppContext ctx, String msg) {
+        log(ctx, Log.INFO, msg, null);
+    }
+
+    /** @since 0.9.8 */
+    private static void error(I2PAppContext ctx, String msg, Throwable t) {
+        log(ctx, Log.ERROR, msg, t);
+    }
+
+    /** @since 0.9.8 */
+    private static void log(I2PAppContext ctx, int level, String msg, Throwable t) {
+        Log l = ctx.logManager().getLog(I2CPSSLSocketFactory.class);
+        l.log(level, msg, t);
     }
 }
