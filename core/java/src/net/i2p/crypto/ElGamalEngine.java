@@ -81,6 +81,7 @@ public class ElGamalEngine {
      */
     public void shutdown() {
         _ykgen.shutdown();
+        SigUtil.clearCaches();
     }
 
     /**

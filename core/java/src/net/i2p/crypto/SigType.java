@@ -7,6 +7,9 @@ import java.security.spec.InvalidParameterSpecException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.data.Hash;
+import net.i2p.data.SimpleDataStructure;
+
 /**
  * Defines the properties for various signature types
  * that I2P supports or may someday support.
@@ -23,15 +26,27 @@ public enum SigType {
      *  Pubkey 128 bytes; privkey 20 bytes; hash 20 bytes; sig 40 bytes
      *  @since 0.9.8
      */
-    DSA_SHA1(0, 128, 20, 20, 40, "SHA-1", "SHA1withDSA", null),
+    DSA_SHA1(0, 128, 20, 20, 40, "SHA-1", "SHA1withDSA", CryptoConstants.DSA_SHA1_SPEC),
     /**  Pubkey 48 bytes; privkey 24 bytes; hash 20 bytes; sig 48 bytes */
-    ECDSA_SHA1_P192(1, 48, 24, 20, 48, "SHA-1", "SHA1withECDSA", null),
+    ECDSA_SHA1_P192(1, 48, 24, 20, 48, "SHA-1", "SHA1withECDSA", ECConstants.P192_SPEC),
     /**  Pubkey 64 bytes; privkey 32 bytes; hash 32 bytes; sig 64 bytes */
-    ECDSA_SHA256_P256(2, 64, 32, 32, 64, "SHA-256", "SHA256withECDSA", null),
+    ECDSA_SHA256_P256(2, 64, 32, 32, 64, "SHA-256", "SHA256withECDSA", ECConstants.P256_SPEC),
     /**  Pubkey 96 bytes; privkey 48 bytes; hash 48 bytes; sig 96 bytes */
-    ECDSA_SHA384_P384(3, 96, 48, 48, 96, "SHA-384", "SHA384withECDSA", null),
+    ECDSA_SHA384_P384(3, 96, 48, 48, 96, "SHA-384", "SHA384withECDSA", ECConstants.P384_SPEC),
     /**  Pubkey 132 bytes; privkey 66 bytes; hash 64 bytes; sig 132 bytes */
-    ECDSA_SHA512_P521(4, 132, 66, 64, 132, "SHA-512", "SHA512withECDSA", null),
+    ECDSA_SHA512_P521(4, 132, 66, 64, 132, "SHA-512", "SHA512withECDSA", ECConstants.P521_SPEC),
+
+    // TESTING....................
+
+    ECDSA_SHA256_P192(5, 48, 24, 32, 48, "SHA-256", "SHA256withECDSA", ECConstants.P192_SPEC),
+    ECDSA_SHA256_P384(6, 96, 48, 32, 96, "SHA-256", "SHA256withECDSA", ECConstants.P384_SPEC),
+    ECDSA_SHA256_P521(7, 132, 66, 32, 132, "SHA-256", "SHA256withECDSA", ECConstants.P521_SPEC),
+
+    ECDSA_SHA384_P256(8, 64, 32, 48, 64, "SHA-384", "SHA384withECDSA", ECConstants.P256_SPEC),
+    ECDSA_SHA384_P521(9, 132, 66, 48, 132, "SHA-384", "SHA384withECDSA", ECConstants.P521_SPEC),
+
+    ECDSA_SHA512_P256(10, 64, 32, 64, 64, "SHA-512", "SHA512withECDSA", ECConstants.P256_SPEC),
+    ECDSA_SHA512_P384(11, 96, 48, 64, 96, "SHA-512", "SHA512withECDSA", ECConstants.P384_SPEC),
 
     //MD5
     //ELGAMAL_SHA256
@@ -97,6 +112,25 @@ public enum SigType {
             return MessageDigest.getInstance(digestName);
         } catch (NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException(e);
+        }
+    }
+
+    /**
+     *  @since 0.9.9
+     *  @throws UnsupportedOperationException if not supported
+     */
+    public SimpleDataStructure getHashInstance() {
+        switch (getHashLen()) {
+            case 20:
+                return new SHA1Hash();
+            case 32:
+                return new Hash();
+            case 48:
+                return new Hash384();
+            case 64:
+                return new Hash512();
+            default:
+                throw new UnsupportedOperationException("Unsupported hash length: " + getHashLen());
         }
     }
 

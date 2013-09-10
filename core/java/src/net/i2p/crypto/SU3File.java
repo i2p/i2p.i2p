@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
@@ -21,6 +26,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.HexDump;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  *  Succesor to the ".sud" format used in TrustedUpdate.
@@ -42,6 +50,7 @@ public class SU3File {
     private long _contentLength;
     private SigningPublicKey _signerPubkey;
     private boolean _headerVerified;
+    private SigType _sigType;
 
     private static final byte[] MAGIC = DataHelper.getUTF8("I2Psu3");
     private static final int FILE_VERSION = 0;
@@ -55,7 +64,7 @@ public class SU3File {
     private static final int CONTENT_PLUGIN = 2;
     private static final int CONTENT_RESEED = 3;
 
-    private static final int SIG_DSA_160 = SigType.DSA_SHA1.getCode();
+    private static final SigType DEFAULT_TYPE = SigType.DSA_SHA1;
 
     /**
      *  Uses TrustedUpdate's default keys for verification.
@@ -68,7 +77,8 @@ public class SU3File {
      *  Uses TrustedUpdate's default keys for verification.
      */
     public SU3File(File file) {
-        this(file, (new TrustedUpdate()).getKeys());
+        //this(file, (new TrustedUpdate()).getKeys());
+        this(file, null);
     }
 
     /**
@@ -129,13 +139,14 @@ public class SU3File {
         if (foo != FILE_VERSION)
             throw new IOException("bad file version");
         skip(in, 1);
-        int sigType = in.read();
+        int sigTypeCode = in.read();
+        _sigType = SigType.getByCode(sigTypeCode);
         // TODO, for other known algos we must start over with a new MessageDigest
         // (rewind 10 bytes)
-        if (sigType != SIG_DSA_160)
-            throw new IOException("bad sig type");
+        if (_sigType == null)
+            throw new IOException("unknown sig type: " + sigTypeCode);
         _signerLength = (int) DataHelper.readLong(in, 2);
-        if (_signerLength != Signature.SIGNATURE_BYTES)
+        if (_signerLength != _sigType.getSigLen())
             throw new IOException("bad sig length");
         skip(in, 1);
         int _versionLength = in.read();
@@ -181,9 +192,19 @@ public class SU3File {
                     break;
                 }
             }
-            if (_signerPubkey == null)
-                throw new IOException("unknown signer: " + _signer);
+        } else {
+            // testing
+            KeyRing ring = new DirKeyRing(new File("su3keyring"));
+            try {
+                _signerPubkey = ring.getKey(_signer, "default", _sigType);
+            } catch (GeneralSecurityException gse) {
+                IOException ioe = new IOException("keystore error");
+                ioe.initCause(gse);
+                throw ioe;
+            }
         }
+        if (_signerPubkey == null)
+            throw new IOException("unknown signer: " + _signer);
         _headerVerified = true;
     }
 
@@ -210,12 +231,33 @@ public class SU3File {
      *  @return true if signature is good
      */
     public boolean verifyAndMigrate(File migrateTo) throws IOException {
-        DigestInputStream in = null;
+        InputStream in = null;
         OutputStream out = null;
         boolean rv = false;
         try {
-            MessageDigest md = SHA1.getInstance();
-            in = new DigestInputStream(new BufferedInputStream(new FileInputStream(_file)), md);
+            in = new BufferedInputStream(new FileInputStream(_file));
+            // read 10 bytes to get the sig type
+            in.mark(10);
+            // following is a dup of that in verifyHeader()
+            byte[] magic = new byte[MAGIC.length];
+            DataHelper.read(in, magic);
+            if (!DataHelper.eq(magic, MAGIC))
+                throw new IOException("Not an su3 file");
+            skip(in, 1);
+            int foo = in.read();
+            if (foo != FILE_VERSION)
+                throw new IOException("bad file version");
+            skip(in, 1);
+            int sigTypeCode = in.read();
+            _sigType = SigType.getByCode(sigTypeCode);
+            if (_sigType == null)
+                throw new IOException("unknown sig type: " + sigTypeCode);
+            // end duplicate code
+            // rewind
+            in.reset();
+            MessageDigest md = _sigType.getDigestInstance();
+            DigestInputStream din = new DigestInputStream(in, md);
+            in = din;
             if (!_headerVerified)
                 verifyHeader(in);
             else
@@ -233,10 +275,13 @@ public class SU3File {
                 tot += read;
             }
             byte[] sha = md.digest();
-            in.on(false);
-            Signature signature = new Signature();
+            din.on(false);
+            Signature signature = new Signature(_sigType);
             signature.readBytes(in);
-            SHA1Hash hash = new SHA1Hash(sha);
+            SimpleDataStructure hash = _sigType.getHashInstance();
+            hash.setData(sha);
+            //System.out.println("hash\n" + HexDump.dump(sha));
+            //System.out.println("sig\n" + HexDump.dump(signature.getData()));
             rv = _context.dsa().verifySignature(signature, hash, _signerPubkey);
         } catch (DataFormatException dfe) {
             IOException ioe = new IOException("foo");
@@ -268,14 +313,15 @@ public class SU3File {
         boolean ok = false;
         try {
             in = new BufferedInputStream(new FileInputStream(content));
-            MessageDigest md = SHA1.getInstance();
+            SigType sigType = privkey.getType();
+            MessageDigest md = sigType.getDigestInstance();
             out = new DigestOutputStream(new BufferedOutputStream(new FileOutputStream(_file)), md);
             out.write(MAGIC);
             out.write((byte) 0);
             out.write((byte) FILE_VERSION);
             out.write((byte) 0);
-            out.write((byte) SIG_DSA_160);
-            DataHelper.writeLong(out, 2, Signature.SIGNATURE_BYTES);
+            out.write((byte) sigType.getCode());
+            DataHelper.writeLong(out, 2, sigType.getSigLen());
             out.write((byte) 0);
             byte[] verBytes = DataHelper.getUTF8(version);
             if (verBytes.length == 0 || verBytes.length > 255)
@@ -315,8 +361,11 @@ public class SU3File {
 
             byte[] sha = md.digest();
             out.on(false);
-            SHA1Hash hash = new SHA1Hash(sha);
+            SimpleDataStructure hash = sigType.getHashInstance();
+            hash.setData(sha);
             Signature signature = _context.dsa().sign(hash, privkey);
+            //System.out.println("hash\n" + HexDump.dump(sha));
+            //System.out.println("sig\n" + HexDump.dump(signature.getData()));
             signature.writeBytes(out);
             ok = true;
         } catch (DataFormatException dfe) {
@@ -344,9 +393,17 @@ public class SU3File {
             if ("showversion".equals(args[0])) {
                 ok = showVersionCLI(args[1]);
             } else if ("sign".equals(args[0])) {
-                ok = signCLI(args[1], args[2], args[3], args[4], args[5]);
+                if (args[1].equals("-t"))
+                    ok = signCLI(args[2], args[3], args[4], args[5], args[6], args[7]);
+                else
+                    ok = signCLI(args[1], args[2], args[3], args[4], args[5]);
             } else if ("verifysig".equals(args[0])) {
                 ok = verifySigCLI(args[1]);
+            } else if ("keygen".equals(args[0])) {
+                if (args[1].equals("-t"))
+                    ok = genKeysCLI(args[2], args[3], args[4]);
+                else
+                    ok = genKeysCLI(args[1], args[2]);
             } else {
                 showUsageCLI();
             }
@@ -358,9 +415,42 @@ public class SU3File {
     }
 
     private static final void showUsageCLI() {
-        System.err.println("Usage: SU3File showversion   signedFile.su3");
-        System.err.println("       SU3File sign          inputFile.zip signedFile.su3 privateKeyFile version signerName@mail.i2p");
-        System.err.println("       SU3File verifysig     signedFile.su3");
+        System.err.println("Usage: SU3File keygen       [-t type|code] publicKeyFile privateKeyFile");
+        System.err.println("       SU3File showversion  signedFile.su3");
+        System.err.println("       SU3File sign         [-t type|code] inputFile.zip signedFile.su3 privateKeyFile version signerName@mail.i2p");
+        System.err.println("       SU3File verifysig    signedFile.su3");
+        System.err.println(dumpSigTypes());
+    }
+
+    /** @since 0.9.9 */
+    private static String dumpSigTypes() {
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("Available signature types:\n");
+        for (SigType t : EnumSet.allOf(SigType.class)) {
+            buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
+            if (t == SigType.DSA_SHA1)
+                buf.append(" DEFAULT");
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+
+    /**
+     *  @param stype number or name
+     *  @return null if not found
+     *  @since 0.9.9
+     */
+    private static SigType parseSigType(String stype) {
+        try {
+            return SigType.valueOf(stype.toUpperCase(Locale.US));
+        } catch (IllegalArgumentException iae) {
+            try {
+                int code = Integer.parseInt(stype);
+                return SigType.getByCode(code);
+            } catch (NumberFormatException nfe) {
+                return null;
+             }
+        }
     }
 
     /** @return success */
@@ -371,7 +461,14 @@ public class SU3File {
             if (versionString.equals(""))
                 System.out.println("No version string found in file '" + signedFile + "'");
             else
-                System.out.println("Version: " + versionString);
+                System.out.println("Version:  " + versionString);
+            String signerString = file.getSignerString();
+            if (signerString.equals(""))
+                System.out.println("No signer string found in file '" + signedFile + "'");
+            else
+                System.out.println("Signer:   " + signerString);
+            if (file._sigType != null)
+                System.out.println("SigType:  " + file._sigType);
             return !versionString.equals("");
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -380,28 +477,47 @@ public class SU3File {
     }
 
     /** @return success */
-    private static final boolean signCLI(String inputFile, String signedFile, String privateKeyFile,
-                                         String version, String signerName) {
-        InputStream in = null;
+    private static final boolean signCLI(String inputFile, String signedFile,
+                                         String privateKeyFile, String version, String signerName) {
+        return signCLI(DEFAULT_TYPE, inputFile, signedFile, privateKeyFile, version, signerName);
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean signCLI(String stype, String inputFile, String signedFile,
+                                         String privateKeyFile, String version, String signerName) {
+        SigType type = parseSigType(stype);
+        if (type == null) {
+            System.out.println("Signature type " + stype + " is not supported");
+            return false;
+        }
+        return signCLI(type, inputFile, signedFile, privateKeyFile, version, signerName);
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean signCLI(SigType type, String inputFile, String signedFile,
+                                         String privateKeyFile, String version, String signerName) {
         try {
-            in = new FileInputStream(privateKeyFile);
-            SigningPrivateKey spk = new SigningPrivateKey();
-            spk.readBytes(in);
-            in.close();
+            File pkfile = new File(privateKeyFile);
+            PrivateKey pk = SigUtil.importJavaPrivateKey(pkfile, type);
+            SigningPrivateKey spk = SigUtil.fromJavaKey(pk, type);
             SU3File file = new SU3File(signedFile);
             file.write(new File(inputFile), CONTENT_ROUTER, version, signerName, spk);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
             return true;
-        } catch (DataFormatException dfe) {
+        } catch (GeneralSecurityException gse) {
             System.out.println("Error signing input file '" + inputFile + "'");
-            dfe.printStackTrace();
+            gse.printStackTrace();
             return false;
         } catch (IOException ioe) {
             System.out.println("Error signing input file '" + inputFile + "'");
             ioe.printStackTrace();
             return false;
-        } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -410,16 +526,88 @@ public class SU3File {
         InputStream in = null;
         try {
             SU3File file = new SU3File(signedFile);
+            //// fixme
             boolean isValidSignature = file.verifyAndMigrate(new File("/dev/null"));
             if (isValidSignature)
-                System.out.println("Signature VALID (signed by " + file.getSignerString() + ')');
+                System.out.println("Signature VALID (signed by " + file.getSignerString() + ' ' + file._sigType + ')');
             else
-                System.out.println("Signature INVALID (signed by " + file.getSignerString() + ')');
+                System.out.println("Signature INVALID (signed by " + file.getSignerString() + ' ' + file._sigType +')');
             return isValidSignature;
         } catch (IOException ioe) {
             System.out.println("Error verifying input file '" + signedFile + "'");
             ioe.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean genKeysCLI(String publicKeyFile, String privateKeyFile) {
+        return genKeysCLI(DEFAULT_TYPE, publicKeyFile, privateKeyFile);
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean genKeysCLI(String stype, String publicKeyFile, String privateKeyFile) {
+        SigType type = parseSigType(stype);
+        if (type == null) {
+            System.out.println("Signature type " + stype + " is not supported");
+            return false;
+        }
+        return genKeysCLI(type, publicKeyFile, privateKeyFile);
+    }
+
+    /**
+     *  Writes Java-encoded keys (X.509 for public and PKCS#8 for private)
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean genKeysCLI(SigType type, String publicKeyFile, String privateKeyFile) {
+        File pubFile = new File(publicKeyFile);
+        File privFile = new File(privateKeyFile);
+        if (pubFile.exists()) {
+            System.out.println("Error: Not overwriting file " + publicKeyFile);
+            return false;
+        }
+        if (privFile.exists()) {
+            System.out.println("Error: Not overwriting file " + privateKeyFile);
+            return false;
+        }
+        FileOutputStream fileOutputStream = null;
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        try {
+            // inefficiently go from Java to I2P to Java formats
+            SimpleDataStructure signingKeypair[] = context.keyGenerator().generateSigningKeys(type);
+            SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
+            SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
+            PublicKey pubkey = SigUtil.toJavaKey(signingPublicKey);
+            PrivateKey privkey = SigUtil.toJavaKey(signingPrivateKey);
+
+            fileOutputStream = new SecureFileOutputStream(pubFile);
+            fileOutputStream.write(pubkey.getEncoded());
+            fileOutputStream.close();
+            fileOutputStream = null;
+
+            fileOutputStream = new SecureFileOutputStream(privFile);
+            fileOutputStream.write(privkey.getEncoded());
+
+            System.out.println("\r\n" + type + " Private key written to: " + privateKeyFile);
+            System.out.println(type + " Public key written to: " + publicKeyFile);
+            System.out.println("\r\nPublic key: " + signingPublicKey.toBase64() + "\r\n");
+        } catch (Exception e) {
+            System.err.println("Error writing keys:");
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (fileOutputStream != null)
+                try {
+                    fileOutputStream.close();
+                } catch (IOException ioe) {}
+        }
+        return true;
     }
 }
