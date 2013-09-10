@@ -676,14 +676,12 @@ public class Router implements RouterClock.ClockShiftListener {
 
     public void killKeys() {
         //new Exception("Clearing identity files").printStackTrace();
-        int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
             File f = new File(_context.getRouterDir(),_rebuildFiles[i]);
             if (f.exists()) {
                 boolean removed = f.delete();
                 if (removed) {
                     System.out.println("INFO:  Removing old identity file: " + _rebuildFiles[i]);
-                    remCount++;
                 } else {
                     System.out.println("ERROR: Could not remove old identity file: " + _rebuildFiles[i]);
                 }
@@ -695,10 +693,6 @@ public class Router implements RouterClock.ClockShiftListener {
             removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
             removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
             saveConfig();
-        }
-
-        if (remCount > 0) {
-            _eventLog.addEvent(EventLog.REKEYED);
         }
     }
 

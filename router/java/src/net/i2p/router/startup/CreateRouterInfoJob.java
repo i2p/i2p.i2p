@@ -27,9 +27,16 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
+/**
+ *  Warning - misnamed. This creates a new RouterIdentity, i.e.
+ *  new router keys and hash. It then builds a new RouterInfo
+ *  and saves all the keys. This is generally run only once, on a new install.
+ *
+ */
 public class CreateRouterInfoJob extends JobImpl {
     private final Log _log;
     private final Job _next;
@@ -118,6 +125,7 @@ public class CreateRouterInfoJob extends JobImpl {
             getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             
             _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
+            getContext().router().eventLog().addEvent(EventLog.REKEYED, ident.calculateHash().toBase64());
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Error building the new router information", dfe);
         } catch (IOException ioe) {
