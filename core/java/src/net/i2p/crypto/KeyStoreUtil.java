@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateEncodingException;
@@ -252,7 +253,7 @@ public class KeyStoreUtil {
      *  @param alias the name of the key
      *  @param cname e.g. randomstuff.console.i2p.net
      *  @param ou e.g. console
-     *  @param keqPW the key password
+     *  @param keyPW the key password, must be at least 6 characters
      *
      *  @return success
      *  @since 0.8.3, consolidated from RouterConsoleRUnner and SSLClientListenerRunner in 0.9.9
@@ -276,16 +277,26 @@ public class KeyStoreUtil {
      *  @param validDays e.g. 3652 (10 years)
      *  @param keyAlg e.g. DSA , RSA, EC
      *  @param keySize e.g. 1024
-     *  @param keqPW the key password
+     *  @param keyPW the key password, must be at least 6 characters
      *
      *  @return success
      *  @since 0.8.3, consolidated from RouterConsoleRUnner and SSLClientListenerRunner in 0.9.9
      */
     public static boolean createKeys(File ks, String ksPW, String alias, String cname, String ou,
                                      int validDays, String keyAlg, int keySize, String keyPW) {
-        if (!ks.exists()) {
+        if (ks.exists()) {
+            try {
+                if (getCert(ks, ksPW, alias) != null) {
+                    error("Not overwriting key " + alias + ", already exists in " + ks, null);
+                    return false;
+                }
+            } catch (Exception e) {
+                error("Not overwriting key \"" + alias + "\", already exists in " + ks, e);
+                return false;
+            }
+        } else {
             File dir = ks.getParentFile();
-            if (!dir.exists()) {
+            if (dir != null && !dir.exists()) {
                 File sdir = new SecureDirectory(dir.getAbsolutePath());
                 if (!sdir.mkdir()) {
                     error("Can't create directory " + dir, null);
@@ -319,9 +330,55 @@ public class KeyStoreUtil {
             for (int i = 0;  i < args.length; i++) {
                 buf.append('"').append(args[i]).append("\" ");
             }
-            error("Failed to create SSL keystore using command line:" + buf, null);
+            error("Failed to create SSL keystore using command line: " + buf, null);
         }
         return success;
+    }
+
+    /** 
+     *  Get a private key out of a keystore
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return the key or null if not found
+     */
+    public static PrivateKey getPrivateKey(File ks, String ksPW, String alias, String keyPW)
+                              throws GeneralSecurityException, IOException {
+        InputStream fis = null;
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            fis = new FileInputStream(ks);
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            keyStore.load(fis, pwchars);
+            char[] keypwchars = keyPW.toCharArray();
+            return (PrivateKey) keyStore.getKey(alias, keypwchars);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Get a cert out of a keystore
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key
+     *  @return the certificate or null if not found
+     */
+    public static Certificate getCert(File ks, String ksPW, String alias)
+                              throws GeneralSecurityException, IOException {
+        InputStream fis = null;
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            fis = new FileInputStream(ks);
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            keyStore.load(fis, pwchars);
+            return keyStore.getCertificate(alias);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
     }
 
     /** 
@@ -338,19 +395,13 @@ public class KeyStoreUtil {
     public static boolean exportCert(File ks, String ksPW, String alias, File certFile) {
         InputStream fis = null;
         try {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            fis = new FileInputStream(ks);
-            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
-            keyStore.load(fis, pwchars);
-            Certificate cert = keyStore.getCertificate(alias);
+            Certificate cert = getCert(ks, ksPW, alias);
             if (cert != null)
                 return CertUtil.saveCert(cert, certFile);
         } catch (GeneralSecurityException gse) {
             error("Error saving ASCII SSL keys", gse);
         } catch (IOException ioe) {
             error("Error saving ASCII SSL keys", ioe);
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
         return false;
     }

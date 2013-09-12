@@ -503,8 +503,15 @@ public class SU3File {
     private static final boolean signCLI(SigType type, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName) {
         try {
+            String keypw = "";
+            while (keypw.length() < 6) {
+                System.out.print("Enter password for key \"" + signerName + "\": ");
+                keypw = DataHelper.readLine(System.in).trim();
+                if (keypw.length() > 0 && keypw.length() < 6)
+                    System.out.println("Key password must be at least 6 characters");
+            }
             File pkfile = new File(privateKeyFile);
-            PrivateKey pk = SigUtil.importJavaPrivateKey(pkfile, type);
+            PrivateKey pk = KeyStoreUtil.getPrivateKey(pkfile,KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, signerName, keypw);
             SigningPrivateKey spk = SigUtil.fromJavaKey(pk, type);
             SU3File file = new SU3File(signedFile);
             file.write(new File(inputFile), CONTENT_ROUTER, version, signerName, spk);
@@ -568,45 +575,45 @@ public class SU3File {
      */
     private static final boolean genKeysCLI(SigType type, String publicKeyFile, String privateKeyFile) {
         File pubFile = new File(publicKeyFile);
-        File privFile = new File(privateKeyFile);
         if (pubFile.exists()) {
             System.out.println("Error: Not overwriting file " + publicKeyFile);
             return false;
         }
-        if (privFile.exists()) {
-            System.out.println("Error: Not overwriting file " + privateKeyFile);
+        File ksFile = new File(privateKeyFile);
+        String alias = "";
+        String keypw = "";
+        try {
+            while (alias.length() == 0) {
+                System.out.print("Enter key name (example@mail.i2p): ");
+                alias = DataHelper.readLine(System.in).trim();
+            }
+            while (keypw.length() < 6) {
+                System.out.print("Enter new key password: ");
+                keypw = DataHelper.readLine(System.in).trim();
+                if (keypw.length() > 0 && keypw.length() < 6)
+                    System.out.println("Key password must be at least 6 characters");
+            }
+        } catch (IOException ioe) {
             return false;
         }
-        FileOutputStream fileOutputStream = null;
-        I2PAppContext context = I2PAppContext.getGlobalContext();
-        try {
-            // inefficiently go from Java to I2P to Java formats
-            SimpleDataStructure signingKeypair[] = context.keyGenerator().generateSigningKeys(type);
-            SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
-            SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
-            PublicKey pubkey = SigUtil.toJavaKey(signingPublicKey);
-            PrivateKey privkey = SigUtil.toJavaKey(signingPrivateKey);
-
-            fileOutputStream = new SecureFileOutputStream(pubFile);
-            fileOutputStream.write(pubkey.getEncoded());
-            fileOutputStream.close();
-            fileOutputStream = null;
-
-            fileOutputStream = new SecureFileOutputStream(privFile);
-            fileOutputStream.write(privkey.getEncoded());
-
-            System.out.println("\r\n" + type + " Private key written to: " + privateKeyFile);
-            System.out.println(type + " Public key written to: " + publicKeyFile);
-            System.out.println("\r\nPublic key: " + signingPublicKey.toBase64() + "\r\n");
-        } catch (Exception e) {
+        int keylen = type.getPubkeyLen() * 8;
+        if (type.getBaseAlgorithm() == SigAlgo.EC) {
+            keylen /= 2;
+            if (keylen == 528)
+                keylen = 521;
+        }
+        boolean success = KeyStoreUtil.createKeys(ksFile, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, alias,
+                                                  "cn", "ou", 3652, type.getBaseAlgorithm().getName(),
+                                                  keylen, keypw);
+        if (!success) {
             System.err.println("Error writing keys:");
-            e.printStackTrace();
             return false;
-        } finally {
-            if (fileOutputStream != null)
-                try {
-                    fileOutputStream.close();
-                } catch (IOException ioe) {}
+        }
+        File outfile = new File(publicKeyFile);
+        success = KeyStoreUtil.exportCert(ksFile, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, alias, outfile);
+        if (!success) {
+            System.err.println("Error writing keys:");
+            return false;
         }
         return true;
     }
