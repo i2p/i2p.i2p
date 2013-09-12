@@ -7,17 +7,13 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Locale;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.util.Log;
 
 /**
@@ -71,14 +67,14 @@ class I2CPSSLSocketFactory {
         }
 
         File dir = new File(context.getConfigDir(), CERT_DIR);
-        int adds = addCerts(dir, ks);
+        int adds = KeyStoreUtil.addCerts(dir, ks);
         int totalAdds = adds;
         if (adds > 0)
             info(context, "Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
 
         File dir2 = new File(System.getProperty("user.dir"), CERT_DIR);
         if (!dir.getAbsolutePath().equals(dir2.getAbsolutePath())) {
-            adds = addCerts(dir2, ks);
+            adds = KeyStoreUtil.addCerts(dir2, ks);
             totalAdds += adds;
             if (adds > 0)
                 info(context, "Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
@@ -103,82 +99,6 @@ class I2CPSSLSocketFactory {
         } catch (GeneralSecurityException gse) {
             error(context, "SSL context init error", gse);
         }
-    }
-
-    /**
-     *  Load all X509 Certs from a directory and add them to the
-     *  trusted set of certificates in the key store
-     *
-     *  @return number successfully added
-     */
-    private static int addCerts(File dir, KeyStore ks) {
-        info("Looking for X509 Certificates in " + dir.getAbsolutePath());
-        int added = 0;
-        if (dir.exists() && dir.isDirectory()) {
-            File[] files = dir.listFiles();
-            if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    File f = files[i];
-                    if (!f.isFile())
-                        continue;
-                    // use file name as alias
-                    String alias = f.getName().toLowerCase(Locale.US);
-                    boolean success = addCert(f, alias, ks);
-                    if (success)
-                        added++;
-                }
-            }
-        }
-        return added;
-    }
-
-    /**
-     *  Load an X509 Cert from a file and add it to the
-     *  trusted set of certificates in the key store
-     *
-     *  @return success
-     */
-    private static boolean addCert(File file, String alias, KeyStore ks) {
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            info("Read X509 Certificate from " + file.getAbsolutePath() +
-                          " Issuer: " + cert.getIssuerX500Principal() +
-                          "; Valid From: " + cert.getNotBefore() +
-                          " To: " + cert.getNotAfter());
-            try {
-                cert.checkValidity();
-            } catch (CertificateExpiredException cee) {
-                error("Rejecting expired X509 Certificate: " + file.getAbsolutePath(), cee);
-                return false;
-            } catch (CertificateNotYetValidException cnyve) {
-                error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
-                return false;
-            }
-            ks.setCertificateEntry(alias, cert);
-            info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
-        } catch (GeneralSecurityException gse) {
-            error("Error reading X509 Certificate: " + file.getAbsolutePath(), gse);
-            return false;
-        } catch (IOException ioe) {
-            error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
-            return false;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
-        }
-        return true;
-    }
-
-    /** @since 0.9.8 */
-    private static void info(String msg) {
-        log(I2PAppContext.getGlobalContext(), Log.INFO, msg, null);
-    }
-
-    /** @since 0.9.8 */
-    private static void error(String msg, Throwable t) {
-        log(I2PAppContext.getGlobalContext(), Log.ERROR, msg, t);
     }
 
     /** @since 0.9.8 */
