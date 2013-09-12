@@ -35,7 +35,7 @@ public class KeyStoreUtil {
     public static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String DEFAULT_KEY_ALGORITHM = "DSA";
     private static final int DEFAULT_KEY_SIZE = 1024;
-    private static final int DEFAULT_KEY_VALID_DAYS = 3562;
+    private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
 
     /**
      *  Create a new KeyStore object, and load it from ksFile if it is
