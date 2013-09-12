@@ -33,8 +33,8 @@ import net.i2p.util.SystemVersion;
 public class KeyStoreUtil {
         
     public static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
-    private static final String DEFAULT_KEY_ALGORITHM = "DSA";
-    private static final int DEFAULT_KEY_SIZE = 1024;
+    private static final String DEFAULT_KEY_ALGORITHM = "RSA";
+    private static final int DEFAULT_KEY_SIZE = 2048;
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
 
     /**
@@ -304,7 +304,7 @@ public class KeyStoreUtil {
                    "-dname", "CN=" + cname + ",OU=" + ou + ",O=I2P Anonymous Network,L=XX,ST=XX,C=XX",
                    "-validity", Integer.toString(validDays),  // 10 years
                    "-keyalg", keyAlg,
-                   "-keysize", "1024",
+                   "-keysize", Integer.toString(keySize),
                    "-keypass", keyPW
         };
         boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 30);  // 30 secs
