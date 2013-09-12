@@ -152,7 +152,7 @@ elif [ $(which certtool) ]; then : ;else
     exit 1
 fi
 
-cd `dirname $0`/../../installer/resources/certificates
+cd `dirname $0`/../../installer/resources/certificates/ssl
 
 for i in *.crt *.cert
 do

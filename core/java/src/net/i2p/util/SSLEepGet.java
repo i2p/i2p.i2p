@@ -72,7 +72,7 @@ import net.i2p.data.DataHelper;
  * Fails on bad certs (must have a valid cert chain)
  * Self-signed certs or CAs not in the JVM key store must be loaded to be trusted.
  *
- * Since 0.8.2, loads additional trusted CA certs from $I2P/certificates/ and ~/.i2p/certificates/
+ * Since 0.8.2, loads additional trusted CA certs from $I2P/certificates/ssl/ and ~/.i2p/certificates/ssl/
  *
  * @author zzz
  * @since 0.7.10
@@ -86,6 +86,8 @@ public class SSLEepGet extends EepGet {
     private final SSLContext _sslContext;
     /** may be null if init failed */
     private SavingTrustManager _stm;
+
+    private static final String CERT_DIR = "certificates/ssl";
 
     /**
      *  A new SSLEepGet with a new SSLState
@@ -171,8 +173,8 @@ public class SSLEepGet extends EepGet {
      *  else from $JAVA_HOME/lib/security/jssacacerts,
      *  else from $JAVA_HOME/lib/security/cacerts.
      *
-     *  Then adds certs found in the $I2P/certificates/ directory
-     *  and in the ~/.i2p/certificates/ directory.
+     *  Then adds certs found in the $I2P/certificates/ssl/ directory
+     *  and in the ~/.i2p/certificates/ssl/ directory.
      *
      *  @return null on failure
      *  @since 0.8.2
@@ -188,13 +190,13 @@ public class SSLEepGet extends EepGet {
             _log.info("Loaded " + count + " default trusted certificates");
         }
 
-        File dir = new File(_context.getBaseDir(), "certificates");
+        File dir = new File(_context.getBaseDir(), CERT_DIR);
         int adds = KeyStoreUtil.addCerts(dir, ks);
         int totalAdds = adds;
         if (adds > 0 && _log.shouldLog(Log.INFO))
             _log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
         if (!_context.getBaseDir().getAbsolutePath().equals(_context.getConfigDir().getAbsolutePath())) {
-            dir = new File(_context.getConfigDir(), "certificates");
+            dir = new File(_context.getConfigDir(), CERT_DIR);
             adds = KeyStoreUtil.addCerts(dir, ks);
             totalAdds += adds;
             if (adds > 0 && _log.shouldLog(Log.INFO))
@@ -202,7 +204,7 @@ public class SSLEepGet extends EepGet {
         }
         dir = new File(System.getProperty("user.dir"));
         if (!_context.getBaseDir().getAbsolutePath().equals(dir.getAbsolutePath())) {
-            dir = new File(_context.getConfigDir(), "certificates");
+            dir = new File(_context.getConfigDir(), CERT_DIR);
             adds = KeyStoreUtil.addCerts(dir, ks);
             totalAdds += adds;
             if (adds > 0 && _log.shouldLog(Log.INFO))
