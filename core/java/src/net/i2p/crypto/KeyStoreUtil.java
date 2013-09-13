@@ -330,7 +330,7 @@ public class KeyStoreUtil {
             for (int i = 0;  i < args.length; i++) {
                 buf.append('"').append(args[i]).append("\" ");
             }
-            error("Failed to create SSL keystore using command line: " + buf, null);
+            error("Failed to generate keys using command line: " + buf, null);
         }
         return success;
     }
