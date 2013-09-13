@@ -17,6 +17,8 @@ import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPrivateKeySpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECField;
@@ -29,6 +31,8 @@ import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Map;
 
@@ -56,10 +60,16 @@ class SigUtil {
      */
     public static PublicKey toJavaKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
-        if (pk.getType() == SigType.DSA_SHA1)
-            return toJavaDSAKey(pk);
-        else
-            return toJavaECKey(pk);
+        switch (pk.getType().getBaseAlgorithm()) {
+            case DSA:
+                return toJavaDSAKey(pk);
+            case EC:
+                return toJavaECKey(pk);
+            case RSA:
+                return toJavaRSAKey(pk);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -67,10 +77,16 @@ class SigUtil {
      */
     public static PrivateKey toJavaKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
-        if (pk.getType() == SigType.DSA_SHA1)
-            return toJavaDSAKey(pk);
-        else
-            return toJavaECKey(pk);
+        switch (pk.getType().getBaseAlgorithm()) {
+            case DSA:
+                return toJavaDSAKey(pk);
+            case EC:
+                return toJavaECKey(pk);
+            case RSA:
+                return toJavaRSAKey(pk);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -78,10 +94,16 @@ class SigUtil {
      */
     public static SigningPublicKey fromJavaKey(PublicKey pk, SigType type)
                               throws GeneralSecurityException {
-        if (type == SigType.DSA_SHA1)
-            return fromJavaKey((DSAPublicKey) pk);
-        else
-            return fromJavaKey((ECPublicKey) pk, type);
+        switch (type.getBaseAlgorithm()) {
+            case DSA:
+                return fromJavaKey((DSAPublicKey) pk);
+            case EC:
+                return fromJavaKey((ECPublicKey) pk, type);
+            case RSA:
+                return fromJavaKey((RSAPublicKey) pk, type);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -89,10 +111,16 @@ class SigUtil {
      */
     public static SigningPrivateKey fromJavaKey(PrivateKey pk, SigType type)
                               throws GeneralSecurityException {
-        if (type == SigType.DSA_SHA1)
-            return fromJavaKey((DSAPrivateKey) pk);
-        else
-            return fromJavaKey((ECPrivateKey) pk, type);
+        switch (type.getBaseAlgorithm()) {
+            case DSA:
+                return fromJavaKey((DSAPrivateKey) pk);
+            case EC:
+                return fromJavaKey((ECPrivateKey) pk, type);
+            case RSA:
+                return fromJavaKey((RSAPrivateKey) pk, type);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -226,6 +254,38 @@ class SigUtil {
         return new SigningPrivateKey(type, bx);
     }
 
+    public static RSAPublicKey toJavaRSAKey(SigningPublicKey pk)
+                              throws GeneralSecurityException {
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        // modulus exponent
+        KeySpec ks = new RSAPublicKeySpec(null, null); // FIXME
+        return (RSAPublicKey) kf.generatePublic(ks);
+    }
+
+    public static RSAPrivateKey toJavaRSAKey(SigningPrivateKey pk)
+                              throws GeneralSecurityException {
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        // modulus exponent
+        KeySpec ks = new RSAPrivateKeySpec(null, null); // FIXME
+        return (RSAPrivateKey) kf.generatePrivate(ks);
+    }
+
+    public static SigningPublicKey fromJavaKey(RSAPublicKey pk, SigType type)
+                              throws GeneralSecurityException {
+        BigInteger y = pk.getPublicExponent();
+        int len = type.getPubkeyLen();
+        byte[] by = rectify(y, len);
+        return new SigningPublicKey(type, by);
+    }
+
+    public static SigningPrivateKey fromJavaKey(RSAPrivateKey pk, SigType type)
+                              throws GeneralSecurityException {
+        BigInteger x = pk.getPrivateExponent();
+        int len = type.getPrivkeyLen();
+        byte[] bx = rectify(x, len);
+        return new SigningPrivateKey(type, bx);
+    }
+
     /**
      *  @return ASN.1 representation
      */
@@ -249,7 +309,7 @@ class SigUtil {
                               throws GeneralSecurityException, IOException {
         byte[] data = getData(file);
         KeySpec ks = new X509EncodedKeySpec(data);
-        String algo = type == SigType.DSA_SHA1 ? "DSA" : "EC";
+        String algo = type.getBaseAlgorithm().getName();
         KeyFactory kf = KeyFactory.getInstance(algo);
         return kf.generatePublic(ks);
     }
@@ -261,7 +321,7 @@ class SigUtil {
                               throws GeneralSecurityException, IOException {
         byte[] data = getData(file);
         KeySpec ks = new PKCS8EncodedKeySpec(data);
-        String algo = type == SigType.DSA_SHA1 ? "DSA" : "EC";
+        String algo = type.getBaseAlgorithm().getName();
         KeyFactory kf = KeyFactory.getInstance(algo);
         return kf.generatePrivate(ks);
     }

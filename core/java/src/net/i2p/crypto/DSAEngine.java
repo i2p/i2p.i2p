@@ -468,7 +468,7 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic raw verify ECDSA only
+     *  Generic raw verify any type
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9
      */
@@ -480,11 +480,10 @@ public class DSAEngine {
         int hashlen = hash.length();
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
-        if (type == SigType.DSA_SHA1)
-            throw new UnsupportedOperationException();
 
-        java.security.Signature jsig = java.security.Signature.getInstance("NONEwithECDSA");
-        PublicKey pubKey = SigUtil.toJavaECKey(verifyingKey);
+        String algo = getRawAlgo(type);
+        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
         jsig.initVerify(pubKey);
         jsig.update(hash.getData());
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
@@ -527,21 +526,20 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic raw sign ECDSA only.
+     *  Generic raw verify any type
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9
      */
     private Signature altSignRaw(SimpleDataStructure hash, SigningPrivateKey privateKey) throws GeneralSecurityException {
         SigType type = privateKey.getType();
-        if (type == SigType.DSA_SHA1)
-            throw new UnsupportedOperationException();
         int hashlen = hash.length();
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
-        java.security.Signature jsig = java.security.Signature.getInstance("NONEwithECDSA");
-        PrivateKey privKey = SigUtil.toJavaECKey(privateKey);
+        String algo = getRawAlgo(type);
+        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(hash.getData());
         return SigUtil.fromJavaSig(jsig.sign(), type);
@@ -558,6 +556,19 @@ public class DSAEngine {
         jsig.initSign(privKey, _context.random());
         jsig.update(data);
         return SigUtil.fromJavaSig(jsig.sign(), SigType.DSA_SHA1);
+    }
+
+    private static String getRawAlgo(SigType type) {
+        switch (type.getBaseAlgorithm()) {
+            case DSA:
+                return "NONEwithDSA";
+            case EC:
+                return "NONEwithECDSA";
+            case RSA:
+                return "NONEwithRSA";
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     //private static final int RUNS = 1000;
