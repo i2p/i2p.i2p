@@ -225,34 +225,34 @@ public class KeyGenerator {
             kpg.initialize(type.getParams(), _context.random());
             kp = kpg.generateKeyPair();
         } catch (ProviderException pe) {
+            // java.security.ProviderException: sun.security.pkcs11.wrapper.PKCS11Exception: CKR_DOMAIN_PARAMS_INVALID
             // This is a RuntimeException, thx Sun
             // Fails for P-192 only, on Ubuntu
             Log log = _context.logManager().getLog(KeyGenerator.class);
             String pname = kpg.getProvider().getName();
             if ("BC".equals(pname)) {
                 if (log.shouldLog(Log.WARN))
-                    log.warn("BC KPG failed", pe);
-                throw new GeneralSecurityException("BC KPG", pe);
+                    log.warn("BC KPG failed for " + type, pe);
+                throw new GeneralSecurityException("BC KPG for " + type, pe);
             }
             if (!ECConstants.isBCAvailable())
-                throw new GeneralSecurityException(pname + " KPG", pe);
+                throw new GeneralSecurityException(pname + " KPG failed for " + type, pe);
             if (log.shouldLog(Log.WARN))
-                log.warn(pname + " KPG failed, trying BC", pe);
+                log.warn(pname + " KPG failed for " + type + ", trying BC", pe);
             try {
                 kpg = KeyPairGenerator.getInstance("EC", "BC");
                 kpg.initialize(type.getParams(), _context.random());
                 kp = kpg.generateKeyPair();
             } catch (ProviderException pe2) {
                 if (log.shouldLog(Log.WARN))
-                    log.warn("BC KPG failed too", pe2);
+                    log.warn("BC KPG failed for " + type + " also", pe2);
                 // throw original exception
-                throw new GeneralSecurityException(pname + " KPG", pe);
+                throw new GeneralSecurityException(pname + " KPG for " + type, pe);
             } catch (GeneralSecurityException gse) {
                 if (log.shouldLog(Log.WARN))
-                    log.warn("BC KPG failed too", gse);
-                gse.printStackTrace();
+                    log.warn("BC KPG failed for " + type + " also", gse);
                 // throw original exception
-                throw new GeneralSecurityException(pname + " KPG", pe);
+                throw new GeneralSecurityException(pname + " KPG for " + type, pe);
             }
         }
         ECPublicKey pubkey = (ECPublicKey) kp.getPublic();

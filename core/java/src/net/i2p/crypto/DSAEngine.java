@@ -382,7 +382,7 @@ public class DSAEngine {
             _log.error("Bad R length " + rbytes.length);
             return null;
         } else {
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Using short rbytes.length [" + rbytes.length + "]");
+            //if (_log.shouldLog(Log.DEBUG)) _log.debug("Using short rbytes.length [" + rbytes.length + "]");
             //System.arraycopy(rbytes, 0, out, 20 - rbytes.length, rbytes.length);
             for (int i = 0; i < rbytes.length; i++)
                 out[i + 20 - rbytes.length] = rbytes[i];
@@ -401,7 +401,7 @@ public class DSAEngine {
             _log.error("Bad S length " + sbytes.length);
             return null;
         } else {
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Using short sbytes.length [" + sbytes.length + "]");
+            //if (_log.shouldLog(Log.DEBUG)) _log.debug("Using short sbytes.length [" + sbytes.length + "]");
             //System.arraycopy(sbytes, 0, out, 40 - sbytes.length, sbytes.length);
             for (int i = 0; i < sbytes.length; i++)
                 out[i + 20 + 20 - sbytes.length] = sbytes[i];

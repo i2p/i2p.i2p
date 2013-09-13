@@ -301,13 +301,15 @@ class ECConstants {
 
     /**
      *  Tries curve name1, then name2, then creates new from parms.
+     *  @param name2 null to skip
+     *  @param parms null to skip
      *  @return null if all fail
      */
     private static ECParameterSpec genSpec(String name1, String name2, ECParms parms) {
         ECParameterSpec rv = genSpec(name1);
-        if (rv == null) {
+        if (rv == null && name2 != null) {
             rv = genSpec(name2);
-            if (rv == null) {
+            if (rv == null && parms != null) {
                 rv = parms.genSpec();
                 if (rv != null)
                     log("Curve " + name2 + " created");
@@ -323,5 +325,13 @@ class ECConstants {
     public static final ECParameterSpec P256_SPEC = genSpec("secp256r1", "P-256", PARM_P256);
     public static final ECParameterSpec P384_SPEC = genSpec("secp384r1", "P-384", PARM_P384);
     public static final ECParameterSpec P521_SPEC = genSpec("secp521r1", "P-521", PARM_P521);
+
+    // Koblitz
+    public static final ECParameterSpec K163_SPEC = genSpec("sect163k1", "K-163", null);
+    public static final ECParameterSpec K233_SPEC = genSpec("sect233k1", "K-233", null);
+    public static final ECParameterSpec K283_SPEC = genSpec("sect283k1", "K-283", null);
+    public static final ECParameterSpec K409_SPEC = genSpec("sect409k1", "K-409", null);
+    public static final ECParameterSpec K571_SPEC = genSpec("sect571k1", "K-571", null);
+
 
 }
