@@ -7,8 +7,7 @@ package net.i2p.crypto;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-
-import net.i2p.data.SigningPublicKey;
+import java.security.PublicKey;
 
 /**
  *  A backend for storing and retrieving SigningPublicKeys
@@ -24,7 +23,7 @@ public interface KeyRing {
      *  @param scope a domain identifier, indicating router update, reseed, etc.
      *  @return null if none
      */
-    public SigningPublicKey getKey(String keyName, String scope, SigType type)
+    public PublicKey getKey(String keyName, String scope, SigType type)
                             throws GeneralSecurityException, IOException;
 
     /**
@@ -32,6 +31,6 @@ public interface KeyRing {
      *  Throws on all errors.
      *  @param scope a domain identifier, indicating router update, reseed, etc.
      */
-    public void setKey(String keyName, String scope, SigningPublicKey key)
+    public void setKey(String keyName, String scope, PublicKey key)
                             throws GeneralSecurityException, IOException;
 }

@@ -14,8 +14,6 @@ import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-import net.i2p.data.SigningPublicKey;
-
 /**
  *  Dumb storage in a directory for testing.
  *  No sanitization of filenames, unsafe.
@@ -30,7 +28,7 @@ class DirKeyRing implements KeyRing {
         _base = baseDir;
     }
 
-    public SigningPublicKey getKey(String keyName, String scope, SigType type)
+    public PublicKey getKey(String keyName, String scope, SigType type)
                             throws GeneralSecurityException, IOException {
         keyName = keyName.replace("@", "_at_");
         File test = new File(keyName);
@@ -46,12 +44,11 @@ class DirKeyRing implements KeyRing {
             fis = new FileInputStream(kd);
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            PublicKey pk = cert.getPublicKey();
-            return SigUtil.fromJavaKey(pk, type);
+            return cert.getPublicKey();
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
     }
 
-    public void setKey(String keyName, String scope, SigningPublicKey key) {}
+    public void setKey(String keyName, String scope, PublicKey key) {}
 }

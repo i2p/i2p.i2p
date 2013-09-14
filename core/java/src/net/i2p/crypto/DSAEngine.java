@@ -38,6 +38,9 @@ import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -172,6 +175,25 @@ public class DSAEngine {
         } catch (GeneralSecurityException gse) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(type + " Sig Verify Fail", gse);
+            return false;
+        }
+    }
+
+    /**
+     *  Generic signature type.
+     *  If you have a Java pubkey, use this, so you don't lose the key parameters,
+     *  which may be different than the ones defined in SigType.
+     *
+     *  @param hash SHA1Hash, Hash, Hash384, or Hash512
+     *  @param pubKey Java key
+     *  @since 0.9.9
+     */
+    public boolean verifySignature(Signature signature, SimpleDataStructure hash, PublicKey pubKey) {
+        try {
+            return altVerifySigRaw(signature, hash, pubKey);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(signature.getType() + " Sig Verify Fail", gse);
             return false;
         }
     }
@@ -331,6 +353,28 @@ public class DSAEngine {
     }
 
     /**
+     *  Generic signature type.
+     *  If you have a Java privkey, use this, so you don't lose the key parameters,
+     *  which may be different than the ones defined in SigType.
+     *
+     *  @param hash SHA1Hash, Hash, Hash384, or Hash512
+     *  @param pubKey Java key
+     *  @param type returns a Signature of this type
+     *  @return null on error
+     *  @since 0.9.9
+     */
+    public Signature sign(SimpleDataStructure hash, PrivateKey privKey, SigType type) {
+        try {
+            String algo = getRawAlgo(privKey);
+            return altSignRaw(algo, hash, privKey, type);
+        } catch (GeneralSecurityException gse) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(type + " Sign Fail", gse);
+            return null;
+        }
+    }
+
+    /**
      *  Sign using DSA-SHA1 or Syndie DSA-SHA256 ONLY.
      *
      *  @param hash either a Hash or a SHA1Hash
@@ -477,13 +521,29 @@ public class DSAEngine {
         SigType type = signature.getType();
         if (type != verifyingKey.getType())
             throw new IllegalArgumentException("type mismatch sig=" + type + " key=" + verifyingKey.getType());
+
+        PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
+        return verifySignature(signature, hash, pubKey);
+    }
+
+    /**
+     *  Generic raw verify any type.
+     *  If you have a Java pubkey, use this, so you don't lose the key parameters,
+     *  which may be different than the ones defined in SigType.
+     *
+     *  @throws GeneralSecurityException if algorithm unvailable or on other errors
+     *  @param verifyingKey Java key
+     *  @since 0.9.9
+     */
+    private boolean altVerifySigRaw(Signature signature, SimpleDataStructure hash, PublicKey pubKey)
+                        throws GeneralSecurityException {
+        SigType type = signature.getType();
         int hashlen = hash.length();
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
         String algo = getRawAlgo(type);
         java.security.Signature jsig = java.security.Signature.getInstance(algo);
-        PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
         jsig.initVerify(pubKey);
         jsig.update(hash.getData());
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
@@ -533,13 +593,26 @@ public class DSAEngine {
      */
     private Signature altSignRaw(SimpleDataStructure hash, SigningPrivateKey privateKey) throws GeneralSecurityException {
         SigType type = privateKey.getType();
+        String algo = getRawAlgo(type);
+        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        PrivateKey privKey = SigUtil.toJavaKey(privateKey);
+        return altSignRaw(algo, hash, privKey, type);
+    }
+
+    /**
+     *  Generic raw verify any type
+     *  @param hash SHA1Hash, Hash, Hash384, or Hash512
+     *  @param type returns a Signature of this type
+     *  @throws GeneralSecurityException if algorithm unvailable or on other errors
+     *  @since 0.9.9
+     */
+    private Signature altSignRaw(String algo, SimpleDataStructure hash, PrivateKey privKey, SigType type)
+                                 throws GeneralSecurityException {
         int hashlen = hash.length();
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
-        String algo = getRawAlgo(type);
         java.security.Signature jsig = java.security.Signature.getInstance(algo);
-        PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(hash.getData());
         return SigUtil.fromJavaSig(jsig.sign(), type);
@@ -558,6 +631,7 @@ public class DSAEngine {
         return SigUtil.fromJavaSig(jsig.sign(), SigType.DSA_SHA1);
     }
 
+    /** @since 0.9.9 */
     private static String getRawAlgo(SigType type) {
         switch (type.getBaseAlgorithm()) {
             case DSA:
@@ -569,6 +643,17 @@ public class DSAEngine {
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    /** @since 0.9.9 */
+    private static String getRawAlgo(PrivateKey privKey) {
+        if (privKey instanceof DSAPrivateKey)
+            return "NONEwithDSA";
+        if (privKey instanceof ECPrivateKey)
+            return "NONEwithECDSA";
+        if (privKey instanceof RSAPrivateKey)
+            return "NONEwithRSA";
+        throw new IllegalArgumentException();
     }
 
     //private static final int RUNS = 1000;

@@ -47,7 +47,7 @@ public class SU3File {
     private int _signerLength;
     private ContentType _contentType;
     private long _contentLength;
-    private SigningPublicKey _signerPubkey;
+    private PublicKey _signerPubkey;
     private boolean _headerVerified;
     private SigType _sigType;
 
@@ -330,13 +330,12 @@ public class SU3File {
      *  @param signer ID of the public key, 1-255 bytes when converted to UTF-8
      */
     public void write(File content, int contentType, String version,
-                      String signer, SigningPrivateKey privkey) throws IOException {
+                      String signer, PrivateKey privkey, SigType sigType) throws IOException {
         InputStream in = null;
         DigestOutputStream out = null;
         boolean ok = false;
         try {
             in = new BufferedInputStream(new FileInputStream(content));
-            SigType sigType = privkey.getType();
             MessageDigest md = sigType.getDigestInstance();
             out = new DigestOutputStream(new BufferedOutputStream(new FileOutputStream(_file)), md);
             out.write(MAGIC);
@@ -385,7 +384,7 @@ public class SU3File {
             out.on(false);
             SimpleDataStructure hash = sigType.getHashInstance();
             hash.setData(sha);
-            Signature signature = _context.dsa().sign(hash, privkey);
+            Signature signature = _context.dsa().sign(hash, privkey, sigType);
             //System.out.println("hash\n" + HexDump.dump(sha));
             //System.out.println("sig\n" + HexDump.dump(signature.getData()));
             signature.writeBytes(out);
@@ -548,9 +547,8 @@ public class SU3File {
                 System.out.println("Private key for " + signerName + " not found in keystore " + privateKeyFile);
                 return false;
             }
-            SigningPrivateKey spk = SigUtil.fromJavaKey(pk, type);
             SU3File file = new SU3File(signedFile);
-            file.write(new File(inputFile), CONTENT_ROUTER, version, signerName, spk);
+            file.write(new File(inputFile), CONTENT_ROUTER, version, signerName, pk, type);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
             return true;
         } catch (GeneralSecurityException gse) {
