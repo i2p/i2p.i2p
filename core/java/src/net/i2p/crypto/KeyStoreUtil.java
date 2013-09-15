@@ -315,10 +315,11 @@ public class KeyStoreUtil {
                    "-dname", "CN=" + cname + ",OU=" + ou + ",O=I2P Anonymous Network,L=XX,ST=XX,C=XX",
                    "-validity", Integer.toString(validDays),  // 10 years
                    "-keyalg", keyAlg,
+                   "-sigalg", getSigAlg(keySize, keyAlg),
                    "-keysize", Integer.toString(keySize),
                    "-keypass", keyPW
         };
-        boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 30);  // 30 secs
+        boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 240);
         if (success) {
             success = ks.exists();
         }
@@ -333,6 +334,30 @@ public class KeyStoreUtil {
             error("Failed to generate keys using command line: " + buf, null);
         }
         return success;
+    }
+
+    private static String getSigAlg(int size, String keyalg) {
+        if (keyalg.equals("EC"))
+            keyalg = "ECDSA";
+        String hash;
+        if (keyalg.equals("ECDSA")) {
+            if (size <= 256)
+                hash = "SHA256";
+            else if (size <= 384)
+                hash = "SHA384";
+            else
+                hash = "SHA512";
+        } else {
+            if (size <= 1024)
+                hash = "SHA1";
+            else if (size <= 2048)
+                hash = "SHA256";
+            else if (size <= 3072)
+                hash = "SHA384";
+            else
+                hash = "SHA512";
+        }
+        return hash + "with" + keyalg;
     }
 
     /** 

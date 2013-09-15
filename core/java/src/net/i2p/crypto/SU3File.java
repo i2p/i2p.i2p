@@ -385,6 +385,8 @@ public class SU3File {
             SimpleDataStructure hash = sigType.getHashInstance();
             hash.setData(sha);
             Signature signature = _context.dsa().sign(hash, privkey, sigType);
+            if (signature == null)
+                throw new IOException("sig fail");
             //System.out.println("hash\n" + HexDump.dump(sha));
             //System.out.println("sig\n" + HexDump.dump(signature.getData()));
             signature.writeBytes(out);

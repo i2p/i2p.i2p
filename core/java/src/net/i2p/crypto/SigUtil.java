@@ -31,6 +31,7 @@ import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -169,8 +170,8 @@ class SigUtil {
         byte[] by = new byte[sublen];
         System.arraycopy(b, 0, bx, 0, sublen);
         System.arraycopy(b, sublen, by, 0, sublen);
-        BigInteger x = new BigInteger(1, bx);
-        BigInteger y = new BigInteger(1, by);
+        BigInteger x = new NativeBigInteger(1, bx);
+        BigInteger y = new NativeBigInteger(1, by);
         ECPoint w = new ECPoint(x, y);
         // see ECConstants re: casting
         ECPublicKeySpec ks = new ECPublicKeySpec(w, (ECParameterSpec) type.getParams());
@@ -184,7 +185,7 @@ class SigUtil {
         int len = type.getPubkeyLen();
         int sublen = len / 2;
         byte[] b = pk.getData();
-        BigInteger s = new BigInteger(1, b);
+        BigInteger s = new NativeBigInteger(1, b);
         // see ECConstants re: casting
         ECPrivateKeySpec ks = new ECPrivateKeySpec(s, (ECParameterSpec) type.getParams());
         KeyFactory kf = KeyFactory.getInstance("EC");
@@ -254,42 +255,71 @@ class SigUtil {
         return new SigningPrivateKey(type, bx);
     }
 
+    /**
+     *  @deprecated unused
+     */
     public static RSAPublicKey toJavaRSAKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
+        SigType type = pk.getType();
         KeyFactory kf = KeyFactory.getInstance("RSA");
+        BigInteger n = new NativeBigInteger(1, pk.getData());
+        BigInteger e = ((RSAKeyGenParameterSpec)type.getParams()).getPublicExponent();
         // modulus exponent
-        KeySpec ks = new RSAPublicKeySpec(null, null); // FIXME
+        KeySpec ks = new RSAPublicKeySpec(n, e);
         return (RSAPublicKey) kf.generatePublic(ks);
     }
 
+    /**
+     *  @deprecated unimplemented, unused
+     */
     public static RSAPrivateKey toJavaRSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
+     /*
         KeyFactory kf = KeyFactory.getInstance("RSA");
+        // private key is modulus (pubkey) + exponent
+        // get each part like in EC
+        BigInteger n = new NativeBigInteger(1, ...);
+        BigInteger d = new NativeBigInteger(1, ...);
         // modulus exponent
-        KeySpec ks = new RSAPrivateKeySpec(null, null); // FIXME
+        KeySpec ks = new RSAPrivateKeySpec(n, d);  // 65537 0x10001
         return (RSAPrivateKey) kf.generatePrivate(ks);
+      */
+      throw new UnsupportedOperationException();
     }
 
+    /**
+     *  @deprecated unused
+     */
     public static SigningPublicKey fromJavaKey(RSAPublicKey pk, SigType type)
                               throws GeneralSecurityException {
-        BigInteger y = pk.getPublicExponent();
+        BigInteger n = pk.getModulus();
         int len = type.getPubkeyLen();
-        byte[] by = rectify(y, len);
-        return new SigningPublicKey(type, by);
+        byte[] bn = rectify(n, len);
+        return new SigningPublicKey(type, bn);
     }
 
+    /**
+     *  @deprecated unimplemented, unused
+     */
     public static SigningPrivateKey fromJavaKey(RSAPrivateKey pk, SigType type)
                               throws GeneralSecurityException {
-        BigInteger x = pk.getPrivateExponent();
-        int len = type.getPrivkeyLen();
-        byte[] bx = rectify(x, len);
+     /*
+        // private key is modulus (pubkey) + exponent
+        BigInteger n = pk.getModulus();
+        BigInteger d = pk.getPrivateExponent();
+        // put them together like in EC
         return new SigningPrivateKey(type, bx);
+      */
+      throw new UnsupportedOperationException();
     }
 
     /**
      *  @return ASN.1 representation
      */
     public static byte[] toJavaSig(Signature sig) {
+        // RSA sigs are not ASN encoded
+        if (sig.getType().getBaseAlgorithm() == SigAlgo.RSA)
+            return sig.getData();
         return sigBytesToASN1(sig.getData());
     }
 
@@ -299,6 +329,9 @@ class SigUtil {
      */
     public static Signature fromJavaSig(byte[] asn, SigType type)
                               throws SignatureException {
+        // RSA sigs are not ASN encoded
+        if (type.getBaseAlgorithm() == SigAlgo.RSA)
+            return new Signature(type, asn);
         return new Signature(type, aSN1ToSigBytes(asn, type.getSigLen()));
     }
 
