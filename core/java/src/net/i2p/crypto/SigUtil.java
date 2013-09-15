@@ -163,16 +163,8 @@ class SigUtil {
     private static ECPublicKey cvtToJavaECKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
         SigType type = pk.getType();
-        int len = type.getPubkeyLen();
-        int sublen = len / 2;
-        byte[] b = pk.getData();
-        byte[] bx = new byte[sublen];
-        byte[] by = new byte[sublen];
-        System.arraycopy(b, 0, bx, 0, sublen);
-        System.arraycopy(b, sublen, by, 0, sublen);
-        BigInteger x = new NativeBigInteger(1, bx);
-        BigInteger y = new NativeBigInteger(1, by);
-        ECPoint w = new ECPoint(x, y);
+        BigInteger[] xy = split(pk.getData());
+        ECPoint w = new ECPoint(xy[0], xy[1]);
         // see ECConstants re: casting
         ECPublicKeySpec ks = new ECPublicKeySpec(w, (ECParameterSpec) type.getParams());
         KeyFactory kf = KeyFactory.getInstance("EC");
@@ -198,12 +190,7 @@ class SigUtil {
         BigInteger x = w.getAffineX();
         BigInteger y = w.getAffineY();
         int len = type.getPubkeyLen();
-        int sublen = len / 2;
-        byte[] b = new byte[len];
-        byte[] bx = rectify(x, sublen);
-        byte[] by = rectify(y, sublen);
-        System.arraycopy(bx, 0, b, 0, sublen);
-        System.arraycopy(by, 0, b, sublen, sublen);
+        byte[] b = combine(x, y, len);
         return new SigningPublicKey(type, b);
     }
 
@@ -270,21 +257,16 @@ class SigUtil {
     }
 
     /**
-     *  @deprecated unimplemented, unused
+     *  @deprecated unused
      */
     public static RSAPrivateKey toJavaRSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
-     /*
         KeyFactory kf = KeyFactory.getInstance("RSA");
         // private key is modulus (pubkey) + exponent
-        // get each part like in EC
-        BigInteger n = new NativeBigInteger(1, ...);
-        BigInteger d = new NativeBigInteger(1, ...);
+        BigInteger[] nd = split(pk.getData());
         // modulus exponent
-        KeySpec ks = new RSAPrivateKeySpec(n, d);  // 65537 0x10001
+        KeySpec ks = new RSAPrivateKeySpec(nd[0], nd[1]);
         return (RSAPrivateKey) kf.generatePrivate(ks);
-      */
-      throw new UnsupportedOperationException();
     }
 
     /**
@@ -299,18 +281,15 @@ class SigUtil {
     }
 
     /**
-     *  @deprecated unimplemented, unused
+     *  @deprecated unused
      */
     public static SigningPrivateKey fromJavaKey(RSAPrivateKey pk, SigType type)
                               throws GeneralSecurityException {
-     /*
         // private key is modulus (pubkey) + exponent
         BigInteger n = pk.getModulus();
         BigInteger d = pk.getPrivateExponent();
-        // put them together like in EC
-        return new SigningPrivateKey(type, bx);
-      */
-      throw new UnsupportedOperationException();
+        byte[] b = combine(n, d, type.getPrivkeyLen());
+        return new SigningPrivateKey(type, b);
     }
 
     /**
@@ -379,6 +358,36 @@ class SigUtil {
             if (in != null) 
                 try { in.close(); } catch (IOException ioe) {}
         }
+    }
+
+    /**
+     *  Split a byte array into two BigIntegers
+     *  @return array of two BigIntegers
+     */
+    private static BigInteger[] split(byte[] b) {
+        int sublen = b.length / 2;
+        byte[] bx = new byte[sublen];
+        byte[] by = new byte[sublen];
+        System.arraycopy(b, 0, bx, 0, sublen);
+        System.arraycopy(b, sublen, by, 0, sublen);
+        NativeBigInteger x = new NativeBigInteger(1, bx);
+        NativeBigInteger y = new NativeBigInteger(1, by);
+        return new NativeBigInteger[] {x, y};
+    }
+
+    /**
+     *  Combine two BigIntegers of nominal length = len / 2
+     *  @return array of exactly len bytes
+     */
+    private static byte[] combine(BigInteger x, BigInteger y, int len)
+                              throws InvalidKeyException {
+        int sublen = len / 2;
+        byte[] b = new byte[len];
+        byte[] bx = rectify(x, sublen);
+        byte[] by = rectify(y, sublen);
+        System.arraycopy(bx, 0, b, 0, sublen);
+        System.arraycopy(by, 0, b, sublen, sublen);
+        return b;
     }
 
     /**

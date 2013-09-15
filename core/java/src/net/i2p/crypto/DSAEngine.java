@@ -491,7 +491,7 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic verify DSA_SHA1 or ECDSA
+     *  Generic verify DSA_SHA1, ECDSA, or RSA
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9
      */
@@ -504,7 +504,7 @@ public class DSAEngine {
             return altVerifySigSHA1(signature, data, verifyingKey);
 
         java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
-        PublicKey pubKey = SigUtil.toJavaECKey(verifyingKey);
+        PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
         jsig.initVerify(pubKey);
         jsig.update(data);
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
@@ -569,7 +569,7 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic sign DSA_SHA1 or ECDSA
+     *  Generic sign DSA_SHA1, ECDSA, or RSA
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9
      */
@@ -579,7 +579,7 @@ public class DSAEngine {
             return altSignSHA1(data, privateKey);
 
         java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
-        PrivateKey privKey = SigUtil.toJavaECKey(privateKey);
+        PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(data);
         return SigUtil.fromJavaSig(jsig.sign(), type);

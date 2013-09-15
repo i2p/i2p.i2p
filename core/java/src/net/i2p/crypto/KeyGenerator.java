@@ -219,7 +219,7 @@ public class KeyGenerator {
     public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {
         if (type == SigType.DSA_SHA1)
             return generateSigningKeys();
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
         KeyPair kp;
         try {
             kpg.initialize(type.getParams(), _context.random());
@@ -238,9 +238,9 @@ public class KeyGenerator {
             if (!ECConstants.isBCAvailable())
                 throw new GeneralSecurityException(pname + " KPG failed for " + type, pe);
             if (log.shouldLog(Log.WARN))
-                log.warn(pname + " KPG failed for " + type + ", trying BC", pe);
+                log.warn(pname + " KPG failed for " + type + ", trying BC"  /* , pe */ );
             try {
-                kpg = KeyPairGenerator.getInstance("EC", "BC");
+                kpg = KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName(), "BC");
                 kpg.initialize(type.getParams(), _context.random());
                 kp = kpg.generateKeyPair();
             } catch (ProviderException pe2) {
@@ -255,8 +255,8 @@ public class KeyGenerator {
                 throw new GeneralSecurityException(pname + " KPG for " + type, pe);
             }
         }
-        ECPublicKey pubkey = (ECPublicKey) kp.getPublic();
-        ECPrivateKey privkey = (ECPrivateKey) kp.getPrivate();
+        java.security.PublicKey pubkey = kp.getPublic();
+        java.security.PrivateKey privkey = kp.getPrivate();
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         keys[0] = SigUtil.fromJavaKey(pubkey, type);
         keys[1] = SigUtil.fromJavaKey(privkey, type);
@@ -292,7 +292,7 @@ public class KeyGenerator {
     public static void main2(String args[]) {
         RandomSource.getInstance().nextBoolean();
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-        int runs = 500; // warmup
+        int runs = 200; // warmup
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i <= 100; i++) {
                 SigType type = SigType.getByCode(i);
@@ -306,7 +306,7 @@ public class KeyGenerator {
                     e.printStackTrace();
                 }
             }
-            runs = 2000;
+            runs = 1000;
         }
     }
 
@@ -331,9 +331,10 @@ public class KeyGenerator {
         }
         stime /= 1000*1000;
         vtime /= 1000*1000;
-        System.out.println("Sign/verify " + runs + " times: " + (vtime+stime) + " ms = " +
+        System.out.println(type + " sign/verify " + runs + " times: " + (vtime+stime) + " ms = " +
                            (((double) stime) / runs) + " each sign, " +
-                           (((double) vtime) / runs) + " each verify");
+                           (((double) vtime) / runs) + " each verify, " +
+                           (((double) (stime + vtime)) / runs) + " s+v");
     }
 
 /******

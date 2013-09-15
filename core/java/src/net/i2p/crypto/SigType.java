@@ -56,7 +56,7 @@ public enum SigType {
 
     RSA_SHA1(17, 128, 256, 20, 128, SigAlgo.RSA, "SHA-1", "SHA1withRSA", RSAConstants.F4_1024_SPEC),
     RSA_SHA256(18, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC),
-    RSA_SHA384(19, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA2384ithRSA", RSAConstants.F4_3072_SPEC),
+    RSA_SHA384(19, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC),
     RSA_SHA512(20, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC),
 
     //MD5
