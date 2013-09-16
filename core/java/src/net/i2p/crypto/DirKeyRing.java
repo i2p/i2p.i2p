@@ -28,15 +28,19 @@ class DirKeyRing implements KeyRing {
         _base = baseDir;
     }
 
+    /**
+     *  Cert must be in the file (escaped keyName).crt,
+     *  and have a CN == keyName
+     */
     public PublicKey getKey(String keyName, String scope, SigType type)
                             throws GeneralSecurityException, IOException {
-        keyName = keyName.replace("@", "_at_");
-        File test = new File(keyName);
+        String fileName = keyName.replace("@", "_at_").replace("<", "_").replace(">", "_");
+        File test = new File(fileName);
         if (test.getParent() != null)
             throw new IOException("bad key name");
         File sd = new File(_base, scope);
         //File td = new File(sd, Integer.toString(type.getCode()));
-        File kd = new File(sd, keyName + ".crt");
+        File kd = new File(sd, fileName + ".crt");
         if (!kd.exists())
             return null;
         InputStream fis = null;
@@ -44,6 +48,10 @@ class DirKeyRing implements KeyRing {
             fis = new FileInputStream(kd);
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
+            cert.checkValidity();
+            String cn = CertUtil.getSubjectValue(cert, "CN");
+            if (!keyName.equals(cn))
+                throw new GeneralSecurityException("CN mismatch: " + cn);
             return cert.getPublicKey();
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}

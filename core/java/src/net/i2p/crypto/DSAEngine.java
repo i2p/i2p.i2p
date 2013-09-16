@@ -358,7 +358,7 @@ public class DSAEngine {
      *  which may be different than the ones defined in SigType.
      *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
-     *  @param pubKey Java key
+     *  @param privKey Java key
      *  @param type returns a Signature of this type
      *  @return null on error
      *  @since 0.9.9

@@ -319,9 +319,19 @@ public class KeyStoreUtil {
                    "-keysize", Integer.toString(keySize),
                    "-keypass", keyPW
         };
+        // TODO pipe key password to process; requires ShellCommand enhancements
         boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 240);
         if (success) {
             success = ks.exists();
+            if (success) {
+                try {
+                    success = getPrivateKey(ks, ksPW, alias, keyPW) != null;
+                } catch (Exception e) {
+                    success = false;
+                }
+            }
+            if (!success)
+                error("Key gen failed for unknown reasons", null);
         }
         if (success) {
             SecureFileOutputStream.setPerms(ks);
@@ -407,7 +417,7 @@ public class KeyStoreUtil {
     }
 
     /** 
-     *  Pull the cert back OUT of the keystore and save it as ascii
+     *  Pull the cert back OUT of the keystore and save it in Base64-encoded X.509 format
      *  so the clients can get to it.
      *
      *  @param ks path to the keystore

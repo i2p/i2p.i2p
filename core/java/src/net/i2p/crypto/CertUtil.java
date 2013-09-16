@@ -11,10 +11,14 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
+
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
+import javax.security.auth.x500.X500Principal;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -63,6 +67,25 @@ public class CertUtil {
         } finally {
             try { if (os != null) os.close(); } catch (IOException foo) {}
         }
+    }
+
+    /**
+     *  Get a value out of the subject distinguished name
+     *  @param type e.g. "CN"
+     *  @return value or null if not found
+     */
+    public static String getSubjectValue(X509Certificate cert, String type) {
+        type = type.toUpperCase(Locale.US);
+        X500Principal p = cert.getSubjectX500Principal();
+        String subj = p.getName();
+        try {
+            LdapName name = new LdapName(subj);
+            for (Rdn rdn : name.getRdns()) {
+                if (type.equals(rdn.getType().toUpperCase(Locale.US)))
+                    return (String) rdn.getValue();
+            }
+        } catch (InvalidNameException ine) {}
+        return null;
     }
 
     private static void error(String msg, Throwable t) {
