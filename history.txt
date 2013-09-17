@@ -1,3 +1,6 @@
+2013-09-17 zzz
+   - Revert expl. default back to 2 hops, wait for next release
+
 2013-09-07 zzz
  * Crypto: Don't use "short exponent" on faster platforms.
    Rebuild router identity if key length doesn't match setting.
