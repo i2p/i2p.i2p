@@ -34,13 +34,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.DSAKey;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.RSAKey;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -364,8 +365,11 @@ public class DSAEngine {
      *  @since 0.9.9
      */
     public Signature sign(SimpleDataStructure hash, PrivateKey privKey, SigType type) {
+        String algo = getRawAlgo(privKey);
+        String talgo = getRawAlgo(type);
+        if (!algo.equals(talgo))
+            throw new IllegalArgumentException("type mismatch type=" + type + " key=" + privKey.getClass().getSimpleName());
         try {
-            String algo = getRawAlgo(privKey);
             return altSignRaw(algo, hash, privKey, type);
         } catch (GeneralSecurityException gse) {
             if (_log.shouldLog(Log.WARN))
@@ -646,12 +650,12 @@ public class DSAEngine {
     }
 
     /** @since 0.9.9 */
-    private static String getRawAlgo(PrivateKey privKey) {
-        if (privKey instanceof DSAPrivateKey)
+    private static String getRawAlgo(Key key) {
+        if (key instanceof DSAKey)
             return "NONEwithDSA";
-        if (privKey instanceof ECPrivateKey)
+        if (key instanceof ECKey)
             return "NONEwithECDSA";
-        if (privKey instanceof RSAPrivateKey)
+        if (key instanceof RSAKey)
             return "NONEwithRSA";
         throw new IllegalArgumentException();
     }

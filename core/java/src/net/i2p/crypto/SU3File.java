@@ -15,10 +15,15 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -58,15 +63,11 @@ public class SU3File {
 
     private static final int TYPE_ZIP = 0;
 
-    private static final int CONTENT_ROUTER = 0;
-    private static final int CONTENT_ROUTER_P200 = 1;
-    private static final int CONTENT_PLUGIN = 2;
-    private static final int CONTENT_RESEED = 3;
-
     private enum ContentType {
-        ROUTER(0, "update"),
-        PLUGIN(1, "plugin"),
-        RESEED(2, "reseed")
+        UNKNOWN(0, "unknown"),
+        ROUTER(1, "router"),
+        PLUGIN(2, "plugin"),
+        RESEED(3, "reseed")
         ;
 
         private final int code;
@@ -78,6 +79,11 @@ public class SU3File {
         }
         public int getCode() { return code; }
         public String getName() { return name; }
+
+        /** @return null if not supported */
+        public static ContentType getByCode(int code) {
+            return BY_CODE.get(Integer.valueOf(code));
+        }
     }
 
     private static final Map<Integer, ContentType> BY_CODE = new HashMap<Integer, ContentType>();
@@ -88,11 +94,8 @@ public class SU3File {
         }
     }
 
-    /** @return null if not supported */
-    public static ContentType getByCode(int code) {
-        return BY_CODE.get(Integer.valueOf(code));
-    }
-    private static final SigType DEFAULT_TYPE = SigType.DSA_SHA1;
+    private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.UNKNOWN;
+    private static final SigType DEFAULT_SIG_TYPE = SigType.DSA_SHA1;
 
     /**
      *
@@ -412,27 +415,40 @@ public class SU3File {
      */
     public static void main(String[] args) {
         boolean ok = false;
+        List<String> a = new ArrayList(Arrays.asList(args));
         try {
-            if ("showversion".equals(args[0])) {
-                ok = showVersionCLI(args[1]);
-            } else if ("sign".equals(args[0])) {
-                if (args[1].equals("-t"))
-                    ok = signCLI(args[2], args[3], args[4], args[5], args[6], args[7]);
-                else
-                    ok = signCLI(args[1], args[2], args[3], args[4], args[5]);
-            } else if ("verifysig".equals(args[0])) {
-                ok = verifySigCLI(args[1]);
-            } else if ("keygen".equals(args[0])) {
-                if (args[1].equals("-t"))
-                    ok = genKeysCLI(args[2], args[3], args[4], args[5]);
-                else
-                    ok = genKeysCLI(args[1], args[2], args[3]);
-            } else if ("extract".equals(args[0])) {
-                ok = extractCLI(args[1], args[2]);
+            // defaults
+            String stype = null;
+            String ctype = null;
+            Iterator<String> iter = a.iterator();
+            String cmd = iter.next();
+            iter.remove();
+            for ( ; iter.hasNext(); ) {
+                String arg = iter.next();
+                if (arg.equals("-t")) {
+                    iter.remove();
+                    stype = iter.next();
+                } else if (arg.equals("-c")) {
+                    iter.remove();
+                    ctype = iter.next();
+                }
+            }
+            if ("showversion".equals(cmd)) {
+                ok = showVersionCLI(a.get(0));
+            } else if ("sign".equals(cmd)) {
+                ok = signCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4));
+            } else if ("verifysig".equals(cmd)) {
+                ok = verifySigCLI(a.get(0));
+            } else if ("keygen".equals(cmd)) {
+                ok = genKeysCLI(stype, a.get(0), a.get(1), a.get(2));
+            } else if ("extract".equals(cmd)) {
+                ok = extractCLI(a.get(0), a.get(1));
             } else {
                 showUsageCLI();
             }
-        } catch (ArrayIndexOutOfBoundsException aioobe) {
+        } catch (NoSuchElementException nsee) {
+            showUsageCLI();
+        } catch (IndexOutOfBoundsException ioobe) {
             showUsageCLI();
         }
         if (!ok)
@@ -454,14 +470,14 @@ public class SU3File {
         buf.append("Available signature types:\n");
         for (SigType t : EnumSet.allOf(SigType.class)) {
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
-            if (t == SigType.DSA_SHA1)
+            if (t == DEFAULT_SIG_TYPE)
                 buf.append(" DEFAULT");
             buf.append('\n');
         }
         buf.append("Available content types:\n");
         for (ContentType t : EnumSet.allOf(ContentType.class)) {
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
-            if (t == ContentType.ROUTER)
+            if (t == DEFAULT_CONTENT_TYPE)
                 buf.append(" DEFAULT");
             buf.append('\n');
         }
@@ -480,6 +496,23 @@ public class SU3File {
             try {
                 int code = Integer.parseInt(stype);
                 return SigType.getByCode(code);
+            } catch (NumberFormatException nfe) {
+                return null;
+             }
+        }
+    }
+    /**
+     *  @param stype number or name
+     *  @return null if not found
+     *  @since 0.9.9
+     */
+    private static ContentType parseContentType(String ctype) {
+        try {
+            return ContentType.valueOf(ctype.toUpperCase(Locale.US));
+        } catch (IllegalArgumentException iae) {
+            try {
+                int code = Integer.parseInt(ctype);
+                return ContentType.getByCode(code);
             } catch (NumberFormatException nfe) {
                 return null;
              }
@@ -509,31 +542,30 @@ public class SU3File {
         }
     }
 
-    /** @return success */
-    private static final boolean signCLI(String inputFile, String signedFile,
-                                         String privateKeyFile, String version, String signerName) {
-        return signCLI(DEFAULT_TYPE, inputFile, signedFile, privateKeyFile, version, signerName);
-    }
-
     /**
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean signCLI(String stype, String inputFile, String signedFile,
+    private static final boolean signCLI(String stype, String ctype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName) {
-        SigType type = parseSigType(stype);
+        SigType type = stype == null ? DEFAULT_SIG_TYPE : parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
         }
-        return signCLI(type, inputFile, signedFile, privateKeyFile, version, signerName);
+        ContentType ct = ctype == null ? DEFAULT_CONTENT_TYPE : parseContentType(stype);
+        if (ct == null) {
+            System.out.println("Content type " + ctype + " is not supported");
+            return false;
+        }
+        return signCLI(type, ct, inputFile, signedFile, privateKeyFile, version, signerName);
     }
 
     /**
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean signCLI(SigType type, String inputFile, String signedFile,
+    private static final boolean signCLI(SigType type, ContentType ctype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName) {
         try {
             String keypw = "";
@@ -550,7 +582,7 @@ public class SU3File {
                 return false;
             }
             SU3File file = new SU3File(signedFile);
-            file.write(new File(inputFile), CONTENT_ROUTER, version, signerName, pk, type);
+            file.write(new File(inputFile), ctype.getCode(), version, signerName, pk, type);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
             return true;
         } catch (GeneralSecurityException gse) {
@@ -608,16 +640,8 @@ public class SU3File {
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean genKeysCLI(String publicKeyFile, String privateKeyFile, String alias) {
-        return genKeysCLI(DEFAULT_TYPE, publicKeyFile, privateKeyFile, alias);
-    }
-
-    /**
-     *  @return success
-     *  @since 0.9.9
-     */
     private static final boolean genKeysCLI(String stype, String publicKeyFile, String privateKeyFile, String alias) {
-        SigType type = parseSigType(stype);
+        SigType type = stype == null ? DEFAULT_SIG_TYPE : parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
