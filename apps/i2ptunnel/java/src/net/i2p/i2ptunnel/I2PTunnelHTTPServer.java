@@ -247,12 +247,16 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.info("request headers: " + _headers);
                 serverout.write(_headers.getBytes());
                 browserin = _browser.getInputStream();
-                // TODO don't spin off a thread for this except for POSTs
-                // beware interference with Tahoe-LAFS, Shoutcast, etc.?
-                // if (browserin.available() == 0) ?
-                I2PAppThread sender = new I2PAppThread(new Sender(serverout, browserin, "server: browser to server", _log), Thread.currentThread().getName() + "hcs");
-                sender.start();
-                
+                // Don't spin off a thread for this except for POSTs
+                // beware interference with Shoutcast, etc.?
+                if ((!(_headers.startsWith("GET ") || _headers.startsWith("HEAD "))) ||
+                    browserin.available() > 0) {  // just in case
+                    I2PAppThread sender = new I2PAppThread(new Sender(serverout, browserin, "server: browser to server", _log),
+                                                                      Thread.currentThread().getName() + "hcs");
+                    sender.start();
+                } else {
+                    // todo - half close? reduce MessageInputStream buffer size?
+                }
                 browserout = _browser.getOutputStream();
                 // NPE seen here in 0.7-7, caused by addition of socket.close() in the
                 // catch (IOException ioe) block above in blockingHandle() ???
