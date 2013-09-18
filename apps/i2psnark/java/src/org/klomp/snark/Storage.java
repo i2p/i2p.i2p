@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,17 +51,7 @@ import net.i2p.util.SystemVersion;
 public class Storage
 {
   private final MetaInfo metainfo;
-  private long[] lengths;
-  private RandomAccessFile[] rafs;
-  private String[] names;
-  private Object[] RAFlock;  // lock on RAF access
-  private long[] RAFtime;    // when was RAF last accessed, or 0 if closed
-  private File[] RAFfile;    // File to make it easier to reopen
-  /** priorities by file; default 0; may be null. @since 0.8.1 */
-  private int[] priorities;
-  /** is the file empty and sparse? */
-  private boolean[] isSparse;
-
+  private final List<TorrentFile> _torrentFiles;
   private final StorageListener listener;
   private final I2PSnarkUtil _util;
   private final Log _log;
@@ -108,6 +99,9 @@ public class Storage
     piece_size = metainfo.getPieceLength(0);
     pieces = needed;
     total_length = metainfo.getTotalLength();
+    List<List<String>> files = metainfo.getFiles();
+    int sz = files != null ? files.size() : 1;
+    _torrentFiles = new ArrayList(sz);
   }
 
   /**
@@ -130,13 +124,13 @@ public class Storage
     _log = util.getContext().logManager().getLog(Storage.class);
     this.listener = listener;
     // Create names, rafs and lengths arrays.
-    getFiles(baseFile);
+    _torrentFiles = getFiles(baseFile);
     
     long total = 0;
     ArrayList<Long> lengthsList = new ArrayList();
-    for (int i = 0; i < lengths.length; i++)
+    for (TorrentFile tf : _torrentFiles)
       {
-        long length = lengths[i];
+        long length = tf.length;
         total += length;
         lengthsList.add(Long.valueOf(length));
       }
@@ -167,10 +161,10 @@ public class Storage
     needed = 0;
 
     List<List<String>> files = new ArrayList();
-    for (int i = 0; i < names.length; i++)
+    for (TorrentFile tf : _torrentFiles)
       {
         List<String> file = new ArrayList();
-        StringTokenizer st = new StringTokenizer(names[i], File.separator);
+        StringTokenizer st = new StringTokenizer(tf.name, File.separator);
         while (st.hasMoreTokens())
           {
             String part = st.nextToken();
@@ -220,42 +214,29 @@ public class Storage
     return piece_hashes;
   }
 
-  private void getFiles(File base) throws IOException
+  private List<TorrentFile> getFiles(File base) throws IOException
   {
     if (base.getAbsolutePath().equals("/"))
         throw new IOException("Don't seed root");
-    ArrayList files = new ArrayList();
+    List<File> files = new ArrayList();
     addFiles(files, base);
 
     int size = files.size();
-    names = new String[size];
-    lengths = new long[size];
-    rafs = new RandomAccessFile[size];
-    RAFlock = new Object[size];
-    RAFtime = new long[size];
-    RAFfile = new File[size];
-    priorities = new int[size];
-    isSparse = new boolean[size];
+    List<TorrentFile> rv = new ArrayList(size);
 
-    int i = 0;
-    Iterator it = files.iterator();
-    while (it.hasNext())
-      {
-        File f = (File)it.next();
-        names[i] = f.getPath();
-	if (base.isDirectory() && names[i].startsWith(base.getPath()))
-          names[i] = names[i].substring(base.getPath().length() + 1);
-        lengths[i] = f.length();
-        RAFlock[i] = new Object();
-        RAFfile[i] = f;
-        i++;
-      }
+    for (File f : files) {
+        rv.add(new TorrentFile(base, f));
+    }
+    // Sort to prevent exposing OS type, and to make it more likely
+    // the same torrent created twice will have the same infohash.
+    Collections.sort(rv);
+    return rv;
   }
 
   /**
    *  @throws IOException if too many total files
    */
-  private void addFiles(List l, File f) throws IOException {
+  private void addFiles(List<File> l, File f) throws IOException {
     if (!f.isDirectory()) {
         if (l.size() >= SnarkManager.MAX_FILES_PER_TORRENT)
             throw new IOException("Too many files, limit is " + SnarkManager.MAX_FILES_PER_TORRENT + ", zip them?");
@@ -330,8 +311,8 @@ public class Storage
    */
   public long remaining(String file) {
       long bytes = 0;
-      for (int i = 0; i < rafs.length; i++) {
-          File f = RAFfile[i];
+      for (TorrentFile tf : _torrentFiles) {
+          File f = tf.RAFfile;
           // use canonical in case snark dir or sub dirs are symlinked
           String canonical = null;
           if (f != null) {
@@ -346,11 +327,11 @@ public class Storage
                   return 0;
               int psz = piece_size;
               long start = bytes;
-              long end = start + lengths[i];
+              long end = start + tf.length;
               int pc = (int) (bytes / psz);
               long rv = 0;
               if (!bitfield.get(pc))
-                  rv = Math.min(psz - (start % psz), lengths[i]);
+                  rv = Math.min(psz - (start % psz), tf.length);
               for (int j = pc + 1; (((long)j) * psz) < end && j < pieces; j++) {
                   if (!bitfield.get(j)) {
                       if (((long)(j+1))*psz < end)
@@ -361,7 +342,7 @@ public class Storage
               }
               return rv;
           }
-          bytes += lengths[i];
+          bytes += tf.length;
       }
       return -1;
   }
@@ -371,16 +352,16 @@ public class Storage
    *  @since 0.8.1
    */
   public int getPriority(String file) {
-      if (complete() || metainfo.getFiles() == null || priorities == null)
+      if (complete() || metainfo.getFiles() == null)
           return 0;
-      for (int i = 0; i < rafs.length; i++) {
-          File f = RAFfile[i];
+      for (TorrentFile tf : _torrentFiles) {
+          File f = tf.RAFfile;
           // use canonical in case snark dir or sub dirs are symlinked
           if (f != null) {
               try {
                   String canonical = f.getCanonicalPath();
                   if (canonical.equals(file))
-                      return priorities[i];
+                      return tf.priority;
               } catch (IOException ioe) {}
           }
       }
@@ -395,16 +376,16 @@ public class Storage
    *  @since 0.8.1
    */
   public void setPriority(String file, int pri) {
-      if (complete() || metainfo.getFiles() == null || priorities == null)
+      if (complete() || metainfo.getFiles() == null)
           return;
-      for (int i = 0; i < rafs.length; i++) {
-          File f = RAFfile[i];
+      for (TorrentFile tf : _torrentFiles) {
+          File f = tf.RAFfile;
           // use canonical in case snark dir or sub dirs are symlinked
           if (f != null) {
               try {
                   String canonical = f.getCanonicalPath();
                   if (canonical.equals(file)) {
-                      priorities[i] = pri;
+                      tf.priority = pri;
                       return;
                   }
               } catch (IOException ioe) {}
@@ -418,6 +399,15 @@ public class Storage
    *  @since 0.8.1
    */
   public int[] getFilePriorities() {
+      if (complete())
+          return null;
+      int sz = _torrentFiles.size();
+      if (sz <= 1)
+          return null;
+      int[] priorities = new int[sz];
+      for (int i = 0; i < sz; i++) {
+          priorities[i] = _torrentFiles.get(i).priority;
+      }
       return priorities;
   }
 
@@ -428,7 +418,18 @@ public class Storage
    *  @since 0.8.1
    */
   void setFilePriorities(int[] p) {
-      priorities = p;
+      if (p == null) {
+          for (TorrentFile tf : _torrentFiles) {
+              tf.priority = 0;
+          }
+      } else {
+          int sz = _torrentFiles.size();
+          if (p.length != sz)
+              throw new IllegalArgumentException();
+          for (int i = 0; i < sz; i++) {
+              _torrentFiles.get(i).priority = p[i];
+          }
+      }
   }
 
   /**
@@ -441,22 +442,23 @@ public class Storage
    *  @since 0.8.1
    */
   public int[] getPiecePriorities() {
-      if (complete() || metainfo.getFiles() == null || priorities == null)
+      if (complete() || metainfo.getFiles() == null)
           return null;
       int[] rv = new int[metainfo.getPieces()];
       int file = 0;
       long pcEnd = -1;
-      long fileEnd = lengths[0] - 1;
+      long fileEnd = _torrentFiles.get(0).length - 1;
       int psz = piece_size;
       for (int i = 0; i < rv.length; i++) {
           pcEnd += psz;
-          int pri = priorities[file];
-          while (fileEnd <= pcEnd && file < lengths.length - 1) {
+          int pri = _torrentFiles.get(file).priority;
+          while (fileEnd <= pcEnd && file < _torrentFiles.size() - 1) {
               file++;
+              TorrentFile tf = _torrentFiles.get(file);
               long oldFileEnd = fileEnd;
-              fileEnd += lengths[file];
-              if (priorities[file] > pri && oldFileEnd < pcEnd)
-                  pri = priorities[file];
+              fileEnd += tf.length;
+              if (tf.priority > pri && oldFileEnd < pcEnd)
+                  pri = tf.priority;
           }
           rv[i] = pri;
       }
@@ -486,13 +488,18 @@ public class Storage
 
   /**
    * Creates (and/or checks) all files from the metainfo file list.
+   * Only call this once, and only after the constructor with the metainfo.
    */
   public void check(String rootDir) throws IOException
   {
     check(rootDir, 0, null);
   }
 
-  /** use a saved bitfield and timestamp from a config file */
+  /**
+   * Creates (and/or checks) all files from the metainfo file list.
+   * Use a saved bitfield and timestamp from a config file.
+   * Only call this once, and only after the constructor with the metainfo.
+   */
   public void check(String rootDir, long savedTime, BitField savedBitField) throws IOException
   {
     File base;
@@ -503,6 +510,8 @@ public class Storage
         base = new SecureFile(rootDir, filterName(metainfo.getName()));
     boolean useSavedBitField = savedTime > 0 && savedBitField != null;
 
+    if (!_torrentFiles.isEmpty())
+        throw new IllegalStateException();
     List<List<String>> files = metainfo.getFiles();
     if (files == null)
       {
@@ -512,22 +521,12 @@ public class Storage
         if (!base.createNewFile() && !base.exists())
           throw new IOException("Could not create file " + base);
 
-        lengths = new long[1];
-        rafs = new RandomAccessFile[1];
-        names = new String[1];
-        RAFlock = new Object[1];
-        RAFtime = new long[1];
-        RAFfile = new File[1];
-        isSparse = new boolean[1];
-        lengths[0] = metainfo.getTotalLength();
-        RAFlock[0] = new Object();
-        RAFfile[0] = base;
+        _torrentFiles.add(new TorrentFile(base, base, metainfo.getTotalLength()));
         if (useSavedBitField) {
             long lm = base.lastModified();
             if (lm <= 0 || lm > savedTime)
                 useSavedBitField = false;
         }
-        names[0] = base.getName();
       }
     else
       {
@@ -540,20 +539,13 @@ public class Storage
         List<Long> ls = metainfo.getLengths();
         int size = files.size();
         long total = 0;
-        lengths = new long[size];
-        rafs = new RandomAccessFile[size];
-        names = new String[size];
-        RAFlock = new Object[size];
-        RAFtime = new long[size];
-        RAFfile = new File[size];
-        isSparse = new boolean[size];
         for (int i = 0; i < size; i++)
           {
             List<String> path = files.get(i);
             File f = createFileFromNames(base, path, areFilesPublic);
             // dup file name check after filtering
             for (int j = 0; j < i; j++) {
-                if (f.equals(RAFfile[j])) {
+                if (f.equals(_torrentFiles.get(j).RAFfile)) {
                     // Rename and start the check over again
                     // Copy path since metainfo list is unmodifiable
                     path = new ArrayList(path);
@@ -570,16 +562,14 @@ public class Storage
                     j = 0;
                 }
             }
-            lengths[i] = ls.get(i).longValue();
-            RAFlock[i] = new Object();
-            RAFfile[i] = f;
-            total += lengths[i];
+            long len = ls.get(i).longValue();
+            _torrentFiles.add(new TorrentFile(base, f, len));
+            total += len;
             if (useSavedBitField) {
                 long lm = f.lastModified();
                 if (lm <= 0 || lm > savedTime)
                     useSavedBitField = false;
             }
-            names[i] = f.getName();
           }
 
         // Sanity check for metainfo file.
@@ -604,8 +594,6 @@ public class Storage
             _log.info("Torrent is complete");
     } else {
         // fixme saved priorities
-        if (files != null)
-            priorities = new int[files.size()];
         if (_log.shouldLog(Log.INFO))
             _log.info("Still need " + needed + " out of " + metainfo.getPieces() + " pieces");
     }
@@ -620,11 +608,11 @@ public class Storage
    */
   public void reopen(String rootDir) throws IOException
   {
-      if (RAFfile == null)
+      if (_torrentFiles.isEmpty())
           throw new IOException("Storage not checked yet");
-      for (int i = 0; i < RAFfile.length; i++) {
-          if (!RAFfile[i].exists())
-              throw new IOException("File does not exist: " + RAFfile[i]);
+      for (TorrentFile tf : _torrentFiles) {
+          if (!tf.RAFfile.exists())
+              throw new IOException("File does not exist: " + tf);
       }
   }
 
@@ -778,10 +766,10 @@ public class Storage
 
     // Make sure all files are available and of correct length
     // The files should all exist as they have been created with zero length by createFilesFromNames()
-    for (int i = 0; i < rafs.length; i++)
+    for (TorrentFile tf : _torrentFiles)
       {
-        long length = RAFfile[i].length();
-        if(RAFfile[i].exists() && length == lengths[i])
+        long length = tf.RAFfile.length();
+        if(tf.RAFfile.exists() && length == tf.length)
           {
             if (listener != null)
               listener.storageAllocated(this, length);
@@ -789,27 +777,27 @@ public class Storage
           }
         else if (length == 0) {
           changed = true;
-          synchronized(RAFlock[i]) {
-              allocateFile(i);
+          synchronized(tf) {
+              allocateFile(tf);
               // close as we go so we don't run out of file descriptors
               try {
-                  closeRAF(i);
+                  tf.closeRAF();
               } catch (IOException ioe) {}
           }
         } else {
-          String msg = "File '" + names[i] + "' exists, but has wrong length (expected " +
-                       lengths[i] + " but found " + length + ") - repairing corruption";
+          String msg = "File '" + tf.name + "' exists, but has wrong length (expected " +
+                       tf.length + " but found " + length + ") - repairing corruption";
           if (listener != null)
               listener.addMessage(msg);
           _log.error(msg);
           changed = true;
           resume = true;
           _probablyComplete = false; // to force RW
-          synchronized(RAFlock[i]) {
-              checkRAF(i);
-              rafs[i].setLength(lengths[i]);
+          synchronized(tf) {
+              RandomAccessFile raf = tf.checkRAF();
+              raf.setLength(tf.length);
               try {
-                  closeRAF(i);
+                  tf.closeRAF();
               } catch (IOException ioe) {}
           }
         }
@@ -820,7 +808,7 @@ public class Storage
       {
         byte[] piece = new byte[piece_size];
         int file = 0;
-        long fileEnd = lengths[0];
+        long fileEnd = _torrentFiles.get(0).length;
         long pieceEnd = 0;
         for (int i = 0; i < pieces; i++)
           {
@@ -829,14 +817,15 @@ public class Storage
             // close as we go so we don't run out of file descriptors
             pieceEnd += length;
             while (fileEnd <= pieceEnd) {
-                synchronized(RAFlock[file]) {
+                TorrentFile tf = _torrentFiles.get(file);
+                synchronized(tf) {
                     try {
-                        closeRAF(file);
+                        tf.closeRAF();
                     } catch (IOException ioe) {}
                 }
-                if (++file >= rafs.length)
+                if (++file >= _torrentFiles.size())
                     break;
-                fileEnd += lengths[file];
+                fileEnd += tf.length;
             }
             if (correctHash)
               {
@@ -882,59 +871,17 @@ public class Storage
    *  Sets isSparse[nr] = true. balloonFile(nr) should be called later to
    *  defrag the file.
    *
-   *  This calls openRAF(); caller must synchronize and call closeRAF().
+   *  This calls OpenRAF(); caller must synchronize and call closeRAF().
    */
-  private void allocateFile(int nr) throws IOException
+  private void allocateFile(TorrentFile tf) throws IOException
   {
     // caller synchronized
-    openRAF(nr, false);  // RW
-    long remaining = lengths[nr];
-    if (listener != null)
-        listener.storageCreateFile(this, names[nr], remaining);
-    rafs[nr].setLength(remaining);
-    // don't bother ballooning later on Windows since there is no sparse file support
-    // until JDK7 using the JSR-203 interface.
-    // RAF seeks/writes do not create sparse files.
-    // Windows will zero-fill up to the point of the write, which
-    // will make the file fairly unfragmented, on average, at least until
-    // near the end where it will get exponentially more fragmented.
-    if (!_isWindows)
-        isSparse[nr] = true;
-    // caller will close rafs[nr]
-    if (listener != null)
-      listener.storageAllocated(this, lengths[nr]);
-  }
-
-  /**
-   *  This "balloons" the file with zeros to eliminate disk fragmentation.,
-   *  Overwrites the entire file with zeros. Sets isSparse[nr] = false.
-   *
-   *  Caller must synchronize and call checkRAF() or openRAF().
-   *  @since 0.9.1
-   */
-  private void balloonFile(int nr) throws IOException
-  {
-    if (_log.shouldLog(Log.INFO))
-        _log.info("Ballooning " + nr + ": " + RAFfile[nr]);
-    long remaining = lengths[nr];
-    final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
-    byte[] zeros = new byte[ZEROBLOCKSIZE];
-    rafs[nr].seek(0);
-    // don't bother setting flag for small files
-    if (remaining > 20*1024*1024)
-        _allocateCount.incrementAndGet();
-    try {
-        while (remaining > 0) {
-            int size = (int) Math.min(remaining, ZEROBLOCKSIZE);
-            rafs[nr].write(zeros, 0, size);
-            remaining -= size;
-        }
-    } finally {
-        remaining = lengths[nr];
-        if (remaining > 20*1024*1024)
-            _allocateCount.decrementAndGet();
+    tf.allocateFile();
+    if (listener != null) {
+        listener.storageCreateFile(this, tf.name, tf.length);
+        listener.storageAllocated(this, tf.length);
     }
-    isSparse[nr] = false;
+    // caller will close rafs[nr]
   }
 
 
@@ -944,18 +891,14 @@ public class Storage
    */
   public void close() throws IOException
   {
-    if (rafs == null) return;
-    for (int i = 0; i < rafs.length; i++)
+    for (TorrentFile tf : _torrentFiles)
       {
-        // if we had an IOE in check(), the RAFlock may be null
-        if (RAFlock[i] == null)
-            continue;
         try {
-          synchronized(RAFlock[i]) {
-            closeRAF(i);
+          synchronized(tf) {
+            tf.closeRAF();
           }
         } catch (IOException ioe) {
-            _log.error("Error closing " + RAFfile[i], ioe);
+            _log.error("Error closing " + tf, ioe);
             // gobble gobble
         }
       }
@@ -1020,11 +963,11 @@ public class Storage
           // Early typecast, avoid possibly overflowing a temp integer
           long start = (long) piece * (long) piece_size;
           int i = 0;
-          long raflen = lengths[i];
+          long raflen = _torrentFiles.get(i).length;
           while (start > raflen) {
               i++;
               start -= raflen;
-              raflen = lengths[i];
+              raflen = _torrentFiles.get(i).length;
           }
     
           int written = 0;
@@ -1033,27 +976,31 @@ public class Storage
           while (written < length) {
               int need = length - written;
               int len = (start + need < raflen) ? need : (int)(raflen - start);
-              synchronized(RAFlock[i]) {
-                  checkRAF(i);
-                  if (isSparse[i]) {
+              TorrentFile tf = _torrentFiles.get(i);
+              synchronized(tf) {
+                  RandomAccessFile raf = tf.checkRAF();
+                  if (tf.isSparse) {
                       // If the file is a newly created sparse file,
                       // AND we aren't skipping it, balloon it with all
                       // zeros to un-sparse it by allocating the space.
                       // Obviously this could take a while.
                       // Once we have written to it, it isn't empty/sparse any more.
-                      if (priorities == null || priorities[i] >= 0)
-                          balloonFile(i);
-                      else
-                          isSparse[i] = false;
+                      if (tf.priority >= 0) {
+                          if (_log.shouldLog(Log.INFO))
+                              _log.info("Ballooning " + tf);
+                          tf.balloonFile();
+                      } else {
+                          tf.isSparse = false;
+                      }
                   }
-                  rafs[i].seek(start);
+                  raf.seek(start);
                   //rafs[i].write(bs, off + written, len);
-                  pp.write(rafs[i], off + written, len);
+                  pp.write(raf, off + written, len);
               }
               written += len;
               if (need - len > 0) {
                   i++;
-                  raflen = lengths[i];
+                  raflen = tf.length;
                   start = 0;
               }
           }
@@ -1130,12 +1077,12 @@ public class Storage
     long start = ((long) piece * (long) piece_size) + off;
 
     int i = 0;
-    long raflen = lengths[i];
+    long raflen = _torrentFiles.get(i).length;
     while (start > raflen)
       {
         i++;
         start -= raflen;
-        raflen = lengths[i];
+        raflen = _torrentFiles.get(i).length;
       }
 
     int read = 0;
@@ -1143,17 +1090,18 @@ public class Storage
       {
         int need = length - read;
         int len = (start + need < raflen) ? need : (int)(raflen - start);
-        synchronized(RAFlock[i])
+        TorrentFile tf = _torrentFiles.get(i);
+        synchronized(tf)
           {
-            checkRAF(i);
-            rafs[i].seek(start);
-            rafs[i].readFully(bs, read, len);
+            RandomAccessFile raf = tf.checkRAF();
+            raf.seek(start);
+            raf.readFully(bs, read, len);
           }
         read += len;
         if (need - len > 0)
           {
             i++;
-            raflen = lengths[i];
+            raflen = _torrentFiles.get(i).length;
             start = 0;
           }
       }
@@ -1161,58 +1109,182 @@ public class Storage
     return length;
   }
 
+  private static final long RAFCloseDelay = 4*60*1000;
+
   /**
    * Close unused RAFs - call periodically
    */
-  private static final long RAFCloseDelay = 4*60*1000;
   public void cleanRAFs() {
     long cutoff = System.currentTimeMillis() - RAFCloseDelay;
-    for (int i = 0; i < RAFlock.length; i++) {
-      synchronized(RAFlock[i]) {
-        if (RAFtime[i] > 0 && RAFtime[i] < cutoff) {
-          try {
-             closeRAF(i);
-          } catch (IOException ioe) {}
-        }
+    for (TorrentFile tf : _torrentFiles) {
+      synchronized(tf) {
+         tf.closeRAF(cutoff);
       }
     }
   }
 
-  /*
-   * For each of the following,
-   * caller must synchronize on RAFlock[i]
-   * ... except at the beginning if you're careful
-   */
-
   /**
-   * This must be called before using the RAF to ensure it is open
+   *  A single file in a torrent.
+   *  @since 0.9.9
    */
-  private void checkRAF(int i) throws IOException {
-    if (RAFtime[i] > 0) {
-      RAFtime[i] = System.currentTimeMillis();
-      return;
-    }
-    openRAF(i);
-  }
+  private class TorrentFile implements Comparable<TorrentFile> {
+      public final long length;
+      public final String name;
+      public final File RAFfile;
+      /**
+       * when was RAF last accessed, or 0 if closed
+       * locking: this
+       */
+      private long RAFtime;
+      /**
+       * null when closed
+       * locking: this
+       */
+      private RandomAccessFile raf;
+      /**
+       * is the file empty and sparse?
+       * locking: this
+       */
+      public boolean isSparse;
+      /** priority by file; default 0 */
+      public volatile int priority;
 
-  private void openRAF(int i) throws IOException {
-    openRAF(i, _probablyComplete);
-  }
+      /**
+       * For new metainfo from files;
+       * use base == f for single-file torrent
+       */
+      public TorrentFile(File base, File f) {
+          this(base, f, f.length());
+      }
 
-  private void openRAF(int i, boolean readonly) throws IOException {
-    rafs[i] = new RandomAccessFile(RAFfile[i], (readonly || !RAFfile[i].canWrite()) ? "r" : "rw");
-    RAFtime[i] = System.currentTimeMillis();
-  }
+      /**
+       * For existing metainfo with specified file length;
+       * use base == f for single-file torrent
+       */
+      public TorrentFile(File base, File f, long len) {
+          String n = f.getPath();
+          if (base.isDirectory() && n.startsWith(base.getPath()))
+              n = n.substring(base.getPath().length() + 1);
+          name = n;
+          length = len;
+          RAFfile = f;
+      }
 
-  /**
-   * Can be called even if not open
-   */
-  private void closeRAF(int i) throws IOException {
-    RAFtime[i] = 0;
-    if (rafs[i] == null)
-      return;
-    rafs[i].close();
-    rafs[i] = null;
+      /*
+       * For each of the following,
+       * caller must synchronize on RAFlock[i]
+       * ... except at the beginning if you're careful
+       */
+
+      /**
+       * This must be called before using the RAF to ensure it is open
+       * locking: this
+       */
+      public RandomAccessFile checkRAF() throws IOException {
+          if (RAFtime > 0)
+            RAFtime = System.currentTimeMillis();
+          else
+            openRAF();
+          return raf;
+      }
+
+      /**
+       * locking: this
+       */
+      private void openRAF() throws IOException {
+          openRAF(_probablyComplete);
+      }
+
+      /**
+       * locking: this
+       */
+      private void openRAF(boolean readonly) throws IOException {
+          raf = new RandomAccessFile(RAFfile, (readonly || !RAFfile.canWrite()) ? "r" : "rw");
+          RAFtime = System.currentTimeMillis();
+      }
+
+      /**
+       * Close if last used time older than cutoff.
+       * locking: this
+       */
+      public void closeRAF(long cutoff) {
+          if (RAFtime > 0 && RAFtime < cutoff) {
+              try {
+                  closeRAF();
+              } catch (IOException ioe) {}
+          }
+      }
+
+      /**
+       * Can be called even if not open
+       * locking: this
+       */
+      public void closeRAF() throws IOException {
+          RAFtime = 0;
+          if (raf == null)
+              return;
+          raf.close();
+          raf = null;
+      }
+
+
+      /**
+       *  This creates a (presumably) sparse file so that reads won't fail with IOE.
+       *  Sets isSparse[nr] = true. balloonFile(nr) should be called later to
+       *  defrag the file.
+       *
+       *  This calls openRAF(); caller must synchronize and call closeRAF().
+       */
+      public void allocateFile() throws IOException {
+          // caller synchronized
+          openRAF(false);  // RW
+          raf.setLength(length);
+          // don't bother ballooning later on Windows since there is no sparse file support
+          // until JDK7 using the JSR-203 interface.
+          // RAF seeks/writes do not create sparse files.
+          // Windows will zero-fill up to the point of the write, which
+          // will make the file fairly unfragmented, on average, at least until
+          // near the end where it will get exponentially more fragmented.
+          if (!_isWindows)
+              isSparse = true;
+      }
+
+      /**
+       *  This "balloons" the file with zeros to eliminate disk fragmentation.,
+       *  Overwrites the entire file with zeros. Sets isSparse[nr] = false.
+       *
+       *  Caller must synchronize and call checkRAF() or openRAF().
+       *  @since 0.9.1
+       */
+      public void balloonFile() throws IOException
+      {
+          long remaining = length;
+          final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
+          byte[] zeros = new byte[ZEROBLOCKSIZE];
+          raf.seek(0);
+          // don't bother setting flag for small files
+          if (remaining > 20*1024*1024)
+              _allocateCount.incrementAndGet();
+          try {
+              while (remaining > 0) {
+                  int size = (int) Math.min(remaining, ZEROBLOCKSIZE);
+                  raf.write(zeros, 0, size);
+                  remaining -= size;
+              }
+          } finally {
+              remaining = length;
+              if (remaining > 20*1024*1024)
+                  _allocateCount.decrementAndGet();
+          }
+          isSparse = false;
+      }
+
+      public int compareTo(TorrentFile tf) {
+          return name.compareTo(tf.name);
+      }
+
+      @Override
+      public String toString() { return name; }
   }
 
   /**
