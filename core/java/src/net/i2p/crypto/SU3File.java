@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -59,7 +60,7 @@ public class SU3File {
     private static final byte[] MAGIC = DataHelper.getUTF8("I2Psu3");
     private static final int FILE_VERSION = 0;
     private static final int MIN_VERSION_BYTES = 16;
-    private static final int VERSION_OFFSET = Signature.SIGNATURE_BYTES;
+    private static final int VERSION_OFFSET = 40; // Signature.SIGNATURE_BYTES; avoid early ctx init
 
     private static final int TYPE_ZIP = 0;
 
@@ -95,7 +96,9 @@ public class SU3File {
     }
 
     private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.UNKNOWN;
-    private static final SigType DEFAULT_SIG_TYPE = SigType.DSA_SHA1;
+    // avoid early ctx init
+    //private static final SigType DEFAULT_SIG_TYPE = SigType.DSA_SHA1;
+    private static final int DEFAULT_SIG_CODE = 0;
 
     /**
      *
@@ -438,6 +441,10 @@ public class SU3File {
             if ("showversion".equals(cmd)) {
                 ok = showVersionCLI(a.get(0));
             } else if ("sign".equals(cmd)) {
+                // speed things up by specifying a small PRNG buffer size
+                Properties props = new Properties();
+                props.setProperty("prng.bufferSize", "16384");
+                new I2PAppContext(props);
                 ok = signCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4));
             } else if ("verifysig".equals(cmd)) {
                 ok = verifySigCLI(a.get(0));
@@ -472,7 +479,7 @@ public class SU3File {
         buf.append("Available signature types:\n");
         for (SigType t : EnumSet.allOf(SigType.class)) {
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
-            if (t == DEFAULT_SIG_TYPE)
+            if (t.getCode() == DEFAULT_SIG_CODE)
                 buf.append(" DEFAULT");
             buf.append('\n');
         }
@@ -550,12 +557,12 @@ public class SU3File {
      */
     private static final boolean signCLI(String stype, String ctype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName) {
-        SigType type = stype == null ? DEFAULT_SIG_TYPE : parseSigType(stype);
+        SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
         }
-        ContentType ct = ctype == null ? DEFAULT_CONTENT_TYPE : parseContentType(stype);
+        ContentType ct = ctype == null ? DEFAULT_CONTENT_TYPE : parseContentType(ctype);
         if (ct == null) {
             System.out.println("Content type " + ctype + " is not supported");
             return false;
@@ -643,7 +650,7 @@ public class SU3File {
      *  @since 0.9.9
      */
     private static final boolean genKeysCLI(String stype, String publicKeyFile, String privateKeyFile, String alias) {
-        SigType type = stype == null ? DEFAULT_SIG_TYPE : parseSigType(stype);
+        SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
