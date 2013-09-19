@@ -428,9 +428,11 @@ public class SU3File {
                 if (arg.equals("-t")) {
                     iter.remove();
                     stype = iter.next();
+                    iter.remove();
                 } else if (arg.equals("-c")) {
                     iter.remove();
                     ctype = iter.next();
+                    iter.remove();
                 }
             }
             if ("showversion".equals(cmd)) {
