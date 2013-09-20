@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Run 'msgfmt -c' on all .po files
 # Returns nonzero on failure

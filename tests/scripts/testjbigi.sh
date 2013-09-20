@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Runs a test using each libjbigi-linux-*.so file
 # Returns nonzero on failure, but it will always

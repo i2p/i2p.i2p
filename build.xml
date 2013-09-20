@@ -1380,6 +1380,7 @@
         <exec executable="tests/scripts/checkpo.sh" failonerror="true" />
         <exec executable="tests/scripts/checkutf8.sh" failonerror="true" />
         <exec executable="tests/scripts/checkxml.sh" failonerror="true" />
+        <exec executable="tests/scripts/checkscripts.sh" failonerror="true" />
     </target>
 
 
