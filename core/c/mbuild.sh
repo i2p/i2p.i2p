@@ -1,20 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh -e
 # Automatic build of so files, ignores failed builds.
 # Place latest gmp tarball in the jbigi dir, and exec this script.
-
-if [ -z "$BASH_VERSION" ]; then
-	echo "This script needs to be run with Bash."
-	echo
-	echo "Please install bash and then run this script with"
-	echo "bash $0"
-	exit 1
-fi
-
-#JBIGI=../../../installer/lib/jbigi/jbigi.jar
-
-#if [ -f jbigi.jarx ] ; then
-#JBIGI=../jbigi.jar
-#fi
 
 rm -f t/* jcpuid/lib/freenet/support/CPUInformation/* jbigi/lib/net/i2p/util/*
 
@@ -32,7 +18,7 @@ mkdir t
 cp jbigi/lib/net/i2p/util/* t/
 ( 
 	cd t
-	for i in *.so ; { strip $i ; }
+	for i in *.so ; do strip $i ; done
 )
 
 cp jcpuid/lib/freenet/support/CPUInformation/* t/
@@ -47,7 +33,7 @@ mkdir t
 cp jbigi/lib/net/i2p/util/* t/
 ( 
 	cd t
-	for i in *.so ; { strip $i ; }
+	for i in *.so ; do strip $i ; done
 )
 
 
