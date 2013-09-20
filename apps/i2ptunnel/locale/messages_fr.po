@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-11 14:30+0000\n"
-"PO-Revision-Date: 2013-07-16 15:35+0000\n"
+"POT-Creation-Date: 2013-09-20 10:24+0000\n"
+"PO-Revision-Date: 2013-08-13 14:14+0000\n"
 "Last-Translator: Boxoa590\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
@@ -33,8 +33,8 @@ msgstr "interne"
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{0} entrant, {0} sortant tunnels"
+msgstr[1] "{0} entrants, {0} sortants tunnels"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:408
 msgid "lower bandwidth and reliability"
@@ -1247,79 +1247,3 @@ msgstr "Terminer"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
 msgstr "Suivant"
-
-#~ msgid "This seems to be a bad destination:"
-#~ msgstr "Cela semble être une mauvaise destination"
-
-#~ msgid "i2paddresshelper cannot help you with a destination like that!"
-#~ msgstr ""
-#~ "i2paddresshelper ne peut pas vous aider avec une destination comme cela !"
-
-#~ msgid ""
-#~ "To visit the destination in your host database, click <a href="
-#~ "\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
-#~ "click <a href=\"{1}\">here</a>."
-#~ msgstr ""
-#~ "Pour aller à la destination de votre base de données d''hôtes, cliquez <a "
-#~ "href=\"{0}\">here</a>. Pour aller à la destination de l''aide d''adresse "
-#~ "en conflit, cliquez <a href=\"{1}\">ici</a>."
-
-#~ msgid "Base 32"
-#~ msgstr "Base 32"
-
-#~ msgid "Continue to {0} without saving"
-#~ msgstr ""
-#~ "Aller sur le site i2p {0} sans enregistrer dans un carnet d'adresses. "
-
-#~ msgid "Save {0} to router address book and continue to eepsite"
-#~ msgstr ""
-#~ "Ajouter au carnet d''adresse du routeur {0} et aller sur le site i2p"
-
-#~ msgid "Save {0} to master address book and continue to eepsite"
-#~ msgstr "Ajouter au carnet d''adresse principal {0} et aller sur le site i2p"
-
-#~ msgid "Save {0} to private address book and continue to eepsite"
-#~ msgstr "Ajouter au carnet d''adresse privé {0} et aller sur le site i2p"
-
-#~ msgid "HTTP Outproxy"
-#~ msgstr "proxy sortant HTTP"
-
-#~ msgid ""
-#~ "Click a link below to look for an address helper by using a \"jump\" "
-#~ "service:"
-#~ msgstr ""
-#~ "Cliquez sur un des liens ci-dessous pour chercher une aide d'adresse en "
-#~ "utilisant un \"service de saut\":"
-
-#~ msgid "{0} jump service"
-#~ msgstr "{0} jump service"
-
-#~ msgid "Added via address helper from {0}"
-#~ msgstr "Ajouté via assistant d''adresse depuis {0}"
-
-#~ msgid "Added via address helper"
-#~ msgstr "Ajouté via assitant d'adresse"
-
-#~ msgid "Redirecting to {0}"
-#~ msgstr "Redirection vers {0}"
-
-#~ msgid "Router Console"
-#~ msgstr "Console du routeur"
-
-#~ msgid "Addressbook"
-#~ msgstr "Carnet d'adresses"
-
-#~ msgid "Configuration"
-#~ msgstr "Configuration"
-
-#~ msgid "Help"
-#~ msgstr "Aide"
-
-#~ msgid "Saved {0} to the {1} addressbook, redirecting now."
-#~ msgstr "{0} ajouté au carnet d''adresses {1}. Redirection en cours."
-
-#~ msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-#~ msgstr "{0} non ajouté au carnet d''adresses {1}. Redirection en cours."
-
-#~ msgid "Click here if you are not redirected automatically."
-#~ msgstr "Cliquez ici si vous n'êtes pas redirigé automatiquement."

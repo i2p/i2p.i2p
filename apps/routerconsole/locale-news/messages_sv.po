@@ -3,13 +3,15 @@
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
+# Translators:
+# hottuna <i2p@robertfoss.se>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2013-01-03 09:01+0000\n"
-"Last-Translator: mon <mattias.ohlsson@inprose.com>\n"
+"POT-Creation-Date: 2013-09-20 10:12+0000\n"
+"PO-Revision-Date: 2013-09-11 22:45+0000\n"
+"Last-Translator: hottuna <i2p@robertfoss.se>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
 "language/sv_SE/)\n"
 "Language: sv_SE\n"
@@ -19,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr ""
+msgstr "Grattis för att I2P installerats."
 
 msgid "Welcome to I2P!"
 msgstr "Välkommen till I2P!"
@@ -32,32 +34,43 @@ msgstr "{0}Ha tålamod{1} medan I2P startar upp och letar upp peers."
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
 "configuration page{3}."
-msgstr "Medan du väntar, var god {0}ställ in dina bandbreddd och port inställningar{1} på {2}konfigurations-sidan{3}."
+msgstr ""
+"Medan du väntar, var god {0}ställ in dina bandbreddd och port "
+"inställningar{1} på {2}konfigurations-sidan{3}."
 
 msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
 msgstr ""
+"Du kan även ställa in din webbläsare till att använda I2P-proxyn för att nå "
+"eepsidor."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
 msgstr ""
+"Skriv in 127.0.0.1 (eller localhost) port 4444 som en http-proxy i din "
+"webbläsares inställningar."
 
 msgid "Do not use SOCKS for this."
-msgstr ""
+msgstr "Använd inte SOCKS för detta."
 
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
 msgstr ""
+"Mer information kan hittsa på {0}I2P webbläsar-proxy inställnings sidan{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please {0}"
 "check out{1} our {2}FAQ{3}."
-msgstr "När du har en \"delade klienter\" distination listad på vänster sida, {0}kika på{1} vår {2}FAQ{3}."
+msgstr ""
+"När du har en \"delade klienter\" distination listad på vänster sida, {0}"
+"kika på{1} vår {2}FAQ{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
 "help{3} or {4}#i2p{5}."
-msgstr "Rikta din IRC-klient till {0}localhost:6668{1} och säg hej till oss på {2}#i2p-help{3} eller {4}#i2p{5}."
+msgstr ""
+"Rikta din IRC-klient till {0}localhost:6668{1} och säg hej till oss på {2}"
+"#i2p-help{3} eller {4}#i2p{5}."
