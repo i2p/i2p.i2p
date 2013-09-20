@@ -15,7 +15,7 @@ TMPFILE=tmp/javafiles.txt
 export TZ=UTC
 RC=0
 
-if ! $(which javac); then
+if ! $(which javac > /dev/null 2>&1); then
     export JAVAC=${JAVA_HOME}/../bin/javac
 fi
 
