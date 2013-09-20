@@ -15,8 +15,8 @@ a soname to shut lintian up.
              UNIXTYPE="linux"
          fi
          COMPILEFLAGS="-fPIC -Wall $CFLAGS"
--        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
-+        INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
+-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE} -I/usr/local/include"
++        INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE} -I/usr/local/include"
          LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
          LIBFILE="libjbigi.so";;
  *)
@@ -26,6 +26,6 @@ a soname to shut lintian up.
  rm -f jbigi.o $LIBFILE
 -$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
 +$CC -c $COMPILEFLAGS $INCLUDES ./jbigi/src/jbigi.c || exit 1
- $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS || exit 1
+ $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1
  
  exit 0
