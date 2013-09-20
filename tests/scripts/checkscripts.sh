@@ -35,7 +35,6 @@ SCRIPTFILES="\
 	./debian/i2p.preinst \
 	./debian/libjbigi-jni.preinst \
 	./debian/repack.sh \
-	./installer/resources/certificates/show.sh \
 	./installer/resources/install_i2p_service_osx.command \
 	./installer/resources/install_i2p_service_unix \
 	./installer/resources/locale/bundle-messages.sh \
