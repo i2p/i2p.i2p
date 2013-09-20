@@ -295,7 +295,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
         buf.append("</td><td align=\"left\" width=\"50%\">");
         if (edit && !ro) {
-            buf.append("<input type=\"text\" size=\"80\" name=\"desc").append(index).append("\" value=\"");
+            buf.append("<input type=\"text\" size=\"80\" spellcheck=\"false\" name=\"desc").append(index).append("\" value=\"");
             buf.append(escapeddesc);
             buf.append("\" >");
         } else {
