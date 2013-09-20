@@ -46,7 +46,6 @@ SCRIPTFILES="\
 	./installer/resources/uninstall_i2p_service_unix \
 	./tests/scripts/checkcerts.sh \
 	./tests/scripts/checkpo.sh \
-	./tests/scripts/checksitecert.sh \
 	./tests/scripts/checkutf8.sh \
 	./tests/scripts/checkxml.sh \
 	./tests/scripts/testjbigi.sh \
