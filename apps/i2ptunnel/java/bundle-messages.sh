@@ -14,8 +14,8 @@ CLASS=net.i2p.i2ptunnel.web.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC
 RC=0
-if ! $(which javac}; then
-    export JAVAC=${JAVA_HOME}/../bin/javac
+if ! $(which javac); then
+    export JAVAC="${JAVA_HOME}/../bin/javac"
 fi
 
 if [ "$1" = "-p" ]
