@@ -172,6 +172,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     /**
      *  Is an update available?
      *  Blocking.
+     *  An available update may still have a constraint or lack sources.
      *  @param maxWait max time to block
      *  @return new version or null if nothing newer is available
      */
@@ -244,7 +245,8 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /**
      *  Is an update available?
-     *  Non-blocking, returns result of last check or notification from an Updater
+     *  Non-blocking, returns result of last check or notification from an Updater.
+     *  An available update may still have a constraint or lack sources.
      *  @return new version or null if nothing newer is available
      */
     public String getUpdateAvailable(UpdateType type) {
@@ -253,7 +255,8 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /**
      *  Is an update available?
-     *  Non-blocking, returns result of last check or notification from an Updater
+     *  Non-blocking, returns result of last check or notification from an Updater.
+     *  An available update may still have a constraint or lack sources.
      *  @return new version or null if nothing newer is available
      */
     public String getUpdateAvailable(UpdateType type, String id) {
@@ -497,7 +500,6 @@ public class ConsoleUpdateManager implements UpdateManager {
                 _log.warn("Update already in progress for: " + type + ' ' + id);
             return false;
         }
-        List<URI> updateSources = null;
         UpdateItem ui = new UpdateItem(type, id);
         VersionAvailable va = _available.get(ui);
         if (va == null) {
@@ -746,6 +748,54 @@ public class ConsoleUpdateManager implements UpdateManager {
         if (msg != null)
             finishStatus(msg);
         return true;
+    }
+
+    /**
+     *  A new version is available but cannot be downloaded or installed due to some constraint.
+     *  The manager should notify the user.
+     *  Called by the Checker, either after check() was called, or it found out on its own.
+     *
+     *  @param newsSource who told us
+     *  @param id plugin name for plugins, ignored otherwise
+     *  @param sourceMap Mapping of methods to sources
+     *  @param newVersion The new version available
+     *  @param message A translated message to be displayed to the user, non-null
+     *  @since 0.9.9
+     */
+    public void notifyVersionConstraint(UpdateTask task, URI newsSource,
+                                        UpdateType type, String id,
+                                        String newVersion, String message) {
+        UpdateItem ui = new UpdateItem(type, id);
+        Version old = _installed.get(ui);
+        VersionAvailable newVA = new VersionAvailable(newVersion, message);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("notifyVersionConstraint " + ui + ' ' + newVA + " old: " + old);
+        if (old != null && old.compareTo(newVA) >= 0) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(ui.toString() + ' ' + old + " already installed");
+            return;
+        }
+        old = _downloaded.get(ui);
+        if (old != null && old.compareTo(newVA) >= 0) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(ui.toString() + ' ' + old + " already downloaded");
+            return;
+        }
+        VersionAvailable oldVA = _available.get(ui);
+        if (oldVA != null)  {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(ui.toString() + ' ' + oldVA + " already available");
+            if (oldVA.compareTo(newVA) >= 0)
+                return;
+            // don't replace an unconstrained version with a constrained one
+            if (oldVA.constraint == null)
+                return;
+            // replace constrained one
+        }
+        // Use the new VersionAvailable
+        if (_log.shouldLog(Log.INFO))
+            _log.info(ui.toString() + ' ' + newVA + " now available");
+        _available.put(ui, newVA);
     }
 
     /**
@@ -1005,6 +1055,18 @@ public class ConsoleUpdateManager implements UpdateManager {
         }
         return Collections.EMPTY_LIST;
     }
+    
+    /**
+     *  Is there a reason we can't download the update?
+     *  @return translated contraint or null
+     *  @since 0.9.9
+     */
+    public String getUpdateConstraint(UpdateType type, String id) {
+        VersionAvailable va = _available.get(new UpdateItem(type, id));
+        if (va != null)
+            return va.constraint;
+        return null;
+    }
 
     /**
      *
@@ -1116,6 +1178,14 @@ public class ConsoleUpdateManager implements UpdateManager {
      */
     public String _(String s, Object o) {
         return Messages.getString(s, o, _context);
+    }
+
+    /**
+     *  translate a string with parameters
+     *  @since 0.9.9
+     */
+    public String _(String s, Object o, Object o2) {
+        return Messages.getString(s, o, o2, _context);
     }
 
     private void updateStatus(String s) {
@@ -1301,6 +1371,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     private static class VersionAvailable extends Version {
         public final String minVersion;
         public final ConcurrentHashMap<UpdateMethod, List<URI>> sourceMap;
+        public volatile String constraint;
 
         /**
          * Puts the method and sources in the map. The map may be added to later.
@@ -1312,9 +1383,21 @@ public class ConsoleUpdateManager implements UpdateManager {
             sourceMap.put(method, updateSources);
         }
 
+        /**
+         * Available but can't be downloaded due to constraint.
+         *
+         */
+        public VersionAvailable(String version, String constraint) {
+            super(version);
+            minVersion = "";
+            sourceMap = new ConcurrentHashMap(4);
+            this.constraint = constraint;
+        }
+
         @Override
         public String toString() {
-            return "VersionAvailable \"" + version + "\" " + sourceMap;
+            return "VersionAvailable \"" + version + "\" " + sourceMap +
+                   (constraint != null ? (" \"" + constraint + '"') : "");
         }
     }
 

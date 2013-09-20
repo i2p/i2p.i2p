@@ -75,6 +75,17 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.9
+     */
+    public static String updateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_SIGNED, "");
+    }
+
+    /**
      *  Already downloaded but not installed version
      *  @return null if none
      *  @since 0.9.4
@@ -259,9 +270,20 @@ public class NewsHelper extends ContentHelper {
      *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean dontInstall(RouterContext ctx) {
-        boolean disabled = ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED);
-        if (disabled)
-            return true;
+        return isUpdateDisabled(ctx) || isBaseReadonly(ctx);
+    }
+    
+    /**
+     *  @since 0.9.9
+     */
+    public static boolean isUpdateDisabled(RouterContext ctx) {
+        return ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED);
+    }
+    
+    /**
+     *  @since 0.9.9
+     */
+    public static boolean isBaseReadonly(RouterContext ctx) {
         File test = new File(ctx.getBaseDir(), "history.txt");
         boolean readonly = ((test.exists() && !test.canWrite()) || (!ctx.getBaseDir().canWrite()));
         return readonly;

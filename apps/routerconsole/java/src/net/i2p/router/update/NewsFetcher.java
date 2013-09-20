@@ -31,6 +31,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Task to fetch updates to the news.xml, and to keep
@@ -59,10 +60,6 @@ class NewsFetcher extends UpdateRunner {
 
     @Override
     public UpdateType getType() { return NEWS; }
-
-    private boolean dontInstall() {
-        return NewsHelper.dontInstall(_context);
-    }
 
     @Override
     public void run() {
@@ -111,9 +108,12 @@ class NewsFetcher extends UpdateRunner {
     private static final String VERSION_PREFIX = "<i2p.release ";
     // all keys mapped to lower case by parseArgs()
     private static final String VERSION_KEY = "version";
+    // you have to be at least this version to update to the new version
     private static final String MIN_VERSION_KEY = "minversion";
+    private static final String MIN_JAVA_VERSION_KEY = "minjavaversion";
     private static final String SUD_KEY = "sudtorrent";
     private static final String SU2_KEY = "su2torrent";
+    // following are unused
     private static final String CLEARNET_SUD_KEY = "sudclearnet";
     private static final String CLEARNET_SU2_KEY = "su2clearnet";
     private static final String I2P_SUD_KEY = "sudi2p";
@@ -125,11 +125,6 @@ class NewsFetcher extends UpdateRunner {
      *  TODO: Check minVersion, use backup URLs specified
      */
     void checkForUpdates() {
-        // For now, don't even tell the manager about new versions if we can't install.
-        // If we do want the manager to know, we must hide the buttons in
-        // SummaryHelper.getUpdateStatus().
-        if (dontInstall())
-            return;
         FileInputStream in = null;
         try {
             in = new FileInputStream(_newsFile);
@@ -143,6 +138,37 @@ class NewsFetcher extends UpdateRunner {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Found version: [" + ver + "]");
                         if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
+                            if (NewsHelper.isUpdateDisabled(_context)) {
+                                String msg = _mgr._("In-network updates disabled. Check package manager.");
+                                _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
+                                _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
+                                return;
+                            }
+                            if (NewsHelper.isBaseReadonly(_context)) {
+                                String msg = _mgr._("No write permission for I2P install directory.");
+                                _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
+                                _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
+                                return;
+                            }
+                            String minRouter = args.get(MIN_VERSION_KEY);
+                            if (minRouter != null) {
+                                if (VersionComparator.comp(RouterVersion.VERSION, minRouter) < 0) {
+                                    String msg = _mgr._("You must first update to version {0}", minRouter);
+                                    _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
+                                    _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
+                                    return;
+                                }
+                            }
+                            String minJava = args.get(MIN_JAVA_VERSION_KEY);
+                            if (minJava != null) {
+                                String ourJava = System.getProperty("java.version");
+                                if (VersionComparator.comp(ourJava, minJava) < 0) {
+                                    String msg = _mgr._("Requires Java version {0} but installed Java version is {1}", minJava, ourJava);
+                                    _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
+                                    _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
+                                    return;
+                                }
+                            }
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is out of date, update!");
                             // TODO if minversion > our version, continue

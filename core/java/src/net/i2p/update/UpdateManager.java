@@ -68,6 +68,22 @@ public interface UpdateManager {
                                           String newVersion, String minVersion);
 
     /**
+     *  A new version is available but cannot be downloaded or installed due to some constraint.
+     *  The manager should notify the user.
+     *  Called by the Checker, either after check() was called, or it found out on its own.
+     *
+     *  @param newsSource who told us
+     *  @param id plugin name for plugins, ignored otherwise
+     *  @param sourceMap Mapping of methods to sources
+     *  @param newVersion The new version available
+     *  @param message A translated message to be displayed to the user, non-null
+     *  @since 0.9.9
+     */
+    public void notifyVersionConstraint(UpdateTask task, URI newsSource,
+                                        UpdateType type, String id,
+                                        String newVersion, String message);
+
+    /**
      *  Called by the Checker after check() was called and all notifyVersionAvailable() callbacks are finished
      *  @param newer notifyVersionAvailable was called
      *  @param success check succeeded (newer or not)

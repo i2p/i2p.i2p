@@ -678,7 +678,22 @@ public class SummaryHelper extends HelperBase {
             buf.append(' ').append(_("Version {0}", dver));
             buf.append("</b></h4>");
         }
-        if ((updateAvailable() || unsignedUpdateAvailable()) &&
+        boolean avail = updateAvailable();
+        boolean unsignedAvail = unsignedUpdateAvailable();
+        String constraint = avail ? NewsHelper.updateConstraint() : null;
+        if (avail && constraint != null &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress()) {
+            if (needSpace)
+                buf.append("<hr>");
+            else
+                needSpace = true;
+            buf.append("<h4><b>").append(_("Update available")).append(":<br>");
+            buf.append(_("Version {0}", getUpdateVersion())).append("<br>");
+            buf.append(constraint).append("</h4>");
+            avail = false;
+        }
+        if ((avail || unsignedAvail) &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress() &&
             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0 &&  // assume using proxy for now
@@ -694,13 +709,13 @@ public class SummaryHelper extends HelperBase {
                 String uri = getRequestURI();
                 buf.append("<form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
-                if (updateAvailable()) {
+                if (avail) {
                     buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
                        // Note to translators: parameter is a version, e.g. "0.8.4"
                        .append(_("Download {0} Update", getUpdateVersion()))
                        .append("</button><br>\n");
                 }
-                if (unsignedUpdateAvailable()) {
+                if (unsignedAvail) {
                     buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"Unsigned\" >")
                        // Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
                        // <br> is optional, to help the browser make the lines even in the button
