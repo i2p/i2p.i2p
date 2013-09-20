@@ -15,6 +15,10 @@ TMPFILE=build/javafiles.txt
 export TZ=UTC
 RC=0
 
+if ! $(which javac]; then
+    export JAVAC=${JAVA_HOME}/../bin/javac
+fi
+
 if [ "$1" = "-p" ]
 then
 	POUPDATE=1
