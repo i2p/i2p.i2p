@@ -145,9 +145,10 @@ public class ConfigClientsHelper extends HelperBase {
             if (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)) {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
+                boolean isRunning = WebAppStarter.isWebAppRunning(app);
                 renderForm(buf, app, app, !"addressbook".equals(app),
                            "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
-                           false, false, false, false, false, true);
+                           false, false, false, isRunning, false, !isRunning);
             }
         }
         buf.append("</table>\n");

@@ -123,12 +123,18 @@ public class ConfigClientsHandler extends FormHandler {
             if (appnum >= 0) {
                 stopClient(appnum);
             } else {
-                try {
-                    PluginStarter.stopPlugin(_context, app);
-                    addFormNotice(_("Stopped plugin {0}", app));
-                } catch (Throwable e) {
-                    addFormError(_("Error stopping plugin {0}", app) + ": " + e);
-                    _log.error("Error stopping plugin " + app,  e);
+                List<String> plugins = PluginStarter.getPlugins();
+                if (plugins.contains(app)) {
+                    try {
+                        PluginStarter.stopPlugin(_context, app);
+                        addFormNotice(_("Stopped plugin {0}", app));
+                    } catch (Throwable e) {
+                        addFormError(_("Error stopping plugin {0}", app) + ": " + e);
+                        _log.error("Error stopping plugin " + app,  e);
+                    }
+                } else {
+                    WebAppStarter.stopWebApp(app);
+                    addFormNotice(_("Stopped webapp {0}", app));
                 }
             }
             return;
