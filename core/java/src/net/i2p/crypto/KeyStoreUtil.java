@@ -326,7 +326,10 @@ public class KeyStoreUtil {
             if (success) {
                 try {
                     success = getPrivateKey(ks, ksPW, alias, keyPW) != null;
+                    if (!success)
+                        error("Key gen failed to get private key", null);
                 } catch (Exception e) {
+                    error("Key gen failed to get private key", e);
                     success = false;
                 }
             }
@@ -458,6 +461,11 @@ public class KeyStoreUtil {
     }
 
     private static void log(I2PAppContext ctx, int level, String msg, Throwable t) {
+        if (level >= Log.WARN && !ctx.isRouterContext()) {
+            System.out.println(msg);
+            if (t != null)
+                t.printStackTrace();
+        }
         Log l = ctx.logManager().getLog(KeyStoreUtil.class);
         l.log(level, msg, t);
     }

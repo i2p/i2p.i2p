@@ -695,13 +695,13 @@ public class SU3File {
                                                   alias, "I2P", 3652, type.getBaseAlgorithm().getName(),
                                                   keylen, keypw);
         if (!success) {
-            System.err.println("Error writing keys:");
+            System.err.println("Error creating keys for " + alias);
             return false;
         }
         File outfile = new File(publicKeyFile);
         success = KeyStoreUtil.exportCert(ksFile, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, alias, outfile);
         if (!success) {
-            System.err.println("Error writing keys:");
+            System.err.println("Error writing public key for " + alias + " to " + outfile);
             return false;
         }
         return true;
