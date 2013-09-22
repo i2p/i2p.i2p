@@ -30,6 +30,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected final RouterContext _context;
     protected final Log _log;
     protected final ConsoleUpdateManager _mgr;
+    protected final UpdateType _type;
     protected final List<URI> _urls;
     protected final String _updateFile;
     protected volatile boolean _isRunning;
@@ -53,20 +54,22 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     /**
      *  Uses router version for partial checks
      */
-    public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
-        this(ctx, mgr, uris, RouterVersion.VERSION);
+    public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, UpdateType type, List<URI> uris) { 
+        this(ctx, mgr, type, uris, RouterVersion.VERSION);
     }
 
     /**
      *  @param currentVersion used for partial checks
      *  @since 0.9.7
      */
-    public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris, String currentVersion) { 
+    public UpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, UpdateType type,
+                        List<URI> uris, String currentVersion) { 
         super("Update Runner");
         setDaemon(true);
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _mgr = mgr;
+        _type = type;
         _urls = uris;
         _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
         _updateFile = (new File(ctx.getTempDir(), "update" + ctx.random().nextInt() + ".tmp")).getAbsolutePath();
@@ -82,7 +85,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         interrupt();
     }
 
-    public UpdateType getType() { return UpdateType.ROUTER_SIGNED; }
+    public UpdateType getType() { return _type; }
 
     public UpdateMethod getMethod() { return UpdateMethod.HTTP; }
 

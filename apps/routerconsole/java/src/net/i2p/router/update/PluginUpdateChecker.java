@@ -35,15 +35,12 @@ class PluginUpdateChecker extends UpdateRunner {
 
     public PluginUpdateChecker(RouterContext ctx, ConsoleUpdateManager mgr,
                                List<URI> uris, String appName, String oldVersion ) { 
-        super(ctx, mgr, uris, oldVersion);
+        super(ctx, mgr, UpdateType.PLUGIN, uris, oldVersion);
         if (!uris.isEmpty())
             _currentURI = uris.get(0);
         _appName = appName;
         _oldVersion = oldVersion;
     }
-
-    @Override
-    public UpdateType getType() { return UpdateType.PLUGIN; }
 
     @Override
     public String getID() { return _appName; }

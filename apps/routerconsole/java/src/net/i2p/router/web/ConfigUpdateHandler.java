@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_ZIP_URL = "router.updateUnsignedURL";
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
+
     /**
      *  Changed as of release 0.8 to support both .sud and .su2
      *  Some JVMs (IcedTea) don't have pack200
@@ -75,6 +77,10 @@ public class ConfigUpdateHandler extends FormHandler {
     "http://update.killyourtv.i2p/i2pupdate.sud\r\n" +
     "http://update.postman.i2p/i2pupdate.sud" ;
 
+    /**
+     *  These are only for .sud and .su2.
+     *  Do NOT use this for .su3
+     */
     public static final String DEFAULT_UPDATE_URL;
     static {
         if (FileUtil.isPack200Supported())
@@ -82,6 +88,34 @@ public class ConfigUpdateHandler extends FormHandler {
         else
             DEFAULT_UPDATE_URL = NO_PACK200_URLS;
     }
+
+    private static final String SU3_CERT_DIR = "certificates/update";
+
+    /**
+     *  Only enabled if we have pack200 and trusted public key certificates installed
+     *  @since 0.9.9
+     */
+    public static final boolean USE_SU3_UPDATE;
+    static {
+        String[] files = (new File(I2PAppContext.getGlobalContext().getBaseDir(), SU3_CERT_DIR)).list();
+        USE_SU3_UPDATE = FileUtil.isPack200Supported() && files != null && files.length > 0;
+    }
+
+    private static final String DEFAULT_SU3_UPDATE_URLS =
+    "http://echelon.i2p/i2p/i2pupdate.su3\r\n" +
+    "http://inr.i2p/i2p/i2pupdate.su3\r\n" +
+    "http://meeh.i2p/i2pupdate/i2pupdate.su3\r\n" +
+    "http://stats.i2p/i2p/i2pupdate.su3\r\n" +
+    "http://www.i2p2.i2p/_static/i2pupdate.su3\r\n" +
+    "http://update.dg.i2p/files/i2pupdate.su3\r\n" +
+    "http://update.killyourtv.i2p/i2pupdate.su3\r\n" +
+    "http://update.postman.i2p/i2pupdate.su3" ;
+
+    /**
+     *  Empty string if disabled. Cannot be overridden by config.
+     *  @since 0.9.9
+     */
+    public static final String SU3_UPDATE_URLS = USE_SU3_UPDATE ? DEFAULT_SU3_UPDATE_URLS : "";
 
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     

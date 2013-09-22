@@ -66,6 +66,8 @@ public class UpdateHandler {
             _nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.noncePrev"))) {
             if (_action.contains("Unsigned")) {
                 update(ROUTER_UNSIGNED);
+            } else if (ConfigUpdateHandler.USE_SU3_UPDATE) {
+                update(ROUTER_SIGNED_SU3);
             } else {
                 update(ROUTER_SIGNED);
             }
@@ -76,7 +78,8 @@ public class UpdateHandler {
         ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
         if (mgr == null)
             return;
-        if (mgr.isUpdateInProgress(ROUTER_SIGNED) || mgr.isUpdateInProgress(ROUTER_UNSIGNED)) {
+        if (mgr.isUpdateInProgress(ROUTER_SIGNED) || mgr.isUpdateInProgress(ROUTER_UNSIGNED) ||
+            mgr.isUpdateInProgress(ROUTER_SIGNED_SU3)) {
             _log.error("Update already running");
             return;
         }

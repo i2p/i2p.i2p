@@ -64,11 +64,16 @@ public class SU3File {
 
     private static final int TYPE_ZIP = 0;
 
+    public static final int CONTENT_UNKNOWN = 0;
+    public static final int CONTENT_ROUTER = 1;
+    public static final int CONTENT_PLUGIN = 2;
+    public static final int CONTENT_RESEED = 3;
+
     private enum ContentType {
-        UNKNOWN(0, "unknown"),
-        ROUTER(1, "router"),
-        PLUGIN(2, "plugin"),
-        RESEED(3, "reseed")
+        UNKNOWN(CONTENT_UNKNOWN, "unknown"),
+        ROUTER(CONTENT_ROUTER, "router"),
+        PLUGIN(CONTENT_PLUGIN, "plugin"),
+        RESEED(CONTENT_RESEED, "reseed")
         ;
 
         private final int code;

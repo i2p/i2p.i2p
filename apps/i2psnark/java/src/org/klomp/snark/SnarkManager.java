@@ -193,6 +193,7 @@ public class SnarkManager implements CompleteListener {
             if (_umgr != null) {
                 _uhandler = new UpdateHandler(_context, _umgr, SnarkManager.this);
                 _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT, 10);
+                _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT, 10);
                 _log.warn("Registering with update manager");
             } else {
                 _log.warn("No update manager to register with");
@@ -210,6 +211,7 @@ public class SnarkManager implements CompleteListener {
         if (_umgr != null && _uhandler != null) {
             //_uhandler.shutdown();
             _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
+            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT);
         }
         _running = false;
         _monitor.interrupt();
