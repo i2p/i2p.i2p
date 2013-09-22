@@ -138,6 +138,24 @@ public class SU3File {
     }
 
     /**
+     *  @return null if unknown
+     *  @since 0.9.9
+     */
+    public SigType getSigType() throws IOException {
+        verifyHeader();
+        return _sigType;
+    }
+
+    /**
+     *  @return -1 if unknown
+     *  @since 0.9.9
+     */
+    public int getContentType() throws IOException {
+        verifyHeader();
+        return _contentType != null ? _contentType.getCode() : -1;
+    }
+
+    /**
      *  Throws IOE if verify vails.
      */
     public void verifyHeader() throws IOException {

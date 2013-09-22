@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
@@ -1092,14 +1093,36 @@ public class ConsoleUpdateManager implements UpdateManager {
         String err;
         // Process the file
         if (isSU3) {
-            err = "todo";
+            SU3File up = new SU3File(_context, f);
+            File temp = new File(_context.getTempDir(), "su3out-" + _context.random().nextLong() + ".zip");
+            try {
+                if (up.verifyAndMigrate(temp)) {
+                    String ver = up.getVersionString();
+                    int type = up.getContentType();
+                    if (ver == null || VersionComparator.comp(RouterVersion.VERSION, ver) <= 0)
+                        err = "Old version " + ver;
+                    else if (type != SU3File.CONTENT_ROUTER)
+                        err = "Bad su3 content type " + type;
+                    else if (!FileUtil.copy(temp, to, true, false))
+                        err = "Failed copy to " + to;
+                    else
+                        err = null;   // success
+                } else {
+                    err = "Signature failed, signer " + DataHelper.stripHTML(up.getSignerString()) +
+                          ' ' + up.getSigType();
+                }
+            } catch (IOException ioe) {
+                _log.error("SU3 extract error", ioe);
+                err = DataHelper.stripHTML(ioe.toString());
+            } finally {
+                temp.delete();
+            }
         } else {
             TrustedUpdate up = new TrustedUpdate(_context);
             err = up.migrateVerified(RouterVersion.VERSION, f, to);
         }
 
-///////////
-        // caller must delete now.. why?
+        // caller must delete.. could be an active torrent
         //f.delete();
         if (err == null) {
             String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
