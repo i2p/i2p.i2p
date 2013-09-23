@@ -1,9 +1,12 @@
+2013-09-23 zzz
+ * Console: Add /proof page which can copied to prove you run a router
+
 2013-09-20 kytv
-  - Chinese, French, German, Russian, and Swedish translation updates from
-    Transifex
+ * Chinese, French, German, Russian, and Swedish translation updates from
+   Transifex
 
 2013-09-17 zzz
-   - Revert expl. default back to 2 hops, wait for next release
+ * Revert expl. default back to 2 hops, wait for next release
 
 2013-09-07 zzz
  * Crypto: Don't use "short exponent" on faster platforms.
