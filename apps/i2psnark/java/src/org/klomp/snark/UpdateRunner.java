@@ -111,7 +111,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                 }
                 _snark = _smgr.addMagnet(name, ih, trackerURL, true, true, this);
                 if (_snark != null) {
-                    updateStatus("<b>" + _smgr.util().getString("Updating from {0}", updateURL) + "</b>");
+                    updateStatus("<b>" + _smgr.util().getString("Updating from {0}", linkify(updateURL)) + "</b>");
                     new Timeout();
                     break;
                 }
@@ -290,6 +290,12 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     }
 
     //////// end CompleteListener methods
+
+    private static String linkify(String url) {
+        String durl = url.length() <= 28 ? url :
+                                           url.substring(0, 25) + "&hellip;";
+        return "<a target=\"_blank\" href=\"" + url + "\"/>" + durl + "</a>";
+    }
 
     private void updateStatus(String s) {
         _umgr.notifyProgress(this, s);
