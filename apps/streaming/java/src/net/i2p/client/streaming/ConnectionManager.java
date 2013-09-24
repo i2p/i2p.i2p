@@ -361,18 +361,29 @@ class ConnectionManager {
     private boolean locked_tooManyStreams() {
         int max = _defaultOptions.getMaxConns();
         if (max <= 0) return false;
-        if (_connectionByInboundId.size() < max) return false;
+        int size = _connectionByInboundId.size();
+        if (size < max) return false;
+        // count both so we can break out of the for loop asap
         int active = 0;
+        int inactive = 0;
+        int maxInactive = size - max;
         for (Connection con : _connectionByInboundId.values()) {
-            if (con.getIsConnected())
-                active++;
+            // ticket #1039
+            if (con.getIsConnected() &&
+                !(con.getCloseSentOn() > 0 && con.getCloseReceivedOn() > 0)) {
+                if (++active >= max)
+                    return true;
+            } else {
+                if (++inactive > maxInactive)
+                    return false;
+            }
         }
         
-        if ( (_connectionByInboundId.size() > 100) && (_log.shouldLog(Log.INFO)) )
-            _log.info("More than 100 connections!  " + active
-                      + " total: " + _connectionByInboundId.size());
+        //if ( (_connectionByInboundId.size() > 100) && (_log.shouldLog(Log.INFO)) )
+        //    _log.info("More than 100 connections!  " + active
+        //              + " total: " + _connectionByInboundId.size());
 
-        return (active >= max);
+        return false;
     }
     
     /**
