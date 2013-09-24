@@ -151,11 +151,22 @@ class Connection {
         return _lastSendId.incrementAndGet();
     }
     
-    void closeReceived() {
-        if (setCloseReceivedOn(_context.clock().now())) {
+    /**
+     *  Notify that a close was received
+     */
+    public void closeReceived() {
+        if (_closeReceivedOn.compareAndSet(0, _context.clock().now())) {
             _inputStream.closeReceived();
             synchronized (_connectLock) { _connectLock.notifyAll(); }
         }
+    }
+    
+    /**
+     *  Notify that a close that we sent was acked
+     *  @since 0.9.9
+     */
+    public void ourCloseAcked() {
+        // todo
     }
     
     /**
@@ -276,15 +287,16 @@ class Connection {
     }
 
     /**
-     * got a packet we shouldn't have, send 'em a reset
-     *
+     * Got a packet we shouldn't have, send 'em a reset.
+     * More than one reset may be sent.
      */
-    void sendReset() {
+    public void sendReset() {
         scheduleDisconnectEvent();
         long now = _context.clock().now();
         if (_resetSentOn.get() + 10*1000 > now) return; // don't send resets too fast
         if (_resetReceived.get()) return;
-        _resetSentOn.compareAndSet(0, now);
+        // Unconditionally set
+        _resetSentOn.set(now);
         if ( (_remotePeer == null) || (_sendStreamId <= 0) ) return;
         PacketLocal reply = new PacketLocal(_context, _remotePeer);
         reply.setFlag(Packet.FLAG_RESET);
@@ -411,9 +423,9 @@ class Connection {
     
     /**
      *  Process the acks and nacks received in a packet
-     *  @return List of packets acked or null
+     *  @return List of packets acked for the first time, or null if none
      */
-    List<PacketLocal> ackPackets(long ackThrough, long nacks[]) {
+    public List<PacketLocal> ackPackets(long ackThrough, long nacks[]) {
         // FIXME synch this part too?
         if (ackThrough < _highestAckedThrough) {
             // dupack which won't tell us anything
@@ -433,7 +445,9 @@ class Connection {
         
         List<PacketLocal> acked = null;
         synchronized (_outboundPackets) {
-            for (Map.Entry<Long, PacketLocal> e : _outboundPackets.entrySet()) {
+            if (!_outboundPackets.isEmpty()) {  // short circuit iterator
+              for (Iterator<Map.Entry<Long, PacketLocal>> iter = _outboundPackets.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry<Long, PacketLocal> e = iter.next();
                 long id = e.getKey().longValue();
                 if (id <= ackThrough) {
                     boolean nacked = false;
@@ -451,10 +465,11 @@ class Connection {
                     }
                     if (!nacked) { // aka ACKed
                         if (acked == null) 
-                            acked = new ArrayList(1);
+                            acked = new ArrayList(8);
                         PacketLocal ackedPacket = e.getValue();
                         ackedPacket.ackReceived();
                         acked.add(ackedPacket);
+                        iter.remove();
                     }
                 } else {
                     // TODO
@@ -475,11 +490,12 @@ class Connection {
                     //nackedPacket.incrementNACKs();
                     break; // _outboundPackets is ordered
                 }
-            }
+              }   // for
+            }   // !isEmpty()
             if (acked != null) {
                 for (int i = 0; i < acked.size(); i++) {
                     PacketLocal p = acked.get(i);
-                    _outboundPackets.remove(Long.valueOf(p.getSequenceNum()));
+                    // removed from _outboundPackets above in iterator
                     _ackedPackets++;
                     if (p.getNumSends() > 1) {
                         _activeResends.decrementAndGet();
@@ -529,7 +545,8 @@ class Connection {
             _log.warn("Took " + elapsed + "ms to pump through " + sched + " on " + toString());
     }
     
-    void resetReceived() {
+    /** notify that a reset was received */
+    public void resetReceived() {
         if (!_resetReceived.compareAndSet(false, true))
             return;
         scheduleDisconnectEvent();
@@ -815,6 +832,7 @@ class Connection {
     /** @return 0 if not sent */
     public long getCloseSentOn() { return _closeSentOn.get(); }
 
+    /** notify that a close was sent */
     public void setCloseSentOn(long when) { 
         if (_closeSentOn.compareAndSet(0, when))
             scheduleDisconnectEvent();
@@ -822,13 +840,6 @@ class Connection {
 
     /** @return 0 if not received */
     public long getCloseReceivedOn() { return _closeReceivedOn.get(); }
-
-    /**
-     *  @return true if the first close received, false otherwise
-     */
-    public boolean setCloseReceivedOn(long when) {
-        return _closeReceivedOn.compareAndSet(0, when);
-    }
 
     public void updateShareOpts() {
         if (_closeSentOn.get() > 0 && !_updatedShareOpts) {

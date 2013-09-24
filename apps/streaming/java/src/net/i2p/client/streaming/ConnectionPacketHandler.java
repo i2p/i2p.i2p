@@ -54,7 +54,7 @@ class ConnectionPacketHandler {
 
         if (con.getHardDisconnected()) {
             if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) || 
-                 (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) || (packet.isFlagSet(Packet.FLAG_CLOSE)) ) {
+                 (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE)) ) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received a data packet after hard disconnect: " + packet + " on " + con);
                 con.sendReset();
@@ -305,6 +305,8 @@ class ConnectionPacketHandler {
                 
                 _context.statManager().addRateData("stream.sendsBeforeAck", numSends, ackTime);
                 
+                if (p.isFlagSet(Packet.FLAG_CLOSE))
+                    con.ourCloseAcked();
                 
                 // ACK the tags we delivered so we can use them
                 //if ( (p.getKeyUsed() != null) && (p.getTagsSent() != null) 
@@ -317,15 +319,18 @@ class ConnectionPacketHandler {
                     _log.debug("Packet acked after " + ackTime + "ms: " + p);
             }
             if (highestRTT > 0) {
-                int oldrtt = con.getOptions().getRTT();
-                int oldrto = con.getOptions().getRTO();
-                int olddev = con.getOptions().getRTTDev();
-                con.getOptions().updateRTT(highestRTT);
-                if (_log.shouldLog(Log.INFO))
+                if (_log.shouldLog(Log.INFO)) {
+                    int oldrtt = con.getOptions().getRTT();
+                    int oldrto = con.getOptions().getRTO();
+                    int olddev = con.getOptions().getRTTDev();
+                    con.getOptions().updateRTT(highestRTT);
                     _log.info("acked: " + acked.size() + " highestRTT: " + highestRTT +
                               " RTT: " + oldrtt + " -> " + con.getOptions().getRTT() +
                               " RTO: " + oldrto + " -> " + con.getOptions().getRTO() +
                               " Dev: " + olddev + " -> " + con.getOptions().getRTTDev());
+                } else {
+                    con.getOptions().updateRTT(highestRTT);
+                }
                 if (firstAck) {
                     if (con.isInbound())
                         _context.statManager().addRateData("stream.con.initialRTT.in", highestRTT, 0);
@@ -542,8 +547,7 @@ class ConnectionPacketHandler {
     private void verifySignature(Packet packet, Connection con) throws I2PException {
         // verify the signature if necessary
         if (con.getOptions().getRequireFullySigned() || 
-            packet.isFlagSet(Packet.FLAG_SYNCHRONIZE) ||
-            packet.isFlagSet(Packet.FLAG_CLOSE) ) {
+            packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE)) {
             // we need a valid signature
             Destination from = con.getRemotePeer();
             if (from == null)

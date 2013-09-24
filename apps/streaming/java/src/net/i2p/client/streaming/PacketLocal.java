@@ -89,10 +89,10 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     }
     
     public boolean shouldSign() { 
-        return isFlagSet(FLAG_SIGNATURE_INCLUDED) ||
-               isFlagSet(FLAG_SYNCHRONIZE) ||
-               isFlagSet(FLAG_CLOSE) ||
-               isFlagSet(FLAG_ECHO);
+        return isFlagSet(FLAG_SIGNATURE_INCLUDED |
+                         FLAG_SYNCHRONIZE |
+                         FLAG_CLOSE |
+                         FLAG_ECHO);
     }
     
     /** last minute update of ack fields, just before write/sign  */
@@ -209,9 +209,9 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         if (_numSends > 1)
             buf.append(" sent ").append(_numSends).append(" times");
         
-        if (isFlagSet(Packet.FLAG_SYNCHRONIZE) ||
-            isFlagSet(Packet.FLAG_CLOSE) ||
-            isFlagSet(Packet.FLAG_RESET)) {
+        if (isFlagSet(FLAG_SYNCHRONIZE |
+                      FLAG_CLOSE |
+                      FLAG_RESET)) {
          
             if (con != null) {
                 buf.append(" from ");
