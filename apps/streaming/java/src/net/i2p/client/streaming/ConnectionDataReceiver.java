@@ -69,7 +69,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         boolean doSend = true;
         if ( (size <= 0) && (con.getLastSendId() >= 0) ) {
             if (con.getOutputStream().getClosed()) {
-                if (con.getCloseSentOn() < 0) {
+                if (con.getCloseSentOn() <= 0) {
                     doSend = true;
                 } else {
                     // closed, no new data, and we've already sent a close packet
