@@ -30,7 +30,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /** LOCKING: this */
     private long _ackOn; 
     private long _cancelledOn;
-    private final AtomicInteger _nackCount = new AtomicInteger(0);
+    private final AtomicInteger _nackCount = new AtomicInteger();
     private volatile boolean _retransmitted;
     private volatile SimpleTimer2.TimedEvent _resendEvent;
     

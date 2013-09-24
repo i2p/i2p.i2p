@@ -70,7 +70,7 @@ class Connection {
     /** Notify this on connection (or connection failure) */
     private final Object _connectLock;
     /** how many messages have been resent and not yet ACKed? */
-    private final AtomicInteger _activeResends = new AtomicInteger(0);
+    private final AtomicInteger _activeResends = new AtomicInteger();
     private final ConEvent _connectionEvent;
     private final int _randomWait;
     private int _localPort;
@@ -565,6 +565,7 @@ class Connection {
     void disconnect(boolean cleanDisconnect) {
         disconnect(cleanDisconnect, true);
     }
+
     void disconnect(boolean cleanDisconnect, boolean removeFromConMgr) {
         synchronized (_connectLock) { _connectLock.notifyAll(); }
         if (_log.shouldLog(Log.DEBUG))

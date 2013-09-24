@@ -21,7 +21,7 @@ class I2PSocketFull implements I2PSocket {
     private final Destination _remotePeer;
     private final Destination _localPeer;
     private volatile MessageChannel _channel;
-    private final AtomicBoolean _closed = new AtomicBoolean(false);
+    private final AtomicBoolean _closed = new AtomicBoolean();
     
     public I2PSocketFull(Connection con, I2PAppContext context) {
         log = context.logManager().getLog(I2PSocketFull.class);

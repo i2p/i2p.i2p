@@ -26,8 +26,8 @@ class MessageOutputStream extends OutputStream {
     private int _valid;
     private final Object _dataLock;
     private final DataReceiver _dataReceiver;
-    private final AtomicReference<IOException>_streamError = new AtomicReference<IOException>(null);
-    private final AtomicBoolean _closed = new AtomicBoolean(false);
+    private final AtomicReference<IOException>_streamError = new AtomicReference<IOException>();
+    private final AtomicBoolean _closed = new AtomicBoolean();
     private long _written;
     private int _writeTimeout;
     private ByteCache _dataCache;
