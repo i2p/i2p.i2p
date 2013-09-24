@@ -24,7 +24,7 @@ import net.i2p.util.NativeBigInteger;
  */
 class ECConstants {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static void log(String s) {
         log(s, null);
