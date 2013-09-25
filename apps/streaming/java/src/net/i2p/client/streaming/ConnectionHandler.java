@@ -67,10 +67,14 @@ class ConnectionHandler {
      */
     public void receiveNewSyn(Packet packet) {
         if (!_active) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping new SYN request, as we're not listening");
-            if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+            if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping new SYN request, as we're not listening");
                 sendReset(packet);
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping non-SYN packet - not listening");
+            }
             return;
         }
         if (_log.shouldLog(Log.INFO))

@@ -688,7 +688,10 @@ class Packet {
         StringBuilder buf = new StringBuilder(64);
         buf.append(toId(_sendStreamId));
         //buf.append("<-->");
-        buf.append(toId(_receiveStreamId)).append(": #").append(_sequenceNum);
+        buf.append(toId(_receiveStreamId)).append(':');
+        if (_sequenceNum != 0 || isFlagSet(FLAG_SYNCHRONIZE))
+            buf.append(" #").append(_sequenceNum);
+        // else an ack-only packet
         //if (_sequenceNum < 10) 
         //    buf.append(" \t"); // so the tab lines up right
         //else
