@@ -74,7 +74,6 @@ public interface UpdateManager {
      *
      *  @param newsSource who told us
      *  @param id plugin name for plugins, ignored otherwise
-     *  @param sourceMap Mapping of methods to sources
      *  @param newVersion The new version available
      *  @param message A translated message to be displayed to the user, non-null
      *  @since 0.9.9
