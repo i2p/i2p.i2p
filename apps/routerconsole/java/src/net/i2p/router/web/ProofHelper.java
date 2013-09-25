@@ -27,11 +27,11 @@ public class ProofHelper extends HelperBase {
         byte[] data = DataHelper.getUTF8(msg);
         Signature sig = _context.dsa().sign(data, _context.keyManager().getSigningPrivateKey());
         buf.setLength(0);
-        buf.append("--- BEGIN I2P SIGNED MESSAGE ---\n");
+        buf.append("---BEGIN I2P SIGNED MESSAGE---\n");
         buf.append(msg);
-        buf.append("\n--- END I2P SIGNED MESSAGE ---\n");
+        buf.append("\n---BEGIN I2P SIGNATURE---\n");
         buf.append(sig.toBase64());
-        buf.append("\n--- END I2P SIGNATURE ---");
+        buf.append("\n---END I2P SIGNATURE---");
         return buf.toString();
     }
 }
