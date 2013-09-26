@@ -6,20 +6,21 @@
 # Translators:
 # "blabla", 2011
 # blabla <blabla@trash-mail.com>, 2012
-# D.A. Loader <>, 2012
+# D.A. Loader, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # SteinQuadrat, 2013
 # mixxy, 2011
+# nextloop <ga25day@mytum.de>, 2013
 # pirr <pirr@tormail.org>, 2012
 # zeroflag <zeroflag@i2pmail.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:25+0000\n"
-"PO-Revision-Date: 2013-06-27 13:09+0000\n"
-"Last-Translator: SteinQuadrat\n"
+"POT-Creation-Date: 2013-09-26 21:33+0000\n"
+"PO-Revision-Date: 2013-09-23 22:30+0000\n"
+"Last-Translator: nextloop <ga25day@mytum.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -600,9 +601,8 @@ msgid "Stop All"
 msgstr "Stoppe alle"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:515
-#, fuzzy
 msgid "Start all stopped torrents"
-msgstr "Torrent starten"
+msgstr "Alle angehaltenen Torrents fortsetzen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:517
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
@@ -1209,15 +1209,15 @@ msgstr "Tracker Liste"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2356
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2365
 msgid "Created"
-msgstr ""
+msgstr "Erstellt"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2375
 msgid "Created By"
-msgstr ""
+msgstr "Erstellt von"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2385
 msgid "Magnet link"

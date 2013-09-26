@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:12+0000\n"
-"PO-Revision-Date: 2013-09-11 22:16+0000\n"
+"POT-Creation-Date: 2013-09-26 21:42+0000\n"
+"PO-Revision-Date: 2013-09-22 05:35+0000\n"
 "Last-Translator: hottuna <i2p@robertfoss.se>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
 "language/sv_SE/)\n"
@@ -55,8 +55,8 @@ msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
 msgstr ""
-"Ogiltigt formulärbegäran, beror troligtvis på attt du använde 'tillbaka' "
-"eller 'uppdatera' knappen. Försök att skicka igen"
+"Ogiltigt formulärbegäran, beror troligtvis på att du använde 'tillbaka' "
+"eller 'uppdatera' knappen. Försök att skicka igen."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:194
 msgid ""
@@ -67,7 +67,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:240
 msgid "Configuration reloaded for all tunnels"
-msgstr "Konfigurationen uppdateras för alla tunnlar"
+msgstr "Konfigurationen har uppdaterats för alla tunnlar"
 
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:253
@@ -81,7 +81,7 @@ msgstr "Stannar tunnel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:334
 msgid "Configuration changes saved"
-msgstr "Konfigurationsändringar sparas"
+msgstr "Konfigurationsändringar sparade"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:337
 msgid "Failed to save configuration"
@@ -89,7 +89,7 @@ msgstr "Det gick inte att spara konfigurationen"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:459
 msgid "New Tunnel"
-msgstr "Ny tunnel"
+msgstr "Ny Tunnel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:482
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:492
@@ -140,15 +140,15 @@ msgstr "CONNECT/SSL/HTTPS proxy"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:512
 msgid "IRC server"
-msgstr "IRC-server"
+msgstr "IRC server"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:513
 msgid "Streamr client"
-msgstr "Klient för Streamr "
+msgstr "Streamr klient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:514
 msgid "Streamr server"
-msgstr "Server för Streamr"
+msgstr "Streamr server"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:515
 msgid "HTTP bidir"
@@ -224,17 +224,17 @@ msgstr "krävs"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:194
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:479
 msgid "Reachable by"
-msgstr "Nåbar via"
+msgstr "Nåbar av"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:196
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:358
 msgid "Outproxies"
-msgstr "utgående proxy"
+msgstr "Utgående proxier"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:203
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:378
 msgid "Tunnel Destination"
-msgstr "Tunnel mål"
+msgstr "Tunnel Mål"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
@@ -248,7 +248,7 @@ msgstr "b32 rekommenderas ej"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:223
 msgid "Shared Client"
-msgstr "Delad klient"
+msgstr "Delad Klient"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:227
 msgid ""
@@ -269,7 +269,7 @@ msgstr "Starta automatiskt"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:145
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:523
 msgid "(Check the Box for 'YES')"
-msgstr "(Markera i boxen för 'Ja')"
+msgstr "(Markera boxen för 'Ja')"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:239
 msgid "Enable DCC"
@@ -278,7 +278,7 @@ msgstr "Aktivera DCC"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:247
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:259
 msgid "Advanced networking options"
-msgstr "Avancerade nätverks instälningar"
+msgstr "Avancerade nätverksinstälningar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:249
 msgid ""
@@ -291,7 +291,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:261
 msgid "Tunnel Options"
-msgstr "Tunnel alternativ"
+msgstr "Tunnel Alternativ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:253
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:263
@@ -331,19 +331,19 @@ msgstr "Variation"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:292
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:302
 msgid "0 hop variance (no randomisation, consistant performance)"
-msgstr "0   hopp variation (ingen slumpmässighet, konstant prestanda)"
+msgstr "0 hopp variation (ingen slumpmässighet, konstant prestanda)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:296
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:306
 msgid ""
 "+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
-msgstr "+ 0-1   hopp variation (medel slumpmässighet, minskad prestanda)"
+msgstr "+ 0-1 hopp variation (medel slumpmässighet, minskad prestanda)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:300
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:310
 msgid ""
 "+ 0-2 hop variance (high additive randomisation, subtractive performance)"
-msgstr "+ 0-2  hopp variation (ökad slumpmässighet, minskad prestanda)"
+msgstr "+ 0-2 hopp variation (ökad slumpmässighet, minskad prestanda)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:304
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:314
@@ -398,7 +398,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:355
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:365
 msgid "backup tunnels"
-msgstr "reserv tunnlar"
+msgstr "reservtunnlar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:362
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:372
@@ -417,7 +417,7 @@ msgstr "bulk-anslutning (hämtningar/webbplatser/BT)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:375
 msgid "Delay Connect"
-msgstr "Fördröj anslutning"
+msgstr "Fördröj Anslutning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:379
 msgid "for request/response connections"
@@ -426,7 +426,7 @@ msgstr "för förfrågan/svar-anslutningar"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:383
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:387
 msgid "Router I2CP Address"
-msgstr "I2CP Routeradress"
+msgstr "Routerns I2CP adress"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:385
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:159
@@ -447,7 +447,7 @@ msgstr "Port"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:467
 msgid "Reduce tunnel quantity when idle"
-msgstr "Minska kvantitetn på tunnel vid inaktivitet"
+msgstr "Minska antalet tunnlar vid inaktivitet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:419
@@ -464,13 +464,13 @@ msgstr "Aktivera"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:409
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:473
 msgid "Reduced tunnel count"
-msgstr "Minska antal tunnlar"
+msgstr "Minskat antal tunnlar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:413
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:433
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
 msgid "Idle minutes"
-msgstr "Inaktiv i minuter"
+msgstr "Inaktiva minuter"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:417
 msgid "Close tunnels when idle"
@@ -508,7 +508,7 @@ msgstr "(om känd)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:466
 msgid "Local Authorization"
-msgstr "Lokala tillstånd"
+msgstr "Lokal Autentisering"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:472
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:482
@@ -522,11 +522,11 @@ msgstr "Lösenord"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:476
 msgid "Outproxy Authorization"
-msgstr "Tillstånd för utproxy"
+msgstr "Autentisering för Utproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:493
 msgid "Jump URL List"
-msgstr "Hopp lista för URLer"
+msgstr "URL Hopp Lista"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:499
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:513
@@ -551,7 +551,7 @@ msgstr "Spara"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:82
 msgid "I2P Tunnel Manager - Edit Server Tunnel"
-msgstr "I2P tunnelhanterare - Redigera servertunneln"
+msgstr "I2P Tunnelhanterare - Redigera Servertunneln"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:110
 msgid "Edit server settings"
@@ -563,11 +563,11 @@ msgstr "Inställningar för en ny server "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:215
 msgid "Website name"
-msgstr "Webbsidas namn"
+msgstr "Webbsidans namn"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:219
 msgid "(leave blank for outproxies)"
-msgstr "(lämna tomt för utgående proxies)"
+msgstr "(lämna tomt för utproxies)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:224
 msgid "Private key file"
@@ -579,7 +579,7 @@ msgstr "Lägg till i den lokala adressboken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:253
 msgid "Hostname Signature"
-msgstr "Värddatornamnets signatur"
+msgstr "Värdnamnets Signatur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:405
 msgid "Encrypt Leaseset"
@@ -591,11 +591,11 @@ msgstr "Krypteringsnyckel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:415
 msgid "Generate New Key"
-msgstr "Skapa ny nyckel "
+msgstr "Skapa Ny Nyckel "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:417
 msgid "Generate"
-msgstr "Skapa"
+msgstr "Generera"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:419
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:511
@@ -604,11 +604,11 @@ msgstr "(Tunneln måste stoppas först)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:421
 msgid "Restricted Access List"
-msgstr "Begränsad åtkomst lista"
+msgstr "Begränsad åtkomstlista"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:427
 msgid "Whitelist"
-msgstr "Lista över tillåtna"
+msgstr "Vitlista"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:431
 msgid "Blacklist"
@@ -648,7 +648,7 @@ msgstr "Maximalt antal samtidiga anslutningar (0 = obegränsat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "New Certificate type"
-msgstr "Ny certifikatet typ"
+msgstr "Nytt Certifikats typ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:483
 msgid "None"
@@ -656,7 +656,7 @@ msgstr "Ingen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:487
 msgid "Hashcash (effort)"
-msgstr "Hashcash (förmåga)"
+msgstr "Hashcash (anstränging)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:493
 msgid "Hashcash Calc Time"
@@ -664,15 +664,15 @@ msgstr "Beräknings tid för Hashcash "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "Estimate"
-msgstr "Uppsaktta"
+msgstr "Uppskattning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:497
 msgid "Hidden"
-msgstr "Dold"
+msgstr "Gömd"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:501
 msgid "Signed (signed by)"
-msgstr "Undertecknad (undertecknat av)"
+msgstr "Signerad (signerad av)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:507
 msgid "Modify Certificate"
@@ -684,11 +684,11 @@ msgstr "Ändra"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:83
 msgid "I2P Tunnel Manager - List"
-msgstr "I2P tunnelhanterare - Lista"
+msgstr "I2P Tunnelhanterare - Lista"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:97
 msgid "Status Messages"
-msgstr "Status meddelande "
+msgstr "Status Meddelanden"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:101
 msgid "Refresh"
@@ -696,23 +696,23 @@ msgstr "Uppdatera"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:109
 msgid "Tunnel Wizard"
-msgstr "Tunnel guide"
+msgstr "Tunnel Guide"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:113
 msgid "Stop All"
-msgstr "Stoppa alla"
+msgstr "Stanna Alla"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:117
 msgid "Start All"
-msgstr "Starta alla"
+msgstr "Starta Alla"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:121
 msgid "Restart All"
-msgstr "Starta om alla"
+msgstr "Starta Om Alla"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:124
 msgid "I2P Server Tunnels"
-msgstr "I2P Servertunnlel"
+msgstr "I2P Servertunnlar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:128
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:149
@@ -723,7 +723,7 @@ msgstr "Pekar på"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:171
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:175
 msgid "Preview"
-msgstr "förhandsvisning"
+msgstr "Förhandsvisning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:132
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:195
@@ -734,11 +734,11 @@ msgstr "Status"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:181
 msgid "Base32 Address"
-msgstr "Bas32 adress"
+msgstr "Base32 Adress"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:189
 msgid "No Preview"
-msgstr "Ingen förhandsvisning"
+msgstr "Ingen Förhandsvisning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:202
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:316
@@ -751,7 +751,7 @@ msgstr "Startar..."
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:337
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:351
 msgid "Stop"
-msgstr "Stopp"
+msgstr "Stanna"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:216
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:344
@@ -761,12 +761,12 @@ msgstr "Kör"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:230
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:358
 msgid "Stopped"
-msgstr "Stoppad"
+msgstr "Stannad"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:237
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:365
 msgid "Start"
-msgstr "Start"
+msgstr "Starta"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:252
 msgid "New server tunnel"
@@ -789,12 +789,12 @@ msgstr "Skapa"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:258
 msgid "I2P Client Tunnels"
-msgstr "I2P Klienttunnel"
+msgstr "I2P Klienttunnlar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:266
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:295
 msgid "Interface"
-msgstr "Gränssnitt "
+msgstr "Interface"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:330
 msgid "Standby"
@@ -874,8 +874,8 @@ msgid ""
 "If you need to connect to a remote service, such as an IRC server inside I2P "
 "or a code repository, then you will require a CLIENT tunnel."
 msgstr ""
-"Om du ansluter till en fjärrtjänst så som tex en IRC-server inom I2P, behövs "
-"en KLIENT-tunnel. "
+"Om du ansluter till en fjärrtjänst som tex en IRC-server inom I2P, behövs en "
+"KLIENT-tunnel. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
 msgid ""
@@ -894,12 +894,12 @@ msgstr "Klient-tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:217
 msgid "There are several types of tunnels to choose from:"
-msgstr "Det finns flera typer av tunnlar att välja på:"
+msgstr "Det finns flera typer av tunnlar att välja mellan:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:225
 msgid "Basic tunnel for connecting to a single service inside I2P."
 msgstr ""
-"Grundläggande tunnel för anslutning till en snigel tjänst innanför I2P.  "
+"Grundläggande tunnel för anslutning till en enskild tjänst innanför I2P.  "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:227
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:269
@@ -921,7 +921,7 @@ msgid ""
 "\"http_proxy\" environment variable for command-line applications in GNU/"
 "Linux."
 msgstr ""
-"Peka din webbläsare på denna tunnel som en http-proxy eller ställ in  "
+"Peka din webbläsare på denna tunnel som en http-proxy eller ställ in "
 "miljövariabeln \"http_proxy\" för terminal baserade applikationer i GNU/"
 "Linux."
 
@@ -939,15 +939,16 @@ msgstr "Specialiserad tunnel för IRC anslutningar. "
 msgid ""
 "With this tunnel type, your IRC client will be able to connect to an IRC "
 "network inside I2P."
-msgstr "Med denna tunneltyp kan IRC-klienter ansluta till IRC-nät inom I2P "
+msgstr ""
+"Med denna tunneltyp kan IRC-klienter ansluta till IRC-nätverk inom I2P "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:239
 msgid ""
 "Each IRC network in I2P that you wish to connect to will require its own "
 "tunnel. (See Also, SOCKS IRC)"
 msgstr ""
-"Varje IRC-nät inom I2P som du vill ansluta till kräver en egen tunnel (Se "
-"även: SOCKS IRC) "
+"Varje IRC-nätverk inom I2P som du vill ansluta till kräver en egen tunnel "
+"(Se även: SOCKS IRC) "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:241
 msgid "A tunnel that implements the SOCKS protocol."
@@ -958,14 +959,15 @@ msgid ""
 "This enables both TCP and UDP connections to be made through a SOCKS "
 "outproxy within I2P."
 msgstr ""
-"Detta möjliggör både TCP och UDP anslutningar genom SOCKS utgående-proxy "
-"innanför I2P "
+"Detta möjliggör både TCP och UDP anslutningar genom SOCKS utproxy innanför "
+"I2P "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:245
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customised for "
 "connecting to IRC networks."
-msgstr "En klient tunnel för SOCKS protokollet som är anpassad för IRC-nät."
+msgstr ""
+"En klient-tunnel för SOCKS protokollet som är anpassad för IRC-nätverk."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:247
 msgid ""
@@ -983,7 +985,7 @@ msgid ""
 "tunnel per IRC network."
 msgstr ""
 "Detta innebär att enbart en I2P-tunnel behövs istället för en tunnel per IRC-"
-"nät."
+"nätverk."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:251
 msgid ""
@@ -991,8 +993,8 @@ msgid ""
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
 msgstr ""
-"IRC-nät utanför I2P kan nås om en SOCKS-proxy innanför I2P är känd, men det "
-"bror på om utgående-proxy har blockerats av IRC-nätet."
+"IRC-nätverk utanför I2P kan nås om en SOCKS-proxy innanför I2P är känd, men "
+"det bror på om utgående-proxy har blockerats av IRC-nätet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:253
 msgid "A client tunnel that implements the HTTP CONNECT command."
@@ -1003,8 +1005,8 @@ msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
 msgstr ""
-"Detta möjliggör TCP anslutningar genom en HTTP utgående-proxy om proxyn "
-"stödjer CONNECT kommandot"
+"Detta möjliggör TCP anslutningar genom en HTTP utproxy om proxyn stödjer "
+"CONNECT kommandot"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:257
 msgid "A customised client tunnel for Streamr."
@@ -1020,7 +1022,7 @@ msgstr "En server-tunnel anpassad för HTTP anslutningar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:273
 msgid "Use this tunnel type if you want to host an eepsite."
-msgstr "Använd denna denna typ av tunnel om du vill köra en eepsite."
+msgstr "Använd denna typ av tunnel om du vill köra en eepsite."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:275
 msgid ""
@@ -1032,11 +1034,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:277
 msgid "This tunnel type is predominantly used when running a Seedless server."
-msgstr "Tunneltypen använd vanligtvis när en Seedless server körs."
+msgstr "Tunneltypen använs vanligtvis när en Seedless server körs."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:279
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
-msgstr "En server-tunnel för IRC-Nät innanför I2P."
+msgstr "En server-tunnel för IRC-nätverk innanför I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:281
 msgid ""
@@ -1059,7 +1061,7 @@ msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
 msgstr ""
-"Kan vad som helst, används enbart för att enkelt identifiera tunneln i "
+"Kan vara vad som helst, används enbart för att enkelt identifiera tunneln i "
 "routerkonsolen  "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:354
@@ -1067,7 +1069,7 @@ msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
 msgstr ""
-"Om du känner till några utgående proxies för denna typen av tunnlar (HTTP "
+"Om du känner till någon utgående proxies för denna typen av tunnlar (HTTP "
 "eller SOCKS), fyll i dem nedan. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:356
@@ -1078,13 +1080,13 @@ msgstr "Separera flera proxyservrar med komma."
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr "Ange I2P destinationen för tjänsten som tunneln skall ansluta till."
+msgstr "Ange I2P mål för tjänsten som tunneln skall ansluta till."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:376
 msgid ""
 "This could be the full base 64 destination key, or an I2P URL from your "
 "address book."
-msgstr "Kan vara hela base 64 målsnyckeln eller en I2P URL från adressboken."
+msgstr "Kan vara hela Base64 målsnyckeln eller en I2P URL från adressboken."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:406
 msgid ""
@@ -1156,7 +1158,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:552
 msgid "The router will start the tunnel once it has been set up."
-msgstr "Routern starta tunneln när den skapats. "
+msgstr "Routern startar tunneln när den skapats. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:556
 msgid ""
@@ -1181,7 +1183,7 @@ msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
 msgstr ""
-"Vid sidan om dessa grundägande inställningar finns att par avancerade val "
+"Vid sidan om dessa grundlägande inställningar finns att par avancerade val "
 "för tunneln. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:662
@@ -1199,7 +1201,7 @@ msgstr "Föregående"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:712
 msgid "Save Tunnel"
-msgstr "Spara tunnel"
+msgstr "Spara Tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:718
 msgid "Finish"

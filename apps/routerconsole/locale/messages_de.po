@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:25+0000\n"
-"PO-Revision-Date: 2013-09-17 11:19+0000\n"
+"POT-Creation-Date: 2013-09-26 21:33+0000\n"
+"PO-Revision-Date: 2013-09-23 22:30+0000\n"
 "Last-Translator: nextloop <ga25day@mytum.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
@@ -2101,6 +2101,8 @@ msgstr "Bann aufheben"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:211
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:209
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:211
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:216
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:209
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:211
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:218
@@ -2631,6 +2633,7 @@ msgstr "Netzwerk"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:289
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:284
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:284
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:310
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:284
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:302
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:284
@@ -3325,9 +3328,8 @@ msgid "Portuguese"
 msgstr "Portugiesisch"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:85
-#, fuzzy
 msgid "Romanian"
-msgstr "Rumänien"
+msgstr "Rumänisch"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:85
 msgid "Russian"
@@ -5260,6 +5262,7 @@ msgstr "Bandbreite einstellen"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:151
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:146
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:146
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:148
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:146
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:164
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:146
@@ -5304,6 +5307,7 @@ msgstr "Router ist offline"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:302
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:297
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:297
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:323
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:297
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:295
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:315
@@ -5349,6 +5353,7 @@ msgstr "Auffrischen (s)"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:306
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:301
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:327
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:298
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:319
@@ -7187,6 +7192,10 @@ msgstr "Teilnehmerprofile"
 msgid "I2P Network Peer Profiles"
 msgstr "Profile der I2P-Netzwerkteilnehmer"
 
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:145
+msgid "Proof"
+msgstr ""
+
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:143
 msgid "statistics"
 msgstr "Statistiken"
@@ -7233,9 +7242,3 @@ msgstr "Webmail"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:328
 msgid "I2P Webmail"
 msgstr "I2P-Webmail"
-
-#~ msgid "killyourtv.i2p"
-#~ msgstr "killyourtv.i2p"
-
-#~ msgid "Select Interface"
-#~ msgstr "Schnittstelle auswählen"

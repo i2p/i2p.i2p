@@ -5,12 +5,13 @@
 #
 # Translators:
 # hottuna <i2p@robertfoss.se>, 2013
+# hottuna <i2p@robertfoss.se>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:12+0000\n"
-"PO-Revision-Date: 2013-09-11 22:45+0000\n"
+"POT-Creation-Date: 2013-09-26 21:42+0000\n"
+"PO-Revision-Date: 2013-09-26 06:40+0000\n"
 "Last-Translator: hottuna <i2p@robertfoss.se>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
 "language/sv_SE/)\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Grattis för att I2P installerats."
+msgstr "Grattis för din I2P installation!"
 
 msgid "Welcome to I2P!"
 msgstr "Välkommen till I2P!"

@@ -6,20 +6,21 @@
 # Translators:
 # blabla, 2011
 # blabla <blabla@trash-mail.com>, 2011-2012
-# D.A. Loader <>, 2012
+# D.A. Loader, 2012
 # driz <driz@i2pmail.org>, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # mixxy, 2011
+# nextloop <ga25day@mytum.de>, 2013
 # pirr <pirr@tormail.org>, 2012
 # zeroflag <zeroflag@i2pmail.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:25+0000\n"
-"PO-Revision-Date: 2013-05-08 13:15+0000\n"
-"Last-Translator: zeroflag <zeroflag@i2pmail.org>\n"
+"POT-Creation-Date: 2013-09-26 21:33+0000\n"
+"PO-Revision-Date: 2013-09-23 22:32+0000\n"
+"Last-Translator: nextloop <ga25day@mytum.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -42,17 +43,15 @@ msgstr[1] ""
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:408
 msgid "lower bandwidth and reliability"
-msgstr ""
+msgstr "niedrigere Bandbreite und Zuverlässlichkeit"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:410
-#, fuzzy
 msgid "standard bandwidth and reliability"
-msgstr ""
-"2 eingehende, 2 ausgehende Tunnel (Standardbandbreitennutzung, zuverlässig)"
+msgstr "standard Bandbreite und Zuverlässlichkeit"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:412
 msgid "higher bandwidth and reliability"
-msgstr ""
+msgstr "hohe Bandbreite und Zuverlässlichkeit"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:119
 msgid "Tunnels are not initialized yet, please reload in two minutes."
@@ -1241,104 +1240,3 @@ msgstr "Abschließen"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Next"
 msgstr "Nächstes"
-
-#~ msgid "This seems to be a bad destination:"
-#~ msgstr "Dies scheint kein gültiges Ziel zu sein:"
-
-#~ msgid "i2paddresshelper cannot help you with a destination like that!"
-#~ msgstr "Der I2P-Adresshelfer kann dir bei solch einem Ziel nicht helfen."
-
-#~ msgid ""
-#~ "To visit the destination in your host database, click <a href="
-#~ "\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
-#~ "click <a href=\"{1}\">here</a>."
-#~ msgstr ""
-#~ "Um das Ziel in Ihrer Host-Datenbank zu besuchen, klicken Sie <a href="
-#~ "\"{0}\">hier</a>, und um das Ziel aus der kollidierenden Adresshelfer-"
-#~ "Anfrage zu besuchen, <a href=\"{1}\">hier</a>!"
-
-#~ msgid "Base 32"
-#~ msgstr "Base 32"
-
-#~ msgid "Continue to {0} without saving"
-#~ msgstr "Weiter zu {0}, ohne zu speichern"
-
-#~ msgid "Save {0} to router address book and continue to eepsite"
-#~ msgstr ""
-#~ "{0} im Router-Adressbuch speichern und auf die Eepseite weiterleiten"
-
-#~ msgid "Save {0} to master address book and continue to eepsite"
-#~ msgstr ""
-#~ "{0} im Master-Adressbuch speichern und auf die Eepseite weiterleiten"
-
-#~ msgid "Save {0} to private address book and continue to eepsite"
-#~ msgstr ""
-#~ "{0} im privaten Adressbuch speichern und auf die Eepseite weiterleiten"
-
-#~ msgid "HTTP Outproxy"
-#~ msgstr "HTTP-Outproxy"
-
-#~ msgid ""
-#~ "Click a link below to look for an address helper by using a \"jump\" "
-#~ "service:"
-#~ msgstr ""
-#~ "Durch Klicken auf einen der untenstehenden Links bekommen Sie einen "
-#~ "Adresshelfer von einem \"Sprung\"-Service:"
-
-#~ msgid "{0} jump service"
-#~ msgstr "Weiterleitungsdienst {0}"
-
-#~ msgid "Added via address helper from {0}"
-#~ msgstr "Hinzugefüg über den Adressenhelfer von {0}"
-
-#~ msgid "Added via address helper"
-#~ msgstr "Durch Adresshelfer hinzugefügt"
-
-#~ msgid "Redirecting to {0}"
-#~ msgstr "Weiterleitung zu {0}"
-
-#~ msgid "Router Console"
-#~ msgstr "Routerkonsole"
-
-#~ msgid "Addressbook"
-#~ msgstr "Adressbuch"
-
-#~ msgid "Configuration"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Help"
-#~ msgstr "Hilfe"
-
-#~ msgid "Saved {0} to the {1} addressbook, redirecting now."
-#~ msgstr ""
-#~ "{0} wurde ins {1} Adressbuch geschrieben.  Du wirst nun weitergeleitet."
-
-#~ msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-#~ msgstr ""
-#~ "Konnte {0} nicht im {1} Adressbuch speichern. Du wirst nun weitergeleitet."
-
-#~ msgid "Click here if you are not redirected automatically."
-#~ msgstr "Klick hier, wenn du nicht automatisch weitergeleitet wirst!"
-
-#~ msgid ""
-#~ "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
-#~ msgstr ""
-#~ "1 eingehender, 1 ausgehender Tunnel (geringe Bandbreitennutzung, weniger "
-#~ "zuverlässig)"
-
-#~ msgid ""
-#~ "3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
-#~ msgstr ""
-#~ "3 eingehende, 3 ausgehende Tunnel (hohe Bandbreitennutzung, zuverlässiger)"
-
-#~ msgid "tunnels"
-#~ msgstr "Tunnel"
-
-#~ msgid "4 in, 4 out (high traffic server)"
-#~ msgstr "4 eingehend, 4 ausgehend (Server mit großem Datenverkehr)"
-
-#~ msgid "5 in, 5 out (high traffic server)"
-#~ msgstr "5 eingehend, 5 ausgehend (Server mit großem Datenverkehr)"
-
-#~ msgid "6 in, 6 out (high traffic server)"
-#~ msgstr "6 eingehend, 6 ausgehend (Server mit großem Datenverkehr)"
