@@ -51,7 +51,7 @@ SCRIPTFILES="\
 "
 
 for script in $SCRIPTFILES; do
-    echo "Checking $script …"
+    echo "Checking $script ..."
     if sh -n "$script" ; then : ; else
         echo "********* FAILED CHECK FOR $script *************"
         FAIL=1
