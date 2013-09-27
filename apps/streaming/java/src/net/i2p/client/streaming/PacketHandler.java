@@ -105,8 +105,8 @@ class PacketHandler {
                 displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
             receiveKnownCon(con, packet);
         } else {
-            receiveUnknownCon(packet, sendId, queueIfNoConn);
             displayPacket(packet, "UNKN", null);
+            receiveUnknownCon(packet, sendId, queueIfNoConn);
         }
         // Don't log here, wait until we have the conn to make the dumps easier to follow
         //((PacketLocal)packet).logTCPDump(true);
@@ -285,6 +285,13 @@ class PacketHandler {
                         return;
                     }
                 }
+            } else {
+                // if it has a send ID, it's almost certainly for a recently removed connection.
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping pkt w/ send ID but no con found, recently disconnected? " + packet);
+                // don't bother sending reset
+                packet.releasePayload();
+                return;
             }
             
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
