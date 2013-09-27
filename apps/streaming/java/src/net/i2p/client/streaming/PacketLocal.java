@@ -191,10 +191,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public StringBuilder formatAsString() {
         StringBuilder buf = super.formatAsString();
         
-        Connection con = _connection;
-        if (con != null)
-            buf.append(" rtt ").append(con.getOptions().getRTT());
-        
         //if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) ) 
         //    buf.append(" with tags");
         final int nackCount = _nackCount.get();
@@ -213,6 +209,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                       FLAG_CLOSE |
                       FLAG_RESET)) {
          
+            Connection con = _connection;
             if (con != null) {
                 buf.append(" from ");
                 Destination local = con.getSession().getMyDestination();

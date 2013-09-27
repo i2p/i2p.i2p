@@ -687,7 +687,7 @@ class Packet {
     protected StringBuilder formatAsString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append(toId(_sendStreamId));
-        //buf.append("<-->");
+        buf.append('/');
         buf.append(toId(_receiveStreamId)).append(':');
         if (_sequenceNum != 0 || isFlagSet(FLAG_SYNCHRONIZE))
             buf.append(" #").append(_sequenceNum);
@@ -696,29 +696,27 @@ class Packet {
         //    buf.append(" \t"); // so the tab lines up right
         //else
         //    buf.append('\t');
-        buf.append(' ');
-        buf.append(toFlagString());
-        if (isFlagSet(FLAG_NO_ACK))
-            buf.append(" NO_ACK ");
-        else
-            buf.append(" ACK ").append(getAckThrough());
-        if (_nacks != null) {
-            buf.append(" NACK");
-            for (int i = 0; i < _nacks.length; i++) {
-                buf.append(" ").append(_nacks[i]);
-            }
-        }
+        toFlagString(buf);
         if ( (_payload != null) && (_payload.getValid() > 0) )
             buf.append(" data: ").append(_payload.getValid());
         return buf;
     }
     
     static final String toId(long id) {
-        return Base64.encode(DataHelper.toLong(4, id));
+        return Base64.encode(DataHelper.toLong(4, id)).replace("==", "");
     }
     
-    private final String toFlagString() {
-        StringBuilder buf = new StringBuilder(32);
+    private final void toFlagString(StringBuilder buf) {
+        if (isFlagSet(FLAG_NO_ACK))
+            buf.append(" NO_ACK");
+        else
+            buf.append(" ACK ").append(getAckThrough());
+        if (_nacks != null) {
+            buf.append(" NACK");
+            for (int i = 0; i < _nacks.length; i++) {
+                buf.append(' ').append(_nacks[i]);
+            }
+        }
         if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
@@ -729,7 +727,6 @@ class Packet {
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG");
         if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
         if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
-        return buf.toString();
     }
 
     /** Generate a pcap/tcpdump-compatible format,
