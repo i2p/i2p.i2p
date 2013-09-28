@@ -57,6 +57,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * may generate a packet with a plain ACK/NACK or CLOSE, or nothing whatsoever
      * if there's nothing new to send.
      *
+     * This is called from MessageOutputStream, i.e. data from the client.
+     *
      * @param buf data to be sent - may be null
      * @param off offset into the buffer to start writing from
      * @param size how many bytes of the buffer to write (may be 0)
@@ -108,6 +110,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * Send some data through the connection, attaching any appropriate flags
      * onto the packet.
      *
+     * Called externally from Connection with args (null, 0, 0) to send an ack
+     *
      * @param buf data to be sent - may be null
      * @param off offset into the buffer to start writing from
      * @param size how many bytes of the buffer to write (may be 0)
@@ -118,6 +122,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     }
 
     /** 
+     * Called externally from Connection with args (null, 0, 0, true) to send an empty data packet
+     *
      * @param buf data to be sent - may be null
      * @param off offset into the buffer to start writing from
      * @param size how many bytes of the buffer to write (may be 0)
@@ -210,13 +216,17 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         // packets sent, otherwise the other side could receive the CLOSE prematurely,
         // since this ACK could arrive before the unacked payload message.
         // TODO if the only unacked packet is the CLOSE packet and it didn't have any data...
+        //
+        // FIXME Implement better half-close by sending CLOSE whenever. Needs 0.9.9 bug fixes
+        // throughout network?
+        //
         if (con.getOutputStream().getClosed() && 
             ( (size > 0) || (con.getUnackedPacketsSent() <= 0) || (packet.getSequenceNum() > 0) ) ) {
             packet.setFlag(Packet.FLAG_CLOSE);
-            con.setCloseSentOn(_context.clock().now());
+            con.notifyCloseSent();
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("New outbound packet on " + _connection + ": " + packet);
+            _log.debug("New OB pkt (acks not yet filled in): " + packet + " on " + _connection);
         return packet;
     }
 

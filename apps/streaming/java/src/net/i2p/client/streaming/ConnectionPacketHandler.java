@@ -52,12 +52,13 @@ class ConnectionPacketHandler {
             return;
         }
 
+        final long seqNum = packet.getSequenceNum();
         if (con.getHardDisconnected()) {
-            if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) || 
+            if ( (seqNum > 0) || (packet.getPayloadSize() > 0) || 
                  (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE | Packet.FLAG_CLOSE)) ) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received a data packet after hard disconnect: " + packet + " on " + con);
-                con.sendReset();
+                // the following will send a RESET
                 con.disconnect(false);
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -68,14 +69,12 @@ class ConnectionPacketHandler {
         }
         
         if ( (con.getCloseSentOn() > 0) && (con.getUnackedPacketsSent() <= 0) && 
-             (packet.getSequenceNum() > 0) && (packet.getPayloadSize() > 0)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Received new data when we've sent them data and all of our data is acked: " 
+             (seqNum > 0) && (packet.getPayloadSize() > 0)) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Received new data when we've sent them data and all of our data is acked: " 
                           + packet + " on " + con + "");
-            con.sendReset();
-            con.disconnect(false);
-            packet.releasePayload();
-            return;
+            // this is fine, half-close
+            // Major bug before 0.9.9, packets were dropped here and a reset sent
         }
 
         if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
@@ -111,7 +110,7 @@ class ConnectionPacketHandler {
             long ready = con.getInputStream().getHighestReadyBockId();
             int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
             int allowedBlocks = available/con.getOptions().getMaxMessageSize();
-            if (packet.getSequenceNum() > ready + allowedBlocks) {
+            if (seqNum > ready + allowedBlocks) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Inbound buffer exceeded on connection " + con + " (" 
                               + ready + "/"+ (ready+allowedBlocks) + "/" + available
@@ -127,23 +126,28 @@ class ConnectionPacketHandler {
 
         _context.statManager().addRateData("stream.con.receiveMessageSize", packet.getPayloadSize(), 0);
         
-        boolean isNew = false;
         boolean allowAck = true;
+        final boolean isSYN = packet.isFlagSet(Packet.FLAG_SYNCHRONIZE);
         
         // We allow the SendStreamID to be 0 so that the originator can send
         // multiple packets before he gets the first ACK back.
         // If we want to limit the number of packets we receive without a
         // SendStreamID, do it in PacketHandler.receiveUnknownCon().
-        if ( (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) && 
+        if ( (!isSYN) && 
              (packet.getReceiveStreamId() <= 0) )
             allowAck = false;
 
-        if (allowAck) {
-            isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
-        } else {
-            con.getInputStream().notifyActivity();
+        // Receive the message.
+        // Note that this is called even for empty packets, including CLOSE packets, so the
+        // MessageInputStream will know the last sequence number.
+        // But not ack-only packets!
+        boolean isNew;
+        if (seqNum > 0 || isSYN)
+            isNew = con.getInputStream().messageReceived(seqNum, packet.getPayload());
+        else
             isNew = false;
-        }
+        if (!allowAck)
+            isNew = false;
         
         //if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
         //    if (_log.shouldLog(Log.DEBUG))
@@ -151,13 +155,19 @@ class ConnectionPacketHandler {
         //                   + " packet: " + packet + " con: " + con);
         //}
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug((isNew ? "New" : "Dup or ack-only") + " inbound packet on " + con + ": " + packet);
+        if (_log.shouldLog(Log.DEBUG)) {
+            String type;
+            if (!allowAck)
+                type = "Non-SYN before SYN";
+            else if (isNew)
+                type = "New";
+            else if (packet.getPayloadSize() <= 0)
+                type = "Ack-only";
+            else
+                type = "Dup";
+            _log.debug(type + " IB pkt: " + packet + " on " + con);
+        }
 
-        // close *after* receiving the data, as well as after verifying the signatures / etc
-        if (packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
-            con.closeReceived();
-        
         boolean fastAck = false;
         boolean ackOnly = false;
         
@@ -180,8 +190,7 @@ class ConnectionPacketHandler {
                     _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
             }
         } else {
-            if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) || 
-                 (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
+            if ( (seqNum > 0) || (packet.getPayloadSize() > 0) || isSYN) {
                 _context.statManager().addRateData("stream.con.receiveDuplicateSize", packet.getPayloadSize(), 0);
                 con.incrementDupMessagesReceived(1);
         
@@ -209,7 +218,7 @@ class ConnectionPacketHandler {
                 }
 
             } else {
-                if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                if (isSYN) {
                     //con.incrementUnackedPacketsReceived();
                     con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
                 } else {
@@ -220,7 +229,7 @@ class ConnectionPacketHandler {
             }
         }
 
-        if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE) && (packet.getSendStreamId() <= 0) ) {
+        if (isSYN && (packet.getSendStreamId() <= 0) ) {
             // don't honor the ACK 0 in SYN packets received when the other side
             // has obviously not seen our messages
         } else {
@@ -249,10 +258,14 @@ class ConnectionPacketHandler {
             // non-ack message payloads are queued in the MessageInputStream
             packet.releasePayload();
         }
-        
+
+        // close *after* receiving the data, as well as after verifying the signatures / etc
         // update the TCB Cache now that we've processed the acks and updated our rtt etc.
-        if (isNew && packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
-            con.updateShareOpts();
+        if (packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED)) {
+            con.closeReceived();
+            if (isNew)
+                con.updateShareOpts();
+        }
 
         //if (choke)
         //    con.fastRetransmit();
@@ -285,6 +298,7 @@ class ConnectionPacketHandler {
         else
             return false;
         
+        boolean lastPacketAcked = false;
         if ( (acked != null) && (!acked.isEmpty()) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(acked.size() + " of our packets acked with " + packet);
@@ -304,9 +318,6 @@ class ConnectionPacketHandler {
                     highestRTT = ackTime;
                 
                 _context.statManager().addRateData("stream.sendsBeforeAck", numSends, ackTime);
-                
-                if (p.isFlagSet(Packet.FLAG_CLOSE))
-                    con.ourCloseAcked();
                 
                 // ACK the tags we delivered so we can use them
                 //if ( (p.getKeyUsed() != null) && (p.getTagsSent() != null) 
@@ -339,9 +350,14 @@ class ConnectionPacketHandler {
                 }
             }
             _context.statManager().addRateData("stream.con.packetsAckedPerMessageReceived", acked.size(), highestRTT);
+            if (con.getCloseSentOn() > 0 && con.getUnackedPacketsSent() <= 0)
+                lastPacketAcked = true;
         }
 
-        return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0), choke);
+        boolean rv = adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0), choke);
+        if (lastPacketAcked)
+            con.notifyLastPacketAcked();
+        return rv;
     }
     
     /** @return are we congested? */

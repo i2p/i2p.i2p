@@ -35,7 +35,8 @@ class Connection {
     private final AtomicLong _lastSendId;
     private final AtomicBoolean _resetReceived = new AtomicBoolean();
     private final AtomicLong _resetSentOn = new AtomicLong();
-    private volatile boolean _connected;
+    private final AtomicBoolean _connected = new AtomicBoolean(true);
+    private final AtomicBoolean _finalDisconnect = new AtomicBoolean();
     private boolean _hardDisconnected;
     private final MessageInputStream _inputStream;
     private final MessageOutputStream _outputStream;
@@ -48,7 +49,7 @@ class Connection {
     private int _unackedPacketsReceived;
     private long _congestionWindowEnd;
     private volatile long _highestAckedThrough;
-    private boolean _isInbound;
+    private final boolean _isInbound;
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
     private final Map<Long, PacketLocal> _outboundPackets;
@@ -87,7 +88,10 @@ class Connection {
     public static final long MAX_RESEND_DELAY = 45*1000;
     public static final long MIN_RESEND_DELAY = 2*1000;
 
-    /** wait up to 5 minutes after disconnection so we can ack/close packets */
+    /**
+     *  Wait up to 5 minutes after disconnection so we can ack/close packets.
+     *  Roughly equal to the TIME-WAIT time in RFC 793, where the recommendation is 4 minutes (2 * MSL)
+     */
     public static final int DISCONNECT_TIMEOUT = 5*60*1000;
     
     public static final int DEFAULT_CONNECT_TIMEOUT = 60*1000;
@@ -107,12 +111,14 @@ class Connection {
      */
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
                       SimpleTimer2 timer,
-                      PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts) {
+                      PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts,
+                      boolean isInbound) {
         _context = ctx;
         _connectionManager = manager;
         _chooser = chooser;
         _outboundQueue = queue;
         _handler = handler;
+        _isInbound = isInbound;
         _log = _context.logManager().getLog(Connection.class);
         _receiver = new ConnectionDataReceiver(_context, this);
         _inputStream = new MessageInputStream(_context);
@@ -135,7 +141,6 @@ class Connection {
         _lastCongestionSeenAt = MAX_WINDOW_SIZE*2; // lets allow it to grow
         _lastCongestionTime = -1;
         _lastCongestionHighestUnacked = -1;
-        _connected = true;
         _lastReceivedOn = -1;
         _activityTimer = new ActivityTimer();
         _ackSinceCongestion = true;
@@ -149,24 +154,6 @@ class Connection {
     
     public long getNextOutboundPacketNum() { 
         return _lastSendId.incrementAndGet();
-    }
-    
-    /**
-     *  Notify that a close was received
-     */
-    public void closeReceived() {
-        if (_closeReceivedOn.compareAndSet(0, _context.clock().now())) {
-            _inputStream.closeReceived();
-            synchronized (_connectLock) { _connectLock.notifyAll(); }
-        }
-    }
-    
-    /**
-     *  Notify that a close that we sent was acked
-     *  @since 0.9.9
-     */
-    public void ourCloseAcked() {
-        // todo
     }
     
     /**
@@ -196,7 +183,7 @@ class Connection {
                 // no need to wait until the other side has ACKed us before sending the first few wsize
                 // packets through
 		// Incorrect assumption, the constructor defaults _connected to true --Sponge
-                    if (!_connected)
+                    if (!_connected.get())
                        return false;
                 started = true;
                 // Try to keep things moving even during NACKs and retransmissions...
@@ -234,6 +221,7 @@ class Connection {
             }
         }
     }
+
     void windowAdjusted() {
         synchronized (_outboundPackets) {
             _outboundPackets.notifyAll();
@@ -290,8 +278,7 @@ class Connection {
      * Got a packet we shouldn't have, send 'em a reset.
      * More than one reset may be sent.
      */
-    public void sendReset() {
-        scheduleDisconnectEvent();
+    private void sendReset() {
         long now = _context.clock().now();
         if (_resetSentOn.get() + 10*1000 > now) return; // don't send resets too fast
         if (_resetReceived.get()) return;
@@ -544,22 +531,74 @@ class Connection {
         if ( (elapsed > 250) && (_log.shouldLog(Log.WARN)) )
             _log.warn("Took " + elapsed + "ms to pump through " + sched + " on " + toString());
     }
+
+    /**
+     *  Notify that a close was sent.
+     *  Called by CPH.
+     *  May be called multiple times... but shouldn't be.
+     */
+    public void notifyCloseSent() { 
+        if (!_closeSentOn.compareAndSet(0, _context.clock().now())) {
+            // TODO ackImmediately() after sending CLOSE causes this. Bad?
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Sent more than one CLOSE: " + toString());
+        }
+        // that's it, wait for notifyLastPacketAcked() or closeReceived()
+    }
     
-    /** notify that a reset was received */
+    /**
+     *  Notify that a close was received.
+     *  Called by CPH.
+     *  May be called multiple times.
+     */
+    public void closeReceived() {
+        if (_closeReceivedOn.compareAndSet(0, _context.clock().now())) {
+            _inputStream.closeReceived();
+            // TODO if outbound && no SYN received, treat like a reset? Could this happen?
+            if (_closeSentOn.get() > 0) {
+                // received after sent
+                disconnect(true);
+            } else {
+                synchronized (_connectLock) { _connectLock.notifyAll(); }
+            }
+        }
+    }
+    
+    /**
+     *  Notify that a close that we sent, and all previous packets, were acked.
+     *  Called by CPH. Only call this once.
+     *  @since 0.9.9
+     */
+    public void notifyLastPacketAcked() {
+        long cso = _closeSentOn.get();
+        if (cso <= 0)
+            throw new IllegalStateException();
+        // we only create one CLOSE packet so we will only get called once,
+        // no need to check
+        long cro = _closeReceivedOn.get();
+        if (cro > 0 && cro < cso)
+            // received before sent
+            disconnect(true);
+    }
+    
+    /**
+     *  Notify that a reset was received.
+     *  May be called multiple times.
+     */
     public void resetReceived() {
         if (!_resetReceived.compareAndSet(false, true))
             return;
-        scheduleDisconnectEvent();
         IOException ioe = new IOException("Reset received");
         _outputStream.streamErrorOccurred(ioe);
         _inputStream.streamErrorOccurred(ioe);
         _connectionError = "Connection reset";
         synchronized (_connectLock) { _connectLock.notifyAll(); }
+        // RFC 793 end of setion 3.4: We are completely done.
+        disconnectComplete();
     }
 
     public boolean getResetReceived() { return _resetReceived.get(); }
     
-    public void setInbound() { _isInbound = true; }
     public boolean isInbound() { return _isInbound; }
 
     /**
@@ -567,10 +606,16 @@ class Connection {
      *  outbound connection. Only set to false on disconnect.
      *  For outbound, use getHighestAckedThrough() >= 0 also,
      *  to determine if the connection is up.
+     *
+     *  In general, this is true until either:
+     *  - CLOSE received and CLOSE sent and our CLOSE is acked
+     *  - RESET received or sent
+     *  - closed on the socket side
      */
-    public boolean getIsConnected() { return _connected; }
+    public boolean getIsConnected() { return _connected.get(); }
 
     public boolean getHardDisconnected() { return _hardDisconnected; }
+
     public boolean getResetSent() { return _resetSentOn.get() > 0; }
 
     /** @return 0 if not sent */
@@ -579,38 +624,103 @@ class Connection {
     /** @return 0 if not scheduled */
     public long getDisconnectScheduledOn() { return _disconnectScheduledOn.get(); }
 
-    void disconnect(boolean cleanDisconnect) {
+    /**
+     *  Must be called when we are done with this connection.
+     *  Enters TIME-WAIT if necessary, and removes from connection manager.
+     *  May be called multiple times.
+     *  This closes the socket side.
+     *  In normal operation, this is called when a CLOSE has been received,
+     *  AND a CLOSE has been sent, AND EITHER:
+     *  received close before sent close AND our CLOSE has been acked
+     *  OR
+     *  received close after sent close.
+     *
+     *  @param cleanDisconnect if true, normal close; if false, send a RESET
+     */
+    public void disconnect(boolean cleanDisconnect) {
         disconnect(cleanDisconnect, true);
     }
 
-    void disconnect(boolean cleanDisconnect, boolean removeFromConMgr) {
+    /**
+     *  Must be called when we are done with this connection.
+     *  May be called multiple times.
+     *  This closes the socket side.
+     *  In normal operation, this is called when a CLOSE has been received,
+     *  AND a CLOSE has been sent, AND EITHER:
+     *  received close before sent close AND our CLOSE has been acked
+     *  OR
+     *  received close after sent close.
+     *
+     *  @param cleanDisconnect if true, normal close; if false, send a RESET
+     *  @param removeFromConMgr if true, enters TIME-WAIT if necessary.
+     *                          if false, MUST call disconnectComplete() later.
+     *                          Should always be true unless called from ConnectionManager.
+     */
+    public void disconnect(boolean cleanDisconnect, boolean removeFromConMgr) {
+        if (!_connected.compareAndSet(true, false)) {
+            return;
+        }
         synchronized (_connectLock) { _connectLock.notifyAll(); }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Disconnecting " + toString(), new Exception("discon"));
-        if (!cleanDisconnect) {
-            _hardDisconnected = true;
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Hard disconnecting and sending a reset on " + toString(), new Exception("cause"));
-            sendReset();
+
+        if (_closeReceivedOn.get() <= 0) {
+            // should have already been called from closeReceived() above
+            _inputStream.closeReceived();
         }
-        
-        if (cleanDisconnect && _connected) {
-            // send close packets and schedule stuff...
+
+        if (cleanDisconnect) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Clean disconnecting, remove? " + removeFromConMgr +
+                           ": " + toString(), new Exception("discon"));
             _outputStream.closeInternal();
-            _inputStream.close();
         } else {
-            if (_connected)
-                doClose();
-            killOutstandingPackets();
+            _hardDisconnected = true;
+            if (_inputStream.getHighestBlockId() >= 0 && !getResetReceived()) {
+                // only send a RESET if we ever got something (and he didn't RESET us),
+                // otherwise don't waste the crypto and tags
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Hard disconnecting and sending reset, remove? " + removeFromConMgr +
+                              " on " + toString(), new Exception("cause"));
+                sendReset();
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Hard disconnecting, remove? " + removeFromConMgr +
+                              " on " + toString(), new Exception("cause"));
+            }
+            _outputStream.streamErrorOccurred(new IOException("Hard disconnect"));
         }
+
         if (removeFromConMgr) {
-            scheduleDisconnectEvent();
+            if (!cleanDisconnect) {
+                disconnectComplete();
+            } else {
+                long cro = _closeReceivedOn.get();
+                long cso = _closeSentOn.get();
+                if (cro > 0 && cro < cso && getUnackedPacketsSent() <= 0) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Rcv close -> send close -> last acked, skip TIME-WAIT for " + toString());
+                    // They sent the first CLOSE.
+                    // We do not need to enter TIME-WAIT, we are done.
+                    // clean disconnect, don't schedule TIME-WAIT
+                    // remove conn
+                    disconnectComplete();
+                } else {
+                    scheduleDisconnectEvent();
+                }
+            }
         }
-        _connected = false;
     }
     
-    void disconnectComplete() {
-        _connected = false;
+    private static final IOException DISCON_IOE = new IOException("disconnected!");
+
+    /**
+     *  Must be called when we are done with this connection.
+     *  Final disconnect. Remove from conn manager.
+     *  May be called multiple times.
+     */
+    public void disconnectComplete() {
+        if (!_finalDisconnect.compareAndSet(false, true))
+            return;
+        _connected.set(false);
         I2PSocketFull s = _socket;
         if (s != null) {
             s.destroy2();
@@ -619,38 +729,35 @@ class Connection {
         _outputStream.destroy();
         _receiver.destroy();
         _activityTimer.cancel();
-        _inputStream.streamErrorOccurred(new IOException("disconnected!"));
+        _inputStream.streamErrorOccurred(DISCON_IOE);
         
-        if (_disconnectScheduledOn.compareAndSet(0, _context.clock().now())) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Connection disconnect complete from dead, drop the con "
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Connection disconnect complete: "
                           + toString());
-            _connectionManager.removeConnection(this);
-        }
-
+        _connectionManager.removeConnection(this);
         killOutstandingPackets();
     }
     
-    /** ignore tag issues */
+    /**
+     *  Cancel and remove all packets awaiting ack
+     */
     private void killOutstandingPackets() {
-        //boolean tagsCancelled = false;
         synchronized (_outboundPackets) {
-            for (Iterator<PacketLocal> iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
-                PacketLocal pl = iter.next();
-                //if ( (pl.getTagsSent() != null) && (pl.getTagsSent().size() > 0) )
-                //    tagsCancelled = true;
+            if (_outboundPackets.isEmpty())
+                return;  // short circuit iterator
+            for (PacketLocal pl : _outboundPackets.values()) {
                 pl.cancelled();
             }
             _outboundPackets.clear();
             _outboundPackets.notifyAll();
         }            
-        //if (tagsCancelled)
-        //    _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
     }
     
     /**
      *  Schedule the end of the TIME-WAIT state,
      *  but only if not previously scheduled.
+     *  Must call either this or disconnectComplete()
+     *
      *  @return true if a new event was scheduled; false if already scheduled
      *  @since 0.9.9
      */
@@ -665,21 +772,11 @@ class Connection {
         public DisconnectEvent() {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Connection disconnect timer initiated: 5 minutes to drop " 
-                          + Connection.this.toString());
+                          + Connection.this.toString(), new Exception());
         }
         public void timeReached() {
-            killOutstandingPackets();
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Connection disconnect timer complete, drop the con "
-                          + Connection.this.toString());
-            _connectionManager.removeConnection(Connection.this);
+            disconnectComplete();
         }
-    }
-    
-    private void doClose() {
-        _outputStream.streamErrorOccurred(new IOException("Hard disconnect"));
-        _inputStream.closeReceived();
-        synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     
     private boolean _remotePeerSet = false;
@@ -832,12 +929,6 @@ class Connection {
     /** @return 0 if not sent */
     public long getCloseSentOn() { return _closeSentOn.get(); }
 
-    /** notify that a close was sent */
-    public void setCloseSentOn(long when) { 
-        if (_closeSentOn.compareAndSet(0, when))
-            scheduleDisconnectEvent();
-    }
-
     /** @return 0 if not received */
     public long getCloseReceivedOn() { return _closeReceivedOn.get(); }
 
@@ -849,6 +940,7 @@ class Connection {
     }
     public void incrementUnackedPacketsReceived() { _unackedPacketsReceived++; }
     public int getUnackedPacketsReceived() { return _unackedPacketsReceived; }
+
     /** how many packets have we sent but not yet received an ACK for?
      * @return Count of packets in-flight.
      */
@@ -894,7 +986,7 @@ class Connection {
     void waitForConnect() {
         long expiration = _context.clock().now() + _options.getConnectTimeout();
         while (true) {
-            if (_connected && (_receiveStreamId > 0) && (_sendStreamId > 0) ) {
+            if (_connected.get() && (_receiveStreamId > 0) && (_sendStreamId > 0) ) {
                 // w00t
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("waitForConnect(): Connected and we have stream IDs");
@@ -905,7 +997,7 @@ class Connection {
                     _log.debug("waitForConnect(): connection error found: " + _connectionError);
                 return;
             }
-            if (!_connected) {
+            if (!_connected.get()) {
                 _connectionError = "Connection failed";
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("waitForConnect(): not connected");
@@ -964,7 +1056,7 @@ class Connection {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Fire inactivity timer on " + Connection.this.toString());
             // uh, nothing more to do...
-            if (!_connected) {
+            if (!_connected.get()) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are already closed");
                 return;
             }
@@ -1101,7 +1193,7 @@ class Connection {
         if (getResetSent())
             buf.append(" reset sent ").append(DataHelper.formatDuration(_context.clock().now() - getResetSentOn())).append(" ago");
         if (getResetReceived())
-            buf.append(" reset received ").append(DataHelper.formatDuration(_context.clock().now() - getDisconnectScheduledOn())).append(" ago");
+            buf.append(" reset rcvd ").append(DataHelper.formatDuration(_context.clock().now() - getDisconnectScheduledOn())).append(" ago");
         if (getCloseSentOn() > 0) {
             buf.append(" close sent ");
             long timeSinceClose = _context.clock().now() - getCloseSentOn();
@@ -1109,7 +1201,7 @@ class Connection {
             buf.append(" ago");
         }
         if (getCloseReceivedOn() > 0)
-            buf.append(" close received ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
+            buf.append(" close rcvd ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
         buf.append(" sent: ").append(1 + _lastSendId.get());
         buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         buf.append(" ackThru ").append(_highestAckedThrough);
@@ -1180,9 +1272,7 @@ class Connection {
             if (_packet.getAckTime() > 0) 
                 return false;
             
-            if (_resetSentOn.get() > 0 || _resetReceived.get() || !_connected) {
-                if(_log.shouldLog(Log.WARN) && (_resetSentOn.get() <= 0) && (!_resetReceived.get()))
-                     _log.warn("??? no resets but not connected: " + _packet); // don't think this is possible
+            if (_resetSentOn.get() > 0 || _resetReceived.get() || _finalDisconnect.get()) {
                 _packet.cancelled();
                 return false;
             }
@@ -1277,9 +1367,22 @@ class Connection {
                 
                 if (numSends - 1 > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Too many resends");
+                        _log.debug("Disconnecting, too many resends of " + _packet);
                     _packet.cancelled();
                     disconnect(false);
+                } else if (numSends >= 3 &&
+                           _packet.isFlagSet(Packet.FLAG_CLOSE) &&
+                           _packet.getPayloadSize() <= 0 &&
+                           _outboundPackets.size() <= 1 &&
+                           getCloseReceivedOn() > 0) {
+                    // Bug workaround to prevent 5 minutes of retransmission
+                    // Routers before 0.9.9 have bugs, they won't ack anything after
+                    // they sent a close. Only send 3 CLOSE packets total, then
+                    // shut down normally.
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Too many CLOSE resends, disconnecting: " + Connection.this.toString());
+                    _packet.cancelled();
+                    disconnect(true);
                 } else {
                     //long timeout = _options.getResendDelay() << numSends;
                     long rto = _options.getRTO();

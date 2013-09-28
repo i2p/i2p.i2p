@@ -43,15 +43,14 @@ class I2PSocketFull implements I2PSocket {
         if (c == null) return;
         if (c.getIsConnected()) {
             OutputStream out = c.getOutputStream();
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException ioe) {
-                    // ignore any write error, as we want to keep on and kill the
-                    // con (thanks Complication!)
-                }
+            try {
+                out.close();
+            } catch (IOException ioe) {
+                // ignore any write error, as we want to keep on and kill the
+                // con (thanks Complication!)
             }
-	    c.disconnect(true);
+            MessageInputStream in = c.getInputStream();
+            in.close();
         } else {
             //throw new IOException("Not connected");
         }
@@ -143,10 +142,7 @@ class I2PSocketFull implements I2PSocket {
     }
     
     void destroy() { 
-        Connection c = _connection;
         destroy2();
-        if (c != null)
-            c.disconnectComplete();
     }
     
     /**
