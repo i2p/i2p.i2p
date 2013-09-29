@@ -103,11 +103,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if (_log.shouldLog(Log.INFO))
             _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
                       " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
-        long afterAccept = getTunnel().getContext().clock().now();
-        long afterSocket = -1;
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
+            long afterAccept = getTunnel().getContext().clock().now();
             // The headers _should_ be in the first packet, but
             // may not be, depending on the client-side options
             socket.setReadTimeout(HEADER_TIMEOUT);
@@ -117,6 +116,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             StringBuilder command = new StringBuilder(128);
             Map<String, List<String>> headers = readHeaders(in, command,
                 CLIENT_SKIPHEADERS, getTunnel().getContext());
+            long afterHeaders = getTunnel().getContext().clock().now();
             
             addEntry(headers, HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
             addEntry(headers, DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p");
@@ -149,7 +149,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             socket.setReadTimeout(readTimeout);
             Socket s = new Socket(remoteHost, remotePort);
-            afterSocket = getTunnel().getContext().clock().now();
+            long afterSocket = getTunnel().getContext().clock().now();
             // instead of i2ptunnelrunner, use something that reads the HTTP 
             // request from the socket, modifies the headers, sends the request to the 
             // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
@@ -186,7 +186,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
             if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
-                          " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
+                          " [" + timeToHandle +
+                          ", read headers: " + (afterHeaders-afterAccept) +
+                          ", socket create: " + (afterSocket-afterHeaders) +
+                          ", start runners: " + (afterHandle-afterSocket) +
+                          "]");
         } catch (SocketException ex) {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
@@ -453,6 +457,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
+    /**
+     *  @return the command followed by the header lines
+     */
     protected static String formatHeaders(Map<String, List<String>> headers, StringBuilder command) {
         StringBuilder buf = new StringBuilder(command.length() + headers.size() * 64);
         buf.append(command.toString().trim()).append("\r\n");
