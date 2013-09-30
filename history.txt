@@ -1,3 +1,5 @@
+* 2013-09-30 0.9.8 released
+
 2013-09-26 kytv
  * French, German, Russian, and Swedish translation updates from Transifex
  * Update geoip.txt based on Maxmind GeoLite Country database from 2013-09-03

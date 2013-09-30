@@ -18,10 +18,10 @@ public class RouterVersion {
     /** deprecated */
     public final static String ID = "Monotone";
     public final static String VERSION = CoreVersion.VERSION;
-    public final static long BUILD = 30;
+    public final static long BUILD = 0;
 
     /** for example "-test" */
-    public final static String EXTRA = "-rc";
+    public final static String EXTRA = "";
     public final static String FULL_VERSION = VERSION + "-" + BUILD + EXTRA;
     public static void main(String args[]) {
         System.out.println("I2P Router version: " + FULL_VERSION);
