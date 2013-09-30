@@ -112,7 +112,8 @@ public class NativeBigInteger extends BigInteger {
      * don't spew log messages. main() below overrides to true.
      */
     private static boolean _doLog = System.getProperty("jbigi.dontLog") == null &&
-                                    I2PAppContext.getGlobalContext().isRouterContext();
+                                    I2PAppContext.getCurrentContext() != null &&
+                                    I2PAppContext.getCurrentContext().isRouterContext();
     
     /**
      *  The following libraries are be available in jbigi.jar in all I2P versions
