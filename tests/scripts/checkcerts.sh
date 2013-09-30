@@ -152,9 +152,9 @@ elif [ $(which certtool) ]; then : ;else
     exit 1
 fi
 
-cd `dirname $0`/../../installer/resources/certificates/ssl
+cd `dirname $0`/../../installer/resources/certificates
 
-for i in *.crt *.cert
+for i in */*.crt
 do
     echo "Checking $i ..."
     EXPIRES=`checkcert $i`
