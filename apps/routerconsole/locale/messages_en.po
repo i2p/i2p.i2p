@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:46+0000\n"
+"POT-Creation-Date: 2013-09-30 16:31+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -2055,6 +2055,8 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:211
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:209
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:211
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:216
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:209
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:211
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:218
@@ -2577,6 +2579,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:289
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:284
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:284
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:310
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:284
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:302
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:284
@@ -5151,6 +5154,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:151
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:146
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:146
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:148
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:146
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:164
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:146
@@ -5195,6 +5199,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:302
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:297
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:297
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:323
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:297
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:295
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:315
@@ -5240,6 +5245,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/oldconsole_jsp.java:306
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:301
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:327
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:298
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/torrents_jsp.java:319
@@ -6845,6 +6851,10 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:310
 msgid "I2P Network Peer Profiles"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:145
+msgid "Proof"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:143

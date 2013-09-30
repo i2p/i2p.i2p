@@ -365,16 +365,16 @@ Debian wrapper.config to try to prevent confusion.
 @@ -185,7 +185,7 @@
  msgstr ""
  
- #: ../i2prouter:1796
+ #: ../i2prouter:1803
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
-+msgid "Please edit /etc/defalt/i2p and set the variable RUN_AS_USER"
++msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1801
+ #: ../i2prouter:1808
 @@ -193,5 +193,5 @@
  msgstr ""
  
- #: ../i2prouter:1804
+ #: ../i2prouter:1811
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -500,41 +500,45 @@ Debian wrapper.config to try to prevent confusion.
 +msgstr "Pour exécuter en tant que root de toute façon, éditer /etc/default/i2p et mettre ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -188,13 +188,13 @@
+@@ -190,16 +190,16 @@
  msgstr "Запросить дамп нитей Java, если запущено."
  
- #: ../i2prouter:1796
+ #: ../i2prouter:1803
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
--msgstr "Пожалуйста отредактируйте i2prouter и установите переменную RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
-+msgstr "Пожалуйста отредактируйте /etc/default/i2p и установите переменную RUN_AS_USER"
+ msgstr ""
+-"Пожалуйста отредактируйте i2prouter и установите переменную RUN_AS_USER"
++"Пожалуйста отредактируйте /etc/default/i2p и установите переменную RUN_AS_USER"
  
- #: ../i2prouter:1801
+ #: ../i2prouter:1808
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Запуск I2P от имени root НЕ рекомендовано."
  
- #: ../i2prouter:1804
+ #: ../i2prouter:1811
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Чтобы всё равно запустить из-под root, отредактируйте i2prouter и установите ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "Чтобы всё равно запустить из-под root, отредактируйте /etc/default/i2p и установите ALLOW_ROOT=true."
+ msgstr ""
+-"Чтобы всё равно запустить из-под root, отредактируйте i2prouter и установите "
++"Чтобы всё равно запустить из-под root, отредактируйте /etc/default/i2p и установите "
+ "ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_sv.po
 +++ b/installer/resources/locale/po/messages_sv.po
-@@ -186,13 +186,13 @@
+@@ -187,14 +187,14 @@
  msgstr "Fråga efter en Java thread dump vid drift."
  
- #: ../i2prouter:1796
+ #: ../i2prouter:1803
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Var god ändra i2prouter och set variabeln RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Var god ändra /etc/default/i2p och set variabeln RUN_AS_USER"
  
- #: ../i2prouter:1801
+ #: ../i2prouter:1808
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Att köra I2P som användare root är *inte* rekommenderat."
  
- #: ../i2prouter:1804
+ #: ../i2prouter:1811
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "För att köra som root oavsett, ändra i2prouter och sätt ALLOW_ROOT=true"
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "För att köra som root oavsett, ändra /etc/default/i2p och sätt ALLOW_ROOT=true"
+ msgstr ""
+-"För att köra som root oavsett, ändra i2prouter och sätt ALLOW_ROOT=true"
++"För att köra som root oavsett, ändra /etc/default/i2p och sätt ALLOW_ROOT=true"
