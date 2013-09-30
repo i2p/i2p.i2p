@@ -35,11 +35,11 @@ public enum SigType {
     ECDSA_SHA512_P521(3, 132, 66, 64, 132, SigAlgo.EC, "SHA-512", "SHA512withECDSA", ECConstants.P521_SPEC),
 
     /**  Pubkey 256 bytes; privkey 512 bytes; hash 32 bytes; sig 256 bytes */
-    RSA_SHA256(4, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC),
+    RSA_SHA256_2048(4, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC),
     /**  Pubkey 384 bytes; privkey 768 bytes; hash 48 bytes; sig 384 bytes */
-    RSA_SHA384(5, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC),
+    RSA_SHA384_3072(5, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC),
     /**  Pubkey 512 bytes; privkey 1024 bytes; hash 64 bytes; sig 512 bytes */
-    RSA_SHA512(6, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC),
+    RSA_SHA512_4096(6, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC),
 
 
 
