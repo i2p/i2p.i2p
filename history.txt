@@ -1,3 +1,6 @@
+2013-10-01 zzz
+ * Startup: Fix rekeying on Windows (tickets #1056, 1057)
+
 * 2013-09-30 0.9.8 released
 
 2013-09-26 kytv
