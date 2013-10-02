@@ -1,3 +1,5 @@
+* 2013-10-02 0.9.8.1 released
+
 2013-10-01 zzz
  * Startup: Fix rekeying on Windows (tickets #1056, 1057)
 
