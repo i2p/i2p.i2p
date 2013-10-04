@@ -180,7 +180,7 @@ public class SnarkManager implements CompleteListener {
             _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
-        _idleChecker = new IdleChecker(_util, _peerCoordinatorSet);
+        _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
         _idleChecker.schedule(5*60*1000);
     }
 

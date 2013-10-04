@@ -22,6 +22,7 @@ import net.i2p.util.SimpleTimer2;
  */
 class IdleChecker extends SimpleTimer2.TimedEvent {
 
+    private final SnarkManager _mgr;
     private final I2PSnarkUtil _util;
     private final PeerCoordinatorSet _pcs;
     private final Log _log;
@@ -36,10 +37,11 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
     /**
      *  Caller must schedule
      */
-    public IdleChecker(I2PSnarkUtil util, PeerCoordinatorSet pcs) {
-        super(util.getContext().simpleTimer2());
-        _log = util.getContext().logManager().getLog(IdleChecker.class);
-        _util = util;
+    public IdleChecker(SnarkManager mgr, PeerCoordinatorSet pcs) {
+        super(mgr.util().getContext().simpleTimer2());
+        _util = mgr.util();
+        _log = _util.getContext().logManager().getLog(IdleChecker.class);
+        _mgr = mgr;
         _pcs = pcs;
     }
 
@@ -64,6 +66,7 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Closing tunnels on idle");
                     _util.disconnect();
+                    _mgr.addMessage(_util.getString("I2P tunnel closed."));
                     schedule(3 * CHECK_TIME);
                     return;
                 }
