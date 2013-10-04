@@ -11,6 +11,8 @@ public abstract class HelperBase {
     protected RouterContext _context;
     protected Writer _out;
 
+    static final String PROP_ADVANCED = "routerconsole.advanced";
+
     /**
      * Configure this bean to query a particular router context
      *
@@ -23,6 +25,11 @@ public abstract class HelperBase {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    /** @since 0.9.9 */
+    public boolean isAdvanced() {
+        return _context.getBooleanProperty(PROP_ADVANCED);
     }
 
     /** might be useful in the jsp's */

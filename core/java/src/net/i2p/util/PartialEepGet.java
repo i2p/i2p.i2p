@@ -11,6 +11,9 @@ import net.i2p.I2PAppContext;
  * Fetch exactly the first 'size' bytes into a stream
  * Anything less or more will throw an IOException
  * No retries, no min and max size options, no timeout option
+ * If the server does not return a Content-Length header of the correct size,
+ * the fetch will fail.
+ *
  * Useful for checking .sud versions
  *
  * @since 0.7.12
@@ -19,7 +22,13 @@ import net.i2p.I2PAppContext;
 public class PartialEepGet extends EepGet {
     long _fetchSize;
 
-    /** @param size fetch exactly this many bytes */
+    /**
+     * Instantiate an EepGet that will fetch exactly size bytes when fetch() is called.
+     *
+     * @param proxyHost use null or "" for no proxy
+     * @param proxyPort use 0 for no proxy
+     * @param size fetch exactly this many bytes
+     */
     public PartialEepGet(I2PAppContext ctx, String proxyHost, int proxyPort,
                          OutputStream outputStream,  String url, long size) {
         // we're using this constructor:
@@ -88,7 +97,8 @@ public class PartialEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("PartialEepGet [-p 127.0.0.1:4444] [-l #bytes] url");
+        System.err.println("PartialEepGet [-p 127.0.0.1:4444] [-l #bytes] url\n" +
+                           "              (use -p :0 for no proxy)");
     }
     
     @Override

@@ -135,6 +135,11 @@ public class ConsoleUpdateManager implements UpdateManager {
         if (ConfigUpdateHandler.USE_SU3_UPDATE) {
             register(c, ROUTER_SIGNED_SU3, HTTP, 0);
             register(u, ROUTER_SIGNED_SU3, HTTP, 0);
+            // todo
+            //register(c, ROUTER_SIGNED_SU3, HTTPS_CLEARNET, 0);
+            //register(u, ROUTER_SIGNED_SU3, HTTPS_CLEARNET, -10);
+            //register(c, ROUTER_SIGNED_SU3, HTTP_CLEARNET, 0);
+            //register(u, ROUTER_SIGNED_SU3, HTTP_CLEARNET, -20);
         }
         // TODO see NewsFetcher
         //register(u, ROUTER_SIGNED, HTTPS_CLEARNET, -5);
