@@ -31,6 +31,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SSLEepGet;
 
 /**
  * Task to fetch updates to the news.xml, and to keep
@@ -88,6 +89,9 @@ class NewsFetcher extends UpdateRunner {
                 EepGet get;
                 if (shouldProxy)
                     get = new EepGet(_context, true, proxyHost, proxyPort, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
+                else if ("https".equals(uri.getScheme()))
+                    // no constructor w/ last mod check
+                    get = new SSLEepGet(_context, _tempFile.getAbsolutePath(), newsURL);
                 else
                     get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
                 get.addStatusListener(this);
