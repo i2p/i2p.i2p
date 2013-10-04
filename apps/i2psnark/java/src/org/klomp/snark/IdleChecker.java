@@ -26,10 +26,12 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
     private final PeerCoordinatorSet _pcs;
     private final Log _log;
     private int _consec;
+    private int _consecNotRunning;
     private boolean _isIdle;
 
     private static final long CHECK_TIME = 63*1000;
     private static final int MAX_CONSEC_IDLE = 4;
+    private static final int MAX_CONSEC_NOT_RUNNING = 20;
 
     /**
      *  Caller must schedule
@@ -43,13 +45,30 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
 
     public void timeReached() {
         if (_util.connected()) {
+            boolean torrentRunning = false;
             boolean hasPeers = false;
             for (PeerCoordinator pc : _pcs) {
-                if (pc.getPeers() > 0) {
-                    hasPeers = true;
-                    break;
+                if (!pc.halted()) {
+                    torrentRunning = true;
+                    if (pc.getPeers() > 0) {
+                        hasPeers = true;
+                        break;
+                    }
                 }
             }
+
+            if (torrentRunning) {
+                _consecNotRunning = 0;
+            } else {
+                if (_consecNotRunning++ >= MAX_CONSEC_NOT_RUNNING) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Closing tunnels on idle");
+                    _util.disconnect();
+                    schedule(3 * CHECK_TIME);
+                    return;
+                }
+            }
+
             if (hasPeers) {
                 if (_isIdle)
                     restoreTunnels();
@@ -62,6 +81,7 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
         } else {
             _isIdle = false;
             _consec = 0;
+            _consecNotRunning = 0;
         }
         schedule(CHECK_TIME);
     }

@@ -190,6 +190,12 @@ class TrackerInfo
     return Math.max(pc, complete + incomplete - 1);
   }
 
+  /** @since 0.9.9 */
+  public int getSeedCount()
+  {
+    return complete;
+  }
+
   public String getFailureReason()
   {
     return failure_reason;

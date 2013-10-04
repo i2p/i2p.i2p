@@ -113,6 +113,7 @@ public class TrackerClient implements Runnable {
   private long lastDHTAnnounce;
   private final List<TCTracker> trackers;
   private final List<TCTracker> backupTrackers;
+  private long _startedOn;
 
   /**
    * Call start() to start it.
@@ -334,6 +335,7 @@ public class TrackerClient implements Runnable {
         }
     }
     this.completed = coordinator.getLeft() == 0;
+    _startedOn = _util.getContext().clock().now();
   }
 
   /**
@@ -482,11 +484,29 @@ public class TrackerClient implements Runnable {
                         consecutiveFails = 0;
                     runStarted = true;
                     tr.started = true;
-
-                    Set<Peer> peers = info.getPeers();
                     tr.seenPeers = info.getPeerCount();
                     if (snark.getTrackerSeenPeers() < tr.seenPeers) // update rising number quickly
                         snark.setTrackerSeenPeers(tr.seenPeers);
+
+                    // auto stop
+                    // These are very high thresholds for now, not configurable,
+                    // just for update torrent
+                    if (completed &&
+                        tr.isPrimary &&
+                        snark.isAutoStoppable() &&
+                        !snark.isChecking() &&
+                        info.getSeedCount() > 100 &&
+                        coordinator.getPeerCount() <= 0 &&
+                        _util.getContext().clock().now() > _startedOn + 2*60*60*1000 &&
+                        uploaded >= 2 * snark.getTotalLength()) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Auto stopping " + snark.getBaseName());
+                        snark.setAutoStoppable(false);
+                        snark.stopTorrent();
+                        return tr.seenPeers;
+                    }
+
+                    Set<Peer> peers = info.getPeers();
 
                     // pass everybody over to our tracker
                     DHT dht = _util.getDHT();

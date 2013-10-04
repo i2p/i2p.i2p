@@ -976,7 +976,8 @@ public class I2PSnarkServlet extends BasicServlet {
                         if (announceURL != null && !_manager.util().getOpenTrackers().contains(announceURL))
                             _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
                     } catch (IOException ioe) {
-                        _manager.addMessage(_("Error creating a torrent for \"{0}\"", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
+                        _manager.addMessage(_("Error creating a torrent for \"{0}\"", baseFile.getAbsolutePath()) + ": " + ioe);
+                        _log.error("Error creating a torrent", ioe);
                     }
                 } else {
                     _manager.addMessage(_("Cannot create a torrent for the nonexistent data: {0}", baseFile.getAbsolutePath()));

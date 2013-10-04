@@ -1666,8 +1666,8 @@ public class SnarkManager implements CompleteListener {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("DirMon found: " + DataHelper.toString(foundNames) + " existing: " + DataHelper.toString(existingNames));
         // lets find new ones first...
-        for (int i = 0; i < foundNames.size(); i++) {
-            if (existingNames.contains(foundNames.get(i))) {
+        for (String name : foundNames) {
+            if (existingNames.contains(name)) {
                 // already known.  noop
             } else {
                 if (shouldAutoStart() && !_util.connect())
@@ -1675,9 +1675,10 @@ public class SnarkManager implements CompleteListener {
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
-                    addTorrent(foundNames.get(i), !shouldAutoStart());
+                    addTorrent(name, !shouldAutoStart());
                 } catch (Exception e) {
-                    addMessage(_("Unable to add {0}", foundNames.get(i)) + ": " + e);
+                    addMessage(_("Error: Could not add the torrent {0}", name) + ": " + e.getMessage());
+                    _log.error("Unable to add the torrent " + name, e);
                 }
             }
         }

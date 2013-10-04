@@ -264,6 +264,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         }
         _hasMetaInfo = true;
         notifyProgress();
+        snark.setAutoStoppable(true);
         return _smgr.gotMetaInfo(snark);
     }
 

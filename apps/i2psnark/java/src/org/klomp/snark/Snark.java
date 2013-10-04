@@ -237,6 +237,7 @@ public class Snark
   private final PeerCoordinatorSet _peerCoordinatorSet;
   private String trackerProblems;
   private int trackerSeenPeers;
+  private boolean _autoStoppable;
 
 
   /** from main() via parseArguments() single torrent */
@@ -904,6 +905,16 @@ public class Snark
     public String getTrackerURL() {
         return additionalTrackerURL;
     }
+
+    /**
+     *  @since 0.9.9
+     */
+    public boolean isAutoStoppable() { return _autoStoppable; }
+
+    /**
+     *  @since 0.9.9
+     */
+    public void setAutoStoppable(boolean yes) { _autoStoppable = yes; }
 
   /**
    * Sets debug, ip and torrent variables then creates a Snark
