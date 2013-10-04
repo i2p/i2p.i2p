@@ -23,6 +23,7 @@ public class ConfigUpdateHandler extends FormHandler {
     private String _proxyHost;
     private String _proxyPort;
     private boolean _updateThroughProxy;
+    private boolean _newsThroughProxy;
     private String _trustedKeys;
     private boolean _updateUnsigned;
     private String _zipURL;
@@ -37,7 +38,11 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
     public static final String DEFAULT_UPDATE_POLICY = "download";
     public static final String PROP_SHOULD_PROXY = "router.updateThroughProxy";
-    public static final String DEFAULT_SHOULD_PROXY = Boolean.TRUE.toString();
+    public static final boolean DEFAULT_SHOULD_PROXY = true;
+    /** @since 0.9.9 */
+    public static final String PROP_SHOULD_PROXY_NEWS = "router.fetchNewsThroughProxy";
+    /** @since 0.9.9 */
+    public static final boolean DEFAULT_SHOULD_PROXY_NEWS = true;
     public static final String PROP_PROXY_HOST = "router.updateProxyHost";
     public static final String DEFAULT_PROXY_HOST = "127.0.0.1";
     public static final String PROP_PROXY_PORT = "router.updateProxyPort";
@@ -164,6 +169,8 @@ public class ConfigUpdateHandler extends FormHandler {
         Map<String, String> changes = new HashMap();
 
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
+            if (_newsURL.startsWith("https"))
+                _newsThroughProxy = false;
             String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
                 changes.put(PROP_NEWS_URL, _newsURL);
@@ -189,8 +196,9 @@ public class ConfigUpdateHandler extends FormHandler {
             }
         }
         
-        changes.put(PROP_SHOULD_PROXY, "" + _updateThroughProxy);
-        changes.put(PROP_UPDATE_UNSIGNED, "" + _updateUnsigned);
+        changes.put(PROP_SHOULD_PROXY, Boolean.toString(_updateThroughProxy));
+        changes.put(PROP_SHOULD_PROXY_NEWS, Boolean.toString(_newsThroughProxy));
+        changes.put(PROP_UPDATE_UNSIGNED, Boolean.toString(_updateUnsigned));
         
         String oldFreqStr = _context.getProperty(PROP_REFRESH_FREQUENCY, DEFAULT_REFRESH_FREQUENCY);
         long oldFreq = DEFAULT_REFRESH_FREQ;
@@ -252,4 +260,6 @@ public class ConfigUpdateHandler extends FormHandler {
     public void setProxyPort(String port) { _proxyPort = port; }
     public void setUpdateUnsigned(String foo) { _updateUnsigned = true; }
     public void setZipURL(String url) { _zipURL = url; }
+     /** @since 0.9.9 */
+    public void setNewsThroughProxy(String foo) { _newsThroughProxy = true; }
 }

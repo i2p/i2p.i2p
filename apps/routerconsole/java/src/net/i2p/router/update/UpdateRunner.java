@@ -149,7 +149,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         int proxyPort;
         boolean isSSL = false;
         if (_method == HTTP) {
-            shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+            shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
             proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             proxyPort = ConfigUpdateHandler.proxyPort(_context);
         } else if (_method == HTTP_CLEARNET) {

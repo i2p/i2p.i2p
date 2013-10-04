@@ -98,7 +98,7 @@ class PluginUpdateRunner extends UpdateRunner {
             } else {
                 updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
                 // use the same settings as for updater
-                boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+                boolean shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
                 String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
                 int proxyPort = ConfigUpdateHandler.proxyPort(_context);
                 try {

@@ -48,6 +48,8 @@
         <tr><td class="mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td></tr>
     <% }   // if canInstall %>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("Fetch news through the eepProxy?")%></b></td>
+          <td><jsp:getProperty name="updatehelper" property="newsThroughProxy" /></td></tr>
         <tr><td class="mediumtags" align="right"><b><%=intl._("Update through the eepProxy?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td></tr>
       <% if (updatehelper.isAdvanced()) { %>
