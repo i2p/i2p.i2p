@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import java.util.Map;
 
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.DecayingBloomFilter;
@@ -121,22 +122,28 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 continue;
             }
             
-            InboundMessageState state = null;
+            InboundMessageState state;
             boolean messageComplete = false;
             boolean messageExpired = false;
-            boolean fragmentOK = false;
+            boolean fragmentOK;
             boolean partialACK = false;
          
             synchronized (messages) {
                 boolean isNew = false;
                 state = messages.get(messageId);
                 if (state == null) {
-                    state = new InboundMessageState(_context, mid, fromPeer);
+                    try {
+                        state = new InboundMessageState(_context, mid, fromPeer, data, i);
+                    } catch (DataFormatException dfe) {
+                        break;
+                    }
                     isNew = true;
+                    fragmentOK = true;
                     // we will add to messages shortly if it isn't complete
+                } else {
+                    fragmentOK = state.receiveFragment(data, i);
                 }
                 
-                fragmentOK = state.receiveFragment(data, i);
              
                 if (state.isComplete()) {
                     messageComplete = true;

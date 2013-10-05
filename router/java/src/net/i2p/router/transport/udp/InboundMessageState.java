@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.CDQEntry;
@@ -53,6 +54,33 @@ class InboundMessageState implements CDQEntry {
     }
     
     /**
+     * Create a new IMS and read in the data from the fragment.
+     * Do NOT call receiveFragment for the same fragment afterwards.
+     * This is more efficient if the fragment is the last (and probably only) fragment.
+     * The main savings is not allocating ByteArray[64].
+     *
+     * @throws DataFormatException if the fragment was corrupt
+     * @since 0.9.9
+     */
+    public InboundMessageState(RouterContext ctx, long messageId, Hash from,
+                               UDPPacketReader.DataReader data, int dataFragment)
+                              throws DataFormatException {
+        _context = ctx;
+        _log = ctx.logManager().getLog(InboundMessageState.class);
+        _messageId = messageId;
+        _from = from;
+        if (data.readMessageIsLast(dataFragment))
+            _fragments = new ByteArray[1 + data.readMessageFragmentNum(dataFragment)];
+        else
+            _fragments = new ByteArray[MAX_FRAGMENTS];
+        _lastFragment = -1;
+        _completeSize = -1;
+        _receiveBegin = ctx.clock().now();
+        if (!receiveFragment(data, dataFragment))
+            throw new DataFormatException("corrupt");
+    }
+    
+    /**
      * Read in the data from the fragment.
      * Caller should synchronize.
      *
@@ -60,8 +88,9 @@ class InboundMessageState implements CDQEntry {
      */
     public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
-        if ( (fragmentNum < 0) || (fragmentNum >= MAX_FRAGMENTS)) {
-            _log.warn("Invalid fragment " + fragmentNum + '/' + MAX_FRAGMENTS);
+        if ( (fragmentNum < 0) || (fragmentNum >= _fragments.length)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid fragment " + fragmentNum + '/' + _fragments.length);
             return false;
         }
         if (_fragments[fragmentNum] == null) {
@@ -105,7 +134,8 @@ class InboundMessageState implements CDQEntry {
                                + ", isLast=" + isLast
                           /*   + ", data=" + Base64.encode(message.getData(), 0, size)   */  );
             } catch (ArrayIndexOutOfBoundsException aioobe) {
-                _log.warn("Corrupt SSU fragment " + fragmentNum, aioobe);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Corrupt SSU fragment " + fragmentNum, aioobe);
                 return false;
             }
         } else {
@@ -247,7 +277,7 @@ class InboundMessageState implements CDQEntry {
     
     public void releaseResources() {
         _released = true;
-        for (int i = 0; i < MAX_FRAGMENTS; i++) {
+        for (int i = 0; i < _fragments.length; i++) {
             if (_fragments[i] != null) {
                 _fragmentCache.release(_fragments[i]);
                 _fragments[i] = null;
