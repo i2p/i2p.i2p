@@ -144,6 +144,9 @@ public abstract class TransportUtil {
                 // Hamachi IPv6
                 if (addr[0] == 0x26 && addr[1] == 0x20 && addr[2] == 0x00 && (addr[3] & 0xff) == 0x9b)
                     return false;
+                // 6bone RFC 2471
+                if (addr[0] == 0x3f && (addr[1] & 0xff) == 0xfe)
+                    return false;
                 try {
                     InetAddress ia = InetAddress.getByAddress(addr);
                     return
