@@ -15,9 +15,9 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
@@ -406,9 +406,8 @@ public class LogManager {
     private void parseLimits(Properties config, String recordPrefix) {
         _limits.clear();
         if (config != null) {
-            for (Iterator iter = config.keySet().iterator(); iter.hasNext();) {
-                String key = (String) iter.next();
-                String val = config.getProperty(key);
+            for (Map.Entry e : config.entrySet()) {
+                String key = (String) e.getKey();
 
                 // if we're filtering the records (e.g. logger.record.*) then
                 // filter accordingly (stripping off that prefix for matches)
@@ -420,6 +419,7 @@ public class LogManager {
                     }
                 }
 
+                String val = (String) e.getValue();
                 LogLimit lim = new LogLimit(key, Log.getLevel(val));
                 //_log.debug("Limit found for " + name + " as " + val);
                 if (!_limits.contains(lim))

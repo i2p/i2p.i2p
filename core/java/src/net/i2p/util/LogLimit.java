@@ -37,7 +37,12 @@ class LogLimit {
     public boolean matches(Log log) {
         String name = log.getName();
         if (name == null) return false;
-        return name.startsWith(_rootName);
+        //return name.startsWith(_rootName);
+        // exact match or higher in class hierarchy
+        // no longer allow foo.bar to match foo.barf
+        return name.startsWith(_rootName) &&
+               (name.length() == _rootName.length() ||
+                name.charAt(_rootName.length()) == '.');
     }
 
     @Override
