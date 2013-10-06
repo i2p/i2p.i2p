@@ -17,6 +17,8 @@ elif [ $UNIXTYPE = "sunos" ]; then
 elif [ $UNIXTYPE = "openbsd" ]; then
     if [ -d /usr/local/jdk-1.7.0 ]; then
         JAVA_HOME="/usr/local/jdk-1.7.0"
+    elif [ -d /usr/local/jdk-1.6.0 ]; then
+        JAVA_HOME="/usr/local/jdk-1.6.0"
     fi
 elif [ $UNIXTYPE = "netbsd" ]; then
     if [ -d /usr/pkg/java/openjdk7 ]; then
@@ -35,8 +37,15 @@ elif [ $UNIXTYPE = "linux" ] && [ -e /etc/arch-release ]; then
 elif [ $UNIXTYPE = "darwin" ]; then
     JAVA_HOME=$(/usr/libexec/java_home)
 elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
+    # Even though the kernel is FreeBSD's, the userland is GNU.
+    # kFreeBSD has $JAVA_HOME/include/linux instead of $JAVA_HOME/include/*bsd
     UNIXTYPE="linux"
-    if [ -d /usr/lib/jvm/java-gcj ]; then
+    # OpenJDK 7 is supported as of Debian Jessie
+    if [ -d /usr/lib/jvm/java-7-openjdk-kfreebsd-amd64/ ]; then
+        JAVA_HOME="/usr/lib/jvm/java-7-openjdk-kfreebsd-amd64"
+    elif [ -d /usr/lib/jvm/java-7-openjdk-kfreebsd-i386/ ]; then
+        JAVA_HOME="/usr/lib/jvm/java-7-openjdk-kfreebsd-i386"
+    elif [ -d /usr/lib/jvm/java-gcj ]; then
         JAVA_HOME="/usr/lib/jvm/java-gcj"
     fi
 fi

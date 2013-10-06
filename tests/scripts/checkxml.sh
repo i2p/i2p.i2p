@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Validate XML and HTML files using xmllint
 # Returns nonzero on failure

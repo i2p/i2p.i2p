@@ -77,6 +77,7 @@ trans.pt = apps/routerconsole/locale-news/messages_pt.po
 trans.ru_RU = apps/routerconsole/locale-news/messages_ru.po
 trans.sv_SE = apps/routerconsole/locale-news/messages_sv.po
 trans.tr_TR = apps/routerconsole/locale-news/messages_tr.po
+trans.zh_CN = apps/routerconsole/locale-news/messages_zh.po
 
 [I2P.i2psnark]
 source_file = apps/i2psnark/locale/messages_en.po

@@ -76,6 +76,7 @@ public class RebuildRouterInfoJob extends JobImpl {
     void rebuildRouterInfo() {
         rebuildRouterInfo(true);
     }
+
     void rebuildRouterInfo(boolean alreadyRunning) {
         _log.debug("Rebuilding the new router info");
         RouterInfo info = null;
@@ -86,8 +87,8 @@ public class RebuildRouterInfoJob extends JobImpl {
         
         if (keyFile.exists()) {
             // ok, no need to rebuild a brand new identity, just update what we can
-            info = getContext().router().getRouterInfo();
-            if (info == null) {
+            RouterInfo oldinfo = getContext().router().getRouterInfo();
+            if (oldinfo == null) {
                 info = new RouterInfo();
                 FileInputStream fis = null;
                 try {
@@ -116,6 +117,9 @@ public class RebuildRouterInfoJob extends JobImpl {
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
+            } else {
+                // Make a new RI from the old identity, or else info.setAddresses() will throw an ISE
+                info = new RouterInfo(oldinfo);
             }
             
             try {

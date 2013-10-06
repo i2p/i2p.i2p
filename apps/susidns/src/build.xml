@@ -126,6 +126,7 @@
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <env key="JAVA_HOME" value="${java.home}" />
             <arg value="./bundle-messages.sh" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
