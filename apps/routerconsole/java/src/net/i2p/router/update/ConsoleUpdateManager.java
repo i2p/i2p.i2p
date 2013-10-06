@@ -1104,7 +1104,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                 if (up.verifyAndMigrate(temp)) {
                     String ver = up.getVersionString();
                     int type = up.getContentType();
-                    if (ver == null || VersionComparator.comp(RouterVersion.VERSION, ver) <= 0)
+                    if (ver == null || VersionComparator.comp(RouterVersion.VERSION, ver) >= 0)
                         err = "Old version " + ver;
                     else if (type != SU3File.CONTENT_ROUTER)
                         err = "Bad su3 content type " + type;

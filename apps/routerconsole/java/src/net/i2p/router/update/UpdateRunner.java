@@ -150,8 +150,14 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         boolean isSSL = false;
         if (_method == HTTP) {
             shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
-            proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-            proxyPort = ConfigUpdateHandler.proxyPort(_context);
+            if (shouldProxy) {
+                proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+                proxyPort = ConfigUpdateHandler.proxyPort(_context);
+            } else {
+                // TODO, wrong method, fail
+                proxyHost = null;
+                proxyPort = 0;
+            }
         } else if (_method == HTTP_CLEARNET) {
             shouldProxy = false;
             proxyHost = null;
@@ -191,7 +197,8 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
                 _log.debug("Selected update URL: " + updateURL);
 
             // Check the first 56 bytes for the version
-            // PartialEepGet works with clearnet but not with SSL
+            // FIXME PartialEepGet works with clearnet but not with SSL
+            _newVersion = null;
             if (!isSSL) {
                 _isPartial = true;
                 _baos.reset();
@@ -265,6 +272,9 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
             return;
         }
 
+        // FIXME if we didn't do a partial, we don't know
+        if (_newVersion == null)
+            _newVersion = "unknown";
         File tmp = new File(_updateFile);
         if (_mgr.notifyComplete(this, _newVersion, tmp))
             this.done = true;

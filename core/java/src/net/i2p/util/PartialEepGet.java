@@ -3,6 +3,7 @@ package net.i2p.util;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.i2p.I2PAppContext;
@@ -32,8 +33,10 @@ public class PartialEepGet extends EepGet {
     public PartialEepGet(I2PAppContext ctx, String proxyHost, int proxyPort,
                          OutputStream outputStream,  String url, long size) {
         // we're using this constructor:
-        // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
-        super(ctx, true, proxyHost, proxyPort, 0, size, size, null, outputStream, url, true, null, null);
+        // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries,
+        //               long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
+        super(ctx, proxyHost != null && proxyPort > 0, proxyHost, proxyPort, 0,
+              size, size, null, outputStream, url, true, null, null);
         _fetchSize = size;
     }
    
@@ -106,6 +109,8 @@ public class PartialEepGet extends EepGet {
         StringBuilder buf = new StringBuilder(2048);
         URL url = new URL(_actualURL);
         String host = url.getHost();
+        if (host == null || host.length() <= 0)
+            throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
         String path = url.getPath();
         String query = url.getQuery();
