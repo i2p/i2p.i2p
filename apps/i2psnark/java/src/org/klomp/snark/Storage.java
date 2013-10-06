@@ -1180,8 +1180,8 @@ public class Storage
        * This must be called before using the RAF to ensure it is open
        * locking: this
        */
-      public RandomAccessFile checkRAF() throws IOException {
-          if (RAFtime > 0)
+      public synchronized RandomAccessFile checkRAF() throws IOException {
+          if (raf != null)
             RAFtime = System.currentTimeMillis();
           else
             openRAF();
@@ -1191,14 +1191,14 @@ public class Storage
       /**
        * locking: this
        */
-      private void openRAF() throws IOException {
+      private synchronized void openRAF() throws IOException {
           openRAF(_probablyComplete);
       }
 
       /**
        * locking: this
        */
-      private void openRAF(boolean readonly) throws IOException {
+      private synchronized void openRAF(boolean readonly) throws IOException {
           raf = new RandomAccessFile(RAFfile, (readonly || !RAFfile.canWrite()) ? "r" : "rw");
           RAFtime = System.currentTimeMillis();
       }
@@ -1207,7 +1207,7 @@ public class Storage
        * Close if last used time older than cutoff.
        * locking: this
        */
-      public void closeRAF(long cutoff) {
+      public synchronized void closeRAF(long cutoff) {
           if (RAFtime > 0 && RAFtime < cutoff) {
               try {
                   closeRAF();
@@ -1219,7 +1219,7 @@ public class Storage
        * Can be called even if not open
        * locking: this
        */
-      public void closeRAF() throws IOException {
+      public synchronized void closeRAF() throws IOException {
           RAFtime = 0;
           if (raf == null)
               return;
@@ -1235,7 +1235,7 @@ public class Storage
        *
        *  This calls openRAF(); caller must synchronize and call closeRAF().
        */
-      public void allocateFile() throws IOException {
+      public synchronized void allocateFile() throws IOException {
           // caller synchronized
           openRAF(false);  // RW
           raf.setLength(length);
@@ -1256,7 +1256,7 @@ public class Storage
        *  Caller must synchronize and call checkRAF() or openRAF().
        *  @since 0.9.1
        */
-      public void balloonFile() throws IOException
+      public synchronized void balloonFile() throws IOException
       {
           long remaining = length;
           final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
