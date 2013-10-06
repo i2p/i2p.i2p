@@ -1,3 +1,95 @@
+2013-10-06 zzz
+ Prop from branch i2p.i2p.zzz.ecdsa:
+ * Build:
+   - Generate su3 file in release target
+   - Add zzz's new RSA 4096 pubkey cert for updates
+   - Fix checkcerts.sh
+ * Console: Move advanced setting to HelperBase
+ * DSAEngine changes:
+   - Implement raw sign/verify for other SigTypes
+   - Add sign/verify methods using Java keys
+ * ECDSA Support:
+   - Add ECConstants which looks for named curves and falls back to
+     explicitly defining the curves
+   - Add support for ECDSA to SigType, DSAEngine and KeyGenerator
+   - Attempt to add BC as a Provider
+   - genSpec: fallback to BC provider
+ * EepGet:
+   - Fix non-proxied PartialEepGet
+   - Prevent non-proxied eepget for an I2P host
+ * KeyGenerator changes:
+   - Generate key pairs for all supported SigTypes
+   - KeyPairGen: Catch ProviderException, fallback to BC provider
+   - Add KeyGenerator main() tests
+ * KeyRing and DirKeyRing added: simple backend for storing X.509 certs
+ * KeyStoreUtil added:
+   - Consolidate KeyStore code from SSLEepGet, I2CPSSLSocketFactory,
+     SSLClientListenerRunner, and RouterConsoleRunner into new
+     KeyStoreUtil and CertUtil classes in net.i2p.crypto (ticket #744)
+   - Change default to RSA 2048 (ticket #1017)
+   - Set file modes on written keys
+   - Overwrite check in createKeys()
+   - New getCert(), getKey()
+   - Extend keygen max wait
+   - Read back private key to verify after keygen
+   - Validate cert after reading from file
+   - Validate CN in cert
+   - Specify cert signature algorithm when generating keys
+ * NativeBigInteger: Tweak to prevent early context instantiation
+ * RSA support added: constants, parameters, sig types, support in DSAEngine, KeyGenerator, SigUtil
+ * SHA1Hash: Add no-arg constructor
+ * SigType changes:
+   - Add parameters (curve specs) to SigTypes
+   - Add getHashInstance()
+   - Add RSA, fix ECDSA
+   - Renumber, rename, comment out types that are too short.
+ * SigUtil added:
+   - Converters from Java formats (ASN.1, X.509, PKCS#8)
+     to I2P formats for Signatures and SigningKeys
+   - Move ASN.1 converter from DSAEngine to SigUtil, generalize
+     for variable length, add support for longer sequences,
+     add more sanity checks, add more exceptions
+   - Move I2P-to-Java DSA key conversion from DSAEngine to SigUtil
+   - Add Java-to-I2P DSA key conversion
+   - Add Java key import
+   - New split() and combine() methods
+ * SSLEepGet: Move all certificates to certificates/ssl, in preparation
+   for other certificate uses by SU3File
+ * SU3File changes:
+   - Support all SigTypes
+   - Implement keygen
+   - Readahead to get sigtype on verify, as we need the hash type
+   - Enum for content type
+   - Add unknown content type, make default
+   - Fix NPE if private key not found or sign fails
+   - Store generated keys in keystore, and get private key from keystore
+     for signing, in Java format
+   - Use Java keys to sign and verify so we don't
+     lose the key parameters in the conversion to I2P keys
+   - Type checking of Java private key vs. type when signing
+   - Use certs instead of public keys for verification
+   - Fix arg processing
+   - Improve validate-without-extract
+   - New extract command
+   - Change static fields to avoid early context init
+   - Reduce PRNG buffer size for faster signing
+ * Update: Preliminary work for su3 router updates:
+   - New ROUTER_SIGNED_SU3 UpdateType
+   - Add support for torrent and HTTP
+   - Refactor UpdateRunners to return actual UpdateType
+   - Deal with signed/su3 conflicts
+   - Verify and extract su3 files.
+   - Stub out support for clearnet su3 updating
+   - New config for proxying news, separate from proxying update
+   - PartialEepGet and SSLEepGet tweaks to support clearnet update
+   - Remove proxy, key, and url config from /configupdate
+   - More URI checks in UpdateRunner
+   - Add https support for news fetch
+   - Add su3 mime type
+   - Reset found version in update loop so we don't fetch from
+     the next host too.
+   - Prevent NPE on version after SSL fetch
+
 * 2013-10-02 0.9.8.1 released
 
 2013-10-01 zzz
