@@ -204,7 +204,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     private void verifySession() throws I2PException {
         if (_isDestroyed.get())
-            throw new I2PException("destroyed");
+            throw new I2PException("Session was closed");
         if (!_connectionManager.getSession().isClosed())
             return;
         _connectionManager.getSession().connect();
