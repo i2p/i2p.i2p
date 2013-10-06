@@ -94,7 +94,7 @@ public class ConfigUpdateHandler extends FormHandler {
             DEFAULT_UPDATE_URL = NO_PACK200_URLS;
     }
 
-    private static final String SU3_CERT_DIR = "certificates/update";
+    private static final String SU3_CERT_DIR = "certificates/router";
 
     /**
      *  Only enabled if we have pack200 and trusted public key certificates installed
