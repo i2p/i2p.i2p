@@ -440,6 +440,7 @@ public class RouterConsoleRunner implements RouterApp {
                         lsnr.setPort(lport);
                         lsnr.setMaxIdleTime(90*1000);  // default 10 sec
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
+                        lsnr.setAcceptors(1);          // default changed to 2 somewhere in Jetty 7?
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
@@ -506,6 +507,7 @@ public class RouterConsoleRunner implements RouterApp {
                             ssll.setPort(sslPort);
                             ssll.setMaxIdleTime(90*1000);  // default 10 sec
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
+                            ssll.setAcceptors(1);          // default changed to 2 somewhere in Jetty 7?
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;
