@@ -1231,11 +1231,11 @@ class PeerCoordinator implements PeerListener
                          return pp;
                       }
                   }
-                  if (_log.shouldLog(Log.WARN)) {
+                  if (_log.shouldLog(Log.INFO)) {
                       if (skipped)
-                          _log.warn("Partial piece " + pp + " with multiple peers skipped for seeder");
+                          _log.info("Partial piece " + pp + " with multiple peers skipped for seeder");
                       else
-                          _log.warn("Partial piece " + pp + " NOT in wantedPieces??");
+                          _log.info("Partial piece " + pp + " NOT in wantedPieces??");
                   }
               }
           }
