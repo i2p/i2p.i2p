@@ -1239,8 +1239,8 @@ class PeerCoordinator implements PeerListener
                   }
               }
           }
-          if (_log.shouldLog(Log.WARN) && !partialPieces.isEmpty())
-              _log.warn("Peer " + peer + " has none of our partials " + partialPieces);
+          if (_log.shouldLog(Log.INFO) && !partialPieces.isEmpty())
+              _log.info("Peer " + peer + " has none of our partials " + partialPieces);
       }
       // ...and this section turns this into the general move-requests-around code!
       // Temporary? So PeerState never calls wantPiece() directly for now...

@@ -800,8 +800,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 // Lookup the dest for the hash
                 // TODO spin off into thread or queue? We really don't want to block here
                 if (!lookupDest(nInfo)) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Dropping repliable query, no dest for " + nInfo);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Dropping repliable query, no dest for " + nInfo);
                     timeout(nInfo);
                     return null;
                 }
