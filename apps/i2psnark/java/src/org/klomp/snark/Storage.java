@@ -971,7 +971,6 @@ public class Storage
           }
     
           int written = 0;
-          int off = 0;
           int length = metainfo.getPieceLength(piece);
           while (written < length) {
               int need = length - written;
@@ -995,12 +994,12 @@ public class Storage
                   }
                   raf.seek(start);
                   //rafs[i].write(bs, off + written, len);
-                  pp.write(raf, off + written, len);
+                  pp.write(raf, written, len);
               }
               written += len;
               if (need - len > 0) {
                   i++;
-                  raflen = tf.length;
+                  raflen = _torrentFiles.get(i).length;
                   start = 0;
               }
           }
