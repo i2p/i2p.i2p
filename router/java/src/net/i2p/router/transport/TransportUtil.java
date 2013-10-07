@@ -147,6 +147,9 @@ public abstract class TransportUtil {
                 // 6bone RFC 2471
                 if (addr[0] == 0x3f && (addr[1] & 0xff) == 0xfe)
                     return false;
+                // Documenation (example) RFC 3849
+                if (addr[0] == 0x20 && addr[1] == 0x01 && addr[2] == 0x0d && (addr[3] & 0xff) == 0xb8)
+                    return false;
                 try {
                     InetAddress ia = InetAddress.getByAddress(addr);
                     return
