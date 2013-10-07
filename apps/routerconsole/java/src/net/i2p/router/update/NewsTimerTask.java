@@ -22,6 +22,7 @@ import static net.i2p.update.UpdateType.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -39,7 +40,7 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
     private final RouterContext _context;
     private final Log _log;
     private final ConsoleUpdateManager _mgr;
-    private boolean _firstRun = true;
+    private volatile boolean _firstRun = true;
 
     private static final long INITIAL_DELAY = 5*60*1000;
     private static final long RUN_DELAY = 10*60*1000;
@@ -56,15 +57,8 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
 
     public void timeReached() {
         if (shouldFetchNews()) {
-            // blocking
-            fetchNews();
-            if (shouldFetchUnsigned()) {
-                // give it a sec for the download to kick in, if it's going to
-                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
-                if (!_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
-                    // nonblocking
-                    fetchUnsignedHead();
-            }
+            Thread t = new Fetcher();
+            t.start();
         } else if (_firstRun) {
             // This covers the case where we got a new news but then shut down before it
             // was successfully downloaded, and then restarted within the 36 hour delay
@@ -76,6 +70,7 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
             // TODO unsigned too?
             if (_mgr.shouldInstall() &&
                 !_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
+                // non-blocking
                 _mgr.update(ROUTER_SIGNED);
         }
         _firstRun = false;
@@ -128,5 +123,29 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
      */
     private void fetchUnsignedHead() {
         _mgr.check(ROUTER_UNSIGNED);
+    }
+
+    /**
+     * Don't clog the scheduler when fetching the news
+     *
+     * @since 0.9.9
+     */
+    private class Fetcher extends I2PAppThread {
+        public Fetcher() {
+            super("News Fetcher");
+            setDaemon(true);
+        }
+
+        public void run() {
+            // blocking
+            fetchNews();
+            if (shouldFetchUnsigned()) {
+                // give it a sec for the download to kick in, if it's going to
+                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                if (!_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
+                    // nonblocking
+                    fetchUnsignedHead();
+            }
+        }
     }
 }
