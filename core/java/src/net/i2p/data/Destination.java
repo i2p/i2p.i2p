@@ -61,16 +61,14 @@ public class Destination extends KeysAndCert {
         Destination rv;
         synchronized(_cache) {
             rv = _cache.get(sk);
-        }
-        if (rv != null && rv.getPublicKey().equals(pk) && rv.getCertificate().equals(c)) {
+            if (rv != null && rv.getPublicKey().equals(pk) && rv.getCertificate().equals(c)) {
+                //if (STATS)
+                //    I2PAppContext.getGlobalContext().statManager().addRateData("DestCache", 1);
+                return rv;
+            }
             //if (STATS)
-            //    I2PAppContext.getGlobalContext().statManager().addRateData("DestCache", 1);
-            return rv;
-        }
-        //if (STATS)
-        //    I2PAppContext.getGlobalContext().statManager().addRateData("DestCache", 0);
-        rv = new Destination(pk, sk, c);
-        synchronized(_cache) {
+            //    I2PAppContext.getGlobalContext().statManager().addRateData("DestCache", 0);
+            rv = new Destination(pk, sk, c);
             _cache.put(sk, rv);
         }
         return rv;
