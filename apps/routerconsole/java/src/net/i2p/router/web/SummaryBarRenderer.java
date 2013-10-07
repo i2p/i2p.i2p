@@ -622,7 +622,13 @@ public class SummaryBarRenderer {
                     // Add offset to start:
                     // 4 - gets rid of <h3>
                     // 16 - gets rid of the date as well (assuming form "<h3>yyyy-mm-dd: Foobarbaz...")
-                    newsContent = newsContent.substring(start+16, newsContent.length());
+                    // Don't truncate the "congratulations" in initial news
+                    if (newsContent.length() > start + 16 &&
+                        newsContent.substring(start + 4, start + 6).equals("20") &&
+                        newsContent.substring(start + 14, start + 16).equals(": "))
+                        newsContent = newsContent.substring(start+16, newsContent.length());
+                    else
+                        newsContent = newsContent.substring(start+4, newsContent.length());
                     int end = newsContent.indexOf("</h3>");
                     if (end >= 0) {
                         String heading = newsContent.substring(0, end);
