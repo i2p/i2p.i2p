@@ -92,8 +92,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         try {
             _sessionId = new SessionId();
             _sessionId.readBytes(in);
-            _destination = new Destination();
-            _destination.readBytes(in);
+            _destination = Destination.create(in);
             _payload = new Payload();
             _payload.readBytes(in);
             _nonce = DataHelper.readLong(in, 4);

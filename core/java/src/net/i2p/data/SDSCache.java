@@ -139,7 +139,7 @@ public class SDSCache<V extends SimpleDataStructure> {
                found = 0;
             }
         }
-        I2PAppContext.getGlobalContext().statManager().addRateData(_statName, found, 0);
+        I2PAppContext.getGlobalContext().statManager().addRateData(_statName, found);
         return rv;
     }
 

@@ -1162,12 +1162,12 @@ public class BlockfileNamingService extends DummyNamingService {
         /** returns null on error */
         public Object construct(byte[] b) {
             DestEntry rv = new DestEntry();
-            Destination dest = new Destination();
-            rv.dest = dest;
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             try {
                 rv.props = DataHelper.readProperties(bais);
-                dest.readBytes(bais);
+                //dest.readBytes(bais);
+                // Will this flush the dest cache too much?
+                rv.dest = Destination.create(bais);
             } catch (IOException ioe) {
                 logError("DB Read Fail", ioe);
                 return null;

@@ -45,7 +45,7 @@ public class Certificate extends DataStructureImpl {
 
     /**
      * If null cert, return immutable static instance, else create new
-     * @throws AIOOBE if not enough bytes
+     * @throws AIOOBE if not enough bytes, FIXME should throw DataFormatException
      * @since 0.8.3
      */
     public static Certificate create(byte[] data, int off) {

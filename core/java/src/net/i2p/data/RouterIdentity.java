@@ -13,6 +13,9 @@ package net.i2p.data;
  * Defines the unique identifier of a router, including any certificate or 
  * public key.
  *
+ * As of 0.9.9 this data structure is immutable after the two keys and the certificate
+ * are set; attempts to change them will throw an IllegalStateException.
+ *
  * @author jrandom
  */
 public class RouterIdentity extends KeysAndCert {

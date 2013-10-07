@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.GarlicMessage;
@@ -312,6 +313,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final void clearCaches() {
         ByteCache.clearAll();
         SimpleByteCache.clearAll();
+        Destination.clearCache();
     }
 
     /**

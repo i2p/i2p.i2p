@@ -1,5 +1,6 @@
 package net.i2p.client.streaming;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -580,12 +581,15 @@ class Packet {
             cur += 2;
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
-            Destination optionFrom = new Destination();
+            ByteArrayInputStream bais = new ByteArrayInputStream(buffer, cur, length - cur);
             try {
-                cur += optionFrom.readBytes(buffer, cur);
+                Destination optionFrom = Destination.create(bais);
+                cur += optionFrom.size();
                 setOptionalFrom(optionFrom);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException("Bad from field", ioe);
             } catch (DataFormatException dfe) {
-                throw new IllegalArgumentException("Bad from field: " + dfe.getMessage());
+                throw new IllegalArgumentException("Bad from field", dfe);
             }
         }
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) {
@@ -631,10 +635,10 @@ class Packet {
             Log l = ctx.logManager().getLog(Packet.class);
             if (l.shouldLog(Log.WARN))
                 l.warn("Signature failed on " + toString(), new Exception("moo"));
-            if (false) {
-                l.error(Base64.encode(buffer, 0, size));
-                l.error("Signature: " + Base64.encode(_optionSignature.getData()));
-            }
+            //if (false) {
+            //    l.error(Base64.encode(buffer, 0, size));
+            //    l.error("Signature: " + Base64.encode(_optionSignature.getData()));
+            //}
         }
         return ok;
     }

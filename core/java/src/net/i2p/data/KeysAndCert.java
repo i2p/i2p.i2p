@@ -24,6 +24,9 @@ import net.i2p.crypto.SHA256Generator;
  * Implemented in 0.8.2 and retrofitted over Destination and RouterIdentity.
  * There's actually no difference between the two of them.
  *
+ * As of 0.9.9 this data structure is immutable after the two keys and the certificate
+ * are set; attempts to change them will throw an IllegalStateException.
+ *
  * @since 0.8.2
  * @author zzz
  */
@@ -37,7 +40,12 @@ public class KeysAndCert extends DataStructureImpl {
         return _certificate;
     }
 
+    /**
+     * @throws IllegalStateException if was already set
+     */
     public void setCertificate(Certificate cert) {
+        if (_certificate != null)
+            throw new IllegalStateException();
         _certificate = cert;
         __calculatedHash = null;
     }
@@ -46,7 +54,12 @@ public class KeysAndCert extends DataStructureImpl {
         return _publicKey;
     }
 
+    /**
+     * @throws IllegalStateException if was already set
+     */
     public void setPublicKey(PublicKey key) {
+        if (_publicKey != null)
+            throw new IllegalStateException();
         _publicKey = key;
         __calculatedHash = null;
     }
@@ -55,20 +68,24 @@ public class KeysAndCert extends DataStructureImpl {
         return _signingKey;
     }
 
+    /**
+     * @throws IllegalStateException if was already set
+     */
     public void setSigningPublicKey(SigningPublicKey key) {
+        if (_signingKey != null)
+            throw new IllegalStateException();
         _signingKey = key;
         __calculatedHash = null;
     }
     
+    /**
+     * @throws IllegalStateException if data already set
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        //_publicKey = new PublicKey();
-        //_publicKey.readBytes(in);
+        if (_publicKey != null || _signingKey != null || _certificate != null)
+            throw new IllegalStateException();
         _publicKey = PublicKey.create(in);
-        //_signingKey = new SigningPublicKey();
-        //_signingKey.readBytes(in);
         _signingKey = SigningPublicKey.create(in);
-        //_certificate = new Certificate();
-        //_certificate.readBytes(in);
         _certificate = Certificate.create(in);
         __calculatedHash = null;
     }
@@ -86,9 +103,10 @@ public class KeysAndCert extends DataStructureImpl {
         if (object == this) return true;
         if ((object == null) || !(object instanceof KeysAndCert)) return false;
         KeysAndCert  ident = (KeysAndCert) object;
-        return DataHelper.eq(_certificate, ident._certificate)
-               && DataHelper.eq(_signingKey, ident._signingKey)
-               && DataHelper.eq(_publicKey, ident._publicKey);
+        return
+               DataHelper.eq(_signingKey, ident._signingKey)
+               && DataHelper.eq(_publicKey, ident._publicKey)
+               && DataHelper.eq(_certificate, ident._certificate);
     }
     
     /** the public key has enough randomness in it to use it by itself for speed */

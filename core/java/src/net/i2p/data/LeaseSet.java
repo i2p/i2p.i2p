@@ -311,8 +311,7 @@ public class LeaseSet extends DatabaseEntry {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_destination != null)
             throw new IllegalStateException();
-        _destination = new Destination();
-        _destination.readBytes(in);
+        _destination = Destination.create(in);
         _encryptionKey = PublicKey.create(in);
         _signingKey = SigningPublicKey.create(in);
         int numLeases = (int) DataHelper.readLong(in, 1);

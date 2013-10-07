@@ -65,12 +65,9 @@ public final class I2PDatagramDissector {
         this.valid = false;
         
         try {
-            rxDest = new Destination();
-            rxSign = new Signature();
-            
             // read destination
-            rxDest.readBytes(dgStream);
-            
+            rxDest = Destination.create(dgStream);
+            rxSign = new Signature();
             // read signature
             rxSign.readBytes(dgStream);
             
@@ -155,6 +152,7 @@ public final class I2PDatagramDissector {
      * @return The Destination of the I2P repliable datagram sender
      */
     public Destination extractSender() {
+      /****
         if (this.rxDest == null)
             return null;
         Destination retDest = new Destination();
@@ -167,6 +165,9 @@ public final class I2PDatagramDissector {
         }
         
         return retDest;
+      ****/
+        // dests are no longer modifiable
+        return rxDest;
     }
     
     /**

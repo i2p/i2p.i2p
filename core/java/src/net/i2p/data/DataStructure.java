@@ -32,9 +32,12 @@ import java.io.OutputStream;
  * @author jrandom
  */
 public interface DataStructure /* extends Serializable */ {
+
     /**
      * Load up the current object with data from the given stream.  Data loaded 
      * this way must match the I2P data structure specification.
+     *
+     * Warning - many classes will throw IllegalStateException if data is already set.
      *
      * @param in stream to read from
      * @throws DataFormatException if the data is improperly formatted
@@ -61,11 +64,24 @@ public interface DataStructure /* extends Serializable */ {
     /**
      * Load the structure from the base 64 encoded data provided
      *
+     * Warning - many classes will throw IllegalStateException if data is already set.
+     * Warning - many classes will throw IllegalArgumentException if data is the wrong size.
+     *
      */
     public void fromBase64(String data) throws DataFormatException;
 
+    /**
+     *  @return may be null if data is not set
+     */
     public byte[] toByteArray();
 
+    /**
+     * Load the structure from the data provided
+     *
+     * Warning - many classes will throw IllegalStateException if data is already set.
+     * Warning - many classes will throw IllegalArgumentException if data is the wrong size.
+     *
+     */
     public void fromByteArray(byte data[]) throws DataFormatException;
 
     /**

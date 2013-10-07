@@ -32,8 +32,10 @@ public class SigningPublicKey extends SimpleDataStructure {
     private final SigType _type;
 
     /**
-     * Pull from cache or return new
-     * @throws AIOOBE if not enough bytes
+     * Pull from cache or return new.
+     * Deprecated - used only by deprecated Destination.readBytes(data, off)
+     *
+     * @throws AIOOBE if not enough bytes, FIXME should throw DataFormatException
      * @since 0.8.3
      */
     public static SigningPublicKey create(byte[] data, int off) {

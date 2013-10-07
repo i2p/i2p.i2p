@@ -32,16 +32,19 @@ public abstract class DataStructureImpl implements DataStructure {
 
         return Base64.encode(data);
     }
+
     public void fromBase64(String data) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         byte bytes[] = Base64.decode(data);
         fromByteArray(bytes);
     }
+
     public Hash calculateHash() {
         byte data[] = toByteArray();
         if (data != null) return SHA256Generator.getInstance().calculateHash(data);
         return null;
     }
+
     public byte[] toByteArray() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
@@ -57,6 +60,7 @@ public abstract class DataStructureImpl implements DataStructure {
             return null;
         }
     }
+
     public void fromByteArray(byte data[]) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         try {
