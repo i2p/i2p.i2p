@@ -825,7 +825,7 @@ public class Storage
                 }
                 if (++file >= _torrentFiles.size())
                     break;
-                fileEnd += tf.length;
+                fileEnd += _torrentFiles.get(file).length;
             }
             if (correctHash)
               {

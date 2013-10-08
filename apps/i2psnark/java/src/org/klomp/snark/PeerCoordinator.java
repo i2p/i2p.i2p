@@ -999,13 +999,13 @@ class PeerCoordinator implements PeerListener
           }
         catch (IOException ioe)
           {
-            snark.stopTorrent();
             String msg = "Error writing storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
             _log.error(msg, ioe);
             if (listener != null) {
                 listener.addMessage(msg);
                 listener.addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
             }
+            snark.stopTorrent();
             throw new RuntimeException(msg, ioe);
           }
         wantedPieces.remove(p);
