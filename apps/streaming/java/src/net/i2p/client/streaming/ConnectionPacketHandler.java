@@ -115,7 +115,6 @@ class ConnectionPacketHandler {
                     _log.warn("Inbound buffer exceeded on connection " + con + " (" 
                               + ready + "/"+ (ready+allowedBlocks) + "/" + available
                               + ": dropping " + packet);
-                ack(con, packet.getAckThrough(), packet.getNacks(), null, false, choke);
                 con.getOptions().setChoke(61*1000);
                 packet.releasePayload();
                 con.ackImmediately();
