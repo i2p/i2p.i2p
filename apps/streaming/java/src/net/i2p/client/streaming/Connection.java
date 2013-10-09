@@ -1254,7 +1254,7 @@ class Connection {
         }
         
         public long getNextSendTime() { return _nextSendTime; }
-        public void timeReached() { retransmit(true); }
+        public void timeReached() { retransmit(); }
         /**
          * Retransmit the packet if we need to.  
          *
@@ -1264,11 +1264,9 @@ class Connection {
          *
          * don't synchronize this, deadlock with ackPackets->ackReceived->SimpleTimer2.cancel
          *
-         * @param penalize true if this retransmission is caused by a timeout, false if we
-         *                 are just sending this packet instead of an ACK
          * @return true if the packet was sent, false if it was not
          */
-        public boolean retransmit(boolean penalize) {
+        public boolean retransmit() {
             if (_packet.getAckTime() > 0) 
                 return false;
             
@@ -1332,7 +1330,7 @@ class Connection {
                 
                 int newWindowSize = getOptions().getWindowSize();
 
-                if (penalize && _ackSinceCongestion) {
+                if (_ackSinceCongestion) {
                     // only shrink the window once per window
                     if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
                         congestionOccurred();
