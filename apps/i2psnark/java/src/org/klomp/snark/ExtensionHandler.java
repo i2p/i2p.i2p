@@ -110,7 +110,8 @@ abstract class ExtensionHandler {
                 // drop if we need metainfo and we haven't found anybody yet
                 synchronized(state) {
                     if (!state.isInitialized()) {
-                        log.debug("Dropping peer, we need metadata! " + peer);
+                        if (log.shouldLog(Log.DEBUG))
+                            log.debug("Dropping peer, we need metadata! " + peer);
                         peer.disconnect();
                     }
                 }
@@ -124,7 +125,8 @@ abstract class ExtensionHandler {
                 // drop if we need metainfo and we haven't found anybody yet
                 synchronized(state) {
                     if (!state.isInitialized()) {
-                        log.debug("Dropping peer, we need metadata! " + peer);
+                        if (log.shouldLog(Log.DEBUG))
+                            log.debug("Dropping peer, we need metadata! " + peer);
                         peer.disconnect();
                     }
                 }

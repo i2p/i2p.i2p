@@ -235,9 +235,9 @@ public class Snark
   private final I2PSnarkUtil _util;
   private final Log _log;
   private final PeerCoordinatorSet _peerCoordinatorSet;
-  private String trackerProblems;
-  private int trackerSeenPeers;
-  private boolean _autoStoppable;
+  private volatile String trackerProblems;
+  private volatile int trackerSeenPeers;
+  private volatile boolean _autoStoppable;
 
 
   /** from main() via parseArguments() single torrent */

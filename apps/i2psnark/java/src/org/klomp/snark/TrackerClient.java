@@ -379,15 +379,24 @@ public class TrackerClient implements Runnable {
             if (dht != null && (meta == null || !meta.isPrivate()))
                 dht.announce(snark.getInfoHash());
 
+            int oldSeenPeers = snark.getTrackerSeenPeers();
             int maxSeenPeers = 0;
-            if (!trackers.isEmpty())
+            if (!trackers.isEmpty()) {
                 maxSeenPeers = getPeersFromTrackers(trackers);
+                // fast update for UI at startup
+                if (maxSeenPeers > oldSeenPeers)
+                    snark.setTrackerSeenPeers(maxSeenPeers);
+            }
             int p = getPeersFromPEX();
             if (p > maxSeenPeers)
                 maxSeenPeers = p;
             p = getPeersFromDHT();
-            if (p > maxSeenPeers)
+            if (p > maxSeenPeers) {
                 maxSeenPeers = p;
+                // fast update for UI at startup
+                if (maxSeenPeers > oldSeenPeers)
+                    snark.setTrackerSeenPeers(maxSeenPeers);
+            }
             // backup if DHT needs bootstrapping
             if (trackers.isEmpty() && !backupTrackers.isEmpty() && dht != null && dht.size() < 16) {
                 p = getPeersFromTrackers(backupTrackers);
@@ -616,17 +625,18 @@ public class TrackerClient implements Runnable {
             // FIXME this needs to be in its own thread
             int rv = 0;
             DHT dht = _util.getDHT();
-            if (dht != null && (meta == null || !meta.isPrivate()) && (!stop) &&
-                _util.getContext().clock().now() >  lastDHTAnnounce + MIN_DHT_ANNOUNCE_INTERVAL) {
+            if (dht != null &&
+                (meta == null || !meta.isPrivate()) &&
+                (!stop) &&
+                (meta == null || _util.getContext().clock().now() >  lastDHTAnnounce + MIN_DHT_ANNOUNCE_INTERVAL)) {
                 int numwant;
                 if (!coordinator.needOutboundPeers())
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
-                Collection<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 2*60*1000);
+                Collection<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 5*60*1000);
                 if (!hashes.isEmpty()) {
                     runStarted = true;
-                    lastDHTAnnounce = _util.getContext().clock().now();
                     rv = hashes.size();
                 }
                 if (_log.shouldLog(Log.INFO))
@@ -638,6 +648,10 @@ public class TrackerClient implements Runnable {
                     int good = dht.announce(snark.getInfoHash(), 1, 5*60*1000);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sent " + good + " good announces to DHT");
+                    if (good > 0)
+                        lastDHTAnnounce = _util.getContext().clock().now();
+                    else
+                        lastDHTAnnounce = 0;
                 }
 
                 // now try these peers

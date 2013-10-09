@@ -513,7 +513,7 @@ public class I2PSnarkUtil {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Using existing session for lookup of " + ip);
                             try {
-                                return sess.lookupDest(h);
+                                return sess.lookupDest(h, 15*1000);
                             } catch (I2PSessionException ise) {
                             }
                         }

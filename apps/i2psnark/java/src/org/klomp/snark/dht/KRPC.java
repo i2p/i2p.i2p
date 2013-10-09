@@ -149,6 +149,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long MAX_MSGID_AGE = 2*60*1000;
     /** how long since sent do we wait for a reply */
     private static final long DEFAULT_QUERY_TIMEOUT = 75*1000;
+    private static final long DEST_LOOKUP_TIMEOUT = 10*1000;
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 63*1000;
     private static final long EXPLORE_TIME = 877*1000;
@@ -327,18 +328,22 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         rv = new HashSet(rv);
         long endTime = _context.clock().now() + maxWait;
 
+        // needs to be much higher than log(size) since many lookups will fail
+        // at first and we will give up too early
+        int maxNodes = 30;
         // Initial set to try, will get added to as we go
-        int maxNodes = 12;
         List<NodeInfo> nodes = _knownNodes.findClosest(iHash, maxNodes);
         SortedSet<NodeInfo> toTry = new TreeSet(new NodeInfoComparator(iHash));
         toTry.addAll(nodes);
         Set<NodeInfo> tried = new HashSet();
 
         if (_log.shouldLog(Log.INFO))
-            _log.info("Starting getPeers for " + iHash + " with " + nodes.size() + " to try");
+            _log.info("Starting getPeers for " + iHash + " (b64: " + new NID(ih) + ") " + " with " + nodes.size() + " to try");
         for (int i = 0; i < maxNodes; i++) {
             if (!_isRunning)
                 break;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Now to try: " + toTry);
             NodeInfo nInfo;
             try {
                 nInfo = toTry.first();
@@ -347,13 +352,15 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
             toTry.remove(nInfo);
             tried.add(nInfo);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Try " + i + ": " + nInfo);
 
             ReplyWaiter waiter = sendGetPeers(nInfo, iHash);
             if (waiter == null)
                 continue;
             synchronized(waiter) {
                 try {
-                    waiter.wait(Math.max(20*1000, (Math.min(40*1000, endTime - _context.clock().now()))));
+                    waiter.wait(Math.max(30*1000, (Math.min(45*1000, endTime - _context.clock().now()))));
                 } catch (InterruptedException ie) {}
             }
 
@@ -370,10 +377,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                  List<Hash> reply = (List<Hash>) waiter.getReplyObject();
                  if (!reply.isEmpty()) {
                      for (int j = 0; j < reply.size() && rv.size() < max; j++) {
-                          rv.add(reply.get(j));
+                          Hash h = reply.get(j);
+                          if (!h.equals(_myNodeInfo.getHash()))
+                              rv.add(h);
                      }
                      if (_log.shouldLog(Log.INFO))
-                         _log.info("Finished get Peers, got " + rv.size() + " from DHT, returning " + reply.size());
+                         _log.info("Finished get Peers, got " + reply.size() + " from DHT, returning " + rv.size());
                      return rv;
                  }
             } else if (replyType == REPLY_NODES) {
@@ -891,7 +900,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             _log.info("looking up dest for " + nInfo);
         try {
             // use a short timeout for now
-            Destination dest = _session.lookupDest(nInfo.getHash(), 5*1000);
+            Destination dest = _session.lookupDest(nInfo.getHash(), DEST_LOOKUP_TIMEOUT);
             if (dest != null) {
                 nInfo.setDestination(dest);
                 if (_log.shouldLog(Log.INFO))
@@ -1190,6 +1199,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
              _log.info("Stored new OB token: " + token + " for: " + nInfo);
 
         List<Hash> peers = _tracker.getPeers(ih, MAX_WANT);
+        peers.remove(nInfo.getHash());   // him
         if (peers.isEmpty()) {
             // similar to find node, but with token
             // get closest from DHT
@@ -1203,10 +1213,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             sendNodes(nInfo, msgID, token, nodeArray);
         } else {
             List<byte[]> hashes = new ArrayList(peers.size());
-            Hash him = nInfo.getHash();
             for (Hash peer : peers) {
-                 if (!peer.equals(him))
-                     hashes.add(peer.getData());
+                 hashes.add(peer.getData());
             }
             sendPeers(nInfo, msgID, token, hashes);
         }
@@ -1324,7 +1332,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 break;
         }
         if (_log.shouldLog(Log.INFO))
-             _log.info("Rcvd peers from: " + nInfo + ": " + DataHelper.toString(rv));
+             _log.info("Rcvd " + peers.size() + " peers from: " + nInfo + ": " + DataHelper.toString(rv));
         return rv;
     }
 
