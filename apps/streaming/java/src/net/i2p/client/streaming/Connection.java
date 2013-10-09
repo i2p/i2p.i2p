@@ -67,7 +67,7 @@ class Connection {
     private int _lastCongestionSeenAt;
     private long _lastCongestionTime;
     private volatile long _lastCongestionHighestUnacked;
-    private boolean _ackSinceCongestion;
+    private final AtomicBoolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
     private final Object _connectLock;
     /** how many messages have been resent and not yet ACKed? */
@@ -143,7 +143,7 @@ class Connection {
         _lastCongestionHighestUnacked = -1;
         _lastReceivedOn = -1;
         _activityTimer = new ActivityTimer();
-        _ackSinceCongestion = true;
+        _ackSinceCongestion = new AtomicBoolean(true);
         _connectLock = new Object();
         _connectionEvent = new ConEvent();
         _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
@@ -499,7 +499,7 @@ class Connection {
             _outboundPackets.notifyAll();
         }
         if ((acked != null) && (!acked.isEmpty()) )
-            _ackSinceCongestion = true;
+            _ackSinceCongestion.set(true);
         return acked;
     }
 
@@ -965,11 +965,10 @@ class Connection {
     void congestionOccurred() {
         // if we hit congestion and e.g. 5 packets are resent,
         // dont set the size to (winSize >> 4).  only set the
-        if (_ackSinceCongestion) {
+        if (_ackSinceCongestion.compareAndSet(true,false)) {
             _lastCongestionSeenAt = _options.getWindowSize();
             _lastCongestionTime = _context.clock().now();
             _lastCongestionHighestUnacked = _lastSendId.get();
-            _ackSinceCongestion = false;
         }
     }
     
@@ -1330,7 +1329,7 @@ class Connection {
                 
                 int newWindowSize = getOptions().getWindowSize();
 
-                if (_ackSinceCongestion) {
+                if (_ackSinceCongestion.get()) {
                     // only shrink the window once per window
                     if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
                         congestionOccurred();
