@@ -634,25 +634,16 @@ public class TrackerClient implements Runnable {
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
-                Collection<Hash> hashes = dht.getPeers(snark.getInfoHash(), numwant, 5*60*1000);
+                Collection<Hash> hashes = dht.getPeersAndAnnounce(snark.getInfoHash(), numwant, 5*60*1000, 1, 3*60*1000);
                 if (!hashes.isEmpty()) {
                     runStarted = true;
+                    lastDHTAnnounce = _util.getContext().clock().now();
                     rv = hashes.size();
+                } else {
+                    lastDHTAnnounce = 0;
                 }
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Got " + hashes + " from DHT");
-                // announce  ourselves while the token is still good
-                // FIXME this needs to be in its own thread
-                if (!stop) {
-                    // announce only to the 1 closest
-                    int good = dht.announce(snark.getInfoHash(), 1, 5*60*1000);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Sent " + good + " good announces to DHT");
-                    if (good > 0)
-                        lastDHTAnnounce = _util.getContext().clock().now();
-                    else
-                        lastDHTAnnounce = 0;
-                }
 
                 // now try these peers
                 if ((!stop) && !hashes.isEmpty()) {
