@@ -140,6 +140,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }
+
     public SimpleTimer2.TimedEvent getResendEvent() { return _resendEvent; }
     
     /** how long after packet creation was it acked?
@@ -230,58 +231,70 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         return buf;
     }
     
+    ////// begin WriteStatus methods
+
     /**
      * Blocks until outbound window is not full. See Connection.packetSendChoke().
      * @param maxWaitMs MessageOutputStream is the only caller, generally with -1
      */
-    public void waitForAccept(int maxWaitMs) {
+    public void waitForAccept(int maxWaitMs) throws IOException, InterruptedException {
         long before = _context.clock().now();
-        int queued = _connection.getUnackedPacketsSent();
-        int window = _connection.getOptions().getWindowSize();
-        boolean accepted = _connection.packetSendChoke(maxWaitMs);
-        long after = _context.clock().now();
-        if (accepted) {
-            _acceptedOn = after;
-        } else {
-            _acceptedOn = -1;
-            releasePayload();
+        boolean accepted = false;
+        try {
+            // throws IOE or IE
+            accepted = _connection.packetSendChoke(maxWaitMs);
+        } finally {
+            if (accepted) {
+                _acceptedOn = _context.clock().now();
+            } else {
+                _acceptedOn = -1;
+                releasePayload();
+            }
+            if ( (_acceptedOn - before > 1000) && (_log.shouldLog(Log.DEBUG)) )  {
+                int queued = _connection.getUnackedPacketsSent();
+                int window = _connection.getOptions().getWindowSize();
+                int afterQueued = _connection.getUnackedPacketsSent();
+                _log.debug("Took " + (_acceptedOn - before) + "ms to get " 
+                           + (accepted ? "accepted" : "rejected")
+                           + (_cancelledOn > 0 ? " and CANCELLED" : "")
+                           + ", queued behind " + queued +" with a window size of " + window 
+                           + ", finally accepted with " + afterQueued + " queued: " 
+                           + toString());
+            }
         }
-        int afterQueued = _connection.getUnackedPacketsSent();
-        if ( (after - before > 1000) && (_log.shouldLog(Log.DEBUG)) )
-            _log.debug("Took " + (after-before) + "ms to get " 
-                       + (accepted ? "accepted" : "rejected")
-                       + (_cancelledOn > 0 ? " and CANCELLED" : "")
-                       + ", queued behind " + queued +" with a window size of " + window 
-                       + ", finally accepted with " + afterQueued + " queued: " 
-                       + toString());
     }
     
     /** block until the packet is acked from the far end */
-    public void waitForCompletion(int maxWaitMs) {
+    public void waitForCompletion(int maxWaitMs) throws IOException, InterruptedException {
         long expiration = _context.clock().now()+maxWaitMs;
-        while (true) {
-            long timeRemaining = expiration - _context.clock().now();
-            if ( (timeRemaining <= 0) && (maxWaitMs > 0) ) break;
-            try {
+        try {
+            while (true) {
+                long timeRemaining = expiration - _context.clock().now();
+                if ( (timeRemaining <= 0) && (maxWaitMs > 0) ) break;
                 synchronized (this) {
                     if (_ackOn > 0) break;
-                    if (_cancelledOn > 0) break;
-                    if (!_connection.getIsConnected()) break;
+                    if (!_connection.getIsConnected())
+                        throw new IOException("disconnected");
+                    if (_cancelledOn > 0)
+                        throw new IOException("cancelled");
                     if (timeRemaining > 60*1000)
                         timeRemaining = 60*1000;
                     else if (timeRemaining <= 0)
                         timeRemaining = 10*1000;
                     wait(timeRemaining);
                 }
-            } catch (InterruptedException ie) { }//{ break; }
+            }
+        } finally {
+            if (!writeSuccessful())
+                releasePayload();
         }
-        if (!writeSuccessful())
-            releasePayload();
     }
     
     public synchronized boolean writeAccepted() { return _acceptedOn > 0 && _cancelledOn <= 0; }
     public synchronized boolean writeFailed() { return _cancelledOn > 0; }
     public synchronized boolean writeSuccessful() { return _ackOn > 0 && _cancelledOn <= 0; }
+
+    ////// end WriteStatus methods
 
     /** Generate a pcap/tcpdump-compatible format,
      *  so we can use standard debugging tools.

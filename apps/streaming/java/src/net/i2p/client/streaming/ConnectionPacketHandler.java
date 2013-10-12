@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -200,8 +201,8 @@ class ConnectionPacketHandler {
                 final long lastSendTime = con.getLastSendTime();
                 
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(String.format("%s congestion.. dup packet %s now %d ackDelay %d lastSend %d",
-                                    con, packet, now, ackDelay, lastSendTime));
+                    _log.warn(String.format("%s congestion.. dup packet %s ackDelay %d lastSend %d ago",
+                                    con, packet, now, ackDelay, DataHelper.formatDuration(now - lastSendTime)));
                 
                 final long nextSendTime = lastSendTime + ackDelay;
                 if (nextSendTime <= now) {

@@ -168,7 +168,7 @@ class Connection {
      * @return true if the packet should be sent, false for a fatal error
      *         will return false after 5 minutes even if timeoutMs is <= 0.
      */
-    boolean packetSendChoke(long timeoutMs) {
+    public boolean packetSendChoke(long timeoutMs) throws IOException, InterruptedException {
         long start = _context.clock().now();
         long writeExpire = start + timeoutMs;  // only used if timeoutMs > 0
         boolean started = false;
@@ -183,8 +183,10 @@ class Connection {
                 // no need to wait until the other side has ACKed us before sending the first few wsize
                 // packets through
 		// Incorrect assumption, the constructor defaults _connected to true --Sponge
-                    if (!_connected.get())
-                       return false;
+                if (!_connected.get())
+                    throw new IOException("disconnected");
+                if (_outputStream.getClosed())
+                    throw new IOException("output stream closed");
                 started = true;
                 // Try to keep things moving even during NACKs and retransmissions...
                 // Limit unacked packets to the window
@@ -207,12 +209,24 @@ class Connection {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + unacked + "/" + wsz + "/" 
                                        + _activeResends + "), waiting " + timeLeft);
-                        try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) { if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends +")"); return false;}
+                        try {
+                            _outboundPackets.wait(Math.min(timeLeft,250l));
+                        } catch (InterruptedException ie) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends +")");
+                            throw ie;
+                        }
                     } else {
                         //if (_log.shouldLog(Log.DEBUG))
                         //    _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
                         //               + "), waiting indefinitely");
-                        try { _outboundPackets.wait(250); } catch (InterruptedException ie) {if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends + ")"); return false;} //10*1000
+                        try {
+                            _outboundPackets.wait(250);
+                        } catch (InterruptedException ie) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends + ")");
+                            throw ie;
+                        } //10*1000
                     }
                 } else {
                     _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
@@ -222,6 +236,9 @@ class Connection {
         }
     }
 
+    /**
+     *  Notify all threads waiting in packetSendChoke()
+     */
     void windowAdjusted() {
         synchronized (_outboundPackets) {
             _outboundPackets.notifyAll();
@@ -710,8 +727,6 @@ class Connection {
         }
     }
     
-    private static final IOException DISCON_IOE = new IOException("disconnected!");
-
     /**
      *  Must be called when we are done with this connection.
      *  Final disconnect. Remove from conn manager.
@@ -729,7 +744,7 @@ class Connection {
         _outputStream.destroy();
         _receiver.destroy();
         _activityTimer.cancel();
-        _inputStream.streamErrorOccurred(DISCON_IOE);
+        _inputStream.streamErrorOccurred(new IOException("disconnected"));
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Connection disconnect complete: "

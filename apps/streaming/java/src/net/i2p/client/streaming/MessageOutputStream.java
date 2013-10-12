@@ -89,15 +89,17 @@ class MessageOutputStream extends OutputStream {
 
         _writeTimeout = ms; 
     }
+
     public int getWriteTimeout() { return _writeTimeout; }
+
     public void setBufferSize(int size) { _nextBufferSize = size; }
     
-	@Override
+    @Override
     public void write(byte b[]) throws IOException {
         write(b, 0, b.length);
     }
     
-	@Override
+    @Override
     public void write(byte b[], int off, int len) throws IOException {
         if (_closed.get()) throw new IOException("Already closed");
         if (_log.shouldLog(Log.DEBUG))
@@ -150,7 +152,13 @@ class MessageOutputStream extends OutputStream {
                 // ok, we've actually added a new packet - lets wait until
                 // its accepted into the queue before moving on (so that we 
                 // dont fill our buffer instantly)
-                ws.waitForAccept(_writeTimeout);
+                try {
+                    ws.waitForAccept(_writeTimeout);
+                } catch (InterruptedException ie) {
+                    IOException ioe2 = new InterruptedIOException("Interrupted write");
+                    ioe2.initCause(ie);
+                    throw ioe2;
+                }
                 if (!ws.writeAccepted()) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Write not accepted of " + ws);
@@ -296,7 +304,7 @@ class MessageOutputStream extends OutputStream {
      *
      * @throws IOException if the write fails
      */
-	@Override
+    @Override
     public void flush() throws IOException {
      /* @throws InterruptedIOException if the write times out
       * Documented here, but doesn't belong in the javadoc. 
@@ -343,14 +351,20 @@ class MessageOutputStream extends OutputStream {
         // Wait a loooooong time, until we have the ACK
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("before waiting " + _writeTimeout + "ms for completion of " + ws);
-        if (_closed.get() && 
-            ( (_writeTimeout > Connection.DISCONNECT_TIMEOUT) ||
-              (_writeTimeout <= 0) ) )
-            ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
-        else if ( (_writeTimeout <= 0) || (_writeTimeout > Connection.DISCONNECT_TIMEOUT) )
-            ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
-        else
-            ws.waitForCompletion(_writeTimeout);
+        try {
+            if (_closed.get() && 
+                ( (_writeTimeout > Connection.DISCONNECT_TIMEOUT) ||
+                  (_writeTimeout <= 0) ) )
+                ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
+            else if ( (_writeTimeout <= 0) || (_writeTimeout > Connection.DISCONNECT_TIMEOUT) )
+                ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
+            else
+                ws.waitForCompletion(_writeTimeout);
+        } catch (InterruptedException ie) {
+            IOException ioe2 = new InterruptedIOException("Interrupted flush");
+            ioe2.initCause(ie);
+            throw ioe2;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after waiting " + _writeTimeout + "ms for completion of " + ws);
         if (ws.writeFailed() && (_writeTimeout > 0) )
@@ -466,6 +480,7 @@ class MessageOutputStream extends OutputStream {
     void flushAvailable(DataReceiver target) throws IOException {
         flushAvailable(target, true);
     }
+
     void flushAvailable(DataReceiver target, boolean blocking) throws IOException {
         WriteStatus ws = null;
         long before = System.currentTimeMillis();
@@ -487,7 +502,13 @@ class MessageOutputStream extends OutputStream {
             _log.debug("Took " + (afterBuild-before) + "ms to build a packet?  " + ws);
         
         if (blocking && ws != null) {
-            ws.waitForAccept(_writeTimeout);
+            try {
+                ws.waitForAccept(_writeTimeout);
+            } catch (InterruptedException ie) {
+                IOException ioe2 = new InterruptedIOException("Interrupted flush");
+                ioe2.initCause(ie);
+                throw ioe2;
+            }
             if (ws.writeFailed())
                 throw new IOException("Flush available failed");
             else if (!ws.writeAccepted())
@@ -526,7 +547,7 @@ class MessageOutputStream extends OutputStream {
          * Success means an ACK FROM THE FAR END.
          * @param maxWaitMs -1 = forever
          */
-        public void waitForCompletion(int maxWaitMs);
+        public void waitForCompletion(int maxWaitMs) throws IOException, InterruptedException;
 
         /** 
          * Wait until the data written is accepted into the outbound pool,
@@ -534,9 +555,9 @@ class MessageOutputStream extends OutputStream {
          * which we throttle rather than accept arbitrary data and queue 
          * @param maxWaitMs -1 = forever
          */
-        public void waitForAccept(int maxWaitMs);
+        public void waitForAccept(int maxWaitMs) throws IOException, InterruptedException;
 
-        /** the write was accepted.  aka did the socket not close? */
+        /** Was the write was accepted.  aka did the socket not close? */
         public boolean writeAccepted();
         /** did the write fail?  */
         public boolean writeFailed();

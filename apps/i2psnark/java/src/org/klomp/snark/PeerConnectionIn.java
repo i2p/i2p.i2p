@@ -65,7 +65,7 @@ class PeerConnectionIn implements Runnable
         try {
             din.close();
         } catch (IOException ioe) {
-            _log.warn("Error closing the stream from " + peer, ioe);
+            //_log.warn("Error closing the stream from " + peer, ioe);
         }
     }
   }

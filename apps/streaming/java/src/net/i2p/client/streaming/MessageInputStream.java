@@ -2,6 +2,7 @@ package net.i2p.client.streaming;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -287,12 +288,12 @@ class MessageInputStream extends InputStream {
     
     @Override
     public int read(byte target[], int offset, int length) throws IOException {
-        if (_locallyClosed) throw new IOException("Already locally closed");
-        throwAnyError();
         long expiration = -1;
         if (_readTimeout > 0)
             expiration = _readTimeout + System.currentTimeMillis();
         synchronized (_dataLock) {
+            if (_locallyClosed) throw new IOException("Already locally closed");
+            throwAnyError();
             for (int i = 0; i < length; i++) {
                 if ( (_readyDataBlocks.isEmpty()) && (i == 0) ) {
                     // ok, we havent found anything, so lets block until we get 
@@ -312,7 +313,13 @@ class MessageInputStream extends InputStream {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                                + ") with no timeout: " + toString());
-                                try { _dataLock.wait(); } catch (InterruptedException ie) { }
+                                try {
+                                    _dataLock.wait();
+                                } catch (InterruptedException ie) {
+                                    IOException ioe2 = new InterruptedIOException("Interrupted read");
+                                    ioe2.initCause(ie);
+                                    throw ioe2;
+                                }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                                + ") with no timeout complete: " + toString());
@@ -321,7 +328,13 @@ class MessageInputStream extends InputStream {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                                + ") with timeout: " + _readTimeout + ": " + toString());
-                                try { _dataLock.wait(_readTimeout); } catch (InterruptedException ie) { }
+                                try {
+                                    _dataLock.wait(_readTimeout);
+                                } catch (InterruptedException ie) {
+                                    IOException ioe2 = new InterruptedIOException("Interrupted read");
+                                    ioe2.initCause(ie);
+                                    throw ioe2;
+                                }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                                + ") with timeout complete: " + _readTimeout + ": " + toString());
@@ -382,10 +395,10 @@ class MessageInputStream extends InputStream {
     
     @Override
     public int available() throws IOException {
-        if (_locallyClosed) throw new IOException("Already closed");
-        throwAnyError();
         int numBytes = 0;
         synchronized (_dataLock) {
+            if (_locallyClosed) throw new IOException("Already closed");
+            throwAnyError();
             for (int i = 0; i < _readyDataBlocks.size(); i++) {
                 ByteArray cur = _readyDataBlocks.get(i);
                 if (i == 0)
@@ -467,14 +480,15 @@ class MessageInputStream extends InputStream {
      *
      */
     void streamErrorOccurred(IOException ioe) {
-        if (_streamError == null)
-            _streamError = ioe;
-        _locallyClosed = true;
         synchronized (_dataLock) {
+            if (_streamError == null)
+                _streamError = ioe;
+            _locallyClosed = true;
             _dataLock.notifyAll();
         }
     }
     
+    /** Caller must lock _dataLock */
     private void throwAnyError() throws IOException {
         IOException ioe = _streamError;
         if (ioe != null) {

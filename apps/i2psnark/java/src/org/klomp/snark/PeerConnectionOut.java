@@ -56,7 +56,6 @@ class PeerConnectionOut implements Runnable
     _id = ++__id;
 
     lastSent = System.currentTimeMillis();
-    quit = false;
   }
   
   public void startup() {
@@ -66,7 +65,7 @@ class PeerConnectionOut implements Runnable
 
   /**
    * Continuesly monitors for more outgoing messages that have to be send.
-   * Stops if quit is true of an IOException occurs.
+   * Stops if quit is true or an IOException occurs.
    */
   public void run()
   {
@@ -215,13 +214,13 @@ class PeerConnectionOut implements Runnable
             thread.interrupt();
         
         sendQueue.clear();
-        sendQueue.notify();
+        sendQueue.notifyAll();
       }
     if (dout != null) {
         try {
             dout.close();
         } catch (IOException ioe) {
-            _log.warn("Error closing the stream to " + peer, ioe);
+            //_log.warn("Error closing the stream to " + peer, ioe);
         }
     }
   }

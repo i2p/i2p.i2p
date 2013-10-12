@@ -254,6 +254,7 @@ class Packet {
      * @return Delay before resending a packet in seconds.
      */
     public int getResendDelay() { return _resendDelay; }
+
     /**
      *  Unused.
      *  Broken before release 0.7.8
@@ -267,17 +268,22 @@ class Packet {
      * @return the payload of the message, null if none.
      */
     public ByteArray getPayload() { return _payload; }
+
     public void setPayload(ByteArray payload) { 
         _payload = payload; 
         if ( (payload != null) && (payload.getValid() > MAX_PAYLOAD_SIZE) )
             throw new IllegalArgumentException("Too large payload: " + payload.getValid());
     }
+
     public int getPayloadSize() {
         return (_payload == null ? 0 : _payload.getValid());
     }
+
+    /** does nothing right now */
     public void releasePayload() {
         //_payload = null;
     }
+
     public ByteArray acquirePayload() {
         _payload = new ByteArray(new byte[Packet.MAX_PAYLOAD_SIZE]);
         return _payload;
@@ -288,13 +294,16 @@ class Packet {
      * @return true if set, false if not.
      */
     public boolean isFlagSet(int flag) { return 0 != (_flags & flag); }
+
     public void setFlag(int flag) { _flags |= flag; }
+
     public void setFlag(int flag, boolean set) { 
         if (set)
             _flags |= flag; 
         else
             _flags &= ~flag;
     }
+
     public void setFlags(int flags) { _flags = flags; } 
 
     /** the signature on the packet (only included if the flag for it is set)

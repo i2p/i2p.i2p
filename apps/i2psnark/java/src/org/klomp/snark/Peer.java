@@ -28,6 +28,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
@@ -68,8 +70,10 @@ public class Peer implements Comparable
   private I2PSocket sock;
   
   private boolean deregister = true;
-  private static long __id;
-  private long _id;
+  private static final AtomicLong __id = new AtomicLong();
+  private final long _id;
+  private final AtomicBoolean _disconnected = new AtomicBoolean();
+
   final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD; // 40 seconds
   final static int RATE_DEPTH = PeerCoordinator.RATE_DEPTH; // make following arrays RATE_DEPTH long
   private long uploaded_old[] = {-1,-1,-1};
@@ -98,7 +102,7 @@ public class Peer implements Comparable
     this.my_id = my_id;
     this.infohash = infohash;
     this.metainfo = metainfo;
-    _id = ++__id;
+    _id = __id.incrementAndGet();
     //_log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating"));
   }
 
@@ -123,7 +127,7 @@ public class Peer implements Comparable
 
     byte[] id  = handshake(in, out);
     this.peerID = new PeerID(id, sock.getPeerDestination());
-    _id = ++__id;
+    _id = __id.incrementAndGet();
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Creating a new peer " + peerID.toString(), new Exception("creating " + _id));
   }
@@ -457,6 +461,8 @@ public class Peer implements Comparable
 
   void disconnect()
   {
+    if (!_disconnected.compareAndSet(false, true))
+        return;
     PeerState s = state;
     if (s != null)
       {
@@ -476,9 +482,11 @@ public class Peer implements Comparable
         PeerConnectionIn in = s.in;
         if (in != null)
           in.disconnect();
-        PeerConnectionOut out = s.out;
-        if (out != null)
-          out.disconnect();
+        // this is blocking in streaming, so do this after closing the socket
+        // so it won't really block
+        //PeerConnectionOut out = s.out;
+        //if (out != null)
+        //  out.disconnect();
         PeerListener pl = s.listener;
         if (pl != null)
           pl.disconnected(this);
@@ -491,6 +499,13 @@ public class Peer implements Comparable
         } catch (IOException ioe) { 
             _log.warn("Error disconnecting " + toString(), ioe);
         }
+    }
+    if (s != null) {
+        // this is blocking in streaming, so do this after closing the socket
+        // so it won't really block
+        PeerConnectionOut out = s.out;
+        if (out != null)
+          out.disconnect();
     }
   }
 
