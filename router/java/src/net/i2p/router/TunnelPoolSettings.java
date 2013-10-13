@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import net.i2p.data.Hash;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SystemVersion;
 
 /**
  * Wrap up the settings for a pool of tunnels.
@@ -53,7 +54,7 @@ public class TunnelPoolSettings {
     public static final int     DEFAULT_BACKUP_QUANTITY = 0;
     // public static final int     DEFAULT_REBUILD_PERIOD = 60*1000;
     public static final int     DEFAULT_DURATION = 10*60*1000;
-    public static final int     DEFAULT_LENGTH = 2;
+    public static final int     DEFAULT_LENGTH = SystemVersion.isAndroid() ? 2 : 3;
     public static final int     DEFAULT_LENGTH_VARIANCE = 0;
     public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)

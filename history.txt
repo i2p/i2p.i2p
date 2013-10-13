@@ -1,3 +1,84 @@
+2013-10-03 zzz
+ Prop from branch i2p.i2p.zzz.test2:
+ * Console:
+   - Implement webapp state detection and stop button for webapps
+     on /configclients (Ticket #1025)
+   - Set per-connector acceptors back to 1, Jetty default changed to 2?
+   - Tag strings on /jobs (ticket #969)
+ * Data Structures:
+   - Make Destination and RouterIdentity keys and cert immutable
+   - Add Destination cache
+ * i2psnark:
+   - Combine getPeers and announce into a single method, as we must announce to
+     the closest from the getPeers, not the closest from the kbuckets
+   - Stop getPeers when nothing closer is found
+   - Increase DHT dest lookup, search timeouts, and max search depth
+   - Loop tracker client faster when in magnet mode or if DHT announce fails
+   - Don't return an empty peers list in DHT if we only know about the requestor
+   - Refactor Storage file data structures
+   - Sort files when creating torrents
+   - Add torrent auto-stop support; enable for update file
+   - Add tunnel auto-close when no torrents are running
+   - Close socket before closing output stream to avoid blocking in
+     Peer.disconnect(), and prevent Peer.disconnect() loop
+ * I2PTunnelHTTPServer: Don't thread a receiver for GET or HEAD
+ * Jetty 7.6.13.v20130916
+ * Logging:
+   - Require strict match of class name component
+   - parseLimits() cleanup
+ * SSU: More efficient ImboundMessageState
+ * Streaming:
+   - Fix active stream counting so it doesn't count streams
+     that are closed and in TIME-WAIT state. Also, break out of the
+     counting loop as soon as we know the answer. (Ticket #1039)
+   - Consolidate scheduling of DisconnectEvent, and ensure
+     we only do it once. (Ticket #1041)
+   - Atomics for close/reset send/receive
+     so we only do things once. (Ticket #1041)
+   - Remove setCloseReceivedOn(), unused outside Connection
+   - OR the isFlagSet parameter instead of multiple calls
+   - Remove acked packets from _outboundPackets inside synced iterator
+   - Short-circuit _outboundPackets iterator if empty
+   - Small optimization if not logging in ConnectionPacketHandler
+   - Stub out processing of close ack (ticket #1042)
+   - Don't queue a message for an unknown connection on the SYN queue
+     if it has a send ID set, it must be for a recently closed connection
+   - Major rework of connection disconnect process. Tickets 1040-1042.
+   - Prevent multiple calls or reentrancy in disconnect() (ticket #1041)
+   - Implement processing of close to skip TIME-WAIT, and
+     wait for all packets to be acked (not just the CLOSE) before
+     doing so, if possible (ticket #1042)
+   - Don't call disconnect() or disconnectComplete() from I2PSocketFull.destroy()
+     so retransmissions and acks can still happen (removes some close loops)
+   - Don't call disconnect() until we have both sent and received a CLOSE (ticket #1040)
+   - Don't reset the connection from CPH just because we sent a CLOSE
+     and it was acked (ticket #1040)
+   - Ack packets even if we sent a CLOSE  (ticket #1040)
+   - Retransmit CLOSE if not acked (ticket #1040)
+   - Send received packets to the MessageInputStream even if we haven't received a SYN
+   - Don't call MessageInputStream.messageReceived() for ack-only packets, that was pointless
+   - Don't send a RESET after timeout of an outbound connection
+   - Work around bugs on other end by limiting retransmission of CLOSE packets
+   - Make I2PSocketFull.close() nonblocking; it will now cause any user-side
+     writes blocked in I/O (Connection.packetSendChoke()) to throw
+     an exception (tickets #629, #1041)
+   - Don't ignore InterruptedExceptions; throw InterruptedIOException
+   - MessageInputStream locking fixes
+   - Make _isInbound final
+   - More cleanups, javadocs, log tweaks
+ * Transport: Treat more IPs as local
+   - 25/8 Hamachi (moved from 5/8 Nov. 2012)
+   - 2620:9b::/32 Hamachi
+   - 3ffc::/16 6bone
+   - 2001:db8::/32 example (RFC 3849)
+   - 0::/8 Includes IPv4 compatibility addresses ::xxxx:xxxx
+ * Update:
+   - Support notification of updates that cannot be downloaded
+     due to "constraints". Add constraint checks for java version,
+     router version, configuration, and base permissions. (ticket #1024)
+   - Thread news fetcher so it doesn't clog the scheduler
+ * Watchdog: Format messages better
+
 2013-10-06 zzz
  Prop from branch i2p.i2p.zzz.ecdsa:
  * Build:

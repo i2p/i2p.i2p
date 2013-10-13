@@ -31,8 +31,8 @@ import net.i2p.util.EepGet;
 import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
-import net.i2p.util.VersionComparator;
 import net.i2p.util.SSLEepGet;
+import net.i2p.util.VersionComparator;
 
 /**
  * Task to fetch updates to the news.xml, and to keep
@@ -58,9 +58,6 @@ class NewsFetcher extends UpdateRunner {
         if (lastMod > 0)
             _lastModified = RFC822Date.to822Date(lastMod);
     }
-
-    @Override
-    public UpdateType getType() { return NEWS; }
 
     @Override
     public void run() {
