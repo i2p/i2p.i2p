@@ -64,7 +64,7 @@ import net.i2p.util.NativeBigInteger;
  *  Params and rv's changed from Hash to SHA1Hash for version 0.8.1
  *  Hash variants of sign() and verifySignature() restored in 0.8.3, required by Syndie.
  *
- *  As of 0.9.9, certain methods support ECDSA keys and signatures, i.e. all types
+ *  As of 0.9.9, certain methods support RSA and ECDSA keys and signatures, i.e. all types
  *  specified in SigType. The type is specified by the getType() method in
  *  Signature, SigningPublicKey, and SigningPrivateKey. See Javadocs for individual
  *  methods for the supported types. Methods encountering an unsupported type

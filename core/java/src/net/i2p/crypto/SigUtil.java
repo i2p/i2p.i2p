@@ -171,7 +171,7 @@ class SigUtil {
         return (ECPublicKey) kf.generatePublic(ks);
     }
 
-    public static ECPrivateKey cvtToJavaECKey(SigningPrivateKey pk)
+    private static ECPrivateKey cvtToJavaECKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         SigType type = pk.getType();
         int len = type.getPubkeyLen();

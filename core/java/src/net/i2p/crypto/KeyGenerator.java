@@ -15,9 +15,6 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.ProviderException;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECPoint;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
