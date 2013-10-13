@@ -39,7 +39,7 @@ public class TunnelRenderer {
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         Map<Hash, TunnelPool> clientOutboundPools = _context.tunnelManager().getOutboundClientPools();
         destinations = new ArrayList(clientInboundPools.keySet());
-        boolean debug = _context.getBooleanProperty(ConfigTunnelsHelper.PROP_ADVANCED);
+        boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
         for (int i = 0; i < destinations.size(); i++) {
             Hash client = destinations.get(i);
             boolean isLocal = _context.clientManager().isLocal(client);

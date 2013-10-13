@@ -6,20 +6,21 @@
 # Translators:
 # "blabla", 2011
 # blabla <blabla@trash-mail.com>, 2012
-# D.A. Loader <>, 2012
+# D.A. Loader, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # SteinQuadrat, 2013
 # mixxy, 2011
+# nextloop <ga25day@mytum.de>, 2013
 # pirr <pirr@tormail.org>, 2012
 # zeroflag <zeroflag@i2pmail.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-02 17:23+0000\n"
-"PO-Revision-Date: 2013-06-27 13:09+0000\n"
-"Last-Translator: SteinQuadrat\n"
+"POT-Creation-Date: 2013-09-26 21:33+0000\n"
+"PO-Revision-Date: 2013-09-23 22:30+0000\n"
+"Last-Translator: nextloop <ga25day@mytum.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/"
 "de/)\n"
 "Language: de\n"
@@ -426,16 +427,16 @@ msgstr "I2P Tunnel öffnen ..."
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "Öffne den I2P-Tunnel und starte alle Torrents ..."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1903
+#: ../java/src/org/klomp/snark/SnarkManager.java:1911
 msgid "Stopping all torrents and closing the I2P tunnel."
 msgstr "Stoppe alle Torrents und beende den I2P-Tunnel."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1922
+#: ../java/src/org/klomp/snark/SnarkManager.java:1930
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Der I2P-Tunnel wird nach Benachrichtigung der Tracker geschlossen."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1929
-#: ../java/src/org/klomp/snark/SnarkManager.java:1940
+#: ../java/src/org/klomp/snark/SnarkManager.java:1937
+#: ../java/src/org/klomp/snark/SnarkManager.java:1948
 msgid "I2P tunnel closed."
 msgstr "I2P-Tunnel geschlossen."
 
@@ -600,9 +601,8 @@ msgid "Stop All"
 msgstr "Stoppe alle"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:515
-#, fuzzy
 msgid "Start all stopped torrents"
-msgstr "Torrent starten"
+msgstr "Alle angehaltenen Torrents fortsetzen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:517
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
@@ -1159,7 +1159,7 @@ msgid "Website URL"
 msgstr "Webseiten-URL"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2016
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2567
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2566
 msgid "Open"
 msgstr "offen"
 
@@ -1209,15 +1209,15 @@ msgstr "Tracker Liste"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2356
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2365
 msgid "Created"
-msgstr ""
+msgstr "Erstellt"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2375
 msgid "Created By"
-msgstr ""
+msgstr "Erstellt von"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2385
 msgid "Magnet link"
@@ -1283,18 +1283,18 @@ msgstr "vollständig"
 msgid "remaining"
 msgstr "verbleibend"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2594
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2592
 msgid "High"
 msgstr "hoch"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2599
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2597
 msgid "Normal"
 msgstr "normal"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2604
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2602
 msgid "Skip"
 msgstr "auslassen"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2613
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2611
 msgid "Save priorities"
 msgstr "Prioritäten speichern"

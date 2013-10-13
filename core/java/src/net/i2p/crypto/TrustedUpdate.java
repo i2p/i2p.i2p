@@ -21,6 +21,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.VersionComparator;
 import net.i2p.util.ZipFileComment;
 
@@ -315,20 +316,29 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
     /** @return success */
     private static final boolean genKeysCLI(String publicKeyFile, String privateKeyFile) {
+        File pubFile = new File(publicKeyFile);
+        File privFile = new File(privateKeyFile);
+        if (pubFile.exists()) {
+            System.out.println("Error: Not overwriting file " + publicKeyFile);
+            return false;
+        }
+        if (privFile.exists()) {
+            System.out.println("Error: Not overwriting file " + privateKeyFile);
+            return false;
+        }
         FileOutputStream fileOutputStream = null;
-
         I2PAppContext context = I2PAppContext.getGlobalContext();
         try {
             Object signingKeypair[] = context.keyGenerator().generateSigningKeypair();
             SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
             SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
 
-            fileOutputStream = new FileOutputStream(publicKeyFile);
+            fileOutputStream = new SecureFileOutputStream(pubFile);
             signingPublicKey.writeBytes(fileOutputStream);
             fileOutputStream.close();
             fileOutputStream = null;
 
-            fileOutputStream = new FileOutputStream(privateKeyFile);
+            fileOutputStream = new SecureFileOutputStream(privFile);
             signingPrivateKey.writeBytes(fileOutputStream);
 
             System.out.println("\r\nPrivate key written to: " + privateKeyFile);

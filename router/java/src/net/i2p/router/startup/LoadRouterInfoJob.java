@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.data.DataFormatException;
@@ -28,9 +29,8 @@ import net.i2p.util.Log;
 
 public class LoadRouterInfoJob extends JobImpl {
     private final Log _log;
-    private boolean _keysExist;
-    private boolean _infoExists;
     private RouterInfo _us;
+    private static final AtomicBoolean _keyLengthChecked = new AtomicBoolean();
     
     public LoadRouterInfoJob(RouterContext ctx) {
         super(ctx);
@@ -61,11 +61,9 @@ public class LoadRouterInfoJob extends JobImpl {
         String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
         
         File rif = new File(getContext().getRouterDir(), routerInfoFile);
-        if (rif.exists())
-            _infoExists = true;
+        boolean infoExists = rif.exists();
         File rkf = new File(getContext().getRouterDir(), keyFilename);
-        if (rkf.exists())
-            _keysExist = true;
+        boolean keysExist = rkf.exists();
         
         InputStream fis1 = null;
         InputStream fis2 = null;
@@ -76,7 +74,7 @@ public class LoadRouterInfoJob extends JobImpl {
             // CRIT   ...sport.udp.EstablishmentManager: Error in the establisher java.lang.NullPointerException
             // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
             // so pretend the RI isn't there if there is no keyfile
-            if (_infoExists && _keysExist) {
+            if (infoExists && keysExist) {
                 fis1 = new BufferedInputStream(new FileInputStream(rif));
                 info = new RouterInfo();
                 info.readBytes(fis1);
@@ -88,16 +86,21 @@ public class LoadRouterInfoJob extends JobImpl {
                 _us = info;
             }
             
-            if (_keysExist) {
+            if (keysExist) {
                 fis2 = new BufferedInputStream(new FileInputStream(rkf));
                 PrivateKey privkey = new PrivateKey();
                 privkey.readBytes(fis2);
                 if (shouldRebuild(privkey)) {
                     _us = null;
+                    // windows... close before deleting
+                    if (fis1 != null) {
+                        try { fis1.close(); } catch (IOException ioe) {}
+                        fis1 = null;
+                    }
+                    try { fis2.close(); } catch (IOException ioe) {}
+                    fis2 = null;
                     rif.delete();
                     rkf.delete();
-                    _infoExists = false;
-                    _keysExist = false;
                     return;
                 }
                 SigningPrivateKey signingPrivKey = new SigningPrivateKey();
@@ -112,17 +115,31 @@ public class LoadRouterInfoJob extends JobImpl {
         } catch (IOException ioe) {
             _log.log(Log.CRIT, "Error reading the router info from " + rif.getAbsolutePath() + " and the keys from " + rkf.getAbsolutePath(), ioe);
             _us = null;
+            // windows... close before deleting
+            if (fis1 != null) {
+                try { fis1.close(); } catch (IOException ioe2) {}
+                fis1 = null;
+            }
+            if (fis2 != null) {
+                try { fis2.close(); } catch (IOException ioe2) {}
+                fis2 = null;
+            }
             rif.delete();
             rkf.delete();
-            _infoExists = false;
-            _keysExist = false;
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Corrupt router info or keys at " + rif.getAbsolutePath() + " / " + rkf.getAbsolutePath(), dfe);
             _us = null;
+            // windows... close before deleting
+            if (fis1 != null) {
+                try { fis1.close(); } catch (IOException ioe) {}
+                fis1 = null;
+            }
+            if (fis2 != null) {
+                try { fis2.close(); } catch (IOException ioe) {}
+                fis2 = null;
+            }
             rif.delete();
             rkf.delete();
-            _infoExists = false;
-            _keysExist = false;
         } finally {
             if (fis1 != null) try { fis1.close(); } catch (IOException ioe) {}
             if (fis2 != null) try { fis2.close(); } catch (IOException ioe) {}
@@ -135,6 +152,11 @@ public class LoadRouterInfoJob extends JobImpl {
      *  @since 0.9.8
      */
     private boolean shouldRebuild(PrivateKey privkey) {
+        // Prevent returning true more than once, ever.
+        // If we are called a second time, it's probably because we failed
+        // to delete router.keys for some reason.
+        if (!_keyLengthChecked.compareAndSet(false, true))
+            return false;
         byte[] pkd = privkey.getData();
         boolean haslong = false;
         for (int i = 0; i < 8; i++) {

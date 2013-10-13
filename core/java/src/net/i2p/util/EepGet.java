@@ -1055,12 +1055,14 @@ public class EepGet {
                 URL url = new URL(_actualURL);
                 if ("http".equals(url.getProtocol())) {
                     String host = url.getHost();
+                    if (host.toLowerCase(Locale.US).endsWith(".i2p"))
+                        throw new MalformedURLException("I2P addresses must be proxied");
                     int port = url.getPort();
                     if (port == -1)
                         port = 80;
                     _proxy = new Socket(host, port);
                 } else {
-                    throw new IOException("URL is not supported:" + _actualURL);
+                    throw new MalformedURLException("URL is not supported:" + _actualURL);
                 }
             // an MUE is an IOE
             //} catch (MalformedURLException mue) {
@@ -1089,6 +1091,8 @@ public class EepGet {
             post = true;
         URL url = new URL(_actualURL);
         String host = url.getHost();
+        if (host == null || host.length() <= 0)
+            throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
         String path = url.getPath();
         String query = url.getQuery();

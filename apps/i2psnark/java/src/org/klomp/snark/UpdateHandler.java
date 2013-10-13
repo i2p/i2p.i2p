@@ -42,10 +42,10 @@ class UpdateHandler implements Updater {
      */
     public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
                              String id, String newVersion, long maxTime) {
-        if (type != UpdateType.ROUTER_SIGNED ||
+        if ((type != UpdateType.ROUTER_SIGNED && type != UpdateType.ROUTER_SIGNED_SU3) ||
             method != UpdateMethod.TORRENT || updateSources.isEmpty())
             return null;
-        UpdateRunner update = new UpdateRunner(_context, _umgr, _smgr, updateSources, newVersion);
+        UpdateRunner update = new UpdateRunner(_context, _umgr, _smgr, type, updateSources, newVersion);
         _umgr.notifyProgress(update, "<b>" + _smgr.util().getString("Updating") + "</b>");
         return update;
     }

@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-11 14:27+0000\n"
+"POT-Creation-Date: 2013-09-20 10:16+0000\n"
 "PO-Revision-Date: 2013-07-12 16:38+0000\n"
 "Last-Translator: varnav\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
@@ -1155,7 +1155,7 @@ msgid "Website URL"
 msgstr "URL сайта"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2016
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2567
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2566
 msgid "Open"
 msgstr "Открыть"
 
@@ -1281,18 +1281,18 @@ msgstr "скачано"
 msgid "remaining"
 msgstr "осталось"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2594
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2592
 msgid "High"
 msgstr "Высокий"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2599
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2597
 msgid "Normal"
 msgstr "Нормальный"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2604
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2602
 msgid "Skip"
 msgstr "Пропустить"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2613
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2611
 msgid "Save priorities"
 msgstr "Сохранить приоритеты"

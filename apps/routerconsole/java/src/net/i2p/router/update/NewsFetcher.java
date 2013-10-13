@@ -32,6 +32,7 @@ import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
+import net.i2p.util.SSLEepGet;
 
 /**
  * Task to fetch updates to the news.xml, and to keep
@@ -50,7 +51,7 @@ class NewsFetcher extends UpdateRunner {
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
     
     public NewsFetcher(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
-        super(ctx, mgr, uris);
+        super(ctx, mgr, NEWS, uris);
         _newsFile = new File(ctx.getRouterDir(), NewsHelper.NEWS_FILE);
         _tempFile = new File(ctx.getTempDir(), "tmp-" + ctx.random().nextLong() + TEMP_NEWS_FILE);
         long lastMod = NewsHelper.lastChecked(ctx);
@@ -73,7 +74,7 @@ class NewsFetcher extends UpdateRunner {
     }
 
     public void fetchNews() {
-        boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+        boolean shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY_NEWS, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY_NEWS);
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         int proxyPort = ConfigUpdateHandler.proxyPort(_context);
 
@@ -88,6 +89,9 @@ class NewsFetcher extends UpdateRunner {
                 EepGet get;
                 if (shouldProxy)
                     get = new EepGet(_context, true, proxyHost, proxyPort, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
+                else if ("https".equals(uri.getScheme()))
+                    // no constructor w/ last mod check
+                    get = new SSLEepGet(_context, _tempFile.getAbsolutePath(), newsURL);
                 else
                     get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
                 get.addStatusListener(this);
@@ -113,9 +117,11 @@ class NewsFetcher extends UpdateRunner {
     private static final String MIN_JAVA_VERSION_KEY = "minjavaversion";
     private static final String SUD_KEY = "sudtorrent";
     private static final String SU2_KEY = "su2torrent";
-    // following are unused
+    private static final String SU3_KEY = "su3torrent";
     private static final String CLEARNET_SUD_KEY = "sudclearnet";
     private static final String CLEARNET_SU2_KEY = "su2clearnet";
+    private static final String CLEARNET_HTTP_SU3_KEY = "su3clearnet";
+    private static final String CLEARNET_HTTPS_SU3_KEY = "su3ssl";
     private static final String I2P_SUD_KEY = "sudi2p";
     private static final String I2P_SU2_KEY = "su2i2p";
 
@@ -175,20 +181,24 @@ class NewsFetcher extends UpdateRunner {
                             // and look for a second entry with clearnet URLs
                             // TODO clearnet URLs, notify with HTTP_CLEARNET and/or HTTPS_CLEARNET
                             Map<UpdateMethod, List<URI>> sourceMap = new HashMap(4);
+                            // Must do su3 first
+                            if (ConfigUpdateHandler.USE_SU3_UPDATE) {
+                                sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED_SU3, "", HTTP));
+                                addMethod(TORRENT, args.get(SU3_KEY), sourceMap);
+                                addMethod(HTTP_CLEARNET, args.get(CLEARNET_HTTP_SU3_KEY), sourceMap);
+                                addMethod(HTTPS_CLEARNET, args.get(CLEARNET_HTTPS_SU3_KEY), sourceMap);
+                                // notify about all sources at once
+                                _mgr.notifyVersionAvailable(this, _currentURI, ROUTER_SIGNED_SU3,
+                                                            "", sourceMap, ver, "");
+                                sourceMap.clear();
+                            }
+                            // now do sud/su2
                             sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP));
                             String key = FileUtil.isPack200Supported() ? SU2_KEY : SUD_KEY;
-                            String murl = args.get(key);
-                            if (murl != null) {
-                                List<URI> uris = tokenize(murl);
-                                if (!uris.isEmpty()) {
-                                    Collections.shuffle(uris, _context.random());
-                                    sourceMap.put(TORRENT, uris);
-                                }
-                            }
+                            addMethod(TORRENT, args.get(key), sourceMap);
                             // notify about all sources at once
-                            _mgr.notifyVersionAvailable(this, _currentURI,
-                                                        ROUTER_SIGNED, "", sourceMap,
-                                                        ver, "");
+                            _mgr.notifyVersionAvailable(this, _currentURI, ROUTER_SIGNED,
+                                                        "", sourceMap, ver, "");
                         } else {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is current");
@@ -290,6 +300,21 @@ class NewsFetcher extends UpdateRunner {
             } catch (URISyntaxException use) {}
         }
         return rv;
+    }
+
+    /**
+     *  Parse URLs and add to the map
+     *  @param urls may be null
+     *  @since 0.9.9
+     */
+    private void addMethod(UpdateMethod method, String urls, Map<UpdateMethod, List<URI>> map) {
+        if (urls != null) {
+            List<URI> uris = tokenize(urls);
+            if (!uris.isEmpty()) {
+                Collections.shuffle(uris, _context.random());
+                map.put(method, uris);
+            }
+        }
     }
 
     /** override to prevent status update */

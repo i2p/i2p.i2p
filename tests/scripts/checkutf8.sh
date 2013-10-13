@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Check for UTF-8 problems in all files where they might appear
 # Also check all Java source files

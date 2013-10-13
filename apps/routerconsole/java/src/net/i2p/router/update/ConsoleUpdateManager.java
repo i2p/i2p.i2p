@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
@@ -69,6 +70,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     private final Map<UpdateItem, Version> _downloaded;
     /** downloaded AND installed */
     private final Map<UpdateItem, Version> _installed;
+    private final boolean _allowTorrent;
     private static final DecimalFormat _pct = new DecimalFormat("0.0%");
 
     private volatile String _status;
@@ -90,6 +92,13 @@ public class ConsoleUpdateManager implements UpdateManager {
         _downloaded = new ConcurrentHashMap();
         _installed = new ConcurrentHashMap();
         _status = "";
+        // DEBUG slow start for snark updates
+        // For 0.9.4 update, only for dev builds
+        // For 0.9.5 update, only for dev builds and 1% more
+        // For 0.9.6 update, only for dev builds and 3% more
+        // For 0.9.8 update, only for dev builds and 30% more
+        // Remove this for 100%
+        _allowTorrent = RouterVersion.BUILD != 0 || _context.random().nextInt(100) < 30;
     }
 
     public static ConsoleUpdateManager getInstance() {
@@ -99,6 +108,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     public void start() {
         notifyInstalled(NEWS, "", Long.toString(NewsHelper.lastUpdated(_context)));
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
+        notifyInstalled(ROUTER_SIGNED_SU3, "", RouterVersion.VERSION);
         // hack to init from the current news file... do this before we register Updaters
         // This will not kick off any Updaters as none are yet registered
         (new NewsFetcher(_context, this, Collections.EMPTY_LIST)).checkForUpdates();
@@ -122,6 +132,15 @@ public class ConsoleUpdateManager implements UpdateManager {
         register(c, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
         Updater u = new UpdateHandler(_context, this);
         register(u, ROUTER_SIGNED, HTTP, 0);
+        if (ConfigUpdateHandler.USE_SU3_UPDATE) {
+            register(c, ROUTER_SIGNED_SU3, HTTP, 0);
+            register(u, ROUTER_SIGNED_SU3, HTTP, 0);
+            // todo
+            //register(c, ROUTER_SIGNED_SU3, HTTPS_CLEARNET, 0);
+            //register(u, ROUTER_SIGNED_SU3, HTTPS_CLEARNET, -10);
+            //register(c, ROUTER_SIGNED_SU3, HTTP_CLEARNET, 0);
+            //register(u, ROUTER_SIGNED_SU3, HTTP_CLEARNET, -20);
+        }
         // TODO see NewsFetcher
         //register(u, ROUTER_SIGNED, HTTPS_CLEARNET, -5);
         //register(u, ROUTER_SIGNED, HTTP_CLEARNET, -10);
@@ -560,18 +579,18 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority) {
-        if ((type == ROUTER_SIGNED || type == ROUTER_UNSIGNED) && NewsHelper.dontInstall(_context)) {
+        if ((type == ROUTER_SIGNED || type == ROUTER_UNSIGNED || type == ROUTER_SIGNED_SU3) &&
+            NewsHelper.dontInstall(_context)) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Ignoring registration for " + type + ", router updates disabled");
             return;
         }
-        // DEBUG slow start for snark updates
-        // For 0.9.4 update, only for dev builds
-        // For 0.9.5 update, only for dev builds and 1% more
-        // For 0.9.6 update, only for dev builds and 3% more
-        // For 0.9.8 update, only for dev builds and 30% more
-        // Remove this for 100%
-        if (method == TORRENT && RouterVersion.BUILD == 0 && _context.random().nextInt(100) > 29) {
+        if (type == ROUTER_SIGNED_SU3 && !ConfigUpdateHandler.USE_SU3_UPDATE) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Ignoring registration for " + type + ", SU3 updates disabled");
+            return;
+        }
+        if (method == TORRENT && !_allowTorrent) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Ignoring torrent registration");
             return;
@@ -725,8 +744,10 @@ public class ConsoleUpdateManager implements UpdateManager {
                 // fall through
 
             case ROUTER_SIGNED:
+            case ROUTER_SIGNED_SU3:
                 if (shouldInstall() &&
                     !(isUpdateInProgress(ROUTER_SIGNED) ||
+                      isUpdateInProgress(ROUTER_SIGNED_SU3) ||
                       isUpdateInProgress(ROUTER_UNSIGNED))) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Updating " + ui + " after notify");
@@ -810,6 +831,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         switch (task.getType()) {
             case NEWS:
             case ROUTER_SIGNED:
+            case ROUTER_SIGNED_SU3:
             case ROUTER_UNSIGNED:
                 // ConfigUpdateHandler, SummaryHelper, SummaryBarRenderer handle status display
                 break;
@@ -926,6 +948,12 @@ public class ConsoleUpdateManager implements UpdateManager {
                     notifyDownloaded(task.getType(), task.getID(), actualVersion);
                 break;
 
+            case ROUTER_SIGNED_SU3:
+                rv = handleSu3File(task.getURI(), actualVersion, file);
+                if (rv)
+                    notifyDownloaded(task.getType(), task.getID(), actualVersion);
+                break;
+
             case ROUTER_UNSIGNED:
                 rv = handleUnsignedFile(task.getURI(), actualVersion, file);
                 if (rv) {
@@ -981,10 +1009,30 @@ public class ConsoleUpdateManager implements UpdateManager {
             _log.info(ui + " " + ver + " downloaded");
         _downloaded.put(ui, ver);
         // one trumps the other
-        if (type == ROUTER_SIGNED)
+        if (type == ROUTER_SIGNED) {
             _downloaded.remove(new UpdateItem(ROUTER_UNSIGNED, ""));
-        else if (type == ROUTER_UNSIGNED)
+            _downloaded.remove(new UpdateItem(ROUTER_SIGNED_SU3, ""));
+            // remove available from other type
+            UpdateItem altui = new UpdateItem(ROUTER_SIGNED_SU3, id);
+            Version old = _available.get(altui);
+            if (old != null && old.compareTo(ver) <= 0)
+                _available.remove(altui);
+            // ... and declare the alt downloaded as well
+            _downloaded.put(altui, ver);
+        } else if (type == ROUTER_SIGNED_SU3) {
             _downloaded.remove(new UpdateItem(ROUTER_SIGNED, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_UNSIGNED, ""));
+            // remove available from other type
+            UpdateItem altui = new UpdateItem(ROUTER_SIGNED, id);
+            Version old = _available.get(altui);
+            if (old != null && old.compareTo(ver) <= 0)
+                _available.remove(altui);
+            // ... and declare the alt downloaded as well
+            _downloaded.put(altui, ver);
+        } else if (type == ROUTER_UNSIGNED) {
+            _downloaded.remove(new UpdateItem(ROUTER_SIGNED, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_SIGNED_SU3, ""));
+        }
         Version old = _available.get(ui);
         if (old != null && old.compareTo(ver) <= 0)
             _available.remove(ui);
@@ -1018,6 +1066,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                 break;
 
             case ROUTER_SIGNED:
+              { // avoid dup variables in next case
                 String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
                 StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
                 List<URI> rv = new ArrayList();
@@ -1028,6 +1077,21 @@ public class ConsoleUpdateManager implements UpdateManager {
                 }
                 Collections.shuffle(rv, _context.random());
                 return rv;
+              }
+
+            case ROUTER_SIGNED_SU3:
+              {
+                String URLs = ConfigUpdateHandler.SU3_UPDATE_URLS;
+                StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
+                List<URI> rv = new ArrayList();
+                while (tok.hasMoreTokens()) {
+                    try {
+                        rv.add(new URI(tok.nextToken().trim()));
+                    } catch (URISyntaxException use) {}
+                }
+                Collections.shuffle(rv, _context.random());
+                return rv;
+              }
 
             case ROUTER_UNSIGNED:
                 String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
@@ -1072,14 +1136,59 @@ public class ConsoleUpdateManager implements UpdateManager {
      *  @return success
      */
     private boolean handleSudFile(URI uri, String actualVersion, File f) {
+        return handleRouterFile(uri, actualVersion, f, false);
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private boolean handleSu3File(URI uri, String actualVersion, File f) {
+        return handleRouterFile(uri, actualVersion, f, true);
+    }
+
+    /**
+     *  Process sud, su2, or su3
+     *  @return success
+     *  @since 0.9.9
+     */
+    private boolean handleRouterFile(URI uri, String actualVersion, File f, boolean isSU3) {
         String url = uri.toString();
-        // Process the .sud/.su2 file
         updateStatus("<b>" + _("Update downloaded") + "</b>");
-        TrustedUpdate up = new TrustedUpdate(_context);
         File to = new File(_context.getRouterDir(), Router.UPDATE_FILE);
-        String err = up.migrateVerified(RouterVersion.VERSION, f, to);
-///////////
-        // caller must delete now.. why?
+        String err;
+        // Process the file
+        if (isSU3) {
+            SU3File up = new SU3File(_context, f);
+            File temp = new File(_context.getTempDir(), "su3out-" + _context.random().nextLong() + ".zip");
+            try {
+                if (up.verifyAndMigrate(temp)) {
+                    String ver = up.getVersionString();
+                    int type = up.getContentType();
+                    if (ver == null || VersionComparator.comp(RouterVersion.VERSION, ver) >= 0)
+                        err = "Old version " + ver;
+                    else if (type != SU3File.CONTENT_ROUTER)
+                        err = "Bad su3 content type " + type;
+                    else if (!FileUtil.copy(temp, to, true, false))
+                        err = "Failed copy to " + to;
+                    else
+                        err = null;   // success
+                } else {
+                    err = "Signature failed, signer " + DataHelper.stripHTML(up.getSignerString()) +
+                          ' ' + up.getSigType();
+                }
+            } catch (IOException ioe) {
+                _log.error("SU3 extract error", ioe);
+                err = DataHelper.stripHTML(ioe.toString());
+            } finally {
+                temp.delete();
+            }
+        } else {
+            TrustedUpdate up = new TrustedUpdate(_context);
+            err = up.migrateVerified(RouterVersion.VERSION, f, to);
+        }
+
+        // caller must delete.. could be an active torrent
         //f.delete();
         if (err == null) {
             String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
@@ -1346,6 +1455,8 @@ public class ConsoleUpdateManager implements UpdateManager {
 
         @Override
         public String toString() {
+            if ("".equals(id))
+                return "UpdateItem " + type;
             return "UpdateItem " + type + ' ' + id;
         }
     }

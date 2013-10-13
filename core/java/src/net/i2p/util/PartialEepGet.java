@@ -3,6 +3,7 @@ package net.i2p.util;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.i2p.I2PAppContext;
@@ -11,6 +12,9 @@ import net.i2p.I2PAppContext;
  * Fetch exactly the first 'size' bytes into a stream
  * Anything less or more will throw an IOException
  * No retries, no min and max size options, no timeout option
+ * If the server does not return a Content-Length header of the correct size,
+ * the fetch will fail.
+ *
  * Useful for checking .sud versions
  *
  * @since 0.7.12
@@ -19,12 +23,20 @@ import net.i2p.I2PAppContext;
 public class PartialEepGet extends EepGet {
     long _fetchSize;
 
-    /** @param size fetch exactly this many bytes */
+    /**
+     * Instantiate an EepGet that will fetch exactly size bytes when fetch() is called.
+     *
+     * @param proxyHost use null or "" for no proxy
+     * @param proxyPort use 0 for no proxy
+     * @param size fetch exactly this many bytes
+     */
     public PartialEepGet(I2PAppContext ctx, String proxyHost, int proxyPort,
                          OutputStream outputStream,  String url, long size) {
         // we're using this constructor:
-        // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
-        super(ctx, true, proxyHost, proxyPort, 0, size, size, null, outputStream, url, true, null, null);
+        // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries,
+        //               long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
+        super(ctx, proxyHost != null && proxyPort > 0, proxyHost, proxyPort, 0,
+              size, size, null, outputStream, url, true, null, null);
         _fetchSize = size;
     }
    
@@ -88,7 +100,8 @@ public class PartialEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("PartialEepGet [-p 127.0.0.1:4444] [-l #bytes] url");
+        System.err.println("PartialEepGet [-p 127.0.0.1:4444] [-l #bytes] url\n" +
+                           "              (use -p :0 for no proxy)");
     }
     
     @Override
@@ -96,6 +109,8 @@ public class PartialEepGet extends EepGet {
         StringBuilder buf = new StringBuilder(2048);
         URL url = new URL(_actualURL);
         String host = url.getHost();
+        if (host == null || host.length() <= 0)
+            throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
         String path = url.getPath();
         String query = url.getQuery();

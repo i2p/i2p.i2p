@@ -49,6 +49,7 @@ public class NewsHelper extends ContentHelper {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return false;
         return mgr.isUpdateInProgress(ROUTER_SIGNED) ||
+               mgr.isUpdateInProgress(ROUTER_SIGNED_SU3) ||
                mgr.isUpdateInProgress(ROUTER_UNSIGNED) ||
                mgr.isUpdateInProgress(TYPE_DUMMY);
     }
@@ -60,7 +61,8 @@ public class NewsHelper extends ContentHelper {
     public static boolean isUpdateAvailable() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return false;
-        return mgr.getUpdateAvailable(ROUTER_SIGNED) != null;
+        return mgr.getUpdateAvailable(ROUTER_SIGNED) != null ||
+               mgr.getUpdateAvailable(ROUTER_SIGNED_SU3) != null;
     }
 
     /**
@@ -71,6 +73,9 @@ public class NewsHelper extends ContentHelper {
     public static String updateVersion() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return null;
+        String rv = mgr.getUpdateAvailable(ROUTER_SIGNED_SU3);
+        if (rv != null)
+            return rv;
         return mgr.getUpdateAvailable(ROUTER_SIGNED);
     }
 
@@ -93,6 +98,9 @@ public class NewsHelper extends ContentHelper {
     public static String updateVersionDownloaded() {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return null;
+        String rv = mgr.getUpdateDownloaded(ROUTER_SIGNED_SU3);
+        if (rv != null)
+            return rv;
         return mgr.getUpdateDownloaded(ROUTER_SIGNED);
     }
 

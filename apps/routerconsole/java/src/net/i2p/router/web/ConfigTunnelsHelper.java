@@ -14,8 +14,6 @@ public class ConfigTunnelsHelper extends HelperBase {
     private static final String HOPS = ngettext("1 hop", "{0} hops");
     private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
 
-    static final String PROP_ADVANCED = "routerconsole.advanced";
-
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);
         // HTML: <input> cannot be inside a <table>
@@ -69,7 +67,7 @@ public class ConfigTunnelsHelper extends HelperBase {
 
     private void renderForm(StringBuilder buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
 
-        boolean advanced = _context.getBooleanProperty(PROP_ADVANCED);
+        boolean advanced = isAdvanced();
 
         buf.append("<tr><th colspan=\"3\"><a name=\"").append(prefix).append("\">");
         buf.append(name).append("</a></th></tr>\n");

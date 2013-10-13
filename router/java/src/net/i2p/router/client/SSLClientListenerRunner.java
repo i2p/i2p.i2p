@@ -21,13 +21,12 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLContext;
 
 import net.i2p.client.I2PClient;
+import net.i2p.crypto.CertUtil;
+import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.Base32;
-import net.i2p.data.Base64;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
-import net.i2p.util.SecureFileOutputStream;
-import net.i2p.util.ShellCommand;
 
 /**
  * SSL version of ClientListenerRunner
@@ -87,31 +86,14 @@ class SSLClientListenerRunner extends ClientListenerRunner {
      */
     private boolean createKeyStore(File ks) {
         // make a random 48 character password (30 * 8 / 5)
-        byte[] rand = new byte[30];
-        _context.random().nextBytes(rand);
-        String keyPassword = Base32.encode(rand);
+        String keyPassword = KeyStoreUtil.randomString();
         // and one for the cname
-        _context.random().nextBytes(rand);
-        String cname = Base32.encode(rand) + ".i2cp.i2p.net";
+        String cname = KeyStoreUtil.randomString() + ".i2cp.i2p.net";
 
-        String keytool = (new File(System.getProperty("java.home"), "bin/keytool")).getAbsolutePath();
-        String[] args = new String[] {
-                   keytool,
-                   "-genkey",            // -genkeypair preferred in newer keytools, but this works with more
-                   "-storetype", KeyStore.getDefaultType(),
-                   "-keystore", ks.getAbsolutePath(),
-                   "-storepass", DEFAULT_KEYSTORE_PASSWORD,
-                   "-alias", KEY_ALIAS,
-                   "-dname", "CN=" + cname + ",OU=I2CP,O=I2P Anonymous Network,L=XX,ST=XX,C=XX",
-                   "-validity", "3652",  // 10 years
-                   "-keyalg", "DSA",
-                   "-keysize", "1024",
-                   "-keypass", keyPassword};
-        boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 30);  // 30 secs
+        boolean success = KeyStoreUtil.createKeys(ks, KEY_ALIAS, cname, "I2CP", keyPassword);
         if (success) {
             success = ks.exists();
             if (success) {
-                SecureFileOutputStream.setPerms(ks);
                 Map<String, String> changes = new HashMap();
                 changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
                 changes.put(PROP_KEY_PASSWORD, keyPassword);
@@ -123,13 +105,8 @@ class SSLClientListenerRunner extends ClientListenerRunner {
                            "The certificate name was generated randomly, and is not associated with your " +
                            "IP address, host name, router identity, or destination keys.");
         } else {
-            _log.error("Failed to create I2CP SSL keystore using command line:");
-            StringBuilder buf = new StringBuilder(256);
-            for (int i = 0;  i < args.length; i++) {
-                buf.append('"').append(args[i]).append("\" ");
-            }
-            _log.error(buf.toString());
-            _log.error("This is for the Sun/Oracle keytool, others may be incompatible.\n" +
+            _log.error("Failed to create I2CP SSL keystore.\n" +
+                       "This is for the Sun/Oracle keytool, others may be incompatible.\n" +
                        "If you create the keystore manually, you must add " + PROP_KEYSTORE_PASSWORD + " and " + PROP_KEY_PASSWORD +
                        " to " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
         }
@@ -143,59 +120,13 @@ class SSLClientListenerRunner extends ClientListenerRunner {
     private void exportCert(File ks) {
         File sdir = new SecureDirectory(_context.getConfigDir(), "certificates");
         if (sdir.exists() || sdir.mkdir()) {
-            InputStream fis = null;
-            try {
-                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                fis = new FileInputStream(ks);
-                String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
-                keyStore.load(fis, ksPass.toCharArray());
-                Certificate cert = keyStore.getCertificate(KEY_ALIAS);
-                if (cert != null) {
-                    File certFile = new File(sdir, ASCII_KEYFILE);
-                    saveCert(cert, certFile);
-                } else {
-                    _log.error("Error getting SSL cert to save as ASCII");
-                }
-            } catch (GeneralSecurityException gse) {
-                _log.error("Error saving ASCII SSL keys", gse);
-            } catch (IOException ioe) {
-                _log.error("Error saving ASCII SSL keys", ioe);
-            } finally {
-                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-            }
+            String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+            File out = new File(sdir, ASCII_KEYFILE);
+            boolean success = KeyStoreUtil.exportCert(ks, ksPass, KEY_ALIAS, out);
+            if (!success)
+                _log.error("Error getting SSL cert to save as ASCII");
         } else {
             _log.error("Error saving ASCII SSL keys");
-        }
-    }
-
-    private static final int LINE_LENGTH = 64;
-
-    /**
-     *  Modified from:
-     *  http://www.exampledepot.com/egs/java.security.cert/ExportCert.html
-     *
-     *  Write a certificate to a file in base64 format.
-     */
-    private void saveCert(Certificate cert, File file) {
-        OutputStream os = null;
-        try {
-           // Get the encoded form which is suitable for exporting
-           byte[] buf = cert.getEncoded();
-           os = new SecureFileOutputStream(file);
-           PrintWriter wr = new PrintWriter(os);
-           wr.println("-----BEGIN CERTIFICATE-----");
-           String b64 = Base64.encode(buf, true);     // true = use standard alphabet
-           for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
-               wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
-           }
-           wr.println("-----END CERTIFICATE-----");
-           wr.flush();
-        } catch (CertificateEncodingException cee) {
-           _log.error("Error writing X509 Certificate " + file.getAbsolutePath(), cee);
-        } catch (IOException ioe) {
-            _log.error("Error writing X509 Certificate " + file.getAbsolutePath(), ioe);
-        } finally {
-            try { if (os != null) os.close(); } catch (IOException foo) {}
         }
     }
 

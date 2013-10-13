@@ -22,6 +22,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private final Log _log;
     private final UpdateManager _umgr;
     private final SnarkManager _smgr;
+    private final UpdateType _type;
     private final List<URI> _urls;
     private volatile boolean _isRunning;
     private volatile boolean _hasMetaInfo;
@@ -36,11 +37,12 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     private static final long CHECK_INTERVAL = 3*60*1000;
 
     public UpdateRunner(I2PAppContext ctx, UpdateManager umgr, SnarkManager smgr,
-                        List<URI> uris, String newVersion) { 
+                        UpdateType type, List<URI> uris, String newVersion) { 
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _umgr = umgr;
         _smgr = smgr;
+        _type = type;
         _urls = uris;
         _newVersion = newVersion;
     }
@@ -56,7 +58,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         }
     }
 
-    public UpdateType getType() { return UpdateType.ROUTER_SIGNED; }
+    public UpdateType getType() { return _type; }
 
     public UpdateMethod getMethod() { return UpdateMethod.TORRENT; }
 
@@ -111,7 +113,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                 }
                 _snark = _smgr.addMagnet(name, ih, trackerURL, true, true, this);
                 if (_snark != null) {
-                    updateStatus("<b>" + _smgr.util().getString("Updating from {0}", updateURL) + "</b>");
+                    updateStatus("<b>" + _smgr.util().getString("Updating from {0}", linkify(updateURL)) + "</b>");
                     new Timeout();
                     break;
                 }
@@ -291,6 +293,12 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     }
 
     //////// end CompleteListener methods
+
+    private static String linkify(String url) {
+        String durl = url.length() <= 28 ? url :
+                                           url.substring(0, 25) + "&hellip;";
+        return "<a target=\"_blank\" href=\"" + url + "\"/>" + durl + "</a>";
+    }
 
     private void updateStatus(String s) {
         _umgr.notifyProgress(this, s);

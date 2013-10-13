@@ -27,6 +27,7 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
 import net.i2p.apps.systray.SysTray;
+import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
@@ -38,8 +39,6 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
-import net.i2p.util.SecureFileOutputStream;
-import net.i2p.util.ShellCommand;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
@@ -677,12 +676,6 @@ public class RouterConsoleRunner implements RouterApp {
                 System.err.println("Console SSL error, must set " + PROP_KEY_PASSWORD + " in " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
             return rv;
         }
-        File dir = ks.getParentFile();
-        if (!dir.exists()) {
-            File sdir = new SecureDirectory(dir.getAbsolutePath());
-            if (!sdir.mkdir())
-                return false;
-        }
         return createKeyStore(ks);
     }
 
@@ -697,31 +690,13 @@ public class RouterConsoleRunner implements RouterApp {
      */
     private boolean createKeyStore(File ks) {
         // make a random 48 character password (30 * 8 / 5)
-        byte[] rand = new byte[30];
-        _context.random().nextBytes(rand);
-        String keyPassword = Base32.encode(rand);
+        String keyPassword = KeyStoreUtil.randomString();
         // and one for the cname
-        _context.random().nextBytes(rand);
-        String cname = Base32.encode(rand) + ".console.i2p.net";
-
-        String keytool = (new File(System.getProperty("java.home"), "bin/keytool")).getAbsolutePath();
-        String[] args = new String[] {
-                   keytool,
-                   "-genkey",            // -genkeypair preferred in newer keytools, but this works with more
-                   "-storetype", KeyStore.getDefaultType(),
-                   "-keystore", ks.getAbsolutePath(),
-                   "-storepass", DEFAULT_KEYSTORE_PASSWORD,
-                   "-alias", "console",
-                   "-dname", "CN=" + cname + ",OU=Console,O=I2P Anonymous Network,L=XX,ST=XX,C=XX",
-                   "-validity", "3652",  // 10 years
-                   "-keyalg", "DSA",
-                   "-keysize", "1024",
-                   "-keypass", keyPassword};
-        boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 30);  // 30 secs
+        String cname = KeyStoreUtil.randomString() + ".console.i2p.net";
+        boolean success = KeyStoreUtil.createKeys(ks, "console", cname, "Console", keyPassword);
         if (success) {
             success = ks.exists();
             if (success) {
-                SecureFileOutputStream.setPerms(ks);
                 try {
                     Map<String, String> changes = new HashMap();
                     changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
@@ -735,13 +710,8 @@ public class RouterConsoleRunner implements RouterApp {
                                "The certificate name was generated randomly, and is not associated with your " +
                                "IP address, host name, router identity, or destination keys.");
         } else {
-            System.err.println("Failed to create console SSL keystore using command line:");
-            StringBuilder buf = new StringBuilder(256);
-            for (int i = 0;  i < args.length; i++) {
-                buf.append('"').append(args[i]).append("\" ");
-            }
-            System.err.println(buf.toString());
-            System.err.println("This is for the Sun/Oracle keytool, others may be incompatible.\n" +
+            System.err.println("Failed to create console SSL keystore.\n" +
+                               "This is for the Sun/Oracle keytool, others may be incompatible.\n" +
                                "If you create the keystore manually, you must add " + PROP_KEYSTORE_PASSWORD + " and " + PROP_KEY_PASSWORD +
                                " to " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
         }

@@ -48,18 +48,24 @@
         <tr><td class="mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td></tr>
     <% }   // if canInstall %>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("Fetch news through the eepProxy?")%></b></td>
+          <td><jsp:getProperty name="updatehelper" property="newsThroughProxy" /></td></tr>
         <tr><td class="mediumtags" align="right"><b><%=intl._("Update through the eepProxy?")%></b></td>
-          <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td>
-        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("eepProxy host")%>:</b></td>
+          <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td></tr>
+      <% if (updatehelper.isAdvanced()) { %>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("eepProxy host")%>:</b></td>
           <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("eepProxy port")%>:</b></td>
           <td><input type="text" size="10" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td></tr>
+      <% }   // if isAdvanced %>
     <% if (updatehelper.canInstall()) { %>
+      <% if (updatehelper.isAdvanced()) { %>
         <tr><td class="mediumtags" align="right"><b><%=intl._("Update URLs")%>:</b></td>
           <td><textarea cols="60" rows="6" name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Trusted keys")%>:</b></td>
-          <td><textarea cols="60" rows="6" name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td>
-        </tr><tr><td id="unsignedbuild" class="mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
+          <td><textarea cols="60" rows="6" name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td></tr>
+      <% }   // if isAdvanced %>
+        <tr><td id="unsignedbuild" class="mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>

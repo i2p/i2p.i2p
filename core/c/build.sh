@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 (cd jcpuid ; sh build.sh ; cd ..)
 (cd jbigi ; sh build.sh ; cd ..)

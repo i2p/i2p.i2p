@@ -46,18 +46,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 import java.util.Locale;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
@@ -67,7 +63,8 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
+import net.i2p.crypto.CertUtil;
+import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 
 /**
@@ -76,7 +73,7 @@ import net.i2p.data.DataHelper;
  * Fails on bad certs (must have a valid cert chain)
  * Self-signed certs or CAs not in the JVM key store must be loaded to be trusted.
  *
- * Since 0.8.2, loads additional trusted CA certs from $I2P/certificates/ and ~/.i2p/certificates/
+ * Since 0.8.2, loads additional trusted CA certs from $I2P/certificates/ssl/ and ~/.i2p/certificates/ssl/
  *
  * @author zzz
  * @since 0.7.10
@@ -91,7 +88,7 @@ public class SSLEepGet extends EepGet {
     /** may be null if init failed */
     private SavingTrustManager _stm;
 
-    private static final boolean _isAndroid = SystemVersion.isAndroid();
+    private static final String CERT_DIR = "certificates/ssl";
 
     /**
      *  A new SSLEepGet with a new SSLState
@@ -107,9 +104,39 @@ public class SSLEepGet extends EepGet {
      *  @since 0.8.2
      */
     public SSLEepGet(I2PAppContext ctx, OutputStream outputStream, String url, SSLState state) {
+        this(ctx, null, outputStream, url, null);
+    }
+
+    /**
+     *  A new SSLEepGet with a new SSLState
+     *  @since 0.9.9
+     */
+    public SSLEepGet(I2PAppContext ctx, String outputFile, String url) {
+        this(ctx, outputFile, url, null);
+    }
+
+    /**
+     *  @param state an SSLState retrieved from a previous SSLEepGet with getSSLState(), or null.
+     *               This makes repeated fetches from the same host MUCH faster,
+     *               and prevents repeated key store loads even for different hosts.
+     *  @since 0.9.9
+     */
+    public SSLEepGet(I2PAppContext ctx, String outputFile, String url, SSLState state) {
+        this(ctx, outputFile, null, url, null);
+    }
+
+    /**
+     *  outputFile, outputStream: One null, one non-null
+     *
+     *  @param state an SSLState retrieved from a previous SSLEepGet with getSSLState(), or null.
+     *               This makes repeated fetches from the same host MUCH faster,
+     *               and prevents repeated key store loads even for different hosts.
+     *  @since 0.9.9
+     */
+    private SSLEepGet(I2PAppContext ctx, String outputFile, OutputStream outputStream, String url, SSLState state) {
         // we're using this constructor:
         // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
-        super(ctx, false, null, -1, 0, -1, -1, null, outputStream, url, true, null, null);
+        super(ctx, false, null, -1, 0, -1, -1, outputFile, outputStream, url, true, null, null);
         if (state != null && state.context != null)
             _sslContext = state.context;
         else
@@ -177,70 +204,39 @@ public class SSLEepGet extends EepGet {
      *  else from $JAVA_HOME/lib/security/jssacacerts,
      *  else from $JAVA_HOME/lib/security/cacerts.
      *
-     *  Then adds certs found in the $I2P/certificates/ directory
-     *  and in the ~/.i2p/certificates/ directory.
+     *  Then adds certs found in the $I2P/certificates/ssl/ directory
+     *  and in the ~/.i2p/certificates/ssl/ directory.
      *
      *  @return null on failure
      *  @since 0.8.2
      */
     private SSLContext initSSLContext() {
-        KeyStore ks;
-        try {
-            ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        } catch (GeneralSecurityException gse) {
-            _log.error("Key Store init error", gse);
+        KeyStore ks = KeyStoreUtil.loadSystemKeyStore();
+        if (ks == null) {
+            _log.error("Key Store init error");
             return null;
         }
-        boolean success = false;
-        String override = System.getProperty("javax.net.ssl.keyStore");
-        if (override != null)
-            success = loadCerts(new File(override), ks);
-        if (!success) {
-            if (_isAndroid) {
-                // thru API 13. As of API 14 (ICS), the file is gone, but
-                // ks.load(null, pw) will bring in the default certs?
-                success = loadCerts(new File(System.getProperty("java.home"), "etc/security/cacerts.bks"), ks);
-            } else {
-                success = loadCerts(new File(System.getProperty("java.home"), "lib/security/jssecacerts"), ks);
-                if (!success)
-                    success = loadCerts(new File(System.getProperty("java.home"), "lib/security/cacerts"), ks);
-            }
-        }
-
-        if (!success) {
-            try {
-                // must be initted
-                ks.load(null, "changeit".toCharArray());
-            } catch (Exception e) {}
-            _log.error("All key store loads failed, will only load local certificates");
-        } else if (_log.shouldLog(Log.INFO)) {
-            int count = 0;
-            try {
-                for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
-                    String alias = e.nextElement();
-                    if (ks.isCertificateEntry(alias))
-                        count++;
-                }
-            } catch (Exception foo) {}
+        if (_log.shouldLog(Log.INFO)) {
+            int count = KeyStoreUtil.countCerts(ks);
             _log.info("Loaded " + count + " default trusted certificates");
         }
 
-        File dir = new File(_context.getBaseDir(), "certificates");
-        int adds = addCerts(dir, ks);
+        File dir = new File(_context.getBaseDir(), CERT_DIR);
+        int adds = KeyStoreUtil.addCerts(dir, ks);
         int totalAdds = adds;
         if (adds > 0 && _log.shouldLog(Log.INFO))
             _log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
         if (!_context.getBaseDir().getAbsolutePath().equals(_context.getConfigDir().getAbsolutePath())) {
-            dir = new File(_context.getConfigDir(), "certificates");
-            adds = addCerts(dir, ks);
+            dir = new File(_context.getConfigDir(), CERT_DIR);
+            adds = KeyStoreUtil.addCerts(dir, ks);
             totalAdds += adds;
             if (adds > 0 && _log.shouldLog(Log.INFO))
                 _log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
         }
         dir = new File(System.getProperty("user.dir"));
         if (!_context.getBaseDir().getAbsolutePath().equals(dir.getAbsolutePath())) {
-            dir = new File(_context.getConfigDir(), "certificates");
-            adds = addCerts(dir, ks);
+            dir = new File(_context.getConfigDir(), CERT_DIR);
+            adds = KeyStoreUtil.addCerts(dir, ks);
             totalAdds += adds;
             if (adds > 0 && _log.shouldLog(Log.INFO))
                 _log.info("Loaded " + adds + " trusted certificates from " + dir.getAbsolutePath());
@@ -260,118 +256,6 @@ public class SSLEepGet extends EepGet {
             _log.error("Key Store update error", gse);
         }
         return null;
-    }
-
-    /**
-     *  Load all X509 Certs from a key store File into a KeyStore
-     *  Note that each call reinitializes the KeyStore
-     *
-     *  @return success
-     *  @since 0.8.2
-     */
-    private boolean loadCerts(File file, KeyStore ks) {
-        if (!file.exists())
-            return false;
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            // "changeit" is the default password
-            ks.load(fis, "changeit".toCharArray());
-        } catch (GeneralSecurityException gse) {
-            _log.error("KeyStore load error, no default keys: " + file.getAbsolutePath(), gse);
-            try {
-                // not clear if null is allowed for password
-                ks.load(null, "changeit".toCharArray());
-            } catch (Exception foo) {}
-            return false;
-        } catch (IOException ioe) {
-            _log.error("KeyStore load error, no default keys: " + file.getAbsolutePath(), ioe);
-            try {
-                ks.load(null, "changeit".toCharArray());
-            } catch (Exception foo) {}
-            return false;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
-        }
-        return true;
-    }
-
-    /**
-     *  Load all X509 Certs from a directory and add them to the
-     *  trusted set of certificates in the key store
-     *
-     *  @return number successfully added
-     *  @since 0.8.2
-     */
-    private int addCerts(File dir, KeyStore ks) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Looking for X509 Certificates in " + dir.getAbsolutePath());
-        int added = 0;
-        if (dir.exists() && dir.isDirectory()) {
-            File[] files = dir.listFiles();
-            if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    File f = files[i];
-                    if (!f.isFile())
-                        continue;
-                    // use file name as alias
-                    // https://www.sslshopper.com/ssl-converter.html
-                    // No idea if all these formats can actually be read by CertificateFactory
-                    String alias = f.getName().toLowerCase(Locale.US);
-                    if (alias.endsWith(".crt") || alias.endsWith(".pem") || alias.endsWith(".key") ||
-                        alias.endsWith(".der") || alias.endsWith(".key") || alias.endsWith(".p7b") ||
-                        alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12"))
-                        alias = alias.substring(0, alias.length() - 4);
-                    boolean success = addCert(f, alias, ks);
-                    if (success)
-                        added++;
-                }
-            }
-        }
-        return added;
-    }
-
-    /**
-     *  Load an X509 Cert from a file and add it to the
-     *  trusted set of certificates in the key store
-     *
-     *  @return success
-     *  @since 0.8.2
-     */
-    private boolean addCert(File file, String alias, KeyStore ks) {
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            if (_log.shouldLog(Log.INFO)) {
-                _log.info("Read X509 Certificate from " + file.getAbsolutePath() +
-                          " Issuer: " + cert.getIssuerX500Principal() +
-                          "; Valid From: " + cert.getNotBefore() +
-                          " To: " + cert.getNotAfter());
-            }
-            try {
-                cert.checkValidity();
-            } catch (CertificateExpiredException cee) {
-                _log.error("Rejecting expired X509 Certificate: " + file.getAbsolutePath(), cee);
-                return false;
-            } catch (CertificateNotYetValidException cnyve) {
-                _log.error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
-                return false;
-            }
-            ks.setCertificateEntry(alias, cert);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
-        } catch (GeneralSecurityException gse) {
-            _log.error("Error reading X509 Certificate: " + file.getAbsolutePath(), gse);
-            return false;
-        } catch (IOException ioe) {
-            _log.error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
-            return false;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
-        }
-        return true;
     }
     
     /**
@@ -425,42 +309,10 @@ public class SSLEepGet extends EepGet {
             } catch (Exception e) {
                 System.out.println("      WARNING: Certificate is not currently valid, it cannot be used");
             }
-            saveCert(cert, new File(name));
+            CertUtil.saveCert(cert, new File(name));
         }
         System.out.println("NOTE: To trust them, copy the certificate file(s) to the certificates directory and rerun without the -s option");
         System.out.println("NOTE: EepGet failed, certificate error follows:");
-    }
-
-    private static final int LINE_LENGTH = 64;
-
-    /**
-     *  Modified from:
-     *  http://www.exampledepot.com/egs/java.security.cert/ExportCert.html
-     *
-     *  This method writes a certificate to a file in base64 format.
-     *  @since 0.8.2
-     */
-    private static void saveCert(Certificate cert, File file) {
-        OutputStream os = null;
-        try {
-           // Get the encoded form which is suitable for exporting
-           byte[] buf = cert.getEncoded();
-           os = new FileOutputStream(file);
-           PrintWriter wr = new PrintWriter(os);
-           wr.println("-----BEGIN CERTIFICATE-----");
-           String b64 = Base64.encode(buf, true);     // true = use standard alphabet
-           for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
-               wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
-           }
-           wr.println("-----END CERTIFICATE-----");
-           wr.flush();
-        } catch (CertificateEncodingException cee) {
-            System.out.println("Error writing X509 Certificate " + file.getAbsolutePath() + ' ' + cee);
-        } catch (IOException ioe) {
-            System.out.println("Error writing X509 Certificate " + file.getAbsolutePath() + ' ' + ioe);
-        } finally {
-            try { if (os != null) os.close(); } catch (IOException foo) {}
-        }
     }
 
     /**
@@ -641,6 +493,8 @@ public class SSLEepGet extends EepGet {
             int port = 0;
             if ("https".equals(url.getProtocol())) {
                 host = url.getHost();
+                if (host.toLowerCase(Locale.US).endsWith(".i2p"))
+                    throw new MalformedURLException("I2P addresses unsupported");
                 port = url.getPort();
                 if (port == -1)
                     port = 443;
@@ -649,7 +503,7 @@ public class SSLEepGet extends EepGet {
                 else
                     _proxy = SSLSocketFactory.getDefault().createSocket(host, port);
             } else {
-                throw new IOException("Only https supported: " + _actualURL);
+                throw new MalformedURLException("Only https supported: " + _actualURL);
             }
         // an MUE is an IOE
         //} catch (MalformedURLException mue) {

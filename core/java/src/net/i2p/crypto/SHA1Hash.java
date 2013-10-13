@@ -26,6 +26,11 @@ public class SHA1Hash extends SimpleDataStructure {
 
     public final static int HASH_LENGTH = SHA1.HASH_LENGTH;
     
+    /** @since 0.9.9 */
+    public SHA1Hash() {
+        super();
+    }
+    
     /** @throws IllegalArgumentException if data is not 20 bytes (null is ok) */
     public SHA1Hash(byte data[]) {
         super(data);

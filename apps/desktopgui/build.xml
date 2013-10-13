@@ -44,6 +44,7 @@
 
 	<target name="bundle" unless="no.bundle">
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <env key="JAVA_HOME" value="${java.home}" />
             <arg value="./bundle-messages.sh" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >

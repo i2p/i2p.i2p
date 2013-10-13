@@ -10,6 +10,14 @@ package net.i2p.crypto;
  */
 
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.ProviderException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECPoint;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -19,8 +27,16 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.SystemVersion;
+
+
+// main()
+import net.i2p.data.DataHelper;
+import net.i2p.data.Signature;
+import net.i2p.util.Clock;
+import net.i2p.util.RandomSource;
 
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
@@ -129,14 +145,16 @@ public class KeyGenerator {
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         keys[0] = new PublicKey();
         keys[1] = new PrivateKey();
-        byte[] k0 = aalpha.toByteArray();
-        byte[] k1 = a.toByteArray();
 
         // bigInteger.toByteArray returns SIGNED integers, but since they'return positive,
         // signed two's complement is the same as unsigned
 
-        keys[0].setData(padBuffer(k0, PublicKey.KEYSIZE_BYTES));
-        keys[1].setData(padBuffer(k1, PrivateKey.KEYSIZE_BYTES));
+        try {
+            keys[0].setData(SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES));
+            keys[1].setData(SigUtil.rectify(a, PrivateKey.KEYSIZE_BYTES));
+        } catch (InvalidKeyException ike) {
+            throw new IllegalArgumentException(ike);
+        }
 
         return keys;
     }
@@ -149,13 +167,18 @@ public class KeyGenerator {
         BigInteger a = new NativeBigInteger(1, priv.toByteArray());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
         PublicKey pub = new PublicKey();
-        byte [] pubBytes = aalpha.toByteArray();
-        pub.setData(padBuffer(pubBytes, PublicKey.KEYSIZE_BYTES));
+        try {
+            pub.setData(SigUtil.rectify(aalpha, PublicKey.KEYSIZE_BYTES));
+        } catch (InvalidKeyException ike) {
+            throw new IllegalArgumentException(ike);
+        }
         return pub;
     }
 
     /** Generate a pair of DSA keys, where index 0 is a SigningPublicKey, and
-     * index 1 is a SigningPrivateKey
+     * index 1 is a SigningPrivateKey.
+     * DSA-SHA1 only.
+     *
      * @return pair of keys
      */
     public Object[] generateSigningKeypair() {
@@ -163,6 +186,8 @@ public class KeyGenerator {
     }
 
     /**
+     *  DSA-SHA1 only.
+     *
      *  Same as above but different return type
      *  @since 0.8.7
      */
@@ -178,15 +203,69 @@ public class KeyGenerator {
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         keys[0] = new SigningPublicKey();
         keys[1] = new SigningPrivateKey();
-        byte k0[] = padBuffer(y.toByteArray(), SigningPublicKey.KEYSIZE_BYTES);
-        byte k1[] = padBuffer(x.toByteArray(), SigningPrivateKey.KEYSIZE_BYTES);
-
-        keys[0].setData(k0);
-        keys[1].setData(k1);
+        try {
+            keys[0].setData(SigUtil.rectify(y, SigningPublicKey.KEYSIZE_BYTES));
+            keys[1].setData(SigUtil.rectify(x, SigningPrivateKey.KEYSIZE_BYTES));
+        } catch (InvalidKeyException ike) {
+            throw new IllegalStateException(ike);
+        }
         return keys;
     }
 
-    /** Convert a SigningPrivateKey to a SigningPublicKey
+    /**
+     *  Generic signature type, supports DSA and ECDSA
+     *  @since 0.9.9
+     */
+    public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {
+        if (type == SigType.DSA_SHA1)
+            return generateSigningKeys();
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
+        KeyPair kp;
+        try {
+            kpg.initialize(type.getParams(), _context.random());
+            kp = kpg.generateKeyPair();
+        } catch (ProviderException pe) {
+            // java.security.ProviderException: sun.security.pkcs11.wrapper.PKCS11Exception: CKR_DOMAIN_PARAMS_INVALID
+            // This is a RuntimeException, thx Sun
+            // Fails for P-192 only, on Ubuntu
+            Log log = _context.logManager().getLog(KeyGenerator.class);
+            String pname = kpg.getProvider().getName();
+            if ("BC".equals(pname)) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("BC KPG failed for " + type, pe);
+                throw new GeneralSecurityException("BC KPG for " + type, pe);
+            }
+            if (!ECConstants.isBCAvailable())
+                throw new GeneralSecurityException(pname + " KPG failed for " + type, pe);
+            if (log.shouldLog(Log.WARN))
+                log.warn(pname + " KPG failed for " + type + ", trying BC"  /* , pe */ );
+            try {
+                kpg = KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName(), "BC");
+                kpg.initialize(type.getParams(), _context.random());
+                kp = kpg.generateKeyPair();
+            } catch (ProviderException pe2) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("BC KPG failed for " + type + " also", pe2);
+                // throw original exception
+                throw new GeneralSecurityException(pname + " KPG for " + type, pe);
+            } catch (GeneralSecurityException gse) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("BC KPG failed for " + type + " also", gse);
+                // throw original exception
+                throw new GeneralSecurityException(pname + " KPG for " + type, pe);
+            }
+        }
+        java.security.PublicKey pubkey = kp.getPublic();
+        java.security.PrivateKey privkey = kp.getPrivate();
+        SimpleDataStructure[] keys = new SimpleDataStructure[2];
+        keys[0] = SigUtil.fromJavaKey(pubkey, type);
+        keys[1] = SigUtil.fromJavaKey(privkey, type);
+        return keys;
+    }
+
+    /** Convert a SigningPrivateKey to a SigningPublicKey.
+     * DSA-SHA1 only.
+     *
      * @param priv a SigningPrivateKey object
      * @return a SigningPublicKey object
      */
@@ -194,27 +273,68 @@ public class KeyGenerator {
         BigInteger x = new NativeBigInteger(1, priv.toByteArray());
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         SigningPublicKey pub = new SigningPublicKey();
-        byte [] pubBytes = padBuffer(y.toByteArray(), SigningPublicKey.KEYSIZE_BYTES);
-        pub.setData(pubBytes);
+        try {
+            pub.setData(SigUtil.rectify(y, SigningPublicKey.KEYSIZE_BYTES));
+        } catch (InvalidKeyException ike) {
+            throw new IllegalArgumentException(ike);
+        }
         return pub;
     }
 
-    /**
-     * Pad the buffer w/ leading 0s or trim off leading bits so the result is the
-     * given length.  
-     */
-    private final static byte[] padBuffer(byte src[], int length) {
-        byte buf[] = new byte[length];
+    public static void main(String args[]) {
+        try {
+             main2(args);
+        } catch (Exception e) {
+             e.printStackTrace();
+        }
+    }
 
-        if (src.length > buf.length) // extra bits, chop leading bits
-            System.arraycopy(src, src.length - buf.length, buf, 0, buf.length);
-        else if (src.length < buf.length) // short bits, padd w/ 0s
-            System.arraycopy(src, 0, buf, buf.length - src.length, src.length);
-        else
-            // eq
-            System.arraycopy(src, 0, buf, 0, buf.length);
+    public static void main2(String args[]) {
+        RandomSource.getInstance().nextBoolean();
+        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        int runs = 200; // warmup
+        for (int j = 0; j < 2; j++) {
+            for (int i = 0; i <= 100; i++) {
+                SigType type = SigType.getByCode(i);
+                if (type == null)
+                    break;
+                try {
+                    System.out.println("Testing " + type);
+                    testSig(type, runs);
+                } catch (Exception e) {
+                    System.out.println("error testing " + type);
+                    e.printStackTrace();
+                }
+            }
+            runs = 1000;
+        }
+    }
 
-        return buf;
+    private static void testSig(SigType type, int runs) throws GeneralSecurityException {
+        byte src[] = new byte[512];
+        long stime = 0;
+        long vtime = 0;
+        SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
+        //System.out.println("pubkey " + keys[0]);
+        //System.out.println("privkey " + keys[1]);
+        for (int i = 0; i < runs; i++) {
+            RandomSource.getInstance().nextBytes(src);
+            long start = System.nanoTime();
+            Signature sig = DSAEngine.getInstance().sign(src, (SigningPrivateKey) keys[1]);
+            long mid = System.nanoTime();
+            boolean ok = DSAEngine.getInstance().verifySignature(sig, src, (SigningPublicKey) keys[0]);
+            long end = System.nanoTime();
+            stime += mid - start;
+            vtime += end - mid;
+            if (!ok)
+                throw new GeneralSecurityException(type + " V(S(data)) fail");
+        }
+        stime /= 1000*1000;
+        vtime /= 1000*1000;
+        System.out.println(type + " sign/verify " + runs + " times: " + (vtime+stime) + " ms = " +
+                           (((double) stime) / runs) + " each sign, " +
+                           (((double) vtime) / runs) + " each verify, " +
+                           (((double) (stime + vtime)) / runs) + " s+v");
     }
 
 /******

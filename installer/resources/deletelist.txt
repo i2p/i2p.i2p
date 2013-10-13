@@ -68,3 +68,15 @@ docs/initialNews/initialNews_nl.xml
 docs/initialNews/initialNews_pt.xml
 docs/initialNews/initialNews_ru.xml
 docs/initialNews/initialNews_sv.xml
+# certificates moved to certificates/ssl
+certificates/193.150.121.66.crt
+certificates/cert.smartcom.org.crt
+certificates/i2p.feared.eu.crt
+certificates/i2p.mooo.com.crt
+certificates/i2pprojekt.de.cert
+certificates/ieb9oopo.mooo.com.crt
+certificates/netdb.i2p2.de.crt
+certificates/netdb.i2p2.no.crt
+certificates/reseed.info.crt
+certificates/reseed.pkol.de.crt
+certificates/www.cacert.org.crt

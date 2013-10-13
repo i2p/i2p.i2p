@@ -30,6 +30,7 @@ package net.i2p.crypto;
  */
 
 import java.math.BigInteger;
+import java.security.spec.DSAParameterSpec;
 
 import net.i2p.util.NativeBigInteger;
 
@@ -63,4 +64,9 @@ public class CryptoConstants {
                                                                + "DE2BCBF6955817183995497CEA956AE515D2261898FA0510"
                                                                + "15728E5A8AACAA68FFFFFFFFFFFFFFFF", 16);
     public static final BigInteger elgg = new NativeBigInteger("2");
+
+    /**
+     *  @since 0.9.9
+     */
+    public static final DSAParameterSpec DSA_SHA1_SPEC = new DSAParameterSpec(dsap, dsaq, dsag);
 }

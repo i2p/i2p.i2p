@@ -28,16 +28,9 @@ class UnsignedUpdateChecker extends UpdateRunner {
 
     public UnsignedUpdateChecker(RouterContext ctx, ConsoleUpdateManager mgr,
                                  List<URI> uris, long lastUpdateTime) { 
-        super(ctx, mgr, uris);
+        super(ctx, mgr, UpdateType.ROUTER_UNSIGNED, uris);
         _ms = lastUpdateTime;
     }
-
-    //////// begin UpdateTask methods
-
-    @Override
-    public UpdateType getType() { return UpdateType.ROUTER_UNSIGNED; }
-
-    //////// end UpdateTask methods
 
     @Override
     public void run() {

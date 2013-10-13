@@ -48,12 +48,9 @@ class DummyHandler implements Checker, Updater {
         private final long _delay;
 
         public DummyRunner(RouterContext ctx, ConsoleUpdateManager mgr, long maxTime) {
-            super(ctx, mgr, Collections.EMPTY_LIST);
+            super(ctx, mgr, UpdateType.TYPE_DUMMY, Collections.EMPTY_LIST);
             _delay = maxTime;
         }
-
-        @Override
-        public UpdateType getType() { return UpdateType.TYPE_DUMMY; }
 
         @Override
         public UpdateMethod getMethod() { return UpdateMethod.METHOD_DUMMY; }

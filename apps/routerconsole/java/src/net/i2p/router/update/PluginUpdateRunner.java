@@ -60,7 +60,7 @@ class PluginUpdateRunner extends UpdateRunner {
 
     public PluginUpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris,
                               String appName, String oldVersion ) {
-        super(ctx, mgr, uris);
+        super(ctx, mgr, UpdateType.PLUGIN, uris);
         if (uris.isEmpty())
             throw new IllegalArgumentException("uri cannot be empty");
         else
@@ -68,12 +68,6 @@ class PluginUpdateRunner extends UpdateRunner {
         _xpi2pURL = _uri.toString();
         _appName = appName;
         _oldVersion = oldVersion;
-    }
-
-
-    @Override
-    public UpdateType getType() {
-        return UpdateType.PLUGIN;
     }
 
     @Override
@@ -104,7 +98,7 @@ class PluginUpdateRunner extends UpdateRunner {
             } else {
                 updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
                 // use the same settings as for updater
-                boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+                boolean shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
                 String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
                 int proxyPort = ConfigUpdateHandler.proxyPort(_context);
                 try {

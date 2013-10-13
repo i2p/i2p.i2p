@@ -39,7 +39,7 @@ SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
             UNIXTYPE="linux"
         fi
         COMPILEFLAGS="-fPIC -Wall $CFLAGS"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE} -I/usr/local/include"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
 *)
@@ -49,7 +49,7 @@ esac
 
 if [ "$1" = "dynamic" ] ; then
         echo "Building a jbigi lib that is dynamically linked to GMP"
-        LIBPATH="-L.libs"
+        LIBPATH="-L.libs -L/usr/local/lib"
         INCLUDELIBS="-lgmp"
 else
         echo "Building a jbigi lib that is statically linked to GMP"
@@ -59,6 +59,6 @@ fi
 echo "Compiling C code..."
 rm -f jbigi.o $LIBFILE
 $CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
-$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS || exit 1
+$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1
 
 exit 0
