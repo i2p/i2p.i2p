@@ -299,6 +299,7 @@ class ConnectionPacketHandler {
             return false;
         
         boolean lastPacketAcked = false;
+        final boolean receivedAck = con.getOptions().receivedAck();
         if ( (acked != null) && (!acked.isEmpty()) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(acked.size() + " of our packets acked with " + packet);
@@ -312,7 +313,7 @@ class ConnectionPacketHandler {
                 final int numSends = p.getNumSends();
                 final int ackTime = p.getAckTime();
                 
-                if (numSends > 1)
+                if (numSends > 1 && receivedAck)
                     numResends++;
                 else if (ackTime > highestRTT) 
                     highestRTT = ackTime;

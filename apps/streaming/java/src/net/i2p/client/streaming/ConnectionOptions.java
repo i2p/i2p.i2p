@@ -629,6 +629,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         computeRTO();
     }
     
+    public synchronized boolean receivedAck() {
+        return _initState != AckInit.INIT;
+    }
+    
     /** How long after sending a packet will we wait before resending?
      * @return delay for a retransmission in ms
      */
