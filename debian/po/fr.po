@@ -1,16 +1,18 @@
-# French debconf translation
-# Copyright (C) 2012 The I2P Project
-# This file is distributed under the same license as the i2p package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-#   Boxoa590, 2012.
+#   Boxoa590, 2012
+# Boxoa590, 2012
+# Towatowa441, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2012-11-13 21:31+0000\n"
-"Last-Translator: Boxoa590\n"
+"PO-Revision-Date: 2013-10-13 21:24+0000\n"
+"Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
 "Language: fr\n"
@@ -52,8 +54,8 @@ msgid ""
 msgstr ""
 "D'origine I2P est configuré pour fonctionner sous le compte i2psvc quand il "
 "fonctionne comme service. Pour utiliser un profil **existant** vous pouvez "
-"entrer içi un nom de compte différent. Par exemple, si votre précédente "
-"installation est à /home/user/i2p, vous pouvez entrer 'user' içi."
+"entrer ici un nom de compte différent. Par exemple, si votre précédente "
+"installation est dans /home/user/i2p, vous pouvez entrer 'user' ici."
 
 #. Type: string
 #. Description
@@ -63,7 +65,7 @@ msgid ""
 "here, the chosen username *MUST* already exist."
 msgstr ""
 "Très important : si un utilisateur autre que celui par défaut de 'i2psvc' "
-"est entré içi, l'utilisateur choisi *DOIT* déjà exister."
+"est entré ici, l'utilisateur choisi *DOIT* déjà exister."
 
 #. Type: string
 #. Description

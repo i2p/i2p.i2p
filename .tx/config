@@ -80,6 +80,7 @@ trans.tr_TR = apps/routerconsole/locale-news/messages_tr.po
 trans.zh_CN = apps/routerconsole/locale-news/messages_zh.po
 
 [I2P.countries]
+type = PO
 source_file = apps/routerconsole/locale-countries/messages_en.po
 source_lang = en
 trans.da = apps/routerconsole/locale-countries/messages_da.po
