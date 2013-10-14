@@ -48,7 +48,7 @@ public class HomeHelper extends HelperBase {
         _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "education.png" + S +
         //_x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "education.png" + S +
         "killyourtv.i2p" + S + _x("Debian and Tahoe-LAFS repositories") + S + "http://killyourtv.i2p/" + S + I + "eepsite.png" + S +
-        "open4you.i2p" + S + S + "http://open4you.i2p/" + S + I + "eepsite.png" + S +
+        _x("Free Web Hosting") + S + _x("Free eepsite hosting with PHP and MySQL") + S + "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
         _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "eepsite.png" + S +
         "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "eepsite.png" + S +
         _x("Plugins") + S + _x("Add-on directory") + S + "http://plugins.i2p/" + S + I + "plugin.png" + S +
