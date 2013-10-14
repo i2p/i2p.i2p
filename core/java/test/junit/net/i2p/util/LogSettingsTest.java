@@ -54,12 +54,12 @@ public class LogSettingsTest extends TestCase {
             temp.close();
         }
         DataHelper.loadProps(p, f);
-        origMinimumOnScreenLevel = p.getProperty("logger.record.net.i2p.util.LogSettings", Log.STR_ERROR);
+        origMinimumOnScreenLevel = p.getProperty("logger.record.net.i2p.util.LogSettingsTest", Log.STR_ERROR);
         origLogSettings = p.getProperty("logger.minimumOnScreenLevel", Log.STR_CRIT);
     }
 
     protected void tearDown() throws IOException{
-	    p.setProperty("logger.record.net.i2p.util.LogSettings", origMinimumOnScreenLevel);
+        p.setProperty("logger.record.net.i2p.util.LogSettingsTest", origMinimumOnScreenLevel);
         p.setProperty("logger.minimumOnScreenLevel", origLogSettings);
         DataHelper.storeProps(p, f);
         
@@ -67,7 +67,7 @@ public class LogSettingsTest extends TestCase {
     }
 
     public void testDebug() throws IOException {
-        p.setProperty("logger.record.net.i2p.util.LogSettings", Log.toLevelString(Log.DEBUG));
+        p.setProperty("logger.record.net.i2p.util.LogSettingsTest", Log.toLevelString(Log.DEBUG));
         p.setProperty("logger.minimumOnScreenLevel", Log.toLevelString(Log.DEBUG));
         
         DataHelper.storeProps(p, f);
@@ -118,7 +118,7 @@ public class LogSettingsTest extends TestCase {
     }
 
     public void testInfo() throws IOException {
-        p.setProperty("logger.record.net.i2p.util.LogSettings", Log.toLevelString(Log.INFO));
+        p.setProperty("logger.record.net.i2p.util.LogSettingsTest", Log.toLevelString(Log.INFO));
         p.setProperty("logger.minimumOnScreenLevel", Log.toLevelString(Log.DEBUG));
         
     	DataHelper.storeProps(p, f);
@@ -166,7 +166,7 @@ public class LogSettingsTest extends TestCase {
     }
 
     public void testWarn() throws IOException {
-        p.setProperty("logger.record.net.i2p.util.LogSettings", Log.toLevelString(Log.WARN));
+        p.setProperty("logger.record.net.i2p.util.LogSettingsTest", Log.toLevelString(Log.WARN));
         p.setProperty("logger.minimumOnScreenLevel", Log.toLevelString(Log.DEBUG));
         
     	DataHelper.storeProps(p, f);
@@ -211,7 +211,7 @@ public class LogSettingsTest extends TestCase {
     }
 
     public void testError() throws IOException{
-        p.setProperty("logger.record.net.i2p.util.LogSettings", Log.toLevelString(Log.ERROR));
+        p.setProperty("logger.record.net.i2p.util.LogSettingsTest", Log.toLevelString(Log.ERROR));
         p.setProperty("logger.minimumOnScreenLevel", Log.toLevelString(Log.DEBUG));
         
     	DataHelper.storeProps(p, f);
@@ -254,7 +254,7 @@ public class LogSettingsTest extends TestCase {
     }
 
     public void testCrit() throws IOException {
-        p.setProperty("logger.record.net.i2p.util.LogSettings", Log.toLevelString(Log.CRIT));
+        p.setProperty("logger.record.net.i2p.util.LogSettingsTest", Log.toLevelString(Log.CRIT));
         p.setProperty("logger.minimumOnScreenLevel", Log.toLevelString(Log.DEBUG));
         
     	DataHelper.storeProps(p, f);

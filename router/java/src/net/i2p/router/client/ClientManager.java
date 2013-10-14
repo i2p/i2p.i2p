@@ -244,14 +244,9 @@ class ClientManager {
                 // sender went away
                 return;
             }
-            ClientMessage msg = new ClientMessage();
-            msg.setDestination(toDest);
-            msg.setPayload(payload);
-            msg.setSenderConfig(runner.getConfig());
-            msg.setFromDestination(runner.getConfig().getDestination());
-            msg.setMessageId(msgId);
-            msg.setExpiration(expiration);
-            msg.setFlags(flags);
+            ClientMessage msg = new ClientMessage(toDest, payload, runner.getConfig(),
+                                                  runner.getConfig().getDestination(), msgId,
+                                                  expiration, flags);
             _ctx.clientMessagePool().add(msg, true);
         }
     }

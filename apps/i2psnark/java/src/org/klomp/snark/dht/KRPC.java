@@ -317,7 +317,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param max maximum number of peers to return
      *  @param maxWait the maximum time to wait (ms) must be > 0
      *  @param annMax the number of peers to announce to
-     *  @param maxWait the maximum total time to wait for announces, may be 0 to return immediately without waiting for acks
+     *  @param annMaxWait the maximum total time to wait for announces, may be 0 to return immediately without waiting for acks
      *  @return possibly empty (never null)
      */
     public Collection<Hash> getPeersAndAnnounce(byte[] ih, int max, long maxWait, int annMax, long annMaxWait) {

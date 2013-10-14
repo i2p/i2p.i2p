@@ -223,9 +223,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                     DataMessage dm = (DataMessage)data;
                     Payload payload = new Payload();
                     payload.setEncryptedData(dm.getData());
-                    ClientMessage m = new ClientMessage();
-                    m.setDestinationHash(_client);
-                    m.setPayload(payload);
+                    ClientMessage m = new ClientMessage(_client, payload);
                     _context.clientManager().messageReceived(m);
                 } else {
                     if (_log.shouldLog(Log.ERROR))
