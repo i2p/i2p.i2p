@@ -108,7 +108,7 @@ public class Destination extends KeysAndCert {
     }
     
     /**
-     * @deprecated, was used only by Packet.java in streaming, now unused
+     * @deprecated was used only by Packet.java in streaming, now unused
      *
      * @throws IllegalStateException if data already set
      */
