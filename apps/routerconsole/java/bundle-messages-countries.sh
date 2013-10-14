@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+
 # Update messages_xx.po and messages_xx.class files,
 # from both java and jsp sources.
 # Requires installed programs xgettext, msgfmt, msgmerge, and find.
@@ -10,8 +10,8 @@
 #
 # zzz - public domain
 #
-CLASS=net.i2p.router.web.messages
-TMPFILE=build/javafiles.txt
+CLASS=net.i2p.router.countries.messages
+TMPFILE=build/javafiles-countries.txt
 export TZ=UTC
 RC=0
 
@@ -32,33 +32,28 @@ fi
 # Fast mode - update ondemond
 # set LG2 to the language you need in envrionment varibales to enable this
 
-
-# list specific files in core/ and router/ here, so we don't scan the whole tree
-ROUTERFILES="\
-   ../../../core/java/src/net/i2p/data/DataHelper.java \
-   ../../../core/java/src/net/i2p/util/LogWriter.java \
-   ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
-   ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
-   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
-   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
-   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
-   ../../../router/java/src/net/i2p/router/Blocklist.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
-   ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java \
-   ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java \
-   ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java"
+#
+# generate strings/Countries.java from ../../../installer/resources/countries.txt
+#
+CFILE=../../../installer/resources/countries.txt
+# add ../java/ so the refs will work in the po file
+JFILE=../java/build/Countries.java
+if [ $CFILE -nt $JFILE -o ! -s $JFILE ]
+then
+	mkdir -p build
+        echo '// Automatically generated pseudo-java for xgettext - do not edit' > $JFILE
+	echo '// Translators may wish to translate a few of these, do not bother to translate all of them!!' >> $JFILE
+	sed -e '/^#/d' -e 's/..,\(..*\)/_("\1");/' $CFILE >> $JFILE
+fi
 
 # add ../java/ so the refs will work in the po file
-JPATHS="../java/src ../jsp/WEB-INF ../java/strings $ROUTERFILES"
-for i in ../locale/messages_*.po
+JPATHS="$JFILE"
+for i in ../locale-countries/messages_*.po
 do
 	# get language
-	LG=${i#../locale/messages_}
+	LG=${i#../locale-countries/messages_}
 	LG=${LG%.po}
-	
+
 	# skip, if specified
 	if [ $LG2 ]; then
 		[ $LG != $LG2 ] && continue || echo INFO: Language update is set to [$LG2] only.
@@ -69,9 +64,8 @@ do
 		# make list of java files newer than the .po file
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
-
-	if [ -s build/obj/net/i2p/router/web/messages_$LG.class -a \
-	     build/obj/net/i2p/router/web/messages_$LG.class -nt $i -a \
+	if [ -s build/obj/net/i2p/router/countries/messages_$LG.class -a \
+	     build/obj/net/i2p/router/countries/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue
@@ -86,17 +80,12 @@ do
 		# _x("foo")
 		# intl._("foo")
 		# intl.title("foo")
-		# handler._("foo")
-		# formhandler._("foo")
-		# net.i2p.router.web.Messages.getString("foo")
 		# In a jsp, you must use a helper or handler that has the context set.
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
-		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
-	                 --keyword=handler._ --keyword=formhandler._ \
-	                 --keyword=net.i2p.router.web.Messages.getString \
+		xgettext -f $TMPFILE -L java --from-code=UTF-8 --no-location\
+	                 --keyword=_ \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then

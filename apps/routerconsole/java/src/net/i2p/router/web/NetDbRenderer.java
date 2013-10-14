@@ -35,6 +35,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
 public class NetDbRenderer {
@@ -332,7 +333,7 @@ public class NetDbRenderer {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append("\"");
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
-                buf.append(_(_context.commSystem().getCountryName(country)));
+                buf.append(getTranslatedCountry(country));
                 buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
@@ -349,6 +350,18 @@ public class NetDbRenderer {
         out.flush();
     }
     
+    private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
+
+    /**
+     * Countries now in a separate bundle
+     * @param code two-letter country code
+     * @since 0.9.9
+     */
+    private String getTranslatedCountry(String code) {
+        String name = _context.commSystem().getCountryName(code);
+        return Translate.getString(name, _context, COUNTRY_BUNDLE_NAME);
+    }
+
     /** sort by translated country name using rules for the current language setting */
     private class CountryComparator implements Comparator<String> {
          Collator coll;
@@ -359,8 +372,8 @@ public class NetDbRenderer {
          }
 
          public int compare(String l, String r) {
-             return coll.compare(_(_context.commSystem().getCountryName(l)),
-                                 _(_context.commSystem().getCountryName(r)));
+             return coll.compare(getTranslatedCountry(l),
+                                 getTranslatedCountry(r));
         }
     }
 
@@ -396,7 +409,7 @@ public class NetDbRenderer {
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
-            buf.append(" title=\"").append(_(_context.commSystem().getCountryName(country))).append('\"');
+            buf.append(" title=\"").append(getTranslatedCountry(country)).append('\"');
             buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
         }
         for (RouterAddress addr : info.getAddresses()) {

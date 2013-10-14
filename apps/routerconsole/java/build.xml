@@ -97,7 +97,7 @@
         </exec>
     </target>
 
-    <target name="jar1" depends="compile, bundle-news, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+    <target name="jar1" depends="compile, bundle-news, bundle-countries, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
@@ -179,6 +179,19 @@
         </exec>
     </target>
 
+    <target name="bundle-countries" unless="no.bundle">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <env key="JAVA_HOME" value="${java.home}" />
+            <arg value="./bundle-messages-countries.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages-countries.sh" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages-countries.sh" />
+        </exec>
+    </target>
+
     <target name="extractProxyTags">
         <java classname="net.i2p.util.TranslateReader" fork="true" failonerror="true">
             <classpath>
@@ -201,6 +214,21 @@
         </exec>
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages-news.sh" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
+    <target name="poupdate-countries" depends="extractProxyTags">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-countries.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-countries.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages-countries.sh" />
             <arg value="-p" />
         </exec>
     </target>

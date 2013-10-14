@@ -323,6 +323,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+    private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
 
     /** Provide a consistent "look" for displaying router IDs in the console */
     @Override
@@ -333,7 +334,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (c != null) {
             String countryName = getCountryName(c);
             if (countryName.length() > 2)
-                countryName = Translate.getString(countryName, _context, BUNDLE_NAME);
+                countryName = Translate.getString(countryName, _context, COUNTRY_BUNDLE_NAME);
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase(Locale.US)).append("\" title=\"");
             buf.append(countryName);
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
