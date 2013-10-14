@@ -16,60 +16,83 @@ import net.i2p.data.i2cp.SessionConfig;
 
 /**
  * Wrap a message either destined for a local client or received from one.
+ * Note that an outbound message may get routed as an inbound message
+ * for local-local communication.
  *
  * @author jrandom
  */
 public class ClientMessage {
-    private Payload _payload;
-    private Destination _destination;
-    private Destination _fromDestination;
+    private final Payload _payload;
+    private final Destination _destination;
+    private final Destination _fromDestination;
     //private MessageReceptionInfo _receptionInfo;
-    private SessionConfig _senderConfig;
-    private Hash _destinationHash;
-    private MessageId _messageId;
-    private long _expiration;
+    private final SessionConfig _senderConfig;
+    private final Hash _destinationHash;
+    private final MessageId _messageId;
+    private final long _expiration;
     /** only for outbound messages */
-    private int _flags;
+    private final int _flags;
     
-    public ClientMessage() {
+    /**
+     *  For outbound (locally originated)
+     *  @since 0.9.9
+     */
+    public ClientMessage(Destination toDest, Payload payload, SessionConfig config, Destination fromDest,
+                         MessageId msgID, long expiration, int flags) {
+        _destination = toDest;
+        _destinationHash = null;
+        _payload = payload;
+        _senderConfig = config;
+        _fromDestination = fromDest;
+        _messageId = msgID;
+        _expiration = expiration;
+        _flags = flags;
+    }
+    
+    /**
+     *  For inbound (from remote dest)
+     *  @since 0.9.9
+     */
+    public ClientMessage(Hash toDestHash, Payload payload) {
+        _destination = null;
+        _destinationHash = toDestHash;
+        _payload = payload;
+        _senderConfig = null;
+        _fromDestination = null;
+        _messageId = null;
+        _expiration = 0;
+        _flags = 0;
     }
     
     /**
      * Retrieve the payload of the message.  All ClientMessage objects should have
      * a payload
-     *
      */
     public Payload getPayload() { return _payload; }
-    public void setPayload(Payload payload) { _payload = payload; }
     
     /**
-     * Retrieve the destination to which this message is directed.  All ClientMessage
-     * objects should have a destination.
-     *
+     * Retrieve the destination to which this message is directed.
+     * Valid for outbound; null for inbound.
+     * If null, use getDestinationHash()
      */
     public Destination getDestination() { return _destination; }
-    public void setDestination(Destination dest) { _destination = dest; }
     
     /**
-     * 
-     *
+     * Valid for outbound; null for inbound.
      */
     public Destination getFromDestination() { return _fromDestination; }
-    public void setFromDestination(Destination dest) { _fromDestination = dest; }
     
     /**
-     * Retrieve the destination to which this message is directed.  All ClientMessage
-     * objects should have a destination.
-     *
+     * Retrieve the destination to which this message is directed.
+     * Valid for inbound; null for outbound.
+     * If null, use getDestination()
      */
     public Hash getDestinationHash() { return _destinationHash; }
-    public void setDestinationHash(Hash dest) { _destinationHash = dest; }
     
     /**
-     * 
+     * Valid for outbound; null for inbound.
      */
     public MessageId getMessageId() { return _messageId; }
-    public void setMessageId(MessageId id) { _messageId = id; }
     
     /**
      * Retrieve the information regarding how the router received this message.  Only
@@ -83,18 +106,14 @@ public class ClientMessage {
     /**
      * Retrieve the session config of the client that sent the message.  This will only be available
      * if the client was local
-     *
      */
     public SessionConfig getSenderConfig() { return _senderConfig; }
-    public void setSenderConfig(SessionConfig config) { _senderConfig = config; }
 
     /**
      * Expiration requested by the client that sent the message.  This will only be available
      * for locally originated messages.
-     *
      */
     public long getExpiration() { return _expiration; }
-    public void setExpiration(long e) { _expiration = e; }
 
     /**
      * Flags requested by the client that sent the message.  This will only be available
@@ -103,9 +122,4 @@ public class ClientMessage {
      * @since 0.8.4
      */
     public int getFlags() { return _flags; }
-
-    /**
-     * @since 0.8.4
-     */
-    public void setFlags(int f) { _flags = f; }
 }
