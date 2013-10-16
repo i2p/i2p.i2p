@@ -16,7 +16,7 @@
 <% /* note to translators - both parameters are URLs */
 %><%=intl._("Please report bugs on {0} or {1}.",
           "<a href=\"http://trac.i2p2.i2p/newticket\">trac.i2p2.i2p</a>",
-          "<a href=\"http://trac.i2p2.de/newticket\">trac.i2p2.de</a>")%>
+          "<a href=\"https://trac.i2p2.de/newticket\">trac.i2p2.de</a>")%>
 <%=intl._("You may use the username \"guest\" and password \"guest\" if you do not wish to register.")%>
 <p><i><%=intl._("Please include this information in bug reports")%>:</i>
  <p>

@@ -42,4 +42,4 @@ Supported JVMs:
   Windows: Latest available from http://java.com/download (1.5+ supported)
   Linux:   Latest available from http://java.com/download (1.5+ supported)
   FreeBSD: 1.5-compatible (NIO required)
-  Other operating systems and JVMs: See http://trac.i2p2.de/wiki/java
+  Other operating systems and JVMs: See https://trac.i2p2.de/wiki/java

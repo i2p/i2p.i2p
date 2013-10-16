@@ -1,6 +1,6 @@
 Prerequisites to build from source:
 	Java SDK (preferably Oracle/Sun or OpenJDK) 1.6.0 or higher
-          Non-linux operating systems and JVMs: See http://trac.i2p2.de/wiki/java
+          Non-linux operating systems and JVMs: See https://trac.i2p2.de/wiki/java
 	Apache Ant 1.7.0 or higher
 	The xgettext, msgfmt, and msgmerge tools installed
 	  from the GNU gettext package http://www.gnu.org/software/gettext/
@@ -22,13 +22,13 @@ Documentation:
 	API: run 'ant javadoc' then start at build/javadoc/index.html
 
 Latest release:
-	http://www.i2p2.de/download.html
+	http://www.i2p2.de/download
 
 To get development branch from source control:
-	http://www.i2p2.de/newdevelopers.html
+	http://www.i2p2.de/newdevelopers
 
 FAQ:
-	http://www.i2p2.de/faq.html
+	http://www.i2p2.de/faq
 
 Need help?
 	IRC irc.freenode.net #i2p

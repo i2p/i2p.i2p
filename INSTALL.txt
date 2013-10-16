@@ -2,7 +2,7 @@ I2P source installation instructions
 
 Prerequisites to build from source:
 	Java SDK (preferably Oracle/Sun or OpenJDK) 1.6.0 or higher
-          Non-linux operating systems and JVMs: See http://trac.i2p2.de/wiki/java
+          Non-linux operating systems and JVMs: See https://trac.i2p2.de/wiki/java
 	Apache Ant 1.7.0 or higher
 	The xgettext, msgfmt, and msgmerge tools installed
 	from the GNU gettext package http://www.gnu.org/software/gettext/
