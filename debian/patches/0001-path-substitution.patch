@@ -480,24 +480,27 @@ Debian wrapper.config to try to prevent confusion.
  "variável ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_fr.po
 +++ b/installer/resources/locale/po/messages_fr.po
-@@ -187,13 +187,13 @@
+@@ -190,8 +190,8 @@
  msgstr "Request a Java thread dump if running."
  
- #: ../i2prouter:1796
+ #: ../i2prouter:1803
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Veuillez éditer i2prouter et paramétrer la variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Veuillez éditer /etc/default/i2p et paramétrer la variable RUN_AS_USER"
  
- #: ../i2prouter:1801
+ #: ../i2prouter:1808
  msgid "Running I2P as the root user is *not* recommended."
- msgstr "Faire fonctionner I2P en tant qu'utilisateur root n'est *pas* recommandé."
+@@ -199,7 +199,7 @@
+ "Faire fonctionner I2P en tant qu'utilisateur root n'est *pas* recommandé."
  
- #: ../i2prouter:1804
+ #: ../i2prouter:1811
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Pour exécuter en tant que root de toute façon, éditer i2prouter et mettre ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "Pour exécuter en tant que root de toute façon, éditer /etc/default/i2p et mettre ALLOW_ROOT=true."
+ msgstr ""
+-"Pour exécuter en tant que root de toute façon, éditer i2prouter et mettre "
++"Pour exécuter en tant que root de toute façon, éditer /etc/default/i2p et mettre "
+ "ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
 @@ -190,16 +190,16 @@
