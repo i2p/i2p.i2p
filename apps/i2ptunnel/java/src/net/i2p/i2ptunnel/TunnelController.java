@@ -407,7 +407,7 @@ public class TunnelController implements Logging {
     /**
      *  These are the ones stored with a prefix of "option."
      *
-     *  @return keys with the "option." prefix stripped
+     *  @return keys with the "option." prefix stripped, non-null
      *  @since 0.9.1 Much better than getClientOptions()
      */
     public Properties getClientOptionProps() {

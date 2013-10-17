@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.security.GeneralSecurityException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -33,6 +34,7 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.Base64;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 
 public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
@@ -43,11 +45,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     private final Object lock = new Object();
     protected final Object slock = new Object();
+    protected final Object sslLock = new Object();
 
     protected final InetAddress remoteHost;
     protected final int remotePort;
     private final boolean _usePool;
     protected final Logging l;
+    private I2PSSLSocketFactory _sslFactory;
 
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000;
     /** default timeout to 5 minutes - override if desired */
@@ -56,6 +60,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     /** do we use threads? default true (ignored for standard servers, always false) */
     private static final String PROP_USE_POOL = "i2ptunnel.usePool";
     private static final boolean DEFAULT_USE_POOL = true;
+    public static final String PROP_USE_SSL = "useSSL";
     /** apparently unused */
     protected static volatile long __serverId = 0;
     /** max number of threads  - this many slowlorisses will DOS this server, but too high could OOM the JVM */
@@ -462,17 +467,17 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (_log.shouldLog(Log.INFO))
             _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
                       " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
-        long afterAccept = I2PAppContext.getGlobalContext().clock().now();
+        long afterAccept = getTunnel().getContext().clock().now();
         long afterSocket = -1;
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
             socket.setReadTimeout(readTimeout);
-            Socket s = new Socket(remoteHost, remotePort);
-            afterSocket = I2PAppContext.getGlobalContext().clock().now();
+            Socket s = getSocket(remoteHost, remotePort);
+            afterSocket = getTunnel().getContext().clock().now();
             new I2PTunnelRunner(s, socket, slock, null, null);
 
-            long afterHandle = I2PAppContext.getGlobalContext().clock().now();
+            long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;
             if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
@@ -485,6 +490,32 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 _log.error("Error connecting to server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
+        }
+    }
+
+    /**
+     *  Get a regular or SSL socket depending on config
+     *
+     *  @since 0.9.9
+     */
+    protected Socket getSocket(InetAddress remoteHost, int remotePort) throws IOException {
+        String opt = getTunnel().getClientOptions().getProperty(PROP_USE_SSL);
+        if (Boolean.parseBoolean(opt)) {
+            synchronized(sslLock) {
+                if (_sslFactory == null) {
+                    try {
+                        _sslFactory = new I2PSSLSocketFactory(getTunnel().getContext(),
+                                                               true, "certificates/i2ptunnel");
+                    } catch (GeneralSecurityException gse) {
+                        IOException ioe = new IOException("SSL Fail");
+                        ioe.initCause(gse);
+                        throw ioe;
+                    }
+                }
+            }
+            return _sslFactory.createSocket(remoteHost, remotePort);
+        } else {
+            return new Socket(remoteHost, remotePort);
         }
     }
 }

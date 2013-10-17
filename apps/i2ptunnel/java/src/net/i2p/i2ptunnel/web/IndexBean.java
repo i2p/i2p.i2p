@@ -31,6 +31,7 @@ import net.i2p.i2ptunnel.I2PTunnelConnectClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
+import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.Addresses;
@@ -770,6 +771,21 @@ public class IndexBean {
         _booleanOptions.add(I2PTunnelIRCClient.PROP_DCC);
     }
 
+    /** @since 0.9.9 */
+    public void setUseSSL(String moo) {
+        _booleanOptions.add(I2PTunnelServer.PROP_USE_SSL);
+    }
+
+    /** @since 0.9.9 */
+    public boolean isSSLEnabled(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = tun.getClientOptionProps();
+            return Boolean.parseBoolean(opts.getProperty(I2PTunnelServer.PROP_USE_SSL));
+        }
+        return false;
+    }
+
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
 
@@ -1149,7 +1165,8 @@ public class IndexBean {
         I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
         };
     private static final String _booleanServerOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST
+        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,
+        I2PTunnelServer.PROP_USE_SSL
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",

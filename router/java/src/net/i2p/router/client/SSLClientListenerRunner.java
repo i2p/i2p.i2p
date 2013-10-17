@@ -118,8 +118,8 @@ class SSLClientListenerRunner extends ClientListenerRunner {
      * so the clients can get to it.
      */
     private void exportCert(File ks) {
-        File sdir = new SecureDirectory(_context.getConfigDir(), "certificates");
-        if (sdir.exists() || sdir.mkdir()) {
+        File sdir = new SecureDirectory(_context.getConfigDir(), "certificates/i2cp");
+        if (sdir.exists() || sdir.mkdirs()) {
             String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
             File out = new File(sdir, ASCII_KEYFILE);
             boolean success = KeyStoreUtil.exportCert(ks, ksPass, KEY_ALIAS, out);

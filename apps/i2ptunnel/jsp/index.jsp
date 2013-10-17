@@ -114,12 +114,19 @@
             <span class="text">
         <%
             if (indexBean.isServerTargetLinkValid(curServer)) {
-          %>
-            <a href="http://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTP server, bypassing I2P" target="_top"><%=indexBean.getServerTarget(curServer)%></a>
+                if (indexBean.isSSLEnabled(curServer)) { %>
+                    <a href="https://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTPS server, bypassing I2P" target="_top"><%=indexBean.getServerTarget(curServer)%> SSL</a>
+             <% } else { %>
+                    <a href="http://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTP server, bypassing I2P" target="_top"><%=indexBean.getServerTarget(curServer)%></a>
         <%
+                }
             } else {
           %><%=indexBean.getServerTarget(curServer)%>
         <%
+                if (indexBean.isSSLEnabled(curServer)) { %>
+                    SSL
+        <%
+                }
             }
           %></span>
         </div>

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,7 @@ import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -438,10 +440,18 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     _queue = mgr.connect();
                     _reader = new QueuedI2CPMessageReader(_queue, this);
                 } else {
-                    if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL)))
-                        _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
-                    else
+                    if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL))) {
+                        try {
+                            I2PSSLSocketFactory fact = new I2PSSLSocketFactory(_context, false, "certificates/i2cp");
+                            _socket = fact.createSocket(_hostname, _portNum);
+                        } catch (GeneralSecurityException gse) {
+                            IOException ioe = new IOException("SSL Fail");
+                            ioe.initCause(gse);
+                            throw ioe;
+                        }
+                    } else {
                         _socket = new Socket(_hostname, _portNum);
+                    }
                     // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
                     OutputStream out = _socket.getOutputStream();
                     out.write(I2PClient.PROTOCOL_BYTE);

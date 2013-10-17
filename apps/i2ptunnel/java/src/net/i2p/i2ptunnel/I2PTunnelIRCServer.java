@@ -137,7 +137,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
 				buf.append("\r\n");
 				modifiedRegistration = buf.toString();
 			}
-            Socket s = new Socket(remoteHost, remotePort);
+            Socket s = getSocket(remoteHost, remotePort);
             new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(), null);
         } catch (SocketException ex) {
             try {

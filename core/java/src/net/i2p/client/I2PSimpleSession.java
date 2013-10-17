@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -19,6 +20,7 @@ import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
+import net.i2p.util.I2PSSLSocketFactory;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -67,10 +69,18 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                     _queue = mgr.connect();
                     _reader = new QueuedI2CPMessageReader(_queue, this);
                 } else {
-                    if (Boolean.parseBoolean(getOptions().getProperty(PROP_ENABLE_SSL)))
-                        _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
-                    else
+                    if (Boolean.parseBoolean(getOptions().getProperty(PROP_ENABLE_SSL))) {
+                        try {
+                            I2PSSLSocketFactory fact = new I2PSSLSocketFactory(_context, false, "certificates/i2cp");
+                            _socket = fact.createSocket(_hostname, _portNum);
+                        } catch (GeneralSecurityException gse) {
+                            IOException ioe = new IOException("SSL Fail");
+                            ioe.initCause(gse);
+                            throw ioe;
+                        }
+                    } else {
                         _socket = new Socket(_hostname, _portNum);
+                    }
                     OutputStream out = _socket.getOutputStream();
                     out.write(I2PClient.PROTOCOL_BYTE);
                     out.flush();

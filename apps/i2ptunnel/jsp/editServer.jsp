@@ -121,6 +121,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext" />               
             </div>
+         <% if (!"streamrserver".equals(tunnelType)) { %>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Use SSL?")%>
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="useSSL" title="Use SSL to connect to target" <%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+         <% } /* !streamrserver */ %>
             
          <% if ("httpbidirserver".equals(tunnelType)) { %>
             <div class="subdivider">
