@@ -55,6 +55,7 @@ import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.Translate;
 
 /**
  * Main driver for the router.
@@ -314,6 +315,7 @@ public class Router implements RouterClock.ClockShiftListener {
         ByteCache.clearAll();
         SimpleByteCache.clearAll();
         Destination.clearCache();
+        Translate.clearCache();
     }
 
     /**

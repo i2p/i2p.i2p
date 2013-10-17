@@ -26,8 +26,8 @@ import net.i2p.util.ConcurrentHashSet;
 public abstract class Translate {
     public static final String PROP_LANG = "routerconsole.lang";
     private static final String _localeLang = Locale.getDefault().getLanguage();
-    private static final Map<String, ResourceBundle> _bundles = new ConcurrentHashMap(2);
-    private static final Set<String> _missing = new ConcurrentHashSet(2);
+    private static final Map<String, ResourceBundle> _bundles = new ConcurrentHashMap(16);
+    private static final Set<String> _missing = new ConcurrentHashSet(16);
     /** use to look for untagged strings */
     private static final String TEST_LANG = "xx";
     private static final String TEST_STRING = "XXXX";
@@ -184,5 +184,6 @@ public abstract class Translate {
      */
     public static void clearCache() {
         _missing.clear();
+        _bundles.clear();
     }
 }
