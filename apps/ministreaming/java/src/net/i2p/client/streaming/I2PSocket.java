@@ -25,13 +25,19 @@ public interface I2PSocket extends Closeable {
     public Destination getPeerDestination();
 
     /**
-     * @return an InputStream to read from the socket.
+     *  As of 0.9.9 will throw an IOE if socket is closed.
+     *  Prior to that would return null instead of throwing IOE.
+     *
+     * @return an InputStream to read from the socket. Non-null since 0.9.9.
      * @throws IOException on failure
      */
     public InputStream getInputStream() throws IOException;
 
     /**
-     * @return an OutputStream to write into the socket.
+     *  As of 0.9.9 will throw an IOE if socket is closed.
+     *  Prior to that would return null instead of throwing IOE.
+     *
+     * @return an OutputStream to write into the socket. Non-null since 0.9.9.
      * @throws IOException on failure
      */
     public OutputStream getOutputStream() throws IOException;

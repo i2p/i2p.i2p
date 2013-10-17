@@ -67,15 +67,15 @@ class I2PSocketFull implements I2PSocket {
     Connection getConnection() { return _connection; }
     
     /**
-     *  Warning, may return null instead of throwing IOE,
-     *  which is not what the interface says.
+     *  As of 0.9.9 will throw an IOE if socket is closed.
+     *  Prior to that would return null instead of throwing IOE.
+     *  @return non-null
      */
-    public InputStream getInputStream() {
+    public InputStream getInputStream() throws IOException {
         Connection c = _connection;
         if (c != null)
             return c.getInputStream();
-        else
-            return null;
+        throw new IOException("Socket closed");
     }
     
     public I2PSocketOptions getOptions() {
@@ -96,15 +96,15 @@ class I2PSocketFull implements I2PSocket {
     }
     
     /**
-     *  Warning, may return null instead of throwing IOE,
-     *  which is not what the interface says.
+     *  As of 0.9.9 will throw an IOE if socket is closed.
+     *  Prior to that would return null instead of throwing IOE.
+     *  @return non-null
      */
     public OutputStream getOutputStream() throws IOException {
         Connection c = _connection;
         if (c != null)
             return c.getOutputStream();
-        else
-            return null;
+        throw new IOException("Socket closed");
     }
     
     public Destination getPeerDestination() { return _remotePeer; }

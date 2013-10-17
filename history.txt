@@ -1,3 +1,11 @@
+2013-10-17 zzz
+ * I2CP: Move SSL client socket code to util,
+   move cert location to certificates/i2cp.
+ * I2PTunnel: Support SSL for connection to local server
+   for Standard, HTTP, and IRC server tunnels.
+   Put server cert in certificates/i2ptunnel if necessary.
+ * Streaming: Throw IOE if socket is closed (ticket #1077)
+
 2013-10-14 kytv
  * French translation updates from Transifex
 
