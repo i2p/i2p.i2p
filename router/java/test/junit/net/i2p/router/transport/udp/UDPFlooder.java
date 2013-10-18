@@ -83,14 +83,10 @@ class UDPFlooder implements Runnable {
                     m.setMessageExpiration(_context.clock().now() + 10*1000);
                     m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
                     if (true) {
-                        OutNetMessage msg = new OutNetMessage(_context);
-                        msg.setMessage(m);
-                        msg.setExpiration(m.getMessageExpiration());
-                        msg.setPriority(500);
                         RouterInfo to = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
                         if (to == null)
                             continue;
-                        msg.setTarget(to);
+                        OutNetMessage msg = new OutNetMessage(_context, m, m.getMessageExpiration(), 500, to);
                         // warning, getStatLog() can be null
                         //_context.statManager().getStatLog().addData(peer.getRemotePeer().toBase64().substring(0,6), "udp.floodDataSent", 1, 0);
 

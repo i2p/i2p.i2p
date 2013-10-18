@@ -106,17 +106,13 @@ public class SendGarlicJob extends JobImpl {
     }
     
     private void sendGarlic() {
-        OutNetMessage msg = new OutNetMessage(getContext());
         long when = _message.getMessageExpiration(); // + Router.CLOCK_FUDGE_FACTOR;
-        msg.setExpiration(when);
-        msg.setMessage(_message);
+        OutNetMessage msg = new OutNetMessage(getContext(), _message, when, _priority, _config.getRecipient());
         msg.setOnFailedReplyJob(_onReplyFailed);
         msg.setOnFailedSendJob(_onSendFailed);
         msg.setOnReplyJob(_onReply);
         msg.setOnSendJob(_onSend);
-        msg.setPriority(_priority);
         msg.setReplySelector(_replySelector);
-        msg.setTarget(_config.getRecipient());
         //_log.info("Sending garlic message to [" + _config.getRecipient() + "] encrypted with " + _config.getRecipientPublicKey() + " or " + _config.getRecipient().getIdentity().getPublicKey());
         //_log.debug("Garlic config data:\n" + _config);
         //msg.setTarget(_target);

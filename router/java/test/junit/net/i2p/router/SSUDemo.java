@@ -186,16 +186,12 @@ public class SSUDemo {
     }
     
     private void newPeerRead(RouterInfo ri) {
-        OutNetMessage out = new OutNetMessage(_us);
+        FooMessage data = new FooMessage(_us, new byte[] { 0x0, 0x1, 0x2, 0x3 });
         // _us.clock() is an ntp synchronized clock.  give up on sending this message
         // if it doesn't get ACKed within the next 10 seconds
-        out.setExpiration(_us.clock().now() + 10*1000);
-        out.setPriority(100);
-        out.setTarget(ri);
-        FooMessage data = new FooMessage(_us, new byte[] { 0x0, 0x1, 0x2, 0x3 });
+        OutNetMessage out = new OutNetMessage(_us, data, _us.clock().now() + 10*1000, 100, ri);
         System.out.println("SEND: " + Base64.encode(data.getData()) + " to " +
                            ri.getIdentity().calculateHash());
-        out.setMessage(data);
         // job fired if we can't contact them, or if it takes too long to get an ACK
         out.setOnFailedSendJob(null); 
         // job fired once the transport gets a full ACK of the message
