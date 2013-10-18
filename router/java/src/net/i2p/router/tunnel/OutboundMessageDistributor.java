@@ -66,11 +66,7 @@ class OutboundMessageDistributor {
             _context.inNetMessagePool().add(m, null, null); 
             return;
         } else {
-            OutNetMessage out = new OutNetMessage(_context);
-            out.setExpiration(_context.clock().now() + MAX_DISTRIBUTE_TIME);
-            out.setTarget(target);
-            out.setMessage(m);
-            out.setPriority(_priority);
+            OutNetMessage out = new OutNetMessage(_context, m, _context.clock().now() + MAX_DISTRIBUTE_TIME, _priority, target);
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("queueing outbound message to " + target.getIdentity().calculateHash());

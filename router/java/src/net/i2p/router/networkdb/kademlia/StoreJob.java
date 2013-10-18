@@ -315,15 +315,11 @@ class StoreJob extends JobImpl {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending store directly to " + peer.getIdentity().getHash());
-        OutNetMessage m = new OutNetMessage(getContext());
-        m.setExpiration(expiration);
-        m.setMessage(msg);
+        OutNetMessage m = new OutNetMessage(getContext(), msg, expiration, STORE_PRIORITY, peer);
         m.setOnFailedReplyJob(onFail);
         m.setOnFailedSendJob(onFail);
         m.setOnReplyJob(onReply);
-        m.setPriority(STORE_PRIORITY);
         m.setReplySelector(selector);
-        m.setTarget(peer);
         getContext().messageRegistry().registerPending(m);
         getContext().commSystem().processMessage(m);
     }

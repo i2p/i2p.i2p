@@ -71,11 +71,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
     private void send(TunnelDataMessage msg, RouterInfo ri) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("forwarding encrypted data out " + _config + ": " + msg.getUniqueId());
-        OutNetMessage m = new OutNetMessage(_context);
-        m.setMessage(msg);
-        m.setExpiration(msg.getMessageExpiration());
-        m.setTarget(ri);
-        m.setPriority(_priority);
+        OutNetMessage m = new OutNetMessage(_context, msg, msg.getMessageExpiration(), _priority, ri);
         _context.outNetMessagePool().add(m);
         _config.incrementProcessedMessages();
     }

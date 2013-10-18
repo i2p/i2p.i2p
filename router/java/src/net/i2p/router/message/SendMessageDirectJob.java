@@ -129,16 +129,12 @@ public class SendMessageDirectJob extends JobImpl {
         Hash us = getContext().routerHash();
         if (us.equals(to)) {
             if (_selector != null) {
-                OutNetMessage outM = new OutNetMessage(getContext());
-                outM.setExpiration(_expiration);
-                outM.setMessage(_message);
+                OutNetMessage outM = new OutNetMessage(getContext(), _message, _expiration, _priority, _router);
                 outM.setOnFailedReplyJob(_onFail);
                 outM.setOnFailedSendJob(_onFail);
                 outM.setOnReplyJob(_onSuccess);
                 outM.setOnSendJob(_onSend);
-                outM.setPriority(_priority);
                 outM.setReplySelector(_selector);
-                outM.setTarget(_router);
                 getContext().messageRegistry().registerPending(outM);
             }
 
@@ -152,16 +148,12 @@ public class SendMessageDirectJob extends JobImpl {
                            + " to inbound message pool as it was destined for ourselves");
             //_log.debug("debug", _createdBy);
         } else {
-            OutNetMessage msg = new OutNetMessage(getContext());
-            msg.setExpiration(_expiration);
-            msg.setMessage(_message);
+            OutNetMessage msg = new OutNetMessage(getContext(), _message, _expiration, _priority, _router);
             msg.setOnFailedReplyJob(_onFail);
             msg.setOnFailedSendJob(_onFail);
             msg.setOnReplyJob(_onSuccess);
             msg.setOnSendJob(_onSend);
-            msg.setPriority(_priority);
             msg.setReplySelector(_selector);
-            msg.setTarget(_router);
             getContext().outNetMessagePool().add(msg);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding " + _message.getClass().getName() 

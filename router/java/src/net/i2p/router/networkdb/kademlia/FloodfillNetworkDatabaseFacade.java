@@ -214,12 +214,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             msg.setReplyGateway(null);
             msg.setReplyToken(0);
             msg.setReplyTunnel(null);
-            OutNetMessage m = new OutNetMessage(_context);
-            m.setMessage(msg);
-            m.setOnFailedReplyJob(null);
-            m.setPriority(FLOOD_PRIORITY);
-            m.setTarget(target);
-            m.setExpiration(_context.clock().now()+FLOOD_TIMEOUT);
+            OutNetMessage m = new OutNetMessage(_context, msg, _context.clock().now()+FLOOD_TIMEOUT, FLOOD_PRIORITY, target);
             // note send failure but don't give credit on success
             // might need to change this
             Job floodFail = new FloodFailedJob(_context, peer);

@@ -57,11 +57,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
         msg.setData(encrypted);
         msg.setTunnelId(_config.getSendTunnel());
         
-        OutNetMessage out = new OutNetMessage(_context);
-        out.setMessage(msg);
-        out.setTarget(_target);
-        out.setExpiration(msg.getMessageExpiration());
-        out.setPriority(PRIORITY);
+        OutNetMessage out = new OutNetMessage(_context, msg, msg.getMessageExpiration(), PRIORITY, _target);
         _context.outNetMessagePool().add(out);
         return msg.getUniqueId();
     }

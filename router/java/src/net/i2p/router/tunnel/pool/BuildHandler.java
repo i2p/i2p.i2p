@@ -781,11 +781,7 @@ class BuildHandler implements Runnable {
         if (!isOutEnd) {
             state.msg.setUniqueId(req.readReplyMessageId());
             state.msg.setMessageExpiration(_context.clock().now() + NEXT_HOP_SEND_TIMEOUT);
-            OutNetMessage msg = new OutNetMessage(_context);
-            msg.setMessage(state.msg);
-            msg.setExpiration(state.msg.getMessageExpiration());
-            msg.setPriority(PRIORITY);
-            msg.setTarget(nextPeerInfo);
+            OutNetMessage msg = new OutNetMessage(_context, state.msg, state.msg.getMessageExpiration(), PRIORITY, nextPeerInfo);
             if (response == 0)
                 msg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
             _context.outNetMessagePool().add(msg);
@@ -814,11 +810,7 @@ class BuildHandler implements Runnable {
                 _context.tunnelDispatcher().dispatch(m);
             } else {
                 // ok, the gateway is some other peer, shove 'er across
-                OutNetMessage outMsg = new OutNetMessage(_context);
-                outMsg.setExpiration(m.getMessageExpiration());
-                outMsg.setMessage(m);
-                outMsg.setPriority(PRIORITY);
-                outMsg.setTarget(nextPeerInfo);
+                OutNetMessage outMsg = new OutNetMessage(_context, m, m.getMessageExpiration(), PRIORITY, nextPeerInfo);
                 if (response == 0)
                     outMsg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
                 _context.outNetMessagePool().add(outMsg);

@@ -192,12 +192,8 @@ class TunnelParticipant {
         _context.messageHistory().wrap("TunnelDataMessage", oldId, "TunnelDataMessage", newId);
         msg.setUniqueId(newId);
         msg.setMessageExpiration(_context.clock().now() + 10*1000);
-        OutNetMessage m = new OutNetMessage(_context);
         msg.setTunnelId(config.getSendTunnel());
-        m.setMessage(msg);
-        m.setExpiration(msg.getMessageExpiration());
-        m.setTarget(ri);
-        m.setPriority(PRIORITY);
+        OutNetMessage m = new OutNetMessage(_context, msg, msg.getMessageExpiration(), PRIORITY, ri);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Forward on from " + _config + ": " + msg);
         _context.outNetMessagePool().add(m);

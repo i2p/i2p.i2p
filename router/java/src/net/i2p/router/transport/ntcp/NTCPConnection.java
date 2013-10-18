@@ -489,15 +489,11 @@ class NTCPConnection {
     }
     
     public void enqueueInfoMessage() {
-        OutNetMessage infoMsg = new OutNetMessage(_context);
-        infoMsg.setExpiration(_context.clock().now()+10*1000);
-        DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
-        dsm.setEntry(_context.router().getRouterInfo());
-        infoMsg.setMessage(dsm);
-        infoMsg.setPriority(PRIORITY);
         RouterInfo target = _context.netDb().lookupRouterInfoLocally(_remotePeer.calculateHash());
         if (target != null) {
-            infoMsg.setTarget(target);
+            DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
+            dsm.setEntry(_context.router().getRouterInfo());
+            OutNetMessage infoMsg = new OutNetMessage(_context, dsm, _context.clock().now()+10*1000, PRIORITY, target);
             infoMsg.beginSend();
             _context.statManager().addRateData("ntcp.infoMessageEnqueued", 1);
             send(infoMsg);

@@ -31,14 +31,14 @@ import net.i2p.util.Log;
 public class OutNetMessage implements CDPQEntry {
     private final Log _log;
     private final RouterContext _context;
-    private RouterInfo _target;
-    private I2NPMessage _message;
-    private int _messageTypeId;
+    private final RouterInfo _target;
+    private final I2NPMessage _message;
+    private final int _messageTypeId;
     /** cached message ID, for use after we discard the message */
-    private long _messageId;
-    private long _messageSize;
-    private int _priority;
-    private long _expiration;
+    private final long _messageId;
+    private final long _messageSize;
+    private final int _priority;
+    private final long _expiration;
     private Job _onSend;
     private Job _onFailedSend;
     private ReplyJob _onReply;
@@ -81,11 +81,37 @@ public class OutNetMessage implements CDPQEntry {
     public static final int PRIORITY_NETDB_HARVEST = 100;
     public static final int PRIORITY_LOWEST = 100;
 
-    public OutNetMessage(RouterContext context) {
+    /**
+     *  Null msg and target (used in OutboundMessageRegistry only)
+     *  @since 0.9.9
+     */
+    public OutNetMessage(RouterContext context, long expiration) {
+        this(context, null, expiration, -1, null);
+    }
+
+    /**
+     *  Standard constructor
+     *  @param msg generally non-null
+     *  @param target generally non-null
+     *  @since 0.9.9
+     */
+    public OutNetMessage(RouterContext context, I2NPMessage msg, long expiration, int priority, RouterInfo target) {
         _context = context;
         _log = context.logManager().getLog(OutNetMessage.class);
-        _priority = -1;
-        _expiration = -1;
+        _message = msg;
+        if (msg != null) {
+            _messageTypeId = msg.getType();
+            _messageId = msg.getUniqueId();
+            _messageSize = _message.getMessageSize();
+        } else {
+            _messageTypeId = 0;
+            _messageId = 0;
+            _messageSize = 0;
+        }
+        _priority = priority;
+        _expiration = expiration;
+        _target = target;
+
         //_createdBy = new Exception("Created by");
         _created = context.clock().now();
         if (_log.shouldLog(Log.INFO))
@@ -160,7 +186,6 @@ public class OutNetMessage implements CDPQEntry {
      *
      */
     public RouterInfo getTarget() { return _target; }
-    public void setTarget(RouterInfo target) { _target = target; }
 
     /**
      * Specifies the message to be sent
@@ -168,15 +193,6 @@ public class OutNetMessage implements CDPQEntry {
      */
     public I2NPMessage getMessage() { return _message; }
 
-    public void setMessage(I2NPMessage msg) {
-        _message = msg;
-        if (msg != null) {
-            _messageTypeId = msg.getType();
-            _messageId = msg.getUniqueId();
-            _messageSize = _message.getMessageSize();
-        }
-    }
-    
     /**
      *  For debugging only.
      *  @return the simple class name
@@ -190,18 +206,19 @@ public class OutNetMessage implements CDPQEntry {
     public long getMessageId() { return _messageId; }
     
     public long getMessageSize() {
-        if (_messageSize <= 0) {
-            _messageSize = _message.getMessageSize();
-        }
         return _messageSize;
     }
     
+    /**
+     *  Copies the message data to outbuffer.
+     *  Used only by VM Comm System.
+     *  @return the length, or -1 if message is null
+     */
     public int getMessageData(byte outBuffer[]) {
         if (_message == null) {
             return -1;
         } else {
             int len = _message.toByteArray(outBuffer);
-            _messageSize = len;
             return len;
         }
     }
@@ -213,7 +230,7 @@ public class OutNetMessage implements CDPQEntry {
      *
      */
     public int getPriority() { return _priority; }
-    public void setPriority(int priority) { _priority = priority; }
+
     /**
      * Specify the # ms since the epoch after which if the message has not been
      * sent the OnFailedSend job should be fired and the message should be
@@ -222,7 +239,7 @@ public class OutNetMessage implements CDPQEntry {
      *
      */
     public long getExpiration() { return _expiration; }
-    public void setExpiration(long expiration) { _expiration = expiration; }
+
     /**
      * After the message is successfully passed to the router specified, the
      * given job is enqueued.
@@ -230,6 +247,7 @@ public class OutNetMessage implements CDPQEntry {
      */
     public Job getOnSendJob() { return _onSend; }
     public void setOnSendJob(Job job) { _onSend = job; }
+
     /**
      * If the router could not be reached or the expiration passed, this job
      * is enqueued.
@@ -237,18 +255,21 @@ public class OutNetMessage implements CDPQEntry {
      */
     public Job getOnFailedSendJob() { return _onFailedSend; }
     public void setOnFailedSendJob(Job job) { _onFailedSend = job; }
+
     /**
      * If the MessageSelector detects a reply, this job is enqueued
      *
      */
     public ReplyJob getOnReplyJob() { return _onReply; }
     public void setOnReplyJob(ReplyJob job) { _onReply = job; }
+
     /**
      * If the Message selector is specified but it doesn't find a reply before
      * its expiration passes, this job is enqueued.
      */
     public Job getOnFailedReplyJob() { return _onFailedReply; }
     public void setOnFailedReplyJob(Job job) { _onFailedReply = job; }
+
     /**
      * Defines a MessageSelector to find a reply to this message.
      *
@@ -256,13 +277,13 @@ public class OutNetMessage implements CDPQEntry {
     public MessageSelector getReplySelector() { return _replySelector; }
     public void setReplySelector(MessageSelector selector) { _replySelector = selector; }
     
-    public void transportFailed(String transportStyle) { 
+    public synchronized void transportFailed(String transportStyle) { 
         if (_failedTransports == null)
             _failedTransports = new HashSet(2);
         _failedTransports.add(transportStyle); 
     }
-    /** not thread safe - dont fail transports and iterate over this at the same time */
-    public Set getFailedTransports() { 
+
+    public synchronized Set getFailedTransports() { 
         return (_failedTransports == null ? Collections.EMPTY_SET : _failedTransports); 
     }
     
@@ -345,38 +366,8 @@ public class OutNetMessage implements CDPQEntry {
      * we may keep the object around for a while to use its ID, jobs, etc.
      */
     public void discardData() {
-        if ( (_message != null) && (_messageSize <= 0) )
-            _messageSize = _message.getMessageSize();
-        //if (_log.shouldLog(Log.DEBUG)) {
-        //    long timeToDiscard = _context.clock().now() - _created;
-        //    _log.debug("Discard " + _messageSize + "byte " + getMessageType() + " message after " 
-        //               + timeToDiscard);
-        //}
-        _message = null;
-        //_context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
-        //_context.messageStateMonitor().outboundMessageDiscarded();
     }
     
-    /*
-    public void finalize() throws Throwable {
-        if (_message != null) {
-            if (_log.shouldLog(Log.WARN)) {
-                StringBuilder buf = new StringBuilder(1024);
-                buf.append("Undiscarded ").append(_messageSize).append("byte ");
-                buf.append(_messageType).append(" message created ");
-                buf.append((_context.clock().now() - _created)).append("ms ago: ");
-                buf.append(_messageId); // .append(" to ").append(_target.calculateHash().toBase64());
-                buf.append(", timing - \n");
-                renderTimestamps(buf);
-                _log.warn(buf.toString(), _createdBy);
-            }
-            _context.messageStateMonitor().outboundMessageDiscarded();
-        }
-        _context.messageStateMonitor().outboundMessageFinalized();
-        super.finalize();
-    }
-    */
-
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
@@ -445,22 +436,4 @@ public class OutNetMessage implements CDPQEntry {
             return _fmt.format(d);
         }
     }
-    
-/****
-
-    @Override
-    public int hashCode() {
-        int rv = DataHelper.hashCode(_message);
-        rv ^= DataHelper.hashCode(_target);
-        // the others are pretty much inconsequential
-        return rv;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        //if(obj == null) return false;
-        //if(!(obj instanceof OutNetMessage)) return false;
-        return obj == this; // two OutNetMessages are different even if they contain the same message
-    }
-****/
 }

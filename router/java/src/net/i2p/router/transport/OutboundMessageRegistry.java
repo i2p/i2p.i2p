@@ -171,8 +171,7 @@ public class OutboundMessageRegistry {
      *  @return an ONM where getMessage() is null. Use it to call unregisterPending() later if desired.
      */
     public OutNetMessage registerPending(MessageSelector replySelector, ReplyJob onReply, Job onTimeout, int timeoutMs) {
-        OutNetMessage msg = new OutNetMessage(_context);
-        msg.setExpiration(_context.clock().now() + timeoutMs);
+        OutNetMessage msg = new OutNetMessage(_context, _context.clock().now() + timeoutMs);
         msg.setOnFailedReplyJob(onTimeout);
         msg.setOnFailedSendJob(onTimeout);
         msg.setOnReplyJob(onReply);
