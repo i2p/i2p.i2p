@@ -61,7 +61,8 @@
     <input type="radio" class="optbox" name="ipv6" value="preferIPv6" <%=nethelper.getIPv6Checked("preferIPv6") %> >
     <%=intl._("Prefer IPv6 over IPv4")%><br>
     <input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
-    <%=intl._("Use IPv6 only (disable IPv4)")%><br>
+    <%=intl._("Use IPv6 only (disable IPv4)")%>
+    (<i><%=intl._("Experimental")%></i>)<br>
  </p><p><b><%=intl._("UDP Configuration:")%></b><br>
  <%=intl._("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" ><br>
