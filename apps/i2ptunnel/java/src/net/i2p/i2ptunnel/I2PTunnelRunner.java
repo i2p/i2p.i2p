@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
 
+import javax.net.ssl.SSLException;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.ByteArray;
@@ -199,6 +201,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Interrupted", ex);
+        } catch (SSLException she) {
+            _log.error("SSL error", she);
         } catch (IOException ex) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Error forwarding", ex);

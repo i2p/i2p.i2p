@@ -54,7 +54,7 @@ public class I2PSSLSocketFactory {
      *  Loads certs from
      *  the ~/.i2p/certificates/ and $I2P/certificates/ directories.
      */
-    private SSLSocketFactory initSSLContext(I2PAppContext context, boolean loadSystemCerts, String relativeCertPath)
+    private static SSLSocketFactory initSSLContext(I2PAppContext context, boolean loadSystemCerts, String relativeCertPath)
                                throws GeneralSecurityException {
         Log log = context.logManager().getLog(I2PSSLSocketFactory.class);
         KeyStore ks;

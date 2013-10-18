@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
 
+import javax.net.ssl.SSLException;
+
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
@@ -295,6 +297,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 s.run(); // same thread
                 if (_log.shouldLog(Log.INFO))
                     _log.info("After pumping the compressed response: " + compressedOut.getTotalRead() + "/" + compressedOut.getTotalCompressed());
+            } catch (SSLException she) {
+                _log.error("SSL error", she);
+                try {
+                    if (browserout == null)
+                        browserout = _browser.getOutputStream();
+                    browserout.write(ERR_UNAVAILABLE);
+                } catch (IOException ioe) {}
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("error compressing", ioe);
