@@ -259,7 +259,7 @@ public class NetDbRenderer {
         
         ObjectCounter<String> versions = new ObjectCounter();
         ObjectCounter<String> countries = new ObjectCounter();
-        int[] transportCount = new int[8];
+        int[] transportCount = new int[TNAMES.length];
         
         Set<RouterInfo> routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
@@ -311,7 +311,7 @@ public class NetDbRenderer {
         // transports table
         buf.append("<table>\n");
         buf.append("<tr><th align=\"left\">" + _("Transports") + "</th><th>" + _("Count") + "</th></tr>\n");
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < TNAMES.length; i++) {
             int num = transportCount[i];
             if (num > 0) {
                 buf.append("<tr><td>").append(_(TNAMES[i]));
@@ -442,8 +442,11 @@ public class NetDbRenderer {
     private static final int SSU = 1;
     private static final int SSUI = 2;
     private static final int NTCP = 4;
+    private static final int IPV6 = 8;
     private static final String[] TNAMES = { _x("Hidden or starting up"), _x("SSU"), _x("SSU with introducers"), "",
-                                  _x("NTCP"), _x("NTCP and SSU"), _x("NTCP and SSU with introducers"), "" };
+                                  _x("NTCP"), _x("NTCP and SSU"), _x("NTCP and SSU with introducers"), "",
+                                  "", _x("IPv6 SSU"), "", "IPv6 SSU with introducers",
+                                  _x("IPv6 NTCP"), _x("IPv6 NTCP and SSU"), "", _x("IPv6 NTCP and SSU with introducers") };
     /**
      *  what transport types
      */
@@ -459,6 +462,10 @@ public class NetDbRenderer {
                 else
                     rv |= SSU;
             }
+            String host = addr.getHost();
+            if (host != null && host.contains(":"))
+                rv |= IPV6;
+
         }
         return rv;
     }
