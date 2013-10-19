@@ -445,8 +445,8 @@ public class NetDbRenderer {
     private static final int IPV6 = 8;
     private static final String[] TNAMES = { _x("Hidden or starting up"), _x("SSU"), _x("SSU with introducers"), "",
                                   _x("NTCP"), _x("NTCP and SSU"), _x("NTCP and SSU with introducers"), "",
-                                  "", _x("IPv6 SSU"), "", "IPv6 SSU with introducers",
-                                  _x("IPv6 NTCP"), _x("IPv6 NTCP and SSU"), "", _x("IPv6 NTCP and SSU with introducers") };
+                                  "", _x("IPv6 SSU"), _x("IPv6 Only SSU, introducers"), _x("IPv6 SSU, introducers"),
+                                  _x("IPv6 NTCP"), _x("IPv6 NTCP, SSU"), _x("IPv6 Only NTCP, SSU, introducers"), _x("IPv6 NTCP, SSU, introducers") };
     /**
      *  what transport types
      */
