@@ -11,6 +11,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.Collections;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
@@ -25,14 +26,13 @@ import net.i2p.util.Log;
  * or other criteria to minimize netdb size, but for now we just use _facade's
  * validate(), which is a sliding expriation based on netdb size.
  *
- * @deprecated unused - see comments in KNDF
  */
 class ExpireRoutersJob extends JobImpl {
     private final Log _log;
     private final KademliaNetworkDatabaseFacade _facade;
     
     /** rerun fairly often, so the fails don't queue up too many netdb searches at once */
-    private final static long RERUN_DELAY_MS = 120*1000;
+    private final static long RERUN_DELAY_MS = 5*60*1000;
     
     public ExpireRoutersJob(RouterContext ctx, KademliaNetworkDatabaseFacade facade) {
         super(ctx);
@@ -43,15 +43,9 @@ class ExpireRoutersJob extends JobImpl {
     public String getName() { return "Expire Routers Job"; }
 
     public void runJob() {
-        // this always returns an empty set (see below)
-        Set<Hash> toExpire = selectKeysToExpire();
+        int removed = expireKeys();
         if (_log.shouldLog(Log.INFO))
-            _log.info("Routers to expire (drop and try to refetch): " + toExpire);
-        for (Hash key : toExpire) {
-            _facade.fail(key);
-        }
-        _facade.queueForExploration(toExpire);
-        
+            _log.info("Routers expired: " + removed);
         requeue(RERUN_DELAY_MS);
     }
     
@@ -59,23 +53,32 @@ class ExpireRoutersJob extends JobImpl {
     /**
      * Run through all of the known peers and pick ones that have really old
      * routerInfo publish dates, excluding ones that we are connected to,
-     * so that they can be failed & queued for searching
+     * so that they can be failed
      *
-     * @return nothing for now
+     * @return number removed
      */
-    private Set<Hash> selectKeysToExpire() {
-        for (Hash key : _facade.getAllRouters()) {
+    private int expireKeys() {
+        Set<Hash> keys = _facade.getAllRouters();
+        keys.remove(getContext().routerHash());
+        int removed = 0;
+        for (Hash key : keys) {
             // Don't expire anybody we are connected to
             if (!getContext().commSystem().isEstablished(key)) {
-                // This does a _facade.validate() and fail() which is sufficient...
-                // no need to impose our own expiration here.
-                // One issue is this will queue a ton of floodfill queries the first time it is run
-                // after the 1h router startup grace period.
-                _facade.lookupRouterInfoLocally(key);
+                DatabaseEntry e = _facade.lookupLocallyWithoutValidation(key);
+                if (e != null &&
+                    e.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                    try {
+                        if (_facade.validate((RouterInfo) e) != null) {
+                            _facade.dropAfterLookupFailed(key);
+                            removed++;
+                        }
+                    } catch (IllegalArgumentException iae) {
+                        _facade.dropAfterLookupFailed(key);
+                        removed++;
+                    }
+                }
             }
         }
-        
-        // let _facade do all the work for now
-        return Collections.EMPTY_SET;
+        return removed;
     }
 }

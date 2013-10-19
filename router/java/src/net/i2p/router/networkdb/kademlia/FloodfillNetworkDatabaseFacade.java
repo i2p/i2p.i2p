@@ -467,7 +467,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
         public String getName() { return "Lookup on failure of netDb peer timed out"; }
         public void runJob() {
-            dropAfterLookupFailed(_peer, _info);
+            dropAfterLookupFailed(_peer);
         }
     }
 
@@ -487,7 +487,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 // great, a legitimate update
             } else {
                 // they just sent us what we already had.  kill 'em both
-                dropAfterLookupFailed(_peer, _info);
+                dropAfterLookupFailed(_peer);
             }
         }
     }

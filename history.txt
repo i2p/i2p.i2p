@@ -1,3 +1,9 @@
+2013-10-19 zzz
+ * NetDB:
+   - Reinstate ExpireRoutersJob
+   - Reduce min part. tunnels for floodfill
+   - Reduce floodfill redundancy
+
 2013-10-17 zzz
  * I2CP: Move SSL client socket code to util,
    move cert location to certificates/i2cp.

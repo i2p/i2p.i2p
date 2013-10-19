@@ -259,12 +259,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         elj.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
         _context.jobQueue().addJob(elj);
         
-        // the ExpireRoutersJob never fired since the tunnel pool manager lied
-        // and said all peers are in use (for no good reason), but this expire
-        // thing was a bit overzealous anyway, since the kbuckets are only
-        // relevent when the network is huuuuuuuuge.
-        //// expire some routers in overly full kbuckets
-        ////_context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
+        //// expire some routers
+        // Don't run until after RefreshRoutersJob has run, and after validate() will return invalid for old routers.
+        Job erj = new ExpireRoutersJob(_context, this);
+        erj.getTiming().setStartAfter(_context.clock().now() + ROUTER_INFO_EXPIRATION_FLOODFILL + 10*60*1000);
+        _context.jobQueue().addJob(erj);
         
         if (!QUIET) {
             // fill the search queue with random keys in buckets that are too small
@@ -433,6 +432,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             fail(key);
         }
         return null;
+    }
+    
+    /**
+     *  Not for use without validation
+     *  @return RouterInfo, LeaseSet, or null, NOT validated
+     *  @since 0.9.9
+     */
+    DatabaseEntry lookupLocallyWithoutValidation(Hash key) {
+        if (!_initialized)
+            return null;
+        return _ds.get(key);
     }
 
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
@@ -752,7 +762,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * @return reason why the entry is not valid, or null if it is valid
      * @since 0.9.7
      */
-    private String validate(RouterInfo routerInfo) throws IllegalArgumentException {
+    String validate(RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
         boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
         // Once we're over MIN_ROUTERS routers, reduce the expiration time down from the default,
@@ -858,6 +868,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return rv;
     }
     
+    /**
+     *   Final remove for a leaseset.
+     *   For a router info, will look up in the network before dropping.
+     */
     public void fail(Hash dbEntry) {
         if (!_initialized) return;
         DatabaseEntry o = _ds.get(dbEntry);
@@ -885,15 +899,20 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** don't use directly - see F.N.D.F. override */
     protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
         //bah, humbug.
-        dropAfterLookupFailed(peer, info);
+        dropAfterLookupFailed(peer);
     }
-    protected void dropAfterLookupFailed(Hash peer, RouterInfo info) {
+
+    /**
+     *  Final remove for a router info.
+     *  Do NOT use for leasesets.
+     */
+    void dropAfterLookupFailed(Hash peer) {
         _context.peerManager().removeCapabilities(peer);
         boolean removed = _kb.remove(peer);
-        if (removed) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Removed kbucket entry for " + peer);
-        }
+        //if (removed) {
+        //    if (_log.shouldLog(Log.INFO))
+        //        _log.info("Removed kbucket entry for " + peer);
+        //}
         
         _ds.remove(peer);
     }
