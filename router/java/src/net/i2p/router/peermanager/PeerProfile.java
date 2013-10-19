@@ -76,7 +76,7 @@ public class PeerProfile {
     private static final Set<String> _bigCountries = new HashSet();
 
     static {
-        String[] big = new String[] {"ca", "fi", "fr", "de", "ru", "se", "ua", "gb", "us" };
+        String[] big = new String[] { "fr", "de", "ru", "ua", "us" };
         _bigCountries.addAll(Arrays.asList(big));
     }
 
