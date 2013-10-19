@@ -2642,6 +2642,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (mime.equals("text/html"))
             icon = "html";
         else if (mime.equals("text/plain") ||
+                 mime.equals("text/x-sfv") ||
                  mime.equals("application/rtf") ||
                  mime.equals("application/epub+zip") ||
                  mime.equals("application/x-mobipocket-ebook"))
