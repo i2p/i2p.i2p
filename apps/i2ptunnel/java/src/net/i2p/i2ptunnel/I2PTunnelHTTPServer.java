@@ -527,6 +527,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
         
+        // slowloris / darkloris
+        long expire = ctx.clock().now() + TOTAL_HEADER_TIMEOUT;
         boolean ok = DataHelper.readLine(in, command);
         if (!ok) throw new IOException("EOF reached while reading the HTTP command [" + command.toString() + "]");
         
@@ -547,8 +549,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if (trimmed > 0)
             ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
         
-        // slowloris / darkloris
-        long expire = ctx.clock().now() + TOTAL_HEADER_TIMEOUT;
         int i = 0;
         while (true) {
             if (++i > MAX_HEADERS)
