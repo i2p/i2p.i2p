@@ -36,6 +36,7 @@ import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 public class TransportManager implements TransportEventListener {
@@ -569,9 +570,10 @@ public class TransportManager implements TransportEventListener {
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
-        if (_upnpManager != null)
+        // newer androids crash w/ network on IO thread
+        if (_upnpManager != null && !SystemVersion.isAndroid())
             out.write(_upnpManager.renderStatusHTML());
-        buf.append("</p>\n");
+        out.write("</p>\n");
         out.flush();
     }
 
