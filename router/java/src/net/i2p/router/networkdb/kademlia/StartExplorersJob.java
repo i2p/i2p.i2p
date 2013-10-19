@@ -62,8 +62,13 @@ class StartExplorersJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Keys to explore during this run: " + toExplore);
             _facade.removeFromExploreKeys(toExplore);
+            long delay = 0;
             for (Hash key : toExplore) {
-                getContext().jobQueue().addJob(new ExploreJob(getContext(), _facade, key));
+                ExploreJob j = new ExploreJob(getContext(), _facade, key);
+                if (delay > 0)
+                    j.getTiming().setStartAfter(getContext().clock().now() + delay);
+                getContext().jobQueue().addJob(j);
+                delay += 200;
             }
         }
         long delay = getNextRunDelay();
