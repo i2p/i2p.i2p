@@ -57,6 +57,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final PeerSelector _peerSelector;
     protected final RouterContext _context;
     private final ReseedChecker _reseedChecker;
+    private volatile long _lastRIPublishTime;
 
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
@@ -584,6 +585,23 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (_context.router().isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
+    }
+
+    /**
+     *  Set the last time we successfully published our RI.
+     *  @since 0.9.9
+     */
+    void routerInfoPublishSuccessful() {
+        _lastRIPublishTime = _context.clock().now();
+    }
+
+    /**
+     *  The last time we successfully published our RI.
+     *  @since 0.9.9
+     */
+    @Override
+    public long getLastRouterInfoPublishTime() {
+        return _lastRIPublishTime;
     }
 
     /**

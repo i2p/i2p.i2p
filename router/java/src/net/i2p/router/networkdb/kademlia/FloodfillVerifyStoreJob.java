@@ -207,9 +207,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
             _facade.verifyFinished(_key);
             if (_message instanceof DatabaseStoreMessage) {
                 // Verify it's as recent as the one we sent
-                boolean success = false;
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)_message;
-                success = dsm.getEntry().getDate() >= _published;
+                boolean success = dsm.getEntry().getDate() >= _published;
                 if (success) {
                     // store ok, w00t!
                     getContext().profileManager().dbLookupSuccessful(_target, delay);
@@ -218,6 +217,8 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Verify success for " + _key);
+                    if (_isRouterInfo)
+                        _facade.routerInfoPublishSuccessful();
                     return;
                 }
                 if (_log.shouldLog(Log.WARN))

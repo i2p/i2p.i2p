@@ -26,15 +26,27 @@ import net.i2p.util.Log;
  * send to the floodfills until the second time it runs.
  */
 public class PublishLocalRouterInfoJob extends JobImpl {
-    private Log _log;
-    final static long PUBLISH_DELAY = 20*60*1000;
+    private final Log _log;
+
+    /**
+     *  Don't store if somebody else stored it recently.
+     */
+    private static final long MIN_PUBLISH_DELAY = 25*60*1000;
+
+    /**
+     *  Too short and the network puts a big connection load on the
+     *  floodfills since we store directly.
+     *  Too long and the floodfill will drop us - timeout is 60 minutes.
+     */
+    private static final long PUBLISH_DELAY = MIN_PUBLISH_DELAY * 5 / 3;
+
     /** this needs to be long enough to give us time to start up,
         but less than 20m (when we start accepting tunnels and could be a IBGW)
         Actually no, we need this soon if we are a new router or
         other routers have forgotten about us, else
         we can't build IB exploratory tunnels.
      */
-    final static long FIRST_TIME_DELAY = 90*1000;
+    private static final long FIRST_TIME_DELAY = 90*1000;
     boolean _notFirstTime;
     
     public PublishLocalRouterInfoJob(RouterContext ctx) {
@@ -44,6 +56,13 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     
     public String getName() { return "Publish Local Router Info"; }
     public void runJob() {
+        long last = getContext().netDb().getLastRouterInfoPublishTime();
+        long now = getContext().clock().now();
+        if (last + MIN_PUBLISH_DELAY > now) {
+            long delay = getDelay();
+            requeue(last + delay);
+            return;
+        }
         RouterInfo ri = new RouterInfo(getContext().router().getRouterInfo());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Old routerInfo contains " + ri.getAddresses().size() 
@@ -79,10 +98,15 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             _log.error("Error signing the updated local router info!", dfe);
         }
         if (_notFirstTime) {
-            requeue((PUBLISH_DELAY * 3 / 4) + getContext().random().nextInt((int)PUBLISH_DELAY / 2));
+            long delay = getDelay();
+            requeue(delay);
         } else {
             requeue(FIRST_TIME_DELAY);
             _notFirstTime = true;
         }
+    }
+
+    private long getDelay() {
+        return (PUBLISH_DELAY * 3 / 4) + getContext().random().nextInt((int)PUBLISH_DELAY / 4);
     }
 }

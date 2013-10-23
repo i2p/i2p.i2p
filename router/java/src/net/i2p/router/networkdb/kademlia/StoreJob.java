@@ -33,11 +33,11 @@ import net.i2p.util.VersionComparator;
  */
 class StoreJob extends JobImpl {
     protected final Log _log;
-    private KademliaNetworkDatabaseFacade _facade;
+    private final KademliaNetworkDatabaseFacade _facade;
     protected final StoreState _state;
     private final Job _onSuccess;
     private final Job _onFailure;
-    private long _timeoutMs;
+    private final long _timeoutMs;
     private final long _expiration;
     private final PeerSelector _peerSelector;
 

@@ -212,9 +212,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             msg.setEntry(ds);
-            msg.setReplyGateway(null);
-            msg.setReplyToken(0);
-            msg.setReplyTunnel(null);
             OutNetMessage m = new OutNetMessage(_context, msg, _context.clock().now()+FLOOD_TIMEOUT, FLOOD_PRIORITY, target);
             // note send failure but don't give credit on success
             // might need to change this
@@ -232,7 +229,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
 
     /** note in the profile that the store failed */
     private static class FloodFailedJob extends JobImpl {
-        private Hash _peer;
+        private final Hash _peer;
     
         public FloodFailedJob(RouterContext ctx, Hash peer) {
             super(ctx);

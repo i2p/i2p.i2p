@@ -164,7 +164,7 @@ class PersistentDataStore extends TransientDataStore {
             super(PersistentDataStore.this._context);
             _key = key;
         }
-        public String getName() { return "Remove Key"; }
+        public String getName() { return "Delete RI file"; }
         public void runJob() {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Removing key " + _key /* , getAddedBy() */);

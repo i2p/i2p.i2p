@@ -62,6 +62,12 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract void publish(LeaseSet localLeaseSet);
     public abstract void unpublish(LeaseSet localLeaseSet);
     public abstract void fail(Hash dbEntry);
+
+    /**
+     *  The last time we successfully published our RI.
+     *  @since 0.9.9
+     */
+    public long getLastRouterInfoPublishTime() { return 0; }
     
     public abstract Set<Hash> getAllRouters();
     public int getKnownRouters() { return 0; }
