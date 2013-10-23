@@ -521,8 +521,25 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @return a new I2PSocket
      */
     public I2PSocket createI2PSocket(Destination dest) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
+        return createI2PSocket(dest, 0);
+    }
+
+    /**
+     * Create a new I2PSocket towards to the specified destination,
+     * adding it to the list of connections actually managed by this
+     * tunnel.
+     *
+     * @param dest The destination to connect to
+     * @param port The destination port to connect to 0 - 65535
+     * @return a new I2PSocket
+     * @since 0.9.9
+     */
+    public I2PSocket createI2PSocket(Destination dest, int port)
+                throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
         verifySocketManager();
-        return createI2PSocket(dest, getDefaultOptions());
+        I2PSocketOptions opts = getDefaultOptions();
+        opts.setPort(port);
+        return createI2PSocket(dest, opts);
     }
 
     /**

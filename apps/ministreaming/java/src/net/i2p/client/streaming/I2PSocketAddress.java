@@ -11,22 +11,52 @@ import net.i2p.data.DataHelper;
  *  Ports are not widely used in I2P, in most cases the port will be zero.
  *  See InetSocketAddress for javadocs.
  *
- *  Warning, this interface and implementation is preliminary and subject to change without notice.
- *
  *  @since 0.9.1
  */
 public class I2PSocketAddress extends SocketAddress {
 
     private final int _port;
-    private final Destination _dest;
+    private Destination _dest;
     private final String _host;
 
-    // no constructor for port-only "wildcard" address
+    /**
+     *  Convenience constructor that parses host:port.
+     *
+     *  Does a naming service lookup to resolve the dest.
+     *  May take several seconds for b32.
+     *  @param host hostname or b64 dest or b32, may have :port appended
+     *  @throws IllegalArgumentException for port < 0 or port > 65535 or invalid port
+     *  @since 0.9.9
+     */
+    public I2PSocketAddress(String host) {
+        int port = 0;
+        int colon = host.indexOf(":");
+        if (colon > 0) {
+            try {
+                port = Integer.parseInt(host.substring(colon + 1));
+                host = host.substring(0, colon);
+                if (port < 0 || port > 65535)
+                    throw new IllegalArgumentException("bad port " + port);
+            } catch (IndexOutOfBoundsException ioobe) {
+                throw new IllegalArgumentException("bad port " + host);
+            } catch (NumberFormatException nfe) {
+                throw new IllegalArgumentException("bad port " + host);
+            }
+        }
+        _port = port;
+        _dest = I2PAppContext.getGlobalContext().namingService().lookup(host);
+        _host = host;
+    }
 
     /**
      *  Does not do a reverse lookup. Host will be null.
+     *  @throws IllegalArgumentException for port < 0 or port > 65535
      */
     public I2PSocketAddress(Destination dest, int port) {
+        if (dest == null)
+            throw new NullPointerException();
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("bad port " + port);
         _port = port;
         _dest = dest;
         _host = null;
@@ -35,19 +65,27 @@ public class I2PSocketAddress extends SocketAddress {
     /**
      *  Does a naming service lookup to resolve the dest.
      *  May take several seconds for b32.
+     *  @throws IllegalArgumentException for port < 0 or port > 65535
      */
     public I2PSocketAddress(String host, int port) {
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("bad port " + port);
         _port = port;
         _dest = I2PAppContext.getGlobalContext().namingService().lookup(host);
         _host = host;
     }
 
+    /**
+     *  @throws IllegalArgumentException for port < 0 or port > 65535
+     */
     public static I2PSocketAddress createUnresolved(String host, int port) {
         return new I2PSocketAddress(port, host);
     }
 
     /** unresolved */
     private I2PSocketAddress(int port, String host) {
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("bad port " + port);
         _port = port;
         _dest = null;
         _host = host;
@@ -57,7 +95,14 @@ public class I2PSocketAddress extends SocketAddress {
         return _port;
     }
 
-    public Destination getAddress() {
+    /**
+     *  Does a naming service lookup to resolve the dest if this was created unresolved
+     *  or if the resolution failed in the constructor.
+     *  If unresolved, this may take several seconds for b32.
+     */
+    public synchronized Destination getAddress() {
+        if (_dest == null)
+            _dest = I2PAppContext.getGlobalContext().namingService().lookup(_host);
         return _dest;
     }
 

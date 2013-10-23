@@ -268,7 +268,11 @@
                     <%=intl._("Tunnel Destination")%>(<span class="accessKey">T</span>):
                 </label>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=(!"null".equals(request.getParameter("targetDestination")) ? request.getParameter("targetDestination") : "" ) %>" class="freetext" />
-                <span class="comment">(<%=intl._("name or destination")%>; <%=intl._("b32 not recommended")%>)</span>
+                <span class="comment">(<%=intl._("name, name:port, or destination")%>
+                     <% if ("streamrclient".equals(tunnelType)) { /* deferred resolution unimplemented in streamr client */ %>
+                         - <%=intl._("b32 not recommended")%>
+                     <% } %> )
+                </span>
             </div><%
                 } else {
             %><input type="hidden" name="targetDestination" value="<%=request.getParameter("targetDestination")%>" /><%

@@ -1,4 +1,9 @@
 2013-10-23 zzz
+ * I2PTunnel standard and IRC clients:
+   - Allow host:port targets; set defaults in i2ptunnel.config (ticket #1066)
+   - Don't fail start if hostname is unresolvable; retry at connect time (ticket #946)
+   - Output IRC message on connect exception
+   - Update target list on-the-fly when configuration changes
  * NetDB:
    - Increase RI publish interval to reduce the connection load on ffs
    - Save RI-last-published time; check it before publishing

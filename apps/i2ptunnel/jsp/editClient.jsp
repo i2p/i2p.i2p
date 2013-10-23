@@ -165,7 +165,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                      %>
                 </label>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
-                <span class="comment">(<%=intl._("name or destination")%>; <%=intl._("b32 not recommended")%>)</span>
+                <span class="comment">(<%=intl._("name, name:port, or destination")%>
+                     <% if ("streamrclient".equals(tunnelType)) { /* deferred resolution unimplemented in streamr client */ %>
+                         - <%=intl._("b32 not recommended")%>
+                     <% } %> )
+                </span>
             </div>
          <% } %>
          <% if (!"streamrclient".equals(tunnelType)) { %>

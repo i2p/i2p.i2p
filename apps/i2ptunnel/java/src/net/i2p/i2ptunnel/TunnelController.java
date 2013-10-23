@@ -424,7 +424,14 @@ public class TunnelController implements Logging {
     }
 
     private void setSessionOptions() {
-        _tunnel.setClientOptions(getClientOptionProps());
+        Properties opts = getClientOptionProps();
+        // targetDestination does NOT start with "option.", but we still want
+        // to allow a change on the fly, so we pass it through this way,
+        // as a "spoofed" option. Since 0.9.9.
+        String target = getTargetDestination();
+        if (target != null)
+            opts.setProperty("targetDestination", target);
+        _tunnel.setClientOptions(opts);
     }
     
     private void setI2CPOptions() {
