@@ -129,7 +129,7 @@ class ConnectionAcceptor implements Runnable
 
   public int getPort()
   {
-    return 6881; // serverSocket.getLocalPort();
+    return TrackerClient.PORT; // serverSocket.getLocalPort();
   }
 
   public void run()
@@ -166,10 +166,18 @@ class ConnectionAcceptor implements Runnable
                     try { socket.close(); } catch (IOException ioe) {}
                     continue;
                 }
-                int bad = _badCounter.count(socket.getPeerDestination().calculateHash());
+                Hash h = socket.getPeerDestination().calculateHash();
+                if (socket.getLocalPort() == 80) {
+                     _badCounter.increment(h);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.error("Dropping incoming HTTP from " + h);
+                    try { socket.close(); } catch (IOException ioe) {}
+                    continue;
+                }
+                int bad = _badCounter.count(h);
                 if (bad >= MAX_BAD) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Rejecting connection from " + socket.getPeerDestination().calculateHash() +
+                        _log.warn("Rejecting connection from " + h +
                                   " after " + bad + " failures, max is " + MAX_BAD);
                     try { socket.close(); } catch (IOException ioe) {}
                     continue;

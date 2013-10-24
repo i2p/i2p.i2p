@@ -56,7 +56,7 @@ abstract class ExtensionHandler {
         }
         // include the map even if empty so the far-end doesn't NPE
         handshake.put("m", m);
-        handshake.put("p", Integer.valueOf(6881));
+        handshake.put("p", Integer.valueOf(TrackerClient.PORT));
         handshake.put("v", "I2PSnark");
         handshake.put("reqq", Integer.valueOf(5));
         return BEncoder.bencode(handshake);

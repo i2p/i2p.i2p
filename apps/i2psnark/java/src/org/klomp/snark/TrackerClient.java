@@ -86,6 +86,7 @@ public class TrackerClient implements Runnable {
   private final static int LONG_SLEEP = 30*60*1000; // sleep a while after lots of fails
   private final static long MIN_TRACKER_ANNOUNCE_INTERVAL = 15*60*1000;
   private final static long MIN_DHT_ANNOUNCE_INTERVAL = 10*60*1000;
+  public static final int PORT = 6881;
 
   private final I2PSnarkUtil _util;
   private final MetaInfo meta;
@@ -135,7 +136,7 @@ public class TrackerClient implements Runnable {
     this.coordinator = coordinator;
     this.snark = snark;
 
-    this.port = 6881; //(port == -1) ? 9 : port;
+    this.port = PORT; //(port == -1) ? 9 : port;
     this.infoHash = urlencode(snark.getInfoHash());
     this.peerID = urlencode(snark.getID());
     this.trackers = new ArrayList(2);

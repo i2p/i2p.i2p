@@ -43,6 +43,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.TrackerClient;
 import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEncoder;
 import org.klomp.snark.bencode.BEValue;
@@ -176,7 +177,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // Construct my NodeInfo
         // Pick ports over a big range to marginally increase security
         // If we add a search DHT, adjust to stay out of each other's way
-        _qPort = 2555 + ctx.random().nextInt(61111);
+        _qPort = TrackerClient.PORT + 10 + ctx.random().nextInt(65535 - 20 - TrackerClient.PORT);
         _rPort = _qPort + 1;
         if (SECURE_NID) {
             _myNID = NodeInfo.generateNID(session.getMyDestination().calculateHash(), _qPort, _context.random());
@@ -756,7 +757,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         Map<String, Object> args = new HashMap();
         args.put("info_hash", ih.getData());
         // port ignored
-        args.put("port", Integer.valueOf(6881));
+        args.put("port", Integer.valueOf(TrackerClient.PORT));
         args.put("token", token.getData());
         map.put("a", args);
         // an announce need not be signed, we have a token

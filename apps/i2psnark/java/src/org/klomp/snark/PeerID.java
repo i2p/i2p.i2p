@@ -58,7 +58,7 @@ class PeerID implements Comparable
   {
     this.id = id;
     this.address = address;
-    this.port = 6881;
+    this.port = TrackerClient.PORT;
     this.destHash = address.calculateHash().getData();
     hash = calculateHash();
     util = null;
@@ -92,7 +92,7 @@ class PeerID implements Comparable
     if (address == null)
         throw new InvalidBEncodingException("Invalid destination [" + bevalue.getString() + "]");
 
-    port = 6881;
+    port = TrackerClient.PORT;
     this.destHash = address.calculateHash().getData();
     hash = calculateHash();
     util = null;
@@ -106,7 +106,7 @@ class PeerID implements Comparable
   public PeerID(byte[] dest_hash, I2PSnarkUtil util) throws InvalidBEncodingException
   {
     // id and address remain null
-    port = 6881;
+    port = TrackerClient.PORT;
     if (dest_hash.length != 32)
         throw new InvalidBEncodingException("bad hash length");
     destHash = dest_hash;
