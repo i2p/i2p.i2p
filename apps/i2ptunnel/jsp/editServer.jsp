@@ -242,10 +242,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
                 <select id="tunnelDepth" name="tunnelDepth" title="Length of each Tunnel" class="selectbox">
                     <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 3);
-                  %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>><%=intl._("0 hop tunnel (low anonymity, low latency)")%></option>
-                    <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl._("1 hop tunnel (medium anonymity, medium latency)")%></option>
-                    <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>><%=intl._("2 hop tunnel (high anonymity, high latency)")%></option>
-                    <option value="3"<%=(tunnelDepth == 3 ? " selected=\"selected\"" : "") %>><%=intl._("3 hop tunnel (very high anonymity, poor performance)")%></option>
+                  %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>><%=intl._("0 hop tunnel (no anonymity)")%></option>
+                    <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl._("1 hop tunnel (low anonymity)")%></option>
+                    <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>><%=intl._("2 hop tunnel (medium anonymity)")%></option>
+                    <option value="3"<%=(tunnelDepth == 3 ? " selected=\"selected\"" : "") %>><%=intl._("3 hop tunnel (high anonymity)")%></option>
                 <% if (tunnelDepth > 3) { 
                 %>    <option value="<%=tunnelDepth%>" selected="selected"><%=tunnelDepth%> <%=intl._("hop tunnel (very poor performance)")%></option>
                 <% }
