@@ -45,7 +45,9 @@ public class ConfigHomeHandler extends FormHandler {
                 return;
             }
             if (restoring) {
-                _context.router().saveConfig(prop, dflt);
+                //_context.router().saveConfig(prop, dflt);
+                // remove config so user will see updates
+                _context.router().saveConfig(prop, null);
                 addFormNotice(_("Restored default settings"));
                 return;
             }
