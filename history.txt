@@ -1,3 +1,9 @@
+2013-10-24 zzz
+ * I2PTunnel standard, HTTP, and IRC servers:
+   Route connections to specific targets based on incoming I2P port
+   with custom option targetForPort.xxxx=myserver:yyyy
+   This allows multiple services on a single server tunnel (ticket #1066)
+
 2013-10-23 zzz
  * I2PTunnel standard and IRC clients:
    - Allow host:port targets; set defaults in i2ptunnel.config (ticket #1066)

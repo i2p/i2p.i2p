@@ -11,12 +11,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.security.GeneralSecurityException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -74,6 +77,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected I2PTunnelTask task;
     protected boolean bidir;
     private ThreadPoolExecutor _executor;
+    private final Map<Integer, InetSocketAddress> _socketMap = new ConcurrentHashMap(4);
 
     /** unused? port should always be specified */
     private int DEFAULT_LOCALPORT = 4488;
@@ -95,6 +99,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         this.remoteHost = host;
         this.remotePort = port;
         _usePool = getUsePool();
+        buildSocketMap(tunnel.getClientOptions());
         sockMgr = createManager(bais);
     }
 
@@ -115,6 +120,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         this.remoteHost = host;
         this.remotePort = port;
         _usePool = getUsePool();
+        buildSocketMap(tunnel.getClientOptions());
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(privkey);
@@ -145,6 +151,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         this.remoteHost = host;
         this.remotePort = port;
         _usePool = getUsePool();
+        buildSocketMap(tunnel.getClientOptions());
         sockMgr = createManager(privData);
     }
 
@@ -162,6 +169,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         this.remotePort = port;
         _log = tunnel.getContext().logManager().getLog(getClass());
         _usePool = false;
+        buildSocketMap(tunnel.getClientOptions());
         sockMgr = sktMgr;
         open = true;
     }
@@ -348,6 +356,37 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             return;
         Properties props = tunnel.getClientOptions();
         sockMgr.setDefaultOptions(sockMgr.buildOptions(props));
+        buildSocketMap(props);
+    }
+
+    /**
+     *  Update the ports map.
+     *
+     *  @since 0.9.9
+     */
+    private void buildSocketMap(Properties props) {
+        _socketMap.clear();
+        for (Map.Entry e : props.entrySet()) {
+            String key = (String) e.getKey();
+            if (key.startsWith("targetForPort.")) {
+                key = key.substring("targetForPort.".length());
+                try {
+                    int myPort = Integer.parseInt(key);
+                    String host = (String) e.getValue();
+                    int colon = host.indexOf(":");
+                    int port = Integer.parseInt(host.substring(colon + 1));
+                    host = host.substring(0, colon);
+                    InetSocketAddress isa = new InetSocketAddress(host, port);
+                    if (isa.isUnresolved())
+                        l.log("Warning - cannot resolve address for port " + key + ": " + host);
+                    _socketMap.put(Integer.valueOf(myPort), isa);
+                } catch (NumberFormatException nfe) {
+                    l.log("Bad socket spec for port " + key + ": " + e.getValue());
+                } catch (IndexOutOfBoundsException ioobe) {
+                    l.log("Bad socket spec for port " + key + ": " + e.getValue());
+                }
+            }
+        }
     }
 
     protected int getHandlerCount() { 
@@ -473,7 +512,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         //threads.
         try {
             socket.setReadTimeout(readTimeout);
-            Socket s = getSocket(remoteHost, remotePort);
+            Socket s = getSocket(socket.getLocalPort());
             afterSocket = getTunnel().getContext().clock().now();
             new I2PTunnelRunner(s, socket, slock, null, null);
 
@@ -494,7 +533,30 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
-     *  Get a regular or SSL socket depending on config
+     *  Get a regular or SSL socket depending on config and the incoming port.
+     *  To configure a specific host:port as the server for incoming port xx,
+     *  set option targetForPort.xx=host:port
+     *
+     *  @since 0.9.9
+     */
+    protected Socket getSocket(int incomingPort) throws IOException {
+        InetAddress host = remoteHost;
+        int port = remotePort;
+        if (incomingPort != 0 && !_socketMap.isEmpty()) {
+            InetSocketAddress isa = _socketMap.get(Integer.valueOf(incomingPort));
+            if (isa != null) {
+                host = isa.getAddress();
+                if (host == null)
+                    throw new IOException("Cannot resolve " + isa.getHostName());
+                port = isa.getPort();
+            }
+        }
+        return getSocket(host, port);
+    }
+
+    /**
+     *  Get a regular or SSL socket depending on config.
+     *  The SSL config applies to all hosts/ports.
      *
      *  @since 0.9.9
      */
