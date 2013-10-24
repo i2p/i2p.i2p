@@ -449,10 +449,18 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     _log.error("Error accepting", ce);
                 // not killing the server..
                 try {
-                    Thread.currentThread().sleep(500);
+                    Thread.sleep(500);
                 } catch (InterruptedException ie) {}
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
+            } catch (Exception e) {
+                // streaming borkage
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Uncaught exception accepting", e);
+                // not killing the server..
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ie) {}
             }
         }
         if (_executor != null)
