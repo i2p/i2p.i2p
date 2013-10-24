@@ -66,9 +66,11 @@ class FloodfillStoreJob extends StoreJob {
             // it finds something stamped with that time or newer.
             DatabaseEntry data = _state.getData();
             boolean isRouterInfo = data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO;
-            // default false
-            if (isRouterInfo && !getContext().getBooleanProperty(PROP_RI_VERIFY))
+            // default false since 0.9.7.1
+            if (isRouterInfo && !getContext().getBooleanProperty(PROP_RI_VERIFY)) {
+                _facade.routerInfoPublishSuccessful();
                 return;
+            }
 
             long published = data.getDate();
 
