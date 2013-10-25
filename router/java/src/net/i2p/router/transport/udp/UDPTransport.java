@@ -2842,7 +2842,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity())
+            if (haveCapacity(33))
                 _expireTimeout = Math.min(_expireTimeout + 15*1000, EXPIRE_TIMEOUT);
             else
                 _expireTimeout = Math.max(_expireTimeout - 45*1000, MIN_EXPIRE_TIMEOUT);
