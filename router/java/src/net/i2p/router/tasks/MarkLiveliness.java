@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import net.i2p.router.Router;
+import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
 
@@ -25,6 +26,7 @@ import net.i2p.util.SimpleTimer;
 public class MarkLiveliness implements SimpleTimer.TimedEvent {
     private final Router _router;
     private final File _pingFile;
+    private volatile boolean _errorLogged;
 
     public MarkLiveliness(Router router, File pingFile) {
         _router = router;
@@ -43,10 +45,13 @@ public class MarkLiveliness implements SimpleTimer.TimedEvent {
         FileOutputStream fos = null;
         try { 
             fos = new SecureFileOutputStream(_pingFile);
-            fos.write(("" + System.currentTimeMillis()).getBytes());
+            fos.write(Long.toString(System.currentTimeMillis()).getBytes());
         } catch (IOException ioe) {
-            System.err.println("Error writing to ping file");
-            ioe.printStackTrace();
+            if (!_errorLogged) {
+                Log log = _router.getContext().logManager().getLog(MarkLiveliness.class);
+                log.logAlways(Log.WARN, "Error writing to ping file " + _pingFile + ": " + ioe);
+                _errorLogged = true;
+            }
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
