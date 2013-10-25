@@ -1,4 +1,14 @@
+2013-10-25 zzz
+ * Streaming:
+   - Check blacklist/whitelist before connection limits, so
+     a blacklisted peer does not increment the counters
+   - Don't increment total throttle if peer is throttled
+   - Fix blacklist NPE after config change (ticket #1070)
+ * Transports: Reduce connection idle time sooner
+
 2013-10-24 zzz
+ * i2psnark: Drop incoming connections on HTTP port
+ * I2PTunnel: Don't let uncaught exception kill server acceptor (ticket #1070)
  * I2PTunnel standard, HTTP, and IRC servers:
    Route connections to specific targets based on incoming I2P port
    with custom option targetForPort.xxxx=myserver:yyyy

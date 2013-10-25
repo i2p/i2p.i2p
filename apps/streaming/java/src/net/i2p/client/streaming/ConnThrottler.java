@@ -46,10 +46,11 @@ class ConnThrottler {
      *  Checks both individual and total. Increments before checking.
      */
     boolean shouldThrottle(Hash h) {
+        // do this first, so we don't increment total if individual throttled
+        if (_max > 0 && this.counter.increment(h) > _max)
+            return true;
         if (_totalMax > 0 && _currentTotal.incrementAndGet() > _totalMax)
             return true;
-        if (_max > 0)
-            return this.counter.increment(h) > _max;
         return false;
     }
 

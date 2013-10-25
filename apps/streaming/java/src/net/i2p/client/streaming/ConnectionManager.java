@@ -395,6 +395,46 @@ class ConnectionManager {
         if (from == null)
             return "null";
         Hash h = from.calculateHash();
+
+        // As of 0.9.9, run the blacklist checks BEFORE the port counters,
+        // so blacklisted dests will not increment the counters and
+        // possibly trigger total-counter blocks for others.
+
+        // if the sig is absent or bad it will be caught later (in CPH)
+        if (_defaultOptions.isAccessListEnabled() &&
+            !_defaultOptions.getAccessList().contains(h))
+            return "not whitelisted";
+        if (_defaultOptions.isBlacklistEnabled() &&
+            _defaultOptions.getBlacklist().contains(h))
+            return "blacklisted";
+        String hashes = _context.getProperty(PROP_BLACKLIST, "");
+        if (!_currentBlacklist.equals(hashes)) {
+            // rebuild _globalBlacklist when property changes
+            synchronized(_globalBlacklist) {
+                if (hashes.length() > 0) {
+                    Set<Hash> newSet = new HashSet<Hash>();
+                    StringTokenizer tok = new StringTokenizer(hashes, ",; ");
+                    while (tok.hasMoreTokens()) {
+                        String hashstr = tok.nextToken();
+                        Hash hh = ConvertToHash.getHash(hashstr);
+                        if (hh != null)
+                            newSet.add(hh);
+                        else
+                            _log.error("Bad blacklist entry: " + hashstr);
+                    }
+                    _globalBlacklist.addAll(newSet);
+                    _globalBlacklist.retainAll(newSet);
+                    _currentBlacklist = hashes;
+                } else {
+                    _globalBlacklist.clear();
+                    _currentBlacklist = "";
+                }
+            }
+        }
+        if (hashes.length() > 0 && _globalBlacklist.contains(h))
+            return "blacklisted globally";
+
+
         String throttled = null;
         // always call all 3 to increment all counters
         if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
@@ -439,42 +479,8 @@ class ConnectionManager {
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
                         " per day";
         }
-        if (throttled != null)
-            return throttled;
-        // if the sig is absent or bad it will be caught later (in CPH)
-        if (_defaultOptions.isAccessListEnabled() &&
-            !_defaultOptions.getAccessList().contains(h))
-            return "not whitelisted";
-        if (_defaultOptions.isBlacklistEnabled() &&
-            _defaultOptions.getBlacklist().contains(h))
-            return "blacklisted";
-        String hashes = _context.getProperty(PROP_BLACKLIST, "");
-        if (!_currentBlacklist.equals(hashes)) {
-            // rebuild _globalBlacklist when property changes
-            synchronized(_globalBlacklist) {
-                if (hashes.length() > 0) {
-                    Set<Hash> newSet = new HashSet<Hash>();
-                    StringTokenizer tok = new StringTokenizer(hashes, ",; ");
-                    while (tok.hasMoreTokens()) {
-                        String hashstr = tok.nextToken();
-                        Hash hh = ConvertToHash.getHash(hashstr);
-                        if (hh != null)
-                            newSet.add(hh);
-                        else
-                            _log.error("Bad blacklist entry: " + hashstr);
-                    }
-                    _globalBlacklist.addAll(newSet);
-                    _globalBlacklist.retainAll(newSet);
-                    _currentBlacklist = hashes;
-                } else {
-                    _globalBlacklist.clear();
-                    _currentBlacklist = "";
-                }
-            }
-        }
-        if (hashes.length() > 0 && _globalBlacklist.contains(h))
-            return "blacklisted globally";
-        return null;
+
+        return throttled;
     }
 
 
