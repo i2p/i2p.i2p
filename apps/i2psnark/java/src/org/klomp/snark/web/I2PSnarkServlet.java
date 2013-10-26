@@ -1117,55 +1117,32 @@ public class I2PSnarkServlet extends BasicServlet {
     /**
      *  Sort alphabetically in current locale, ignore case, ignore leading "the "
      *  (I guess this is worth it, a lot of torrents start with "The "
-     *  These are full path names which makes it harder
      *  @since 0.7.14
      */
-    private class TorrentNameComparator implements Comparator<String> {
+    private static class TorrentNameComparator implements Comparator<Snark> {
         private final Comparator collator = Collator.getInstance();
-        private final String skip;
 
-        public TorrentNameComparator() {
-            String s;
-            try {
-                s = _manager.getDataDir().getCanonicalPath();
-            } catch (IOException ioe) {
-                s = _manager.getDataDir().getAbsolutePath();
-            }
-            skip = s + File.separator;
-        }
-
-        public int compare(String l, String r) {
-            if (l.startsWith(skip))
-                l = l.substring(skip.length());
-            if (r.startsWith(skip))
-                r = r.substring(skip.length());
-            String llc = l.toLowerCase(Locale.US);
+        public int compare(Snark l, Snark r) {
+            // put downloads and magnets first
+            if (l.getStorage() == null && r.getStorage() != null)
+                return -1;
+            if (l.getStorage() != null && r.getStorage() == null)
+                return 1;
+            String ls = l.getBaseName();
+            String llc = ls.toLowerCase(Locale.US);
             if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
-                l = l.substring(4);
-            String rlc = r.toLowerCase(Locale.US);
+                ls = ls.substring(4);
+            String rs = r.getBaseName();
+            String rlc = rs.toLowerCase(Locale.US);
             if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
-                r = r.substring(4);
-            return collator.compare(l, r);
+                rs = rs.substring(4);
+            return collator.compare(ls, rs);
         }
     }
 
     private List<Snark> getSortedSnarks(HttpServletRequest req) {
-        Set<String> files = _manager.listTorrentFiles();
-        TreeSet<String> fileNames = new TreeSet(new TorrentNameComparator());
-        fileNames.addAll(files);
-        ArrayList<Snark> rv = new ArrayList(fileNames.size());
-        int magnet = 0;
-        for (Iterator iter = fileNames.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            Snark snark = _manager.getTorrent(name);
-            if (snark != null) {
-                // put downloads and magnets first
-                if (snark.getStorage() == null)
-                    rv.add(magnet++, snark);
-                else
-                    rv.add(snark);
-            }
-        }
+        ArrayList<Snark> rv = new ArrayList(_manager.getTorrents());
+        Collections.sort(rv, new TorrentNameComparator());
         return rv;
     }
 
@@ -1201,23 +1178,12 @@ public class I2PSnarkServlet extends BasicServlet {
         if (statsOnly)
             return;
 
-        String filename = snark.getName();
-        if (snark.getMetaInfo() != null) {
-            // Only do this if not a magnet or torrent download
-            // Strip full path down to the local name
-            File f = new File(filename);
-            filename = f.getName();
-        }
-        int i = filename.lastIndexOf(".torrent");
-        if (i > 0)
-            filename = filename.substring(0, i);
-        String fullFilename = filename;
-        if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
-            String start = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
+        String basename = snark.getBaseName();
+        if (basename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
+            String start = basename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
             if (start.indexOf(" ") < 0 && start.indexOf("-") < 0) {
                 // browser has nowhere to break it
-                fullFilename = filename;
-                filename = start + "&hellip;";
+                basename = start + "&hellip;";
             }
         }
         // includes skipped files, -1 for magnet mode
@@ -1360,7 +1326,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(trackerLink);
         }
 
-        String encodedBaseName = urlEncode(snark.getBaseName());
+        String encodedBaseName = urlEncode(basename);
         // File type icon column
         out.write("</td>\n<td>");
         if (isValid) {
@@ -1403,7 +1369,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("\">");
             out.write(buf.toString());
         }
-        out.write(filename);
+        out.write(basename);
         if (remaining == 0 || isMultiFile)
             out.write("</a>");
 
@@ -1474,7 +1440,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Can't figure out how to escape double quotes inside the onclick string.
                 // Single quotes in translate strings with parameters must be doubled.
                 // Then the remaining single quote must be escaped
-                out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
+                out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", basename));
                 out.write("')) { return false; }\"");
                 out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
                 out.write(_("Remove"));
@@ -1494,7 +1460,7 @@ public class I2PSnarkServlet extends BasicServlet {
             // Can't figure out how to escape double quotes inside the onclick string.
             // Single quotes in translate strings with parameters must be doubled.
             // Then the remaining single quote must be escaped
-            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
+            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", basename));
             out.write("')) { return false; }\"");
             out.write(" src=\"" + _imgPath + "delete.png\" alt=\"");
             out.write(_("Delete"));
