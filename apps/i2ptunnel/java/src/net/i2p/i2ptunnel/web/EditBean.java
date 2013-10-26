@@ -10,9 +10,11 @@ package net.i2p.i2ptunnel.web;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
@@ -370,12 +372,11 @@ public class EditBean extends IndexBean {
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts == null) return "";
-            StringBuilder buf = new StringBuilder(64);
-            int i = 0;
             boolean isMD5Proxy = "httpclient".equals(tun.getType()) ||
                                  "connectclient".equals(tun.getType());
-            for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
-                String key = (String)iter.next();
+            Map<String, String> sorted = new TreeMap();
+            for (Map.Entry e : opts.entrySet()) {
+                String key = (String)e.getKey();
                 if (_noShowSet.contains(key))
                     continue;
                 // leave in for HTTP and Connect so it can get migrated to MD5
@@ -383,10 +384,18 @@ public class EditBean extends IndexBean {
                 if ((!isMD5Proxy) &&
                     _nonProxyNoShowSet.contains(key))
                     continue;
-                String val = opts.getProperty(key);
-                if (i != 0) buf.append(' ');
-                buf.append(key).append('=').append(val);
-                i++;
+                sorted.put(key, (String)e.getValue());
+            }
+            if (sorted.isEmpty())
+                return "";
+            StringBuilder buf = new StringBuilder(64);
+            boolean space = false;
+            for (Map.Entry<String, String> e : sorted.entrySet()) {
+                if (space)
+                    buf.append(' ');
+                else
+                    space = true;
+                buf.append(e.getKey()).append('=').append(e.getValue());
             }
             return buf.toString();
         } else {
