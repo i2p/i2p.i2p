@@ -25,6 +25,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.util.ByteCache;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -41,6 +42,18 @@ import net.i2p.data.Base32;
  */
 public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
+    /** all of these in SECONDS */
+    public static final String OPT_POST_WINDOW = "postCheckTime";
+    public static final String OPT_POST_BAN_TIME = "postBanTime";
+    public static final String OPT_POST_TOTAL_BAN_TIME = "postTotalBanTime";
+    public static final String OPT_POST_MAX = "maxPosts";
+    public static final String OPT_POST_TOTAL_MAX = "maxTotalPosts";
+    public static final int DEFAULT_POST_WINDOW = 5*60;
+    public static final int DEFAULT_POST_BAN_TIME = 30*60;
+    public static final int DEFAULT_POST_TOTAL_BAN_TIME = 10*60;
+    public static final int DEFAULT_POST_MAX = 3;
+    public static final int DEFAULT_POST_TOTAL_MAX = 10;
+
     /** what Host: should we seem to be to the webserver? */
     private String _spoofHost;
     private static final String HASH_HEADER = "X-I2P-DestHash";
@@ -53,6 +66,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final long START_INTERVAL = (60 * 1000) * 3;
     private long _startedOn = 0L;
+    private ConnThrottler _postThrottler;
 
     private final static byte[] ERR_UNAVAILABLE =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -64,6 +78,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
          "<p>This I2P eepsite is unavailable. It may be down or undergoing maintenance.</p>\n" +
+         "</body></html>")
+         .getBytes();
+
+    private final static byte[] ERR_DENIED =
+        ("HTTP/1.1 403 Denied\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>403 Denied</title></head>\n"+
+         "<body><h2>403 Denied</h2>\n" +
+         "<p>Denied due to excessive requests. Please try again later.</p>\n" +
          "</body></html>")
          .getBytes();
 
@@ -91,8 +118,57 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     @Override
     public void startRunning() {
         super.startRunning();
-        _startedOn = getTunnel().getContext().clock().now();
         // Would be better if this was set when the inbound tunnel becomes alive.
+        _startedOn = getTunnel().getContext().clock().now();
+        setupPostThrottle();
+    }
+
+    /** @since 0.9.9 */
+    private void setupPostThrottle() {
+        int pp = getIntOption(OPT_POST_MAX, 0);
+        int pt = getIntOption(OPT_POST_TOTAL_MAX, 0);
+        synchronized(this) {
+            if (pp != 0 || pp != 0 || _postThrottler != null) {
+                long pw = 1000L * getIntOption(OPT_POST_WINDOW, DEFAULT_POST_WINDOW);
+                long pb = 1000L * getIntOption(OPT_POST_BAN_TIME, DEFAULT_POST_BAN_TIME);
+                long px = 1000L * getIntOption(OPT_POST_TOTAL_BAN_TIME, DEFAULT_POST_TOTAL_BAN_TIME);
+                if (_postThrottler == null)
+                    _postThrottler = new ConnThrottler(pp, pt, pw, pb, px, "POST", _log);
+                else
+                    _postThrottler.updateLimits(pp, pt, pw, pb, px);
+            }
+        }
+    }
+
+    /** @since 0.9.9 */
+    private int getIntOption(String opt, int dflt) {
+        Properties opts = getTunnel().getClientOptions();
+        String o = opts.getProperty(opt);
+        if (o != null) {
+            try {
+                return Integer.parseInt(o);
+            } catch (NumberFormatException nfe) {}
+        }
+        return dflt;
+    }
+
+    /** @since 0.9.9 */
+    @Override
+    public boolean close(boolean forced) {
+        synchronized(this) {
+            if (_postThrottler != null)
+                _postThrottler.clear();
+        }
+        return super.close(forced);
+    }
+
+    /** @since 0.9.9 */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel)
+            return;
+        setupPostThrottle();
+        super.optionsUpdated(tunnel);
     }
 
 
@@ -102,9 +178,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      */
     @Override
     protected void blockingHandle(I2PSocket socket) {
+        Hash peerHash = socket.getPeerDestination().calculateHash();
         if (_log.shouldLog(Log.INFO))
             _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
-                      " from: " + socket.getPeerDestination().calculateHash() + " port " + socket.getPort());
+                      " from: " + peerHash + " port " + socket.getPort());
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
@@ -119,9 +196,27 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             Map<String, List<String>> headers = readHeaders(in, command,
                 CLIENT_SKIPHEADERS, getTunnel().getContext());
             long afterHeaders = getTunnel().getContext().clock().now();
+
+            if (_postThrottler != null &&
+                command.length() >= 5 &&
+                command.substring(0, 5).toUpperCase(Locale.US).equals("POST ")) {
+                if (_postThrottler.shouldThrottle(peerHash)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Refusing POST since peer is throttled: " + peerHash.toBase64());
+                    try {
+                        // Send a 503, so the user doesn't get an HTTP Proxy error message
+                        // and blame his router or the network.
+                        socket.getOutputStream().write(ERR_DENIED);
+                    } catch (IOException ioe) {}
+                    try {
+                        socket.close();
+                    } catch (IOException ioe) {}
+                    return;
+                }
+            }
             
-            addEntry(headers, HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
-            addEntry(headers, DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p");
+            addEntry(headers, HASH_HEADER, peerHash.toBase64());
+            addEntry(headers, DEST32_HEADER, Base32.encode(peerHash.getData()) + ".b32.i2p");
             addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
 
             // Port-specific spoofhost

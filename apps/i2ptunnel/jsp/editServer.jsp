@@ -425,7 +425,41 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               </div>
             </div>
 
-            <div class="subdivider">
+            <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+              %><div class="rowItem">
+                  <div id="optionsField" class="rowItem">
+                      <label><%=intl._("POST limits (0=unlimited)")%><br /><%=intl._("Per client")%>:</label>
+                  </div>
+                  <div id="portField" class="rowItem">
+                      <label><%=intl._("Per period")%>:</label>
+                      <input type="text" id="port" name="postMax" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext" />                
+                  </div>
+                  <div id="portField" class="rowItem">
+                      <label><%=intl._("Ban minutes")%>:</label>
+                      <input type="text" id="port" name="postBanTime" value="<%=editBean.getPostBanTime(curTunnel)%>" class="freetext" />                
+                  </div>
+                </div>
+                <div class="rowItem">
+                  <div id="optionsField" class="rowItem">
+                      <label><%=intl._("Total")%>:</label>
+                  </div>
+                  <div id="portField" class="rowItem">
+                      <input type="text" id="port" name="postTotalMax" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext" />                
+                  </div>
+                  <div id="portField" class="rowItem">
+                      <input type="text" id="port" name="postTotalBanTime" value="<%=editBean.getPostTotalBanTime(curTunnel)%>" class="freetext" />                
+                  </div>
+                </div>
+                <div class="rowItem">
+                  <div id="optionsField" class="rowItem">
+                      <label><%=intl._("POST limit period (minutes)")%>:</label>
+                  </div>
+                  <div id="portField" class="rowItem">
+                      <input type="text" id="port" name="postCheckTime" value="<%=editBean.getPostCheckTime(curTunnel)%>" class="freetext" />                
+                  </div>
+                </div>
+            <% } // httpserver
+          %><div class="subdivider">
                 <hr />
             </div>
            

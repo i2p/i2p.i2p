@@ -30,6 +30,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.i2ptunnel.I2PTunnelConnectClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
@@ -809,7 +810,7 @@ public class IndexBean {
     public void setReduceTime(String val) {
         if (val != null) {
             try {
-                _otherOptions.put("i2cp.reduceIdleTime", "" + (Integer.parseInt(val.trim()) * 60*1000));
+                _otherOptions.put("i2cp.reduceIdleTime", Integer.toString(Integer.parseInt(val.trim()) * 60*1000));
             } catch (NumberFormatException nfe) {}
         }
     }
@@ -835,7 +836,7 @@ public class IndexBean {
     public void setCloseTime(String val) {
         if (val != null) {
             try {
-                _otherOptions.put("i2cp.closeIdleTime", "" + (Integer.parseInt(val.trim()) * 60*1000));
+                _otherOptions.put("i2cp.closeIdleTime", Integer.toString(Integer.parseInt(val.trim()) * 60*1000));
             } catch (NumberFormatException nfe) {}
         }
     }
@@ -912,6 +913,35 @@ public class IndexBean {
     public void setMaxStreams(String s) {
         if (s != null)
             _otherOptions.put(PROP_MAX_STREAMS, s.trim());
+    }
+
+    /**
+     * POST limits
+     * @since 0.9.9
+     */
+    public void setPostMax(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPServer.OPT_POST_MAX, s.trim());
+    }
+
+    public void setPostTotalMax(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, s.trim());
+    }
+
+    public void setPostCheckTime(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPServer.OPT_POST_WINDOW, Integer.toString(Integer.parseInt(s.trim()) * 60));
+    }
+
+    public void setPostBanTime(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPServer.OPT_POST_BAN_TIME, Integer.toString(Integer.parseInt(s.trim()) * 60));
+    }
+
+    public void setPostTotalBanTime(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME, Integer.toString(Integer.parseInt(s.trim()) * 60));
     }
 
     /** params needed for hashcash and dest modification */
@@ -1124,6 +1154,9 @@ public class IndexBean {
         } else if ("httpserver".equals(_type) || "httpbidirserver".equals(_type)) {
             if (_spoofedHost != null)
                 config.setProperty("spoofedHost", _spoofedHost);
+            for (String p : _httpServerOpts)
+                if (_otherOptions.containsKey(p))
+                    config.setProperty("option." + p, _otherOptions.get(p));
         }
         if ("httpbidirserver".equals(_type)) {
             if (_port != null)
@@ -1180,6 +1213,13 @@ public class IndexBean {
          PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
          PROP_MAX_STREAMS
         };
+    private static final String _httpServerOpts[] = {
+        I2PTunnelHTTPServer.OPT_POST_WINDOW,
+        I2PTunnelHTTPServer.OPT_POST_BAN_TIME,
+        I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME,
+        I2PTunnelHTTPServer.OPT_POST_MAX,
+        I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX
+        };
 
     /**
      *  do NOT add these to noShoOpts, we must leave them in for HTTPClient and ConnectCLient
@@ -1190,7 +1230,7 @@ public class IndexBean {
         "proxyUsername", "proxyPassword"
         };
 
-    protected static final Set _noShowSet = new HashSet(64);
+    protected static final Set _noShowSet = new HashSet(128);
     protected static final Set _nonProxyNoShowSet = new HashSet(4);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
@@ -1199,6 +1239,7 @@ public class IndexBean {
         _noShowSet.addAll(Arrays.asList(_booleanServerOpts));
         _noShowSet.addAll(Arrays.asList(_otherClientOpts));
         _noShowSet.addAll(Arrays.asList(_otherServerOpts));
+        _noShowSet.addAll(Arrays.asList(_httpServerOpts));
         _nonProxyNoShowSet.addAll(Arrays.asList(_otherProxyOpts));
     }
 

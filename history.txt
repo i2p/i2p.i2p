@@ -1,4 +1,8 @@
+2013-10-26 zzz
+ * I2PTunnel HTTP server: New POST limiter
+
 2013-10-25 zzz
+ * Router: Only log ping file error once (ticket #1086)
  * Streaming:
    - Check blacklist/whitelist before connection limits, so
      a blacklisted peer does not increment the counters

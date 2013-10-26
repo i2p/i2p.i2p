@@ -21,6 +21,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
@@ -272,6 +273,30 @@ public class EditBean extends IndexBean {
 
     public String getMaxStreams(int tunnel) {
         return getProperty(tunnel, PROP_MAX_STREAMS, "0");
+    }
+
+    /**
+     * POST limits
+     * @since 0.9.9
+     */
+    public String getPostMax(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_MAX, "0");
+    }
+
+    public String getPostTotalMax(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, "0");
+    }
+
+    public int getPostCheckTime(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_WINDOW, I2PTunnelHTTPServer.DEFAULT_POST_WINDOW) / 60;
+    }
+
+    public int getPostBanTime(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_BAN_TIME, I2PTunnelHTTPServer.DEFAULT_POST_BAN_TIME) / 60;
+    }
+
+    public int getPostTotalBanTime(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME, I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_BAN_TIME) / 60;
     }
 
     private int getProperty(int tunnel, String prop, int def) {
