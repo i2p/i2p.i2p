@@ -604,16 +604,12 @@ public class ProfileOrganizer {
         if (matches.size() < howMany) {
             int orig = matches.size();
             int needed = howMany - orig;
-            int start = 0;
             List selected = new ArrayList(needed);
             getReadLock();
             try {
-                // we randomize the whole list when rebuilding it, but randomizing 
-                // the entire list on each peer selection is a bit crazy
-                start = _context.random().nextInt(_notFailingPeersList.size());
-                for (int i = 0; i < _notFailingPeersList.size() && selected.size() < needed; i++) {
-                    int curIndex = (i+start) % _notFailingPeersList.size();
-                    Hash cur = _notFailingPeersList.get(curIndex);
+                // use RandomIterator to avoid shuffling the whole thing
+                for (Iterator<Hash> iter = new RandomIterator(_notFailingPeersList); (selected.size() < needed) && iter.hasNext(); ) {
+                    Hash cur = iter.next();
                     if (matches.contains(cur) ||
                         (exclude != null && exclude.contains(cur))) {
                         if (_log.shouldLog(Log.DEBUG))
@@ -631,7 +627,7 @@ public class ProfileOrganizer {
                 }
             } finally { releaseReadLock(); }
             if (_log.shouldLog(Log.INFO))
-                _log.info("Selecting all not failing (strict? " + onlyNotFailing + " start=" + start 
+                _log.info("Selecting all not failing (strict? " + onlyNotFailing
                           + ") found " + selected.size() + " new peers: " + selected + " all=" + _notFailingPeersList.size() + " strict=" + _strictCapacityOrder.size());
             matches.addAll(selected);
         }
@@ -848,7 +844,9 @@ public class ProfileOrganizer {
             locked_promoteFastAsNecessary();
             locked_demoteFastAsNecessary();
 
-            Collections.shuffle(_notFailingPeersList, _context.random());
+            // we now use a random iterator in selectAllNotFailingPeers(),
+            // as it was picking peers in-order before the first reorganization
+            //Collections.shuffle(_notFailingPeersList, _context.random());
 
             placeTime = System.currentTimeMillis()-placeStart;
         } finally { releaseWriteLock(); }
