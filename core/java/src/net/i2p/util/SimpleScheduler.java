@@ -184,8 +184,8 @@ public class SimpleScheduler {
 
     /** Run every timeoutMs. TimedEvent must not do its own reschedule via addEvent() */
     private class PeriodicRunnableEvent extends RunnableEvent {
-        private long _timeoutMs;
-        private long _initialDelay;
+        private final long _timeoutMs;
+        private final long _initialDelay;
         public PeriodicRunnableEvent(SimpleTimer.TimedEvent t, long initialDelay, long timeoutMs) {
             super(t, timeoutMs);
             _initialDelay = initialDelay;
