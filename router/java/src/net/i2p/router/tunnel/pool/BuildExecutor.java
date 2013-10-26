@@ -471,7 +471,9 @@ class BuildExecutor implements Runnable {
                 cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             } while (addToBuilding(cfg)); // if a dup, go araound again
         }
-        BuildRequestor.request(_context, pool, cfg, this);
+        boolean ok = BuildRequestor.request(_context, pool, cfg, this);
+        if (!ok)
+            return;
         long buildTime = System.currentTimeMillis() - beforeBuild;
         if (cfg.getLength() <= 1)
             _context.statManager().addRateData("tunnel.buildRequestZeroHopTime", buildTime, 0);

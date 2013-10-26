@@ -1,5 +1,12 @@
 2013-10-26 zzz
+ * i2psnark: Display base name, not torrent file name (ticket #985)
  * I2PTunnel HTTP server: New POST limiter
+ * Profiles: Ensure we select random peers even before the first reorganization
+ * Streaming: Randomize end of first conn limit period
+ * Tunnels:
+   - Don't use fallback expl. tunnels as the paired tunnel
+     for a client tunnel build.
+   - Fix selection of an expl. tunnel close to a hash
 
 2013-10-25 zzz
  * Router: Only log ping file error once (ticket #1086)

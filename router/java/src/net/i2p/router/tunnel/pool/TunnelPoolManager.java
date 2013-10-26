@@ -177,11 +177,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      * @since 0.8.10
      */
     public TunnelInfo selectInboundExploratoryTunnel(Hash closestTo) { 
-        TunnelInfo info = _inboundExploratory.selectTunnel(); 
+        TunnelInfo info = _inboundExploratory.selectTunnel(closestTo); 
         if (info == null) {
             _inboundExploratory.buildFallback();
             // still can be null, but probably not
-            info = _inboundExploratory.selectTunnel(closestTo);
+            info = _inboundExploratory.selectTunnel();
         }
         return info;
     }
@@ -221,11 +221,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      * @since 0.8.10
      */
     public TunnelInfo selectOutboundExploratoryTunnel(Hash closestTo) { 
-        TunnelInfo info = _outboundExploratory.selectTunnel();
+        TunnelInfo info = _outboundExploratory.selectTunnel(closestTo);
         if (info == null) {
             _outboundExploratory.buildFallback();
             // still can be null, but probably not
-            info = _outboundExploratory.selectTunnel(closestTo);
+            info = _outboundExploratory.selectTunnel();
         }
         return info;
     }
