@@ -1,3 +1,6 @@
+2013-10-27 zzz
+ * Streaming; Fix crash caused by previous blacklist fix (ticket #1070)
+
 2013-10-26 zzz
  * i2psnark: Display base name, not torrent file name (ticket #985)
  * I2PTunnel HTTP server: New POST limiter
@@ -83,7 +86,7 @@
  * Logging:
    - Require strict match of class name component
    - parseLimits() cleanup
- * SSU: More efficient ImboundMessageState
+ * SSU: More efficient InboundMessageState
  * Streaming:
    - Fix active stream counting so it doesn't count streams
      that are closed and in TIME-WAIT state. Also, break out of the

@@ -784,7 +784,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
                 Hash h = ConvertToHash.getHash(hashstr);
                 if (h == null)
                     error("bad list hash: " + hashstr);
-                else if (_blackListEnabled)
+                else if (blackListEnabled)
                     blackList.add(h);
                 else
                     accessList.add(h);
