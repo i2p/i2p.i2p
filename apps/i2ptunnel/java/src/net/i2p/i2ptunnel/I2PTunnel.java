@@ -954,12 +954,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * "openSOCKSTunnelResult" = "ok" or "error" after the client tunnel has
      * started.
      *
-     * @param args {portNumber [, sharedClient]}
+     * @param args {portNumber [, sharedClient]} or (portNumber, ignored (false), privKeyFile)
      * @param l logger to receive events and output
      * @throws IllegalArgumentException on config problem
      */
     public void runSOCKSTunnel(String args[], Logging l) {
-        if (args.length >= 1 && args.length <= 2) {
+        if (args.length >= 1 && args.length <= 3) {
             int _port = -1;
             try {
                 _port = Integer.parseInt(args[0]);
@@ -972,12 +972,15 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
             boolean isShared = false;
-            if (args.length > 1)
+            if (args.length == 2)
                 isShared = Boolean.parseBoolean(args[1].trim());
 
             ownDest = !isShared;
+            String privateKeyFile = null;
+            if (args.length == 3)
+                privateKeyFile = args[2];
             try {
-                I2PTunnelTask task = new I2PSOCKSTunnel(_port, l, ownDest, this, this, null);
+                I2PTunnelTask task = new I2PSOCKSTunnel(_port, l, ownDest, this, this, privateKeyFile);
                 addtask(task);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {

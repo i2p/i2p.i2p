@@ -399,7 +399,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <hr />
             </div>
 
-         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
+         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "socksirctunnel".equals(tunnelType) || "sockstunnel".equals(tunnelType)) { %>
             <div id="optionsField" class="rowItem">
                 <label for="privKeyFile" accesskey="k">
                     <%=intl._("Persistent private key")%>(<span class="accessKey">k</span>):

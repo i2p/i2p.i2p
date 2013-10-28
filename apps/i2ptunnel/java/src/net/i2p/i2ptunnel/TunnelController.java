@@ -263,7 +263,12 @@ public class TunnelController implements Logging {
             if (!props.containsKey(I2PSOCKSTunnel.PROP_PROXY_DEFAULT))
                 props.setProperty(I2PSOCKSTunnel.PROP_PROXY_DEFAULT, proxyList);
         }
-        _tunnel.runSOCKSTunnel(new String[] { listenPort, sharedClient }, this);
+        if (getPersistentClientKey()) {
+            String privKeyFile = getPrivKeyFile(); 
+            _tunnel.runSOCKSTunnel(new String[] { listenPort, "false", privKeyFile }, this);
+        } else {
+            _tunnel.runSOCKSTunnel(new String[] { listenPort, sharedClient }, this);
+        }
     }
     
     /** @since 0.7.12 */
