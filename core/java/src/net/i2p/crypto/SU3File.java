@@ -468,7 +468,12 @@ public class SU3File {
                 Properties props = new Properties();
                 props.setProperty("prng.bufferSize", "16384");
                 new I2PAppContext(props);
-                ok = signCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4));
+                ok = signCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4), "");
+            } else if ("bulksign".equals(cmd)) {
+                Properties props = new Properties();
+                props.setProperty("prng.bufferSize", "16384");
+                new I2PAppContext(props);
+                ok = bulkSignCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3));
             } else if ("verifysig".equals(cmd)) {
                 ok = verifySigCLI(a.get(0));
             } else if ("keygen".equals(cmd)) {
@@ -490,6 +495,7 @@ public class SU3File {
     private static final void showUsageCLI() {
         System.err.println("Usage: SU3File keygen       [-t type|code] publicKeyFile keystore.ks you@mail.i2p");
         System.err.println("       SU3File sign         [-c type|code] [-t type|code] inputFile.zip signedFile.su3 keystore.ks version you@mail.i2p");
+        System.err.println("       SU3File bulksign     [-c type|code] [-t type|code] directory keystore.ks version you@mail.i2p");
         System.err.println("       SU3File showversion  signedFile.su3");
         System.err.println("       SU3File verifysig    signedFile.su3");
         System.err.println("       SU3File extract      signedFile.su3 outFile.zip");
@@ -578,8 +584,53 @@ public class SU3File {
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean signCLI(String stype, String ctype, String inputFile, String signedFile,
+    private static final boolean bulkSignCLI(String stype, String ctype, String dir,
                                          String privateKeyFile, String version, String signerName) {
+        File d = new File(dir);
+        if (!d.isDirectory()) {
+            System.out.println("Directory does not exist: " + d);
+            return false;
+        }
+        File[] files = d.listFiles();
+        if (files == null || files.length == 0) {
+            System.out.println("No zip files found in " + d);
+            return false;
+        }
+        String keypw = "";
+        try {
+            while (keypw.length() < 6) {
+                System.out.print("Enter password for key \"" + signerName + "\": ");
+                keypw = DataHelper.readLine(System.in).trim();
+                if (keypw.length() > 0 && keypw.length() < 6)
+                    System.out.println("Key password must be at least 6 characters");
+            }
+        } catch (IOException ioe) {
+            System.out.println("Error asking for password");
+            ioe.printStackTrace();
+            return false;
+        }
+        int success = 0;
+        for (File in : files) {
+            String inputFile = in.getPath();
+            if (!inputFile.endsWith(".zip"))
+                continue;
+            String signedFile = inputFile.substring(0, inputFile.length() - 4) + ".su3";
+            boolean rv = signCLI(stype, ctype, inputFile, signedFile, privateKeyFile, version, signerName, keypw);
+            if (!rv)
+                return false;
+            success++;
+        }
+        if (success == 0)
+            System.out.println("No files processed in " + d);
+        return success > 0;
+    }
+
+    /**
+     *  @return success
+     *  @since 0.9.9
+     */
+    private static final boolean signCLI(String stype, String ctype, String inputFile, String signedFile,
+                                         String privateKeyFile, String version, String signerName, String keypw) {
         SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
@@ -590,7 +641,7 @@ public class SU3File {
             System.out.println("Content type " + ctype + " is not supported");
             return false;
         }
-        return signCLI(type, ct, inputFile, signedFile, privateKeyFile, version, signerName);
+        return signCLI(type, ct, inputFile, signedFile, privateKeyFile, version, signerName, keypw);
     }
 
     /**
@@ -598,9 +649,8 @@ public class SU3File {
      *  @since 0.9.9
      */
     private static final boolean signCLI(SigType type, ContentType ctype, String inputFile, String signedFile,
-                                         String privateKeyFile, String version, String signerName) {
+                                         String privateKeyFile, String version, String signerName, String keypw) {
         try {
-            String keypw = "";
             while (keypw.length() < 6) {
                 System.out.print("Enter password for key \"" + signerName + "\": ");
                 keypw = DataHelper.readLine(System.in).trim();
