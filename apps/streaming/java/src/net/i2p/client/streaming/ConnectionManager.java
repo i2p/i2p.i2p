@@ -401,12 +401,6 @@ class ConnectionManager {
         // possibly trigger total-counter blocks for others.
 
         // if the sig is absent or bad it will be caught later (in CPH)
-        if (_defaultOptions.isAccessListEnabled() &&
-            !_defaultOptions.getAccessList().contains(h))
-            return "not whitelisted";
-        if (_defaultOptions.isBlacklistEnabled() &&
-            _defaultOptions.getBlacklist().contains(h))
-            return "blacklisted";
         String hashes = _context.getProperty(PROP_BLACKLIST, "");
         if (!_currentBlacklist.equals(hashes)) {
             // rebuild _globalBlacklist when property changes
@@ -434,53 +428,58 @@ class ConnectionManager {
         if (hashes.length() > 0 && _globalBlacklist.contains(h))
             return "blacklisted globally";
 
+        if (_defaultOptions.isAccessListEnabled() &&
+            !_defaultOptions.getAccessList().contains(h))
+            return "not whitelisted";
+        if (_defaultOptions.isBlacklistEnabled() &&
+            _defaultOptions.getBlacklist().contains(h))
+            return "blacklisted";
 
-        String throttled = null;
-        // always call all 3 to increment all counters
-        if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
-            _context.statManager().addRateData("stream.con.throttledMinute", 1, 0);
-            if (_defaultOptions.getMaxConnsPerMinute() <= 0)
-                throttled = "throttled by" +
-                        " total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
-                        " per minute";
-            else if (_defaultOptions.getMaxTotalConnsPerMinute() <= 0)
-                throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
-                        " per minute";
+
+        if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
+            _context.statManager().addRateData("stream.con.throttledDay", 1, 0);
+            if (_defaultOptions.getMaxConnsPerDay() <= 0)
+                return "throttled by" +
+                        " total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
+                        " per day";
+            else if (_defaultOptions.getMaxTotalConnsPerDay() <= 0)
+                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                        " per day";
             else
-                throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
-                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
-                        " per minute";
+                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
+                        " per day";
         }
         if (_hourThrottler != null && _hourThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledHour", 1, 0);
             if (_defaultOptions.getMaxConnsPerHour() <= 0)
-                throttled = "throttled by" +
+                return "throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
                         " per hour";
             else if (_defaultOptions.getMaxTotalConnsPerHour() <= 0)
-                throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
                         " per hour";
             else
-                throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
                         " or total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
                         " per hour";
         }
-        if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
-            _context.statManager().addRateData("stream.con.throttledDay", 1, 0);
-            if (_defaultOptions.getMaxConnsPerDay() <= 0)
-                throttled = "throttled by" +
-                        " total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
-                        " per day";
-            else if (_defaultOptions.getMaxTotalConnsPerDay() <= 0)
-                throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
-                        " per day";
+        if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
+            _context.statManager().addRateData("stream.con.throttledMinute", 1, 0);
+            if (_defaultOptions.getMaxConnsPerMinute() <= 0)
+                return "throttled by" +
+                        " total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
+                        " per minute";
+            else if (_defaultOptions.getMaxTotalConnsPerMinute() <= 0)
+                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                        " per minute";
             else
-                throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
-                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
-                        " per day";
+                return "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
+                        " per minute";
         }
 
-        return throttled;
+        return null;
     }
 
 

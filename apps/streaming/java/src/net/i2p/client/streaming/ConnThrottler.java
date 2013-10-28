@@ -34,7 +34,7 @@ class ConnThrottler {
         // to prevent correlation across destinations
         // and identification of router startup time
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(),
-                                                       RandomSource.getInstance().nextLong(period),
+                                                       (period / 2) + RandomSource.getInstance().nextLong(period / 2),
                                                        period);
     }
 
