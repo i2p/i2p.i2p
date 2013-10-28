@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
@@ -220,12 +221,12 @@ public class GraphHelper extends FormHandler {
                 name = _stat;
                 displayName = _("Bandwidth usage");
             } else {
-                List<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
+                Set<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
                 if (rates.size() != 1) {
                     _out.write("Graphs not enabled for " + _stat);
                     return "";
                 }
-                Rate r = rates.get(0);
+                Rate r = rates.iterator().next();
                 period = r.getPeriod();
                 name = r.getRateStat().getName();
                 displayName = name;

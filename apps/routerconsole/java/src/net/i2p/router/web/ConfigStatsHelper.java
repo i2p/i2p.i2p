@@ -21,9 +21,10 @@ import net.i2p.util.Log;
 public class ConfigStatsHelper extends HelperBase {
     private Log _log;
     private String _filter;
-    private Set<String> _filters;
+    private final Set<String> _filters;
+    private final Set<String> _graphs;
     /** list of names of stats which are remaining, ordered by nested groups */
-    private List<String> _stats;
+    private final List<String> _stats;
     private String _currentStatName;
     private String _currentGraphName;
     private String _currentStatDescription;
@@ -35,6 +36,12 @@ public class ConfigStatsHelper extends HelperBase {
     private boolean _currentIsGraphed;
     private boolean _currentCanBeGraphed;
     
+    public ConfigStatsHelper() {
+        _stats = new ArrayList();
+        _filters = new HashSet();
+        _graphs = new HashSet();
+    }
+
     /**
      * Configure this bean to query a particular router context
      *
@@ -46,7 +53,6 @@ public class ConfigStatsHelper extends HelperBase {
         super.setContextId(contextId);
         _log = _context.logManager().getLog(ConfigStatsHelper.class);
         
-        _stats = new ArrayList();
         Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
         Map<String, Set<String>> groups = new TreeMap(new AlphaComparator());
         groups.putAll(unsorted);
@@ -57,10 +63,17 @@ public class ConfigStatsHelper extends HelperBase {
         if (_filter == null)
             _filter = "";
         
-        _filters = new HashSet();
         StringTokenizer tok = new StringTokenizer(_filter, ",");
         while (tok.hasMoreTokens())
             _filters.add(tok.nextToken().trim());
+
+        // create a local copy of the config. Querying r.getSummaryListener()
+        // lags behind, as StatSummarizer only runs once a minute.
+        String specs = _context.getProperty("stat.summaries", StatSummarizer.DEFAULT_DATABASES);
+        tok = new StringTokenizer(specs, ",");
+        while (tok.hasMoreTokens()) {
+            _graphs.add(tok.nextToken().trim());
+        }
     }
 
     /**
@@ -100,9 +113,12 @@ public class ConfigStatsHelper extends HelperBase {
             if (period <= 10*60*1000) {
                 Rate r = rs.getRate(period);
                 _currentCanBeGraphed = r != null;
-                if (_currentCanBeGraphed)
-                    _currentIsGraphed = r.getSummaryListener() != null;
+                if (_currentCanBeGraphed) {
+                    // see above
+                    //_currentIsGraphed = r.getSummaryListener() != null;
                     _currentGraphName = _currentStatName + "." + period;
+                    _currentIsGraphed = _graphs.contains(_currentGraphName);
+                }
             } else {
                 _currentCanBeGraphed = false;
             }

@@ -50,16 +50,16 @@ public class ConfigStatsHandler extends FormHandler {
 
     public void setGraphList(String stats[]) {
         if (stats != null) {
-            String s = "";
+            StringBuilder s = new StringBuilder(128);
             for (int i = 0; i < stats.length; i++) {
                 String cur = stats[i].trim();
                 if (cur.length() > 0) {
                     if (s.length() > 0)
-                        s = s + ",";
-                    s = s + cur;
+                        s.append(",");
+                    s.append(cur);
                 }
             }
-            _graphs = s;
+            _graphs = s.toString();
         } else {
             _graphs = "";
         }
@@ -122,7 +122,7 @@ public class ConfigStatsHandler extends FormHandler {
             addFormNotice(_("Restart required to take effect"));
         }
         if (graphsChanged)
-            addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));
+            addFormNotice(_("Graph list updated, may take up to 60s to be reflected on the {0}Graphs Page{1}", "<a href=\"graphs\">", "</a>"));
     }
     
 }

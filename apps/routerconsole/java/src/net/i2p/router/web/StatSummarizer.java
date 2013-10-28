@@ -3,8 +3,9 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
@@ -96,7 +97,7 @@ public class StatSummarizer implements Runnable {
     /** list of SummaryListener instances */
     List<SummaryListener> getListeners() { return _listeners; }
     
-    private static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
+    static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
                                                     ",bw.recvRate.60000" +
 //                                                  ",tunnel.testSuccessTime.60000" +
 //                                                  ",udp.outboundActiveCount.60000" +
@@ -127,8 +128,8 @@ public class StatSummarizer implements Runnable {
              ( (spec != null) && (oldSpecs != null) && (oldSpecs.equals(spec))) )
             return oldSpecs;
         
-        List<Rate> old = parseSpecs(oldSpecs);
-        List<Rate> newSpecs = parseSpecs(spec);
+        Set<Rate> old = parseSpecs(oldSpecs);
+        Set<Rate> newSpecs = parseSpecs(spec);
         
         // remove old ones
         for (Rate r : old) {
@@ -307,9 +308,9 @@ public class StatSummarizer implements Runnable {
      * @param specs statName.period,statName.period,statName.period
      * @return list of Rate objects
      */
-    List<Rate> parseSpecs(String specs) {
+    Set<Rate> parseSpecs(String specs) {
         StringTokenizer tok = new StringTokenizer(specs, ",");
-        List<Rate> rv = new ArrayList();
+        Set<Rate> rv = new HashSet();
         while (tok.hasMoreTokens()) {
             String spec = tok.nextToken();
             int split = spec.lastIndexOf('.');
