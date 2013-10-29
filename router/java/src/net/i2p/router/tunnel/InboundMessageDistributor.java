@@ -62,13 +62,15 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
         if ( (_client != null) && 
              (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) &&
              (_client.equals(((DatabaseSearchReplyMessage)msg).getSearchKey()))) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Removing replies from a DSRM down a tunnel for " + _client + ": " + msg);
             DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
-            DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
-            newMsg.setFromHash(orig.getFromHash());
-            newMsg.setSearchKey(orig.getSearchKey());
-            msg = newMsg;
+            if (orig.getNumReplies() > 0) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Removing replies from a DSRM down a tunnel for " + _client + ": " + msg);
+                DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
+                newMsg.setFromHash(orig.getFromHash());
+                newMsg.setSearchKey(orig.getSearchKey());
+                msg = newMsg;
+            }
         } else if ( (_client != null) && 
              (type == DatabaseStoreMessage.MESSAGE_TYPE) &&
              (((DatabaseStoreMessage)msg).getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
@@ -156,29 +158,43 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             case DeliveryInstructions.DELIVERY_MODE_LOCAL:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("local delivery instructions for clove: " + data.getClass().getName());
-                if (data instanceof GarlicMessage) {
+                int type = data.getType();
+                if (type == GarlicMessage.MESSAGE_TYPE) {
                     _receiver.receive((GarlicMessage)data);
-                } else if (data instanceof DatabaseStoreMessage) {
+                } else if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
                         // Treat db store explicitly here (not in HandleFloodfillDatabaseStoreMessageJob),
                         // since we don't want to republish (or flood)
                         // unnecessarily. Reply tokens ignored.
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
                         try {
                             if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-                                // If it was stored to us before, don't undo the
-                                // receivedAsPublished flag so we will continue to respond to requests
-                                // for the leaseset. That is, we don't want this to change the
-                                // RAP flag of the leaseset.
-                                // When the keyspace rotates at midnight, and this leaseset moves out
-                                // of our keyspace, maybe we shouldn't do this?
-                                // Should we do this whether ff or not?
-                                LeaseSet ls = (LeaseSet) dsm.getEntry();
-                                LeaseSet old = _context.netDb().store(dsm.getKey(), ls);
-                                if (old != null && old.getReceivedAsPublished()
-                                    /** && ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled() **/ )
-                                    ls.setReceivedAsPublished(true);
-                                if (_log.shouldLog(Log.INFO))
-                                    _log.info("Storing LS for: " + dsm.getKey() + " sent to: " + _client);
+                                if (dsm.getKey().equals(_client)) {
+                                    // store of our own LS.
+                                    // This is almost certainly a response to a FloodfillVerifyStoreJob search.
+                                    // We must send to the InNetMessagePool so the message can be matched
+                                    // and the verify marked as successful.
+                                    // Ensure the reply info is clear...
+                                    dsm.setReplyToken(0);
+                                    dsm.setReplyTunnel(null);
+                                    dsm.setReplyGateway(null);
+                                    // ... and inject it.
+                                    _context.inNetMessagePool().add(dsm, null, null);
+                                } else {
+                                    // If it was stored to us before, don't undo the
+                                    // receivedAsPublished flag so we will continue to respond to requests
+                                    // for the leaseset. That is, we don't want this to change the
+                                    // RAP flag of the leaseset.
+                                    // When the keyspace rotates at midnight, and this leaseset moves out
+                                    // of our keyspace, maybe we shouldn't do this?
+                                    // Should we do this whether ff or not?
+                                    LeaseSet ls = (LeaseSet) dsm.getEntry();
+                                    LeaseSet old = _context.netDb().store(dsm.getKey(), ls);
+                                    if (old != null && old.getReceivedAsPublished()
+                                        /** && ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled() **/ )
+                                        ls.setReceivedAsPublished(true);
+                                    if (_log.shouldLog(Log.INFO))
+                                        _log.info("Storing LS for: " + dsm.getKey() + " sent to: " + _client);
+                                }
                             } else {                                        
                                 if (_client != null) {
                                     // drop it, since the data we receive shouldn't include router 
@@ -195,13 +211,26 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Bad store attempt", iae);
                         }
-                } else if (data instanceof DataMessage) {
+                } else if (_client != null && type == DatabaseSearchReplyMessage.MESSAGE_TYPE &&
+                           _client.equals(((DatabaseSearchReplyMessage) data).getSearchKey())) {
+                    // DSRMs show up here now that replies are encrypted
+                    DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) data;
+                    if (orig.getNumReplies() > 0) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Removing replies from a garlic DSRM down a tunnel for " + _client + ": " + data);
+                        DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
+                        newMsg.setFromHash(orig.getFromHash());
+                        newMsg.setSearchKey(orig.getSearchKey());
+                        orig = newMsg;
+                     }
+                    _context.inNetMessagePool().add(orig, null, null);
+                } else if (type == DataMessage.MESSAGE_TYPE) {
                         // a data message targetting the local router is how we send load tests (real
                         // data messages target destinations)
                         _context.statManager().addRateData("tunnel.handleLoadClove", 1, 0);
                         data = null;
                         //_context.inNetMessagePool().add(data, null, null);
-                } else if (_client != null && data.getType() != DeliveryStatusMessage.MESSAGE_TYPE) {
+                } else if (_client != null && type != DeliveryStatusMessage.MESSAGE_TYPE) {
                             // drop it, since the data we receive shouldn't include other stuff, 
                             // as that might open an attack vector
                             _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, 

@@ -82,7 +82,21 @@ class FloodfillVerifyStoreJob extends JobImpl {
             return;
         }        
 
-        DatabaseLookupMessage lookup = buildLookup();
+        boolean isInboundExploratory;
+        TunnelInfo replyTunnelInfo;
+        if (_isRouterInfo || getContext().keyRing().get(_key) != null) {
+            replyTunnelInfo = getContext().tunnelManager().selectInboundExploratoryTunnel(_target);
+            isInboundExploratory = true;
+        } else {
+            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_key, _target);
+            isInboundExploratory = false;
+        }
+        if (replyTunnelInfo == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No inbound tunnels to get a reply from!");
+            return;
+        }
+        DatabaseLookupMessage lookup = buildLookup(replyTunnelInfo);
         if (lookup == null) {
             _facade.verifyFinished(_key);
             return;
@@ -112,7 +126,19 @@ class FloodfillVerifyStoreJob extends JobImpl {
             return;
         }
         if (DatabaseLookupMessage.supportsEncryptedReplies(peer)) {
-            MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(getContext());
+            // register the session with the right SKM
+            MessageWrapper.OneTimeSession sess;
+            if (isInboundExploratory) {
+                sess = MessageWrapper.generateSession(getContext());
+            } else {
+                sess = MessageWrapper.generateSession(getContext(), _key);
+                if (sess == null) {
+                     if (_log.shouldLog(Log.WARN))
+                         _log.warn("No SKM to reply to");
+                    _facade.verifyFinished(_key);
+                    return;
+                }
+            }
             if (_log.shouldLog(Log.INFO))
                 _log.info("Requesting encrypted reply from " + _target + ' ' + sess.key + ' ' + sess.tag);
             lookup.setReplySession(sess.key, sess.tag);
@@ -154,20 +180,10 @@ class FloodfillVerifyStoreJob extends JobImpl {
         return _sentTo;
     }
     
-    private DatabaseLookupMessage buildLookup() {
+    private DatabaseLookupMessage buildLookup(TunnelInfo replyTunnelInfo) {
         // If we are verifying a leaseset, use the destination's own tunnels,
         // to avoid association by the exploratory tunnel OBEP.
         // Unless it is an encrypted leaseset.
-        TunnelInfo replyTunnelInfo;
-        if (_isRouterInfo || getContext().keyRing().get(_key) != null)
-            replyTunnelInfo = getContext().tunnelManager().selectInboundExploratoryTunnel(_target);
-        else
-            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_key, _target);
-        if (replyTunnelInfo == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("No inbound tunnels to get a reply from!");
-            return null;
-        }
         DatabaseLookupMessage m = new DatabaseLookupMessage(getContext(), true);
         m.setMessageExpiration(getContext().clock().now() + VERIFY_TIMEOUT);
         m.setReplyTunnel(replyTunnelInfo.getReceiveTunnelId(0));

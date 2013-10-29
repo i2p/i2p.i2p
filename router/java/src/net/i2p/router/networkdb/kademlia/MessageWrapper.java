@@ -168,10 +168,38 @@ public class MessageWrapper {
      *  @since 0.9.7
      */
     public static OneTimeSession generateSession(RouterContext ctx) {
+        return generateSession(ctx, ctx.sessionKeyManager());
+    }
+
+    /**
+     *  Create a single key and tag, for receiving a single encrypted message,
+     *  and register it with the client's session key manager, to expire in two minutes.
+     *  The recipient can then send us an AES-encrypted message,
+     *  avoiding ElGamal.
+     *
+     *  @return null if we can't find the SKM for the localDest
+     *  @since 0.9.9
+     */
+    public static OneTimeSession generateSession(RouterContext ctx, Hash localDest) {
+         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(localDest);
+         if (skm == null)
+             return null;
+         return generateSession(ctx, skm);
+    }
+
+    /**
+     *  Create a single key and tag, for receiving a single encrypted message,
+     *  and register it with the given session key manager, to expire in two minutes.
+     *  The recipient can then send us an AES-encrypted message,
+     *  avoiding ElGamal.
+     *
+     *  @since 0.9.9
+     */
+    private static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
         SessionTag tag = new SessionTag(true);
         Set<SessionTag> tags = new RemovableSingletonSet(tag);
-        ctx.sessionKeyManager().tagsReceived(key, tags, 2*60*1000);
+        skm.tagsReceived(key, tags, 2*60*1000);
         return new OneTimeSession(key, tag);
     }
 
