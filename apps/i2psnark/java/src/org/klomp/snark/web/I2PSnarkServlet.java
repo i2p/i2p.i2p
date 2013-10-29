@@ -509,7 +509,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     // show startall too
                     out.write("<br>");
                     if (isDegraded)
-                        out.write("<a href=\"/" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                        out.write("<a href=\"" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
                     else
                         out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
                     out.write(_("Start all stopped torrents"));
@@ -523,7 +523,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         } else if ((!_manager.util().isConnecting()) && !snarks.isEmpty()) {
             if (isDegraded)
-                out.write("<a href=\"/" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
@@ -1418,7 +1418,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
-                    out.write("<a href=\"/" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Start the torrent"));

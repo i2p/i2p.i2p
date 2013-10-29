@@ -1,4 +1,6 @@
 2013-10-29 zzz
+ * i2psnark: Fix start and start-all buttons on text-mode browsers
+   and Opera (ticket #1093)
  * InboundMessageDistributor:
    - Don't discard an encrypted DSRM received
      down a tunnel, just strip the hashes like we do for unencrypted
