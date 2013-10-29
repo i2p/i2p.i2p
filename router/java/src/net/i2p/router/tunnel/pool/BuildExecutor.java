@@ -129,7 +129,7 @@ class BuildExecutor implements Runnable {
             }
         }
         if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
-        if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
+        else if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
         // expire any REALLY old requests
@@ -319,6 +319,11 @@ class BuildExecutor implements Runnable {
                 if ( (mgr == null) || (mgr.getFreeTunnelCount() <= 0) || (mgr.getOutboundTunnelCount() <= 0) ) {
                     // we don't have either inbound or outbound tunnels, so don't bother trying to build
                     // non-zero-hop tunnels
+                    // try to kickstart it to build a fallback, otherwise we may get stuck here for a long time (minutes)
+                    if (mgr.getFreeTunnelCount() <= 0)
+                        mgr.selectInboundTunnel();
+                    if (mgr.getOutboundTunnelCount() <= 0)
+                        mgr.selectOutboundTunnel();
                     synchronized (_currentlyBuilding) {
                         if (!_repoll) {
                             if (_log.shouldLog(Log.DEBUG))
@@ -498,7 +503,7 @@ class BuildExecutor implements Runnable {
      */
     public void buildComplete(PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Build complete for " + cfg);
+            _log.debug("Build complete for " + cfg, new Exception());
         pool.buildComplete(cfg);
         if (cfg.getLength() > 1)
             removeFromBuilding(cfg.getReplyMessageId());

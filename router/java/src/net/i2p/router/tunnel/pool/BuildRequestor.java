@@ -133,10 +133,10 @@ abstract class BuildRequestor {
             else
                 pairedTunnel = mgr.selectInboundTunnel(pool.getSettings().getDestination(), farEnd);
             if (pairedTunnel == null) {   
-                if (log.shouldLog(Log.INFO))
-                    log.info("Couldn't find a paired tunnel for " + cfg + ", fall back on exploratory tunnels for pairing");
                 if (isInbound) {
-                    pairedTunnel = mgr.selectOutboundExploratoryTunnel(farEnd);
+                    // random more reliable than closest ??
+                    //pairedTunnel = mgr.selectOutboundExploratoryTunnel(farEnd);
+                    pairedTunnel = mgr.selectOutboundTunnel();
                     if (pairedTunnel != null &&
                         pairedTunnel.getLength() <= 1 &&
                         mgr.getOutboundSettings().getLength() + mgr.getOutboundSettings().getLengthVariance() > 0) {
@@ -146,7 +146,9 @@ abstract class BuildRequestor {
                         pairedTunnel = null;
                     }
                 } else {
-                    pairedTunnel = mgr.selectInboundExploratoryTunnel(farEnd);
+                    // random more reliable than closest ??
+                    //pairedTunnel = mgr.selectInboundExploratoryTunnel(farEnd);
+                    pairedTunnel = mgr.selectInboundTunnel();
                     if (pairedTunnel != null &&
                         pairedTunnel.getLength() <= 1 &&
                         mgr.getInboundSettings().getLength() + mgr.getInboundSettings().getLengthVariance() > 0) {
@@ -154,6 +156,8 @@ abstract class BuildRequestor {
                         pairedTunnel = null;
                     }
                 }
+                if (pairedTunnel != null && log.shouldLog(Log.INFO))
+                    log.info("Couldn't find a paired tunnel for " + cfg + ", using exploratory tunnel");
             }
         }
         if (pairedTunnel == null) {
