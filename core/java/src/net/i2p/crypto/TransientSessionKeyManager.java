@@ -518,14 +518,15 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags, long expire) {
         TagSet tagSet = new TagSet(sessionTags, key, _context.clock().now() + expire,
                                    _rcvTagSetID.incrementAndGet());
-        if (_log.shouldLog(Log.INFO))
+        if (_log.shouldLog(Log.INFO)) {
             _log.info("Received " + tagSet);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Tags: " + DataHelper.toString(sessionTags));
+        }
         TagSet old = null;
         SessionTag dupTag = null;
         synchronized (_inboundTagSets) {
             for (SessionTag tag : sessionTags) {
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("Receiving tag " + tag + " in tagSet: " + tagSet);
                 old = _inboundTagSets.put(tag, tagSet);
                 if (old != null) {
                     if (!old.getAssociatedKey().equals(tagSet.getAssociatedKey())) {

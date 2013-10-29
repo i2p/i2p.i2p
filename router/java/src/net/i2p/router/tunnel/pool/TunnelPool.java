@@ -250,7 +250,8 @@ public class TunnelPool {
         TunnelInfo rv = null;
         synchronized (_tunnels) {
             if (!_tunnels.isEmpty()) {
-                Collections.sort(_tunnels, new TunnelInfoComparator(closestTo, avoidZeroHop));
+                if (_tunnels.size() > 1)
+                    Collections.sort(_tunnels, new TunnelInfoComparator(closestTo, avoidZeroHop));
                 for (TunnelInfo info : _tunnels) {
                     if (info.getExpiration() > _context.clock().now()) {
                         rv = info;

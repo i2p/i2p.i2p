@@ -130,7 +130,7 @@ public class InNetMessagePool implements Service {
                 _log.info("Received inbound " 
                           + " with id " + messageBody.getUniqueId()
                           + " expiring on " + exp
-                          + " of type " + messageBody.getClass().getName());
+                          + " of type " + messageBody.getClass().getSimpleName());
         
         //if (messageBody instanceof DataMessage) {
         //    _context.statManager().getStatLog().addData(fromRouterHash.toBase64().substring(0,6), "udp.floodDataReceived", 1, 0);
@@ -185,7 +185,7 @@ public class InNetMessagePool implements Service {
 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Add message to the inNetMessage pool - builder: " + builder 
-                               + " message class: " + messageBody.getClass().getName());
+                               + " message class: " + messageBody.getClass().getSimpleName());
 
                 if (builder != null) {
                     Job job = builder.createJob(messageBody, fromRouter, 

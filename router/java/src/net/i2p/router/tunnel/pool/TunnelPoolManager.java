@@ -271,9 +271,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     /** @return number of inbound exploratory tunnels */
     public int getFreeTunnelCount() { 
-        if (_inboundExploratory == null)
-            return 0;
-        else
             return _inboundExploratory.size(); 
     }
 

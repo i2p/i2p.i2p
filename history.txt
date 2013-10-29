@@ -1,3 +1,18 @@
+2013-10-29 zzz
+ * InboundMessageDistributor:
+   - Don't discard an encrypted DSRM received
+     down a tunnel, just strip the hashes like we do for unencrypted
+   - Send a store of our own encrypted LS received down a tunnel to
+     the InNetMessagePool so the FloodfillVerifyStoreJob will see it.
+ * NetDB: Fix LS store verifies with encrypted replies
+   by storing the tagset with the correct SKM for the inbound tunnel used.
+   Broken since 0.9.7 when it was introduced.
+ * Tunnels:
+   - Build a new exploratory fallback tunnel in the BuildExecutor
+     loop if we run out.
+   - Don't use closest expl. tunnel as the paired tunnel for a build,
+     use a random one instead (partially back out change from -12)
+
 2013-10-29 meeh
  * Adding no.i2p registrar
 
