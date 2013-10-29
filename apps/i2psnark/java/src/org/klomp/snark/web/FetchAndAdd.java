@@ -160,8 +160,8 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
                 return;
             }
 
-            name = Storage.filterName(name);
-            name = name + ".torrent";
+            String originalName = Storage.filterName(name);
+            name = originalName + ".torrent";
             File torrentFile = new File(_mgr.getDataDir(), name);
 
             String canonical = torrentFile.getCanonicalPath();
@@ -174,6 +174,8 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             } else {
                 // This may take a LONG time to create the storage.
                 _mgr.copyAndAddTorrent(file, canonical);
+                snark = _mgr.getTorrentByBaseName(originalName);
+                snark.startTorrent();
             }
         } catch (IOException ioe) {
             _mgr.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());

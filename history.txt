@@ -1,3 +1,6 @@
+2013-10-29 dg
+ * i2psnark: Start torrents by default (ticket #1072)
+
 2013-10-29 zzz
  * i2psnark: Fix start and start-all buttons on text-mode browsers
    and Opera (ticket #1093)

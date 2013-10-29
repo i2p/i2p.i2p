@@ -1018,7 +1018,8 @@ public class SnarkManager implements CompleteListener {
      * @since 0.8.4
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus) {
-        addMagnet(name, ih, trackerURL, updateStatus, shouldAutoStart(), this);
+        // updateStatus is true from UI, false from config file bulk add
+        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, this);
     }
     
     /**
