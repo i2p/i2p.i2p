@@ -1,6 +1,9 @@
 2013-10-29 meeh
  * Adding no.i2p registrar
 
+2013-10-28 dg
+ * I2PTunnel: Enable persistent keying for SOCKS tunnels (ticket #1088)
+
 2013-10-27 zzz
  * Streaming; Fix crash caused by previous blacklist fix (ticket #1070)
 
