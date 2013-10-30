@@ -794,6 +794,7 @@ class EstablishState {
             Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
+        @Override public String toString() { return "VerfiedEstablishState";}
     }
 
     /** @deprecated unused */
