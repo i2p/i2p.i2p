@@ -1059,8 +1059,8 @@ class NTCPConnection {
             if (msg != null) {
                 _lastSendTime = System.currentTimeMillis();
                 _context.statManager().addRateData("ntcp.sendTime", msg.getSendTime());
-                if (_log.shouldLog(Log.INFO)) {
-                    _log.info("I2NP message " + _messagesWritten + "/" + msg.getMessageId() + " sent after " 
+                if (_log.shouldLog(Log.DEBUG)) {
+                    _log.debug("I2NP message " + _messagesWritten + "/" + msg.getMessageId() + " sent after " 
                               + msg.getSendTime() + "/"
                               + msg.getLifetime()
                               + " with " + buf.capacity() + " bytes (uid=" + System.identityHashCode(msg)+" on " + toString() + ")");
@@ -1499,8 +1499,8 @@ class NTCPConnection {
                     I2NPMessage read = h.lastRead();
                     long timeToRecv = System.currentTimeMillis() - _stateBegin;
                     releaseHandler(h);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
                                    + " received after " + timeToRecv + " with " + _size +"/"+ (_blocks*16) + " bytes on " + NTCPConnection.this.toString());
                     _context.statManager().addRateData("ntcp.receiveTime", timeToRecv);
                     _context.statManager().addRateData("ntcp.receiveSize", _size);
@@ -1549,6 +1549,10 @@ class NTCPConnection {
                (_isInbound ? "from " : "to ") +
                (_remotePeer == null ? "unknown" : _remotePeer.calculateHash().toBase64().substring(0,6)) +
                (isEstablished() ? "" : " not established") +
-               " created " + DataHelper.formatDuration(getTimeSinceCreated()) + " ago";
+               " created " + DataHelper.formatDuration(getTimeSinceCreated()) + " ago," +
+               " last send " + DataHelper.formatDuration(getTimeSinceSend()) + " ago," +
+               " last recv " + DataHelper.formatDuration(getTimeSinceReceive()) + " ago," +
+               " sent " + _messagesWritten + "," +
+               " rcvd " + _messagesRead;
     }
 }
