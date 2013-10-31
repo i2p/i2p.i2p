@@ -63,9 +63,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _clientPeerSelector = new ClientPeerSelector(ctx);
 
         ExploratoryPeerSelector selector = new ExploratoryPeerSelector(_context);
-        TunnelPoolSettings inboundSettings = new TunnelPoolSettings(true, true);
+        TunnelPoolSettings inboundSettings = new TunnelPoolSettings(null, true, true);
         _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector);
-        TunnelPoolSettings outboundSettings = new TunnelPoolSettings(true, false);
+        TunnelPoolSettings outboundSettings = new TunnelPoolSettings(null, true, false);
         _outboundExploratory = new TunnelPool(_context, this, outboundSettings, selector);
         
         // threads will be started in startup()
@@ -377,7 +377,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private static void setSettings(Map<Hash, TunnelPool> pools, Hash client, TunnelPoolSettings settings) {
         TunnelPool pool = pools.get(client); 
         if (pool != null) {
-            settings.setDestination(client); // prevent spoofing or unset dest
             pool.setSettings(settings);
         }
     }
@@ -397,8 +396,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         Hash dest = client.calculateHash();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Building tunnels for the client " + dest + ": " + settings);
-        settings.getInboundSettings().setDestination(dest);
-        settings.getOutboundSettings().setDestination(dest);
         TunnelPool inbound = null;
         TunnelPool outbound = null;
 

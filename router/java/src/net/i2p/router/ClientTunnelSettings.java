@@ -11,6 +11,8 @@ package net.i2p.router;
 import java.util.Iterator;
 import java.util.Properties;
 
+import net.i2p.data.Hash;
+
 /**
  * Wrap up the client settings specifying their tunnel criteria
  *
@@ -19,9 +21,9 @@ public class ClientTunnelSettings {
     private final TunnelPoolSettings _inboundSettings;
     private final TunnelPoolSettings _outboundSettings;
     
-    public ClientTunnelSettings() {
-        _inboundSettings = new TunnelPoolSettings(false, true);
-        _outboundSettings = new TunnelPoolSettings(false, false);
+    public ClientTunnelSettings(Hash dest) {
+        _inboundSettings = new TunnelPoolSettings(dest, false, true);
+        _outboundSettings = new TunnelPoolSettings(dest, false, false);
     }
     
     public TunnelPoolSettings getInboundSettings() { return _inboundSettings; }

@@ -11,6 +11,7 @@ package net.i2p.router.client;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
+import net.i2p.data.Hash;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
@@ -324,13 +325,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         _runner.getConfig().getOptions().putAll(message.getSessionConfig().getOptions());
-        ClientTunnelSettings settings = new ClientTunnelSettings();
+        Hash dest = _runner.getConfig().getDestination().calculateHash();
+        ClientTunnelSettings settings = new ClientTunnelSettings(dest);
         Properties props = new Properties();
         props.putAll(_runner.getConfig().getOptions());
         settings.readFromProperties(props);
-        _context.tunnelManager().setInboundSettings(_runner.getConfig().getDestination().calculateHash(),
+        _context.tunnelManager().setInboundSettings(dest,
                                                     settings.getInboundSettings());
-        _context.tunnelManager().setOutboundSettings(_runner.getConfig().getDestination().calculateHash(),
+        _context.tunnelManager().setOutboundSettings(dest,
                                                      settings.getOutboundSettings());
         sendStatusMessage(SessionStatusMessage.STATUS_UPDATED);
     }

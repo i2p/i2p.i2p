@@ -13,7 +13,7 @@ import net.i2p.util.SystemVersion;
  *
  */
 public class TunnelPoolSettings {
-    private Hash _destination;
+    private final Hash _destination;
     private String _destinationNickname;
     private int _quantity;
     private int _backupQuantity;
@@ -46,6 +46,7 @@ public class TunnelPoolSettings {
     public static final String  PROP_DURATION = "duration";
     public static final String  PROP_LENGTH = "length";
     public static final String  PROP_LENGTH_VARIANCE = "lengthVariance";
+    /** don't trust this, always true */
     public static final String  PROP_ALLOW_ZERO_HOP = "allowZeroHop";
     public static final String  PROP_IP_RESTRICTION = "IPRestriction";
     public static final String  PROP_PRIORITY = "priority";
@@ -63,7 +64,8 @@ public class TunnelPoolSettings {
     private static final int MAX_PRIORITY = 25;
     private static final int EXPLORATORY_PRIORITY = 30;
     
-    public TunnelPoolSettings(boolean isExploratory, boolean isInbound) {
+    public TunnelPoolSettings(Hash dest, boolean isExploratory, boolean isInbound) {
+        _destination = dest;
         _isExploratory = isExploratory;
         _isInbound = isInbound;
         _quantity = DEFAULT_QUANTITY;
@@ -73,7 +75,10 @@ public class TunnelPoolSettings {
         _length = DEFAULT_LENGTH;
         _lengthVariance = DEFAULT_LENGTH_VARIANCE;
         _lengthOverride = -1;
-        _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
+        if (isExploratory)
+            _allowZeroHop = true;
+        else
+            _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
         _randomKey = generateRandomKey();
@@ -114,9 +119,22 @@ public class TunnelPoolSettings {
      */
     public void setLength(int length) { _length = length; }
     
-    /** if there are no tunnels to build with, will this pool allow 0 hop tunnels? */
+    /**
+     * If there are no tunnels to build with, will this pool allow 0 hop tunnels?
+     * Always true for exploratory.
+     * Generally true for client, but should probably be ignored...
+     * use getLength() + getLengthVariance() > 0 instead.
+     */
     public boolean getAllowZeroHop() { return _allowZeroHop; }
-    public void setAllowZeroHop(boolean ok) { _allowZeroHop = ok; }
+
+    /**
+     * If there are no tunnels to build with, will this pool allow 0 hop tunnels?
+     * No effect on exploratory (always true)
+     */
+    public void setAllowZeroHop(boolean ok) {
+        if (!_isExploratory)
+            _allowZeroHop = ok;
+    }
     
     /** 
      * how should the length be varied.  if negative, this randomly skews from
@@ -153,7 +171,6 @@ public class TunnelPoolSettings {
     
     /** what destination is this a tunnel for (or null if none) */
     public Hash getDestination() { return _destination; }
-    public void setDestination(Hash dest) { _destination = dest; }
 
     /** random key used for peer ordering */
     public Hash getRandomKey() { return _randomKey; }

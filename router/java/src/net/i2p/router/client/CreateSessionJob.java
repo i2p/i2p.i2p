@@ -10,6 +10,7 @@ package net.i2p.router.client;
 
 import java.util.Properties;
 
+import net.i2p.data.Hash;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
@@ -43,9 +44,10 @@ class CreateSessionJob extends JobImpl {
                 _log.error("No session config on runner " + _runner);
             return;
         }
+        Hash dest = cfg.getDestination().calculateHash();
         if (_log.shouldLog(Log.INFO))
-            _log.info("Requesting lease set for destination " + cfg.getDestination().calculateHash().toBase64());
-        ClientTunnelSettings settings = new ClientTunnelSettings();
+            _log.info("Requesting lease set for destination " + dest);
+        ClientTunnelSettings settings = new ClientTunnelSettings(dest);
         Properties props = new Properties();
         
         // We're NOT going to force all clients to use the router's defaults, since that may be
