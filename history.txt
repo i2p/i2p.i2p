@@ -1,3 +1,8 @@
+2013-10-31 zzz
+ * i2psnark: Always verify file lengths at startup (ticket #1099)
+ * Transports: Increase threshold for idle timeout reduction
+   (partially back out change from -10)
+
 2013-10-29 dg
  * i2psnark: Start torrents by default (ticket #1072)
 

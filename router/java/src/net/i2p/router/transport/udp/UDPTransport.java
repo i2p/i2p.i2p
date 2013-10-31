@@ -102,7 +102,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private final Set<RemoteHostId> _dropList;
     
-    private int _expireTimeout;
+    private volatile long _expireTimeout;
 
     /** last report from a peer of our IP */
     private Hash _lastFrom;
@@ -1217,11 +1217,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return;
             } else {
                 if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received an RI from the same net");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Received an RI from the same net");
                 } else {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received a leaseSet: " + dsm);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Received a leaseSet: " + dsm);
                 }
             }
         } else {
@@ -2826,6 +2826,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private final List<PeerState> _expireBuffer;
         private volatile boolean _alive;
         private int _runCount;
+        private boolean _lastLoopShort;
         // we've seen firewalls change ports after 40 seconds
         private static final long PING_FIREWALL_TIME = 30*1000;
         private static final long PING_FIREWALL_CUTOFF = PING_FIREWALL_TIME / 2;
@@ -2833,6 +2834,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final int SLICES = 4;
         private static final long SHORT_LOOP_TIME = PING_FIREWALL_CUTOFF / (SLICES + 1);
         private static final long LONG_LOOP_TIME = 25*1000;
+        private static final long EXPIRE_INCREMENT = 15*1000;
+        private static final long EXPIRE_DECREMENT = 45*1000;
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
@@ -2842,10 +2845,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity(33))
-                _expireTimeout = Math.min(_expireTimeout + 15*1000, EXPIRE_TIMEOUT);
-            else
-                _expireTimeout = Math.max(_expireTimeout - 45*1000, MIN_EXPIRE_TIMEOUT);
+            if (haveCapacity(60)) {
+                long inc;
+                // don't adjust too quickly if we are looping fast
+                if (_lastLoopShort)
+                    inc = EXPIRE_INCREMENT * SHORT_LOOP_TIME / LONG_LOOP_TIME;
+                else
+                    inc = EXPIRE_INCREMENT;
+                _expireTimeout = Math.min(_expireTimeout + inc, EXPIRE_TIMEOUT);
+            } else {
+                long dec;
+                if (_lastLoopShort)
+                    dec = EXPIRE_DECREMENT * SHORT_LOOP_TIME / LONG_LOOP_TIME;
+                else
+                    dec = EXPIRE_DECREMENT;
+                _expireTimeout = Math.max(_expireTimeout - dec, MIN_EXPIRE_TIMEOUT);
+            }
             long now = _context.clock().now();
             long shortInactivityCutoff = now - _expireTimeout;
             long longInactivityCutoff = now - EXPIRE_TIMEOUT;
@@ -2855,6 +2870,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int currentListenPort = getListenPort(false);
             boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
             boolean shortLoop = shouldPingFirewall;
+            _lastLoopShort = shortLoop;
             _expireBuffer.clear();
             _runCount++;
 
@@ -2890,11 +2906,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 		    }
                 }
 
-            for (PeerState peer : _expireBuffer) {
-                sendDestroy(peer);
-                dropPeer(peer, false, "idle too long");
+            if (!_expireBuffer.isEmpty()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Expiring " + _expireBuffer.size() + " peers");
+                for (PeerState peer : _expireBuffer) {
+                    sendDestroy(peer);
+                    dropPeer(peer, false, "idle too long");
+                    // TODO sleep to limit burst like in destroyAll() ??
+                    // but we are on the timer thread...
+                    // hopefully this isn't too many at once
+                    // ... or only send a max of x, then requeue
+                }
+                _expireBuffer.clear();
             }
-            _expireBuffer.clear();
 
             if (_alive)
                 schedule(shortLoop ? SHORT_LOOP_TIME : LONG_LOOP_TIME);
