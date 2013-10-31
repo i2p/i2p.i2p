@@ -526,6 +526,8 @@ public class Storage
             long lm = base.lastModified();
             if (lm <= 0 || lm > savedTime)
                 useSavedBitField = false;
+            else if (base.length() != metainfo.getTotalLength())
+                useSavedBitField = false;
         }
       }
     else
@@ -569,6 +571,8 @@ public class Storage
                 long lm = f.lastModified();
                 if (lm <= 0 || lm > savedTime)
                     useSavedBitField = false;
+                else if (f.length() != len)
+                    useSavedBitField = false;
             }
           }
 
@@ -587,6 +591,8 @@ public class Storage
     } else {
       // the following sets the needed variable
       changed = true;
+      if (_log.shouldLog(Log.INFO))
+          _log.info("Forcing check");
       checkCreateFiles(false);
     }
     if (complete()) {
