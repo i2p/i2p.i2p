@@ -1403,37 +1403,38 @@ public class ProfileOrganizer {
      *
      */
     private void locked_placeProfile(PeerProfile profile) {
+        Hash peer = profile.getPeer();
         if (profile.getIsFailing()) {
             if (!shouldDrop(profile))
-                _failingPeers.put(profile.getPeer(), profile);
-            _fastPeers.remove(profile.getPeer());
-            _highCapacityPeers.remove(profile.getPeer());
-            _wellIntegratedPeers.remove(profile.getPeer());
-            _notFailingPeers.remove(profile.getPeer());
-            _notFailingPeersList.remove(profile.getPeer());
+                _failingPeers.put(peer, profile);
+            _fastPeers.remove(peer);
+            _highCapacityPeers.remove(peer);
+            _wellIntegratedPeers.remove(peer);
+            _notFailingPeers.remove(peer);
+            _notFailingPeersList.remove(peer);
         } else {
-            _failingPeers.remove(profile.getPeer());
-            _fastPeers.remove(profile.getPeer());
-            _highCapacityPeers.remove(profile.getPeer());
-            _wellIntegratedPeers.remove(profile.getPeer());
+            _failingPeers.remove(peer);
+            _fastPeers.remove(peer);
+            _highCapacityPeers.remove(peer);
+            _wellIntegratedPeers.remove(peer);
             
-            _notFailingPeers.put(profile.getPeer(), profile);
-            _notFailingPeersList.add(profile.getPeer());
+            _notFailingPeers.put(peer, profile);
+            _notFailingPeersList.add(peer);
             // if not selectable for a tunnel (banlisted for example),
             // don't allow them in the high-cap pool, what would the point of that be?
             if (_thresholdCapacityValue <= profile.getCapacityValue() &&
-                isSelectable(profile.getPeer())) {
-                _highCapacityPeers.put(profile.getPeer(), profile);
+                isSelectable(peer)) {
+                _highCapacityPeers.put(peer, profile);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("High capacity: \t" + profile.getPeer().toBase64());
+                    _log.debug("High capacity: \t" + peer);
                 if (_thresholdSpeedValue <= profile.getSpeedValue()) {
                     if (!profile.getIsActive()) {
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("Skipping fast mark [!active] for " + profile.getPeer().toBase64());
+                            _log.info("Skipping fast mark [!active] for " + peer);
                     } else {
-                        _fastPeers.put(profile.getPeer(), profile);
+                        _fastPeers.put(peer, profile);
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Fast: \t" + profile.getPeer().toBase64());
+                            _log.debug("Fast: \t" + peer);
                     }
                 }
                 
@@ -1446,9 +1447,9 @@ public class ProfileOrganizer {
             // to call him well-integrated.
             // This could be used later to see if a floodfill peer is for real.
             if (_thresholdIntegrationValue <= profile.getIntegrationValue()) {
-                _wellIntegratedPeers.put(profile.getPeer(), profile);
+                _wellIntegratedPeers.put(peer, profile);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Integrated: \t" + profile.getPeer().toBase64());
+                    _log.debug("Integrated: \t" + peer);
             }
         }
     }
