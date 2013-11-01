@@ -16,9 +16,9 @@
 <h1>I2P Router Help &amp; Support</h1>
 <div class="main" id="main"><p>
 
-<%@include file="help/help.jsi" %>
-<%@include file="help/legal.jsi" %>
-<%@include file="help/sidebar.jsi" %>
+<%@include file="help.jsi" %>
+<%@include file="help-legal.jsi" %>
+<%@include file="help-sidebar.jsi" %>
 
 <h2>Change Log</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
