@@ -381,7 +381,7 @@ class GeoIP {
 
     /** see above for ip-to-long mapping */
     private static long toLong(byte ip[]) {
-        int rv = 0;
+        long rv = 0;
         if (ip.length == 16) {
             for (int i = 0; i < 8; i++)
                 rv |= (ip[i] & 0xffL) << ((7-i)*8);
@@ -402,13 +402,16 @@ class GeoIP {
         return _codeToName.get(code);
     }
 
-/*** doesn't work since switched to RouterContext above
+/***
     public static void main(String args[]) {
-        GeoIP g = new GeoIP(new I2PAppContext());
+        GeoIP g = new GeoIP(new Router().getContext());
         String tests[] = {"0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.255", "1.0.0.0",
                                         "94.3.3.3", "77.1.2.3", "127.0.0.0", "127.127.127.127", "128.0.0.0",
                                         "89.8.9.3", "72.5.6.8", "217.4.9.7", "175.107.027.107", "135.6.5.2",
-                                        "129.1.2.3", "255.255.255.254", "255.255.255.255"};
+                                        "129.1.2.3", "255.255.255.254", "255.255.255.255",
+                          "::", "1", "2000:1:2:3::", "2001:200:1:2:3:4:5:6", "2001:208:7:8:9::",
+                          "2c0f:fff0:1234:5678:90ab:cdef:0:0", "2c0f:fff1:0::"
+                          };
         for (int i = 0; i < tests.length; i++)
             g.add(tests[i]);
         long start = System.currentTimeMillis();

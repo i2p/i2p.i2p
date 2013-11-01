@@ -327,13 +327,13 @@ class GeoIPv6 {
     /**
      *  Merge and compress CSV files to I2P compressed format
      *
-     *  GeoIP infile1.csv[.gz] [infile2.csv[.gz]...] outfile.dat.gz
+     *  GeoIPv6 infile1.csv[.gz] [infile2.csv[.gz]...] outfile.dat.gz
      *
      *  Used to create the file for distribution, do not comment out
      */
     public static void main(String args[]) {
         if (args.length < 2) {
-            System.err.println("Usage: GeoIP infile1.csv [infile2.csv...] outfile.dat.gz");
+            System.err.println("Usage: GeoIPv6 infile1.csv [infile2.csv...] outfile.dat.gz");
             System.exit(1);
         }
         List<File> infiles = new ArrayList();
