@@ -983,24 +983,31 @@ public class Storage
               int len = (start + need < raflen) ? need : (int)(raflen - start);
               TorrentFile tf = _torrentFiles.get(i);
               synchronized(tf) {
-                  RandomAccessFile raf = tf.checkRAF();
-                  if (tf.isSparse) {
-                      // If the file is a newly created sparse file,
-                      // AND we aren't skipping it, balloon it with all
-                      // zeros to un-sparse it by allocating the space.
-                      // Obviously this could take a while.
-                      // Once we have written to it, it isn't empty/sparse any more.
-                      if (tf.priority >= 0) {
-                          if (_log.shouldLog(Log.INFO))
-                              _log.info("Ballooning " + tf);
-                          tf.balloonFile();
-                      } else {
-                          tf.isSparse = false;
+                  try {
+                      RandomAccessFile raf = tf.checkRAF();
+                      if (tf.isSparse) {
+                          // If the file is a newly created sparse file,
+                          // AND we aren't skipping it, balloon it with all
+                          // zeros to un-sparse it by allocating the space.
+                          // Obviously this could take a while.
+                          // Once we have written to it, it isn't empty/sparse any more.
+                          if (tf.priority >= 0) {
+                              if (_log.shouldLog(Log.INFO))
+                                  _log.info("Ballooning " + tf);
+                              tf.balloonFile();
+                          } else {
+                              tf.isSparse = false;
+                          }
                       }
+                      raf.seek(start);
+                      //rafs[i].write(bs, off + written, len);
+                      pp.write(raf, written, len);
+                  } catch (IOException ioe) {
+                      // get the file name in the logs
+                      IOException ioe2 = new IOException("Error writing " + tf.RAFfile.getAbsolutePath());
+                      ioe2.initCause(ioe);
+                      throw ioe2;
                   }
-                  raf.seek(start);
-                  //rafs[i].write(bs, off + written, len);
-                  pp.write(raf, written, len);
               }
               written += len;
               if (need - len > 0) {
@@ -1096,12 +1103,18 @@ public class Storage
         int need = length - read;
         int len = (start + need < raflen) ? need : (int)(raflen - start);
         TorrentFile tf = _torrentFiles.get(i);
-        synchronized(tf)
-          {
-            RandomAccessFile raf = tf.checkRAF();
-            raf.seek(start);
-            raf.readFully(bs, read, len);
-          }
+        synchronized(tf) {
+            try {
+                RandomAccessFile raf = tf.checkRAF();
+                raf.seek(start);
+                raf.readFully(bs, read, len);
+            } catch (IOException ioe) {
+                // get the file name in the logs
+                IOException ioe2 = new IOException("Error reading " + tf.RAFfile.getAbsolutePath());
+                ioe2.initCause(ioe);
+                throw ioe2;
+            }
+        }
         read += len;
         if (need - len > 0)
           {
