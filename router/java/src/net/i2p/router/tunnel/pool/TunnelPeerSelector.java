@@ -218,10 +218,10 @@ public abstract class TunnelPeerSelector {
             char excl[] = getExcludeCaps(ctx);
             if (excl != null) {
                 FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
-                List known = fac.getKnownRouterData();
+                List<RouterInfo> known = fac.getKnownRouterData();
                 if (known != null) {
                     for (int i = 0; i < known.size(); i++) {
-                        RouterInfo peer = (RouterInfo)known.get(i);
+                        RouterInfo peer = known.get(i);
                         boolean shouldExclude = shouldExclude(ctx, log, peer, excl);
                         if (shouldExclude) {
                             peers.add(peer.getIdentity().calculateHash());

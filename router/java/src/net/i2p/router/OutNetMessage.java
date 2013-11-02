@@ -377,6 +377,7 @@ public class OutNetMessage implements CDPQEntry {
         } else {
             buf.append("a ").append(_messageSize).append(" byte ");
             buf.append(getMessageType());
+            buf.append(" ID ").append(_messageId);
         }
         buf.append(" expiring on ").append(new Date(_expiration));
         buf.append(" priority ").append(_priority);

@@ -240,11 +240,12 @@ public class TunnelCreatorConfig implements TunnelInfo {
                 buf.append(_config[i].getReceiveTunnel());
             else
                 buf.append("me");
-            buf.append('.');
-            if (_config[i].getSendTunnel() != null)
+            if (_config[i].getSendTunnel() != null) {
+                buf.append('.');
                 buf.append(_config[i].getSendTunnel());
-            else
-                buf.append("me");
+            } else if (_isInbound || i == 0) {
+                buf.append(".me");
+            }
             if (i + 1 < _peers.length)
                 buf.append("-->");
         }

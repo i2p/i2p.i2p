@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
@@ -56,22 +57,30 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // If hidden and inbound, use fast peers - that we probably have recently
         // connected to and so they have our real RI - to maximize the chance
         // that the adjacent hop can connect to us.
-        if (settings.isInbound() && ctx.router().isHidden())
+        if (settings.isInbound() && ctx.router().isHidden()) {
+            if (l.shouldLog(Log.INFO))
+                l.info("EPS SFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
             ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
-        else if (exploreHighCap) 
+        } else if (exploreHighCap) {
+            if (l.shouldLog(Log.INFO))
+                l.info("EPS SHCP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
             ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
-        else if (ctx.commSystem().haveHighOutboundCapacity())
+        } else if (ctx.commSystem().haveHighOutboundCapacity()) {
+            if (l.shouldLog(Log.INFO))
+                l.info("EPS SNFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
             ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
-        else // use only connected peers so we don't make more connections
+        } else { // use only connected peers so we don't make more connections
+            if (l.shouldLog(Log.INFO))
+                l.info("EPS SANFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
             ctx.profileOrganizer().selectActiveNotFailingPeers(length, exclude, matches);
-        
-        if (l.shouldLog(Log.DEBUG))
-            l.debug("profileOrganizer.selectNotFailing(" + length + ") found " + matches);
+        }
         
         matches.remove(ctx.routerHash());
         ArrayList<Hash> rv = new ArrayList(matches);
         if (rv.size() > 1)
             orderPeers(rv, settings.getRandomKey());
+        if (l.shouldLog(Log.DEBUG))
+            l.debug("EPS got " + rv.size() + ": " + DataHelper.toString(rv));
         if (settings.isInbound())
             rv.add(0, ctx.routerHash());
         else
