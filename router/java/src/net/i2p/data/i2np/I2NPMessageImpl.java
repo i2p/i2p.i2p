@@ -63,6 +63,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         _context = context;
         _log = context.logManager().getLog(I2NPMessageImpl.class);
         _expiration = _context.clock().now() + DEFAULT_EXPIRATION_MS;
+        // FIXME/TODO set only for outbound, or only on write, or something, to not waste entropy
         _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
         //_context.statManager().createRateStat("i2np.writeTime", "How long it takes to write an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
         //_context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
@@ -248,9 +249,13 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
     
     /**
-     * Replay resistent message Id
+     * Replay resistant message Id
      */
     public long getUniqueId() { return _uniqueId; }
+
+    /**
+     *  The ID is set to a random value in the constructor but it can be overridden here.
+     */
     public void setUniqueId(long id) { _uniqueId = id; }
     
     /**
@@ -258,10 +263,14 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *
      */
     public long getMessageExpiration() { return _expiration; }
+
+    /**
+     *  The expiration is set to one minute from now in the constructor but it can be overridden here.
+     */
     public void setMessageExpiration(long exp) { _expiration = exp; }
     
     public synchronized int getMessageSize() { 
-        return calculateWrittenLength()+15 + CHECKSUM_LENGTH; // 16 bytes in the header
+        return calculateWrittenLength() + (15 + CHECKSUM_LENGTH); // 16 bytes in the header
     }
 
     /**
