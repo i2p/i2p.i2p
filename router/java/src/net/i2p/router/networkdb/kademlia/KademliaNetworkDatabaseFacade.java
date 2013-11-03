@@ -662,7 +662,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         long earliest = leaseSet.getEarliestLeaseDate();
         long latest = leaseSet.getLatestLeaseDate();
         long now = _context.clock().now();
-        if (earliest <= now - 2*Router.CLOCK_FUDGE_FACTOR ||
+        if (earliest <= now - 10*60*1000L ||
             // same as the isCurrent(Router.CLOCK_FUDGE_FACTOR) test in
             // lookupLeaseSetLocally()
             latest <= now - Router.CLOCK_FUDGE_FACTOR) {
