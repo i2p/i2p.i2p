@@ -61,10 +61,13 @@ public abstract class TransportImpl implements Transport {
     protected final RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
-    private final Set<Hash> _wasUnreachableEntries;
+    private final Map<Hash, Long> _wasUnreachableEntries;
     private final Set<InetAddress> _localAddresses;
     /** global router ident -> IP */
     private static final Map<Hash, byte[]> _IPMap;
+
+    private static final long UNREACHABLE_PERIOD = 5*60*1000;
+    private static final long WAS_UNREACHABLE_PERIOD = 30*60*1000;
 
     static {
         long maxMemory = SystemVersion.getMaxMemory();
@@ -97,8 +100,8 @@ public abstract class TransportImpl implements Transport {
             _sendPool = new ArrayBlockingQueue(8);
         else
             _sendPool = null;
-        _unreachableEntries = new HashMap(16);
-        _wasUnreachableEntries = new ConcurrentHashSet(16);
+        _unreachableEntries = new HashMap(32);
+        _wasUnreachableEntries = new HashMap(32);
         _localAddresses = new ConcurrentHashSet(4);
         _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
@@ -701,8 +704,6 @@ public abstract class TransportImpl implements Transport {
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
 
-    private static final long UNREACHABLE_PERIOD = 5*60*1000;
-
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
         synchronized (_unreachableEntries) {
@@ -718,12 +719,17 @@ public abstract class TransportImpl implements Transport {
     }
 
     /** called when we can't reach a peer */
-    /** This isn't very useful since it is cleared when they contact us */
     public void markUnreachable(Hash peer) {
-        long now = _context.clock().now();
+        short status = _context.commSystem().getReachabilityStatus();
+        if (status == CommSystemFacade.STATUS_DISCONNECTED ||
+            status == CommSystemFacade.STATUS_HOSED)
+            return;
+        Long now = Long.valueOf(_context.clock().now());
         synchronized (_unreachableEntries) {
-            _unreachableEntries.put(peer, Long.valueOf(now));
+            // This isn't very useful since it is cleared when they contact us
+            _unreachableEntries.put(peer, now);
         }
+        // This is not cleared when they contact us
         markWasUnreachable(peer, true);
     }
 
@@ -748,29 +754,53 @@ public abstract class TransportImpl implements Transport {
                         iter.remove();
                 }
             }
+            synchronized (_wasUnreachableEntries) {
+                for (Iterator<Long> iter = _wasUnreachableEntries.values().iterator(); iter.hasNext(); ) {
+                    Long when = iter.next();
+                    if (when.longValue() + WAS_UNREACHABLE_PERIOD < now)
+                        iter.remove();
+                }
+            }
         }
     }
 
     /**
      * Was the peer UNreachable (outbound only) the last time we tried it?
-     * This is NOT reset if the peer contacts us and it is never expired.
+     * This is NOT reset if the peer contacts us.
      */
     public boolean wasUnreachable(Hash peer) {
-        if (_wasUnreachableEntries.contains(peer))
-            return true;
+        long now = _context.clock().now();
+        synchronized (_wasUnreachableEntries) {
+            Long when = _wasUnreachableEntries.get(peer);
+            if (when != null) {
+                if (when.longValue() + WAS_UNREACHABLE_PERIOD < now) {
+                    _unreachableEntries.remove(peer);
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return false;
         return null == ri.getTargetAddress(this.getStyle());
     }
+
     /**
      * Maintain the WasUnreachable list
      */
-    public void markWasUnreachable(Hash peer, boolean yes) {
-        if (yes)
-            _wasUnreachableEntries.add(peer);
-        else
-            _wasUnreachableEntries.remove(peer);
+    private void markWasUnreachable(Hash peer, boolean yes) {
+        if (yes) {
+            Long now = Long.valueOf(_context.clock().now());
+            synchronized (_wasUnreachableEntries) {
+                _wasUnreachableEntries.put(peer, now);
+            }
+        } else {
+            synchronized (_wasUnreachableEntries) {
+                _wasUnreachableEntries.remove(peer);
+            }
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer,
                       yes ? new Exception() : null);
