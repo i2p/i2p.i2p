@@ -40,6 +40,7 @@ public class EventLog {
     public static final String CRITICAL = "critical";
     public static final String INSTALLED = "installed";
     public static final String INSTALL_FAILED = "intallFailed";
+    public static final String NETWORK = "network";
     public static final String NEW_IDENT = "newIdent";
     public static final String OOM = "oom";
     public static final String REKEYED = "rekeyed";

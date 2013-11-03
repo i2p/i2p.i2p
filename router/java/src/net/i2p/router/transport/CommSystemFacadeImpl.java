@@ -27,6 +27,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -420,7 +421,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
         public void timeReached() {
              boolean good = Addresses.isConnected();
-             _netMonitorStatus = good;
+             if (_netMonitorStatus != good) {
+                 _context.router().eventLog().addEvent(EventLog.NETWORK, good ? "connected" : "disconnected");
+                 _netMonitorStatus = good;
+             }
              reschedule(good ? LONG_DELAY : SHORT_DELAY);
         }
     }
