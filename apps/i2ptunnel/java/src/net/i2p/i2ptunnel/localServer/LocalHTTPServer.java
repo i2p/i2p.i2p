@@ -183,6 +183,15 @@ public abstract class LocalHTTPServer {
 
     /** @since 0.8.7 */
     private static void writeRedirectPage(OutputStream out, boolean success, String host, String book, String url) throws IOException {
+        String tbook;
+        if ("hosts.txt".equals(book))
+            tbook = _("router");
+        else if ("userhosts.txt".equals(book))
+            tbook = _("master");
+        else if ("privatehosts.txt".equals(book))
+            tbook = _("private");
+        else
+            tbook = book;
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
                   "\r\n"+
@@ -199,8 +208,8 @@ public abstract class LocalHTTPServer {
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
                   (success ?
-                           _("Saved {0} to the {1} addressbook, redirecting now.", host, book) :
-                           _("Failed to save {0} to the {1} addressbook, redirecting now.", host, book)) +
+                           _("Saved {0} to the {1} addressbook, redirecting now.", host, tbook) :
+                           _("Failed to save {0} to the {1} addressbook, redirecting now.", host, tbook)) +
                   "</h3>\n<p><a href=\"" + url + "\">" +
                   _("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
