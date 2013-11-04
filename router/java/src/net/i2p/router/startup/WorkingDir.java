@@ -272,10 +272,10 @@ public class WorkingDir {
         // but distros might put one in
         "addressbook,eepsite," +
         // base install - files
-        // We don't currently have a default router.config or logger.config in the base distribution,
+        // We don't currently have a default router.config, logger.config, or webapps.config in the base distribution,
         // but distros might put one in
         "blocklist.txt,hosts.txt,i2psnark.config,i2ptunnel.config,jetty-i2psnark.xml," +
-        "logger.config,router.config,systray.config";
+        "logger.config,router.config,systray.config,webapps.config";
 
     private static boolean migrate(String list, File olddir, File todir) {
         boolean rv = true;
