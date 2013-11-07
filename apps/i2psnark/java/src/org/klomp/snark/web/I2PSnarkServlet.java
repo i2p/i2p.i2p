@@ -1179,6 +1179,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return;
 
         String basename = snark.getBaseName();
+        String fullBasename = basename;
         if (basename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
             String start = basename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
             if (start.indexOf(" ") < 0 && start.indexOf("-") < 0) {
@@ -1326,7 +1327,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(trackerLink);
         }
 
-        String encodedBaseName = urlEncode(basename);
+        String encodedBaseName = urlEncode(fullBasename);
         // File type icon column
         out.write("</td>\n<td>");
         if (isValid) {
@@ -1440,7 +1441,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Can't figure out how to escape double quotes inside the onclick string.
                 // Single quotes in translate strings with parameters must be doubled.
                 // Then the remaining single quote must be escaped
-                out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", basename));
+                out.write(_("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?", snark.getName()));
                 out.write("')) { return false; }\"");
                 out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
                 out.write(_("Remove"));
@@ -1460,7 +1461,7 @@ public class I2PSnarkServlet extends BasicServlet {
             // Can't figure out how to escape double quotes inside the onclick string.
             // Single quotes in translate strings with parameters must be doubled.
             // Then the remaining single quote must be escaped
-            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", basename));
+            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullBasename));
             out.write("')) { return false; }\"");
             out.write(" src=\"" + _imgPath + "delete.png\" alt=\"");
             out.write(_("Delete"));
