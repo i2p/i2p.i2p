@@ -899,10 +899,14 @@ waitforwrapperstop() {
 }
 
 create_config_dir() {
-    if ! mkdir -p "$I2P_CONFIG_DIR"; then
-        echo "Error creating $I2P_CONFIG_DIR! Edit $0 and set I2P_CONFIG_DIR" >&2
-        echo "to the correct location." >&2
-        exit 1
+    if [ ! -d "$I2P_CONFIG_DIR" ]; then
+        UMASK=$(awk -F'=' '/^ *wrapper\.umask/{print $2}' $WRAPPER_CONF)
+        umask $UMASK
+        if ! mkdir -p "$I2P_CONFIG_DIR"; then
+            echo "Error creating $I2P_CONFIG_DIR! Edit $0 and set I2P_CONFIG_DIR" >&2
+            echo "to the correct location." >&2
+            exit 1
+        fi
     fi
 }
 
