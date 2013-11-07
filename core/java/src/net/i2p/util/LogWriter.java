@@ -37,6 +37,7 @@ class LogWriter implements Runnable {
     private volatile boolean _write;
     private static final int MAX_DISKFULL_MESSAGES = 8;
     private int _diskFullMessageCount;
+    private LogRecord _last;
     
     public LogWriter(LogManager manager) {
         _manager = manager;
@@ -73,25 +74,26 @@ class LogWriter implements Runnable {
             Queue<LogRecord> records = _manager.getQueue();
             if (records == null) return;
             if (!records.isEmpty()) {
-                LogRecord last = null;
+                if (_last != null && _last.getDate() < _manager.getContext().clock().now() - 30*60*1000)
+                    _last = null;
                 LogRecord rec;
                 int dupCount = 0;
                 while ((rec = records.poll()) != null) {
-                    if (_manager.shouldDropDuplicates() && rec.equals(last)) {
+                    if (_manager.shouldDropDuplicates() && rec.equals(_last)) {
                         dupCount++;
                     } else {
                         if (dupCount > 0) {
-                            writeRecord(dupMessage(dupCount, last, false));
-                            _manager.getBuffer().add(dupMessage(dupCount, last, true));
+                            writeRecord(dupMessage(dupCount, _last, false));
+                            _manager.getBuffer().add(dupMessage(dupCount, _last, true));
                             dupCount = 0;
                         }
                         writeRecord(rec);
                     }
-                    last = rec;
+                    _last = rec;
                 }
                 if (dupCount > 0) {
-                    writeRecord(dupMessage(dupCount, last, false));
-                    _manager.getBuffer().add(dupMessage(dupCount, last, true));
+                    writeRecord(dupMessage(dupCount, _last, false));
+                    _manager.getBuffer().add(dupMessage(dupCount, _last, true));
                 }
                 try {
                     if (_currentOut != null)
