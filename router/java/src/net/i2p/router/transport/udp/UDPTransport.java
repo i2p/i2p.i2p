@@ -42,6 +42,7 @@ import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.util.EventLog;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
@@ -882,6 +883,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 changes.put(PROP_IP, newIP);
                 changes.put(PROP_IP_CHANGE, Long.toString(now));
                 _context.router().saveConfig(changes, null);
+
+                if (oldIP != null) {
+                    _context.router().eventLog().addEvent(EventLog.CHANGE_IP, newIP);
+                }
 
                 // laptop mode
                 // For now, only do this at startup
