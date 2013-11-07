@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 import net.i2p.util.LHMCache;
 
@@ -66,11 +67,15 @@ class DummyNamingService extends NamingService {
 
         // Try Base32 decoding
         if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p") &&
-            _context.getBooleanPropertyDefaultTrue(PROP_B32)) {
-            d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
-            if (d != null) {
-                putCache(hostname, d);
-                return d;
+                _context.getBooleanPropertyDefaultTrue(PROP_B32)) {
+            try {
+                d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
+                if (d != null) {
+                    putCache(hostname, d);
+                    return d;
+                }
+            } catch (I2PSessionException i2pse) {
+                _log.warn("couldn't lookup b32",i2pse);
             }
         }
 

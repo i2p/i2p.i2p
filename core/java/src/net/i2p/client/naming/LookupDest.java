@@ -38,7 +38,7 @@ class LookupDest {
     protected LookupDest(I2PAppContext context) {}
 
     /** @param key 52 chars (do not include the .b32.i2p suffix) */
-    static Destination lookupBase32Hash(I2PAppContext ctx, String key) {
+    static Destination lookupBase32Hash(I2PAppContext ctx, String key) throws I2PSessionException {
         byte[] h = Base32.decode(key);
         if (h == null)
             return null;
@@ -56,27 +56,30 @@ class LookupDest {
     ****/
 
     /** @param h 32 byte hash */
-    static Destination lookupHash(I2PAppContext ctx, byte[] h) {
+    static Destination lookupHash(I2PAppContext ctx, byte[] h) throws I2PSessionException {
         Hash key = Hash.create(h);
         Destination rv = null;
+        I2PClient client = new I2PSimpleClient();
+        Properties opts = new Properties();
+        String s = ctx.getProperty(I2PClient.PROP_TCP_HOST);
+        if (s != null)
+            opts.put(I2PClient.PROP_TCP_HOST, s);
+        s = ctx.getProperty(I2PClient.PROP_TCP_PORT);
+        if (s != null)
+            opts.put(I2PClient.PROP_TCP_PORT, s);
+        I2PSession session = null;
         try {
-            I2PClient client = new I2PSimpleClient();
-            Properties opts = new Properties();
-            String s = ctx.getProperty(I2PClient.PROP_TCP_HOST);
-            if (s != null)
-                opts.put(I2PClient.PROP_TCP_HOST, s);
-            s = ctx.getProperty(I2PClient.PROP_TCP_PORT);
-            if (s != null)
-                opts.put(I2PClient.PROP_TCP_PORT, s);
-            I2PSession session = client.createSession(null, opts);
+            session = client.createSession(null, opts);
             session.connect();
             rv = session.lookupDest(key, DEFAULT_TIMEOUT);
-            session.destroySession();
-        } catch (I2PSessionException ise) {}
+        } finally {
+            if (session != null)
+                session.destroySession();
+        }
         return rv;
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws I2PSessionException {
         Destination dest = lookupBase32Hash(I2PAppContext.getGlobalContext(), args[0]);
         if (dest == null)
             System.out.println("Destination not found!");
