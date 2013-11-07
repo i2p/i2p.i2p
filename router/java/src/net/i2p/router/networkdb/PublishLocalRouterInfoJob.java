@@ -60,7 +60,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         long now = getContext().clock().now();
         if (last + MIN_PUBLISH_DELAY > now) {
             long delay = getDelay();
-            requeue(last + delay);
+            requeue(last + delay - now);
             return;
         }
         RouterInfo ri = new RouterInfo(getContext().router().getRouterInfo());
@@ -107,6 +107,6 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     }
 
     private long getDelay() {
-        return (PUBLISH_DELAY * 3 / 4) + getContext().random().nextInt((int)PUBLISH_DELAY / 4);
+        return (PUBLISH_DELAY * 3 / 4) + getContext().random().nextLong(PUBLISH_DELAY / 4);
     }
 }

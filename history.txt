@@ -1,3 +1,8 @@
+2013-11-07 zzz
+ * i2psnark: Fix file links, broken in -12 (ticket #1114)
+ * Logging: Track duplicates across flush interval (ticket #1110)
+ * NetDB: Fix RI publish interval, broken in -7
+
 2013-11-03 zzz
  * NetDB: Allow store of leaseset as long as one lease has not expired
  * Transport:
