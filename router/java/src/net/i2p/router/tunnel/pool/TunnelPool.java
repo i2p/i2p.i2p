@@ -261,7 +261,7 @@ public class TunnelPool {
             }
         }
         if (rv != null) {
-            _context.statManager().addRateData("tunnel.matchLease", closestTo.equals(rv) ? 1 : 0);
+            _context.statManager().addRateData("tunnel.matchLease", closestTo.equals(rv.getFarEnd()) ? 1 : 0);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": No tunnels to select from");

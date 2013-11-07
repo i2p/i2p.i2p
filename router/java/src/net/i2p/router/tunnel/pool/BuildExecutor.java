@@ -320,10 +320,12 @@ class BuildExecutor implements Runnable {
                     // we don't have either inbound or outbound tunnels, so don't bother trying to build
                     // non-zero-hop tunnels
                     // try to kickstart it to build a fallback, otherwise we may get stuck here for a long time (minutes)
-                    if (mgr.getFreeTunnelCount() <= 0)
-                        mgr.selectInboundTunnel();
-                    if (mgr.getOutboundTunnelCount() <= 0)
-                        mgr.selectOutboundTunnel();
+                    if (mgr != null) {
+                        if (mgr.getFreeTunnelCount() <= 0)
+                            mgr.selectInboundTunnel();
+                        if (mgr.getOutboundTunnelCount() <= 0)
+                            mgr.selectOutboundTunnel();
+                    }
                     synchronized (_currentlyBuilding) {
                         if (!_repoll) {
                             if (_log.shouldLog(Log.DEBUG))

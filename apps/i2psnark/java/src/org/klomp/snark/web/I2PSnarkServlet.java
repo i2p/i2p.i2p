@@ -2487,7 +2487,6 @@ public class I2PSnarkServlet extends BasicServlet {
                     Storage storage = snark.getStorage();
                     try {
                         File f = item;
-                        if (f != null) {
                             long remaining = storage.remaining(f.getCanonicalPath());
                             if (remaining < 0) {
                                 complete = true;
@@ -2507,9 +2506,6 @@ public class I2PSnarkServlet extends BasicServlet {
                                          (100 * (length - remaining) / length) + "% " + _("complete") +
                                          " (" + DataHelper.formatSize2(remaining) + "B " + _("remaining") + ")";
                             }
-                        } else {
-                            status = "Not a file?";
-                        }
                     } catch (IOException ioe) {
                         status = "Not a file? " + ioe;
                     }

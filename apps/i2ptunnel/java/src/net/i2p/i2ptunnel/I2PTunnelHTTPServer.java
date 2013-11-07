@@ -128,7 +128,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         int pp = getIntOption(OPT_POST_MAX, 0);
         int pt = getIntOption(OPT_POST_TOTAL_MAX, 0);
         synchronized(this) {
-            if (pp != 0 || pp != 0 || _postThrottler != null) {
+            if (pp != 0 || pt != 0 || _postThrottler != null) {
                 long pw = 1000L * getIntOption(OPT_POST_WINDOW, DEFAULT_POST_WINDOW);
                 long pb = 1000L * getIntOption(OPT_POST_BAN_TIME, DEFAULT_POST_BAN_TIME);
                 long px = 1000L * getIntOption(OPT_POST_TOTAL_BAN_TIME, DEFAULT_POST_TOTAL_BAN_TIME);

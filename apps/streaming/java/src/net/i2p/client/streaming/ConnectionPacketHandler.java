@@ -202,7 +202,7 @@ class ConnectionPacketHandler {
                 
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(String.format("%s congestion.. dup packet %s ackDelay %d lastSend %d ago",
-                                    con, packet, now, ackDelay, DataHelper.formatDuration(now - lastSendTime)));
+                                    con, packet, ackDelay, DataHelper.formatDuration(now - lastSendTime)));
                 
                 final long nextSendTime = lastSendTime + ackDelay;
                 if (nextSendTime <= now) {

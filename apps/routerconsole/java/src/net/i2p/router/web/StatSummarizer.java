@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
@@ -309,6 +310,8 @@ public class StatSummarizer implements Runnable {
      * @return list of Rate objects
      */
     Set<Rate> parseSpecs(String specs) {
+        if (specs == null)
+            return Collections.EMPTY_SET;
         StringTokenizer tok = new StringTokenizer(specs, ",");
         Set<Rate> rv = new HashSet();
         while (tok.hasMoreTokens()) {

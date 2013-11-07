@@ -318,8 +318,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             if (s.isClosed()) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since the old one closed [s=" + s + "]");
-                if (s != null)
-                    tunnel.removeSession(s);
+                tunnel.removeSession(s);
                 // We could be here a LONG time, holding the lock
                 socketManager = buildSocketManager(tunnel, pkf);
             } else {

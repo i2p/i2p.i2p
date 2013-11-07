@@ -197,6 +197,9 @@ public class TunnelPoolSettings {
 
     public Properties getUnknownOptions() { return _unknownOptions; }
     
+    /**
+     *  @param prefix non-null
+     */
     public void readFromProperties(String prefix, Map<Object, Object> props) {
         for (Map.Entry e : props.entrySet()) {
             String name = (String) e.getKey();
@@ -225,11 +228,14 @@ public class TunnelPoolSettings {
                      int max = _isExploratory ? EXPLORATORY_PRIORITY : MAX_PRIORITY;
                     _priority = Math.min(max, Math.max(MIN_PRIORITY, getInt(value, def)));
                 } else
-                    _unknownOptions.setProperty(name.substring((prefix != null ? prefix.length() : 0)), value);
+                    _unknownOptions.setProperty(name.substring(prefix.length()), value);
             }
         }
-	}
+    }
     
+    /**
+     *  @param prefix non-null
+     */
     public void writeToProperties(String prefix, Properties props) {
         if (props == null) return;
         props.setProperty(prefix + PROP_ALLOW_ZERO_HOP, ""+_allowZeroHop);
