@@ -43,7 +43,11 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
     public void distribute(I2NPMessage msg, Hash target) {
         distribute(msg, target, null);
     }
+
     public void distribute(I2NPMessage msg, Hash target, TunnelId tunnel) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("IBMD for " + _client + " to " + target + " / " + tunnel + " : " + msg);
+
         // allow messages on client tunnels even after client disconnection, as it may
         // include e.g. test messages, etc.  DataMessages will be dropped anyway
         /*
