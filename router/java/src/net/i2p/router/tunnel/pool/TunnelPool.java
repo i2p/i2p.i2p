@@ -674,11 +674,17 @@ public class TunnelPool {
                 if (rlen > 1 && llen <= 1)
                     return 1;
             }
-            byte lhsDelta[] = DataHelper.xor(lhs.getFarEnd().getData(), _base);
-            byte rhsDelta[] = DataHelper.xor(rhs.getFarEnd().getData(), _base);
-            int rv = DataHelper.compareTo(lhsDelta, rhsDelta);
-            if (rv != 0)
-                return rv;
+            // TODO don't prefer exact match for security?
+            byte lhsb[] = lhs.getFarEnd().getData();
+            byte rhsb[] = rhs.getFarEnd().getData();
+            for (int i = 0; i < _base.length; i++) {
+                int ld = (lhsb[i] ^ _base[i]) & 0xff;
+                int rd = (rhsb[i] ^ _base[i]) & 0xff;
+                if (ld < rd)
+                    return -1;
+                if (ld > rd)
+                    return 1;
+            }
             // latest-expiring first as a tie-breaker
             return (int) (rhs.getExpiration() - lhs.getExpiration());
         }

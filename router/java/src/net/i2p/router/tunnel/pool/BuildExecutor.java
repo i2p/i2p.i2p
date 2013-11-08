@@ -337,12 +337,14 @@ class BuildExecutor implements Runnable {
                     }
                 } else {
                     if ( (allowed > 0) && (!wanted.isEmpty()) ) {
-                        Collections.shuffle(wanted, _context.random());
-                        try {
-                            Collections.sort(wanted, new TunnelPoolComparator());
-                        } catch (IllegalArgumentException iae) {
-                            // Java 7 TimSort - see info in TunnelPoolComparator
-                            continue;
+                        if (wanted.size() > 1) {
+                            Collections.shuffle(wanted, _context.random());
+                            try {
+                                Collections.sort(wanted, new TunnelPoolComparator());
+                            } catch (IllegalArgumentException iae) {
+                                // Java 7 TimSort - see info in TunnelPoolComparator
+                                continue;
+                            }
                         }
 
                         // force the loops to be short, since 3 consecutive tunnel build requests can take
