@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
@@ -161,10 +162,17 @@ public class JobQueue {
         //if (job instanceof JobImpl)
         //    ((JobImpl)job).addedToQueue();
 
-        long numReady = 0;
+        long numReady;
         boolean alreadyExists = false;
         boolean dropped = false;
         // getNext() is now outside the jobLock, is that ok?
+        long now = _context.clock().now();
+        long start = job.getTiming().getStartAfter();
+        if (start > now + 3*24*60*60*1000L) {
+            // catch bugs, Job.requeue() argument is a delay not a time
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Scheduling job far in the future: " + (new Date(start)) + ' ' + job);
+        }
         synchronized (_jobLock) {
             if (_readyJobs.contains(job))
                 alreadyExists = true;
@@ -184,9 +192,9 @@ public class JobQueue {
                 dropped = true;
             } else {
                 if (!alreadyExists) {
-                    if (job.getTiming().getStartAfter() <= _context.clock().now()) {
+                    if (start <= now) {
                         // don't skew us - its 'start after' its been queued, or later
-                        job.getTiming().setStartAfter(_context.clock().now());
+                        job.getTiming().setStartAfter(now);
                         if (job instanceof JobImpl)
                             ((JobImpl)job).madeReady();
                         _readyJobs.offer(job);
@@ -194,7 +202,7 @@ public class JobQueue {
                         _timedJobs.add(job);
                         // only notify for _timedJobs, as _readyJobs does not use that lock
                         // only notify if sooner, to reduce contention
-                        if (job.getTiming().getStartAfter() < _nextPumperRun)
+                        if (start < _nextPumperRun)
                             _jobLock.notifyAll();
                     }
                 }
