@@ -43,15 +43,12 @@ public class MessageWrapper {
      *  @return null on encrypt failure
      */
     static WrappedMessage wrap(RouterContext ctx, I2NPMessage m, Hash from, RouterInfo to) {
-        DeliveryInstructions instructions = new DeliveryInstructions();
-        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-
         PayloadGarlicConfig payload = new PayloadGarlicConfig();
         payload.setCertificate(Certificate.NULL_CERT);
         payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         payload.setPayload(m);
         payload.setRecipient(to);
-        payload.setDeliveryInstructions(instructions);
+        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKeyManager skm;
@@ -127,15 +124,12 @@ public class MessageWrapper {
      *  @since 0.9.5
      */
     static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, RouterInfo to) {
-        DeliveryInstructions instructions = new DeliveryInstructions();
-        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-
         PayloadGarlicConfig payload = new PayloadGarlicConfig();
         payload.setCertificate(Certificate.NULL_CERT);
         payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         payload.setPayload(m);
         payload.setRecipient(to);
-        payload.setDeliveryInstructions(instructions);
+        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKey sentKey = ctx.keyGenerator().generateSessionKey();
@@ -215,14 +209,11 @@ public class MessageWrapper {
      *  @since 0.9.7
      */
     public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, SessionKey encryptKey, SessionTag encryptTag) {
-        DeliveryInstructions instructions = new DeliveryInstructions();
-        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-
         PayloadGarlicConfig payload = new PayloadGarlicConfig();
         payload.setCertificate(Certificate.NULL_CERT);
         payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         payload.setPayload(m);
-        payload.setDeliveryInstructions(instructions);
+        payload.setDeliveryInstructions(DeliveryInstructions.LOCAL);
         payload.setExpiration(m.getMessageExpiration());
 
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, null, null, 

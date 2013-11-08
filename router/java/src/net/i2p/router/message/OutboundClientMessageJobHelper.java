@@ -122,18 +122,8 @@ class OutboundClientMessageJobHelper {
         // and get the leaseset stored before handling the data
         config.addClove(dataClove);
 
-        DeliveryInstructions instructions = new DeliveryInstructions();
-        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-        // defaults
-        //instructions.setDelayRequested(false);
-        //instructions.setDelaySeconds(0);
-        //instructions.setEncrypted(false);
-        //instructions.setEncryptionKey(null);
-        //instructions.setRouter(null);
-        //instructions.setTunnelId(null);
-        
         config.setCertificate(Certificate.NULL_CERT);
-        config.setDeliveryInstructions(instructions);
+        config.setDeliveryInstructions(DeliveryInstructions.LOCAL);
         config.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(expiration); // +2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipientPublicKey(recipientPK);
@@ -233,16 +223,8 @@ class OutboundClientMessageJobHelper {
      */
     static PayloadGarlicConfig buildLeaseSetClove(RouterContext ctx, long expiration, LeaseSet replyLeaseSet) {
         PayloadGarlicConfig clove = new PayloadGarlicConfig();
-        
-        DeliveryInstructions instructions = new DeliveryInstructions();
-        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-        // defaults
-        //instructions.setDelayRequested(false);
-        //instructions.setDelaySeconds(0);
-        //instructions.setEncrypted(false);
-        
         clove.setCertificate(Certificate.NULL_CERT);
-        clove.setDeliveryInstructions(instructions);
+        clove.setDeliveryInstructions(DeliveryInstructions.LOCAL);
         clove.setExpiration(expiration);
         clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);

@@ -33,8 +33,8 @@ import net.i2p.data.TunnelId;
  */
 public class DeliveryInstructions extends DataStructureImpl {
     //private final static Log _log = new Log(DeliveryInstructions.class);
-    private boolean _encrypted;
-    private SessionKey _encryptionKey;
+    //private boolean _encrypted;
+    //private SessionKey _encryptionKey;
     private int _deliveryMode;
     public final static int DELIVERY_MODE_LOCAL = 0;
     public final static int DELIVERY_MODE_DESTINATION = 1;
@@ -56,6 +56,13 @@ public class DeliveryInstructions extends DataStructureImpl {
     private final static long FLAG_MODE = 96;
     private final static long FLAG_DELAY = 16;
     
+    /**
+     *  Immutable local instructions, no options
+     *
+     *  @since 0.9.9
+     */
+    public static final DeliveryInstructions LOCAL = new LocalInstructions();
+
     public DeliveryInstructions() {
         _deliveryMode = -1;
     }
@@ -64,25 +71,25 @@ public class DeliveryInstructions extends DataStructureImpl {
      * For cloves only (not tunnels), default false, unused
      * @deprecated unused
      */
-    public boolean getEncrypted() { return _encrypted; }
+    public boolean getEncrypted() { return /* _encrypted */ false; }
     
     /**
      * For cloves only (not tunnels), default false, unused
      * @deprecated unused
      */
-    public void setEncrypted(boolean encrypted) { _encrypted = encrypted; }
+    public void setEncrypted(boolean encrypted) { /* _encrypted = encrypted; */ }
 
     /**
      * For cloves only (not tunnels), default null, unused
      * @deprecated unused
      */
-    public SessionKey getEncryptionKey() { return _encryptionKey; }
+    public SessionKey getEncryptionKey() { return /* _encryptionKey */ null; }
 
     /**
      * For cloves only (not tunnels), default null, unused
      * @deprecated unused
      */
-    public void setEncryptionKey(SessionKey key) { _encryptionKey = key; }
+    public void setEncryptionKey(SessionKey key) { /* _encryptionKey = key; */ }
 
     /** default -1 */
     public int getDeliveryMode() { return _deliveryMode; }
@@ -121,7 +128,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     public void setDelayRequested(boolean req) { _delayRequested = req; }
     
     /**
-     * default 0, unusedx
+     * default 0, unused
      * @deprecated unused
      */
     public long getDelaySeconds() { return _delaySeconds; }
@@ -252,20 +259,20 @@ public class DeliveryInstructions extends DataStructureImpl {
      * @deprecated unused
      */
 /****
-    private boolean flagEncrypted(long flags) {
+    private static boolean flagEncrypted(long flags) {
         return (0 != (flags & FLAG_ENCRYPTED));
     }
 ****/
     
     /** high bits */
-    private int flagMode(long flags) {
+    private static int flagMode(long flags) {
         long v = flags & FLAG_MODE;
         v >>>= 5;
         return (int)v;
     }
     
     /**  unused */
-    private boolean flagDelay(long flags) {
+    private static boolean flagDelay(long flags) {
         return (0 != (flags & FLAG_DELAY));
     }
     
@@ -491,5 +498,91 @@ public class DeliveryInstructions extends DataStructureImpl {
         buf.append("\n\tTunnelId: ").append(getTunnelId());
         
         return buf.toString();
+    }
+
+    /**
+     *  An immutable local delivery instructions with no options
+     *  for efficiency.
+     *
+     *  @since 0.9.9
+     */
+    private static final class LocalInstructions extends DeliveryInstructions {
+        //private static final byte flag = DELIVERY_MODE_LOCAL << 5;  // 0
+
+        @Override
+        public void setEncrypted(boolean encrypted) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void setEncryptionKey(SessionKey key) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public int getDeliveryMode() { return DELIVERY_MODE_LOCAL; }
+
+        @Override
+        public void setDeliveryMode(int mode) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void setDestination(Hash dest) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void setRouter(Hash router) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void setTunnelId(TunnelId id) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void setDelayRequested(boolean req) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void setDelaySeconds(long seconds) {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void readBytes(InputStream in) throws DataFormatException, IOException {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public int readBytes(byte data[], int offset) throws DataFormatException {
+            throw new RuntimeException("immutable");
+        }
+
+        @Override
+        public void writeBytes(OutputStream out) throws DataFormatException, IOException {
+            out.write((byte) 0);
+        }
+
+        @Override
+        public int writeBytes(byte target[], int offset) {
+            target[offset] = 0;
+            return 1;
+        }
+
+        @Override
+        public int getSize() {
+            return 1;
+        }
+
+        @Override
+        public String toString() {
+            return "[DeliveryInstructions: " +
+                   "\n\tDelivery mode: " +
+                   "local]";
+        }
     }
 }
