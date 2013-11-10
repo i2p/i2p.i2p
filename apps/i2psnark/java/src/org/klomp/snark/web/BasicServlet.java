@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
@@ -469,7 +470,7 @@ class BasicServlet extends HttpServlet
         {
             String cpath = getServletContext().getContextPath();
             // this won't work if we aren't at top level
-            String cname = cpath == "" ? "i2psnark" : cpath.substring(1).replace("/", "_");
+            String cname = "".equals(cpath) ? "i2psnark" : cpath.substring(1).replace("/", "_");
             return (new File(_context.getBaseDir(), "webapps/" + cname + ".war")).lastModified();
         }
 
@@ -578,7 +579,7 @@ class BasicServlet extends HttpServlet
         byte[] buf = ba.getData();
         try {
             if (skip > 0)
-                in.skip(skip);
+                DataHelper.skip(in, skip);
             int read = 0;
             long tot = 0;
             boolean done = false;

@@ -525,11 +525,15 @@ public class Blocklist {
             byte[] pib = pa.getIP();
             if (pib == null) continue;
             // O(n**2)
+            boolean dup = false;
             for (int i = 0; i < rv.size(); i++) {
-                // findbugs triggered on this, looks like unfinished work
-                //if (DataHelper.eq(rv.get(i), pib)) continue;
+                if (DataHelper.eq(rv.get(i), pib)) {
+                    dup = true;
+                    break;
+                }
             }
-            rv.add(pib);
+            if (!dup)
+                rv.add(pib);
          }
          return rv;
     }

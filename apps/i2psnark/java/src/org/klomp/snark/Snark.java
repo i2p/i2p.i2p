@@ -232,7 +232,7 @@ public class Snark
   private byte[] id;
   private final byte[] infoHash;
   private String additionalTrackerURL;
-  private final I2PSnarkUtil _util;
+  protected final I2PSnarkUtil _util;
   private final Log _log;
   private final PeerCoordinatorSet _peerCoordinatorSet;
   private volatile String trackerProblems;

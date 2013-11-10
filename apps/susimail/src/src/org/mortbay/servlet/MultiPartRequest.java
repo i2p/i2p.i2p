@@ -435,11 +435,11 @@ public class MultiPartRequest
     }
     
     /* ------------------------------------------------------------ */
-    private class Part
+    private static class Part
     {
-        String _name=null;
-        String _filename=null;
+        String _name;
+        String _filename;
         Hashtable _headers= new Hashtable(10);
-        byte[] _data=null;
+        byte[] _data;
     }    
 };

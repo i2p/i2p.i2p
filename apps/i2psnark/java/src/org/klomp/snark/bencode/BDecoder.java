@@ -60,7 +60,7 @@ public class BDecoder
   private int indicator = 0;
 
   // Used for ugly hack to get SHA hash over the metainfo info map
-  private final String special_map = "info";
+  private static final String special_map = "info";
   private boolean in_special_map = false;
   /** creation deferred until we encounter the special map, to make processing of announce replies more efficient */
   private MessageDigest sha_digest;
