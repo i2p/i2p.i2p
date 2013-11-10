@@ -474,9 +474,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
         try {
             fileInputStream = new FileInputStream(signedFile);
-            long skipped = fileInputStream.skip(Signature.SIGNATURE_BYTES);
-            if (skipped != Signature.SIGNATURE_BYTES)
-                return "";
+            DataHelper.skip(fileInputStream, Signature.SIGNATURE_BYTES);
             byte[] data = new byte[VERSION_BYTES];
             int bytesRead = DataHelper.read(fileInputStream, data);
 
@@ -515,9 +513,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
      */
     public static String getVersionString(InputStream inputStream) {
         try {
-            long skipped = inputStream.skip(Signature.SIGNATURE_BYTES);
-            if (skipped != Signature.SIGNATURE_BYTES)
-                return "";
+            DataHelper.skip(inputStream, Signature.SIGNATURE_BYTES);
             byte[] data = new byte[VERSION_BYTES];
             int bytesRead = DataHelper.read(inputStream, data);
 
@@ -640,10 +636,8 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         try {
             fileInputStream = new FileInputStream(signedFile);
             fileOutputStream = new FileOutputStream(outputFile);
-            long skipped = 0;
 
-            while (skipped < HEADER_BYTES)
-                skipped += fileInputStream.skip(HEADER_BYTES - skipped);
+            DataHelper.skip(fileInputStream, HEADER_BYTES);
 
             byte[] buffer = new byte[16*1024];
             int bytesRead = 0;

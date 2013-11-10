@@ -170,8 +170,7 @@ class PeerAcceptor
         if (b != PROTO[i])
             throw new IOException("Bad protocol 0x" + Integer.toHexString(b) + " at byte " + i);
     }
-    if (in.skip(8) != 8)
-        throw new IOException("EOF before hash");
+    DataHelper.skip(in, 8);
     byte buf[] = new byte[20];
     int read = DataHelper.read(in, buf);
     if (read != buf.length)
