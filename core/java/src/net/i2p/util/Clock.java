@@ -113,7 +113,7 @@ public class Clock implements Timestamper.UpdateListener {
     /*
      * @return the current delta from System.currentTimeMillis() in milliseconds
      */
-    public synchronized long getOffset() {
+    public long getOffset() {
         return _offset;
     }
     

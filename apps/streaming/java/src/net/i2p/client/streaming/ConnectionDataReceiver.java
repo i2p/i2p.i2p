@@ -116,7 +116,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * @param buf data to be sent - may be null
      * @param off offset into the buffer to start writing from
      * @param size how many bytes of the buffer to write (may be 0)
-     * @return the packet sent, or null if the connection died
+     * @return the packet sent
      */
     public PacketLocal send(byte buf[], int off, int size) {
         return send(buf, off, size, false);
