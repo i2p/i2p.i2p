@@ -526,7 +526,8 @@ public class Blocklist {
             if (pib == null) continue;
             // O(n**2)
             for (int i = 0; i < rv.size(); i++) {
-                if (DataHelper.eq(rv.get(i), pib)) continue;
+                // findbugs triggered on this, looks like unfinished work
+                //if (DataHelper.eq(rv.get(i), pib)) continue;
             }
             rv.add(pib);
          }

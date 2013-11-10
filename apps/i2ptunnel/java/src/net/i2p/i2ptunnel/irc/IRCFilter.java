@@ -71,7 +71,7 @@ abstract class IRCFilter {
 
         // Allow numerical responses
         try {
-            new Integer(command);
+            Integer.valueOf(command);
             return s;
         } catch(NumberFormatException nfe){}
 

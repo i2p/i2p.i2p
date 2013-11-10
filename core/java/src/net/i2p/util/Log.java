@@ -209,14 +209,15 @@ public class Log {
             return;
         
         // catenate all toString()s
-        String descString = "close() loop in";
+        StringBuilder builder = new StringBuilder();
+        builder.append("close() loop in");
         for (Object o : desc) {
-            descString += " ";
-            descString += String.valueOf(o);
+            builder.append(" ");
+            builder.append(String.valueOf(o));
         }
         
         Exception e = new Exception("check stack trace");
-        log(level,descString,e);
+        log(level,builder.toString(),e);
     }
 
     public String getName() {

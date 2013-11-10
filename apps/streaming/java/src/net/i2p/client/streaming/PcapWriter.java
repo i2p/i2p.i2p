@@ -238,10 +238,7 @@ public class PcapWriter {
             seq = pkt.getSequenceNum();
         long acked = 0;
         if (con != null) {
-            if (isInbound)
-                acked = getLowestAckedThrough(pkt, con);
-            else
-                acked = getLowestAckedThrough(pkt, con);
+            acked = getLowestAckedThrough(pkt, con);
         }
         DataHelper.writeLong(_fos, 4, pkt.getSequenceNum());
         DataHelper.writeLong(_fos, 4, acked);

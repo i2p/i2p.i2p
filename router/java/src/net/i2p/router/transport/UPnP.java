@@ -415,7 +415,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
-		return Integer.valueOf(getIP.getOutputArgumentList().getArgument("NewUpstreamMaxBitRate").getValue());
+		return Integer.parseInt(getIP.getOutputArgumentList().getArgument("NewUpstreamMaxBitRate").getValue());
 	}
 	
 	/**
@@ -429,7 +429,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
-		return Integer.valueOf(getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate").getValue());
+		return Integer.parseInt(getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate").getValue());
 	}
 	
 	/** debug only */
