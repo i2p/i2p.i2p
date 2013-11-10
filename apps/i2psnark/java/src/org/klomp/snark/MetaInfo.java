@@ -517,7 +517,6 @@ public class MetaInfo
    *  @since 0.9.1
    */
   boolean checkPiece(PartialPiece pp) {
-    MessageDigest sha1 = SHA1.getInstance();
     int piece = pp.getPiece();
     byte[] hash;
     try {

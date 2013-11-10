@@ -223,7 +223,6 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private static boolean isUnreachable(RouterInfo info) {
         if (info == null) return true;
         String cap = info.getCapabilities();
-        if (cap == null) return false;
         return cap.indexOf(Router.CAPABILITY_REACHABLE) >= 0;
     }
     

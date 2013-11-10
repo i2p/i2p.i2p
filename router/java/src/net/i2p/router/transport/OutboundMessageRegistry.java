@@ -139,12 +139,10 @@ public class OutboundMessageRegistry {
                     
                     if (o instanceof OutNetMessage) {
                         msg = (OutNetMessage)o;
-                        if (msg != null)
-                            rv.add(msg);
+                        rv.add(msg);
                     } else if (o instanceof List) {
                         msgs = (List<OutNetMessage>)o;
-                        if (msgs != null)
-                            rv.addAll(msgs);
+                        rv.addAll(msgs);
                     }
                 }
                 if (removed) {

@@ -273,8 +273,6 @@ public class IndexBean {
         TunnelController cur = getController(_tunnel);
         
         Properties config = getConfig();
-        if (config == null)
-            return "Invalid params";
         
         if (cur == null) {
             // creating new
@@ -970,8 +968,6 @@ public class IndexBean {
 
         TunnelController tun = getController(_tunnel);
         Properties config = getConfig();
-        if (config == null)
-            return "Invalid params";
         if (tun == null) {
             // creating new
             tun = new TunnelController(config, "", true);
@@ -1038,8 +1034,6 @@ public class IndexBean {
     private String generateNewEncryptionKey() {
         TunnelController tun = getController(_tunnel);
         Properties config = getConfig();
-        if (config == null)
-            return "Invalid params";
         if (tun == null) {
             // creating new
             tun = new TunnelController(config, "", true);

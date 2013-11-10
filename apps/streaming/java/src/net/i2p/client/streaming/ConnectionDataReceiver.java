@@ -93,7 +93,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
 
         if (doSend) {
             PacketLocal packet = send(buf, off, size);
-            if (packet == null) return _dummyStatus;
+            // this shouldn't be null
+            //if (packet == null) return _dummyStatus;
             
             //dont wait for non-acks
             if ( (packet.getSequenceNum() > 0) || (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) )

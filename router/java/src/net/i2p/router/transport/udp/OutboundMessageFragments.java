@@ -150,7 +150,6 @@ class OutboundMessageFragments {
      *
      */
     public void add(OutNetMessage msg) {
-        I2NPMessage msgBody = msg.getMessage();
         RouterInfo target = msg.getTarget();
         if (target == null)
             return;

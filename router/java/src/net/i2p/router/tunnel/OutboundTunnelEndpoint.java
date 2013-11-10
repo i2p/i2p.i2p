@@ -58,7 +58,7 @@ class OutboundTunnelEndpoint {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("outbound tunnel " + _config + " received a full message: " + msg
                            + " to be forwarded on to "
-                           + (toRouter != null ? toRouter.toBase64().substring(0,4) : "")
+                           + toRouter.toBase64().substring(0,4)
                            + (toTunnel != null ? ":" + toTunnel.getTunnelId() : ""));
             int size = msg.getMessageSize();
             // don't drop it if we are the target

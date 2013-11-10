@@ -229,7 +229,7 @@ public class DHSessionKeyBuilder {
         //_peerValue = new NativeBigInteger(val);
     }
 
-    public BigInteger getPeerPublicValue() {
+    public synchronized BigInteger getPeerPublicValue() {
         return _peerValue;
     }
 

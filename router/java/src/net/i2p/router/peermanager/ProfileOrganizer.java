@@ -1270,8 +1270,6 @@ public class ProfileOrganizer {
         if (pinfo == null)
             return rv;
         Collection<RouterAddress> paddr = pinfo.getAddresses();
-        if (paddr == null)
-            return rv;
         for (RouterAddress pa : paddr) {
             byte[] pib = pa.getIP();
             if (pib == null) continue;

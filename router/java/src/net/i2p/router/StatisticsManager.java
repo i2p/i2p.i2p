@@ -86,7 +86,7 @@ public class StatisticsManager implements Service {
         
         if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS) &&
             _context.random().nextInt(RANDOM_INCLUDE_STATS) == 0) {
-            long publishedUptime = _context.router().getUptime();
+            //long publishedUptime = _context.router().getUptime();
             // Don't publish these for first hour
             // Disabled in 0.9
             //if (publishedUptime > 62*60*1000)

@@ -283,7 +283,6 @@ public class TunnelPoolSettings {
     }
     
     private static final boolean getBoolean(String str, boolean defaultValue) { 
-        if (str == null) return defaultValue;
         boolean v = Boolean.parseBoolean(str) ||
                     (str != null && "YES".equals(str.toUpperCase(Locale.US)));
         return v;

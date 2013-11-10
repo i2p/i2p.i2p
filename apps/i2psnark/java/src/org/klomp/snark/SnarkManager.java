@@ -754,7 +754,7 @@ public class SnarkManager implements CompleteListener {
      *  @since 0.9.1
      */
     public void saveOpenTrackers(List<String> ot) {
-        String val = setListConfig(PROP_OPENTRACKERS, ot);
+        setListConfig(PROP_OPENTRACKERS, ot);
         if (ot == null)
             ot = Collections.singletonList(I2PSnarkUtil.DEFAULT_OPENTRACKERS);
         _util.setOpenTrackers(ot);
