@@ -69,12 +69,12 @@ public abstract class ZipFileComment {
         try {
             in = new FileInputStream(file);
             if (skip > 0)
-                in.skip(skip);
+                DataHelper.skip(in, skip);
             byte[] hdr = new byte[HEADER_LEN];
             DataHelper.read(in, hdr);
             if (!DataHelper.eq(hdr, magicStart))
                 throw new ZipException("Not a zip file: " + file);
-            in.skip(fileLen - (skip + HEADER_LEN + buffer.length));
+            DataHelper.skip(in, fileLen - (skip + HEADER_LEN + buffer.length));
             DataHelper.read(in, buffer);
             return getComment(buffer);
         } finally {

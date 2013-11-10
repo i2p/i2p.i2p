@@ -198,14 +198,16 @@ public class SOCKS5Server extends SOCKSServer {
         addressType = in.readUnsignedByte();
         switch (addressType) {
         case AddressType.IPV4:
-            connHostName = new String("");
+            //connHostName = new String();
+            StringBuilder builder = new StringBuilder();
             for (int i = 0; i < 4; ++i) {
                 int octet = in.readUnsignedByte();
-                connHostName += Integer.toString(octet);
+                builder.append(Integer.toString(octet));
                 if (i != 3) {
-                    connHostName += ".";
+                    builder.append(".");
                 }
             }
+            connHostName = builder.toString();
             // Check if the requested IP should be mapped to a domain name
             String mappedDomainName = getMappedDomainNameForIP(connHostName);
             if (mappedDomainName != null) {

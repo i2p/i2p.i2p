@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -78,6 +79,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 
 	private Device _router;
 	private Service _service;
+	// UDN -> friendly name
+        private final Map<String, String> _otherUDNs;
 	private boolean isDisabled = false; // We disable the plugin if more than one IGD is found
 	private volatile boolean _serviceLacksAPM;
 	private final Object lock = new Object();
@@ -92,6 +95,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private ForwardPortCallback forwardCallback;
 
 	private static final String PROP_ADVANCED = "routerconsole.advanced";
+	private static final String PROP_IGNORE = "i2np.upnp.ignore";
 	
 	public UPnP(I2PAppContext context) {
 		super();
@@ -99,6 +103,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		_log = _context.logManager().getLog(UPnP.class);
 		portsToForward = new HashSet<ForwardPort>();
 		portsForwarded = new HashSet<ForwardPort>();
+                _otherUDNs = new HashMap<String, String>(4);
 		addDeviceChangeListener(this);
 	}
 	
@@ -178,21 +183,33 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 *  DeviceChangeListener
 	 */
 	public void deviceAdded(Device dev) {
+                String udn = dev.getUDN();
+		if (udn == null)
+			udn = "???";
+                String name = dev.getFriendlyName();
+		if (name == null)
+			name = "???";
 		synchronized (lock) {
 			if(isDisabled) {
 				if (_log.shouldLog(Log.WARN))
-					_log.warn("Plugin has been disabled previously, ignoring new device.");
+					_log.warn("Plugin has been disabled previously, ignoring " + name + " UDN: " + udn);
+				_otherUDNs.put(udn, name);
 				return;
 			}
 		}
 		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice()) {
 			if (_log.shouldLog(Log.WARN))
-				_log.warn("UP&P non-IGD device found, ignoring : " + dev.getFriendlyName());
+				_log.warn("UP&P non-IGD device found, ignoring " + name);
+			synchronized (lock) {
+				_otherUDNs.put(udn, name);
+			}
 			return; // ignore non-IGD devices
 		} else if(isNATPresent()) {
                         // maybe we should see if the old one went away before ignoring the new one?
-			if (_log.shouldLog(Log.WARN))
-				_log.warn("UP&P ignoring additional IGD device found: " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+			_log.logAlways(Log.WARN, "UP&P ignoring additional device " + name + " UDN: " + udn);
+			synchronized (lock) {
+				_otherUDNs.put(udn, name);
+			}
 			/********** seems a little drastic
 			isDisabled = true;
 			
@@ -206,11 +223,29 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			return;
 		}
 		
-		if (_log.shouldLog(Log.WARN))
-			_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN() + " lease time: " + dev.getLeaseTime());
-		synchronized(lock) {
-			_router = dev;
+		boolean ignore = false;
+		String toIgnore = _context.getProperty(PROP_IGNORE);
+		if (toIgnore != null) {
+			String[] ignores = toIgnore.split("[,; \r\n\t]");
+			for (int i = 0; i < ignores.length; i++) {
+				if (ignores[i].equals(udn)) {
+					ignore = true;
+					_log.logAlways(Log.WARN, "Ignoring by config: " + name + " UDN: " + udn);
+					break;
+				}
+			}
 		}
+		synchronized(lock) {
+			if (ignore) {
+				_otherUDNs.put(udn, name);
+				return;
+			} else {
+				_router = dev;
+			}
+		}
+
+		if (_log.shouldLog(Log.WARN))
+			_log.warn("UP&P IGD found : " + name + " UDN: " + udn + " lease time: " + dev.getLeaseTime());
 		
 		discoverService();
 		// We have found the device we need: stop the listener thread
@@ -303,16 +338,21 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 *  DeviceChangeListener
 	 */
 	public void deviceRemoved(Device dev ){
+                String udn = dev.getUDN();
 		if (_log.shouldLog(Log.WARN))
-			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + udn);
 		synchronized (lock) {
 			if(_router == null) return;
+			if (udn != null)
+				_otherUDNs.remove(udn);
+			else
+				_otherUDNs.remove("???");
 			// I2P this wasn't working
 			//if(_router.equals(dev)) {
 		        if(ROUTER_DEVICE.equals(dev.getDeviceType()) &&
 			   dev.isRootDevice() &&
 			   stringEquals(_router.getFriendlyName(), dev.getFriendlyName()) &&
-			   stringEquals(_router.getUDN(), dev.getUDN())) {
+			   stringEquals(_router.getUDN(), udn)) {
 				if (_log.shouldLog(Log.WARN))
 					_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
 				_router = null;
@@ -375,7 +415,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
-		return Integer.valueOf(getIP.getOutputArgumentList().getArgument("NewUpstreamMaxBitRate").getValue());
+		try {
+		    return Integer.parseInt(getIP.getOutputArgumentList().getArgument("NewUpstreamMaxBitRate").getValue());
+		} catch (NumberFormatException nfe) {
+		    return -1;
+		}
 	}
 	
 	/**
@@ -389,7 +433,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
-		return Integer.valueOf(getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate").getValue());
+		try {
+		    return Integer.parseInt(getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate").getValue());
+		} catch (NumberFormatException nfe) {
+		    return -1;
+		}
 	}
 	
 	/** debug only */
@@ -557,6 +605,21 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<h3><a name=\"upnp\"></a>").append(_("UPnP Status")).append("</h3>");
 		
+		synchronized(_otherUDNs) {
+			if (!_otherUDNs.isEmpty()) {
+				sb.append(_("Disabled UPnP Devices"));
+				sb.append("<ul>");
+				for (Map.Entry<String, String> e : _otherUDNs.entrySet()) {
+					String udn = e.getKey();
+					String name = e.getValue();
+					sb.append("<li>").append(name)
+					  .append("<br>UDN: ").append(udn)
+					  .append("</li>");
+				}
+				sb.append("</ul>");
+			}
+		}
+
 		if(isDisabled) {
 			sb.append(_("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?"));
 			return sb.toString();

@@ -83,7 +83,7 @@ class GeoIPv6 {
             if (!DataHelper.eq(magic, DataHelper.getASCII(MAGIC)))
                 throw new IOException("Not a IPv6 geoip data file");
             // skip timestamp and comments
-            in.skip(HEADER_LEN - MAGIC.length());
+            DataHelper.skip(in, HEADER_LEN - MAGIC.length());
             byte[] buf = new byte[18];
             while (DataHelper.read(in, buf) == 18 && idx < search.length) {
                 long ip1 = readLong(buf, 0);

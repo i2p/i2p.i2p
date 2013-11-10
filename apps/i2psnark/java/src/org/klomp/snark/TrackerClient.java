@@ -473,6 +473,9 @@ public class TrackerClient implements Runnable {
                   {
                     long uploaded = coordinator.getUploaded();
                     long downloaded = coordinator.getDownloaded();
+                    long len = snark.getTotalLength();
+                    if (len > 0 && downloaded > len)
+                        downloaded = len;
                     left = coordinator.getLeft();
                     String event;
                     if (!tr.started) {
@@ -508,6 +511,7 @@ public class TrackerClient implements Runnable {
                         info.getSeedCount() > 100 &&
                         coordinator.getPeerCount() <= 0 &&
                         _util.getContext().clock().now() > _startedOn + 2*60*60*1000 &&
+                        snark.getTotalLength() > 0 &&
                         uploaded >= 2 * snark.getTotalLength()) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Auto stopping " + snark.getBaseName());
@@ -715,6 +719,9 @@ public class TrackerClient implements Runnable {
             _log.debug("Running unannounce " + _threadName + " to " + tr.announce);
         long uploaded = coordinator.getUploaded();
         long downloaded = coordinator.getDownloaded();
+        long len = snark.getTotalLength();
+        if (len > 0 && downloaded > len)
+            downloaded = len;
         long left = coordinator.getLeft();
         try
           {

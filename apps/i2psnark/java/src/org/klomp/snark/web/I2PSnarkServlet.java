@@ -2548,7 +2548,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 File f = item;
-                if ((!complete) && (!item.isDirectory()) && f != null) {
+                if ((!complete) && (!item.isDirectory())) {
                     int pri = snark.getStorage().getPriority(f.getCanonicalPath());
                     buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
                     if (pri > 0)

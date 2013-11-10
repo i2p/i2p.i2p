@@ -2,6 +2,7 @@ package net.i2p.data;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -124,6 +125,38 @@ public class DataHelperTest extends TestCase{
             byte decompressed[] = DataHelper.decompress(compressed);
             assertTrue(DataHelper.eq(data, decompressed));
             
+        }
+    }
+
+    public void testSkip() throws Exception {
+        final int sz = 256;
+        TestInputStream tis = new TestInputStream(sz);
+        DataHelper.skip(tis, sz);
+        try {
+            DataHelper.skip(tis, 1);
+            fail();
+        } catch (IOException ioe) {}
+        
+        DataHelper.skip(tis, 0);
+        
+        try {
+            DataHelper.skip(tis, -1);
+            fail("skipped negative?");
+        } catch (IllegalArgumentException expected) {}
+    }
+
+    private static class TestInputStream extends ByteArrayInputStream {
+        private final Random r = new Random();
+
+        public TestInputStream(int size) {
+            super(new byte[size]);
+            r.nextBytes(buf);
+        }
+
+        /** skip a little at a time, or sometimes zero */
+        @Override
+        public long skip(long n) {
+            return super.skip(Math.min(n, r.nextInt(4)));
         }
     }
 }

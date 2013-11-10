@@ -363,14 +363,14 @@ class FragmentHandler {
             synchronized (_fragmentedMessages) {
                 msg = _fragmentedMessages.get(Long.valueOf(messageId));
                 if (msg == null) {
-                    msg = new FragmentedMessage(_context);
+                    msg = new FragmentedMessage(_context, messageId);
                     _fragmentedMessages.put(Long.valueOf(messageId), msg);
                 }
             }
 
             // synchronized is required, fragments may be arriving in different threads
             synchronized(msg) {
-                boolean ok = msg.receive(messageId, preprocessed, offset, size, false, router, tunnelId);
+                boolean ok = msg.receive(preprocessed, offset, size, false, router, tunnelId);
                 if (!ok) return -1;
                 if (msg.isComplete()) {
                     synchronized (_fragmentedMessages) {
@@ -430,14 +430,14 @@ class FragmentHandler {
         synchronized (_fragmentedMessages) {
             msg = _fragmentedMessages.get(Long.valueOf(messageId));
             if (msg == null) {
-                msg = new FragmentedMessage(_context);
+                msg = new FragmentedMessage(_context, messageId);
                 _fragmentedMessages.put(Long.valueOf(messageId), msg);
             }
         }
         
         // synchronized is required, fragments may be arriving in different threads
         synchronized(msg) {
-            boolean ok = msg.receive(messageId, fragmentNum, preprocessed, offset, size, isLast);
+            boolean ok = msg.receive(fragmentNum, preprocessed, offset, size, isLast);
             if (!ok) return -1;
             
             if (msg.isComplete()) {

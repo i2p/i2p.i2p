@@ -146,7 +146,7 @@ class FloodfillMonitorJob extends JobImpl {
             final RouterContext rc = getContext();
             final String log = String.format(
                     "FF criteria breakdown: happy=%b, capabilities=%s, maxLag=%d, known=%d, " +
-                    "active=%d, participating=%d, offset=%d, ssuAddr=%b",
+                    "active=%d, participating=%d, offset=%d, ssuAddr=%s",
                     happy, 
                     rc.router().getRouterInfo().getCapabilities(),
                     rc.jobQueue().getMaxLag(),
@@ -154,7 +154,7 @@ class FloodfillMonitorJob extends JobImpl {
                     rc.commSystem().countActivePeers(),
                     rc.tunnelManager().getParticipatingCount(),
                     Math.abs(rc.clock().getOffset()),
-                    rc.router().getRouterInfo().getTargetAddress("SSU")
+                    rc.router().getRouterInfo().getTargetAddress("SSU").toString()
                     );
             _log.debug(log);
         }

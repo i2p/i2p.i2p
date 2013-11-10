@@ -531,7 +531,7 @@ public class SnarkManager implements CompleteListener {
                 	    _util.setStartupDelay(minutes);
 	                    changed = true;
         	            _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(minutes));
-                	    addMessage(_("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * 60 * 1000)));
+                	    addMessage(_("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * (60L * 1000))));
                 }
 	}
 
@@ -754,7 +754,7 @@ public class SnarkManager implements CompleteListener {
      *  @since 0.9.1
      */
     public void saveOpenTrackers(List<String> ot) {
-        String val = setListConfig(PROP_OPENTRACKERS, ot);
+        setListConfig(PROP_OPENTRACKERS, ot);
         if (ot == null)
             ot = Collections.singletonList(I2PSnarkUtil.DEFAULT_OPENTRACKERS);
         _util.setOpenTrackers(ot);
@@ -1489,7 +1489,7 @@ public class SnarkManager implements CompleteListener {
     private class DirMonitor implements Runnable {
         public void run() {
             // don't bother delaying if auto start is false
-            long delay = 60 * 1000 * getStartupDelayMinutes();
+            long delay = (60L * 1000) * getStartupDelayMinutes();
             if (delay > 0 && shouldAutoStart()) {
                 addMessage(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}

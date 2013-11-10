@@ -45,16 +45,16 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 
 public class BloomSHA1 {
-    protected final int m;
-    protected final int k;
-    protected int count;
+    private final int m;
+    private final int k;
+    private int count;
    
-    protected final int[] filter;
-    protected final KeySelector ks;
+    private final int[] filter;
+    private final KeySelector ks;
     
     // convenience variables
-    protected final int filterBits;
-    protected final int filterWords;
+    private final int filterBits;
+    private final int filterWords;
     
     private final BlockingQueue<int[]> buf;
 
@@ -120,7 +120,7 @@ public class BloomSHA1 {
         this (20, 8);
     }
     /** Clear the filter, unsynchronized */
-    protected void doClear() {
+    private void doClear() {
         Arrays.fill(filter, 0);
         count = 0;
     }
@@ -186,9 +186,9 @@ public class BloomSHA1 {
      * @param b byte array representing a key (SHA1 digest)
      * @return true if b is in the filter 
      */
-    protected final boolean isMember(byte[] b) { return isMember(b, 0, b.length); }
+    private final boolean isMember(byte[] b) { return isMember(b, 0, b.length); }
 
-    protected final boolean isMember(byte[] b, int offset, int len) {
+    private final boolean isMember(byte[] b, int offset, int len) {
         int[] bitOffset = acquire();
         int[] wordOffset = acquire();
         ks.getOffsets(b, offset, len, bitOffset, wordOffset);

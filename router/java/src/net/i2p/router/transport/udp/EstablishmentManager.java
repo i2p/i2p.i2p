@@ -1306,7 +1306,7 @@ class EstablishmentManager {
         _outboundByHash.remove(outboundState.getRemoteIdentity().calculateHash(), outboundState);
         // should have already been removed in handleOutbound() above
         // remove only if value == state
-        boolean removed = _outboundStates.remove(outboundState.getRemoteHostId(), outboundState);
+        _outboundStates.remove(outboundState.getRemoteHostId(), outboundState);
         if (outboundState.getState() != OB_STATE_CONFIRMED_COMPLETELY) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Expired: " + outboundState + " Lifetime: " + outboundState.getLifetime());

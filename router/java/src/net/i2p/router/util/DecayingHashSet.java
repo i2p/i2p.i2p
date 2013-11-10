@@ -79,8 +79,8 @@ public class DecayingHashSet extends DecayingBloomFilter {
             throw new IllegalArgumentException("Bad size");
         _current = new ConcurrentHashSet(128);
         _previous = new ConcurrentHashSet(128);
-        if (_log.shouldLog(Log.WARN))
-           _log.warn("New DHS " + name + " entryBytes = " + entryBytes +
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("New DHS " + name + " entryBytes = " + entryBytes +
                      " cycle (s) = " + (durationMs / 1000));
         // try to get a handle on memory usage vs. false positives
         context.statManager().createRateStat("router.decayingHashSet." + name + ".size",

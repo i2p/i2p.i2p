@@ -149,7 +149,7 @@ public class SimpleTimer {
             }
             // FIXME if you plan to use this class again
             while (_events.containsKey(time))
-                time = new Long(time.longValue() + 1);
+                time = Long.valueOf(time.longValue() + 1);
             _events.put(time, event);
             _eventTimes.put(event, time);
             

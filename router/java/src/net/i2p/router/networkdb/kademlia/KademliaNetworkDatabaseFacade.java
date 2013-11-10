@@ -926,7 +926,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     void dropAfterLookupFailed(Hash peer) {
         _context.peerManager().removeCapabilities(peer);
-        boolean removed = _kb.remove(peer);
+        _kb.remove(peer);
         //if (removed) {
         //    if (_log.shouldLog(Log.INFO))
         //        _log.info("Removed kbucket entry for " + peer);

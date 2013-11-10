@@ -104,19 +104,20 @@ public class SOCKS4aServer extends SOCKSServer {
             throw new SOCKSException("Invalid port number in request");
         }
 
-        connHostName = new String("");
+        StringBuilder builder = new StringBuilder();
         boolean alreadyWarned = false;
         for (int i = 0; i < 4; ++i) {
             int octet = in.readByte() & 0xff;
-            connHostName += Integer.toString(octet);
+            builder.append(Integer.toString(octet));
             if (i != 3) {
-                connHostName += ".";
+                builder.append(".");
                 if (octet != 0 && !alreadyWarned) {
                     _log.warn("IPV4 address type in request: " + connHostName + ". Is your client secure?");
                     alreadyWarned = true;
                 }
             }
         }
+        connHostName = builder.toString();
 
         // Check if the requested IP should be mapped to a domain name
         String mappedDomainName = getMappedDomainNameForIP(connHostName);

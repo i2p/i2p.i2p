@@ -390,6 +390,7 @@ public class BSkipSpan extends SkipSpan {
 		this.prev = null;
 
 		BSkipSpan bss = this;
+		// findbugs ok (set in load() above)
 		int np = nextPage;
 		while(np != 0) {
 			BSkipSpan temp = bsl.spanHash.get(Integer.valueOf(np));
