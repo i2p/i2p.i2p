@@ -19,7 +19,7 @@ import net.i2p.util.SimpleTimer2;
 class FragmentedMessage {
     private final I2PAppContext _context;
     private final Log _log;
-    private long _messageId;
+    private final long _messageId;
     private Hash _toRouter;
     private TunnelId _toTunnel;
     private final ByteArray _fragments[];
@@ -33,11 +33,12 @@ class FragmentedMessage {
     private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
     // 64 is pretty absurd, 32 is too, most likely
     private static final int MAX_FRAGMENTS = 64;
+    private static final int MAX_FRAGMENT_SIZE = 996;
     
-    public FragmentedMessage(I2PAppContext ctx) {
+    public FragmentedMessage(I2PAppContext ctx, long messageId) {
         _context = ctx;
         _log = ctx.logManager().getLog(FragmentedMessage.class);
-        _messageId = -1;
+        _messageId = messageId;
         _fragments = new ByteArray[MAX_FRAGMENTS];
         _highFragmentNum = -1;
         _releasedAfter = -1;
@@ -48,37 +49,30 @@ class FragmentedMessage {
      * Receive a followup fragment, though one of these may arrive at the endpoint
      * prior to the fragment # 0.
      *
-     * @param messageId what messageId is this fragment a part of 
-     * @param fragmentNum sequence number within the message (must be greater than 1)
-     * @param payload data for the fragment
+     * @param fragmentNum sequence number within the message (1 - 63)
+     * @param payload data for the fragment non-null
      * @param offset index into the payload where the fragment data starts (past headers/etc)
      * @param length how much past the offset should we snag?
      * @param isLast is this the last fragment in the message?
      */
-    public boolean receive(long messageId, int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
-        if (fragmentNum < 0) {
+    public boolean receive(int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
+        if (fragmentNum <= 0 || fragmentNum >= MAX_FRAGMENTS) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Fragment # == " + fragmentNum + " for messageId " + messageId);
+                _log.error("Fragment # == " + fragmentNum + " for messageId " + _messageId);
             return false;
         }
-        if (payload == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Payload is null for messageId " + messageId);
-            return false;
-        }
-        if (length <= 0) {
+        if (length <= 0 || length > MAX_FRAGMENT_SIZE) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Length is impossible (" + length + ") for messageId " + messageId);
+                _log.warn("Length is impossible (" + length + ") for messageId " + _messageId);
             return false;
         }
         if (offset + length > payload.length) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+                _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + _messageId);
             return false;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive message " + messageId + " fragment " + fragmentNum + " with " + length + " bytes (last? " + isLast + ") offset = " + offset);
-        _messageId = messageId;
+            _log.debug("Receive message " + _messageId + " fragment " + fragmentNum + " with " + length + " bytes (last? " + isLast + ") offset = " + offset);
         // we should just use payload[] and use an offset/length on it
         ByteArray ba = _cache.acquire(); //new ByteArray(payload, offset, length); //new byte[length]);
         System.arraycopy(payload, offset, ba.getData(), 0, length);
@@ -95,43 +89,36 @@ class FragmentedMessage {
             _highFragmentNum = fragmentNum;
         if (isLast && fragmentNum <= 0) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("hmm, isLast and fragmentNum=" + fragmentNum + " for message " + messageId);
+                _log.error("hmm, isLast and fragmentNum=" + fragmentNum + " for message " + _messageId);
             return false;
         }
         return true;
     }
     
     /**
-     * Receive the first fragment and related metadata.  This may not be the first
+     * Receive the first fragment (#0) and related metadata.  This may not be the first
      * one to arrive at the endpoint however.
      *
-     * @param messageId what messageId is this fragment a part of 
-     * @param payload data for the fragment
+     * @param payload data for the fragment non-null
      * @param offset index into the payload where the fragment data starts (past headers/etc)
      * @param length how much past the offset should we snag?
      * @param isLast is this the last fragment in the message?
      * @param toRouter what router is this destined for (may be null)
      * @param toTunnel what tunnel is this destined for (may be null)
      */
-    public boolean receive(long messageId, byte payload[], int offset, int length, boolean isLast, Hash toRouter, TunnelId toTunnel) {
-        if (payload == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Payload is null for messageId " + messageId);
-            return false;
-        }
-        if (length <= 0) {
+    public boolean receive(byte payload[], int offset, int length, boolean isLast, Hash toRouter, TunnelId toTunnel) {
+        if (length <= 0 || length > MAX_FRAGMENT_SIZE) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Length is impossible (" + length + ") for messageId " + messageId);
+                _log.warn("Length is impossible (" + length + ") for messageId " + _messageId);
             return false;
         }
         if (offset + length > payload.length) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+                _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + _messageId);
             return false;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive message " + messageId + " with " + length + " bytes (last? " + isLast + ") targetting " + toRouter + " / " + toTunnel + " offset=" + offset);
-        _messageId = messageId;
+            _log.debug("Receive message " + _messageId + " with " + length + " bytes (last? " + isLast + ") targetting " + toRouter + " / " + toTunnel + " offset=" + offset);
         ByteArray ba = _cache.acquire(); // new ByteArray(payload, offset, length); // new byte[length]);
         System.arraycopy(payload, offset, ba.getData(), 0, length);
         ba.setValid(length);
