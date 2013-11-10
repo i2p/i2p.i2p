@@ -348,9 +348,6 @@ public abstract class TunnelPeerSelector {
 
     private static boolean shouldExclude(RouterContext ctx, Log log, RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
-        if (cap == null) {
-            return true;
-        }
         for (int j = 0; j < excl.length; j++) {
             if (cap.indexOf(excl[j]) >= 0) {
                 return true;

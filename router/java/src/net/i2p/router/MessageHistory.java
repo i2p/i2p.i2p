@@ -374,8 +374,7 @@ public class MessageHistory {
         buf.append(getPrefix());
         buf.append("timed out waiting for a reply to [").append(sentMessage.getMessageType());
         buf.append("] [").append(sentMessage.getMessageId()).append("] expiring on [");
-        if (sentMessage != null)
-            buf.append(getTime(sentMessage.getReplySelector().getExpiration()));
+        buf.append(getTime(sentMessage.getReplySelector().getExpiration()));
         buf.append("] ").append(sentMessage.getReplySelector().toString());
         addEntry(buf.toString());
     }

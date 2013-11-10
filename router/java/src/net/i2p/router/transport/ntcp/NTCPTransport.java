@@ -952,8 +952,7 @@ public class NTCPTransport extends TransportImpl {
             }
         } else if (enabled.equals("false") &&
                    name != null && name.length() > 0 &&
-                   !name.equals(ohost) &&
-                   nport != null) {
+                   !name.equals(ohost)) {
             // Host name is configured, and we have a port (either auto or configured)
             // but we probably only get here if the port is auto,
             // otherwise createNTCPAddress() would have done it already

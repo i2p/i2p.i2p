@@ -175,7 +175,6 @@ class SigUtil {
                               throws GeneralSecurityException {
         SigType type = pk.getType();
         int len = type.getPubkeyLen();
-        int sublen = len / 2;
         byte[] b = pk.getData();
         BigInteger s = new NativeBigInteger(1, b);
         // see ECConstants re: casting

@@ -598,7 +598,6 @@ public class DSAEngine {
     private Signature altSignRaw(SimpleDataStructure hash, SigningPrivateKey privateKey) throws GeneralSecurityException {
         SigType type = privateKey.getType();
         String algo = getRawAlgo(type);
-        java.security.Signature jsig = java.security.Signature.getInstance(algo);
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         return altSignRaw(algo, hash, privKey, type);
     }
