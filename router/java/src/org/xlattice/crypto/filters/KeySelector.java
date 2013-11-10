@@ -40,14 +40,14 @@ public class KeySelector {
     }
 
     /** AND with byte to expose index-many bits */
-    public final static int[] UNMASK = { 
+    private final static int[] UNMASK = { 
  // 0  1  2  3   4   5   6    7    8   9     10   11     12    13     14     15
     0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767};
     /** AND with byte to zero out index-many bits */
-    public final static int[] MASK   = {
+    private final static int[] MASK   = {
     ~0,~1,~3,~7,~15,~31,~63,~127,~255,~511,~1023,~2047,~4095,~8191,~16383,~32767};
 
-    public final static int TWO_UP_15 = 32 * 1024;
+    private final static int TWO_UP_15 = 32 * 1024;
 
     /** 
      * Creates a key selector for a Bloom filter.  When a key is presented
