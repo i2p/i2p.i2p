@@ -136,6 +136,13 @@ public class DataHelperTest extends TestCase{
             DataHelper.skip(tis, 1);
             fail();
         } catch (IOException ioe) {}
+        
+        DataHelper.skip(tis, 0);
+        
+        try {
+            DataHelper.skip(tis, -1);
+            fail("skipped negative?");
+        } catch (IllegalArgumentException expected) {}
     }
 
     private static class TestInputStream extends ByteArrayInputStream {
