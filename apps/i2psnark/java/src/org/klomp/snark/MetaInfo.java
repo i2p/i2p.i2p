@@ -216,7 +216,16 @@ public class MetaInfo
 
     // BEP 27
     val = info.get("private");
-    privateTorrent = val != null && val.getString().equals("1");
+    if (val != null) {
+        Object o = val.getValue();
+        // Is it supposed to be a number or a string?
+        // i2psnark does it as a string. BEP 27 doesn't say.
+        // Transmission does numbers.
+        privateTorrent = "1".equals(o) ||
+                         ((o instanceof Number) && ((Number) o).intValue() == 1);
+    } else {
+        privateTorrent = false;
+    }
 
     val = info.get("piece length");
     if (val == null)
