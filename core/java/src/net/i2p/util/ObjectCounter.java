@@ -1,5 +1,6 @@
 package net.i2p.util;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,7 +10,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  *  @author zzz, welterde
  */
-public class ObjectCounter<K> {
+public class ObjectCounter<K> implements Serializable {
+    /**
+     * Serializable so it can be passed in an Android Bundle
+     */
+    private static final long serialVersionUID = 3160378641721937421L;
+
     private final ConcurrentHashMap<K, AtomicInteger> map;
 
     public ObjectCounter() {
