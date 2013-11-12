@@ -1,5 +1,7 @@
 package net.i2p.router;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import net.i2p.data.DataHelper;
 
 /**
@@ -9,7 +11,7 @@ import net.i2p.data.DataHelper;
  */
 public class JobStats {
     private final String _job;
-    private volatile long _numRuns;
+    private final AtomicLong _numRuns = new AtomicLong();
     private volatile long _totalTime;
     private volatile long _maxTime;
     private volatile long _minTime;
@@ -26,7 +28,7 @@ public class JobStats {
     }
     
     public void jobRan(long runTime, long lag) {
-        _numRuns++;
+        _numRuns.incrementAndGet();
         _totalTime += runTime;
         if ( (_maxTime < 0) || (runTime > _maxTime) )
             _maxTime = runTime;
@@ -40,13 +42,14 @@ public class JobStats {
     }
     
     public String getName() { return _job; }
-    public long getRuns() { return _numRuns; }
+    public long getRuns() { return _numRuns.get(); }
     public long getTotalTime() { return _totalTime; }
     public long getMaxTime() { return _maxTime; }
     public long getMinTime() { return _minTime; }
     public long getAvgTime() { 
-        if (_numRuns > 0) 
-            return _totalTime / _numRuns; 
+        long numRuns = _numRuns.get();
+        if (numRuns > 0) 
+            return _totalTime / numRuns; 
         else 
             return 0; 
     }
@@ -54,8 +57,9 @@ public class JobStats {
     public long getMaxPendingTime() { return _maxPendingTime; }
     public long getMinPendingTime() { return _minPendingTime; }
     public long getAvgPendingTime() { 
-        if (_numRuns > 0) 
-            return _totalPendingTime / _numRuns; 
+        long numRuns = _numRuns.get();
+        if (numRuns > 0) 
+            return _totalPendingTime / numRuns; 
         else 
             return 0; 
     }

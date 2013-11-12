@@ -50,7 +50,7 @@ class SingleSearchJob extends FloodOnlySearchJob {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Single search for " + _key + " to " + _to);
         getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), _to);
-        _lookupsRemaining = 1;
+        _lookupsRemaining.set(1);
     }
 
     @Override

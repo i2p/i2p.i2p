@@ -143,7 +143,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
 ********/
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
-        for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
+        for (int i = 0; _lookupsRemaining.get() < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
             Hash peer = floodfillPeers.get(i);
             if (peer.equals(getContext().routerHash()))
                 continue;
@@ -177,7 +177,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
                 _log.info(getJobId() + ": Floodfill search for " + _key + " to " + peer);
             getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), peer);
             count++;
-            _lookupsRemaining++;
+            _lookupsRemaining.incrementAndGet();
         }
         
         if (count <= 0) {

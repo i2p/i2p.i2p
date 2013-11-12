@@ -36,9 +36,9 @@ class MessageInputStream extends InputStream {
     private final List<ByteArray> _readyDataBlocks;
     private int _readyDataBlockIndex;
     /** highest message ID used in the readyDataBlocks */
-    private volatile long _highestReadyBlockId;
+    private long _highestReadyBlockId;
     /** highest overall message ID */
-    private volatile long _highestBlockId;
+    private long _highestBlockId;
     /** 
      * Message ID (Long) to ByteArray for blocks received
      * out of order when there are lower IDs not yet 
@@ -76,16 +76,18 @@ class MessageInputStream extends InputStream {
      * @return highest data block ID completely received or -1 for none
      */
     public long getHighestReadyBockId() { 
-        // not synchronized as it doesnt hurt to read a too-low value
-        return _highestReadyBlockId; 
+        synchronized (_dataLock) {
+            return _highestReadyBlockId; 
+        }
     }
     
     /**
      * @return highest data block ID received  or -1 for none
      */
     public long getHighestBlockId() { 
-        // not synchronized as it doesnt hurt to read a too-low value
-        return _highestBlockId;
+        synchronized (_dataLock) {
+            return _highestBlockId;
+        }
     }
     
     /**

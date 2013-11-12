@@ -1,5 +1,7 @@
 package net.i2p.router;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.i2p.data.Hash;
 
 /**
@@ -15,7 +17,7 @@ class RouterDoSThrottle extends RouterThrottleImpl {
     }
     
     private volatile long _currentLookupPeriod;
-    private volatile int _currentLookupCount;
+    private final AtomicInteger _currentLookupCount = new AtomicInteger();
     // if we receive over 20 netDb lookups in 10 seconds, someone is acting up
     private static final long LOOKUP_THROTTLE_PERIOD = 10*1000;
     private static final long LOOKUP_THROTTLE_MAX = 20;
@@ -30,10 +32,10 @@ class RouterDoSThrottle extends RouterThrottleImpl {
         long now = _context.clock().now();
         if (_currentLookupPeriod + LOOKUP_THROTTLE_PERIOD > now) {
             // same period, check for DoS
-            _currentLookupCount++;
-            if (_currentLookupCount >= LOOKUP_THROTTLE_MAX) {
-                _context.statManager().addRateData("router.throttleNetDbDoS", _currentLookupCount, 0);
-                int rand = _context.random().nextInt(_currentLookupCount);
+            int cnt = _currentLookupCount.incrementAndGet();
+            if (cnt >= LOOKUP_THROTTLE_MAX) {
+                _context.statManager().addRateData("router.throttleNetDbDoS", cnt, 0);
+                int rand = _context.random().nextInt(cnt);
                 if (rand > LOOKUP_THROTTLE_MAX) {
                     return false;
                 } else {
@@ -47,7 +49,7 @@ class RouterDoSThrottle extends RouterThrottleImpl {
             // on to the next period, reset counter, no DoS
             // (no, I'm not worried about concurrency here)
             _currentLookupPeriod = now;
-            _currentLookupCount = 1;
+            _currentLookupCount.set(1);
             return true;
         }
     }

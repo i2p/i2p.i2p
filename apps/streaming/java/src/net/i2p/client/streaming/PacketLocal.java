@@ -24,7 +24,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private final Destination _to;
     private SessionKey _keyUsed;
     private final long _createdOn;
-    private volatile int _numSends;
+    private final AtomicInteger _numSends = new AtomicInteger();
     private volatile long _lastSend;
     private long _acceptedOn;
     /** LOCKING: this */
@@ -99,9 +99,10 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public void prepare() {
         if (_connection != null)
             _connection.getInputStream().updateAcks(this);
-        if (_numSends > 0) {
+        int numSends = _numSends.get();
+        if (numSends > 0) {
             // so we can debug to differentiate resends
-            setOptionalDelay(_numSends * 1000);
+            setOptionalDelay(numSends * 1000);
             setFlag(FLAG_DELAY_REQUESTED);
         }
     }
@@ -109,7 +110,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public long getCreatedOn() { return _createdOn; }
     public long getLifetime() { return _context.clock().now() - _createdOn; }
     public void incrementSends() { 
-        _numSends++;
+        _numSends.incrementAndGet();
         _lastSend = _context.clock().now();
     }
     
@@ -152,7 +153,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         else
             return (int)(_ackOn - _createdOn);
     }
-    public int getNumSends() { return _numSends; }
+    public int getNumSends() { return _numSends.get(); }
     public long getLastSend() { return _lastSend; }
 
     /** @return null if not bound */
@@ -166,7 +167,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         final int cnt = _nackCount.incrementAndGet();
         SimpleTimer2.TimedEvent evt = _resendEvent;
         if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && evt != null && (!_retransmitted) &&
-            (_numSends == 1 || _lastSend < _context.clock().now() - 4*1000)) {  // Don't fast retx if we recently resent it
+            (_numSends.get() == 1 || _lastSend < _context.clock().now() - 4*1000)) {  // Don't fast retx if we recently resent it
             _retransmitted = true;
             evt.reschedule(0);
             // the predicate used to be '+', changing to '-' --zab
@@ -174,13 +175,13 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
             if (_log.shouldLog(Log.DEBUG)) {
                 final String log = String.format("%s nacks and retransmits. Criteria: nacks=%d, retransmitted=%b,"+
                     " numSends=%d, lastSend=%d, now=%d",
-                    toString(), cnt, _retransmitted, _numSends, _lastSend, _context.clock().now());
+                    toString(), cnt, _retransmitted, _numSends.get(), _lastSend, _context.clock().now());
                     _log.debug(log);
             }
         } else if (_log.shouldLog(Log.DEBUG)) {
             final String log = String.format("%s nack but no retransmit.  Criteria: nacks=%d, retransmitted=%b,"+
                     " numSends=%d, lastSend=%d, now=%d",
-                    toString(), cnt, _retransmitted, _numSends, _lastSend, _context.clock().now());
+                    toString(), cnt, _retransmitted, _numSends.get(), _lastSend, _context.clock().now());
                     _log.debug(log);
         }
     }
@@ -203,8 +204,9 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                 buf.append(" ack after ").append(getAckTime());
         }
         
-        if (_numSends > 1)
-            buf.append(" sent ").append(_numSends).append(" times");
+        int numSends = _numSends.get();
+        if (numSends > 1)
+            buf.append(" sent ").append(numSends).append(" times");
         
         if (isFlagSet(FLAG_SYNCHRONIZE |
                       FLAG_CLOSE |

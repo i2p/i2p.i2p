@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -40,7 +41,7 @@ class ConnectionManager {
     private final Map<Long, PingRequest> _pendingPings;
     private volatile boolean _throttlersInitialized;
     private final ConnectionOptions _defaultOptions;
-    private volatile int _numWaiting;
+    private final AtomicInteger _numWaiting = new AtomicInteger();
     private long _soTimeout;
     private volatile ConnThrottler _minuteThrottler;
     private volatile ConnThrottler _hourThrottler;
@@ -299,24 +300,24 @@ class ConnectionManager {
         long expiration = _context.clock().now() + opts.getConnectTimeout();
         if (opts.getConnectTimeout() <= 0)
             expiration = _context.clock().now() + DEFAULT_STREAM_DELAY_MAX;
-        _numWaiting++;
+        _numWaiting.incrementAndGet();
         while (true) {
             long remaining = expiration - _context.clock().now();
             if (remaining <= 0) { 
                 _log.logAlways(Log.WARN, "Refusing to connect since we have exceeded our max of " 
                           + _defaultOptions.getMaxConns() + " connections");
-                _numWaiting--;
+                _numWaiting.decrementAndGet();
                 return null;
             }
 
                 if (locked_tooManyStreams()) {
                     int max = _defaultOptions.getMaxConns();
                     // allow a full buffer of pending/waiting streams
-                    if (_numWaiting > max) {
+                    if (_numWaiting.get() > max) {
                         _log.logAlways(Log.WARN, "Refusing connection since we have exceeded our max of "
                                       + max + " and there are " + _numWaiting
                                       + " waiting already");
-                        _numWaiting--;
+                        _numWaiting.decrementAndGet();
                         return null;
                     }
 
@@ -346,8 +347,14 @@ class ConnectionManager {
         if (opts.getConnectDelay() <= 0) {
             con.waitForConnect();
         }
-        if (_numWaiting > 0)
-            _numWaiting--;
+        // safe decrement
+        for (;;) {
+            int n = _numWaiting.get();
+            if (n <= 0)
+                break;
+            if (_numWaiting.compareAndSet(n, n - 1))
+                break;
+        }
         
         _context.statManager().addRateData("stream.connectionCreated", 1, 0);
         return con;

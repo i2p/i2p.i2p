@@ -8,6 +8,7 @@ import net.i2p.util.Log;
  * @deprecated unused
  */
 public class MessageStateMonitor {
+/****
     private Log _log;
     private volatile int _inboundLiveCount;
     private volatile int _inboundReadCount;
@@ -65,4 +66,5 @@ public class MessageStateMonitor {
     public int getInboundReadCount() { return _inboundReadCount; }
     public int getOutboundLiveCount() { return _outboundLiveCount; }
     public int getOutboundDiscardedCount() { return _outboundDiscardedCount; }
+****/
 }
