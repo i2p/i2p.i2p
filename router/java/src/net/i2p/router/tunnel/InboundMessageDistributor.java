@@ -107,8 +107,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             if (type == GarlicMessage.MESSAGE_TYPE) {
                 // in case we're looking for replies to a garlic message (cough load tests cough)
                 _context.inNetMessagePool().handleReplies(msg);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("received garlic message in the tunnel, parse it out");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("received garlic message in the tunnel, parse it out");
                 _receiver.receive((GarlicMessage)msg);
             } else {
                 if (_log.shouldLog(Log.INFO))
@@ -170,35 +170,29 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         // since we don't want to republish (or flood)
                         // unnecessarily. Reply tokens ignored.
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
-                        try {
+                        // Ensure the reply info is cleared, just in case
+                        dsm.setReplyToken(0);
+                        dsm.setReplyTunnel(null);
+                        dsm.setReplyGateway(null);
+
                             if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-                                if (dsm.getKey().equals(_client)) {
+                                    // Case 1:
                                     // store of our own LS.
                                     // This is almost certainly a response to a FloodfillVerifyStoreJob search.
                                     // We must send to the InNetMessagePool so the message can be matched
                                     // and the verify marked as successful.
-                                    // Ensure the reply info is clear...
-                                    dsm.setReplyToken(0);
-                                    dsm.setReplyTunnel(null);
-                                    dsm.setReplyGateway(null);
+
+                                    // Case 2:
+                                    // Store of somebody else's LS.
+                                    // This could be an encrypted response to an IterativeSearchJob search.
+                                    // We must send to the InNetMessagePool so the message can be matched
+                                    // and the search marked as successful.
+                                    // Or, it's a normal LS bundled with data and a MessageStatusMessage.
+
                                     // ... and inject it.
-                                    _context.inNetMessagePool().add(dsm, null, null);
-                                } else {
-                                    // If it was stored to us before, don't undo the
-                                    // receivedAsPublished flag so we will continue to respond to requests
-                                    // for the leaseset. That is, we don't want this to change the
-                                    // RAP flag of the leaseset.
-                                    // When the keyspace rotates at midnight, and this leaseset moves out
-                                    // of our keyspace, maybe we shouldn't do this?
-                                    // Should we do this whether ff or not?
-                                    LeaseSet ls = (LeaseSet) dsm.getEntry();
-                                    LeaseSet old = _context.netDb().store(dsm.getKey(), ls);
-                                    if (old != null && old.getReceivedAsPublished()
-                                        /** && ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled() **/ )
-                                        ls.setReceivedAsPublished(true);
                                     if (_log.shouldLog(Log.INFO))
-                                        _log.info("Storing LS for: " + dsm.getKey() + " sent to: " + _client);
-                                }
+                                        _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: " + _client);
+                                    _context.inNetMessagePool().add(dsm, null, null);
                             } else {                                        
                                 if (_client != null) {
                                     // drop it, since the data we receive shouldn't include router 
@@ -209,12 +203,18 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                     _log.error("Dropped dangerous message down a tunnel for " + _client + ": " + dsm, new Exception("cause"));
                                     return;
                                 }
-                                _context.netDb().store(dsm.getKey(), (RouterInfo) dsm.getEntry());
+                                // Case 3:
+                                // Store of an RI (ours or somebody else's)
+                                // This is almost certainly a response to an IterativeSearchJob search.
+                                // We must send to the InNetMessagePool so the message can be matched
+                                // and the search marked as successful.
+                                // note that encrypted replies to RI lookups is currently disables in ISJ, we won't get here.
+
+                                // ... and inject it.
+                                if (_log.shouldLog(Log.INFO))
+                                    _log.info("Storing garlic RI down tunnel for: " + dsm.getKey() + " sent to: " + _client);
+                                _context.inNetMessagePool().add(dsm, null, null);
                             }
-                        } catch (IllegalArgumentException iae) {
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("Bad store attempt", iae);
-                        }
                 } else if (_client != null && type == DatabaseSearchReplyMessage.MESSAGE_TYPE &&
                            _client.equals(((DatabaseSearchReplyMessage) data).getSearchKey())) {
                     // DSRMs show up here now that replies are encrypted
