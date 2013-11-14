@@ -1008,7 +1008,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         /** the request */
         public final Hash hash;
         /** the reply */
-        public Destination destination;
+        public volatile Destination destination;
 
         public LookupWaiter(Hash h) {
             this.hash = h;
