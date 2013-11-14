@@ -10,6 +10,7 @@ package net.i2p.data.i2np;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DatabaseEntry;
@@ -258,14 +259,16 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseStoreMessage: ");
-        buf.append("\n\tExpiration: ").append(_expiration);
+        buf.append("\n\tExpiration: ").append(new Date(_expiration));
         buf.append("\n\tUnique ID: ").append(_uniqueId);
+        if (_replyToken != 0) {
+            buf.append("\n\tReply token: ").append(_replyToken);
+            buf.append("\n\tReply tunnel: ").append(_replyTunnel);
+            buf.append("\n\tReply gateway: ").append(_replyGateway);
+        }
         buf.append("\n\tKey: ").append(getKey());
         buf.append("\n\tEntry: ").append(_dbEntry);
-        buf.append("\n\tReply token: ").append(_replyToken);
-        buf.append("\n\tReply tunnel: ").append(_replyTunnel);
-        buf.append("\n\tReply gateway: ").append(_replyGateway);
-        buf.append("]");
+        buf.append(']');
         return buf.toString();
     }
 }
