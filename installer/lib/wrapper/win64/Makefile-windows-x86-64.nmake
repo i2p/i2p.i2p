@@ -1,0 +1,62 @@
+# Copyright (c) 1999, 2011 Tanuki Software, Ltd.
+# http://www.tanukisoftware.com
+# All rights reserved.
+#
+# This software is the proprietary information of Tanuki Software.
+# You shall use it only in accordance with the terms of the
+# license agreement you entered into with Tanuki Software.
+# http://wrapper.tanukisoftware.com/doc/english/licenseOverview.html
+
+PROJ = wrapper
+
+COMPILE = cl /D "WIN32" /D "WIN64" /D "NDEBUG" /FD /EHsc /MT /W3 /nologo /c /Zi /errorReport:prompt /D "_CRT_SECURE_NO_DEPRECATE" /D "UNICODE" /D "_UNICODE" /D "_WIN32_WINNT=0x0500"
+LINK = link /NOLOGO /MANIFEST /DEBUG /MACHINE:AMD64 /ERRORREPORT:PROMPT DelayImp.lib
+RC = rc
+
+# EXE Definitions
+EXE_OUTDIR = $(PROJ)32_VC8__Win64_Release
+EXE_OBJS = $(EXE_OUTDIR)\wrapper_i18n.obj $(EXE_OUTDIR)\logger.obj $(EXE_OUTDIR)\property.obj $(EXE_OUTDIR)\wrapper.obj $(EXE_OUTDIR)\wrapper_win.obj $(EXE_OUTDIR)\wrappereventloop.obj $(EXE_OUTDIR)\wrapper_file.obj $(EXE_OUTDIR)\wrapperinfo.obj $(EXE_OUTDIR)\wrapper_hashmap.obj
+EXE_LIBS = mpr.lib shell32.lib netapi32.lib wsock32.lib shlwapi.lib advapi32.lib user32.lib Crypt32.lib Wintrust.lib pdh.lib
+EXE_COMPILE_OPTS = /O2 /GL /D "_CONSOLE"
+EXE_LINK_OPTS = /INCREMENTAL:NO /SUBSYSTEM:CONSOLE /MANIFESTFILE:"$(EXE_OUTDIR)\$(PROJ).exe.intermediate.manifest" /PDB:"$(EXE_OUTDIR)\$(PROJ).pdb" /OPT:REF /OPT:ICF /LTCG
+
+# DLL Definitions
+DLL_OUTDIR = $(PROJ)JNI32_VC8__Win64_Release
+DLL_OBJS = $(DLL_OUTDIR)\wrapper_i18n.obj $(DLL_OUTDIR)\wrapperjni.obj $(DLL_OUTDIR)\wrapperjni_win.obj $(DLL_OUTDIR)\wrapperinfo.obj
+DLL_LIBS = shell32.lib advapi32.lib user32.lib
+DLL_COMPILE_OPTS = /Od  /I "..\" /I ".\" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /D "_WINDOWS" /D "_USRDLL" /D "DECODERJNI_VC8_EXPORTS" /D "_WINDLL"
+DLL_LINK_OPTS = /INCREMENTAL /DLL /SUBSYSTEM:WINDOWS /MANIFESTFILE:"$(DLL_OUTDIR)\$(PROJ).dll.intermediate.manifest" /PDB:"$(DLL_OUTDIR)\$(PROJ).pdb"
+
+
+all: $(EXE_OUTDIR) $(DLL_OUTDIR) $(PROJ).exe $(PROJ).dll
+
+# Define project specific macros
+
+#----- If OUTDIR does not exist, then create directory
+$(EXE_OUTDIR) :
+    if not exist "$(EXE_OUTDIR)/$(NULL)" mkdir $(EXE_OUTDIR)
+$(DLL_OUTDIR) :
+    if not exist "$(DLL_OUTDIR)/$(NULL)" mkdir $(DLL_OUTDIR)
+
+# Inference rule for updating the object files
+.c{$(EXE_OUTDIR)}.obj:
+    $(COMPILE) $(EXE_COMPILE_OPTS) /Fo"$(EXE_OUTDIR)\\" /Fd"$(EXE_OUTDIR)\\" $**
+.c{$(DLL_OUTDIR)}.obj:
+    $(COMPILE) $(DLL_COMPILE_OPTS) /Fo"$(DLL_OUTDIR)\\" /Fd"$(DLL_OUTDIR)\\" $**
+
+# Build rule for resource file
+$(EXE_OUTDIR)\$(PROJ).res: $(PROJ).rc $(RC_DEP)
+    $(RC) /fo"$(EXE_OUTDIR)/$(PROJ).res" $(PROJ).rc
+$(DLL_OUTDIR)\$(PROJ).res: $(PROJ).rc $(RC_DEP)
+    $(RC) /fo"$(DLL_OUTDIR)/$(PROJ).res" $(PROJ).rc
+$(PROJ).exe: $(BASE_OBJS) $(EXE_OBJS) $(EXE_OUTDIR)\$(PROJ).res
+    $(LINK) $(EXE_LINK_OPTS) $(EXE_OBJS) $(EXE_LIBS) $(EXE_OUTDIR)\$(PROJ).res /OUT:"..\..\bin\$(PROJ).exe"
+
+$(PROJ).dll: $(BASE_OBJS) $(DLL_OBJS) $(DLL_OUTDIR)\$(PROJ).res
+    $(LINK) $(DLL_LINK_OPTS) $(DLL_OBJS) $(DLL_LIBS) $(DLL_OUTDIR)\$(PROJ).res /OUT:"..\..\lib\$(PROJ).dll"
+
+clean:
+    if exist $(EXE_OUTDIR)/$(NULL) rd /s /q $(EXE_OUTDIR)
+    if exist $(DLL_OUTDIR)/$(NULL) rd /s /q $(DLL_OUTDIR)
+    if exist ..\..\bin\$(PROJ).exe del /q ..\..\bin\$(PROJ).exe
+    if exist ..\..\lib\$(PROJ).dll del /q ..\..\lib\$(PROJ).dll

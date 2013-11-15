@@ -1,8 +1,8 @@
-Basic instructions for BSD
---------------------------
+Basic instructions for FreeBSD < 10
+-----------------------------------
 
 Prerequisites for compiling the wrapper can be installed with:
-	pkg_add -r apache-ant gmake openjdk6
+	pkg_add -r apache-ant gmake openjdk7
 
 One the prereqs are installed, cd into the wrapper source and run
 

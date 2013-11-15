@@ -1,3 +1,12 @@
+2013-11-14 kytv
+ * Update Java Service Wrapper to v3.5.22
+    - Windows: Self-compiled with VS2010 in Windows 7. The icon has been
+      changed from Tanuki's default to Itoopie.
+    - Linux ARMv6: Compiled on a RaspberryPi using gcc 4.6.3-14+rpi1,
+      Icedtea6 6b27-1.12.5-1+rpi1 and stripped
+    - All other binaries are from the "community edition" deltapack offered by
+      Tanuki.
+
 2013-11-14 zzz
  * Tunnels: Fix reception of encrypted responses to LS lookups (ticket #1125)
 
