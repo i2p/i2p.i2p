@@ -67,9 +67,8 @@ import net.i2p.util.SystemVersion;
  * The default servlet.                                                 
  * This servlet, normally mapped to /, provides the handling for static 
  * content, OPTION and TRACE methods for the context.                   
- * The following initParameters are supported, these can be set either
- * on the servlet itself or as ServletContext initParameters with a prefix
- * of org.mortbay.jetty.servlet.Default. :                          
+ * The following initParameters are supported, these can be set
+ * on the servlet itself:
  * <PRE>                                                                      
  *
  *  resourceBase      Set to replace the context resource base

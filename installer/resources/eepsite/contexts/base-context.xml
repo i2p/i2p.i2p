@@ -12,7 +12,7 @@ to serve static html files and images.
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./eepsite/docroot/</Set>
   <Call name="setInitParameter">
-    <Arg>cacheControl</Arg>
+    <Arg>org.eclipse.jetty.servlet.Default.cacheControl</Arg>
     <Arg>max-age=3600,public</Arg>
   </Call>
   <Call name="setMimeTypes">

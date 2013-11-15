@@ -41,7 +41,7 @@ public class WebAppStarter {
     static {
         //_log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
         // see DefaultServlet javadocs
-        String pfx = "org.mortbay.jetty.servlet.Default.";
+        String pfx = "org.eclipse.jetty.servlet.Default.";
         INIT_PARAMS.put(pfx + "cacheControl", "max-age=86400");
         INIT_PARAMS.put(pfx + "dirAllowed", "false");
     }
