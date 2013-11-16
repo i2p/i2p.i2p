@@ -54,6 +54,6 @@ public class LongBytes implements Serializer {
 				 ((long)(b[5] & 0xff) << 16) |
 				 ((long)(b[6] & 0xff) <<  8) |
 				 (b[7] & 0xff));
-		return new Long(v);
+		return Long.valueOf(v);
 	}
 }

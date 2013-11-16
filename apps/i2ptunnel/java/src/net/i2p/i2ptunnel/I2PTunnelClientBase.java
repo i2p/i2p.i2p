@@ -22,6 +22,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -43,7 +44,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
 
-    private static volatile long __clientId = 0;
+    private static final AtomicLong __clientId = new AtomicLong();
     protected long _clientId;
     protected final Object sockLock = new Object(); // Guards sockMgr and mySockets
     protected I2PSocketManager sockMgr; // should be final and use a factory. LINT
@@ -161,7 +162,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                                EventDispatcher notifyThis, String handlerName, 
                                I2PTunnel tunnel, String pkf) throws IllegalArgumentException{
         super(localPort + " (uninitialized)", notifyThis, tunnel);
-        _clientId = ++__clientId;
+        _clientId = __clientId.incrementAndGet();
         this.localPort = localPort;
         this.l = l;
         _ownDest = ownDest; // == ! shared client

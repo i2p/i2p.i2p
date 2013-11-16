@@ -293,7 +293,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             }
             if (sess == null) {
                 SessionKey key = _context.keyGenerator().generateSessionKey();
-                sess = createAndReturnSession(target, key);
+                createAndReturnSession(target, key);
                 return key;
             }
             return sess.getCurrentKey();

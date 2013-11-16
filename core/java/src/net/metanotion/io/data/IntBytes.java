@@ -46,6 +46,6 @@ public class IntBytes implements Serializer {
 				 ((b[1] & 0xff) << 16) |
 				 ((b[2] & 0xff) <<  8) |
 				 (b[3] & 0xff));
-		return new Integer(v);
+		return Integer.valueOf(v);
 	}
 }

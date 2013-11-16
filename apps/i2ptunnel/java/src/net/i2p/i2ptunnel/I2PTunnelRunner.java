@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.SSLException;
 
@@ -26,7 +27,7 @@ import net.i2p.util.Log;
 public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErrorListener {
     protected final Log _log;
 
-    private static volatile long __runnerId;
+    private static final AtomicLong __runnerId = new AtomicLong();
     private final long _runnerId;
     /** 
      * max bytes streamed in a packet - smaller ones might be filled
@@ -96,7 +97,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         if (_log.shouldLog(Log.INFO))
             _log.info("I2PTunnelRunner started");
-        _runnerId = ++__runnerId;
+        _runnerId = __runnerId.incrementAndGet();
         __forwarderId = i2ps.hashCode();
         setName("I2PTunnelRunner " + _runnerId);
         start();

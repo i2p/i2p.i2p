@@ -89,9 +89,9 @@ public class CertUtil {
         log(I2PAppContext.getGlobalContext(), Log.ERROR, msg, t);
     }
 
-    private static void error(I2PAppContext ctx, String msg, Throwable t) {
-        log(ctx, Log.ERROR, msg, t);
-    }
+    //private static void error(I2PAppContext ctx, String msg, Throwable t) {
+    //    log(ctx, Log.ERROR, msg, t);
+    //}
 
     private static void log(I2PAppContext ctx, int level, String msg, Throwable t) {
         Log l = ctx.logManager().getLog(CertUtil.class);

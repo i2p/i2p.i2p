@@ -477,9 +477,11 @@ public class Base64 {
      * @param breakLines Break lines at 80 characters or less.
      * @since 1.4
      */
+/***** unused
     private static String encodeBytes(byte[] source, boolean breakLines) {
         return encodeBytes(source, 0, source.length, breakLines);
     } // end encodeBytes
+******/
 
     /**
      * Encodes a byte array into Base64 notation.
@@ -493,13 +495,13 @@ public class Base64 {
     private static String encodeBytes(byte[] source, int off, int len) {
         return encodeBytes(source, off, len, true);
     } // end encodeBytes
-******/
 
     private static String encodeBytes(byte[] source, int off, int len, boolean breakLines) {
         StringBuilder buf = new StringBuilder( (len*4)/3 );
         encodeBytes(source, off, len, breakLines, buf, ALPHABET);
         return buf.toString();
     }
+******/
         
     /**
      * Encodes a byte array into Base64 notation.

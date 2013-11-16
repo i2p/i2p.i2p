@@ -1104,7 +1104,6 @@ public class ConsoleUpdateManager implements UpdateManager {
 
             case PLUGIN:
                 Properties props = PluginStarter.pluginProperties(_context, id);
-                String oldVersion = props.getProperty("version");
                 String xpi2pURL = props.getProperty("updateURL");
                 if (xpi2pURL != null) {
                     try {
@@ -1471,6 +1470,12 @@ public class ConsoleUpdateManager implements UpdateManager {
         public int compareTo(Version r) {
             return VersionComparator.comp(version, r.version);
         }
+
+        @Override
+        public int hashCode() { return version.hashCode(); }
+
+        @Override
+        public boolean equals(Object o) { return (o instanceof Version) && version.equals(((Version)o).version); }
 
         @Override
         public String toString() {

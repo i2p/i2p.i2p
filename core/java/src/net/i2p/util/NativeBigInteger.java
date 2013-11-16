@@ -522,9 +522,11 @@ public class NativeBigInteger extends BigInteger {
      * @return true if it was loaded successfully, else false
      *
      */
+/****
     private static final boolean loadGeneric(boolean optimized) {
         return loadGeneric(getMiddleName(optimized));
     }
+****/
 
     private static final boolean loadGeneric(String name) {
         try {
@@ -563,10 +565,12 @@ public class NativeBigInteger extends BigInteger {
      * @return true if it was loaded successfully, else false
      *
      */
+/****
     private static final boolean loadFromResource(boolean optimized) {
         String resourceName = getResourceName(optimized);
         return loadFromResource(resourceName);
     }
+****/
 
     private static final boolean loadFromResource(String resourceName) {
         if (resourceName == null) return false;

@@ -97,10 +97,6 @@ class FloodfillVerifyStoreJob extends JobImpl {
             return;
         }
         DatabaseLookupMessage lookup = buildLookup(replyTunnelInfo);
-        if (lookup == null) {
-            _facade.verifyFinished(_key);
-            return;
-        }        
  
         // If we are verifying a leaseset, use the destination's own tunnels,
         // to avoid association by the exploratory tunnel OBEP.
@@ -180,6 +176,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         return _sentTo;
     }
     
+    /** @return non-null */
     private DatabaseLookupMessage buildLookup(TunnelInfo replyTunnelInfo) {
         // If we are verifying a leaseset, use the destination's own tunnels,
         // to avoid association by the exploratory tunnel OBEP.

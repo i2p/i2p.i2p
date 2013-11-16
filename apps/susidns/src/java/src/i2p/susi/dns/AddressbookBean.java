@@ -354,11 +354,17 @@ public class AddressbookBean extends BaseBean
 	{
 		String filename = properties.getProperty( getBook() + "_addressbook" );
 		
-		FileOutputStream fos = new SecureFileOutputStream( ConfigBean.addressbookPrefix + filename  );
-		addressbook.store( fos, null );
+		FileOutputStream fos = null;
 		try {
-			fos.close();
-		} catch (IOException ioe) {}
+			fos = new SecureFileOutputStream( ConfigBean.addressbookPrefix + filename  );
+			addressbook.store( fos, null );
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException ioe) {}
+			}
+		}
 	}
 
 	public String getFilter() {

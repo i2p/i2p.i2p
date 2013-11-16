@@ -29,9 +29,6 @@ import net.i2p.util.PortMapper;
  */
 public class I2PTunnelIRCClient extends I2PTunnelClientBase {
 
-    /** used to assign unique IDs to the threads / clients.  no logic or functionality */
-    private static volatile long __clientId = 0;
-    
     /** list of Destination objects that we point at */
     private final List<I2PSocketAddress> _addrs;
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000; // -1
@@ -61,7 +58,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
               ownDest, 
               l, 
               notifyThis, 
-              "IRC Client on " + tunnel.listenHost + ':' + localPort + " #" + (++__clientId), tunnel, pkf);
+              "IRC Client on " + tunnel.listenHost + ':' + localPort, tunnel, pkf);
         
         _addrs = new ArrayList(4);
         buildAddresses(destinations);
@@ -139,9 +136,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
             i2ps.setReadTimeout(readTimeout);
             StringBuffer expectedPong = new StringBuffer();
             DCCHelper dcc = _dccEnabled ? new DCC(s.getLocalAddress().getAddress()) : null;
-            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + __clientId + " in", true);
+            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + _clientId + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + __clientId + " out", true);
+            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + _clientId + " out", true);
             out.start();
         } catch (Exception ex) {
             // generally NoRouteToHostException

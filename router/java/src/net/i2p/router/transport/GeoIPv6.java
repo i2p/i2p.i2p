@@ -293,6 +293,12 @@ class GeoIPv6 {
         }
 
         @Override
+        public int hashCode() { return (((int) from) ^ ((int) to)); }
+
+        @Override
+        public boolean equals(Object o) { return (o instanceof V6Entry) && compareTo((V6Entry)o) == 0; }
+
+        @Override
         public String toString() {
                 return "0x" + Long.toHexString(from) + " -> 0x" + Long.toHexString(to) + " : " + cc;
         }

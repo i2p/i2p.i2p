@@ -202,7 +202,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest,
                                String wwwProxy, EventDispatcher notifyThis,
                                I2PTunnel tunnel) throws IllegalArgumentException {
-        super(localPort, ownDest, l, notifyThis, "HTTP Proxy on " + tunnel.listenHost + ':' + localPort + " #" + (++__clientId), tunnel);
+        super(localPort, ownDest, l, notifyThis, "HTTP Proxy on " + tunnel.listenHost + ':' + localPort, tunnel);
         _proxyNonce = Long.toString(_context.random().nextLong());
 
         //proxyList = new ArrayList(); // We won't use outside of i2p
@@ -335,7 +335,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String internalPath = null;
         String internalRawQuery = null;
         String currentProxy = null;
-        long requestId = ++__requestId;
+        long requestId = __requestId.incrementAndGet();
         boolean shout = false;
 
         try {

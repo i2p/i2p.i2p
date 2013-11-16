@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -54,11 +55,23 @@ public class KeyStoreUtil {
         char[] pwchars = password != null ? password.toCharArray() : null;
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         if (exists) {
-            InputStream fis = new FileInputStream(ksFile);
-            ks.load(fis, pwchars);
+            InputStream fis = null;
+            try {
+                fis = new FileInputStream(ksFile);
+                ks.load(fis, pwchars);
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            }
         }
-        if (ksFile != null && !exists)
-            ks.store(new SecureFileOutputStream(ksFile), pwchars);
+        if (ksFile != null && !exists) {
+            OutputStream fos = null;
+            try {
+                fos = new SecureFileOutputStream(ksFile);
+                ks.store(fos, pwchars);
+            } finally {
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            }
+        }
         return ks;
     }
 
@@ -452,13 +465,13 @@ public class KeyStoreUtil {
         log(I2PAppContext.getGlobalContext(), Log.ERROR, msg, t);
     }
 
-    private static void info(I2PAppContext ctx, String msg) {
-        log(ctx, Log.INFO, msg, null);
-    }
+    //private static void info(I2PAppContext ctx, String msg) {
+    //    log(ctx, Log.INFO, msg, null);
+    //}
 
-    private static void error(I2PAppContext ctx, String msg, Throwable t) {
-        log(ctx, Log.ERROR, msg, t);
-    }
+    //private static void error(I2PAppContext ctx, String msg, Throwable t) {
+    //    log(ctx, Log.ERROR, msg, t);
+    //}
 
     private static void log(I2PAppContext ctx, int level, String msg, Throwable t) {
         if (level >= Log.WARN && !ctx.isRouterContext()) {

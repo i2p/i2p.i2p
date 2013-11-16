@@ -681,10 +681,17 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      * this is safe to call multiple times (only tells the client once)
      */
+/****
     private void dieFatal() {
         dieFatal(MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
     }
+****/
 
+    /**
+     * give up the ghost, this message just aint going through.  tell the client.
+     *
+     * this is safe to call multiple times (only tells the client once)
+     */
     private void dieFatal(int status) {
         if (_finished.getAndSet(true))
             return;

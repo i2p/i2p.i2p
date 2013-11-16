@@ -51,6 +51,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -78,7 +79,7 @@ import net.i2p.util.Log;
 public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private final Log _log;
     private final I2PAppContext _context;
-    private static long __tunnelId = 0;
+    private static final AtomicLong __tunnelId = new AtomicLong();
     private final long _tunnelId;
     private final Properties _clientOptions;
     private final Set<I2PSession> _sessions;
@@ -118,7 +119,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
         super();
         _context = I2PAppContext.getGlobalContext(); // new I2PAppContext();
-        _tunnelId = ++__tunnelId;
+        _tunnelId = __tunnelId.incrementAndGet();
         _log = _context.logManager().getLog(I2PTunnel.class);
         // as of 0.8.4, include context properties
         Properties p = _context.getProperties();

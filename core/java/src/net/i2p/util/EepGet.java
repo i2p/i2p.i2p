@@ -1291,7 +1291,7 @@ public class EepGet {
             } catch (IOException ioe) {
                 _decompressException = ioe;
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + (in != null ? in.getTotalRead() + "/" + in.getTotalExpanded() : ""), ioe);
+                    _log.warn("Error decompressing: " + written + ", " + in.getTotalRead() + "/" + in.getTotalExpanded(), ioe);
             } catch (OutOfMemoryError oom) {
                 _decompressException = new IOException("OOM in HTTP Decompressor");
                 _log.error("OOM in HTTP Decompressor", oom);

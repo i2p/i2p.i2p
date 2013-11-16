@@ -632,7 +632,7 @@ public class PluginStarter implements Runnable {
 
             ClassLoader cl = null;
             if (app.classpath != null) {
-                String cp = new String(app.classpath);
+                String cp = app.classpath;
                 if (cp.indexOf("$") >= 0) {
                     cp = cp.replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                     cp = cp.replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());

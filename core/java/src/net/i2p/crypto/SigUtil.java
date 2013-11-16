@@ -174,7 +174,6 @@ class SigUtil {
     private static ECPrivateKey cvtToJavaECKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         SigType type = pk.getType();
-        int len = type.getPubkeyLen();
         byte[] b = pk.getData();
         BigInteger s = new NativeBigInteger(1, b);
         // see ECConstants re: casting

@@ -85,7 +85,7 @@ public class WebAppStarter {
             throw new IOException("Web app " + warPath + " does not exist");
         Long oldmod = warModTimes.get(warPath);
         if (oldmod == null) {
-            warModTimes.put(warPath, new Long(newmod));
+            warModTimes.put(warPath, Long.valueOf(newmod));
         } else if (oldmod.longValue() < newmod) {
             // copy war to temporary directory
             File warTmpDir = new SecureDirectory(ctx.getTempDir(), "war-copy-" + appName + ctx.random().nextInt());

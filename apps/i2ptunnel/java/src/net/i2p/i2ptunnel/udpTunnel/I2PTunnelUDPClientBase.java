@@ -6,6 +6,7 @@ package net.i2p.i2ptunnel.udpTunnel;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.net.ServerSocket;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
@@ -48,13 +49,12 @@ import net.i2p.util.EventDispatcher;
 
     static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
 
-    private static volatile long __clientId = 0;
+    private static final AtomicLong __clientId = new AtomicLong();
     protected long _clientId;
 
     protected Destination dest = null;
 
     private final Object startLock = new Object();
-    private Object conLock = new Object();
     
     private I2PSession _session;
     private Source _i2pSource;
@@ -67,7 +67,7 @@ import net.i2p.util.EventDispatcher;
    public I2PTunnelUDPClientBase(String destination, Logging l, EventDispatcher notifyThis,
                                   I2PTunnel tunnel) throws IllegalArgumentException {
         super("UDPServer", notifyThis, tunnel);
-        _clientId = ++__clientId;
+        _clientId = __clientId.incrementAndGet();;
         this.l = l;
 
         _context = tunnel.getContext();

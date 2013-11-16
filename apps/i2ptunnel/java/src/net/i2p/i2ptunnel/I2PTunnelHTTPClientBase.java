@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -69,9 +70,6 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
          "HTTP outproxy configured.  Please configure an outproxy in I2PTunnel")
          .getBytes();
     
-    /** used to assign unique IDs to the threads / clients.  no logic or functionality */
-    protected static volatile long __clientId = 0;
-
     private final byte[] _proxyNonce;
     private final ConcurrentHashMap<String, NonceInfo> _nonces;
     private final AtomicInteger _nonceCleanCounter = new AtomicInteger();
@@ -90,7 +88,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
 
     protected static final int DEFAULT_READ_TIMEOUT = 5*60*1000;
     
-    protected static long __requestId = 0;
+    protected static final AtomicLong __requestId = new AtomicLong();
 
     public I2PTunnelHTTPClientBase(int localPort, boolean ownDest, Logging l, 
                                EventDispatcher notifyThis, String handlerName, 

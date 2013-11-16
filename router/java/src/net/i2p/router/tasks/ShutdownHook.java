@@ -8,6 +8,8 @@ package net.i2p.router.tasks;
  *
  */
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -21,12 +23,12 @@ import net.i2p.util.Log;
  */
 public class ShutdownHook extends Thread {
     private final RouterContext _context;
-    private static int __id = 0;
+    private static final AtomicInteger __id = new AtomicInteger();
     private final int _id;
 
     public ShutdownHook(RouterContext ctx) {
         _context = ctx;
-        _id = ++__id;
+        _id = __id.incrementAndGet();
     }
 
     @Override

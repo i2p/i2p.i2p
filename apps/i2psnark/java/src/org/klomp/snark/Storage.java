@@ -1302,6 +1302,15 @@ public class Storage
       }
 
       @Override
+      public int hashCode() { return RAFfile.getAbsolutePath().hashCode(); }
+
+      @Override
+      public boolean equals(Object o) {
+          return (o instanceof TorrentFile) &&
+                 RAFfile.getAbsolutePath().equals(((TorrentFile)o).RAFfile.getAbsolutePath());
+      }
+
+      @Override
       public String toString() { return name; }
   }
 

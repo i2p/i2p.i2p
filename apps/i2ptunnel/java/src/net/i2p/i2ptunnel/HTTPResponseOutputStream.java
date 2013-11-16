@@ -273,11 +273,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
 
         public void run() {
-            ReusableGZIPInputStream _in = null;
+            ReusableGZIPInputStream _in = ReusableGZIPInputStream.acquire();
             long written = 0;
             ByteArray ba = null;
             try {
-                _in = ReusableGZIPInputStream.acquire();
                 // blocking
                 _in.initialize(_inRaw);
                 ba = _cache.acquire();
@@ -294,7 +293,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     _log.info("Decompressed: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded());
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + (_in != null ? _in.getTotalRead() + "/" + _in.getTotalExpanded() : ""), ioe);
+                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded(), ioe);
             } catch (OutOfMemoryError oom) {
                 _log.error("OOM in HTTP Decompressor", oom);
             } finally {

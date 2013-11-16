@@ -108,10 +108,6 @@ public class AESEngine {
 
         byte decr[] = new byte[payload.length];
         decrypt(payload, 0, decr, 0, sessionKey, iv, payload.length);
-        if (decr == null) {
-            _log.error("Error decrypting the data - payload " + payload.length + " decrypted to null");
-            return null;
-        }
 
         byte h[] = SimpleByteCache.acquire(Hash.HASH_LENGTH);
         _context.sha().calculateHash(iv, 0, 16, h, 0);
