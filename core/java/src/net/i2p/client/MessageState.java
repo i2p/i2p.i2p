@@ -3,6 +3,7 @@ package net.i2p.client;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
@@ -31,11 +32,11 @@ class MessageState {
     private boolean _cancelled;
     private final long _created;
 
-    private static long __stateId = 0;
-    private long _stateId;
+    private static final AtomicLong __stateId = new AtomicLong();
+    private final long _stateId;
     
     public MessageState(I2PAppContext ctx, long nonce, String prefix) {
-        _stateId = ++__stateId;
+        _stateId = __stateId.incrementAndGet();
         _context = ctx;
         _log = ctx.logManager().getLog(MessageState.class);
         _nonce = nonce;

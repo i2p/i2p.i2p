@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -902,7 +903,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		return "?";
 	}
 
-	private static int __id = 0;
+	private static final AtomicInteger __id = new AtomicInteger();
 
 	/**
 	 *  postControlAction() can take many seconds, especially if it's failing,
@@ -925,7 +926,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
 	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));
-		t.setName("UPnP Port Opener " + (++__id));
+		t.setName("UPnP Port Opener " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();
 	}
@@ -967,7 +968,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to un-forward " + portsToForwardNow.size() + " ports");
 	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
-		t.setName("UPnP Port Closer " + (++__id));
+		t.setName("UPnP Port Closer " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();
 	}

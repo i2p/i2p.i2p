@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
@@ -738,11 +739,12 @@ public class LogManager {
         _consoleBuffer.clear();
     }
 
-    private static int __id = 0;
+    private static final AtomicInteger __id = new AtomicInteger();
+
     private class ShutdownHook extends Thread {
-        private int _id;
+        private final int _id;
         public ShutdownHook() {
-            _id = ++__id;
+            _id = __id.incrementAndGet();
         }
         @Override
         public void run() {

@@ -1,5 +1,7 @@
 package net.i2p.router.networkdb.kademlia;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -17,7 +19,7 @@ import net.i2p.util.Log;
 class SearchMessageSelector implements MessageSelector {
     private final Log _log;
     private final RouterContext _context;
-    private static int __searchSelectorId = 0;
+    private static final AtomicInteger __searchSelectorId = new AtomicInteger();
     private final Hash _peer;
     private boolean _found;
     private final int _id;
@@ -31,7 +33,7 @@ class SearchMessageSelector implements MessageSelector {
         _found = false;
         _exp = expiration;
         _state = state;
-        _id = ++__searchSelectorId;
+        _id = __searchSelectorId.incrementAndGet();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("[" + _id + "] Created: " + toString());
     }

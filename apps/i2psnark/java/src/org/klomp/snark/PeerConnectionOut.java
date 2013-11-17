@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
@@ -44,8 +45,8 @@ class PeerConnectionOut implements Runnable
   // Contains Messages.
   private final List<Message> sendQueue = new ArrayList();
   
-  private static long __id = 0;
-  private long _id;
+  private static final AtomicLong __id = new AtomicLong();
+  private final long _id;
   
   long lastSent;
 
@@ -53,7 +54,7 @@ class PeerConnectionOut implements Runnable
   {
     this.peer = peer;
     this.dout = dout;
-    _id = ++__id;
+    _id = __id.incrementAndGet();
 
     lastSent = System.currentTimeMillis();
   }

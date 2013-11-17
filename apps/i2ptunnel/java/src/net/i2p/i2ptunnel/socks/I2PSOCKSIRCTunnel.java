@@ -7,6 +7,7 @@
 package net.i2p.i2ptunnel.socks;
 
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.i2ptunnel.I2PTunnel;
@@ -30,7 +31,7 @@ import net.i2p.util.Log;
  */
 public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
 
-    private static int __clientId = 0;
+    private static final AtomicInteger __clientId = new AtomicInteger();
 
     /** @param pkf private key file name or null for transient key */
     public I2PSOCKSIRCTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
@@ -50,11 +51,12 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
             Socket clientSock = serv.getClientSocket();
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             StringBuffer expectedPong = new StringBuffer();
+            int id = __clientId.incrementAndGet();
             Thread in = new I2PAppThread(new IrcInboundFilter(clientSock, destSock, expectedPong, _log),
-                                         "SOCKS IRC Client " + (++__clientId) + " in", true);
+                                         "SOCKS IRC Client " + id + " in", true);
             in.start();
             Thread out = new I2PAppThread(new IrcOutboundFilter(clientSock, destSock, expectedPong, _log),
-                                          "SOCKS IRC Client " + __clientId + " out", true);
+                                          "SOCKS IRC Client " + id + " out", true);
             out.start();
         } catch (SOCKSException e) {
             if (_log.shouldLog(Log.WARN))

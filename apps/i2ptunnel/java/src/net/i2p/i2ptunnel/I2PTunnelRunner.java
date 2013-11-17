@@ -55,7 +55,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private long totalSent;
     private long totalReceived;
 
-    private volatile long __forwarderId;
+    private static final AtomicLong __forwarderId = new AtomicLong();
     
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            List<I2PSocket> sockList) {
@@ -98,7 +98,6 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         if (_log.shouldLog(Log.INFO))
             _log.info("I2PTunnelRunner started");
         _runnerId = __runnerId.incrementAndGet();
-        __forwarderId = i2ps.hashCode();
         setName("I2PTunnelRunner " + _runnerId);
         start();
     }
@@ -312,7 +311,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             _toI2P = toI2P;
             direction = (toI2P ? "toI2P" : "fromI2P");
             _cache = ByteCache.getInstance(32, NETWORK_BUFFER_SIZE);
-            setName("StreamForwarder " + _runnerId + "." + (++__forwarderId));
+            setName("StreamForwarder " + _runnerId + '.' + __forwarderId.incrementAndGet());
             start();
         }
 
