@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,15 +51,30 @@ public class CSSHelper extends HelperBase {
         return url;
     }
 
-    /** change default language for the router AND save it */
+    /**
+     * change default language for the router AND save it
+     * @param lang xx OR xx_XX
+     */
     public void setLang(String lang) {
         // Protected with nonce in css.jsi
-        if (lang != null && lang.length() == 2 && !lang.equals(_context.getProperty(Messages.PROP_LANG))) {
-            _context.router().saveConfig(Messages.PROP_LANG, lang);
+        if (lang != null) {
+            Map m = new HashMap(2);
+            if (lang.length() == 2) {
+                m.put(Messages.PROP_LANG, lang.toLowerCase(Locale.US));
+                m.put(Messages.PROP_COUNTRY, "");
+                _context.router().saveConfig(m, null);
+            } else if (lang.length() == 5) {
+                m.put(Messages.PROP_LANG, lang.substring(0, 2).toLowerCase(Locale.US));
+                m.put(Messages.PROP_COUNTRY, lang.substring(3, 5).toUpperCase(Locale.US));
+                _context.router().saveConfig(m, null);
+            }
         }
     }
 
-    /** needed for conditional css loads for zh */
+    /**
+     * needed for conditional css loads for zh
+     * @return two-letter only, lower-case
+     */
     public String getLang() {
         return Messages.getLanguage(_context);
     }

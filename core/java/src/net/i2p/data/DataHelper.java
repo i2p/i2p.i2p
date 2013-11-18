@@ -399,6 +399,7 @@ public class DataHelper {
      * - Leading whitespace is not trimmed
      * - '=' is the only key-termination character (not ':' or whitespace)
      *
+     * As of 0.9.10, an empty value is allowed.
      */
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);
@@ -442,11 +443,12 @@ public class DataHelper {
                 // it was a horrible idea anyway
                 //val = val.replaceAll("\\\\r","\r");
                 //val = val.replaceAll("\\\\n","\n");
-                if ( (key.length() > 0) && (val.length() > 0) )
-                    if (forceLowerCase)
-                        props.setProperty(key.toLowerCase(Locale.US), val);
-                    else
-                        props.setProperty(key, val);
+
+                // as of 0.9.10, an empty value is allowed
+                if (forceLowerCase)
+                    props.setProperty(key.toLowerCase(Locale.US), val);
+                else
+                    props.setProperty(key, val);
             }
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
