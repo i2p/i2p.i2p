@@ -4,17 +4,18 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-#   <b790979@klzlk.com>, 2011, 2012.
-#   <businesshehe@yahoo.com>, 2011, 2012.
-#   <polacco@i2pmail.org>, 2012.
-# PolishAnon <b790979@klzlk.com>, 2011.
+# PolishAnon <b790979@klzlk.com>, 2011-2012
+# Warton <businesshehe@yahoo.com>, 2011-2012
+# polacco <polacco@i2pmail.org>, 2012
+# PolishAnon <b790979@klzlk.com>, 2011
+# Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2012-11-22 16:39+0000\n"
-"Last-Translator: polacco <polacco@i2pmail.org>\n"
+"POT-Creation-Date: 2013-11-19 23:01+0000\n"
+"PO-Revision-Date: 2013-10-23 21:02+0000\n"
+"Last-Translator: Tracerneo <ziolkoneo@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/"
 "pl/)\n"
 "Language: pl\n"
@@ -187,7 +188,7 @@ msgid "Cape Verde"
 msgstr "Wyspy Zielonego Przylądka"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
 msgid "Christmas Island"
 msgstr "Wyspa Bożego Narodzenia"
@@ -274,7 +275,7 @@ msgid "French Guiana"
 msgstr "Gujana Francuska"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
 msgstr "Ghana"
@@ -451,7 +452,7 @@ msgid "Montenegro"
 msgstr "Czarnogóra"
 
 msgid "Saint Martin"
-msgstr ""
+msgstr "Saint-Martin"
 
 msgid "Madagascar"
 msgstr "Madagaskar"
@@ -767,4 +768,3 @@ msgstr "Zambia"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2013-07-30 00:27+0000\n"
-"Last-Translator: CimpianAlin <Predator@windowslive.com>\n"
+"POT-Creation-Date: 2013-11-19 23:02+0000\n"
+"PO-Revision-Date: 2013-11-06 09:54+0000\n"
+"Last-Translator: polearnik <polearnik@mail.ru>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/"
 "ro/)\n"
 "Language: ro\n"
@@ -22,10 +22,10 @@ msgstr ""
 "2:1));\n"
 
 msgid "Anonymous Proxy"
-msgstr ""
+msgstr "Proxy anonim"
 
 msgid "Satellite Provider"
-msgstr ""
+msgstr "Provider satelit"
 
 msgid "Andorra"
 msgstr "Andorra"
@@ -73,7 +73,7 @@ msgid "Aruba"
 msgstr "Aruba"
 
 msgid "Åland Islands"
-msgstr ""
+msgstr "Insulele Åland"
 
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
@@ -139,7 +139,7 @@ msgid "Canada"
 msgstr "Canada"
 
 msgid "Cocos (Keeling) Islands"
-msgstr ""
+msgstr "Insulele Cocos (Keeling)"
 
 msgid "The Democratic Republic of the Congo"
 msgstr "Republica Democrată Congo"
@@ -175,7 +175,7 @@ msgid "Costa Rica"
 msgstr "Costa Rica"
 
 msgid "Serbia and Montenegro"
-msgstr ""
+msgstr "Serbia și Muntenegru"
 
 msgid "Cuba"
 msgstr "Cuba"
@@ -184,10 +184,10 @@ msgid "Cape Verde"
 msgstr "Capul Verde"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
 msgid "Christmas Island"
-msgstr ""
+msgstr "Insula Christmas"
 
 msgid "Cyprus"
 msgstr "Cipru"
@@ -223,7 +223,7 @@ msgid "Egypt"
 msgstr "Egipt"
 
 msgid "Western Sahara"
-msgstr ""
+msgstr "Sahara Occidentală"
 
 msgid "Eritrea"
 msgstr "Eritreea"
@@ -235,7 +235,7 @@ msgid "Ethiopia"
 msgstr "Etiopia"
 
 msgid "European Union"
-msgstr ""
+msgstr "Uniunea Europeană"
 
 msgid "Finland"
 msgstr "Finlanda"
@@ -271,7 +271,7 @@ msgid "French Guiana"
 msgstr "Guyana Franceză"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
 msgstr "Ghana"
@@ -337,7 +337,7 @@ msgid "Israel"
 msgstr "Izrael"
 
 msgid "Isle of Man"
-msgstr ""
+msgstr "Insula Man"
 
 msgid "India"
 msgstr "India"
@@ -358,7 +358,7 @@ msgid "Italy"
 msgstr "Italia"
 
 msgid "Jersey"
-msgstr ""
+msgstr "Jersey"
 
 msgid "Jamaica"
 msgstr "Jamaica"
@@ -388,7 +388,7 @@ msgid "Saint Kitts and Nevis"
 msgstr "Sfântul Kitts și Nevis"
 
 msgid "The Democratic People's Republic of Korea"
-msgstr ""
+msgstr "Republica Populară Democrată Coreea"
 
 msgid "Republic of Korea"
 msgstr "Republica Coreea"
@@ -445,10 +445,10 @@ msgid "Republic of Moldova"
 msgstr "Republica Moldova"
 
 msgid "Montenegro"
-msgstr ""
+msgstr "Muntenegru"
 
 msgid "Saint Martin"
-msgstr ""
+msgstr "Sfântul Martin"
 
 msgid "Madagascar"
 msgstr "Madagascar"
@@ -568,7 +568,7 @@ msgid "Saint Pierre and Miquelon"
 msgstr "Saint Pierre și Miquelon"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "Insulele Pitcairn"
 
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
@@ -589,7 +589,7 @@ msgid "Qatar"
 msgstr "Qatar"
 
 msgid "Réunion"
-msgstr ""
+msgstr "Réunion"
 
 msgid "Romania"
 msgstr "România"
@@ -622,13 +622,13 @@ msgid "Singapore"
 msgstr "Singapore"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "Sfînta Elena"
 
 msgid "Slovenia"
 msgstr "Slovenia"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Svalbard și Jan Mayen"
 
 msgid "Slovakia"
 msgstr "Slovacia"
@@ -764,4 +764,3 @@ msgstr "Zambia"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

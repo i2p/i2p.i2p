@@ -1,3 +1,7 @@
+2013-11-19 kytv
+
+ * Translation updates and start of Japanese translation pulled from Transifex
+
 2013-11-14 kytv
  * Update Java Service Wrapper to v3.5.22
     - Windows: Self-compiled with VS2010 in Windows 7. The icon has been

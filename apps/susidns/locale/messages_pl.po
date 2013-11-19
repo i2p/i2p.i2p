@@ -4,15 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-#   <b790979@klzlk.com>, 2011, 2012.
-# Smert i2p <Smert@safe-mail.net>, 2013.
+# PolishAnon <b790979@klzlk.com>, 2011, 2012
+# Smert <Smert@safe-mail.net>, 2013
+# Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-22 13:14+0000\n"
-"PO-Revision-Date: 2013-02-05 21:11+0000\n"
-"Last-Translator: Smert <Smert@safe-mail.net>\n"
+"POT-Creation-Date: 2013-11-19 23:01+0000\n"
+"PO-Revision-Date: 2013-10-23 20:58+0000\n"
+"Last-Translator: Tracerneo <ziolkoneo@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/"
 "pl/)\n"
 "Language: pl\n"
@@ -114,7 +115,7 @@ msgstr "Wyświetlono {0} z {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:258
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:227
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:412
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
 msgid "Add"
 msgstr "Dodaj"
 
@@ -122,7 +123,7 @@ msgstr "Dodaj"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:227
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:239
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
 msgid "Replace"
 msgstr "Zastąp"
 
@@ -180,13 +181,13 @@ msgstr "Wpisz nazwę hosta i miejsca przeznaczenia"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:274
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:267
 msgid "Delete Entry"
 msgstr "Usuń wpis"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
 msgid "Delete Selected"
 msgstr "Usuń zaznaczone"
 
@@ -222,9 +223,9 @@ msgid "ERROR: Could not write addressbook file."
 msgstr "BŁĄD: Nie można zapisać pliku książki adresowej."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:340
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:149
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:142
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or \"reload"
 "\" button on your browser. Please resubmit."
@@ -233,9 +234,9 @@ msgstr ""
 "\" lub \"przeładuj\" w przeglądarce. Proszę prześlij ponownie."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:342
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:151
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:313
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:130
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
@@ -243,25 +244,25 @@ msgstr ""
 "Jeśli problem będzie się powtarzał, sprawdź, czy masz włączoną obsługę "
 "plików cookie w przeglądarce."
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:103
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:131
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:117
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:153
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:145
 msgid "Save"
 msgstr "Zapisz"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:133
 msgid "Configuration saved."
 msgstr "Konfiguracja zapisana."
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:143
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:122
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:134
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:136
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:143
 msgid "Reload"
 msgstr "Przeładuj"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:145
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:136
 msgid "Configuration reloaded."
 msgstr "Konfiguracja przeładowana."
 
@@ -286,18 +287,18 @@ msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr ""
 "Nie udało się usunąć Miejsca Przeznaczenia dla {0} z serwisu nazewnictwa {1}"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:115
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr ""
 "Subskrypcje zapisane, trwa teraz aktualizowanie książki adresowej ze źródeł "
 "subskrypcji."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:120
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:134
 msgid "Subscriptions saved."
 msgstr "Subskrypcje zapisane."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:124
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
 msgid "Subscriptions reloaded."
 msgstr "Subskrypcje przeładowane."
 
@@ -417,8 +418,8 @@ msgid "Links"
 msgstr "Linki"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:404
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:266
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:402
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:259
 msgid "Destination"
 msgstr "Miejsce przeznaczenia"
 
@@ -426,32 +427,32 @@ msgstr "Miejsce przeznaczenia"
 msgid "Mark for deletion"
 msgstr "Zaznacz do usunięcia"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:305
 msgid "Base 32 address"
 msgstr "Adres Base 32"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:309
 msgid "More information on this entry"
 msgstr "Więcej informacji na temat tego wpisu"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
 msgid "details"
 msgstr "szczegóły"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:347
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:406
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:383
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:381
 msgid "This address book is empty."
 msgstr "Ta książka adresowa jest pusta."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "Add new destination"
 msgstr "Dodaj nowe miejsce przeznaczenia"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:400
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:165
 msgid "Host Name"
 msgstr "Nazwa hosta"
@@ -580,59 +581,59 @@ msgstr "Nazwa motywu do użycia (domyślnie na \"light\")"
 msgid "addressbook"
 msgstr "Ksiazka adresowa"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:181
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:179
 msgid "Encoded Name"
 msgstr "Zakodowana Nazwa"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:197
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:193
 msgid "Base 32 Address"
 msgstr "Adress Base 32"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:201
 msgid "Base 64 Hash"
 msgstr "Hash Base 64"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
 msgid "Address Helper"
 msgstr "Pomoc Adresowa"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
 msgid "link"
 msgstr "link"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:224
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:217
 msgid "Public Key"
 msgstr "Klucz publiczny"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
 msgid "ElGamal 2048 bit"
 msgstr "ElGamal 2048 bitów"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:230
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:223
 msgid "Signing Key"
 msgstr "Klucz Podpisywania"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:225
 msgid "DSA 1024 bit"
 msgstr "DSA 1024 bity"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:229
 msgid "Certificate"
 msgstr "Certyfikat"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:242
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:235
 msgid "Added Date"
 msgstr "Data dodania"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:241
 msgid "Source"
 msgstr "Źródło"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:254
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:247
 msgid "Last Modified"
 msgstr "Ostatnio modyfikowano"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:260
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:253
 msgid "Notes"
 msgstr "Notatki"
 
@@ -675,10 +676,11 @@ msgstr ""
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
-"naming.html\">the overview on www.i2p2.i2p</a>."
+"naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>."
 msgstr ""
-"Aby uzyskać więcej informacji na temat nazewnictwa w I2P, zobacz <a href="
-"\"http://www.i2p2.i2p/naming.html\">przegląd www.i2p2.i2p</a> ."
+"W celu znalezienia większej ilości informacji na temat nazewnictwa w  I2P, "
+"sprawdź <a href=\"http://www.i2p2.i2p/naming.html\" target=\"_top"
+"\">informacje na www.i2p2.i2p</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142
 msgid "How does the addressbook application work?"

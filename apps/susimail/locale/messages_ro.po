@@ -5,13 +5,14 @@
 #
 # Translators:
 # CimpianAlin <Predator@windowslive.com>, 2013
+# polearnik <polearnik@mail.ru>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-11 14:23+0000\n"
-"PO-Revision-Date: 2013-07-30 01:12+0000\n"
-"Last-Translator: CimpianAlin <Predator@windowslive.com>\n"
+"POT-Creation-Date: 2013-11-19 23:03+0000\n"
+"PO-Revision-Date: 2013-11-11 12:42+0000\n"
+"Last-Translator: polearnik <polearnik@mail.ru>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/"
 "ro/)\n"
 "Language: ro\n"
@@ -168,9 +169,9 @@ msgstr "Eroare la ștergerea mesajului: {0}"
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "mesaj sters"
+msgstr[1] "{0} mesaje sterse"
+msgstr[2] "{0} mesaje sterse"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1313
 #: src/src/i2p/susi/webmail/WebMail.java:1654
@@ -181,9 +182,9 @@ msgstr "Autentificare"
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} mesaj"
+msgstr[1] "{0} mesaje"
+msgstr[2] "{0} mesaje"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1317
 msgid "Show Message"
@@ -296,7 +297,7 @@ msgstr "Utilizator"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1644
 msgid "Password"
-msgstr ""
+msgstr "Parola"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1649
 msgid "Host"
@@ -316,7 +317,7 @@ msgstr "Reset"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1655
 msgid "Learn about I2P mail"
-msgstr ""
+msgstr "Aflați mai multe despre e-mail I2P"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1656
 msgid "Create Account"
@@ -379,9 +380,9 @@ msgstr "Dimensiune"
 #, java-format
 msgid "1 Byte"
 msgid_plural "{0} Bytes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} Byte"
+msgstr[1] "{0} Bytes"
+msgstr[2] "{0} Bytes"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1713
 msgid "Mark All"
@@ -432,7 +433,7 @@ msgstr "Setează"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1737
 msgid "Really delete this message?"
-msgstr ""
+msgstr "într-adevăr  doriti sa stergeti acest mesaj?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1737
 msgid "Yes, really delete it!"

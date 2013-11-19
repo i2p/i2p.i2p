@@ -74,14 +74,14 @@ public class ConfigUIHelper extends HelperBase {
      *  added to the top-level build.xml for the updater.
      */
     private static final String langs[] = {"ar", "cs", "da", "de", "et", "el", "en", "es", "fi",
-                                           "fr", "hu", "it", "nb", "nl", "pl", "pt", "ro", "ru",
+                                           "fr", "hu", "it", "ja", "nb", "nl", "pl", "pt", "ro", "ru",
                                            "sv", "tr", "uk", "vi", "zh"};
     private static final String flags[] = {"lang_ar", "cz", "dk", "de", "ee", "gr", "us", "es", "fi",
-                                           "fr", "hu", "it", "nl", "no", "pl", "pt", "ro", "ru",
+                                           "fr", "hu", "it", "jp", "nl", "no", "pl", "pt", "ro", "ru",
                                            "se", "tr", "ua", "vn", "cn"};
     private static final String xlangs[] = {_x("Arabic"), _x("Czech"), _x("Danish"),
                                             _x("German"), _x("Estonian"), _x("Greek"), _x("English"), _x("Spanish"), _x("Finnish"),
-                                            _x("French"), _x("Hungarian"), _x("Italian"), _x("Dutch"), _x("Norwegian Bokmaal"), _x("Polish"),
+                                            _x("French"), _x("Hungarian"), _x("Italian"), _x("Japanese"), _x("Dutch"), _x("Norwegian Bokmaal"), _x("Polish"),
                                             _x("Portuguese"), _x("Romanian"), _x("Russian"), _x("Swedish"),
                                             _x("Turkish"), _x("Ukrainian"), _x("Vietnamese"), _x("Chinese")};
 

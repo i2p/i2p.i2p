@@ -1,0 +1,68 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# walking <waling@mail.i2p>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-11-19 23:06+0000\n"
+"PO-Revision-Date: 2013-08-17 02:13+0000\n"
+"Last-Translator: xtoaster <zhazhenzhong@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/"
+"language/zh_CN/)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Congratulations on getting I2P installed!"
+msgstr "恭喜您I2P安装成功！"
+
+msgid "Welcome to I2P!"
+msgstr "欢迎来到I2P！"
+
+#, java-format
+msgid "Please {0}have patience{1} as I2P boots up and finds peers."
+msgstr "I2P启动和搜索节点时，请{0}保持耐心{1}。"
+
+#, java-format
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
+"configuration page{3}."
+msgstr "等待的过程中，请到{2}配置页面{3}{0}调整您的带宽设置{1}。"
+
+msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "同时您也可以设置您的浏览器使用 I2P 代理访问 I2P 内网站点。"
+
+msgid ""
+"Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
+"browser settings."
+msgstr "只需将主机 127.0.0.1 (或 localhost) 端口 4444 设置为浏览器代理即可。"
+
+msgid "Do not use SOCKS for this."
+msgstr "请不要作为SOCKS代理使用。"
+
+#, java-format
+msgid ""
+"More information can be found on the {0}I2P browser proxy setup page{1}."
+msgstr "详情请参见{0}I2P 浏览器代理设置页面{1}。"
+
+#, java-format
+msgid ""
+"Once you have a \"shared clients\" destination listed on the left, please {0}"
+"check out{1} our {2}FAQ{3}."
+msgstr ""
+"当页面左侧出现 \"共享客户端\" 目标后，请{0}看看{1}我们的{2}常见问题集FAQ{3}。"
+
+#, java-format
+msgid ""
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
+"help{3} or {4}#i2p{5}."
+msgstr ""
+"用您的IRC客户端打开{0}localhost:6668{1}，欢迎到{2}#i2p-help{3}或{4}#i2p{5}房"
+"间向大家问好。"
