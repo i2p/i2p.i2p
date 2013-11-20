@@ -665,7 +665,7 @@ public class DoCMDS implements Runnable {
 													break die;
 												}
 												try {
-													nickinfo.add(P_QUIET, new Boolean(Boolean.parseBoolean(Arg) == true));
+													nickinfo.add(P_QUIET, Boolean.valueOf(Arg));
 												} catch (Exception ex) {
 													try {
 														wunlock();
@@ -989,7 +989,7 @@ public class DoCMDS implements Runnable {
 													prt = Integer.parseInt(Arg);
 													if (prt > 1 && prt < 65536) {
 														try {
-															nickinfo.add(P_INPORT, new Integer(prt));
+															nickinfo.add(P_INPORT, Integer.valueOf(prt));
 														} catch (Exception ex) {
 															try {
 																wunlock();

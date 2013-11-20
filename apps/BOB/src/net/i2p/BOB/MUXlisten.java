@@ -70,7 +70,7 @@ public class MUXlisten implements Runnable {
 
 			this.database.getWriteLock();
 			this.info.getWriteLock();
-			this.info.add("STARTING", new Boolean(true));
+			this.info.add("STARTING", Boolean.valueOf(true));
 			this.info.releaseWriteLock();
 			this.database.releaseWriteLock();
 			this.database.getReadLock();
@@ -160,7 +160,7 @@ public class MUXlisten implements Runnable {
 			try {
 				wlock();
 				try {
-					info.add("RUNNING", new Boolean(true));
+					info.add("RUNNING", Boolean.valueOf(true));
 				} catch (Exception e) {
 					lock.set(false);
 					wunlock();

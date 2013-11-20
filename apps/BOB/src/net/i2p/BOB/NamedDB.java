@@ -15,6 +15,8 @@
  */
 package net.i2p.BOB;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Internal database to relate nicknames to options to values
  *
@@ -23,7 +25,9 @@ package net.i2p.BOB;
 public class NamedDB {
 
 	private volatile Object[][] data;
-	private volatile int index,  writersWaiting,  readers;
+	private volatile int index;
+	private final AtomicInteger writersWaiting = new AtomicInteger();
+	private final AtomicInteger readers = new AtomicInteger();
 
 	/**
 	 * make initial NULL object
@@ -31,27 +35,27 @@ public class NamedDB {
 	 */
 	public NamedDB() {
 		this.data = new Object[1][2];
-		this.index = this.writersWaiting = this.readers = 0;
+		this.index = 0;
 	}
 
 	synchronized public void getReadLock() {
-		while ((writersWaiting != 0)) {
+		while ((writersWaiting.get() != 0)) {
 			try {
 				wait();
 			} catch (InterruptedException ie) {
 			}
 		}
-		readers++;
+		readers.incrementAndGet();
 	}
 
 	synchronized public void releaseReadLock() {
-		readers--;
+		readers.decrementAndGet();
 		notifyAll();
 	}
 
 	synchronized public void getWriteLock() {
-		writersWaiting++;
-		while (readers != 0 && writersWaiting != 1) {
+		writersWaiting.incrementAndGet();
+		while (readers.get() != 0 && writersWaiting.get() != 1) {
 			try {
 				wait();
 			} catch (InterruptedException ie) {
@@ -60,7 +64,7 @@ public class NamedDB {
 	}
 
 	synchronized public void releaseWriteLock() {
-		writersWaiting--;
+		writersWaiting.decrementAndGet();
 		notifyAll();
 	}
 
