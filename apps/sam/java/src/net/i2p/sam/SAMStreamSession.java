@@ -305,8 +305,8 @@ public class SAMStreamSession {
         }
 
         synchronized (handlersMapLock) {
-            handlersMap.put(new Integer(id), reader);
-            sendersMap.put(new Integer(id), sender);
+            handlersMap.put(Integer.valueOf(id), reader);
+            sendersMap.put(Integer.valueOf(id), sender);
         }
 
         I2PAppThread t = new I2PAppThread(reader, "SAMReader" + id);
@@ -332,12 +332,12 @@ public class SAMStreamSession {
      */
     protected SAMStreamSessionSocketReader getSocketReader ( int id ) {
         synchronized (handlersMapLock) {
-            return handlersMap.get(new Integer(id));
+            return handlersMap.get(Integer.valueOf(id));
         }
     }
     private StreamSender getSender(int id) {
         synchronized (handlersMapLock) {
-            return sendersMap.get(new Integer(id));
+            return sendersMap.get(Integer.valueOf(id));
         }
     }
 
@@ -349,7 +349,7 @@ public class SAMStreamSession {
      */
     protected boolean checkSocketHandlerId ( int id ) {
         synchronized (handlersMapLock) {
-            return (!(handlersMap.get(new Integer(id)) == null));
+            return (!(handlersMap.get(Integer.valueOf(id)) == null));
         }
     }
 
@@ -363,8 +363,8 @@ public class SAMStreamSession {
         StreamSender sender = null;
 
         synchronized (handlersMapLock) {
-            reader = handlersMap.remove(new Integer(id));
-            sender = sendersMap.remove(new Integer(id));
+            reader = handlersMap.remove(Integer.valueOf(id));
+            sender = sendersMap.remove(Integer.valueOf(id));
         }
 
         if (reader != null)

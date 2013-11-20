@@ -817,10 +817,10 @@ public class DoCMDS implements Runnable {
 										try {
 											database.add(Arg, nickinfo);
 											nickinfo.add(P_NICKNAME, Arg);
-											nickinfo.add(P_STARTING, new Boolean(false));
-											nickinfo.add(P_RUNNING, new Boolean(false));
-											nickinfo.add(P_STOPPING, new Boolean(false));
-											nickinfo.add(P_QUIET, new Boolean(false));
+											nickinfo.add(P_STARTING, Boolean.valueOf(false));
+											nickinfo.add(P_RUNNING, Boolean.valueOf(false));
+											nickinfo.add(P_STOPPING, Boolean.valueOf(false));
+											nickinfo.add(P_QUIET, Boolean.valueOf(false));
 											nickinfo.add(P_INHOST, "localhost");
 											nickinfo.add(P_OUTHOST, "localhost");
 											Properties Q = new Properties();
@@ -1076,7 +1076,7 @@ public class DoCMDS implements Runnable {
 													prt = Integer.parseInt(Arg);
 													if (prt > 1 && prt < 65536) {
 														try {
-															nickinfo.add(P_OUTPORT, new Integer(prt));
+															nickinfo.add(P_OUTPORT, Integer.valueOf(prt));
 														} catch (Exception ex) {
 															try {
 																wunlock();
@@ -1355,7 +1355,7 @@ public class DoCMDS implements Runnable {
 													break die;
 												}
 
-												nickinfo.add(P_STOPPING, new Boolean(true));
+												nickinfo.add(P_STOPPING, Boolean.valueOf(true));
 												try {
 													wunlock();
 

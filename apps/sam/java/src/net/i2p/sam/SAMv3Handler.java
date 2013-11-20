@@ -218,7 +218,7 @@ public class SAMv3Handler extends SAMv1Handler
 
 		public SessionRecord( String dest, Properties props, SAMv3Handler handler )
 		{
-			m_dest = new String(dest) ; 
+			m_dest = dest; 
 			m_props = new Properties() ;
 			m_props.putAll(props);
 			m_threadgroup = null ;
@@ -235,7 +235,7 @@ public class SAMv3Handler extends SAMv1Handler
 
 		synchronized public String getDest()
 		{
-			return new String(m_dest) ;
+			return m_dest;
 		}
 		synchronized public Properties getProps()
 		{

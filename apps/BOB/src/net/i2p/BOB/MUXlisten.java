@@ -104,7 +104,7 @@ public class MUXlisten implements Runnable {
 			// Something went bad.
 			this.database.getWriteLock();
 			this.info.getWriteLock();
-			this.info.add("STARTING", new Boolean(false));
+			this.info.add("STARTING", Boolean.valueOf(false));
 			this.info.releaseWriteLock();
 			this.database.releaseWriteLock();
 			throw new IOException(e.toString());
@@ -112,7 +112,7 @@ public class MUXlisten implements Runnable {
 			// Something went bad.
 			this.database.getWriteLock();
 			this.info.getWriteLock();
-			this.info.add("STARTING", new Boolean(false));
+			this.info.add("STARTING", Boolean.valueOf(false));
 			this.info.releaseWriteLock();
 			this.database.releaseWriteLock();
 			throw new RuntimeException(e);
@@ -120,7 +120,7 @@ public class MUXlisten implements Runnable {
 			// Something else went bad.
 			this.database.getWriteLock();
 			this.info.getWriteLock();
-			this.info.add("STARTING", new Boolean(false));
+			this.info.add("STARTING", Boolean.valueOf(false));
 			this.info.releaseWriteLock();
 			this.database.releaseWriteLock();
 			e.printStackTrace();
@@ -204,7 +204,7 @@ public class MUXlisten implements Runnable {
 						try {
 							wlock();
 							try {
-								info.add("STARTING", new Boolean(false));
+								info.add("STARTING", Boolean.valueOf(false));
 							} catch (Exception e) {
 								wunlock();
 								break quit;
@@ -258,9 +258,9 @@ public class MUXlisten implements Runnable {
 			try {
 				wlock();
 				try {
-					info.add("STARTING", new Boolean(false));
-					info.add("STOPPING", new Boolean(true));
-					info.add("RUNNING", new Boolean(false));
+					info.add("STARTING", Boolean.valueOf(false));
+					info.add("STOPPING", Boolean.valueOf(true));
+					info.add("RUNNING", Boolean.valueOf(false));
 				} catch (Exception e) {
 					lock.set(false);
 					wunlock();
@@ -309,9 +309,9 @@ public class MUXlisten implements Runnable {
 			try {
 				wlock();
 				try {
-					info.add("STARTING", new Boolean(false));
-					info.add("STOPPING", new Boolean(false));
-					info.add("RUNNING", new Boolean(false));
+					info.add("STARTING", Boolean.valueOf(false));
+					info.add("STOPPING", Boolean.valueOf(false));
+					info.add("RUNNING", Boolean.valueOf(false));
 				} catch (Exception e) {
 					lock.set(false);
 					wunlock();
