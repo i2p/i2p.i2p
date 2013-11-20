@@ -24,7 +24,7 @@ import net.i2p.data.Destination;
  *
  */
 public class I2PSessionTest extends TestCase implements I2PSessionListener{
-    private Set _s;
+    private Set<String> _s;
     
     
     public void setUp(){
@@ -56,7 +56,7 @@ public class I2PSessionTest extends TestCase implements I2PSessionListener{
         
         session.setSessionListener(this);
         
-        _s = new HashSet();
+        _s = new HashSet<String>();
         _s.add("a");
         _s.add("b");
         _s.add("c");

@@ -23,9 +23,9 @@ public class RouterInfoTest extends StructureTest {
     private final static Log _log = new Log(RouterInfoTest.class);
     public DataStructure createDataStructure() throws DataFormatException {
         RouterInfo info = new RouterInfo();
-        HashSet addresses = new HashSet();
+        HashSet<RouterAddress> addresses = new HashSet<RouterAddress>();
         DataStructure structure = (new RouterAddressTest()).createDataStructure();
-        addresses.add(structure);
+        addresses.add((RouterAddress) structure);
         info.setAddresses(addresses);
         
     	PublicKey pubKey = null;
@@ -57,9 +57,9 @@ public class RouterInfoTest extends StructureTest {
         options.setProperty("netConnectionSpeed", "OC12");
         info.setOptions(options);
 	
-        HashSet peers = new HashSet();
+        HashSet<Hash> peers = new HashSet<Hash>();
         structure = (new HashTest()).createDataStructure();
-        peers.add(structure);
+        peers.add((Hash) structure);
         info.setPeers(peers);
     	info.setPublished(System.currentTimeMillis());
             

@@ -9,7 +9,6 @@ package net.i2p.data;
  */
  
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
 import java.util.Properties;
 
 /**

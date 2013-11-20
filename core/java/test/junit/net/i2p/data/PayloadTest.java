@@ -8,9 +8,6 @@ package net.i2p.data;
  *
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 /**
  * Test harness for loading / storing Payload objects
  *
