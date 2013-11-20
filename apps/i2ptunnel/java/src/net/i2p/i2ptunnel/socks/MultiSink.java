@@ -10,10 +10,10 @@ import net.i2p.util.Log;
  * Sends to one of many Sinks
  * @author zzz modded from streamr/MultiSource
  */
-public class MultiSink implements Source, Sink {
+public class MultiSink<S extends Sink> implements Source, Sink {
     private static final Log _log = new Log(MultiSink.class);
 
-    public MultiSink(Map cache) {
+    public MultiSink(Map<Destination, S> cache) {
         this.cache = cache;
     }
     
@@ -31,5 +31,5 @@ public class MultiSink implements Source, Sink {
         s.send(from, data);
     }
     
-    private Map<Destination, Sink> cache;
+    private Map<Destination, S> cache;
 }

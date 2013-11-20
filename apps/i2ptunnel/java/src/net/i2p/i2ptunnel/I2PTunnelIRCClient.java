@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketAddress;
 import net.i2p.data.Base32;
@@ -60,7 +59,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
               notifyThis, 
               "IRC Client on " + tunnel.listenHost + ':' + localPort, tunnel, pkf);
         
-        _addrs = new ArrayList(4);
+        _addrs = new ArrayList<I2PSocketAddress>(4);
         buildAddresses(destinations);
 
         if (_addrs.isEmpty()) {

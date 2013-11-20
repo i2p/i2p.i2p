@@ -26,10 +26,10 @@ import net.i2p.i2ptunnel.udp.*;
  */
 public class SOCKSUDPPort implements Source, Sink {
 
-    public SOCKSUDPPort(InetAddress host, int port, Map replyMap) {
+    public SOCKSUDPPort(InetAddress host, int port, Map<Destination, SOCKSUDPPort> replyMap) {
 
         // this passes the host and port from UDPUnwrapper to UDPWrapper
-        Map cache = new ConcurrentHashMap(4);
+        Map<Destination, SOCKSHeader> cache = new ConcurrentHashMap<Destination, SOCKSHeader>(4);
 
         // rcv from I2P and send to a port
         this.wrapper = new SOCKSUDPWrapper(cache);
@@ -41,7 +41,7 @@ public class SOCKSUDPPort implements Source, Sink {
         this.udpsource = new UDPSource(sock);
         this.unwrapper = new SOCKSUDPUnwrapper(cache);
         this.udpsource.setSink(this.unwrapper);
-        this.udptracker = new ReplyTracker(this, replyMap);
+        this.udptracker = new ReplyTracker<SOCKSUDPPort>(this, replyMap);
         this.unwrapper.setSink(this.udptracker);
     }
 
@@ -73,5 +73,5 @@ public class SOCKSUDPPort implements Source, Sink {
     private UDPSource udpsource;
     private SOCKSUDPWrapper wrapper;
     private SOCKSUDPUnwrapper unwrapper;
-    private ReplyTracker udptracker;
+    private ReplyTracker<SOCKSUDPPort> udptracker;
 }

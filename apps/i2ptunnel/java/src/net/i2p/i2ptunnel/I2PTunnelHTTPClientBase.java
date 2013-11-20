@@ -94,10 +94,10 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                                EventDispatcher notifyThis, String handlerName, 
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, handlerName, tunnel);
-        _proxyList = new ArrayList(4);
+        _proxyList = new ArrayList<String>(4);
         _proxyNonce = new byte[PROXYNONCE_BYTES];
         _context.random().nextBytes(_proxyNonce);
-        _nonces = new ConcurrentHashMap();
+        _nonces = new ConcurrentHashMap<String, NonceInfo>();
     }
 
     /**
@@ -110,10 +110,10 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
             throws IllegalArgumentException {
         super(localPort, l, sktMgr, tunnel, notifyThis, clientId);
-        _proxyList = new ArrayList(4);
+        _proxyList = new ArrayList<String>(4);
         _proxyNonce = new byte[PROXYNONCE_BYTES];
         _context.random().nextBytes(_proxyNonce);
-        _nonces = new ConcurrentHashMap();
+        _nonces = new ConcurrentHashMap<String, NonceInfo>();
     }
 
     //////// Authorization stuff
@@ -409,7 +409,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  @since 0.9.4
      */
     private static Map<String, String> parseArgs(String args) {
-        Map<String, String> rv = new HashMap(8);
+        Map<String, String> rv = new HashMap<String, String>(8);
         char data[] = args.toCharArray();
         StringBuilder buf = new StringBuilder(32);
         boolean isQuoted = false;

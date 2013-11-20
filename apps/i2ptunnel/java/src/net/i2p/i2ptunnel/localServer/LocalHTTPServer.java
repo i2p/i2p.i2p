@@ -17,7 +17,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
-import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
 /**
@@ -119,7 +118,7 @@ public abstract class LocalHTTPServer {
         // Parameters are url, host, dest, nonce, and master | router | private.
         // Do the add and redirect.
         if (targetRequest.equals("/add")) {
-            Map<String, String> opts = new HashMap(8);
+            Map<String, String> opts = new HashMap<String, String>(8);
             // this only works if all keys are followed by =value
             StringTokenizer tok = new StringTokenizer(query, "=&;");
             while (tok.hasMoreTokens()) {

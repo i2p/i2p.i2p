@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
-
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
@@ -70,7 +66,7 @@ public class TunnelController implements Logging {
         _tunnel = new I2PTunnel();
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelController.class);
         setConfig(config, prefix);
-        _messages = new ArrayList(4);
+        _messages = new ArrayList<String>(4);
         _running = false;
         boolean keyOK = true;
         if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
@@ -741,9 +737,9 @@ public class TunnelController implements Logging {
      * @return list of messages pulled off (each is a String, earliest first)
      */
     public List<String> clearMessages() { 
-        List rv = null;
+        List<String> rv = null;
         synchronized (this) {
-            rv = new ArrayList(_messages);
+            rv = new ArrayList<String>(_messages);
             _messages.clear();
         }
         return rv;

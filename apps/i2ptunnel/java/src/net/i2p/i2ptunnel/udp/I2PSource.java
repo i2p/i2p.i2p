@@ -32,7 +32,7 @@ public class I2PSource implements Source, Runnable {
         this.raw = raw;
         
         // create queue
-        this.queue = new ArrayBlockingQueue(256);
+        this.queue = new ArrayBlockingQueue<Integer>(256);
         
         // create listener
         this.sess.setSessionListener(new Listener());

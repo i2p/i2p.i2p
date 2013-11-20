@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 
-import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -77,7 +76,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected I2PTunnelTask task;
     protected boolean bidir;
     private ThreadPoolExecutor _executor;
-    private final Map<Integer, InetSocketAddress> _socketMap = new ConcurrentHashMap(4);
+    private final Map<Integer, InetSocketAddress> _socketMap = new ConcurrentHashMap<Integer, InetSocketAddress>(4);
 
     /** unused? port should always be specified */
     private int DEFAULT_LOCALPORT = 4488;
@@ -321,7 +320,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         synchronized (lock) {
             if (!forced && sockMgr.listSockets().size() != 0) {
                 l.log("There are still active connections!");
-                for (Iterator it = sockMgr.listSockets().iterator(); it.hasNext();) {
+                for (Iterator<I2PSocket> it = sockMgr.listSockets().iterator(); it.hasNext();) {
                     l.log("->" + it.next());
                 }
                 return false;
@@ -473,7 +472,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
         public CustomThreadPoolExecutor(int max, String name) {
              super(MIN_HANDLERS, max, HANDLER_KEEPALIVE_MS, TimeUnit.MILLISECONDS,
-                   new SynchronousQueue(), new CustomThreadFactory(name));
+                   new SynchronousQueue<Runnable>(), new CustomThreadFactory(name));
         }
     }
 

@@ -123,7 +123,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
         } else if (cmd.startsWith("-l ")) { // ping a list of hosts
             BufferedReader br = new BufferedReader(new FileReader(cmd.substring(3)));
             String line;
-            List pingHandlers = new ArrayList();
+            List<PingHandler> pingHandlers = new ArrayList<PingHandler>();
             int i = 0;
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("#")) continue; // comments
@@ -137,7 +137,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                     reportTimes = false;
             }
             br.close();
-            for (Iterator it = pingHandlers.iterator(); it.hasNext();) {
+            for (Iterator<PingHandler> it = pingHandlers.iterator(); it.hasNext();) {
                 Thread t = (Thread) it.next();
                 t.join();
             }

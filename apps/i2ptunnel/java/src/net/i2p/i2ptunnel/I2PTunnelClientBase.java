@@ -48,7 +48,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected long _clientId;
     protected final Object sockLock = new Object(); // Guards sockMgr and mySockets
     protected I2PSocketManager sockMgr; // should be final and use a factory. LINT
-    protected final List<I2PSocket> mySockets = new ArrayList();
+    protected final List<I2PSocket> mySockets = new ArrayList<I2PSocket>();
     protected boolean _ownDest;
 
     protected Destination dest = null;
@@ -678,7 +678,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
         public CustomThreadPoolExecutor() {
              super(0, Integer.MAX_VALUE, HANDLER_KEEPALIVE_MS, TimeUnit.MILLISECONDS,
-                   new SynchronousQueue(), new CustomThreadFactory());
+                   new SynchronousQueue<Runnable>(), new CustomThreadFactory());
         }
     }
 

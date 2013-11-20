@@ -597,7 +597,7 @@ public class SOCKS5Server extends SOCKSServer {
      * RFC 1928 isn't clear... maybe not.
      */
     private void handleUDP(DataInputStream in, DataOutputStream out) throws SOCKSException {
-        List<Integer> ports = new ArrayList(1);
+        List<Integer> ports = new ArrayList<Integer>(1);
         synchronized (_startLock) {
             if (_tunnel == null) {
                 // tunnel options?

@@ -69,13 +69,13 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
     private void parseOptions() {
         Properties opts = getTunnel().getClientOptions();
-        proxies = new HashMap(1);
+        proxies = new HashMap<String, List<String>>(1);
         for (Map.Entry e : opts.entrySet()) {
            String prop = (String)e.getKey();
            if ((!prop.startsWith(PROP_PROXY_PREFIX)) || prop.length() <= PROP_PROXY_PREFIX.length())
               continue;
            String port = prop.substring(PROP_PROXY_PREFIX.length());
-           List proxyList = new ArrayList(1);
+           List<String> proxyList = new ArrayList<String>(1);
            StringTokenizer tok = new StringTokenizer((String)e.getValue(), ", \t");
            while (tok.hasMoreTokens()) {
                String proxy = tok.nextToken().trim();

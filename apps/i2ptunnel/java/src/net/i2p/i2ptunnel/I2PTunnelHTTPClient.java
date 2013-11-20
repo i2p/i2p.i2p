@@ -3,7 +3,6 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +69,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      *  Map of host name to base64 destination for destinations collected
      *  via address helper links
      */
-    private final ConcurrentHashMap<String, String> addressHelpers = new ConcurrentHashMap(8);
+    private final ConcurrentHashMap<String, String> addressHelpers = new ConcurrentHashMap<String, String>(8);
 
     /**
      *  Used to protect actions via http://proxy.i2p/
