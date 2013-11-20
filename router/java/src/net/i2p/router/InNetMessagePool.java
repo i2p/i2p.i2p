@@ -56,7 +56,7 @@ public class InNetMessagePool implements Service {
      * using the jobQueue's single thread.
      *
      */
-    public static final String PROP_DISPATCH_THREADED = "router.dispatchTemptyList()hreaded";
+    public static final String PROP_DISPATCH_THREADED = "router.dispatchThreaded";
     public static final boolean DEFAULT_DISPATCH_THREADED = false;
     /**
      * If we aren't doing threaded dispatch for tunnel messages, should we
