@@ -570,8 +570,8 @@ public class TunnelDispatcher implements Service {
             long maxTime = before + MAX_FUTURE_EXPIRATION;
             if ( (msg.getMessageExpiration() < minTime) || (msg.getMessage().getMessageExpiration() < minTime) ||
                  (msg.getMessageExpiration() > maxTime) || (msg.getMessage().getMessageExpiration() > maxTime) ) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
                                + " as the wrapper's expiration is in " + DataHelper.formatDuration(msg.getMessageExpiration()-before)
                                + " and/or the content's expiration is in " + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-before)
                                + " with messageId " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " and message type "
