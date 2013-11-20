@@ -198,7 +198,7 @@ public class SAMUtils {
             val = props.getProperty(key);
             
             if (!firstIter) {
-                msg += ";";
+                builder.append(";");
             } else {
                 firstIter = false;
             }
