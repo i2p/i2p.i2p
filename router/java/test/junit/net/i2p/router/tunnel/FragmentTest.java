@@ -54,7 +54,7 @@ public class FragmentTest {
     @Test
     public void testSingle() {
         PendingGatewayMessage pending = createPending(949, false, false);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending);
 
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
@@ -77,7 +77,7 @@ public class FragmentTest {
     @Test
     public void testMultiple() throws Exception {
         PendingGatewayMessage pending = createPending(2048, false, false);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending);
         
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
@@ -100,7 +100,7 @@ public class FragmentTest {
      */
     public void runDelayed() {
         PendingGatewayMessage pending = createPending(2048, false, false);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending);
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
         SenderImpl sender = new SenderImpl();
@@ -126,7 +126,7 @@ public class FragmentTest {
     
     protected boolean runVaried(int size, boolean includeRouter, boolean includeTunnel) {
         PendingGatewayMessage pending = createPending(size, includeRouter, includeTunnel);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending);
         
         DefragmentedReceiverImpl handleReceiver = new DefragmentedReceiverImpl(pending.getData());

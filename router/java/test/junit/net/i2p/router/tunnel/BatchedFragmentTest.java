@@ -41,7 +41,7 @@ public class BatchedFragmentTest extends FragmentTest {
     @Test
     public void testBatched() {
         PendingGatewayMessage pending1 = createPending(10, false, false);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending1);
         
         PendingGatewayMessage pending2 = createPending(1024, false, false);
@@ -77,7 +77,7 @@ public class BatchedFragmentTest extends FragmentTest {
     @Test
     public void testSingle() {
         PendingGatewayMessage pending = createPending(949, false, false);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending);
 
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
@@ -103,7 +103,7 @@ public class BatchedFragmentTest extends FragmentTest {
     @Test
     public void testMultiple() throws Exception {
         PendingGatewayMessage pending = createPending(2048, false, false);
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending);
         
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);
@@ -176,7 +176,7 @@ public class BatchedFragmentTest extends FragmentTest {
     }
     
     private void runBatch(PendingGatewayMessage pending1, PendingGatewayMessage pending2, PendingGatewayMessage pending3) {
-        ArrayList messages = new ArrayList();
+        ArrayList<PendingGatewayMessage> messages = new ArrayList<PendingGatewayMessage>();
         messages.add(pending1);
         
         TunnelGateway.QueuePreprocessor pre = createPreprocessor(_context);

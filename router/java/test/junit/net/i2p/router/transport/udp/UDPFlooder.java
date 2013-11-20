@@ -19,7 +19,7 @@ class UDPFlooder implements Runnable {
     private RouterContext _context;
     // private Log _log;
     private UDPTransport _transport;
-    private final List _peers;
+    private final List<PeerState> _peers;
     private boolean _alive;
     private static final byte _floodData[] = new byte[4096];
     
@@ -27,7 +27,7 @@ class UDPFlooder implements Runnable {
         _context = ctx;
         // _log = ctx.logManager().getLog(UDPFlooder.class);
         _transport = transport;
-        _peers = new ArrayList(4);
+        _peers = new ArrayList<PeerState>(4);
         ctx.random().nextBytes(_floodData);
     }
     

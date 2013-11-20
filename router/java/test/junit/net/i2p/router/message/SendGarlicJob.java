@@ -53,9 +53,9 @@ public class SendGarlicJob extends JobImpl {
      * @param replySelector ???
      */
     public SendGarlicJob(RouterContext ctx, GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector) {
-        this(ctx, config, onSend, onSendFailed, onReply, onReplyFailed, timeoutMs, priority, replySelector, new SessionKey(), new HashSet());
+        this(ctx, config, onSend, onSendFailed, onReply, onReplyFailed, timeoutMs, priority, replySelector, new SessionKey(), new HashSet<SessionTag>());
     }
-    public SendGarlicJob(RouterContext ctx, GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector, SessionKey wrappedKey, Set wrappedTags) {
+    public SendGarlicJob(RouterContext ctx, GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector, SessionKey wrappedKey, Set<SessionTag> wrappedTags) {
         super(ctx);
         _log = ctx.logManager().getLog(SendGarlicJob.class);
         if (config == null) throw new IllegalArgumentException("No config specified");

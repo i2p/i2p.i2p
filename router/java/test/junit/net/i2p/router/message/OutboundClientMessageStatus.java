@@ -20,7 +20,7 @@ class OutboundClientMessageStatus {
     private ClientMessage _msg;
     private PayloadGarlicConfig _clove;
     private LeaseSet _leaseSet;
-    private final Set _sent;
+    private final Set<Tunnel> _sent;
     private int _numLookups;
     private boolean _success;
     private boolean _failure;
@@ -32,7 +32,7 @@ class OutboundClientMessageStatus {
         _msg = msg;
         _clove = null;
         _leaseSet = null;
-        _sent = new HashSet(4);
+        _sent = new HashSet<Tunnel>(4);
         _success = false;
         _failure = false;
         _numLookups = 0;

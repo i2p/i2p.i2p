@@ -48,7 +48,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
     public void testSmall() throws Exception {
         int runCount = 1;
         
-        List messages = new ArrayList(runCount);
+        List<DataMessage> messages = new ArrayList<DataMessage>(runCount);
         long start = _context.clock().now();
     
         for (int i = 0; i < runCount; i++) {
@@ -59,7 +59,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
         
         Thread.sleep(1000);
         
-        List received = _receiver.clearReceived();
+        List<I2NPMessage> received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
             assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
@@ -69,7 +69,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
     public void testRouter() throws Exception {
         int runCount = 1;
         
-        List messages = new ArrayList(runCount);
+        List<DataMessage> messages = new ArrayList<DataMessage>(runCount);
         long start = _context.clock().now();
     
         for (int i = 0; i < runCount; i++) {
@@ -82,7 +82,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
         
         Thread.sleep(1000);
         
-        List received = _receiver.clearReceived();
+        List<I2NPMessage> received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
             assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
@@ -92,7 +92,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
     public void testTunnel() throws Exception {
         int runCount = 1;
         
-        List messages = new ArrayList(runCount);
+        List<DataMessage> messages = new ArrayList<DataMessage>(runCount);
         long start = _context.clock().now();
     
         for (int i = 0; i < runCount; i++) {
@@ -107,7 +107,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
         
         Thread.sleep(1000);
         
-        List received = _receiver.clearReceived();
+        List<I2NPMessage> received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
             assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
@@ -117,7 +117,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
     public void testLarge() throws Exception {
         int runCount = 1;
         
-        List messages = new ArrayList(runCount);
+        List<DataMessage> messages = new ArrayList<DataMessage>(runCount);
         long start = _context.clock().now();
     
         for (int i = 0; i < runCount; i++) {
@@ -128,7 +128,7 @@ public abstract class GatewayTestBase extends RouterTestBase {
         
         Thread.sleep(1000);
         
-        List received = _receiver.clearReceived();
+        List<I2NPMessage> received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
             assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
@@ -148,11 +148,11 @@ public abstract class GatewayTestBase extends RouterTestBase {
     protected class TestReceiver implements TunnelGateway.Receiver, FragmentHandler.DefragmentedReceiver {
         private TunnelCreatorConfig _config;
         private FragmentHandler _handler;
-        private volatile List _received;
+        private volatile List<I2NPMessage> _received;
         public TestReceiver(TunnelCreatorConfig config) {
             _config = config;
             _handler = new FragmentHandler(_context, TestReceiver.this);
-            _received = new ArrayList(1000);
+            _received = new ArrayList<I2NPMessage>(1000);
         }
         public long receiveEncrypted(byte[] encrypted) {
             // fake all the hops...
@@ -174,9 +174,9 @@ public abstract class GatewayTestBase extends RouterTestBase {
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
             _received.add(msg);
         }
-        public List clearReceived() { 
-            List rv = _received; 
-            _received = new ArrayList();
+        public List<I2NPMessage> clearReceived() { 
+            List<I2NPMessage> rv = _received; 
+            _received = new ArrayList<I2NPMessage>();
             return rv;
         }
         @Override
