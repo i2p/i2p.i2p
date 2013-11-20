@@ -32,7 +32,7 @@ public class PortMapper {
      *  @param context unused for now
      */
     public PortMapper(I2PAppContext context) {
-        _dir = new ConcurrentHashMap(8);
+        _dir = new ConcurrentHashMap<String, Integer>(8);
     }
 
     /**

@@ -64,7 +64,7 @@ class YKGenerator {
         MAX_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MAX, defaultMax);
 
         CALC_DELAY = ctx.getProperty(PROP_YK_PRECALC_DELAY, DEFAULT_YK_PRECALC_DELAY);
-        _values = new LinkedBlockingQueue(MAX_NUM_BUILDERS);
+        _values = new LinkedBlockingQueue<BigInteger[]>(MAX_NUM_BUILDERS);
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("ElGamal YK Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "

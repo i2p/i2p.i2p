@@ -202,7 +202,7 @@ public class RouterInfo extends DatabaseEntry {
      */
     public Set<Hash> getPeers() {
         if (_peers == null)
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         return _peers;
     }
 
@@ -221,7 +221,7 @@ public class RouterInfo extends DatabaseEntry {
             return;
         }
         if (_peers == null)
-            _peers = new HashSet(2);
+            _peers = new HashSet<Hash>(2);
         synchronized (_peers) {
             _peers.clear();
             _peers.addAll(peers);
@@ -546,7 +546,7 @@ public class RouterInfo extends DatabaseEntry {
         if (numPeers == 0) {
             _peers = null;
         } else {
-            _peers = new HashSet(numPeers);
+            _peers = new HashSet<Hash>(numPeers);
             for (int i = 0; i < numPeers; i++) {
                 Hash peerIdentityHash = new Hash();
                 peerIdentityHash.readBytes(din);

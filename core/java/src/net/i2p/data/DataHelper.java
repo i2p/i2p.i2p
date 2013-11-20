@@ -92,7 +92,7 @@ public class DataHelper {
             "version", "created", "upgraded", "lists",
             "a", "s",
         };
-        _propertiesKeyCache = new HashMap(keys.length);
+        _propertiesKeyCache = new HashMap<String, String>(keys.length);
         for (int i = 0; i < keys.length; i++) {
             _propertiesKeyCache.put(keys[i], keys[i]);
         }
@@ -1394,7 +1394,7 @@ public class DataHelper {
      *  @return a new list
      */
     public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
-        if (dataStructures == null) return Collections.EMPTY_LIST;
+        if (dataStructures == null) return Collections.emptyList();
 
         // This used to use Hash.toString(), which is insane, since a change to toString()
         // would break the whole network. Now use Hash.toBase64().
@@ -1409,7 +1409,7 @@ public class DataHelper {
         //for (DataStructure struct : tm.values()) {
         //    rv.add(struct);
         //}
-        ArrayList<DataStructure> rv = new ArrayList(dataStructures);
+        ArrayList<DataStructure> rv = new ArrayList<DataStructure>(dataStructures);
         sortStructureList(rv);
         return rv;
     }

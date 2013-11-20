@@ -45,8 +45,8 @@ public abstract class NamingService {
     protected NamingService(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(getClass());
-        _listeners = new CopyOnWriteArraySet();
-        _updaters = new CopyOnWriteArraySet();
+        _listeners = new CopyOnWriteArraySet<NamingServiceListener>();
+        _updaters = new CopyOnWriteArraySet<NamingServiceUpdater>();
     }
     
     /**
@@ -226,7 +226,7 @@ public abstract class NamingService {
      *  @since 0.8.7
      */
     public Map<String, Destination> getEntries(Properties options) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     /**
@@ -242,7 +242,7 @@ public abstract class NamingService {
      *  @since 0.8.7
      */
     public Map<String, String> getBase64Entries(Properties options) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     /**
@@ -263,7 +263,7 @@ public abstract class NamingService {
      *  @since 0.8.7
      */
     public Set<String> getNames(Properties options) {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**

@@ -47,7 +47,6 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
 
@@ -99,7 +98,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected Map<Long, MessagePayloadMessage> _availableMessages;
 
     /** hashes of lookups we are waiting for */
-    protected final LinkedBlockingQueue<LookupWaiter> _pendingLookups = new LinkedBlockingQueue();
+    protected final LinkedBlockingQueue<LookupWaiter> _pendingLookups = new LinkedBlockingQueue<LookupWaiter>();
     protected final Object _bwReceivedLock = new Object();
     protected volatile int[] _bwLimits;
     
@@ -145,7 +144,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  @since 0.8.9
      */
-    private static final Map<Hash, Destination> _lookupCache = new LHMCache(16);
+    private static final Map<Hash, Destination> _lookupCache = new LHMCache<Hash, Destination>(16);
 
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
@@ -196,7 +195,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _fastReceive = Boolean.parseBoolean(_options.getProperty(I2PClient.PROP_FAST_RECEIVE));
         if (hasDest) {
             _producer = new I2CPMessageProducer(context);
-            _availableMessages = new ConcurrentHashMap();
+            _availableMessages = new ConcurrentHashMap<Long, MessagePayloadMessage>();
             _myDestination = new Destination();
             _privateKey = new PrivateKey();
             _signingPrivateKey = new SigningPrivateKey();
@@ -593,7 +592,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  message. Just copy all unclaimed ones and check 30 seconds later.
      */
     private class VerifyUsage implements SimpleTimer.TimedEvent {
-        private final List<Long> toCheck = new ArrayList();
+        private final List<Long> toCheck = new ArrayList<Long>();
         
         public void timeReached() {
             if (isClosed())
@@ -623,8 +622,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         private volatile boolean _alive;
  
         public AvailabilityNotifier() {
-            _pendingIds = new ArrayList(2);
-            _pendingSizes = new ArrayList(2);
+            _pendingIds = new ArrayList<Long>(2);
+            _pendingSizes = new ArrayList<Integer>(2);
         }
         
         public void stopNotifying() { 

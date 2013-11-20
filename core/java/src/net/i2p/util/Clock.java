@@ -27,7 +27,7 @@ public class Clock implements Timestamper.UpdateListener {
     
     public Clock(I2PAppContext context) {
         _context = context;
-        _listeners = new CopyOnWriteArraySet();
+        _listeners = new CopyOnWriteArraySet<ClockUpdateListener>();
         _startedOn = System.currentTimeMillis();
     }
 

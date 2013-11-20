@@ -26,7 +26,7 @@ public final class CryptixAESKeyCache {
      * @deprecated unused, keys are now cached in the SessionKey objects
      */
     public CryptixAESKeyCache() {
-        _availableKeys = new LinkedBlockingQueue(MAX_KEYS);
+        _availableKeys = new LinkedBlockingQueue<KeyCacheEntry>(MAX_KEYS);
     }
     
     /**

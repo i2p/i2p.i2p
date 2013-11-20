@@ -1,7 +1,5 @@
 package net.i2p.app;
 
-import net.i2p.I2PAppContext;
-
 /**
  *  If a class started via clients.config implements this interface,
  *  it will be used to manage the client, instead of starting with main()

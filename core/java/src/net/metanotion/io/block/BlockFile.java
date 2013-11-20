@@ -94,7 +94,7 @@ public class BlockFile {
 	private boolean _isClosed;
 	/** cached list of free pages, only valid if freListStart > 0 */
 	private FreeListBlock flb;
-	private final HashMap openIndices = new HashMap();
+	private final HashMap<String, BSkipList> openIndices = new HashMap<String, BSkipList>();
 
 	private void mount() throws IOException {
 		file.seek(BlockFile.OFFSET_MOUNTED);
@@ -481,12 +481,12 @@ public class BlockFile {
 		_isClosed = true;
 		metaIndex.close();
 
-		Set oi = openIndices.keySet();
-		Iterator i = oi.iterator();
+		Set<String> oi = openIndices.keySet();
+		Iterator<String> i = oi.iterator();
 		Object k;
 		while(i.hasNext()) {
 			k = i.next();
-			BSkipList bsl = (BSkipList) openIndices.get(k);
+			BSkipList bsl = openIndices.get(k);
 			bsl.close();
 		}
 

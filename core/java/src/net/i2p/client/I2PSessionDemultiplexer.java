@@ -27,7 +27,7 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
 
     public I2PSessionDemultiplexer(I2PAppContext ctx) {
         _log = ctx.logManager().getLog(I2PSessionDemultiplexer.class);
-        _listeners = new ConcurrentHashMap();
+        _listeners = new ConcurrentHashMap<Integer, I2PSessionMuxedListener>();
     }
 
     /** unused */

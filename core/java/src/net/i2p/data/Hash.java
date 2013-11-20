@@ -26,7 +26,7 @@ public class Hash extends SimpleDataStructure {
     public final static Hash FAKE_HASH = new Hash(new byte[HASH_LENGTH]);
     private static final int CACHE_SIZE = 2048;
     
-    private static final SDSCache<Hash> _cache = new SDSCache(Hash.class, HASH_LENGTH, CACHE_SIZE);
+    private static final SDSCache<Hash> _cache = new SDSCache<Hash>(Hash.class, HASH_LENGTH, CACHE_SIZE);
 
     /**
      * Pull from cache or return new

@@ -71,7 +71,7 @@ public class TranslateReader extends FilterReader {
         super(new BufferedReader(new InputStreamReader(in, "UTF-8")));
         _ctx = ctx;
         _bundle = bundle;
-        _args = new ArrayList(4);
+        _args = new ArrayList<String>(4);
         _inBuf = new StringBuilder(64);
         _outBuf = new StringBuilder(64);
         _argBuf = new StringBuilder(64);
@@ -415,7 +415,7 @@ public class TranslateReader extends FilterReader {
             File[] listing = dir.listFiles();
             if (listing == null)
                 throw new IOException();
-            filelist = new ArrayList(listing.length);
+            filelist = new ArrayList<String>(listing.length);
             for (int i = 0; i < listing.length; i++) {
                 File f = listing[i];
                 if (!f.isDirectory())

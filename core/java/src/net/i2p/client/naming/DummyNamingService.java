@@ -31,7 +31,7 @@ class DummyNamingService extends NamingService {
      *  Classes should take care to call removeCache() for any entries that
      *  are invalidated.
      */
-    private static final Map<String, Destination> _cache = new LHMCache(CACHE_MAX_SIZE);
+    private static final Map<String, Destination> _cache = new LHMCache<String, Destination>(CACHE_MAX_SIZE);
 
     /** 
      * The naming service should only be constructed and accessed through the 

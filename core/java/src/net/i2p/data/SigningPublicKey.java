@@ -27,7 +27,7 @@ public class SigningPublicKey extends SimpleDataStructure {
     public final static int KEYSIZE_BYTES = DEF_TYPE.getPubkeyLen();
     private static final int CACHE_SIZE = 1024;
 
-    private static final SDSCache<SigningPublicKey> _cache = new SDSCache(SigningPublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
+    private static final SDSCache<SigningPublicKey> _cache = new SDSCache<SigningPublicKey>(SigningPublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
 
     private final SigType _type;
 

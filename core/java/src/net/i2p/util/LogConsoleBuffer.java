@@ -36,8 +36,8 @@ public class LogConsoleBuffer {
         lim = Math.max(limit, 4);
         // Add some extra room to minimize the chance of losing a message,
         // since we are doing offer() below.
-        _buffer = new LinkedBlockingQueue(lim + 4);
-        _critBuffer = new LinkedBlockingQueue(lim + 4);
+        _buffer = new LinkedBlockingQueue<String>(lim + 4);
+        _critBuffer = new LinkedBlockingQueue<String>(lim + 4);
     }
 
     void add(String msg) {
@@ -64,7 +64,7 @@ public class LogConsoleBuffer {
      * @return oldest first
      */
     public List<String> getMostRecentMessages() {
-            return new ArrayList(_buffer);
+            return new ArrayList<String>(_buffer);
     }
 
     /**
@@ -75,7 +75,7 @@ public class LogConsoleBuffer {
      * @return oldest first
      */
     public List<String> getMostRecentCriticalMessages() {
-            return new ArrayList(_critBuffer);
+            return new ArrayList<String>(_critBuffer);
     }
 
     /**

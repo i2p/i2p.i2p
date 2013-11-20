@@ -21,14 +21,10 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPrivateKeySpec;
 import java.security.spec.DSAPublicKeySpec;
-import java.security.spec.ECField;
-import java.security.spec.ECFieldFp;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.ECPoint;
-import java.security.spec.EllipticCurve;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -51,8 +47,8 @@ import net.i2p.util.NativeBigInteger;
  */
 class SigUtil {
 
-    private static final Map<SigningPublicKey, ECPublicKey> _pubkeyCache = new LHMCache(64);
-    private static final Map<SigningPrivateKey, ECPrivateKey> _privkeyCache = new LHMCache(16);
+    private static final Map<SigningPublicKey, ECPublicKey> _pubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
+    private static final Map<SigningPrivateKey, ECPrivateKey> _privkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);
 
     private SigUtil() {}
 

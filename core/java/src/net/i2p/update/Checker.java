@@ -1,8 +1,5 @@
 package net.i2p.update;
 
-import java.net.URI;
-import java.util.List;
-
 /**
  *  Controls one or more types of updates.
  *  This must be registered with the UpdateManager.

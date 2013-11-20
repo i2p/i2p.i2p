@@ -83,7 +83,7 @@ public abstract class Addresses {
                                                  boolean includeIPv6) {
         boolean haveIPv4 = false;
         boolean haveIPv6 = false;
-        SortedSet<String> rv = new TreeSet();
+        SortedSet<String> rv = new TreeSet<String>();
         try {
             InetAddress localhost = InetAddress.getLocalHost();
             InetAddress[] allMyIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
@@ -236,7 +236,7 @@ public abstract class Addresses {
         } else {
             size = 32;
         }
-        _IPAddress = new LHMCache(size);
+        _IPAddress = new LHMCache<String, byte[]>(size);
     }
 
     /**

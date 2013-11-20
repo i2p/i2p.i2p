@@ -35,7 +35,7 @@ public final class SHA256Generator {
      *  @param context unused
      */
     public SHA256Generator(I2PAppContext context) {
-        _digests = new LinkedBlockingQueue(32);
+        _digests = new LinkedBlockingQueue<MessageDigest>(32);
     }
     
     public static final SHA256Generator getInstance() {

@@ -34,7 +34,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     private Date _end;
 
     public RequestLeaseSetMessage() {
-        _endpoints = new ArrayList();
+        _endpoints = new ArrayList<TunnelEndpoint>();
     }
 
     public SessionId getSessionId() {

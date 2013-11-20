@@ -9,8 +9,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateFactory;
@@ -20,7 +18,6 @@ import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
-import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;

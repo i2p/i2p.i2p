@@ -33,7 +33,7 @@ class ClientWriterRunner implements Runnable {
     public ClientWriterRunner(OutputStream out, I2PSessionImpl session) {
         _out = new BufferedOutputStream(out);
         _session = session;
-        _messagesToWrite = new LinkedBlockingQueue(MAX_QUEUE_SIZE);
+        _messagesToWrite = new LinkedBlockingQueue<I2CPMessage>(MAX_QUEUE_SIZE);
         Thread t = new I2PAppThread(this, "I2CP Client Writer " + __Id.incrementAndGet(), true);
         t.start();
     }

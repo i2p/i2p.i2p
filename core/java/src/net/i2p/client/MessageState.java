@@ -41,7 +41,7 @@ class MessageState {
         _log = ctx.logManager().getLog(MessageState.class);
         _nonce = nonce;
         _prefix = prefix + "[" + _stateId + "]: ";
-        _receivedStatus = new HashSet();
+        _receivedStatus = new HashSet<Integer>();
         _created = ctx.clock().now();
         //ctx.statManager().createRateStat("i2cp.checkStatusTime", "how long it takes to go through the states", "i2cp", new long[] { 60*1000 });
     }
@@ -150,8 +150,8 @@ class MessageState {
 
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug(_prefix + "isSuccess(" + wantedStatus + "): " + _receivedStatus);
-        for (Iterator iter = _receivedStatus.iterator(); iter.hasNext();) {
-            Integer val = (Integer) iter.next();
+        for (Iterator<Integer> iter = _receivedStatus.iterator(); iter.hasNext();) {
+            Integer val = iter.next();
             int recv = val.intValue();
             switch (recv) {
                 case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
@@ -210,8 +210,8 @@ class MessageState {
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug(_prefix + "isFailure(" + wantedStatus + "): " + _receivedStatus);
         
-        for (Iterator iter = _receivedStatus.iterator(); iter.hasNext();) {
-            Integer val = (Integer) iter.next();
+        for (Iterator<Integer> iter = _receivedStatus.iterator(); iter.hasNext();) {
+            Integer val = iter.next();
             int recv = val.intValue();
             switch (recv) {
                 case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:

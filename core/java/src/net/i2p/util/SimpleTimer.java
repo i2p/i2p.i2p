@@ -54,9 +54,9 @@ public class SimpleTimer {
     private SimpleTimer(I2PAppContext context, String name) {
         runn = new SimpleStore(true);
         _log = context.logManager().getLog(SimpleTimer.class);
-        _events = new TreeMap();
-        _eventTimes = new HashMap(256);
-        _readyEvents = new ArrayList(4);
+        _events = new TreeMap<Long, TimedEvent>();
+        _eventTimes = new HashMap<TimedEvent, Long>(256);
+        _readyEvents = new ArrayList<TimedEvent>(4);
         I2PThread runner = new I2PThread(new SimpleTimerRunner());
         runner.setName(name);
         runner.setDaemon(true);
@@ -155,8 +155,8 @@ public class SimpleTimer {
             
             if ( (_events.size() != _eventTimes.size()) ) {
                 _log.error("Skewed events: " + _events.size() + " for " + _eventTimes.size());
-                for (Iterator iter = _eventTimes.keySet().iterator(); iter.hasNext(); ) {
-                    TimedEvent evt = (TimedEvent)iter.next();
+                for (Iterator<TimedEvent> iter = _eventTimes.keySet().iterator(); iter.hasNext(); ) {
+                    TimedEvent evt = iter.next();
                     Long when = _eventTimes.get(evt);
                     TimedEvent cur = _events.get(when);
                     if (cur != evt) {
@@ -209,7 +209,7 @@ public class SimpleTimer {
     //  private TimedEvent _recentEvents[] = new TimedEvent[5];
     private class SimpleTimerRunner implements Runnable {
         public void run() {
-            List<TimedEvent> eventsToFire = new ArrayList(1);
+            List<TimedEvent> eventsToFire = new ArrayList<TimedEvent>(1);
             while(runn.getAnswer()) {
                 try {
                     synchronized (_events) {

@@ -131,14 +131,14 @@ public class LogManager {
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
         _alreadyNoticedMissingConfig = false;
-        _limits = new ConcurrentHashSet();
-        _logs = new ConcurrentHashMap(128);
+        _limits = new ConcurrentHashSet<LogLimit>();
+        _logs = new ConcurrentHashMap<Object, Log>(128);
         _defaultLimit = Log.ERROR;
         _context = context;
         _log = getLog(LogManager.class);
         String location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         setConfig(location);
-        _records = new LinkedBlockingQueue(_logBufferSize);
+        _records = new LinkedBlockingQueue<LogRecord>(_logBufferSize);
         _consoleBuffer = new LogConsoleBuffer(_consoleBufferSize);
         // If we aren't in the router context, delay creating the LogWriter until required,
         // so it doesn't create a log directory and log files unless there is output.
@@ -582,7 +582,7 @@ public class LogManager {
         for (LogLimit limit : _limits) {
             if (limit.matches(log)) { 
                 if (limits == null)
-                    limits = new ArrayList(4);
+                    limits = new ArrayList<LogLimit>(4);
                 limits.add(limit);
             }
         }

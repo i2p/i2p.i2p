@@ -52,7 +52,7 @@ import net.i2p.data.ByteArray;
 public final class ByteCache {
 
     //private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
-    private static final Map<Integer, ByteCache> _caches = new ConcurrentHashMap(16);
+    private static final Map<Integer, ByteCache> _caches = new ConcurrentHashMap<Integer, ByteCache>(16);
 
     /**
      *  max size in bytes of each cache
@@ -119,7 +119,7 @@ public final class ByteCache {
     
     private ByteCache(int maxCachedEntries, int entrySize) {
         if (_cache)
-            _available = new LinkedBlockingQueue(maxCachedEntries);
+            _available = new LinkedBlockingQueue<ByteArray>(maxCachedEntries);
         _maxCached = maxCachedEntries;
         _entrySize = entrySize;
         _lastOverflow = -1;
@@ -131,7 +131,7 @@ public final class ByteCache {
         if (_maxCached >= maxCachedEntries) return;
         _maxCached = maxCachedEntries;
         // make a bigger one, move the cached items over
-        Queue<ByteArray> newLBQ = new LinkedBlockingQueue(maxCachedEntries);
+        Queue<ByteArray> newLBQ = new LinkedBlockingQueue<ByteArray>(maxCachedEntries);
         ByteArray ba;
         while ((ba = _available.poll()) != null)
             newLBQ.offer(ba);

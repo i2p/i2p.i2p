@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -100,7 +99,7 @@ public class ElGamalAESEngine {
         SessionKey key = keyManager.consumeTag(st);
         SessionKey foundKey = new SessionKey();
         SessionKey usedKey = new SessionKey();
-        Set foundTags = new HashSet();
+        Set<SessionTag> foundTags = new HashSet<SessionTag>();
         byte decrypted[] = null;
         boolean wasExisting = false;
         if (key != null) {
@@ -170,7 +169,7 @@ public class ElGamalAESEngine {
      *
      * @return null if decryption fails
      */
-    private byte[] decryptNewSession(byte data[], PrivateKey targetPrivateKey, Set foundTags, SessionKey usedKey,
+    private byte[] decryptNewSession(byte data[], PrivateKey targetPrivateKey, Set<SessionTag> foundTags, SessionKey usedKey,
                                     SessionKey foundKey) throws DataFormatException {
         if (data == null) {
             //if (_log.shouldLog(Log.WARN)) _log.warn("Data is null, unable to decrypt new session");
@@ -246,7 +245,7 @@ public class ElGamalAESEngine {
      * @return decrypted data or null on failure
      *
      */
-    private byte[] decryptExistingSession(byte data[], SessionKey key, PrivateKey targetPrivateKey, Set foundTags,
+    private byte[] decryptExistingSession(byte data[], SessionKey key, PrivateKey targetPrivateKey, Set<SessionTag> foundTags,
                                          SessionKey usedKey, SessionKey foundKey) throws DataFormatException {
         byte preIV[] = SimpleByteCache.acquire(32);
         System.arraycopy(data, 0, preIV, 0, 32);
@@ -315,7 +314,7 @@ public class ElGamalAESEngine {
      * Note: package private for ElGamalTest.testAES()
      */
     byte[] decryptAESBlock(byte encrypted[], int offset, int encryptedLen, SessionKey key, byte iv[], 
-                           byte sentTag[], Set foundTags, SessionKey foundKey) throws DataFormatException {
+                           byte sentTag[], Set<SessionTag> foundTags, SessionKey foundKey) throws DataFormatException {
         //_log.debug("iv for decryption: " + DataHelper.toString(iv, 16));	
         //_log.debug("decrypting AES block.  encr.length = " + (encrypted == null? -1 : encrypted.length) + " sentTag: " + DataHelper.toString(sentTag, 32));
         byte decrypted[] = new byte[encryptedLen];
@@ -324,13 +323,13 @@ public class ElGamalAESEngine {
         //_log.debug("Hash of entire aes block after decryption: \n" + DataHelper.toString(h.getData(), 32));
         try {
             SessionKey newKey = null;
-            List tags = null;
+            List<SessionTag> tags = null;
 
             //ByteArrayInputStream bais = new ByteArrayInputStream(decrypted);
             int cur = 0;
             long numTags = DataHelper.fromLong(decrypted, cur, 2);
             if ((numTags < 0) || (numTags > MAX_TAGS_RECEIVED)) throw new Exception("Invalid number of session tags");
-            if (numTags > 0) tags = new ArrayList((int)numTags);
+            if (numTags > 0) tags = new ArrayList<SessionTag>((int)numTags);
             cur += 2;
             //_log.debug("# tags: " + numTags);
             if (numTags * SessionTag.BYTE_LENGTH > decrypted.length - 2) {
@@ -404,7 +403,7 @@ public class ElGamalAESEngine {
      *
      * Unused externally, only called by below (i.e. newKey is always null)
      */
-    public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
+    public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
                                  SessionTag currentTag, SessionKey newKey, long paddedSize) {
         if (currentTag == null) {
             if (_log.shouldLog(Log.INFO))
@@ -450,7 +449,7 @@ public class ElGamalAESEngine {
      *          body's real size, no bytes are appended but the body is not truncated)
      *
      */
-    public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
+    public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
                                  SessionTag currentTag, long paddedSize) {
         return encrypt(data, target, key, tagsForDelivery, currentTag, null, paddedSize);
     }
@@ -464,7 +463,7 @@ public class ElGamalAESEngine {
      *                        200 max enforced at receiver
      * @deprecated unused
      */
-    public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery, long paddedSize) {
+    public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery, long paddedSize) {
         return encrypt(data, target, key, tagsForDelivery, null, null, paddedSize);
     }
 
@@ -502,7 +501,7 @@ public class ElGamalAESEngine {
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      */
-    private byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
+    private byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
                                     SessionKey newKey, long paddedSize) {
         //_log.debug("Encrypting to a NEW session");
         byte elgSrcData[] = new byte[SessionKey.KEYSIZE_BYTES+32+158];
@@ -571,7 +570,7 @@ public class ElGamalAESEngine {
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      */
-    private byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
+    private byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set<SessionTag> tagsForDelivery,
                                          SessionTag currentTag, SessionKey newKey, long paddedSize) {
         //_log.debug("Encrypting to an EXISTING session");
         byte rawTag[] = currentTag.getData();
@@ -629,7 +628,7 @@ public class ElGamalAESEngine {
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      */
-    final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
+    final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set<SessionTag> tagsForDelivery, SessionKey newKey,
                                         long paddedSize) {
         return encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize, 0);
     }
@@ -639,11 +638,11 @@ public class ElGamalAESEngine {
      * @param tagsForDelivery session tags to be associated with the key or null;
      *                        200 max enforced at receiver
      */
-    private final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
+    private final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set<SessionTag> tagsForDelivery, SessionKey newKey,
                                         long paddedSize, int prefixBytes) {
         //_log.debug("iv for encryption: " + DataHelper.toString(iv, 16));
         //_log.debug("Encrypting AES");
-        if (tagsForDelivery == null) tagsForDelivery = Collections.EMPTY_SET;
+        if (tagsForDelivery == null) tagsForDelivery = Collections.emptySet();
         int size = 2 // sizeof(tags)
                  + SessionTag.BYTE_LENGTH*tagsForDelivery.size()
                  + 4 // payload length
@@ -657,8 +656,8 @@ public class ElGamalAESEngine {
         int cur = prefixBytes;
         DataHelper.toLong(aesData, cur, 2, tagsForDelivery.size());
         cur += 2;
-        for (Iterator iter = tagsForDelivery.iterator(); iter.hasNext();) {
-            SessionTag tag = (SessionTag) iter.next();
+        for (Iterator<SessionTag> iter = tagsForDelivery.iterator(); iter.hasNext();) {
+            SessionTag tag = iter.next();
             System.arraycopy(tag.getData(), 0, aesData, cur, SessionTag.BYTE_LENGTH);
             cur += SessionTag.BYTE_LENGTH;
         }
