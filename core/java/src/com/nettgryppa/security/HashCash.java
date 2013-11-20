@@ -212,13 +212,20 @@ public class HashCash implements Comparable<HashCash> {
   /**
        * Two objects are considered equal if they are both of type HashCash and have an identical string representation
        */
-  /* FIXME missing hashCode() method FIXME */
   @Override
   public boolean equals(Object obj) {
     if(obj instanceof HashCash)
       return toString().equals(obj.toString());
     else
       return super.equals(obj);
+  }
+
+  /**
+   * Implemented based on definition of equals()
+   */
+  @Override
+  public int hashCode() {
+      return ("HashCash:"+toString()).hashCode();
   }
   
   /**
@@ -330,14 +337,15 @@ private static long bytesToLong(byte[] b) {
     List<String> tempList;
     boolean first = true;
     
-    for(String key: extensions.keySet()) {
+    for(Map.Entry<String, List<String>> entry: extensions.entrySet()) {
+        String key = entry.getKey();
       if(key.contains(":") || key.contains(";") || key.contains("="))
           throw new IllegalArgumentException("Extension key contains an illegal character. " + key);
       if(!first)
         result.append(";");
       first = false;
       result.append(key);
-      tempList = extensions.get(key);
+      tempList = entry.getValue();
       
       if(null != tempList) {
         result.append("=");
@@ -442,7 +450,7 @@ private static long bytesToLong(byte[] b) {
   public static int estimateValue(int secs) throws NoSuchAlgorithmException  {
     initEstimates();
     int result = 0;
-    long millis = secs * 1000 * 65536;
+    long millis = secs * 1000L * 65536;
     millis /= milliFor16;
     
     while(millis > 1) {

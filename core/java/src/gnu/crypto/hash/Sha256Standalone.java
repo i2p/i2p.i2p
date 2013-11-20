@@ -95,7 +95,7 @@ public class Sha256Standalone extends BaseHashStandalone {
    private static final int[] w = new int[64];
 
    /** caches the result of the correctness test, once executed. */
-   private static Boolean valid;
+   private static volatile Boolean valid;
 
    /** 256-bit interim result. */
    private int h0, h1, h2, h3, h4, h5, h6, h7;
@@ -218,7 +218,7 @@ public class Sha256Standalone extends BaseHashStandalone {
          md.update((byte) 0x62); // b
          md.update((byte) 0x63); // c
          String result = "broken"; //Util.toString(md.digest());
-         valid = new Boolean(DIGEST0.equals(result));
+         valid = Boolean.valueOf(DIGEST0.equals(result));
       }
 
       return valid.booleanValue();
