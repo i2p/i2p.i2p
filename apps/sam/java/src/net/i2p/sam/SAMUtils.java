@@ -190,7 +190,6 @@ public class SAMUtils {
     private static String dumpProperties(Properties props) {
         Enumeration names = props.propertyNames();
         StringBuilder builder = new StringBuilder();
-        String msg = "";
         String key, val;
         boolean firstIter = true;
         
