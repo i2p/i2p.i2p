@@ -120,11 +120,11 @@ class AddressBook {
                 subscription.setLastFetched(I2PAppContext.getGlobalContext().clock().now());
                 subf = tmp;
             } else {
-                a = Collections.EMPTY_MAP;
+                a = Collections.emptyMap();
                 tmp.delete();
             }
         } catch (IOException ioe) {
-            a = Collections.EMPTY_MAP;
+            a = Collections.emptyMap();
         }
         this.addresses = a;
         this.subFile = subf;
@@ -148,7 +148,7 @@ class AddressBook {
         try {
             a = ConfigParser.parse(file);
         } catch (IOException exp) {
-            a = new HashMap();
+            a = new HashMap<String, String>();
         }
         this.addresses = a;
         this.subFile = null;
