@@ -69,7 +69,7 @@ class SubscriptionList {
     public SubscriptionList(File locationsFile, File etagsFile,
             File lastModifiedFile, File lastFetchedFile, long delay, List<String> defaultSubs, String proxyHost, 
             int proxyPort) {
-        this.subscriptions = new LinkedList();
+        this.subscriptions = new LinkedList<Subscription>();
         this.etagsFile = etagsFile;
         this.lastModifiedFile = lastModifiedFile;
         this.lastFetchedFile = lastFetchedFile;
@@ -84,17 +84,17 @@ class SubscriptionList {
         try {
             etags = ConfigParser.parse(etagsFile);
         } catch (IOException exp) {
-            etags = new HashMap();
+            etags = new HashMap<String, String>();
         }
         try {
             lastModified = ConfigParser.parse(lastModifiedFile);
         } catch (IOException exp) {
-            lastModified = new HashMap();
+            lastModified = new HashMap<String, String>();
         }
         try {
             lastFetched = ConfigParser.parse(lastFetchedFile);
         } catch (IOException exp) {
-            lastFetched = new HashMap();
+            lastFetched = new HashMap<String, String>();
         }
         for (String location : locations) {
             this.subscriptions.add(new Subscription(location, etags.get(location),
@@ -121,9 +121,9 @@ class SubscriptionList {
      * won't be read back correctly; the '=' should be escaped.
      */
     public void write() {
-        Map<String, String> etags = new HashMap();
-        Map<String, String>  lastModified = new HashMap();
-        Map<String, String>  lastFetched = new HashMap();
+        Map<String, String> etags = new HashMap<String, String>();
+        Map<String, String>  lastModified = new HashMap<String, String>();
+        Map<String, String>  lastFetched = new HashMap<String, String>();
         for (Subscription sub : this.subscriptions) {
             if (sub.getEtag() != null) {
                 etags.put(sub.getLocation(), sub.getEtag());

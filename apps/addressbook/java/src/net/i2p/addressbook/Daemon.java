@@ -251,7 +251,7 @@ public class Daemon {
         }
         delay *= 60 * 60 * 1000;
         
-        List<String> defaultSubs = new LinkedList();
+        List<String> defaultSubs = new LinkedList<String>();
         // defaultSubs.add("http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/hosts.txt");
         defaultSubs.add("http://www.i2p2.i2p/hosts.txt");
         
@@ -331,7 +331,7 @@ public class Daemon {
             homeFile = new SecureDirectory(System.getProperty("user.dir"));
         }
         
-        Map<String, String> defaultSettings = new HashMap();
+        Map<String, String> defaultSettings = new HashMap<String, String>();
         defaultSettings.put("proxy_host", "127.0.0.1");
         defaultSettings.put("proxy_port", "4444");
         defaultSettings.put("master_addressbook", "../userhosts.txt");

@@ -138,7 +138,8 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>> {
         public boolean equals(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
-            Map.Entry e = (Map.Entry) o;
+            @SuppressWarnings("unchecked")
+            Map.Entry<Object, Object> e = (Map.Entry<Object, Object>) o;
             return key.equals(e.getKey()) && value.equals(e.getValue());
         }
     }
