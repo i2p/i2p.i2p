@@ -424,7 +424,6 @@ public class MessageHistory {
      */
     public void sendMessage(String messageType, long messageId, long expiration, Hash peer, boolean sentOk, String info) {
         if (!_doLog) return;
-        if (false) return;
         StringBuilder buf = new StringBuilder(256);
         buf.append(getPrefix());
         buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
@@ -452,7 +451,6 @@ public class MessageHistory {
      */
     public void receiveMessage(String messageType, long messageId, long expiration, Hash from, boolean isValid) {
         if (!_doLog) return;
-        if (false) return;
         StringBuilder buf = new StringBuilder(256);
         buf.append(getPrefix());
         buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");
@@ -535,7 +533,7 @@ public class MessageHistory {
         buf.append(" ").append(status);
         addEntry(buf.toString());
     }
-    public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
+    public void fragmentMessage(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {
         if (!_doLog) return;
         //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuilder buf = new StringBuilder(48);
@@ -547,7 +545,7 @@ public class MessageHistory {
             buf.append(": ").append(msg);
         addEntry(buf.toString());
     }
-    public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, Object tunnel, String msg) {
+    public void fragmentMessage(long messageId, int numFragments, int totalLength, List<Long> messageIds, Object tunnel, String msg) {
         if (!_doLog) return;
         //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuilder buf = new StringBuilder(48);
