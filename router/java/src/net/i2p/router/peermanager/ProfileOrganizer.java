@@ -216,7 +216,7 @@ public class ProfileOrganizer {
         return old;
     }
     
-    private int count(Map<? extends Object, ? extends Object> m) {
+    private int count(Map<Hash, PeerProfile> m) {
         getReadLock();
         try {
             return m.size();
@@ -1296,8 +1296,8 @@ public class ProfileOrganizer {
     }
 
     /** does a contain any of the elements in b? */
-    private static boolean containsAny(Set<? extends Object> a, Set<? extends Object> b) {
-        for (Object o : b) {
+    private static <T> boolean  containsAny(Set<T> a, Set<T> b) {
+        for (T o : b) {
             if (a.contains(o))
                 return true;
         }
