@@ -30,10 +30,10 @@ class Reader {
     public Reader(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
-        _pendingConnections = new LinkedHashSet(16);
-        _runners = new ArrayList(8);
-        _liveReads = new HashSet(8);
-        _readAfterLive = new HashSet(8);
+        _pendingConnections = new LinkedHashSet<NTCPConnection>(16);
+        _runners = new ArrayList<Runner>(8);
+        _liveReads = new HashSet<NTCPConnection>(8);
+        _readAfterLive = new HashSet<NTCPConnection>(8);
     }
     
     public synchronized void startReading(int numReaders) {

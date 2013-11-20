@@ -143,7 +143,7 @@ public abstract class BuildMessageGenerator {
      * Encrypt the records so their hop ident is visible at the appropriate times
      * @param order list of hop #s as Integers.  For instance, if (order.get(1) is 4), it is peer cfg.getPeer(4)
      */
-    public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg, TunnelCreatorConfig cfg, List order) {
+    public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg, TunnelCreatorConfig cfg, List<Integer> order) {
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         // encrypt the records so that the right elements will be visible at the right time
         for (int i = 0; i < msg.getRecordCount(); i++) {

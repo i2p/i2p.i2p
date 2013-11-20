@@ -1,6 +1,5 @@
 package net.i2p.router.util;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 

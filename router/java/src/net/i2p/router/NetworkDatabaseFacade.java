@@ -77,9 +77,9 @@ public abstract class NetworkDatabaseFacade implements Service {
     /** @deprecated moved to router console */
     public void renderStatusHTML(Writer out) throws IOException {}
     /** public for NetDbRenderer in routerconsole */
-    public Set<LeaseSet> getLeases() { return Collections.EMPTY_SET; }
+    public Set<LeaseSet> getLeases() { return Collections.emptySet(); }
     /** public for NetDbRenderer in routerconsole */
-    public Set<RouterInfo> getRouters() { return Collections.EMPTY_SET; }
+    public Set<RouterInfo> getRouters() { return Collections.emptySet(); }
 
     /** @since 0.9 */
     public ReseedChecker reseedChecker() { return null; };

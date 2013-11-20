@@ -178,7 +178,7 @@ class ProfilePersistenceHelper {
     public Set<PeerProfile> readProfiles() {
         long start = _context.clock().now();
         List<File> files = selectFiles();
-        Set<PeerProfile> profiles = new HashSet(files.size());
+        Set<PeerProfile> profiles = new HashSet<PeerProfile>(files.size());
         for (File f :  files) {
             PeerProfile profile = readProfile(f);
             if (profile != null)
@@ -202,7 +202,7 @@ class ProfilePersistenceHelper {
         File files[] = _profileDir.listFiles(filter);
         if (files != null && files.length > 0)
             migrate(files);
-        List rv = new ArrayList(1024);
+        List<File> rv = new ArrayList<File>(1024);
         for (int j = 0; j < B64.length(); j++) {
             File subdir = new File(_profileDir, DIR_PREFIX + B64.charAt(j));
             files = subdir.listFiles(filter);

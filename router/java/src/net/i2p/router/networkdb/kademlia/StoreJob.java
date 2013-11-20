@@ -234,7 +234,7 @@ class StoreJob extends JobImpl {
     private List<Hash> getClosestFloodfillRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         KBucketSet ks = _facade.getKBuckets();
-        if (ks == null) return new ArrayList();
+        if (ks == null) return new ArrayList<Hash>();
         return ((FloodfillPeerSelector)_peerSelector).selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);
     }
 

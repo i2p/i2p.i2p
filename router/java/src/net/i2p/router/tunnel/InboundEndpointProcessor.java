@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel;
 
-import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;

@@ -23,7 +23,6 @@ import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -58,8 +57,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelGatewayMessage.MESSAGE_TYPE, b);
         //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelDataMessage.MESSAGE_TYPE, b);
 
-        _clientInboundPools = new ConcurrentHashMap(4);
-        _clientOutboundPools = new ConcurrentHashMap(4);
+        _clientInboundPools = new ConcurrentHashMap<Hash, TunnelPool>(4);
+        _clientOutboundPools = new ConcurrentHashMap<Hash, TunnelPool>(4);
         _clientPeerSelector = new ClientPeerSelector(ctx);
 
         ExploratoryPeerSelector selector = new ExploratoryPeerSelector(_context);
@@ -319,7 +318,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         int part = getParticipatingCount();
         if (part <= 0)
             return 0d;
-        List<TunnelPool> pools = new ArrayList();
+        List<TunnelPool> pools = new ArrayList<TunnelPool>();
         listPools(pools);
         int count = 0;
         for (int i = 0; i < pools.size(); i++) {
@@ -562,7 +561,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
     /** @return total number of non-fallback expl. + client tunnels */
     private int countTunnelsPerPeer(ObjectCounter<Hash> lc) {
-        List<TunnelPool> pools = new ArrayList();
+        List<TunnelPool> pools = new ArrayList<TunnelPool>();
         listPools(pools);
         int tunnelCount = 0;
         for (TunnelPool tp : pools) {
@@ -597,9 +596,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      *  @return Set of peers that should not be allowed in another tunnel
      */
     public Set<Hash> selectPeersInTooManyTunnels() {
-        ObjectCounter<Hash> lc = new ObjectCounter();
+        ObjectCounter<Hash> lc = new ObjectCounter<Hash>();
         int tunnelCount = countTunnelsPerPeer(lc);
-        Set<Hash> rv = new HashSet();
+        Set<Hash> rv = new HashSet<Hash>();
         if (tunnelCount >= 4 && _context.router().getUptime() > 10*60*1000) {
             int max = _context.getProperty("router.maxTunnelPercentage", DEFAULT_MAX_PCT_TUNNELS);
             for (Hash h : lc.objects()) {
@@ -612,12 +611,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
     /** for TunnelRenderer in router console */
     public Map<Hash, TunnelPool> getInboundClientPools() {
-            return new HashMap(_clientInboundPools);
+            return new HashMap<Hash, TunnelPool>(_clientInboundPools);
     }
 
     /** for TunnelRenderer in router console */
     public Map<Hash, TunnelPool> getOutboundClientPools() {
-            return new HashMap(_clientOutboundPools);
+            return new HashMap<Hash, TunnelPool>(_clientOutboundPools);
     }
 
     /**

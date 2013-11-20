@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.i2p.crypto.KeyGenerator;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;

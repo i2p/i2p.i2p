@@ -1,9 +1,6 @@
 package net.i2p.router.util;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;

@@ -75,8 +75,8 @@ public class Blocklist {
     private int _blocklistSize;
     private final Object _lock = new Object();
     private Entry _wrapSave;
-    private final Set<Hash> _inProcess = new HashSet(4);
-    private Map<Hash, String> _peerBlocklist = new HashMap(4);
+    private final Set<Hash> _inProcess = new HashSet<Hash>(4);
+    private Map<Hash, String> _peerBlocklist = new HashMap<Hash, String>(4);
 
     /**
      *  Limits of transient (in-memory) blocklists.
@@ -86,8 +86,8 @@ public class Blocklist {
     private static final int MAX_IPV4_SINGLES = 256;
     private static final int MAX_IPV6_SINGLES = 512;
 
-    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet(4);
-    private final Map<BigInteger, Object> _singleIPv6Blocklist = new LHMCache(MAX_IPV6_SINGLES);
+    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet<Integer>(4);
+    private final Map<BigInteger, Object> _singleIPv6Blocklist = new LHMCache<BigInteger, Object>(MAX_IPV6_SINGLES);
 
     private static final Object DUMMY = Integer.valueOf(0);    
 
@@ -518,8 +518,8 @@ public class Blocklist {
     private List<byte[]> getAddresses(Hash peer) {
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null)
-            return Collections.EMPTY_LIST;
-        List<byte[]> rv = new ArrayList(4);
+            return Collections.emptyList();
+        List<byte[]> rv = new ArrayList<byte[]>(4);
         // for each peer address
         for (RouterAddress pa : pinfo.getAddresses()) {
             byte[] pib = pa.getIP();
@@ -753,7 +753,7 @@ public class Blocklist {
      * Additional jobs can wait.
      * Although could this clog up the job queue runners? Yes.
      * So we also stagger these jobs.
-     *
+     *(Map.Entry) 
      */
     private synchronized void banlistForever(Hash peer, List<byte[]> ips) {
         String file = _context.getProperty(PROP_BLOCKLIST_FILE, BLOCKLIST_FILE_DEFAULT);
@@ -818,7 +818,7 @@ public class Blocklist {
     public void renderStatusHTML(Writer out) throws IOException {
         // move to the jsp
         //out.write("<h2>Banned IPs</h2>");
-        Set<Integer> singles = new TreeSet();
+        Set<Integer> singles = new TreeSet<Integer>();
         singles.addAll(_singleIPBlocklist);
         if (!(singles.isEmpty() && _singleIPv6Blocklist.isEmpty())) {
             out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
@@ -846,7 +846,7 @@ public class Blocklist {
             if (!_singleIPv6Blocklist.isEmpty()) {
                 List<BigInteger> s6;
                 synchronized(_singleIPv6Blocklist) {
-                    s6 = new ArrayList(_singleIPv6Blocklist.keySet());
+                    s6 = new ArrayList<BigInteger>(_singleIPv6Blocklist.keySet());
                 }
                 Collections.sort(s6);
                 for (BigInteger bi : s6) {

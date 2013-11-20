@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
@@ -47,8 +46,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
-        _activeFloodQueries = new HashMap();
-         _verifiesInProgress = new ConcurrentHashSet(8);
+        _activeFloodQueries = new HashMap<Hash, FloodSearchJob>();
+         _verifiesInProgress = new ConcurrentHashSet<Hash>(8);
 
         _context.statManager().createRequiredRateStat("netDb.successTime", "Time for successful lookup (ms)", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -140,7 +139,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     @Override
-    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
+    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore) {
         // if we are a part of the floodfill netDb, don't send out our own leaseSets as part 
         // of the flooding - instead, send them to a random floodfill peer so *they* can flood 'em out.
         // perhaps statistically adjust this so we are the source every 1/N times... or something.
@@ -268,7 +267,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
 
     public List<RouterInfo> getKnownRouterData() {
-        List<RouterInfo> rv = new ArrayList();
+        List<RouterInfo> rv = new ArrayList<RouterInfo>();
         DataStore ds = getDataStore();
         if (ds != null) {
             for (DatabaseEntry o : ds.getEntries()) {

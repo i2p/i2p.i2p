@@ -125,7 +125,7 @@ public abstract class TunnelPeerSelector {
             peers = I2PAppContext.getGlobalContext().getProperty("explicitPeers");
         
         Log log = ctx.logManager().getLog(ClientPeerSelector.class);
-        List<Hash> rv = new ArrayList();
+        List<Hash> rv = new ArrayList<Hash>();
         StringTokenizer tok = new StringTokenizer(peers, ",");
         while (tok.hasMoreTokens()) {
             String peerStr = tok.nextToken();
@@ -198,7 +198,7 @@ public abstract class TunnelPeerSelector {
         //
         // Defaults changed to true for inbound only in filterUnreachable below.
 
-        Set<Hash> peers = new HashSet(1);
+        Set<Hash> peers = new HashSet<Hash>(1);
         peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
         peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
@@ -507,7 +507,7 @@ public abstract class TunnelPeerSelector {
 ****/
 
     /** see HashComparator */
-    protected void orderPeers(List rv, Hash hash) {
+    protected void orderPeers(List<Hash> rv, Hash hash) {
         if (rv.size() > 1)
             Collections.sort(rv, new HashComparator(hash));
     }

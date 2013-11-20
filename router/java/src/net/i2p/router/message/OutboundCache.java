@@ -11,7 +11,6 @@ import net.i2p.data.LeaseSet;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -43,12 +42,12 @@ public class OutboundCache {
      *
      * NOT concurrent.
      */
-    final Map<HashPair, TunnelInfo> tunnelCache = new HashMap(64);
+    final Map<HashPair, TunnelInfo> tunnelCache = new HashMap<HashPair, TunnelInfo>(64);
 
     /*
      * NOT concurrent.
      */
-    final Map<HashPair, TunnelInfo> backloggedTunnelCache = new HashMap(64);
+    final Map<HashPair, TunnelInfo> backloggedTunnelCache = new HashMap<HashPair, TunnelInfo>(64);
 
     /**
       * Returns the reply lease set if forced to do so,
@@ -68,7 +67,7 @@ public class OutboundCache {
       *
       * Concurrent.
       */
-    final Map<HashPair, LeaseSet> leaseSetCache = new ConcurrentHashMap(64);
+    final Map<HashPair, LeaseSet> leaseSetCache = new ConcurrentHashMap<HashPair, LeaseSet>(64);
 
     /**
      * Use the same inbound tunnel (i.e. lease) as we did for the same destination previously,
@@ -84,7 +83,7 @@ public class OutboundCache {
      *
      * Concurrent.
      */
-    final ConcurrentHashMap<HashPair, Lease> leaseCache = new ConcurrentHashMap(64);
+    final ConcurrentHashMap<HashPair, Lease> leaseCache = new ConcurrentHashMap<HashPair, Lease>(64);
 
     /**
      * This cache is used to ensure that we request a reply every so often.
@@ -94,7 +93,7 @@ public class OutboundCache {
      *
      * Concurrent.
      */
-    final Map<HashPair, Long> lastReplyRequestCache = new ConcurrentHashMap(64);
+    final Map<HashPair, Long> lastReplyRequestCache = new ConcurrentHashMap<HashPair, Long>(64);
 
     private final RouterContext _context;
 

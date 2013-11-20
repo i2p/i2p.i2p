@@ -25,7 +25,7 @@ import net.i2p.util.VersionComparator;
  *  Methods for creating Tunnel Build Messages, i.e. requests
  */
 abstract class BuildRequestor {
-    private static final List<Integer> ORDER = new ArrayList(TunnelBuildMessage.MAX_RECORD_COUNT);
+    private static final List<Integer> ORDER = new ArrayList<Integer>(TunnelBuildMessage.MAX_RECORD_COUNT);
     static {
         for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
             ORDER.add(Integer.valueOf(i));
@@ -225,7 +225,7 @@ abstract class BuildRequestor {
     private static final boolean SEND_VARIABLE = true;
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
     private static final int SHORT_RECORDS = 5;
-    private static final List<Integer> SHORT_ORDER = new ArrayList(SHORT_RECORDS);
+    private static final List<Integer> SHORT_ORDER = new ArrayList<Integer>(SHORT_RECORDS);
     static {
         for (int i = 0; i < SHORT_RECORDS; i++)
             SHORT_ORDER.add(Integer.valueOf(i));
@@ -292,12 +292,12 @@ abstract class BuildRequestor {
         List<Integer> order;
         if (useVariable) {
             msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
-            order = new ArrayList(SHORT_ORDER);
+            order = new ArrayList<Integer>(SHORT_ORDER);
             //if (log.shouldLog(Log.INFO))
             //    log.info("Using new VTBM");
         } else {
             msg = new TunnelBuildMessage(ctx);
-            order = new ArrayList(ORDER);
+            order = new ArrayList<Integer>(ORDER);
         }
 
         // This is in BuildExecutor.buildTunnel() now

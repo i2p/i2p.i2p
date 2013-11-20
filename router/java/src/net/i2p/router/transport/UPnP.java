@@ -266,9 +266,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	}
 	
 	private void registerPortMappings() {
-		Set ports;
+		Set<ForwardPort> ports;
 		synchronized(lock) {
-			ports = new HashSet(portsForwarded);
+			ports = new HashSet<ForwardPort>(portsForwarded);
 		}
 		if (ports.isEmpty())
 			return;
@@ -326,9 +326,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	}
 	
 	public void unregisterPortMappings() {
-		Set ports;
+		Set<ForwardPort> ports;
 		synchronized(lock) {
-			ports = new HashSet(portsForwarded);
+			ports = new HashSet<ForwardPort>(portsForwarded);
 		}
 		if (ports.isEmpty())
 			return;
@@ -918,7 +918,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
                                                                       "UPnP device does not support port forwarding",
                                                                       port.portNumber);
-			Map map = Collections.singletonMap(port, fps);
+			Map<ForwardPort, ForwardPortStatus> map = Collections.singletonMap(port, fps);
 			forwardCallback.portForwardStatus(map);
 		    }
 		    return;
@@ -949,7 +949,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				} else {
 					fps = new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber);
 				}
-				Map map = Collections.singletonMap(port, fps);
+				Map<ForwardPort, ForwardPortStatus> map = Collections.singletonMap(port, fps);
 				try {
 					forwardCallback.portForwardStatus(map);
 				} catch (Exception e) {

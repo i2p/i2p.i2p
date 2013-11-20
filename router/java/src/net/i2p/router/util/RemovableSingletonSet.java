@@ -1,10 +1,8 @@
 package net.i2p.router.util;
 
 import java.util.AbstractSet;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 /**
  *  Like Collections.singleton() but item is removable,

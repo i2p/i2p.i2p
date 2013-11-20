@@ -13,9 +13,7 @@ import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +29,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.Transport.AddressSource.*;
+import net.i2p.router.transport.TransportManager.Port;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -66,7 +65,7 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailSelf", "Could not attempt to bid on message, as it targeted ourselves", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _transports = new ConcurrentHashMap(2);
+        _transports = new ConcurrentHashMap<String, Transport>(2);
         if (_context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UPNP))
             _upnpManager = new UPnPManager(context, this);
         else
@@ -168,7 +167,7 @@ public class TransportManager implements TransportEventListener {
         _log.debug("Starting up the transport manager");
         // Let's do this in a predictable order to make testing easier
         // Start NTCP first so it can get notified from SSU
-        List<Transport> tps = new ArrayList();
+        List<Transport> tps = new ArrayList<Transport>();
         Transport tp = getTransport(NTCPTransport.STYLE);
         if (tp != null)
             tps.add(tp);
@@ -363,7 +362,7 @@ public class TransportManager implements TransportEventListener {
      *  This forces a rebuild
      */
     public List<RouterAddress> getAddresses() {
-        List<RouterAddress> rv = new ArrayList(4);
+        List<RouterAddress> rv = new ArrayList<RouterAddress>(4);
         // do this first since SSU may force a NTCP change
         for (Transport t : _transports.values())
             t.updateAddress();
@@ -406,7 +405,7 @@ public class TransportManager implements TransportEventListener {
      * which we will pass along to UPnP
      */
     private Set<Port> getPorts() {
-        Set<Port> rv = new HashSet(4);
+        Set<Port> rv = new HashSet<Port>(4);
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
@@ -435,7 +434,7 @@ public class TransportManager implements TransportEventListener {
         if (_context.router().getRouterInfo().equals(msg.getTarget()))
             throw new IllegalArgumentException("WTF, bids for a message bound to ourselves?");
 
-        List<TransportBid> rv = new ArrayList(_transports.size());
+        List<TransportBid> rv = new ArrayList<TransportBid>(_transports.size());
         Set failedTransports = msg.getFailedTransports();
         for (Transport t : _transports.values()) {
             if (failedTransports.contains(t.getStyle())) {
@@ -535,7 +534,7 @@ public class TransportManager implements TransportEventListener {
     }
 
     public List<String> getMostRecentErrorMessages() { 
-        List<String> rv = new ArrayList(16);
+        List<String> rv = new ArrayList<String>(16);
         for (Transport t : _transports.values()) {
             rv.addAll(t.getMostRecentErrorMessages());
         }
@@ -543,7 +542,7 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        TreeMap<String, Transport> transports = new TreeMap();
+        TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
         for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);
         }

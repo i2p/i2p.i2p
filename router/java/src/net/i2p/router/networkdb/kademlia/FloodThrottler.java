@@ -17,7 +17,7 @@ class FloodThrottler {
     private static final long CLEAN_TIME = 60*1000;
 
     FloodThrottler() {
-        this.counter = new ObjectCounter();
+        this.counter = new ObjectCounter<Hash>();
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 

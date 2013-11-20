@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 
@@ -29,14 +27,14 @@ public abstract class CommSystemFacade implements Service {
     public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, null, 0); }
     
     /** Create the list of RouterAddress structures based on the router's config */
-    public List<RouterAddress> createAddresses() { return Collections.EMPTY_LIST; }
+    public List<RouterAddress> createAddresses() { return Collections.emptyList(); }
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }
     public boolean haveInboundCapacity(int pct) { return true; }
     public boolean haveOutboundCapacity(int pct) { return true; }
     public boolean haveHighOutboundCapacity() { return true; }
-    public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
+    public List getMostRecentErrorMessages() { return Collections.emptyList(); }
     
     /**
      * Median clock skew of connected peers in seconds, or null if we cannot answer.

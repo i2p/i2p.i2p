@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -322,7 +321,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
 
         // get the possible leases
-        List<Lease> leases = new ArrayList(_leaseSet.getLeaseCount());
+        List<Lease> leases = new ArrayList<Lease>(_leaseSet.getLeaseCount());
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
             Lease lease = _leaseSet.getLease(i);
             if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
@@ -454,7 +453,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
-        Set<SessionTag> tags = new HashSet();
+        Set<SessionTag> tags = new HashSet<SessionTag>();
 
         LeaseSet replyLeaseSet;
         // Per-message flag == false overrides session option which is default true

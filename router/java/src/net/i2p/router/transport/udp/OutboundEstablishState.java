@@ -1,6 +1,5 @@
 package net.i2p.router.transport.udp;
 
-import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -116,7 +115,7 @@ class OutboundEstablishState {
         _remoteHostId = remoteHostId;
         _remotePeer = remotePeer;
         _introKey = introKey;
-        _queuedMessages = new LinkedBlockingQueue();
+        _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;

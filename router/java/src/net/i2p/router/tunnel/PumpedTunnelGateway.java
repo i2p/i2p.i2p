@@ -68,7 +68,7 @@ class PumpedTunnelGateway extends TunnelGateway {
             _isInbound = false;
         } else if (receiver != null) {  // extended by ThrottledPTG for IB
             // Bounded non-priority queue for inbound
-            _prequeue = new CoDelBlockingQueue(context, "IBGW", MAX_IB_QUEUE);
+            _prequeue = new CoDelBlockingQueue<PendingGatewayMessage>(context, "IBGW", MAX_IB_QUEUE);
             _nextHop = receiver.getSendTo();
             _isInbound = true;
         } else {

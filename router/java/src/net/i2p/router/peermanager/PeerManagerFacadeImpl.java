@@ -89,7 +89,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
      *  @return non-null unmodifiable set
      */
     public Set<Hash> getPeersByCapability(char capability) { 
-        if (_manager == null) return Collections.EMPTY_SET;
+        if (_manager == null) return Collections.emptySet();
         return _manager.getPeersByCapability(capability); 
     }
 

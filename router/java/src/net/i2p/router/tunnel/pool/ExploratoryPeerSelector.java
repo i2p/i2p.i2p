@@ -47,7 +47,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // so they don't get used for client tunnels either.
         // FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
         // exclude.addAll(fac.getFloodfillPeers());
-        HashSet matches = new HashSet(length);
+        HashSet<Hash> matches = new HashSet<Hash>(length);
         boolean exploreHighCap = shouldPickHighCap();
 
         //
@@ -76,7 +76,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         }
         
         matches.remove(ctx.routerHash());
-        ArrayList<Hash> rv = new ArrayList(matches);
+        ArrayList<Hash> rv = new ArrayList<Hash>(matches);
         if (rv.size() > 1)
             orderPeers(rv, settings.getRandomKey());
         if (l.shouldLog(Log.DEBUG))

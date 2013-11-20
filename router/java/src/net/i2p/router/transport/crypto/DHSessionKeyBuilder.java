@@ -17,7 +17,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.crypto.CryptoConstants;
-import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.ByteArray;
 //import net.i2p.data.DataHelper;
@@ -470,7 +469,7 @@ public class DHSessionKeyBuilder {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("DH Precalc (minimum: " + _minSize + " max: " + _maxSize + ", delay: "
                            + _calcDelay + ")");
-            _builders = new LinkedBlockingQueue(_maxSize);
+            _builders = new LinkedBlockingQueue<DHSessionKeyBuilder>(_maxSize);
             setPriority(Thread.MIN_PRIORITY);
         }
         

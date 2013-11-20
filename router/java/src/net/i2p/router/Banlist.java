@@ -58,7 +58,7 @@ public class Banlist {
     public Banlist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Banlist.class);
-        _entries = new ConcurrentHashMap(16);
+        _entries = new ConcurrentHashMap<Hash, Entry>(16);
         _context.jobQueue().addJob(new Cleanup(_context));
     }
     
@@ -66,7 +66,7 @@ public class Banlist {
         private List<Hash> _toUnbanlist;
         public Cleanup(RouterContext ctx) {
             super(ctx);
-            _toUnbanlist = new ArrayList(4);
+            _toUnbanlist = new ArrayList<Hash>(4);
             getTiming().setStartAfter(ctx.clock().now() + BANLIST_CLEANER_START_DELAY);
         }
         public String getName() { return "Expire banned peers"; }
@@ -74,8 +74,8 @@ public class Banlist {
             _toUnbanlist.clear();
             long now = getContext().clock().now();
             try {
-                for (Iterator iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
-                    Map.Entry<Hash, Entry> e = (Map.Entry) iter.next();
+                for (Iterator<Map.Entry<Hash, Entry>> iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<Hash, Entry> e = iter.next();
                     if (e.getValue().expireOn <= now) {
                         iter.remove();
                         _toUnbanlist.add(e.getKey());
@@ -169,7 +169,7 @@ public class Banlist {
         e.causeCode = reasonCode;
         e.transports = null;
         if (transport != null) {
-            e.transports = new ConcurrentHashSet(2);
+            e.transports = new ConcurrentHashSet<String>(2);
             e.transports.add(transport);
         }
         

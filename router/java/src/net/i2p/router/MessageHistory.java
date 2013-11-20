@@ -56,7 +56,7 @@ public class MessageHistory {
         _log = context.logManager().getLog(getClass());
          _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
         _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-        _unwrittenEntries = new LinkedBlockingQueue();
+        _unwrittenEntries = new LinkedBlockingQueue<String>();
         _reinitializeJob = new ReinitializeJob();
         _writeJob = new WriteJob();
         _firstPass = true;

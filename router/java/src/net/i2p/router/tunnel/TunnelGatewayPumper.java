@@ -6,12 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SystemVersion;
 
@@ -41,8 +37,8 @@ class TunnelGatewayPumper implements Runnable {
     /** Creates a new instance of TunnelGatewayPumper */
     public TunnelGatewayPumper(RouterContext ctx) {
         _context = ctx;
-        _wantsPumping = new LinkedHashSet(16);
-        _backlogged = new HashSet(16);
+        _wantsPumping = new LinkedHashSet<PumpedTunnelGateway>(16);
+        _backlogged = new HashSet<PumpedTunnelGateway>(16);
         if (ctx.getBooleanProperty("i2p.dummyTunnelManager")) {
             _pumpers = 1;
         } else {
@@ -79,7 +75,7 @@ class TunnelGatewayPumper implements Runnable {
     
     public void run() {
         PumpedTunnelGateway gw = null;
-        List<PendingGatewayMessage> queueBuf = new ArrayList(32);
+        List<PendingGatewayMessage> queueBuf = new ArrayList<PendingGatewayMessage>(32);
         boolean requeue = false;
         while (!_stop) {
             try {

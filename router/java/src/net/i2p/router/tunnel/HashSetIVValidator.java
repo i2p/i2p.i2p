@@ -15,7 +15,7 @@ class HashSetIVValidator implements IVValidator {
     private final Set<ByteArray> _received;
     
     public HashSetIVValidator() {
-        _received = new ConcurrentHashSet();
+        _received = new ConcurrentHashSet<ByteArray>();
     }
     
     public boolean receiveIV(byte ivData[], int ivOffset, byte payload[], int payloadOffset) {

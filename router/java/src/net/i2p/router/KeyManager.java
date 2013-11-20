@@ -12,7 +12,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +26,6 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
@@ -57,7 +55,7 @@ public class KeyManager {
     public KeyManager(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(KeyManager.class);	
-        _leaseSetKeys = new ConcurrentHashMap();
+        _leaseSetKeys = new ConcurrentHashMap<Hash, LeaseSetKeys>();
     }
     
     public void startup() {

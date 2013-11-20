@@ -11,7 +11,6 @@ package net.i2p.router.client;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.client.I2PSessionException;
@@ -239,7 +238,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         if (_manager != null)
             return _manager.listClients();
         else
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
     }
 
     /**

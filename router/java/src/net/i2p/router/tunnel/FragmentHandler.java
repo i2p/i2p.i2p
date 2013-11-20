@@ -105,7 +105,7 @@ class FragmentHandler {
     public FragmentHandler(RouterContext context, DefragmentedReceiver receiver) {
         _context = context;
         _log = context.logManager().getLog(FragmentHandler.class);
-        _fragmentedMessages = new HashMap(16);
+        _fragmentedMessages = new HashMap<Long, FragmentedMessage>(16);
         _receiver = receiver;
         // all createRateStat in TunnelDispatcher
     }

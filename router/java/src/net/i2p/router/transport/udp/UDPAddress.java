@@ -229,7 +229,7 @@ class UDPAddress {
         long max = 2048;
         // 512 nominal for 128 MB
         int size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
-        _inetAddressCache = new LHMCache(size);
+        _inetAddressCache = new LHMCache<String, InetAddress>(size);
     }
 
     /**

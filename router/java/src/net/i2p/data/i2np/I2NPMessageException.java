@@ -9,7 +9,6 @@ package net.i2p.data.i2np;
  */
 
 import net.i2p.I2PException;
-import net.i2p.util.Log;
 
 /**
  * Represent an error serializing or deserializing an APIMessage

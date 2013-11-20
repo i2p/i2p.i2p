@@ -54,7 +54,7 @@ class MessageReceiver {
             _threadCount = Math.max(MIN_THREADS, Math.min(MAX_THREADS, ctx.bandwidthLimiter().getInboundKBytesPerSecond() / 20));
             qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
         }
-        _completeMessages = new CoDelBlockingQueue(ctx, "UDP-MessageReceiver", qsize);
+        _completeMessages = new CoDelBlockingQueue<InboundMessageState>(ctx, "UDP-MessageReceiver", qsize);
 
         // the runners run forever, no need to have a cache
         //_cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);

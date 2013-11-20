@@ -312,8 +312,8 @@ class PeerState {
         _currentReceiveSecond = now - (now % 1000);
         _lastSendTime = now;
         _lastReceiveTime = now;
-        _currentACKs = new ConcurrentHashSet();
-        _currentACKsResend = new LinkedBlockingQueue();
+        _currentACKs = new ConcurrentHashSet<Long>();
+        _currentACKsResend = new LinkedBlockingQueue<Long>();
         _sendWindowBytes = DEFAULT_SEND_WINDOW_BYTES;
         _sendWindowBytesRemaining = DEFAULT_SEND_WINDOW_BYTES;
         _slowStartThreshold = MAX_SEND_WINDOW_BYTES/2;
@@ -335,10 +335,10 @@ class PeerState {
         _rto = INIT_RTO;
         _rtt = INIT_RTT;
         _rttDeviation = _rtt;
-        _inboundMessages = new HashMap(8);
+        _inboundMessages = new HashMap<Long, InboundMessageState>(8);
         _outboundMessages = new CachedIteratorArrayList<OutboundMessageState>(32);
         //_outboundQueue = new CoDelPriorityBlockingQueue(ctx, "UDP-PeerState", 32);
-        _outboundQueue = new PriBlockingQueue(ctx, "UDP-PeerState", 32);
+        _outboundQueue = new PriBlockingQueue<OutboundMessageState>(ctx, "UDP-PeerState", 32);
         // all createRateStat() moved to EstablishmentManager
         _remoteIP = remoteIP;
         _remotePeer = remotePeer;
@@ -820,7 +820,7 @@ class PeerState {
      */
     public List<Long> getCurrentFullACKs() {
             // no such element exception seen here
-            List<Long> rv = new ArrayList(_currentACKs);
+            List<Long> rv = new ArrayList<Long>(_currentACKs);
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Returning " + _currentACKs.size() + " current acks");
             return rv;
@@ -841,7 +841,7 @@ class PeerState {
      * @since 0.8.12 was included in getCurrentFullACKs()
      */
     public List<Long> getCurrentResendACKs() {
-            List<Long> randomResends = new ArrayList(_currentACKsResend);
+            List<Long> randomResends = new ArrayList<Long>(_currentACKsResend);
             Collections.shuffle(randomResends, _context.random());
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Returning " + randomResends.size() + " resend acks");
@@ -915,10 +915,10 @@ class PeerState {
                 maxResendAcks = MAX_RESEND_ACKS_SMALL;
             else
                 maxResendAcks = MAX_RESEND_ACKS_LARGE;
-            List<ACKBitfield> rv = new ArrayList(maxResendAcks);
+            List<ACKBitfield> rv = new ArrayList<ACKBitfield>(maxResendAcks);
 
             // save to add to currentACKsResend later so we don't include twice
-            List<Long> currentACKsRemoved = new ArrayList(_currentACKs.size());
+            List<Long> currentACKsRemoved = new ArrayList<Long>(_currentACKs.size());
             // As explained above, we include the acks in any order
             // since we are unlikely to get backed up -
             // just take them using the Set iterator.
@@ -934,7 +934,7 @@ class PeerState {
             if (_currentACKs.isEmpty())
                 _wantACKSendSince = -1;
             if (alwaysIncludeRetransmissions || !rv.isEmpty()) {
-                List<Long> randomResends = new ArrayList(_currentACKsResend);
+                List<Long> randomResends = new ArrayList<Long>(_currentACKsResend);
                 // now repeat by putting in some old ACKs
                 // randomly selected from the Resend queue.
                 // Maybe we should only resend each one a certain number of times...
@@ -968,7 +968,7 @@ class PeerState {
             // ok, there's room to *try* to fit in some partial ACKs, so
             // we should try to find some packets to partially ACK 
             // (preferably the ones which have the most received fragments)
-            List<ACKBitfield> partial = new ArrayList();
+            List<ACKBitfield> partial = new ArrayList<ACKBitfield>();
             fetchPartialACKs(partial);
             // we may not be able to use them all, but lets try...
             for (int i = 0; (bytesRemaining > 4) && (i < partial.size()); i++) {
@@ -1432,7 +1432,7 @@ class PeerState {
             List<OutboundMessageState> tempList;
             synchronized (_outboundMessages) {
                     _retransmitter = null;
-                    tempList = new ArrayList(_outboundMessages);
+                    tempList = new ArrayList<OutboundMessageState>(_outboundMessages);
                     _outboundMessages.clear();
             }
             //_outboundQueue.drainAllTo(tempList);
@@ -1481,21 +1481,21 @@ class PeerState {
                     iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
-                    if (succeeded == null) succeeded = new ArrayList(4);
+                    if (succeeded == null) succeeded = new ArrayList<OutboundMessageState>(4);
                     succeeded.add(state);
                 } else if (state.isExpired()) {
                     iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
                     _context.statManager().addRateData("udp.sendFailed", state.getPushCount());
-                    if (failed == null) failed = new ArrayList(4);
+                    if (failed == null) failed = new ArrayList<OutboundMessageState>(4);
                     failed.add(state);
                 } else if (state.getPushCount() > OutboundMessageFragments.MAX_VOLLEYS) {
                     iter.remove();
                     if (state == _retransmitter)
                         _retransmitter = null;
                     _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount());
-                    if (failed == null) failed = new ArrayList(4);
+                    if (failed == null) failed = new ArrayList<OutboundMessageState>(4);
                     failed.add(state);
                 } // end (pushCount > maxVolleys)
             } // end iterating over outbound messages
@@ -1913,7 +1913,7 @@ class PeerState {
         _sendWindowBytes = oldPeer._sendWindowBytes;
         oldPeer._dead = true;
         
-        List<Long> tmp = new ArrayList();
+        List<Long> tmp = new ArrayList<Long>();
         // AIOOBE from concurrent access
         //tmp.addAll(oldPeer._currentACKs);
         for (Long l : oldPeer._currentACKs) {
@@ -1933,7 +1933,7 @@ class PeerState {
             _currentACKsResend.addAll(tmp);
 	}
         
-        Map<Long, InboundMessageState> msgs = new HashMap();
+        Map<Long, InboundMessageState> msgs = new HashMap<Long, InboundMessageState>();
         synchronized (oldPeer._inboundMessages) {
             msgs.putAll(oldPeer._inboundMessages);
             oldPeer._inboundMessages.clear();
@@ -1943,7 +1943,7 @@ class PeerState {
 	}
         msgs.clear();
         
-        List<OutboundMessageState> tmp2 = new ArrayList();
+        List<OutboundMessageState> tmp2 = new ArrayList<OutboundMessageState>();
         OutboundMessageState retransmitter = null;
         synchronized (oldPeer._outboundMessages) {
             tmp2.addAll(oldPeer._outboundMessages);

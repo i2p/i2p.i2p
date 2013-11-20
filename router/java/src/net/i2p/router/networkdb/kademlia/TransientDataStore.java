@@ -33,7 +33,7 @@ class TransientDataStore implements DataStore {
     public TransientDataStore(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
-        _data = new ConcurrentHashMap(1024);
+        _data = new ConcurrentHashMap<Hash, DatabaseEntry>(1024);
         if (_log.shouldLog(Log.INFO))
             _log.info("Data Store initialized");
     }

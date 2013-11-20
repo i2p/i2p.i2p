@@ -5,7 +5,6 @@ import java.io.Writer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
@@ -97,11 +96,11 @@ public class TunnelDispatcher implements Service {
     public TunnelDispatcher(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelDispatcher.class);
-        _outboundGateways = new ConcurrentHashMap();
-        _outboundEndpoints = new ConcurrentHashMap();
-        _participants = new ConcurrentHashMap();
-        _inboundGateways = new ConcurrentHashMap();
-        _participatingConfig = new ConcurrentHashMap();
+        _outboundGateways = new ConcurrentHashMap<TunnelId, TunnelGateway>();
+        _outboundEndpoints = new ConcurrentHashMap<TunnelId, OutboundTunnelEndpoint>();
+        _participants = new ConcurrentHashMap<TunnelId, TunnelParticipant>();
+        _inboundGateways = new ConcurrentHashMap<TunnelId, TunnelGateway>();
+        _participatingConfig = new ConcurrentHashMap<TunnelId, HopConfig>();
         _pumper = new TunnelGatewayPumper(ctx);
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRequiredRateStat("tunnel.participatingTunnels", 
@@ -690,7 +689,7 @@ public class TunnelDispatcher implements Service {
      *  @return a copy
      */
     public List<HopConfig> listParticipatingTunnels() {
-        return new ArrayList(_participatingConfig.values());
+        return new ArrayList<HopConfig>(_participatingConfig.values());
     }
 
     /**
@@ -949,7 +948,7 @@ public class TunnelDispatcher implements Service {
         
         public LeaveTunnel(RouterContext ctx) {
             super(ctx);
-            _configs = new LinkedBlockingQueue();
+            _configs = new LinkedBlockingQueue<HopConfig>();
             // 20 min no tunnels accepted + 10 min tunnel expiration
             getTiming().setStartAfter(ctx.clock().now() + 30*60*1000);
             getContext().jobQueue().addJob(LeaveTunnel.this);

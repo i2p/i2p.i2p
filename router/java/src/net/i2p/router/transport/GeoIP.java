@@ -8,9 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.InetAddress;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
@@ -62,12 +60,12 @@ class GeoIP {
     public GeoIP(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(GeoIP.class);
-        _codeToName = new ConcurrentHashMap(512);
-        _codeCache = new ConcurrentHashMap(512);
-        _IPToCountry = new ConcurrentHashMap();
-        _pendingSearch = new ConcurrentHashSet();
-        _pendingIPv6Search = new ConcurrentHashSet();
-        _notFound = new ConcurrentHashSet();
+        _codeToName = new ConcurrentHashMap<String, String>(512);
+        _codeCache = new ConcurrentHashMap<String, String>(512);
+        _IPToCountry = new ConcurrentHashMap<Long, String>();
+        _pendingSearch = new ConcurrentHashSet<Long>();
+        _pendingIPv6Search = new ConcurrentHashSet<Long>();
+        _notFound = new ConcurrentHashSet<Long>();
         _lock = new AtomicBoolean();
         readCountryFile();
     }

@@ -55,7 +55,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         _log = ctx.logManager().getLog(getClass());
         _sentTo = sentTo;
         _facade = facade;
-        _ignore = new HashSet(MAX_PEERS_TO_TRY);
+        _ignore = new HashSet<Hash>(MAX_PEERS_TO_TRY);
         if (sentTo != null) {
             _ignore.add(_sentTo);
         }
@@ -277,7 +277,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private void resend() {
         DatabaseEntry ds = _facade.lookupLocally(_key);
         if (ds != null) {
-            Set<Hash> toSkip = new HashSet(2);
+            Set<Hash> toSkip = new HashSet<Hash>(2);
             if (_sentTo != null)
                 toSkip.add(_sentTo);
             if (_target != null)

@@ -24,7 +24,7 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
     private RouterContext _context;
     private Log _log;
     /** FIFO queue of messages in a particular priority */
-    private List _queue[];
+    private List<OutNetMessage> _queue[];
     /** all messages in the indexed queue are at or below the given priority. */
     private int _priorityLimits[];
     /** weighting for each queue */
@@ -46,7 +46,7 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
     private Expirer _expirer;
     private FailedListener _listener;
     /** set of peers (Hash) whose congestion window is exceeded in the active queue */
-    private Set _chokedPeers;
+    private Set<Hash> _chokedPeers;
     
     /**
      * Build up a new queue
@@ -67,7 +67,7 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
         _bytesTransferred = new long[weighting.length];
         _messagesFlushed = new int[weighting.length];
         for (int i = 0; i < weighting.length; i++) {
-            _queue[i] = new ArrayList(8);
+            _queue[i] = new ArrayList<OutNetMessage>(8);
             _weighting[i] = weighting[i];
             _priorityLimits[i] = priorityLimits[i];
             _messagesFlushed[i] = 0;
@@ -76,7 +76,7 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
         }
         _alive = true;
         _nextLock = this;
-        _chokedPeers = Collections.synchronizedSet(new HashSet(16));
+        _chokedPeers = Collections.synchronizedSet(new HashSet<Hash>(16));
         _listener = lsnr;
         _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.messageQueueSize", "How many messages are on the current class queue at removal", "udp", UDPTransport.RATES);
@@ -233,7 +233,7 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
      */
     private class Expirer implements Runnable {
         public void run() {
-            List removed = new ArrayList(1);
+            List<OutNetMessage> removed = new ArrayList<OutNetMessage>(1);
             while (_alive) {
                 long now = _context.clock().now();
                 for (int i = 0; i < _queue.length; i++) {

@@ -7,7 +7,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
@@ -57,7 +56,7 @@ class TunnelGateway {
     protected TunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
         _context = context;
         _log = context.logManager().getLog(getClass());
-        _queue = new ArrayList(4);
+        _queue = new ArrayList<PendingGatewayMessage>(4);
         _preprocessor = preprocessor;
         _sender = sender;
         _receiver = receiver;

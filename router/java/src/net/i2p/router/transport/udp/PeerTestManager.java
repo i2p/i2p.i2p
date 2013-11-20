@@ -17,7 +17,6 @@ import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -161,8 +160,8 @@ class PeerTestManager {
         _context = context;
         _transport = transport;
         _log = context.logManager().getLog(PeerTestManager.class);
-        _activeTests = new ConcurrentHashMap();
-        _recentTests = new LinkedBlockingQueue();
+        _activeTests = new ConcurrentHashMap<Long, PeerTestState>();
+        _recentTests = new LinkedBlockingQueue<Long>();
         _packetBuilder = new PacketBuilder(context, transport);
         _throttle = new IPThrottler(MAX_PER_IP, THROTTLE_CLEAN_TIME);
         _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", UDPTransport.RATES);

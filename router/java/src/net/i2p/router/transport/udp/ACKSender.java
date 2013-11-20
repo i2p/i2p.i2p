@@ -34,7 +34,7 @@ class ACKSender implements Runnable {
         _context = ctx;
         _log = ctx.logManager().getLog(ACKSender.class);
         _transport = transport;
-        _peersToACK = new LinkedBlockingQueue();
+        _peersToACK = new LinkedBlockingQueue<PeerState>();
         _builder = new PacketBuilder(_context, transport);
         _alive = true;
         _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", UDPTransport.RATES);
@@ -86,7 +86,7 @@ class ACKSender implements Runnable {
     public void run() {
 
         // we use a Set to strip out dups that come in on the Queue
-        Set<PeerState> notYet = new HashSet();
+        Set<PeerState> notYet = new HashSet<PeerState>();
         while (_alive) {
             PeerState peer = null;
             long now = 0;

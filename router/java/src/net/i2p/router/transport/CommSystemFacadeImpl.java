@@ -12,12 +12,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Vector;
 
 import net.i2p.data.Hash;
@@ -30,7 +27,6 @@ import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
@@ -191,7 +187,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         // No, don't do this, it makes it almost impossible to build inbound tunnels
         //if (_context.router().isHidden())
         //    return Collections.EMPTY_SET;
-        List<RouterAddress> addresses = new ArrayList(_manager.getAddresses());
+        List<RouterAddress> addresses = new ArrayList<RouterAddress>(_manager.getAddresses());
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses, new Exception("creator"));
         return addresses;

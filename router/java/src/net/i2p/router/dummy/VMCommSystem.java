@@ -29,7 +29,7 @@ public class VMCommSystem extends CommSystemFacade {
     /**
      * Mapping from Hash to VMCommSystem for all routers hooked together
      */
-    private static Map _commSystemFacades = Collections.synchronizedMap(new HashMap(16));
+    private static Map<Hash, VMCommSystem> _commSystemFacades = Collections.synchronizedMap(new HashMap<Hash, VMCommSystem>(16));
     
     public VMCommSystem(RouterContext context) {
         _context = context;

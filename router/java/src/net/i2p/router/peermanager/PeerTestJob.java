@@ -69,12 +69,12 @@ public class PeerTestJob extends JobImpl {
 
     public void runJob() {
         if (!_keepTesting) return;
-        Set peers = selectPeersToTest();
+        Set<RouterInfo> peers = selectPeersToTest();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Testing " + peers.size() + " peers");
         
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            RouterInfo peer = (RouterInfo)iter.next();
+        for (Iterator<RouterInfo> iter = peers.iterator(); iter.hasNext(); ) {
+            RouterInfo peer = iter.next();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Testing peer " + peer.getIdentity().getHash().toBase64());
             testPeer(peer);
@@ -87,19 +87,19 @@ public class PeerTestJob extends JobImpl {
      *
      * @return set of RouterInfo structures
      */
-    private Set selectPeersToTest() {
+    private Set<RouterInfo> selectPeersToTest() {
         PeerSelectionCriteria criteria = new PeerSelectionCriteria();
         criteria.setMinimumRequired(getTestConcurrency());
         criteria.setMaximumRequired(getTestConcurrency());
         criteria.setPurpose(PeerSelectionCriteria.PURPOSE_TEST);
-        List peerHashes = _manager.selectPeers(criteria);
+        List<Hash> peerHashes = _manager.selectPeers(criteria);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Peer selection found " + peerHashes.size() + " peers");
         
-        Set peers = new HashSet(peerHashes.size());
-        for (Iterator iter = peerHashes.iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
+        Set<RouterInfo> peers = new HashSet<RouterInfo>(peerHashes.size());
+        for (Iterator<Hash> iter = peerHashes.iterator(); iter.hasNext(); ) {
+            Hash peer = iter.next();
             RouterInfo peerInfo = getContext().netDb().lookupRouterInfoLocally(peer);
             if (peerInfo != null) {
                 peers.add(peerInfo);

@@ -1,7 +1,6 @@
 package net.i2p.router;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.Router;
-import net.i2p.util.Log;
 
 /**
  * Fire up multiple routers in the same VM, all with their own RouterContext

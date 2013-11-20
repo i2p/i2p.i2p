@@ -154,7 +154,7 @@ class GeoIPv6 {
     */
     private static boolean compressGeoIPv6CSVFiles(List<File> inFiles, File outFile) {
         boolean DEBUG = false;
-        List<V6Entry> entries = new ArrayList(20000);
+        List<V6Entry> entries = new ArrayList<V6Entry>(20000);
         for (File geoFile : inFiles) {
             int count = 0;
             InputStream in = null;
@@ -342,7 +342,7 @@ class GeoIPv6 {
             System.err.println("Usage: GeoIPv6 infile1.csv [infile2.csv...] outfile.dat.gz");
             System.exit(1);
         }
-        List<File> infiles = new ArrayList();
+        List<File> infiles = new ArrayList<File>();
         for (int i = 0; i < args.length - 1; i++) {
             infiles.add(new File(args[i]));
         }
@@ -353,6 +353,6 @@ class GeoIPv6 {
             System.exit(1);
         }
         // readback for testing
-        readGeoIPFile(outfile, new Long[] { Long.MAX_VALUE }, Collections.EMPTY_MAP, new Log(GeoIPv6.class));
+        readGeoIPFile(outfile, new Long[] { Long.MAX_VALUE }, Collections.<String, String> emptyMap(), new Log(GeoIPv6.class));
     }
 }

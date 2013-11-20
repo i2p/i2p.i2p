@@ -46,8 +46,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -119,9 +117,9 @@ class ClientConnectionRunner {
         _manager = manager;
         _socket = socket;
         // unused for fastReceive
-        _messages = new ConcurrentHashMap();
-        _alreadyProcessed = new ArrayList();
-        _acceptedPending = new ConcurrentHashSet();
+        _messages = new ConcurrentHashMap<MessageId, Payload>();
+        _alreadyProcessed = new ArrayList<MessageId>();
+        _acceptedPending = new ConcurrentHashSet<MessageId>();
         _messageId = new AtomicInteger(_context.random().nextInt());
     }
     

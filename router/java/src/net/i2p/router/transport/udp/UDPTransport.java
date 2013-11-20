@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -48,7 +47,6 @@ import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 
@@ -212,10 +210,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         super(ctx);
         _dhFactory = dh;
         _log = ctx.logManager().getLog(UDPTransport.class);
-        _peersByIdent = new ConcurrentHashMap(128);
-        _peersByRemoteHost = new ConcurrentHashMap(128);
-        _dropList = new ConcurrentHashSet(2);
-        _endpoints = new CopyOnWriteArrayList();
+        _peersByIdent = new ConcurrentHashMap<Hash, PeerState>(128);
+        _peersByRemoteHost = new ConcurrentHashMap<RemoteHostId, PeerState>(128);
+        _dropList = new ConcurrentHashSet<RemoteHostId>(2);
+        _endpoints = new CopyOnWriteArrayList<UDPEndpoint>();
         
         // See comments in DummyThrottle.java
         if (USE_PRIORITY) {
@@ -280,7 +278,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int port = getRequestedPort();
         if (port < 0) {
             port = UDPEndpoint.selectRandomPort(_context);
-            Map<String, String> changes = new HashMap();
+            Map<String, String> changes = new HashMap<String, String>();
             changes.put(PROP_INTERNAL_PORT, Integer.toString(port));
             changes.put(PROP_EXTERNAL_PORT, Integer.toString(port));
             _context.router().saveConfig(changes, null);
@@ -330,7 +328,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
 
-        List<InetAddress> bindToAddrs = new ArrayList(4);
+        List<InetAddress> bindToAddrs = new ArrayList<InetAddress>(4);
         if (bindTo != null) {
             String[] bta = bindTo.split("[,; \r\n\t]");
             for (int i = 0; i < bta.length; i++) {
@@ -860,7 +858,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1);
         } else if (updated) {
             _context.statManager().addRateData("udp.addressUpdated", 1);
-            Map<String, String> changes = new HashMap();
+            Map<String, String> changes = new HashMap<String, String>();
             if (ourIP.length == 4 && !fixedPort)
                 changes.put(PROP_EXTERNAL_PORT, Integer.toString(ourPort));
             // queue a country code lookup of the new IP
@@ -975,7 +973,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.3
      */
     List<PeerState> getPeerStatesByIP(RemoteHostId hostInfo) {
-        List<PeerState> rv = new ArrayList(4);
+        List<PeerState> rv = new ArrayList<PeerState>(4);
         byte[] ip = hostInfo.getIP();
         if (ip != null && ip.length == 4) {
             for (PeerState ps : _peersByIdent.values()) {
@@ -2160,7 +2158,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     @Override
     public Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector();
+        Vector<Long> skews = new Vector<Long>();
 
         // If our clock is way off, we may not have many (or any) successful connections,
         // so try hard in that case to return good data
@@ -2213,8 +2211,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int FLAG_UPTIME = 16;
     private static final int FLAG_DEBUG = 99;
     
-    private static Comparator getComparator(int sortFlags) {
-        Comparator rv = null;
+    private static Comparator<PeerState> getComparator(int sortFlags) {
+        Comparator<PeerState> rv = null;
         switch (Math.abs(sortFlags)) {
             case FLAG_IDLE_IN:
                 rv = IdleInComparator.instance();
@@ -2503,7 +2501,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        TreeSet<PeerState> peers = new TreeSet(getComparator(sortFlags));
+        TreeSet<PeerState> peers = new TreeSet<PeerState>(getComparator(sortFlags));
         peers.addAll(_peersByIdent.values());
         long offsetTotal = 0;
 
@@ -2844,8 +2842,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
-            _expirePeers = new ConcurrentHashSet(128);
-            _expireBuffer = new ArrayList();
+            _expirePeers = new ConcurrentHashSet<PeerState>(128);
+            _expireBuffer = new ArrayList<PeerState>();
         }
 
         public void timeReached() {
@@ -3039,8 +3037,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     PeerState pickTestPeer(PeerTestState.Role peerRole, RemoteHostId dontInclude) {
         if (peerRole == ALICE)
             throw new IllegalArgumentException();
-        List<PeerState> peers = new ArrayList(_peersByIdent.values());
-        for (Iterator<PeerState> iter = new RandomIterator(peers); iter.hasNext(); ) {
+        List<PeerState> peers = new ArrayList<PeerState>(_peersByIdent.values());
+        for (Iterator<PeerState> iter = new RandomIterator<PeerState>(peers); iter.hasNext(); ) {
             PeerState peer = iter.next();
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;

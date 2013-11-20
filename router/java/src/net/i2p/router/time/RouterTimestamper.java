@@ -61,8 +61,8 @@ public class RouterTimestamper extends Timestamper {
     public RouterTimestamper(I2PAppContext ctx, UpdateListener lsnr, boolean daemon) {
         super();
         // moved here to prevent problems with synchronized statements.
-        _servers = new ArrayList(3);
-        _listeners = new CopyOnWriteArrayList();
+        _servers = new ArrayList<String>(3);
+        _listeners = new CopyOnWriteArrayList<UpdateListener>();
         _context = ctx;
         _daemon = daemon;
         // DO NOT initialize _log here, stack overflow via LogManager init loop
@@ -178,7 +178,7 @@ public class RouterTimestamper extends Timestamper {
                             lastFailed = !queryTime(_servers.toArray(new String[_servers.size()]));
                         } catch (IllegalArgumentException iae) {
                             if ( (!_initialized) && (_log.shouldLog(Log.ERROR)) ) {
-                                List<String> all = new ArrayList();
+                                List<String> all = new ArrayList<String>();
                                 if (_priorityServers != null)
                                     all.addAll(_priorityServers);
                                 all.addAll(_servers);
@@ -299,7 +299,7 @@ public class RouterTimestamper extends Timestamper {
                     country = country.toLowerCase(Locale.US);
             }
             if (country != null &&  country.length() > 0) {
-                _priorityServers = new ArrayList(3);
+                _priorityServers = new ArrayList<String>(3);
                 for (int i = 0; i < 3; i++)
                      _priorityServers.add(i + "." + country + ".pool.ntp.org");
             } else {

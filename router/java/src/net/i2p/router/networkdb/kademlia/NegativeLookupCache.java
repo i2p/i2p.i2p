@@ -16,7 +16,7 @@ class NegativeLookupCache {
     private static final long CLEAN_TIME = 4*60*1000;
 
     public NegativeLookupCache() {
-        this.counter = new ObjectCounter();
+        this.counter = new ObjectCounter<Hash>();
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 

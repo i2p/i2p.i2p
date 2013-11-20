@@ -89,7 +89,7 @@ public abstract class ClientManagerFacade implements Service {
      *
      * @return set of Destination objects
      */
-    public Set<Destination> listClients() { return Collections.EMPTY_SET; }
+    public Set<Destination> listClients() { return Collections.emptySet(); }
     
     /**
      * Return the client's current config, or null if not connected

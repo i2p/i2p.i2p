@@ -36,9 +36,9 @@ public class InNetMessagePool implements Service {
     private final HandlerJobBuilder _handlerJobBuilders[];
 
     /** following 5 unused unless DISPATCH_DIRECT == false */
-    private final List _pendingDataMessages;
-    private final List _pendingDataMessagesFrom;
-    private final List _pendingGatewayMessages;
+    private final List<I2NPMessage> _pendingDataMessages;
+    private final List<Hash> _pendingDataMessagesFrom;
+    private final List<I2NPMessage> _pendingGatewayMessages;
     private SharedShortCircuitDataJob _shortCircuitDataJob;
     private SharedShortCircuitGatewayJob _shortCircuitGatewayJob;
 
@@ -56,7 +56,7 @@ public class InNetMessagePool implements Service {
      * using the jobQueue's single thread.
      *
      */
-    public static final String PROP_DISPATCH_THREADED = "router.dispatchThreaded";
+    public static final String PROP_DISPATCH_THREADED = "router.dispatchTemptyList()hreaded";
     public static final boolean DEFAULT_DISPATCH_THREADED = false;
     /**
      * If we aren't doing threaded dispatch for tunnel messages, should we
@@ -75,9 +75,9 @@ public class InNetMessagePool implements Service {
             _pendingDataMessagesFrom = null;
             _pendingGatewayMessages = null;
         } else {
-            _pendingDataMessages = new ArrayList(16);
-            _pendingDataMessagesFrom = new ArrayList(16);
-            _pendingGatewayMessages = new ArrayList(16);
+            _pendingDataMessages = new ArrayList<I2NPMessage>(16);
+            _pendingDataMessagesFrom = new ArrayList<Hash>(16);
+            _pendingGatewayMessages = new ArrayList<I2NPMessage>(16);
             _shortCircuitDataJob = new SharedShortCircuitDataJob(context);
             _shortCircuitGatewayJob = new SharedShortCircuitGatewayJob(context);
         }

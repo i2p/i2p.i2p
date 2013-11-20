@@ -48,7 +48,7 @@ class LocalHash extends Hash {
     public void prepareCache() {
         synchronized (this) {
             if (_xorCache == null)
-                _xorCache = new HashMap(MAX_CACHED_XOR);
+                _xorCache = new HashMap<Hash, byte[]>(MAX_CACHED_XOR);
         }
     }
     
@@ -70,13 +70,13 @@ class LocalHash extends Hash {
             synchronized (_xorCache) {
                 int toRemove = _xorCache.size() + 1 - MAX_CACHED_XOR;
                 if (toRemove > 0) {
-                    Set keys = new HashSet(toRemove);
+                    Set<Hash> keys = new HashSet<Hash>(toRemove);
                     // this removes essentially random keys - we dont maintain any sort
                     // of LRU or age.  perhaps we should?
                     int removed = 0;
-                    for (Iterator iter = _xorCache.keySet().iterator(); iter.hasNext() && removed < toRemove; removed++) 
+                    for (Iterator<Hash> iter = _xorCache.keySet().iterator(); iter.hasNext() && removed < toRemove; removed++) 
                         keys.add(iter.next());
-                    for (Iterator iter = keys.iterator(); iter.hasNext(); ) 
+                    for (Iterator<Hash> iter = keys.iterator(); iter.hasNext(); ) 
                         _xorCache.remove(iter.next());
                 }
                 distance = DataHelper.xor(key.getData(), getData());

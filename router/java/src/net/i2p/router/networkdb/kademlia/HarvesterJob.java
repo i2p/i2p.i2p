@@ -57,9 +57,9 @@ class HarvesterJob extends JobImpl {
     public String getName() { return "Harvest the netDb"; }
     public void runJob() {
         if (shouldHarvest()) {
-            List peers = selectPeersToUpdate();
+            List<Hash> peers = selectPeersToUpdate();
             for (int i = 0; i < peers.size(); i++) {
-                Hash peer= (Hash)peers.get(i);
+                Hash peer= peers.get(i);
                 harvest(peer);
             }
         }
@@ -75,12 +75,12 @@ class HarvesterJob extends JobImpl {
      * Retrieve a list of hashes for peers we want to update
      *
      */
-    private List selectPeersToUpdate() { 
-        Map routersByAge = new TreeMap();
-        Set peers = _facade.getAllRouters();
+    private List<Hash> selectPeersToUpdate() { 
+        Map<Long, Hash> routersByAge = new TreeMap<Long, Hash>();
+        Set<Hash> peers = _facade.getAllRouters();
         long now = getContext().clock().now();
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
+        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext(); ) {
+            Hash peer = iter.next();
             RouterInfo info = _facade.lookupRouterInfoLocally(peer);
             if (info != null) {
                 long when = info.getPublished();
@@ -95,9 +95,9 @@ class HarvesterJob extends JobImpl {
         // ok now we have the known peers sorted by date (oldest first),
         // ignoring peers that are new, so lets grab the oldest MAX_PER_RUN
         // entries
-        List rv = new ArrayList(); 
-        for (Iterator iter = routersByAge.values().iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
+        List<Hash> rv = new ArrayList<Hash>(); 
+        for (Iterator<Hash> iter = routersByAge.values().iterator(); iter.hasNext(); ) {
+            Hash peer = iter.next();
             rv.add(peer);
             if (rv.size() >= MAX_PER_RUN)
                 break;

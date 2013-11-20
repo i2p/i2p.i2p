@@ -196,7 +196,7 @@ class PersistentDataStore extends TransientDataStore {
         private volatile boolean _quit;
 
         public Writer() { 
-            _keys = new ConcurrentHashMap(64);
+            _keys = new ConcurrentHashMap<Hash, DatabaseEntry>(64);
             _waitLock = new Object();
         }
 
