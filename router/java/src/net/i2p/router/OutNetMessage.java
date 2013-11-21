@@ -283,8 +283,8 @@ public class OutNetMessage implements CDPQEntry {
         _failedTransports.add(transportStyle); 
     }
 
-    public synchronized Set getFailedTransports() { 
-        return (_failedTransports == null ? Collections.EMPTY_SET : _failedTransports); 
+    public synchronized Set<String> getFailedTransports() { 
+        return (_failedTransports == null ? Collections.<String> emptySet() : _failedTransports); 
     }
     
     /** when did the sending process begin */
