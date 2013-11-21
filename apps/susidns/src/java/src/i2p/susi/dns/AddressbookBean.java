@@ -82,7 +82,7 @@ public class AddressbookBean extends BaseBean
 	public AddressbookBean()
 	{
 		super();
-		deletionMarks = new LinkedList();
+		deletionMarks = new LinkedList<String>();
 		beginIndex = 0;
 		endIndex = DISPLAY_SIZE - 1;
 	}
@@ -150,7 +150,7 @@ public class AddressbookBean extends BaseBean
 		try {
 			fis =  new FileInputStream( getFileName() );
 			addressbook.load( fis );
-			LinkedList<AddressBean> list = new LinkedList();
+			LinkedList<AddressBean> list = new LinkedList<AddressBean>();
 			Enumeration e = addressbook.keys();
 			while( e.hasMoreElements() ) {
 				String name = (String)e.nextElement();

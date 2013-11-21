@@ -34,7 +34,6 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.OrderedProperties;
-import net.i2p.util.SecureFileOutputStream;
 
 public class ConfigBean implements Serializable {
 	

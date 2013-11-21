@@ -37,7 +37,6 @@ import java.util.List;
 
 import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFileOutputStream;
-import net.i2p.util.SystemVersion;
 
 public class SubscriptionsBean extends BaseBean
 {
@@ -89,7 +88,7 @@ public class SubscriptionsBean extends BaseBean
 		File file = new File( getFileName() );
 		try {
 			// trim and sort
-			List<String> urls = new ArrayList();
+			List<String> urls = new ArrayList<String>();
                         InputStream in = new ByteArrayInputStream(content.getBytes("UTF-8"));
                         String line;
                         while ((line = DataHelper.readLine(in)) != null) {

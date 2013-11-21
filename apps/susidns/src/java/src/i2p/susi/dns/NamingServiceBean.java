@@ -146,7 +146,7 @@ public class NamingServiceBean extends AddressbookBean
 		Debug.debug("Searching within " + service + " with filename=" + getFileName() + " and with filter=" + filter + " and with search=" + search);
 		String message = "";
 		try {
-			LinkedList<AddressBean> list = new LinkedList();
+			LinkedList<AddressBean> list = new LinkedList<AddressBean>();
 			Map<String, Destination> results;
 			Properties searchProps = new Properties();
 			// only blockfile needs this
