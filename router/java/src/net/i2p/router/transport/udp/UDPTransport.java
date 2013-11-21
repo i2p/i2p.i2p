@@ -428,7 +428,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             (newPort != port || newPort != oldIPort || newPort != oldEPort)) {
             // attempt to use it as our external port - this will be overridden by
             // externalAddressReceived(...)
-            Map<String, String> changes = new HashMap();
+            Map<String, String> changes = new HashMap<String, String>();
             changes.put(PROP_INTERNAL_PORT, Integer.toString(newPort));
             changes.put(PROP_EXTERNAL_PORT, Integer.toString(newPort));
             _context.router().saveConfig(changes, null);
