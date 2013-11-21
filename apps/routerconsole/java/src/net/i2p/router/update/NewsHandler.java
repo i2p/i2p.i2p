@@ -38,7 +38,7 @@ class NewsHandler extends UpdateHandler implements Checker {
         if ((type != ROUTER_SIGNED && type != NEWS) ||
             method != HTTP)
             return null;
-        List<URI> updateSources = new ArrayList(2);
+        List<URI> updateSources = new ArrayList<URI>(2);
         try {
             updateSources.add(new URI(ConfigUpdateHelper.getNewsURL(_context)));
         } catch (URISyntaxException use) {}

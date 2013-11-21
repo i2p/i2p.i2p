@@ -39,10 +39,10 @@ public class JobQueueHelper extends HelperBase {
      *  @since 0.8.9
      */
     private void renderStatusHTML(Writer out) throws IOException {
-        List<Job> readyJobs = new ArrayList(8);
-        List<Job> timedJobs = new ArrayList(128);
-        List<Job> activeJobs = new ArrayList(8);
-        List<Job> justFinishedJobs = new ArrayList(8);
+        List<Job> readyJobs = new ArrayList<Job>(8);
+        List<Job> timedJobs = new ArrayList<Job>(128);
+        List<Job> activeJobs = new ArrayList<Job>(8);
+        List<Job> justFinishedJobs = new ArrayList<Job>(8);
         
         int numRunners = _context.jobQueue().getJobs(readyJobs, timedJobs, activeJobs, justFinishedJobs);
         
@@ -70,7 +70,7 @@ public class JobQueueHelper extends HelperBase {
         buf.append("</ol>\n");
 
         buf.append("<hr><b>").append(_("Ready/waiting jobs")).append(": ").append(readyJobs.size()).append("</b><ol>\n");
-        ObjectCounter<String> counter = new ObjectCounter();
+        ObjectCounter<String> counter = new ObjectCounter<String>();
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = readyJobs.get(i);
             counter.increment(j.getName());
@@ -117,7 +117,7 @@ public class JobQueueHelper extends HelperBase {
     
     /** @since 0.9.5 */
     private void getJobCounts(StringBuilder buf, ObjectCounter<String> counter) {
-        List<String> names = new ArrayList(counter.objects());
+        List<String> names = new ArrayList<String>(counter.objects());
         if (names.size() < 4)
             return;
         buf.append("<table style=\"width: 30%; margin-left: 100px;\">\n" +
@@ -153,7 +153,7 @@ public class JobQueueHelper extends HelperBase {
         long maxPendingTime = -1;
         long minPendingTime = -1;
 
-        List<JobStats> tstats = new ArrayList(_context.jobQueue().getJobStats());
+        List<JobStats> tstats = new ArrayList<JobStats>(_context.jobQueue().getJobStats());
         Collections.sort(tstats, new JobStatsComparator());
         
         for (JobStats stats : tstats) {

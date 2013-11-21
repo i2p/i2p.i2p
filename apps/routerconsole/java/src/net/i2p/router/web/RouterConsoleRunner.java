@@ -9,12 +9,11 @@ import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
@@ -28,7 +27,6 @@ import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.crypto.KeyStoreUtil;
-import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
@@ -40,12 +38,9 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SystemVersion;
-import net.i2p.util.VersionComparator;
-
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
@@ -378,10 +373,10 @@ public class RouterConsoleRunner implements RouterApp {
 
         HandlerWrapper rootWebApp = null;
         ServletHandler rootServletHandler = null;
-        List<Connector> connectors = new ArrayList(4);
+        List<Connector> connectors = new ArrayList<Connector>(4);
         try {
             int boundAddresses = 0;
-            Set addresses = Addresses.getAllAddresses();
+            SortedSet<String> addresses = Addresses.getAllAddresses();
             boolean hasIPV4 = addresses.contains("0.0.0.0");
             boolean hasIPV6 = addresses.contains("0:0:0:0:0:0:0:0");
 
@@ -587,7 +582,7 @@ public class RouterConsoleRunner implements RouterApp {
         // so things start faster.
         // Jetty 6 starts the connector before the router console is ready
         // This also prevents one webapp from breaking the whole thing
-        List<String> notStarted = new ArrayList();
+        List<String> notStarted = new ArrayList<String>();
         if (_server.isRunning()) {
             File dir = new File(_webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());
@@ -698,7 +693,7 @@ public class RouterConsoleRunner implements RouterApp {
             success = ks.exists();
             if (success) {
                 try {
-                    Map<String, String> changes = new HashMap();
+                    Map<String, String> changes = new HashMap<String, String>();
                     changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
@@ -724,7 +719,7 @@ public class RouterConsoleRunner implements RouterApp {
      */
     static void initialize(RouterContext ctx, WebAppContext context) {
         ConstraintSecurityHandler sec = new ConstraintSecurityHandler();
-        List<ConstraintMapping> constraints = new ArrayList(4);
+        List<ConstraintMapping> constraints = new ArrayList<ConstraintMapping>(4);
         ConsolePasswordManager mgr = new ConsolePasswordManager(ctx);
         boolean enable = ctx.getBooleanProperty(PROP_PW_ENABLE);
         if (enable) {
@@ -842,7 +837,7 @@ public class RouterConsoleRunner implements RouterApp {
         public CustomThreadPoolExecutor() {
              super(new ThreadPoolExecutor(
                       MIN_THREADS, MAX_THREADS, MAX_IDLE_TIME, TimeUnit.MILLISECONDS,
-                      new SynchronousQueue(),
+                      new SynchronousQueue<Runnable>(),
                       new CustomThreadFactory(),
                       new ThreadPoolExecutor.CallerRunsPolicy())
                   );

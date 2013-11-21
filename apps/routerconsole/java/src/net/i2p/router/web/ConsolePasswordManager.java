@@ -79,7 +79,7 @@ public class ConsolePasswordManager extends RouterPasswordManager {
      */
     public Map<String, String> getMD5(String realm) {
         String pfx = realm + '.';
-        Map<String, String> rv = new HashMap(4);
+        Map<String, String> rv = new HashMap<String, String>(4);
         for (Map.Entry<String, String> e : _context.router().getConfigMap().entrySet()) {
             String prop = e.getKey();
             if (prop.startsWith(pfx) && prop.endsWith(PROP_MD5)) {
@@ -105,14 +105,14 @@ public class ConsolePasswordManager extends RouterPasswordManager {
             // consolePassword
             String pw = _context.getProperty(PROP_CONSOLE_OLD);
             if (pw != null) {
-                Map toAdd = new HashMap(2);
+                Map<String, String> toAdd = new HashMap<String, String>(2);
                 if (pw.length() > 0) {
                     saveMD5(RouterConsoleRunner.PROP_CONSOLE_PW, RouterConsoleRunner.JETTY_REALM,
                             CONSOLE_USER, pw);
                     toAdd.put(RouterConsoleRunner.PROP_PW_ENABLE, "true");
                 }
                 toAdd.put(PROP_MIGRATED, "true");
-                List toDel = Collections.singletonList(PROP_CONSOLE_OLD);
+                List<String> toDel = Collections.singletonList(PROP_CONSOLE_OLD);
                 return _context.router().saveConfig(toAdd, toDel);
             }
             return true;
@@ -164,7 +164,7 @@ public class ConsolePasswordManager extends RouterPasswordManager {
         if (hex == null)
             return false;
         Map<String, String> toAdd = Collections.singletonMap(pfx + PROP_MD5, hex);
-        List<String> toDel = new ArrayList(4);
+        List<String> toDel = new ArrayList<String>(4);
         toDel.add(pfx + PROP_PW);
         toDel.add(pfx + PROP_B64);
         toDel.add(pfx + PROP_CRYPT);

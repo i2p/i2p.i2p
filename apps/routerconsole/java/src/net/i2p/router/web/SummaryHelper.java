@@ -409,7 +409,7 @@ public class SummaryHelper extends HelperBase {
      */
     public String getDestinations() {
         // convert the set to a list so we can sort by name and not lose duplicates
-        List<Destination> clients = new ArrayList(_context.clientManager().listClients());
+        List<Destination> clients = new ArrayList<Destination>(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
@@ -837,7 +837,7 @@ public class SummaryHelper extends HelperBase {
         String[] allSections = SummaryBarRenderer.ALL_SECTIONS;
         Map<String, String> sectionNames = SummaryBarRenderer.SECTION_NAMES;
         List<String> sections = getSummaryBarSections("default");
-        TreeSet<String> sortedSections = new TreeSet();
+        TreeSet<String> sortedSections = new TreeSet<String>();
 
         for (int i = 0; i < allSections.length; i++) {
             String section = allSections[i];

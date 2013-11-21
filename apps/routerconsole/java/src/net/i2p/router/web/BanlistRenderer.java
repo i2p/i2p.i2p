@@ -40,7 +40,7 @@ public class BanlistRenderer {
         StringBuilder buf = new StringBuilder(1024);
         // move to the jsp
         //buf.append("<h2>Banned Peers</h2>");
-        Map<Hash, Banlist.Entry> entries = new TreeMap(new HashComparator());
+        Map<Hash, Banlist.Entry> entries = new TreeMap<Hash, Banlist.Entry>(new HashComparator());
         
         entries.putAll(_context.banlist().getEntries());
         if (entries.isEmpty()) {
@@ -64,7 +64,7 @@ public class BanlistRenderer {
                 buf.append(_("Temporary ban expiring in {0}", expireString));
             else
                 buf.append(_("Banned until restart or in {0}", expireString));
-            Set transports = entry.transports;
+            Set<String> transports = entry.transports;
             if ( (transports != null) && (!transports.isEmpty()) )
                 buf.append(" on the following transport: ").append(transports);
             if (entry.cause != null) {

@@ -6,7 +6,6 @@ import java.text.DecimalFormat;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -37,7 +36,7 @@ public class StatsGenerator {
         buf.setLength(0);
         
         Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
-        Map<String, Set<String>> groups = new TreeMap(new AlphaComparator());
+        Map<String, Set<String>> groups = new TreeMap<String, Set<String>>(new AlphaComparator());
         groups.putAll(unsorted);
         for (String group : groups.keySet()) {
             buf.append("<option value=\"#").append(group).append("\">");

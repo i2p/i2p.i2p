@@ -50,7 +50,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _ratesOnly;
     private boolean _udpDisabled;
     private String _ipv6Mode;
-    private final Map<String, String> changes = new HashMap();
+    private final Map<String, String> changes = new HashMap<String, String>();
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
     @Override
@@ -150,7 +150,7 @@ public class ConfigNetHandler extends FormHandler {
     private void saveChanges() {
         boolean restartRequired = false;
         boolean error = false;
-        List<String> removes = new ArrayList();
+        List<String> removes = new ArrayList<String>();
         
         if (!_ratesOnly) {
             // IP Settings
@@ -162,7 +162,7 @@ public class ConfigNetHandler extends FormHandler {
                 if (_udpAutoIP.equals("fixed")) {
                     if (_settings == null)
                         _settings = Collections.EMPTY_MAP;
-                    Set<String> addrs = new TreeSet();
+                    Set<String> addrs = new TreeSet<String>();
                     for (Object o : _settings.keySet()) {
                         String k = (String) o;
                         if (k.startsWith("addr_")) {

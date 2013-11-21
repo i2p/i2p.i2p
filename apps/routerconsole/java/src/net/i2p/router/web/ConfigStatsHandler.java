@@ -15,7 +15,7 @@ import net.i2p.stat.StatManager;
  */
 public class ConfigStatsHandler extends FormHandler {
     private String _filename;
-    private List _stats;
+    private List<String> _stats;
     private String _graphs;
     private boolean _explicitFilter;
     private String _explicitFilterValue;
@@ -23,7 +23,7 @@ public class ConfigStatsHandler extends FormHandler {
     
     public ConfigStatsHandler() {
         super();
-        _stats = new ArrayList();
+        _stats = new ArrayList<String>();
         _graphs = "";
         _explicitFilter = false;
         _isFull = false;
@@ -75,7 +75,7 @@ public class ConfigStatsHandler extends FormHandler {
      *
      */
     private void saveChanges() {
-        Map<String, String> changes = new HashMap();
+        Map<String, String> changes = new HashMap<String, String>();
         if (_filename == null)
             _filename = StatManager.DEFAULT_STAT_FILE;
         changes.put(StatManager.PROP_STAT_FILE, _filename);

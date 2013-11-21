@@ -20,13 +20,10 @@ import net.i2p.router.web.PluginStarter;
 import net.i2p.update.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
-import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
 
 

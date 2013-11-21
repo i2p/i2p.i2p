@@ -11,7 +11,7 @@ import net.i2p.util.RandomSource;
  */
 public class CSSHelper extends HelperBase {
 
-    private static final Map<String, Boolean> _UACache = new ConcurrentHashMap();
+    private static final Map<String, Boolean> _UACache = new ConcurrentHashMap<String, Boolean>();
 
     public static final String PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME_NAME = "routerconsole.theme";

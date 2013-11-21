@@ -137,15 +137,15 @@ public class GraphHelper extends FormHandler {
         if (StatSummarizer.isDisabled())
             return "";
         try {
-            List listeners = StatSummarizer.instance().getListeners();
-            TreeSet ordered = new TreeSet(new AlphaComparator());
+            List<SummaryListener> listeners = StatSummarizer.instance().getListeners();
+            TreeSet<SummaryListener> ordered = new TreeSet<SummaryListener>(new AlphaComparator());
             ordered.addAll(listeners);
 
             // go to some trouble to see if we have the data for the combined bw graph
             boolean hasTx = false;
             boolean hasRx = false;
-            for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
-                SummaryListener lsnr = (SummaryListener)iter.next();
+            for (Iterator<SummaryListener> iter = ordered.iterator(); iter.hasNext(); ) {
+                SummaryListener lsnr = iter.next();
                 String title = lsnr.getRate().getRateStat().getName();
                 if (title.equals("bw.sendRate")) hasTx = true;
                 else if (title.equals("bw.recvRate")) hasRx = true;
@@ -166,8 +166,8 @@ public class GraphHelper extends FormHandler {
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
             
-            for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
-                SummaryListener lsnr = (SummaryListener)iter.next();
+            for (Iterator<SummaryListener> iter = ordered.iterator(); iter.hasNext(); ) {
+                SummaryListener lsnr = iter.next();
                 Rate r = lsnr.getRate();
                 // e.g. "statname for 60m"
                 String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod()));
@@ -430,7 +430,7 @@ public class GraphHelper extends FormHandler {
             _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
             _showEvents != _context.getBooleanProperty(PROP_EVENTS) ||
             _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
-            Map<String, String> changes = new HashMap();
+            Map<String, String> changes = new HashMap<String, String>();
             changes.put(PROP_X, "" + _width);
             changes.put(PROP_Y, "" + _height);
             changes.put(PROP_PERIODS, "" + _periodCount);

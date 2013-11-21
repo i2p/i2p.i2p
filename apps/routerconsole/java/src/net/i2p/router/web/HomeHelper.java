@@ -127,7 +127,7 @@ public class HomeHelper extends HelperBase {
 
     static Collection<App> buildApps(RouterContext ctx, String config) {
         String[] args = config.split("" + S);
-        Set<App> apps = new TreeSet(new AppComparator());
+        Set<App> apps = new TreeSet<App>(new AppComparator());
         for (int i = 0; i < args.length - 3; i += 4) {
             String name = Messages.getString(args[i], ctx);
             String desc = Messages.getString(args[i+1], ctx);
@@ -140,7 +140,7 @@ public class HomeHelper extends HelperBase {
 
     static Collection<App> buildSearchApps(String config) {
         String[] args = config.split("" + S);
-        Set<App> apps = new TreeSet(new AppComparator());
+        Set<App> apps = new TreeSet<App>(new AppComparator());
         for (int i = 0; i < args.length - 1; i += 2) {
             String name = args[i];
             String url = args[i+1];

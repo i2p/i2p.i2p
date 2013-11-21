@@ -4,15 +4,11 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
-import net.i2p.update.*;
 import static net.i2p.update.UpdateType.*;
 import net.i2p.util.EepGet;
-import net.i2p.util.FileUtil;
-import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
     

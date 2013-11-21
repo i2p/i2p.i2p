@@ -15,7 +15,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
-import net.i2p.router.startup.RouterAppManager;
 import net.i2p.util.Addresses;
 
 public class ConfigClientsHelper extends HelperBase {
@@ -58,7 +57,7 @@ public class ConfigClientsHelper extends HelperBase {
 
     /** @since 0.8.3 */
     public String[] intfcAddresses() {
-        ArrayList<String> al = new ArrayList(Addresses.getAllAddresses());
+        ArrayList<String> al = new ArrayList<String>(Addresses.getAllAddresses());
         return al.toArray(new String[al.size()]);
     }
 

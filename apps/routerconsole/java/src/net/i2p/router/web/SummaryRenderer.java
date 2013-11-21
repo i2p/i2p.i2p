@@ -23,7 +23,6 @@ import net.i2p.util.SystemVersion;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
-import org.jrobin.graph.RrdGraphDefTemplate;
 
 /**
  *  Generate the RRD graph png images,

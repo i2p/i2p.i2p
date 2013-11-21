@@ -246,10 +246,10 @@ public class ConfigServiceHandler extends FormHandler {
     }
 
     private void browseOnStartup(boolean shouldLaunchBrowser) {
-        List clients = ClientAppConfig.getClientApps(_context);
+        List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         boolean found = false;
         for (int cur = 0; cur < clients.size(); cur++) {
-            ClientAppConfig ca = (ClientAppConfig) clients.get(cur);
+            ClientAppConfig ca = clients.get(cur);
             if (UrlLauncher.class.getName().equals(ca.className)) {
                 ca.disabled = !shouldLaunchBrowser;
                 found = true;

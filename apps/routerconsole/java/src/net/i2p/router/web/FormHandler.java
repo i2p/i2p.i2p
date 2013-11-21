@@ -30,8 +30,8 @@ public abstract class FormHandler {
     private boolean _valid;
     
     public FormHandler() {
-        _errors = new ArrayList();
-        _notices = new ArrayList();
+        _errors = new ArrayList<String>();
+        _notices = new ArrayList<String>();
         _valid = true;
     }
     

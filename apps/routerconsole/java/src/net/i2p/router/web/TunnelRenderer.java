@@ -38,7 +38,7 @@ public class TunnelRenderer {
         List<Hash> destinations = null;
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         Map<Hash, TunnelPool> clientOutboundPools = _context.tunnelManager().getOutboundClientPools();
-        destinations = new ArrayList(clientInboundPools.keySet());
+        destinations = new ArrayList<Hash>(clientInboundPools.keySet());
         boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
         for (int i = 0; i < destinations.size(); i++) {
             Hash client = destinations.get(i);
@@ -64,7 +64,7 @@ public class TunnelRenderer {
             renderPool(out, in, outPool);
         }
         
-        List participating = _context.tunnelDispatcher().listParticipatingTunnels();
+        List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
         Collections.sort(participating, new TunnelComparator());
         out.write("<h2><a name=\"participating\"></a>" + _("Participating tunnels") + "</h2><table>\n");
         out.write("<tr><th>" + _("Receive on") + "</th><th>" + _("From") + "</th><th>"
@@ -142,7 +142,7 @@ public class TunnelRenderer {
     private void renderPool(Writer out, TunnelPool in, TunnelPool outPool) throws IOException {
         List<TunnelInfo> tunnels = null;
         if (in == null)
-            tunnels = new ArrayList();
+            tunnels = new ArrayList<TunnelInfo>();
         else
             tunnels = in.listTunnels();
         if (outPool != null)

@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -85,7 +84,7 @@ public class ConfigSummaryHandler extends FormHandler {
                     return;
                 }
             } else if (deleting) {
-                Set<Integer> toDelete = new HashSet();
+                Set<Integer> toDelete = new HashSet<Integer>();
                 for (Object o : _settings.keySet()) {
                     if (!(o instanceof String))
                         continue;

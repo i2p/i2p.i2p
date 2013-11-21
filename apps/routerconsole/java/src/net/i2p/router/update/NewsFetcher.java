@@ -5,10 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,18 +15,15 @@ import java.util.StringTokenizer;
 
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
-import net.i2p.router.web.ConfigUpdateHelper;
 import net.i2p.router.web.NewsHelper;
 import net.i2p.update.*;
 import static net.i2p.update.UpdateType.*;
 import static net.i2p.update.UpdateMethod.*;
 import net.i2p.util.EepGet;
-import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SSLEepGet;
@@ -177,7 +172,7 @@ class NewsFetcher extends UpdateRunner {
                             // TODO if minversion > our version, continue
                             // and look for a second entry with clearnet URLs
                             // TODO clearnet URLs, notify with HTTP_CLEARNET and/or HTTPS_CLEARNET
-                            Map<UpdateMethod, List<URI>> sourceMap = new HashMap(4);
+                            Map<UpdateMethod, List<URI>> sourceMap = new HashMap<UpdateMethod, List<URI>>(4);
                             // Must do su3 first
                             if (ConfigUpdateHandler.USE_SU3_UPDATE) {
                                 sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED_SU3, "", HTTP));
@@ -231,7 +226,7 @@ class NewsFetcher extends UpdateRunner {
      *  @since 0.9.4
      */
     private static Map<String, String> parseArgs(String args) {
-        Map<String, String> rv = new HashMap(8);
+        Map<String, String> rv = new HashMap<String, String>(8);
         char data[] = args.toCharArray();
         StringBuilder buf = new StringBuilder(32);
         boolean isQuoted = false;
@@ -290,7 +285,7 @@ class NewsFetcher extends UpdateRunner {
 
     private static List<URI> tokenize(String URLs) {
         StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
-        List<URI> rv = new ArrayList();
+        List<URI> rv = new ArrayList<URI>();
         while (tok.hasMoreTokens()) {
             try {
                 rv.add(new URI(tok.nextToken().trim()));

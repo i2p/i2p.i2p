@@ -16,7 +16,6 @@ import net.i2p.app.ClientAppState;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
-import net.i2p.router.startup.RouterAppManager;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
 
@@ -426,7 +425,7 @@ public class ConfigClientsHandler extends FormHandler {
      *  @since 0.8.3
      */
     private void saveInterfaceChanges() {
-        Map<String, String> changes = new HashMap();
+        Map<String, String> changes = new HashMap<String, String>();
         String port = getJettyString("port");
         if (port != null)
             changes.put(ClientManagerFacadeImpl.PROP_CLIENT_PORT, port);

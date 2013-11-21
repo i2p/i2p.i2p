@@ -9,8 +9,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +23,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
-import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.Messages;
@@ -37,7 +34,6 @@ import static net.i2p.update.UpdateMethod.*;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
 
@@ -84,13 +80,13 @@ public class ConsoleUpdateManager implements UpdateManager {
     public ConsoleUpdateManager(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(ConsoleUpdateManager.class);
-        _registeredUpdaters = new ConcurrentHashSet();
-        _registeredCheckers = new ConcurrentHashSet();
-        _activeCheckers = new ConcurrentHashSet();
-        _downloaders = new ConcurrentHashMap();
-        _available = new ConcurrentHashMap();
-        _downloaded = new ConcurrentHashMap();
-        _installed = new ConcurrentHashMap();
+        _registeredUpdaters = new ConcurrentHashSet<RegisteredUpdater>();
+        _registeredCheckers = new ConcurrentHashSet<RegisteredChecker>();
+        _activeCheckers = new ConcurrentHashSet<UpdateTask>();
+        _downloaders = new ConcurrentHashMap<UpdateTask, List<RegisteredUpdater>>();
+        _available = new ConcurrentHashMap<UpdateItem, VersionAvailable>();
+        _downloaded = new ConcurrentHashMap<UpdateItem, Version>();
+        _installed = new ConcurrentHashMap<UpdateItem, Version>();
         _status = "";
         // DEBUG slow start for snark updates
         // For 0.9.4 update, only for dev builds
@@ -111,7 +107,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         notifyInstalled(ROUTER_SIGNED_SU3, "", RouterVersion.VERSION);
         // hack to init from the current news file... do this before we register Updaters
         // This will not kick off any Updaters as none are yet registered
-        (new NewsFetcher(_context, this, Collections.EMPTY_LIST)).checkForUpdates();
+        (new NewsFetcher(_context, this, Collections.<URI> emptyList())).checkForUpdates();
         for (String plugin : PluginStarter.getPlugins()) {
             Properties props = PluginStarter.pluginProperties(_context, plugin);
             String ver = props.getProperty("version");
@@ -123,7 +119,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         DummyHandler dh = new DummyHandler(_context, this);
         register((Checker)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
         register((Updater)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
-        VersionAvailable dummyVA = new VersionAvailable("", "", METHOD_DUMMY, Collections.EMPTY_LIST);
+        VersionAvailable dummyVA = new VersionAvailable("", "", METHOD_DUMMY, Collections.<URI> emptyList());
         _available.put(new UpdateItem(TYPE_DUMMY, ""), dummyVA);
         // register news before router, so we don't fire off an update
         // right at instantiation if the news is already indicating a new version
@@ -526,7 +522,7 @@ public class ConsoleUpdateManager implements UpdateManager {
                 _log.warn("No version available for: " + type + ' ' + id);
             return false;
         }
-        List<RegisteredUpdater> sorted = new ArrayList(4);
+        List<RegisteredUpdater> sorted = new ArrayList<RegisteredUpdater>(4);
         for (RegisteredUpdater ru : _registeredUpdaters) {
             if (ru.type == type)
                 sorted.add(ru);
@@ -1069,7 +1065,7 @@ public class ConsoleUpdateManager implements UpdateManager {
               { // avoid dup variables in next case
                 String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
                 StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
-                List<URI> rv = new ArrayList();
+                List<URI> rv = new ArrayList<URI>();
                 while (tok.hasMoreTokens()) {
                     try {
                         rv.add(new URI(tok.nextToken().trim()));
@@ -1083,7 +1079,7 @@ public class ConsoleUpdateManager implements UpdateManager {
               {
                 String URLs = ConfigUpdateHandler.SU3_UPDATE_URLS;
                 StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
-                List<URI> rv = new ArrayList();
+                List<URI> rv = new ArrayList<URI>();
                 while (tok.hasMoreTokens()) {
                     try {
                         rv.add(new URI(tok.nextToken().trim()));
@@ -1115,7 +1111,7 @@ public class ConsoleUpdateManager implements UpdateManager {
              default:
                 break;
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
     
     /**
@@ -1494,7 +1490,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         public VersionAvailable(String version, String min, UpdateMethod method, List<URI> updateSources) {
             super(version);
             minVersion = min;
-            sourceMap = new ConcurrentHashMap(4);
+            sourceMap = new ConcurrentHashMap<UpdateMethod, List<URI>>(4);
             sourceMap.put(method, updateSources);
         }
 
@@ -1505,7 +1501,7 @@ public class ConsoleUpdateManager implements UpdateManager {
         public VersionAvailable(String version, String constraint) {
             super(version);
             minVersion = "";
-            sourceMap = new ConcurrentHashMap(4);
+            sourceMap = new ConcurrentHashMap<UpdateMethod, List<URI>>(4);
             this.constraint = constraint;
         }
 
@@ -1539,7 +1535,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /** debug */
     private static void toString(StringBuilder buf, Collection col) {
-        List<String> list = new ArrayList(col.size());
+        List<String> list = new ArrayList<String>(col.size());
         for (Object o : col) {
             list.add(o.toString());
         }
@@ -1551,7 +1547,7 @@ public class ConsoleUpdateManager implements UpdateManager {
 
     /** debug */
     private static void toString(StringBuilder buf, Map<?, ?> map) {
-        List<String> list = new ArrayList(map.size());
+        List<String> list = new ArrayList<String>(map.size());
         for (Map.Entry entry : map.entrySet()) {
             String key = entry.getKey().toString();
             String val = entry.getValue().toString();

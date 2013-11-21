@@ -108,11 +108,11 @@ public class NetDbRenderer {
         DecimalFormat fmt;
         if (debug) {
             ourRKey = _context.routerHash();
-            leases = new TreeSet(new LeaseSetRoutingKeyComparator(ourRKey));
+            leases = new TreeSet<LeaseSet>(new LeaseSetRoutingKeyComparator(ourRKey));
             fmt = new DecimalFormat("#0.00");
         } else {
             ourRKey = null;
-            leases = new TreeSet(new LeaseSetComparator());
+            leases = new TreeSet<LeaseSet>(new LeaseSetComparator());
             fmt = null;
         }
         leases.addAll(_context.netDb().getLeases());
@@ -257,11 +257,11 @@ public class NetDbRenderer {
             buf.setLength(0);
         }
         
-        ObjectCounter<String> versions = new ObjectCounter();
-        ObjectCounter<String> countries = new ObjectCounter();
+        ObjectCounter<String> versions = new ObjectCounter<String>();
+        ObjectCounter<String> countries = new ObjectCounter<String>();
         int[] transportCount = new int[TNAMES.length];
         
-        Set<RouterInfo> routers = new TreeSet(new RouterInfoComparator());
+        Set<RouterInfo> routers = new TreeSet<RouterInfo>(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
         for (RouterInfo ri : routers) {
             Hash key = ri.getIdentity().getHash();
@@ -292,7 +292,7 @@ public class NetDbRenderer {
            .append(_("Network Database Router Statistics"))
            .append("</th></tr><tr><td style=\"vertical-align: top;\">");
         // versions table
-        List<String> versionList = new ArrayList(versions.objects());
+        List<String> versionList = new ArrayList<String>(versions.objects());
         if (!versionList.isEmpty()) {
             Collections.sort(versionList, Collections.reverseOrder(new VersionComparator()));
             buf.append("<table>\n");
@@ -324,7 +324,7 @@ public class NetDbRenderer {
         buf.setLength(0);
 
         // country table
-        List<String> countryList = new ArrayList(countries.objects());
+        List<String> countryList = new ArrayList<String>(countries.objects());
         if (!countryList.isEmpty()) {
             Collections.sort(countryList, new CountryComparator());
             buf.append("<table>\n");

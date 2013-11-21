@@ -46,7 +46,7 @@ public class StatSummarizer implements Runnable {
     public StatSummarizer() {
         _context = RouterContext.listContexts().get(0); // only summarize one per jvm
         _log = _context.logManager().getLog(getClass());
-        _listeners = new CopyOnWriteArrayList();
+        _listeners = new CopyOnWriteArrayList<SummaryListener>();
         _instance = this;
         _sem = new Semaphore(MAX_CONCURRENT_PNG, true);
         _context.addShutdownTask(new Shutdown());
@@ -311,9 +311,9 @@ public class StatSummarizer implements Runnable {
      */
     Set<Rate> parseSpecs(String specs) {
         if (specs == null)
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         StringTokenizer tok = new StringTokenizer(specs, ",");
-        Set<Rate> rv = new HashSet();
+        Set<Rate> rv = new HashSet<Rate>();
         while (tok.hasMoreTokens()) {
             String spec = tok.nextToken();
             int split = spec.lastIndexOf('.');

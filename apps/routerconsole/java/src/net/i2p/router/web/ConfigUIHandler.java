@@ -37,8 +37,8 @@ public class ConfigUIHandler extends FormHandler {
     private void saveChanges() {
         if (_config == null)
             return;
-        Map<String, String> changes = new HashMap();
-        List<String> removes = new ArrayList();
+        Map<String, String> changes = new HashMap<String, String>();
+        List<String> removes = new ArrayList<String>();
         String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         boolean oldForceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
         if (_config.equals("default")) // obsolete

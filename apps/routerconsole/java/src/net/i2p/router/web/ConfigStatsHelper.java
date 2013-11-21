@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +36,9 @@ public class ConfigStatsHelper extends HelperBase {
     private boolean _currentCanBeGraphed;
     
     public ConfigStatsHelper() {
-        _stats = new ArrayList();
-        _filters = new HashSet();
-        _graphs = new HashSet();
+        _stats = new ArrayList<String>();
+        _filters = new HashSet<String>();
+        _graphs = new HashSet<String>();
     }
 
     /**
@@ -54,7 +53,7 @@ public class ConfigStatsHelper extends HelperBase {
         _log = _context.logManager().getLog(ConfigStatsHelper.class);
         
         Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
-        Map<String, Set<String>> groups = new TreeMap(new AlphaComparator());
+        Map<String, Set<String>> groups = new TreeMap<String, Set<String>>(new AlphaComparator());
         groups.putAll(unsorted);
         for (Set<String> stats : groups.values()) {
              _stats.addAll(stats);
