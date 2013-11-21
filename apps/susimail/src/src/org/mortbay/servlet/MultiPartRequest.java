@@ -62,7 +62,7 @@ public class MultiPartRequest
     String _boundary;
     String _encoding;
     byte[] _byteBoundary;
-    MultiMap _partMap = new MultiMap(10);
+    MultiMap<String> _partMap = new MultiMap<String>(10);
     int _char=-2;
     boolean _lastPart=false;
     
@@ -103,8 +103,8 @@ public class MultiPartRequest
      */
     public String[] getPartNames()
     {
-        Set s = _partMap.keySet();
-        return (String[]) s.toArray(new String[s.size()]);
+        Set<String> s = _partMap.keySet();
+        return s.toArray(new String[s.size()]);
     }
     
     /* ------------------------------------------------------------ */
@@ -125,7 +125,7 @@ public class MultiPartRequest
      */
     public String getString(String name)
     {
-        List part = _partMap.getValues(name);
+        List<Object> part = _partMap.getValues(name);
         if (part==null)
             return null;
         if (_encoding != null)
@@ -151,7 +151,7 @@ public class MultiPartRequest
      */
     public String[] getStrings(String name)
     {
-        List parts = _partMap.getValues(name);
+        List<Object> parts = _partMap.getValues(name);
         if (parts==null)
             return null;
         String[] strings = new String[parts.size()];
@@ -185,7 +185,7 @@ public class MultiPartRequest
      */
     public InputStream getInputStream(String name)
     {
-        List part = (List)_partMap.getValues(name);
+        List<Object> part = _partMap.getValues(name);
         if (part==null)
             return null;
         return new ByteArrayInputStream(((Part)part.get(0))._data);
@@ -194,7 +194,7 @@ public class MultiPartRequest
     /* ------------------------------------------------------------ */
     public InputStream[] getInputStreams(String name) 
     {
-        List parts = (List)_partMap.getValues(name);
+        List<Object> parts = _partMap.getValues(name);
         if (parts==null)
             return null;
         InputStream[] streams = new InputStream[parts.size()];
@@ -209,9 +209,9 @@ public class MultiPartRequest
      * @param name The part name 
      * @return Hashtable of parameters
      */
-    public Hashtable getParams(String name)
+    public Hashtable<String, String> getParams(String name)
     {
-        List part = (List)_partMap.getValues(name);
+        List<Object> part = _partMap.getValues(name);
         if (part==null)
             return null;
         return ((Part)part.get(0))._headers;
@@ -220,7 +220,7 @@ public class MultiPartRequest
     /* ------------------------------------------------------------ */
     public Hashtable[] getMultipleParams(String name) 
     {
-        List parts = (List)_partMap.getValues(name);
+        List<Object> parts = _partMap.getValues(name);
         if (parts==null)
             return null;
         Hashtable[] params = new Hashtable[parts.size()];
@@ -237,7 +237,7 @@ public class MultiPartRequest
      */
     public String getFilename(String name)
     {
-        List part = (List)_partMap.getValues(name);
+        List<Object> part = _partMap.getValues(name);
         if (part==null)
             return null;
         return ((Part)part.get(0))._filename;
@@ -246,7 +246,7 @@ public class MultiPartRequest
     /* ------------------------------------------------------------ */
     public String[] getFilenames(String name) 
     {
-        List parts = (List)_partMap.getValues(name);
+        List<Object> parts = _partMap.getValues(name);
         if (parts==null)
             return null;
         String[] filenames = new String[parts.size()];
@@ -439,7 +439,7 @@ public class MultiPartRequest
     {
         String _name;
         String _filename;
-        Hashtable _headers= new Hashtable(10);
+        Hashtable<String, String> _headers= new Hashtable<String, String>(10);
         byte[] _data;
     }    
 };

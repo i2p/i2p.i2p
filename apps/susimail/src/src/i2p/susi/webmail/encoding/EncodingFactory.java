@@ -37,10 +37,10 @@ public class EncodingFactory {
 	
 	public static final String CONFIG_ENCODING = "encodings";
 	
-	private static Hashtable encodings = null;
+	private static Hashtable<String, Encoding> encodings = null;
 	
 	static {
-		encodings = new Hashtable();
+		encodings = new Hashtable<String, Encoding>();
 		String list = Config.getProperty( CONFIG_ENCODING );
 		if( list != null ) {
 			String[] classNames = list.split( ";" );
@@ -66,14 +66,14 @@ public class EncodingFactory {
 	 */
 	public static Encoding getEncoding( String name )
 	{
-		return name != null && name.length() > 0 ? (Encoding)encodings.get( name ) : null;
+		return name != null && name.length() > 0 ? encodings.get( name ) : null;
 	}
 	/**
 	 * Returns list of available encodings;
 	 * 
 	 * @return List of encodings
 	 */
-	public static Set availableEncodings()
+	public static Set<String> availableEncodings()
 	{
 		return encodings.keySet();
 	}
