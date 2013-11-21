@@ -367,7 +367,7 @@ public class HTTPPacket
 	//	Header
 	////////////////////////////////////////////////
 
-	private Vector httpHeaderList = new Vector();
+	private Vector<HTTPHeader> httpHeaderList = new Vector<HTTPHeader>();
 	
 	public int getNHeaders()
 	{
@@ -405,7 +405,7 @@ public class HTTPPacket
 	public void clearHeaders()
 	{
 		httpHeaderList.clear();
-		httpHeaderList = new Vector();
+		httpHeaderList = new Vector<HTTPHeader>();
 	}
 	
 	public boolean hasHeader(String name)

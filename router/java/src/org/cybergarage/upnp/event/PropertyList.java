@@ -17,7 +17,7 @@ package org.cybergarage.upnp.event;
 
 import java.util.*;
 
-public class PropertyList extends Vector 
+public class PropertyList extends Vector<Property> 
 {
 	////////////////////////////////////////////////
 	//	Constants
