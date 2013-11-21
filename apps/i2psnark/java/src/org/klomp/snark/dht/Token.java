@@ -7,7 +7,6 @@ import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
-import net.i2p.data.DataHelper;
 
 /**
  *  Used for Both outgoing and incoming tokens

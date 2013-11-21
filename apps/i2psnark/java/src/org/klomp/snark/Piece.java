@@ -18,7 +18,7 @@ class Piece implements Comparable {
     
     public Piece(int id) {
         this.id = id;
-        this.peers = new HashSet(I2PSnarkUtil.MAX_CONNECTIONS / 2);
+        this.peers = new HashSet<PeerID>(I2PSnarkUtil.MAX_CONNECTIONS / 2);
         // defer creating requests to save memory
     }
     
@@ -82,7 +82,7 @@ class Piece implements Comparable {
     public void setRequested(Peer peer, boolean requested) {
         if (requested) {
             if (this.requests == null)
-                this.requests = new HashSet(2);
+                this.requests = new HashSet<PeerID>(2);
             this.requests.add(peer.getPeerID());
         } else {
             if (this.requests != null)

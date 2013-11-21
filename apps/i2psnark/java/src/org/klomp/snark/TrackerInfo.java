@@ -59,7 +59,7 @@ class TrackerInfo
     this(be.bdecodeMap().getMap(), my_id, infohash, metainfo, util);
   }
 
-  private TrackerInfo(Map m, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
+  private TrackerInfo(Map<String, BEValue> m, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
     BEValue reason = (BEValue)m.get("failure reason");
@@ -80,7 +80,7 @@ class TrackerInfo
 
         BEValue bePeers = (BEValue)m.get("peers");
         if (bePeers == null) {
-          peers = Collections.EMPTY_SET;
+          peers = Collections.emptySet();
         } else {
             Set<Peer> p;
             try {
@@ -127,7 +127,7 @@ class TrackerInfo
   private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
-    Set<Peer> peers = new HashSet(l.size());
+    Set<Peer> peers = new HashSet<Peer>(l.size());
 
     for (BEValue bev : l) {
         PeerID peerID;
@@ -161,7 +161,7 @@ class TrackerInfo
     throws IOException
   {
     int count = l.length / HASH_LENGTH;
-    Set<Peer> peers = new HashSet(count);
+    Set<Peer> peers = new HashSet<Peer>(count);
 
     for (int i = 0; i < count; i++) {
         PeerID peerID;

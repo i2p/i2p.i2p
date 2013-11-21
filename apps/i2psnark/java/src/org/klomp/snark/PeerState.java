@@ -56,7 +56,7 @@ class PeerState implements DataLoader
   final PeerConnectionOut out;
 
   // Outstanding request
-  private final List<Request> outstandingRequests = new ArrayList();
+  private final List<Request> outstandingRequests = new ArrayList<Request>();
   /** the tail (NOT the head) of the request queue */
   private Request lastRequest = null;
 
@@ -451,7 +451,7 @@ class PeerState implements DataLoader
   synchronized List<Request> returnPartialPieces()
   {
       Set<Integer> pcs = getRequestedPieces();
-      List<Request> rv = new ArrayList(pcs.size());
+      List<Request> rv = new ArrayList<Request>(pcs.size());
       for (Integer p : pcs) {
           Request req = getLowestOutstandingRequest(p.intValue());
           if (req != null) {
@@ -469,7 +469,7 @@ class PeerState implements DataLoader
    * @return all pieces we are currently requesting, or empty Set
    */
   synchronized private Set<Integer> getRequestedPieces() {
-      Set<Integer> rv = new HashSet(outstandingRequests.size() + 1);
+      Set<Integer> rv = new HashSet<Integer>(outstandingRequests.size() + 1);
       for (Request req : outstandingRequests) {
           rv.add(Integer.valueOf(req.getPiece()));
       if (pendingRequest != null)

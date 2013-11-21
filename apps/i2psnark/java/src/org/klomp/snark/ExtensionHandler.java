@@ -43,8 +43,8 @@ abstract class ExtensionHandler {
    *  @return bencoded outgoing handshake message
    */
     public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht) {
-        Map<String, Object> handshake = new HashMap();
-        Map<String, Integer> m = new HashMap();
+        Map<String, Object> handshake = new HashMap<String, Object>();
+        Map<String, Integer> m = new HashMap<String, Integer>();
         if (pexAndMetadata) {
             m.put(TYPE_METADATA, Integer.valueOf(ID_METADATA));
             m.put(TYPE_PEX, Integer.valueOf(ID_PEX));
@@ -276,7 +276,7 @@ abstract class ExtensionHandler {
 
     /** REQUEST and REJECT are the same except for message type */
     private static void sendMessage(Peer peer, int type, int piece) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("msg_type", Integer.valueOf(type));
         map.put("piece", Integer.valueOf(piece));
         byte[] payload = BEncoder.bencode(map);
@@ -291,7 +291,7 @@ abstract class ExtensionHandler {
     }
 
     private static void sendPiece(Peer peer, int piece, byte[] data) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("msg_type", Integer.valueOf(TYPE_DATA));
         map.put("piece", Integer.valueOf(piece));
         map.put("total_size", Integer.valueOf(data.length));
@@ -334,7 +334,7 @@ abstract class ExtensionHandler {
             if (ids.length < HASH_LENGTH)
                 return;
             int len = Math.min(ids.length, (I2PSnarkUtil.MAX_CONNECTIONS - 1) * HASH_LENGTH);
-            List<PeerID> peers = new ArrayList(len / HASH_LENGTH);
+            List<PeerID> peers = new ArrayList<PeerID>(len / HASH_LENGTH);
             for (int off = 0; off < len; off += HASH_LENGTH) {
                 byte[] hash = new byte[HASH_LENGTH];
                 System.arraycopy(ids, off, hash, 0, HASH_LENGTH);
@@ -382,7 +382,7 @@ abstract class ExtensionHandler {
     public static void sendPEX(Peer peer, List<Peer> pList) {
         if (pList.isEmpty())
             return;
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<String, Object>();
         byte[] peers = new byte[HASH_LENGTH * pList.size()];
         int off = 0;
         for (Peer p : pList) {
@@ -406,7 +406,7 @@ abstract class ExtensionHandler {
      *  @since DHT
      */
     public static void sendDHT(Peer peer, int qport, int rport) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("port", Integer.valueOf(qport));
         map.put("rport", Integer.valueOf(rport));
         byte[] payload = BEncoder.bencode(map);

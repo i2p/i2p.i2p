@@ -21,8 +21,6 @@
 package org.klomp.snark;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -38,7 +36,6 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.ConvertToHash;
@@ -139,8 +136,8 @@ public class TrackerClient implements Runnable {
     this.port = PORT; //(port == -1) ? 9 : port;
     this.infoHash = urlencode(snark.getInfoHash());
     this.peerID = urlencode(snark.getID());
-    this.trackers = new ArrayList(2);
-    this.backupTrackers = new ArrayList(2);
+    this.trackers = new ArrayList<TCTracker>(2);
+    this.backupTrackers = new ArrayList<TCTracker>(2);
   }
 
   public synchronized void start() {
@@ -274,7 +271,7 @@ public class TrackerClient implements Runnable {
         primary = meta.getAnnounce();
     else if (additionalTrackerURL != null)
         primary = additionalTrackerURL;
-    Set<Hash> trackerHashes = new HashSet(8);
+    Set<Hash> trackerHashes = new HashSet<Hash>(8);
 
     // primary tracker
     if (primary != null) {
@@ -533,7 +530,7 @@ public class TrackerClient implements Runnable {
                     if (coordinator.needOutboundPeers()) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
-                        List<Peer> ordered = new ArrayList(peers);
+                        List<Peer> ordered = new ArrayList<Peer>(peers);
                         Random r = _util.getContext().random();
                         Collections.shuffle(ordered, r);
                         Iterator<Peer> it = ordered.iterator();
@@ -598,7 +595,7 @@ public class TrackerClient implements Runnable {
                 if (!pids.isEmpty()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Got " + pids.size() + " from PEX");
-                    List<Peer> peers = new ArrayList(pids.size());
+                    List<Peer> peers = new ArrayList<Peer>(pids.size());
                     for (PeerID pID : pids) {
                         peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
                     }
@@ -652,7 +649,7 @@ public class TrackerClient implements Runnable {
 
                 // now try these peers
                 if ((!stop) && !hashes.isEmpty()) {
-                    List<Peer> peers = new ArrayList(hashes.size());
+                    List<Peer> peers = new ArrayList<Peer>(hashes.size());
                     for (Hash h : hashes) {
                         try {
                             PeerID pID = new PeerID(h.getData(), _util);

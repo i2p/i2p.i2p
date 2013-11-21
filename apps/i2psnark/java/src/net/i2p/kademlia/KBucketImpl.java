@@ -53,7 +53,7 @@ class KBucketImpl<T extends SimpleDataStructure> implements KBucket<T> {
     /** include if no bits higher than this bit (inclusive) are set */
     private final int _end;
     private final int _max;
-    private final KBucketTrimmer _trimmer;
+    private final KBucketTrimmer<T> _trimmer;
     /** when did we last shake things up */
     private long _lastChanged;
     private final I2PAppContext _context;
@@ -62,11 +62,11 @@ class KBucketImpl<T extends SimpleDataStructure> implements KBucket<T> {
      *  All entries in this bucket will have at least one bit different
      *  from us in the range [begin, end] inclusive.
      */
-    public KBucketImpl(I2PAppContext context, int begin, int end, int max, KBucketTrimmer trimmer) {
+    public KBucketImpl(I2PAppContext context, int begin, int end, int max, KBucketTrimmer<T> trimmer) {
         if (begin > end)
             throw new IllegalArgumentException(begin + " > " + end);
         _context = context;
-        _entries = new ConcurrentHashSet(max + 4);
+        _entries = new ConcurrentHashSet<T>(max + 4);
         _begin = begin;
         _end = end;
         _max = max;
