@@ -42,8 +42,8 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         super();
         _bufferCount = Math.max(context.getProperty("prng.buffers", DEFAULT_BUFFERS), 2);
         _bufferSize = Math.max(context.getProperty("prng.bufferSize", DEFAULT_BUFSIZE), 16*1024);
-        _emptyBuffers = new LinkedBlockingQueue(_bufferCount);
-        _fullBuffers = new LinkedBlockingQueue(_bufferCount);
+        _emptyBuffers = new LinkedBlockingQueue<AsyncBuffer>(_bufferCount);
+        _fullBuffers = new LinkedBlockingQueue<AsyncBuffer>(_bufferCount);
         _context = context;
         context.statManager().createRequiredRateStat("prng.bufferWaitTime", "Delay for random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
         context.statManager().createRequiredRateStat("prng.bufferFillTime", "Time to fill random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
@@ -77,7 +77,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     /** the seed is only propogated once the prng is started with startup() */
     @Override
     public void seed(byte val[]) {
-        Map props = Collections.singletonMap(SEED, val);
+        Map<String, byte[]> props = Collections.singletonMap(SEED, val);
         init(props);
         //fillBlock();
     }

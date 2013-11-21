@@ -131,12 +131,12 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   }
 
   public void seed(byte val[]) {
-      Map props = Collections.singletonMap(SEED, val);
+      Map<String, byte[]> props = Collections.singletonMap(SEED, val);
       init(props);
       fillBlock();
   }
   
-  public void setup(Map attributes)
+  public void setup(Map<String, byte[]> attributes)
   {
     lastReseed = 0;
     reseedCount = 0;
@@ -312,7 +312,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       incrementCounter();
     }
 
-    public void setup(Map attributes)
+    public void setup(Map<String, byte[]> attributes)
     {
       seeded = false;
       Arrays.fill(key, (byte) 0);

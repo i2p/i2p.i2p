@@ -91,7 +91,7 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
       return name;
    }
 
-   public void init(Map attributes) {
+   public void init(Map<String, byte[]> attributes) {
       this.setup(attributes);
 
       ndx = 0;
@@ -179,7 +179,7 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
     return super.clone();
   }
 
-   public abstract void setup(Map attributes);
+   public abstract void setup(Map<String, byte[]> attributes);
 
    public abstract void fillBlock(); //throws LimitReachedException;
 }
