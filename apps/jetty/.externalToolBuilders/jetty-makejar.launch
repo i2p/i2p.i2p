@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.ant.AntBuilderLaunchConfigurationType">
+<stringAttribute key="org.eclipse.ant.ui.ATTR_ANT_AUTO_TARGETS" value="ensureJettylib,"/>
+<stringAttribute key="org.eclipse.ant.ui.ATTR_ANT_CLEAN_TARGETS" value="distclean,"/>
+<stringAttribute key="org.eclipse.ant.ui.ATTR_ANT_MANUAL_TARGETS" value="jar,"/>
+<booleanAttribute key="org.eclipse.ant.ui.ATTR_TARGETS_UPDATED" value="true"/>
+<booleanAttribute key="org.eclipse.ant.ui.DEFAULT_VM_INSTALL" value="false"/>
+<stringAttribute key="org.eclipse.debug.core.ATTR_REFRESH_SCOPE" value="${project}"/>
+<booleanAttribute key="org.eclipse.debug.ui.ATTR_LAUNCH_IN_BACKGROUND" value="false"/>
+<listAttribute key="org.eclipse.jdt.launching.CLASSPATH">
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.launching.JRE_CONTAINER&quot; path=&quot;1&quot; type=&quot;4&quot;/&gt;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/i2p_sdk/src&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry id=&quot;org.eclipse.ant.ui.classpathentry.antHome&quot;&gt;&#10;&lt;memento default=&quot;true&quot;/&gt;&#10;&lt;/runtimeClasspathEntry&gt;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry id=&quot;org.eclipse.ant.ui.classpathentry.extraClasspathEntries&quot;&gt;&#10;&lt;memento/&gt;&#10;&lt;/runtimeClasspathEntry&gt;&#10;"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.ant.ui.AntClasspathProvider"/>
+<booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jetty"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:/jetty/build.xml}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_RUN_BUILD_KINDS" value="incremental,auto,clean"/>
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${workspace_loc:/jetty}"/>
+</launchConfiguration>
