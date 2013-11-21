@@ -83,9 +83,9 @@ public class HTTPMUSocket
 		if (ssdpMultiGroup == null || ssdpMultiIf == null)
 			return "";
 		InetAddress mcastAddr = ssdpMultiGroup.getAddress();
-		Enumeration addrs = ssdpMultiIf.getInetAddresses();
+		Enumeration<InetAddress> addrs = ssdpMultiIf.getInetAddresses();
 		while (addrs.hasMoreElements()) {
-			InetAddress addr = (InetAddress)addrs.nextElement();
+			InetAddress addr = addrs.nextElement();
 			if (mcastAddr instanceof Inet6Address && addr instanceof Inet6Address)
 				return addr.getHostAddress();
 			if (mcastAddr instanceof Inet4Address && addr instanceof Inet4Address)

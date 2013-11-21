@@ -67,9 +67,9 @@ public class Action
 	void setService(Service s){
 		serviceNode=s.getServiceNode();
 		/*To ensure integrity of the XML structure*/
-		Iterator i = getArgumentList().iterator();
+		Iterator<Argument> i = getArgumentList().iterator();
 		while (i.hasNext()) {
-			Argument arg = (Argument) i.next();
+			Argument arg = i.next();
 			arg.setService(s);
 		}		
 	}
@@ -170,9 +170,9 @@ public class Action
 		}else{
 			argumentListNode.removeAllNodes();
 		}
-		Iterator i = al.iterator();
+		Iterator<Argument> i = al.iterator();
 		while (i.hasNext()) {
-			Argument a = (Argument) i.next();
+			Argument a = i.next();
 			a.setService(getService());
 			argumentListNode.addNode(a.getArgumentNode());
 		}

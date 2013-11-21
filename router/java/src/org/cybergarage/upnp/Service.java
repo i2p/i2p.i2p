@@ -501,9 +501,9 @@ public class Service
 	}
 	
 	public void addAction(Action a){
-		Iterator i = a.getArgumentList().iterator();
+		Iterator<Argument> i = a.getArgumentList().iterator();
 		while (i.hasNext()) {
-			Argument arg = (Argument) i.next();
+			Argument arg = i.next();
 			arg.setService(this);
 		}
 

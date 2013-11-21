@@ -277,9 +277,9 @@ public class StateVariable extends NodeData
 		getStateVariableNode().removeNode(AllowedValueList.ELEM_NAME);
 		getStateVariableNode().removeNode(AllowedValueRange.ELEM_NAME);
 		Node n = new Node(AllowedValueList.ELEM_NAME);
-		Iterator i=avl.iterator();
+		Iterator<AllowedValue> i=avl.iterator();
 		while (i.hasNext()) {
-			AllowedValue av = (AllowedValue) i.next();
+			AllowedValue av = i.next();
 			//n.addNode(new Node(AllowedValue.ELEM_NAME,av.getValue())); wrong!
 			n.addNode(av.getAllowedValueNode());						//better (twa)
 		}
