@@ -175,7 +175,7 @@ public abstract class TransportImpl implements Transport {
      * Vector composed of Long, each element representing a peer skew in seconds.
      * Dummy version. Transports override it.
      */
-    public Vector getClockSkews() { return new Vector(); }
+    public Vector<Long> getClockSkews() { return new Vector<Long>(); }
 
     public List<String> getMostRecentErrorMessages() { return Collections.emptyList(); }
 

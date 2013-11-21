@@ -97,7 +97,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      */
     @Override
     public long getFramedAveragePeerClockSkew(int percentToInclude) {
-        Vector skews = _manager.getClockSkews();
+        Vector<Long> skews = _manager.getClockSkews();
         if (skews == null ||
             skews.isEmpty() ||
             (skews.size() < 5 && _context.clock().getUpdatedSuccessfully())) {

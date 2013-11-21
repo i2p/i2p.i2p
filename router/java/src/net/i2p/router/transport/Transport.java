@@ -127,7 +127,7 @@ public interface Transport {
     public int countActiveSendPeers();
     public boolean haveCapacity();
     public boolean haveCapacity(int pct);
-    public Vector getClockSkews();
+    public Vector<Long> getClockSkews();
     public List<String> getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;

@@ -29,7 +29,6 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.Transport.AddressSource.*;
-import net.i2p.router.transport.TransportManager.Port;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -286,10 +285,10 @@ public class TransportManager implements TransportEventListener {
      * Vector composed of Long, each element representing a peer skew in seconds.
      * Note: this method returns them in whimsical order.
      */
-    public Vector getClockSkews() {
-        Vector skews = new Vector();
+    public Vector<Long> getClockSkews() {
+        Vector<Long> skews = new Vector<Long>();
         for (Transport t : _transports.values()) {
-            Vector tempSkews = t.getClockSkews();
+            Vector<Long> tempSkews = t.getClockSkews();
             if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }
@@ -435,7 +434,7 @@ public class TransportManager implements TransportEventListener {
             throw new IllegalArgumentException("WTF, bids for a message bound to ourselves?");
 
         List<TransportBid> rv = new ArrayList<TransportBid>(_transports.size());
-        Set failedTransports = msg.getFailedTransports();
+        Set<String> failedTransports = msg.getFailedTransports();
         for (Transport t : _transports.values()) {
             if (failedTransports.contains(t.getStyle())) {
                 if (_log.shouldLog(Log.DEBUG))
@@ -461,7 +460,7 @@ public class TransportManager implements TransportEventListener {
     public TransportBid getNextBid(OutNetMessage msg) {
         int unreachableTransports = 0;
         Hash peer = msg.getTarget().getIdentity().calculateHash();
-        Set failedTransports = msg.getFailedTransports();
+        Set<String> failedTransports = msg.getFailedTransports();
         TransportBid rv = null;
         for (Transport t : _transports.values()) {
             if (t.isUnreachable(peer)) {
