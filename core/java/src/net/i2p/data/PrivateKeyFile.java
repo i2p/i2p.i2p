@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -402,8 +401,7 @@ public class PrivateKeyFile {
                             System.out.println("Attempting to verify using " + sz + " hosts, this may take a while");
                     }
                     
-                    for (Iterator iter = hosts.entrySet().iterator(); iter.hasNext(); )  {
-                        Map.Entry entry = (Map.Entry)iter.next();
+                    for (Map.Entry<Object, Object> entry : hosts.entrySet())  {
                         String s = (String) entry.getValue();
                         Destination signer = new Destination(s);
                         // make it go faster if we have the signerHash hint

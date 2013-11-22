@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -22,7 +23,8 @@ public class BlockfileNamingServiceTest extends TestCase {
     List<String> _names;
     File hostsTxt, routerDir;
 
-    public void setUp() throws Exception {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setUp() throws Exception {
         I2PAppContext ctx = new I2PAppContext();
         routerDir = ctx.getRouterDir();
         
@@ -31,7 +33,7 @@ public class BlockfileNamingServiceTest extends TestCase {
         Properties props = new Properties();
         assertNotNull("test classpath not set correctly",is);
         DataHelper.loadProps(props, is, true);
-        _names = new ArrayList(props.keySet());
+        _names = new ArrayList<String>((Set<String>) (Set) props.keySet());  // TODO-Java6: s/keySet()/stringPropertyNames()/
         Collections.shuffle(_names);
         is.close();
         
