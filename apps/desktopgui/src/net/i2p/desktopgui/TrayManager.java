@@ -1,28 +1,15 @@
 package net.i2p.desktopgui;
 
 import java.awt.AWTException;
-import java.awt.Desktop;
 import java.awt.Image;
-import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.Desktop.Action;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-
-import javax.swing.SwingWorker;
 
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.router.RouterManager;
-import net.i2p.desktopgui.util.BrowseException;
-import net.i2p.desktopgui.util.ConfigurationManager;
-import net.i2p.desktopgui.util.I2PDesktop;
 import net.i2p.util.Log;
 
 /**
