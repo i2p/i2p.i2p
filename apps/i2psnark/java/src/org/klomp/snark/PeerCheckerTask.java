@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
@@ -73,7 +72,7 @@ class PeerCheckerTask implements Runnable
 
         // Keep track of peers we remove now,
         // we will add them back to the end of the list.
-        List<Peer> removed = new ArrayList();
+        List<Peer> removed = new ArrayList<Peer>();
         int uploadLimit = coordinator.allowedUploaders();
         boolean overBWLimit = coordinator.overUpBWLimit();
         DHT dht = _util.getDHT();

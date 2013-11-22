@@ -26,7 +26,7 @@ public class I2PThread extends Thread {
      *  Logging removed, too much trouble with extra contexts
      */
     //private volatile Log _log;
-    private static final Set _listeners = new CopyOnWriteArraySet();
+    private static final Set<OOMEventListener> _listeners = new CopyOnWriteArraySet<OOMEventListener>();
     //private String _name;
     //private Exception _createdBy;
 
@@ -112,8 +112,8 @@ public class I2PThread extends Thread {
 ****/
     
     protected void fireOOM(OutOfMemoryError oom) {
-        for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
-            OOMEventListener listener = (OOMEventListener)iter.next();
+        for (Iterator<OOMEventListener> iter = _listeners.iterator(); iter.hasNext(); ) {
+            OOMEventListener listener = iter.next();
             listener.outOfMemory(oom);
         }
     }

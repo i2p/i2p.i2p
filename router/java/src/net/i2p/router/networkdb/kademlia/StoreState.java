@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.MessageWrapper.WrappedMessage;
 
 /**
  *  Tracks the state of a StoreJob
@@ -38,16 +39,16 @@ class StoreState {
         _context = ctx;
         _key = key;
         _data = data;
-        _pendingPeers = new HashSet(4);
-        _pendingPeerTimes = new HashMap(4);
-        _pendingMessages = new ConcurrentHashMap(4);
-        _attemptedPeers = new HashSet(8);
+        _pendingPeers = new HashSet<Hash>(4);
+        _pendingPeerTimes = new HashMap<Hash, Long>(4);
+        _pendingMessages = new ConcurrentHashMap<Hash, WrappedMessage>(4);
+        _attemptedPeers = new HashSet<Hash>(8);
         if (toSkip != null) {
             _attemptedPeers.addAll(toSkip);
             _completeCount = toSkip.size();
         }
-        _failedPeers = new HashSet(8);
-        _successfulPeers = new HashSet(4);
+        _failedPeers = new HashSet<Hash>(8);
+        _successfulPeers = new HashSet<Hash>(4);
         //_successfulExploratoryPeers = new HashSet(16);
         _completed = -1;
         _started = _context.clock().now();

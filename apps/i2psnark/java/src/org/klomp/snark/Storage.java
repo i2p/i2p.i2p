@@ -75,7 +75,7 @@ public class Storage
   public static final int MAX_PIECES = 10*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
 
-  private static final Map<String, String> _filterNameCache = new ConcurrentHashMap();
+  private static final Map<String, String> _filterNameCache = new ConcurrentHashMap<String, String>();
 
   private static final boolean _isWindows = SystemVersion.isWindows();
 
@@ -101,7 +101,7 @@ public class Storage
     total_length = metainfo.getTotalLength();
     List<List<String>> files = metainfo.getFiles();
     int sz = files != null ? files.size() : 1;
-    _torrentFiles = new ArrayList(sz);
+    _torrentFiles = new ArrayList<TorrentFile>(sz);
   }
 
   /**
@@ -127,7 +127,7 @@ public class Storage
     _torrentFiles = getFiles(baseFile);
     
     long total = 0;
-    ArrayList<Long> lengthsList = new ArrayList();
+    ArrayList<Long> lengthsList = new ArrayList<Long>();
     for (TorrentFile tf : _torrentFiles)
       {
         long length = tf.length;
@@ -160,10 +160,10 @@ public class Storage
     bitfield = new BitField(pieces);
     needed = 0;
 
-    List<List<String>> files = new ArrayList();
+    List<List<String>> files = new ArrayList<List<String>>();
     for (TorrentFile tf : _torrentFiles)
       {
-        List<String> file = new ArrayList();
+        List<String> file = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(tf.name, File.separator);
         while (st.hasMoreTokens())
           {
@@ -218,11 +218,11 @@ public class Storage
   {
     if (base.getAbsolutePath().equals("/"))
         throw new IOException("Don't seed root");
-    List<File> files = new ArrayList();
+    List<File> files = new ArrayList<File>();
     addFiles(files, base);
 
     int size = files.size();
-    List<TorrentFile> rv = new ArrayList(size);
+    List<TorrentFile> rv = new ArrayList<TorrentFile>(size);
 
     for (File f : files) {
         rv.add(new TorrentFile(base, f));
@@ -550,7 +550,7 @@ public class Storage
                 if (f.equals(_torrentFiles.get(j).RAFfile)) {
                     // Rename and start the check over again
                     // Copy path since metainfo list is unmodifiable
-                    path = new ArrayList(path);
+                    path = new ArrayList<String>(path);
                     int last = path.size() - 1;
                     String lastPath = path.get(last);
                     int dot = lastPath.lastIndexOf('.');

@@ -133,9 +133,9 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     public BlockfileNamingService(I2PAppContext context) {
         super(context);
-        _lists = new ArrayList();
-        _invalid = new ArrayList();
-        _negativeCache = new LHMCache(NEGATIVE_CACHE_SIZE);
+        _lists = new ArrayList<String>();
+        _invalid = new ArrayList<InvalidEntry>();
+        _negativeCache = new LHMCache<String, String>(NEGATIVE_CACHE_SIZE);
         BlockFile bf = null;
         RAIFile raf = null;
         boolean readOnly = false;
@@ -468,7 +468,7 @@ public class BlockfileNamingService extends DummyNamingService {
 
     private static List<String> getFilenames(String list) {
         StringTokenizer tok = new StringTokenizer(list, ",");
-        List<String> rv = new ArrayList(tok.countTokens());
+        List<String> rv = new ArrayList<String>(tok.countTokens());
         while (tok.hasMoreTokens())
             rv.add(tok.nextToken());
         return rv;
@@ -847,20 +847,20 @@ public class BlockfileNamingService extends DummyNamingService {
                        " limit=" + limit + " skip=" + skip);
         synchronized(_bf) {
             if (_isClosed)
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
-                    return Collections.EMPTY_MAP;
+                    return Collections.emptyMap();
                 }
                 SkipIterator iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
                     iter = sl.iterator();
-                Map<String, Destination> rv = new HashMap();
+                Map<String, Destination> rv = new HashMap<String, Destination>();
                 for (int i = 0; i < skip && iter.hasNext(); i++) {
                     // don't bother validating here
                     iter.next();
@@ -886,10 +886,10 @@ public class BlockfileNamingService extends DummyNamingService {
                 return rv;
             } catch (IOException ioe) {
                 _log.error("DB lookup error", ioe);
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             } catch (RuntimeException re) {
                 _log.error("DB lookup error", re);
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             } finally {
                 deleteInvalid();
             }

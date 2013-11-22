@@ -42,7 +42,7 @@ class ExploreKeySelectorJob extends JobImpl {
             requeue(30*RERUN_DELAY_MS);
             return;
         }
-        Set toExplore = selectKeysToExplore();
+        Set<Hash> toExplore = selectKeysToExplore();
         _log.info("Filling the explorer pool with: " + toExplore);
         if (toExplore != null)
             _facade.queueForExploration(toExplore);
@@ -54,16 +54,16 @@ class ExploreKeySelectorJob extends JobImpl {
      * for it, with a maximum number of keys limited by the exploration pool size
      *
      */
-    private Set selectKeysToExplore() {
-        Set alreadyQueued = _facade.getExploreKeys();
+    private Set<Hash> selectKeysToExplore() {
+        Set<Hash> alreadyQueued = _facade.getExploreKeys();
         if (alreadyQueued.size() > KBucketSet.NUM_BUCKETS) return null;
-        Set toExplore = new HashSet(KBucketSet.NUM_BUCKETS - alreadyQueued.size());
+        Set<Hash> toExplore = new HashSet<Hash>(KBucketSet.NUM_BUCKETS - alreadyQueued.size());
         for (int i = 0; i < KBucketSet.NUM_BUCKETS; i++) {
             KBucket bucket = _facade.getKBuckets().getBucket(i);
             if (bucket.getKeyCount() < KBucketSet.BUCKET_SIZE) {
                 boolean already = false;
-                for (Iterator iter = alreadyQueued.iterator(); iter.hasNext(); ) {
-                    Hash key = (Hash)iter.next();
+                for (Iterator<Hash> iter = alreadyQueued.iterator(); iter.hasNext(); ) {
+                    Hash key = iter.next();
                     if (bucket.shouldContain(key)) {
                         already = true;
                         _log.debug("Bucket " + i + " is already queued for exploration \t" + key);

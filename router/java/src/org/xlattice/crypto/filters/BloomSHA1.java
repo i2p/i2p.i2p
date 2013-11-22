@@ -95,7 +95,7 @@ public class BloomSHA1 {
         filterWords = (filterBits + 31)/32;     // round up 
         filter = new int[filterWords];
         ks = new KeySelector(m, k);
-        buf = new LinkedBlockingQueue(16);
+        buf = new LinkedBlockingQueue<int[]>(16);
 
         // DEBUG
         //System.out.println("Bloom constructor: m = " + m + ", k = " + k

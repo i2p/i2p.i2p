@@ -36,12 +36,12 @@ public class MailCache {
 	public static final boolean FETCH_ALL = false;
 	
 	private POP3MailBox mailbox;
-	private Hashtable mails;
+	private Hashtable<String, Mail> mails;
 	private Object synchronizer;
 	
 	MailCache( POP3MailBox mailbox ) {
 		this.mailbox = mailbox;
-		mails = new Hashtable();
+		mails = new Hashtable<String, Mail>();
 		synchronizer = new Object();
 	}
 	/**
@@ -61,7 +61,7 @@ public class MailCache {
 			 */
 			synchronized( synchronizer ) {
 
-				mail = (Mail)mails.get( uidl );
+				mail = mails.get( uidl );
 			
 				if( mail == null ) {
 					newMail = new Mail();

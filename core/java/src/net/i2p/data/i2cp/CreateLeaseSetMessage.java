@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataHelper;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;

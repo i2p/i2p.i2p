@@ -96,11 +96,11 @@ class PeerSelector {
      */
     List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
         if (peersToIgnore == null)
-            peersToIgnore = new HashSet(1);
+            peersToIgnore = new HashSet<Hash>(1);
         peersToIgnore.add(_context.routerHash());
         MatchSelectionCollector matches = new MatchSelectionCollector(key, peersToIgnore);
         kbuckets.getAll(matches);
-        List rv = matches.get(maxNumRouters);
+        List<Hash> rv = matches.get(maxNumRouters);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " 
                        + rv + " (not including " + peersToIgnore + ") [allHashes.size = " 
@@ -116,7 +116,7 @@ class PeerSelector {
         private int _matches;
         public MatchSelectionCollector(Hash key, Set<Hash> toIgnore) {
             _key = key;
-            _sorted = new TreeMap();
+            _sorted = new TreeMap<BigInteger, Hash>();
             _toIgnore = toIgnore;
             _matches = 0;
         }
@@ -138,7 +138,7 @@ class PeerSelector {
         }
         /** get the first $howMany entries matching */
         public List<Hash> get(int howMany) {
-            List<Hash> rv = new ArrayList(howMany);
+            List<Hash> rv = new ArrayList<Hash>(howMany);
             for (int i = 0; i < howMany; i++) {
                 if (_sorted.isEmpty())
                     break;

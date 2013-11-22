@@ -1,6 +1,5 @@
 package net.i2p.router;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -69,7 +68,7 @@ public class RouterContext extends I2PAppContext {
     private volatile boolean _initialized;
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object();
 
-    private static final List<RouterContext> _contexts = new CopyOnWriteArrayList();
+    private static final List<RouterContext> _contexts = new CopyOnWriteArrayList<RouterContext>();
     
     /**
      *  Caller MUST call initAll() after instantiation.
@@ -89,7 +88,7 @@ public class RouterContext extends I2PAppContext {
         //initAll();
         if (!_contexts.isEmpty())
             System.err.println("Warning - More than one router in this JVM");
-        _finalShutdownTasks = new CopyOnWriteArraySet();
+        _finalShutdownTasks = new CopyOnWriteArraySet<Runnable>();
         _contexts.add(this);
     }
 

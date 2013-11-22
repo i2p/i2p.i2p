@@ -1,7 +1,5 @@
 package net.i2p.router.tasks;
 
-import java.io.File;
-
 import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
 import net.i2p.router.CommSystemFacade;
@@ -10,7 +8,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.util.ShellCommand;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 

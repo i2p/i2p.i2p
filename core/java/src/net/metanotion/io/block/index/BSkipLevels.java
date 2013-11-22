@@ -226,7 +226,7 @@ public class BSkipLevels extends SkipLevels {
 	 *  @since 0.8.8
 	 */
 	private boolean blvlfix() {
-		TreeSet<SkipLevels> lvls = new TreeSet(new LevelComparator());
+		TreeSet<SkipLevels> lvls = new TreeSet<SkipLevels>(new LevelComparator());
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("Starting level search");
 		getAllLevels(this, lvls);
@@ -284,7 +284,7 @@ public class BSkipLevels extends SkipLevels {
 	 *  @param lvlSet out parameter, the result
 	 *  @since 0.8.8
 	 */
-	private void getAllLevels(SkipLevels l, Set lvlSet) {
+	private void getAllLevels(SkipLevels l, Set<SkipLevels> lvlSet) {
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("GAL " + l.print());
 		// Do level 0 without recursion, on the assumption everything is findable

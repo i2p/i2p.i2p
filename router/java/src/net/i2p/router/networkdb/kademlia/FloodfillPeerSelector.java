@@ -88,7 +88,7 @@ class FloodfillPeerSelector extends PeerSelector {
             peersToIgnore.add(_context.routerHash());
         // TODO this is very slow
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
-        if (kbuckets == null) return new ArrayList();
+        if (kbuckets == null) return new ArrayList<Hash>();
         kbuckets.getAll(matches);
         List<Hash> rv = matches.get(maxNumRouters, preferConnected);
         if (_log.shouldLog(Log.DEBUG))
@@ -126,7 +126,7 @@ class FloodfillPeerSelector extends PeerSelector {
         return matches.getFloodfillParticipants();
       *****/
         Set<Hash> set = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
-        List<Hash> rv = new ArrayList(set.size());
+        List<Hash> rv = new ArrayList<Hash>(set.size());
         for (Hash h : set) {
             if ((toIgnore != null && toIgnore.contains(h)) ||
                 _context.banlist().isBanlistedForever(h))
@@ -180,7 +180,7 @@ class FloodfillPeerSelector extends PeerSelector {
             toIgnore = Collections.singleton(_context.routerHash());
         } else if (!toIgnore.contains(_context.routerHash())) {
             // copy the Set so we don't confuse StoreJob
-            toIgnore = new HashSet(toIgnore);
+            toIgnore = new HashSet<Hash>(toIgnore);
             toIgnore.add(_context.routerHash());
         }
         return selectFloodfillParticipantsIncludingUs(key, howMany, toIgnore, kbuckets);
@@ -195,12 +195,12 @@ class FloodfillPeerSelector extends PeerSelector {
      */
     private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);
-        TreeSet<Hash> sorted = new TreeSet(new XORComparator(key));
+        TreeSet<Hash> sorted = new TreeSet<Hash>(new XORComparator(key));
         sorted.addAll(ffs);
 
-        List<Hash> rv = new ArrayList(howMany);
-        List<Hash> okff = new ArrayList(ffs.size());
-        List<Hash> badff = new ArrayList(ffs.size());
+        List<Hash> rv = new ArrayList<Hash>(howMany);
+        List<Hash> okff = new ArrayList<Hash>(ffs.size());
+        List<Hash> badff = new ArrayList<Hash>(ffs.size());
         int found = 0;
         long now = _context.clock().now();
 
@@ -219,7 +219,7 @@ class FloodfillPeerSelector extends PeerSelector {
         // 5 == FNDF.MAX_TO_FLOOD + 1
         int limit = Math.max(5, howMany);
         limit = Math.min(limit, ffs.size());
-        Set<Integer> maskedIPs = new HashSet(limit + 4);
+        Set<Integer> maskedIPs = new HashSet<Integer>(limit + 4);
         // split sorted list into 3 sorted lists
         for (int i = 0; found < howMany && i < limit; i++) {
             Hash entry = sorted.first();
@@ -303,7 +303,7 @@ class FloodfillPeerSelector extends PeerSelector {
       * @since 0.9.5 modified from ProfileOrganizer
       */
     private Set<Integer> maskedIPSet(Hash peer, RouterInfo pinfo, int mask) {
-        Set<Integer> rv = new HashSet(4);
+        Set<Integer> rv = new HashSet<Integer>(4);
         byte[] commIP = _context.commSystem().getIP(peer);
         if (commIP != null)
             rv.add(maskedIP(commIP, mask));
@@ -354,8 +354,8 @@ class FloodfillPeerSelector extends PeerSelector {
          */
         public FloodfillSelectionCollector(Hash key, Set<Hash> toIgnore, int wanted) {
             _key = key;
-            _sorted = new TreeSet(new XORComparator(key));
-            _floodfillMatches = new ArrayList(8);
+            _sorted = new TreeSet<Hash>(new XORComparator(key));
+            _floodfillMatches = new ArrayList<Hash>(8);
             _toIgnore = toIgnore;
             _wanted = wanted;
         }
@@ -410,15 +410,15 @@ class FloodfillPeerSelector extends PeerSelector {
          *  Group 4: Non-floodfills, sorted by closest-to-the-key
          */
         public List<Hash> get(int howMany, boolean preferConnected) {
-            List<Hash> rv = new ArrayList(howMany);
-            List<Hash> badff = new ArrayList(howMany);
-            List<Hash> unconnectedff = new ArrayList(howMany);
+            List<Hash> rv = new ArrayList<Hash>(howMany);
+            List<Hash> badff = new ArrayList<Hash>(howMany);
+            List<Hash> unconnectedff = new ArrayList<Hash>(howMany);
             int found = 0;
             long now = _context.clock().now();
             // Only add in "good" floodfills here...
             // Let's say published in last 3h and no failed sends in last 30m
             // (Forever banlisted ones are excluded in add() above)
-            for (Iterator<Hash> iter = new RandomIterator(_floodfillMatches); (found < howMany) && iter.hasNext(); ) {
+            for (Iterator<Hash> iter = new RandomIterator<Hash>(_floodfillMatches); (found < howMany) && iter.hasNext(); ) {
                 Hash entry = iter.next();
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
                 if (info != null && now - info.getPublished() > 3*60*60*1000) {

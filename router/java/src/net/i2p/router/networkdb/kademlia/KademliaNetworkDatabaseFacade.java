@@ -46,7 +46,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** where the data store is pushing the data */
     private String _dbDir;
     // set of Hash objects that we should search on (to fill up a bucket, not to get data)
-    private final Set<Hash> _exploreKeys = new ConcurrentHashSet(64);
+    private final Set<Hash> _exploreKeys = new ConcurrentHashSet<Hash>(64);
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -138,8 +138,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _context = context;
         _log = _context.logManager().getLog(getClass());
         _peerSelector = createPeerSelector();
-        _publishingLeaseSets = new HashMap(8);
-        _activeRequests = new HashMap(8);
+        _publishingLeaseSets = new HashMap<Hash, RepublishLeaseSetJob>(8);
+        _activeRequests = new HashMap<Hash, SearchJob>(8);
         _reseedChecker = new ReseedChecker(context);
         context.statManager().createRateStat("netDb.lookupDeferred", "how many lookups are deferred?", "NetworkDatabase", new long[] { 60*60*1000 });
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 60*60*1000 });
@@ -181,7 +181,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** @return unmodifiable set */
     public Set<Hash> getExploreKeys() {
         if (!_initialized)
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         return Collections.unmodifiableSet(_exploreKeys);
     }
     
@@ -323,8 +323,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * @param peersToIgnore can be null
      */
     public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) {
-        if (!_initialized) return Collections.EMPTY_SET;
-        return new HashSet(_peerSelector.selectNearest(key, maxNumRouters, peersToIgnore, _kb));
+        if (!_initialized) return Collections.emptySet();
+        return new HashSet<Hash>(_peerSelector.selectNearest(key, maxNumRouters, peersToIgnore, _kb));
     }
     
 /*****
@@ -349,9 +349,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     /** get the hashes for all known routers */
     public Set<Hash> getAllRouters() {
-        if (!_initialized) return Collections.EMPTY_SET;
+        if (!_initialized) return Collections.emptySet();
         Set<Map.Entry<Hash, DatabaseEntry>> entries = _ds.getMapEntries();
-        Set<Hash> rv = new HashSet(entries.size());
+        Set<Hash> rv = new HashSet<Hash>(entries.size());
         for (Map.Entry<Hash, DatabaseEntry> entry : entries) {
             if (entry.getValue().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 rv.add(entry.getKey());
@@ -988,10 +988,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     @Override
     public Set<LeaseSet> getLeases() {
         if (!_initialized) return null;
-        Set leases = new HashSet();
+        Set<LeaseSet> leases = new HashSet<LeaseSet>();
         for (DatabaseEntry o : getDataStore().getEntries()) {
             if (o.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
-                leases.add(o);
+                leases.add((LeaseSet)o);
         }
         return leases;
     }
@@ -1000,10 +1000,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     @Override
     public Set<RouterInfo> getRouters() {
         if (!_initialized) return null;
-        Set routers = new HashSet();
+        Set<RouterInfo> routers = new HashSet<RouterInfo>();
         for (DatabaseEntry o : getDataStore().getEntries()) {
             if (o.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
-                routers.add(o);
+                routers.add((RouterInfo)o);
         }
         return routers;
     }
@@ -1034,7 +1034,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** unused (overridden in FNDF) */
-    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
+    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set<Hash> toIgnore) {
         if ( (ds == null) || (key == null) ) {
             if (onFailure != null) 
                 _context.jobQueue().addJob(onFailure);

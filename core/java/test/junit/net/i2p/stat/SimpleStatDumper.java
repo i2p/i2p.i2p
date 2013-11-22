@@ -21,9 +21,9 @@ public class SimpleStatDumper {
     }
 
     private static void dumpFrequencies(I2PAppContext ctx, StringBuilder buf) {
-        Set frequencies = new TreeSet(ctx.statManager().getFrequencyNames());
-        for (Iterator iter = frequencies.iterator(); iter.hasNext();) {
-            String name = (String) iter.next();
+        Set<String> frequencies = new TreeSet<String>(ctx.statManager().getFrequencyNames());
+        for (Iterator<String> iter = frequencies.iterator(); iter.hasNext();) {
+            String name = iter.next();
             FrequencyStat freq = ctx.statManager().getFrequency(name);
             buf.append('\n');
             buf.append(freq.getGroupName()).append('.').append(freq.getName()).append(": ")
@@ -41,9 +41,9 @@ public class SimpleStatDumper {
     }
 
     private static void dumpRates(I2PAppContext ctx, StringBuilder buf) {
-        Set rates = new TreeSet(ctx.statManager().getRateNames());
-        for (Iterator iter = rates.iterator(); iter.hasNext();) {
-            String name = (String) iter.next();
+        Set<String> rates = new TreeSet<String>(ctx.statManager().getRateNames());
+        for (Iterator<String> iter = rates.iterator(); iter.hasNext();) {
+            String name = iter.next();
             RateStat rate = ctx.statManager().getRate(name);
             buf.append('\n');
             buf.append(rate.getGroupName()).append('.').append(rate.getName()).append(": ")

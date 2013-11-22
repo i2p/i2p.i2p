@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.transport.FIFOBandwidthLimiter.Request;
 import net.i2p.util.Log;
 
 /**
@@ -92,7 +93,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     public void run() {
         // bootstrap 'em with nothing
         _lastRefillTime = _limiter.now();
-        List<FIFOBandwidthLimiter.Request> buffer = new ArrayList(2);
+        List<FIFOBandwidthLimiter.Request> buffer = new ArrayList<Request>(2);
         while (_isRunning) {
             long now = _limiter.now();
             if (now >= _lastCheckConfigTime + _configCheckPeriodMs) {

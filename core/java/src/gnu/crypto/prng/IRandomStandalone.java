@@ -107,7 +107,7 @@ public interface IRandomStandalone extends Cloneable {
     * @exception IllegalArgumentException if at least one of the defined name/
     * value pairs contains invalid data.
     */
-   void init(Map attributes);
+   void init(Map<String, byte[]> attributes);
 
    /**
      * <p>Returns the next 8 bits of random data generated from this instance.</p>

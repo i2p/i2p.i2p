@@ -116,7 +116,6 @@ public class TCPio implements Runnable {
 				Aout.close();
 			} catch (IOException ex) {
 			}
-			return;
 		}
 	}
 }

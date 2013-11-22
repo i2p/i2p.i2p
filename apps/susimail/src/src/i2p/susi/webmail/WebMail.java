@@ -322,7 +322,7 @@ public class WebMail extends HttpServlet
 		String subject, body, showUIDL;
 		public MailPart showAttachment;
 		public String sentMail;
-		public ArrayList attachments;
+		public ArrayList<Attachment> attachments;
 		public boolean reallyDelete;
 		String themePath, imgPath;
 		boolean isMobile;
@@ -875,8 +875,8 @@ public class WebMail extends HttpServlet
 	 * @return message number or -1
 	 */
 	private static int getCheckedMessage(RequestWrapper request) {
-		for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); ) {
-			String parameter = (String)e.nextElement();
+		for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
+			String parameter = e.nextElement();
 			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
 				String number = parameter.substring( 5 );
 				try {
@@ -944,7 +944,7 @@ public class WebMail extends HttpServlet
 								attachment.setTransferEncoding( encodeTo );
 								attachment.setContentType( contentType );
 								if( sessionObject.attachments == null )
-									sessionObject.attachments = new ArrayList();
+									sessionObject.attachments = new ArrayList<Attachment>();
 								sessionObject.attachments.add( attachment );
 							}
 							else {
@@ -962,8 +962,8 @@ public class WebMail extends HttpServlet
 			}
 		}
 		else if( sessionObject.attachments != null && buttonPressed( request, DELETE_ATTACHMENT ) ) {
-			for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); ) {
-				String parameter = (String)e.nextElement();
+			for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
+				String parameter = e.nextElement();
 				if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
 					String number = parameter.substring( 5 );
 					try {
@@ -1108,8 +1108,8 @@ public class WebMail extends HttpServlet
 		else {
 			int numberDeleted = 0;
 			if( buttonPressed( request, REALLYDELETE ) ) {
-				for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); ) {
-					String parameter = (String)e.nextElement();
+				for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
+					String parameter = e.nextElement();
 					if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
 						String number = parameter.substring( 5 );
 						try {
@@ -1440,10 +1440,10 @@ public class WebMail extends HttpServlet
 		if( prop.compareToIgnoreCase( "false" ) != 0 ) {
 			from = "<" + sessionObject.user + "@" + domain + ">";
 		}
-		ArrayList toList = new ArrayList();
-		ArrayList ccList = new ArrayList();
-		ArrayList bccList = new ArrayList();
-		ArrayList recipients = new ArrayList();
+		ArrayList<String> toList = new ArrayList<String>();
+		ArrayList<String> ccList = new ArrayList<String>();
+		ArrayList<String> bccList = new ArrayList<String>();
+		ArrayList<String> recipients = new ArrayList<String>();
 		
 		String sender = null;
 		

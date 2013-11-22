@@ -25,7 +25,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
-import net.i2p.util.VersionComparator;
 
 /**
  * A traditional Kademlia search that continues to search
@@ -94,10 +93,10 @@ class IterativeSearchJob extends FloodSearchJob {
         _timeoutMs = Math.min(timeoutMs, MAX_SEARCH_TIME);
         _expiration = _timeoutMs + ctx.clock().now();
         _rkey = ctx.routingKeyGenerator().getRoutingKey(key);
-        _toTry = new TreeSet(new XORComparator(_rkey));
-        _unheardFrom = new HashSet(CONCURRENT_SEARCHES);
-        _failedPeers = new HashSet(TOTAL_SEARCH_LIMIT);
-        _sentTime = new ConcurrentHashMap(TOTAL_SEARCH_LIMIT);
+        _toTry = new TreeSet<Hash>(new XORComparator(_rkey));
+        _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
+        _failedPeers = new HashSet<Hash>(TOTAL_SEARCH_LIMIT);
+        _sentTime = new ConcurrentHashMap<Hash, Long>(TOTAL_SEARCH_LIMIT);
     }
 
     @Override
@@ -116,7 +115,7 @@ class IterativeSearchJob extends FloodSearchJob {
             // but we're passing the rkey not the key, so we do it below instead in certain cases.
             floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, TOTAL_SEARCH_LIMIT, ks);
         } else {
-            floodfillPeers = new ArrayList(TOTAL_SEARCH_LIMIT);
+            floodfillPeers = new ArrayList<Hash>(TOTAL_SEARCH_LIMIT);
         }
 
         // For testing or local networks... we will
@@ -137,14 +136,14 @@ class IterativeSearchJob extends FloodSearchJob {
             // so this situation should be temporary
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running netDb searches against the floodfill peers, but we don't know any");
-            List<Hash> all = new ArrayList(_facade.getAllRouters());
+            List<Hash> all = new ArrayList<Hash>(_facade.getAllRouters());
             if (all.isEmpty()) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("We don't know any peers at all");
                 failed();
                 return;
             }
-            Iterator<Hash> iter = new RandomIterator(all);
+            Iterator<Hash> iter = new RandomIterator<Hash>(all);
             // Limit non-FF to 3, because we don't sort the FFs ahead of the non-FFS,
             // so once we get some FFs we want to be sure to query them
             for (int i = 0; iter.hasNext() && i < MAX_NON_FF; i++) {

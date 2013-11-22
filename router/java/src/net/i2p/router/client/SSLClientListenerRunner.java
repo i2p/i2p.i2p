@@ -4,15 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +17,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLContext;
 
 import net.i2p.client.I2PClient;
-import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.KeyStoreUtil;
-import net.i2p.data.Base32;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
@@ -94,7 +88,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
         if (success) {
             success = ks.exists();
             if (success) {
-                Map<String, String> changes = new HashMap();
+                Map<String, String> changes = new HashMap<String, String>();
                 changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
                 changes.put(PROP_KEY_PASSWORD, keyPassword);
                 _context.router().saveConfig(changes, null);

@@ -112,8 +112,8 @@ public class RouterGenerator {
 	return info;
     }
     
-    static Set createAddresses(int num) {
-	Set addresses = new HashSet();
+    static Set<RouterAddress> createAddresses(int num) {
+	Set<RouterAddress> addresses = new HashSet<RouterAddress>();
 	RouterAddress addr = createTCPAddress(num);
 	if (addr != null)
 	    addresses.add(addr);

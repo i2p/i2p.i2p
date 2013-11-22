@@ -49,7 +49,7 @@ class SearchJob extends JobImpl {
     private final boolean _keepStats;
     private Job _pendingRequeueJob;
     private final PeerSelector _peerSelector;
-    private final List _deferredSearches;
+    private final List<Search> _deferredSearches;
     private boolean _deferredCleared;
     private long _startedOn;
     private boolean _floodfillPeersExhausted;
@@ -99,7 +99,7 @@ class SearchJob extends JobImpl {
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
         _keepStats = keepStats;
-        _deferredSearches = new ArrayList(0);
+        _deferredSearches = new ArrayList<Search>(0);
         _peerSelector = facade.getPeerSelector();
         _startedOn = -1;
         _expiration = getContext().clock().now() + timeoutMs;
@@ -260,7 +260,7 @@ class SearchJob extends JobImpl {
             return;
         } 
         int sent = 0;
-        Set attempted = _state.getAttempted();
+        Set<Hash> attempted = _state.getAttempted();
         while (sent <= 0) {
             //boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
             boolean onlyFloodfill = true;
@@ -271,7 +271,7 @@ class SearchJob extends JobImpl {
                 fail();
                 return;
             }
-            List closestHashes = getClosestRouters(_state.getTarget(), toCheck, attempted);
+            List<Hash> closestHashes = getClosestRouters(_state.getTarget(), toCheck, attempted);
             if ( (closestHashes == null) || (closestHashes.isEmpty()) ) {
                 if (_state.getPending().isEmpty()) {
                     // we tried to find some peers, but there weren't any and no one else is going to answer
@@ -290,8 +290,8 @@ class SearchJob extends JobImpl {
                 return;
             } else {
                 attempted.addAll(closestHashes);
-                for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
+                for (Iterator<Hash> iter = closestHashes.iterator(); iter.hasNext(); ) {
+                    Hash peer = iter.next();
                     DatabaseEntry ds = _facade.getDataStore().get(peer);
                     if (ds == null) {
                         if (_log.shouldLog(Log.INFO))
@@ -365,7 +365,7 @@ class SearchJob extends JobImpl {
      *
      * @return ordered list of Hash objects
      */
-    private List getClosestRouters(Hash key, int numClosest, Set alreadyChecked) {
+    private List<Hash> getClosestRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Current routing key for " + key + ": " + rkey);
@@ -627,11 +627,11 @@ class SearchJob extends JobImpl {
                     _facade.sendStore(_state.getTarget(), ds, null, null, RESEND_TIMEOUT, _state.getSuccessful());
             }
         } else {
-            Set sendTo = _state.getRepliedPeers(); // _state.getFailed();
+            Set<Hash> sendTo = _state.getRepliedPeers(); // _state.getFailed();
             sendTo.addAll(_state.getPending());
             int numSent = 0;
-            for (Iterator iter = sendTo.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Iterator<Hash> iter = sendTo.iterator(); iter.hasNext(); ) {
+                Hash peer = iter.next();
                 RouterInfo peerInfo = _facade.lookupRouterInfoLocally(peer);
                 if (peerInfo == null) continue;
                 if (resend(peerInfo, (LeaseSet)ds))
@@ -726,10 +726,10 @@ class SearchJob extends JobImpl {
     }
     
     private void handleDeferred(boolean success) {
-        List deferred = null;
+        List<Search> deferred = null;
         synchronized (_deferredSearches) {
             if (!_deferredSearches.isEmpty()) {
-                deferred = new ArrayList(_deferredSearches);
+                deferred = new ArrayList<Search>(_deferredSearches);
                 _deferredSearches.clear();
             }
             _deferredCleared = true;
@@ -737,7 +737,7 @@ class SearchJob extends JobImpl {
         if (deferred != null) {
             long now = getContext().clock().now();
             for (int i = 0; i < deferred.size(); i++) {
-                Search cur = (Search)deferred.get(i);
+                Search cur = deferred.get(i);
                 if (cur.getExpiration() < now)
                     getContext().jobQueue().addJob(cur.getOnFail());
                 else if (success)

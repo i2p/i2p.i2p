@@ -19,7 +19,7 @@ package org.cybergarage.upnp.event;
 
 import java.util.*;
 
-public class SubscriberList extends Vector 
+public class SubscriberList extends Vector<Subscriber> 
 {
 	////////////////////////////////////////////////
 	//	Constructor

@@ -166,7 +166,7 @@ public class ConfigUpdateHandler extends FormHandler {
             return;
         }
 
-        Map<String, String> changes = new HashMap();
+        Map<String, String> changes = new HashMap<String, String>();
 
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
             if (_newsURL.startsWith("https"))

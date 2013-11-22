@@ -56,11 +56,11 @@ class PacketHandler {
         _inbound = inbound;
         _testManager = testManager;
         _introManager = introManager;
-        _failCache = new LHMCache(24);
+        _failCache = new LHMCache<RemoteHostId, Object>(24);
 
         long maxMemory = SystemVersion.getMaxMemory();
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (2*1024*1024)));
-        _inboundQueue = new CoDelBlockingQueue(ctx, "UDP-Receiver", qsize);
+        _inboundQueue = new CoDelBlockingQueue<UDPPacket>(ctx, "UDP-Receiver", qsize);
         int num_handlers;
         if (maxMemory < 32*1024*1024)
             num_handlers = 1;

@@ -30,11 +30,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
-import net.i2p.data.SigningPrivateKey;
-import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
-import net.i2p.util.HexDump;
-import net.i2p.util.SecureFileOutputStream;
 
 /**
  *  Succesor to the ".sud" format used in TrustedUpdate.
@@ -441,7 +437,7 @@ public class SU3File {
      */
     public static void main(String[] args) {
         boolean ok = false;
-        List<String> a = new ArrayList(Arrays.asList(args));
+        List<String> a = new ArrayList<String>(Arrays.asList(args));
         try {
             // defaults
             String stype = null;

@@ -11,12 +11,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
-import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -104,9 +102,9 @@ class IntroductionManager {
         _log = ctx.logManager().getLog(IntroductionManager.class);
         _transport = transport;
         _builder = new PacketBuilder(ctx, transport);
-        _outbound = new ConcurrentHashMap(MAX_OUTBOUND);
-        _inbound = new ConcurrentHashSet(MAX_INBOUND);
-        _recentHolePunches = new HashSet(16);
+        _outbound = new ConcurrentHashMap<Long, PeerState>(MAX_OUTBOUND);
+        _inbound = new ConcurrentHashSet<PeerState>(MAX_INBOUND);
+        _recentHolePunches = new HashSet<InetAddress>(16);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
@@ -169,7 +167,7 @@ class IntroductionManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Picking inbound out of " + _inbound.size());
         if (_inbound.isEmpty()) return 0;
-        List<PeerState> peers = new ArrayList(_inbound);
+        List<PeerState> peers = new ArrayList<PeerState>(_inbound);
         int sz = peers.size();
         start = start % sz;
         int found = 0;

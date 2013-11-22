@@ -24,7 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @since 0.7.9
  */
 public class InternalServerSocket extends ServerSocket {
-    private static final ConcurrentHashMap<Integer, InternalServerSocket> _sockets = new ConcurrentHashMap(4);
+    private static final ConcurrentHashMap<Integer, InternalServerSocket> _sockets = new ConcurrentHashMap<Integer, InternalServerSocket>(4);
     private final BlockingQueue<InternalSocket> _acceptQueue;
     private final Integer _port;
     private volatile boolean _running;
@@ -41,7 +41,7 @@ public class InternalServerSocket extends ServerSocket {
          if (previous != null)
              throw new IOException("Internal port in use: " + port);
          _running = true;
-         _acceptQueue = new LinkedBlockingQueue();
+         _acceptQueue = new LinkedBlockingQueue<InternalSocket>();
          //if (_log.shouldLog(Log.DEBUG))
          //    _log.debug("Registered " + _port);
     }

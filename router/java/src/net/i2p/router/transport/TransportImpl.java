@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,7 +42,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
@@ -75,7 +73,7 @@ public abstract class TransportImpl implements Transport {
         long max = 4096;
         // 1024 nominal for 128 MB
         int size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (128*1024))));
-        _IPMap = new LHMCache(size);
+        _IPMap = new LHMCache<Hash, byte[]>(size);
     }
 
     /**
@@ -95,14 +93,14 @@ public abstract class TransportImpl implements Transport {
         //_context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
 
-        _currentAddresses = new CopyOnWriteArrayList();
+        _currentAddresses = new CopyOnWriteArrayList<RouterAddress>();
         if (getStyle().equals("NTCP"))
-            _sendPool = new ArrayBlockingQueue(8);
+            _sendPool = new ArrayBlockingQueue<OutNetMessage>(8);
         else
             _sendPool = null;
-        _unreachableEntries = new HashMap(32);
-        _wasUnreachableEntries = new HashMap(32);
-        _localAddresses = new ConcurrentHashSet(4);
+        _unreachableEntries = new HashMap<Hash, Long>(32);
+        _wasUnreachableEntries = new HashMap<Hash, Long>(32);
+        _localAddresses = new ConcurrentHashSet<InetAddress>(4);
         _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
@@ -177,9 +175,9 @@ public abstract class TransportImpl implements Transport {
      * Vector composed of Long, each element representing a peer skew in seconds.
      * Dummy version. Transports override it.
      */
-    public Vector getClockSkews() { return new Vector(); }
+    public Vector<Long> getClockSkews() { return new Vector<Long>(); }
 
-    public List<String> getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
+    public List<String> getMostRecentErrorMessages() { return Collections.emptyList(); }
 
     /**
      * Nonblocking call to pull the next outbound message
@@ -564,7 +562,7 @@ public abstract class TransportImpl implements Transport {
      *  @since IPv6
      */
     protected Collection<InetAddress> getSavedLocalAddresses() {
-        List<InetAddress> rv = new ArrayList(_localAddresses);
+        List<InetAddress> rv = new ArrayList<InetAddress>(_localAddresses);
         _localAddresses.clear();
         return rv;
     }

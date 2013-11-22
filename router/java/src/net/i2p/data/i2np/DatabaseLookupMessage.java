@@ -212,7 +212,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     public Set<Hash> getDontIncludePeers() {
         if (_dontIncludePeers == null)
             return null;
-        return new HashSet(_dontIncludePeers);
+        return new HashSet<Hash>(_dontIncludePeers);
     }
 
     /**
@@ -225,7 +225,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     public void setDontIncludePeers(Collection<Hash> peers) {
         _hasChecksum = false;
         if (peers != null)
-            _dontIncludePeers = new ArrayList(peers);
+            _dontIncludePeers = new ArrayList<Hash>(peers);
         else
             _dontIncludePeers = null;
     }
@@ -239,7 +239,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
      */
     public void addDontIncludePeer(Hash peer) {
         if (_dontIncludePeers == null)
-            _dontIncludePeers = new ArrayList();
+            _dontIncludePeers = new ArrayList<Hash>();
         else if (_dontIncludePeers.contains(peer))
             return;
         _hasChecksum = false;
@@ -256,7 +256,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     public void addDontIncludePeers(Collection<Hash> peers) {
         _hasChecksum = false;
         if (_dontIncludePeers == null) {
-            _dontIncludePeers = new ArrayList(peers);
+            _dontIncludePeers = new ArrayList<Hash>(peers);
         } else {
             for (Hash peer : peers) {
                 if (!_dontIncludePeers.contains(peer))
@@ -297,7 +297,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         
         if ( (numPeers < 0) || (numPeers > MAX_NUM_PEERS) )
             throw new I2NPMessageException("Invalid number of peers - " + numPeers);
-        List<Hash> peers = new ArrayList(numPeers);
+        List<Hash> peers = new ArrayList<Hash>(numPeers);
         for (int i = 0; i < numPeers; i++) {
             //byte peer[] = new byte[Hash.HASH_LENGTH];
             //System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);

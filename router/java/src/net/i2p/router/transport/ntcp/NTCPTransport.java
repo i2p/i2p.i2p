@@ -12,7 +12,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,6 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.Transport;
 import static net.i2p.router.transport.Transport.AddressSource.*;
 import net.i2p.router.transport.TransportBid;
@@ -39,7 +37,6 @@ import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
-import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -170,10 +167,10 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.wantsQueuedWrite", "", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.write", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.writeError", "", "ntcp", RATES);
-        _endpoints = new HashSet(4);
-        _establishing = new ConcurrentHashSet(16);
+        _endpoints = new HashSet<InetSocketAddress>(4);
+        _establishing = new ConcurrentHashSet<NTCPConnection>(16);
         _conLock = new Object();
-        _conByIdent = new ConcurrentHashMap(64);
+        _conByIdent = new ConcurrentHashMap<Hash, NTCPConnection>(64);
 
         _finisher = new NTCPSendFinisher(ctx, this);
 
@@ -472,7 +469,7 @@ public class NTCPTransport extends TransportImpl {
      */
     @Override
     public Vector<Long> getClockSkews() {
-        Vector<Long> skews = new Vector();
+        Vector<Long> skews = new Vector<Long>();
 
         for (NTCPConnection con : _conByIdent.values()) {
             if (con.isEstablished())
@@ -1088,7 +1085,7 @@ public class NTCPTransport extends TransportImpl {
         _finisher.stop();
         List<NTCPConnection> cons;
         synchronized (_conLock) {
-            cons = new ArrayList(_conByIdent.values());
+            cons = new ArrayList<NTCPConnection>(_conByIdent.values());
             _conByIdent.clear();
         }
         for (NTCPConnection con : cons) {
@@ -1105,7 +1102,7 @@ public class NTCPTransport extends TransportImpl {
 
     @Override
     public void renderStatusHTML(java.io.Writer out, String urlBase, int sortFlags) throws IOException {
-        TreeSet<NTCPConnection> peers = new TreeSet(getComparator(sortFlags));
+        TreeSet<NTCPConnection> peers = new TreeSet<NTCPConnection>(getComparator(sortFlags));
         peers.addAll(_conByIdent.values());
 
         long offsetTotal = 0;
@@ -1220,8 +1217,8 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_rateFmt) { return _rateFmt.format(rate); }
     }
 
-    private Comparator getComparator(int sortFlags) {
-        Comparator rv = null;
+    private Comparator<NTCPConnection> getComparator(int sortFlags) {
+        Comparator<NTCPConnection> rv = null;
         switch (Math.abs(sortFlags)) {
             default:
                 rv = AlphaComparator.instance();

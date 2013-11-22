@@ -133,7 +133,7 @@ public class MagnetURI {
         }
         if (idx < 0 || idx > uri.length())
             return null;
-        List<String> rv = new ArrayList();
+        List<String> rv = new ArrayList<String>();
         while (true) {
             String p = uri.substring(idx);
             uri = p;

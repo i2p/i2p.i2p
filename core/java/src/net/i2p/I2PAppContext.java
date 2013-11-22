@@ -201,7 +201,7 @@ public class I2PAppContext {
         _overrideProps = new I2PProperties();
         if (envProps != null)
             _overrideProps.putAll(envProps);
-        _shutdownTasks = new ConcurrentHashSet(32);
+        _shutdownTasks = new ConcurrentHashSet<Runnable>(32);
         _portMapper = new PortMapper(this);
     
    /*
@@ -535,7 +535,7 @@ public class I2PAppContext {
      *
      * @return set of Strings containing the names of defined system properties
      */
-    public Set getPropertyNames() { 
+    public Set<String> getPropertyNames() { 
         // clone to avoid ConcurrentModificationException
         Set names = new HashSet(((Properties) System.getProperties().clone()).keySet());
         if (_overrideProps != null)

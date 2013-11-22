@@ -23,11 +23,11 @@ import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 
 public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
-    private Map _routers;
+    private Map<Hash, RouterInfo> _routers;
     private RouterContext _context;
     
     public DummyNetworkDatabaseFacade(RouterContext ctx) {
-        _routers = Collections.synchronizedMap(new HashMap());
+        _routers = Collections.synchronizedMap(new HashMap<Hash, RouterInfo>());
         _context = ctx;
     }
 
@@ -61,6 +61,6 @@ public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _routers.remove(dbEntry);
     }
     
-    public Set<Hash> getAllRouters() { return new HashSet(_routers.keySet()); }
-    public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) { return new HashSet(_routers.values()); }
+    public Set<Hash> getAllRouters() { return new HashSet<Hash>(_routers.keySet()); }
+    public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) { return getAllRouters(); }
 }

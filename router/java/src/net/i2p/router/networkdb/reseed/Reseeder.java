@@ -251,7 +251,7 @@ public class Reseeder {
         * @return count of routerinfos successfully fetched
         */
         private int reseed(boolean echoStatus) {
-            List<String> URLList = new ArrayList();
+            List<String> URLList = new ArrayList<String>();
             String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
@@ -267,7 +267,7 @@ public class Reseeder {
             Collections.shuffle(URLList, _context.random());
             if (defaulted && !SSLDisable) {
                 // put the non-SSL at the end of the SSL
-                List<String> URLList2 = new ArrayList();
+                List<String> URLList2 = new ArrayList<String>();
                 tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
                 while (tok.hasMoreTokens())
                     URLList2.add(tok.nextToken().trim());
@@ -334,7 +334,7 @@ public class Reseeder {
                 String content = new String(contentRaw);
                 // This isn't really URLs, but Base64 hashes
                 // but they may include % encoding
-                Set<String> urls = new HashSet(1024);
+                Set<String> urls = new HashSet<String>(1024);
                 Hash ourHash = _context.routerHash();
                 String ourB64 = ourHash != null ? ourHash.toBase64() : null;
                 int cur = 0;
@@ -370,7 +370,7 @@ public class Reseeder {
                     return 0;
                 }
 
-                List<String> urlList = new ArrayList(urls);
+                List<String> urlList = new ArrayList<String>(urls);
                 Collections.shuffle(urlList, _context.random());
                 int fetched = 0;
                 int errors = 0;

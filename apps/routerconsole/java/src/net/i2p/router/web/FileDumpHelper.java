@@ -35,7 +35,7 @@ public class FileDumpHelper extends HelperBase {
         // jars added in wrapper.config
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         URL[] urls = urlClassLoader.getURLs();
-        List<File> flist = new ArrayList();
+        List<File> flist = new ArrayList<File>();
         for (int i = 0; i < urls.length; i++) {
             String p = urls[i].toString();
             if (p.startsWith("file:") && p.endsWith(".jar")) {

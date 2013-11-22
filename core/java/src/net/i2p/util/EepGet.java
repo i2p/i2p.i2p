@@ -143,7 +143,7 @@ public class EepGet {
         _postData = postData;
         _bytesRemaining = -1;
         _fetchHeaderTimeout = CONNECT_TIMEOUT;
-        _listeners = new ArrayList(1);
+        _listeners = new ArrayList<StatusListener>(1);
         _etag = etag;
         _lastModified = lastModified;
         _etagOrig = etag;
@@ -190,7 +190,7 @@ public class EepGet {
                     lineLen = Integer.parseInt(args[++i]);
                 } else if (args[i].equals("-h")) {
                     if (extra == null)
-                        extra = new ArrayList(2);
+                        extra = new ArrayList<String>(2);
                     extra.add(args[++i]);
                     extra.add(args[++i]);
                 } else if (args[i].equals("-u")) {
@@ -1241,7 +1241,7 @@ public class EepGet {
      */
     public void addHeader(String name, String value) {
         if (_extraHeaders == null)
-            _extraHeaders = new ArrayList();
+            _extraHeaders = new ArrayList<String>();
         _extraHeaders.add(name + ": " + value);
     }
 

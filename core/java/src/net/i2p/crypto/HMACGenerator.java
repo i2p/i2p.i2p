@@ -49,7 +49,7 @@ public class HMACGenerator {
      *  @param context unused
      */
     public HMACGenerator(I2PAppContext context) {
-        _available = new LinkedBlockingQueue(32);
+        _available = new LinkedBlockingQueue<I2PHMac>(32);
     }
     
     /**

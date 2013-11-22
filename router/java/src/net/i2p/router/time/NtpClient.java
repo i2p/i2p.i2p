@@ -65,7 +65,7 @@ class NtpClient {
     public static long currentTime(String serverNames[]) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
-        ArrayList names = new ArrayList(serverNames.length);
+        ArrayList<String> names = new ArrayList<String>(serverNames.length);
         for (int i = 0; i < serverNames.length; i++)
             names.add(serverNames[i]);
         Collections.shuffle(names);
@@ -87,7 +87,7 @@ class NtpClient {
     public static long[] currentTimeAndStratum(String serverNames[]) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
-        ArrayList names = new ArrayList(serverNames.length);
+        ArrayList<String> names = new ArrayList<String>(serverNames.length);
         for (int i = 0; i < serverNames.length; i++)
             names.add(serverNames[i]);
         Collections.shuffle(names);

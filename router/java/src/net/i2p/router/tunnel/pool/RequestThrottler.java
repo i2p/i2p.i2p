@@ -3,7 +3,6 @@ package net.i2p.router.tunnel.pool;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -26,7 +25,7 @@ class RequestThrottler {
 
     RequestThrottler(RouterContext ctx) {
         this.context = ctx;
-        this.counter = new ObjectCounter();
+        this.counter = new ObjectCounter<Hash>();
         ctx.simpleScheduler().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 

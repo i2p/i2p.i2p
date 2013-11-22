@@ -11,7 +11,6 @@ package net.i2p.router.client;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -78,9 +77,9 @@ class ClientManager {
         //                                      "How large are messages received by the client?", 
         //                                      "ClientMessages", 
         //                                      new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _runners = new ConcurrentHashMap();
-        _runnersByHash = new ConcurrentHashMap();
-        _pendingRunners = new HashSet();
+        _runners = new ConcurrentHashMap<Destination, ClientConnectionRunner>();
+        _runnersByHash = new ConcurrentHashMap<Hash, ClientConnectionRunner>();
+        _pendingRunners = new HashSet<ClientConnectionRunner>();
         _port = port;
         // following are for RequestLeaseSetJob
         _ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 60*60*1000 });
@@ -124,7 +123,7 @@ class ClientManager {
         _log.info("Shutting down the ClientManager");
         if (_listener != null)
             _listener.stopListening();
-        Set<ClientConnectionRunner> runners = new HashSet();
+        Set<ClientConnectionRunner> runners = new HashSet<ClientConnectionRunner>();
         synchronized (_runners) {
             for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {
                 ClientConnectionRunner runner = iter.next();
@@ -153,8 +152,8 @@ class ClientManager {
     public I2CPMessageQueue internalConnect() throws I2PSessionException {
         if (!_isStarted)
             throw new I2PSessionException("Router client manager is shut down");
-        LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue(INTERNAL_QUEUE_SIZE);
-        LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue(INTERNAL_QUEUE_SIZE);
+        LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue<I2CPMessage>(INTERNAL_QUEUE_SIZE);
+        LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue<I2CPMessage>(INTERNAL_QUEUE_SIZE);
         I2CPMessageQueue myQueue = new I2CPMessageQueueImpl(in, out);
         I2CPMessageQueue hisQueue = new I2CPMessageQueueImpl(out, in);
         ClientConnectionRunner runner = new QueuedClientConnectionRunner(_ctx, this, myQueue);
@@ -344,7 +343,7 @@ class ClientManager {
      *  Unsynchronized
      */
     public Set<Destination> listClients() {
-        Set<Destination> rv = new HashSet();
+        Set<Destination> rv = new HashSet<Destination>();
         rv.addAll(_runners.keySet());
         return rv;
     }

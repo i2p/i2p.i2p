@@ -82,7 +82,7 @@ public interface EventDispatcher {
      *
      * @return A set of event names
      */
-    public Set getEvents();
+    public Set<String> getEvents();
 
     /**
      * Ignore further event notifications

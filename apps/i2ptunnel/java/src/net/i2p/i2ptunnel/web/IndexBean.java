@@ -102,7 +102,7 @@ public class IndexBean {
     /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
     private static final int MAX_NONCES = 8;
     /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
-    private static final List<String> _nonces = new ArrayList(MAX_NONCES + 1);
+    private static final List<String> _nonces = new ArrayList<String>(MAX_NONCES + 1);
 
     static final String CLIENT_NICKNAME = "shared clients";
     public static final String PROP_THEME_NAME = "routerconsole.theme";
@@ -129,8 +129,8 @@ public class IndexBean {
         _tunnel = -1;
         _curNonce = "-1";
         addNonce();
-        _booleanOptions = new ConcurrentHashSet(4);
-        _otherOptions = new ConcurrentHashMap(4);
+        _booleanOptions = new ConcurrentHashSet<String>(4);
+        _otherOptions = new ConcurrentHashMap<String, String>(4);
     }
     
     /**
@@ -1224,8 +1224,8 @@ public class IndexBean {
         "proxyUsername", "proxyPassword"
         };
 
-    protected static final Set _noShowSet = new HashSet(128);
-    protected static final Set _nonProxyNoShowSet = new HashSet(4);
+    protected static final Set<String> _noShowSet = new HashSet<String>(128);
+    protected static final Set<String> _nonProxyNoShowSet = new HashSet<String>(4);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));

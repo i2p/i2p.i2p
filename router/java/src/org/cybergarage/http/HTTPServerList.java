@@ -23,7 +23,7 @@ import java.util.Vector;
 import org.cybergarage.net.HostInterface;
 import org.cybergarage.upnp.Device;
 
-public class HTTPServerList extends Vector 
+public class HTTPServerList extends Vector<HTTPServer> 
 {
 	////////////////////////////////////////////////
 	//	Constructor

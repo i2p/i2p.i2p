@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -34,7 +33,6 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -762,7 +760,7 @@ public class Snark
         PeerCoordinator coord = coordinator;
         if (coord != null)
             return coord.peerList();
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**

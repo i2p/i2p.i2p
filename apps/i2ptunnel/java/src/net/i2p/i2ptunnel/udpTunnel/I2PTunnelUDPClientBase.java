@@ -5,7 +5,6 @@ package net.i2p.i2ptunnel.udpTunnel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.net.ServerSocket;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;

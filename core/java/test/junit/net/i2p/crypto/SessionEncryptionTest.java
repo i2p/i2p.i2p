@@ -81,11 +81,11 @@ public class SessionEncryptionTest extends TestCase{
         SessionTag tag3 = new SessionTag(true);
         SessionTag tag4 = new SessionTag(true);
         
-        HashSet firstTags = new HashSet();
+        HashSet<SessionTag> firstTags = new HashSet<SessionTag>();
         firstTags.add(tag1);
         firstTags.add(tag2);
         
-        HashSet secondTags = new HashSet();
+        HashSet<SessionTag> secondTags = new HashSet<SessionTag>();
         secondTags.add(tag3);
         secondTags.add(tag4);
         
@@ -180,11 +180,11 @@ public class SessionEncryptionTest extends TestCase{
         SessionTag tag3 = new SessionTag(true);
         SessionTag tag4 = new SessionTag(true);
         
-        HashSet firstTags = new HashSet();
+        HashSet<SessionTag> firstTags = new HashSet<SessionTag>();
         firstTags.add(tag1);
         firstTags.add(tag2);
         
-        HashSet secondTags = new HashSet();
+        HashSet<SessionTag> secondTags = new HashSet<SessionTag>();
         secondTags.add(tag3);
         secondTags.add(tag4);
         
@@ -271,7 +271,7 @@ public class SessionEncryptionTest extends TestCase{
         SessionKey curKey = _context.sessionKeyManager().createSession(pubKey);
         
         for (int i = 0; i < 1000; i++) {
-            Set tags = null;
+            Set<SessionTag> tags = null;
             SessionKey nextKey = null;
             curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
             SessionTag curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
@@ -302,8 +302,8 @@ public class SessionEncryptionTest extends TestCase{
         }
     }
     
-    private Set generateNewTags(int numTags) {
-        Set tags = new HashSet(numTags);
+    private Set<SessionTag> generateNewTags(int numTags) {
+        Set<SessionTag> tags = new HashSet<SessionTag>(numTags);
         for (int i = 0; i < numTags; i++)
             tags.add(new SessionTag(true));
         return tags;

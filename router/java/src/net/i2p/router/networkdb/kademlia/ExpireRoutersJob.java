@@ -8,7 +8,6 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.Collections;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;

@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -99,10 +98,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     private static final String nocli_args[] = { "-nocli", "-die"};
 
-    private final List<I2PTunnelTask> tasks = new ArrayList();
+    private final List<I2PTunnelTask> tasks = new ArrayList<I2PTunnelTask>();
     private int next_task_id = 1;
 
-    private final Set listeners = new CopyOnWriteArraySet();
+    private final Set<ConnectionEventListener> listeners = new CopyOnWriteArraySet<ConnectionEventListener>();
 
     public static void main(String[] args) throws IOException {
         new I2PTunnel(args);
@@ -124,7 +123,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         // as of 0.8.4, include context properties
         Properties p = _context.getProperties();
         _clientOptions = p;
-        _sessions = new CopyOnWriteArraySet();
+        _sessions = new CopyOnWriteArraySet<I2PSession>();
         
         addConnectionEventListener(lsnr);
         boolean gui = true;
@@ -196,7 +195,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /** @return A copy, non-null */
     List<I2PSession> getSessions() { 
-            return new ArrayList(_sessions); 
+            return new ArrayList<I2PSession>(_sessions); 
     }
 
     void addSession(I2PSession session) { 
@@ -1506,7 +1505,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *
      */
     private void purgetasks(Logging l) {
-            List<I2PTunnelTask> removed = new ArrayList();
+            List<I2PTunnelTask> removed = new ArrayList<I2PTunnelTask>();
             for (I2PTunnelTask t : tasks) {
                 if (!t.isOpen()) {
                     _log.debug(getPrefix() + "Purging inactive tunnel: [" + t.getId() + "] " + t.toString());
@@ -1668,8 +1667,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     void routerDisconnected() {
         _log.error(getPrefix() + "Router disconnected - firing notification events");
-            for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-                ConnectionEventListener lsnr = (ConnectionEventListener) iter.next();
+            for (Iterator<ConnectionEventListener> iter = listeners.iterator(); iter.hasNext();) {
+                ConnectionEventListener lsnr = iter.next();
                 if (lsnr != null) lsnr.routerDisconnected();
             }
     }

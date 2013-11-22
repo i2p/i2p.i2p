@@ -35,7 +35,7 @@ public class MetaNamingService extends DummyNamingService {
         super(context);
         String list = _context.getProperty(PROP_NAME_SERVICES, DEFAULT_NAME_SERVICES);
         StringTokenizer tok = new StringTokenizer(list, ",");
-        _services = new CopyOnWriteArrayList();
+        _services = new CopyOnWriteArrayList<NamingService>();
         while (tok.hasMoreTokens()) {
             try {
                 Class cls = Class.forName(tok.nextToken());
@@ -53,7 +53,7 @@ public class MetaNamingService extends DummyNamingService {
      */
     public MetaNamingService(I2PAppContext context, List<NamingService> services) {
         super(context);
-        _services = new CopyOnWriteArrayList();
+        _services = new CopyOnWriteArrayList<NamingService>();
         if (services != null) {
             for (NamingService ns : services) {
                 addNamingService(ns, false);
@@ -172,7 +172,7 @@ public class MetaNamingService extends DummyNamingService {
      */
     @Override
     public Map<String, Destination> getEntries(Properties options) {
-        Map<String, Destination> rv = new HashMap();
+        Map<String, Destination> rv = new HashMap<String, Destination>();
         for (NamingService ns : _services) { 
              rv.putAll(ns.getEntries(options));
         }
@@ -184,7 +184,7 @@ public class MetaNamingService extends DummyNamingService {
      */
     @Override
     public Set<String> getNames(Properties options) {
-        Set<String> rv = new HashSet();
+        Set<String> rv = new HashSet<String>();
         for (NamingService ns : _services) { 
              rv.addAll(ns.getNames(options));
         }

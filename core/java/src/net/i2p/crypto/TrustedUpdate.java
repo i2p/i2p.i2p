@@ -161,7 +161,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
     /** 172 */
     private static final int KEYSIZE_B64_BYTES = 2 + (SigningPublicKey.KEYSIZE_BYTES * 4 / 3);
 
-    private static final Map<String, String> DEFAULT_KEYS = new HashMap(4);
+    private static final Map<String, String> DEFAULT_KEYS = new HashMap<String, String>(4);
     static {
             //DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
             DEFAULT_KEYS.put(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
@@ -187,7 +187,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
     public TrustedUpdate(I2PAppContext context) {
         _context = context;
         _log = _context.logManager().getLog(TrustedUpdate.class);
-        _trustedKeys = new HashMap(4);
+        _trustedKeys = new HashMap<SigningPublicKey, String>(4);
 
         String propertyTrustedKeys = context.getProperty(PROP_TRUSTED_KEYS);
 

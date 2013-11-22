@@ -154,7 +154,7 @@ public class OutNetMessage implements CDPQEntry {
                 return (Map<String, Long>)_timestamps.clone();
             }
         }
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     /** @deprecated unused */
@@ -170,8 +170,8 @@ public class OutNetMessage implements CDPQEntry {
 
     private void locked_initTimestamps() {
         if (_timestamps == null) {
-            _timestamps = new HashMap(8);
-            _timestampOrder = new ArrayList(8);
+            _timestamps = new HashMap<String, Long>(8);
+            _timestampOrder = new ArrayList<String>(8);
         }
     }
     
@@ -279,12 +279,12 @@ public class OutNetMessage implements CDPQEntry {
     
     public synchronized void transportFailed(String transportStyle) { 
         if (_failedTransports == null)
-            _failedTransports = new HashSet(2);
+            _failedTransports = new HashSet<String>(2);
         _failedTransports.add(transportStyle); 
     }
 
-    public synchronized Set getFailedTransports() { 
-        return (_failedTransports == null ? Collections.EMPTY_SET : _failedTransports); 
+    public synchronized Set<String> getFailedTransports() { 
+        return (_failedTransports == null ? Collections.<String> emptySet() : _failedTransports); 
     }
     
     /** when did the sending process begin */

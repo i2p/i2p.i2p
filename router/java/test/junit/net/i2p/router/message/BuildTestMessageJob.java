@@ -16,6 +16,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -80,7 +81,7 @@ public class BuildTestMessageJob extends JobImpl {
             _log.debug("Building garlic message to test " + _target.getIdentity().getHash().toBase64());
         GarlicConfig config = buildGarlicCloveConfig();
         // TODO: make the last params on this specify the correct sessionKey and tags used
-        ReplyJob replyJob = new JobReplyJob(getContext(), _onSend, config.getRecipient().getIdentity().getPublicKey(), config.getId(), null, new HashSet());
+        ReplyJob replyJob = new JobReplyJob(getContext(), _onSend, config.getRecipient().getIdentity().getPublicKey(), config.getId(), null, new HashSet<SessionTag>());
         MessageSelector sel = buildMessageSelector();
         SendGarlicJob job = new SendGarlicJob(getContext(), config, null, _onSendFailed, replyJob, _onSendFailed, _timeoutMs, _priority, sel);
         getContext().jobQueue().addJob(job);
@@ -183,9 +184,9 @@ public class BuildTestMessageJob extends JobImpl {
         private Job _job;
         private PublicKey _target;
         private long _msgId;
-        private Set _sessionTagsDelivered;
+        private Set<SessionTag> _sessionTagsDelivered;
         private SessionKey _keyDelivered;
-        public JobReplyJob(RouterContext ctx, Job job, PublicKey target, long msgId, SessionKey keyUsed, Set tagsDelivered) {
+        public JobReplyJob(RouterContext ctx, Job job, PublicKey target, long msgId, SessionKey keyUsed, Set<SessionTag> tagsDelivered) {
             super(ctx);
             _job = job;
             _target = target;

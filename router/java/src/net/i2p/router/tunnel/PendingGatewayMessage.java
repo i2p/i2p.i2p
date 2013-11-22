@@ -6,7 +6,6 @@ import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.RouterContext;
 import net.i2p.router.util.CDQEntry;
 
 /**
@@ -69,7 +68,7 @@ class PendingGatewayMessage implements CDQEntry {
     public void addMessageId(long id) { 
         synchronized (this) {
             if (_messageIds == null)
-                _messageIds = new ArrayList();
+                _messageIds = new ArrayList<Long>();
             _messageIds.add(Long.valueOf(id));
         }
     }
@@ -81,9 +80,9 @@ class PendingGatewayMessage implements CDQEntry {
     public List<Long> getMessageIds() { 
         synchronized (this) { 
             if (_messageIds != null)
-                return new ArrayList(_messageIds); 
+                return new ArrayList<Long>(_messageIds); 
             else
-                return new ArrayList();
+                return new ArrayList<Long>();
         } 
     }
 

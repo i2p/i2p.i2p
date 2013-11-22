@@ -104,10 +104,10 @@ class DHTTracker {
     List<Hash> getPeers(InfoHash ih, int max) {
         Peers peers = _torrents.get(ih);
         if (peers == null)
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
 
         int size = peers.size();
-        List<Hash> rv = new ArrayList(peers.values());
+        List<Hash> rv = new ArrayList<Hash>(peers.values());
         if (max < size) {
                 Collections.shuffle(rv, _context.random());
                 rv = rv.subList(0, max);

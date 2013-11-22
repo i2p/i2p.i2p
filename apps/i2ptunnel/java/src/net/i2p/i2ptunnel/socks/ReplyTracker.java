@@ -10,10 +10,10 @@ import net.i2p.util.Log;
  * Track who the reply goes to
  * @author zzz
  */
-public class ReplyTracker implements Source, Sink {
+public class ReplyTracker<S extends Sink> implements Source, Sink {
     private static final Log _log = new Log(MultiSink.class);
 
-    public ReplyTracker(Sink reply, Map cache) {
+    public ReplyTracker(S reply, Map<Destination, S> cache) {
         this.reply = reply;
         this.cache = cache;
     }
@@ -29,7 +29,7 @@ public class ReplyTracker implements Source, Sink {
         this.sink.send(to, data);
     }
     
-    private Sink reply;
-    private Map<Destination, Sink> cache;
+    private S reply;
+    private Map<Destination, S> cache;
     private Sink sink;
 }

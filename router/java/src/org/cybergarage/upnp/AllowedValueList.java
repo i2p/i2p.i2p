@@ -20,7 +20,7 @@ package org.cybergarage.upnp;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class AllowedValueList extends Vector
+public class AllowedValueList extends Vector<AllowedValue>
 {
 	////////////////////////////////////////////////
 	//	Constants
@@ -55,8 +55,8 @@ public class AllowedValueList extends Vector
 	}
 
 	public boolean isAllowed(String v){
-		for (Iterator i = this.iterator(); i.hasNext();) {
-			AllowedValue av = (AllowedValue) i.next();
+		for (Iterator<AllowedValue> i = this.iterator(); i.hasNext();) {
+			AllowedValue av = i.next();
 			if(av.getValue().equals(v))
 				return true;
 		}

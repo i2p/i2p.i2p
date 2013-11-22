@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.reseed.Reseeder;
 
 /**
  * Handler to deal with reseed requests.

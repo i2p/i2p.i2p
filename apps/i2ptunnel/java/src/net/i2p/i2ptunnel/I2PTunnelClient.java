@@ -43,13 +43,13 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
               "Standard client on " + tunnel.listenHost + ':' + localPort,
               tunnel, pkf);
 
-        _addrs = new ArrayList(1);
+        _addrs = new ArrayList<I2PSocketAddress>(1);
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openClientResult", "error");
             return;
         }
 
-        dests = new ArrayList(1);
+        dests = new ArrayList<Destination>(1);
         buildAddresses(destinations);
 
         if (_addrs.isEmpty()) {

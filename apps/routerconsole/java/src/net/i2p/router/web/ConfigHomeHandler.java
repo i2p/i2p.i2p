@@ -81,7 +81,7 @@ public class ConfigHomeHandler extends FormHandler {
                 addFormNotice(_("Added") + ": " + app.name);
             } else {
                 // deleting
-                Set<String> toDelete = new HashSet();
+                Set<String> toDelete = new HashSet<String>();
                 for (Object o : _settings.keySet()) {
                      if (!(o instanceof String))
                          continue;

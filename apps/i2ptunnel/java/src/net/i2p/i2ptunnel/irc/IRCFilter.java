@@ -232,7 +232,7 @@ abstract class IRCFilter {
                 "WALLOPS",
                 "ZLINE"
         };
-        _allowedOutbound = new HashSet(Arrays.asList(allowedCommands));
+        _allowedOutbound = new HashSet<String>(Arrays.asList(allowedCommands));
     }
 
     /*************************************************************************

@@ -127,7 +127,7 @@ class TestJob extends JobImpl {
         SessionTag encryptTag = new SessionTag(true);
         _encryptTag = encryptTag;
         SessionKey sentKey = new SessionKey();
-        Set sentTags = null;
+        Set<SessionTag> sentTags = null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
                                                               getContext().keyManager().getPublicKey(), 
                                                               encryptKey, encryptTag);
@@ -137,7 +137,7 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
-        Set<SessionTag> encryptTags = new RemovableSingletonSet(encryptTag);
+        Set<SessionTag> encryptTags = new RemovableSingletonSet<SessionTag>(encryptTag);
         // Register the single tag with the appropriate SKM
         if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
             SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());

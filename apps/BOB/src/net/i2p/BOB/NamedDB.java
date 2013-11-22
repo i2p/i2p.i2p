@@ -23,7 +23,7 @@ package net.i2p.BOB;
 public class NamedDB {
 
 	private volatile Object[][] data;
-	private volatile int index,  writersWaiting,  readers;
+	private int index,  writersWaiting,  readers;
 
 	/**
 	 * make initial NULL object
@@ -31,7 +31,6 @@ public class NamedDB {
 	 */
 	public NamedDB() {
 		this.data = new Object[1][2];
-		this.index = this.writersWaiting = this.readers = 0;
 	}
 
 	synchronized public void getReadLock() {

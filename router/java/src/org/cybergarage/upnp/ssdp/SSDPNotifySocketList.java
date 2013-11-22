@@ -22,7 +22,7 @@ import org.cybergarage.net.*;
 
 import org.cybergarage.upnp.*;
 
-public class SSDPNotifySocketList extends Vector 
+public class SSDPNotifySocketList extends Vector<SSDPNotifySocket> 
 {
 	////////////////////////////////////////////////
 	//	Constructor

@@ -32,7 +32,7 @@ public class ConfigLoggingHelper extends HelperBase {
     public String getLogLevelTable() {
         StringBuilder buf = new StringBuilder(32*1024);
         Properties limits = _context.logManager().getLimits();
-        TreeSet<String> sortedLogs = new TreeSet();
+        TreeSet<String> sortedLogs = new TreeSet<String>();
         for (Iterator iter = limits.keySet().iterator(); iter.hasNext(); ) {
             String prefix = (String)iter.next();
             sortedLogs.add(prefix);
@@ -98,7 +98,7 @@ public class ConfigLoggingHelper extends HelperBase {
     public String getNewClassBox() {
         List<Log> logs = _context.logManager().getLogs();
         Set limits = _context.logManager().getLimits().keySet();
-        TreeSet<String> sortedLogs = new TreeSet();
+        TreeSet<String> sortedLogs = new TreeSet<String>();
 
         for (Log log : logs) {
             String name = log.getName();

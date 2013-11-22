@@ -3,7 +3,6 @@ package org.klomp.snark;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
-
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
@@ -33,7 +30,6 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
@@ -94,10 +90,10 @@ public class I2PSnarkUtil {
         _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
         _baseName = baseName;
-        _opts = new HashMap();
+        _opts = new HashMap<String, String>();
         //setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", 7654, null);
-        _banlist = new ConcurrentHashSet();
+        _banlist = new ConcurrentHashSet<Hash>();
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
@@ -220,8 +216,8 @@ public class I2PSnarkUtil {
                 _log.debug("Connecting to I2P", new Exception("I did it"));
             Properties opts = _context.getProperties();
             if (_opts != null) {
-                for (Iterator iter = _opts.keySet().iterator(); iter.hasNext(); ) {
-                    String key = (String)iter.next();
+                for (Iterator<String> iter = _opts.keySet().iterator(); iter.hasNext(); ) {
+                    String key = iter.next();
                     opts.setProperty(key, _opts.get(key).toString());
                 }
             }
@@ -577,7 +573,7 @@ public class I2PSnarkUtil {
      */
     public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         return _openTrackers;
     }
 

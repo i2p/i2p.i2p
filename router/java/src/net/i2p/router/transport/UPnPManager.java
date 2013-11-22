@@ -6,7 +6,6 @@ package net.i2p.router.transport;
 
 import java.net.InetAddress;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,7 +121,7 @@ class UPnPManager {
                 return;
         //}
 
-        Set<ForwardPort> forwards = new HashSet(ports.size());
+        Set<ForwardPort> forwards = new HashSet<ForwardPort>(ports.size());
         for (TransportManager.Port entry : ports) {
             String style = entry.style;
             int port = entry.port;

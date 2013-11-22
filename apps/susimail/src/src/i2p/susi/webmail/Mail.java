@@ -119,7 +119,7 @@ public class Mail {
 		
 		return null;
 	}
-	public static boolean getRecipientsFromList( ArrayList recipients, String text, boolean ok )
+	public static boolean getRecipientsFromList( ArrayList<String> recipients, String text, boolean ok )
 	{
 		if( text != null && text.length() > 0 ) {			
 			String[] ccs = text.split( "," );
@@ -141,12 +141,12 @@ public class Mail {
 		}
 		return ok;
 	}
-	public static void appendRecipients( StringBuilder buf, ArrayList recipients, String prefix )
+	public static void appendRecipients( StringBuilder buf, ArrayList<String> recipients, String prefix )
 	{
-		for( Iterator it = recipients.iterator(); it.hasNext(); ) {
+		for( Iterator<String> it = recipients.iterator(); it.hasNext(); ) {
 			buf.append( prefix );
 			prefix ="\t";
-			buf.append( (String)it.next() );
+			buf.append( it.next() );
 			buf.append( "\r\n" );
 		}
 	}
@@ -217,12 +217,12 @@ public class Mail {
 							reply = Mail.getAddress( line.substring( 9 ).trim() );
 						}
 						else if( line.startsWith( "To:" ) ) {
-							ArrayList list = new ArrayList();
+							ArrayList<String> list = new ArrayList<String>();
 							Mail.getRecipientsFromList( list, line.substring( 3 ).trim(), true );
 							to = list.toArray();
 						}
 						else if( line.startsWith( "Cc:" ) ) {
-							ArrayList list = new ArrayList();
+							ArrayList<String> list = new ArrayList<String>();
 							Mail.getRecipientsFromList( list, line.substring( 3 ).trim(), true );
 							cc = list.toArray();
 						}

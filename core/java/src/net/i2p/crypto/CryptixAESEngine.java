@@ -18,7 +18,6 @@ import java.security.InvalidKeyException;
 //import javax.crypto.spec.SecretKeySpec;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;

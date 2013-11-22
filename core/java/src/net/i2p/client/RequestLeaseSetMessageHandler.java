@@ -48,7 +48,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     protected RequestLeaseSetMessageHandler(I2PAppContext context, int messageType) {
         super(context, messageType);
         // not clear why there would ever be more than one
-        _existingLeaseSets = new ConcurrentHashMap(4);
+        _existingLeaseSets = new ConcurrentHashMap<Destination, LeaseInfo>(4);
     }
     
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {

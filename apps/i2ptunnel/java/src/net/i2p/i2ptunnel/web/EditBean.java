@@ -8,11 +8,9 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -43,9 +41,9 @@ public class EditBean extends IndexBean {
         TunnelControllerGroup group = TunnelControllerGroup.getInstance();
         if (group == null)
             return false;
-        List controllers = group.getControllers();
+        List<TunnelController> controllers = group.getControllers();
         if (controllers.size() > tunnel) {
-            TunnelController cur = (TunnelController)controllers.get(tunnel);
+            TunnelController cur = controllers.get(tunnel);
             if (cur == null) return false;
             return isClient(cur.getType());
         } else {
@@ -374,7 +372,7 @@ public class EditBean extends IndexBean {
             if (opts == null) return "";
             boolean isMD5Proxy = "httpclient".equals(tun.getType()) ||
                                  "connectclient".equals(tun.getType());
-            Map<String, String> sorted = new TreeMap();
+            Map<String, String> sorted = new TreeMap<String, String>();
             for (Map.Entry e : opts.entrySet()) {
                 String key = (String)e.getKey();
                 if (_noShowSet.contains(key))

@@ -31,12 +31,12 @@ class SearchState {
     public SearchState(RouterContext context, Hash key) {
         _context = context;
         _searchKey = key;
-        _pendingPeers = new HashSet(16);
-        _attemptedPeers = new HashSet(16);
-        _failedPeers = new HashSet(16);
-        _successfulPeers = new HashSet(16);
-        _pendingPeerTimes = new HashMap(16);
-        _repliedPeers = new HashSet(16);
+        _pendingPeers = new HashSet<Hash>(16);
+        _attemptedPeers = new HashSet<Hash>(16);
+        _failedPeers = new HashSet<Hash>(16);
+        _successfulPeers = new HashSet<Hash>(16);
+        _pendingPeerTimes = new HashMap<Hash, Long>(16);
+        _repliedPeers = new HashSet<Hash>(16);
         _completed = -1;
         _started = _context.clock().now();
     }
@@ -44,12 +44,12 @@ class SearchState {
     public Hash getTarget() { return _searchKey; }
     public Set<Hash> getPending() {
         synchronized (_pendingPeers) {
-            return (Set)_pendingPeers.clone();
+            return (Set<Hash>)_pendingPeers.clone();
         }
     }
     public Set<Hash> getAttempted() {
         synchronized (_attemptedPeers) {
-            return (Set)_attemptedPeers.clone();
+            return (Set<Hash>)_attemptedPeers.clone();
         }
     }
     public Set<Hash> getClosestAttempted(int max) {
@@ -60,10 +60,10 @@ class SearchState {
     
     private Set<Hash> locked_getClosest(Set<Hash> peers, int max, Hash target) {
         if (_attemptedPeers.size() <= max)
-            return new HashSet(_attemptedPeers);
-        TreeSet closest = new TreeSet(new XORComparator(target));
+            return new HashSet<Hash>(_attemptedPeers);
+        TreeSet<Hash> closest = new TreeSet<Hash>(new XORComparator(target));
         closest.addAll(_attemptedPeers);
-        Set<Hash> rv = new HashSet(max);
+        Set<Hash> rv = new HashSet<Hash>(max);
         int i = 0;
         for (Iterator<Hash> iter = closest.iterator(); iter.hasNext() && i < max; i++) {
             rv.add(iter.next());
@@ -78,12 +78,12 @@ class SearchState {
     }
     public Set<Hash> getSuccessful() {
         synchronized (_successfulPeers) {
-            return (Set)_successfulPeers.clone();
+            return (Set<Hash>)_successfulPeers.clone();
         }
     }
     public Set<Hash> getFailed() {
         synchronized (_failedPeers) {
-            return (Set)_failedPeers.clone();
+            return (Set<Hash>)_failedPeers.clone();
         }
     }
     public boolean completed() { return _completed != -1; }
@@ -155,7 +155,7 @@ class SearchState {
         }
     }
     
-    public Set getRepliedPeers() { synchronized (_repliedPeers) { return (Set)_repliedPeers.clone(); } }
+    public Set<Hash> getRepliedPeers() { synchronized (_repliedPeers) { return (Set<Hash>)_repliedPeers.clone(); } }
     
     public void replyTimeout(Hash peer) {
         synchronized (_pendingPeers) {

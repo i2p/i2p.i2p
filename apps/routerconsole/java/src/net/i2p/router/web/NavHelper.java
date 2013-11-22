@@ -7,10 +7,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.router.web.HomeHelper.App;
 
 public class NavHelper {
-    private static Map<String, String> _apps = new ConcurrentHashMap(4);
-    private static Map<String, String> _tooltips = new ConcurrentHashMap(4);
+    private static Map<String, String> _apps = new ConcurrentHashMap<String, String>(4);
+    private static Map<String, String> _tooltips = new ConcurrentHashMap<String, String>(4);
     
     /**
      * To register a new client application so that it shows up on the router
@@ -42,7 +43,7 @@ public class NavHelper {
         if (_apps.isEmpty())
             return "";
         StringBuilder buf = new StringBuilder(256); 
-        List<String> l = new ArrayList(_apps.keySet());
+        List<String> l = new ArrayList<String>(_apps.keySet());
         Collections.sort(l);
         for (String name : l) {
             String path = _apps.get(name);
@@ -65,8 +66,8 @@ public class NavHelper {
      */
     static List<HomeHelper.App> getClientApps(I2PAppContext ctx) {
         if (_apps.isEmpty())
-            return Collections.EMPTY_LIST;
-        List<HomeHelper.App> rv = new ArrayList(_apps.size());
+            return Collections.emptyList();
+        List<HomeHelper.App> rv = new ArrayList<App>(_apps.size());
         for (Map.Entry<String, String> e : _apps.entrySet()) {
             String name = e.getKey();
             String path = e.getValue();

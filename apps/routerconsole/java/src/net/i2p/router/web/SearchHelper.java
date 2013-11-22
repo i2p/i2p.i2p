@@ -14,7 +14,7 @@ public class SearchHelper extends HelperBase {
 
     private String _engine;
     private String _query;
-    private Map<String, String> _engines = new TreeMap();
+    private Map<String, String> _engines = new TreeMap<String, String>();
     
     private static final char S = ',';
     // in case engines need to know where it came from

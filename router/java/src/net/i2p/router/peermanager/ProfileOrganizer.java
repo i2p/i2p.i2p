@@ -2,13 +2,10 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -97,13 +94,13 @@ public class ProfileOrganizer {
         _context = context;
         _log = context.logManager().getLog(ProfileOrganizer.class);
         _comp = new InverseCapacityComparator();
-        _fastPeers = new HashMap(32);
-        _highCapacityPeers = new HashMap(64);
-        _wellIntegratedPeers = new HashMap(128);
-        _notFailingPeers = new HashMap(256);
-        _notFailingPeersList = new ArrayList(256);
-        _failingPeers = new HashMap(16);
-        _strictCapacityOrder = new TreeSet(_comp);
+        _fastPeers = new HashMap<Hash, PeerProfile>(32);
+        _highCapacityPeers = new HashMap<Hash, PeerProfile>(64);
+        _wellIntegratedPeers = new HashMap<Hash, PeerProfile>(128);
+        _notFailingPeers = new HashMap<Hash, PeerProfile>(256);
+        _notFailingPeersList = new ArrayList<Hash>(256);
+        _failingPeers = new HashMap<Hash, PeerProfile>(16);
+        _strictCapacityOrder = new TreeSet<PeerProfile>(_comp);
         _persistenceHelper = new ProfilePersistenceHelper(_context);
         
         _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 60*60*1000 });
@@ -219,7 +216,7 @@ public class ProfileOrganizer {
         return old;
     }
     
-    private int count(Map m) {
+    private int count(Map<Hash, PeerProfile> m) {
         getReadLock();
         try {
             return m.size();
@@ -567,7 +564,7 @@ public class ProfileOrganizer {
      */
     private void selectActiveNotFailingPeers2(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         if (matches.size() < howMany) {
-            Map<Hash, PeerProfile> activePeers = new HashMap();
+            Map<Hash, PeerProfile> activePeers = new HashMap<Hash, PeerProfile>();
             getReadLock();
             try {
                 for (Iterator<Map.Entry<Hash, PeerProfile>> iter = _notFailingPeers.entrySet().iterator(); iter.hasNext(); ) {
@@ -604,11 +601,11 @@ public class ProfileOrganizer {
         if (matches.size() < howMany) {
             int orig = matches.size();
             int needed = howMany - orig;
-            List selected = new ArrayList(needed);
+            List<Hash> selected = new ArrayList<Hash>(needed);
             getReadLock();
             try {
                 // use RandomIterator to avoid shuffling the whole thing
-                for (Iterator<Hash> iter = new RandomIterator(_notFailingPeersList); (selected.size() < needed) && iter.hasNext(); ) {
+                for (Iterator<Hash> iter = new RandomIterator<Hash>(_notFailingPeersList); (selected.size() < needed) && iter.hasNext(); ) {
                     Hash cur = iter.next();
                     if (matches.contains(cur) ||
                         (exclude != null && exclude.contains(cur))) {
@@ -666,9 +663,9 @@ public class ProfileOrganizer {
         getReadLock();
         try {
             count = _notFailingPeers.size();
-            n = new ArrayList(_notFailingPeers.keySet());
+            n = new ArrayList<Hash>(_notFailingPeers.keySet());
         } finally { releaseReadLock(); }
-        List<Hash> l = new ArrayList(count / 4);
+        List<Hash> l = new ArrayList<Hash>(count / 4);
         for (Iterator<Hash> iter = n.iterator(); iter.hasNext(); ) {
             Hash peer = iter.next();
             if (_context.commSystem().wasUnreachable(peer))
@@ -719,7 +716,7 @@ public class ProfileOrganizer {
         try {
             long cutoff = _context.clock().now() - (20*1000);
             int count = _notFailingPeers.size();
-            List<Hash> l = new ArrayList(count / 128);
+            List<Hash> l = new ArrayList<Hash>(count / 128);
             for (Iterator<PeerProfile> iter = _notFailingPeers.values().iterator(); iter.hasNext(); ) {
                 PeerProfile prof = iter.next();
                 if (prof.getTunnelHistory().getLastRejectedBandwidth() > cutoff)
@@ -736,7 +733,7 @@ public class ProfileOrganizer {
     public Set<Hash> selectAllPeers() {
         getReadLock();
         try {
-            Set<Hash> allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
+            Set<Hash> allPeers = new HashSet<Hash>(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             allPeers.addAll(_failingPeers.keySet());
             allPeers.addAll(_notFailingPeers.keySet());
             allPeers.addAll(_highCapacityPeers.keySet());
@@ -806,7 +803,7 @@ public class ProfileOrganizer {
             //allPeers.addAll(_highCapacityPeers.values());
             //allPeers.addAll(_fastPeers.values());
 
-            Set<PeerProfile> reordered = new TreeSet(_comp);
+            Set<PeerProfile> reordered = new TreeSet<PeerProfile>(_comp);
             long sortStart = System.currentTimeMillis();
             for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile prof = iter.next();
@@ -932,7 +929,7 @@ public class ProfileOrganizer {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Need to explicitly demote " + numToDemote + " peers from the fast group");
             // sort by speed, slowest-first
-            Set<PeerProfile> sorted = new TreeSet(new SpeedComparator());
+            Set<PeerProfile> sorted = new TreeSet<PeerProfile>(new SpeedComparator());
             sorted.addAll(_fastPeers.values());
             Iterator<PeerProfile> iter = sorted.iterator();
             for (int i = 0; i < numToDemote && iter.hasNext(); i++) {
@@ -1024,7 +1021,7 @@ public class ProfileOrganizer {
     private void locked_calculateThresholds(Set<PeerProfile> allPeers) {
         double totalCapacity = 0;
         double totalIntegration = 0;
-        Set<PeerProfile> reordered = new TreeSet(_comp);
+        Set<PeerProfile> reordered = new TreeSet<PeerProfile>(_comp);
         for (Iterator<PeerProfile> iter = allPeers.iterator(); iter.hasNext(); ) {
             PeerProfile profile = iter.next();
             
@@ -1217,10 +1214,10 @@ public class ProfileOrganizer {
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
-        List<Hash> all = new ArrayList(peers.keySet());
-        Set<Integer> IPSet = new HashSet(8);
+        List<Hash> all = new ArrayList<Hash>(peers.keySet());
+        Set<Integer> IPSet = new HashSet<Integer>(8);
         // use RandomIterator to avoid shuffling the whole thing
-        for (Iterator<Hash> iter = new RandomIterator(all); (matches.size() < howMany) && iter.hasNext(); ) {
+        for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
             if (toExclude != null && toExclude.contains(peer))
                 continue;
@@ -1262,7 +1259,7 @@ public class ProfileOrganizer {
       * @return an opaque set of masked IPs for this peer
       */
     private Set<Integer> maskedIPSet(Hash peer, int mask) {
-        Set<Integer> rv = new HashSet(4);
+        Set<Integer> rv = new HashSet<Integer>(4);
         byte[] commIP = _context.commSystem().getIP(peer);
         if (commIP != null)
             rv.add(maskedIP(commIP, mask));
@@ -1299,8 +1296,8 @@ public class ProfileOrganizer {
     }
 
     /** does a contain any of the elements in b? */
-    private static boolean containsAny(Set a, Set b) {
-        for (Object o : b) {
+    private static <T> boolean  containsAny(Set<T> a, Set<T> b) {
+        for (T o : b) {
             if (a.contains(o))
                 return true;
         }
@@ -1320,9 +1317,9 @@ public class ProfileOrganizer {
      *</pre>
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, Hash randomKey, int subTierMode) {
-        List<Hash> all = new ArrayList(peers.keySet());
+        List<Hash> all = new ArrayList<Hash>(peers.keySet());
         // use RandomIterator to avoid shuffling the whole thing
-        for (Iterator<Hash> iter = new RandomIterator(all); (matches.size() < howMany) && iter.hasNext(); ) {
+        for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
             if (toExclude != null && toExclude.contains(peer))
                 continue;

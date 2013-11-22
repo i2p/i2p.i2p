@@ -16,7 +16,6 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.RequestVariableLeaseSetMessage;
-import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;

@@ -58,7 +58,7 @@ class ExpireLeasesJob extends JobImpl {
      *
      */
     private Set<Hash> selectKeysToExpire() {
-        Set<Hash> toExpire = new HashSet(128);
+        Set<Hash> toExpire = new HashSet<Hash>(128);
         for (Map.Entry<Hash, DatabaseEntry> entry : _facade.getDataStore().getMapEntries()) {
             DatabaseEntry obj = entry.getValue();
             if (obj.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {

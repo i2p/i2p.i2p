@@ -29,7 +29,7 @@ public class StatLogSplitter {
     }
     
     private static void splitLog(String filename) {
-        Map outputFiles = new HashMap(4);
+        Map<String, FileWriter> outputFiles = new HashMap<String, FileWriter>(4);
         try {
             BufferedReader in = new BufferedReader(new FileReader(filename));
             String line;
@@ -68,8 +68,8 @@ public class StatLogSplitter {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        for (Iterator iter = outputFiles.values().iterator(); iter.hasNext(); ) {
-            FileWriter out = (FileWriter)iter.next();
+        for (Iterator<FileWriter> iter = outputFiles.values().iterator(); iter.hasNext(); ) {
+            FileWriter out = iter.next();
             try { out.close(); } catch (IOException ioe) {}
         }
     }

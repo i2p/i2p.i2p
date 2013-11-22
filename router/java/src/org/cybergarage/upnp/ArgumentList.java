@@ -17,7 +17,7 @@ package org.cybergarage.upnp;
 
 import java.util.Vector;
 
-public class ArgumentList extends Vector 
+public class ArgumentList extends Vector<Argument> 
 {
 	////////////////////////////////////////////////
 	//	Constants

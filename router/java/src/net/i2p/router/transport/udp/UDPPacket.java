@@ -51,7 +51,7 @@ class UDPPacket implements CDQEntry {
         if (CACHE) {
             long maxMemory = SystemVersion.getMaxMemory();
             int csize = (int) Math.max(MIN_CACHE_SIZE, Math.min(MAX_CACHE_SIZE, maxMemory / (1024*1024)));
-            _packetCache = new LinkedBlockingQueue(csize);
+            _packetCache = new LinkedBlockingQueue<UDPPacket>(csize);
         } else {
             _packetCache = null;
         }

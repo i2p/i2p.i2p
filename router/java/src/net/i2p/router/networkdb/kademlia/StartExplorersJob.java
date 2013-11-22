@@ -133,7 +133,7 @@ class StartExplorersJob extends JobImpl {
         Set<Hash> queued = _facade.getExploreKeys();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Keys waiting for exploration: " + queued.size());
-        Set<Hash> rv = new HashSet(num);
+        Set<Hash> rv = new HashSet<Hash>(num);
         for (Hash key : queued) {
             if (rv.size() >= num) break;
             rv.add(key);

@@ -1,6 +1,5 @@
 package net.i2p.util;
 
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public final class SimpleByteCache {
 
-    private static final ConcurrentHashMap<Integer, SimpleByteCache> _caches = new ConcurrentHashMap(8);
+    private static final ConcurrentHashMap<Integer, SimpleByteCache> _caches = new ConcurrentHashMap<Integer, SimpleByteCache>(8);
 
     private static final int DEFAULT_SIZE = 64;
 
@@ -89,8 +88,8 @@ public final class SimpleByteCache {
      */
     private Queue<byte[]> createQueue() {
         if (_entrySize <= MAX_FOR_ABQ)
-            return new ArrayBlockingQueue(_maxCached);
-        return new LinkedBlockingQueue(_maxCached);
+            return new ArrayBlockingQueue<byte[]>(_maxCached);
+        return new LinkedBlockingQueue<byte[]>(_maxCached);
     }
 
     /**

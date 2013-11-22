@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.udpTunnel.I2PTunnelUDPClientBase;
@@ -33,9 +32,9 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
     public SOCKSUDPTunnel(I2PTunnel tunnel) {
         super(null, tunnel, tunnel, tunnel);
 
-        this.ports = new ConcurrentHashMap(1);
-        this.cache = new ConcurrentHashMap(1);
-        this.demuxer = new MultiSink(this.cache);
+        this.ports = new ConcurrentHashMap<Integer, SOCKSUDPPort>(1);
+        this.cache = new ConcurrentHashMap<Destination, SOCKSUDPPort>(1);
+        this.demuxer = new MultiSink<SOCKSUDPPort>(this.cache);
         setSink(this.demuxer);
     }
 
@@ -53,8 +52,8 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
         SOCKSUDPPort sup = this.ports.remove(port);
         if (sup != null)
             sup.stop();
-        for (Iterator iter = cache.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry<Destination, SOCKSUDPPort> e = (Map.Entry) iter.next();
+        for (Iterator<Map.Entry<Destination, SOCKSUDPPort>> iter = cache.entrySet().iterator(); iter.hasNext();) {
+            Map.Entry<Destination, SOCKSUDPPort> e = iter.next();
             if (e.getValue() == sup)
                 iter.remove();
         }
@@ -89,5 +88,5 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
 
     private Map<Integer, SOCKSUDPPort> ports;
     private Map<Destination, SOCKSUDPPort> cache;
-    private MultiSink demuxer;
+    private MultiSink<SOCKSUDPPort> demuxer;
 }

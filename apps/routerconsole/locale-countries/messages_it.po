@@ -4,20 +4,21 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
 # Translators:
-#   <badcluster@i2pmail.org>, 2012.
-#   <bovas85@gmail.com>, 2012.
-#   <colomboi2p@ymail.com>, 2012.
-#   <ironbishop@fsfe.org>, 2011.
-#   <jokjok@hotmail.it>, 2011.
-#   <kronat@tiscali.it>, 2011.
-# Tony Goodyear <fswitch20@hotmail.com>, 2012.
+# BadCluster <badcluster@i2pmail.org>, 2012
+# Leelium <bovas85@gmail.com>, 2012
+#   <colomboi2p@ymail.com>, 2012
+# fletcherlynd <fletcherlynd@hotmail.com>, 2013
+# ironbishop <ironbishop@fsfe.org>, 2011
+# mkkid <jokjok@hotmail.it>, 2011
+# danimoth <kronat@tiscali.it>, 2011
+# Tony Goodyear <fswitch20@hotmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2012-11-18 22:14+0000\n"
-"Last-Translator: Tony Goodyear <fswitch20@hotmail.com>\n"
+"POT-Creation-Date: 2013-11-19 22:58+0000\n"
+"PO-Revision-Date: 2013-11-02 23:22+0000\n"
+"Last-Translator: fletcherlynd <fletcherlynd@hotmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
 "it/)\n"
 "Language: it\n"
@@ -189,7 +190,7 @@ msgid "Cape Verde"
 msgstr "Capo Verde"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
 msgid "Christmas Island"
 msgstr "Island Christmas "
@@ -769,4 +770,3 @@ msgstr "Zambia"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

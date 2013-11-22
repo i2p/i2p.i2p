@@ -44,7 +44,7 @@ public class ConfigUIHelper extends HelperBase {
 
     /** @return standard and user-installed themes, sorted (untranslated) */
     private Set<String> themeSet() {
-         Set<String> rv = new TreeSet();
+         Set<String> rv = new TreeSet<String>();
          // add a failsafe even if we can't find any themes
          rv.add(CSSHelper.DEFAULT_THEME);
          File dir = new File(_context.getBaseDir(), "docs/themes/console");
@@ -57,9 +57,9 @@ public class ConfigUIHelper extends HelperBase {
                  rv.add(name);
          }
          // user themes
-         Set props = _context.getPropertyNames();
-         for (Iterator iter = props.iterator(); iter.hasNext(); ) {
-              String prop = (String) iter.next();
+         Set<String> props = _context.getPropertyNames();
+         for (Iterator<String> iter = props.iterator(); iter.hasNext(); ) {
+              String prop = iter.next();
               if (prop.startsWith(PROP_THEME_PFX) && prop.length() > PROP_THEME_PFX.length())
                   rv.add(prop.substring(PROP_THEME_PFX.length()));
          }

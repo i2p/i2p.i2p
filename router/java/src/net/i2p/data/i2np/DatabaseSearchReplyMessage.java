@@ -33,7 +33,7 @@ public class DatabaseSearchReplyMessage extends FastI2NPMessageImpl {
         // do this in netdb if we need it
         //_context.statManager().createRateStat("netDb.searchReplyMessageSend", "How many search reply messages we send", "NetworkDatabase", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         //_context.statManager().createRateStat("netDb.searchReplyMessageReceive", "How many search reply messages we receive", "NetworkDatabase", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
-        _peerHashes = new ArrayList(3);
+        _peerHashes = new ArrayList<Hash>(3);
     }
     
     /**

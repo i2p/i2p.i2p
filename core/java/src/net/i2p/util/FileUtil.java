@@ -106,7 +106,7 @@ public class FileUtil {
         try {
             byte buf[] = new byte[16*1024];
             zip = new ZipFile(zipfile);
-            Enumeration entries = zip.entries();
+            Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
                 if (entry.getName().indexOf("..") != -1) {
@@ -215,7 +215,7 @@ public class FileUtil {
         try {
             byte buf[] = new byte[16*1024];
             zip = new ZipFile(zipfile);
-            Enumeration entries = zip.entries();
+            Enumeration<? extends ZipEntry> entries = zip.entries();
             boolean p200TestRequired = true;
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
@@ -358,7 +358,7 @@ public class FileUtil {
         try {
             fis = new FileInputStream(f);
             BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-            List lines = new ArrayList(maxNumLines > 0 ? maxNumLines : 64);
+            List<String> lines = new ArrayList<String>(maxNumLines > 0 ? maxNumLines : 64);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 lines.add(line);

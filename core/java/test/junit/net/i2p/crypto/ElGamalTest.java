@@ -156,7 +156,7 @@ public class ElGamalTest extends TestCase{
         String msg = "Hello world";
         
         byte encrypted[] = _context.elGamalAESEngine().encryptAESBlock(msg.getBytes(), sessionKey, iv, null, null, 64);
-        Set foundTags = new HashSet();
+        Set<SessionTag> foundTags = new HashSet<SessionTag>();
         SessionKey foundKey = new SessionKey();
         byte decrypted[] = null;
         try{
@@ -338,7 +338,7 @@ public class ElGamalTest extends TestCase{
         PrivateKey privKey = (PrivateKey)kp[1];
         SessionKey sessionKey = ctx.keyGenerator().generateSessionKey();
         for (int i = 0; i < 10; i++) {
-            Set tags = new HashSet(5);
+            Set<SessionTag> tags = new HashSet<SessionTag>(5);
             if (i == 0) {
                 for (int j = 0; j < 5; j++)
                     tags.add(new SessionTag(true));

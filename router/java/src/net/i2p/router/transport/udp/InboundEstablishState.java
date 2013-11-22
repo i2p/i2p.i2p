@@ -98,7 +98,7 @@ class InboundEstablishState {
         _currentState = InboundState.IB_STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
         _keyBuilder = dh;
-        _queuedMessages = new LinkedBlockingQueue();
+        _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
     }
     
     public synchronized InboundState getState() { return _currentState; }

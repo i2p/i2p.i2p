@@ -19,7 +19,7 @@ package org.cybergarage.upnp;
 
 import java.util.Vector;
 
-public class ServiceList extends Vector 
+public class ServiceList extends Vector<Service> 
 {
 	////////////////////////////////////////////////
 	//	Constants

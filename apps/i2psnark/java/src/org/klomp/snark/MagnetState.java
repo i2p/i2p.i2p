@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.RandomSource;
 
@@ -190,7 +189,7 @@ class MagnetState {
      */
     public MetaInfo buildMetaInfo() throws Exception {
         // top map has nothing in it but the info map (no announce)
-        Map<String, BEValue> map = new HashMap();
+        Map<String, BEValue> map = new HashMap<String, BEValue>();
         InputStream is = new ByteArrayInputStream(metainfoBytes);
         BDecoder dec = new BDecoder(is);
         BEValue bev = dec.bdecodeMap();

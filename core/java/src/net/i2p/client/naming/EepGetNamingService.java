@@ -50,10 +50,10 @@ public class EepGetNamingService extends DummyNamingService {
         super(context);
     }
     
-    private List getURLs() {
+    private List<String> getURLs() {
         String list = _context.getProperty(PROP_EEPGET_LIST, DEFAULT_EEPGET_LIST);
         StringTokenizer tok = new StringTokenizer(list, ",");
-        List rv = new ArrayList(tok.countTokens());
+        List<String> rv = new ArrayList<String>(tok.countTokens());
         while (tok.hasMoreTokens())
             rv.add(tok.nextToken());
         return rv;
@@ -70,13 +70,13 @@ public class EepGetNamingService extends DummyNamingService {
         if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p"))
             return null;
 
-        List URLs = getURLs();
+        List<String> URLs = getURLs();
         if (URLs.isEmpty())
             return null;
 
         // prevent lookup loops - this cannot be the only lookup service
         for (int i = 0; i < URLs.size(); i++) { 
-            String url = (String)URLs.get(i);
+            String url = URLs.get(i);
             if (url.startsWith("http://" + hostname + "/")) {
                 _log.error("Lookup loop: " + hostname);
                 return null;

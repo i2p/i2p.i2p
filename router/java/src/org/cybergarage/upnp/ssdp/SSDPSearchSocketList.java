@@ -24,7 +24,7 @@ import java.util.Vector;
 import org.cybergarage.net.HostInterface;
 import org.cybergarage.upnp.device.SearchListener;
 
-public class SSDPSearchSocketList extends Vector 
+public class SSDPSearchSocketList extends Vector<SSDPSearchSocket> 
 {
 	////////////////////////////////////////////////
 	//	Constructor

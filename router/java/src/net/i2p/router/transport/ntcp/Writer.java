@@ -26,10 +26,10 @@ class Writer {
     
     public Writer(RouterContext ctx) {
         _log = ctx.logManager().getLog(getClass());
-        _pendingConnections = new LinkedHashSet(16);
-        _runners = new ArrayList(5);
-        _liveWrites = new HashSet(5);
-        _writeAfterLive = new HashSet(5);
+        _pendingConnections = new LinkedHashSet<NTCPConnection>(16);
+        _runners = new ArrayList<Runner>(5);
+        _liveWrites = new HashSet<NTCPConnection>(5);
+        _writeAfterLive = new HashSet<NTCPConnection>(5);
     }
     
     public synchronized void startWriting(int numWriters) {

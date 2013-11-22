@@ -51,9 +51,9 @@ public class OutboundMessageRegistry {
     public OutboundMessageRegistry(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(OutboundMessageRegistry.class);
-        _selectors = new ArrayList(64);
-        _selectorToMessage = new HashMap(64);
-        _activeMessages = new ConcurrentHashSet(64);
+        _selectors = new ArrayList<MessageSelector>(64);
+        _selectorToMessage = new HashMap<MessageSelector, Object>(64);
+        _activeMessages = new ConcurrentHashSet<OutNetMessage>(64);
         _cleanupTask = new CleanupTask();
     }
     
@@ -108,10 +108,10 @@ public class OutboundMessageRegistry {
                 MessageSelector sel = _selectors.get(i);
                 boolean isMatch = sel.isMatch(message);
                 if (isMatch) {
-                    if (matchedSelectors == null) matchedSelectors = new ArrayList(1);
+                    if (matchedSelectors == null) matchedSelectors = new ArrayList<MessageSelector>(1);
                     matchedSelectors.add(sel);
                     if (!sel.continueMatching()) {
-                        if (removedSelectors == null) removedSelectors = new ArrayList(1);
+                        if (removedSelectors == null) removedSelectors = new ArrayList<MessageSelector>(1);
                         removedSelectors.add(sel);
                         //iter.remove();
                         _selectors.remove(i);
@@ -123,11 +123,11 @@ public class OutboundMessageRegistry {
 
         List<OutNetMessage> rv = null;
         if (matchedSelectors != null) {
-            rv = new ArrayList(matchedSelectors.size());
+            rv = new ArrayList<OutNetMessage>(matchedSelectors.size());
             for (MessageSelector sel : matchedSelectors) {
                 boolean removed = false;
                 OutNetMessage msg = null;
-                List msgs = null;
+                List<OutNetMessage> msgs = null;
                 synchronized (_selectorToMessage) {
                     Object o = null;
                     if ( (removedSelectors != null) && (removedSelectors.contains(sel)) ) {
@@ -154,7 +154,7 @@ public class OutboundMessageRegistry {
                 }
             }
         } else {
-            rv = Collections.EMPTY_LIST;
+            rv = Collections.emptyList();
         }
 
         return rv;
@@ -202,11 +202,11 @@ public class OutboundMessageRegistry {
         synchronized (_selectorToMessage) { 
             Object oldMsg = _selectorToMessage.put(sel, msg);
             if (oldMsg != null) {
-                List multi = null;
+                List<OutNetMessage> multi = null;
                 if (oldMsg instanceof OutNetMessage) {
                     //multi = Collections.synchronizedList(new ArrayList(4));
-                    multi = new ArrayList(4);
-                    multi.add(oldMsg);
+                    multi = new ArrayList<OutNetMessage>(4);
+                    multi.add((OutNetMessage)oldMsg);
                     multi.add(msg);
                     _selectorToMessage.put(sel, multi);
                 } else if (oldMsg instanceof List) {
@@ -261,7 +261,7 @@ public class OutboundMessageRegistry {
 
         public void timeReached() {
             long now = _context.clock().now();
-            List<MessageSelector> removing = new ArrayList(8);
+            List<MessageSelector> removing = new ArrayList<MessageSelector>(8);
             synchronized (_selectors) {
                 // CME?
                 //for (Iterator<MessageSelector> iter = _selectors.iterator(); iter.hasNext(); ) {

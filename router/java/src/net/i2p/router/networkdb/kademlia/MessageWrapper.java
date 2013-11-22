@@ -59,7 +59,7 @@ public class MessageWrapper {
         if (skm == null)
             return null;
         SessionKey sentKey = new SessionKey();
-        Set<SessionTag> sentTags = new HashSet();
+        Set<SessionTag> sentTags = new HashSet<SessionTag>();
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, payload, sentKey, sentTags, 
                                                               NETDB_TAGS_TO_DELIVER, NETDB_LOW_THRESHOLD, skm);
         if (msg == null)
@@ -192,7 +192,7 @@ public class MessageWrapper {
     private static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
         SessionTag tag = new SessionTag(true);
-        Set<SessionTag> tags = new RemovableSingletonSet(tag);
+        Set<SessionTag> tags = new RemovableSingletonSet<SessionTag>(tag);
         skm.tagsReceived(key, tags, 2*60*1000);
         return new OneTimeSession(key, tag);
     }

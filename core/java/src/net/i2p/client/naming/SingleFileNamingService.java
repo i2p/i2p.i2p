@@ -308,7 +308,7 @@ public class SingleFileNamingService extends NamingService {
     @Override
     public Map<String, Destination> getEntries(Properties options) {
         if (!_file.exists())
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         String searchOpt = null;
         String startsWith = null;
         if (options != null) {
@@ -322,7 +322,7 @@ public class SingleFileNamingService extends NamingService {
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
             String line = null;
-            Map<String, Destination> rv = new HashMap();
+            Map<String, Destination> rv = new HashMap<String, Destination>();
             while ( (line = in.readLine()) != null) {
                 if (line.length() <= 0)
                     continue;
@@ -357,7 +357,7 @@ public class SingleFileNamingService extends NamingService {
             return rv;
         } catch (IOException ioe) {
             _log.error("getEntries error", ioe);
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();
@@ -370,13 +370,13 @@ public class SingleFileNamingService extends NamingService {
      */
     public Set<String> getNames(Properties options) {
         if (!_file.exists())
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         BufferedReader in = null;
         getReadLock();
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
             String line = null;
-            Set<String> rv = new HashSet();
+            Set<String> rv = new HashSet<String>();
             while ( (line = in.readLine()) != null) {
                 if (line.length() <= 0)
                     continue;
@@ -391,7 +391,7 @@ public class SingleFileNamingService extends NamingService {
             return rv;
         } catch (IOException ioe) {
             _log.error("getNames error", ioe);
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();

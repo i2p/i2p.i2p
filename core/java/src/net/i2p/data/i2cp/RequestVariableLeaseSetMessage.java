@@ -37,7 +37,7 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
     private static final String MIN_VERSION = "0.9.7";
 
     public RequestVariableLeaseSetMessage() {
-        _endpoints = new ArrayList();
+        _endpoints = new ArrayList<Lease>();
     }
 
     /**

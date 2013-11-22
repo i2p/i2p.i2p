@@ -58,8 +58,8 @@ public class BSkipList extends SkipList {
 	public final BlockFile bf;
 	private boolean isClosed;
 
-	final HashMap<Integer, BSkipSpan> spanHash = new HashMap();
-	final HashMap<Integer, SkipLevels> levelHash = new HashMap();
+	final HashMap<Integer, BSkipSpan> spanHash = new HashMap<Integer, BSkipSpan>();
+	final HashMap<Integer, SkipLevels> levelHash = new HashMap<Integer, SkipLevels>();
 
 	private final boolean fileOnly;
 

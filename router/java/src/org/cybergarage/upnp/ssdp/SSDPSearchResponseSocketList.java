@@ -24,7 +24,7 @@ import org.cybergarage.net.*;
 
 import org.cybergarage.upnp.*;
 
-public class SSDPSearchResponseSocketList extends Vector 
+public class SSDPSearchResponseSocketList extends Vector<SSDPSearchResponseSocket> 
 {
 	////////////////////////////////////////////////
 	//	Constructor

@@ -11,7 +11,6 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
@@ -443,7 +442,7 @@ class PacketBuilder {
      * It doesn't generate a reply, but that's ok.
      */
     public UDPPacket buildPing(PeerState peer) {
-        return buildACK(peer, Collections.EMPTY_LIST);
+        return buildACK(peer, Collections.<ACKBitfield> emptyList());
     }
 
     /**
@@ -1082,7 +1081,7 @@ class PacketBuilder {
     public List<UDPPacket> buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
-        List<UDPPacket> rv = new ArrayList(count);
+        List<UDPPacket> rv = new ArrayList<UDPPacket>(count);
         for (int i = 0; i < count; i++) {
             InetAddress iaddr = addr.getIntroducerHost(i);
             int iport = addr.getIntroducerPort(i);
@@ -1095,7 +1094,7 @@ class PacketBuilder {
                 iaddr.getAddress().length != 4 ||
                 (!_transport.isValid(iaddr.getAddress())) ||
                 (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
-                if (_log.shouldLog(_log.WARN))
+                if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()
                                + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
                 // TODO implement some sort of introducer banlist

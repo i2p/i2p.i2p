@@ -6,7 +6,6 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
 
 /**
  * Zero-copy in-JVM.

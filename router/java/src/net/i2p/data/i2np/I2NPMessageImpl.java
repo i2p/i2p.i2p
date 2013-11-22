@@ -48,7 +48,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     //private static final boolean RAW_FULL_SIZE = false;
     
     /** unused */
-    private static final Map<Integer, Builder> _builders = new ConcurrentHashMap(1);
+    private static final Map<Integer, Builder> _builders = new ConcurrentHashMap<Integer, Builder>(1);
 
     /** @deprecated unused */
     public static final void registerBuilder(Builder builder, int type) { _builders.put(Integer.valueOf(type), builder); }

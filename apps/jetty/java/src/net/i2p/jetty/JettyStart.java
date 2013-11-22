@@ -57,7 +57,7 @@ public class JettyStart implements ClientApp {
         _state = UNINITIALIZED;
         _mgr = mgr;
         _args = args;
-        _jettys = new ArrayList(args.length);
+        _jettys = new ArrayList<LifeCycle>(args.length);
         parseArgs(args);
         _state = INITIALIZED;
     }

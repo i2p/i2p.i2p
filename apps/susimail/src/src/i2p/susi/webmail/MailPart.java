@@ -37,7 +37,7 @@ public class MailPart {
 	public String headerLines[], type, boundary, encoding, name,
 		filename, description, disposition, charset, version;
 	public int beginBody, begin, end;
-	public ArrayList parts = null;
+	public ArrayList<MailPart> parts = null;
 	public boolean multipart = false, message = false;
 	public ReadBuffer buffer = null;
 	
@@ -53,7 +53,7 @@ public class MailPart {
 		buffer = readBuffer;
 		
 		if( parts == null )
-			parts = new ArrayList();
+			parts = new ArrayList<MailPart>();
 		else
 			parts.clear();
 

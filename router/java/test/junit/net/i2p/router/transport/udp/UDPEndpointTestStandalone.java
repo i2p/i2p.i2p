@@ -24,12 +24,12 @@ public class UDPEndpointTestStandalone {
     private final Log _log;
     private UDPEndpoint _endpoints[];
     private volatile boolean _beginTest;
-    private final List _sentNotReceived;
+    private final List<ByteArray> _sentNotReceived;
     
     public UDPEndpointTestStandalone(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPEndpointTestStandalone.class);
-        _sentNotReceived = Collections.synchronizedList(new ArrayList(1000));
+        _sentNotReceived = Collections.synchronizedList(new ArrayList<ByteArray>(1000));
     }
     
     public void runTest(int numPeers) {

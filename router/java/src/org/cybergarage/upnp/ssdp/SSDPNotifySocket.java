@@ -33,7 +33,6 @@ import java.net.*;
 import java.io.IOException;
 
 import org.cybergarage.net.*;
-import org.cybergarage.util.*;
 import org.cybergarage.http.*;
 import org.cybergarage.upnp.*;
 import org.cybergarage.util.Debug;

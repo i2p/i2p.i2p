@@ -81,7 +81,7 @@ class SubscriptionIterator implements Iterator<AddressBook> {
             //                   DataHelper.formatDuration(I2PAppContext.getGlobalContext().clock().now() - sub.getLastFetched()) +
             //                   " ago but the minimum delay is " +
             //                   DataHelper.formatDuration(this.delay));
-            return new AddressBook(Collections.EMPTY_MAP);
+            return new AddressBook(Collections.<String, String> emptyMap());
         }
     }
 

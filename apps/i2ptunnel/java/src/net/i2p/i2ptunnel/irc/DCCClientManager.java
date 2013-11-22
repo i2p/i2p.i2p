@@ -55,9 +55,9 @@ public class DCCClientManager extends EventReceiver {
         _dispatch = dispatch;
         _tunnel = tunnel;
         _log = tunnel.getContext().logManager().getLog(DCCClientManager.class);
-        _incoming = new ConcurrentHashMap(8);
-        _active = new ConcurrentHashMap(8);
-        _complete = new ConcurrentHashMap(8);
+        _incoming = new ConcurrentHashMap<Integer, I2PTunnelDCCClient>(8);
+        _active = new ConcurrentHashMap<Integer, I2PTunnelDCCClient>(8);
+        _complete = new ConcurrentHashMap<Integer, I2PTunnelDCCClient>(8);
     }
 
     public boolean close(boolean forced) {

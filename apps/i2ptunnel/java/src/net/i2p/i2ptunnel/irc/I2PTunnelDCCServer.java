@@ -75,10 +75,10 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     public I2PTunnelDCCServer(I2PSocketManager sktMgr, Logging l,
                               EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(DUMMY, 0, sktMgr, l, notifyThis, tunnel);
-        _outgoing = new ConcurrentHashMap(8);
-        _active = new ConcurrentHashMap(8);
-        _resume = new ConcurrentHashMap(8);
-        _sockList = new CopyOnWriteArrayList();
+        _outgoing = new ConcurrentHashMap<Integer, LocalAddress>(8);
+        _active = new ConcurrentHashMap<Integer, LocalAddress>(8);
+        _resume = new ConcurrentHashMap<Integer, LocalAddress>(8);
+        _sockList = new CopyOnWriteArrayList<I2PSocket>();
     }
 
     /**

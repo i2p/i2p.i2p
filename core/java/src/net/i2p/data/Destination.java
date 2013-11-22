@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import net.i2p.I2PAppContext;
 import net.i2p.util.LHMCache;
 import net.i2p.util.SystemVersion;
 
@@ -48,7 +47,7 @@ public class Destination extends KeysAndCert {
         //    I2PAppContext.getGlobalContext().statManager().createRateStat("DestCache", "Hit rate", "Router", new long[] { 10*60*1000 });
     }
 
-    private static final Map<SigningPublicKey, Destination> _cache = new LHMCache(CACHE_SIZE);
+    private static final Map<SigningPublicKey, Destination> _cache = new LHMCache<SigningPublicKey, Destination>(CACHE_SIZE);
 
     /**
      * Pull from cache or return new

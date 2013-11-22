@@ -16,7 +16,6 @@ import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 
 /**
  * I2PSession with protocol and ports
@@ -297,7 +296,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
         private final AtomicBoolean stopping = new AtomicBoolean(false);
 
         public MuxedAvailabilityNotifier() {
-            _msgs = new LinkedBlockingQueue();
+            _msgs = new LinkedBlockingQueue<MsgData>();
         }
 
         @Override

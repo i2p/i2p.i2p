@@ -9,7 +9,7 @@ public class ConfigAdvancedHelper extends HelperBase {
     
     public String getSettings() {
         StringBuilder buf = new StringBuilder(4*1024);
-        TreeMap<String, String> sorted = new TreeMap();
+        TreeMap<String, String> sorted = new TreeMap<String, String>();
         sorted.putAll(_context.router().getConfigMap());
         for (Map.Entry<String, String> e : sorted.entrySet()) {
             String name = e.getKey();

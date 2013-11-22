@@ -5,7 +5,6 @@ import java.io.Writer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
@@ -97,11 +96,11 @@ public class TunnelDispatcher implements Service {
     public TunnelDispatcher(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelDispatcher.class);
-        _outboundGateways = new ConcurrentHashMap();
-        _outboundEndpoints = new ConcurrentHashMap();
-        _participants = new ConcurrentHashMap();
-        _inboundGateways = new ConcurrentHashMap();
-        _participatingConfig = new ConcurrentHashMap();
+        _outboundGateways = new ConcurrentHashMap<TunnelId, TunnelGateway>();
+        _outboundEndpoints = new ConcurrentHashMap<TunnelId, OutboundTunnelEndpoint>();
+        _participants = new ConcurrentHashMap<TunnelId, TunnelParticipant>();
+        _inboundGateways = new ConcurrentHashMap<TunnelId, TunnelGateway>();
+        _participatingConfig = new ConcurrentHashMap<TunnelId, HopConfig>();
         _pumper = new TunnelGatewayPumper(ctx);
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRequiredRateStat("tunnel.participatingTunnels", 
@@ -571,8 +570,8 @@ public class TunnelDispatcher implements Service {
             long maxTime = before + MAX_FUTURE_EXPIRATION;
             if ( (msg.getMessageExpiration() < minTime) || (msg.getMessage().getMessageExpiration() < minTime) ||
                  (msg.getMessageExpiration() > maxTime) || (msg.getMessage().getMessageExpiration() > maxTime) ) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
                                + " as the wrapper's expiration is in " + DataHelper.formatDuration(msg.getMessageExpiration()-before)
                                + " and/or the content's expiration is in " + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-before)
                                + " with messageId " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " and message type "
@@ -690,7 +689,7 @@ public class TunnelDispatcher implements Service {
      *  @return a copy
      */
     public List<HopConfig> listParticipatingTunnels() {
-        return new ArrayList(_participatingConfig.values());
+        return new ArrayList<HopConfig>(_participatingConfig.values());
     }
 
     /**
@@ -949,7 +948,7 @@ public class TunnelDispatcher implements Service {
         
         public LeaveTunnel(RouterContext ctx) {
             super(ctx);
-            _configs = new LinkedBlockingQueue();
+            _configs = new LinkedBlockingQueue<HopConfig>();
             // 20 min no tunnels accepted + 10 min tunnel expiration
             getTiming().setStartAfter(ctx.clock().now() + 30*60*1000);
             getContext().jobQueue().addJob(LeaveTunnel.this);

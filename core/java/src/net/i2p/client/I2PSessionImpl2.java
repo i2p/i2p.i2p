@@ -63,7 +63,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      */
     public I2PSessionImpl2(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
         super(ctx, destKeyStream, options);
-        _sendingStates = new HashSet(32);
+        _sendingStates = new HashSet<MessageState>(32);
         // default is BestEffort
         _noEffort = "none".equals(getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
 
@@ -449,8 +449,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         long inSync = 0;
         synchronized (_sendingStates) {
             inSync = _context.clock().now();
-            for (Iterator iter = _sendingStates.iterator(); iter.hasNext();) {
-                state = (MessageState) iter.next();
+            for (Iterator<MessageState> iter = _sendingStates.iterator(); iter.hasNext();) {
+                state = iter.next();
                 if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "State " + state.getMessageId() + " / " + state.getNonce());
                 if (state.getNonce() == nonce) {
                     if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Found a matching state");
@@ -523,8 +523,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_sendingStates == null)    // only null if overridden by I2PSimpleSession
             return;
         synchronized (_sendingStates) {
-            for (Iterator iter = _sendingStates.iterator(); iter.hasNext();) {
-                MessageState state = (MessageState) iter.next();
+            for (Iterator<MessageState> iter = _sendingStates.iterator(); iter.hasNext();) {
+                MessageState state = iter.next();
                 state.cancel();
             }
             if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Disconnecting " + _sendingStates.size() + " states");

@@ -35,7 +35,6 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 
@@ -148,20 +147,20 @@ public class SnarkManager implements CompleteListener {
      *  @since 0.9.6
      */
     public SnarkManager(I2PAppContext ctx, String ctxPath, String ctxName) {
-        _snarks = new ConcurrentHashMap();
-        _magnets = new ConcurrentHashSet();
+        _snarks = new ConcurrentHashMap<String, Snark>();
+        _magnets = new ConcurrentHashSet<String>();
         _addSnarkLock = new Object();
         _context = ctx;
         _contextPath = ctxPath;
         _contextName = ctxName;
         _log = _context.logManager().getLog(SnarkManager.class);
-        _messages = new LinkedBlockingQueue();
+        _messages = new LinkedBlockingQueue<String>();
         _util = new I2PSnarkUtil(_context, ctxName);
         String cfile = ctxName + CONFIG_FILE_SUFFIX;
         _configFile = new File(cfile);
         if (!_configFile.isAbsolute())
             _configFile = new File(_context.getConfigDir(), cfile);
-        _trackerMap = new ConcurrentHashMap(4);
+        _trackerMap = new ConcurrentHashMap<String, Tracker>(4);
         loadConfig(null);
     }
 
@@ -240,8 +239,8 @@ public class SnarkManager implements CompleteListener {
     /** newest last */
     public List<String> getMessages() {
         if (_messages.isEmpty())
-            return Collections.EMPTY_LIST;
-        return new ArrayList(_messages);
+            return Collections.emptyList();
+        return new ArrayList<String>(_messages);
     }
     
     /** @since 0.9 */
@@ -595,7 +594,7 @@ public class SnarkManager implements CompleteListener {
                 try { port = Integer.parseInt(i2cpPort); } catch (NumberFormatException nfe) {}
             }
 
-            Map<String, String> opts = new HashMap();
+            Map<String, String> opts = new HashMap<String, String>();
             if (i2cpOpts == null) i2cpOpts = "";
             StringTokenizer tok = new StringTokenizer(i2cpOpts, " \t\n");
             while (tok.hasMoreTokens()) {
@@ -604,7 +603,7 @@ public class SnarkManager implements CompleteListener {
                 if (split > 0)
                     opts.put(pair.substring(0, split), pair.substring(split+1));
             }
-            Map<String, String> oldOpts = new HashMap();
+            Map<String, String> oldOpts = new HashMap<String, String>();
             String oldI2CPOpts = _config.getProperty(PROP_I2CP_OPTS);
             if (oldI2CPOpts == null) oldI2CPOpts = "";
             tok = new StringTokenizer(oldI2CPOpts, " \t\n");
@@ -737,7 +736,7 @@ public class SnarkManager implements CompleteListener {
      */
     private List<String> getOpenTrackers() {
         if (!_util.shouldUseOpenTrackers())
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         return getListConfig(PROP_OPENTRACKERS, I2PSnarkUtil.DEFAULT_OPENTRACKERS);
     }
     
@@ -782,7 +781,7 @@ public class SnarkManager implements CompleteListener {
         if (val == null)
             val = dflt;
         if (val == null)
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         return Arrays.asList(val.split(","));
     }
 
@@ -833,7 +832,7 @@ public class SnarkManager implements CompleteListener {
      *  An unsynchronized copy.
      */
     public Set<String> listTorrentFiles() {
-        return new HashSet(_snarks.keySet());
+        return new HashSet<String>(_snarks.keySet());
     }
 
     /**
@@ -1386,7 +1385,7 @@ public class SnarkManager implements CompleteListener {
      *  @return failure message or null on success
      */
     private String validateTorrent(MetaInfo info) {
-        List files = info.getFiles();
+        List<List<String>> files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
             return _("Too many files in \"{0}\" ({1}), deleting it!", info.getName(), files.size());
         } else if ( (files == null) && (info.getName().endsWith(".torrent")) ) {
@@ -1402,7 +1401,7 @@ public class SnarkManager implements CompleteListener {
             return _("Torrent \"{0}\" has no data, deleting it!", info.getName());
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
-            List lengths = info.getLengths();
+            List<Long> lengths = info.getLengths();
             if (lengths != null)
                 for (int i = 0; i < lengths.size(); i++)
                     System.out.println("File " + i + " is " + lengths.get(i) + " long.");
@@ -1688,8 +1687,8 @@ public class SnarkManager implements CompleteListener {
         // Don't remove magnet torrents that don't have a torrent file yet
         existingNames.removeAll(_magnets);
         // now lets see which ones have been removed...
-        for (Iterator iter = existingNames.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        for (Iterator<String> iter = existingNames.iterator(); iter.hasNext(); ) {
+            String name = iter.next();
             if (foundNames.contains(name)) {
                 // known and still there.  noop
             } else {

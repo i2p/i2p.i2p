@@ -36,7 +36,7 @@ public class LoadClientAppsJob extends JobImpl {
             if (_loaded) return;
             _loaded = true;
         }
-        List apps = ClientAppConfig.getClientApps(getContext());
+        List<ClientAppConfig> apps = ClientAppConfig.getClientApps(getContext());
         if (apps.isEmpty()) {
             _log.error("Warning - No client apps or router console configured - we are just a router");
             System.err.println("Warning - No client apps or router console configured - we are just a router");
@@ -106,7 +106,7 @@ public class LoadClientAppsJob extends JobImpl {
      *  @return non-null, 0-length if args is null
      */
     public static String[] parseArgs(String args) {
-        List<String> argList = new ArrayList(4);
+        List<String> argList = new ArrayList<String>(4);
         if (args != null) {
             char data[] = args.toCharArray();
             StringBuilder buf = new StringBuilder(32);

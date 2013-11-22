@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/desktopgui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/i2p_router"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/i2p_sdk"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/desktopgui"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jetty"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jrobin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/systray"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/lib/wrapper/all/wrapper.jar"/>
-	<classpathentry kind="lib" path="/jrobin/jrobin-1.5.9.1.jar"/>
-	<classpathentry kind="lib" path="/jetty/jettylib/javax.servlet.jar"/>
-	<classpathentry kind="lib" path="/jetty/jettylib/jetty-java5-threadpool.jar"/>
-	<classpathentry kind="lib" path="/jetty/jettylib/jetty-sslengine.jar"/>
-	<classpathentry kind="lib" path="/jetty/jettylib/jetty-util.jar"/>
-	<classpathentry kind="lib" path="/jetty/jettylib/org.mortbay.jetty.jar"/>
 	<classpathentry kind="output" path="build/obj"/>
 </classpath>

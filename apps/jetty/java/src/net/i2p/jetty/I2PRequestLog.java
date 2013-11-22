@@ -32,7 +32,6 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.DateCache;
 import org.eclipse.jetty.util.RolloverFileOutputStream;
 import org.eclipse.jetty.util.StringUtil;
-import org.eclipse.jetty.util.TypeUtil;
 import org.eclipse.jetty.util.Utf8StringBuilder;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.log.Log;
@@ -83,7 +82,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient DateCache _logDateCache;
     private transient PathMap _ignorePathMap;
     private transient Writer _writer;
-    private transient ArrayList _buffers;
+    private transient ArrayList<Utf8StringBuilder> _buffers;
     private transient char[] _copy;
 
     
@@ -262,7 +261,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
             synchronized(_writer)
             {
                 int size=_buffers.size();
-                u8buf = size==0?new Utf8StringBuilder(160):(Utf8StringBuilder)_buffers.remove(size-1);
+                u8buf = size==0?new Utf8StringBuilder(160):_buffers.remove(size-1);
                 buf = u8buf.getStringBuilder();
             }
             
@@ -467,7 +466,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
             _ignorePathMap = null;
         
         _writer = new OutputStreamWriter(_out);
-        _buffers = new ArrayList();
+        _buffers = new ArrayList<Utf8StringBuilder>();
         _copy = new char[1024];
         super.doStart();
     }

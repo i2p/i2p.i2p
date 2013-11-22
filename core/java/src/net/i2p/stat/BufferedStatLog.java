@@ -26,7 +26,7 @@ public class BufferedStatLog implements StatLog {
     private int _lastWrite;
     /** flush stat events to disk after this many events (or 30s)*/
     private int _flushFrequency;
-    private final List _statFilters;
+    private final List<String> _statFilters;
     private String _lastFilters;
     private BufferedWriter _out;
     private String _outFile;
@@ -45,7 +45,7 @@ public class BufferedStatLog implements StatLog {
             _events[i] = new StatEvent();
         _eventNext = 0;
         _lastWrite = _events.length-1;
-        _statFilters = new ArrayList(10);
+        _statFilters = new ArrayList<String>(10);
         _flushFrequency = 500;
         updateFilters();
         I2PThread writer = new I2PThread(new StatLogWriter(), "StatLogWriter");

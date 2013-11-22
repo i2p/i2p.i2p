@@ -40,7 +40,7 @@ public class ConfigAdvancedHandler extends FormHandler {
      *
      */
     private void saveChanges() {
-        Set<String> unsetKeys = new HashSet(_context.router().getConfigSettings());
+        Set<String> unsetKeys = new HashSet<String>(_context.router().getConfigSettings());
         if (_config != null) {
             Properties props = new Properties();
             try {

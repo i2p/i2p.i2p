@@ -30,7 +30,7 @@ import net.i2p.util.Log;
  * As of 0.8.11, inbound request handling is done in a separate thread.
  */
 class BuildExecutor implements Runnable {
-    private final ArrayList<Long> _recentBuildIds = new ArrayList(100);
+    private final ArrayList<Long> _recentBuildIds = new ArrayList<Long>(100);
     private final RouterContext _context;
     private final Log _log;
     private final TunnelPoolManager _manager;
@@ -51,8 +51,8 @@ class BuildExecutor implements Runnable {
         _log = ctx.logManager().getLog(getClass());
         _manager = mgr;
         _currentlyBuilding = new Object();
-        _currentlyBuildingMap = new ConcurrentHashMap(MAX_CONCURRENT_BUILDS);
-        _recentlyBuildingMap = new ConcurrentHashMap(4 * MAX_CONCURRENT_BUILDS);
+        _currentlyBuildingMap = new ConcurrentHashMap<Long, PooledTunnelCreatorConfig>(MAX_CONCURRENT_BUILDS);
+        _recentlyBuildingMap = new ConcurrentHashMap<Long, PooledTunnelCreatorConfig>(4 * MAX_CONCURRENT_BUILDS);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.buildExploratoryExpire", "No response to our build request", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
@@ -153,7 +153,7 @@ class BuildExecutor implements Runnable {
                 _recentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg);
                 iter.remove();
                 if (expired == null)
-                    expired = new ArrayList();
+                    expired = new ArrayList<PooledTunnelCreatorConfig>();
                 expired.add(cfg);
             }
         }
@@ -284,8 +284,8 @@ class BuildExecutor implements Runnable {
 
     public void run() {
         _isRunning = true;
-        List<TunnelPool> wanted = new ArrayList(MAX_CONCURRENT_BUILDS);
-        List<TunnelPool> pools = new ArrayList(8);
+        List<TunnelPool> wanted = new ArrayList<TunnelPool>(MAX_CONCURRENT_BUILDS);
+        List<TunnelPool> pools = new ArrayList<TunnelPool>(8);
         
         while (_isRunning && !_manager.isShutdown()){
             //loopBegin = System.currentTimeMillis();

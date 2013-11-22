@@ -8,9 +8,6 @@ package net.i2p.data.i2cp;
  *
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 import net.i2p.data.StructureTest;
 import net.i2p.data.DataStructure;
 import net.i2p.data.DataFormatException;

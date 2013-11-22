@@ -65,7 +65,7 @@ public class GarlicMessageBuilder {
     private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         log.error("buildMessage 2 args, using router SKM", new Exception("who did it"));
-        return buildMessage(ctx, config, new SessionKey(), new HashSet(), ctx.sessionKeyManager());
+        return buildMessage(ctx, config, new SessionKey(), new HashSet<SessionTag>(), ctx.sessionKeyManager());
     }
 
     /**

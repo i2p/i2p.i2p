@@ -189,7 +189,7 @@ public class SAMUtils {
     /* Dump a Properties object in an human-readable form */
     private static String dumpProperties(Properties props) {
         Enumeration names = props.propertyNames();
-        String msg = "";
+        StringBuilder builder = new StringBuilder();
         String key, val;
         boolean firstIter = true;
         
@@ -198,14 +198,14 @@ public class SAMUtils {
             val = props.getProperty(key);
             
             if (!firstIter) {
-                msg += ";";
+                builder.append(";");
             } else {
                 firstIter = false;
             }
-            msg += " \"" + key + "\" -> \"" + val + "\"";
+            builder.append(" \"" + key + "\" -> \"" + val + "\"");
         }
         
-        return msg;
+        return builder.toString();
     }
     
 /****

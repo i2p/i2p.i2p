@@ -45,7 +45,7 @@ class ConnectionAcceptor implements Runnable
   private PeerAcceptor peeracceptor;
   private Thread thread;
   private final I2PSnarkUtil _util;
-  private final ObjectCounter<Hash> _badCounter = new ObjectCounter();
+  private final ObjectCounter<Hash> _badCounter = new ObjectCounter<Hash>();
   private final SimpleTimer2.TimedEvent _cleaner;
 
   private volatile boolean stop;

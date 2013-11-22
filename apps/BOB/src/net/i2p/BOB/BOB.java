@@ -308,7 +308,7 @@ public class BOB {
 					database.releaseReadLock();
 					database.getWriteLock();
 					nickinfo.getWriteLock();
-					nickinfo.add(P_STOPPING, new Boolean(true));
+					nickinfo.add(P_STOPPING, Boolean.valueOf(true));
 					nickinfo.releaseWriteLock();
 					database.releaseWriteLock();
 				} else {

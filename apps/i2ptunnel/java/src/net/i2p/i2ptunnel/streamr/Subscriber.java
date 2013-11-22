@@ -8,8 +8,6 @@ package net.i2p.i2ptunnel.streamr;
 // system
 import java.util.Set;
 
-// i2p
-import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.ConcurrentHashSet;

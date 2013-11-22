@@ -54,8 +54,8 @@ public class RequestWrapper {
 
 	private HttpServletRequest httpRequest = null;
 	private MultiPartRequest multiPartRequest = null;
-	private Hashtable cache;
-	private Hashtable cachedParameterNames;
+	private Hashtable<String, String> cache;
+	private Hashtable<String, Integer> cachedParameterNames;
 	/**
 	 * do not call
 	 */
@@ -66,7 +66,7 @@ public class RequestWrapper {
 	 * @param httpRequest
 	 */
 	public RequestWrapper(HttpServletRequest httpRequest) {
-		cache = new Hashtable();
+		cache = new Hashtable<String, String>();
 		this.httpRequest = httpRequest;
 		String contentType = httpRequest.getContentType();
 		if( contentType != null && contentType.toLowerCase(Locale.US).startsWith( "multipart/form-data" ) ) {
@@ -101,10 +101,10 @@ public class RequestWrapper {
 	/**
 	 * @return List of request parameter names
 	 */
-	public Enumeration getParameterNames() {
+	public Enumeration<String> getParameterNames() {
 		if( multiPartRequest != null ) {
 			if( cachedParameterNames == null ) {
-				cachedParameterNames = new Hashtable();
+				cachedParameterNames = new Hashtable<String, Integer>();
 				String[] partNames = multiPartRequest.getPartNames();
 				for( int i = 0; i < partNames.length; i++ )
 					cachedParameterNames.put( partNames[i], Integer.valueOf( i ) );
@@ -133,9 +133,9 @@ public class RequestWrapper {
 	{
 		String result = null;
 		if( multiPartRequest != null ) {
-			Hashtable params = multiPartRequest.getParams( partName );
-			for( Enumeration e = params.keys(); e.hasMoreElements(); ) {
-				String key = (String)e.nextElement();
+			Hashtable<String, String> params = multiPartRequest.getParams( partName );
+			for( Enumeration<String> e = params.keys(); e.hasMoreElements(); ) {
+				String key = e.nextElement();
 				if( key.toLowerCase(Locale.US).compareToIgnoreCase( "content-type") == 0 ) {
 					String value = (String)params.get( key );
 					int i = value.indexOf( ";" );

@@ -3,7 +3,6 @@ package net.i2p.i2ptunnel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -83,14 +82,14 @@ public class TunnelControllerGroup implements ClientApp {
         _context = context;
         _mgr = mgr;
         _log = _context.logManager().getLog(TunnelControllerGroup.class);
-        _controllers = new ArrayList();
+        _controllers = new ArrayList<TunnelController>();
         if (args == null || args.length <= 0)
             _configFile = DEFAULT_CONFIG_FILE;
         else if (args.length == 1)
             _configFile = args[0];
         else
             throw new IllegalArgumentException("Usage: TunnelControllerGroup [filename]");
-        _sessions = new HashMap(4);
+        _sessions = new HashMap<I2PSession, Set<TunnelController>>(4);
         synchronized (TunnelControllerGroup.class) {
             if (_instance == null)
                 _instance = this;
@@ -288,7 +287,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages from the controller as it is stopped
      */
     public synchronized List<String> removeController(TunnelController controller) {
-        if (controller == null) return new ArrayList();
+        if (controller == null) return new ArrayList<String>();
         controller.stopTunnel();
         List<String> msgs = controller.clearMessages();
         _controllers.remove(controller);
@@ -302,7 +301,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages the tunnels generate when stopped
      */
     public synchronized List<String> stopAllControllers() {
-        List<String> msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = _controllers.get(i);
             controller.stopTunnel();
@@ -319,7 +318,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages the tunnels generate when started
      */
     public synchronized List<String> startAllControllers() {
-        List<String> msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = _controllers.get(i);
             controller.startTunnelBackground();
@@ -337,7 +336,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages the tunnels generate when restarted
      */
     public synchronized List<String> restartAllControllers() {
-        List<String> msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = _controllers.get(i);
             controller.restartTunnel();
@@ -354,7 +353,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages the tunnels have generated
      */
     public synchronized List<String> clearAllMessages() {
-        List<String> msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = _controllers.get(i);
             msgs.addAll(controller.clearMessages());
@@ -426,7 +425,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of TunnelController objects
      */
     public synchronized List<TunnelController> getControllers() {
-        return new ArrayList(_controllers);
+        return new ArrayList<TunnelController>(_controllers);
     }
     
     
@@ -439,7 +438,7 @@ public class TunnelControllerGroup implements ClientApp {
         synchronized (_sessions) {
             Set<TunnelController> owners = _sessions.get(session);
             if (owners == null) {
-                owners = new HashSet(2);
+                owners = new HashSet<TunnelController>(2);
                 _sessions.put(session, owners);
             }
             owners.add(controller);

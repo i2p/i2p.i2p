@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -189,9 +188,9 @@ public class ConfigNetHelper extends HelperBase {
         Set<String> configs;
         String cs = getUdphostname();
         if (cs.length() <= 0) {
-            configs = Collections.EMPTY_SET;
+            configs = Collections.emptySet();
         } else {
-            configs = new HashSet(4);
+            configs = new HashSet<String>(4);
             String[] ca = cs.split("[,; \r\n\t]");
             for (int i = 0; i < ca.length; i++) {
                 String c = ca[i];

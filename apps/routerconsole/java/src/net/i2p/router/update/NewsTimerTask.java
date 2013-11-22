@@ -1,30 +1,12 @@
 package net.i2p.router.update;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.RouterVersion;
 import net.i2p.router.web.ConfigUpdateHandler;
-import net.i2p.router.web.ConfigUpdateHelper;
 import net.i2p.router.web.NewsHelper;
 import static net.i2p.update.UpdateType.*;
-import net.i2p.util.EepGet;
-import net.i2p.util.EepHead;
-import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**

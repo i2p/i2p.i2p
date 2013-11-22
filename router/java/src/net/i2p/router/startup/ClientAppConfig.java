@@ -151,7 +151,7 @@ public class ClientAppConfig {
         try {
             DataHelper.loadProps(clientApps, cfgFile);
         } catch (IOException ioe) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return getClientApps(clientApps);
     }
@@ -162,7 +162,7 @@ public class ClientAppConfig {
      * @since 0.7.12
      */
     private static List<ClientAppConfig> getClientApps(Properties clientApps) {
-        List<ClientAppConfig> rv = new ArrayList(8);
+        List<ClientAppConfig> rv = new ArrayList<ClientAppConfig>(8);
         int i = 0;
         while (true) {
             String className = clientApps.getProperty(PREFIX + i + ".main");

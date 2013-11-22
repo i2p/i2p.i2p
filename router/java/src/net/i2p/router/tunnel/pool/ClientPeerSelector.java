@@ -34,16 +34,16 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 return selectExplicit(settings, length);
         
             Set<Hash> exclude = getExclude(settings.isInbound(), false);
-            Set<Hash> matches = new HashSet(length);
+            Set<Hash> matches = new HashSet<Hash>(length);
             if (length == 1) {
                 ctx.profileOrganizer().selectFastPeers(length, exclude, matches, 0);
                 matches.remove(ctx.routerHash());
-                rv = new ArrayList(matches);
+                rv = new ArrayList<Hash>(matches);
             } else {
                 // build a tunnel using 4 subtiers.
                 // For a 2-hop tunnel, the first hop comes from subtiers 0-1 and the last from subtiers 2-3.
                 // For a longer tunnels, the first hop comes from subtier 0, the middle from subtiers 2-3, and the last from subtier 1.
-                rv = new ArrayList(length + 1);
+                rv = new ArrayList<Hash>(length + 1);
                 // OBEP or IB last hop
                 // group 0 or 1 if two hops, otherwise group 0
                 if (!settings.isInbound()) {
@@ -61,7 +61,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                     matches.remove(ctx.routerHash());
                     if (matches.size() > 1) {
                         // order the middle peers for tunnels >= 4 hops
-                        List<Hash> ordered = new ArrayList(matches);
+                        List<Hash> ordered = new ArrayList<Hash>(matches);
                         orderPeers(ordered, settings.getRandomKey());
                         rv.addAll(ordered);
                     } else {
@@ -80,7 +80,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 rv.addAll(matches);
             }
         } else {
-            rv = new ArrayList(1);
+            rv = new ArrayList<Hash>(1);
         }
         
         if (settings.isInbound())

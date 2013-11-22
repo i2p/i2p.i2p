@@ -49,7 +49,7 @@ class KBucketImpl implements KBucket {
     public KBucketImpl(I2PAppContext context, LocalHash local) {
         _context = context;
         _log = context.logManager().getLog(KBucketImpl.class);
-        _entries = new ConcurrentHashSet(2); //all but the last 1 or 2 buckets will be empty
+        _entries = new ConcurrentHashSet<Hash>(2); //all but the last 1 or 2 buckets will be empty
         _lastShuffle = context.clock().now();
         setLocal(local);
     }
@@ -219,8 +219,8 @@ class KBucketImpl implements KBucket {
     /**
      *  @deprecated makes a copy, remove toIgnore in KBS instead
      */
-    public Set<Hash> getEntries(Set toIgnoreHashes) {
-        Set<Hash> entries = new HashSet(_entries);
+    public Set<Hash> getEntries(Set<Hash> toIgnoreHashes) {
+        Set<Hash> entries = new HashSet<Hash>(_entries);
         entries.removeAll(toIgnoreHashes);
         return entries;
     }

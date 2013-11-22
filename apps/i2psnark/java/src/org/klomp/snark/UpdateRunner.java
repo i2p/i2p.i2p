@@ -6,11 +6,9 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
-import net.i2p.data.DataHelper;
 import net.i2p.update.*;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
-import net.i2p.util.VersionComparator;
 
 /**
  *  The downloader for router signed updates.

@@ -100,12 +100,12 @@ public class HostInterface
 			
 		int nHostAddrs = 0;
 		try {
-			Enumeration nis = NetworkInterface.getNetworkInterfaces();
+			Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
 			while (nis.hasMoreElements()){
-				NetworkInterface ni = (NetworkInterface)nis.nextElement();
-				Enumeration addrs = ni.getInetAddresses();
+				NetworkInterface ni = nis.nextElement();
+				Enumeration<InetAddress> addrs = ni.getInetAddresses();
 				while (addrs.hasMoreElements()) {
-					InetAddress addr = (InetAddress)addrs.nextElement();
+					InetAddress addr = addrs.nextElement();
 					if (isUsableAddress(addr) == false)
 						continue;
 					nHostAddrs++;
@@ -126,9 +126,9 @@ public class HostInterface
 	 * @since 1.8.0
 	 */
 	public final static InetAddress[] getInetAddress(int ipfilter,String[] interfaces){
-		Enumeration nis;
+		Enumeration<NetworkInterface> nis;
 		if(interfaces!=null){
-			Vector iflist = new Vector();
+			Vector<NetworkInterface> iflist = new Vector<NetworkInterface>();
 			for (int i = 0; i < interfaces.length; i++) {
 				NetworkInterface ni;
 				try {
@@ -147,12 +147,12 @@ public class HostInterface
 				return null;
 			}
 		}		
-		ArrayList addresses = new ArrayList();
+		ArrayList<InetAddress> addresses = new ArrayList<InetAddress>();
 		while (nis.hasMoreElements()){
-			NetworkInterface ni = (NetworkInterface)nis.nextElement();			
-			Enumeration addrs = ni.getInetAddresses();
+			NetworkInterface ni = nis.nextElement();			
+			Enumeration<InetAddress> addrs = ni.getInetAddresses();
 			while (addrs.hasMoreElements()) {
-				InetAddress addr = (InetAddress)addrs.nextElement();
+				InetAddress addr = addrs.nextElement();
 				if(((ipfilter & LOCAL_BITMASK)==0) && addr.isLoopbackAddress())
 					continue;
 				
@@ -163,7 +163,7 @@ public class HostInterface
 				}
 			}
 		}
-		return (InetAddress[]) addresses.toArray(new InetAddress[]{});
+		return addresses.toArray(new InetAddress[]{});
 	}
 	
 	
@@ -174,12 +174,12 @@ public class HostInterface
 			
 		int hostAddrCnt = 0;
 		try {
-			Enumeration nis = NetworkInterface.getNetworkInterfaces();
+			Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
 			while (nis.hasMoreElements()){
-				NetworkInterface ni = (NetworkInterface)nis.nextElement();
-				Enumeration addrs = ni.getInetAddresses();
+				NetworkInterface ni = nis.nextElement();
+				Enumeration<InetAddress> addrs = ni.getInetAddresses();
 				while (addrs.hasMoreElements()) {
-					InetAddress addr = (InetAddress)addrs.nextElement();
+					InetAddress addr = addrs.nextElement();
 					if (isUsableAddress(addr) == false)
 						continue;
 					if (hostAddrCnt < n) {

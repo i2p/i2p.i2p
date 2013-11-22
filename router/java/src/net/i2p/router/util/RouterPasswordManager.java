@@ -9,7 +9,6 @@ import java.util.Map;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.PasswordManager;
 
@@ -71,8 +70,8 @@ public class RouterPasswordManager extends PasswordManager {
                     saveHash(PROP_I2CP_NEW, user, pw);
             }
             // obfuscation of plaintext passwords
-            Map<String, String> toAdd = new HashMap(5);
-            List<String> toDel = new ArrayList(5);
+            Map<String, String> toAdd = new HashMap<String, String>(5);
+            List<String> toDel = new ArrayList<String>(5);
          /****
             for (int i = 0; i < MIGRATE_FROM.length; i++) {
                 if ((pw = _context.getProperty(MIGRATE_FROM[i])) != null) {
@@ -114,7 +113,7 @@ public class RouterPasswordManager extends PasswordManager {
         if (user != null && user.length() > 0)
             pfx += '.' + user;
         Map<String, String> toAdd = Collections.singletonMap(pfx + PROP_PW, pw);
-        List<String> toDel = new ArrayList(4);
+        List<String> toDel = new ArrayList<String>(4);
         toDel.add(pfx + PROP_B64);
         toDel.add(pfx + PROP_MD5);
         toDel.add(pfx + PROP_CRYPT);
@@ -138,7 +137,7 @@ public class RouterPasswordManager extends PasswordManager {
             pfx += '.' + user;
         String b64 = Base64.encode(DataHelper.getUTF8(pw));
         Map<String, String> toAdd = Collections.singletonMap(pfx + PROP_B64, b64);
-        List<String> toDel = new ArrayList(4);
+        List<String> toDel = new ArrayList<String>(4);
         toDel.add(pfx + PROP_PW);
         toDel.add(pfx + PROP_MD5);
         toDel.add(pfx + PROP_CRYPT);
@@ -167,7 +166,7 @@ public class RouterPasswordManager extends PasswordManager {
         System.arraycopy(pwHash, 0, shashBytes, SALT_LENGTH, SessionKey.KEYSIZE_BYTES);
         String shash = Base64.encode(shashBytes);
         Map<String, String> toAdd = Collections.singletonMap(pfx + PROP_SHASH, shash);
-        List<String> toDel = new ArrayList(4);
+        List<String> toDel = new ArrayList<String>(4);
         toDel.add(pfx + PROP_PW);
         toDel.add(pfx + PROP_B64);
         toDel.add(pfx + PROP_MD5);
@@ -186,7 +185,7 @@ public class RouterPasswordManager extends PasswordManager {
         String pfx = realm;
         if (user != null && user.length() > 0)
             pfx += '.' + user;
-        List<String> toDel = new ArrayList(5);
+        List<String> toDel = new ArrayList<String>(5);
         toDel.add(pfx + PROP_PW);
         toDel.add(pfx + PROP_B64);
         toDel.add(pfx + PROP_MD5);

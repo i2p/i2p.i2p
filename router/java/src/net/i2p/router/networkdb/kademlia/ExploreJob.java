@@ -117,7 +117,7 @@ class ExploreJob extends SearchJob {
             // We don't want our hash in the message's don't-include list though.
             // We're just exploring, but this could give things away, and tie our exploratory tunnels to our router,
             // so let's not put our hash in there.
-            Set<Hash> dontInclude = new HashSet(dontIncludePeers);
+            Set<Hash> dontInclude = new HashSet<Hash>(dontIncludePeers);
             List<Hash> peers = _peerSelector.selectNearestExplicit(rkey, available, dontInclude, ks);
             dontIncludePeers.addAll(peers);
         }

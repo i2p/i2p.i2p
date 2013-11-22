@@ -1,6 +1,5 @@
 package net.i2p.router.update;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;

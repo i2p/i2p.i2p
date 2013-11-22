@@ -48,8 +48,10 @@ public class POP3MailBox {
 
 	private boolean connected = false;
 
-	private Hashtable headerList = null, bodyList = null, sizes = null, uidlToID = null;
-	private ArrayList uidlList = null;
+	private Hashtable<Integer, ReadBuffer> headerList = null, bodyList = null;
+	private Hashtable<Integer, Integer> sizes = null;
+	private Hashtable<String, Integer> uidlToID = null;
+	private ArrayList<String> uidlList = null;
 
 	private Socket socket = null;
 
@@ -73,11 +75,11 @@ public class POP3MailBox {
 		this.port = port;
 		this.user = user;
 		this.pass = pass;
-		headerList = new Hashtable();
-		bodyList = new Hashtable();
-		uidlList = new ArrayList();
-		uidlToID = new Hashtable();
-		sizes = new Hashtable();
+		headerList = new Hashtable<Integer, ReadBuffer>();
+		bodyList = new Hashtable<Integer, ReadBuffer>();
+		uidlList = new ArrayList<String>();
+		uidlToID = new Hashtable<String, Integer>();
+		sizes = new Hashtable<Integer, Integer>();
 		synchronizer = new Object();
 		connect();
 	}
@@ -313,7 +315,7 @@ public class POP3MailBox {
 		if(readBuffer != null) {
 			String[] lines = new String( readBuffer.content, 0, readBuffer.length ).split( "\r\n" );
 			if (lines != null) {
-				sizes = new Hashtable();
+				sizes = new Hashtable<Integer, Integer>();
 				for (int i = 0; i < lines.length; i++) {
 					int j = lines[i].indexOf(" ");
 					if (j != -1) {

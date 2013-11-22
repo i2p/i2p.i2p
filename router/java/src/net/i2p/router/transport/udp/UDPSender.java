@@ -40,7 +40,7 @@ class UDPSender {
         _log = ctx.logManager().getLog(UDPSender.class);
         long maxMemory = SystemVersion.getMaxMemory();
         int qsize = (int) Math.max(MIN_QUEUE_SIZE, Math.min(MAX_QUEUE_SIZE, maxMemory / (1024*1024)));
-        _outboundQueue = new CoDelBlockingQueue(ctx, "UDP-Sender", qsize);
+        _outboundQueue = new CoDelBlockingQueue<UDPPacket>(ctx, "UDP-Sender", qsize);
         _socket = socket;
         _runner = new Runner();
         _name = name;

@@ -192,11 +192,11 @@ public class RandomIterator<E> implements Iterator<E> {
 
     private static void test(int n) {
         System.out.println("testing with " + n);
-        List<Integer> l = new ArrayList(n);
+        List<Integer> l = new ArrayList<Integer>(n);
         for (int i = 0; i < n; i++) {
             l.add(Integer.valueOf(i));
         }
-        for (Iterator<Integer> iter = new RandomIterator(l); iter.hasNext(); ) {
+        for (Iterator<Integer> iter = new RandomIterator<Integer>(l); iter.hasNext(); ) {
             System.out.println(iter.next().toString());
         }
     }

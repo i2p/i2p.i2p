@@ -7,7 +7,6 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
@@ -68,7 +67,7 @@ class OutboundMessageFragments {
         _log = ctx.logManager().getLog(OutboundMessageFragments.class);
         _transport = transport;
         // _throttle = throttle;
-        _activePeers = new ConcurrentHashSet(256);
+        _activePeers = new ConcurrentHashSet<PeerState>(256);
         _builder = new PacketBuilder(ctx, transport);
         _alive = true;
         // _allowExcess = false;
@@ -363,12 +362,12 @@ class OutboundMessageFragments {
             List<Long> msgIds = peer.getCurrentFullACKs();
             int newFullAckCount = msgIds.size();
             msgIds.addAll(peer.getCurrentResendACKs());
-            List<ACKBitfield> partialACKBitfields = new ArrayList();
+            List<ACKBitfield> partialACKBitfields = new ArrayList<ACKBitfield>();
             peer.fetchPartialACKs(partialACKBitfields);
             int piggybackedPartialACK = partialACKBitfields.size();
             // getCurrentFullACKs() already makes a copy, do we need to copy again?
             // YES because buildPacket() now removes them (maybe)
-            List<Long> remaining = new ArrayList(msgIds);
+            List<Long> remaining = new ArrayList<Long>(msgIds);
             int sparseCount = 0;
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
             for (int i = 0; i < fragments; i++) {
