@@ -244,8 +244,8 @@ public class SAMBridge implements Runnable, ClientApp {
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(persistFilename);
-                for (Iterator iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
-                    String name = (String)iter.next();
+                for (Iterator<String> iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
+                    String name = iter.next();
                     String privKeys = nameToPrivKeys.get(name);
                     out.write(name.getBytes());
                     out.write('=');
