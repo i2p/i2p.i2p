@@ -11,7 +11,7 @@ package net.i2p.sam;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -188,14 +188,13 @@ public class SAMUtils {
 
     /* Dump a Properties object in an human-readable form */
     private static String dumpProperties(Properties props) {
-        Enumeration names = props.propertyNames();
         StringBuilder builder = new StringBuilder();
         String key, val;
         boolean firstIter = true;
         
-        while (names.hasMoreElements()) {
-            key = (String)names.nextElement();
-            val = props.getProperty(key);
+        for (Map.Entry<Object, Object> entry : props.entrySet()) {
+            key = (String) entry.getKey();
+            val = (String) entry.getValue();
             
             if (!firstIter) {
                 builder.append(";");
