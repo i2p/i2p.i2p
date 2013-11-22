@@ -8,7 +8,7 @@ package net.i2p.router;
  *
  */
 
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.data.Hash;
@@ -49,9 +49,9 @@ public class ClientTunnelSettings {
         writeToProperties(p);
         buf.append("Client tunnel settings:\n");
         buf.append("====================================\n");
-        for (Iterator iter = p.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val  = p.getProperty(name);
+        for (Map.Entry<Object, Object> entry : p.entrySet()) {
+            String name = (String) entry.getKey();
+            String val  = (String) entry.getValue();
             buf.append(name).append(" = [").append(val).append("]\n");
         }
         buf.append("====================================\n");
