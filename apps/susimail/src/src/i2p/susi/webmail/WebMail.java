@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -316,7 +315,7 @@ public class WebMail extends HttpServlet
 		int state, smtpPort;
 		POP3MailBox mailbox;
 		MailCache mailCache;
-		Folder folder;
+		Folder<String> folder;
 		String user, pass, host, error, info;
 		String replyTo, replyCC;
 		String subject, body, showUIDL;
@@ -413,8 +412,7 @@ public class WebMail extends HttpServlet
 		if( mailPart.multipart ) {
 			if( mailPart.type.compareTo( "multipart/alternative" ) == 0 ) {
 				MailPart chosen = null;
-				for( ListIterator li = mailPart.parts.listIterator(); li.hasNext(); ) {
-					MailPart subPart = (MailPart)li.next();
+				for( MailPart subPart : mailPart.parts ) {
 					if( subPart.type != null && subPart.type.compareTo( "text/plain" ) == 0 )
 						chosen = subPart;
 				}
@@ -423,16 +421,12 @@ public class WebMail extends HttpServlet
 					return;
 				}
 			}
-			for( ListIterator li = mailPart.parts.listIterator(); li.hasNext(); ) {
-				MailPart part = (MailPart)li.next();
+			for( MailPart part : mailPart.parts )
 				showPart( out, part, level + 1, html );
-			}
 		}
 		else if( mailPart.message ) {
-			for( ListIterator li = mailPart.parts.listIterator(); li.hasNext(); ) {
-				MailPart part = (MailPart)li.next();
+			for( MailPart part : mailPart.parts )
 				showPart( out, part, level + 1, html );
-			}			
 		}
 		else {
 			boolean showBody = false;
@@ -627,7 +621,7 @@ public class WebMail extends HttpServlet
 						sessionObject.smtpPort = smtpPortNo;
 						sessionObject.state = STATE_LIST;
 						sessionObject.mailCache = new MailCache( sessionObject.mailbox );
-						sessionObject.folder = new Folder();
+						sessionObject.folder = new Folder<String>();
 						sessionObject.folder.setElements( sessionObject.mailbox.getUIDLs() );
 						sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SENDER, new SenderSorter( sessionObject.mailCache ) );
@@ -1052,8 +1046,8 @@ public class WebMail extends HttpServlet
 			return part;
 		
 		if( part.multipart || part.message ) {
-			for( Iterator it = part.parts.iterator(); it.hasNext(); ) {
-				MailPart subPart = getMailPartFromHashCode( (MailPart)it.next(), hashCode );
+			for( MailPart p : part.parts ) {
+				MailPart subPart = getMailPartFromHashCode( p, hashCode );
 				if( subPart != null )
 					return subPart;
 			}
@@ -1275,7 +1269,7 @@ public class WebMail extends HttpServlet
 			
 			if( sessionObject.state == STATE_LIST ) {
 				processFolderButtons( sessionObject, request );
-				for( Iterator it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
+				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 					String uidl = (String)it.next();
 					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
 					if( mail != null && mail.error.length() > 0 ) {
@@ -1520,8 +1514,7 @@ public class WebMail extends HttpServlet
 			}
 
 			if( multipart ) {
-				for( Iterator it = sessionObject.attachments.iterator(); it.hasNext(); ) {
-					Attachment attachment = (Attachment)it.next();
+				for( Attachment attachment : sessionObject.attachments ) {
 					body.append( "\r\n--" + boundary + "\r\nContent-type: " + attachment.getContentType() + "\r\nContent-Disposition: attachment; filename=\"" + attachment.getFileName() + "\"\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() + "\r\n\r\n" );
 					body.append( attachment.getData() );
 				}
@@ -1615,12 +1608,11 @@ public class WebMail extends HttpServlet
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
-			for( Iterator it = sessionObject.attachments.iterator(); it.hasNext(); ) {
+			for( Attachment attachment : sessionObject.attachments ) {
 				if( !wroteHeader ) {
 					out.println( "<tr><td colspan=\"2\" align=\"center\">" + _("Attachments:") + "</td></tr>" );
 					wroteHeader = true;
 				}
-				Attachment attachment = (Attachment)it.next();
 				out.println( "<tr><td colspan=\"2\" align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
 			}
 		}
@@ -1682,7 +1674,7 @@ public class WebMail extends HttpServlet
 			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size"), sessionObject.imgPath ) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
-		for( Iterator it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
+		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = (String)it.next();
 			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
 			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\">";
