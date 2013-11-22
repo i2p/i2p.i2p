@@ -15,7 +15,6 @@ import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 
@@ -125,7 +124,7 @@ class Connection {
         // FIXME pass through a passive flush delay setting as the 4th arg
         _outputStream = new MessageOutputStream(_context, timer, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
         _timer = timer;
-        _outboundPackets = new TreeMap();
+        _outboundPackets = new TreeMap<Long, PacketLocal>();
         if (opts != null) {
             _localPort = opts.getLocalPort();
             _remotePort = opts.getPort();
@@ -469,7 +468,7 @@ class Connection {
                     }
                     if (!nacked) { // aka ACKed
                         if (acked == null) 
-                            acked = new ArrayList(8);
+                            acked = new ArrayList<PacketLocal>(8);
                         PacketLocal ackedPacket = e.getValue();
                         ackedPacket.ackReceived();
                         acked.add(ackedPacket);

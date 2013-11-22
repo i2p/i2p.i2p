@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
-import net.i2p.data.Base64;
 import net.i2p.util.Log;
 
 /**
