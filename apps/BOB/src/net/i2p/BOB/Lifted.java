@@ -15,7 +15,7 @@
  */
 package net.i2p.BOB;
 
-import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -39,10 +39,8 @@ public class Lifted {
 	 *
 	 **/
 	public static void copyProperties(Properties src_prop, Properties dest_prop) {
-		for (Enumeration propertyNames = src_prop.propertyNames();
-			propertyNames.hasMoreElements();) {
-			Object key = propertyNames.nextElement();
-			dest_prop.put(key, src_prop.get(key));
+		for (Map.Entry<Object, Object> e : src_prop.entrySet()) {
+			dest_prop.put((String)e.getKey(), (String)e.getValue());
 		}
 	}
 }
