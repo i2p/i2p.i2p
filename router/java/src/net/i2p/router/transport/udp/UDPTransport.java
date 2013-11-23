@@ -2848,7 +2848,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity(60)) {
+            if (haveCapacity(45)) {
                 long inc;
                 // don't adjust too quickly if we are looping fast
                 if (_lastLoopShort)
