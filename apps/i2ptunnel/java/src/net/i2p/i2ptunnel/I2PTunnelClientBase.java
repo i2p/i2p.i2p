@@ -263,6 +263,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     getTunnel().removeSession(sess);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(getTunnel().getClientOptions().getProperty("inbound.nickname") + ": Built a new destination on resume");
+                    // make sure the old one is closed
+                    sockMgr.destroySocketManager();
                     newManager = true;
                 }  // else the old socket manager will reconnect the old session if necessary
             }
@@ -320,6 +322,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since the old one closed [s=" + s + "]");
                 tunnel.removeSession(s);
+                // make sure the old one is closed
+                socketManager.destroySocketManager();
                 // We could be here a LONG time, holding the lock
                 socketManager = buildSocketManager(tunnel, pkf);
             } else {
