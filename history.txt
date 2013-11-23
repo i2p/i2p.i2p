@@ -1,8 +1,10 @@
+2013-11-23 zzz
+ * i2ptunnel: Clean up old timer threads
+
 2013-11-23 str4d
  * susimail: Fix NPE when deleting last message (ticket #414)
 
 2013-11-19 kytv
-
  * Translation updates and start of Japanese translation pulled from Transifex
 
 2013-11-14 kytv

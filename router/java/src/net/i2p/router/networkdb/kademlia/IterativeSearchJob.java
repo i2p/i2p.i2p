@@ -156,7 +156,7 @@ class IterativeSearchJob extends FloodSearchJob {
         _toTry.remove(_key);
         if (_toTry.isEmpty()) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn(getJobId() + ": Iterative search for " + _key + " had no peers to send to");
+                _log.warn(getJobId() + ": ISJ for " + _key + " had no peers to send to");
             // no floodfill peers, fail
             failed();
             return;
@@ -168,7 +168,9 @@ class IterativeSearchJob extends FloodSearchJob {
         Job onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
         _out = getContext().messageRegistry().registerPending(replySelector, onReply, onTimeout, _timeoutMs);
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Iterative search for " + _key + " (rkey " + _rkey + ") timeout " +
+            _log.info(getJobId() + ": New ISJ for " +
+                      (_isLease ? "LS " : "RI ") +
+                      _key + " (rkey " + _rkey + ") timeout " +
                       DataHelper.formatDuration(_timeoutMs) + " toTry: "  + DataHelper.toString(_toTry));
         retry();
     }
@@ -251,8 +253,13 @@ class IterativeSearchJob extends FloodSearchJob {
             dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
             dlm.setSearchKey(_key);
             
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + ": Iterative search for " + _key + " to " + peer);
+            if (_log.shouldLog(Log.INFO)) {
+                int tries;
+                synchronized(this) {
+                    tries = _unheardFrom.size() + _failedPeers.size();
+                }
+                _log.info(getJobId() + ": ISJ try " + tries + " for " + _key + " to " + peer);
+            }
             long now = getContext().clock().now();
             _sentTime.put(peer, Long.valueOf(now));
 
@@ -270,6 +277,13 @@ class IterativeSearchJob extends FloodSearchJob {
                         dlm.setReplySession(sess.key, sess.tag);
                     }
                     outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
+                    // ElG can take a while so do a final check before we send it,
+                    // a response may have come in.
+                    if (_dead) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(getJobId() + ": aborting send, finished while wrapping msg to " + peer);
+                        return;
+                    }
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(getJobId() + ": Encrypted DLM for " + _key + " to " + peer);
                 }
@@ -375,7 +389,7 @@ class IterativeSearchJob extends FloodSearchJob {
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO)) {
             long timeRemaining = _expiration - getContext().clock().now();
-            _log.info(getJobId() + ": Iterative search for " + _key + " failed with " + timeRemaining + " remaining after " + time +
+            _log.info(getJobId() + ": ISJ for " + _key + " failed with " + timeRemaining + " remaining after " + time +
                       ", peers queried: " + tries);
         }
         getContext().statManager().addRateData("netDb.failedTime", time, 0);
@@ -410,7 +424,7 @@ class IterativeSearchJob extends FloodSearchJob {
         }
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Iterative search for " + _key + " successful after " + time +
+            _log.info(getJobId() + ": ISJ for " + _key + " successful after " + time +
                       ", peers queried: " + tries);
         getContext().statManager().addRateData("netDb.successTime", time, 0);
         getContext().statManager().addRateData("netDb.successRetries", tries - 1, 0);
