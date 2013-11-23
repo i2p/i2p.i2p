@@ -25,7 +25,11 @@ public class Signature extends SimpleDataStructure {
     private static final SigType DEF_TYPE = SigType.DSA_SHA1;
     /** 40 */
     public final static int SIGNATURE_BYTES = DEF_TYPE.getSigLen();
-    /** all zeros */
+
+    /**
+     * all zeros
+     * @deprecated to be removed
+     */
     public final static byte[] FAKE_SIGNATURE = new byte[SIGNATURE_BYTES];
 
     private final SigType _type;
