@@ -104,8 +104,16 @@ public interface I2PSocketManager {
      * Destroy the socket manager, freeing all the associated resources.  This
      * method will block untill all the managed sockets are closed.
      *
+     * The socket manager CANNOT be reused after this.
      */
     public void destroySocketManager();
+    
+    /**
+     * Has the socket manager been destroyed?
+     *
+     * @since 0.9.9
+     */
+    public boolean isDestroyed();
 
     /**
      * Retrieve a set of currently connected I2PSockets, either initiated locally or remotely.

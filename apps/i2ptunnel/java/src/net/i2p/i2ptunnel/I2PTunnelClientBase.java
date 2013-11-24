@@ -252,7 +252,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected void verifySocketManager() {
         synchronized(sockLock) {
             boolean newManager = false;
-            if (this.sockMgr == null) {
+            // other shared client could have destroyed it
+            if (this.sockMgr == null || this.sockMgr.isDestroyed()) {
                 newManager = true;
             } else {
                 I2PSession sess = sockMgr.getSession();
@@ -264,7 +265,14 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(getTunnel().getClientOptions().getProperty("inbound.nickname") + ": Built a new destination on resume");
                     // make sure the old one is closed
-                    sockMgr.destroySocketManager();
+                    // if it's shared client, it will be destroyed in getSocketManager()
+                    // with the correct locking
+                    boolean shouldDestroy;
+                    synchronized(I2PTunnelClientBase.class) {
+                        shouldDestroy = sockMgr != socketManager;
+                    }
+                    if (shouldDestroy)
+                        sockMgr.destroySocketManager();
                     newManager = true;
                 }  // else the old socket manager will reconnect the old session if necessary
             }
@@ -316,7 +324,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel, String pkf) {
         // shadows instance _log
         Log _log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
-        if (socketManager != null) {
+        if (socketManager != null && !socketManager.isDestroyed()) {
             I2PSession s = socketManager.getSession();
             if (s.isClosed()) {
                 if (_log.shouldLog(Log.INFO))

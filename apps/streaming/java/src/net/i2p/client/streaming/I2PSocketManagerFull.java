@@ -339,6 +339,15 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     /**
+     * Has the socket manager been destroyed?
+     *
+     * @since 0.9.9
+     */
+    public boolean isDestroyed() {
+        return _isDestroyed.get();
+    }
+
+    /**
      * Retrieve a set of currently connected I2PSockets, either initiated locally or remotely.
      *
      * @return set of currently connected I2PSockets
