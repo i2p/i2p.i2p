@@ -26,6 +26,7 @@ public class RandomTrimmer<T extends SimpleDataStructure> implements KBucketTrim
         if (sz < _max)
             return true;
         T toRemove = e.get(_ctx.random().nextInt(sz));
-        return kbucket.remove(toRemove);
+        kbucket.remove(toRemove);
+        return true;
     }
 }
