@@ -55,7 +55,7 @@ class ECConstants {
             log("BC provider already loaded");
             loaded = true;
         }
-        BC_AVAILABLE = true;
+        BC_AVAILABLE = loaded;
     }
 
     public static boolean isBCAvailable() { return BC_AVAILABLE; }
