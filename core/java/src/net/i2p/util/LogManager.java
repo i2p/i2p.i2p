@@ -166,9 +166,9 @@ public class LogManager {
         t.start();
     }
 
-    public Log getLog(Class cls) { return getLog(cls, null); }
+    public Log getLog(Class<?> cls) { return getLog(cls, null); }
     public Log getLog(String name) { return getLog(null, name); }
-    public Log getLog(Class cls, String name) {
+    public Log getLog(Class<?> cls, String name) {
         String scope = Log.getScope(name, cls);
         boolean isNew = false;
         Log rv = _logs.get(scope);

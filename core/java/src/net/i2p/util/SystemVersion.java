@@ -47,7 +47,7 @@ public abstract class SystemVersion {
         int sdk = 0;
         if (_isAndroid) {
             try {
-                Class ver = Class.forName("android.os.Build.VERSION", true, ClassLoader.getSystemClassLoader());
+                Class<?> ver = Class.forName("android.os.Build.VERSION", true, ClassLoader.getSystemClassLoader());
                 Field field = ver.getField("SDK_INT");
                 sdk = field.getInt(null);
             } catch (Exception e) {}
