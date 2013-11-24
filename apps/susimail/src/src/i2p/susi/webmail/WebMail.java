@@ -1281,10 +1281,15 @@ public class WebMail extends HttpServlet
 			
 			if( sessionObject.state == STATE_SHOW ) {
 				processMessageButtons( sessionObject, request );
-				Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
-				if( mail != null && mail.error.length() > 0 ) {
-					sessionObject.error += mail.error;
-					mail.error = "";
+				// If the last message has just been deleted then
+				// sessionObject.state = STATE_LIST and
+				// sessionObject.showUIDL = null
+				if ( sessionObject.showUIDL != null ) {
+					Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
+					if( mail != null && mail.error.length() > 0 ) {
+						sessionObject.error += mail.error;
+						mail.error = "";
+					}
 				}
 			}
 			
