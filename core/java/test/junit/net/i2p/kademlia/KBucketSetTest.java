@@ -1,4 +1,4 @@
-package net.i2p.router.networkdb.kademlia;
+package net.i2p.kademlia;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain
@@ -20,11 +20,13 @@ import net.i2p.data.Hash;
 
 public class KBucketSetTest extends TestCase{
 	private I2PAppContext context;
-    private KBucketSet set;
+	private KBucketSet<Hash> set;
+	private static final int K = 8;
+	private static final int B = 1;
 	
 	public void setUp(){
 		context = I2PAppContext.getGlobalContext();
-        set = new KBucketSet(context, Hash.FAKE_HASH);
+		set = new KBucketSet<Hash>(context, Hash.FAKE_HASH, K, B);
 	}
 	
 	public void testRandom(){
@@ -36,6 +38,7 @@ public class KBucketSetTest extends TestCase{
     }
     
     public void testSelf() {
-        assertTrue(set.add(Hash.FAKE_HASH));
+        // new implementation will never include myself
+        assertFalse(set.add(Hash.FAKE_HASH));
     }
 }
