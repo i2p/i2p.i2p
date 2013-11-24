@@ -20,6 +20,9 @@ import java.util.TreeSet;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
+import net.i2p.kademlia.KBucketSet;
+import net.i2p.kademlia.SelectionCollector;
+import net.i2p.kademlia.XORComparator;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.util.RandomIterator;
@@ -53,7 +56,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * @return List of Hash for the peers selected
      */
     @Override
-    List<Hash> selectMostReliablePeers(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
+    List<Hash> selectMostReliablePeers(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, true);
     }
 
@@ -68,7 +71,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * @return List of Hash for the peers selected
      */
     @Override
-    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
+    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, false);
     }
 
@@ -81,7 +84,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * @param peersToIgnore can be null
      * @return List of Hash for the peers selected
      */
-    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
+    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
             peersToIgnore = Collections.singleton(_context.routerHash());
         else
@@ -104,7 +107,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List will not include our own hash.
      *  List is not sorted and not shuffled.
      */
-    List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
+    List<Hash> selectFloodfillParticipants(KBucketSet<Hash> kbuckets) {
         Set<Hash> ignore = Collections.singleton(_context.routerHash());
         return selectFloodfillParticipants(ignore, kbuckets);
     }
@@ -116,7 +119,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List MAY INCLUDE our own hash.
      *  List is not sorted and not shuffled.
      */
-    private List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet kbuckets) {
+    private List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet<Hash> kbuckets) {
       /*****
         if (kbuckets == null) return Collections.EMPTY_LIST;
         // TODO this is very slow - use profile getPeersByCapability('f') instead
@@ -155,7 +158,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *           success newer than failure
      *  Group 3: All others
      */
-    List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
+    List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet<Hash> kbuckets) {
         Set<Hash> ignore = Collections.singleton(_context.routerHash());
         return selectFloodfillParticipants(key, maxNumRouters, ignore, kbuckets);
     }
@@ -175,7 +178,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  @param toIgnore can be null
      *  @param kbuckets now unused
      */
-    List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
+    List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet<Hash> kbuckets) {
         if (toIgnore == null) {
             toIgnore = Collections.singleton(_context.routerHash());
         } else if (!toIgnore.contains(_context.routerHash())) {
@@ -193,9 +196,9 @@ class FloodfillPeerSelector extends PeerSelector {
      *  @param toIgnore can be null
      *  @param kbuckets now unused
      */
-    private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
+    private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet<Hash> kbuckets) {
         List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);
-        TreeSet<Hash> sorted = new TreeSet<Hash>(new XORComparator(key));
+        TreeSet<Hash> sorted = new TreeSet<Hash>(new XORComparator<Hash>(key));
         sorted.addAll(ffs);
 
         List<Hash> rv = new ArrayList<Hash>(howMany);
@@ -339,7 +342,7 @@ class FloodfillPeerSelector extends PeerSelector {
         return Integer.valueOf(rv);
     }
 
-    private class FloodfillSelectionCollector implements SelectionCollector {
+    private class FloodfillSelectionCollector implements SelectionCollector<Hash> {
         private final TreeSet<Hash> _sorted;
         private final List<Hash>  _floodfillMatches;
         private final Hash _key;
@@ -354,7 +357,7 @@ class FloodfillPeerSelector extends PeerSelector {
          */
         public FloodfillSelectionCollector(Hash key, Set<Hash> toIgnore, int wanted) {
             _key = key;
-            _sorted = new TreeSet<Hash>(new XORComparator(key));
+            _sorted = new TreeSet<Hash>(new XORComparator<Hash>(key));
             _floodfillMatches = new ArrayList<Hash>(8);
             _toIgnore = toIgnore;
             _wanted = wanted;
@@ -475,7 +478,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * @return List of Hash for the peers selected, ordered
      */
     @Override
-    List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+    List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets) {
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         if (peersToIgnore != null && peersToIgnore.contains(Hash.FAKE_HASH)) {
             // return non-ff

@@ -35,7 +35,7 @@ import net.i2p.util.Log;
  * times 2**(B-1) for Kademlia value B.
  *
  * Refactored from net.i2p.router.networkdb.kademlia
- * @since 0.9.2
+ * @since 0.9.2 in i2psnark, moved to core in 0.9.10
  */
 public class KBucketSet<T extends SimpleDataStructure> {
     private final Log _log;

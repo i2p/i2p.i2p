@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
+import net.i2p.kademlia.XORComparator;
 import net.i2p.router.RouterContext;
 
 /**
@@ -61,7 +62,7 @@ class SearchState {
     private Set<Hash> locked_getClosest(Set<Hash> peers, int max, Hash target) {
         if (_attemptedPeers.size() <= max)
             return new HashSet<Hash>(_attemptedPeers);
-        TreeSet<Hash> closest = new TreeSet<Hash>(new XORComparator(target));
+        TreeSet<Hash> closest = new TreeSet<Hash>(new XORComparator<Hash>(target));
         closest.addAll(_attemptedPeers);
         Set<Hash> rv = new HashSet<Hash>(max);
         int i = 0;

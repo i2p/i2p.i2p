@@ -15,6 +15,7 @@ import java.util.Set;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
+import net.i2p.kademlia.KBucketSet;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -97,7 +98,7 @@ class ExploreJob extends SearchJob {
                 available--;
         }
 
-        KBucketSet ks = _facade.getKBuckets();
+        KBucketSet<Hash> ks = _facade.getKBuckets();
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());
         // in a few releases, we can (and should) remove this,
         // as routers will honor the above flag, and we want the table to include

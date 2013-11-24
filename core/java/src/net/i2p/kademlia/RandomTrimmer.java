@@ -8,7 +8,7 @@ import net.i2p.data.SimpleDataStructure;
 
 /**
  *  Removes a random element. Not resistant to flooding.
- *  @since 0.9.2
+ *  @since 0.9.2 in i2psnark, moved to core in 0.9.10
  */
 public class RandomTrimmer<T extends SimpleDataStructure> implements KBucketTrimmer<T> {
     protected final I2PAppContext _ctx;
