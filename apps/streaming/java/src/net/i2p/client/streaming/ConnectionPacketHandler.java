@@ -365,22 +365,8 @@ class ConnectionPacketHandler {
     private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked, boolean choke) {
         boolean congested = false;
         if ( (!isNew) && (sequenceNum > 0) ) {
-            // dup real packet, or they told us to back off
-            int oldSize = con.getOptions().getWindowSize();
-            con.congestionOccurred();
-            oldSize >>>= 1;
-            if (oldSize <= 0)
-                oldSize = 1;
-
-            // setRTT has its own ceiling
-            //con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
-            con.getOptions().setWindowSize(oldSize);
-
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Congestion occurred - new windowSize " + oldSize + " / " + con.getOptions().getWindowSize() + " congestionSeenAt: "
-                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
-                           + ") for " + con);
-
+                _log.debug("Congestion occurred on the sending side. Not adjusting window "+con);
 
             congested = true;
         } 
