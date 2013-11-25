@@ -255,6 +255,7 @@ public class Reseeder {
             String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
+            boolean SSLRequired = _context.getBooleanProperty(PROP_SSL_REQUIRED);
             if (defaulted) {
                 if (SSLDisable)
                     URLs = DEFAULT_SEED_URL;
@@ -265,7 +266,7 @@ public class Reseeder {
             while (tok.hasMoreTokens())
                 URLList.add(tok.nextToken().trim());
             Collections.shuffle(URLList, _context.random());
-            if (defaulted && !SSLDisable) {
+            if (defaulted && !SSLDisable && !SSLRequired) {
                 // put the non-SSL at the end of the SSL
                 List<String> URLList2 = new ArrayList<String>();
                 tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
