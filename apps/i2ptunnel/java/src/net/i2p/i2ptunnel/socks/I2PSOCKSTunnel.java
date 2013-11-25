@@ -70,7 +70,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     private void parseOptions() {
         Properties opts = getTunnel().getClientOptions();
         proxies = new HashMap<String, List<String>>(1);
-        for (Map.Entry e : opts.entrySet()) {
+        for (Map.Entry<Object, Object> e : opts.entrySet()) {
            String prop = (String)e.getKey();
            if ((!prop.startsWith(PROP_PROXY_PREFIX)) || prop.length() <= PROP_PROXY_PREFIX.length())
               continue;

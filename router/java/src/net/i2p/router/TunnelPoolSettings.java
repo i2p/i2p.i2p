@@ -201,7 +201,7 @@ public class TunnelPoolSettings {
      *  @param prefix non-null
      */
     public void readFromProperties(String prefix, Map<Object, Object> props) {
-        for (Map.Entry e : props.entrySet()) {
+        for (Map.Entry<Object, Object> e : props.entrySet()) {
             String name = (String) e.getKey();
             String value = (String) e.getValue();
             if (name.startsWith(prefix)) {
@@ -250,7 +250,7 @@ public class TunnelPoolSettings {
         props.setProperty(prefix + PROP_IP_RESTRICTION, ""+_IPRestriction);
         if (!_isInbound)
             props.setProperty(prefix + PROP_PRIORITY, Integer.toString(_priority));
-        for (Map.Entry e : _unknownOptions.entrySet()) {
+        for (Map.Entry<Object, Object> e : _unknownOptions.entrySet()) {
             String name = (String) e.getKey();
             String val = (String) e.getValue();
             props.setProperty(prefix + name, val);
@@ -264,7 +264,7 @@ public class TunnelPoolSettings {
         writeToProperties("", p);
         buf.append("Tunnel pool settings:\n");
         buf.append("====================================\n");
-        for (Map.Entry e : p.entrySet()) {
+        for (Map.Entry<Object, Object> e : p.entrySet()) {
             String name = (String) e.getKey();
             String val = (String) e.getValue();
             buf.append(name).append(" = [").append(val).append("]\n");

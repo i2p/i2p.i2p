@@ -2,8 +2,6 @@ package net.i2p.client.streaming;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
-
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.Destination;

@@ -2,7 +2,6 @@ package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
 
 /**
  * Base scheduler

@@ -7,9 +7,6 @@ package net.i2p.desktopgui;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import java.awt.GraphicsEnvironment;
-
-import net.i2p.I2PAppContext;
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.*;
 import net.i2p.util.Log;

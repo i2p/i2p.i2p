@@ -15,14 +15,14 @@ package net.i2p.util;
  */
 class LogRecord {
     private final long _date;
-    private final Class _source;
+    private final Class<?> _source;
     private final String _name;
     private final String _threadName;
     private final int _priority;
     private final String _message;
     private final Throwable _throwable;
 
-    public LogRecord(Class src, String name, String threadName, int priority, String msg, Throwable t) {
+    public LogRecord(Class<?> src, String name, String threadName, int priority, String msg, Throwable t) {
         _date = Clock.getInstance().now();
         _source = src;
         _name = name;
@@ -36,7 +36,7 @@ class LogRecord {
         return _date;
     }
 
-    public Class getSource() {
+    public Class<?> getSource() {
         return _source;
     }
 

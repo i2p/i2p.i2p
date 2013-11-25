@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
@@ -123,7 +123,8 @@ public class TunnelPool {
             return; // don't override client specified settings
         } else {
             if (_settings.isExploratory()) {
-                Map props = _context.router().getConfigMap();
+                Properties props = new Properties();
+                props.putAll(_context.router().getConfigMap());
                 if (_settings.isInbound())
                     _settings.readFromProperties(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY, props);
                 else

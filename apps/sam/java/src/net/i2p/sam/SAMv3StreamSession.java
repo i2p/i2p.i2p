@@ -8,7 +8,6 @@ package net.i2p.sam;
  *
  */
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
@@ -16,12 +15,9 @@ import java.net.NoRouteToHostException;
 import java.util.Properties;
 
 import net.i2p.I2PException;
-import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
-import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PAppThread;

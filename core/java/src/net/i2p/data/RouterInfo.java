@@ -244,7 +244,7 @@ public class RouterInfo extends DatabaseEntry {
      * @return an unmodifiable view, non-null, sorted
      * @since 0.8.13
      */
-    public Map getOptionsMap() {
+    public Map<Object, Object> getOptionsMap() {
         return Collections.unmodifiableMap(_options);
     }
 
@@ -626,7 +626,7 @@ public class RouterInfo extends DatabaseEntry {
             }
         }
         buf.append("\n\tOptions (").append(_options.size()).append("):");
-        for (Map.Entry e : _options.entrySet()) {
+        for (Map.Entry<Object, Object> e : _options.entrySet()) {
             String key = (String) e.getKey();
             String val = (String) e.getValue();
             buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");

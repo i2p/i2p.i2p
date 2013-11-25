@@ -413,7 +413,7 @@ public class TunnelController implements Logging {
      */
     public Properties getClientOptionProps() {
         Properties opts = new Properties();
-        for (Map.Entry e : _config.entrySet()) {
+        for (Map.Entry<Object, Object> e : _config.entrySet()) {
             String key = (String) e.getKey();
             if (key.startsWith("option.")) {
                 key = key.substring("option.".length());
@@ -471,7 +471,7 @@ public class TunnelController implements Logging {
      */
     public void setConfig(Properties config, String prefix) {
         Properties props = new Properties();
-        for (Map.Entry e : config.entrySet()) {
+        for (Map.Entry<Object, Object> e : config.entrySet()) {
             String key = (String) e.getKey();
             if (key.startsWith(prefix)) {
                 key = key.substring(prefix.length());
@@ -516,7 +516,7 @@ public class TunnelController implements Logging {
      */
     public Properties getConfig(String prefix) { 
         Properties rv = new Properties();
-        for (Map.Entry e : _config.entrySet()) {
+        for (Map.Entry<Object, Object> e : _config.entrySet()) {
             String key = (String) e.getKey();
             String val = (String) e.getValue();
             rv.setProperty(prefix + key, val);
@@ -538,7 +538,7 @@ public class TunnelController implements Logging {
      */
     public String getClientOptions() {
         StringBuilder opts = new StringBuilder(64);
-        for (Map.Entry e : _config.entrySet()) {
+        for (Map.Entry<Object, Object> e : _config.entrySet()) {
             String key = (String) e.getKey();
             if (key.startsWith("option.")) {
                 key = key.substring("option.".length());

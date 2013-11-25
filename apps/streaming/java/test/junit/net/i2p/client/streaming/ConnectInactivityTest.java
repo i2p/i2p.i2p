@@ -6,7 +6,6 @@ import org.junit.Test;
 
 
 import net.i2p.I2PAppContext;
-import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.util.Log;
 

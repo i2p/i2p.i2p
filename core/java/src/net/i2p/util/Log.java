@@ -25,7 +25,7 @@ import net.i2p.I2PAppContext;
  * @author jrandom
  */
 public class Log {
-    private final Class _class;
+    private final Class<?> _class;
     private final String _className;
     private final String _name;
     private int _minPriority;
@@ -75,7 +75,7 @@ public class Log {
      *  Warning - not recommended.
      *  Use I2PAppContext.getGlobalContext().logManager().getLog(cls)
      */
-    public Log(Class cls) {
+    public Log(Class<?> cls) {
         this(I2PAppContext.getGlobalContext().logManager(), cls, null);
         _manager.addLog(this);
     }
@@ -89,7 +89,7 @@ public class Log {
         _manager.addLog(this);
     }
 
-    Log(LogManager manager, Class cls) {
+    Log(LogManager manager, Class<?> cls) {
         this(manager, cls, null);
     }
 
@@ -97,7 +97,7 @@ public class Log {
         this(manager, null, name);
     }
 
-    Log(LogManager manager, Class cls, String name) {
+    Log(LogManager manager, Class<?> cls, String name) {
         _manager = manager;
         _class = cls;
         _className = cls != null ? cls.getName() : null;
@@ -229,7 +229,7 @@ public class Log {
     /** @return the LogScope (private class) */
     public Object getScope() { return _scope; }
 
-    static String getScope(String name, Class cls) { 
+    static String getScope(String name, Class<?> cls) { 
         if ( (name == null) && (cls == null) ) return "f00";
         if (cls == null) return name;
         if (name == null) return cls.getName();
@@ -239,7 +239,7 @@ public class Log {
     private static final class LogScope {
         private final String _scopeCache;
 
-        public LogScope(String name, Class cls) {
+        public LogScope(String name, Class<?> cls) {
             _scopeCache = getScope(name, cls);
         }
 

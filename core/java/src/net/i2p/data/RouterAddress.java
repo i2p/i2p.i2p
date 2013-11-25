@@ -157,7 +157,7 @@ public class RouterAddress extends DataStructureImpl {
      * @return an unmodifiable view, non-null, sorted
      * @since 0.8.13
      */
-    public Map getOptionsMap() {
+    public Map<Object, Object> getOptionsMap() {
         return Collections.unmodifiableMap(_options);
     }
 
@@ -324,7 +324,7 @@ public class RouterAddress extends DataStructureImpl {
         buf.append("\n\tCost: ").append(_cost);
         //buf.append("\n\tExpiration: ").append(_expiration);
             buf.append("\n\tOptions (").append(_options.size()).append("):");
-            for (Map.Entry e : _options.entrySet()) {
+            for (Map.Entry<Object, Object> e : _options.entrySet()) {
                 String key = (String) e.getKey();
                 String val = (String) e.getValue();
                 buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");

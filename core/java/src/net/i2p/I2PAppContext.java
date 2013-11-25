@@ -535,11 +535,12 @@ public class I2PAppContext {
      *
      * @return set of Strings containing the names of defined system properties
      */
-    public Set<String> getPropertyNames() { 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public Set<String> getPropertyNames() { 
         // clone to avoid ConcurrentModificationException
-        Set names = new HashSet(((Properties) System.getProperties().clone()).keySet());
+        Set<String> names = new HashSet<String>((Set<String>) (Set) ((Properties) System.getProperties().clone()).keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         if (_overrideProps != null)
-            names.addAll(_overrideProps.keySet());
+            names.addAll((Set<String>) (Set) _overrideProps.keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         return names;
     }
     

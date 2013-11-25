@@ -35,19 +35,19 @@ public class OrderedProperties extends Properties {
     }
 
     @Override
-    public Set keySet() {
-        return Collections.unmodifiableSortedSet(new TreeSet(super.keySet()));
+    public Set<Object> keySet() {
+        return Collections.unmodifiableSortedSet(new TreeSet<Object>(super.keySet()));
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
-        TreeSet<Map.Entry<Object, Object>> rv = new TreeSet(new EntryComparator());
+        TreeSet<Map.Entry<Object, Object>> rv = new TreeSet<Map.Entry<Object, Object>>(new EntryComparator());
         rv.addAll(super.entrySet());
         return Collections.unmodifiableSortedSet(rv);
     }
 
-    private static class EntryComparator implements Comparator<Map.Entry> {
-         public int compare(Map.Entry l, Map.Entry r) {
+    private static class EntryComparator implements Comparator<Map.Entry<Object, Object>> {
+         public int compare(Map.Entry<Object, Object> l, Map.Entry<Object, Object> r) {
              return ((String)l.getKey()).compareTo(((String)r.getKey()));
         }
     }
