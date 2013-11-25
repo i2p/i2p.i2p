@@ -114,7 +114,7 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
             System.out.println("Enabling desktopgui");
         }
         try {
-            RouterManager.getRouterContext().setProperty(property, value);
+            RouterManager.getRouterContext().router().saveConfig(property, value);
         } catch (Exception ex) {
             Logger.getLogger(DesktopguiConfigurationFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

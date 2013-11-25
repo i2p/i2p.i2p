@@ -28,7 +28,6 @@ import i2p.susi.util.ReadBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
 
 /**
  * @author susi
@@ -58,7 +57,7 @@ public class Base64 implements Encoding {
 	 */
 	public String encode(String str) throws EncodingException {
 		try {
-			return encode( new StringBufferInputStream( str ) );
+			return encode( new ByteArrayInputStream( str.getBytes() ) );
 		}catch (IOException e) {
 			throw new EncodingException( e.getMessage() );
 		}
