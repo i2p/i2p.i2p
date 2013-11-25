@@ -3,7 +3,6 @@ package net.i2p.router.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -116,10 +115,10 @@ public class EventLog {
             }
         }
         rv = new TreeMap<Long, String>();
-        InputStream in = null;
+        BufferedReader br = null;
         try {
-            in = new FileInputStream(_file);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(_file), "UTF-8"));
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
@@ -141,7 +140,7 @@ public class EventLog {
             _cacheTime.put(event, Long.valueOf(since));
         } catch (IOException ioe) {
         } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
         return rv;
     }

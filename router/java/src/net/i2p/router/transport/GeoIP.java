@@ -194,10 +194,10 @@ class GeoIP {
                 _log.warn("Country file not found: " + geoFile.getAbsolutePath());
             return;
         }
-        FileInputStream in = null;
+        BufferedReader br = null;
         try {
-            in = new FileInputStream(geoFile);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(geoFile), "UTF-8"));
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
@@ -215,7 +215,7 @@ class GeoIP {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error reading the Country File", ioe);
         } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -256,11 +256,11 @@ class GeoIP {
         String[] rv = new String[search.length];
         int idx = 0;
         long start = _context.clock().now();
-        FileInputStream in = null;
+        BufferedReader br = null;
         try {
-            in = new FileInputStream(geoFile);
             String buf = null;
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+            br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(geoFile), "ISO-8859-1"));
             while ((buf = br.readLine()) != null && idx < search.length) {
                 try {
                     if (buf.charAt(0) == '#') {
@@ -288,7 +288,7 @@ class GeoIP {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error reading the geoFile", ioe);
         } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
 
         if (_log.shouldLog(Log.INFO)) {
