@@ -946,7 +946,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         boolean hasPrivate = false;
                         boolean hasPublic = false;
                         for (String url : backupURLs) {
-                            if (_manager.getPrivateTrackers().contains(announceURL))
+                            if (_manager.getPrivateTrackers().contains(url))
                                 hasPrivate = true;
                             else
                                 hasPublic = true;
