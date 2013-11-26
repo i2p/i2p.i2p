@@ -27,7 +27,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
@@ -325,7 +324,7 @@ class BasicServlet extends HttpServlet
         long content_length = content.getContentLength();
 
         // see if there are any range headers
-        Enumeration reqRanges = request.getHeaders("Range");
+        Enumeration<?> reqRanges = request.getHeaders("Range");
 
         if (reqRanges == null || !reqRanges.hasMoreElements()) {
             // if there were no ranges, send entire entity

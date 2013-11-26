@@ -73,7 +73,7 @@ public class InclusiveByteRange
      * @param size Size of the resource.
      * @return List of satisfiable ranges
      */
-    public static List<InclusiveByteRange> satisfiableRanges(Enumeration headers, long size)
+    public static List<InclusiveByteRange> satisfiableRanges(Enumeration<?> headers, long size)
     {
         List<InclusiveByteRange> satRanges = null;
         
@@ -128,7 +128,7 @@ public class InclusiveByteRange
                         if (first < size)
                         {
                             if (satRanges == null)
-                                satRanges = new ArrayList(4);
+                                satRanges = new ArrayList<InclusiveByteRange>(4);
                             InclusiveByteRange range = new InclusiveByteRange(first,last);
                             satRanges.add(range);
                         }

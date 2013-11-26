@@ -175,7 +175,7 @@ public class BEncoder
 
     // Keys must be sorted. XXX - But is this the correct order?
     Set<String> s = m.keySet();
-    List<String> l = new ArrayList(s);
+    List<String> l = new ArrayList<String>(s);
     Collections.sort(l);
 
     Iterator<String> it = l.iterator();

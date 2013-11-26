@@ -156,11 +156,11 @@ public class MetaInfo
     if (val == null) {
         this.announce_list = null;
     } else {
-        this.announce_list = new ArrayList();
+        this.announce_list = new ArrayList<List<String>>();
         List<BEValue> bl1 = val.getList();
         for (BEValue bev : bl1) {
             List<BEValue> bl2 = bev.getList();
-            List<String> sl2 = new ArrayList();           
+            List<String> sl2 = new ArrayList<String>();           
             for (BEValue bev2 : bl2) {
                 sl2.add(bev2.getString());
             }
@@ -259,9 +259,9 @@ public class MetaInfo
         if (size == 0)
           throw new InvalidBEncodingException("zero size files list");
 
-        List<List<String>> m_files = new ArrayList(size);
-        List<List<String>> m_files_utf8 = new ArrayList(size);
-        List<Long> m_lengths = new ArrayList(size);
+        List<List<String>> m_files = new ArrayList<List<String>>(size);
+        List<List<String>> m_files_utf8 = new ArrayList<List<String>>(size);
+        List<Long> m_lengths = new ArrayList<Long>(size);
         long l = 0;
         for (int i = 0; i < list.size(); i++)
           {
@@ -287,7 +287,7 @@ public class MetaInfo
             if (path_length == 0)
               throw new InvalidBEncodingException("zero size file path list");
 
-            List<String> file = new ArrayList(path_length);
+            List<String> file = new ArrayList<String>(path_length);
             Iterator<BEValue> it = path_list.iterator();
             while (it.hasNext()) {
                 String s = it.next().getString();
@@ -310,7 +310,7 @@ public class MetaInfo
                 path_list = val.getList();
                 path_length = path_list.size();
                 if (path_length > 0) {
-                    file = new ArrayList(path_length);
+                    file = new ArrayList<String>(path_length);
                     it = path_list.iterator();
                     while (it.hasNext())
                         file.add(it.next().getString());
@@ -573,10 +573,10 @@ public class MetaInfo
    */
   public MetaInfo reannounce(String announce) throws InvalidBEncodingException
   {
-        Map<String, BEValue> m = new HashMap();
+        Map<String, BEValue> m = new HashMap<String, BEValue>();
         if (announce != null)
             m.put("announce", new BEValue(DataHelper.getUTF8(announce)));
-        Map info = createInfoMap();
+        Map<String, BEValue> info = createInfoMap();
         m.put("info", new BEValue(info));
         return new MetaInfo(m);
   }

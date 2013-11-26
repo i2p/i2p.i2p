@@ -281,7 +281,7 @@ public class BDecoder
                                           + (char)c + "'");
     indicator = 0;
 
-    List result = new ArrayList();
+    List<BEValue> result = new ArrayList<BEValue>();
     c = getNextIndicator();
     while (c != 'e')
       {
