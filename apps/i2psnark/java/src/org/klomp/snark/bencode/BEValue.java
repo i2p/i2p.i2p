@@ -142,6 +142,7 @@ public class BEValue
    * succeeds when the BEValue is actually a List, otherwise it will
    * throw a InvalidBEncodingException.
    */
+  @SuppressWarnings("unchecked")
   public List<BEValue> getList() throws InvalidBEncodingException
   {
     try
@@ -159,6 +160,7 @@ public class BEValue
    * values. This operation only succeeds when the BEValue is actually
    * a Map, otherwise it will throw a InvalidBEncodingException.
    */
+  @SuppressWarnings("unchecked")
   public Map<String, BEValue> getMap() throws InvalidBEncodingException
   {
     try
