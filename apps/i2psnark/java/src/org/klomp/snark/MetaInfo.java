@@ -615,31 +615,42 @@ public class MetaInfo
     if (_log.shouldLog(Log.WARN))
         _log.warn("Creating new infomap", new Exception());
     // otherwise we must create it
-    Map info = new HashMap();
-    info.put("name", name);
+    Map<String, BEValue> info = new HashMap<String, BEValue>();
+    info.put("name", new BEValue(DataHelper.getUTF8(name)));
     if (name_utf8 != null)
-        info.put("name.utf-8", name_utf8);
+        info.put("name.utf-8", new BEValue(DataHelper.getUTF8(name_utf8)));
     // BEP 27
     if (privateTorrent)
-        info.put("private", "1");
+        info.put("private", new BEValue(DataHelper.getUTF8("1")));
 
-    info.put("piece length", Integer.valueOf(piece_length));
-    info.put("pieces", piece_hashes);
+    info.put("piece length", new BEValue(Integer.valueOf(piece_length)));
+    info.put("pieces", new BEValue(piece_hashes));
     if (files == null)
-      info.put("length", Long.valueOf(length));
+      info.put("length", new BEValue(Long.valueOf(length)));
     else
       {
-        List l = new ArrayList();
+        List<BEValue> l = new ArrayList<BEValue>();
         for (int i = 0; i < files.size(); i++)
           {
-            Map file = new HashMap();
-            file.put("path", files.get(i));
-            if ( (files_utf8 != null) && (files_utf8.size() > i) )
-                file.put("path.utf-8", files_utf8.get(i));
-            file.put("length", lengths.get(i));
-            l.add(file);
+            Map<String, BEValue> file = new HashMap<String, BEValue>();
+            List<String> fi = files.get(i);
+            List<BEValue> befiles = new ArrayList<BEValue>(fi.size());
+            for (int j = 0; j < fi.size(); j++) {
+                befiles.add(new BEValue(DataHelper.getUTF8(fi.get(j))));
+            }
+            file.put("path", new BEValue(befiles));
+            if ( (files_utf8 != null) && (files_utf8.size() > i) ) {
+                List<String> fiu = files_utf8.get(i);
+                List<BEValue> beufiles = new ArrayList<BEValue>(fiu.size());
+                for (int j = 0; j < fiu.size(); j++) {
+                    beufiles.add(new BEValue(DataHelper.getUTF8(fiu.get(j))));
+                }
+                file.put("path.utf-8", new BEValue(beufiles));
+            }
+            file.put("length", new BEValue(lengths.get(i)));
+            l.add(new BEValue(file));
           }
-        info.put("files", l);
+        info.put("files", new BEValue(l));
       }
 
     // TODO if we add the ability for other keys in the first constructor

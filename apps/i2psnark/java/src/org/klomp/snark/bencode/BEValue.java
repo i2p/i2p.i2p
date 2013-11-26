@@ -49,12 +49,12 @@ public class BEValue
     this.value = value;
   }
 
-  public BEValue(List value)
+  public BEValue(List<BEValue> value)
   {
     this.value = value;
   }
 
-  public BEValue(Map value)
+  public BEValue(Map<String, BEValue> value)
   {
     this.value = value;
   }
@@ -146,7 +146,7 @@ public class BEValue
   {
     try
       {
-        return (List)value;
+        return (List<BEValue>)value;
       }
     catch (ClassCastException cce)
       {
@@ -163,7 +163,7 @@ public class BEValue
   {
     try
       {
-        return (Map)value;
+        return (Map<String, BEValue>)value;
       }
     catch (ClassCastException cce)
       {
