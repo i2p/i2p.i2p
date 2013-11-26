@@ -39,7 +39,7 @@ import net.i2p.util.Log;
 
 import org.klomp.snark.bencode.BEValue;
 
-public class Peer implements Comparable
+public class Peer implements Comparable<Peer>
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Peer.class);
   // Identifying property, the peer id of the other side.
@@ -194,7 +194,7 @@ public class Peer implements Comparable
    * Compares the PeerIDs.
    * @deprecated unused?
    */
-  public int compareTo(Object o)
+  public int compareTo(Peer o)
   {
     Peer p = (Peer)o;
     int rv = peerID.compareTo(p.peerID);

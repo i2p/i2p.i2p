@@ -42,7 +42,7 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
  *  and the PeerID is not required.
  *  Equality is now determined solely by the dest hash.
  */
-class PeerID implements Comparable
+class PeerID implements Comparable<PeerID>
 {
   private byte[] id;
   private Destination address;
@@ -76,15 +76,15 @@ class PeerID implements Comparable
    * Creates a PeerID from a Map containing BEncoded peer id, ip and
    * port.
    */
-  public PeerID(Map m)
+  public PeerID(Map<String, BEValue> m)
     throws InvalidBEncodingException, UnknownHostException
   {
-    BEValue bevalue = (BEValue)m.get("peer id");
+    BEValue bevalue = m.get("peer id");
     if (bevalue == null)
       throw new InvalidBEncodingException("peer id missing");
     id = bevalue.getBytes();
 
-    bevalue = (BEValue)m.get("ip");
+    bevalue = m.get("ip");
     if (bevalue == null)
       throw new InvalidBEncodingException("ip missing");
     address = I2PSnarkUtil.getDestinationFromBase64(bevalue.getString());
@@ -195,10 +195,8 @@ class PeerID implements Comparable
    * Compares port, address and id.
    * @deprecated unused? and will NPE now that address can be null?
    */
-  public int compareTo(Object o)
+  public int compareTo(PeerID pid)
   {
-    PeerID pid = (PeerID)o;
-
     int result = port - pid.port;
     if (result != 0)
       return result;
