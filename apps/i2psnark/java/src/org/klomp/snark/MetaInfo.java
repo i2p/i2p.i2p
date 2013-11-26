@@ -586,12 +586,12 @@ public class MetaInfo
    */
   public synchronized byte[] getTorrentData()
   {
-        Map m = new HashMap();
+        Map<String, Object> m = new HashMap<String, Object>();
         if (announce != null)
             m.put("announce", announce);
         if (announce_list != null)
             m.put("announce-list", announce_list);
-        Map info = createInfoMap();
+        Map<String, BEValue> info = createInfoMap();
         m.put("info", info);
         // don't save this locally, we should only do this once
         return BEncoder.bencode(m);
