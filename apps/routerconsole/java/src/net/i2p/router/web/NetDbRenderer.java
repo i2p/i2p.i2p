@@ -418,8 +418,8 @@ public class NetDbRenderer {
             int cost = addr.getCost();
             if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
                 buf.append('[').append(_("cost")).append('=').append("" + cost).append("] ");
-            Map p = addr.getOptionsMap();
-            for (Map.Entry e : (Set<Map.Entry>) p.entrySet()) {
+            Map<Object, Object> p = addr.getOptionsMap();
+            for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String name = (String) e.getKey();
                 String val = (String) e.getValue();
                 buf.append('[').append(_(DataHelper.stripHTML(name))).append('=').append(DataHelper.stripHTML(val)).append("] ");
@@ -428,8 +428,8 @@ public class NetDbRenderer {
         buf.append("</td></tr>\n");
         if (full) {
             buf.append("<tr><td>" + _("Stats") + ": <br><code>");
-            Map p = info.getOptionsMap();
-            for (Map.Entry e : (Set<Map.Entry>) p.entrySet()) {
+            Map<Object, Object> p = info.getOptionsMap();
+            for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String key = (String) e.getKey();
                 String val = (String) e.getValue();
                 buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");

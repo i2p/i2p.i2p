@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -202,7 +201,7 @@ public class I2PSocketManagerFactory {
         if (opts == null)
             opts = new Properties();
         Properties syscopy = (Properties) System.getProperties().clone();
-        for (Map.Entry e : syscopy.entrySet()) {
+        for (Map.Entry<Object, Object> e : syscopy.entrySet()) {
             String name = (String) e.getKey();
             if (!opts.containsKey(name))
                 opts.setProperty(name, (String) e.getValue());

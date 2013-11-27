@@ -277,7 +277,7 @@ public class JobQueue {
         if (_maxWaitingJobs <= 0) return false; // dont ever drop jobs
         if (!_allowParallelOperation) return false; // dont drop during startup [duh]
         if (numReady > _maxWaitingJobs) {
-            Class cls = job.getClass();
+            Class<? extends Job> cls = job.getClass();
             // lets not try to drop too many tunnel messages...
             //if (cls == HandleTunnelMessageJob.class)
             //    return true;

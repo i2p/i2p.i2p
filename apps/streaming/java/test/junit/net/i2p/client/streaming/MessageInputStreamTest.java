@@ -59,7 +59,7 @@ public class MessageInputStreamTest extends TestCase {
         _context.random().nextBytes(orig);
         
         MessageInputStream in = new MessageInputStream(_context);
-        ArrayList order = new ArrayList(32);
+        ArrayList<Integer> order = new ArrayList<Integer>(32);
         for (int i = 0; i < orig.length / 1024; i++)
             order.add(new Integer(i));
         Collections.shuffle(order);
@@ -92,7 +92,7 @@ public class MessageInputStreamTest extends TestCase {
         
         MessageInputStream in = new MessageInputStream(_context);
         for (int n = 0; n < 3; n++) {
-            ArrayList order = new ArrayList(32);
+            ArrayList<Integer> order = new ArrayList<Integer>(32);
             for (int i = 0; i < orig.length / 1024; i++)
                 order.add(new Integer(i));
             Collections.shuffle(order);
@@ -126,7 +126,7 @@ public class MessageInputStreamTest extends TestCase {
         _context.random().nextBytes(orig);
         
         MessageInputStream in = new MessageInputStream(_context);
-        ArrayList order = new ArrayList(32);
+        ArrayList<Integer> order = new ArrayList<Integer>(32);
         for (int i = 0; i < orig.length / 1024; i++)
             order.add(new Integer(i));
         Collections.shuffle(order);

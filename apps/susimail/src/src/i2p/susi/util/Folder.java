@@ -41,7 +41,7 @@ import java.util.Iterator;
  * 
  * @author susi
  */
-public class Folder {
+public class Folder<O extends Object> {
 	
 	public static final String PAGESIZE = "pager.pagesize";
 	public static final int DEFAULT_PAGESIZE = 10;
@@ -50,10 +50,10 @@ public class Folder {
 	public static final boolean UP = true;
 
 	private int pages, pageSize, currentPage;
-	private Object[] unsortedElements, elements;
-	private Hashtable sorter;
+	private O[] unsortedElements, elements;
+	private Hashtable<String, Comparator<O>> sorter;
 	private boolean sortingDirection;
-	Comparator currentSorter;
+	Comparator<O> currentSorter;
 	
 	public Folder()
 	{
@@ -61,7 +61,7 @@ public class Folder {
 		pageSize = 0;
 		currentPage = 1;
 		unsortedElements = null;
-		sorter = new Hashtable();
+		sorter = new Hashtable<String, Comparator<O>>();
 		sortingDirection = UP;
 		currentSorter = null;
 	}
@@ -129,12 +129,13 @@ public class Folder {
 	 * @param source Array to copy.
 	 * @return Copy of source.
 	 */
-	private Object[] copyArray( Object[] source )
+	@SuppressWarnings("unchecked")
+	private O[] copyArray( O[] source )
 	{
 		Object[] destination = new Object[source.length];
 		for( int i = 0; i < source.length; i++ )
 			destination[i] = source[i];
-		return destination;
+		return (O[])destination;
 	}
 	/**
 	 * Recalculates variables.
@@ -171,9 +172,9 @@ public class Folder {
 	/**
 	 * Set the array of objects the folder should manage.
 	 * 
-	 * @param elements Array of Objects.
+	 * @param elements Array of Os.
 	 */
-	public void setElements( Object[] elements )
+	public void setElements( O[] elements )
 	{
 		this.unsortedElements = elements;
 		if( currentSorter != null )
@@ -187,9 +188,9 @@ public class Folder {
 	 * Returns an iterator containing the elements on the current page.
 	 * @return Iterator containing the elements on the current page.
 	 */
-	public Iterator currentPageIterator()
+	public Iterator<O> currentPageIterator()
 	{
-		ArrayList list = new ArrayList();
+		ArrayList<O> list = new ArrayList<O>();
 		if( elements != null ) {
 			int pageSize = getPageSize();
 			int offset = ( currentPage - 1 ) * pageSize;
@@ -249,7 +250,7 @@ public class Folder {
 	 * @param id ID to identify the Comparator with @link sortBy()
 	 * @param sorter a Comparator to sort the Array given by @link setElements()
 	 */
-	public void addSorter( String id, Comparator sorter )
+	public void addSorter( String id, Comparator<O> sorter )
 	{
 		this.sorter.put( id, sorter );
 	}
@@ -263,7 +264,7 @@ public class Folder {
 	 */
 	public void sortBy( String id )
 	{
-		currentSorter = (Comparator)sorter.get( id );
+		currentSorter = sorter.get( id );
 		sort();
 	}
 	
@@ -273,9 +274,9 @@ public class Folder {
 	 * @param x Position of the element on the current page.
 	 * @return Element on the current page on the given position.
 	 */
-	public Object getElementAtPosXonCurrentPage( int x )
+	public O getElementAtPosXonCurrentPage( int x )
 	{
-		Object result = null;
+		O result = null;
 		if( elements != null ) {
 			int pageSize = getPageSize();
 			int offset = ( currentPage - 1 ) * pageSize;
@@ -306,7 +307,7 @@ public class Folder {
 	 * 
 	 * @return First element.
 	 */
-	public Object getFirstElement()
+	public O getFirstElement()
 	{
 		/*
 		 * sorting direction is taken into account from getElement
@@ -319,7 +320,7 @@ public class Folder {
 	 * 
 	 * @return Last element.
 	 */
-	public Object getLastElement()
+	public O getLastElement()
 	{
 		/*
 		 * sorting direction is taken into account from getElement
@@ -333,7 +334,7 @@ public class Folder {
 	 * @param element
 	 * @return index
 	 */
-	private int getIndexOf( Object element )
+	private int getIndexOf( O element )
 	{
 		if( elements != null ) {
 			for( int i = 0; i < elements.length; i++ )
@@ -350,9 +351,9 @@ public class Folder {
 	 * @param element
 	 * @return The next element
 	 */
-	public Object getNextElement( Object element )
+	public O getNextElement( O element )
 	{
-		Object result = null;
+		O result = null;
 		
 		int i = getIndexOf( element );
 
@@ -371,9 +372,9 @@ public class Folder {
 	 * @param element
 	 * @return The previous element
 	 */
-	public Object getPreviousElement( Object element )
+	public O getPreviousElement( O element )
 	{
-		Object result = null;
+		O result = null;
 		
 		int i = getIndexOf( element );
 
@@ -390,9 +391,9 @@ public class Folder {
 	 * @param i
 	 * @return Element at index i
 	 */
-	private Object getElement( int i )
+	private O getElement( int i )
 	{
-		Object result = null;
+		O result = null;
 		
 		if( elements != null ) {
 			if( sortingDirection == DOWN )
@@ -424,7 +425,7 @@ public class Folder {
 	 * 
 	 * @param element
 	 */
-	public boolean isLastElement( Object element )
+	public boolean isLastElement( O element )
 	{
 		if( elements == null )
 			return false;
@@ -437,7 +438,7 @@ public class Folder {
 	 * 
 	 * @param element
 	 */
-	public boolean isFirstElement( Object element )
+	public boolean isFirstElement( O element )
 	{
 		if( elements == null )
 			return false;

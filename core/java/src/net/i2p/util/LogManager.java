@@ -166,9 +166,9 @@ public class LogManager {
         t.start();
     }
 
-    public Log getLog(Class cls) { return getLog(cls, null); }
+    public Log getLog(Class<?> cls) { return getLog(cls, null); }
     public Log getLog(String name) { return getLog(null, name); }
-    public Log getLog(Class cls, String name) {
+    public Log getLog(Class<?> cls, String name) {
         String scope = Log.getScope(name, cls);
         boolean isNew = false;
         Log rv = _logs.get(scope);
@@ -186,7 +186,7 @@ public class LogManager {
 
     /** now used by ConfigLogingHelper */
     public List<Log> getLogs() {
-        return new ArrayList(_logs.values());
+        return new ArrayList<Log>(_logs.values());
     }
 
     /**
@@ -407,7 +407,7 @@ public class LogManager {
     private void parseLimits(Properties config, String recordPrefix) {
         _limits.clear();
         if (config != null) {
-            for (Map.Entry e : config.entrySet()) {
+            for (Map.Entry<Object, Object> e : config.entrySet()) {
                 String key = (String) e.getKey();
 
                 // if we're filtering the records (e.g. logger.record.*) then

@@ -30,9 +30,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
@@ -151,10 +151,9 @@ public class AddressbookBean extends BaseBean
 			fis =  new FileInputStream( getFileName() );
 			addressbook.load( fis );
 			LinkedList<AddressBean> list = new LinkedList<AddressBean>();
-			Enumeration e = addressbook.keys();
-			while( e.hasMoreElements() ) {
-				String name = (String)e.nextElement();
-				String destination = addressbook.getProperty( name );
+			for( Map.Entry<Object, Object> entry : addressbook.entrySet() ) {
+				String name = (String) entry.getKey();
+				String destination = (String) entry.getValue();
 				if( filter != null && filter.length() > 0 ) {
 					if( filter.compareTo( "0-9" ) == 0 ) {
 						char first = name.charAt(0);

@@ -7,7 +7,7 @@ import java.util.Set;
  * This class is used solely by PeerCoordinator.
  * Caller must synchronize on many of these methods.
  */
-class Piece implements Comparable {
+class Piece implements Comparable<Piece> {
 
     private final int id;
     private final Set<PeerID> peers;
@@ -26,11 +26,11 @@ class Piece implements Comparable {
      *  Highest priority first,
      *  then rarest first
      */
-    public int compareTo(Object o) throws ClassCastException {
-        int pdiff = ((Piece)o).priority - this.priority;   // reverse
+    public int compareTo(Piece op) {
+        int pdiff = op.priority - this.priority;   // reverse
         if (pdiff != 0)
             return pdiff;
-        return this.peers.size() - ((Piece)o).peers.size();
+        return this.peers.size() - op.peers.size();
     }
     
     @Override

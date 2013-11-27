@@ -67,13 +67,16 @@ public class MultiRouter {
         Scanner scan = new Scanner(args[0]);
         if (!scan.hasNextInt()) {
             usage();
+            scan.close();
             return;
         }
         nbrRouters = scan.nextInt();
         if (nbrRouters < 0) {
             usage();
+            scan.close();
             return;
         }
+        scan.close();
         
         _out = System.out;
 

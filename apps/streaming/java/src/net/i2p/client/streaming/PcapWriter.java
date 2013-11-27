@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
 
 /**
  *  Write a standard pcap file with a "TCP" packet that can be analyzed with

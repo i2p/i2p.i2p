@@ -158,12 +158,13 @@ class GeoIPv6 {
         for (File geoFile : inFiles) {
             int count = 0;
             InputStream in = null;
+            BufferedReader br = null;
             try {
                 in = new BufferedInputStream(new FileInputStream(geoFile));
                 if (geoFile.getName().endsWith(".gz"))
                     in = new GZIPInputStream(in);
                 String buf = null;
-                BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+                br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
                 while ((buf = br.readLine()) != null) {
                     try {
                         if (buf.charAt(0) == '#') {
@@ -191,6 +192,7 @@ class GeoIPv6 {
                 return false;
             } finally {
                 if (in != null) try { in.close(); } catch (IOException ioe) {}
+                if (br != null) try { br.close(); } catch (IOException ioe) {}
             }
         }
         Collections.sort(entries);

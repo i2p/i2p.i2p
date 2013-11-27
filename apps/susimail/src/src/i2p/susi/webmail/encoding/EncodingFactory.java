@@ -46,7 +46,7 @@ public class EncodingFactory {
 			String[] classNames = list.split( ";" );
 			for( int i = 0; i < classNames.length; i++ ) {
 				try {
-					Class c = Class.forName( classNames[i] );
+					Class<?> c = Class.forName( classNames[i] );
 					Encoding e = (Encoding)c.newInstance();
 					encodings.put( e.getName(), e );
 					Debug.debug( Debug.DEBUG, "Registered " + e.getClass().getName() );

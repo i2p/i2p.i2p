@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 import net.i2p.I2PAppContext;
-import net.i2p.desktopgui.i18n.DesktopguiTranslator;
-import net.i2p.desktopgui.util.ConfigurationManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;

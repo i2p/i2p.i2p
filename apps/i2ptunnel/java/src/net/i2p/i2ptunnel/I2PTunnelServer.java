@@ -365,7 +365,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     private void buildSocketMap(Properties props) {
         _socketMap.clear();
-        for (Map.Entry e : props.entrySet()) {
+        for (Map.Entry<Object, Object> e : props.entrySet()) {
             String key = (String) e.getKey();
             if (key.startsWith("targetForPort.")) {
                 key = key.substring("targetForPort.".length());

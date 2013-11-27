@@ -226,7 +226,7 @@ public class DataHelper {
                 p = props;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
-            for (Map.Entry entry : p.entrySet()) {
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 if (utf8)
@@ -273,7 +273,7 @@ public class DataHelper {
             OrderedProperties p = new OrderedProperties();
             p.putAll(props);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
-            for (Map.Entry entry : p.entrySet()) {
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 writeStringUTF8(baos, key);
@@ -367,7 +367,7 @@ public class DataHelper {
      * (unless the options param is an OrderedProperties)
      */
     public static String toString(Properties options) {
-        return toString((Map) options);
+        return toString((Map<?, ?>) options);
     }
 
     /**
@@ -378,7 +378,7 @@ public class DataHelper {
     public static String toString(Map<?, ?> options) {
         StringBuilder buf = new StringBuilder();
         if (options != null) {
-            for (Map.Entry entry : options.entrySet()) {
+            for (Map.Entry<?, ?> entry : options.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 buf.append("[").append(key).append("] = [").append(val).append("]");
@@ -470,7 +470,7 @@ public class DataHelper {
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
-            for (Map.Entry entry : props.entrySet()) {
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 if (name.contains("#") ||

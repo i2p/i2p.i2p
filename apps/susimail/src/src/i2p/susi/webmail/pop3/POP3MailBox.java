@@ -59,8 +59,6 @@ public class POP3MailBox {
 
 	private Object synchronizer = null;
 
-	private Object[] uidls = null;
-
 	/**
 	 * @param host
 	 * @param port
@@ -275,7 +273,6 @@ public class POP3MailBox {
 			
 			uidlToID.clear();
 			uidlList.clear();
-			uidls = null;
 			
 			readBuffer = sendCmdNa( "UIDL", DEFAULT_BUFSIZE );
 			if( readBuffer != null ) {
@@ -295,7 +292,6 @@ public class POP3MailBox {
 						}
 					}
 				}
-				uidls = uidlList.toArray();
 			}
 			else {
 				System.err.println( "Error getting UIDL list from pop3 server.");
@@ -350,7 +346,6 @@ public class POP3MailBox {
 		uidlList.clear();
 		uidlToID.clear();
 		sizes.clear();
-		uidls = null;
 		mails = 0;
 	}
 	/**
@@ -649,7 +644,7 @@ public class POP3MailBox {
 	private int getIDfromUIDL( String uidl )
 	{
 		int result = -1;
-		Integer intObject = (Integer)uidlToID.get( uidl );
+		Integer intObject = uidlToID.get( uidl );
 		if( intObject != null ) {
 			result = intObject.intValue();
 		}
@@ -662,15 +657,15 @@ public class POP3MailBox {
 	 */
 	public String getUIDLfromID( int id )
 	{
-		return (String)uidlList.get( id );
+		return uidlList.get( id );
 	}
 	/**
 	 * 
 	 * @return A list of the available UIDLs.
 	 */
-	public Object[] getUIDLs()
+	public String[] getUIDLs()
 	{
-		return uidls;
+		return uidlList.toArray(new String[uidlList.size()]);
 	}
 	/**
 	 * 

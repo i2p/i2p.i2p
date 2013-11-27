@@ -280,8 +280,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 */
 	private void discoverService() {
 		synchronized (lock) {
-			for (Iterator iter = _router.getDeviceList().iterator();iter.hasNext();) {
-				Device current = (Device)iter.next();
+			for (Device current : _router.getDeviceList()) {
 				if (!current.getDeviceType().equals(WAN_DEVICE))
 					continue;
 

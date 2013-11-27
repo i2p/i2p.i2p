@@ -24,7 +24,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         super(context);
     }
 
-    public List<Hash> selectPeers(TunnelPoolSettings settings) {
+	public List<Hash> selectPeers(TunnelPoolSettings settings) {
         Log l = ctx.logManager().getLog(getClass());
         int length = getLength(settings);
         if (length < 0) { 
@@ -34,7 +34,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         }
         
         if (false && shouldSelectExplicit(settings)) {
-            List rv = selectExplicit(settings, length);
+            List<Hash> rv = selectExplicit(settings, length);
             if (l.shouldLog(Log.DEBUG))
                 l.debug("Explicit peers selected: " + rv);
             return rv;

@@ -3,8 +3,6 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 
-import java.util.Iterator;
-
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -43,8 +41,7 @@ public class PersistentKeyRing extends KeyRing {
     }
 
     private void addFromProperties() {
-        for (Iterator iter = _ctx.getPropertyNames().iterator(); iter.hasNext(); ) {
-            String prop = (String) iter.next();
+        for (String prop : _ctx.getPropertyNames()) {
             if (!prop.startsWith(PROP_PFX))
                 continue;
             String key = _ctx.getProperty(prop);

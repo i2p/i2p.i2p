@@ -59,9 +59,9 @@ public class BEncoder
     else if (o instanceof Number)
       bencode((Number)o, out);
     else if (o instanceof List)
-      bencode((List)o, out);
+      bencode((List<?>)o, out);
     else if (o instanceof Map)
-      bencode((Map<String, Object>)o, out);
+      bencode((Map<?, ?>)o, out);
     else if (o instanceof BEValue)
       bencode(((BEValue)o).getValue(), out);
     else
@@ -110,7 +110,7 @@ public class BEncoder
     out.write('e');
   }
 
-  public static byte[] bencode(List l)
+  public static byte[] bencode(List<?> l)
   {
     try
       {
@@ -124,10 +124,10 @@ public class BEncoder
       }
   }
 
-  public static void bencode(List l, OutputStream out) throws IOException
+  public static void bencode(List<?> l, OutputStream out) throws IOException
   {
     out.write('l');
-    Iterator it = l.iterator();
+    Iterator<?> it = l.iterator();
     while (it.hasNext())
       bencode(it.next(), out);
     out.write('e');
@@ -175,7 +175,7 @@ public class BEncoder
 
     // Keys must be sorted. XXX - But is this the correct order?
     Set<String> s = m.keySet();
-    List<String> l = new ArrayList(s);
+    List<String> l = new ArrayList<String>(s);
     Collections.sort(l);
 
     Iterator<String> it = l.iterator();

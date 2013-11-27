@@ -37,10 +37,10 @@ abstract class PersistDHT {
     public static synchronized void loadDHT(KRPC krpc, File file) {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistDHT.class);
         int count = 0;
-        FileInputStream in = null;
+        BufferedReader br = null;
         try {
-            in = new FileInputStream(file);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+            br = new BufferedReader(new InputStreamReader(
+            		new FileInputStream(file), "ISO-8859-1"));
             String line = null;
             while ( (line = br.readLine()) != null) {
                 if (line.startsWith("#"))
@@ -61,7 +61,7 @@ abstract class PersistDHT {
             if (log.shouldLog(Log.WARN) && file.exists())
                 log.warn("Error reading the DHT File", ioe);
         } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
         }
         if (log.shouldLog(Log.INFO))
             log.info("Loaded " + count + " nodes from " + file);
