@@ -1535,7 +1535,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     }
 
     /** debug */
-    private static void toString(StringBuilder buf, Collection col) {
+    private static void toString(StringBuilder buf, Collection<?> col) {
         List<String> list = new ArrayList<String>(col.size());
         for (Object o : col) {
             list.add(o.toString());
@@ -1549,7 +1549,7 @@ public class ConsoleUpdateManager implements UpdateManager {
     /** debug */
     private static void toString(StringBuilder buf, Map<?, ?> map) {
         List<String> list = new ArrayList<String>(map.size());
-        for (Map.Entry entry : map.entrySet()) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
             String key = entry.getKey().toString();
             String val = entry.getValue().toString();
             list.add("[" + key + "] = [" + val + "]<br>");
