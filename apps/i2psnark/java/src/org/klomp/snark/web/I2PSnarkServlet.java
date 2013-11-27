@@ -200,7 +200,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     resp.sendError(404);
                 } else {
                     String base = addPaths(req.getRequestURI(), "/");
-                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
+                    @SuppressWarnings("unchecked") // TODO-Java6: Remove cast, return type is correct
+                    String listing = getListHTML(resource, base, true, method.equals("POST") ? (Map<String, String[]>) req.getParameterMap() : null);
                     if (method.equals("POST")) {
                         // P-R-G
                         sendRedirect(req, resp, "");
@@ -676,7 +677,8 @@ public class I2PSnarkServlet extends BasicServlet {
         String action = req.getParameter("action");
         if (action == null) {
             // http://www.onenaught.com/posts/382/firefox-4-change-input-type-image-only-submits-x-and-y-not-name
-            Map params = req.getParameterMap();
+            @SuppressWarnings("unchecked") // TODO-Java6: Remove cast, return type is correct
+            Map<String, String[]> params = req.getParameterMap();
             for (Object o : params.keySet()) {
                 String key = (String) o;
                 if (key.startsWith("action_") && key.endsWith(".x")) {
@@ -2201,7 +2203,7 @@ public class I2PSnarkServlet extends BasicServlet {
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(File r, String base, boolean parent, Map postParams)
+    private String getListHTML(File r, String base, boolean parent, Map<String, String[]> postParams)
         throws IOException
     {
         File[] ls = null;
@@ -2637,17 +2639,16 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /** @since 0.8.1 */
-    private void savePriorities(Snark snark, Map postParams) {
+    private void savePriorities(Snark snark, Map<String, String[]> postParams) {
         Storage storage = snark.getStorage();
         if (storage == null)
             return;
-        Set<Map.Entry> entries = postParams.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String)entry.getKey();
+        for (Map.Entry<String, String[]> entry : postParams.entrySet()) {
+            String key = entry.getKey();
             if (key.startsWith("pri.")) {
                 try {
                     String file = key.substring(4);
-                    String val = ((String[])entry.getValue())[0];   // jetty arrays
+                    String val = entry.getValue()[0];   // jetty arrays
                     int pri = Integer.parseInt(val);
                     storage.setPriority(file, pri);
                     //System.err.println("Priority now " + pri + " for " + file);
