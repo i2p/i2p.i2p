@@ -58,17 +58,17 @@ class StoreState {
     public DatabaseEntry getData() { return _data; }
     public Set<Hash> getPending() { 
         synchronized (_pendingPeers) {
-            return (Set<Hash>)_pendingPeers.clone(); 
+            return new HashSet<Hash>(_pendingPeers); 
         }
     }
     public Set<Hash> getAttempted() { 
         synchronized (_attemptedPeers) {
-            return (Set<Hash>)_attemptedPeers.clone(); 
+            return new HashSet<Hash>(_attemptedPeers); 
         }
     }
     public Set<Hash> getSuccessful() { 
         synchronized (_successfulPeers) {
-            return (Set<Hash>)_successfulPeers.clone(); 
+            return new HashSet<Hash>(_successfulPeers); 
         }
     }
     /** unused */
@@ -82,7 +82,7 @@ class StoreState {
 
     public Set<Hash> getFailed() { 
         synchronized (_failedPeers) {
-            return (Set<Hash>)_failedPeers.clone(); 
+            return new HashSet<Hash>(_failedPeers); 
         }
     }
     public boolean completed() { return _completed != -1; }

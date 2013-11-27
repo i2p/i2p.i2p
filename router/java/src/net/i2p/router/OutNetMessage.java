@@ -151,7 +151,7 @@ public class OutNetMessage implements CDPQEntry {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
-                return (Map<String, Long>)_timestamps.clone();
+                return new HashMap<String, Long>(_timestamps);
             }
         }
         return Collections.emptyMap();
