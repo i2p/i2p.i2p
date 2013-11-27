@@ -18,7 +18,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -288,8 +287,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** save some memory, don't pass along the pointless properties */
     private Properties filter(Properties options) {
         Properties rv = new Properties();
-        for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
+        for (Object oKey : options.keySet()) { // TODO-Java6: s/keySet()/stringPropertyNames()/
+            String key = (String) oKey;
             if (key.startsWith("java.") ||
                 key.startsWith("user.") ||
                 key.startsWith("os.") ||

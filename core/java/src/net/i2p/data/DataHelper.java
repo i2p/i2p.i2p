@@ -497,10 +497,10 @@ public class DataHelper {
      * Pretty print the collection
      *
      */
-    public static String toString(Collection col) {
+    public static String toString(Collection<?> col) {
         StringBuilder buf = new StringBuilder();
         if (col != null) {
-            for (Iterator iter = col.iterator(); iter.hasNext();) {
+            for (Iterator<?> iter = col.iterator(); iter.hasNext();) {
                 Object o = iter.next();
                 buf.append("[").append(o).append("]");
                 if (iter.hasNext()) buf.append(", ");
@@ -964,12 +964,12 @@ public class DataHelper {
      * based on the value of each at each step along the way.
      *
      */
-    public final static boolean eq(Collection lhs, Collection rhs) {
+    public final static boolean eq(Collection<?> lhs, Collection<?> rhs) {
         if ((lhs == null) && (rhs == null)) return true;
         if ((lhs == null) || (rhs == null)) return false;
         if (lhs.size() != rhs.size()) return false;
-        Iterator liter = lhs.iterator();
-        Iterator riter = rhs.iterator();
+        Iterator<?> liter = lhs.iterator();
+        Iterator<?> riter = rhs.iterator();
         while ((liter.hasNext()) && (riter.hasNext()))
             if (!(eq(liter.next(), riter.next()))) return false;
         return true;
@@ -1132,10 +1132,10 @@ public class DataHelper {
      * Calculate the hashcode of the collection, using 0 for null
      * 
      */
-    public static int hashCode(Collection col) {
+    public static int hashCode(Collection<?> col) {
         if (col == null) return 0;
         int c = 0;
-        for (Iterator iter = col.iterator(); iter.hasNext();)
+        for (Iterator<?> iter = col.iterator(); iter.hasNext();)
             c = 7 * c + hashCode(iter.next());
         return c;
     }
