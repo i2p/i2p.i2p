@@ -609,7 +609,7 @@ class Connection {
         _inputStream.streamErrorOccurred(ioe);
         _connectionError = "Connection reset";
         synchronized (_connectLock) { _connectLock.notifyAll(); }
-        // RFC 793 end of setion 3.4: We are completely done.
+        // RFC 793 end of section 3.4: We are completely done.
         disconnectComplete();
     }
 

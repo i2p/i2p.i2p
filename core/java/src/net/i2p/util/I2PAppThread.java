@@ -10,7 +10,6 @@ package net.i2p.util;
  */
 
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -45,10 +44,8 @@ public class I2PAppThread extends I2PThread {
     
     @Override
     protected void fireOOM(OutOfMemoryError oom) {
-        for (Iterator<OOMEventListener> iter = _threadListeners.iterator(); iter.hasNext(); ) {
-            OOMEventListener listener = iter.next();
+        for (OOMEventListener listener : _threadListeners)
             listener.outOfMemory(oom);
-        }
     }
 
     /** register a new component that wants notification of OOM events */

@@ -523,10 +523,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_sendingStates == null)    // only null if overridden by I2PSimpleSession
             return;
         synchronized (_sendingStates) {
-            for (Iterator<MessageState> iter = _sendingStates.iterator(); iter.hasNext();) {
-                MessageState state = iter.next();
+            for (MessageState state : _sendingStates)
                 state.cancel();
-            }
             if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Disconnecting " + _sendingStates.size() + " states");
             _sendingStates.clear();
         }

@@ -1,7 +1,6 @@
 package net.i2p.router.networkdb.kademlia;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,10 +57,8 @@ class HarvesterJob extends JobImpl {
     public void runJob() {
         if (shouldHarvest()) {
             List<Hash> peers = selectPeersToUpdate();
-            for (int i = 0; i < peers.size(); i++) {
-                Hash peer= peers.get(i);
+            for (Hash peer : peers)
                 harvest(peer);
-            }
         }
         requeue(REQUEUE_DELAY);
     }
@@ -79,8 +76,7 @@ class HarvesterJob extends JobImpl {
         Map<Long, Hash> routersByAge = new TreeMap<Long, Hash>();
         Set<Hash> peers = _facade.getAllRouters();
         long now = getContext().clock().now();
-        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
+        for (Hash peer : peers) {
             RouterInfo info = _facade.lookupRouterInfoLocally(peer);
             if (info != null) {
                 long when = info.getPublished();
@@ -96,8 +92,7 @@ class HarvesterJob extends JobImpl {
         // ignoring peers that are new, so lets grab the oldest MAX_PER_RUN
         // entries
         List<Hash> rv = new ArrayList<Hash>(); 
-        for (Iterator<Hash> iter = routersByAge.values().iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
+        for (Hash peer : routersByAge.values()) {
             rv.add(peer);
             if (rv.size() >= MAX_PER_RUN)
                 break;

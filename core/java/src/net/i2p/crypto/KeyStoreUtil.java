@@ -266,7 +266,7 @@ public class KeyStoreUtil {
      *  @param keyPW the key password, must be at least 6 characters
      *
      *  @return success
-     *  @since 0.8.3, consolidated from RouterConsoleRUnner and SSLClientListenerRunner in 0.9.9
+     *  @since 0.8.3, consolidated from RouterConsoleRunner and SSLClientListenerRunner in 0.9.9
      */
     public static boolean createKeys(File ks, String alias, String cname, String ou,
                                      String keyPW) {
@@ -290,7 +290,7 @@ public class KeyStoreUtil {
      *  @param keyPW the key password, must be at least 6 characters
      *
      *  @return success
-     *  @since 0.8.3, consolidated from RouterConsoleRUnner and SSLClientListenerRunner in 0.9.9
+     *  @since 0.8.3, consolidated from RouterConsoleRunner and SSLClientListenerRunner in 0.9.9
      */
     public static boolean createKeys(File ks, String ksPW, String alias, String cname, String ou,
                                      int validDays, String keyAlg, int keySize, String keyPW) {

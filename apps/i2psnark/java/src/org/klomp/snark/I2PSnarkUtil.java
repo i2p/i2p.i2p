@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -216,10 +215,8 @@ public class I2PSnarkUtil {
                 _log.debug("Connecting to I2P", new Exception("I did it"));
             Properties opts = _context.getProperties();
             if (_opts != null) {
-                for (Iterator<String> iter = _opts.keySet().iterator(); iter.hasNext(); ) {
-                    String key = iter.next();
-                    opts.setProperty(key, _opts.get(key).toString());
-                }
+                for (Map.Entry<String, String> entry : _opts.entrySet() )
+                    opts.setProperty(entry.getKey(), entry.getValue());
             }
             if (opts.getProperty("inbound.nickname") == null)
                 opts.setProperty("inbound.nickname", _baseName.replace("i2psnark", "I2PSnark"));

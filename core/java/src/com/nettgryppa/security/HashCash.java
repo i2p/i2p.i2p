@@ -338,7 +338,7 @@ private static long bytesToLong(byte[] b) {
     boolean first = true;
     
     for(Map.Entry<String, List<String>> entry: extensions.entrySet()) {
-        String key = entry.getKey();
+      String key = entry.getKey();
       if(key.contains(":") || key.contains(";") || key.contains("="))
           throw new IllegalArgumentException("Extension key contains an illegal character. " + key);
       if(!first)

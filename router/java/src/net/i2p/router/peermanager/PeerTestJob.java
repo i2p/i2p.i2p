@@ -1,7 +1,6 @@
 package net.i2p.router.peermanager;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -73,8 +72,7 @@ public class PeerTestJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Testing " + peers.size() + " peers");
         
-        for (Iterator<RouterInfo> iter = peers.iterator(); iter.hasNext(); ) {
-            RouterInfo peer = iter.next();
+        for (RouterInfo peer : peers) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Testing peer " + peer.getIdentity().getHash().toBase64());
             testPeer(peer);
@@ -98,8 +96,7 @@ public class PeerTestJob extends JobImpl {
             _log.debug("Peer selection found " + peerHashes.size() + " peers");
         
         Set<RouterInfo> peers = new HashSet<RouterInfo>(peerHashes.size());
-        for (Iterator<Hash> iter = peerHashes.iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
+        for (Hash peer : peerHashes) {
             RouterInfo peerInfo = getContext().netDb().lookupRouterInfoLocally(peer);
             if (peerInfo != null) {
                 peers.add(peerInfo);

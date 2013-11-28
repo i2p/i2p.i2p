@@ -9,7 +9,6 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -62,8 +61,7 @@ class ExploreKeySelectorJob extends JobImpl {
             KBucket bucket = _facade.getKBuckets().getBucket(i);
             if (bucket.getKeyCount() < KBucketSet.BUCKET_SIZE) {
                 boolean already = false;
-                for (Iterator<Hash> iter = alreadyQueued.iterator(); iter.hasNext(); ) {
-                    Hash key = iter.next();
+                for (Hash key : alreadyQueued) {
                     if (bucket.shouldContain(key)) {
                         already = true;
                         _log.debug("Bucket " + i + " is already queued for exploration \t" + key);
