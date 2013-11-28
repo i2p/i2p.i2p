@@ -1,3 +1,6 @@
+2013-11-28 dg
+ * I2PTunnel: Don't send 'X-Forwarded-For' on HTTP server tunnels for anonymity reasons.
+
 2013-11-25 str4d
  * Reseed: Listen to "Require SSL" config option
 

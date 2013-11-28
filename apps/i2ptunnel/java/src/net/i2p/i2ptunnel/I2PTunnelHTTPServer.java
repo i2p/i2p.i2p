@@ -61,7 +61,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String DEST32_HEADER = "X-I2P-DestB32";
     private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER, DEST64_HEADER, DEST32_HEADER};
     private static final String SERVER_HEADER = "Server";
-    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER};
+    private static final String X_POWERED_BY_HEADER = "X-Powered-By";
+    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER};
     private static final long HEADER_TIMEOUT = 15*1000;
     private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final long START_INTERVAL = (60 * 1000) * 3;
