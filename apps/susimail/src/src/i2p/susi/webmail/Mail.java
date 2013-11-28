@@ -36,7 +36,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 
 /**
@@ -143,10 +142,10 @@ public class Mail {
 	}
 	public static void appendRecipients( StringBuilder buf, ArrayList<String> recipients, String prefix )
 	{
-		for( Iterator<String> it = recipients.iterator(); it.hasNext(); ) {
+		for( String recipient : recipients ) {
 			buf.append( prefix );
 			prefix ="\t";
-			buf.append( it.next() );
+			buf.append( recipient );
 			buf.append( "\r\n" );
 		}
 	}

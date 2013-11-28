@@ -1,6 +1,5 @@
 package net.i2p.client.streaming;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -94,10 +93,8 @@ class MessageHandler implements I2PSessionMuxedListener {
             _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
         
-        for (Iterator<I2PSocketManager.DisconnectListener> iter = _listeners.iterator(); iter.hasNext(); ) {
-            I2PSocketManager.DisconnectListener lsnr = iter.next();
+        for (I2PSocketManager.DisconnectListener lsnr : _listeners)
             lsnr.sessionDisconnected();
-        }
         _listeners.clear();
     }
 

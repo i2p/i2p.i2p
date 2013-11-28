@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -233,8 +232,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      */
     private class QueueAll implements SimpleTimer.TimedEvent {
         public void timeReached() {
-            for (Iterator<Hash> iter = _context.netDb().getAllRouters().iterator(); iter.hasNext(); ) {
-                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(iter.next());
+            for (Hash h : _context.netDb().getAllRouters()) {
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
                 if (ri == null)
                     continue;
                 byte[] ip = getIP(ri);

@@ -383,8 +383,8 @@ class IterativeSearchJob extends FloodSearchJob {
         synchronized(this) {
             tries = _unheardFrom.size() + _failedPeers.size();
             // blame the unheard-from (others already blamed in failed() above)
-            for (Iterator<Hash> iter = _unheardFrom.iterator(); iter.hasNext(); ) 
-                getContext().profileManager().dbLookupFailed(iter.next());
+            for (Hash h : _unheardFrom)
+                getContext().profileManager().dbLookupFailed(h);
         }
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO)) {

@@ -2,7 +2,6 @@ package net.i2p.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -155,8 +154,7 @@ public class SimpleTimer {
             
             if ( (_events.size() != _eventTimes.size()) ) {
                 _log.error("Skewed events: " + _events.size() + " for " + _eventTimes.size());
-                for (Iterator<TimedEvent> iter = _eventTimes.keySet().iterator(); iter.hasNext(); ) {
-                    TimedEvent evt = iter.next();
+                for (TimedEvent evt : _eventTimes.keySet()) {
                     Long when = _eventTimes.get(evt);
                     TimedEvent cur = _events.get(when);
                     if (cur != evt) {

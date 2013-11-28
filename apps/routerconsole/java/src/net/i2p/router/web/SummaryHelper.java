@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -417,8 +416,7 @@ public class SummaryHelper extends HelperBase {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table>");
             
-            for (Iterator<Destination> iter = clients.iterator(); iter.hasNext(); ) {
-                Destination client = iter.next();
+            for (Destination client : clients) {
                 String name = getName(client);
                 Hash h = client.calculateHash();
                 

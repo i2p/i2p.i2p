@@ -1667,10 +1667,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     void routerDisconnected() {
         _log.error(getPrefix() + "Router disconnected - firing notification events");
-            for (Iterator<ConnectionEventListener> iter = listeners.iterator(); iter.hasNext();) {
-                ConnectionEventListener lsnr = iter.next();
+            for (ConnectionEventListener lsnr : listeners)
                 if (lsnr != null) lsnr.routerDisconnected();
-            }
     }
 
     /**

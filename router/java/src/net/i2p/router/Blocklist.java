@@ -137,8 +137,7 @@ public class Blocklist {
                     return;
                 }
             }
-            for (Iterator<Hash> iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
-                Hash peer = iter.next();
+            for (Hash peer : _peerBlocklist.keySet()) {
                 String reason;
                 String comment = _peerBlocklist.get(peer);
                 if (comment != null)

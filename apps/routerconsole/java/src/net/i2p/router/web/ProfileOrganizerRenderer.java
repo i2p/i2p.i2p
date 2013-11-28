@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -45,8 +44,7 @@ class ProfileOrganizerRenderer {
         Set<PeerProfile> order = new TreeSet<PeerProfile>(mode == 2 ? new HashComparator() : new ProfileComparator());
         int older = 0;
         int standard = 0;
-        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext();) {
-            Hash peer = iter.next();
+        for (Hash peer : peers) {
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
             if (mode == 2) {
@@ -94,8 +92,7 @@ class ProfileOrganizerRenderer {
                    buf.append("<th>&nbsp;</th>");
                    buf.append("</tr>");
         int prevTier = 1;
-        for (Iterator<PeerProfile> iter = order.iterator(); iter.hasNext();) {
-            PeerProfile prof = iter.next();
+        for (PeerProfile prof : order) {
             Hash peer = prof.getPeer();
             
             int tier = 0;
@@ -217,8 +214,7 @@ class ProfileOrganizerRenderer {
         buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
         buf.append("</tr>");
         RateAverages ra = RateAverages.getTemp();
-        for (Iterator<PeerProfile> iter = order.iterator(); iter.hasNext();) {
-            PeerProfile prof = iter.next();
+        for (PeerProfile prof : order) {
             Hash peer = prof.getPeer();
 
             buf.append("<tr><td align=\"center\" nowrap>");

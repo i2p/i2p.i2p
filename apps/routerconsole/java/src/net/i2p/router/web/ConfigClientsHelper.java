@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -139,8 +138,7 @@ public class ConfigClientsHelper extends HelperBase {
         buf.append("<tr><th align=\"right\">" + _("WebApp") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties(_context);
         Set<String> keys = new TreeSet(props.keySet());
-        for (Iterator<String> iter = keys.iterator(); iter.hasNext(); ) {
-            String name = iter.next();
+        for (String name : keys) {
             if (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)) {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
@@ -165,8 +163,7 @@ public class ConfigClientsHelper extends HelperBase {
         buf.append("<tr><th align=\"right\">" + _("Plugin") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
         Properties props = PluginStarter.pluginProperties();
         Set<String> keys = new TreeSet(props.keySet());
-        for (Iterator<String> iter = keys.iterator(); iter.hasNext(); ) {
-            String name = iter.next();
+        for (String name : keys) {
             if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
                 String val = props.getProperty(name);

@@ -1,7 +1,6 @@
 package net.i2p.stat;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -22,8 +21,7 @@ public class SimpleStatDumper {
 
     private static void dumpFrequencies(I2PAppContext ctx, StringBuilder buf) {
         Set<String> frequencies = new TreeSet<String>(ctx.statManager().getFrequencyNames());
-        for (Iterator<String> iter = frequencies.iterator(); iter.hasNext();) {
-            String name = iter.next();
+        for (String name : frequencies) {
             FrequencyStat freq = ctx.statManager().getFrequency(name);
             buf.append('\n');
             buf.append(freq.getGroupName()).append('.').append(freq.getName()).append(": ")
@@ -42,8 +40,7 @@ public class SimpleStatDumper {
 
     private static void dumpRates(I2PAppContext ctx, StringBuilder buf) {
         Set<String> rates = new TreeSet<String>(ctx.statManager().getRateNames());
-        for (Iterator<String> iter = rates.iterator(); iter.hasNext();) {
-            String name = iter.next();
+        for (String name : rates) {
             RateStat rate = ctx.statManager().getRate(name);
             buf.append('\n');
             buf.append(rate.getGroupName()).append('.').append(rate.getName()).append(": ")

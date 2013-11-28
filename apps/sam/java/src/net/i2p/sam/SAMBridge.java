@@ -20,7 +20,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -244,9 +243,9 @@ public class SAMBridge implements Runnable, ClientApp {
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(persistFilename);
-                for (Iterator<String> iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
-                    String name = iter.next();
-                    String privKeys = nameToPrivKeys.get(name);
+                for (Map.Entry<String, String> entry : nameToPrivKeys.entrySet()) {
+                    String name = entry.getKey();
+                    String privKeys = entry.getValue();
                     out.write(name.getBytes());
                     out.write('=');
                     out.write(privKeys.getBytes());
