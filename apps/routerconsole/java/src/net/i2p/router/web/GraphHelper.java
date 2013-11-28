@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -144,8 +143,7 @@ public class GraphHelper extends FormHandler {
             // go to some trouble to see if we have the data for the combined bw graph
             boolean hasTx = false;
             boolean hasRx = false;
-            for (Iterator<SummaryListener> iter = ordered.iterator(); iter.hasNext(); ) {
-                SummaryListener lsnr = iter.next();
+            for (SummaryListener lsnr : ordered) {
                 String title = lsnr.getRate().getRateStat().getName();
                 if (title.equals("bw.sendRate")) hasTx = true;
                 else if (title.equals("bw.recvRate")) hasRx = true;
@@ -166,8 +164,7 @@ public class GraphHelper extends FormHandler {
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
             
-            for (Iterator<SummaryListener> iter = ordered.iterator(); iter.hasNext(); ) {
-                SummaryListener lsnr = iter.next();
+            for (SummaryListener lsnr : ordered) {
                 Rate r = lsnr.getRate();
                 // e.g. "statname for 60m"
                 String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod()));

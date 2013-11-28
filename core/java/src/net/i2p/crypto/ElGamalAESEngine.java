@@ -12,7 +12,6 @@ package net.i2p.crypto;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -656,8 +655,7 @@ public class ElGamalAESEngine {
         int cur = prefixBytes;
         DataHelper.toLong(aesData, cur, 2, tagsForDelivery.size());
         cur += 2;
-        for (Iterator<SessionTag> iter = tagsForDelivery.iterator(); iter.hasNext();) {
-            SessionTag tag = iter.next();
+        for (SessionTag tag : tagsForDelivery) {
             System.arraycopy(tag.getData(), 0, aesData, cur, SessionTag.BYTE_LENGTH);
             cur += SessionTag.BYTE_LENGTH;
         }

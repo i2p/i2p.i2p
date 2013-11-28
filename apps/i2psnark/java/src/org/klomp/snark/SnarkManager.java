@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1687,8 +1686,7 @@ public class SnarkManager implements CompleteListener {
         // Don't remove magnet torrents that don't have a torrent file yet
         existingNames.removeAll(_magnets);
         // now lets see which ones have been removed...
-        for (Iterator<String> iter = existingNames.iterator(); iter.hasNext(); ) {
-            String name = iter.next();
+        for (String name : existingNames) {
             if (foundNames.contains(name)) {
                 // known and still there.  noop
             } else {

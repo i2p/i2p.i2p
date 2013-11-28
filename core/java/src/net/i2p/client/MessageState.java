@@ -1,7 +1,6 @@
 package net.i2p.client;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -150,8 +149,7 @@ class MessageState {
 
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug(_prefix + "isSuccess(" + wantedStatus + "): " + _receivedStatus);
-        for (Iterator<Integer> iter = _receivedStatus.iterator(); iter.hasNext();) {
-            Integer val = iter.next();
+        for (Integer val : _receivedStatus) {
             int recv = val.intValue();
             switch (recv) {
                 case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
@@ -210,8 +208,7 @@ class MessageState {
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug(_prefix + "isFailure(" + wantedStatus + "): " + _receivedStatus);
         
-        for (Iterator<Integer> iter = _receivedStatus.iterator(); iter.hasNext();) {
-            Integer val = iter.next();
+        for (Integer val : _receivedStatus) {
             int recv = val.intValue();
             switch (recv) {
                 case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:

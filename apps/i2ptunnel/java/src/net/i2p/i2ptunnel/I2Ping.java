@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -137,10 +136,8 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                     reportTimes = false;
             }
             br.close();
-            for (Iterator<PingHandler> it = pingHandlers.iterator(); it.hasNext();) {
-                Thread t = (Thread) it.next();
+            for (Thread t : pingHandlers)
                 t.join();
-            }
             return;
         } else {
             Thread t = new PingHandler(cmd);

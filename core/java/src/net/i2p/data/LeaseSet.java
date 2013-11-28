@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -290,10 +289,8 @@ public class LeaseSet extends DatabaseEntry {
             _signingKey.writeBytes(out);
             DataHelper.writeLong(out, 1, _leases.size());
             //DataHelper.writeLong(out, 4, _version);
-            for (Iterator<Lease> iter = _leases.iterator(); iter.hasNext();) {
-                Lease lease = iter.next();
+            for (Lease lease : _leases)
                 lease.writeBytes(out);
-            }
         } catch (IOException ioe) {
             return null;
         } catch (DataFormatException dfe) {
@@ -339,10 +336,8 @@ public class LeaseSet extends DatabaseEntry {
         _signingKey.writeBytes(out);
         DataHelper.writeLong(out, 1, _leases.size());
         //DataHelper.writeLong(out, 4, _version);
-        for (Iterator<Lease> iter = _leases.iterator(); iter.hasNext();) {
-            Lease lease = iter.next();
+        for (Lease lease : _leases)
             lease.writeBytes(out);
-        }
         _signature.writeBytes(out);
     }
     

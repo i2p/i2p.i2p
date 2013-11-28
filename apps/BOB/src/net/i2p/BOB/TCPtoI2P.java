@@ -70,8 +70,7 @@ public class TCPtoI2P implements Runnable {
 	 * @throws IOException
 	 */
 	private static String lnRead(InputStream in) throws IOException {
-		String S = "";
-        StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		int b;
 		char c;
 
@@ -86,7 +85,7 @@ public class TCPtoI2P implements Runnable {
 				break;
 			}
 			c = (char) (b & 0x7f); // We only care about ASCII
-            builder.append(c);
+			builder.append(c);
 		}
 		return builder.toString();
 	}

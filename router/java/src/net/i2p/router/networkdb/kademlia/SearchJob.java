@@ -10,7 +10,6 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -290,8 +289,7 @@ class SearchJob extends JobImpl {
                 return;
             } else {
                 attempted.addAll(closestHashes);
-                for (Iterator<Hash> iter = closestHashes.iterator(); iter.hasNext(); ) {
-                    Hash peer = iter.next();
+                for (Hash peer : closestHashes) {
                     DatabaseEntry ds = _facade.getDataStore().get(peer);
                     if (ds == null) {
                         if (_log.shouldLog(Log.INFO))
@@ -630,8 +628,7 @@ class SearchJob extends JobImpl {
             Set<Hash> sendTo = _state.getRepliedPeers(); // _state.getFailed();
             sendTo.addAll(_state.getPending());
             int numSent = 0;
-            for (Iterator<Hash> iter = sendTo.iterator(); iter.hasNext(); ) {
-                Hash peer = iter.next();
+            for (Hash peer : sendTo) {
                 RouterInfo peerInfo = _facade.lookupRouterInfoLocally(peer);
                 if (peerInfo == null) continue;
                 if (resend(peerInfo, (LeaseSet)ds))

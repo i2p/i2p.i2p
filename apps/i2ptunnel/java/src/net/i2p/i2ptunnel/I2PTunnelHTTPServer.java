@@ -204,7 +204,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Refusing POST since peer is throttled: " + peerHash.toBase64());
                     try {
-                        // Send a 503, so the user doesn't get an HTTP Proxy error message
+                        // Send a 403, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
                         socket.getOutputStream().write(ERR_DENIED);
                     } catch (IOException ioe) {}

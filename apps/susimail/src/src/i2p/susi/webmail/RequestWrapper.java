@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -134,10 +135,10 @@ public class RequestWrapper {
 		String result = null;
 		if( multiPartRequest != null ) {
 			Hashtable<String, String> params = multiPartRequest.getParams( partName );
-			for( Enumeration<String> e = params.keys(); e.hasMoreElements(); ) {
-				String key = e.nextElement();
+			for( Map.Entry<String, String> e : params.entrySet() ) {
+				String key = e.getKey();
 				if( key.toLowerCase(Locale.US).compareToIgnoreCase( "content-type") == 0 ) {
-					String value = (String)params.get( key );
+					String value = e.getValue();
 					int i = value.indexOf( ";" );
 					if( i != -1 )
 						result = value.substring( 0, i );

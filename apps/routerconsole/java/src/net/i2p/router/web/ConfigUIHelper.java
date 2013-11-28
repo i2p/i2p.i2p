@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,8 +57,7 @@ public class ConfigUIHelper extends HelperBase {
          }
          // user themes
          Set<String> props = _context.getPropertyNames();
-         for (Iterator<String> iter = props.iterator(); iter.hasNext(); ) {
-              String prop = iter.next();
+         for (String prop : props) {
               if (prop.startsWith(PROP_THEME_PFX) && prop.length() > PROP_THEME_PFX.length())
                   rv.add(prop.substring(PROP_THEME_PFX.length()));
          }
