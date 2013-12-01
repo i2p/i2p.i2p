@@ -1,3 +1,7 @@
+2013-12-01 kytv
+ * Update geoip.txt based on Maxmind GeoLite Country database from 2013-11-05.
+ * French, Italian, Romanian, Spanish, and Swedish translation updates from transifex
+
 2013-11-28 dg
  * I2PTunnel: Don't send 'X-Powered-By' on HTTP server tunnels for anonymity reasons.
 
