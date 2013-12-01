@@ -9,13 +9,14 @@
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
 # Boxoa590, 2012
+# Towatowa441, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 22:57+0000\n"
-"PO-Revision-Date: 2013-11-19 12:47+0000\n"
-"Last-Translator: Boxoa590\n"
+"POT-Creation-Date: 2013-12-01 20:01+0000\n"
+"PO-Revision-Date: 2013-11-22 17:45+0000\n"
+"Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
 "Language: fr\n"
@@ -24,27 +25,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:352
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:362
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:350
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:360
 msgid "internal"
 msgstr "interne"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:438
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:436
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] "{0} entrant, {0} sortant tunnels"
 msgstr[1] "{0} entrants, {0} sortants tunnels"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:440
 msgid "lower bandwidth and reliability"
 msgstr "bande passante et fiabilité plus basses"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
 msgid "standard bandwidth and reliability"
 msgstr "basse passante et fiabilité standards"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:446
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
 msgid "higher bandwidth and reliability"
 msgstr "basse passante et fiabilité plus élevées"
 
@@ -244,9 +245,8 @@ msgstr "Destination de tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
-#, fuzzy
 msgid "name, name:port, or destination"
-msgstr "nom ou destination"
+msgstr "nom, nom:port, ou destination"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -307,27 +307,23 @@ msgstr "Longueur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
-#, fuzzy
 msgid "0 hop tunnel (no anonymity)"
-msgstr "Tunnel à 0 saut (anonymat et latence faibles)"
+msgstr "0 tunnel d'étape (aucun anonymat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
-#, fuzzy
 msgid "1 hop tunnel (low anonymity)"
-msgstr "Tunnel à 0 saut (anonymat et latence faibles)"
+msgstr "1 tunnel d'étape (bas anonymat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
-#, fuzzy
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "Tunnel à 1 saut (anonymat et latence moyens)"
+msgstr "2 tunnels d'étape (moyen anonymat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
-#, fuzzy
 msgid "3 hop tunnel (high anonymity)"
-msgstr "Tunnel à 2 sauts (anonymat et latence élevés)"
+msgstr "3 tunnels d'étape (haut anonymat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -578,7 +574,7 @@ msgstr "Paramètres de nouveau serveur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:179
 msgid "Use SSL?"
-msgstr ""
+msgstr "Utiliser SSL ?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:222
 msgid "Website name"
@@ -668,22 +664,20 @@ msgid "Max concurrent connections (0=unlimited)"
 msgstr "Connexions simultanées maximum (0=pas de limite)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
-#, fuzzy
 msgid "POST limits (0=unlimited)"
-msgstr "Limite de connexions entrantes (0=pas de limite)"
+msgstr "Limites de POST (0=illimité)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
-msgstr ""
+msgstr "Par période"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
-#, fuzzy
 msgid "Ban minutes"
-msgstr "Minutes d'inactivité"
+msgstr "Minutes ban"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
-msgstr ""
+msgstr "Période de limite de POST (minutes)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:516
 msgid "New Certificate type"
@@ -1276,6 +1270,3 @@ msgstr "Terminer"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid "Next"
 msgstr "Suivant"
-
-#~ msgid "3 hop tunnel (very high anonymity, poor performance)"
-#~ msgstr "Tunnel à 3 sauts (anonymat et latence très élevés)"

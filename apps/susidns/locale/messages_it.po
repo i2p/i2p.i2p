@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 22:58+0000\n"
+"POT-Creation-Date: 2013-12-01 20:02+0000\n"
 "PO-Revision-Date: 2013-11-02 22:19+0000\n"
 "Last-Translator: fletcherlynd <fletcherlynd@hotmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
@@ -218,9 +218,9 @@ msgid "ERROR: Could not write addressbook file."
 msgstr "ERRORE: impossibile scrivere sul file della rubrica."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:340
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:140
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:139
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:142
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:141
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or \"reload"
 "\" button on your browser. Please resubmit."
@@ -229,9 +229,9 @@ msgstr ""
 "\" o \"aggiorna\" del tuo browser. Per favore inviarlo nuovamente."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:342
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:141
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:313
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:143
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
@@ -239,25 +239,25 @@ msgstr ""
 "Se il problema persisite, verifica di avere i cookies abilitati nel tuo "
 "browser."
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:131
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:117
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:130
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:116
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:153
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:145
 msgid "Save"
 msgstr "Salva"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:133
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:132
 msgid "Configuration saved."
 msgstr "Configurazione salvata."
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:134
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:136
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:133
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:135
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:143
 msgid "Reload"
 msgstr "Ricarica"
 
-#: ../src/java/src/i2p/susi/dns/ConfigBean.java:136
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:135
 msgid "Configuration reloaded."
 msgstr "Configurazione ricaricata."
 
@@ -284,18 +284,18 @@ msgstr ""
 "Operazione di eliminazione della Destinazione per {0} dal servizio di naming "
 "{1} fallita"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr ""
 "Sottoscrizioni salvate, è in corso l'aggiornamento della rubrica a partire "
 "dalle fonti di sottoscrizione."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:134
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:133
 msgid "Subscriptions saved."
 msgstr "Sottoscrizioni salvate."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:137
 msgid "Subscriptions reloaded."
 msgstr "Sottoscrizioni ricaricate."
 
