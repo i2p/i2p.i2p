@@ -421,12 +421,14 @@ public class WebMail extends HttpServlet
 					return;
 				}
 			}
-			for( MailPart part : mailPart.parts )
+			for( MailPart part : mailPart.parts ) {
 				showPart( out, part, level + 1, html );
+			}
 		}
 		else if( mailPart.message ) {
-			for( MailPart part : mailPart.parts )
+			for( MailPart part : mailPart.parts ) {
 				showPart( out, part, level + 1, html );
+			}
 		}
 		else {
 			boolean showBody = false;

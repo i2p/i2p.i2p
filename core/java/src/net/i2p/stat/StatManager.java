@@ -62,8 +62,9 @@ public class StatManager {
     public StatLog getStatLog() { return _statLog; }
     public void setStatLog(StatLog log) { 
         _statLog = log; 
-            for (RateStat rs : _rateStats.values())
+            for (RateStat rs : _rateStats.values()) {
                 rs.setStatLog(log);
+            }
     }
 
     /**

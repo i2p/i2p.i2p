@@ -190,26 +190,30 @@ class StoreState {
         buf.append(" Attempted: ");
         synchronized (_attemptedPeers) {
             buf.append(_attemptedPeers.size()).append(' ');
-            for (Hash peer : _attemptedPeers)
+            for (Hash peer : _attemptedPeers) {
                 buf.append(peer.toBase64()).append(" ");
+            }
         }
         buf.append(" Pending: ");
         synchronized (_pendingPeers) {
             buf.append(_pendingPeers.size()).append(' ');
-            for (Hash peer : _pendingPeers)
+            for (Hash peer : _pendingPeers) {
                 buf.append(peer.toBase64()).append(" ");
+            }
         }
         buf.append(" Failed: ");
         synchronized (_failedPeers) { 
             buf.append(_failedPeers.size()).append(' ');
-            for (Hash peer : _failedPeers)
+            for (Hash peer : _failedPeers) {
                 buf.append(peer.toBase64()).append(" ");
+            }
         }
         buf.append(" Successful: ");
         synchronized (_successfulPeers) {
             buf.append(_successfulPeers.size()).append(' ');
-            for (Hash peer : _successfulPeers)
+            for (Hash peer : _successfulPeers) {
                 buf.append(peer.toBase64()).append(" ");
+            }
         }
 /****
         buf.append(" Successful Exploratory: ");

@@ -541,10 +541,12 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         if (old != null) {
             // drop both old and tagSet tags
             synchronized (_inboundTagSets) {
-                for (SessionTag tag : old.getTags())
+                for (SessionTag tag : old.getTags()) {
                     _inboundTagSets.remove(tag);
-                for (SessionTag tag : sessionTags)
+                }
+                for (SessionTag tag : sessionTags) {
                     _inboundTagSets.remove(tag);
+                }
             }
 
             if (_log.shouldLog(Log.WARN)) {

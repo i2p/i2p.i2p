@@ -93,8 +93,9 @@ class MessageHandler implements I2PSessionMuxedListener {
             _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
         
-        for (I2PSocketManager.DisconnectListener lsnr : _listeners)
+        for (I2PSocketManager.DisconnectListener lsnr : _listeners) {
             lsnr.sessionDisconnected();
+        }
         _listeners.clear();
     }
 

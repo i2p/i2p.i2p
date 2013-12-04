@@ -124,15 +124,18 @@ class ClientManager {
             _listener.stopListening();
         Set<ClientConnectionRunner> runners = new HashSet<ClientConnectionRunner>();
         synchronized (_runners) {
-            for (ClientConnectionRunner runner : _runners.values())
+            for (ClientConnectionRunner runner : _runners.values()) {
                 runners.add(runner);
+            }
         }
         synchronized (_pendingRunners) {
-            for (ClientConnectionRunner runner : _pendingRunners)
+            for (ClientConnectionRunner runner : _pendingRunners) {
                 runners.add(runner);
+            }
         }
-        for (ClientConnectionRunner runner : runners)
+        for (ClientConnectionRunner runner : runners) {
             runner.disconnectClient(msg, Log.WARN);
+        }
         _runnersByHash.clear();
     }
     
