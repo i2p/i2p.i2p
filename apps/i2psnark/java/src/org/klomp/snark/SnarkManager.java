@@ -169,7 +169,7 @@ public class SnarkManager implements CompleteListener {
     public void start() {
         _running = true;
         _peerCoordinatorSet = new PeerCoordinatorSet();
-        _connectionAcceptor = new ConnectionAcceptor(_util);
+        _connectionAcceptor = new ConnectionAcceptor(_util, _peerCoordinatorSet);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         // only if default instance

@@ -525,17 +525,16 @@ public class Snark
         if (_peerCoordinatorSet != null) {
             // multitorrent
             _peerCoordinatorSet.add(coordinator);
-            if (acceptor != null) {
-                acceptor.startAccepting(_peerCoordinatorSet, serversocket);
-            } else {
-              // error
-            }
         } else {
             // single torrent
-            acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
+            acceptor = new ConnectionAcceptor(_util, new PeerAcceptor(coordinator));
         }
         // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
         trackerclient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
+    }
+    // ensure acceptor is running when in multitorrent
+    if (_peerCoordinatorSet != null && acceptor != null) {
+        acceptor.startAccepting();
     }
 
     stopped = false;

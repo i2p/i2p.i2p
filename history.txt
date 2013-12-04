@@ -1,3 +1,7 @@
+2013-12-04 zzz
+i2psnark: Fix ConnectionAcceptor not restarting after tunnel
+  restart, preventing incoming connections
+
 2013-12-01 kytv
  * Update geoip.txt based on Maxmind GeoLite Country database from 2013-11-05.
  * French, Italian, Romanian, Spanish, and Swedish translation updates from transifex
