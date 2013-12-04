@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.udp;
 
-// system
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 
@@ -15,9 +9,8 @@ import java.net.DatagramPacket;
  */
 public class UDPSource implements Source, Runnable {
     public static final int MAX_SIZE = 15360;
+
     public UDPSource(int port) {
-        this.sink = null;
-        
         // create udp-socket
         try {
             this.sock = new DatagramSocket(port);
@@ -31,7 +24,6 @@ public class UDPSource implements Source, Runnable {
 
     /** use socket from UDPSink */
     public UDPSource(DatagramSocket sock) {
-        this.sink = null;
         this.sock = sock;
         this.thread = new Thread(this);
     }
@@ -73,19 +65,7 @@ public class UDPSource implements Source, Runnable {
         this.sock.close();    
     }    
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    protected DatagramSocket sock;
+    protected final DatagramSocket sock;
     protected Sink sink;
-    protected Thread thread;
+    protected final Thread thread;
 }

@@ -1,16 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.udp;
 
-// system
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
-// i2p
 import net.i2p.data.Destination;
 
 /**
@@ -18,6 +11,7 @@ import net.i2p.data.Destination;
  * @author welterde
  */
 public class UDPSink implements Sink {
+
     public UDPSink(InetAddress host, int port) {
         // create socket
         try {
@@ -61,17 +55,8 @@ public class UDPSink implements Sink {
         this.sock.close();    
     }    
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    protected DatagramSocket sock;
-    protected InetAddress remoteHost;
-    protected int remotePort;
+    protected final DatagramSocket sock;
+    protected final InetAddress remoteHost;
+    protected final int remotePort;
 
 }

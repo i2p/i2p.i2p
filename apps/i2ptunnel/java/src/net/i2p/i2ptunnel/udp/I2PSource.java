@@ -1,15 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.udp;
 
-// system
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-// i2p
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionListener;
 import net.i2p.client.datagram.I2PDatagramDissector;
@@ -19,15 +12,17 @@ import net.i2p.client.datagram.I2PDatagramDissector;
  * @author welterde
  */
 public class I2PSource implements Source, Runnable {
+
     public I2PSource(I2PSession sess) {
         this(sess, true, false);
     }
+
     public I2PSource(I2PSession sess, boolean verify) {
         this(sess, verify, false);
     }
+
     public I2PSource(I2PSession sess, boolean verify, boolean raw) {
         this.sess = sess;
-        this.sink = null;
         this.verify = verify;
         this.raw = raw;
         
@@ -80,11 +75,6 @@ public class I2PSource implements Source, Runnable {
         }
     }
     
-    
-    
-    
-    
-    
     protected class Listener implements I2PSessionListener {
 
         public void messageAvailable(I2PSession sess, int id, long size) {
@@ -109,15 +99,10 @@ public class I2PSource implements Source, Runnable {
         
     }
     
-    
-    
-    
-    
-    
-    protected I2PSession sess;
-    protected BlockingQueue<Integer> queue;
+    protected final I2PSession sess;
+    protected final BlockingQueue<Integer> queue;
     protected Sink sink;
-    protected Thread thread;
-    protected boolean verify;
-    protected boolean raw;
+    protected final Thread thread;
+    protected final boolean verify;
+    protected final boolean raw;
 }
