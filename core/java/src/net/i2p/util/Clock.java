@@ -68,7 +68,6 @@ public class Clock implements Timestamper.UpdateListener {
      * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
     public synchronized void setOffset(long offsetMs, boolean force) {
-        if (false) return;
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
