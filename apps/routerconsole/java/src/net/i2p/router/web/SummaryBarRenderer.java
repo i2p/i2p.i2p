@@ -252,6 +252,8 @@ public class SummaryBarRenderer {
            .append(_("Addressbook"))
            .append("</a>\n");
 
+        if (_context.getBooleanProperty(HelperBase.PROP_ADVANCED))
+            buf.append("<a href=\"/debug\">Debug</a>\n");
         File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
         if (javadoc.exists())
             buf.append("<a href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");

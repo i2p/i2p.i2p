@@ -25,6 +25,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -89,6 +90,24 @@ class PeerManager {
             super(_context.simpleTimer2(), REORGANIZE_TIME);
         }
         public void timeReached() {
+            (new ReorgThread(this)).start();
+        }
+    }
+
+    /**
+     *  This takes too long to run on the SimpleTimer2 queue
+     *  @since 0.9.10
+     */
+    private class ReorgThread extends I2PThread {
+        private SimpleTimer2.TimedEvent _event;
+
+        public ReorgThread(SimpleTimer2.TimedEvent event) {
+            super("PeerManager Reorg");
+            setDaemon(true);
+            _event = event;
+        }
+
+        public void run() {
             long start = System.currentTimeMillis();
             try {
                 _organizer.reorganize(true);
@@ -104,7 +123,7 @@ class PeerManager {
                 delay = REORGANIZE_TIME_MEDIUM;
             else
                 delay = REORGANIZE_TIME;
-            schedule(delay);
+            _event.schedule(delay);
         }
     }
     

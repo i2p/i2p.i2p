@@ -65,36 +65,66 @@ public class ConfigUIHelper extends HelperBase {
     }
 
     /**
-     *  Each language has the ISO code, the flag, and the name.
+     *  Each language has the ISO code, the flag, the name, and the optional country name.
      *  Alphabetical by the ISO code please.
      *  See http://en.wikipedia.org/wiki/ISO_639-1 .
      *  Any language-specific flag added to the icon set must be
      *  added to the top-level build.xml for the updater.
      */
-    private static final String langs[] = {"ar", "cs", "da", "de", "et", "el", "en", "es", "fi",
-                                           "fr", "hu", "it", "ja", "nb", "nl", "pl", "pt", "ro", "ru",
-                                           "sv", "tr", "uk", "vi", "zh"};
-    private static final String flags[] = {"lang_ar", "cz", "dk", "de", "ee", "gr", "us", "es", "fi",
-                                           "fr", "hu", "it", "jp", "nl", "no", "pl", "pt", "ro", "ru",
-                                           "se", "tr", "ua", "vn", "cn"};
-    private static final String xlangs[] = {_x("Arabic"), _x("Czech"), _x("Danish"),
-                                            _x("German"), _x("Estonian"), _x("Greek"), _x("English"), _x("Spanish"), _x("Finnish"),
-                                            _x("French"), _x("Hungarian"), _x("Italian"), _x("Japanese"), _x("Dutch"), _x("Norwegian Bokmaal"), _x("Polish"),
-                                            _x("Portuguese"), _x("Romanian"), _x("Russian"), _x("Swedish"),
-                                            _x("Turkish"), _x("Ukrainian"), _x("Vietnamese"), _x("Chinese")};
+    private static final String langs[][] = {
+        { "ar", "lang_ar", _x("Arabic"), null },
+        { "cs", "cz", _x("Czech"), null },
+        { "da", "dk", _x("Danish"), null },
+        { "de", "de", _x("German"), null },
+        { "et", "ee", _x("Estonian"), null },
+        { "el", "gr", _x("Greek"), null },
+        { "en", "us", _x("English"), null },
+        { "es", "es", _x("Spanish"), null },
+        { "fi", "fi", _x("Finnish"), null },
+        { "fr", "fr", _x("French"), null },
+        { "hu", "hu", _x("Hungarian"), null },
+        { "it", "it", _x("Italian"), null },
+        { "ja", "jp", _x("Japanese"), null },
+        { "nb", "nl", _x("Dutch"), null },
+        { "nl", "no", _x("Norwewgian Bokmaal"), null },
+        { "pl", "pl", _x("Polish"), null },
+        { "pt", "pt", _x("Portuguese"), null },
+     //   { "pt_BR", "br", _x("Portuguese"), "Brazil" },
+        { "ro", "ro", _x("Romainian"), null },
+        { "ru", "ru", _x("Russian"), null },
+        { "sv", "se", _x("Swedish"), null },
+        { "tr", "tr", _x("Turkish"), null },
+        { "uk", "ua", _x("Ukrainian"), null },
+        { "vi", "vn", _x("Vietnamese"), null },
+        { "zh", "cn", _x("Chinese"), null }
+    };
+
+
 
     /** todo sort by translated string */
     public String getLangSettings() {
         StringBuilder buf = new StringBuilder(512);
         String current = Messages.getLanguage(_context);
+        String country = Messages.getCountry(_context);
+        if (country != null && country.length() > 0)
+            current += '_' + country;
         for (int i = 0; i < langs.length; i++) {
             // we use "lang" so it is set automagically in CSSHelper
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
-            if (langs[i].equals(current))
+            String lang = langs[i][0];
+            if (lang.equals(current))
                 buf.append("checked=\"checked\" ");
-            buf.append("value=\"").append(langs[i]).append("\">")
-               .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(flags[i]).append("\"> ")
-               .append(Messages.getDisplayLanguage(langs[i], xlangs[i], _context)).append("<br>\n");
+            buf.append("value=\"").append(lang).append("\">")
+               .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\"> ");
+            String slang = lang.length() > 2 ? lang.substring(0, 2) : lang;
+            buf.append(Messages.getDisplayLanguage(slang, langs[i][2], _context));
+            String name = langs[i][3];
+            if (name != null) {
+                buf.append(" (")
+                   .append(Messages.getString(name, _context, Messages.COUNTRY_BUNDLE_NAME))
+                   .append(')');
+            }
+            buf.append("<br>\n");
         }
         return buf.toString();
     }

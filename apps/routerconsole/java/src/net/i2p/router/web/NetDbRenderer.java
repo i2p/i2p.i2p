@@ -350,8 +350,6 @@ public class NetDbRenderer {
         out.flush();
     }
     
-    private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
-
     /**
      * Countries now in a separate bundle
      * @param code two-letter country code
@@ -359,7 +357,7 @@ public class NetDbRenderer {
      */
     private String getTranslatedCountry(String code) {
         String name = _context.commSystem().getCountryName(code);
-        return Translate.getString(name, _context, COUNTRY_BUNDLE_NAME);
+        return Translate.getString(name, _context, Messages.COUNTRY_BUNDLE_NAME);
     }
 
     /** sort by translated country name using rules for the current language setting */

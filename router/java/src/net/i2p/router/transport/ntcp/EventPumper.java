@@ -211,7 +211,7 @@ class EventPumper implements Runnable {
                         int failsafeInvalid = 0;
 
                         // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-                        if (_transport.haveCapacity(60))
+                        if (_transport.haveCapacity(45))
                             _expireIdleWriteTime = Math.min(_expireIdleWriteTime + 1000, MAX_EXPIRE_IDLE_TIME);
                         else
                             _expireIdleWriteTime = Math.max(_expireIdleWriteTime - 3000, MIN_EXPIRE_IDLE_TIME);
