@@ -289,14 +289,22 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if ( (message.getLeaseSet() == null) || (message.getPrivateKey() == null) || (message.getSigningPrivateKey() == null) ) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null lease set granted: " + message);
+            _runner.disconnectClient("Invalid CreateLeaseSetMessage");
             return;
         }
 
+        _context.keyManager().registerKeys(message.getLeaseSet().getDestination(), message.getSigningPrivateKey(), message.getPrivateKey());
+        try {
+            _context.netDb().publish(message.getLeaseSet());
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Invalid leaseset from client", iae);
+            _runner.disconnectClient("Invalid leaseset: " + iae);
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("New lease set granted for destination " 
                       + message.getLeaseSet().getDestination().calculateHash().toBase64());
-        _context.keyManager().registerKeys(message.getLeaseSet().getDestination(), message.getSigningPrivateKey(), message.getPrivateKey());
-        _context.netDb().publish(message.getLeaseSet());
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
         _runner.leaseSetCreated(message.getLeaseSet());

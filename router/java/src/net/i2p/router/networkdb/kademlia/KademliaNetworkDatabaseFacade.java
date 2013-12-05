@@ -527,14 +527,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     private static final long PUBLISH_DELAY = 3*1000;
 
-    public void publish(LeaseSet localLeaseSet) {
+    /**
+     * @throws IllegalArgumentException if the leaseSet is not valid
+     */
+    public void publish(LeaseSet localLeaseSet) throws IllegalArgumentException {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
         try {
             store(h, localLeaseSet);
         } catch (IllegalArgumentException iae) {
             _log.error("wtf, locally published leaseSet is not valid?", iae);
-            return;
+            throw iae;
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
