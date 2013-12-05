@@ -51,14 +51,15 @@ import net.i2p.util.EventDispatcher;
     private static final AtomicLong __clientId = new AtomicLong();
     protected long _clientId;
 
-    protected Destination dest = null;
+    protected Destination dest;
 
     private final Object startLock = new Object();
     
-    private I2PSession _session;
-    private Source _i2pSource;
-    private Sink _i2pSink;
-    private Destination _otherDest;
+    private final I2PSession _session;
+    private final Source _i2pSource;
+    private final Sink _i2pSink;
+    private final Destination _otherDest;
+
     /**
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
@@ -105,6 +106,7 @@ import net.i2p.util.EventDispatcher;
              }
             _i2pSink = new I2PSink(_session, _otherDest, false);
         } else {
+            _otherDest = null;
             _i2pSink = new I2PSinkAnywhere(_session, false);
         }   
     }
