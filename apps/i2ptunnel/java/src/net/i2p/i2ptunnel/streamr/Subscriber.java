@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.streamr;
 
-// system
 import java.util.Set;
 
 import net.i2p.data.Destination;
@@ -51,15 +45,6 @@ public class Subscriber implements Sink {
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private Set<Destination> subscriptions;
-    private MultiSource multi;
+    private final Set<Destination> subscriptions;
+    private final MultiSource multi;
 }

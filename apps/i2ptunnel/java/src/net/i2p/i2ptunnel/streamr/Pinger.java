@@ -7,9 +7,11 @@ import net.i2p.i2ptunnel.udp.*;
  * @author welterde/zzz
  */
 public class Pinger implements Source, Runnable {
+
     public Pinger() {
         this.thread = new Thread(this);
     }
+
     public void setSink(Sink sink) {
         this.sink = sink;
     }
@@ -53,7 +55,7 @@ public class Pinger implements Source, Runnable {
     }
 
     protected Sink sink;
-    protected Thread thread;
+    protected final Thread thread;
     private final Object waitlock = new Object();
-    protected boolean running;
+    protected volatile boolean running;
 }

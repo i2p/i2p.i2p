@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.streamr;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,6 +12,7 @@ import net.i2p.i2ptunnel.udp.*;
  * @author zzz modded for I2PTunnel
  */
 public class MultiSource implements Source, Sink {
+
     public MultiSource() {
         this.sinks = new CopyOnWriteArrayList<Destination>();
     }
@@ -45,20 +41,6 @@ public class MultiSource implements Source, Sink {
         this.sinks.remove(sink);
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private Sink sink;
-    private List<Destination> sinks;
+    private final List<Destination> sinks;
 }

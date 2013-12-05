@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.streamr;
 
 import java.net.InetAddress;
@@ -52,16 +47,7 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
         this.sink.stop();
         return super.close(forced);
     }
-
-
-
-
-
-
-
-
     
-    
-    private UDPSink sink;
-    private Pinger pinger;
+    private final UDPSink sink;
+    private final Pinger pinger;
 }

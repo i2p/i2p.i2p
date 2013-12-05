@@ -1,14 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.i2p.i2ptunnel.streamr;
 
-// system
 import java.io.File;
 
-// i2p
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
@@ -57,17 +50,8 @@ public class StreamrProducer extends I2PTunnelUDPServerBase {
         this.multi.stop();
         return super.close(forced);
     }
-
-
     
-    
-    
-    
-    
-    
-    
-    
-    private MultiSource multi;
-    private UDPSource server;
-    private Sink subscriber;
+    private final MultiSource multi;
+    private final UDPSource server;
+    private final Sink subscriber;
 }
