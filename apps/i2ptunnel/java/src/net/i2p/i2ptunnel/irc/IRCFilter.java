@@ -39,7 +39,7 @@ abstract class IRCFilter {
         final String[] allowedCommands =
         {
                 // "NOTICE", // can contain CTCP
-                //"PING",
+                "PING",
                 //"PONG",
                 "MODE",
                 "JOIN",
@@ -76,8 +76,6 @@ abstract class IRCFilter {
         } catch(NumberFormatException nfe){}
 
         
-	if ("PING".equals(command))
-            return "PING 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
 	if ("PONG".equals(command)) {
             // Turn the received ":irc.freshcoffee.i2p PONG irc.freshcoffee.i2p :127.0.0.1"
             // into ":127.0.0.1 PONG 127.0.0.1 " so that the caller can append the client's extra parameter
@@ -175,7 +173,7 @@ abstract class IRCFilter {
                 // "PART", // replace with filtered PART to hide client part messages
                 "PASS",
                 // "PING",
-                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!)
+                "PONG",
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "RULES",
                 "SETNAME",
@@ -291,8 +289,6 @@ abstract class IRCFilter {
             
             return rv;
         }
-	if ("PONG".equals(command))
-            return "PONG 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
 
         // Allow all allowedCommands
         if (_allowedOutbound.contains(command))
