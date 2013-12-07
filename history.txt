@@ -1,3 +1,5 @@
+* 2013-12-07 0.9.9 released
+
 2013-12-04 zzz
 i2psnark: Fix ConnectionAcceptor not restarting after tunnel
   restart, preventing incoming connections
