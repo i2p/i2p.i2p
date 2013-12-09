@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +62,11 @@ class MessageInputStream extends InputStream {
     
     public MessageInputStream(I2PAppContext ctx) {
         _log = ctx.logManager().getLog(MessageInputStream.class);
-        _readyDataBlocks = new ArrayList(4);
+        _readyDataBlocks = new ArrayList<ByteArray>(4);
         _highestReadyBlockId = -1;
         _highestBlockId = -1;
         _readTimeout = -1;
-        _notYetReadyBlocks = new HashMap(4);
+        _notYetReadyBlocks = new HashMap<Long, ByteArray>(4);
         _dataLock = new Object();
         //_cache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
     }
@@ -110,7 +109,7 @@ class MessageInputStream extends InputStream {
                 // ACK
             } else {
                 if (ids == null)
-                    ids = new ArrayList(4);
+                    ids = new ArrayList<Long>(4);
                 ids.add(l);
             }
         }

@@ -767,13 +767,13 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         // but avoid concurrent modification just in case
         Set<Hash> accessList, blackList;
         if (accessListEnabled)
-            accessList = new HashSet();
+            accessList = new HashSet<Hash>();
         else
-            accessList = Collections.EMPTY_SET;
+            accessList = Collections.emptySet();
         if (blackListEnabled)
-            blackList = new HashSet();
+            blackList = new HashSet<Hash>();
         else
-            blackList = Collections.EMPTY_SET;
+            blackList = Collections.emptySet();
         if (accessListEnabled || blackListEnabled) {
             String hashes = opts.getProperty(PROP_ACCESS_LIST);
             if (hashes == null)

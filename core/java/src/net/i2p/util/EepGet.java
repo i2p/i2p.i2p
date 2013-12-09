@@ -384,6 +384,7 @@ public class EepGet {
                             fmt.format("%7.2f", Double.valueOf(lifetimeKBps));
                             buf.append(" KBps");
                             System.out.println(buf.toString());
+                            fmt.close();
                         }
                         _lastComplete = now;
                     }

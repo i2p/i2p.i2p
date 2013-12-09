@@ -31,7 +31,7 @@ import net.i2p.util.SecureFile;
  *
  * @since 0.8.2
  */
-class PartialPiece implements Comparable {
+class PartialPiece implements Comparable<PartialPiece> {
 
     // we store the piece so we can use it in compareTo()
     private final Piece piece;
@@ -295,8 +295,7 @@ class PartialPiece implements Comparable {
      *  then rarest first,
      *  then highest downloaded first
      */
-    public int compareTo(Object o) throws ClassCastException {
-        PartialPiece opp = (PartialPiece)o;
+    public int compareTo(PartialPiece opp) {
         int d = this.piece.compareTo(opp.piece);
         if (d != 0)
             return d;

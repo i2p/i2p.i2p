@@ -424,7 +424,7 @@ public class SnarkManager implements CompleteListener {
         String i2cpHost = _config.getProperty(PROP_I2CP_HOST);
         int i2cpPort = getInt(PROP_I2CP_PORT, 7654);
         String opts = _config.getProperty(PROP_I2CP_OPTS);
-        Map i2cpOpts = new HashMap();
+        Map<String, String> i2cpOpts = new HashMap<String, String>();
         if (opts != null) {
             StringTokenizer tok = new StringTokenizer(opts, " ");
             while (tok.hasMoreTokens()) {
@@ -1652,7 +1652,7 @@ public class SnarkManager implements CompleteListener {
      */
     private void monitorTorrents(File dir) {
         String fileNames[] = dir.list(TorrentFilenameFilter.instance());
-        List<String> foundNames = new ArrayList(0);
+        List<String> foundNames = new ArrayList<String>(0);
         if (fileNames != null) {
             for (int i = 0; i < fileNames.length; i++) {
                 try {
@@ -1738,7 +1738,7 @@ public class SnarkManager implements CompleteListener {
      *  @since 0.9.1
      */
     public List<Tracker> getSortedTrackers() { 
-        List<Tracker> rv = new ArrayList(_trackerMap.values());
+        List<Tracker> rv = new ArrayList<Tracker>(_trackerMap.values());
         Collections.sort(rv, new IgnoreCaseComparator());
         return rv;
     }

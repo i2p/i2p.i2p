@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,17 +57,17 @@ class StoreState {
     public DatabaseEntry getData() { return _data; }
     public Set<Hash> getPending() { 
         synchronized (_pendingPeers) {
-            return (Set<Hash>)_pendingPeers.clone(); 
+            return new HashSet<Hash>(_pendingPeers); 
         }
     }
     public Set<Hash> getAttempted() { 
         synchronized (_attemptedPeers) {
-            return (Set<Hash>)_attemptedPeers.clone(); 
+            return new HashSet<Hash>(_attemptedPeers); 
         }
     }
     public Set<Hash> getSuccessful() { 
         synchronized (_successfulPeers) {
-            return (Set<Hash>)_successfulPeers.clone(); 
+            return new HashSet<Hash>(_successfulPeers); 
         }
     }
     /** unused */
@@ -82,7 +81,7 @@ class StoreState {
 
     public Set<Hash> getFailed() { 
         synchronized (_failedPeers) {
-            return (Set<Hash>)_failedPeers.clone(); 
+            return new HashSet<Hash>(_failedPeers); 
         }
     }
     public boolean completed() { return _completed != -1; }
@@ -124,8 +123,8 @@ class StoreState {
     public void addPending(Collection<Hash> pending) {
         synchronized (_pendingPeers) {
             _pendingPeers.addAll(pending);
-            for (Iterator<Hash> iter = pending.iterator(); iter.hasNext(); ) 
-                _pendingPeerTimes.put(iter.next(), Long.valueOf(_context.clock().now()));
+            for (Hash peer : pending) 
+                _pendingPeerTimes.put(peer, Long.valueOf(_context.clock().now()));
         }
         synchronized (_attemptedPeers) {
             _attemptedPeers.addAll(pending);
@@ -191,32 +190,28 @@ class StoreState {
         buf.append(" Attempted: ");
         synchronized (_attemptedPeers) {
             buf.append(_attemptedPeers.size()).append(' ');
-            for (Iterator<Hash> iter = _attemptedPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = iter.next();
+            for (Hash peer : _attemptedPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
         buf.append(" Pending: ");
         synchronized (_pendingPeers) {
             buf.append(_pendingPeers.size()).append(' ');
-            for (Iterator<Hash> iter = _pendingPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = iter.next();
+            for (Hash peer : _pendingPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
         buf.append(" Failed: ");
         synchronized (_failedPeers) { 
             buf.append(_failedPeers.size()).append(' ');
-            for (Iterator<Hash> iter = _failedPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = iter.next();
+            for (Hash peer : _failedPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
         buf.append(" Successful: ");
         synchronized (_successfulPeers) {
             buf.append(_successfulPeers.size()).append(' ');
-            for (Iterator<Hash> iter = _successfulPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = iter.next();
+            for (Hash peer : _successfulPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }

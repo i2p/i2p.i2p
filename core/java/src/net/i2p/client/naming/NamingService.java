@@ -462,8 +462,8 @@ public abstract class NamingService {
         NamingService instance = null;
         String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL);
         try {
-            Class cls = Class.forName(impl);
-            Constructor con = cls.getConstructor(new Class[] { I2PAppContext.class });
+            Class<?> cls = Class.forName(impl);
+            Constructor<?> con = cls.getConstructor(new Class[] { I2PAppContext.class });
             instance = (NamingService)con.newInstance(new Object[] { context });
         } catch (Exception ex) {
             Log log = context.logManager().getLog(NamingService.class);

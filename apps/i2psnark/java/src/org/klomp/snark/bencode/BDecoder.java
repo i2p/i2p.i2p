@@ -281,7 +281,7 @@ public class BDecoder
                                           + (char)c + "'");
     indicator = 0;
 
-    List result = new ArrayList();
+    List<BEValue> result = new ArrayList<BEValue>();
     c = getNextIndicator();
     while (c != 'e')
       {
@@ -308,7 +308,7 @@ public class BDecoder
                                           + (char)c + "'");
     indicator = 0;
 
-    Map result = new HashMap();
+    Map<String, BEValue> result = new HashMap<String, BEValue>();
     c = getNextIndicator();
     while (c != 'e')
       {

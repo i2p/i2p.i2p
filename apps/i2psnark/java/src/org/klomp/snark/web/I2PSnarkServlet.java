@@ -1,12 +1,8 @@
 package org.klomp.snark.web;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -16,7 +12,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,14 +21,11 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
-import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 import org.klomp.snark.I2PSnarkUtil;
@@ -208,7 +200,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     resp.sendError(404);
                 } else {
                     String base = addPaths(req.getRequestURI(), "/");
-                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
+                    @SuppressWarnings("unchecked") // TODO-Java6: Remove cast, return type is correct
+                    String listing = getListHTML(resource, base, true, method.equals("POST") ? (Map<String, String[]>) req.getParameterMap() : null);
                     if (method.equals("POST")) {
                         // P-R-G
                         sendRedirect(req, resp, "");
@@ -684,7 +677,8 @@ public class I2PSnarkServlet extends BasicServlet {
         String action = req.getParameter("action");
         if (action == null) {
             // http://www.onenaught.com/posts/382/firefox-4-change-input-type-image-only-submits-x-and-y-not-name
-            Map params = req.getParameterMap();
+            @SuppressWarnings("unchecked") // TODO-Java6: Remove cast, return type is correct
+            Map<String, String[]> params = req.getParameterMap();
             for (Object o : params.keySet()) {
                 String key = (String) o;
                 if (key.startsWith("action_") && key.endsWith(".x")) {
@@ -758,8 +752,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
-                        String name = (String)iter.next();
+                    for (String name : _manager.listTorrentFiles() ) {
                         Snark snark = _manager.getTorrent(name);
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
                             _manager.stopTorrent(snark, false);
@@ -781,8 +774,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
-                        String name = (String)iter.next();
+                    for (String name : _manager.listTorrentFiles() ) {
                         Snark snark = _manager.getTorrent(name);
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
                             MetaInfo meta = snark.getMetaInfo();
@@ -809,8 +801,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
-                        String name = (String)iter.next();
+                    for (String name : _manager.listTorrentFiles() ) {
                         Snark snark = _manager.getTorrent(name);
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
                             MetaInfo meta = snark.getMetaInfo();
@@ -849,7 +840,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 }
                             }
                             // step 2 make Set of dirs with reverse sort
-                            Set<File> dirs = new TreeSet(Collections.reverseOrder());
+                            Set<File> dirs = new TreeSet<File>(Collections.reverseOrder());
                             for (List<String> list : files) {
                                 for (int i = 1; i < list.size(); i++) {
                                     dirs.add(Storage.getFileFromNames(f, list.subList(0, i)));
@@ -922,8 +913,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     if (announceURL.equals("none"))
                         announceURL = null;
                     _lastAnnounceURL = announceURL;
-                    List<String> backupURLs = new ArrayList();
-                    Enumeration e = req.getParameterNames();
+                    List<String> backupURLs = new ArrayList<String>();
+                    Enumeration<?> e = req.getParameterNames();
                     while (e.hasMoreElements()) {
                          Object o = e.nextElement();
                          if (!(o instanceof String))
@@ -955,7 +946,7 @@ public class I2PSnarkServlet extends BasicServlet {
                             _manager.addMessage(_("Error - Cannot mix private and public trackers in a torrent"));
                             return;
                         }
-                        announceList = new ArrayList(backupURLs.size());
+                        announceList = new ArrayList<List<String>>(backupURLs.size());
                         for (String url : backupURLs) {
                             announceList.add(Collections.singletonList(url));
                         }
@@ -1017,10 +1008,10 @@ public class I2PSnarkServlet extends BasicServlet {
         if (action.equals(_("Delete selected")) || action.equals(_("Save tracker configuration"))) {
             boolean changed = false;
             Map<String, Tracker> trackers = _manager.getTrackerMap();
-            List<String> removed = new ArrayList();
-            List<String> open = new ArrayList();
-            List<String> priv = new ArrayList();
-            Enumeration e = req.getParameterNames();
+            List<String> removed = new ArrayList<String>();
+            List<String> open = new ArrayList<String>();
+            List<String> priv = new ArrayList<String>();
+            Enumeration<?> e = req.getParameterNames();
             while (e.hasMoreElements()) {
                  Object o = e.nextElement();
                  if (!(o instanceof String))
@@ -1045,7 +1036,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
 
             open.removeAll(removed);
-            List<String> oldOpen = new ArrayList(_manager.util().getOpenTrackers());
+            List<String> oldOpen = new ArrayList<String>(_manager.util().getOpenTrackers());
             Collections.sort(oldOpen);
             Collections.sort(open);
             if (!open.equals(oldOpen))
@@ -1054,7 +1045,7 @@ public class I2PSnarkServlet extends BasicServlet {
             priv.removeAll(removed);
             // open trumps private
             priv.removeAll(open);
-            List<String> oldPriv = new ArrayList(_manager.getPrivateTrackers());
+            List<String> oldPriv = new ArrayList<String>(_manager.getPrivateTrackers());
             Collections.sort(oldPriv);
             Collections.sort(priv);
             if (!priv.equals(oldPriv))
@@ -1074,11 +1065,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     _manager.saveTrackerMap();
                     // open trumps private
                     if (req.getParameter("_add_open_") != null) {
-                        List newOpen = new ArrayList(_manager.util().getOpenTrackers());
+                        List<String> newOpen = new ArrayList<String>(_manager.util().getOpenTrackers());
                         newOpen.add(aurl);
                         _manager.saveOpenTrackers(newOpen);
                     } else if (req.getParameter("_add_private_") != null) {
-                        List newPriv = new ArrayList(_manager.getPrivateTrackers());
+                        List<String> newPriv = new ArrayList<String>(_manager.getPrivateTrackers());
                         newPriv.add(aurl);
                         _manager.savePrivateTrackers(newPriv);
                     }
@@ -1141,7 +1132,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     private List<Snark> getSortedSnarks(HttpServletRequest req) {
-        ArrayList<Snark> rv = new ArrayList(_manager.getTorrents());
+        ArrayList<Snark> rv = new ArrayList<Snark>(_manager.getTorrents());
         Collections.sort(rv, new TorrentNameComparator());
         return rv;
     }
@@ -1916,7 +1907,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
         //          + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br>\n");
 
-        Map<String, String> options = new TreeMap(_manager.util().getI2CPOptions());
+        Map<String, String> options = new TreeMap<String, String>(_manager.util().getI2CPOptions());
         out.write("<tr><td>");
         out.write(_("Inbound Settings"));
         out.write(":<td>");
@@ -2212,7 +2203,7 @@ public class I2PSnarkServlet extends BasicServlet {
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(File r, String base, boolean parent, Map postParams)
+    private String getListHTML(File r, String base, boolean parent, Map<String, String[]> postParams)
         throws IOException
     {
         File[] ls = null;
@@ -2388,7 +2379,7 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(":</b> ")
                    .append(formatSize(needed));
             if (meta != null) {
-                List files = meta.getFiles();
+                List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
                 buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
                    .append(_("Files"))
@@ -2648,17 +2639,16 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /** @since 0.8.1 */
-    private void savePriorities(Snark snark, Map postParams) {
+    private void savePriorities(Snark snark, Map<String, String[]> postParams) {
         Storage storage = snark.getStorage();
         if (storage == null)
             return;
-        Set<Map.Entry> entries = postParams.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String)entry.getKey();
+        for (Map.Entry<String, String[]> entry : postParams.entrySet()) {
+            String key = entry.getKey();
             if (key.startsWith("pri.")) {
                 try {
                     String file = key.substring(4);
-                    String val = ((String[])entry.getValue())[0];   // jetty arrays
+                    String val = entry.getValue()[0];   // jetty arrays
                     int pri = Integer.parseInt(val);
                     storage.setPriority(file, pri);
                     //System.err.println("Priority now " + pri + " for " + file);

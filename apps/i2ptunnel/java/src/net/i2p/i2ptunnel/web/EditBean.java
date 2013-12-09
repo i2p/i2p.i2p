@@ -373,7 +373,7 @@ public class EditBean extends IndexBean {
             boolean isMD5Proxy = "httpclient".equals(tun.getType()) ||
                                  "connectclient".equals(tun.getType());
             Map<String, String> sorted = new TreeMap<String, String>();
-            for (Map.Entry e : opts.entrySet()) {
+            for (Map.Entry<Object, Object> e : opts.entrySet()) {
                 String key = (String)e.getKey();
                 if (_noShowSet.contains(key))
                     continue;

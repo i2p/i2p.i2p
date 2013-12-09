@@ -366,7 +366,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @since 0.9.1
      */
     public void setClientOptions(Properties opts) {
-        for (Iterator iter = _clientOptions.keySet().iterator(); iter.hasNext();) {
+        for (Iterator<Object> iter = _clientOptions.keySet().iterator(); iter.hasNext();) {
             Object key = iter.next();
             if (!opts.containsKey(key))
                 iter.remove();
@@ -1667,8 +1667,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     void routerDisconnected() {
         _log.error(getPrefix() + "Router disconnected - firing notification events");
-            for (Iterator<ConnectionEventListener> iter = listeners.iterator(); iter.hasNext();) {
-                ConnectionEventListener lsnr = iter.next();
+            for (ConnectionEventListener lsnr : listeners) {
                 if (lsnr != null) lsnr.routerDisconnected();
             }
     }

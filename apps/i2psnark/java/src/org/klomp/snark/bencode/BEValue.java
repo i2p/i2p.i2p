@@ -49,12 +49,12 @@ public class BEValue
     this.value = value;
   }
 
-  public BEValue(List value)
+  public BEValue(List<BEValue> value)
   {
     this.value = value;
   }
 
-  public BEValue(Map value)
+  public BEValue(Map<String, BEValue> value)
   {
     this.value = value;
   }
@@ -142,11 +142,12 @@ public class BEValue
    * succeeds when the BEValue is actually a List, otherwise it will
    * throw a InvalidBEncodingException.
    */
+  @SuppressWarnings("unchecked")
   public List<BEValue> getList() throws InvalidBEncodingException
   {
     try
       {
-        return (List)value;
+        return (List<BEValue>)value;
       }
     catch (ClassCastException cce)
       {
@@ -159,11 +160,12 @@ public class BEValue
    * values. This operation only succeeds when the BEValue is actually
    * a Map, otherwise it will throw a InvalidBEncodingException.
    */
+  @SuppressWarnings("unchecked")
   public Map<String, BEValue> getMap() throws InvalidBEncodingException
   {
     try
       {
-        return (Map)value;
+        return (Map<String, BEValue>)value;
       }
     catch (ClassCastException cce)
       {

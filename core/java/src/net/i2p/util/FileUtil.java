@@ -295,7 +295,7 @@ public class FileUtil {
         //Pack200.newUnpacker().unpack(in, out);
         if (!_failedOracle) {
             try {
-                Class p200 = Class.forName("java.util.jar.Pack200", true, ClassLoader.getSystemClassLoader());
+                Class<?> p200 = Class.forName("java.util.jar.Pack200", true, ClassLoader.getSystemClassLoader());
                 Method newUnpacker = p200.getMethod("newUnpacker", (Class[]) null);
                 Object unpacker = newUnpacker.invoke(null,(Object[])  null);
                 Method unpack = unpacker.getClass().getMethod("unpack", new Class[] {InputStream.class, JarOutputStream.class});
@@ -316,8 +316,8 @@ public class FileUtil {
         //(new Archive(in, out)).unpack();
         if (!_failedApache) {
             try {
-                Class p200 = Class.forName("org.apache.harmony.unpack200.Archive", true, ClassLoader.getSystemClassLoader());
-                Constructor newUnpacker = p200.getConstructor(new Class[] {InputStream.class, JarOutputStream.class});
+                Class<?> p200 = Class.forName("org.apache.harmony.unpack200.Archive", true, ClassLoader.getSystemClassLoader());
+                Constructor<?> newUnpacker = p200.getConstructor(new Class[] {InputStream.class, JarOutputStream.class});
                 Object unpacker = newUnpacker.newInstance(new Object[] {in, out});
                 Method unpack = unpacker.getClass().getMethod("unpack", (Class[]) null);
                 // throws IOException or Pack200Exception

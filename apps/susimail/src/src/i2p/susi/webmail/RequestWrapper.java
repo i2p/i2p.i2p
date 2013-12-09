@@ -102,6 +102,7 @@ public class RequestWrapper {
 	/**
 	 * @return List of request parameter names
 	 */
+	@SuppressWarnings("unchecked") // TODO-Java6: Remove, type is correct
 	public Enumeration<String> getParameterNames() {
 		if( multiPartRequest != null ) {
 			if( cachedParameterNames == null ) {

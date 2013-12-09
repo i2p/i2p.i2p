@@ -29,7 +29,6 @@ import i2p.susi.util.ReadBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
 
 /**
  * @author susi
@@ -57,7 +56,7 @@ public class QuotedPrintable implements Encoding {
 	 */
 	public String encode(String text) throws EncodingException {
 		try {
-			return encode( new StringBufferInputStream( text ) );
+			return encode( new ByteArrayInputStream( text.getBytes() ) );
 		}catch (IOException e) {
 			throw new EncodingException( "IOException occured." );
 		}

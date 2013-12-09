@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -68,12 +69,12 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /**
      * @deprecated should always return null or an empty set
      */
-    public Set getTagsSent() { return Collections.EMPTY_SET; }
+    public Set<SessionTag> getTagsSent() { return Collections.emptySet(); }
 
     /**
      * @deprecated I2PSession throws out the tags
      */
-    public void setTagsSent(Set tags) { 
+    public void setTagsSent(Set<SessionTag> tags) { 
         if (tags != null && !tags.isEmpty())
             _log.error("Who is sending tags thru the streaming lib? " + tags.size());
       /****

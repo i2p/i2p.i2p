@@ -541,12 +541,10 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         if (old != null) {
             // drop both old and tagSet tags
             synchronized (_inboundTagSets) {
-                for (Iterator<SessionTag> iter = old.getTags().iterator(); iter.hasNext(); ) {
-                    SessionTag tag = iter.next();
+                for (SessionTag tag : old.getTags()) {
                     _inboundTagSets.remove(tag);
                 }
-                for (Iterator<SessionTag> iter = sessionTags.iterator(); iter.hasNext(); ) {
-                    SessionTag tag = iter.next();
+                for (SessionTag tag : sessionTags) {
                     _inboundTagSets.remove(tag);
                 }
             }
@@ -734,8 +732,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             buf.append("<tr><td><b>Session key</b>: ").append(skey.toBase64()).append("</td>" +
                        "<td><b># Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr><td colspan=\"2\"><ul>");
-            for (Iterator<TagSet> siter = sets.iterator(); siter.hasNext();) {
-                TagSet ts = siter.next();
+            for (TagSet ts : sets) {
                 int size = ts.getTags().size();
                 total += size;
                 buf.append("<li><b>ID: ").append(ts.getID());
@@ -1050,8 +1047,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         public long getLastExpirationDate() {
             long last = 0;
             synchronized (_tagSets) {
-                for (Iterator<TagSet> iter = _tagSets.iterator(); iter.hasNext();) {
-                    TagSet set = iter.next();
+                for (TagSet set : _tagSets) {
                     if ( (set.getDate() > last) && (!set.getTags().isEmpty()) ) 
                         last = set.getDate();
                 }

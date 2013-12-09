@@ -156,11 +156,11 @@ public class MetaInfo
     if (val == null) {
         this.announce_list = null;
     } else {
-        this.announce_list = new ArrayList();
+        this.announce_list = new ArrayList<List<String>>();
         List<BEValue> bl1 = val.getList();
         for (BEValue bev : bl1) {
             List<BEValue> bl2 = bev.getList();
-            List<String> sl2 = new ArrayList();           
+            List<String> sl2 = new ArrayList<String>();           
             for (BEValue bev2 : bl2) {
                 sl2.add(bev2.getString());
             }
@@ -259,9 +259,9 @@ public class MetaInfo
         if (size == 0)
           throw new InvalidBEncodingException("zero size files list");
 
-        List<List<String>> m_files = new ArrayList(size);
-        List<List<String>> m_files_utf8 = new ArrayList(size);
-        List<Long> m_lengths = new ArrayList(size);
+        List<List<String>> m_files = new ArrayList<List<String>>(size);
+        List<List<String>> m_files_utf8 = new ArrayList<List<String>>(size);
+        List<Long> m_lengths = new ArrayList<Long>(size);
         long l = 0;
         for (int i = 0; i < list.size(); i++)
           {
@@ -287,7 +287,7 @@ public class MetaInfo
             if (path_length == 0)
               throw new InvalidBEncodingException("zero size file path list");
 
-            List<String> file = new ArrayList(path_length);
+            List<String> file = new ArrayList<String>(path_length);
             Iterator<BEValue> it = path_list.iterator();
             while (it.hasNext()) {
                 String s = it.next().getString();
@@ -310,7 +310,7 @@ public class MetaInfo
                 path_list = val.getList();
                 path_length = path_list.size();
                 if (path_length > 0) {
-                    file = new ArrayList(path_length);
+                    file = new ArrayList<String>(path_length);
                     it = path_list.iterator();
                     while (it.hasNext())
                         file.add(it.next().getString());
@@ -573,10 +573,10 @@ public class MetaInfo
    */
   public MetaInfo reannounce(String announce) throws InvalidBEncodingException
   {
-        Map<String, BEValue> m = new HashMap();
+        Map<String, BEValue> m = new HashMap<String, BEValue>();
         if (announce != null)
             m.put("announce", new BEValue(DataHelper.getUTF8(announce)));
-        Map info = createInfoMap();
+        Map<String, BEValue> info = createInfoMap();
         m.put("info", new BEValue(info));
         return new MetaInfo(m);
   }
@@ -586,12 +586,12 @@ public class MetaInfo
    */
   public synchronized byte[] getTorrentData()
   {
-        Map m = new HashMap();
+        Map<String, Object> m = new HashMap<String, Object>();
         if (announce != null)
             m.put("announce", announce);
         if (announce_list != null)
             m.put("announce-list", announce_list);
-        Map info = createInfoMap();
+        Map<String, BEValue> info = createInfoMap();
         m.put("info", info);
         // don't save this locally, we should only do this once
         return BEncoder.bencode(m);
@@ -615,31 +615,42 @@ public class MetaInfo
     if (_log.shouldLog(Log.WARN))
         _log.warn("Creating new infomap", new Exception());
     // otherwise we must create it
-    Map info = new HashMap();
-    info.put("name", name);
+    Map<String, BEValue> info = new HashMap<String, BEValue>();
+    info.put("name", new BEValue(DataHelper.getUTF8(name)));
     if (name_utf8 != null)
-        info.put("name.utf-8", name_utf8);
+        info.put("name.utf-8", new BEValue(DataHelper.getUTF8(name_utf8)));
     // BEP 27
     if (privateTorrent)
-        info.put("private", "1");
+        info.put("private", new BEValue(DataHelper.getUTF8("1")));
 
-    info.put("piece length", Integer.valueOf(piece_length));
-    info.put("pieces", piece_hashes);
+    info.put("piece length", new BEValue(Integer.valueOf(piece_length)));
+    info.put("pieces", new BEValue(piece_hashes));
     if (files == null)
-      info.put("length", Long.valueOf(length));
+      info.put("length", new BEValue(Long.valueOf(length)));
     else
       {
-        List l = new ArrayList();
+        List<BEValue> l = new ArrayList<BEValue>();
         for (int i = 0; i < files.size(); i++)
           {
-            Map file = new HashMap();
-            file.put("path", files.get(i));
-            if ( (files_utf8 != null) && (files_utf8.size() > i) )
-                file.put("path.utf-8", files_utf8.get(i));
-            file.put("length", lengths.get(i));
-            l.add(file);
+            Map<String, BEValue> file = new HashMap<String, BEValue>();
+            List<String> fi = files.get(i);
+            List<BEValue> befiles = new ArrayList<BEValue>(fi.size());
+            for (int j = 0; j < fi.size(); j++) {
+                befiles.add(new BEValue(DataHelper.getUTF8(fi.get(j))));
+            }
+            file.put("path", new BEValue(befiles));
+            if ( (files_utf8 != null) && (files_utf8.size() > i) ) {
+                List<String> fiu = files_utf8.get(i);
+                List<BEValue> beufiles = new ArrayList<BEValue>(fiu.size());
+                for (int j = 0; j < fiu.size(); j++) {
+                    beufiles.add(new BEValue(DataHelper.getUTF8(fiu.get(j))));
+                }
+                file.put("path.utf-8", new BEValue(beufiles));
+            }
+            file.put("length", new BEValue(lengths.get(i)));
+            l.add(new BEValue(file));
           }
-        info.put("files", l);
+        info.put("files", new BEValue(l));
       }
 
     // TODO if we add the ability for other keys in the first constructor

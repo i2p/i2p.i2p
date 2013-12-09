@@ -2,7 +2,6 @@ package net.i2p.stat;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -63,8 +62,7 @@ public class StatManager {
     public StatLog getStatLog() { return _statLog; }
     public void setStatLog(StatLog log) { 
         _statLog = log; 
-            for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext(); ) {
-                RateStat rs = iter.next();
+            for (RateStat rs : _rateStats.values()) {
                 rs.setStatLog(log);
             }
     }
@@ -168,8 +166,7 @@ public class StatManager {
                     }
                 }
         }
-            for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext();) {
-                RateStat stat = iter.next();
+            for (RateStat stat : _rateStats.values()) {
                 if (stat != null) {
                     stat.coalesceStats();
                 }

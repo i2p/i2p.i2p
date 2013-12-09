@@ -16,7 +16,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.security.GeneralSecurityException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -320,8 +319,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         synchronized (lock) {
             if (!forced && sockMgr.listSockets().size() != 0) {
                 l.log("There are still active connections!");
-                for (Iterator<I2PSocket> it = sockMgr.listSockets().iterator(); it.hasNext();) {
-                    l.log("->" + it.next());
+                for (I2PSocket skt : sockMgr.listSockets()) {
+                    l.log("->" + skt);
                 }
                 return false;
             }
@@ -365,7 +364,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     private void buildSocketMap(Properties props) {
         _socketMap.clear();
-        for (Map.Entry e : props.entrySet()) {
+        for (Map.Entry<Object, Object> e : props.entrySet()) {
             String key = (String) e.getKey();
             if (key.startsWith("targetForPort.")) {
                 key = key.substring("targetForPort.".length());

@@ -121,6 +121,7 @@ public class I2PAppContext {
     private final File _logDir;
     private final File _appDir;
     private volatile File _tmpDir;
+    private final Random _tmpDirRand = new Random();
     // split up big lock on this to avoid deadlocks
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
@@ -403,7 +404,7 @@ public class I2PAppContext {
                 String d = getProperty("i2p.dir.temp", System.getProperty("java.io.tmpdir"));
                 // our random() probably isn't warmed up yet
                 byte[] rand = new byte[6];
-                (new Random()).nextBytes(rand);
+                _tmpDirRand.nextBytes(rand);
                 String f = "i2p-" + Base64.encode(rand) + ".tmp";
                 _tmpDir = new SecureDirectory(d, f);
                 if (_tmpDir.exists()) {
@@ -535,11 +536,12 @@ public class I2PAppContext {
      *
      * @return set of Strings containing the names of defined system properties
      */
-    public Set<String> getPropertyNames() { 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public Set<String> getPropertyNames() { 
         // clone to avoid ConcurrentModificationException
-        Set names = new HashSet(((Properties) System.getProperties().clone()).keySet());
+        Set<String> names = new HashSet<String>((Set<String>) (Set) ((Properties) System.getProperties().clone()).keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         if (_overrideProps != null)
-            names.addAll(_overrideProps.keySet());
+            names.addAll((Set<String>) (Set) _overrideProps.keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         return names;
     }
     

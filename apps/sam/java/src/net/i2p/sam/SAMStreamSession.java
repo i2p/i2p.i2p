@@ -381,15 +381,15 @@ public class SAMStreamSession {
      */
     private void removeAllSocketHandlers() {
         Integer id;
-        Set keySet;
-        Iterator iter;
+        Set<Integer> keySet;
+        Iterator<Integer> iter;
 
         synchronized (handlersMapLock) {
             keySet = handlersMap.keySet();
             iter = keySet.iterator();
             
             while (iter.hasNext()) {
-                 id = (Integer)iter.next();
+                 id = iter.next();
                  handlersMap.get(id).stopRunning();
                  sendersMap.get(id).shutDownGracefully();
             }

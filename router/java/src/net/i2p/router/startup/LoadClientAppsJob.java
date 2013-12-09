@@ -197,7 +197,7 @@ public class LoadClientAppsJob extends JobImpl {
             log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
         if (args == null)
             args = new String[0];
-        Class cls = Class.forName(className, true, cl);
+        Class<?> cls = Class.forName(className, true, cl);
         Method method = cls.getMethod("main", new Class[] { String[].class });
         method.invoke(cls, new Object[] { args });
     }
@@ -264,15 +264,15 @@ public class LoadClientAppsJob extends JobImpl {
 
         public void run() {
             try {
-                Class cls = Class.forName(_className, true, _cl);
+                Class<?> cls = Class.forName(_className, true, _cl);
                 if (isRouterApp(cls)) {
-                    Constructor con = cls.getConstructor(RouterContext.class, ClientAppManager.class, String[].class);
+                    Constructor<?> con = cls.getConstructor(RouterContext.class, ClientAppManager.class, String[].class);
                     RouterAppManager mgr = _ctx.clientAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     RouterApp app = (RouterApp) con.newInstance(conArgs);
                     mgr.addAndStart(app, _args);
                 } else if (isClientApp(cls)) {
-                    Constructor con = cls.getConstructor(I2PAppContext.class, ClientAppManager.class, String[].class);
+                    Constructor<?> con = cls.getConstructor(I2PAppContext.class, ClientAppManager.class, String[].class);
                     RouterAppManager mgr = _ctx.clientAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     ClientApp app = (ClientApp) con.newInstance(conArgs);
@@ -288,17 +288,17 @@ public class LoadClientAppsJob extends JobImpl {
                 _log.info("Done running client application " + _appName);
         }
 
-        private static boolean isRouterApp(Class cls) {
+        private static boolean isRouterApp(Class<?> cls) {
             return isInterface(cls, RouterApp.class);
         }
 
-        private static boolean isClientApp(Class cls) {
+        private static boolean isClientApp(Class<?> cls) {
             return isInterface(cls, ClientApp.class);
         }
 
-        private static boolean isInterface(Class cls, Class intfc) {
+        private static boolean isInterface(Class<?> cls, Class<?> intfc) {
             try {
-                Class[] intfcs = cls.getInterfaces();
+                Class<?>[] intfcs = cls.getInterfaces();
                 for (int i = 0; i < intfcs.length; i++) {
                     if (intfcs[i] == intfc)
                         return true;

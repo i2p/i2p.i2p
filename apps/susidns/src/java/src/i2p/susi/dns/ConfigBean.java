@@ -88,7 +88,7 @@ public class ConfigBean implements Serializable {
 				// use loadProps to trim
 				Properties props = new OrderedProperties();
 				DataHelper.loadProps(props, file);
-				for (Map.Entry e : props.entrySet()) {
+				for (Map.Entry<Object, Object> e : props.entrySet()) {
 					buf.append((String) e.getKey()).append('=')
 					   .append((String) e.getValue()).append('\n');
 				}

@@ -2114,8 +2114,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int countActivePeers() {
         long now = _context.clock().now();
         int active = 0;
-        for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
-                PeerState peer = iter.next();
+        for (PeerState peer : _peersByIdent.values()) {
                 if (now-peer.getLastReceiveTime() <= 5*60*1000)
                     active++;
             }
@@ -2126,8 +2125,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int countActiveSendPeers() {
         long now = _context.clock().now();
         int active = 0;
-        for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
-                PeerState peer = iter.next();
+        for (PeerState peer : _peersByIdent.values()) {
                 if (now-peer.getLastSendFullyTime() <= 1*60*1000)
                     active++;
             }

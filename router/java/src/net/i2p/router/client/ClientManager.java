@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -125,19 +124,16 @@ class ClientManager {
             _listener.stopListening();
         Set<ClientConnectionRunner> runners = new HashSet<ClientConnectionRunner>();
         synchronized (_runners) {
-            for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {
-                ClientConnectionRunner runner = iter.next();
+            for (ClientConnectionRunner runner : _runners.values()) {
                 runners.add(runner);
             }
         }
         synchronized (_pendingRunners) {
-            for (Iterator<ClientConnectionRunner> iter = _pendingRunners.iterator(); iter.hasNext();) {
-                ClientConnectionRunner runner = iter.next();
+            for (ClientConnectionRunner runner : _pendingRunners) {
                 runners.add(runner);
             }
         }
-        for (Iterator<ClientConnectionRunner> iter = runners.iterator(); iter.hasNext(); ) {
-            ClientConnectionRunner runner = iter.next();
+        for (ClientConnectionRunner runner : runners) {
             runner.disconnectClient(msg, Log.WARN);
         }
         _runnersByHash.clear();

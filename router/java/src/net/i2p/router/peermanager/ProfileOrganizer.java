@@ -236,15 +236,13 @@ public class ProfileOrganizer {
        
         getReadLock();
         try {
-            for (Iterator<PeerProfile> iter = _failingPeers.values().iterator(); iter.hasNext(); ) {
-                PeerProfile profile = iter.next();
+            for (PeerProfile profile : _failingPeers.values()) {
                 if (profile.getLastSendSuccessful() >= hideBefore)
                     activePeers++;
                 else if (profile.getLastHeardFrom() >= hideBefore)
                     activePeers++;
             }
-            for (Iterator<PeerProfile> iter = _notFailingPeers.values().iterator(); iter.hasNext(); ) {
-                PeerProfile profile = iter.next();
+            for (PeerProfile profile : _notFailingPeers.values()) {
                 if (profile.getLastSendSuccessful() >= hideBefore)
                     activePeers++;
                 else if (profile.getLastHeardFrom() >= hideBefore)
@@ -539,8 +537,7 @@ public class ProfileOrganizer {
         if (matches.size() < howMany) {
             getReadLock();
             try {
-                for (Iterator<Hash> iter = _notFailingPeers.keySet().iterator(); iter.hasNext(); ) {
-                    Hash peer = iter.next();
+                for (Hash peer : _notFailingPeers.keySet()) {
                     if (!_context.commSystem().isEstablished(peer))
                         exclude.add(peer);
                 }
@@ -567,8 +564,7 @@ public class ProfileOrganizer {
             Map<Hash, PeerProfile> activePeers = new HashMap<Hash, PeerProfile>();
             getReadLock();
             try {
-                for (Iterator<Map.Entry<Hash, PeerProfile>> iter = _notFailingPeers.entrySet().iterator(); iter.hasNext(); ) {
-                    Map.Entry<Hash, PeerProfile> e = iter.next();
+                for (Map.Entry<Hash, PeerProfile> e : _notFailingPeers.entrySet()) {
                     if (_context.commSystem().isEstablished(e.getKey()))
                         activePeers.put(e.getKey(), e.getValue());
                 }
@@ -666,8 +662,7 @@ public class ProfileOrganizer {
             n = new ArrayList<Hash>(_notFailingPeers.keySet());
         } finally { releaseReadLock(); }
         List<Hash> l = new ArrayList<Hash>(count / 4);
-        for (Iterator<Hash> iter = n.iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
+        for (Hash peer : n) {
             if (_context.commSystem().wasUnreachable(peer))
                 l.add(peer);
             else {
@@ -717,8 +712,7 @@ public class ProfileOrganizer {
             long cutoff = _context.clock().now() - (20*1000);
             int count = _notFailingPeers.size();
             List<Hash> l = new ArrayList<Hash>(count / 128);
-            for (Iterator<PeerProfile> iter = _notFailingPeers.values().iterator(); iter.hasNext(); ) {
-                PeerProfile prof = iter.next();
+            for (PeerProfile prof : _notFailingPeers.values()) {
                 if (prof.getTunnelHistory().getLastRejectedBandwidth() > cutoff)
                     l.add(prof.getPeer());
             }
@@ -779,8 +773,7 @@ public class ProfileOrganizer {
         if (shouldCoalesce) {
             getReadLock();
             try {
-                for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
-                    PeerProfile prof = iter.next();
+                for (PeerProfile prof : _strictCapacityOrder) {
                     if ( (expireOlderThan > 0) && (prof.getLastSendSuccessful() <= expireOlderThan) ) {
                         continue;
                     }
@@ -887,8 +880,7 @@ public class ProfileOrganizer {
         if (numToPromote > 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Need to explicitly promote " + numToPromote + " peers to the fast group");
-            for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
-                PeerProfile cur = iter.next();
+            for (PeerProfile cur : _strictCapacityOrder) {
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
                     if (!isSelectable(cur.getPeer())) {
                         // skip peers we dont have in the netDb
@@ -990,8 +982,7 @@ public class ProfileOrganizer {
         int needToUnfail = MIN_NOT_FAILING_ACTIVE - notFailingActive;
         if (needToUnfail > 0) {
             int unfailed = 0;
-            for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
-                PeerProfile best = iter.next();
+            for (PeerProfile best : _strictCapacityOrder) {
                 if ( (best.getIsActive()) && (best.getIsFailing()) ) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("All peers were failing, so we have overridden the failing flag for one of the most reliable active peers (" + best.getPeer().toBase64() + ")");
@@ -1022,9 +1013,7 @@ public class ProfileOrganizer {
         double totalCapacity = 0;
         double totalIntegration = 0;
         Set<PeerProfile> reordered = new TreeSet<PeerProfile>(_comp);
-        for (Iterator<PeerProfile> iter = allPeers.iterator(); iter.hasNext(); ) {
-            PeerProfile profile = iter.next();
-            
+        for (PeerProfile profile : allPeers) {
             if (_us.equals(profile.getPeer())) continue;
             
             // only take into account active peers that aren't failing
@@ -1072,8 +1061,7 @@ public class ProfileOrganizer {
         double thresholdAtMinHighCap = 0;
         double thresholdAtLowest = CapacityCalculator.GROWTH_FACTOR;
         int cur = 0;
-        for (Iterator<PeerProfile> iter = reordered.iterator(); iter.hasNext(); ) {
-            PeerProfile profile = iter.next();
+        for (PeerProfile profile : reordered) {
             double val = profile.getCapacityValue();
             if (val > meanCapacity)
                 numExceedingMean++;
@@ -1164,8 +1152,7 @@ public class ProfileOrganizer {
     private void locked_calculateSpeedThresholdMean(Set<PeerProfile> reordered) {
         double total = 0;
         int count = 0;
-        for (Iterator<PeerProfile> iter = reordered.iterator(); iter.hasNext(); ) {
-            PeerProfile profile = iter.next();
+        for (PeerProfile profile : reordered) {
             if (profile.getCapacityValue() >= _thresholdCapacityValue) {
                 // duplicates being clobbered is fine by us
                 total += profile.getSpeedValue();
@@ -1524,8 +1511,7 @@ public class ProfileOrganizer {
         DecimalFormat fmt = new DecimalFormat("0,000.0");
         fmt.setPositivePrefix("+");
         
-        for (Iterator<Hash> iter = organizer.selectAllPeers().iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
+        for (Hash peer : organizer.selectAllPeers()) {
             PeerProfile profile = organizer.getProfile(peer);
             if (!profile.getIsActive()) {
                 System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 

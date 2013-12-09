@@ -226,7 +226,7 @@ public class DataHelper {
                 p = props;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
-            for (Map.Entry entry : p.entrySet()) {
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 if (utf8)
@@ -273,7 +273,7 @@ public class DataHelper {
             OrderedProperties p = new OrderedProperties();
             p.putAll(props);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
-            for (Map.Entry entry : p.entrySet()) {
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 writeStringUTF8(baos, key);
@@ -367,7 +367,7 @@ public class DataHelper {
      * (unless the options param is an OrderedProperties)
      */
     public static String toString(Properties options) {
-        return toString((Map) options);
+        return toString((Map<?, ?>) options);
     }
 
     /**
@@ -378,7 +378,7 @@ public class DataHelper {
     public static String toString(Map<?, ?> options) {
         StringBuilder buf = new StringBuilder();
         if (options != null) {
-            for (Map.Entry entry : options.entrySet()) {
+            for (Map.Entry<?, ?> entry : options.entrySet()) {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 buf.append("[").append(key).append("] = [").append(val).append("]");
@@ -470,7 +470,7 @@ public class DataHelper {
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
-            for (Map.Entry entry : props.entrySet()) {
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 if (name.contains("#") ||
@@ -497,10 +497,10 @@ public class DataHelper {
      * Pretty print the collection
      *
      */
-    public static String toString(Collection col) {
+    public static String toString(Collection<?> col) {
         StringBuilder buf = new StringBuilder();
         if (col != null) {
-            for (Iterator iter = col.iterator(); iter.hasNext();) {
+            for (Iterator<?> iter = col.iterator(); iter.hasNext();) {
                 Object o = iter.next();
                 buf.append("[").append(o).append("]");
                 if (iter.hasNext()) buf.append(", ");
@@ -964,12 +964,12 @@ public class DataHelper {
      * based on the value of each at each step along the way.
      *
      */
-    public final static boolean eq(Collection lhs, Collection rhs) {
+    public final static boolean eq(Collection<?> lhs, Collection<?> rhs) {
         if ((lhs == null) && (rhs == null)) return true;
         if ((lhs == null) || (rhs == null)) return false;
         if (lhs.size() != rhs.size()) return false;
-        Iterator liter = lhs.iterator();
-        Iterator riter = rhs.iterator();
+        Iterator<?> liter = lhs.iterator();
+        Iterator<?> riter = rhs.iterator();
         while ((liter.hasNext()) && (riter.hasNext()))
             if (!(eq(liter.next(), riter.next()))) return false;
         return true;
@@ -1132,10 +1132,10 @@ public class DataHelper {
      * Calculate the hashcode of the collection, using 0 for null
      * 
      */
-    public static int hashCode(Collection col) {
+    public static int hashCode(Collection<?> col) {
         if (col == null) return 0;
         int c = 0;
-        for (Iterator iter = col.iterator(); iter.hasNext();)
+        for (Iterator<?> iter = col.iterator(); iter.hasNext();)
             c = 7 * c + hashCode(iter.next());
         return c;
     }

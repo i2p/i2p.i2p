@@ -20,7 +20,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -214,12 +213,12 @@ public class SAMBridge implements Runnable, ClientApp {
     private void loadKeys() {
         synchronized (nameToPrivKeys) {
             nameToPrivKeys.clear();
-            FileInputStream in = null;
+            BufferedReader br = null;
             try {
-                in = new FileInputStream(persistFilename);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                br = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(persistFilename)));
                 String line = null;
-                while ( (line = reader.readLine()) != null) {
+                while ( (line = br.readLine()) != null) {
                     int eq = line.indexOf('=');
                     String name = line.substring(0, eq);
                     String privKeys = line.substring(eq+1);
@@ -230,7 +229,7 @@ public class SAMBridge implements Runnable, ClientApp {
             } catch (IOException ioe) {
                 _log.error("Unable to read the keys from " + persistFilename, ioe);
             } finally {
-                if (in != null) try { in.close(); } catch (IOException ioe) {}
+                if (br != null) try { br.close(); } catch (IOException ioe) {}
             }
         }
     }
@@ -244,9 +243,9 @@ public class SAMBridge implements Runnable, ClientApp {
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(persistFilename);
-                for (Iterator iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
-                    String name = (String)iter.next();
-                    String privKeys = nameToPrivKeys.get(name);
+                for (Map.Entry<String, String> entry : nameToPrivKeys.entrySet()) {
+                    String name = entry.getKey();
+                    String privKeys = entry.getValue();
                     out.write(name.getBytes());
                     out.write('=');
                     out.write(privKeys.getBytes());

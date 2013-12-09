@@ -21,8 +21,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletContext;
-
 
 /* ------------------------------------------------------------ */
 /**
@@ -48,7 +46,7 @@ class MimeTypes
     private final Map<String, String> _mimeMap;
 
     public MimeTypes() {
-        _mimeMap = new ConcurrentHashMap();
+        _mimeMap = new ConcurrentHashMap<String, String>();
     }
 
     /* ------------------------------------------------------------ */

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <Match>
+    <Class name="net.metanotion.io.block.index.BSkipSpan" />
+    <Field name="nextPage" />
+    <Bug pattern="UR_UNINIT_READ" />
+  </Match>
+</FindBugsFilter>

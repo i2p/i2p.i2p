@@ -1,13 +1,8 @@
 package net.i2p.desktopgui.util;
 
 import java.awt.Desktop;
-import java.awt.TrayIcon;
 import java.awt.Desktop.Action;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-
-import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.util.Log;
 
 public class I2PDesktop {

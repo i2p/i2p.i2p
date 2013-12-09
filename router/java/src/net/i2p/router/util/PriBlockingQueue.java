@@ -34,7 +34,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
      *  except when using put(), which is unbounded.
      */
     public PriBlockingQueue(I2PAppContext ctx, String name, int initialCapacity) {
-        super(initialCapacity, new PriorityComparator());
+        super(initialCapacity, new PriorityComparator<E>());
         _context = ctx;
         _log = ctx.logManager().getLog(PriorityBlockingQueue.class);
         _name = name;
