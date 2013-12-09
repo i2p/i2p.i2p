@@ -252,6 +252,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.enforceProtocol", "true");
             if (opts.getProperty("i2p.streaming.disableRejectLogging") == null)
                 opts.setProperty("i2p.streaming.disableRejectLogging", "true");
+            if (opts.getProperty("i2p.streaming.answerPings") == null)
+                opts.setProperty("i2p.streaming.answerPings", "false");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             _connecting = false;
         }
