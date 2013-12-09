@@ -192,13 +192,21 @@ public class PrivateKeyFile {
         this.dest = d;
     }
     
-    /** change cert type - caller must also call write() */
+    /**
+     * Change cert type - caller must also call write().
+     * Side effect - creates new Destination object.
+     */
     public Certificate setCertType(int t) {
         if (this.dest == null)
             throw new IllegalArgumentException("Dest is null");
         Certificate c = new Certificate();
         c.setCertificateType(t);
-        this.dest.setCertificate(c);
+        // dests now immutable, must create new
+        Destination newdest = new Destination();
+        newdest.setPublicKey(dest.getPublicKey());
+        newdest.setSigningPublicKey(dest.getSigningPublicKey());
+        newdest.setCertificate(c);
+        dest = newdest;
         return c;
     }
     
