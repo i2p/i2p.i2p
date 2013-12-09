@@ -13,7 +13,7 @@
 <%
     String url = searchhelper.getURL();
     if (url != null) {
-        response.setStatus(303, "Redirecting");
+        response.setStatus(303);
         response.setHeader("Location", url);
 %>
 Searching...
