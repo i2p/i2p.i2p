@@ -155,7 +155,7 @@ public class BEncoder
     out.write(bs);
   }
 
-  public static byte[] bencode(Map<String, Object> m)
+  public static byte[] bencode(Map<?, ?> m)
   {
     try
       {
@@ -169,23 +169,29 @@ public class BEncoder
       }
   }
 
-  public static void bencode(Map<String, Object> m, OutputStream out) throws IOException
+  public static void bencode(Map<?, ?> m, OutputStream out)
+    throws IOException, IllegalArgumentException
   {
     out.write('d');
 
     // Keys must be sorted. XXX - But is this the correct order?
-    Set<String> s = m.keySet();
-    List<String> l = new ArrayList<String>(s);
+    Set<?> s = m.keySet();
+    List<String> l = new ArrayList<String>(s.size());
+    for (Object k : s) {
+      // Keys must be Strings.
+      if (String.class.isAssignableFrom(k.getClass()))
+        l.add((String) k);
+      else
+        throw new IllegalArgumentException("Cannot bencode map: contains non-String key of type " + k.getClass());
+    }
     Collections.sort(l);
 
     Iterator<String> it = l.iterator();
     while(it.hasNext())
       {
-        // Keys must be Strings.
         String key = it.next();
-        Object value = m.get(key);
         bencode(key, out);
-        bencode(value, out);
+        bencode(m.get(key), out);
       }
 
     out.write('e');
