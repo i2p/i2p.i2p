@@ -17,6 +17,8 @@ import java.util.TreeMap;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
+import net.i2p.kademlia.KBucketSet;
+import net.i2p.kademlia.SelectionCollector;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.HashDistance;
 import net.i2p.util.Log;
@@ -41,7 +43,7 @@ class PeerSelector {
      *
      * @return ordered list of Hash objects
      */
-    List<Hash> selectMostReliablePeers(Hash key, int numClosest, Set<Hash> alreadyChecked, KBucketSet kbuckets) {
+    List<Hash> selectMostReliablePeers(Hash key, int numClosest, Set<Hash> alreadyChecked, KBucketSet<Hash> kbuckets) {
         // get the peers closest to the key
         return selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
     }
@@ -54,7 +56,7 @@ class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    List<Hash> selectNearestExplicit(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+    List<Hash> selectNearestExplicit(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets) {
         //if (true)
             return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets);
         
@@ -94,7 +96,7 @@ class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets) {
         if (peersToIgnore == null)
             peersToIgnore = new HashSet<Hash>(1);
         peersToIgnore.add(_context.routerHash());
@@ -109,7 +111,7 @@ class PeerSelector {
     }
     
     /** UNUSED */
-    private class MatchSelectionCollector implements SelectionCollector {
+    private class MatchSelectionCollector implements SelectionCollector<Hash> {
         private TreeMap<BigInteger, Hash> _sorted;
         private Hash _key;
         private Set<Hash> _toIgnore;
@@ -200,7 +202,7 @@ class PeerSelector {
      * @param peersToIgnore can be null
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+    List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet<Hash> kbuckets) {
         // sure, this may not be exactly correct per kademlia (peers on the border of a kbucket in strict kademlia
         // would behave differently) but I can see no reason to keep around an /additional/ more complicated algorithm.
         // later if/when selectNearestExplicit gets costly, we may revisit this (since kbuckets let us cache the distance()

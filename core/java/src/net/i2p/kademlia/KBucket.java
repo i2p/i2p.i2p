@@ -17,7 +17,7 @@ import net.i2p.data.SimpleDataStructure;
  * a local key, using XOR as the distance metric
  *
  * Refactored from net.i2p.router.networkdb.kademlia
- * @since 0.9.2
+ * @since 0.9.2 in i2psnark, moved to core in 0.9.10
  */
 public interface KBucket<T extends SimpleDataStructure> {
 

@@ -5,7 +5,7 @@ import net.i2p.data.SimpleDataStructure;
 
 /**
  *  Removes a random element, but only if the bucket hasn't changed in 5 minutes.
- *  @since 0.9.2
+ *  @since 0.9.2 in i2psnark, moved to core in 0.9.10
  */
 public class RandomIfOldTrimmer<T extends SimpleDataStructure> extends RandomTrimmer<T> {
 

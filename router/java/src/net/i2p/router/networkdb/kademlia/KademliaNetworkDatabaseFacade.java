@@ -9,6 +9,8 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +27,9 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.kademlia.KBucketSet;
+import net.i2p.kademlia.RejectTrimmer;
+import net.i2p.kademlia.SelectionCollector;
 import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
@@ -41,7 +46,7 @@ import net.i2p.util.Log;
  */
 public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final Log _log;
-    private KBucketSet _kb; // peer hashes sorted into kbuckets, but within kbuckets, unsorted
+    private KBucketSet<Hash> _kb; // peer hashes sorted into kbuckets, but within kbuckets, unsorted
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
@@ -132,7 +137,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     protected final static long PUBLISH_JOB_DELAY = 5*60*1000l;
 
-    private static final int MAX_EXPLORE_QUEUE = 128;
+    static final int MAX_EXPLORE_QUEUE = 128;
+
+    /**
+     *  kad K
+     *  Was 500 in old implementation but that was with B ~= -8!
+     */
+    private static final int BUCKET_SIZE = 16;
+    private static final int KAD_B = 3;
 
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -168,7 +180,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return _reseedChecker;
     }
 
-    KBucketSet getKBuckets() { return _kb; }
+    KBucketSet<Hash> getKBuckets() { return _kb; }
     DataStore getDataStore() { return _ds; }
     
     long getLastExploreNewDate() { return _lastExploreNew; }
@@ -185,13 +197,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return Collections.unmodifiableSet(_exploreKeys);
     }
     
-    public void removeFromExploreKeys(Set<Hash> toRemove) {
+    public void removeFromExploreKeys(Collection<Hash> toRemove) {
         if (!_initialized) return;
         _exploreKeys.removeAll(toRemove);
         _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
     }
 
-    public void queueForExploration(Set<Hash> keys) {
+    public void queueForExploration(Collection<Hash> keys) {
         if (!_initialized) return;
         for (Iterator<Hash> iter = keys.iterator(); iter.hasNext() && _exploreKeys.size() < MAX_EXPLORE_QUEUE; ) {
             _exploreKeys.add(iter.next());
@@ -240,7 +252,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _log.info("Starting up the kademlia network database");
         RouterInfo ri = _context.router().getRouterInfo();
         String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
-        _kb = new KBucketSet(_context, ri.getIdentity().getHash());
+        _kb = new KBucketSet<Hash>(_context, ri.getIdentity().getHash(),
+                                   BUCKET_SIZE, KAD_B, new RejectTrimmer<Hash>());
         try {
             _ds = new PersistentDataStore(_context, dbDir, this);
         } catch (IOException ioe) {
@@ -368,7 +381,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return count.size();
     }
     
-    private class CountRouters implements SelectionCollector {
+    private class CountRouters implements SelectionCollector<Hash> {
         private int _count;
         public int size() { return _count; }
         public void add(Hash entry) {
@@ -1044,5 +1057,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return;
         }
         _context.jobQueue().addJob(new StoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
+    }
+
+    /**
+     * Debug info, HTML formatted
+     * @since 0.9.10
+     */
+    @Override
+    public void renderStatusHTML(Writer out) throws IOException {
+        out.write(_kb.toString().replace("\n", "<br>\n"));
     }
 }

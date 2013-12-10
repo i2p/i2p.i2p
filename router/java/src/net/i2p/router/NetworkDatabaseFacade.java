@@ -74,7 +74,8 @@ public abstract class NetworkDatabaseFacade implements Service {
     public int getKnownLeaseSets() { return 0; }
     public boolean isInitialized() { return true; }
     public void rescan() {}
-    /** @deprecated moved to router console */
+
+    /** Debug only - all user info moved to NetDbRenderer in router console */
     public void renderStatusHTML(Writer out) throws IOException {}
     /** public for NetDbRenderer in routerconsole */
     public Set<LeaseSet> getLeases() { return Collections.emptySet(); }

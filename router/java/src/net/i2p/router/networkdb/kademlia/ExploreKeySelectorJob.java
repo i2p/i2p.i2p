@@ -8,10 +8,13 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.Hash;
+import net.i2p.kademlia.KBucket;
+import net.i2p.kademlia.KBucketSet;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -28,6 +31,7 @@ class ExploreKeySelectorJob extends JobImpl {
     private KademliaNetworkDatabaseFacade _facade;
     
     private final static long RERUN_DELAY_MS = 60*1000;
+    private final static long OLD_BUCKET_TIME = 15*60*1000;
     
     public ExploreKeySelectorJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
@@ -41,7 +45,7 @@ class ExploreKeySelectorJob extends JobImpl {
             requeue(30*RERUN_DELAY_MS);
             return;
         }
-        Set<Hash> toExplore = selectKeysToExplore();
+        Collection<Hash> toExplore = selectKeysToExplore();
         _log.info("Filling the explorer pool with: " + toExplore);
         if (toExplore != null)
             _facade.queueForExploration(toExplore);
@@ -53,32 +57,11 @@ class ExploreKeySelectorJob extends JobImpl {
      * for it, with a maximum number of keys limited by the exploration pool size
      *
      */
-    private Set<Hash> selectKeysToExplore() {
+    private Collection<Hash> selectKeysToExplore() {
         Set<Hash> alreadyQueued = _facade.getExploreKeys();
-        if (alreadyQueued.size() > KBucketSet.NUM_BUCKETS) return null;
-        Set<Hash> toExplore = new HashSet<Hash>(KBucketSet.NUM_BUCKETS - alreadyQueued.size());
-        for (int i = 0; i < KBucketSet.NUM_BUCKETS; i++) {
-            KBucket bucket = _facade.getKBuckets().getBucket(i);
-            if (bucket.getKeyCount() < KBucketSet.BUCKET_SIZE) {
-                boolean already = false;
-                for (Hash key : alreadyQueued) {
-                    if (bucket.shouldContain(key)) {
-                        already = true;
-                        _log.debug("Bucket " + i + " is already queued for exploration \t" + key);
-                        break;
-                    }
-                }
-                if (!already) {
-                    // no keys are queued for exploring this still-too-small bucket yet
-                    Hash key = bucket.generateRandomKey();
-                    _log.debug("Bucket " + i + " is NOT queued for exploration, and it only has " + bucket.getKeyCount() + " keys, so explore with \t" + key);
-                    toExplore.add(key);
-                }
-            } else {
-                _log.debug("Bucket " + i + " already has enough keys (" + bucket.getKeyCount() + "), no need to explore further");
-            }
-        }
-        return toExplore;
+        if (alreadyQueued.size() > KademliaNetworkDatabaseFacade.MAX_EXPLORE_QUEUE)
+            return null;
+        return _facade.getKBuckets().getExploreKeys(OLD_BUCKET_TIME);
     }
     
 }

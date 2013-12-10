@@ -16,6 +16,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.kademlia.KBucketSet;
+import net.i2p.kademlia.XORComparator;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
@@ -93,7 +95,7 @@ class IterativeSearchJob extends FloodSearchJob {
         _timeoutMs = Math.min(timeoutMs, MAX_SEARCH_TIME);
         _expiration = _timeoutMs + ctx.clock().now();
         _rkey = ctx.routingKeyGenerator().getRoutingKey(key);
-        _toTry = new TreeSet<Hash>(new XORComparator(_rkey));
+        _toTry = new TreeSet<Hash>(new XORComparator<Hash>(_rkey));
         _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
         _failedPeers = new HashSet<Hash>(TOTAL_SEARCH_LIMIT);
         _sentTime = new ConcurrentHashMap<Hash, Long>(TOTAL_SEARCH_LIMIT);
@@ -109,7 +111,7 @@ class IterativeSearchJob extends FloodSearchJob {
         }
         // pick some floodfill peers and send out the searches
         List<Hash> floodfillPeers;
-        KBucketSet ks = _facade.getKBuckets();
+        KBucketSet<Hash> ks = _facade.getKBuckets();
         if (ks != null) {
             // Ideally we would add the key to an exclude list, so we don't try to query a ff peer for itself,
             // but we're passing the rkey not the key, so we do it below instead in certain cases.
