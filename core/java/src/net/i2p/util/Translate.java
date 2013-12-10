@@ -25,7 +25,12 @@ import net.i2p.util.ConcurrentHashSet;
  */
 public abstract class Translate {
     public static final String PROP_LANG = "routerconsole.lang";
+    /** @since 0.9.10 */
+    public static final String PROP_COUNTRY = "routerconsole.country";
+    /** non-null, two-letter lower case, may be "" */
     private static final String _localeLang = Locale.getDefault().getLanguage();
+    /** non-null, two-letter upper case, may be "" */
+    private static final String _localeCountry = Locale.getDefault().getCountry();
     private static final Map<String, ResourceBundle> _bundles = new ConcurrentHashMap<String, ResourceBundle>(16);
     private static final Set<String> _missing = new ConcurrentHashSet<String>(16);
     /** use to look for untagged strings */
@@ -42,7 +47,7 @@ public abstract class Translate {
         // shouldnt happen but dont dump the po headers if it does
         if (key.equals(""))
             return key;
-        ResourceBundle bundle = findBundle(bun, lang);
+        ResourceBundle bundle = findBundle(bun, lang, getCountry(ctx));
         if (bundle == null)
             return key;
         try {
@@ -110,7 +115,7 @@ public abstract class Translate {
             return TEST_STRING + '(' + n + ')' + TEST_STRING;
         ResourceBundle bundle = null;
         if (!lang.equals("en"))
-            bundle = findBundle(bun, lang);
+            bundle = findBundle(bun, lang, getCountry(ctx));
         String x;
         if (bundle == null)
             x = n == 1 ? s : p;
@@ -129,7 +134,10 @@ public abstract class Translate {
         }
     }
 
-    /** @return lang in routerconsole.lang property, else current locale */
+    /**
+     *  Two-letter lower case
+     *  @return lang in routerconsole.lang property, else current locale
+     */
     public static String getLanguage(I2PAppContext ctx) {
         String lang = ctx.getProperty(PROP_LANG);
         if (lang == null || lang.length() <= 0)
@@ -137,14 +145,39 @@ public abstract class Translate {
         return lang;
     }
 
-    /** cache both found and not found for speed */
-    private static ResourceBundle findBundle(String bun, String lang) {
-        String key = bun + '-' + lang;
+    /**
+     *  Two-letter upper case or ""
+     *  @return country in routerconsole.country property, else current locale
+     *  @since 0.9.10
+     */
+    public static String getCountry(I2PAppContext ctx) {
+        // property may be empty so we don't have a non-default
+        // language and a default country
+        return ctx.getProperty(PROP_COUNTRY, _localeCountry);
+    }
+
+    /**
+     * cache both found and not found for speed
+     * @param lang non-null, if "" returns null
+     * @param country non-null, may be ""
+     * @return null if not found
+     */
+    private static ResourceBundle findBundle(String bun, String lang, String country) {
+        String key = bun + '-' + lang + '-' + country;
         ResourceBundle rv = _bundles.get(key);
         if (rv == null && !_missing.contains(key)) {
+            if ("".equals(lang)) {
+                _missing.add(key);
+                return null;
+            }
             try {
+                Locale loc;
+                if ("".equals(country))
+                    loc = new Locale(lang);
+                else
+                    loc = new Locale(lang, country);
                 // We must specify the class loader so that a webapp can find the bundle in the .war
-                rv = ResourceBundle.getBundle(bun, new Locale(lang), Thread.currentThread().getContextClassLoader());
+                rv = ResourceBundle.getBundle(bun, loc, Thread.currentThread().getContextClassLoader());
                 if (rv != null)
                     _bundles.put(key, rv);
             } catch (MissingResourceException e) {

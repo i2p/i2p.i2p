@@ -10,6 +10,9 @@ import net.i2p.data.SigningPublicKey;
  *
  */
 public class DummyDSAEngine extends DSAEngine {
+
+    private static final Signature FAKE_SIGNATURE = new Signature(new byte[Signature.SIGNATURE_BYTES]);
+
     public DummyDSAEngine(I2PAppContext context) {
         super(context);
     }
@@ -21,8 +24,6 @@ public class DummyDSAEngine extends DSAEngine {
     
     @Override
     public Signature sign(byte data[], SigningPrivateKey signingKey) {
-        Signature sig = new Signature();
-        sig.setData(Signature.FAKE_SIGNATURE);
-        return sig;
+        return FAKE_SIGNATURE;
     }
 }

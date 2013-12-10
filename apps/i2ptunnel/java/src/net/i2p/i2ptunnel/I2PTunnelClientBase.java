@@ -194,6 +194,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                       Boolean.parseBoolean(tunnel.getClientOptions().getProperty(I2PTunnelIRCClient.PROP_DCC));
         if (!dccEnabled)
             tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
+        if (tunnel.getClientOptions().getProperty("i2p.streaming.answerPings") == null)
+            tunnel.getClientOptions().setProperty("i2p.streaming.answerPings", "false");
         
         boolean openNow = !Boolean.parseBoolean(tunnel.getClientOptions().getProperty("i2cp.delayOpen"));
         if (openNow) {

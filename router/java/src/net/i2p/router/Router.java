@@ -229,13 +229,28 @@ public class Router implements RouterClock.ClockShiftListener {
         // for the ping file
         // Check for other router but do not start a thread yet so the update doesn't cause
         // a NCDFE
-        if (!isOnlyRouterRunning()) {
-            _eventLog.addEvent(EventLog.ABORTED, "Another router running");
-            System.err.println("ERROR: There appears to be another router already running!");
-            System.err.println("       Please make sure to shut down old instances before starting up");
-            System.err.println("       a new one.  If you are positive that no other instance is running,");
-            System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
-            System.exit(-1);
+        for (int i = 0; i < 14; i++) {
+            // Wrapper can start us up too quickly after a crash, the ping file
+            // may still be less than LIVELINESS_DELAY (60s) old.
+            // So wait at least 60s to be sure.
+            if (isOnlyRouterRunning()) {
+                if (i > 0)
+                    System.err.println("INFO: No, there wasn't another router already running. Proceeding with startup.");
+                break;
+            }
+            if (i < 13) {
+                if (i == 0)
+                    System.err.println("WARN: There may be another router already running. Waiting a while to be sure...");
+                // yes this is ugly to sleep in the constructor.
+                try { Thread.sleep(5000); } catch (InterruptedException ie) {}
+            } else {
+                _eventLog.addEvent(EventLog.ABORTED, "Another router running");
+                System.err.println("ERROR: There appears to be another router already running!");
+                System.err.println("       Please make sure to shut down old instances before starting up");
+                System.err.println("       a new one.  If you are positive that no other instance is running,");
+                System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
+                System.exit(-1);
+            }
         }
 
         if (_config.get("router.firstVersion") == null) {

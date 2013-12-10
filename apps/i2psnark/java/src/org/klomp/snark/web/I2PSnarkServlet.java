@@ -1998,12 +1998,8 @@ public class I2PSnarkServlet extends BasicServlet {
             if (privateTrackers.contains(t.announceURL)) {
                 buf.append(" checked=\"checked\"");
             } else {
-                for (int i = 1; i < SnarkManager.DEFAULT_TRACKERS.length; i += 2) {
-                    if (SnarkManager.DEFAULT_TRACKERS[i].contains(t.announceURL)) {
-                        buf.append(" disabled=\"disabled\"");
-                        break;
-                    }
-                }
+                if (SnarkManager.DEFAULT_TRACKER_ANNOUNCES.contains(t.announceURL))
+                    buf.append(" disabled=\"disabled\"");
             }
             buf.append(">" +
                        "</td><td>").append(urlify(announceURL, 35))
