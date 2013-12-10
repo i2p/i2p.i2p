@@ -1,3 +1,42 @@
+2013-12-10 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Config files: Allow empty values
+ * Data: Deprecate Signature.FAKE_SIGNATURE
+ * GeoIP: Thread the periodic lookup so it doesn't clog the timer queue
+ * I2CP router-side: Disconnect client on attempt to publish invalid leaseset
+ * i2psnark:
+   - Make a set of the default trackers so the config array
+     can be private and the lookup for the form is more efficient.
+   - Disable streaming pings (ticket #1142)
+ * i2ptunnel: Disable streaming pings for clients (ticket #1142)
+ * i2ptunnel IRC client: Do not filter server PING or client PONG (ticket #1141)
+ * Jetty 7.6.14.v20131031
+ * PeerManager: Thread the periodic reorg so it doesn't clog the timer queue
+ * PrivateKeyFile: Fix ISE (ticket #1145)
+ * Startup: Wait a while and recheck if a recent ping file is there,
+            so that a crashed router doesn't prevent a restart (ticket #633)
+ * Transport: Reduce target connections from 60% to 45% of limit
+   to improve network capacity. Apparent problems with lower limits were
+   actually due to unrelated bugs, fixed in 0.9.8.1-22.
+ * Translations:
+   - Add support for country variants (ticket #1133)
+   - Refactor data in ConfigUIHelper
+ * UDP PeerState: findbugs volatile/atomic/synch
+Prop from i2p.i2p.zzz.netdbkad:
+ * NetDB:
+   - Move net.i2p.kademlia package from i2psnark to core, and convert
+     netdb to use it.
+   - Delete old implementation in netdb
+   - Fixups in netdb for generics
+   - Add debug output to /debug
+ * Kad unit tests:
+   - Move KBucketSetTest to new directory
+   - Fix testSelf() as new implementation will never include myself
+   - Delete KBucketImplTest, not applicable/useful now
+   - Port KBSTest from i2p.zzz.kademlia branch
+   - Fix RandomTrimmer so it always returns true, so it may be used
+     as the trimmer in the unit tests
+
 * 2013-12-07 0.9.9 released
 
 2013-12-04 zzz
