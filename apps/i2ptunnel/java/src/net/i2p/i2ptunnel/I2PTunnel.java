@@ -307,27 +307,28 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     private static void runHelp(Logging l) {
         l.log("Command list:");
-        l.log("config <i2phost> <i2pport>");
-        l.log("listen_on <ip>");
+        // alphabetical please...
+        l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
         l.log("clientoptions[ key=value]*");
-        l.log("read_timeout <msecs>");
-        l.log("owndest yes|no");
-        l.log("ping <args>");
-        l.log("server <host> <port> <privkeyfile>");
-        l.log("httpserver <host> <port> <spoofedhost> <privkeyfile>");
-        l.log("httpbidirserver <host> <port> <proxyport> <spoofedhost> <privkeyfile>");
-        l.log("textserver <host> <port> <privkey>");
+        l.log("close [forced] <jobnumber>|all");
+        l.log("config <i2phost> <i2pport>");
+        l.log("connectclient <port> [<sharedClient>] [<proxy>]");
         l.log("genkeys <privkeyfile> [<pubkeyfile>]");
         l.log("gentextkeys");
-        l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
-        l.log("ircclient <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
+        l.log("httpbidirserver <host> <port> <proxyport> <spoofedhost> <privkeyfile>");
         l.log("httpclient <port> [<sharedClient>] [<proxy>]");
-        l.log("connectclient <port> [<sharedClient>] [<proxy>]");
-        l.log("lookup <name>");
-        l.log("quit");
-        l.log("close [forced] <jobnumber>|all");
+        l.log("httpserver <host> <port> <spoofedhost> <privkeyfile>");
+        l.log("ircclient <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
         l.log("list");
+        l.log("listen_on <ip>");
+        l.log("lookup <name>");
+        l.log("owndest yes|no");
+        l.log("ping <args>");
+        l.log("quit");
+        l.log("read_timeout <msecs>");
         l.log("run <commandfile>");
+        l.log("server <host> <port> <privkeyfile>");
+        l.log("textserver <host> <port> <privkey>");
     }
     
     /**
