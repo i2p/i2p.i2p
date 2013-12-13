@@ -10,8 +10,6 @@ public class NetDbHelper extends HelperBase {
     private boolean _debug;
     private boolean _graphical;
     
-    private static final String PROP_DEBUG = "routerconsole.debug";
-
     private static final String titles[] =
                                           {_x("Summary"),                       // 0
                                            _x("Local Router"),                  // 1
@@ -107,7 +105,7 @@ public class NetDbHelper extends HelperBase {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if (i == 5 && !_context.getBooleanProperty(PROP_DEBUG))
+            if (i == 5 && !_context.getBooleanProperty(PROP_ADVANCED))
                 continue;
             if (i == tab) {
                 // we are there
