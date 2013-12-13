@@ -143,8 +143,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      *  kad K
      *  Was 500 in old implementation but that was with B ~= -8!
      */
-    private static final int BUCKET_SIZE = 16;
-    private static final int KAD_B = 3;
+    private static final int BUCKET_SIZE = 24;
+    private static final int KAD_B = 4;
 
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -373,14 +373,30 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return rv;
     }
     
+    /**
+     *  This used to return the number of routers that were in
+     *  both the kbuckets AND the data store, which was fine when the kbuckets held everything.
+     *  But now that is probably not what you want.
+     *  Just return the count in the data store.
+     */
     @Override
     public int getKnownRouters() { 
+/****
         if (_kb == null) return 0;
         CountRouters count = new CountRouters();
         _kb.getAll(count);
         return count.size();
+****/
+        if (_ds == null) return 0;
+        int rv = 0;
+        for (DatabaseEntry ds : _ds.getEntries()) {
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+                rv++;
+        }
+        return rv;
     }
     
+/****
     private class CountRouters implements SelectionCollector<Hash> {
         private int _count;
         public int size() { return _count; }
@@ -391,6 +407,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _count++;
         }
     }
+****/
     
     /**
      *  This is only used by StatisticsManager to publish
@@ -416,6 +433,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      *  This is fast and doesn't use synchronization,
      *  but it includes both routerinfos and leasesets.
      *  Use it to avoid deadlocks.
+     *  No - not true - the KBS contains RIs only.
      */
     protected int getKBucketSetSize() {  
         if (_kb == null) return 0;

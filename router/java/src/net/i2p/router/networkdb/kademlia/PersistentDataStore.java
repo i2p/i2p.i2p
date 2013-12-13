@@ -16,7 +16,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -398,6 +401,10 @@ class PersistentDataStore extends TransientDataStore {
                 // move all new RIs to subdirs, then scan those
                 if (routerInfoFiles != null)
                     migrate(_dbDir, routerInfoFiles);
+                // Loading the files in-order causes clumping in the kbuckets,
+                // and bias on early peer selection, so first collect all the files,
+                // then shuffle and load.
+                List<File> toRead = new ArrayList<File>(2048);
                 for (int j = 0; j < B64.length(); j++) {
                     File subdir = new File(_dbDir, DIR_PREFIX + B64.charAt(j));
                     File[] files = subdir.listFiles(RouterInfoFilter.getInstance());
@@ -410,10 +417,14 @@ class PersistentDataStore extends TransientDataStore {
                     if (lastMod <= _lastModified)
                         continue;
                     for (int i = 0; i < files.length; i++) {
-                        Hash key = getRouterInfoHash(files[i].getName());
-                        if (key != null && !isKnown(key))
-                            (new ReadRouterJob(files[i], key)).runJob();
+                        toRead.add(files[i]);
                     }
+                }
+                Collections.shuffle(toRead, _context.random());
+                for (File file : toRead) {
+                    Hash key = getRouterInfoHash(file.getName());
+                    if (key != null && !isKnown(key))
+                        (new ReadRouterJob(file, key)).runJob();
                 }
             }
             
