@@ -414,13 +414,20 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label><%=intl._("File")%>:</label>
                 <input type="text" size="30" id="clientHost" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
             </div>
-            <div id="destinationField" class="rowItem">
-                <label for="localDestination" accesskey="L">
-                    <%=intl._("Local destination")%>(<span class="accessKey">L</span>):
-                </label>
-                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
-                <span class="comment"><%=intl._("(if known)")%></span>
-            </div>
+         <%
+            String destb64 = editBean.getDestinationBase64(curTunnel);     
+            if (destb64.length() > 0) {
+           %>   <div id="destinationField" class="rowItem">
+                    <label for="localDestination" accesskey="L">
+                        <%=intl._("Local destination")%>(<span class="accessKey">L</span>):
+                    </label>
+                    <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=destb64%></textarea>               
+                </div>
+                <div id="destinationField" class="rowItem">
+                    <label><%=intl._("Local Base 32")%>:</label>
+                    <%=editBean.getDestHashBase32(curTunnel)%>.b32.i2p
+                </div>
+         <% } // if destb64  %>
 
             <div class="subdivider">
                 <hr />
