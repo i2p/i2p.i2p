@@ -172,6 +172,7 @@ class NtpClient {
         }
     }
     
+/****/
     public static void main(String[] args) throws IOException {
         // Process command-line args
         if(args.length <= 0) {
@@ -184,11 +185,6 @@ class NtpClient {
         System.out.println("Current time: " + new java.util.Date(now));
     }
     
-    
-    
-    /**
-     * Prints usage
-     */
     static void printUsage() {
         System.out.println(
         "NtpClient - an NTP client for Java.\n" +
@@ -207,4 +203,5 @@ class NtpClient {
         "more details.");
         
     }
+/****/
 }
