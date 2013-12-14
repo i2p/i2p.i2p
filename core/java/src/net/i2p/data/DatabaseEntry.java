@@ -107,15 +107,17 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      */
     public Hash getRoutingKey() {
         RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
-        if ((gen.getModData() == null) || (_routingKeyGenMod == null)
-            || (!DataHelper.eq(gen.getModData(), _routingKeyGenMod))) {
+        byte[] mod = gen.getModData();
+        if (!DataHelper.eq(mod, _routingKeyGenMod)) {
             _currentRoutingKey = gen.getRoutingKey(getHash());
-            _routingKeyGenMod = gen.getModData();
+            _routingKeyGenMod = mod;
         }
         return _currentRoutingKey;
     }
 
-
+    /**
+     * @deprecated unused
+     */
     public void setRoutingKey(Hash key) {
         _currentRoutingKey = key;
     }

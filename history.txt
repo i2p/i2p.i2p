@@ -1,3 +1,10 @@
+2013-12-14 zzz
+* NetDB:
+ - Just before midnight, flood to new location too so lookups
+   don't fail after keyspace rotation (ticket #510)
+ - Refactor RoutingKeyGenerator and UpdateRoutingKeyModifierJob
+   in support of the above
+
 2013-12-13 zzz
  * i2ptunnel: Show destination for persistent client key only if available;
               show b32 for the key as well

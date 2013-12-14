@@ -8,11 +8,7 @@ package net.i2p.router.tasks;
  *
  */
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-
+import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -26,7 +22,6 @@ import net.i2p.util.Log;
  */
 public class UpdateRoutingKeyModifierJob extends JobImpl {
     private final Log _log;
-    private final Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
     // Run every 15 minutes in case of time zone change, clock skew, etc.
     private static final long MAX_DELAY_FAILSAFE = 15*60*1000;
 
@@ -38,29 +33,11 @@ public class UpdateRoutingKeyModifierJob extends JobImpl {
     public String getName() { return "Update Routing Key Modifier"; }
 
     public void runJob() {
+        RoutingKeyGenerator gen = getContext().routingKeyGenerator();
         // make sure we requeue quickly if just before midnight
-        long delay = Math.min(MAX_DELAY_FAILSAFE, getTimeTillMidnight());
+        long delay = Math.max(5, Math.min(MAX_DELAY_FAILSAFE, gen.getTimeTillMidnight()));
         // TODO tell netdb if mod data changed?
-        getContext().routingKeyGenerator().generateDateBasedModData();
+        gen.generateDateBasedModData();
         requeue(delay);
-    }
-
-    private long getTimeTillMidnight() {
-        long now = getContext().clock().now();
-        _cal.setTime(new Date(now));
-        _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
-        _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
-        _cal.add(Calendar.DATE, 1);
-        _cal.set(Calendar.HOUR_OF_DAY, 0);
-        _cal.set(Calendar.MINUTE, 0);
-        _cal.set(Calendar.SECOND, 0);
-        _cal.set(Calendar.MILLISECOND, 0);
-        long then = _cal.getTime().getTime();
-        long howLong = then - now;
-        if (howLong < 0) // hi kaffe
-            howLong = 24*60*60*1000l + howLong;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Time till midnight: " + howLong + "ms");
-        return howLong;
     }
 }

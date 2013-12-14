@@ -17,6 +17,7 @@ import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
 /**
@@ -37,6 +38,8 @@ import net.i2p.util.Log;
  * Also - the method generateDateBasedModData() should be called after midnight GMT 
  * once per day to generate the correct routing keys!
  *
+ * Warning - API subject to change. Not for use outside the router.
+ *
  */
 public class RoutingKeyGenerator {
     private final Log _log;
@@ -54,6 +57,8 @@ public class RoutingKeyGenerator {
     }
     
     private volatile byte _currentModData[];
+    private volatile byte _nextModData[];
+    private volatile long _nextMidnight;
     private volatile long _lastChanged;
 
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -61,12 +66,72 @@ public class RoutingKeyGenerator {
     private static final int LENGTH = FORMAT.length();
     private final static SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT);
 
+    /**
+     *  The current (today's) mod data.
+     *  Warning - not a copy, do not corrupt.
+     *
+     *  @return non-null, 8 bytes
+     */
     public byte[] getModData() {
         return _currentModData;
     }
 
+    /**
+     *  Tomorrow's mod data.
+     *  Warning - not a copy, do not corrupt.
+     *  For debugging use only.
+     *
+     *  @return non-null, 8 bytes
+     *  @since 0.9.10
+     */
+    public byte[] getNextModData() {
+        return _nextModData;
+    }
+
     public long getLastChanged() {
         return _lastChanged;
+    }
+
+    /**
+     *  How long until midnight (ms)
+     *
+     *  @return could be slightly negative
+     *  @since 0.9.10 moved from UpdateRoutingKeyModifierJob
+     */
+    public long getTimeTillMidnight() {
+        return _nextMidnight - _context.clock().now();
+    }
+
+    /**
+     *  Set _cal to midnight for the time given.
+     *  Caller must synch.
+     *  @since 0.9.10
+     */
+    private void setCalToPreviousMidnight(long now) {
+            _cal.setTime(new Date(now));
+            _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
+            _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
+            _cal.set(Calendar.HOUR_OF_DAY, 0);
+            _cal.set(Calendar.MINUTE, 0);
+            _cal.set(Calendar.SECOND, 0);
+            _cal.set(Calendar.MILLISECOND, 0);
+    }
+
+    /**
+     *  Generate mod data from _cal.
+     *  Caller must synch.
+     *  @since 0.9.10
+     */
+    private byte[] generateModDataFromCal() {
+        Date today = _cal.getTime();
+        
+        String modVal = _fmt.format(today);
+        if (modVal.length() != LENGTH)
+            throw new IllegalStateException();
+        byte[] mod = new byte[LENGTH];
+        for (int i = 0; i < LENGTH; i++)
+            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
+        return mod;
     }
 
     /**
@@ -77,34 +142,26 @@ public class RoutingKeyGenerator {
      */
     public synchronized boolean generateDateBasedModData() {
         long now = _context.clock().now();
-            _cal.setTime(new Date(now));
-            _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
-            _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
-            _cal.set(Calendar.HOUR_OF_DAY, 0);
-            _cal.set(Calendar.MINUTE, 0);
-            _cal.set(Calendar.SECOND, 0);
-            _cal.set(Calendar.MILLISECOND, 0);
-        Date today = _cal.getTime();
-        
-        String modVal = _fmt.format(today);
-        if (modVal.length() != LENGTH)
-            throw new IllegalStateException();
-        byte[] mod = new byte[LENGTH];
-        for (int i = 0; i < LENGTH; i++)
-            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
+        setCalToPreviousMidnight(now);
+        byte[] mod = generateModDataFromCal();
         boolean changed = !DataHelper.eq(_currentModData, mod);
         if (changed) {
+            // add a day and store next midnight and mod data for convenience
+            _cal.add(Calendar.DATE, 1);
+            _nextMidnight = _cal.getTime().getTime();
+            byte[] next = generateModDataFromCal();
             _currentModData = mod;
+            _nextModData = next;
             _lastChanged = now;
             if (_log.shouldLog(Log.INFO))
-                _log.info("Routing modifier generated: " + modVal);
+                _log.info("Routing modifier generated: " + HexDump.dump(mod));
         }
         return changed;
     }
     
     /**
      * Generate a modified (yet consistent) hash from the origKey by generating the
-     * SHA256 of the targetKey with the current modData appended to it, *then* 
+     * SHA256 of the targetKey with the current modData appended to it
      *
      * This makes Sybil's job a lot harder, as she needs to essentially take over the
      * whole keyspace.
@@ -112,10 +169,29 @@ public class RoutingKeyGenerator {
      * @throws IllegalArgumentException if origKey is null
      */
     public Hash getRoutingKey(Hash origKey) {
+        return getKey(origKey, _currentModData);
+    }
+    
+    /**
+     * Get the routing key using tomorrow's modData, not today's
+     *
+     * @since 0.9.10
+     */
+    public Hash getNextRoutingKey(Hash origKey) {
+        return getKey(origKey, _nextModData);
+    }
+    
+    /**
+     * Generate a modified (yet consistent) hash from the origKey by generating the
+     * SHA256 of the targetKey with the specified modData appended to it
+     *
+     * @throws IllegalArgumentException if origKey is null
+     */
+    private static Hash getKey(Hash origKey, byte[] modData) {
         if (origKey == null) throw new IllegalArgumentException("Original key is null");
         byte modVal[] = new byte[Hash.HASH_LENGTH + LENGTH];
         System.arraycopy(origKey.getData(), 0, modVal, 0, Hash.HASH_LENGTH);
-        System.arraycopy(_currentModData, 0, modVal, Hash.HASH_LENGTH, LENGTH);
+        System.arraycopy(modData, 0, modVal, Hash.HASH_LENGTH, LENGTH);
         return SHA256Generator.getInstance().calculateHash(modVal);
     }
 

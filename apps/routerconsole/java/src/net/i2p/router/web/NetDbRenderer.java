@@ -195,6 +195,8 @@ public class NetDbRenderer {
             buf.append("</b></p><p><b>Published (RAP) Leasesets: ").append(netdb.getKnownLeaseSets());
             buf.append("</b></p><p><b>Mod Data: \"").append(DataHelper.getUTF8(_context.routingKeyGenerator().getModData()))
                .append("\" Last Changed: ").append(new Date(_context.routingKeyGenerator().getLastChanged()));
+            buf.append("</b></p><p><b>Next Mod Data: \"").append(DataHelper.getUTF8(_context.routingKeyGenerator().getNextModData()))
+               .append("\" Change in: ").append(DataHelper.formatDuration(_context.routingKeyGenerator().getTimeTillMidnight()));
             int ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
             buf.append("</b></p><p><b>Known Floodfills: ").append(ff);
             buf.append("</b></p><p><b>Currently Floodfill? ");
