@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 
@@ -143,16 +144,20 @@ public class PartialEepGet extends EepGet {
         buf.append("\r\n");
 
         buf.append("Cache-control: no-cache\r\n" +
-                   "Pragma: no-cache\r\n");
-        // This will be replaced if we are going through I2PTunnelHTTPClient
-        buf.append("User-Agent: " + USER_AGENT + "\r\n" +
+                   "Pragma: no-cache\r\n" +
                    "Accept-Encoding: \r\n" +
                    "Connection: close\r\n");
+        boolean uaOverridden = false;
         if (_extraHeaders != null) {
             for (String hdr : _extraHeaders) {
+                if (hdr.toLowerCase(Locale.US).startsWith("user-agent: "))
+                    uaOverridden = true;
                 buf.append(hdr).append("\r\n");
             }
         }
+        // This will be replaced if we are going through I2PTunnelHTTPClient
+        if(!uaOverridden)
+            buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("\r\n");
 
         if (_log.shouldLog(Log.DEBUG))

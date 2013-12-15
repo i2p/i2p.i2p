@@ -18,6 +18,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 
+import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Snark;
 import org.klomp.snark.SnarkManager;
@@ -130,6 +131,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             return null;
         _eepGet = new I2PSocketEepGet(_ctx, manager, RETRIES, out.getAbsolutePath(), _url);
         _eepGet.addStatusListener(this);
+        _eepGet.addHeader("User-Agent", I2PSnarkUtil.EEPGET_USER_AGENT);
         if (_eepGet.fetch()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Fetch successful [" + _url + "]: size=" + out.length());

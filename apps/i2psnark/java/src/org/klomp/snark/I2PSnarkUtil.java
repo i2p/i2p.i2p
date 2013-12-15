@@ -76,6 +76,7 @@ public class I2PSnarkUtil {
     public static final int MAX_CONNECTIONS = 16; // per torrent
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     public static final boolean DEFAULT_USE_DHT = true;
+    public static final String EEPGET_USER_AGENT = "I2PSnark";
 
     public I2PSnarkUtil(I2PAppContext ctx) {
         this(ctx, "i2psnark");
@@ -393,6 +394,7 @@ public class I2PSnarkUtil {
             }
         }
         EepGet get = new I2PSocketEepGet(_context, _manager, retries, out.getAbsolutePath(), fetchURL);
+        get.addHeader("User-Agent", EEPGET_USER_AGENT);
         if (get.fetch(timeout)) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Fetch successful [" + url + "]: size=" + out.length());
@@ -434,6 +436,7 @@ public class I2PSnarkUtil {
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream(initialSize);
         EepGet get = new I2PSocketEepGet(_context, _manager, retries, -1, maxSize, null, out, fetchURL);
+        get.addHeader("User-Agent", EEPGET_USER_AGENT);
         if (get.fetch(timeout)) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Fetch successful [" + url + "]: size=" + out.size());

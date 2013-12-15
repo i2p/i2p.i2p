@@ -1156,14 +1156,18 @@ public class EepGet {
             // we don't want to transparently gunzip it and save it as a .gz file.
             (!path.endsWith(".gz")) && (!path.endsWith(".tgz")))
             buf.append("gzip");
-        buf.append("\r\nUser-Agent: " + USER_AGENT + "\r\n" +
-                   "Connection: close\r\n");
+        buf.append("\r\n");
+        boolean uaOverridden = false;
         if (_extraHeaders != null) {
             for (String hdr : _extraHeaders) {
+                if (hdr.toLowerCase(Locale.US).startsWith("user-agent: "))
+                    uaOverridden = true;
                 buf.append(hdr).append("\r\n");
             }
         }
-        buf.append("\r\n");
+        if(!uaOverridden)
+            buf.append("User-Agent: " + USER_AGENT + "\r\n");
+        buf.append("Connection: close\r\n\r\n");
         if (post)
             buf.append(_postData);
         if (_log.shouldLog(Log.DEBUG))
@@ -1237,6 +1241,9 @@ public class EepGet {
     /**
      *  Add an extra header to the request.
      *  Must be called before fetch().
+     *  Not supported by EepHead.
+     *  As of 0.9.10, If name is User-Agent, this will replace the default User-Agent header.
+     *  Note that headers may be subsequently modified or removed in the I2PTunnel HTTP Client proxy.
      *
      *  @since 0.8.8
      */
@@ -1250,6 +1257,7 @@ public class EepGet {
      *  Add basic authorization header for the proxy.
      *  Only added if the request is going through a proxy.
      *  Must be called before fetch().
+     *  Not supported by EepHead.
      *
      *  @since 0.8.9
      */

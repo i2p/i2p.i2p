@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -193,13 +194,17 @@ public class I2PSocketEepGet extends EepGet {
         buf.append("Accept-Encoding: \r\n" +
                    "Cache-control: no-cache\r\n" +
                    "Pragma: no-cache\r\n" +
-                   "User-Agent: " + USER_AGENT + "\r\n" +
                    "Connection: close\r\n");
+        boolean uaOverridden = false;
         if (_extraHeaders != null) {
             for (String hdr : _extraHeaders) {
+                if (hdr.toLowerCase(Locale.US).startsWith("user-agent: "))
+                    uaOverridden = true;
                 buf.append(hdr).append("\r\n");
             }
         }
+        if(!uaOverridden)
+            buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("\r\n");
         return buf.toString();
     }
