@@ -69,11 +69,23 @@ public class ConfigRestartBean {
         } else if (shuttingDown) {
             buf.append("<h4>");
             buf.append(_("Shutdown in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
+            int tuns = ctx.tunnelManager().getParticipatingCount();
+            if (tuns > 0) {
+                buf.append("<br>").append(ngettext("Please wait for routing commitment on {0} tunnel to expire",
+                                                "Please wait for routing commitments on {0} tunnels to expire",
+                                                tuns, ctx));
+            }
             buf.append("</h4><hr>");
             buttons(ctx, buf, urlBase, systemNonce, SET1);
         } else if (restarting) {
             buf.append("<h4>");
             buf.append(_("Restart in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
+            int tuns = ctx.tunnelManager().getParticipatingCount();
+            if (tuns > 0) {
+                buf.append("<br>").append(ngettext("Please wait for routing commitment on {0} tunnel to expire",
+                                                "Please wait for routing commitments on {0} tunnels to expire",
+                                                tuns, ctx));
+            }
             buf.append("</h4><hr>");
             buttons(ctx, buf, urlBase, systemNonce, SET2);
         } else {
@@ -120,6 +132,11 @@ public class ConfigRestartBean {
 
     private static String _(String s, Object o, RouterContext ctx) {
         return Messages.getString(s, o, ctx);
+    }
+
+    /** translate (ngettext) @since 0.9.10 */
+    private static String ngettext(String s, String p, int n, RouterContext ctx) {
+        return Messages.getString(n, s, p, ctx);
     }
 }
 
