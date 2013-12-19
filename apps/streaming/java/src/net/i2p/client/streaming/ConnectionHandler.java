@@ -21,7 +21,7 @@ class ConnectionHandler {
     private final Log _log;
     private final ConnectionManager _manager;
     private final LinkedBlockingQueue<Packet> _synQueue;
-    private boolean _active;
+    private volatile boolean _active;
     private int _acceptTimeout;
     
     /** max time after receiveNewSyn() and before the matched accept() */
@@ -230,7 +230,8 @@ class ConnectionHandler {
     }
     
     private class TimeoutSyn implements SimpleTimer.TimedEvent {
-        private Packet _synPacket;
+        private final Packet _synPacket;
+
         public TimeoutSyn(Packet packet) {
             _synPacket = packet;
         }
@@ -239,12 +240,15 @@ class ConnectionHandler {
             boolean removed = _synQueue.remove(_synPacket);
             
             if (removed) {
-                if (_synPacket.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+                if (_synPacket.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Expired on the SYN queue: " + _synPacket);
                     // timeout - send RST
                     sendReset(_synPacket);
-                else
+                } else {
                     // non-syn packet got stranded on the syn queue, send it to the con
                     reReceivePacket(_synPacket);
+                }
             } else {
                 // handled.  noop
             }
