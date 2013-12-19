@@ -30,7 +30,7 @@ class ConnThrottler {
         _totalMax = totalMax;
         this.counter = new ObjectCounter<Hash>();
         _currentTotal = new AtomicInteger();
-        // shorten the initial period by a random amount,mpleScheduler.getInstance().addPeriodicEvent(new Cleaner(),
+        // shorten the initial period by a random amount
         // to prevent correlation across destinations
         // and identification of router startup time
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(),
