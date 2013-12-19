@@ -13,6 +13,7 @@ import java.util.Set;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -42,9 +43,11 @@ class ExpireRoutersJob extends JobImpl {
     public String getName() { return "Expire Routers Job"; }
 
     public void runJob() {
-        int removed = expireKeys();
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Routers expired: " + removed);
+        if (getContext().commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_DISCONNECTED) {
+            int removed = expireKeys();
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Routers expired: " + removed);
+        }
         requeue(RERUN_DELAY_MS);
     }
     
@@ -59,6 +62,8 @@ class ExpireRoutersJob extends JobImpl {
     private int expireKeys() {
         Set<Hash> keys = _facade.getAllRouters();
         keys.remove(getContext().routerHash());
+        if (keys.size() < 150)
+            return 0;
         int removed = 0;
         for (Hash key : keys) {
             // Don't expire anybody we are connected to
