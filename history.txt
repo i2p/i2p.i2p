@@ -1,3 +1,13 @@
+2013-12-19 zzz
+ * NetDB: Fixes for ExpireRoutersJob
+  - Don't expire if too few routers
+  - Don't expire if net is disconnected
+  - Don't run in VMCommSystem
+
+2013-12-15 zzz
+* EepGet: Allow override of the User-Agent
+* i2psnark: Set User-Agent
+
 2013-12-14 zzz
 * NetDB:
  - Just before midnight, flood to new location too so lookups
@@ -438,18 +448,18 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 * 2013-08-10 0.9.7.1 released
 
-2012-08-10 zzz
+2013-08-10 zzz
  * Prop from i2p.i2p.0971
  * Update:
    - New update hosts, thanks Meeh and dg
    - Increase update-via-torrent to 30%
 
-2012-07-30 zzz
+2013-07-30 zzz
  * i2psnark: Increase max piece size to 4 MB (ticket #993)
  * Tunnels: Extend local expiration of IB tunnels, to allow for
    more clock skew and not drop valid messages at their destination
 
-2012-07-29 zzz
+2013-07-29 zzz
  * Signatures:
    - Prep for new signature algorithms; new SigType enum;
      Signature, SigningPublicKey, SigningPrivateKey store type
@@ -458,16 +468,16 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
    - New SU3File generator/verifier/extractor
  * GeoIPv6: Fix NPE (ticket #992)
 
-2012-07-28 zzz
+2013-07-28 zzz
  * Addresses: Treat RFC 4193 addresses fc00::/7 as local
  * NetDB: Disable RI verifies for now
 
-2012-07-26 zzz
+2013-07-26 zzz
  * Transports:
    - Fix IPv6-only option 2nd try
    - Treat RFC 4193 addresses fc00::/7 as local
 
-2012-07-25 zzz
+2013-07-25 zzz
  * Transports:
    - Prefer IPv6 by default
    - Fix IPv6-only option
@@ -477,13 +487,13 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
    - Make expl. default 3 hops  (ticket #966)
    - Allow expl. fallback up to -2 hops
 
-2012-07-24 zzz
+2013-07-24 zzz
  * GeoIP: Fix lookups, broken in IPv6 branch
  * UPnP:
    - main() tweaks for debugging
    - Fix for devices that return base URLs with trailing '/' (ticket #986)
 
-2012-07-22 zzz
+2013-07-22 zzz
  * BuildReplyHandler:
    - Make non-static
    - Don't pollute Hash cache with build response record hashes
@@ -493,14 +503,14 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
    - Don't pollute Hash cache with hashes
    - cleanups
 
-2012-07-21 zzz
+2013-07-21 zzz
  * I2CP:
    - Don't NPE when loglevel=warn
    - Don't enforce property length limits when inside router JVM
  * I2PSnark: Log uncaught error in ThreadedStarter to router log
  * I2PThread: Log uncaught error to wrapper log
 
-2012-07-20 zzz
+2013-07-20 zzz
  Prop from i2p.i2p.zzz.ipv6:
  * Addresses:
    - blocklist 192.88.88.0/24 6to4 anycast
@@ -624,7 +634,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
    - Pass device IP back in forward port callback
    - Only declare success if forwarded IP is public
 
-2012-07-20 zzz
+2013-07-20 zzz
  Prop from i2p.i2p.zzz.test2:
  * DHSessionKeyBuilder: Fix for session and mac keys if DH key is between 32 and 63 bytes.
    Was: NPE. Now: mac key is hash of session key. Won't ever happen. (Ticket #963)
@@ -662,12 +672,12 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
    ngettext fix for "peers" string
 
 
-2012-07-19 zzz
+2013-07-19 zzz
  * PRNG:
    - Don't delay the refiller if we need more (don't limit max output)
    - Add FortunaRandomSource.main() to output to stdout for testing e.g. with dieharder
 
-2012-07-19 zab
+2013-07-19 zab
  * Streaming:
    - initialize streaming RTT from sample, trac #979, RFC 6298
    - store rttDev in TCBCache
