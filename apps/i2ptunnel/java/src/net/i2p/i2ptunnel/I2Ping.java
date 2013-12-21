@@ -18,7 +18,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 public class I2Ping extends I2PTunnelTask implements Runnable {
-    private final static Log _log = new Log(I2Ping.class);
+    private final Log _log = new Log(I2Ping.class);
 
     private int PING_COUNT = 3;
     private static final int CPING_COUNT = 5;
@@ -28,20 +28,20 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
 
     private int MAX_SIMUL_PINGS = 10; // not really final...
 
-    private boolean countPing = false;
+    private boolean countPing;
     private boolean reportTimes = true;
 
-    private I2PSocketManager sockMgr;
-    private Logging l;
-    private boolean finished = false;
-    private String command;
+    private final I2PSocketManager sockMgr;
+    private final Logging l;
+    private boolean finished;
+    private final String command;
     private long timeout = PING_TIMEOUT;
 
     private final Object simulLock = new Object();
-    private int simulPings = 0;
-    private long lastPingTime = 0;
+    private int simulPings;
+    private long lastPingTime;
 
-    private final Object lock = new Object(), slock = new Object();
+    private final Object lock = new Object();
 
     //public I2Ping(String cmd, Logging l,
     //		  boolean ownDest) {
@@ -52,12 +52,10 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
         super("I2Ping [" + cmd + "]", notifyThis, tunnel);
         this.l = l;
         command = cmd;
-        synchronized (slock) {
-            if (ownDest) {
-                sockMgr = I2PTunnelClient.buildSocketManager(tunnel);
-            } else {
-                sockMgr = I2PTunnelClient.getSocketManager(tunnel);
-            }
+        if (ownDest) {
+            sockMgr = I2PTunnelClient.buildSocketManager(tunnel);
+        } else {
+            sockMgr = I2PTunnelClient.getSocketManager(tunnel);
         }
         Thread t = new I2PAppThread(this);
         t.setName("Client");
@@ -187,7 +185,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
     }
 
     public class PingHandler extends I2PAppThread {
-        private String destination;
+        private final String destination;
 
         public PingHandler(String dest) {
             this.destination = dest;

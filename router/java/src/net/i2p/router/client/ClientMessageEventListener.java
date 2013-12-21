@@ -20,6 +20,7 @@ import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
+import net.i2p.data.i2cp.HostLookupMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.I2CPMessageReader;
@@ -50,8 +51,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     protected final RouterContext _context;
     protected final ClientConnectionRunner _runner;
     private final boolean  _enforceAuth;
+    private volatile boolean _authorized;
     
     private static final String PROP_AUTH = "i2cp.auth";
+    /** if true, user/pw must be in GetDateMessage */
+    private static final String PROP_AUTH_STRICT = "i2cp.strictAuth";
 
     /**
      *  @param enforceAuth set false for in-JVM, true for socket access
@@ -61,6 +65,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _log = _context.logManager().getLog(ClientMessageEventListener.class);
         _runner = runner;
         _enforceAuth = enforceAuth;
+        if ((!_enforceAuth) || !_context.getBooleanProperty(PROP_AUTH))
+            _authorized = true;
         _context.statManager().createRateStat("client.distributeTime", "How long it took to inject the client message into the router", "ClientMessages", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
@@ -72,6 +78,20 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (_runner.isDead()) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Message received: \n" + message);
+        int type = message.getType();
+        if (!_authorized) {
+            // TODO change to default true
+            boolean strict = _context.getBooleanProperty(PROP_AUTH_STRICT);
+            if ((strict && type != GetDateMessage.MESSAGE_TYPE) ||
+                (type != CreateSessionMessage.MESSAGE_TYPE &&
+                 type != GetDateMessage.MESSAGE_TYPE &&
+                 type != DestLookupMessage.MESSAGE_TYPE &&
+                 type != GetBandwidthLimitsMessage.MESSAGE_TYPE)) {
+                _log.error("Received message type " + type + " without required authentication");
+                _runner.disconnectClient("Authorization required");
+                return;
+            }
+        }
         switch (message.getType()) {
             case GetDateMessage.MESSAGE_TYPE:
                 handleGetDate((GetDateMessage)message);
@@ -103,6 +123,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             case DestLookupMessage.MESSAGE_TYPE:
                 handleDestLookup((DestLookupMessage)message);
                 break;
+            case HostLookupMessage.MESSAGE_TYPE:
+                handleHostLookup((HostLookupMessage)message);
+                break;
             case ReconfigureSessionMessage.MESSAGE_TYPE:
                 handleReconfigureSession((ReconfigureSessionMessage)message);
                 break;
@@ -124,6 +147,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (_log.shouldLog(Log.ERROR))
             _log.error("Error occurred", error);
         // Is this is a little drastic for an unknown message type?
+        // Send the whole exception string over for diagnostics
+        _runner.disconnectClient(error.toString());
         _runner.stopRunning();
     }
   
@@ -137,6 +162,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         String clientVersion = message.getVersion();
         if (clientVersion != null)
             _runner.setClientVersion(clientVersion);
+        Properties props = message.getOptions();
+        if (!checkAuth(props))
+            return;
         try {
             // only send version if the client can handle it (0.8.7 or greater)
             _runner.doSend(new SetDateMessage(clientVersion != null ? CoreVersion.VERSION : null));
@@ -174,24 +202,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
 
         // Auth, since 0.8.2
-        if (_enforceAuth && _context.getBooleanProperty(PROP_AUTH)) {
-                Properties props = in.getOptions();
-                String user = props.getProperty("i2cp.username");
-                String pw = props.getProperty("i2cp.password");
-                if (user == null || user.length() == 0 || pw == null || pw.length() == 0) {
-                    _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname"));
-                    _runner.disconnectClient("Authorization required to create session, specify i2cp.username and i2cp.password in session options");
-                    return;
-                }
-                PasswordManager mgr = new PasswordManager(_context);
-                if (!mgr.checkHash(PROP_AUTH, user, pw)) {
-                    _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname") + " user: " + user);
-                    _runner.disconnectClient("Authorization failed for Create Session, user = " + user);
-                    return;
-                }
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("I2CP auth success for client: " + props.getProperty("inbound.nickname") + " user: " + user);
-        }
+        Properties inProps = in.getOptions();
+        if (!checkAuth(inProps))
+            return;
 
         SessionId sessionId = new SessionId();
         sessionId.setSessionId(getNextSessionId()); 
@@ -213,6 +226,44 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         startCreateSessionJob();
     }
     
+    /**
+     *  Side effect - sets _authorized.
+     *  Side effect - disconnects session if not authorized.
+     *
+     *  @param props contains i2cp.username and i2cp.password, may be null
+     *  @return success
+     *  @since 0.9.10
+     */
+    private boolean checkAuth(Properties props) {
+        if (_authorized)
+            return true;
+        if (_enforceAuth && _context.getBooleanProperty(PROP_AUTH)) {
+            String user = null;
+            String pw = null;
+            if (props != null) {
+                user = props.getProperty("i2cp.username");
+                pw = props.getProperty("i2cp.password");
+            }
+            if (user == null || user.length() == 0 || pw == null || pw.length() == 0) {
+                _log.error("I2CP auth failed");
+                _runner.disconnectClient("Authorization required, specify i2cp.username and i2cp.password in options");
+                _authorized = false;
+                return false;
+            }
+            PasswordManager mgr = new PasswordManager(_context);
+            if (!mgr.checkHash(PROP_AUTH, user, pw)) {
+                _log.error("I2CP auth failed user: " + user);
+                _runner.disconnectClient("Authorization failed, user = " + user);
+                _authorized = false;
+                return false;
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("I2CP auth success user: " + user);
+        }
+        _authorized = true;
+        return true;
+    }
+
     /**
      *  Override for testing
      *  @since 0.9.8
@@ -313,6 +364,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     /** override for testing */
     protected void handleDestLookup(DestLookupMessage message) {
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash()));
+    }
+
+    /**
+     * override for testing
+     * @since 0.9.10
+     */
+    protected void handleHostLookup(HostLookupMessage message) {
+        _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getReqID(),
+                                                     message.getTimeout(), message.getHash(), message.getHostname()));
     }
 
     /**

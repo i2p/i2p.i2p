@@ -89,7 +89,8 @@ public class SessionConfig extends DataStructureImpl {
     }
 
     /**
-     * Configure the session with the given options
+     * Configure the session with the given options;
+     * keys and values 255 bytes (not chars) max each
      *
      * @param options Properties for this session
      */

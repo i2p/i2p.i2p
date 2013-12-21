@@ -31,7 +31,7 @@ public class I2CPMessageHandler {
      *          message - if it is an unknown type or has improper formatting, etc.
      */
     public static I2CPMessage readMessage(InputStream in) throws IOException, I2CPMessageException {
-        int length = -1;
+        int length;
         try {
             length = (int) DataHelper.readLong(in, 4);
         } catch (DataFormatException dfe) {
@@ -41,6 +41,10 @@ public class I2CPMessageHandler {
             if (length < 0) throw new I2CPMessageException("Invalid message length specified");
             int type = (int) DataHelper.readLong(in, 1);
             I2CPMessage msg = createMessage(type);
+            // Note that the readMessage() calls don't, in general, read and discard
+            // extra data, so we can't add new fields to the end of messages
+            // in a compatible way. And the readers could read beyond the length too.
+            // To fix this we'd have to read into a BAOS/BAIS or use a filter input stream
             msg.readMessage(in, length, type);
             return msg;
         } catch (DataFormatException dfe) {
@@ -52,7 +56,7 @@ public class I2CPMessageHandler {
      * Yes, this is fairly ugly, but its the only place it ever happens.  
      *
      */
-    private static I2CPMessage createMessage(int type) throws IOException,
+    private static I2CPMessage createMessage(int type) throws
                                                        I2CPMessageException {
         switch (type) {
         case CreateLeaseSetMessage.MESSAGE_TYPE:
@@ -97,6 +101,10 @@ public class I2CPMessageHandler {
             return new GetBandwidthLimitsMessage();
         case BandwidthLimitsMessage.MESSAGE_TYPE:
             return new BandwidthLimitsMessage();
+        case HostLookupMessage.MESSAGE_TYPE:
+            return new HostLookupMessage();
+        case HostReplyMessage.MESSAGE_TYPE:
+            return new HostReplyMessage();
         default:
             throw new I2CPMessageException("The type " + type + " is an unknown I2CP message");
         }
