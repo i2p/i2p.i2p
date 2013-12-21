@@ -22,6 +22,12 @@ import net.i2p.data.DataHelper;
 public class I2CPMessageHandler {
 
     /**
+     *  This is huge. Mainly to catch a completly bogus response, possibly not an I2CP socket.
+     *  @since 0.9.10
+     */
+    public static final int MAX_LENGTH = 128*1024;
+
+    /**
      * Read an I2CPMessage from the stream and return the fully populated object.
      * 
      * @param in I2CP input stream
@@ -37,8 +43,9 @@ public class I2CPMessageHandler {
         } catch (DataFormatException dfe) {
             throw new IOException("Connection closed");
         }
+        if (length > MAX_LENGTH)
+            throw new I2CPMessageException("Invalid message length specified");
         try {
-            if (length < 0) throw new I2CPMessageException("Invalid message length specified");
             int type = (int) DataHelper.readLong(in, 1);
             I2CPMessage msg = createMessage(type);
             // Note that the readMessage() calls don't, in general, read and discard

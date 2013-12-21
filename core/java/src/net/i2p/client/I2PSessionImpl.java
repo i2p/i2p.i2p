@@ -1209,6 +1209,19 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @return null on failure
      */
     public Destination lookupDest(String name, long maxWait) throws I2PSessionException {
+        if (name.length() == 0)
+            return null;
+        // Shortcut for b64
+        if (name.length() >= 516) {
+            try {
+                return new Destination(name);
+            } catch (DataFormatException dfe) {
+                return null;
+            }
+        }
+        // won't fit in Mapping
+        if (name.length() >= 256 && !_context.isRouterContext())
+            return null;
         synchronized (_lookupCache) {
             Destination rv = _lookupCache.get(name);
             if (rv != null)

@@ -295,8 +295,15 @@ class Packet {
      */
     public boolean isFlagSet(int flag) { return 0 != (_flags & flag); }
 
+    /**
+     *  @param flag bitmask of any flag(s)
+     */
     public void setFlag(int flag) { _flags |= flag; }
 
+    /**
+     *  @param flag bitmask of any flag(s)
+     *  @param set true to set, false to clear
+     */
     public void setFlag(int flag, boolean set) { 
         if (set)
             _flags |= flag; 
@@ -304,7 +311,7 @@ class Packet {
             _flags &= ~flag;
     }
 
-    public void setFlags(int flags) { _flags = flags; } 
+    private void setFlags(int flags) { _flags = flags; } 
 
     /** the signature on the packet (only included if the flag for it is set)
      * @return signature on the packet if the flag for signatures is set

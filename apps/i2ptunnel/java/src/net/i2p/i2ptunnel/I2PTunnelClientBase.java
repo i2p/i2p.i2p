@@ -51,15 +51,18 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected final List<I2PSocket> mySockets = new ArrayList<I2PSocket>();
     protected boolean _ownDest;
 
-    protected Destination dest = null;
+    protected Destination dest;
     private int localPort;
 
-    private boolean listenerReady = false;
+    /**
+     *  Protected for I2Ping since 0.9.10. Not for use outside package.
+     */
+    protected boolean listenerReady;
 
     protected ServerSocket ss;
 
     private final Object startLock = new Object();
-    private boolean startRunning = false;
+    private boolean startRunning;
 
     // private Object closeLock = new Object();
 
@@ -68,7 +71,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private String privKeyFile;
 
     // true if we are chained from a server.
-    private boolean chained = false;
+    private boolean chained;
 
     /** how long to wait before dropping an idle thread */
     private static final long HANDLER_KEEPALIVE_MS = 2*60*1000;
@@ -582,7 +585,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         return i2ps;
     }
 
-    public final void run() {
+    /**
+     *  Non-final since 0.9.10.
+     *  Any overrides must set listenerReady = true.
+     */
+    public void run() {
         try {
             InetAddress addr = getListenHost(l);
             if (addr == null) {

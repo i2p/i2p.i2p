@@ -348,8 +348,7 @@ class PacketHandler {
             }
         } else {
             PacketLocal pong = new PacketLocal(_context, packet.getOptionalFrom());
-            pong.setFlag(Packet.FLAG_ECHO, true);
-            pong.setFlag(Packet.FLAG_SIGNATURE_INCLUDED, false);
+            pong.setFlag(Packet.FLAG_ECHO | Packet.FLAG_NO_ACK);
             pong.setReceiveStreamId(packet.getSendStreamId());
             _manager.getPacketQueue().enqueue(pong);
         }

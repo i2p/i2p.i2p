@@ -593,8 +593,9 @@ class ConnectionManager {
         Long id = Long.valueOf(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
         PacketLocal packet = new PacketLocal(_context, peer);
         packet.setSendStreamId(id.longValue());
-        packet.setFlag(Packet.FLAG_ECHO);
-        packet.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
+        packet.setFlag(Packet.FLAG_ECHO |
+                       Packet.FLAG_NO_ACK |
+                       Packet.FLAG_SIGNATURE_INCLUDED);
         packet.setOptionalFrom(_session.getMyDestination());
         //if ( (keyToUse != null) && (tagsToSend != null) ) {
         //    packet.setKeyUsed(keyToUse);

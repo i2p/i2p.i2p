@@ -1508,20 +1508,19 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     private void runPing(String allargs, Logging l) {
         if (allargs.length() != 0) {
-            I2PTunnelTask task;
-            // pings always use the main destination
-            task = new I2Ping(allargs, l, false, this, this);
+            _clientOptions.setProperty(I2Ping.PROP_COMMAND, allargs);
+            I2PTunnelTask task = new I2Ping(l, ownDest, this, this);
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
-            l.log("ping <opts> <dest>");
+            l.log("ping <opts> <b64dest|host>");
             l.log("ping <opts> -h (pings all hosts in hosts.txt)");
             l.log("ping <opts> -l <destlistfile> (pings a list of hosts in a file)");
             l.log("   Options:\n" +
                   "     -c (require 5 consecutive pings to report success)\n" +
                   "     -m maxSimultaneousPings (default 10)\n" +
                   "     -n numberOfPings (default 3)\n" +
-                  "     -t timeout (ms, default 5000)\n");
+                  "     -t timeout (ms, default 30000)\n");
             l.log("   Tests communication with peers.\n");
             notifyEvent("pingTaskId", Integer.valueOf(-1));
         }
@@ -1732,7 +1731,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 // we do it below instead so we can set the host and port,
                 // which we can't do with lookup()
                 d = inst.lookup(name);
-                if (d != null || ctx.isRouterContext())
+                if (d != null || ctx.isRouterContext() || name.length() >= 516)
                     return d;
             }
             // Outside router context only,
