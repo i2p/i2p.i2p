@@ -223,7 +223,7 @@ public class Snark
   private PeerCoordinator coordinator;
   private ConnectionAcceptor acceptor;
   private TrackerClient trackerclient;
-  private String rootDataDir = ".";
+  private final File rootDataDir;
   private final CompleteListener completeListener;
   private volatile boolean stopped;
   private volatile boolean starting;
@@ -291,7 +291,7 @@ public class Snark
     acceptor = connectionAcceptor;
 
     this.torrent = torrent;
-    this.rootDataDir = rootDir;
+    this.rootDataDir = new File(rootDir);
 
     stopped = true;
     activity = "Network setup";
@@ -395,13 +395,12 @@ public class Snark
         try
           {
             activity = "Checking storage";
-            storage = new Storage(_util, meta, slistener);
+            storage = new Storage(_util, rootDataDir, meta, slistener);
             if (completeListener != null) {
-                storage.check(rootDataDir,
-                              completeListener.getSavedTorrentTime(this),
+                storage.check(completeListener.getSavedTorrentTime(this),
                               completeListener.getSavedTorrentBitField(this));
             } else {
-                storage.check(rootDataDir);
+                storage.check();
             }
             // have to figure out when to reopen
             // if (!start)
@@ -453,7 +452,7 @@ public class Snark
     this.torrent = torrent;
     this.infoHash = ih;
     this.additionalTrackerURL = trackerURL;
-    this.rootDataDir = rootDir;
+    this.rootDataDir = new File(rootDir);
     stopped = true;
     id = generateID();
 
@@ -548,7 +547,7 @@ public class Snark
     } else if (trackerclient.halted()) {
         if (storage != null) {
             try {
-                 storage.reopen(rootDataDir);
+                 storage.reopen();
              }   catch (IOException ioe) {
                  try { storage.close(); } catch (IOException ioee) {
                      ioee.printStackTrace();
@@ -1104,8 +1103,8 @@ public class Snark
   public void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo) {
       try {
           // The following two may throw IOE...
-          storage = new Storage(_util, metainfo, this);
-          storage.check(rootDataDir);
+          storage = new Storage(_util, rootDataDir, metainfo, this);
+          storage.check();
           // ... so don't set meta until here
           meta = metainfo;
           if (completeListener != null) {
