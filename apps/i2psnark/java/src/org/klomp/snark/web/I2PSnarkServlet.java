@@ -2154,9 +2154,11 @@ public class I2PSnarkServlet extends BasicServlet {
         private final Comparator collator = Collator.getInstance();
 
         public int compare(File l, File r) {
-            if (l.isDirectory() && !r.isDirectory())
+            boolean ld = l.isDirectory();
+            boolean rd = r.isDirectory();
+            if (ld && !rd)
                 return -1;
-            if (r.isDirectory() && !l.isDirectory())
+            if (rd && !ld)
                 return 1;
             return collator.compare(l.getName(), r.getName());
         }
