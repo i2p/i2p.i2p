@@ -13,11 +13,14 @@ import net.i2p.crypto.SigType;
 
 /**
  * Defines the signature as defined by the I2P data structure spec.
- * A signature is a 40-byte array verifying the authenticity of some data 
+ * By default, a signature is a 40-byte array verifying the authenticity of some data 
  * using the DSA-SHA1 algorithm.
  *
  * The signature is the 20-byte R followed by the 20-byte S,
  * both are unsigned integers.
+ *
+ * As of release 0.9.8, signatures of arbitrary length and type are supported.
+ * See SigType.
  *
  * @author jrandom
  */
@@ -39,10 +42,15 @@ public class Signature extends SimpleDataStructure {
     }
 
     /**
+     *  Unknown type not allowed as we won't know the length to read in the data.
+     *
+     *  @param type non-null
      *  @since 0.9.8
      */
     public Signature(SigType type) {
         super();
+        if (type == null)
+            throw new IllegalArgumentException("unknown type");
         _type = type;
     }
 
@@ -51,10 +59,15 @@ public class Signature extends SimpleDataStructure {
     }
 
     /**
+     *  Should we allow an unknown type here?
+     *
+     *  @param type non-null
      *  @since 0.9.8
      */
     public Signature(SigType type, byte data[]) {
         super();
+        if (type == null)
+            throw new IllegalArgumentException("unknown type");
         _type = type;
         setData(data);
     }
@@ -64,6 +77,7 @@ public class Signature extends SimpleDataStructure {
     }
 
     /**
+     *  @return non-null
      *  @since 0.9.8
      */
     public SigType getType() {

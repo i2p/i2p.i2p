@@ -554,7 +554,7 @@ public class RouterInfo extends DatabaseEntry {
             }
         }
         DataHelper.readProperties(din, _options);
-        _signature = new Signature();
+        _signature = new Signature(_identity.getSigningPublicKey().getType());
         _signature.readBytes(in);
 
         if (verifySig) {

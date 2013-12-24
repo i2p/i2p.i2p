@@ -62,7 +62,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** private key for decryption */
     private final PrivateKey _privateKey;
     /** private key for signing */
-    private final SigningPrivateKey _signingPrivateKey;
+    private   /* final */   SigningPrivateKey _signingPrivateKey;
     /** configuration options */
     private final Properties _options;
     /** this session's Id */
@@ -373,6 +373,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private void readDestination(InputStream destKeyStream) throws DataFormatException, IOException {
         _myDestination.readBytes(destKeyStream);
         _privateKey.readBytes(destKeyStream);
+        _signingPrivateKey = new SigningPrivateKey(_myDestination.getSigningPublicKey().getType());
         _signingPrivateKey.readBytes(destKeyStream);
     }
 

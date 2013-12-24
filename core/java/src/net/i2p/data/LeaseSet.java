@@ -275,11 +275,9 @@ public class LeaseSet extends DatabaseEntry {
     protected byte[] getBytes() {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
-        int len = PublicKey.KEYSIZE_BYTES  // dest
-                + SigningPublicKey.KEYSIZE_BYTES // dest
-                + 3 // cert minimum, could be more, only used to size the BAOS
+        int len = _destination.size()
                 + PublicKey.KEYSIZE_BYTES // encryptionKey
-                + SigningPublicKey.KEYSIZE_BYTES // signingKey
+                + _signingKey.length() // signingKey
                 + 1
                 + _leases.size() * 44; // leases
         ByteArrayOutputStream out = new ByteArrayOutputStream(len);
@@ -310,7 +308,9 @@ public class LeaseSet extends DatabaseEntry {
             throw new IllegalStateException();
         _destination = Destination.create(in);
         _encryptionKey = PublicKey.create(in);
-        _signingKey = SigningPublicKey.create(in);
+        // revocation signing key must be same type as the destination signing key
+        _signingKey = new SigningPublicKey(_destination.getSigningPublicKey().getType());
+        _signingKey.readBytes(in);
         int numLeases = (int) DataHelper.readLong(in, 1);
         if (numLeases > MAX_LEASES)
             throw new DataFormatException("Too many leases - max is " + MAX_LEASES);
@@ -320,7 +320,8 @@ public class LeaseSet extends DatabaseEntry {
             lease.readBytes(in);
             addLease(lease);
         }
-        _signature = new Signature();
+        // signature must be same type as the destination signing key
+        _signature = new Signature(_destination.getSigningPublicKey().getType());
         _signature.readBytes(in);
     }
     
@@ -345,11 +346,9 @@ public class LeaseSet extends DatabaseEntry {
      *  Number of bytes, NOT including signature
      */
     public int size() {
-        return PublicKey.KEYSIZE_BYTES //destination.pubKey
-             + SigningPublicKey.KEYSIZE_BYTES // destination.signPubKey
-             + _destination.getCertificate().size() // destination.certificate, usually 3
+        return _destination.size()
              + PublicKey.KEYSIZE_BYTES // encryptionKey
-             + SigningPublicKey.KEYSIZE_BYTES // signingKey
+             + _signingKey.length() // signingKey
              + 1 // number of leases
              + _leases.size() * (Hash.HASH_LENGTH + 4 + 8);
     }

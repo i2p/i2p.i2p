@@ -189,7 +189,7 @@ public class SessionConfig extends DataStructureImpl {
         _destination = Destination.create(rawConfig);
         _options = DataHelper.readProperties(rawConfig);
         _creationDate = DataHelper.readDate(rawConfig);
-        _signature = new Signature();
+        _signature = new Signature(_destination.getSigningPublicKey().getType());
         _signature.readBytes(rawConfig);
     }
 

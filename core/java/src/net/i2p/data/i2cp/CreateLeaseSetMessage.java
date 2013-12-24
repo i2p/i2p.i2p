@@ -71,6 +71,11 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         try {
             _sessionId = new SessionId();
             _sessionId.readBytes(in);
+            // Revocation is unimplemented.
+            // As the SPK comes before the LeaseSet, we don't know the key type.
+            // We could have some sort of callback or state setting so we get the
+            // expected type from the session. But for now, we just assume it's 20 bytes.
+            // Clients outside router context should throw in a dummy 20 bytes.
             _signingPrivateKey = new SigningPrivateKey();
             _signingPrivateKey.readBytes(in);
             _privateKey = new PrivateKey();
@@ -87,7 +92,7 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         if ((_sessionId == null) || (_signingPrivateKey == null) || (_privateKey == null) || (_leaseSet == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         int size = 4 // sessionId
-                 + SigningPrivateKey.KEYSIZE_BYTES
+                 + _signingPrivateKey.length()
                  + PrivateKey.KEYSIZE_BYTES
                  + _leaseSet.size();
         ByteArrayOutputStream os = new ByteArrayOutputStream(size);
