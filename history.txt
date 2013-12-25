@@ -1,5 +1,5 @@
 2013-12-25 dg
- * Console: Add 'advanced warning' to /confgiclients
+ * Console: Add 'advanced warning' to /configclients
  * SOCKS5Server: Remove redundant, commented out line from my previous findbugs
 
 2013-12-19 zzz
