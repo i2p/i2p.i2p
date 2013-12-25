@@ -198,7 +198,6 @@ public class SOCKS5Server extends SOCKSServer {
         addressType = in.readUnsignedByte();
         switch (addressType) {
         case AddressType.IPV4:
-            //connHostName = new String();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < 4; ++i) {
                 int octet = in.readUnsignedByte();

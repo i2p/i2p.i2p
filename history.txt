@@ -1,3 +1,7 @@
+2013-12-25 dg
+ * Console: Add 'advanced warning' to /confgiclients
+ * SOCKS5Server: Remove redundant, commented out line from my previous findbugs
+
 2013-12-19 zzz
  * NetDB: Fixes for ExpireRoutersJob
   - Don't expire if too few routers

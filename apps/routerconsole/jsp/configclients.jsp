@@ -28,7 +28,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%@include file="formhandler.jsi" %>
  <div class="configure">
  <h3><%=intl._("Client Configuration")%></h3><p>
- <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
+ <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%><br>
+ <span style="color: #FF0000;"><b><%=intl._("Be careful changing any settings here. The 'router console' and 'application tunnels' are required for most uses of I2P. Only advanced users should change these.")%></b></span>
  </p><div class="wideload">
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
