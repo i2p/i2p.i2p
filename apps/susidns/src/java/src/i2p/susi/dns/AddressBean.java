@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
@@ -228,9 +229,36 @@ public class AddressBean
 				return _("Hidden");
 			case Certificate.CERTIFICATE_TYPE_SIGNED:
 				return _("Signed");
+			case Certificate.CERTIFICATE_TYPE_KEY:
+				return _("Key");
 			default:
 				return _("Type {0}", type);
 		}
+	}
+
+	/**
+	 * Do this the easy way
+	 * @since 0.9.11
+	 */
+	public String getSigType() {
+		// (4 / 3) * (pubkey length + signing key length)
+		String cert = destination.substring(512);
+		if (cert.equals("AAAA"))
+			return _("DSA 1024 bit");
+		byte[] enc = Base64.decode(cert);
+		if (enc == null)
+			// shouldn't happen
+			return "invalid";
+		int type = enc[0] & 0xff;
+		if (type != Certificate.CERTIFICATE_TYPE_KEY)
+			return _("DSA 1024 bit");
+		int st = ((enc[3] & 0xff) << 8) | (enc[4] & 0xff);
+		if (st == 0)
+			return _("DSA 1024 bit");
+		SigType stype = SigType.getByCode(st);
+                if (stype == null)
+			return _("Type {0}", st);
+                return stype.toString();
 	}
 
 	/** @since 0.8.7 */
