@@ -1223,7 +1223,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     }
 
     /**
-     * Generate a new keypair
+     * Generate a new keypair.
+     * Does NOT support non-default sig types.
      * Deprecated - only used by CLI
      *
      * Sets the event "genkeysResult" = "ok" or "error" after the generation is complete
@@ -1266,7 +1267,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     }
 
     /**
-     * Generate a new keypair
+     * Generate a new keypair.
+     * Does NOT support non-default sig types.
      * Deprecated - only used by CLI
      *
      * Sets the event "privateKey" = base64 of the privateKey stream and
@@ -1275,7 +1277,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param l logger to receive events and output
      */
     private static void runGenTextKeys(Logging l) {
-        ByteArrayOutputStream privkey = new ByteArrayOutputStream(512);
+        ByteArrayOutputStream privkey = new ByteArrayOutputStream(1024);
         ByteArrayOutputStream pubkey = new ByteArrayOutputStream(512);
         makeKey(privkey, pubkey, l);
         l.log("Private key: " + Base64.encode(privkey.toByteArray()));
@@ -1527,10 +1529,11 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Create a new destination, storing the destination and its private keys where 
-     * instructed
+     * instructed.
+     * Does NOT support non-default sig types.
      * Deprecated - only used by CLI
      *
-     * @param writeTo location to store the private keys
+     * @param writeTo location to store the destination and private keys
      * @param pubDest location to store the destination
      * @param l logger to send messages to
      */

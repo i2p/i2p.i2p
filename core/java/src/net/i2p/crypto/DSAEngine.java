@@ -89,13 +89,20 @@ public class DSAEngine {
      *  Uses TheCrypto code for DSA-SHA1 unless configured to use the java.security libraries.
      */
     public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
+        return verifySignature(signature, signedData, 0, signedData.length, verifyingKey);
+    }
+
+    /**
+     *  Verify using any sig type as of 0.9.11 (DSA only prior to that)
+     */
+    public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
         boolean rv;
         SigType type = signature.getType();
         if (type != verifyingKey.getType())
             throw new IllegalArgumentException("type mismatch sig=" + signature.getType() + " key=" + verifyingKey.getType());
         if (type != SigType.DSA_SHA1) {
             try {
-                rv = altVerifySig(signature, signedData, verifyingKey);
+                rv = altVerifySig(signature, signedData, offset, size, verifyingKey);
                 if ((!rv) && _log.shouldLog(Log.WARN))
                     _log.warn(type + " Sig Verify Fail");
                 return rv;
@@ -107,7 +114,7 @@ public class DSAEngine {
         }
         if (_useJavaLibs) {
             try {
-                rv = altVerifySigSHA1(signature, signedData, verifyingKey);
+                rv = altVerifySigSHA1(signature, signedData, offset, size, verifyingKey);
                 if ((!rv) && _log.shouldLog(Log.WARN))
                     _log.warn("Lib DSA Sig Verify Fail");
                 return rv;
@@ -117,17 +124,10 @@ public class DSAEngine {
                 // now try TheCrypto
             }
         }
-        rv = verifySignature(signature, signedData, 0, signedData.length, verifyingKey);
+        rv = verifySignature(signature, calculateHash(signedData, offset, size), verifyingKey);
         if ((!rv) && _log.shouldLog(Log.WARN))
             _log.warn("TheCrypto DSA Sig Verify Fail");
         return rv;
-    }
-
-    /**
-     *  Verify using DSA-SHA1 ONLY
-     */
-    public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
-        return verifySignature(signature, calculateHash(signedData, offset, size), verifyingKey);
     }
 
     /**
@@ -256,16 +256,26 @@ public class DSAEngine {
     }
 
     /**
-     *  Sign using DSA-SHA1 or ECDSA.
+     *  Sign using any key type.
      *  Uses TheCrypto code unless configured to use the java.security libraries.
      *
      *  @return null on error
      */
     public Signature sign(byte data[], SigningPrivateKey signingKey) {
+        return sign(data, 0, data.length, signingKey);
+    }
+
+    /**
+     *  Sign using any key type as of 0.9.11 (DSA-SHA1 only prior to that)
+     *
+     *  @return null on error
+     */
+    public Signature sign(byte data[], int offset, int length, SigningPrivateKey signingKey) {
+        if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
         SigType type = signingKey.getType();
         if (type != SigType.DSA_SHA1) {
             try {
-                return altSign(data, signingKey);
+                return altSign(data, offset, length, signingKey);
             } catch (GeneralSecurityException gse) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(type + " Sign Fail", gse);
@@ -274,23 +284,13 @@ public class DSAEngine {
         }
         if (_useJavaLibs) {
             try {
-                return altSignSHA1(data, signingKey);
+                return altSignSHA1(data, offset, length, signingKey);
             } catch (GeneralSecurityException gse) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Lib Sign Fail, privkey = " + signingKey, gse);
                 // now try TheCrypto
             }
         }
-        return sign(data, 0, data.length, signingKey);
-    }
-
-    /**
-     *  Sign using DSA-SHA1 ONLY
-     *
-     *  @return null on error
-     */
-    public Signature sign(byte data[], int offset, int length, SigningPrivateKey signingKey) {
-        if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
         SHA1Hash h = calculateHash(data, offset, length);
         return sign(h, signingKey);
     }
@@ -495,20 +495,20 @@ public class DSAEngine {
     /**
      *  Generic verify DSA_SHA1, ECDSA, or RSA
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.9.9
+     *  @since 0.9.9 added off/len 0.9.11
      */
-    private boolean altVerifySig(Signature signature, byte[] data, SigningPublicKey verifyingKey)
+    private boolean altVerifySig(Signature signature, byte[] data, int offset, int len, SigningPublicKey verifyingKey)
                         throws GeneralSecurityException {
         SigType type = signature.getType();
         if (type != verifyingKey.getType())
             throw new IllegalArgumentException("type mismatch sig=" + type + " key=" + verifyingKey.getType());
         if (type == SigType.DSA_SHA1)
-            return altVerifySigSHA1(signature, data, verifyingKey);
+            return altVerifySigSHA1(signature, data, offset, len, verifyingKey);
 
         java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
         jsig.initVerify(pubKey);
-        jsig.update(data);
+        jsig.update(data, offset, len);
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
         return rv;
     }
@@ -555,13 +555,14 @@ public class DSAEngine {
     /**
      *  Alternate to verifySignature() using java.security libraries.
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.8.7
+     *  @since 0.8.7 added off/len 0.9.11
      */
-    private boolean altVerifySigSHA1(Signature signature, byte[] data, SigningPublicKey verifyingKey) throws GeneralSecurityException {
+    private boolean altVerifySigSHA1(Signature signature, byte[] data, int offset,
+                                     int len, SigningPublicKey verifyingKey) throws GeneralSecurityException {
         java.security.Signature jsig = java.security.Signature.getInstance("SHA1withDSA");
         PublicKey pubKey = SigUtil.toJavaDSAKey(verifyingKey);
         jsig.initVerify(pubKey);
-        jsig.update(data);
+        jsig.update(data, offset, len);
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
         //if (!rv) {
         //    System.out.println("BAD SIG\n" + net.i2p.util.HexDump.dump(signature.getData()));
@@ -573,17 +574,18 @@ public class DSAEngine {
     /**
      *  Generic sign DSA_SHA1, ECDSA, or RSA
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.9.9
+     *  @since 0.9.9 added off/len 0.9.11
      */
-    private Signature altSign(byte[] data, SigningPrivateKey privateKey) throws GeneralSecurityException {
+    private Signature altSign(byte[] data, int offset, int len,
+                              SigningPrivateKey privateKey) throws GeneralSecurityException {
         SigType type = privateKey.getType();
         if (type == SigType.DSA_SHA1)
-            return altSignSHA1(data, privateKey);
+            return altSignSHA1(data, offset, len, privateKey);
 
         java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         jsig.initSign(privKey, _context.random());
-        jsig.update(data);
+        jsig.update(data, offset, len);
         return SigUtil.fromJavaSig(jsig.sign(), type);
     }
 
@@ -622,13 +624,14 @@ public class DSAEngine {
     /**
      *  Alternate to sign() using java.security libraries.
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.8.7
+     *  @since 0.8.7 added off/len args 0.9.11
      */
-    private Signature altSignSHA1(byte[] data, SigningPrivateKey privateKey) throws GeneralSecurityException {
+    private Signature altSignSHA1(byte[] data, int offset, int len,
+                                  SigningPrivateKey privateKey) throws GeneralSecurityException {
         java.security.Signature jsig = java.security.Signature.getInstance("SHA1withDSA");
         PrivateKey privKey = SigUtil.toJavaDSAKey(privateKey);
         jsig.initSign(privKey, _context.random());
-        jsig.update(data);
+        jsig.update(data, offset, len);
         return SigUtil.fromJavaSig(jsig.sign(), SigType.DSA_SHA1);
     }
 

@@ -41,6 +41,11 @@ public interface I2PClient {
     /** @since 0.8.1 */
     public final static String PROP_RELIABILITY_NONE = "none";
 
+    /** @since 0.9.11 */
+    public static final String PROP_SIGTYPE = "i2cp.destination.sigType";
+    /** @since 0.9.11 */
+    public static final SigType DEFAULT_SIGTYPE = SigType.DSA_SHA1;
+
     /**
      * For router->client payloads.
      *

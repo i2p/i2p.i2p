@@ -397,13 +397,14 @@ class Packet {
      * @throws IllegalStateException if there is data missing or otherwise b0rked
      */
     public int writePacket(byte buffer[], int offset) throws IllegalStateException {
-        return writePacket(buffer, offset, true);
+        return writePacket(buffer, offset, 0);
     }
+
     /**
-     * @param includeSig if true, include the real signature, otherwise put zeroes
-     *                   in its place.
+     * @param fakeSigLen if 0, include the real signature in _optionSignature;
+     *                   if nonzero, leave space for that many bytes
      */
-    private int writePacket(byte buffer[], int offset, boolean includeSig) throws IllegalStateException {
+    private int writePacket(byte buffer[], int offset, int fakeSigLen) throws IllegalStateException {
         int cur = offset;
         DataHelper.toLong(buffer, cur, 4, (_sendStreamId >= 0 ? _sendStreamId : STREAM_ID_UNKNOWN));
         cur += 4;
@@ -438,7 +439,12 @@ class Packet {
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
             optionSize += 2;
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
-            optionSize += _optionSignature.length();
+            if (fakeSigLen > 0)
+                optionSize += fakeSigLen;
+            else if (_optionSignature != null)
+                optionSize += _optionSignature.length();
+            else
+                throw new IllegalStateException();
         }
         
         DataHelper.toLong(buffer, cur, 2, optionSize);
@@ -456,11 +462,14 @@ class Packet {
             cur += 2;
         }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
-            if (includeSig)
+            if (fakeSigLen == 0) {
+                // we're signing (or validating)
                 System.arraycopy(_optionSignature.getData(), 0, buffer, cur, _optionSignature.length());
-            else // we're signing (or validating)
-                Arrays.fill(buffer, cur, cur + _optionSignature.length(), (byte)0x0);
-            cur += _optionSignature.length();
+                cur += _optionSignature.length();
+            } else {
+                Arrays.fill(buffer, cur, cur + fakeSigLen, (byte)0x0);
+                cur += fakeSigLen;
+            }
         }
         
         if (_payload != null) {
@@ -661,7 +670,7 @@ class Packet {
         
         if (buffer == null)
             buffer = new byte[size];
-        int written = writePacket(buffer, 0, false);
+        int written = writePacket(buffer, 0, from.getSigningPublicKey().getType().getSigLen());
         if (written != size) {
             ctx.logManager().getLog(Packet.class).error("Written " + written + " size " + size + " for " + toString(), new Exception("moo"));
             return false;
@@ -692,7 +701,7 @@ class Packet {
      */
     public int writeSignedPacket(byte buffer[], int offset, I2PAppContext ctx, SigningPrivateKey key) throws IllegalStateException {
         setFlag(FLAG_SIGNATURE_INCLUDED);
-        int size = writePacket(buffer, offset, false);
+        int size = writePacket(buffer, offset, key.getType().getSigLen());
         _optionSignature = ctx.dsa().sign(buffer, offset, size, key);
         //if (false) {
         //    Log l = ctx.logManager().getLog(Packet.class);
@@ -760,7 +769,7 @@ class Packet {
         if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
-        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM");
+        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM ").append(_optionFrom.size());
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");

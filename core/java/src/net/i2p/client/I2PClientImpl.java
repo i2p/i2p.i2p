@@ -47,7 +47,7 @@ class I2PClientImpl implements I2PClient {
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
-        return createDestination(destKeyStream, SigType.DSA_SHA1);
+        return createDestination(destKeyStream, DEFAULT_SIGTYPE);
     }
 
     /**
