@@ -6,7 +6,7 @@ import java.util.Properties;
  * Define the configuration for streaming and verifying data on the socket.
  * Use I2PSocketManager.buildOptions() to get one of these.
  */
-class I2PSocketOptionsImpl implements I2PSocketOptions {
+public class I2PSocketOptionsImpl implements I2PSocketOptions {
     private long _connectTimeout;
     private long _readTimeout;
     private long _writeTimeout;
@@ -93,7 +93,7 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
         }
     }
     
-    protected static double getDouble(Properties opts, String name, double defaultVal) {
+    public static double getDouble(Properties opts, String name, double defaultVal) {
         if (opts == null) return defaultVal;
         String val = opts.getProperty(name);
         if (val == null) {

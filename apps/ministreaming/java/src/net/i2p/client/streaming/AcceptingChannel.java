@@ -16,11 +16,11 @@ import java.nio.channels.SelectableChannel;
  */
 public abstract class AcceptingChannel extends SelectableChannel {
 
-    abstract I2PSocket accept() throws I2PException, ConnectException;
+    public abstract I2PSocket accept() throws I2PException, ConnectException;
 
     protected final I2PSocketManager _socketManager;
 
-    AcceptingChannel(I2PSocketManager manager) {
+    protected AcceptingChannel(I2PSocketManager manager) {
         this._socketManager = manager;
     }
 }

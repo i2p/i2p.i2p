@@ -1,3 +1,6 @@
+2014-01-04 dg
+ * Streaming: Move streaming to new package (ticket #1135)
+
 2013-12-25 dg
  * Console: Add 'advanced warning' to /configclients
  * SOCKS5Server: Remove redundant, commented out line from my previous findbugs

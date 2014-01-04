@@ -25,7 +25,7 @@ import net.i2p.util.Log;
 public class I2PSocketManagerFactory {
 
     public static final String PROP_MANAGER = "i2p.streaming.manager";
-    public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerFull";
+    public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.impl.I2PSocketManagerFull";
     
     /**
      * Create a socket manager using a brand new destination connected to the
