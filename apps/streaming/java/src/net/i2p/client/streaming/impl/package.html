@@ -1,0 +1,17 @@
+<html><body>
+<p>Implements a TCP-like (reliable, authenticated, in order) set of sockets for 
+communicating over the IP-like (unreliable, unauthenticated, unordered) I2P
+messages.
+
+This is the streaming implementation (moved for ticket #1135 to here). 
+For the API (which you probably want), see ministreaming. 
+
+Note that this class is split across two jars, streaming.jar and ministreaming.jar.
+The interfaces and some code are in ministreaming.jar, but the
+real work gets done in streaming.jar. Clients must have both jars
+in their classpath.
+
+Most clients will require (only) streaming.jar, ministreaming.jar, and i2p.jar
+in their classpath to communicate with the router.
+</p>
+</body></html>

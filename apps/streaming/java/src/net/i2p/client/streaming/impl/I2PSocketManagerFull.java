@@ -17,10 +17,10 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.client.streaming.I2PServerSocket;
+import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
-import net.i2p.client.streaming.I2PSocket;
-import net.i2p.client.streaming.I2PServerSocket;
 
 /**
  * Centralize the coordination and multiplexing of the local client's streaming.

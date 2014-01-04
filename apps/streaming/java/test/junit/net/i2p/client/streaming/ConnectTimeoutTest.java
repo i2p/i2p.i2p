@@ -1,4 +1,4 @@
-package net.i2p.client.streaming;
+package net.i2p.client.streaming.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
@@ -8,6 +8,8 @@ import org.junit.Test;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
+import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 

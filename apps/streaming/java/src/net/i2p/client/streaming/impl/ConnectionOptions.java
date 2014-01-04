@@ -1,7 +1,7 @@
 package net.i2p.client.streaming.impl;
 
-import net.i2p.client.streaming.I2PSocketOptionsImpl;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.client.streaming.I2PSocketOptionsImpl;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package net.i2p.client.streaming;
+package net.i2p.client.streaming.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

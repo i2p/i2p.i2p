@@ -7,9 +7,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManager.DisconnectListener;
 import net.i2p.util.Log;
-import net.i2p.client.streaming.I2PSocketManager;
 
 /**
  * Receive raw information from the I2PSession and turn it into

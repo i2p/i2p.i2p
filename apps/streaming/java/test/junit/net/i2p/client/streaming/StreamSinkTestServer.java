@@ -1,6 +1,6 @@
 package net.i2p.client.streaming;
 
-
+import net.i2p.client.streaming.impl.I2PSocketManagerFull;
 /**
  *
  */
