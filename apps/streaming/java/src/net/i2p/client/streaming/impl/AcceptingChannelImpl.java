@@ -33,7 +33,7 @@ class AcceptingChannelImpl extends AcceptingChannel {
     private volatile I2PSocket next;
     private final I2PServerSocket socket;
 
-    public I2PSocket accept() throws I2PException, ConnectException {
+    protected I2PSocket accept() throws I2PException, ConnectException {
         I2PSocket sock;
         try {
             sock = socket.accept();
