@@ -13,6 +13,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketEepGet;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.crypto.SHA1;
+import net.i2p.data.DataHelper;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -96,7 +97,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             add(file);
         } else {
             _mgr.addMessage(_("Torrent was not retrieved from {0}", urlify(_url)) +
-                            ((_failCause != null) ? (": " + _failCause) : ""));
+                            ((_failCause != null) ? (": " + DataHelper.stripHTML(_failCause)) : ""));
         }
         if (file != null)
             file.delete();

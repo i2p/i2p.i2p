@@ -305,8 +305,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             I2PSocket sock = connect(peer, options);
             return new StandardSocket(sock);
         } catch (I2PException i2pe) {
-            // fixme in 1.6 change to cause
-            throw new IOException(i2pe.toString());
+            IOException ioe = new IOException("connect fail");
+            ioe.initCause(i2pe);
+            throw ioe;
         }
     }
 

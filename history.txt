@@ -1,3 +1,8 @@
+2014-01-04 zzz
+ * Peermanager: Disable small same-country bonus
+ * Tunnels: Change client default to 3 hops in router;
+   change expl. default to 2+0 IB and 2 + 0-1 OB
+
 2014-01-04 dg
  * Streaming: Move streaming to new package (ticket #1135)
 
