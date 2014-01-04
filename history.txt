@@ -5,6 +5,7 @@
 
 2014-01-04 dg
  * Streaming: Move streaming to new package (ticket #1135)
+ * Console: Change /configclients 'advanced warning' to include 'toopie, no red
 
 2013-12-25 dg
  * Console: Add 'advanced warning' to /configclients
