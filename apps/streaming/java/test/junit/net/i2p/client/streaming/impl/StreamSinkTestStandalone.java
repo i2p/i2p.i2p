@@ -1,5 +1,9 @@
-package net.i2p.client.streaming;
+package net.i2p.client.streaming.impl;
 
+import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.client.streaming.StreamSinkClient;
+import net.i2p.client.streaming.StreamSinkSend;
+import net.i2p.client.streaming.StreamSinkServer;
 import net.i2p.client.streaming.impl.I2PSocketManagerFull;
 /**
  * Usage: StreamSinkTest [(old|new) [#hops [#kb]]]
