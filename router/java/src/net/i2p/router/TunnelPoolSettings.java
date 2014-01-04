@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.data.Hash;
+import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SystemVersion;
 
@@ -56,8 +57,22 @@ public class TunnelPoolSettings {
     // public static final int     DEFAULT_REBUILD_PERIOD = 60*1000;
     public static final int     DEFAULT_DURATION = 10*60*1000;
     //public static final int     DEFAULT_LENGTH = SystemVersion.isAndroid() ? 2 : 3;
-    public static final int     DEFAULT_LENGTH = 2;
-    public static final int     DEFAULT_LENGTH_VARIANCE = 0;
+
+    private static final boolean isSlow = SystemVersion.isGNU() ||
+                                          SystemVersion.isARM() ||
+                                          SystemVersion.isApache() ||
+                                          !NativeBigInteger.isNative();
+
+    /** client only */
+    private static final int    DEFAULT_IB_LENGTH = 3;
+    private static final int    DEFAULT_OB_LENGTH = 3;
+    private static final int    DEFAULT_LENGTH_VARIANCE = 0;
+    /** expl only */
+    private static final int    DEFAULT_IB_EXPL_LENGTH = 2;
+    private static final int    DEFAULT_OB_EXPL_LENGTH = 2;
+    private static final int    DEFAULT_IB_EXPL_LENGTH_VARIANCE = 0;
+    private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
+
     public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)
     private static final int MIN_PRIORITY = -25;
@@ -72,8 +87,13 @@ public class TunnelPoolSettings {
         _backupQuantity = DEFAULT_BACKUP_QUANTITY;
         // _rebuildPeriod = DEFAULT_REBUILD_PERIOD;
         //_duration = DEFAULT_DURATION;
-        _length = DEFAULT_LENGTH;
-        _lengthVariance = DEFAULT_LENGTH_VARIANCE;
+        if (isInbound) {
+            _length = isExploratory ? DEFAULT_IB_EXPL_LENGTH : DEFAULT_IB_LENGTH;
+            _lengthVariance = isExploratory ? DEFAULT_IB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
+        } else {
+            _length = isExploratory ? DEFAULT_OB_EXPL_LENGTH : DEFAULT_OB_LENGTH;
+            _lengthVariance = isExploratory ? DEFAULT_OB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
+        }
         _lengthOverride = -1;
         if (isExploratory)
             _allowZeroHop = true;
@@ -212,9 +232,15 @@ public class TunnelPoolSettings {
                 //else if (name.equalsIgnoreCase(prefix + PROP_DURATION))
                 //    _duration = getInt(value, DEFAULT_DURATION);
                 else if (name.equalsIgnoreCase(prefix + PROP_LENGTH))
-                    _length = getInt(value, DEFAULT_LENGTH);
+                    _length = getInt(value, _isInbound ?
+                                            (_isExploratory ? DEFAULT_IB_EXPL_LENGTH : DEFAULT_IB_LENGTH) :
+                                            (_isExploratory ? DEFAULT_OB_EXPL_LENGTH : DEFAULT_OB_LENGTH));
                 else if (name.equalsIgnoreCase(prefix + PROP_LENGTH_VARIANCE))
-                    _lengthVariance = getInt(value, DEFAULT_LENGTH_VARIANCE);
+                    _lengthVariance = getInt(value, _isExploratory ?
+                                                        (_isInbound ?
+                                                             DEFAULT_IB_EXPL_LENGTH_VARIANCE :
+                                                             DEFAULT_OB_EXPL_LENGTH_VARIANCE) :
+                                                        DEFAULT_LENGTH_VARIANCE);
                 else if (name.equalsIgnoreCase(prefix + PROP_QUANTITY))
                     _quantity = getInt(value, DEFAULT_QUANTITY);
                 // else if (name.equalsIgnoreCase(prefix + PROP_REBUILD_PERIOD))
