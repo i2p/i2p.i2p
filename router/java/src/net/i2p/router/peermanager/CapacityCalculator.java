@@ -67,6 +67,7 @@ class CapacityCalculator {
         // boost connected peers
         if (profile.isEstablished())
             capacity += BONUS_ESTABLISHED;
+     /****
         // boost same country
         if (profile.isSameCountry()) {
             double bonus = BONUS_SAME_COUNTRY;
@@ -78,6 +79,7 @@ class CapacityCalculator {
             }
             capacity += bonus;
         }
+      ****/
         // penalize unreachable peers
         if (profile.wasUnreachable())
             capacity -= PENALTY_UNREACHABLE;
