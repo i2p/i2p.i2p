@@ -10,7 +10,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
-import static net.i2p.client.streaming.I2PSocketOptionsImpl.getDouble;
+import static net.i2p.client.streaming.impl.I2PSocketOptionsImpl.getDouble;
 
 /**
  *  Share important TCP Control Block parameters across Connections

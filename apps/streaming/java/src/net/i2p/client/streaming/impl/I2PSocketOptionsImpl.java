@@ -1,12 +1,14 @@
-package net.i2p.client.streaming;
+package net.i2p.client.streaming.impl;
 
 import java.util.Properties;
+
+import net.i2p.client.streaming.I2PSocketOptions;
 
 /**
  * Define the configuration for streaming and verifying data on the socket.
  * Use I2PSocketManager.buildOptions() to get one of these.
  */
-public class I2PSocketOptionsImpl implements I2PSocketOptions {
+class I2PSocketOptionsImpl implements I2PSocketOptions {
     private long _connectTimeout;
     private long _readTimeout;
     private long _writeTimeout;
