@@ -29,6 +29,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
+import net.i2p.outproxy.Outproxy;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
@@ -320,6 +321,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
     public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
     public static final String PROP_DISABLE_HELPER = "i2ptunnel.httpclient.disableAddressHelper";
+    public static final String PROP_OUTPROXY = "i2ptunnel.useLocalOutproxy";
 
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
@@ -330,6 +332,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String targetRequest = null;
 
         boolean usingWWWProxy = false;
+        boolean usingOutproxy = false;
+        Outproxy outproxy = null;
         boolean usingInternalServer = false;
         String internalPath = null;
         String internalRawQuery = null;
@@ -677,34 +681,47 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         s.close();
                         return;
                     } else if(host.contains(".") || host.startsWith("[")) {
-                        if(port >= 0) {
-                            host = host + ':' + port;
-                        }
-                        // The request must be forwarded to a WWW proxy
-                        if(_log.shouldLog(Log.DEBUG)) {
-                            _log.debug("Before selecting outproxy for " + host);
-                        }
-                        currentProxy = selectProxy();
-                        if(_log.shouldLog(Log.DEBUG)) {
-                            _log.debug("After selecting outproxy for " + host + ": " + currentProxy);
-                        }
-                        if(currentProxy == null) {
-                            if(_log.shouldLog(Log.WARN)) {
-                                _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
+                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY)) &&
+                            (outproxy = _context.outproxy()) != null) {
+                            int rPort = requestURI.getPort();
+                            if (rPort > 0)
+                                remotePort = rPort;
+                            else
+                                remotePort = 80;
+                            usingOutproxy = true;
+                            targetRequest = requestURI.toASCIIString();
+                            if(_log.shouldLog(Log.DEBUG))
+                                _log.debug(getPrefix(requestId) + " [" + host + "]: outproxy!");
+                        } else {
+                            if(port >= 0) {
+                                host = host + ':' + port;
                             }
-                            l.log("No HTTP outproxy found for the request.");
-                            if(out != null) {
-                                out.write(getErrorPage("noproxy", _ERR_NO_OUTPROXY));
-                                writeFooter(out);
+                            // The request must be forwarded to a WWW proxy
+                            if(_log.shouldLog(Log.DEBUG)) {
+                                _log.debug("Before selecting outproxy for " + host);
                             }
-                            s.close();
-                            return;
-                        }
-                        destination = currentProxy;
-                        usingWWWProxy = true;
-                        targetRequest = requestURI.toASCIIString();
-                        if(_log.shouldLog(Log.DEBUG)) {
-                            _log.debug(getPrefix(requestId) + " [" + host + "]: wwwProxy!");
+                            currentProxy = selectProxy();
+                            if(_log.shouldLog(Log.DEBUG)) {
+                                _log.debug("After selecting outproxy for " + host + ": " + currentProxy);
+                            }
+                            if(currentProxy == null) {
+                                if(_log.shouldLog(Log.WARN)) {
+                                    _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
+                                }
+                                l.log("No HTTP outproxy found for the request.");
+                                if(out != null) {
+                                    out.write(getErrorPage("noproxy", _ERR_NO_OUTPROXY));
+                                    writeFooter(out);
+                                }
+                                s.close();
+                                return;
+                            }
+                            destination = currentProxy;
+                            usingWWWProxy = true;
+                            targetRequest = requestURI.toASCIIString();
+                            if(_log.shouldLog(Log.DEBUG)) {
+                                _log.debug(getPrefix(requestId) + " [" + host + "]: wwwProxy!");
+                            }
                         }
                     } else {
                         // what is left for here? a hostname with no dots, and != "i2p"
@@ -722,7 +739,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         return;
                     }   // end host name processing
 
-                    boolean isValid = usingWWWProxy || usingInternalServer || isSupportedAddress(host, protocol);
+                    boolean isValid = usingOutproxy || usingWWWProxy ||
+                                      usingInternalServer || isSupportedAddress(host, protocol);
                     if(!isValid) {
                         if(_log.shouldLog(Log.INFO)) {
                             _log.info(getPrefix(requestId) + "notValid(" + host + ")");
@@ -743,7 +761,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 // end first line processing
 
                 } else {
-                    if(lowercaseLine.startsWith("host: ") && !usingWWWProxy) {
+                    if(lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingOutproxy) {
                         // Note that we only pass the original Host: line through to the outproxy
                         // But we don't create a Host: line if it wasn't sent to us
                         line = "Host: " + host;
@@ -815,7 +833,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if(!shout) {
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
-                            if(usingWWWProxy) {
+                            if(usingWWWProxy || usingOutproxy) {
                                 newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
                             } else {
                                 newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
@@ -848,7 +866,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
             }
 
-            if(method == null || destination == null) {
+            if(method == null || (destination == null && !usingOutproxy)) {
                 //l.log("No HTTP method found in the request.");
                 if(out != null) {
                     if(protocol != null && "http".equals(protocol.toLowerCase(Locale.US))) {
@@ -893,6 +911,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     LocalHTTPServer.serveLocalFile(out, method, internalPath, internalRawQuery, _proxyNonce);
                 }
                 s.close();
+                return;
+            }
+
+            // no destination, going to outproxy plugin
+            if (usingOutproxy) {
+                Socket outSocket = outproxy.connect(host, remotePort);
+                byte[] data = newRequest.toString().getBytes("ISO-8859-1");
+                Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
+                new I2PTunnelOutproxyRunner(s, outSocket, sockLock, data, onTimeout);
                 return;
             }
 

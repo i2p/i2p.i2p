@@ -25,6 +25,7 @@ import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
+import net.i2p.outproxy.Outproxy;
 import net.i2p.stat.StatManager;
 import net.i2p.update.UpdateManager;
 import net.i2p.util.Clock;
@@ -94,6 +95,7 @@ public class I2PAppContext {
     private SimpleTimer _simpleTimer;
     private SimpleTimer2 _simpleTimer2;
     private final PortMapper _portMapper;
+    private Outproxy _outproxy;
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
@@ -127,7 +129,8 @@ public class I2PAppContext {
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
                          _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
                          _lock13 = new Object(), _lock14 = new Object(), _lock15 = new Object(), _lock16 = new Object(),
-                         _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
+                         _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object(),
+                         _lock21 = new Object();
 
     /**
      * Pull the default context, creating a new one if necessary, else using 
@@ -1022,5 +1025,40 @@ public class I2PAppContext {
      */
     public UpdateManager updateManager() {
         return null;
+    }
+
+    /**
+     *  A local outproxy
+     *  @return The outproxy if it is registered, else null
+     *  @since 0.9.11
+     */
+    public Outproxy outproxy() {
+        return _outproxy;
+    }
+
+    /**
+     *  Register as the outproxy. For now, only one.
+     *  @throws IllegalStateException if one was already registered
+     *  @since 0.9.11
+     */
+    public void registerOutproxy(Outproxy oproxy) {
+        synchronized(_lock21) {
+            if (_outproxy != null)
+                throw new IllegalStateException();
+            _outproxy = oproxy;
+        }
+    }
+
+    /**
+     *  Unregister the outproxy.
+     *  @throws IllegalStateException if it was not registered
+     *  @since 0.9.11
+     */
+    public void unregisterOutproxy(Outproxy oproxy) {
+        synchronized(_lock21) {
+            if (_outproxy != oproxy)
+                throw new IllegalStateException();
+            _outproxy = null;
+        }
     }
 }
