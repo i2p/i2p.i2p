@@ -1215,7 +1215,7 @@ public class IndexBean {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
         "outproxyUsername", "outproxyPassword",
         I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
-        I2PTunnelHTTPClientBase.PROP_AUTH
+        I2PTunnelHTTPClientBase.PROP_AUTH, I2PClient.PROP_SIGTYPE
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
