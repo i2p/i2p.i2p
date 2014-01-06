@@ -323,7 +323,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
     public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
     public static final String PROP_DISABLE_HELPER = "i2ptunnel.httpclient.disableAddressHelper";
-    public static final String PROP_OUTPROXY = "i2ptunnel.useLocalOutproxy";
+    /** @since 0.9.11 */
+    public static final String PROP_USE_OUTPROXY_PLUGIN = "i2ptunnel.useLocalOutproxy";
+    /** @since 0.9.11 */
+    public static final String PROP_SSL_OUTPROXIES = "i2ptunnel.httpclient.SSLOutproxies";
 
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
@@ -694,7 +697,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         s.close();
                         return;
                     } else if(host.contains(".") || host.startsWith("[")) {
-                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY))) {
+                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USE_OUTPROXY_PLUGIN))) {
                             ClientAppManager mgr = _context.clientAppManager();
                             if (mgr != null) {
                                 ClientApp op = mgr.getRegisteredApp(Outproxy.NAME);
@@ -723,7 +726,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             if(_log.shouldLog(Log.DEBUG)) {
                                 _log.debug("Before selecting outproxy for " + host);
                             }
-                            currentProxy = selectProxy();
+                            if ("https".equals(protocol) ||
+                                method.toUpperCase(Locale.US).equals("CONNECT"))
+                                currentProxy = selectSSLProxy();
+                            else
+                                currentProxy = selectProxy();
                             if(_log.shouldLog(Log.DEBUG)) {
                                 _log.debug("After selecting outproxy for " + host + ": " + currentProxy);
                             }
@@ -1100,6 +1107,26 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         }
+    }
+
+    /**
+     *  Unlike selectProxy(), we parse the option on the fly so it
+     *  can be changed. selectProxy() requires restart...
+     *  @return null if none
+     *  @since 0.9.11
+     */
+    private String selectSSLProxy() {
+        String s = getTunnel().getClientOptions().getProperty(PROP_SSL_OUTPROXIES);
+        if (s == null)
+            return null;
+        String[] p = s.split(", ");
+        if (p.length == 0)
+            return null;
+        // todo doesn't check for ""
+        if (p.length == 1)
+            return p[0];
+        int i = _context.random().nextInt(p.length);
+        return p[i];
     }
 
     /** @since 0.8.7 */

@@ -868,6 +868,17 @@ public class IndexBean {
         if (s != null)
             _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, s.trim());
     }
+
+    /** @since 0.9.11 */
+    public void setSslProxies(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, s.trim().replace(" ", ","));
+    }
+
+    /** @since 0.9.11 */
+    public void setUseOutproxyPlugin(String moo) {
+        _booleanOptions.add(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+    }
     
     /** all of these are @since 0.8.3 */
     protected static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
@@ -1189,7 +1200,8 @@ public class IndexBean {
         "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
         };
     private static final String _booleanProxyOpts[] = {
-        I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
+        I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH,
+        I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,
@@ -1199,7 +1211,8 @@ public class IndexBean {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
         "outproxyUsername", "outproxyPassword",
         I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
-        I2PTunnelHTTPClientBase.PROP_AUTH
+        I2PTunnelHTTPClientBase.PROP_AUTH,
+        I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",

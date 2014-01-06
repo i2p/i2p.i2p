@@ -245,7 +245,17 @@ public class EditBean extends IndexBean {
             return "";
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, "");
     }
+
+    /** @since 0.9.11 */
+    public String getSslProxies(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, "");
+    }
     
+    /** @since 0.9.11 */
+    public boolean getUseOutproxyPlugin(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+    }
+
     /** all of these are @since 0.8.3 */
     public String getLimitMinute(int tunnel) {
         return getProperty(tunnel, PROP_MAX_CONNS_MIN, "0");

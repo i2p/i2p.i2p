@@ -152,6 +152,21 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
             </div>
+              <% if ("httpclient".equals(tunnelType)) {
+                 %><div id="destinationField" class="rowItem">
+                   <label>
+                       <%=intl._("SSL Outproxies")%>:
+                   </label>
+                   <input type="text" size="30" id="sslProxyList" name="sslProxies" title="List of Outproxy I2P destinations" value="<%=editBean.getSslProxies(curTunnel)%>" class="freetext" />                
+                   </div>
+              <% }  // httpclient %>
+            <div id="startupField" class="rowItem">
+                <label>
+                    <%=intl._("Use Outproxy Plugin")%>:
+                </label>
+                <input value="1" type="checkbox" id="shared" name="useOutproxyPlugin" title="Use plugin instead of above-listed proxies if available"<%=(editBean.getUseOutproxyPlugin(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
+            </div>
             <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
