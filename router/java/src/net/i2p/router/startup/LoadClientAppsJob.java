@@ -267,13 +267,13 @@ public class LoadClientAppsJob extends JobImpl {
                 Class<?> cls = Class.forName(_className, true, _cl);
                 if (isRouterApp(cls)) {
                     Constructor<?> con = cls.getConstructor(RouterContext.class, ClientAppManager.class, String[].class);
-                    RouterAppManager mgr = _ctx.clientAppManager();
+                    RouterAppManager mgr = _ctx.routerAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     RouterApp app = (RouterApp) con.newInstance(conArgs);
                     mgr.addAndStart(app, _args);
                 } else if (isClientApp(cls)) {
                     Constructor<?> con = cls.getConstructor(I2PAppContext.class, ClientAppManager.class, String[].class);
-                    RouterAppManager mgr = _ctx.clientAppManager();
+                    RouterAppManager mgr = _ctx.routerAppManager();
                     Object[] conArgs = new Object[] {_ctx, _ctx.clientAppManager(), _args};
                     ClientApp app = (ClientApp) con.newInstance(conArgs);
                     mgr.addAndStart(app, _args);

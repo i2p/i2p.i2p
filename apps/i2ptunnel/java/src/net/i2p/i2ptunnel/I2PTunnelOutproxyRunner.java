@@ -48,6 +48,7 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
     private final Object slock, finishLock = new Object();
     volatile boolean finished = false;
     private final byte[] initialI2PData;
+    private final byte[] initialSocketData;
     /** when the last data was sent/received (or -1 if never) */
     private long lastActivityOn;
     /** when the runner started up */
@@ -68,11 +69,12 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
                          it will be run before closing s.
      */
     public I2PTunnelOutproxyRunner(Socket s, Socket i2ps, Object slock, byte[] initialI2PData,
-                                   Runnable onTimeout) {
+                                   byte[] initialSocketData, Runnable onTimeout) {
         this.s = s;
         this.i2ps = i2ps;
         this.slock = slock;
         this.initialI2PData = initialI2PData;
+        this.initialSocketData = initialSocketData;
         this.onTimeout = onTimeout;
         lastActivityOn = -1;
         startedOn = Clock.getInstance().now();
@@ -130,9 +132,14 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
                     i2pout.write(initialI2PData);
                     i2pout.flush();
             }
+            if (initialSocketData != null) {
+                // this does not increment totalReceived
+                out.write(initialSocketData);
+            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Initial data " + (initialI2PData != null ? initialI2PData.length : 0) 
-                           + " written to the outproxy, starting forwarders");
+                           + " written to the outproxy, " + (initialSocketData != null ? initialSocketData.length : 0)
+                           + " written to the socket, starting forwarders");
             if (!(s instanceof InternalSocket))
                 in = new BufferedInputStream(in, 2*NETWORK_BUFFER_SIZE);
             Thread t1 = new StreamForwarder(in, i2pout, true);

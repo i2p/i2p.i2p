@@ -103,7 +103,7 @@ public class ConfigClientsHelper extends HelperBase {
                 showStart = false;
                 showStop = false;
             } else {
-                ClientApp clientApp = _context.clientAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
+                ClientApp clientApp = _context.routerAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
                 showStart = clientApp == null;
                 showStop = clientApp != null && clientApp.getState() == ClientAppState.RUNNING;
             }

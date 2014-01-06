@@ -18,6 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.Outproxy;
 import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -29,7 +32,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
-import net.i2p.outproxy.Outproxy;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
@@ -416,6 +418,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                      ****/
                     }
 
+                    method = params[0];
+                    if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                        // this makes things easier later, by spoofing a
+                        // protocol so the URI parser find the host and port
+                        // FIXME breaks in-net outproxy
+                        request = "https://" + request + '/';
+                    }
+
                     // Now use the Java URI parser
                     // This will be the incoming URI but will then get modified
                     // to be the outgoing URI (with http:// if going to outproxy, otherwise without)
@@ -447,13 +457,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         s.close();
                         return;
                     }
-                    method = params[0];
+
                     String protocolVersion = params[2];
 
                     protocol = requestURI.getScheme();
                     host = requestURI.getHost();
                     if(protocol == null || host == null) {
-                        _log.warn("Null protocol or host: " + request);
+                        _log.warn("Null protocol or host: " + request + ' ' + protocol + ' ' + host);
                         method = null;
                         break;
                     }
@@ -531,6 +541,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 break;
                             }
                           ******/
+                        } else if ("https".equals(protocol) ||
+                                   method.toUpperCase(Locale.US).equals("CONNECT")) {
+                            remotePort = 443;
                         } else {
                             remotePort = 80;
                         }
@@ -681,18 +694,28 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         s.close();
                         return;
                     } else if(host.contains(".") || host.startsWith("[")) {
-                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY)) &&
-                            (outproxy = _context.outproxy()) != null) {
-                            int rPort = requestURI.getPort();
-                            if (rPort > 0)
-                                remotePort = rPort;
-                            else
-                                remotePort = 80;
-                            usingOutproxy = true;
-                            targetRequest = requestURI.toASCIIString();
-                            if(_log.shouldLog(Log.DEBUG))
-                                _log.debug(getPrefix(requestId) + " [" + host + "]: outproxy!");
-                        } else {
+                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY))) {
+                            ClientAppManager mgr = _context.clientAppManager();
+                            if (mgr != null) {
+                                ClientApp op = mgr.getRegisteredApp(Outproxy.NAME);
+                                if (op != null) {
+                                    outproxy = (Outproxy) op;
+                                    int rPort = requestURI.getPort();
+                                    if (rPort > 0)
+                                        remotePort = rPort;
+                                    else if ("https".equals(protocol) ||
+                                             method.toUpperCase(Locale.US).equals("CONNECT"))
+                                        remotePort = 443;
+                                    else
+                                        remotePort = 80;
+                                    usingOutproxy = true;
+                                    targetRequest = requestURI.toASCIIString();
+                                    if(_log.shouldLog(Log.DEBUG))
+                                        _log.debug(getPrefix(requestId) + " [" + host + "]: outproxy!");
+                                }
+                            }
+                        }
+                        if (!usingOutproxy) {
                             if(port >= 0) {
                                 host = host + ':' + port;
                             }
@@ -917,9 +940,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // no destination, going to outproxy plugin
             if (usingOutproxy) {
                 Socket outSocket = outproxy.connect(host, remotePort);
-                byte[] data = newRequest.toString().getBytes("ISO-8859-1");
                 Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-                new I2PTunnelOutproxyRunner(s, outSocket, sockLock, data, onTimeout);
+                byte[] data;
+                byte[] response;
+                if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                    data = null;
+                    response = I2PTunnelConnectClient.SUCCESS_RESPONSE;
+                } else {
+                    data = newRequest.toString().getBytes("ISO-8859-1");
+                    response = null;
+                }
+                new I2PTunnelOutproxyRunner(s, outSocket, sockLock, data, response, onTimeout);
                 return;
             }
 
@@ -1025,9 +1056,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if (remotePort > 0)
                 sktOpts.setPort(remotePort);
             I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
-            byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-            new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+            if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                byte[] data;
+                byte[] response;
+                if (usingWWWProxy) {
+                    data = newRequest.toString().getBytes("ISO-8859-1");
+                    response = null;
+                } else {
+                    data = null;
+                    response = I2PTunnelConnectClient.SUCCESS_RESPONSE;
+                }
+                new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+            } else {
+                byte[] data = newRequest.toString().getBytes("ISO-8859-1");
+                new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+            }
         } catch (SocketException ex) {
             if (_log.shouldLog(Log.INFO)) {
                 _log.info(getPrefix(requestId) + "Error trying to connect", ex);
@@ -1310,8 +1354,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
         }
          ****/
-        return protocol.toLowerCase(Locale.US).equals("http");
+        String lc = protocol.toLowerCase(Locale.US);
+        return lc.equals("http") || lc.equals("https");
     }
+
     private final static byte[] ERR_HELPER_DISABLED =
                                 ("HTTP/1.1 403 Disabled\r\n" +
             "Content-Type: text/plain\r\n" +

@@ -235,7 +235,7 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         ClientAppConfig ca = clients.get(i);
-        ClientApp clientApp = _context.clientAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
+        ClientApp clientApp = _context.routerAppManager().getClientApp(ca.className, LoadClientAppsJob.parseArgs(ca.args));
         if (clientApp != null && clientApp.getState() == ClientAppState.RUNNING) {
             try {
                 // todo parseArgs(ca.stopArgs) ?

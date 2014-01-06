@@ -1,4 +1,4 @@
-package net.i2p.outproxy;
+package net.i2p.app;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -8,6 +8,8 @@ import java.net.Socket;
  *  @since 0.9.11
  */
 public interface Outproxy {
+
+    public static final String NAME = "outproxy";
 
     /**
      *

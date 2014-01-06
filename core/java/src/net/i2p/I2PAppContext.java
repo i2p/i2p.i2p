@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
@@ -1028,37 +1029,11 @@ public class I2PAppContext {
     }
 
     /**
-     *  A local outproxy
-     *  @return The outproxy if it is registered, else null
-     *  @since 0.9.11
+     *  The RouterAppManager in RouterContext, null always in I2PAppContext
+     *  @return null always
+     *  @since 0.9.11, in RouterContext since 0.9.4
      */
-    public Outproxy outproxy() {
-        return _outproxy;
-    }
-
-    /**
-     *  Register as the outproxy. For now, only one.
-     *  @throws IllegalStateException if one was already registered
-     *  @since 0.9.11
-     */
-    public void registerOutproxy(Outproxy oproxy) {
-        synchronized(_lock21) {
-            if (_outproxy != null)
-                throw new IllegalStateException();
-            _outproxy = oproxy;
-        }
-    }
-
-    /**
-     *  Unregister the outproxy.
-     *  @throws IllegalStateException if it was not registered
-     *  @since 0.9.11
-     */
-    public void unregisterOutproxy(Outproxy oproxy) {
-        synchronized(_lock21) {
-            if (_outproxy != oproxy)
-                throw new IllegalStateException();
-            _outproxy = null;
-        }
+    public ClientAppManager clientAppManager() {
+        return null;
     }
 }

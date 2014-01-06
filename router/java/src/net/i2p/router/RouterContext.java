@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.internal.InternalClientManager;
@@ -586,7 +587,18 @@ public class RouterContext extends I2PAppContext {
      *  @return the manager
      *  @since 0.9.4
      */
-    public RouterAppManager clientAppManager() {
+    @Override
+    public ClientAppManager clientAppManager() {
+        return _appManager;
+    }
+
+    /**
+     *  The RouterAppManager.
+     *  For convenience, same as clientAppManager(), no cast required
+     *  @return the manager
+     *  @since 0.9.11
+     */
+    public RouterAppManager routerAppManager() {
         return _appManager;
     }
 }

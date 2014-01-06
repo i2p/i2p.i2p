@@ -35,7 +35,7 @@
     /*
      *  Print out the status for the AppManager
      */
-    ctx.clientAppManager().renderStatusHTML(out);
+    ctx.routerAppManager().renderStatusHTML(out);
 
     /*
      *  Print out the status for all the SessionKeyManagers
