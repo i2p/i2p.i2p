@@ -137,7 +137,7 @@ class StandardServerSocket extends ServerSocket {
 
     @Override
     public boolean isClosed() {
-        return ((I2PSocketManagerFull)_socket.getManager()).getConnectionManager().getAllowIncomingConnections();
+        return !((I2PSocketManagerFull)_socket.getManager()).getConnectionManager().getAllowIncomingConnections();
     }
 
     /**
