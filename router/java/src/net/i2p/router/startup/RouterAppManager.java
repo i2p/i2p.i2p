@@ -138,8 +138,13 @@ public class RouterAppManager implements ClientAppManager {
      *  @return true if successful, false if duplicate name
      */
     public boolean register(ClientApp app) {
-        if (!_clients.containsKey(app))
-            return false;
+        if (!_clients.containsKey(app)) {
+            // Allow registration even if we didn't start it,
+            // useful for plugins
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Registering untracked client " + app.getName());
+            //return false;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Client " + app.getDisplayName() + " REGISTERED AS " + app.getName());
         // TODO if old app in there is not running and != this app, allow replacement
