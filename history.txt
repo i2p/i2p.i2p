@@ -1,3 +1,10 @@
+2014-01-09
+ * Translations
+  - Updates to French, German, Romanian, and Russian
+  - New Brazilian Portuguese translation
+  - Mass pull of translations from Transifex
+  - Update of English strings
+
 2014-01-09 str4d
  * susimail:
   - Fixed pagination with zero entries (ticket #1168)
