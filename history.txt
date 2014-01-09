@@ -1,3 +1,6 @@
+2014-01-09 str4d
+ * Console: Fixed overlapping text issue in midnight theme
+
 2014-01-04 zzz
  * Peermanager: Disable small same-country bonus
  * Tunnels: Change client default to 3 hops in router;
