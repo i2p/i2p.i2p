@@ -381,7 +381,7 @@ div.main {
 }
 
 div.main ul {
-     margin: -10px 0 -10px -10px;
+     margin: 5px 0;
 }
 
 div.main li {
@@ -978,7 +978,8 @@ div.joblog ul {
 }
 
 div.joblog li:first-child {
-     margin-top: -10px;
+     margin-top: 0;
+     padding: 10px 0;
 }
 
 div.joblog li:last-child {
