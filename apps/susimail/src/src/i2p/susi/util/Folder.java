@@ -176,11 +176,14 @@ public class Folder<O extends Object> {
 	 */
 	public void setElements( O[] elements )
 	{
-		this.unsortedElements = elements;
-		if( currentSorter != null )
-			sort();
-		else
-			this.elements = elements;
+		if (elements.length > 0) {
+			this.unsortedElements = elements;
+			if( currentSorter != null )
+				sort();
+			else
+				this.elements = elements;
+		} else
+			this.elements = null;
 		update();
 	}
 	
