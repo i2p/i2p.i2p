@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the desktopgui package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # blabla <blabla@trash-mail.com>, 2011
 # ducki2p <ducki2p@gmail.com>, 2011
@@ -11,15 +11,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-03-03 18:29+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-01-09 19:14+0000\n"
 "PO-Revision-Date: 2013-06-08 04:50+0000\n"
 "Last-Translator: Boxoa590\n"
-"Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
+"Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
+"fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:23
@@ -50,10 +51,10 @@ msgstr "Redémarrer I2P"
 msgid "Stop I2P"
 msgstr "Arrêter I2P"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:43
 msgid "Tray icon configuration"
 msgstr "Configuration de l'icône de notification"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:46
 msgid "Should tray icon be enabled?"
 msgstr "Activer l'icône de notification ?"

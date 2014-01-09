@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:04+0000\n"
+"POT-Creation-Date: 2014-01-09 19:03+0000\n"
 "PO-Revision-Date: 2013-11-11 12:42+0000\n"
 "Last-Translator: polearnik <polearnik@mail.ru>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/"
@@ -22,150 +22,150 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
-#: src/src/i2p/susi/webmail/WebMail.java:447
+#: src/src/i2p/susi/webmail/WebMail.java:443
 msgid "unknown"
 msgstr "necunoscut"
 
-#: src/src/i2p/susi/webmail/WebMail.java:466
+#: src/src/i2p/susi/webmail/WebMail.java:462
 msgid "Warning: no transfer encoding found, fallback to 7bit."
 msgstr "Atenție: nu sa găsit transfer codat, revenire la 7bit."
 
-#: src/src/i2p/susi/webmail/WebMail.java:471
+#: src/src/i2p/susi/webmail/WebMail.java:467
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
 msgstr "Nici un encoder găsit pentru codificarea \\'' {0} \\''."
 
-#: src/src/i2p/susi/webmail/WebMail.java:477
+#: src/src/i2p/susi/webmail/WebMail.java:473
 msgid "Warning: no charset found, fallback to US-ASCII."
 msgstr "Atenție: nu sa găsit setul de caractere, revenire la US-ASCII."
 
-#: src/src/i2p/susi/webmail/WebMail.java:491
+#: src/src/i2p/susi/webmail/WebMail.java:487
 #, java-format
 msgid "Charset \\''{0}\\'' not supported."
 msgstr "Set de caractere \\'' {0} \\'' nu este suportat."
 
-#: src/src/i2p/susi/webmail/WebMail.java:495
+#: src/src/i2p/susi/webmail/WebMail.java:491
 #, java-format
 msgid "Part ({0}) not shown, because of {1}"
 msgstr "Partea ({0}) nu apare, din cauza {1}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:518
+#: src/src/i2p/susi/webmail/WebMail.java:514
 msgid "Download"
 msgstr "Descarcă"
 
-#: src/src/i2p/susi/webmail/WebMail.java:518
+#: src/src/i2p/susi/webmail/WebMail.java:514
 msgid "File is packed into a zipfile for security reasons."
 msgstr "Fișier este ambalat într-o arhiva zip pentru motive de securitate."
 
-#: src/src/i2p/susi/webmail/WebMail.java:518
+#: src/src/i2p/susi/webmail/WebMail.java:514
 #, java-format
 msgid "attachment ({0})."
 msgstr "atașament ({0})."
 
-#: src/src/i2p/susi/webmail/WebMail.java:522
+#: src/src/i2p/susi/webmail/WebMail.java:518
 #, java-format
 msgid "Attachment ({0})."
 msgstr "Atașament ({0})."
 
-#: src/src/i2p/susi/webmail/WebMail.java:572
+#: src/src/i2p/susi/webmail/WebMail.java:568
 msgid "Need username for authentication."
 msgstr "Aveți nevoie de nume de utilizator pentru autentificare."
 
-#: src/src/i2p/susi/webmail/WebMail.java:576
+#: src/src/i2p/susi/webmail/WebMail.java:572
 msgid "Need password for authentication."
 msgstr "Aveți nevoie de parolă pentru autentificare."
 
-#: src/src/i2p/susi/webmail/WebMail.java:580
+#: src/src/i2p/susi/webmail/WebMail.java:576
 msgid "Need hostname for connect."
 msgstr "Aveți nevoie de nume de gazdă pentru conectare."
 
-#: src/src/i2p/susi/webmail/WebMail.java:585
+#: src/src/i2p/susi/webmail/WebMail.java:581
 msgid "Need port number for pop3 connect."
 msgstr "Aveți nevoie de numărul de port la POP3 pentru conectare."
 
-#: src/src/i2p/susi/webmail/WebMail.java:592
+#: src/src/i2p/susi/webmail/WebMail.java:588
 msgid "POP3 port number is not in range 0..65535."
 msgstr "Numărul de port POP3 nu este în intervalul 0 .. 65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:598
+#: src/src/i2p/susi/webmail/WebMail.java:594
 msgid "POP3 port number is invalid."
 msgstr "Numărul de port POP3 este invalid."
 
-#: src/src/i2p/susi/webmail/WebMail.java:604
+#: src/src/i2p/susi/webmail/WebMail.java:600
 msgid "Need port number for smtp connect."
 msgstr "Aveți nevoie de numărul de port pentru SMTP pentru conectare."
 
-#: src/src/i2p/susi/webmail/WebMail.java:611
+#: src/src/i2p/susi/webmail/WebMail.java:607
 msgid "SMTP port number is not in range 0..65535."
 msgstr "Numărul de port SMTP nu este în intervalul 0 .. 65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:617
+#: src/src/i2p/susi/webmail/WebMail.java:613
 msgid "SMTP port number is invalid."
 msgstr "Numărul de port SMTP este invalid."
 
-#: src/src/i2p/susi/webmail/WebMail.java:664
+#: src/src/i2p/susi/webmail/WebMail.java:660
 msgid "User logged out."
 msgstr "Utilizatorul sa deconectat."
 
-#: src/src/i2p/susi/webmail/WebMail.java:668
+#: src/src/i2p/susi/webmail/WebMail.java:664
 msgid "Internal error, lost connection."
 msgstr "Eroare internă, conexiune pierdută."
 
-#: src/src/i2p/susi/webmail/WebMail.java:764
+#: src/src/i2p/susi/webmail/WebMail.java:760
 #, java-format
 msgid "On {0} {1} wrote:"
 msgstr "Pe {0} {1} a scris:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:811
+#: src/src/i2p/susi/webmail/WebMail.java:807
 msgid "begin forwarded mail"
 msgstr "începe transmiterea la e-mail"
 
-#: src/src/i2p/susi/webmail/WebMail.java:833
+#: src/src/i2p/susi/webmail/WebMail.java:829
 msgid "end forwarded mail"
 msgstr "sfârșește transmiterea la e-mail"
 
-#: src/src/i2p/susi/webmail/WebMail.java:840
-#: src/src/i2p/susi/webmail/WebMail.java:1775
+#: src/src/i2p/susi/webmail/WebMail.java:836
+#: src/src/i2p/susi/webmail/WebMail.java:1769
 msgid "Could not fetch mail body."
 msgstr "Nu poate prelua corpul la e-mail."
 
-#: src/src/i2p/susi/webmail/WebMail.java:868
+#: src/src/i2p/susi/webmail/WebMail.java:864
 msgid "Message id not valid."
 msgstr "ID-ul mesajului nu este valabil."
 
-#: src/src/i2p/susi/webmail/WebMail.java:951
+#: src/src/i2p/susi/webmail/WebMail.java:947
 #, java-format
 msgid "No Encoding found for {0}"
 msgstr "Nu sa găsit nici o codificare la {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:955
+#: src/src/i2p/susi/webmail/WebMail.java:951
 #, java-format
 msgid "Could not encode data: {0}"
 msgstr "Nu pot codifica datele: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:960
+#: src/src/i2p/susi/webmail/WebMail.java:956
 #, java-format
 msgid "Error reading uploaded file: {0}"
 msgstr "Eroare la citirea fișierului încărcat: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1038
+#: src/src/i2p/susi/webmail/WebMail.java:1034
 msgid "Error parsing download parameter."
 msgstr "Eroare de analiză la descărcarea parametrului."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1082
+#: src/src/i2p/susi/webmail/WebMail.java:1078
 msgid "Invalid pagesize number, resetting to default value."
 msgstr "Număr invalid la dimensiunea paginii, resetare la valoarea implicită."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1106
+#: src/src/i2p/susi/webmail/WebMail.java:1102
 msgid "No messages marked for deletion."
 msgstr "Nu sunt mesaje marcate pentru ștergere."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1126
+#: src/src/i2p/susi/webmail/WebMail.java:1122
 #, java-format
 msgid "Error deleting message: {0}"
 msgstr "Eroare la ștergerea mesajului: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1137
+#: src/src/i2p/susi/webmail/WebMail.java:1133
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
@@ -173,12 +173,12 @@ msgstr[0] "mesaj sters"
 msgstr[1] "{0} mesaje sterse"
 msgstr[2] "{0} mesaje sterse"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1318
-#: src/src/i2p/susi/webmail/WebMail.java:1659
+#: src/src/i2p/susi/webmail/WebMail.java:1314
+#: src/src/i2p/susi/webmail/WebMail.java:1653
 msgid "Login"
 msgstr "Autentificare"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1320
+#: src/src/i2p/susi/webmail/WebMail.java:1316
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
@@ -186,197 +186,197 @@ msgstr[0] "{0} mesaj"
 msgstr[1] "{0} mesaje"
 msgstr[2] "{0} mesaje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1322
+#: src/src/i2p/susi/webmail/WebMail.java:1318
 msgid "Show Message"
 msgstr "Arată mesajul"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1388
+#: src/src/i2p/susi/webmail/WebMail.java:1384
 #, java-format
 msgid "Error decoding content: {0}"
 msgstr "Eroare decodare conținut: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1393
+#: src/src/i2p/susi/webmail/WebMail.java:1389
 msgid "Error decoding content: No encoder found."
 msgstr "Eroare conținut decodare: Nu sa găsit codificator."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1440
+#: src/src/i2p/susi/webmail/WebMail.java:1436
 msgid "no subject"
 msgstr "fară subiect"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1457
+#: src/src/i2p/susi/webmail/WebMail.java:1453
 msgid "Found no valid sender address."
 msgstr "Nu sa găsit nici o adresă de expeditor valabilă."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1463
+#: src/src/i2p/susi/webmail/WebMail.java:1459
 #, java-format
 msgid "Found no valid address in \\''{0}\\''."
 msgstr "Nu sa găsit nici o adresă valabilă în \\''{0}\\''."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1482
+#: src/src/i2p/susi/webmail/WebMail.java:1478
 msgid "No recipients found."
 msgstr "Nici un destinatar găsit."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1489
+#: src/src/i2p/susi/webmail/WebMail.java:1485
 msgid "Quoted printable encoder not available."
 msgstr "Codificatorul imprimabil citat nu este valabil."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1494
+#: src/src/i2p/susi/webmail/WebMail.java:1490
 msgid "Header line encoder not available."
 msgstr "Linie antet codificator nu este valabil."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1545
+#: src/src/i2p/susi/webmail/WebMail.java:1540
 msgid "Mail sent."
 msgstr "Mail trimis."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1584
+#: src/src/i2p/susi/webmail/WebMail.java:1579
 msgid "Send"
 msgstr "Trimite"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1585
+#: src/src/i2p/susi/webmail/WebMail.java:1580
 msgid "Cancel"
 msgstr "Anulează"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1586
+#: src/src/i2p/susi/webmail/WebMail.java:1581
 msgid "Delete Attachment"
 msgstr "Ștergeți Atașament"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1587
-#: src/src/i2p/susi/webmail/WebMail.java:1681
-#: src/src/i2p/susi/webmail/WebMail.java:1762
+#: src/src/i2p/susi/webmail/WebMail.java:1582
+#: src/src/i2p/susi/webmail/WebMail.java:1675
+#: src/src/i2p/susi/webmail/WebMail.java:1756
 msgid "Reload Config"
 msgstr "Reîncarcă Configurația"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1588
-#: src/src/i2p/susi/webmail/WebMail.java:1682
-#: src/src/i2p/susi/webmail/WebMail.java:1763
+#: src/src/i2p/susi/webmail/WebMail.java:1583
+#: src/src/i2p/susi/webmail/WebMail.java:1676
+#: src/src/i2p/susi/webmail/WebMail.java:1757
 msgid "Logout"
 msgstr "Ieșire"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1611
-#: src/src/i2p/susi/webmail/WebMail.java:1767
+#: src/src/i2p/susi/webmail/WebMail.java:1606
+#: src/src/i2p/susi/webmail/WebMail.java:1761
 msgid "From:"
 msgstr "De la:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1612
+#: src/src/i2p/susi/webmail/WebMail.java:1607
 msgid "To:"
 msgstr "Pentru:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1613
+#: src/src/i2p/susi/webmail/WebMail.java:1608
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1614
+#: src/src/i2p/susi/webmail/WebMail.java:1609
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1615
-#: src/src/i2p/susi/webmail/WebMail.java:1769
+#: src/src/i2p/susi/webmail/WebMail.java:1610
+#: src/src/i2p/susi/webmail/WebMail.java:1763
 msgid "Subject:"
 msgstr "Subiect:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1616
+#: src/src/i2p/susi/webmail/WebMail.java:1611
 msgid "Bcc to self"
 msgstr "Bcc pentru mine"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1619
+#: src/src/i2p/susi/webmail/WebMail.java:1614
 msgid "New Attachment:"
 msgstr "Atașament nou:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1619
+#: src/src/i2p/susi/webmail/WebMail.java:1614
 msgid "Upload File"
 msgstr "Încărcați fișier"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1625
+#: src/src/i2p/susi/webmail/WebMail.java:1620
 msgid "Attachments:"
 msgstr "Atașamente:"
 
 #. current postman hq length limits 16/12, new postman version 32/32
-#: src/src/i2p/susi/webmail/WebMail.java:1648
+#: src/src/i2p/susi/webmail/WebMail.java:1642
 msgid "User"
 msgstr "Utilizator"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1649
+#: src/src/i2p/susi/webmail/WebMail.java:1643
 msgid "Password"
 msgstr "Parola"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1654
+#: src/src/i2p/susi/webmail/WebMail.java:1648
 msgid "Host"
 msgstr "Gazdă"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1655
+#: src/src/i2p/susi/webmail/WebMail.java:1649
 msgid "POP3-Port"
 msgstr "POP3-Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1656
+#: src/src/i2p/susi/webmail/WebMail.java:1650
 msgid "SMTP-Port"
 msgstr "SMTP-Port"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1659
+#: src/src/i2p/susi/webmail/WebMail.java:1653
 msgid "Reset"
 msgstr "Reset"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1660
+#: src/src/i2p/susi/webmail/WebMail.java:1654
 msgid "Learn about I2P mail"
 msgstr "Aflați mai multe despre e-mail I2P"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1661
+#: src/src/i2p/susi/webmail/WebMail.java:1655
 msgid "Create Account"
 msgstr "Creați un cont"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1673
+#: src/src/i2p/susi/webmail/WebMail.java:1667
 msgid "Really delete the marked messages?"
 msgstr "Sigur ștergeți mesajele marcate?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1673
+#: src/src/i2p/susi/webmail/WebMail.java:1667
 msgid "Yes, really delete them!"
 msgstr "Da, într-adevăr ștergeți-le!"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1675
-#: src/src/i2p/susi/webmail/WebMail.java:1754
+#: src/src/i2p/susi/webmail/WebMail.java:1669
+#: src/src/i2p/susi/webmail/WebMail.java:1748
 msgid "New"
 msgstr "Nou"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1676
-#: src/src/i2p/susi/webmail/WebMail.java:1755
+#: src/src/i2p/susi/webmail/WebMail.java:1670
+#: src/src/i2p/susi/webmail/WebMail.java:1749
 msgid "Reply"
 msgstr "Replică"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1677
-#: src/src/i2p/susi/webmail/WebMail.java:1756
+#: src/src/i2p/susi/webmail/WebMail.java:1671
+#: src/src/i2p/susi/webmail/WebMail.java:1750
 msgid "Reply All"
 msgstr "Răspunde la toate"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1678
-#: src/src/i2p/susi/webmail/WebMail.java:1757
+#: src/src/i2p/susi/webmail/WebMail.java:1672
+#: src/src/i2p/susi/webmail/WebMail.java:1751
 msgid "Forward"
 msgstr "Înaintare"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1679
-#: src/src/i2p/susi/webmail/WebMail.java:1758
+#: src/src/i2p/susi/webmail/WebMail.java:1673
+#: src/src/i2p/susi/webmail/WebMail.java:1752
 msgid "Delete"
 msgstr "Șterge"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1680
+#: src/src/i2p/susi/webmail/WebMail.java:1674
 msgid "Check Mail"
 msgstr "Verifica e-mail"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1684
+#: src/src/i2p/susi/webmail/WebMail.java:1678
 msgid "Sender"
 msgstr "Expeditor"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1685
+#: src/src/i2p/susi/webmail/WebMail.java:1679
 msgid "Subject"
 msgstr "Subiect"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1686
+#: src/src/i2p/susi/webmail/WebMail.java:1680
 msgid "Date"
 msgstr "Data"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1687
+#: src/src/i2p/susi/webmail/WebMail.java:1681
 msgid "Size"
 msgstr "Dimensiune"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1713
+#: src/src/i2p/susi/webmail/WebMail.java:1707
 #, java-format
 msgid "1 Byte"
 msgid_plural "{0} Bytes"
@@ -384,69 +384,69 @@ msgstr[0] "{0} Byte"
 msgstr[1] "{0} Bytes"
 msgstr[2] "{0} Bytes"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1718
+#: src/src/i2p/susi/webmail/WebMail.java:1712
 msgid "Mark All"
 msgstr "Marchează toate"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1719
+#: src/src/i2p/susi/webmail/WebMail.java:1713
 msgid "Invert Selection"
 msgstr "Inversează selecția"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1720
+#: src/src/i2p/susi/webmail/WebMail.java:1714
 msgid "Clear"
 msgstr "Goliți"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1723
-#: src/src/i2p/susi/webmail/WebMail.java:1724
+#: src/src/i2p/susi/webmail/WebMail.java:1717
+#: src/src/i2p/susi/webmail/WebMail.java:1718
 msgid "First"
 msgstr "Primul"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1723
-#: src/src/i2p/susi/webmail/WebMail.java:1724
-#: src/src/i2p/susi/webmail/WebMail.java:1759
+#: src/src/i2p/susi/webmail/WebMail.java:1717
+#: src/src/i2p/susi/webmail/WebMail.java:1718
+#: src/src/i2p/susi/webmail/WebMail.java:1753
 msgid "Previous"
 msgstr "Anterior"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1725
+#: src/src/i2p/susi/webmail/WebMail.java:1719
 #, java-format
 msgid "Page {0} of {1}"
 msgstr "Pagina {0} din {1}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1727
-#: src/src/i2p/susi/webmail/WebMail.java:1728
+#: src/src/i2p/susi/webmail/WebMail.java:1721
+#: src/src/i2p/susi/webmail/WebMail.java:1722
 msgid "Last"
 msgstr "Ultimul"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1727
-#: src/src/i2p/susi/webmail/WebMail.java:1728
-#: src/src/i2p/susi/webmail/WebMail.java:1760
+#: src/src/i2p/susi/webmail/WebMail.java:1721
+#: src/src/i2p/susi/webmail/WebMail.java:1722
+#: src/src/i2p/susi/webmail/WebMail.java:1754
 msgid "Next"
 msgstr "Următorul"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1731
+#: src/src/i2p/susi/webmail/WebMail.java:1725
 msgid "Pagesize:"
 msgstr "Dimensiune pagină:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1732
+#: src/src/i2p/susi/webmail/WebMail.java:1726
 msgid "Set"
 msgstr "Setează"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1742
+#: src/src/i2p/susi/webmail/WebMail.java:1736
 msgid "Really delete this message?"
 msgstr "într-adevăr  doriti sa stergeti acest mesaj?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1742
+#: src/src/i2p/susi/webmail/WebMail.java:1736
 msgid "Yes, really delete it!"
 msgstr "Da, într-adevăr se șterge!"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1761
+#: src/src/i2p/susi/webmail/WebMail.java:1755
 msgid "Back to Folder"
 msgstr "Înapoi la Dosar"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1768
+#: src/src/i2p/susi/webmail/WebMail.java:1762
 msgid "Date:"
 msgstr "Data:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1779
+#: src/src/i2p/susi/webmail/WebMail.java:1773
 msgid "Could not fetch mail."
 msgstr "Nu pot prelua mail."

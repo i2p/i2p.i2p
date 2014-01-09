@@ -2,44 +2,43 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 22:57+0000\n"
-"PO-Revision-Date: 2013-11-19 12:47+0000\n"
+"POT-Creation-Date: 2013-12-01 20:06+0000\n"
+"PO-Revision-Date: 2013-11-20 09:42+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Hungarian (http://www.transifex.com/projects/p/I2P/language/"
-"hu/)\n"
-"Language: hu\n"
+"Language-Team: Hungarian (http://www.transifex.com/projects/p/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:352
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:362
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:350
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:360
 msgid "internal"
 msgstr "Belső"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:438
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:436
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:440
 msgid "lower bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
 msgid "standard bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:446
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
 msgid "higher bandwidth and reliability"
 msgstr ""
 
@@ -51,9 +50,7 @@ msgstr ""
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr ""
-"Űrlap küldése sikertelen, valószínűleg a 'vissza' vagy 'újratöltés' gombokat "
-"használtad a böngésződben. Kérlek, hogy küldd újra."
+msgstr "Űrlap küldése sikertelen, valószínűleg a 'vissza' vagy 'újratöltés' gombokat használtad a böngésződben. Kérlek, hogy küldd újra."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:196
 msgid ""
@@ -234,9 +231,8 @@ msgstr "Alagút Célállomás"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
-#, fuzzy
 msgid "name, name:port, or destination"
-msgstr "név vagy célállomás"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -251,9 +247,7 @@ msgstr "Megosztott Kliens"
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr ""
-"(Alagút megosztása más kliensekkel és IRC vagy HTTP kliensekkel? A "
-"változtatáshoz a kliens proxy újraindítása szükséges)"
+msgstr "(Alagút megosztása más kliensekkel és IRC vagy HTTP kliensekkel? A változtatáshoz a kliens proxy újraindítása szükséges)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:141
@@ -281,9 +275,7 @@ msgstr "Haladó hálózati opciók"
 msgid ""
 "(NOTE: when this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!)"
-msgstr ""
-"(FIGYELEM: ha ez a kliens proxy alagutak megosztására van beállítva, ezek a "
-"beállítások érvényesek az összes megosztott proxy kliensre!)"
+msgstr "(FIGYELEM: ha ez a kliens proxy alagutak megosztására van beállítva, ezek a beállítások érvényesek az összes megosztott proxy kliensre!)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:268
@@ -297,27 +289,23 @@ msgstr "Hossz"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
-#, fuzzy
 msgid "0 hop tunnel (no anonymity)"
-msgstr "Alagút 0 ugrással (alacsony anonimitás, alacsony késés)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
-#, fuzzy
 msgid "1 hop tunnel (low anonymity)"
-msgstr "Alagút 0 ugrással (alacsony anonimitás, alacsony késés)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
-#, fuzzy
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "Alagút 1 ugrással (közepes anonimitás, közepes késés)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
-#, fuzzy
 msgid "3 hop tunnel (high anonymity)"
-msgstr "Alagút 2 ugrással (nagyfokú anonimitás, nagyfokú késés)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -338,24 +326,18 @@ msgstr "0 ugrású szórás (véletlenszerűség nélkül, állandó teljesítm�
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:313
 msgid ""
 "+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
-msgstr ""
-"+ 0-1 ugrású szórás (közepes mennyiségű véletlenszerűség, teljesítmény-"
-"romlással járhat)"
+msgstr "+ 0-1 ugrású szórás (közepes mennyiségű véletlenszerűség, teljesítmény-romlással járhat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:317
 msgid ""
 "+ 0-2 hop variance (high additive randomisation, subtractive performance)"
-msgstr ""
-"+ 0-2 ugrású szórás (nagy mennyiségű véletlenszerűség, teljesítmény-"
-"romlással járhat)"
+msgstr "+ 0-2 ugrású szórás (nagy mennyiségű véletlenszerűség, teljesítmény-romlással járhat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:321
 msgid "+/- 0-1 hop variance (standard randomisation, standard performance)"
-msgstr ""
-"+/- 0-1 ugrású szórás (normál mennyiségű véletlenszerűség nélkül, normál "
-"teljesítmény)"
+msgstr "+/- 0-1 ugrású szórás (normál mennyiségű véletlenszerűség nélkül, normál teljesítmény)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:309
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:325
@@ -380,30 +362,23 @@ msgstr "Mentések Száma"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:336
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:352
 msgid "0 backup tunnels (0 redundancy, no added resource usage)"
-msgstr ""
-"0 mentési alagút (nincs felesleg, nincs hozzáadott erőforrás használat)"
+msgstr "0 mentési alagút (nincs felesleg, nincs hozzáadott erőforrás használat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:340
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:356
 msgid "1 backup tunnel each direction (low redundancy, low resource usage)"
-msgstr ""
-"1 mentési alagút minden irányban (kevés felesleg, alacsony erőforrás "
-"használat)"
+msgstr "1 mentési alagút minden irányban (kevés felesleg, alacsony erőforrás használat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:344
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:360
 msgid ""
 "2 backup tunnels each direction (medium redundancy, medium resource usage)"
-msgstr ""
-"2 mentési alagút minden irányban (közepes mennyiségű felesleg, közepes "
-"mértékű erőforrás használat)"
+msgstr "2 mentési alagút minden irányban (közepes mennyiségű felesleg, közepes mértékű erőforrás használat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:364
 msgid "3 backup tunnels each direction (high redundancy, high resource usage)"
-msgstr ""
-"3 mentési alagút minden irányban (nagy mennyiségű felesleg, magas erőforrás "
-"használat)"
+msgstr "3 mentési alagút minden irányban (nagy mennyiségű felesleg, magas erőforrás használat)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:356
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:372
@@ -597,10 +572,7 @@ msgstr "Hosztnév Aláírás"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:412
 msgid "Encrypt Leaseset"
-msgstr ""
-"Leaseset Titkosítása (Leaseset - magában foglalja a bejövő átjárókat "
-"(gateway) adott célállomáshoz, azaz a routerek és alagutak Bejövő pontjait, "
-"melyhez kliens csatlakozik, hogy elérjen adott szolgáltatást)"
+msgstr "Leaseset Titkosítása (Leaseset - magában foglalja a bejövő átjárókat (gateway) adott célállomáshoz, azaz a routerek és alagutak Bejövő pontjait, melyhez kliens csatlakozik, hogy elérjen adott szolgáltatást)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:418
 msgid "Encryption Key"
@@ -666,18 +638,16 @@ msgid "Max concurrent connections (0=unlimited)"
 msgstr "Maximális egyidejű csatlakozás (0=korlátlan)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
-#, fuzzy
 msgid "POST limits (0=unlimited)"
-msgstr "Bejövő csatlakozási korlát (0=korlátlan)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
-#, fuzzy
 msgid "Ban minutes"
-msgstr "Üresjárat percben"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
@@ -893,34 +863,27 @@ msgstr "Varázsló kész"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:189
 msgid ""
-"This wizard will take you through the various options available for creating "
-"tunnels in I2P."
-msgstr ""
-"Ez a varázsló végigvezet azokon a különböző lehetőségeken, melyekkel "
-"alagutak hozhatók létre az I2P-n belül."
+"This wizard will take you through the various options available for creating"
+" tunnels in I2P."
+msgstr "Ez a varázsló végigvezet azokon a különböző lehetőségeken, melyekkel alagutak hozhatók létre az I2P-n belül."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:191
 msgid ""
-"The first thing to decide is whether you want to create a server or a client "
-"tunnel."
+"The first thing to decide is whether you want to create a server or a client"
+" tunnel."
 msgstr "Az első eldöntendő kérdés, hogy szerver vagy kliens alagút készüljön."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
-"If you need to connect to a remote service, such as an IRC server inside I2P "
-"or a code repository, then you will require a CLIENT tunnel."
-msgstr ""
-"Ha egy távoli szolgáltatáshoz való kapcsolódásra van szükség, úgy mint IRC "
-"szerver az I2P-n belül vagy egy programkód szoftvertár, akkor az KLIENS "
-"alagúttal működik."
+"If you need to connect to a remote service, such as an IRC server inside I2P"
+" or a code repository, then you will require a CLIENT tunnel."
+msgstr "Ha egy távoli szolgáltatáshoz való kapcsolódásra van szükség, úgy mint IRC szerver az I2P-n belül vagy egy programkód szoftvertár, akkor az KLIENS alagúttal működik."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
 msgid ""
 "On the other hand, if you wish to host a service for others to connect to "
 "you'll need to create a SERVER tunnel."
-msgstr ""
-"Másrészről, annak biztosítására, hogy egy általad futtatott szolgáltatáshoz "
-"mások csatlakozhassanak, SZERVER alagútra van szükség."
+msgstr "Másrészről, annak biztosítására, hogy egy általad futtatott szolgáltatáshoz mások csatlakozhassanak, SZERVER alagútra van szükség."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:197
 msgid "Server Tunnel"
@@ -932,44 +895,35 @@ msgstr "Kliens Alagút"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:217
 msgid "There are several types of tunnels to choose from:"
-msgstr ""
-"Létezik néhány különböző fajtájú alagút, melyek közül lehet választani:"
+msgstr "Létezik néhány különböző fajtájú alagút, melyek közül lehet választani:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:225
 msgid "Basic tunnel for connecting to a single service inside I2P."
-msgstr ""
-"Alap alagút egyszerű szolgáltatáshoz való kapcsolódáshoz az I2P-n belül. "
+msgstr "Alap alagút egyszerű szolgáltatáshoz való kapcsolódáshoz az I2P-n belül. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:227
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:269
 msgid ""
 "Try this if none of the tunnel types below fit your requirements, or you "
 "don't know what type of tunnel you need."
-msgstr ""
-"Próbáld ki ezt, ha az alább felsorol alagút fajták közül egy sem felel meg "
-"elvárásaidnak vagy ha nem tudod, milyen fajtájú alagútra van szükséged."
+msgstr "Próbáld ki ezt, ha az alább felsorol alagút fajták közül egy sem felel meg elvárásaidnak vagy ha nem tudod, milyen fajtájú alagútra van szükséged."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:229
 msgid "Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P."
-msgstr ""
-"Alagút, amely HTTP proxyként viselkedik, eep oldalak I2P-n belüli eléréséhez."
+msgstr "Alagút, amely HTTP proxyként viselkedik, eep oldalak I2P-n belüli eléréséhez."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
-"\"http_proxy\" environment variable for command-line applications in GNU/"
-"Linux."
-msgstr ""
-"Állítsd be a böngésződet, hogy ezt az alagutat használja HTTP proxyként, "
-"vagy állítsd be a \"http_proxy\" környezeti változót a parancssori "
-"alkalmazásokhoz GNU/Linux alatt."
+"\"http_proxy\" environment variable for command-line applications in "
+"GNU/Linux."
+msgstr "Állítsd be a böngésződet, hogy ezt az alagutat használja HTTP proxyként, vagy állítsd be a \"http_proxy\" környezeti változót a parancssori alkalmazásokhoz GNU/Linux alatt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
 msgid ""
 "Websites outside I2P can also be reached if an HTTP proxy within I2P is "
 "known."
-msgstr ""
-"I2P-n kívüli weboldalak is elérhetők, ha I2P-n belüli HTTP proxy ismert."
+msgstr "I2P-n kívüli weboldalak is elérhetők, ha I2P-n belüli HTTP proxy ismert."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:235
 msgid "Customised client tunnel specific for IRC connections."
@@ -979,17 +933,13 @@ msgstr "Testre szabott kliens alagút, kimondottan IRC csatlakozásokhoz."
 msgid ""
 "With this tunnel type, your IRC client will be able to connect to an IRC "
 "network inside I2P."
-msgstr ""
-"Ezzel a típusú alagúttal az IRC kliensed I2P-n belüli IRC hálózathoz képes "
-"csatlakozni."
+msgstr "Ezzel a típusú alagúttal az IRC kliensed I2P-n belüli IRC hálózathoz képes csatlakozni."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:239
 msgid ""
 "Each IRC network in I2P that you wish to connect to will require its own "
 "tunnel. (See Also, SOCKS IRC)"
-msgstr ""
-"Külön alagútra van szüksége minden IRC hálózatnak az I2P-n belül, melyhez "
-"csatlakozni akarsz (lásd még SOCKS IRC)"
+msgstr "Külön alagútra van szüksége minden IRC hálózatnak az I2P-n belül, melyhez csatlakozni akarsz (lásd még SOCKS IRC)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:241
 msgid "A tunnel that implements the SOCKS protocol."
@@ -999,45 +949,33 @@ msgstr "Alagút, mely SOCKS protokolt használ."
 msgid ""
 "This enables both TCP and UDP connections to be made through a SOCKS "
 "outproxy within I2P."
-msgstr ""
-"Ez lehetővé teszi mind TCP, mind UDP csatlakozások létrehozását az I2P-n "
-"belül SOCKS kimenő proxyn keresztül."
+msgstr "Ez lehetővé teszi mind TCP, mind UDP csatlakozások létrehozását az I2P-n belül SOCKS kimenő proxyn keresztül."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:245
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customised for "
 "connecting to IRC networks."
-msgstr ""
-"Kliens alagút, mely SOCKS protokolt használ, IRC hálózatokhoz való "
-"csatlakozásra alakítva."
+msgstr "Kliens alagút, mely SOCKS protokolt használ, IRC hálózatokhoz való csatlakozásra alakítva."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:247
 msgid ""
 "With this tunnel type, IRC networks in I2P can be reached by typing the I2P "
 "address into your IRC client, and configuring the IRC client to use this "
 "SOCKS tunnel."
-msgstr ""
-"Ezzel a típusú alagút lehetővé teszi I2P-n belüli IRC hálózatokhoz való "
-"csatlkaozást. Gépeld be az I2P címet az IRC kliensedbe és állítsd be IRC "
-"kliensedet, hogy ezt a SOCKS alagutat használja."
+msgstr "Ezzel a típusú alagút lehetővé teszi I2P-n belüli IRC hálózatokhoz való csatlkaozást. Gépeld be az I2P címet az IRC kliensedbe és állítsd be IRC kliensedet, hogy ezt a SOCKS alagutat használja."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:249
 msgid ""
 "This means that only one I2P tunnel is required rather than a separate "
 "tunnel per IRC network."
-msgstr ""
-"Ez azt jelenti, hogy mindössze egy I2P alagútra van szükség, az IRC "
-"hálózatonkénti külön alagutak helyett."
+msgstr "Ez azt jelenti, hogy mindössze egy I2P alagútra van szükség, az IRC hálózatonkénti külön alagutak helyett."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:251
 msgid ""
 "IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P "
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
-msgstr ""
-"I2P-n kívüli IRC hálózatok szintén elérhetők, amennyiben a SOCKS kimenő "
-"proxy ismert az I2P-n belül, habár ez annak a függvénye, hogy az IRC hálózat "
-"blokkolja a kimenő proxyt vagy sem."
+msgstr "I2P-n kívüli IRC hálózatok szintén elérhetők, amennyiben a SOCKS kimenő proxy ismert az I2P-n belül, habár ez annak a függvénye, hogy az IRC hálózat blokkolja a kimenő proxyt vagy sem."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:253
 msgid "A client tunnel that implements the HTTP CONNECT command."
@@ -1047,9 +985,7 @@ msgstr "Kliens alagút, mely a HTTP CONNECT parancsot használja."
 msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
-msgstr ""
-"Ez lehetővé teszi TCP kapcsolatok létrehozását HTTP kimenő proxyn keresztül, "
-"feltéve, hogy a proxy támogatja a CONNECT parancsot."
+msgstr "Ez lehetővé teszi TCP kapcsolatok létrehozását HTTP kimenő proxyn keresztül, feltéve, hogy a proxy támogatja a CONNECT parancsot."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:257
 msgid "A customised client tunnel for Streamr."
@@ -1057,8 +993,7 @@ msgstr "Speciális kliens alagút Streamr számár."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:267
 msgid "A basic server tunnel for hosting a generic service inside I2P."
-msgstr ""
-"Alap szerver alagút általános szolgáltatás biztosítására az I2P-n belül."
+msgstr "Alap szerver alagút általános szolgáltatás biztosítására az I2P-n belül."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:271
 msgid "A server tunnel that is customised for HTTP connections."
@@ -1072,15 +1007,11 @@ msgstr "Ezt a típusú alagutat használd, ha eep oldalt szeretnél hosztolni."
 msgid ""
 "A customised server tunnel that can both serve HTTP data and connect to "
 "other server tunnels."
-msgstr ""
-"Egyedi igényekre szabott szerver alagút, mely egyszerre képes HTTP adatot "
-"biztosítani és csatlakozni más szerver alagutakhoz."
+msgstr "Egyedi igényekre szabott szerver alagút, mely egyszerre képes HTTP adatot biztosítani és csatlakozni más szerver alagutakhoz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:277
 msgid "This tunnel type is predominantly used when running a Seedless server."
-msgstr ""
-"Ez az alagút fajta elsősorban táplálás nélküli (seedless) szerver "
-"futtatásához használt."
+msgstr "Ez az alagút fajta elsősorban táplálás nélküli (seedless) szerver futtatásához használt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:279
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
@@ -1090,9 +1021,7 @@ msgstr "Egyedi szerver alagút IRC hálózatok hosztolására az I2P-n belül."
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
-msgstr ""
-"Rendszerint külön alagút létrehozása szükséges minden IRC szerver számára, "
-"hogy az I2P-n belül elérhetővé váljon."
+msgstr "Rendszerint külön alagút létrehozása szükséges minden IRC szerver számára, hogy az I2P-n belül elérhetővé váljon."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:283
 msgid "A customised server tunnel for Streamr."
@@ -1106,17 +1035,13 @@ msgstr "Válassz nevet és leírást az alagútnak."
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr ""
-"Lehet bármi, amit szeretnél - ezek csak arra szolgálnak, hogy megkönnyítsék "
-"a beazonosítást a router konzolon."
+msgstr "Lehet bármi, amit szeretnél - ezek csak arra szolgálnak, hogy megkönnyítsék a beazonosítást a router konzolon."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:354
 msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
-msgstr ""
-"Ha ismersz bármilyen kimenő proxyt ehhez az alagútfajtához (vagy HTTP, vagy "
-"SOCKS), töltsd ki az alábbi részt."
+msgstr "Ha ismersz bármilyen kimenő proxyt ehhez az alagútfajtához (vagy HTTP, vagy SOCKS), töltsd ki az alábbi részt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:356
 msgid "Separate multiple proxies with commas."
@@ -1126,25 +1051,19 @@ msgstr "Több proxy esetén a bejegyzések vesszővel elválasztandóak."
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr ""
-"Írd be a szolgáltatás I2P célállomását, melyhez e kliens alagútnak "
-"csatlakoznia kell."
+msgstr "Írd be a szolgáltatás I2P célállomását, melyhez e kliens alagútnak csatlakoznia kell."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:376
 msgid ""
 "This could be the full base 64 destination key, or an I2P URL from your "
 "address book."
-msgstr ""
-"Ez lehet a teljes bázis 64 célállomás kulcs vagy egy I2P URL a "
-"címjegyzékedből."
+msgstr "Ez lehet a teljes bázis 64 célállomás kulcs vagy egy I2P URL a címjegyzékedből."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:409
 msgid ""
 "This is the IP that your service is running on, this is usually on the same "
 "machine so 127.0.0.1 is autofilled."
-msgstr ""
-"Ez az IP, melyen a szolgáltatásod fut, ez rendszerint ugyanazon a gépen van, "
-"így a 127.0.0.1 automatikusan beírásra kerül."
+msgstr "Ez az IP, melyen a szolgáltatásod fut, ez rendszerint ugyanazon a gépen van, így a 127.0.0.1 automatikusan beírásra kerül."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:432
 msgid "This is the port that the service is accepting connections on."
@@ -1162,9 +1081,7 @@ msgstr "Ez ugyancsak a HTTPBidir szerver alagút kliens portja."
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
-msgstr ""
-"Milyen elérést szeretnél adni ennek az alagútnak? Csak ez a gép, a teljes "
-"alhálózatod vagy külső internet?"
+msgstr "Milyen elérést szeretnél adni ennek az alagútnak? Csak ez a gép, a teljes alhálózatod vagy külső internet?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:476
 msgid "You will most likely want to just allow 127.0.0.1"
@@ -1174,41 +1091,30 @@ msgstr "Legvalószínűbb, hogy csak aa 127.0.0.1-et szeretnéd engedélyezni."
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
-msgstr ""
-"Az I2P router képes ezt az alagutat automatikusan elindítani a router "
-"indulásakor."
+msgstr "Az I2P router képes ezt az alagutat automatikusan elindítani a router indulásakor."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:520
 msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occassionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr ""
-"Ez hasznos lehet gyakorta használt alagutak esetén (ez különösen szerver "
-"alagutakra vonatkozik), de azon alagutak számára, melyek csak alkalomszerűen "
-"használsz ez azt jelentené, hogy az I2P router felesleges alagutakat hoz "
-"létre és tart fenn."
+msgstr "Ez hasznos lehet gyakorta használt alagutak esetén (ez különösen szerver alagutakra vonatkozik), de azon alagutak számára, melyek csak alkalomszerűen használsz ez azt jelentené, hogy az I2P router felesleges alagutakat hoz létre és tart fenn."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:546
 msgid "The wizard has now collected enough information to create your tunnel."
-msgstr ""
-"A varázsló elég információt gyűjtött össze, hogy létrehozza az alagutat."
+msgstr "A varázsló elég információt gyűjtött össze, hogy létrehozza az alagutat."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:548
 msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
-msgstr ""
-"A lenti Mentés gombra kattintva a varázsló beállítja az alagutat, és "
-"visszairányít az I2PAlagút főoldalára."
+msgstr "A lenti Mentés gombra kattintva a varázsló beállítja az alagutat, és visszairányít az I2PAlagút főoldalára."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:553
 msgid ""
 "Because you chose to automatically start the tunnel when the router starts, "
 "you don't have to do anything further."
-msgstr ""
-"Mivel azt választottad, hogy az alagút automatikusan induljon a router "
-"indításakor, nincs szükség további beavatkozásra."
+msgstr "Mivel azt választottad, hogy az alagút automatikusan induljon a router indításakor, nincs szükség további beavatkozásra."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:555
 msgid "The router will start the tunnel once it has been set up."
@@ -1218,17 +1124,13 @@ msgstr "A router elindítja az alagutat, amint az beállításra kerül."
 msgid ""
 "Because you chose not to automatically start the tunnel, you will have to "
 "manually start it."
-msgstr ""
-"Mivel azt választottad, hogy az alagút ne induljon el automatikusan a router "
-"indításakor, ezért a jövőben kézi indításra lesz szükség."
+msgstr "Mivel azt választottad, hogy az alagút ne induljon el automatikusan a router indításakor, ezért a jövőben kézi indításra lesz szükség."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:561
 msgid ""
 "You can do this by clicking the Start button on the main page which "
 "corresponds to the new tunnel."
-msgstr ""
-"Ez elérhető a fő oldalon az új alagúthoz tartozó Indítás gombra való "
-"kattintással."
+msgstr "Ez elérhető a fő oldalon az új alagúthoz tartozó Indítás gombra való kattintással."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:565
 msgid "Below is a summary of the options you chose:"
@@ -1238,19 +1140,14 @@ msgstr "Lentebb található egy összegzés a választható opciókról:"
 msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
-msgstr ""
-"Ez alap beállítások mellet számos haladó opció létezik az alagutak "
-"beállításához."
+msgstr "Ez alap beállítások mellet számos haladó opció létezik az alagutak beállításához."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:665
 msgid ""
 "The wizard will set reasonably sensible default values for these, but you "
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
-msgstr ""
-"A varázsló elég elfogadható alap értékeket állít be ezeknek, azonban ezek az "
-"értékek megtekintheteők és/vagy szerkeszthetők, ha az alagút nevére "
-"kattintasz az I2PAlagút fő oldalán."
+msgstr "A varázsló elég elfogadható alap értékeket állít be ezeknek, azonban ezek az értékek megtekintheteők és/vagy szerkeszthetők, ha az alagút nevére kattintasz az I2PAlagút fő oldalán."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:707
 msgid "Previous"
@@ -1267,7 +1164,3 @@ msgstr "Befejezés"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid "Next"
 msgstr "Következő"
-
-#~ msgid "3 hop tunnel (very high anonymity, poor performance)"
-#~ msgstr ""
-#~ "Alagút 3 ugrással (rendkívül nagyfokú anonimitás, alacsony teljesítmény)"
