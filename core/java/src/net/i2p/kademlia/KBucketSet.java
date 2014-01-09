@@ -276,6 +276,8 @@ public class KBucketSet<T extends SimpleDataStructure> {
         try {
             kbucket = getBucket(entry);
         } finally { releaseReadLock(); }
+        if (kbucket == null)  // us
+            return false;
         boolean removed = kbucket.remove(entry);
         return removed;
     }
