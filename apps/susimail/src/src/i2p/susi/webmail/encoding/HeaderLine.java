@@ -45,26 +45,24 @@ public class HeaderLine implements Encoding {
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
 	 */
 	public String encode(String text) throws EncodingException {
-		try {
-			return encode( new ByteArrayInputStream( text.getBytes() ) );
-		} catch (IOException e) {
-			throw new EncodingException( "IOException occured." );
-		}
+		return encode( text.getBytes() );
 	}
 	private static final int BUFSIZE = 2;
-	private String encode(InputStream in) throws IOException
-	{
+	/* (non-Javadoc)
+	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
+	 */
+	public String encode( byte in[] ) throws EncodingException {
 		StringBuilder out = new StringBuilder();
 		int l = 0, buffered = 0, tmp[] = new int[BUFSIZE];
 		boolean quoting = false;
 		boolean quote = false;
 		boolean linebreak = false;
 		String quotedSequence = null;
-		int rest = 0;
+		int rest = in.length;
+		int index = 0;
 		while( true ) {
-			rest = in.available();
 			while( rest > 0 && buffered < BUFSIZE ) {
-				tmp[buffered++] = in.read();
+				tmp[buffered++] = in[index++];
 				rest--;
 			}
 			if( rest == 0 && buffered == 0 )
@@ -95,10 +93,10 @@ public class HeaderLine implements Encoding {
 			}
 			if( quote ) {
 				if( ! quoting ) {
-					quotedSequence = "=?iso-8859-1?Q?";
+					quotedSequence = "=?utf-8?Q?";
 					quoting = true;
 				}
-				quotedSequence += HexTable.table[ c ];
+				quotedSequence += HexTable.table[ c < 0 ? 256 + c : c ];
 			}
 			else {
 				if( quoting ) {
@@ -147,19 +145,6 @@ public class HeaderLine implements Encoding {
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
 	 */
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
-	 */
-	public String encode( byte in[] ) throws EncodingException {
-		try {
-			return encode( new ByteArrayInputStream( in ) );
-		} catch (IOException e) {
-			throw new EncodingException( "IOException occured." );
-		}
-	}
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
-	 */
 	public ReadBuffer decode( byte in[] ) throws DecodingException {
 		return decode( in, 0, in.length );
 	}
@@ -174,6 +159,7 @@ public class HeaderLine implements Encoding {
 			throw new DecodingException( "Index out of bound." );
 		boolean linebreak = false;
 		boolean lastCharWasQuoted = false;
+		int lastSkip = 0;
 		while( length-- > 0 ) {
 			byte c = in[offset++];
 			if( c == '=' ) {
@@ -250,6 +236,7 @@ public class HeaderLine implements Encoding {
 					 */
 					out[written++] = '\r';
 					out[written++] = '\n';
+					lastSkip = 0;
 				}
 				else {
 					if( !lastCharWasQuoted )
@@ -257,9 +244,17 @@ public class HeaderLine implements Encoding {
 					/*
 					 * skip whitespace
 					 */
+					int skipped = 1;
 					while( length > 0 && ( in[offset] == ' ' || in[offset] == '\t' ) ) {
+						if( lastSkip > 0 && skipped >= lastSkip ) {
+							break;
+						}
 						offset++;
 						length--;
+						skipped++;
+					}
+					if( lastSkip == 0 && skipped > 0 ) {
+						lastSkip = skipped;
 					}
 					continue;
 				}
@@ -273,6 +268,7 @@ public class HeaderLine implements Encoding {
 		if( linebreak ) {
 			out[written++] = '\r';
 			out[written++] = '\n';
+			lastSkip = 0;
 		}
 			
 		ReadBuffer readBuffer = new ReadBuffer();
@@ -298,5 +294,6 @@ public class HeaderLine implements Encoding {
 		HeaderLine hl = new HeaderLine();
 		System.out.println( hl.encode( text ) );
 		System.out.println( hl.encode( "test ÄÖÜ" ) );
+		System.out.println( hl.encode( "Здравствуйте" ) );
 	}
 }

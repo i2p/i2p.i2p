@@ -1,4 +1,5 @@
 2014-01-09 str4d
+ * susimail: UTF-8 support from wockenfuss (ticket #508)
  * Console: Fixed overlapping text issue in midnight theme
 
 2014-01-04 zzz

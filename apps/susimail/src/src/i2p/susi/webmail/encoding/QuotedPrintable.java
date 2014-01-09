@@ -44,22 +44,8 @@ public class QuotedPrintable implements Encoding {
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
 	 */
-	public String encode( byte in[] ) throws EncodingException {
-		try {
-			return encode( new ByteArrayInputStream( in ) );
-		}catch (IOException e) {
-			throw new EncodingException( "IOException occured." );
-		}
-	}
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
-	 */
 	public String encode(String text) throws EncodingException {
-		try {
-			return encode( new ByteArrayInputStream( text.getBytes() ) );
-		}catch (IOException e) {
-			throw new EncodingException( "IOException occured." );
-		}
+		return encode( text.getBytes() );
 	}
 	/**
 	 * 
@@ -67,13 +53,17 @@ public class QuotedPrintable implements Encoding {
 	 * @return
 	 */
 	private static int BUFSIZE = 2;
-	private String encode( InputStream in ) throws EncodingException, IOException {
+	/* (non-Javadoc)
+	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
+	 */
+	public String encode( byte in[] ) throws EncodingException {
 		StringBuilder out = new StringBuilder();
-		int read = 0, buffered = 0, tmp[] = new int[BUFSIZE];
+		int buffered = 0, tmp[] = new int[BUFSIZE];
+		int read = in.length;
+		int index = 0;
 		while( true ) {
-			read = in.available();
 			while( read > 0 && buffered < BUFSIZE ) {
-				tmp[buffered++] = in.read();
+				tmp[buffered++] = in[index++];
 				read--;
 			}
 			if( read == 0 && buffered == 0 )
@@ -105,10 +95,7 @@ public class QuotedPrintable implements Encoding {
 					tmp[j-1] = tmp[j];
 			}
 			else {
-				if( c < 0 || c > 255 ) {
-					throw new EncodingException( "Encoding supports only values of 0..255." );
-				}
-				out.append( HexTable.table[ c ] );
+				out.append( HexTable.table[ c < 0 ? 256 + c : c ] );
 			}
 		}
 		return out.toString();
