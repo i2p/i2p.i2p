@@ -2372,7 +2372,7 @@ msgstr "Nederlands"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:89
 #, fuzzy
-msgid "Norwewgian Bokmaal"
+msgid "Norwegian Bokmaal"
 msgstr "Norsk (bokmål)"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:90
@@ -2386,7 +2386,7 @@ msgstr "Português"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:93
 #, fuzzy
-msgid "Romainian"
+msgid "Romanian"
 msgstr "Румынский"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:94

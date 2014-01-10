@@ -2306,7 +2306,7 @@ msgid "Dutch"
 msgstr "Holandês"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:89
-msgid "Norwewgian Bokmaal"
+msgid "Norwegian Bokmaal"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:90
@@ -2319,7 +2319,7 @@ msgid "Portuguese"
 msgstr "Português"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:93
-msgid "Romainian"
+msgid "Romanian"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:94
