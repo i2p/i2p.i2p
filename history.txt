@@ -1,3 +1,6 @@
+2014-01-10 str4d
+ * BOB: Implement ClientApp interface (ticket #347)
+
 2014-01-09
  * Translations
   - Updates to French, German, Romanian, and Russian
