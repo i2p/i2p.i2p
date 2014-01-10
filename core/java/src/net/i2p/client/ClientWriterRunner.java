@@ -33,7 +33,7 @@ class ClientWriterRunner implements Runnable {
     private static final long MAX_SEND_WAIT = 10*1000;
     
     /**
-     *  As of 0.9.10 does not start the thread, caller must call startWriting()
+     *  As of 0.9.11 does not start the thread, caller must call startWriting()
      */
     public ClientWriterRunner(OutputStream out, I2PSessionImpl session) {
         _out = new BufferedOutputStream(out);
@@ -42,7 +42,7 @@ class ClientWriterRunner implements Runnable {
     }
 
     /**
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     public void startWriting() {
         Thread t = new I2PAppThread(this, "I2CP Client Writer " + __Id.incrementAndGet(), true);

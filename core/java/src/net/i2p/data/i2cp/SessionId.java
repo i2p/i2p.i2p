@@ -29,12 +29,24 @@ public class SessionId extends DataStructureImpl {
         _sessionId = -1;
     }
 
+    /**
+     *  @param id 0-65535
+     *  @since 0.9.11
+     */
+    public SessionId(int id) {
+        if (id < 0 || id > 65535)
+            throw new IllegalArgumentException();
+        _sessionId = id;
+    }
+
     public int getSessionId() {
         return _sessionId;
     }
 
     /** @param id 0-65535 */
     public void setSessionId(int id) {
+        if (id < 0 || id > 65535)
+            throw new IllegalArgumentException();
         _sessionId = id;
     }
 

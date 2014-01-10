@@ -120,7 +120,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     protected enum State {
         OPENING,
-        /** @since 0.9.10 */
+        /** @since 0.9.11 */
         GOTDATE,
         OPEN,
         CLOSING,
@@ -145,11 +145,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private volatile boolean _routerSupportsHostLookup;
 
     /**
-     *  Since 0.9.10, key is either a Hash or a String
+     *  Since 0.9.11, key is either a Hash or a String
      *  @since 0.8.9
      */
     private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(16);
-    private static final String MIN_HOST_LOOKUP_VERSION = "0.9.10";
+    private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
     private static final boolean TEST_LOOKUP = false;
 
     /** SSL interface (only) @since 0.8.3 */
@@ -483,7 +483,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
             Properties auth = null;
             if ((!_context.isRouterContext()) && _options.containsKey(PROP_USER) && _options.containsKey(PROP_PW)) {
-                // Only supported by routers 0.9.10 or higher, but we don't know the version yet.	
+                // Only supported by routers 0.9.11 or higher, but we don't know the version yet.	
                 // Auth will also be sent in the SessionConfig.
                 auth = new OrderedProperties();
                 auth.setProperty(PROP_USER, _options.getProperty(PROP_USER));
@@ -541,7 +541,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     /**
-     *  @since 0.9.10 moved from connect()
+     *  @since 0.9.11 moved from connect()
      */
     protected void waitForDate() throws InterruptedException, IOException {
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After getDate / begin waiting for a response");
@@ -1040,7 +1040,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  Called by the message handler
      *  on reception of HostReplyMessage
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     void destReceived(long nonce, Destination d) {
         // notify by hash
@@ -1064,7 +1064,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  Called by the message handler
      *  on reception of HostReplyMessage
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     void destLookupFailed(long nonce) {
         for (LookupWaiter w : _pendingLookups) {
@@ -1102,14 +1102,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             this(h, -1);
         }
 
-        /** @since 0.9.10 */
+        /** @since 0.9.11 */
         public LookupWaiter(Hash h, long nonce) {
             this.hash = h;
             this.name = null;
             this.nonce = nonce;
         }
 
-        /** @since 0.9.10 */
+        /** @since 0.9.11 */
         public LookupWaiter(String name, long nonce) {
             this.hash = null;
             this.name = name;
@@ -1160,7 +1160,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_routerSupportsHostLookup) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Sending HostLookup for " + h);
-                sendMessage(new HostLookupMessage(h, nonce, maxWait));
+                SessionId id = _sessionId;
+                if (id == null)
+                    id = new SessionId(65535);
+                sendMessage(new HostLookupMessage(id, h, nonce, maxWait));
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Sending DestLookup for " + h);
@@ -1192,10 +1195,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      *  See interface for suggested implementation.
      *
-     *  Requires router side to be 0.9.10 or higher. If the router is older,
+     *  Requires router side to be 0.9.11 or higher. If the router is older,
      *  this will return null immediately.
      *
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     public Destination lookupDest(String name) throws I2PSessionException {
         return lookupDest(name, 10*1000);
@@ -1205,7 +1208,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  Ask the router to lookup a Destination by host name.
      *  Blocking. See above for details.
      *  @param maxWait ms
-     *  @since 0.9.10
+     *  @since 0.9.11
      *  @return null on failure
      */
     public Destination lookupDest(String name, long maxWait) throws I2PSessionException {
@@ -1247,7 +1250,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         try {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Sending HostLookup for " + name);
-            sendMessage(new HostLookupMessage(name, nonce, maxWait));
+            SessionId id = _sessionId;
+            if (id == null)
+                id = new SessionId(65535);
+            sendMessage(new HostLookupMessage(id, name, nonce, maxWait));
             try {
                 synchronized (waiter) {
                     waiter.wait(maxWait);

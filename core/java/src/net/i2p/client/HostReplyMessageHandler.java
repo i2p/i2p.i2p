@@ -15,7 +15,7 @@ import net.i2p.data.Destination;
 /**
  * Handle I2CP dest replies from the router
  *
- * @since 0.9.10
+ * @since 0.9.11
  */
 class HostReplyMessageHandler extends HandlerImpl {
 

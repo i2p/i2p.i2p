@@ -103,8 +103,8 @@ class I2PSimpleSession extends I2PSessionImpl2 {
             if (!_context.isRouterContext()) {
                 Properties opts = getOptions();
                 // Send auth message if required
-                // Auth was not enforced on a simple session until 0.9.10
-                // We will get disconnected for router version < 0.9.10 since it doesn't
+                // Auth was not enforced on a simple session until 0.9.11
+                // We will get disconnected for router version < 0.9.11 since it doesn't
                 // support the AuthMessage
                 if ((!opts.containsKey(PROP_USER)) && (!opts.containsKey(PROP_PW))) {
                     // auto-add auth if not set in the options

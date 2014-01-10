@@ -232,7 +232,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      *  @param props contains i2cp.username and i2cp.password, may be null
      *  @return success
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     private boolean checkAuth(Properties props) {
         if (_authorized)
@@ -368,11 +368,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 
     /**
      * override for testing
-     * @since 0.9.10
+     * @since 0.9.11
      */
     protected void handleHostLookup(HostLookupMessage message) {
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getReqID(),
-                                                     message.getTimeout(), message.getHash(), message.getHostname()));
+                                                     message.getTimeout(), message.getSessionId(),
+                                                     message.getHash(), message.getHostname()));
     }
 
     /**

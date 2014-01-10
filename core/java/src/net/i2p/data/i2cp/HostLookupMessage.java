@@ -17,7 +17,7 @@ import net.i2p.data.Hash;
  * Request the router look up the dest for a hash
  * or a host. Replaces DestLookupMessage.
  *
- * @since 0.9.10; do not send to routers older than 0.9.10.
+ * @since 0.9.11; do not send to routers older than 0.9.11.
  */
 public class HostLookupMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 38;
@@ -27,6 +27,7 @@ public class HostLookupMessage extends I2CPMessageImpl {
     private int _lookupType;
     private Hash _hash;
     private String _host;
+    private SessionId _sessionId;
 
     public static final int LOOKUP_HASH = 0;
     public static final int LOOKUP_HOST = 1;
@@ -39,7 +40,9 @@ public class HostLookupMessage extends I2CPMessageImpl {
      *  @param reqID 0 to 2**32 - 1
      *  @param timeout ms 1 to 2**32 - 1
      */
-    public HostLookupMessage(Hash h, long reqID, long timeout) {
+    public HostLookupMessage(SessionId id, Hash h, long reqID, long timeout) {
+        if (id == null || h == null)
+            throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
             throw new IllegalArgumentException();
         if (timeout <= 0 || timeout > MAX_INT)
@@ -54,7 +57,9 @@ public class HostLookupMessage extends I2CPMessageImpl {
      *  @param reqID 0 to 2**32 - 1
      *  @param timeout ms 1 to 2**32 - 1
      */
-    public HostLookupMessage(String host, long reqID, long timeout) {
+    public HostLookupMessage(SessionId id, String host, long reqID, long timeout) {
+        if (id == null || host == null)
+            throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
             throw new IllegalArgumentException();
         if (timeout <= 0 || timeout > MAX_INT)
@@ -63,6 +68,10 @@ public class HostLookupMessage extends I2CPMessageImpl {
         _reqID = reqID;
         _timeout = timeout;
         _lookupType = LOOKUP_HOST;
+    }
+
+    public SessionId getSessionId() {
+        return _sessionId;
     }
 
     /**
@@ -102,6 +111,8 @@ public class HostLookupMessage extends I2CPMessageImpl {
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
+            _sessionId = new SessionId();
+            _sessionId.readBytes(in);
             _reqID = DataHelper.readLong(in, 4);
             _timeout = DataHelper.readLong(in, 4);
             _lookupType = (int) DataHelper.readLong(in, 1);
@@ -124,16 +135,17 @@ public class HostLookupMessage extends I2CPMessageImpl {
         if (_lookupType == LOOKUP_HASH) {
             if (_hash == null)
                 throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-            len = 9 + Hash.HASH_LENGTH;
+            len = 11 + Hash.HASH_LENGTH;
         } else if (_lookupType == LOOKUP_HOST) {
             if (_host == null)
                 throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-            len = 10 + _host.length();
+            len = 12 + _host.length();
         } else {
             throw new I2CPMessageException("bad type");
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream(len);
         try {
+            _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);
             DataHelper.writeLong(os, 4, _timeout);
             DataHelper.writeLong(os, 1, _lookupType);
@@ -156,6 +168,7 @@ public class HostLookupMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[HostLookupMessage: ");
+        buf.append("\n\t").append(_sessionId);
         buf.append("\n\tReqID: ").append(_reqID);
         buf.append("\n\tTimeout: ").append(_timeout);
         if (_lookupType == LOOKUP_HASH)

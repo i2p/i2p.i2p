@@ -268,10 +268,10 @@ public interface I2PSession {
      *  }
      *</pre>
      *
-     *  Requires router side to be 0.9.10 or higher. If the router is older,
+     *  Requires router side to be 0.9.11 or higher. If the router is older,
      *  this will return null immediately.
      *
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     public Destination lookupDest(String name) throws I2PSessionException;
 
@@ -279,7 +279,7 @@ public interface I2PSession {
      *  Ask the router to lookup a Destination by host name.
      *  Blocking. See above for details.
      *  @param maxWait ms
-     *  @since 0.9.10
+     *  @since 0.9.11
      *  @return null on failure
      */
     public Destination lookupDest(String name, long maxWait) throws I2PSessionException;

@@ -17,7 +17,7 @@ import net.i2p.data.Destination;
 /**
  * Response to HostLookupMessage. Replaces DestReplyMessage.
  *
- * @since 0.9.10
+ * @since 0.9.11
  */
 public class HostReplyMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 39;
@@ -25,6 +25,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
     private Destination _dest;
     private long _reqID;
     private int _code;
+    private SessionId _sessionId;
 
     public static final int RESULT_SUCCESS = 0;
     /** generic fail, other codes TBD */
@@ -40,8 +41,8 @@ public class HostReplyMessage extends I2CPMessageImpl {
      *  @param d non-null
      *  @param reqID 0 to 2**32 - 1
      */
-    public HostReplyMessage(Destination d, long reqID) {
-        if (d == null)
+    public HostReplyMessage(SessionId id, Destination d, long reqID) {
+        if (id == null || d == null)
             throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
             throw new IllegalArgumentException();
@@ -55,13 +56,19 @@ public class HostReplyMessage extends I2CPMessageImpl {
      *  @param failureCode 1-255
      *  @param reqID from the HostLookup 0 to 2**32 - 1
      */
-    public HostReplyMessage(int failureCode, long reqID) {
+    public HostReplyMessage(SessionId id, int failureCode, long reqID) {
+        if (id == null)
+            throw new IllegalArgumentException();
         if (failureCode <= 0 || failureCode > 255)
             throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
             throw new IllegalArgumentException();
         _code = failureCode;
         _reqID = reqID;
+    }
+
+    public SessionId getSessionId() {
+        return _sessionId;
     }
 
     /**
@@ -87,6 +94,8 @@ public class HostReplyMessage extends I2CPMessageImpl {
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
+            _sessionId = new SessionId();
+            _sessionId.readBytes(in);
             _reqID = DataHelper.readLong(in, 4);
             _code = (int) DataHelper.readLong(in, 1);
             if (_code == RESULT_SUCCESS)
@@ -97,7 +106,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        int len = 5;
+        int len = 7;
         if (_code == RESULT_SUCCESS) {
             if (_dest == null)
                 throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -105,6 +114,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream(len);
         try {
+            _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 4, _reqID);
             DataHelper.writeLong(os, 1, _code);
             if (_code == RESULT_SUCCESS)
@@ -123,6 +133,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[HostReplyMessage: ");
+        buf.append("\n\t").append(_sessionId);
         buf.append("\n\tReqID: ").append(_reqID);
         buf.append("\n\tCode: ").append(_code);
         if (_code == RESULT_SUCCESS)
