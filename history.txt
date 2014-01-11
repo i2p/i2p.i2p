@@ -1,3 +1,6 @@
+2014-01-11 str4d
+ * BOB: Pass through I2CP host/port (ticket #827)
+
 2014-01-10 str4d
  * BOB: Implement ClientApp interface (ticket #347)
 
