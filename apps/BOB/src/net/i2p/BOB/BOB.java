@@ -27,15 +27,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer2;
 
@@ -129,46 +131,13 @@ public class BOB implements Runnable, ClientApp {
 	// no longer used.
 	// private static int maxConnections = 0;
 
-	private final Log _log;
+	private final Logger _log;
 	private final ClientAppManager _mgr;
 	private final String[] _args;
 	private volatile ClientAppState _state = UNINITIALIZED;
 
 	private volatile ServerSocket listener;
 	private volatile Thread _runner;
-
-	/**
-	 * Log a warning
-	 *
-	 * @param arg
-	 * @deprecated
-	 */
-	public static void info(String arg) {
-		System.out.println("INFO:" + arg);
-		(new Log(BOB.class)).info(arg);
-	}
-
-	/**
-	 * Log a warning
-	 *
-	 * @param arg
-	 * @deprecated
-	 */
-	public static void warn(String arg) {
-		System.out.println("WARNING:" + arg);
-		(new Log(BOB.class)).warn(arg);
-	}
-
-	/**
-	 * Log an error
-	 *
-	 * @param arg
-	 * @deprecated
-	 */
-	public static void error(String arg) {
-		System.out.println("ERROR: " + arg);
-		(new Log(BOB.class)).error(arg);
-	}
 
 	/**
 	 * Stop BOB gracefully
@@ -188,7 +157,23 @@ public class BOB implements Runnable, ClientApp {
 	 *  @since 0.9.10
 	 */
 	public BOB(I2PAppContext context, ClientAppManager mgr, String[] args) {
-		_log = context.logManager().getLog(BOB.class);
+		// If we were run from command line, log to stdout
+		boolean logToStdout = false;
+		String classPath = BOB.class.getResource("BOB.class").toString();
+		if (classPath.startsWith("jar")) {
+			String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+					"/META-INF/MANIFEST.MF";
+			try {
+				Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+				Attributes attrs = manifest.getMainAttributes();
+				String mainClass = attrs.getValue("Main-Class");
+				if ("net.i2p.BOB.Main".equals(mainClass))
+					logToStdout = true;
+			} catch (IOException ioe) {}
+		}
+
+		_log = new Logger(context.logManager().getLog(BOB.class), logToStdout);
+
 		_mgr = mgr;
 		_args = args;
 		_state = INITIALIZED;
@@ -238,12 +223,10 @@ public class BOB implements Runnable, ClientApp {
 				props.load(fi);
 				fi.close();
 			} catch (FileNotFoundException fnfe) {
-				if (_log.shouldLog(Log.WARN))
-					_log.warn("Unable to load up the BOB config file " + cfg.getAbsolutePath() + ", Using defaults.", fnfe);
+				_log.warn("Unable to load up the BOB config file " + cfg.getAbsolutePath() + ", Using defaults.", fnfe);
 				save = true;
 			} catch (IOException ioe) {
-				if (_log.shouldLog(Log.WARN))
-					_log.warn("IOException on BOB config file " + cfg.getAbsolutePath() + ", using defaults.", ioe);
+				_log.warn("IOException on BOB config file " + cfg.getAbsolutePath() + ", using defaults.", ioe);
 			}
 		}
 		// Global router and client API configurations that are missing are set to defaults here.
@@ -291,14 +274,12 @@ public class BOB implements Runnable, ClientApp {
 				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
 			}
 			try {
-				if (_log.shouldLog(Log.WARN))
-					_log.warn("Writing new defaults file " + cfg.getAbsolutePath());
+				_log.warn("Writing new defaults file " + cfg.getAbsolutePath());
 				FileOutputStream fo = new FileOutputStream(cfg);
 				props.store(fo, cfg.getAbsolutePath());
 				fo.close();
 			} catch (IOException ioe) {
-				if (_log.shouldLog(Log.ERROR))
-					_log.error("IOException on BOB config file " + cfg.getAbsolutePath(), ioe);
+				_log.error("IOException on BOB config file " + cfg.getAbsolutePath(), ioe);
 			}
 		}
 	}
@@ -326,8 +307,7 @@ public class BOB implements Runnable, ClientApp {
 	public void run() {
 		if (listener == null) return;
 		changeState(RUNNING);
-		if (_log.shouldLog(Log.INFO))
-			_log.info("BOB is now running.");
+		_log.info("BOB is now running.");
 		if (_mgr != null)
 			_mgr.register(this);
 
@@ -360,14 +340,13 @@ public class BOB implements Runnable, ClientApp {
 			}
 			changeState(STOPPING);
 		} catch (Exception e) {
-			if (spin.get() && _log.shouldLog(Log.ERROR))
+			if (spin.get())
 				_log.error("Unexpected error while listening for connections", e);
 			else
 				e = null;
 			changeState(STOPPING, e);
 		} finally {
-			if (_log.shouldLog(Log.INFO))
-				_log.info("BOB is now shutting down...");
+			_log.info("BOB is now shutting down...");
 			// Clean up everything.
 			try {
 				listener.close();
@@ -399,8 +378,7 @@ public class BOB implements Runnable, ClientApp {
 				}
 			}
 			changeState(STOPPED);
-			if (_log.shouldLog(Log.INFO))
-				_log.info("BOB is now stopped.");
+			_log.info("BOB is now stopped.");
 		}
 	}
 
@@ -466,10 +444,9 @@ public class BOB implements Runnable, ClientApp {
 		try {
 			startListener();
 		} catch (IOException e) {
-			if (_log.shouldLog(Log.ERROR))
-				_log.error("Error starting BOB on"
-						+ props.getProperty(PROP_BOB_HOST)
-						+ ":" + props.getProperty(PROP_BOB_PORT), e);
+			_log.error("Error starting BOB on"
+					+ props.getProperty(PROP_BOB_HOST)
+					+ ":" + props.getProperty(PROP_BOB_PORT), e);
 			changeState(START_FAILED, e);
 			throw e;
 		}

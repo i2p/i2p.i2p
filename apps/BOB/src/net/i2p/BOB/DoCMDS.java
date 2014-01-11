@@ -31,7 +31,6 @@ import net.i2p.client.I2PClientFactory;
 //import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 //import net.i2p.i2ptunnel.I2PTunnel;
-import net.i2p.util.Log;
 // needed only for debugging.
 // import java.util.logging.Level;
 // import java.util.logging.Logger;
@@ -56,7 +55,7 @@ public class DoCMDS implements Runnable {
 	private ByteArrayOutputStream prikey;
 	private boolean dk,  ns,  ip,  op;
 	private NamedDB nickinfo;
-	private Log _log;
+	private Logger _log;
 	private AtomicBoolean LIVE;
 	private AtomicBoolean lock;
 	/* database strings */
@@ -164,7 +163,7 @@ public class DoCMDS implements Runnable {
 	 * @param database
 	 * @param _log
 	 */
-	DoCMDS(AtomicBoolean LIVE, AtomicBoolean lock, Socket server, Properties props, NamedDB database, Log _log) {
+	DoCMDS(AtomicBoolean LIVE, AtomicBoolean lock, Socket server, Properties props, NamedDB database, Logger _log) {
 		this.lock = lock;
 		this.LIVE = LIVE;
 		this.server = server;
@@ -606,7 +605,7 @@ public class DoCMDS implements Runnable {
 														break die;
 													}
 												} catch (I2PException ipe) {
-													BOB.error("Error generating keys" + ipe);
+													_log.error("Error generating keys", ipe);
 													out.println("ERROR generating keys");
 												}
 

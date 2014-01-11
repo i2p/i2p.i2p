@@ -36,7 +36,7 @@ import net.i2p.util.Log;
 public class MUXlisten implements Runnable {
 
 	private NamedDB database,  info;
-	private Log _log;
+	private Logger _log;
 	private I2PSocketManager socketManager;
 	private ByteArrayInputStream prikey;
 	private ThreadGroup tg;
@@ -57,7 +57,7 @@ public class MUXlisten implements Runnable {
 	 * @throws net.i2p.I2PException
 	 * @throws java.io.IOException
 	 */
-	MUXlisten(AtomicBoolean lock, NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
+	MUXlisten(AtomicBoolean lock, NamedDB database, NamedDB info, Logger _log) throws I2PException, IOException, RuntimeException {
 		try {
 			int port = 0;
 			InetAddress host = null;
