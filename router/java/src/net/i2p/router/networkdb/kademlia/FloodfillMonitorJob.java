@@ -129,7 +129,7 @@ class FloodfillMonitorJob extends JobImpl {
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 200;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
-        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 50;
+        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 35;
         happy = happy && Math.abs(getContext().clock().getOffset()) < 10*1000;
         // We need an address and no introducers
         if (happy) {

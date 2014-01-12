@@ -479,7 +479,20 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return _ds.get(key);
     }
 
+    /**
+     *  Lookup using exploratory tunnels
+     */
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
+        lookupLeaseSet(key, onFindJob, onFailedLookupJob, timeoutMs, null);
+    }
+
+    /**
+     *  Lookup using the client's tunnels
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @since 0.9.10
+     */
+    public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob,
+                               long timeoutMs, Hash fromLocalDest) {
         if (!_initialized) return;
         LeaseSet ls = lookupLeaseSetLocally(key);
         if (ls != null) {
@@ -490,7 +503,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("leaseSet not found locally, running search");
-            search(key, onFindJob, onFailedLookupJob, timeoutMs, true);
+            search(key, onFindJob, onFailedLookupJob, timeoutMs, true, fromLocalDest);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after lookupLeaseSet");
@@ -1018,6 +1031,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _context.statManager().addRateData("netDb.lookupDeferred", deferred, searchJob.getExpiration()-_context.clock().now());
         }
         return searchJob;
+    }
+    
+    /**
+     * Unused - see FNDF
+     * @throws UnsupportedOperationException always
+     * @since 0.9.10
+     */
+    SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease,
+                     Hash fromLocalDest) {
+        throw new UnsupportedOperationException();
     }
     
     /** public for NetDbRenderer in routerconsole */

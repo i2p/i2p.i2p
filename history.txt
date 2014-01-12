@@ -1,10 +1,18 @@
+2014-01-11 zzz
+ * NetDB:
+   - Reduce min part tunnels for ffs to 35
+   - Use client tunnels for LS lookups from OCMOSJ (ticket #1166)
+
 2014-01-11 str4d
  * BOB: Pass through I2CP host/port (ticket #827)
 
 2014-01-10 str4d
  * BOB: Implement ClientApp interface (ticket #347)
 
-2014-01-09
+2014-01-09 zzz
+ * Kademila: Fix NPE in remove()
+
+2014-01-09 kytv
  * Translations
   - Updates to French, German, Romanian, and Russian
   - New Brazilian Portuguese translation
@@ -16,6 +24,9 @@
   - Fixed pagination with zero entries (ticket #1168)
   - UTF-8 support from wockenfuss (ticket #508)
  * Console: Fixed overlapping text issue in midnight theme
+
+2014-01-07 zzz
+ * Streaming: Fix StandardServerSocket.close() and isClosed()
 
 2014-01-04 zzz
  * Peermanager: Disable small same-country bonus

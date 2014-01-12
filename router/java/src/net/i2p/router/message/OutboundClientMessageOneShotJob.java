@@ -219,7 +219,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job for " + _toString);
             LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
-            getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs);
+            getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs, _from.calculateHash());
         }
     }
     
