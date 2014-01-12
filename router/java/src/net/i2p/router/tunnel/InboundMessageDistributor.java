@@ -58,16 +58,19 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
         */
         
         int type = msg.getType();
-        // FVSJ could also result in a DSRM.
+        // FVSJ or client lookups could also result in a DSRM.
         // Since there's some code that replies directly to this to gather new ff RouterInfos,
         // sanitize it
         if ( (_client != null) && 
-             (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) &&
-             (_client.equals(((DatabaseSearchReplyMessage)msg).getSearchKey()))) {
+             (type == DatabaseSearchReplyMessage.MESSAGE_TYPE)) {
+            // TODO: Strip in IterativeLookupJob etc. instead, depending on
+            // LS or RI and client or expl., so that we can safely follow references
+            // in a reply to a LS lookup over client tunnels.
+            // ILJ would also have to follow references via client tunnels
             DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
             if (orig.getNumReplies() > 0) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Removing replies from a DSRM down a tunnel for " + _client + ": " + msg);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Removing replies from a DSRM down a tunnel for " + _client + ": " + msg);
                 DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
                 newMsg.setFromHash(orig.getFromHash());
                 newMsg.setSearchKey(orig.getSearchKey());
@@ -213,13 +216,16 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                     _log.info("Storing garlic RI down tunnel for: " + dsm.getKey() + " sent to: " + _client);
                                 _context.inNetMessagePool().add(dsm, null, null);
                             }
-                } else if (_client != null && type == DatabaseSearchReplyMessage.MESSAGE_TYPE &&
-                           _client.equals(((DatabaseSearchReplyMessage) data).getSearchKey())) {
+                } else if (_client != null && type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
                     // DSRMs show up here now that replies are encrypted
+                    // TODO: Strip in IterativeLookupJob etc. instead, depending on
+                    // LS or RI and client or expl., so that we can safely follow references
+                    // in a reply to a LS lookup over client tunnels.
+                    // ILJ would also have to follow references via client tunnels
                     DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) data;
                     if (orig.getNumReplies() > 0) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Removing replies from a garlic DSRM down a tunnel for " + _client + ": " + data);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Removing replies from a garlic DSRM down a tunnel for " + _client + ": " + data);
                         DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
                         newMsg.setFromHash(orig.getFromHash());
                         newMsg.setSearchKey(orig.getSearchKey());

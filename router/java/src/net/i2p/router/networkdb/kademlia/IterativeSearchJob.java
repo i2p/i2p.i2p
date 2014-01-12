@@ -292,7 +292,9 @@ class IterativeSearchJob extends FloodSearchJob {
                 synchronized(this) {
                     tries = _unheardFrom.size() + _failedPeers.size();
                 }
-                _log.info(getJobId() + ": ISJ try " + tries + " for " + _key + " to " + peer +
+                _log.info(getJobId() + ": ISJ try " + tries + " for " +
+                          (_isLease ? "LS " : "RI ") +
+                          _key + " to " + peer +
                           " reply via client tunnel? " + isClientReplyTunnel);
             }
             long now = getContext().clock().now();
