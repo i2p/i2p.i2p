@@ -90,8 +90,9 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
              (type != DeliveryStatusMessage.MESSAGE_TYPE) &&
              (type != GarlicMessage.MESSAGE_TYPE) &&
              // allow DSM of our own key (used by FloodfillVerifyStoreJob)
-             // as long as there's no reply token (FVSJ will never set a reply token but an attacker might)
-             ((type != DatabaseStoreMessage.MESSAGE_TYPE)  || (!_client.equals(((DatabaseStoreMessage)msg).getKey())) ||
+             // or other keys (used by IterativeSearchJob)
+             // as long as there's no reply token (we will never set a reply token but an attacker might)
+             ((type != DatabaseStoreMessage.MESSAGE_TYPE) ||
               (((DatabaseStoreMessage)msg).getReplyToken() != 0)) &&
              (type != TunnelBuildReplyMessage.MESSAGE_TYPE) &&
              (type != VariableTunnelBuildReplyMessage.MESSAGE_TYPE)) {

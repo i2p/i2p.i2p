@@ -1,5 +1,5 @@
 2014-01-12 zzz
- * NetDB: Fix handling of DSRM down client tunnels
+ * NetDB: Fix handling of DSRM and DSM down client tunnels
 
 2014-01-11 zzz
  * NetDB:
