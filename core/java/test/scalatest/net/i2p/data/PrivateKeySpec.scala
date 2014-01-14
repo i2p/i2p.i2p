@@ -7,7 +7,11 @@ import org.scalatest.matchers.ShouldMatchers
  * @author str4d
  */
 class PrivateKeySpec extends FunSpec with ShouldMatchers {
+    val privateKey = new PrivateKey
+
     describe("A PrivateKey") {
-        it("should be 256 bytes long") (pending)
+        it("should be 256 bytes long") {
+            privateKey should have length (256)
+        }
     }
 }
