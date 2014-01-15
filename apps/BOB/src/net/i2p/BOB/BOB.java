@@ -159,17 +159,20 @@ public class BOB implements Runnable, ClientApp {
 	public BOB(I2PAppContext context, ClientAppManager mgr, String[] args) {
 		// If we were run from command line, log to stdout
 		boolean logToStdout = false;
-		String classPath = BOB.class.getResource("BOB.class").toString();
-		if (classPath.startsWith("jar")) {
-			String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
-					"/META-INF/MANIFEST.MF";
-			try {
-				Manifest manifest = new Manifest(new URL(manifestPath).openStream());
-				Attributes attrs = manifest.getMainAttributes();
-				String mainClass = attrs.getValue("Main-Class");
-				if ("net.i2p.BOB.Main".equals(mainClass))
-					logToStdout = true;
-			} catch (IOException ioe) {}
+		URL classResource = BOB.class.getResource("BOB.class");
+		if (classResource != null) {
+		    String classPath = classResource.toString();
+		    if (classPath.startsWith("jar")) {
+		        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+		                "/META-INF/MANIFEST.MF";
+		        try {
+		            Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+		            Attributes attrs = manifest.getMainAttributes();
+		            String mainClass = attrs.getValue("Main-Class");
+		            if ("net.i2p.BOB.Main".equals(mainClass))
+		                logToStdout = true;
+		        } catch (IOException ioe) {}
+		    }
 		}
 
 		_log = new Logger(context.logManager().getLog(BOB.class), logToStdout);
