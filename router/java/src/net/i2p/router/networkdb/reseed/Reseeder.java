@@ -61,7 +61,7 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://netdb.i2p2.de/" + "," +
+              //http://netdb.i2p2.de/" + "," +
               "http://reseed.i2p-projekt.de/" + "," +
              //"http://euve5653.vserver.de/netDb/" +  "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
@@ -76,7 +76,7 @@ public class Reseeder {
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
-              "https://netdb.i2p2.de/" + "," +
+              //"https://netdb.i2p2.de/" + "," +
               "https://reseed.i2p-projekt.de/" + "," +
               //"https://euve5653.vserver.de/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
