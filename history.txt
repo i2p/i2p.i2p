@@ -1,3 +1,5 @@
+* 2014-01-22 0.9.10 released
+
 2014-01-20 kytv
  * Translation updates
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
