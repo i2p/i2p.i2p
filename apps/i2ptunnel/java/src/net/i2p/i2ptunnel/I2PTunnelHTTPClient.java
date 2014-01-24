@@ -52,6 +52,8 @@ import net.i2p.util.Translate;
  *   $method /eepproxy/$site/$path $protocolVersion
  * </pre>
  *
+ * CONNECT (https) supported as of release 0.9.11.
+ *
  * Note that http://i2p/$b64key/... and /eepproxy/$site/... are not recommended
  * in browsers or other user-visible applications, as relative links will not
  * resolve correctly, cookies won't work, etc.
@@ -332,12 +334,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         OutputStream out = null;
 
         /**
-         * The URL after fixup, always starting with http://
+         * The URL after fixup, always starting with http:// or https://
          */
         String targetRequest = null;
 
+        // in-net outproxy
         boolean usingWWWProxy = false;
-        boolean usingOutproxy = false;
+        // local outproxy plugin
+        boolean usingInternalOutproxy = false;
         Outproxy outproxy = null;
         boolean usingInternalServer = false;
         String internalPath = null;
@@ -425,7 +429,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if (method.toUpperCase(Locale.US).equals("CONNECT")) {
                         // this makes things easier later, by spoofing a
                         // protocol so the URI parser find the host and port
-                        // FIXME breaks in-net outproxy
+                        // For in-net outproxy, will be fixed up below
                         request = "https://" + request + '/';
                     }
 
@@ -711,14 +715,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         remotePort = 443;
                                     else
                                         remotePort = 80;
-                                    usingOutproxy = true;
+                                    usingInternalOutproxy = true;
                                     targetRequest = requestURI.toASCIIString();
                                     if(_log.shouldLog(Log.DEBUG))
                                         _log.debug(getPrefix(requestId) + " [" + host + "]: outproxy!");
                                 }
                             }
                         }
-                        if (!usingOutproxy) {
+                        if (!usingInternalOutproxy) {
                             if(port >= 0) {
                                 host = host + ':' + port;
                             }
@@ -738,7 +742,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 if(_log.shouldLog(Log.WARN)) {
                                     _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
                                 }
-                                l.log("No HTTP outproxy found for the request.");
+                                l.log("No outproxy found for the request.");
                                 if(out != null) {
                                     out.write(getErrorPage("noproxy", _ERR_NO_OUTPROXY));
                                     writeFooter(out);
@@ -769,7 +773,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         return;
                     }   // end host name processing
 
-                    boolean isValid = usingOutproxy || usingWWWProxy ||
+                    boolean isValid = usingInternalOutproxy || usingWWWProxy ||
                                       usingInternalServer || isSupportedAddress(host, protocol);
                     if(!isValid) {
                         if(_log.shouldLog(Log.INFO)) {
@@ -780,7 +784,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         break;
                     }
 
-                    line = method + ' ' + requestURI.toASCIIString() + ' ' + protocolVersion;
+                    if (method.toUpperCase(Locale.US).equals("CONNECT")) {
+                        // fix up the change to requestURI above to get back to the original host:port
+                        line = method + ' ' + requestURI.getHost() + ':' + requestURI.getPort() + ' ' + protocolVersion;
+                    } else {
+                        line = method + ' ' + requestURI.toASCIIString() + ' ' + protocolVersion;
+                    }
 
                     if(_log.shouldLog(Log.DEBUG)) {
                         _log.debug(getPrefix(requestId) + "NEWREQ: \"" + line + "\"");
@@ -791,7 +800,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 // end first line processing
 
                 } else {
-                    if(lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingOutproxy) {
+                    if(lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingInternalOutproxy) {
                         // Note that we only pass the original Host: line through to the outproxy
                         // But we don't create a Host: line if it wasn't sent to us
                         line = "Host: " + host;
@@ -853,17 +862,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if(ok != null) {
                         gzip = Boolean.parseBoolean(ok);
                     }
-                    if(gzip && !usingInternalServer) {
+                    if(gzip && !usingInternalServer &&
+                       !method.toUpperCase(Locale.US).equals("CONNECT")) {
                         // according to rfc2616 s14.3, this *should* force identity, even if
                         // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
                         // seems to work.
                         newRequest.append("Accept-Encoding: \r\n");
-                        newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
+                        if (!usingInternalOutproxy)
+                            newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }
-                    if(!shout) {
+                    if(!shout && !method.toUpperCase(Locale.US).equals("CONNECT")) {
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
-                            if(usingWWWProxy || usingOutproxy) {
+                            if(usingWWWProxy || usingInternalOutproxy) {
                                 newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
                             } else {
                                 newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
@@ -896,7 +907,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
             }
 
-            if(method == null || (destination == null && !usingOutproxy)) {
+            if(method == null || (destination == null && !usingInternalOutproxy)) {
                 //l.log("No HTTP method found in the request.");
                 if(out != null) {
                     if(protocol != null && "http".equals(protocol.toLowerCase(Locale.US))) {
@@ -945,7 +956,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
 
             // no destination, going to outproxy plugin
-            if (usingOutproxy) {
+            if (usingInternalOutproxy) {
                 Socket outSocket = outproxy.connect(host, remotePort);
                 Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
                 byte[] data;

@@ -39,9 +39,9 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
      * Sun's impl of BufferedOutputStream), but that is the streaming
      * api's job...
      */
-    static int MAX_PACKET_SIZE = 1024 * 4;
+    private static final int MAX_PACKET_SIZE = 1024 * 4;
 
-    static final int NETWORK_BUFFER_SIZE = MAX_PACKET_SIZE;
+    private static final int NETWORK_BUFFER_SIZE = MAX_PACKET_SIZE;
 
     private final Socket s;
     private final Socket i2ps;
@@ -61,7 +61,7 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
     private static final AtomicLong __forwarderId = new AtomicLong();
     
     /**
-     *  Starts itself
+     *  Starts itself (fixme)
      *
      *  @param slock the socket lock, non-null
      *  @param initialI2PData may be null
@@ -80,9 +80,9 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
         startedOn = Clock.getInstance().now();
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         if (_log.shouldLog(Log.INFO))
-            _log.info("I2PTunnelRunner started");
+            _log.info("OutproxyRunner started");
         _runnerId = __runnerId.incrementAndGet();
-        setName("I2PTunnelOutproxyRunner " + _runnerId);
+        setName("OutproxyRunner " + _runnerId);
         start();
     }
 
@@ -254,9 +254,9 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
             this.in = in;
             this.out = out;
             _toI2P = toI2P;
-            direction = (toI2P ? "toI2P" : "fromI2P");
+            direction = (toI2P ? "toOutproxy" : "fromOutproxy");
             _cache = ByteCache.getInstance(32, NETWORK_BUFFER_SIZE);
-            setName("StreamForwarder " + _runnerId + '.' + __forwarderId.incrementAndGet());
+            setName("OutproxyForwarder " + _runnerId + '.' + __forwarderId.incrementAndGet());
             start();
         }
 

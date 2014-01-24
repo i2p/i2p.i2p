@@ -251,9 +251,12 @@ public class EditBean extends IndexBean {
         return getProperty(tunnel, I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, "");
     }
     
-    /** @since 0.9.11 */
+    /**
+     *  Default true
+     *  @since 0.9.11
+     */
     public boolean getUseOutproxyPlugin(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+        return Boolean.parseBoolean(getProperty(tunnel, I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, "true"));
     }
 
     /** all of these are @since 0.8.3 */
