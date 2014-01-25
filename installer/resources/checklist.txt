@@ -78,15 +78,11 @@ Notify the following people:
 
 Website files to change:
 	Sync with mtn.i2p2.i2p
-	announcements.html
-	announcements_*.html
-	download.html (change version numbers and SHA256s)
-	download_*.html (change version numbers and SHA256s)
-	index.html
-	index_*.html
 	hosts.txt if it changed (copy from i2p.i2p mtn branch)
-        release-x.y.z.html (new)
-        static/news/news.xml
+	i2p2www/__init__.py (release number)
+	i2p2www/pages/downloads/list.html (checksums)
+	i2p2www/static/news/news.xml
+	New release announcement - see i2p2www/blog/README for instructions
 	Sync with mtn.i2p2.i2p
 
 Announce on:
