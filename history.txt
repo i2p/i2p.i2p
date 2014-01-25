@@ -1,3 +1,8 @@
+2014-01-25 zab
+ * Move OutNetMessage buffer preparation to the Writer threads 
+   (Ticket #1184)
+ * Up version to -1
+
 * 2014-01-22 0.9.10 released
 
 2014-01-20 kytv

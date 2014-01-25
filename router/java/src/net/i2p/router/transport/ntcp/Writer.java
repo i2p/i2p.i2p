@@ -24,12 +24,16 @@ class Writer {
     private final Set<NTCPConnection> _writeAfterLive;
     private final List<Runner> _runners;
     
+    /** a scratch space to serialize and encrypt messages */
+    private final NTCPConnection.PrepBuffer _prepBuffer;
+    
     public Writer(RouterContext ctx) {
         _log = ctx.logManager().getLog(getClass());
         _pendingConnections = new LinkedHashSet<NTCPConnection>(16);
         _runners = new ArrayList<Runner>(5);
         _liveWrites = new HashSet<NTCPConnection>(5);
         _writeAfterLive = new HashSet<NTCPConnection>(5);
+        _prepBuffer = new NTCPConnection.PrepBuffer();
     }
     
     public synchronized void startWriting(int numWriters) {
@@ -119,7 +123,8 @@ class Writer {
                     try {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Prepare next write on: " + con);
-                        con.prepareNextWrite();
+                        _prepBuffer.init();
+                        con.prepareNextWrite(_prepBuffer);
                     } catch (RuntimeException re) {
                         _log.log(Log.CRIT, "Error in the ntcp writer", re);
                     }
