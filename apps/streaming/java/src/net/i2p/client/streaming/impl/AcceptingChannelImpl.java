@@ -1,11 +1,5 @@
 package net.i2p.client.streaming.impl;
 
-import net.i2p.I2PException;
-import net.i2p.client.streaming.AcceptingChannel;
-import net.i2p.client.streaming.I2PServerSocket;
-import net.i2p.client.streaming.I2PSocket;
-import net.i2p.client.streaming.I2PSocketManager;
-
 import java.net.SocketTimeoutException;
 import java.net.ConnectException;
 import java.io.IOException;
@@ -15,6 +9,12 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.spi.AbstractSelectionKey;
 import java.nio.channels.spi.SelectorProvider;
+
+import net.i2p.I2PException;
+import net.i2p.client.streaming.AcceptingChannel;
+import net.i2p.client.streaming.I2PServerSocket;
+import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketManager;
 
 /**
  *  As this does not (yet) extend ServerSocketChannel it cannot be returned by StandardServerSocket.getChannel(),

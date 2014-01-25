@@ -1,8 +1,5 @@
 package net.i2p.client.streaming.impl;
 
-import net.i2p.client.streaming.I2PSocket;
-import net.i2p.client.streaming.I2PSocketOptions;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +8,9 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
+
+import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketOptions;
 
 /**
  * Bridge to I2PSocket.
