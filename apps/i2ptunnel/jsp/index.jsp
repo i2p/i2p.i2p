@@ -302,16 +302,22 @@
             <% } %>
             </label>
             <div class="text">
-            <% String cdest = indexBean.getClientDestination(curClient);
-               if (cdest.length() > 70) { // Probably a B64 (a B32 is 60 chars) so truncate
-                   %><%=cdest.substring(0, 45)%>&hellip;<%=cdest.substring(cdest.length() - 15, cdest.length())%><%
-               } else if (cdest.length() > 0) {
-                   %><%=cdest%><%
+            <%
+               if (indexBean.getIsUsingOutproxyPlugin(curClient)) {
+                   %><%=intl._("internal plugin")%><%
                } else {
-                   %><i><%=intl._("none")%></i><%
+                   String cdest = indexBean.getClientDestination(curClient);
+                   if (cdest.length() > 70) { // Probably a B64 (a B32 is 60 chars) so truncate
+                       %><%=cdest.substring(0, 45)%>&hellip;<%=cdest.substring(cdest.length() - 15, cdest.length())%><%
+                   } else if (cdest.length() > 0) {
+                       %><%=cdest%><%
+                   } else {
+                       %><i><%=intl._("none")%></i><%
+                   }
                } %>
             </div>
         </div>
+        <% /* TODO SSL outproxy for httpclient if plugin not present */ %>
 
         <div class="descriptionField rowItem">
             <label><%=intl._("Description")%>:</label>
@@ -335,7 +341,7 @@
         <label><%=intl._("New client tunnel")%>:</label>
                     <select name="type">
                         <option value="client"><%=intl._("Standard")%></option>
-                        <option value="httpclient">HTTP</option>
+                        <option value="httpclient">HTTP/CONNECT</option>
                         <option value="ircclient">IRC</option>
                         <option value="sockstunnel">SOCKS 4/4a/5</option>
                         <option value="socksirctunnel">SOCKS IRC</option>

@@ -190,7 +190,7 @@
                 if (tunnelIsClient) {
                 %><select name="type">
                     <option value="client"><%=intl._("Standard")%></option>
-                    <option value="httpclient">HTTP</option>
+                    <option value="httpclient">HTTP/CONNECT</option>
                     <option value="ircclient">IRC</option>
                     <option value="sockstunnel">SOCKS 4/4a/5</option>
                     <option value="socksirctunnel">SOCKS IRC</option>

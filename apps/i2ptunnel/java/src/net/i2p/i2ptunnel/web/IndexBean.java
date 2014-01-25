@@ -22,6 +22,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.Outproxy;
 import net.i2p.data.Base32;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
@@ -502,7 +504,7 @@ public class IndexBean {
     
     public String getTypeName(String internalType) {
         if ("client".equals(internalType)) return _("Standard client");
-        else if ("httpclient".equals(internalType)) return _("HTTP client");
+        else if ("httpclient".equals(internalType)) return _("HTTP/HTTPS client");
         else if ("ircclient".equals(internalType)) return _("IRC client");
         else if ("server".equals(internalType)) return _("Standard server");
         else if ("httpserver".equals(internalType)) return _("HTTP server");
@@ -644,6 +646,26 @@ public class IndexBean {
         return "";
     }
     
+    /**
+     *  For index.jsp
+     *  @return true if the plugin is enabled, installed, and running
+     *  @since 0.9.11
+     */
+    public boolean getIsUsingOutproxyPlugin(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            if ("httpclient".equals(tun.getType())) {
+                Properties opts = tun.getClientOptionProps();
+                if (Boolean.parseBoolean(opts.getProperty(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, "true"))) {
+                    ClientAppManager mgr = _context.clientAppManager();
+                    if (mgr != null)
+                        return mgr.getRegisteredApp(Outproxy.NAME) != null;
+                }
+            }
+        }
+        return false;
+    }
+
     ///
     /// bean props for form submission
     ///
