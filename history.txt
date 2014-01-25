@@ -1,3 +1,10 @@
+2014-01-25 zzz
+ * i2psnark: Lower threshold for auto-stop
+ * Installer: Update links
+ * NetDB: Fix NPE after client shutdown (ticket #1174)
+ * Router: Lower frequency for publishing stats
+ * Update: All updates via torrent
+
 2014-01-25 zab
  * Move OutNetMessage buffer preparation to the Writer threads 
    (Ticket #1184)

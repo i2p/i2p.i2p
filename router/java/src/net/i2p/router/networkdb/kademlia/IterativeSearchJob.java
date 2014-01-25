@@ -313,9 +313,11 @@ class IterativeSearchJob extends FloodSearchJob {
                             sess = MessageWrapper.generateSession(getContext(), _fromLocalDest);
                         else
                             sess = MessageWrapper.generateSession(getContext());
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info(getJobId() + ": Requesting encrypted reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
-                        dlm.setReplySession(sess.key, sess.tag);
+                        if (sess != null) {
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info(getJobId() + ": Requesting encrypted reply from " + peer + ' ' + sess.key + ' ' + sess.tag);
+                            dlm.setReplySession(sess.key, sess.tag);
+                        } // else client went away, but send it anyway
                     }
                     outMsg = MessageWrapper.wrap(getContext(), dlm, ri);
                     // ElG can take a while so do a final check before we send it,
