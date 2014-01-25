@@ -22,7 +22,6 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
-import net.i2p.util.Log;
 
 /**
  * Listen on I2P and connect to TCP
@@ -32,7 +31,7 @@ import net.i2p.util.Log;
 public class I2Plistener implements Runnable {
 
 	private NamedDB info,  database;
-	private Log _log;
+	private Logger _log;
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
 	private AtomicBoolean lives;
@@ -45,7 +44,7 @@ public class I2Plistener implements Runnable {
 	 * @param database
 	 * @param _log
 	 */
-	I2Plistener(I2PServerSocket SS, I2PSocketManager S, NamedDB info, NamedDB database, Log _log, AtomicBoolean lives) {
+	I2Plistener(I2PServerSocket SS, I2PSocketManager S, NamedDB info, NamedDB database, Logger _log, AtomicBoolean lives) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;

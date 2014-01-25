@@ -97,7 +97,7 @@ class NTCPConnection {
     //private final CoDelPriorityBlockingQueue<OutNetMessage> _outbound;
     private final PriBlockingQueue<OutNetMessage> _outbound;
     /**
-     *  current prepared OutNetMessage, or null - synchronize on _outbound to modify
+     *  current prepared OutNetMessage, or null - synchronize on _outbound to modify or read
      *  FIXME why do we need this???
      */
     private OutNetMessage _currentOutbound;
@@ -302,11 +302,20 @@ class NTCPConnection {
 
     public long getMessagesSent() { return _messagesWritten; }
     public long getMessagesReceived() { return _messagesRead; }
-    public long getOutboundQueueSize() { 
-            int queued = _outbound.size();
-            if (_currentOutbound != null)
-                queued++;
+    public long getOutboundQueueSize() {
+            int queued;
+            synchronized(_outbound) {
+                queued = _outbound.size();
+                if (getCurrentOutbound() != null)
+                    queued++;
+            }
             return queued;
+    }
+    
+    private OutNetMessage getCurrentOutbound() {
+        synchronized(_outbound) {
+            return _currentOutbound;
+        }
     }
 
     /** @return milliseconds */
@@ -383,20 +392,12 @@ class NTCPConnection {
         List<OutNetMessage> pending = new ArrayList<OutNetMessage>();
         //_outbound.drainAllTo(pending);
         _outbound.drainTo(pending);
-        for (OutNetMessage msg : pending) {
-            Object buf = msg.releasePreparationBuffer();
-            if (buf != null)
-                releaseBuf((PrepBuffer)buf);
+        for (OutNetMessage msg : pending) 
             _transport.afterSend(msg, false, allowRequeue, msg.getLifetime());
-        }
 
-        OutNetMessage msg = _currentOutbound;
-        if (msg != null) {
-            Object buf = msg.releasePreparationBuffer();
-            if (buf != null)
-                releaseBuf((PrepBuffer)buf);
+        OutNetMessage msg = getCurrentOutbound();
+        if (msg != null) 
             _transport.afterSend(msg, false, allowRequeue, msg.getLifetime());
-        }
         
         return old;
     }
@@ -429,12 +430,11 @@ class NTCPConnection {
         _consecutiveBacklog = 0;
      ****/
         //if (FAST_LARGE)
-            bufferedPrepare(msg);
         _outbound.offer(msg);
         //int enqueued = _outbound.size();
         // although stat description says ahead of this one, not including this one...
         //_context.statManager().addRateData("ntcp.sendQueueSize", enqueued);
-        boolean noOutbound = (_currentOutbound == null);
+        boolean noOutbound = (getCurrentOutbound() == null);
         //if (_log.shouldLog(Log.DEBUG)) _log.debug("messages enqueued on " + toString() + ": " + enqueued + " new one: " + msg.getMessageId() + " of " + msg.getMessageType());
         if (isEstablished() && noOutbound)
             _transport.getWriter().wantsWrite(this, "enqueued");
@@ -468,7 +468,7 @@ class NTCPConnection {
             int size = _outbound.size();
             if (_log.shouldLog(Log.WARN)) {
 	        int writeBufs = _writeBufs.size();
-                boolean currentOutboundSet = _currentOutbound != null;
+                boolean currentOutboundSet = getCurrentOutbound() != null;
                 try {
                     _log.warn("Too backlogged: size is " + size 
                           + ", wantsWrite? " + (0 != (_conKey.interestOps()&SelectionKey.OP_WRITE))
@@ -595,11 +595,13 @@ class NTCPConnection {
     /**
      * prepare the next i2np message for transmission.  this should be run from
      * the Writer thread pool.
+     * 
+     * @param prep an instance of PrepBuffer to use as scratch space
      *
      */
-    synchronized void prepareNextWrite() {
+    synchronized void prepareNextWrite(PrepBuffer prep) {
         //if (FAST_LARGE)
-            prepareNextWriteFast();
+            prepareNextWriteFast(prep);
         //else
         //    prepareNextWriteSmall();
     }
@@ -708,9 +710,10 @@ class NTCPConnection {
      * the Writer thread pool.
      *
      * Caller must synchronize.
+     * @param buf a PrepBuffer to use as scratch space
      *
      */
-    private void prepareNextWriteFast() {
+    private void prepareNextWriteFast(PrepBuffer buf) {
         if (_closed.get())
             return;
         //if (_log.shouldLog(Log.DEBUG))
@@ -771,14 +774,7 @@ class NTCPConnection {
         }
         
         //long begin = System.currentTimeMillis();
-        PrepBuffer buf = (PrepBuffer)msg.releasePreparationBuffer();
-        if (buf == null) {
-            // race, see ticket #392
-            //throw new RuntimeException("buf is null for " + msg);
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Null prep buf for " + msg);
-            return;
-        }
+        bufferedPrepare(msg,buf);
         _context.aes().encrypt(buf.unencrypted, 0, buf.encrypted, 0, _sessionKey, _prevWriteEnd, 0, buf.unencryptedLength);
         System.arraycopy(buf.encrypted, buf.encrypted.length-16, _prevWriteEnd, 0, _prevWriteEnd.length);
         //long encryptedTime = System.currentTimeMillis();
@@ -788,7 +784,6 @@ class NTCPConnection {
         //               + Base64.encode(unencrypted, 0, 16) + "..." + "\nIV=" + Base64.encode(_prevWriteEnd, 0, 16));
         _transport.getPumper().wantsWrite(this, buf.encrypted);
         //long wantsTime = System.currentTimeMillis();
-        releaseBuf(buf);
         //long releaseTime = System.currentTimeMillis();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("prepared outbound " + System.identityHashCode(msg) 
@@ -808,16 +803,15 @@ class NTCPConnection {
     
     /**
      * Serialize the message/checksum/padding/etc for transmission, but leave off
-     * the encryption for the actual write process (when we will always have the
-     * end of the previous encrypted transmission to serve as our IV).  with care,
-     * the encryption could be handled here too, as long as messages aren't expired
-     * in the queue and the establishment process takes that into account.
+     * the encryption.  This should be called from a Writer thread
+     * 
+     * @param msg message to send
+     * @param buf PrepBuffer to use as scratch space
      */
-    private void bufferedPrepare(OutNetMessage msg) {
+    private void bufferedPrepare(OutNetMessage msg, PrepBuffer buf) {
         //if (!_isInbound && !_established)
         //    return;
         //long begin = System.currentTimeMillis();
-        PrepBuffer buf = acquireBuf();
         //long alloc = System.currentTimeMillis();
         
         I2NPMessage m = msg.getMessage();
@@ -854,39 +848,12 @@ class NTCPConnection {
         buf.encrypted = new byte[buf.unencryptedLength];
         
         //long crced = System.currentTimeMillis();
-        msg.prepared(buf);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Buffered prepare took " + (crced-begin) + ", alloc=" + (alloc-begin)
         //               + " serialize=" + (serialized-alloc) + " crc=" + (crced-serialized));
     }
-    
-    private static final int MIN_BUFS = 4;
-    private static final int MAX_BUFS = 16;
-    private static int NUM_PREP_BUFS;
-    static {
-        long maxMemory = SystemVersion.getMaxMemory();
-        NUM_PREP_BUFS = (int) Math.max(MIN_BUFS, Math.min(MAX_BUFS, 1 + (maxMemory / (16*1024*1024))));
-    }
 
-    private final static LinkedBlockingQueue<PrepBuffer> _bufs = new LinkedBlockingQueue<PrepBuffer>(NUM_PREP_BUFS);
-
-    /**
-     *  32KB each
-     *  @return initialized buffer
-     */
-    private static PrepBuffer acquireBuf() {
-        PrepBuffer b = _bufs.poll();
-        if (b == null)
-            b = new PrepBuffer();
-        return b;
-    }
-
-    private static void releaseBuf(PrepBuffer buf) {
-        buf.init();
-        _bufs.offer(buf);
-    }
-
-    private static class PrepBuffer {
+    public static class PrepBuffer {
         final byte unencrypted[];
         int unencryptedLength;
         final byte base[];
@@ -894,13 +861,13 @@ class NTCPConnection {
         final Adler32 crc;
         byte encrypted[];
         
-        PrepBuffer() {
+        public PrepBuffer() {
             unencrypted = new byte[BUFFER_SIZE];
             base = new byte[BUFFER_SIZE];
             crc = new Adler32();
         }
 
-        private void init() {
+        public void init() {
             unencryptedLength = 0;
             baseLength = 0;
             encrypted = null;
@@ -1072,8 +1039,7 @@ class NTCPConnection {
                 _log.info("I2NP meta message sent completely");
         }
         
-        boolean msgs = ((!_outbound.isEmpty()) || (_currentOutbound != null));
-        if (msgs) // push through the bw limiter to reach _writeBufs
+        if (getOutboundQueueSize() > 0) // push through the bw limiter to reach _writeBufs
             _transport.getWriter().wantsWrite(this, "write completed");
 
         // this is not necessary, EventPumper.processWrite() handles this
@@ -1359,7 +1325,6 @@ class NTCPConnection {
      */
     static void releaseResources() {
         _i2npHandlers.clear();
-        _bufs.clear();
     }
 
     /**

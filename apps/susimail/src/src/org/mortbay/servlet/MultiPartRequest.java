@@ -92,7 +92,7 @@ public class MultiPartRequest
             value(content_type.substring(content_type.indexOf("boundary=")));
         
         //if(log.isDebugEnabled())log.debug("Boundary="+_boundary);
-        _byteBoundary= (_boundary+"--").getBytes("ISO-8859-1");
+        _byteBoundary= (_boundary+"--").getBytes("UTF-8");
         
         loadAllParts();
     }

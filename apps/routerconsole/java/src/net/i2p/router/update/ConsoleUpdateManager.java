@@ -95,7 +95,9 @@ public class ConsoleUpdateManager implements UpdateManager {
         // For 0.9.8 update, only for dev builds and 30% more
         // For 0.9.10 update, only for dev builds and 60% more
         // Remove this for 100%
-        _allowTorrent = RouterVersion.BUILD != 0 || _context.random().nextInt(100) < 60;
+        //_allowTorrent = RouterVersion.BUILD != 0 || _context.random().nextInt(100) < 60;
+        // Finally, for 0.9.12, 18 months later...
+        _allowTorrent = true;
     }
 
     public static ConsoleUpdateManager getInstance() {

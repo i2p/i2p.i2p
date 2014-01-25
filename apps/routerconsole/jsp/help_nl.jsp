@@ -17,10 +17,10 @@
 <div class="main" id="main"><p>
 Als je wilt helpen om de documentatie te verbeteren of vertalen, of wilt helpen
 met andere aspecten van het project, zie dan de documentatie voor 
-<a href="http://www.i2p2.i2p/getinvolved.html">vrijwilligers.</a>
+<a href="http://i2p-projekt.i2p/getinvolved.html">vrijwilligers.</a>
 </p>Verdere ondersteuning is hier beschikbaar:
 <ul class="links">
-<li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ op www.i2p2.i2p</a></li>
+<li class="tidylist"><a href="http://i2p-projekt.i2p/faq.html">FAQ op i2p-projekt.i2p</a></li>
 </ul>
 <br>Je kunt ook het <a href="http://forum.i2p/">I2P forum</a>
 of IRC proberen.
@@ -168,7 +168,7 @@ Dit product bevat software ontwikkeld door de Apache Software Foundation
 (http://www.apache.org/).</p>
 
 <p>Een andere applicatie op deze webpagina is <a
-href="http://www.i2p2.i2p/i2ptunnel">I2PTunnel</a> (je <a href="i2ptunnel/"
+href="http://i2p-projekt.i2p/i2ptunnel">I2PTunnel</a> (je <a href="i2ptunnel/"
 target="_blank">web interface</a>) - een GPL applicatie geschreven door mihi
 die normaal TCP/IP verkeer over I2P laat tunnelen (zoals de eepproxy en de irc
 proxy). Er is ook een <a href="http://susi.i2p/">susimail</a> web based mail
@@ -178,7 +178,7 @@ GPL applicatie geschreven door susi23. De adresboek applicatie, geschreven door
 hosts.txt bestanden (zie ./addressbook/ voor meer informatie).</p>
 
 <p>De router bevat ook standaard human's public domain <a
-href="http://www.i2p2.i2p/sam">SAM</a> brug, welke andere client applicaties
+href="http://i2p-projekt.i2p/sam">SAM</a> brug, welke andere client applicaties
 (zoals de <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) kan gebruiken.
 Er is ook een geoptimaliseerde library voor het uitvoeren van berekeningen met
 grote getallen - jbigi - deze gebruikt de LGPL licensed <a
@@ -187,9 +187,9 @@ architecturen.  Opstarters voor windows gebruikers zijn gemaakt met <a
 href="http://launch4j.sourceforge.net/">Launch4J</a>, en de installer is
 gemaakt met <a href="http://www.izforge.com/izpack/">IzPack</a>.  Voor details
 over andere beschikbare applicaties, en hun licenties, zie het <a
-href="http://www.i2p2.i2p/licenses">licentie beleid</a>.  Broncode voor I2P en
+href="http://i2p-projekt.i2p/licenses">licentie beleid</a>.  Broncode voor I2P en
 de meeste gebundelde client applicaties kan gevonden worden op onze <a
-href="http://www.i2p2.i2p/download">download pagina</a>.</p>
+href="http://i2p-projekt.i2p/download">download pagina</a>.</p>
 
 <h2>Release geschiedenis</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />

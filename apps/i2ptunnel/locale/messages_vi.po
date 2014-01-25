@@ -2,45 +2,44 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# dich_tran <tran.nathan@gmail.com>, 2011
-# dich_tran <tran.nathan@gmail.com>, 2011
+# dich_tran <thnhan@gmail.com>, 2011
+# dich_tran <thnhan@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 23:06+0000\n"
-"PO-Revision-Date: 2013-11-19 12:47+0000\n"
+"POT-Creation-Date: 2013-12-01 20:06+0000\n"
+"PO-Revision-Date: 2013-11-20 09:42+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/projects/p/I2P/language/"
-"vi/)\n"
-"Language: vi\n"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/I2P/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:352
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:362
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:350
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:360
 msgid "internal"
 msgstr "nội bộ"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:438
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:436
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:440
 msgid "lower bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
 msgid "standard bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:446
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
 msgid "higher bandwidth and reliability"
 msgstr ""
 
@@ -52,9 +51,7 @@ msgstr ""
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr ""
-"Mẫu đơn đệ nạp không đúng, có lẻ vì bạn dùng nút 'back' hay 'reload\" của "
-"trình duyệt. Xin vui lòng đệ nạp lại."
+msgstr "Mẫu đơn đệ nạp không đúng, có lẻ vì bạn dùng nút 'back' hay 'reload\" của trình duyệt. Xin vui lòng đệ nạp lại."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:196
 msgid ""
@@ -235,9 +232,8 @@ msgstr "Địa điểm Hầm đến"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
-#, fuzzy
 msgid "name, name:port, or destination"
-msgstr "tên hay điểm đến"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -252,9 +248,7 @@ msgstr "Chia khách"
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr ""
-"(Chia sẻ hầm với những khách khác hay khách irc/http? Chỉnh đổi yêu cầu khởi "
-"động lại proxy khách)"
+msgstr "(Chia sẻ hầm với những khách khác hay khách irc/http? Chỉnh đổi yêu cầu khởi động lại proxy khách)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:141
@@ -282,9 +276,7 @@ msgstr "Tùy chọn mạng cao cấp "
 msgid ""
 "(NOTE: when this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!)"
-msgstr ""
-"(GHI CHÚ: khi proxy khách được cấu hình để chia sẻ hầm, thì những tùy chọn "
-"này cho tất cả khách proxy chia sẻ)"
+msgstr "(GHI CHÚ: khi proxy khách được cấu hình để chia sẻ hầm, thì những tùy chọn này cho tất cả khách proxy chia sẻ)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:268
@@ -298,27 +290,23 @@ msgstr "Độ dài"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
-#, fuzzy
 msgid "0 hop tunnel (no anonymity)"
-msgstr "hầm 0 bước nhảy (độ ẩn danh thấp, độ trễ thấp)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
-#, fuzzy
 msgid "1 hop tunnel (low anonymity)"
-msgstr "hầm 0 bước nhảy (độ ẩn danh thấp, độ trễ thấp)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
-#, fuzzy
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "hầm 1 bước nhảy (độ ẩn danh vừa, độ trễ vừa)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
-#, fuzzy
 msgid "3 hop tunnel (high anonymity)"
-msgstr "hầm 2 bước nhảy (độ ẩn danh cao, độ trễ cao"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -651,18 +639,16 @@ msgid "Max concurrent connections (0=unlimited)"
 msgstr "Số đường nối tối đa cùng lúc (0=không giới hạn)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
-#, fuzzy
 msgid "POST limits (0=unlimited)"
-msgstr "Giới hạn đường nối vào (0=không giới hạn)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
-#, fuzzy
 msgid "Ban minutes"
-msgstr "Số phút rảnh rổi"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
@@ -878,20 +864,20 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:189
 msgid ""
-"This wizard will take you through the various options available for creating "
-"tunnels in I2P."
+"This wizard will take you through the various options available for creating"
+" tunnels in I2P."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:191
 msgid ""
-"The first thing to decide is whether you want to create a server or a client "
-"tunnel."
+"The first thing to decide is whether you want to create a server or a client"
+" tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
-"If you need to connect to a remote service, such as an IRC server inside I2P "
-"or a code repository, then you will require a CLIENT tunnel."
+"If you need to connect to a remote service, such as an IRC server inside I2P"
+" or a code repository, then you will require a CLIENT tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
@@ -930,8 +916,8 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
-"\"http_proxy\" environment variable for command-line applications in GNU/"
-"Linux."
+"\"http_proxy\" environment variable for command-line applications in "
+"GNU/Linux."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
@@ -1179,6 +1165,3 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid "Next"
 msgstr ""
-
-#~ msgid "3 hop tunnel (very high anonymity, poor performance)"
-#~ msgstr "hầm 3 bước nhảy (độ ẩn danh rất cao, hiệu suất tệ)"

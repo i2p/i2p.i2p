@@ -25,15 +25,20 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
     private volatile boolean _firstRun = true;
 
     private static final long INITIAL_DELAY = 5*60*1000;
+    private static final long NEW_INSTALL_DELAY = 25*60*1000;
     private static final long RUN_DELAY = 10*60*1000;
 
     public NewsTimerTask(RouterContext ctx, ConsoleUpdateManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsTimerTask.class);
         _mgr = mgr;
-        ctx.simpleScheduler().addPeriodicEvent(this,
-                                             INITIAL_DELAY + _context.random().nextLong(INITIAL_DELAY),
-                                             RUN_DELAY);
+        long installed = ctx.getProperty("router.firstInstalled", 0L);
+        boolean isNew = (ctx.clock().now() - installed) < 30*60*1000L;
+        long delay = isNew ? NEW_INSTALL_DELAY : INITIAL_DELAY;
+        delay += _context.random().nextLong(INITIAL_DELAY);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Scheduling first news check in " + DataHelper.formatDuration(delay));
+        ctx.simpleScheduler().addPeriodicEvent(this, delay, RUN_DELAY);
         // UpdateManager calls NewsFetcher to check the existing news at startup
     }
 

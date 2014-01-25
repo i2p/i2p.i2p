@@ -8,10 +8,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
-import net.i2p.data.Destination;
-import net.i2p.util.Log;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
 /**
  * Bridge between the full streaming lib and the I2PSocket API

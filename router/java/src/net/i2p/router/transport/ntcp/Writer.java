@@ -80,9 +80,15 @@ class Writer {
     }
     
     private class Runner implements Runnable {
+        
+        /** a scratch space to serialize and encrypt messages */
+        private final NTCPConnection.PrepBuffer _prepBuffer;
+        
         private volatile boolean _stop;
 
-        public Runner() {}
+        public Runner() {
+            _prepBuffer = new NTCPConnection.PrepBuffer();
+        }
 
         public void stop() { _stop = true; }
 
@@ -119,7 +125,8 @@ class Writer {
                     try {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Prepare next write on: " + con);
-                        con.prepareNextWrite();
+                        _prepBuffer.init();
+                        con.prepareNextWrite(_prepBuffer);
                     } catch (RuntimeException re) {
                         _log.log(Log.CRIT, "Error in the ntcp writer", re);
                     }

@@ -61,7 +61,7 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://netdb.i2p2.de/" + "," +
+              //http://netdb.i2p2.de/" + "," +
               "http://reseed.i2p-projekt.de/" + "," +
              //"http://euve5653.vserver.de/netDb/" +  "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
@@ -70,13 +70,15 @@ public class Reseeder {
               "http://netdb.i2p2.no/" + "," +
               "http://reseed.info/"  + "," +
               "http://reseed.pkol.de/" + "," +
+              "http://uk.reseed.i2p2.no/" + "," +
+              "http://i2p-netdb.innovatio.no/" + "," +
               "http://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"http://i2p.feared.eu/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
-              "https://netdb.i2p2.de/" + "," +
+              //"https://netdb.i2p2.de/" + "," +
               "https://reseed.i2p-projekt.de/" + "," +
               //"https://euve5653.vserver.de/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
@@ -85,6 +87,7 @@ public class Reseeder {
               "https://netdb.i2p2.no/" + "," +
               "https://reseed.info/"  + "," +
               "https://reseed.pkol.de/" + "," +
+              "https://uk.reseed.i2p2.no/" + "," +
               "https://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"https://i2p.feared.eu/";

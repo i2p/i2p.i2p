@@ -1333,7 +1333,7 @@ public class WebMail extends HttpServlet
 				}
 				out.println( "</head>\n<body>\n" +
 					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
-					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
+					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<p class=\"error\">" + sessionObject.error + "</p>" );
@@ -1509,11 +1509,11 @@ public class WebMail extends HttpServlet
 				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
 			}
 			else {
-				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: text/plain; charset=\"iso-8859-1\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
+				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
 			}
 			try {
 				if( multipart )
-					body.append( "--" + boundary + "\r\nContent-type: text/plain; charset=\"iso-8859-1\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
+					body.append( "--" + boundary + "\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
 				body.append( qp.encode( text ) );
 			} catch (EncodingException e) {
 				ok = false;

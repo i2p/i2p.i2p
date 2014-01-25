@@ -1,3 +1,59 @@
+2014-01-25 zzz
+ * i2psnark: Lower threshold for auto-stop
+ * Installer: Update links
+ * NetDB: Fix NPE after client shutdown (ticket #1174)
+ * Router: Lower frequency for publishing stats
+ * Update: All updates via torrent
+
+2014-01-25 zab
+ * Move OutNetMessage buffer preparation to the Writer threads 
+   (Ticket #1184)
+ * Up version to -1
+
+* 2014-01-22 0.9.10 released
+
+2014-01-20 kytv
+ * Translation updates
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-01-08.
+
+2014-01-20 zzz
+ * Console: Change www.i2p2.i2p links to i2p-projekt.i2p
+ * Reseed: Remove netdb.i2p2.de
+
+2014-01-12 zzz
+ * NetDB: Fix handling of DSRM and DSM down client tunnels
+
+2014-01-11 zzz
+ * NetDB:
+   - Reduce min part tunnels for ffs to 35
+   - Use client tunnels for LS lookups from OCMOSJ (ticket #1166)
+
+2014-01-11 str4d
+ * BOB: Pass through I2CP host/port (ticket #827)
+
+2014-01-10 str4d
+ * BOB: Implement ClientApp interface (ticket #347)
+
+2014-01-09 zzz
+ * Kademila: Fix NPE in remove()
+
+2014-01-09 kytv
+ * Translations
+  - Updates to French, German, Romanian, and Russian
+  - New Brazilian Portuguese translation
+  - Mass pull of translations from Transifex
+  - Update of English strings
+
+2014-01-09 str4d
+ * susimail:
+  - Fixed pagination with zero entries (ticket #1168)
+  - UTF-8 support from wockenfuss (ticket #508)
+ * Console: Fixed overlapping text issue in midnight theme
+
+2014-01-07 zzz
+ * Streaming: Fix StandardServerSocket.close() and isClosed()
+
 2014-01-04 zzz
  * Peermanager: Disable small same-country bonus
  * Tunnels: Change client default to 3 hops in router;
@@ -5,6 +61,7 @@
 
 2014-01-04 dg
  * Streaming: Move streaming to new package (ticket #1135)
+ * Console: Change /configclients 'advanced warning' to include 'toopie, no red
 
 2013-12-25 dg
  * Console: Add 'advanced warning' to /configclients

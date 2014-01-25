@@ -15,9 +15,9 @@ public class DummyNamingServiceTest extends TestCase {
     }
 
     public void testLookup() throws Exception{
-        // The good b64 and b32 are the destination of www.i2p2.i2p =)
-        String goodB64 = "-KR6qyfPWXoN~F3UzzYSMIsaRy4quickbrownfoxXSzUQXQdi2Af1TV2UMH3PpPuNu-GwrqihwmLSkPFg4fv4yQQY3E10VeQVuI67dn5vlan3NGMsjqxoXTSHHt7C3nX3szXK90JSoO~tRMDl1xyqtKm94-RpIyNcLXofd0H6b02683CQIjb-7JiCpDD0zharm6SU54rhdisIUVXpi1xYgg2pKVpssL~KCp7RAGzpt2rSgz~RHFsecqGBeFwJdiko-6CYW~tcBcigM8ea57LK7JjCFVhOoYTqgk95AG04-hfehnmBtuAFHWklFyFh88x6mS9sbVPvi-am4La0G0jvUJw9a3wQ67jMr6KWQ~w~bFe~FDqoZqVXl8t88qHPIvXelvWw2Y8EMSF5PJhWw~AZfoWOA5VQVYvcmGzZIEKtFGE7bgQf3rFtJ2FAtig9XXBsoLisHbJgeVb29Ew5E7bkwxvEe9NYkIqvrKvUAt1i55we0Nkt6xlEdhBqg6xXOyIAAAA";
-        String goodB32 = "rjxwbsw4zjhv4zsplma6jmf5nr24e4ymvvbycd3swgiinbvg7oga.b32.i2p";
+        // The good b64 and b32 are the destination of www.i2p-projekt.i2p =)
+        String goodB64 = "8ZAW~KzGFMUEj0pdchy6GQOOZbuzbqpWtiApEj8LHy2~O~58XKxRrA43cA23a9oDpNZDqWhRWEtehSnX5NoCwJcXWWdO1ksKEUim6cQLP-VpQyuZTIIqwSADwgoe6ikxZG0NGvy5FijgxF4EW9zg39nhUNKRejYNHhOBZKIX38qYyXoB8XCVJybKg89aMMPsCT884F0CLBKbHeYhpYGmhE4YW~aV21c5pebivvxeJPWuTBAOmYxAIgJE3fFU-fucQn9YyGUFa8F3t-0Vco-9qVNSEWfgrdXOdKT6orr3sfssiKo3ybRWdTpxycZ6wB4qHWgTSU5A-gOA3ACTCMZBsASN3W5cz6GRZCspQ0HNu~R~nJ8V06Mmw~iVYOu5lDvipmG6-dJky6XRxCedczxMM1GWFoieQ8Ysfuxq-j8keEtaYmyUQme6TcviCEvQsxyVirr~dTC-F8aZ~y2AlG5IJz5KD02nO6TRkI2fgjHhv9OZ9nskh-I2jxAzFP6Is1kyAAAA";
+        String goodB32 = "udhdrtrcetjm5sxzskjyr5ztpeszydbh4dpl3pl4utgqqw2v4jna.b32.i2p";
         // TODO: Come up with an actual bad b64 and b32
         String badB64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
         String badB32 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.b32.i2p";
@@ -41,6 +41,6 @@ public class DummyNamingServiceTest extends TestCase {
         //assertNull(ns.lookup(badB32));
 
         // DummyNameService only handles b64 and b32 addresses
-        assertNull(ns.lookup("www.i2p2.i2p"));
+        assertNull(ns.lookup("www.i2p-projekt.i2p"));
     }
 }

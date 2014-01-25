@@ -5,6 +5,7 @@
 #
 # Translators:
 # tengo <akin@rbcmail.ru>, 2013
+# IOException <opexob@yandex.ru>, 2013
 # sfix <anon-9b36b2e@lycos.com>, 2013
 # ducki2p <ducki2p@gmail.com>, 2011
 # varnav, 2013
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 23:03+0000\n"
-"PO-Revision-Date: 2013-11-19 12:47+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2014-01-09 19:11+0000\n"
+"PO-Revision-Date: 2013-12-03 16:00+0000\n"
+"Last-Translator: Bergitte <alvina_alexandrova@mail.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
 "language/ru_RU/)\n"
 "Language: ru_RU\n"
@@ -29,12 +30,12 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:352
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:362
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:350
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:360
 msgid "internal"
 msgstr "внутренний"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:438
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:436
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
@@ -42,15 +43,15 @@ msgstr[0] "{0} входящий, {0} исходящий туннель"
 msgstr[1] "{0} входящих, {0} исходящих туннеля"
 msgstr[2] "{0} входящих, {0} исходящих туннелей"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:440
 msgid "lower bandwidth and reliability"
 msgstr "меньшая пропускная способность и надёжность"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
 msgid "standard bandwidth and reliability"
 msgstr "обычная пропускная способность и надёжность"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:446
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
 msgid "higher bandwidth and reliability"
 msgstr "более высокая пропускная способность и надёжность"
 
@@ -249,9 +250,8 @@ msgstr "Адрес назначения туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
-#, fuzzy
 msgid "name, name:port, or destination"
-msgstr "имя или адрес"
+msgstr "имя, имя:порт, или назначение"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -312,27 +312,23 @@ msgstr "Длина"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
-#, fuzzy
 msgid "0 hop tunnel (no anonymity)"
-msgstr "0 хопов (низкая анонимность, малые задержки)"
+msgstr "Тоннель 0 прыжков (без анонимизации)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
-#, fuzzy
 msgid "1 hop tunnel (low anonymity)"
-msgstr "0 хопов (низкая анонимность, малые задержки)"
+msgstr "Тоннель с 1 прыжком (низкая анонимность)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
-#, fuzzy
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "1 хоп (умеренная анонимность, умеренные задержки)"
+msgstr "Тоннель с 2 прыжками (средняя анонимность)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
-#, fuzzy
 msgid "3 hop tunnel (high anonymity)"
-msgstr "2 хопа (высокая анонимность, высокие задержки)"
+msgstr "Тоннель с 3 прыжками (высокая анонимность)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -479,8 +475,8 @@ msgstr "Снижать количество туннелей при просто
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:428
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:440
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:450
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:469
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:479
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:478
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:488
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:414
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:504
 msgid "Enable"
@@ -522,54 +518,54 @@ msgstr "Постоянный секретный ключ"
 msgid "File"
 msgstr "Файл"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:458
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:463
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:243
 msgid "Local destination"
 msgstr "Локальный адрес назначения"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:462
-msgid "(if known)"
-msgstr "(если известен)"
-
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:467
+msgid "Local Base 32"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:476
 msgid "Local Authorization"
 msgstr "Локальная авторизация"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:473
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:483
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:482
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:492
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:475
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:487
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:484
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:496
 msgid "Password"
 msgstr "Пароль"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:477
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:486
 msgid "Outproxy Authorization"
 msgstr "Авторизация outproxy"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:494
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:503
 msgid "Jump URL List"
 msgstr "Список адресов jump-сервисов"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:500
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:509
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:548
 msgid "Custom options"
 msgstr "Дополнительные параметры"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:504
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:513
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:552
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:702
 msgid "Cancel"
 msgstr "Отмена"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:508
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:517
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:556
 msgid "Delete"
 msgstr "Удалить"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:510
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:519
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:558
 msgid "Save"
 msgstr "Сохранить"
@@ -588,7 +584,7 @@ msgstr "Настройки нового серверного туннеля"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:179
 msgid "Use SSL?"
-msgstr ""
+msgstr "Использовать SSL?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:222
 msgid "Website name"
@@ -678,22 +674,20 @@ msgid "Max concurrent connections (0=unlimited)"
 msgstr "Максимум одновременных соединений (0=неограниченно)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
-#, fuzzy
 msgid "POST limits (0=unlimited)"
-msgstr "Ограничение входящих соединений (0=неограниченно)"
+msgstr "Лимиты POST (0=без ограничений)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
-msgstr ""
+msgstr "В период"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
-#, fuzzy
 msgid "Ban minutes"
-msgstr "Минут простоя"
+msgstr "Минут блокировки"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
-msgstr ""
+msgstr "Ограничение периода POST (минуты)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:516
 msgid "New Certificate type"
@@ -1267,5 +1261,5 @@ msgstr "Закончить"
 msgid "Next"
 msgstr "Следующее"
 
-#~ msgid "3 hop tunnel (very high anonymity, poor performance)"
-#~ msgstr "3 хопа (очень высокая анонимность, низкая производительность)"
+#~ msgid "(if known)"
+#~ msgstr "(если известен)"

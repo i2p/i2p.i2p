@@ -299,6 +299,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     /**
+     * Lookup using exploratory tunnels
+     *
      * Begin a kademlia style search for the key specified, which can take up to timeoutMs and
      * will fire the appropriate jobs on success or timeout (or if the kademlia search completes
      * without any match)
@@ -307,6 +309,17 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     @Override
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
+        return search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease, null);
+    }
+
+    /**
+     * Lookup using the client's tunnels
+     * @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     * @return null always
+     * @since 0.9.10
+     */
+    SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease,
+                     Hash fromLocalDest) {
         //if (true) return super.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
         if (key == null) throw new IllegalArgumentException("searchin for nothin, eh?");
         boolean isNew = false;
@@ -316,7 +329,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             if (searchJob == null) {
                 //if (SearchJob.onlyQueryFloodfillPeers(_context)) {
                     //searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
-                    searchJob = new IterativeSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                    searchJob = new IterativeSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs,
+                                                       isLease, fromLocalDest);
                 //} else {
                 //    searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
                 //}

@@ -2,7 +2,7 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # Денис Лысенко <gribua@gmail.com>, 2011
 # Денис Лысенко <gribua@gmail.com>, 2012
@@ -10,24 +10,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 23:05+0000\n"
-"PO-Revision-Date: 2013-11-19 12:47+0000\n"
+"POT-Creation-Date: 2013-12-01 20:06+0000\n"
+"PO-Revision-Date: 2013-11-20 09:42+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/"
-"language/uk_UA/)\n"
-"Language: uk_UA\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: uk_UA\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:352
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:362
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:350
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:360
 msgid "internal"
 msgstr "внутрішній"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:438
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:436
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
@@ -35,15 +33,15 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:440
 msgid "lower bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:442
 msgid "standard bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:446
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
 msgid "higher bandwidth and reliability"
 msgstr ""
 
@@ -55,9 +53,7 @@ msgstr ""
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr ""
-"Неправильно передана форма, можливо ви використовуєте дію браузера \"назад\" "
-"або \"оновити\". Будь-ласка повторіть спробу."
+msgstr "Неправильно передана форма, можливо ви використовуєте дію браузера \"назад\" або \"оновити\". Будь-ласка повторіть спробу."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:196
 msgid ""
@@ -152,9 +148,7 @@ msgstr "Streamr сервер"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:515
 msgid "HTTP bidir"
-msgstr ""
-"HTTP bidir (експерементальний двухнаправлений режим, інструкцію запитуйте у "
-"sponge)"
+msgstr "HTTP bidir (експерементальний двухнаправлений режим, інструкцію запитуйте у sponge)"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:603
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:313
@@ -240,9 +234,8 @@ msgstr "Адреса Призначення  Тунелю"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
-#, fuzzy
 msgid "name, name:port, or destination"
-msgstr "ім'я або призначення"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -257,9 +250,7 @@ msgstr "Колективний Клієнт"
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr ""
-"(Використовувати тунелі спільно з іншими клієнтами і  irc/httpclients? Зміна "
-"налаштування потребує перезапуску тунелю)"
+msgstr "(Використовувати тунелі спільно з іншими клієнтами і  irc/httpclients? Зміна налаштування потребує перезапуску тунелю)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:141
@@ -287,9 +278,7 @@ msgstr "Розширені мережеві опції"
 msgid ""
 "(NOTE: when this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!)"
-msgstr ""
-"(Зверніть увагу: коли цей клієнтський проксі настроєний ділитись тунелями, "
-"то ці опції будуть дійсні для всіх проксі клієнтів з якими ви ділитесь!)"
+msgstr "(Зверніть увагу: коли цей клієнтський проксі настроєний ділитись тунелями, то ці опції будуть дійсні для всіх проксі клієнтів з якими ви ділитесь!)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:268
@@ -303,27 +292,23 @@ msgstr "Довжина"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
-#, fuzzy
 msgid "0 hop tunnel (no anonymity)"
-msgstr "0 хоп тунель (низька анонімність, низький пінг)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
-#, fuzzy
 msgid "1 hop tunnel (low anonymity)"
-msgstr "0 хоп тунель (низька анонімність, низький пінг)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
-#, fuzzy
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "1 хоп тунель (середня анонімність, середній пінг)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
-#, fuzzy
 msgid "3 hop tunnel (high anonymity)"
-msgstr "2 хоп тунель (висока анонімність, великий пінг)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -344,8 +329,7 @@ msgstr "0 хоп розкид (без рандомізації, фіксован
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:313
 msgid ""
 "+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
-msgstr ""
-"+0-1 хоп розкид (помірна збільшена рандомізація, понижена продуктивність)"
+msgstr "+0-1 хоп розкид (помірна збільшена рандомізація, понижена продуктивність)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:301
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:317
@@ -381,31 +365,23 @@ msgstr "Резервна кількість"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:336
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:352
 msgid "0 backup tunnels (0 redundancy, no added resource usage)"
-msgstr ""
-"0 резервних тунелів (0 надлишок, відсутність додаткового навантаження на "
-"систему) "
+msgstr "0 резервних тунелів (0 надлишок, відсутність додаткового навантаження на систему) "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:340
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:356
 msgid "1 backup tunnel each direction (low redundancy, low resource usage)"
-msgstr ""
-"1 резервний тунель в кожному напрямку (низька надлишковість, низьке "
-"використання ресурсів системи)"
+msgstr "1 резервний тунель в кожному напрямку (низька надлишковість, низьке використання ресурсів системи)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:344
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:360
 msgid ""
 "2 backup tunnels each direction (medium redundancy, medium resource usage)"
-msgstr ""
-"2 резервні тунелі в кожному напрямку (середня надмірність, середнє "
-"навантаження на систему)"
+msgstr "2 резервні тунелі в кожному напрямку (середня надмірність, середнє навантаження на систему)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:348
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:364
 msgid "3 backup tunnels each direction (high redundancy, high resource usage)"
-msgstr ""
-"3 резервні тунелі в кожному напрямку (висока надмірність, високе "
-"навантаження на систему)"
+msgstr "3 резервні тунелі в кожному напрямку (висока надмірність, високе навантаження на систему)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:356
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:372
@@ -433,9 +409,7 @@ msgstr "Затримка Зєднання"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:380
 msgid "for request/response connections"
-msgstr ""
-"оптимізація для з'єднань, які починаються з запиту клієнта/відповіді "
-"сервера. "
+msgstr "оптимізація для з'єднань, які починаються з запиту клієнта/відповіді сервера. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:384
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:394
@@ -667,18 +641,16 @@ msgid "Max concurrent connections (0=unlimited)"
 msgstr "Максимум одночасних зєднань (0=необмежено)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
-#, fuzzy
 msgid "POST limits (0=unlimited)"
-msgstr "Обмеження вхідних зєднань (0=необмежено)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
-#, fuzzy
 msgid "Ban minutes"
-msgstr "Хвилин простою"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
@@ -894,20 +866,20 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:189
 msgid ""
-"This wizard will take you through the various options available for creating "
-"tunnels in I2P."
+"This wizard will take you through the various options available for creating"
+" tunnels in I2P."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:191
 msgid ""
-"The first thing to decide is whether you want to create a server or a client "
-"tunnel."
+"The first thing to decide is whether you want to create a server or a client"
+" tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
-"If you need to connect to a remote service, such as an IRC server inside I2P "
-"or a code repository, then you will require a CLIENT tunnel."
+"If you need to connect to a remote service, such as an IRC server inside I2P"
+" or a code repository, then you will require a CLIENT tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
@@ -946,8 +918,8 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
-"\"http_proxy\" environment variable for command-line applications in GNU/"
-"Linux."
+"\"http_proxy\" environment variable for command-line applications in "
+"GNU/Linux."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
@@ -1195,7 +1167,3 @@ msgstr "Завершити"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid "Next"
 msgstr "Далі"
-
-#~ msgid "3 hop tunnel (very high anonymity, poor performance)"
-#~ msgstr ""
-#~ "3 хоп тунель (дуже висока анонімність, погана продуктивність (комп'ютера))"

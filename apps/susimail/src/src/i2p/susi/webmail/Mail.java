@@ -177,7 +177,7 @@ public class Mail {
 				
 				try {
 					ReadBuffer decoded = hl.decode( header );
-					BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), "ISO-8859-1" ) );
+					BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), "UTF-8" ) );
 					String line;
 					while( ( line = reader.readLine() ) != null ) {
 						if( line.length() == 0 )

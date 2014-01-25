@@ -8,13 +8,13 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
-# Towatowa441, 2013
+# Towatowa441, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:01+0000\n"
-"PO-Revision-Date: 2013-11-22 17:41+0000\n"
+"POT-Creation-Date: 2014-01-09 19:14+0000\n"
+"PO-Revision-Date: 2014-01-09 09:54+0000\n"
 "Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
 "fr/)\n"
@@ -434,7 +434,7 @@ msgid ""
 msgstr ""
 "Pour aller à la destination de votre base de données d''hôtes, cliquez <a "
 "href=\"{0}\">içi</a>. Pour aller à la destination de l''assistant d''adresse "
-"en conflit, cliquez <a href=\"{1}\">içi</a>."
+"en conflit, cliquez <a href=\"{1}\">ici</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
 msgid "Host"
@@ -451,7 +451,8 @@ msgstr "Destination"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
 #, java-format
 msgid "Continue to {0} without saving"
-msgstr "Aller sur le site i2p {0} sans enregistrer dans un carnet d'adresses. "
+msgstr ""
+"Aller sur le site i2p {0} sans enregistrer dans un carnet d''adresses. "
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
 #, java-format

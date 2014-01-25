@@ -15,6 +15,8 @@
  */
 package net.i2p.BOB;
 
+import static net.i2p.app.ClientAppState.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,12 +27,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.*;
 import net.i2p.client.I2PClient;
-import net.i2p.util.Log;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer2;
 
@@ -105,57 +112,76 @@ import net.i2p.util.SimpleTimer2;
  *
  * @author sponge
  */
-public class BOB {
+public class BOB implements Runnable, ClientApp {
 
 	public final static String PROP_CONFIG_LOCATION = "BOB.config";
 	public final static String PROP_BOB_PORT = "BOB.port";
 	public final static String PROP_BOB_HOST = "BOB.host";
 	public final static String PROP_CFG_VER = "BOB.CFG.VER";
-	private static NamedDB database;
-	private static Properties props = new Properties();
-	private static AtomicBoolean spin = new AtomicBoolean(true);
+
+	private static BOB _bob;
+
+	private NamedDB database;
+	private Properties props = new Properties();
+	private AtomicBoolean spin = new AtomicBoolean(true);
 	private static final String P_RUNNING = "RUNNING";
 	private static final String P_STARTING = "STARTING";
 	private static final String P_STOPPING = "STOPPING";
-	private static AtomicBoolean lock = new AtomicBoolean(false);
+	private AtomicBoolean lock = new AtomicBoolean(false);
 	// no longer used.
 	// private static int maxConnections = 0;
 
-	/**
-	 * Log a warning
-	 *
-	 * @param arg
-	 */
-	public static void info(String arg) {
-		System.out.println("INFO:" + arg);
-		(new Log(BOB.class)).info(arg);
-	}
+	private final Logger _log;
+	private final ClientAppManager _mgr;
+	private final String[] _args;
+	private volatile ClientAppState _state = UNINITIALIZED;
 
-	/**
-	 * Log a warning
-	 *
-	 * @param arg
-	 */
-	public static void warn(String arg) {
-		System.out.println("WARNING:" + arg);
-		(new Log(BOB.class)).warn(arg);
-	}
-
-	/**
-	 * Log an error
-	 *
-	 * @param arg
-	 */
-	public static void error(String arg) {
-		System.out.println("ERROR: " + arg);
-		(new Log(BOB.class)).error(arg);
-	}
+	private volatile ServerSocket listener;
+	private volatile Thread _runner;
 
 	/**
 	 * Stop BOB gracefully
+	 * @deprecated unused
 	 */
 	public static void stop() {
-		spin.set(false);
+		_bob.shutdown(null);
+	}
+
+	/**
+	 *  For ClientApp interface.
+	 *  Does NOT open the listener socket or start threads; caller must call startup()
+	 *
+	 *  @param mgr may be null
+	 *  @param args non-null
+	 *  @throws Exception on bad args
+	 *  @since 0.9.10
+	 */
+	public BOB(I2PAppContext context, ClientAppManager mgr, String[] args) {
+		// If we were run from command line, log to stdout
+		boolean logToStdout = false;
+		URL classResource = BOB.class.getResource("BOB.class");
+		if (classResource != null) {
+		    String classPath = classResource.toString();
+		    if (classPath.startsWith("jar")) {
+		        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+		                "/META-INF/MANIFEST.MF";
+		        try {
+		            Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+		            Attributes attrs = manifest.getMainAttributes();
+		            String mainClass = attrs.getValue("Main-Class");
+		            if ("net.i2p.BOB.Main".equals(mainClass))
+		                logToStdout = true;
+		        } catch (IOException ioe) {}
+		    }
+		}
+
+		_log = new Logger(context.logManager().getLog(BOB.class), logToStdout);
+
+		_mgr = mgr;
+		_args = args;
+		_state = INITIALIZED;
+		database = new NamedDB();
+		loadConfig();
 	}
 
 	/**
@@ -164,8 +190,22 @@ public class BOB {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		database = new NamedDB();
-		ServerSocket listener = null;
+		try {
+			_bob = new BOB(I2PAppContext.getGlobalContext(), null, args);
+			_bob.startup();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	private void loadConfig() {
 		int i = 0;
 		boolean save = false;
 		// Set up all defaults to be passed forward to other threads.
@@ -176,116 +216,140 @@ public class BOB {
 		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
 		i = Y1.hashCode();
 		i = Y2.hashCode();
-		Log _log = new Log(BOB.class);
-		try {
-			{
-				File cfg = new File(configLocation);
-				if (!cfg.isAbsolute()) {
-					cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
-				}
-				try {
-					FileInputStream fi = new FileInputStream(cfg);
-					props.load(fi);
-					fi.close();
-				} catch (FileNotFoundException fnfe) {
-					warn("Unable to load up the BOB config file " + cfg.getAbsolutePath() + ", Using defaults.");
-					warn(fnfe.toString());
-					save = true;
-				} catch (IOException ioe) {
-					warn("IOException on BOB config file " + cfg.getAbsolutePath() + ", using defaults.");
-					warn(ioe.toString());
-				}
+		{
+			File cfg = new File(configLocation);
+			if (!cfg.isAbsolute()) {
+				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
 			}
-			// Global router and client API configurations that are missing are set to defaults here.
-			if (!props.containsKey(I2PClient.PROP_TCP_HOST)) {
-				props.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-				save = true;
-			}
-			if (!props.containsKey(I2PClient.PROP_TCP_PORT)) {
-				props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
-				save = true;
-			}
-			if (!props.containsKey(PROP_BOB_PORT)) {
-				props.setProperty(PROP_BOB_PORT, "2827"); // 0xB0B
-				save = true;
-			}
-			if (!props.containsKey("inbound.length")) {
-				props.setProperty("inbound.length", "1");
-				save = true;
-			}
-			if (!props.containsKey("outbound.length")) {
-				props.setProperty("outbound.length", "1");
-				save = true;
-			}
-			if (!props.containsKey("inbound.lengthVariance")) {
-				props.setProperty("inbound.lengthVariance", "0");
-				save = true;
-			}
-			if (!props.containsKey("outbound.lengthVariance")) {
-				props.setProperty("outbound.lengthVariance", "0");
-				save = true;
-			}
-			if (!props.containsKey(PROP_BOB_HOST)) {
-				props.setProperty(PROP_BOB_HOST, "localhost");
-				save = true;
-			}
-			// PROP_RELIABILITY_NONE, PROP_RELIABILITY_BEST_EFFORT, PROP_RELIABILITY_GUARANTEED
-			if (!props.containsKey(PROP_CFG_VER)) {
-				props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
-				props.setProperty(PROP_CFG_VER,"1");
-				save = true;
-			}
-			if (save) {
-				File cfg = new File(configLocation);
-				if (!cfg.isAbsolute()) {
-					cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
-				}
-				try {
-					warn("Writing new defaults file " + cfg.getAbsolutePath());
-					FileOutputStream fo = new FileOutputStream(cfg);
-					props.store(fo, cfg.getAbsolutePath());
-					fo.close();
-				} catch (IOException ioe) {
-					error("IOException on BOB config file " + cfg.getAbsolutePath() + ", " + ioe);
-				}
-			}
-
-			i = 0;
-			boolean g = false;
-			spin.set(true);
 			try {
-				info("BOB is now running.");
-				listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
-				Socket server = null;
-				listener.setSoTimeout(500); // .5 sec
-				
-				while (spin.get()) {
-					//DoCMDS connection;
-
-					try {
-						server = listener.accept();
-						server.setKeepAlive(true);
-						g = true;
-					} catch (ConnectException ce) {
-						g = false;
-					} catch (SocketTimeoutException ste) {
-						g = false;
-					}
-
-					if (g) {
-						DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
-						Thread t = new Thread(conn_c);
-						t.setName("BOB.DoCMDS " + i);
-						t.start();
-						i++;
-					}
-				}
+				FileInputStream fi = new FileInputStream(cfg);
+				props.load(fi);
+				fi.close();
+			} catch (FileNotFoundException fnfe) {
+				_log.warn("Unable to load up the BOB config file " + cfg.getAbsolutePath() + ", Using defaults.", fnfe);
+				save = true;
 			} catch (IOException ioe) {
-				error("IOException on socket listen: " + ioe);
-				ioe.printStackTrace();
+				_log.warn("IOException on BOB config file " + cfg.getAbsolutePath() + ", using defaults.", ioe);
 			}
+		}
+		// Global router and client API configurations that are missing are set to defaults here.
+		if (!props.containsKey(I2PClient.PROP_TCP_HOST)) {
+			props.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+			save = true;
+		}
+		if (!props.containsKey(I2PClient.PROP_TCP_PORT)) {
+			props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
+			save = true;
+		}
+		if (!props.containsKey(PROP_BOB_PORT)) {
+			props.setProperty(PROP_BOB_PORT, "2827"); // 0xB0B
+			save = true;
+		}
+		if (!props.containsKey("inbound.length")) {
+			props.setProperty("inbound.length", "1");
+			save = true;
+		}
+		if (!props.containsKey("outbound.length")) {
+			props.setProperty("outbound.length", "1");
+			save = true;
+		}
+		if (!props.containsKey("inbound.lengthVariance")) {
+			props.setProperty("inbound.lengthVariance", "0");
+			save = true;
+		}
+		if (!props.containsKey("outbound.lengthVariance")) {
+			props.setProperty("outbound.lengthVariance", "0");
+			save = true;
+		}
+		if (!props.containsKey(PROP_BOB_HOST)) {
+			props.setProperty(PROP_BOB_HOST, "localhost");
+			save = true;
+		}
+		// PROP_RELIABILITY_NONE, PROP_RELIABILITY_BEST_EFFORT, PROP_RELIABILITY_GUARANTEED
+		if (!props.containsKey(PROP_CFG_VER)) {
+			props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
+			props.setProperty(PROP_CFG_VER,"1");
+			save = true;
+		}
+		if (save) {
+			File cfg = new File(configLocation);
+			if (!cfg.isAbsolute()) {
+				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
+			}
+			try {
+				_log.warn("Writing new defaults file " + cfg.getAbsolutePath());
+				FileOutputStream fo = new FileOutputStream(cfg);
+				props.store(fo, cfg.getAbsolutePath());
+				fo.close();
+			} catch (IOException ioe) {
+				_log.error("IOException on BOB config file " + cfg.getAbsolutePath(), ioe);
+			}
+		}
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	private void startListener() throws IOException {
+		listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
+		listener.setSoTimeout(500); // .5 sec
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	private void startThread() {
+		I2PAppThread t = new I2PAppThread(this, "BOBListener");
+		t.start();
+		_runner = t;
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	public void run() {
+		if (listener == null) return;
+		changeState(RUNNING);
+		_log.info("BOB is now running.");
+		if (_mgr != null)
+			_mgr.register(this);
+
+		int i = 0;
+		boolean g = false;
+		spin.set(true);
+		try {
+			Socket server = null;
+
+			while (spin.get()) {
+				//DoCMDS connection;
+
+				try {
+					server = listener.accept();
+					server.setKeepAlive(true);
+					g = true;
+				} catch (ConnectException ce) {
+					g = false;
+				} catch (SocketTimeoutException ste) {
+					g = false;
+				}
+
+				if (g) {
+					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
+					Thread t = new Thread(conn_c);
+					t.setName("BOB.DoCMDS " + i);
+					t.start();
+					i++;
+				}
+			}
+			changeState(STOPPING);
+		} catch (Exception e) {
+			if (spin.get())
+				_log.error("Unexpected error while listening for connections", e);
+			else
+				e = null;
+			changeState(STOPPING, e);
 		} finally {
-			info("BOB is now shutting down...");
+			_log.info("BOB is now shutting down...");
 			// Clean up everything.
 			try {
 				listener.close();
@@ -316,8 +380,8 @@ public class BOB {
 					database.releaseReadLock();
 				}
 			}
-			info("BOB is now stopped.");
-
+			changeState(STOPPED);
+			_log.info("BOB is now stopped.");
 		}
 	}
 
@@ -369,4 +433,86 @@ public class BOB {
 			waitjoin(groups[i], level + 1, groups[i].getName());
 		}
 	}
+
+	////// begin ClientApp interface
+
+	/**
+	 * @since 0.9.10
+	 */
+	@Override
+	public void startup() throws IOException {
+		if (_state != INITIALIZED)
+			return;
+		changeState(STARTING);
+		try {
+			startListener();
+		} catch (IOException e) {
+			_log.error("Error starting BOB on"
+					+ props.getProperty(PROP_BOB_HOST)
+					+ ":" + props.getProperty(PROP_BOB_PORT), e);
+			changeState(START_FAILED, e);
+			throw e;
+		}
+		startThread();
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	@Override
+	public void shutdown(String[] args) {
+		if (_state != RUNNING)
+			return;
+		changeState(STOPPING);
+		spin.set(false);
+		if (_runner != null)
+			_runner.interrupt();
+		else
+			changeState(STOPPED);
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	@Override
+	public ClientAppState getState() {
+		return _state;
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	@Override
+	public String getName() {
+		return "BOB";
+	}
+
+	/**
+	 * @since 0.9.10
+	 */
+	@Override
+	public String getDisplayName() {
+		return "BOB " + Arrays.toString(_args);
+	}
+
+	////// end ClientApp interface
+	////// begin ClientApp helpers
+
+	/**
+	 *  @since 0.9.10
+	 */
+	private void changeState(ClientAppState state) {
+		changeState(state, null);
+	}
+
+	/**
+	 *  @since 0.9.10
+	 */
+	private synchronized void changeState(ClientAppState state, Exception e) {
+		_state = state;
+		if (_mgr != null)
+			_mgr.notify(this, state, null, e);
+	}
+
+	////// end ClientApp helpers
 }

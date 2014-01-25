@@ -1,7 +1,5 @@
 package net.i2p.client.streaming.impl;
 
-import net.i2p.client.streaming.I2PSocket;
-
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
@@ -15,6 +13,8 @@ import java.nio.channels.spi.AbstractSelectionKey;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.i2p.client.streaming.I2PSocket;
 
 /**
  *  As this does not (yet) extend SocketChannel it cannot be returned by StandardSocket.getChannel(),

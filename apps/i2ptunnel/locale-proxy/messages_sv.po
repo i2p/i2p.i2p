@@ -2,24 +2,24 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # samaire <samaire@samaire.net>, 2013
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
+# WinterFairy <winterfairy@riseup.net>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:05+0000\n"
-"PO-Revision-Date: 2013-11-26 16:35+0000\n"
-"Last-Translator: samaire <samaire@samaire.net>\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
-"language/sv_SE/)\n"
-"Language: sv_SE\n"
+"POT-Creation-Date: 2013-12-01 20:06+0000\n"
+"PO-Revision-Date: 2014-01-12 12:06+0000\n"
+"Last-Translator: WinterFairy <winterfairy@riseup.net>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../java/build/Proxy.java:5 ../java/build/Proxy.java:11
@@ -83,28 +83,21 @@ msgstr "HTTP Utproxyn hittades ej."
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr ""
-"Den är antingen offline, nätverket är under stor belastning eller så är din "
-"router ännu inte väl integrerad med peers."
+msgstr "Den är antingen offline, nätverket är under stor belastning eller så är din router ännu inte väl integrerad med peers."
 
 #: ../java/build/Proxy.java:14
 #, java-format
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr ""
-"Du kanske vill {0}försöka igen{1} eftersom en ny utproxy kommer väljas "
-"slumpmässigt utav de som är definierade {2}här{3} (om du har mer än en "
-"inställd)."
+msgstr "Du kanske vill {0}försöka igen{1} eftersom en ny utproxy kommer väljas slumpmässigt utav de som är definierade {2}här{3} (om du har mer än en inställd)."
 
 #: ../java/build/Proxy.java:15
 #, java-format
 msgid ""
-"If you continue to have trouble you may want to edit your outproxy list {0}"
-"here{1}."
-msgstr ""
-"Om du fortsätter att ha problem, så kanske du vill ändra din utproxy-liste "
-"{0}här{1}."
+"If you continue to have trouble you may want to edit your outproxy list "
+"{0}here{1}."
+msgstr "Om du fortsätter att ha problem, så kanske du vill ändra din utproxy-liste {0}här{1}."
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:38
 #: ../java/build/Proxy.java:59 ../java/build/Proxy.java:102
@@ -127,9 +120,7 @@ msgstr "Din webbläsare är felkonfigurerad."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr ""
-"Använd inte proxyn för åtkomst till routerkonsolen, localhost eller lokala "
-"LAN mål."
+msgstr "Använd inte proxyn för åtkomst till routerkonsolen, localhost eller lokala LAN mål."
 
 #: ../java/build/Proxy.java:26
 msgid "Warning: Eepsite Unknown"
@@ -154,20 +145,16 @@ msgstr "Om du har en Base64-adress, {0}lägg till den till din adressbok{1}."
 
 #: ../java/build/Proxy.java:36
 msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link "
-"below."
-msgstr ""
-"Annars, hitta en Base32 eller adresshjälpar-länk eller använder en hopp-"
-"tjänst länk nedan."
+"Otherwise, find a Base 32 or address helper link, or use a jump service link"
+" below."
+msgstr "Annars, hitta en Base32 eller adresshjälpar-länk eller använder en hopp-tjänst länk nedan."
 
 #: ../java/build/Proxy.java:37
 #, java-format
 msgid ""
 "Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
 "subscriptions{3} to your addressbook."
-msgstr ""
-"Ser du denhär sidan ofta? Kika i {0}FAQ:en{1} efter hjälp med att {2}lägga "
-"till några prenumerationer{3} till din adressbok."
+msgstr "Ser du denhär sidan ofta? Kika i {0}FAQ:en{1} efter hjälp med att {2}lägga till några prenumerationer{3} till din adressbok."
 
 #: ../java/build/Proxy.java:39 ../java/build/Proxy.java:45
 msgid "Warning: Invalid Request URI"
@@ -175,16 +162,13 @@ msgstr "Varning: Ogiltig URI Begärd"
 
 #: ../java/build/Proxy.java:46
 msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr ""
-"Den begärde URI:n är ogiltig och innehåller troligtvis ogiltiga tecken."
+msgstr "Den begärde URI:n är ogiltig och innehåller troligtvis ogiltiga tecken."
 
 #: ../java/build/Proxy.java:47
 msgid ""
 "If you clicked a link, check the end of the URI for any characters the "
 "browser has mistakenly added on."
-msgstr ""
-"Om du klicka på en länk, kontrollera slutet av URI:n efter andra tecken som "
-"webbläsaren av misstag lagt till."
+msgstr "Om du klicka på en länk, kontrollera slutet av URI:n efter andra tecken som webbläsaren av misstag lagt till."
 
 #: ../java/build/Proxy.java:48 ../java/build/Proxy.java:54
 msgid "Warning: Invalid Destination"
@@ -194,15 +178,13 @@ msgstr "Varning: Ogiltigt Mål"
 msgid ""
 "The eepsite destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr ""
-"Eepsite målet som specificerades är inte giltigt eller kan annars ej nås."
+msgstr "Eepsite målet som specificerades är inte giltigt eller kan annars ej nås."
 
 #: ../java/build/Proxy.java:56
 msgid ""
-"Perhaps you pasted in the wrong Base 64 string or the link you are following "
-"is bad."
-msgstr ""
-"Kanske kopierade du in fel Base64 sträng eller så är länken du följer dålig."
+"Perhaps you pasted in the wrong Base 64 string or the link you are following"
+" is bad."
+msgstr "Kanske kopierade du in fel Base64 sträng eller så är länken du följer dålig."
 
 #: ../java/build/Proxy.java:57
 msgid "The I2P host could also be offline."
@@ -229,9 +211,7 @@ msgstr "Varning: Ingen Utproxy Inställd"
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
-msgstr ""
-"Din förfrågan var för en sida utanför I2P, men du har ingen HTTP utproxy "
-"inställd."
+msgstr "Din förfrågan var för en sida utanför I2P, men du har ingen HTTP utproxy inställd."
 
 #: ../java/build/Proxy.java:76
 msgid "Please configure an outproxy in I2PTunnel."
@@ -245,27 +225,20 @@ msgstr "Varning: Konflikt för Mål-nyckeln"
 msgid ""
 "The addresshelper link you followed specifies a different destination key "
 "than a host entry in your host database."
-msgstr ""
-"Adresshjälpar-länken du följde specifierad en annan mål-nyckel än för den "
-"värd som finns i din värd-databas."
+msgstr "Adresshjälpar-länken du följde specifierad en annan mål-nyckel än för den värd som finns i din värd-databas."
 
 #: ../java/build/Proxy.java:85
 msgid ""
-"Someone could be trying to impersonate another eepsite, or people have given "
-"two eepsites identical names."
-msgstr ""
-"Någon kanske försöker utge sig för att vara en annan eepsite eller personer "
-"kan ha givit eepsites identiska namn."
+"Someone could be trying to impersonate another eepsite, or people have given"
+" two eepsites identical names."
+msgstr "Någon kanske försöker utge sig för att vara en annan eepsite eller personer kan ha givit eepsites identiska namn."
 
 #: ../java/build/Proxy.java:86
 msgid ""
 "You can resolve the conflict by considering which key you trust, and either "
 "discarding the addresshelper link, discarding the host entry from your host "
 "database, or naming one of them differently."
-msgstr ""
-"Du kan lösa konflikten genom att överväga vilken nyckel du litar på och "
-"antingen kasta bort adresshjälpar-länken, kasta bort värdnamnet från din "
-"värd-databas eller namnge dom olikt."
+msgstr "Du kan lösa konflikten genom att överväga vilken nyckel du litar på och antingen kasta bort adresshjälpar-länken, kasta bort värdnamnet från din värd-databas eller namnge dom olikt."
 
 #: ../java/build/Proxy.java:87
 msgid "Proxy Authorization Required"
@@ -276,32 +249,28 @@ msgid "I2P HTTP Proxy Authorization Required"
 msgstr "I2P HTTP Proxy Tillstånd Krävs"
 
 #: ../java/build/Proxy.java:89
-msgid "This proxy is configured to require a username and password for access."
-msgstr ""
-"Denhär proxy är inställd till att kräva användarnamn och lösenord för "
-"åtkomst."
+msgid ""
+"This proxy is configured to require a username and password for access."
+msgstr "Denhär proxy är inställd till att kräva användarnamn och lösenord för åtkomst."
 
 #: ../java/build/Proxy.java:90
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr ""
-"Var god ange ditt användarnamn och lösenord eller kontrollera din {0}router-"
-"konfiguration{1} eller {2}I2PTunnel-konfiguration{3}."
+msgstr "Var god ange ditt användarnamn och lösenord eller kontrollera din {0}router-konfiguration{1} eller {2}I2PTunnel-konfiguration{3}."
 
 #: ../java/build/Proxy.java:91
 #, java-format
 msgid ""
-"To disable authorization, remove the configuration {0}i2ptunnel.proxy."
-"auth=basic{1}, then stop and restart the HTTP Proxy tunnel."
-msgstr ""
-"För att slå av autentisering, ta bort inställningen {0}i2ptunnel.proxy."
-"auth=basic{1}, stanna och starta sedan om  HTTP Porxy tunneln."
+"To disable authorization, remove the configuration "
+"{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
+"tunnel."
+msgstr "För att slå av autentisering, ta bort inställningen {0}i2ptunnel.proxy.auth=basic{1}, stanna och starta sedan om  HTTP Porxy tunneln."
 
 #: ../java/build/Proxy.java:92 ../java/build/Proxy.java:98
 msgid "Warning: Eepsite Unreachable"
-msgstr "Varning: Eepsite Kan Ej Nås"
+msgstr "Varning: Eepsite kan ej nås"
 
 #: ../java/build/Proxy.java:99
 msgid "The eepsite was not reachable."
@@ -311,9 +280,7 @@ msgstr "Eepsiten var inte nåbar."
 msgid ""
 "The eepsite is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr ""
-"Eepsiten är offline, nätverket är uner hög belastning eller din router är "
-"ännu inte väl integrerad med peers."
+msgstr "Eepsiten är offline, nätverket är under hög belastning eller din router är ännu inte väl integrerad med peers."
 
 #: ../java/build/Proxy.java:103
 msgid "Information: New Host Name"
@@ -327,9 +294,7 @@ msgstr "Information: Nytt Värdnamn med Adresshjälpare"
 msgid ""
 "The address helper link you followed is for a new host name that is not in "
 "your address book."
-msgstr ""
-"Adressjälpar-länken du följde är för ett nytt värdnamn som inte är i din "
-"adressbok."
+msgstr "Adressjälpar-länken du följde är för ett nytt värdnamn som inte är i din adressbok."
 
 #: ../java/build/Proxy.java:111
 msgid "You may save this host name to your local address book."
@@ -338,25 +303,19 @@ msgstr "Du kan spara detta värdnamn i din lokala adressbok."
 #: ../java/build/Proxy.java:112
 msgid ""
 "If you save it to your address book, you will not see this message again."
-msgstr ""
-"Om du sparar det i din adressbok, så kommer du inte se dethär meddelandet "
-"igen."
+msgstr "Om du sparar det i din adressbok, så kommer du inte se dethär meddelandet igen."
 
 #: ../java/build/Proxy.java:113
 msgid ""
-"If you do not save it, the host name will be forgotten after the next router "
-"restart."
-msgstr ""
-"Om du inte sparar det, så kommer värdnamnet glömmas bort efter nästa router-"
-"omstart."
+"If you do not save it, the host name will be forgotten after the next router"
+" restart."
+msgstr "Om du inte sparar det, så kommer värdnamnet glömmas bort efter nästa router-omstart."
 
 #: ../java/build/Proxy.java:114
 msgid ""
 "If you do not wish to visit this host, click the \"back\" button on your "
 "browser."
-msgstr ""
-"Om du inte vill besöka värden, klicka på \"tillbaka\"-knappen i din "
-"webbläsare."
+msgstr "Om du inte vill besöka värden, klicka på \"tillbaka\"-knappen i din webbläsare."
 
 #: ../java/build/Proxy.java:115 ../java/build/Proxy.java:121
 msgid "Warning: Bad Address Helper"
@@ -365,8 +324,7 @@ msgstr "Varning: Dålig Adresshjälpare"
 #: ../java/build/Proxy.java:122
 #, java-format
 msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr ""
-"Hjälpar-nyckeln i URL:en ({0}i2paddresshelper={1}) är inte möjlig att hitta."
+msgstr "Hjälpar-nyckeln i URL:en ({0}i2paddresshelper={1}) är inte möjlig att hitta."
 
 #: ../java/build/Proxy.java:123
 msgid "It seems to be garbage data, or a mistyped Base 32 address."
@@ -376,9 +334,7 @@ msgstr "Det verkar vara skräp-data eller en felskriven Base32 adress."
 msgid ""
 "Check your URL to try and fix the helper key to be a valid Base 32 hostname "
 "or Base 64 key."
-msgstr ""
-"Kontrollera din URL för att försöka fixa hjälpar-nyckeln så att den är ett "
-"giltigt Base32 värdnamn eller Base64 nyckel."
+msgstr "Kontrollera din URL för att försöka fixa hjälpar-nyckeln så att den är ett giltigt Base32 värdnamn eller Base64 nyckel."
 
 #: ../java/build/Proxy.java:125 ../java/build/Proxy.java:131
 msgid "Warning: Non-HTTP Protocol"
@@ -410,13 +366,10 @@ msgstr "i2padresshjälp kan inte hjälpa dig med ett sådant  mål!"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
 #, java-format
 msgid ""
-"To visit the destination in your host database, click <a href=\"{0}\">here</"
-"a>. To visit the conflicting addresshelper destination, click <a href="
-"\"{1}\">here</a>."
-msgstr ""
-"För att besöka målet i din värd databas href=\"{0}\"> klicka <a här </ a>. "
-"För att besöka de motstridiga hjälpaddresserna,<a href=\"{1}\"> klicka <a "
-"här </ a>."
+"To visit the destination in your host database, click <a "
+"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+"click <a href=\"{1}\">here</a>."
+msgstr "För att besöka målet i din värd databas href=\"{0}\"> klicka <a här </ a>. För att besöka de motstridiga hjälpaddresserna,<a href=\"{1}\"> klicka <a här </ a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
 msgid "Host"
@@ -457,10 +410,9 @@ msgstr "HTTP Utproxy"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1216
 msgid ""
-"Click a link below to look for an address helper by using a \"jump\" service:"
-msgstr ""
-"Klicka på en länk nedan för att söka efter en hjälpaddress genom att använda "
-"en \"hopp\" tjänst"
+"Click a link below to look for an address helper by using a \"jump\" "
+"service:"
+msgstr "Klicka på en länk nedan för att söka efter en hjälpaddress genom att använda en \"hopp\" tjänst"
 
 #. Translators: parameter is a host name
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
