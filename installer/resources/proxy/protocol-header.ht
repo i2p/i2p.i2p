@@ -19,7 +19,7 @@ Proxy-Connection: close
 <h3>_("Warning: Non-HTTP Protocol")</h3>
 <p>
 _("The request uses a bad protocol.")
-_("The I2P HTTP Proxy supports {0}http://{1} requests ONLY.", "<code>", "</code>")
-_("Other protocols such as {0}https://{1} and {0}ftp://{1} are not allowed.", "<code>", "</code>")
+_("The I2P HTTP Proxy supports HTTP and HTTPS requests only.")
+_("Other protocols such as FTP are not allowed.")
 </p>
 </div>
