@@ -26,7 +26,6 @@ import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
-import net.i2p.outproxy.Outproxy;
 import net.i2p.stat.StatManager;
 import net.i2p.update.UpdateManager;
 import net.i2p.util.Clock;
@@ -96,7 +95,6 @@ public class I2PAppContext {
     private SimpleTimer _simpleTimer;
     private SimpleTimer2 _simpleTimer2;
     private final PortMapper _portMapper;
-    private Outproxy _outproxy;
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
