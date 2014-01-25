@@ -24,16 +24,12 @@ class Writer {
     private final Set<NTCPConnection> _writeAfterLive;
     private final List<Runner> _runners;
     
-    /** a scratch space to serialize and encrypt messages */
-    private final NTCPConnection.PrepBuffer _prepBuffer;
-    
     public Writer(RouterContext ctx) {
         _log = ctx.logManager().getLog(getClass());
         _pendingConnections = new LinkedHashSet<NTCPConnection>(16);
         _runners = new ArrayList<Runner>(5);
         _liveWrites = new HashSet<NTCPConnection>(5);
         _writeAfterLive = new HashSet<NTCPConnection>(5);
-        _prepBuffer = new NTCPConnection.PrepBuffer();
     }
     
     public synchronized void startWriting(int numWriters) {
@@ -84,9 +80,15 @@ class Writer {
     }
     
     private class Runner implements Runnable {
+        
+        /** a scratch space to serialize and encrypt messages */
+        private final NTCPConnection.PrepBuffer _prepBuffer;
+        
         private volatile boolean _stop;
 
-        public Runner() {}
+        public Runner() {
+            _prepBuffer = new NTCPConnection.PrepBuffer();
+        }
 
         public void stop() { _stop = true; }
 
