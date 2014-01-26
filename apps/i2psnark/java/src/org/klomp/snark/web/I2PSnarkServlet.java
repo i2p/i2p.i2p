@@ -185,7 +185,8 @@ public class I2PSnarkServlet extends BasicServlet {
 
         boolean isConfigure = "/configure".equals(path);
         // index.jsp doesn't work, it is grabbed by the war handler before here
-        if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
+        if (!(path == null || path.equals("/") || path.equals("/index.jsp") ||
+              path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
             if (path.endsWith("/")) {
                 // Listing of a torrent (torrent detail page)
                 // bypass the horrid Resource.getListHTML()
@@ -2219,7 +2220,14 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (snark != null && postParams != null) {
             // caller must P-R-G
-            savePriorities(snark, postParams);
+            String[] val = postParams.get("nonce");
+            if (val != null) {
+                String nonce = val[0];
+                if (String.valueOf(_nonce).equals(nonce))
+                    savePriorities(snark, postParams);
+                else
+                    _manager.addMessage("Please retry form submission (bad nonce)");
+            }
             return null;
         }
 
@@ -2232,7 +2240,7 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append(title);
         buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
              "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("arrow_refresh.png\">&nbsp;&nbsp;");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_("I2PSnark"));
         else
@@ -2242,8 +2250,10 @@ public class I2PSnarkServlet extends BasicServlet {
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
         boolean showPriority = ls != null && snark != null && snark.getStorage() != null && !snark.getStorage().complete();
-        if (showPriority)
+        if (showPriority) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
+            buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
+        }
         if (snark != null) {
             // first table - torrent info
             buf.append("<table class=\"snarkTorrentInfo\">\n");
@@ -2256,7 +2266,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String fullPath = snark.getName();
             String baseName = urlEncode((new File(fullPath)).getName());
             buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Torrent file"))
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(fullPath)
@@ -2348,40 +2358,40 @@ public class I2PSnarkServlet extends BasicServlet {
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
             buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;<b>")
+               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("size.png\" >&nbsp;<b>")
                .append(_("Size"))
                .append(":</b> ")
                .append(formatSize(snark.getTotalLength()));
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
             if (completion < 1.0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;<b>")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
                    .append(_("Completion"))
                    .append(":</b> ")
                    .append((new DecimalFormat("0.00%")).format(completion));
             else
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;")
                    .append(_("Complete"));
             // else unknown
             long needed = snark.getNeededLength();
             if (needed > 0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;<b>")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
                    .append(_("Remaining"))
                    .append(":</b> ")
                    .append(formatSize(needed));
             if (meta != null) {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                    .append(_("Files"))
                    .append(":</b> ")
                    .append(fileCount);
             }
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Pieces"))
                .append(":</b> ")
                .append(pieces);
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Piece size"))
                .append(":</b> ")
                .append(formatSize(snark.getPieceLength(0)))
@@ -2404,7 +2414,7 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("<table class=\"snarkDirInfo\"><thead>\n");
         buf.append("<tr>\n")
            .append("<th colspan=2>")
-           .append("<img border=\"0\" src=\"" + _imgPath + "file.png\" title=\"")
+           .append("<img border=\"0\" src=\"").append(_imgPath).append("file.png\" title=\"")
            .append(_("Directory"))
            .append(": ")
            .append(directory)
@@ -2412,20 +2422,20 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_("Directory"))
            .append("\"></th>\n");
         buf.append("<th align=\"right\">")
-           .append("<img border=\"0\" src=\"" + _imgPath + "size.png\" title=\"")
+           .append("<img border=\"0\" src=\"").append(_imgPath).append("size.png\" title=\"")
            .append(_("Size"))
            .append("\" alt=\"")
            .append(_("Size"))
            .append("\"></th>\n");
         buf.append("<th class=\"headerstatus\">")
-           .append("<img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"")
+           .append("<img border=\"0\" src=\"").append(_imgPath).append("status.png\" title=\"")
            .append(_("Status"))
            .append("\" alt=\"")
            .append(_("Status"))
            .append("\"></th>\n");
         if (showPriority)
             buf.append("<th class=\"headerpriority\">")
-               .append("<img border=\"0\" src=\"" + _imgPath + "priority.png\" title=\"")
+               .append("<img border=\"0\" src=\"").append(_imgPath).append("priority.png\" title=\"")
                .append(_("Priority"))
                .append("\" alt=\"")
                .append(_("Priority"))
@@ -2433,7 +2443,7 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         buf.append(addPaths(base,"../"));
-        buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
+        buf.append("\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("up.png\"> ")
            .append(_("Up to higher level directory"))
            .append("</A></td></tr>\n");
 
@@ -2610,6 +2620,8 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "application";
         else if (plc.endsWith(".iso"))
             icon = "cd";
+        else if (mime.equals("application/x-bittorrent"))
+            icon = "magnet";
         else
             icon = "page_white";
         return icon;
