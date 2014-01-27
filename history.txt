@@ -1,3 +1,8 @@
+2014-01-27 zab
+ * Move message serialization later in the SSU sending pipeline
+  (Ticket #1183)
+ * Up version to -5
+
 2014-01-27 zzz
  * i2ptunnel HTTP Proxy: Fix default enable for outproxy plugin
 
@@ -13,7 +18,7 @@
 
 2014-01-25 zab
  * Move OutNetMessage buffer preparation to the Writer threads 
-   (Ticket #1184)
+   (Ticket #1183)
  * Up version to -1
 
 * 2014-01-22 0.9.10 released

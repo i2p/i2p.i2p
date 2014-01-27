@@ -20,6 +20,7 @@ class OutboundMessageState implements CDPQEntry {
     private final Log _log;
     /** may be null if we are part of the establishment */
     private final OutNetMessage _message;
+    private final I2NPMessage _i2npMessage;
     private final long _messageId;
     /** will be null, unless we are part of the establishment */
     private final PeerState _peer;
@@ -28,7 +29,7 @@ class OutboundMessageState implements CDPQEntry {
     /** fixed fragment size across the message */
     private int _fragmentSize;
     /** size of the I2NP message */
-    private final int _totalSize;
+    private int _totalSize;
     /** sends[i] is how many times the fragment has been sent, or -1 if ACKed */
     private short _fragmentSends[];
     private final long _startedOn;
@@ -89,13 +90,9 @@ class OutboundMessageState implements CDPQEntry {
         _context = context;
         _log = _context.logManager().getLog(OutboundMessageState.class);
         _message = m;
+        _i2npMessage = msg;
         _peer = peer;
-        int size = msg.getRawMessageSize();
-        acquireBuf(size);
-        _totalSize = msg.toRawByteArray(_messageBuf.getData());
-        _messageBuf.setValid(_totalSize);
         _messageId = msg.getUniqueId();
-
         _startedOn = _context.clock().now();
         _nextSendTime = _startedOn;
         _expiration = _startedOn + EXPIRATION;
@@ -103,6 +100,18 @@ class OutboundMessageState implements CDPQEntry {
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
+    }
+    
+    /**
+     * lazily inits the message buffer unless already inited
+     */
+    private synchronized void initBuf() {
+        if (_messageBuf != null)
+            return;
+        final int size = _i2npMessage.getRawMessageSize();
+        acquireBuf(size);
+        _totalSize = _i2npMessage.toRawByteArray(_messageBuf.getData());
+        _messageBuf.setValid(_totalSize);
     }
     
     /**
@@ -175,7 +184,7 @@ class OutboundMessageState implements CDPQEntry {
         return true;
     }
 
-    public int getUnackedSize() {
+    public synchronized int getUnackedSize() {
         short fragmentSends[] = _fragmentSends;
         ByteArray messageBuf = _messageBuf;
         int rv = 0;
@@ -288,6 +297,7 @@ class OutboundMessageState implements CDPQEntry {
     public void fragment(int fragmentSize) {
         if (_fragmentSends != null)
             throw new IllegalStateException();
+        initBuf();
         int numFragments = _totalSize / fragmentSize;
         if (numFragments * fragmentSize < _totalSize)
             numFragments++;
@@ -335,6 +345,11 @@ class OutboundMessageState implements CDPQEntry {
      */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
 
+    /**
+     * This assumes fragment(int size) has been called
+     * @param fragmentNum the number of the fragment 
+     * @return the size of the fragment specified by the number
+     */
     public int fragmentSize(int fragmentNum) {
         if (_messageBuf == null) return -1;
         if (fragmentNum + 1 == _fragmentSends.length) {
@@ -351,7 +366,8 @@ class OutboundMessageState implements CDPQEntry {
 
     /**
      * Write a part of the the message onto the specified buffer.
-     * See releaseResources() above for synchhronization information.
+     * See releaseResources() above for synchronization information.
+     * This assumes fragment(int size) has been called.
      *
      * @param out target to write
      * @param outOffset into outOffset to begin writing
