@@ -163,7 +163,7 @@ class PeerState implements DataLoader
           _log.debug(peer + " rcv bitfield");
         if (bitfield != null)
           {
-            // XXX - Be liberal in what you except?
+            // XXX - Be liberal in what you accept?
             if (_log.shouldLog(Log.WARN))
               _log.warn("Got unexpected bitfield message from " + peer);
             return;

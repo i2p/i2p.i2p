@@ -86,20 +86,18 @@ public class Storage
   private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
 
   /**
-   * Creates a new storage based on the supplied MetaInfo.  This will
+   * Creates a new storage based on the supplied MetaInfo.
+   *
+   * Does not check storage. Caller MUST call check(), which will
    * try to create and/or check all needed files in the MetaInfo.
    *
-   * Does not check storage. Caller MUST call check()
+   * @param baseFile the torrent data file or dir
    */
-  public Storage(I2PSnarkUtil util, File rootDir, MetaInfo metainfo, StorageListener listener)
+  public Storage(I2PSnarkUtil util, File baseFile, MetaInfo metainfo, StorageListener listener)
   {
     _util = util;
     _log = util.getContext().logManager().getLog(Storage.class);
-    boolean areFilesPublic = _util.getFilesPublic();
-    if (areFilesPublic)
-        _base = new File(rootDir, filterName(metainfo.getName()));
-    else
-        _base = new SecureFile(rootDir, filterName(metainfo.getName()));
+    _base = baseFile;
     this.metainfo = metainfo;
     this.listener = listener;
     needed = metainfo.getPieces();
@@ -708,7 +706,8 @@ public class Storage
 
   /**
    *  The base file or directory.
-   *  @return a new List
+   *  @return the File
+   *  @since 0.9.11
    */
   public File getBase() {
       return _base;
@@ -716,8 +715,8 @@ public class Storage
 
   /**
    *  Does not include directories. Unsorted.
-   *  @since 0.9.10
    *  @return a new List
+   *  @since 0.9.11
    */
   public List<File> getFiles() {
       List<File> rv = new ArrayList<File>(_torrentFiles.size());
@@ -731,7 +730,7 @@ public class Storage
    *  Includes the base for a multi-file torrent.
    *  Sorted bottom-up for easy deletion.
    *  Slow. Use for deletion only.
-   *  @since 0.9.10
+   *  @since 0.9.11
    *  @return a new Set or null for a single-file torrent
    */
   public SortedSet<File> getDirectories() {

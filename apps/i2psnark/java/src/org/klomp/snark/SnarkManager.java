@@ -86,6 +86,7 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_DIR = "i2psnark.dir";
     private static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     private static final String PROP_META_STAMP = "stamp";
+    private static final String PROP_META_BASE = "base";
     private static final String PROP_META_BITFIELD = "bitfield";
     private static final String PROP_META_PRIORITY = "priority";
     private static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
@@ -347,7 +348,7 @@ public class SnarkManager implements CompleteListener {
      *
      *  @return the new config directory, non-null
      *  @throws RuntimeException on creation fail
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     private File migrateConfig(File oldFile) {
         File dir = new SecureDirectory(oldFile + CONFIG_DIR_SUFFIX);
@@ -455,7 +456,7 @@ public class SnarkManager implements CompleteListener {
     /**
      *  The config for a torrent
      *  @return non-null, possibly empty
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     private Properties getConfig(Snark snark) {
         return getConfig(snark.getInfoHash());
@@ -465,7 +466,7 @@ public class SnarkManager implements CompleteListener {
      *  The config for a torrent
      *  @param ih 20-byte infohash
      *  @return non-null, possibly empty
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     private Properties getConfig(byte[] ih) {
         Properties rv = new OrderedProperties();
@@ -482,7 +483,7 @@ public class SnarkManager implements CompleteListener {
      *  The config file for a torrent
      *  @param confDir the config directory
      *  @param ih 20-byte infohash
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     private static File configFile(File confDir, byte[] ih) {
         String hex = I2PSnarkUtil.toHex(ih);
@@ -1071,15 +1072,23 @@ public class SnarkManager implements CompleteListener {
 
     /**
      *  Caller must verify this torrent is not already added.
+     *
+     *  @param filename the absolute path to save the metainfo to, generally ending in ".torrent"
+     *  @param baseFile may be null, if so look in rootDataDir
      *  @throws RuntimeException via Snark.fatal()
      */
-    private void addTorrent(String filename) { addTorrent(filename, false); }
+    private void addTorrent(String filename) {
+        addTorrent(filename, null, false);
+    }
 
     /**
      *  Caller must verify this torrent is not already added.
+     *
+     *  @param filename the absolute path to save the metainfo to, generally ending in ".torrent"
+     *  @param baseFile may be null, if so look in rootDataDir
      *  @throws RuntimeException via Snark.fatal()
      */
-    private void addTorrent(String filename, boolean dontAutoStart) {
+    private void addTorrent(String filename, File baseFile, boolean dontAutoStart) {
         if ((!dontAutoStart) && !_util.connected()) {
             addMessage(_("Connecting to I2P"));
             boolean ok = _util.connect();
@@ -1160,9 +1169,13 @@ public class SnarkManager implements CompleteListener {
                     } else {
                         // TODO load saved closest DHT nodes and pass to the Snark ?
                         // This may take a LONG time
+                        if (baseFile == null)
+                            baseFile = getSavedBaseFile(info.getInfoHash());
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
                         torrent = new Snark(_util, filename, null, -1, null, null, this,
                                             _peerCoordinatorSet, _connectionAcceptor,
-                                            false, dataDir.getPath());
+                                            false, dataDir.getPath(), baseFile);
                         loadSavedFilePriorities(torrent);
                         synchronized (_snarks) {
                             _snarks.put(filename, torrent);
@@ -1305,14 +1318,17 @@ public class SnarkManager implements CompleteListener {
      * This verifies that a torrent with this infohash is not already added.
      * This may take a LONG time to create or check the storage.
      *
+     * Called from servlet.
+     *
      * @param metainfo the metainfo for the torrent
      * @param bitfield the current completion status of the torrent
      * @param filename the absolute path to save the metainfo to, generally ending in ".torrent", which is also the name of the torrent
      *                 Must be a filesystem-safe name.
+     * @param baseFile may be null, if so look in rootDataDir
      * @throws RuntimeException via Snark.fatal()
      * @since 0.8.4
      */
-    public void addTorrent(MetaInfo metainfo, BitField bitfield, String filename, boolean dontAutoStart) throws IOException {
+    public void addTorrent(MetaInfo metainfo, BitField bitfield, String filename, File baseFile, boolean dontAutoStart) throws IOException {
         // prevent interference by DirMonitor
         synchronized (_snarks) {
             Snark snark = getTorrentByInfoHash(metainfo.getInfoHash());
@@ -1321,11 +1337,11 @@ public class SnarkManager implements CompleteListener {
                 return;
             }
             // so addTorrent won't recheck
-            saveTorrentStatus(metainfo, bitfield, null); // no file priorities
+            saveTorrentStatus(metainfo, bitfield, null, baseFile); // no file priorities
             try {
                 locked_writeMetaInfo(metainfo, filename, areFilesPublic());
                 // hold the lock for a long time
-                addTorrent(filename, dontAutoStart);
+                addTorrent(filename, baseFile, dontAutoStart);
             } catch (IOException ioe) {
                 addMessage(_("Failed to copy torrent file to {0}", filename));
                 _log.error("Failed to write torrent file", ioe);
@@ -1461,6 +1477,19 @@ public class SnarkManager implements CompleteListener {
         }
         storage.setFilePriorities(rv);
     }
+
+    /**
+     * Get the base location for a torrent from the config file.
+     * @return File or null, doesn't necessarily exist
+     * @since 0.9.11
+     */
+    public File getSavedBaseFile(byte[] ih) {
+        Properties config = getConfig(ih);
+        String base = config.getProperty(PROP_META_BASE);
+        if (base == null)
+            return null;
+        return new File(base);
+    }
     
     /**
      * Save the completion status of a torrent and the current time in the config file
@@ -1471,14 +1500,15 @@ public class SnarkManager implements CompleteListener {
      *
      * @param bitfield non-null
      * @param priorities may be null
+     * @param base may be null
      */
-    public void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities) {
+    public void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, File base) {
         synchronized (_configLock) {
-            locked_saveTorrentStatus(metainfo, bitfield, priorities);
+            locked_saveTorrentStatus(metainfo, bitfield, priorities, base);
         }
     }
 
-    private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities) {
+    private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities, File base) {
         byte[] ih = metainfo.getInfoHash();
         String bfs;
         if (bitfield.complete()) {
@@ -1490,6 +1520,8 @@ public class SnarkManager implements CompleteListener {
         Properties config = getConfig(ih);
         config.setProperty(PROP_META_STAMP, Long.toString(System.currentTimeMillis()));
         config.setProperty(PROP_META_BITFIELD, bfs);
+        if (base != null)
+            config.setProperty(PROP_META_BASE, base.getAbsolutePath());
 
         // now the file priorities
         if (priorities != null) {
@@ -1742,7 +1774,7 @@ public class SnarkManager implements CompleteListener {
         MetaInfo meta = snark.getMetaInfo();
         Storage storage = snark.getStorage();
         if (meta != null && storage != null)
-            saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities());
+            saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(), storage.getBase());
     }
     
     /**
@@ -1764,7 +1796,7 @@ public class SnarkManager implements CompleteListener {
                 snark.stopTorrent();
                 return null;
             }
-            saveTorrentStatus(meta, storage.getBitField(), null); // no file priorities
+            saveTorrentStatus(meta, storage.getBitField(), null, storage.getBase()); // no file priorities
             // temp for addMessage() in case canonical throws
             String name = storage.getBaseName();
             try {
@@ -1865,7 +1897,7 @@ public class SnarkManager implements CompleteListener {
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
-                    addTorrent(name, !shouldAutoStart());
+                    addTorrent(name, null, !shouldAutoStart());
                 } catch (Exception e) {
                     addMessage(_("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
