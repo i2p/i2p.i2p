@@ -316,7 +316,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         // alphabetical please...
         l.log("  auth <username> <password>");
         l.log("  client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
-        l.log("  clientoptions [key=value ]*");
+        l.log("  clientoptions [-acx] [key=value ]*");
         l.log("  close [forced] <jobnumber>|all");
         l.log("  config [-s] <i2phost> <i2pport>");
         l.log("  connectclient <port> [<sharedClient>] [<proxy>]");
