@@ -46,6 +46,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
             throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
             throw new IllegalArgumentException();
+        _sessionId = id;
         _dest = d;
         _reqID = reqID;
     }
@@ -63,6 +64,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
             throw new IllegalArgumentException();
         if (reqID < 0 || reqID > MAX_INT)
             throw new IllegalArgumentException();
+        _sessionId = id;
         _code = failureCode;
         _reqID = reqID;
     }
@@ -135,7 +137,7 @@ public class HostReplyMessage extends I2CPMessageImpl {
         buf.append("[HostReplyMessage: ");
         buf.append("\n\t").append(_sessionId);
         buf.append("\n\tReqID: ").append(_reqID);
-        buf.append("\n\tCode: ").append(_code);
+        buf.append("\n\tResult: ").append(_code);
         if (_code == RESULT_SUCCESS)
             buf.append("\n\tDestination: ").append(_dest);
         buf.append("]");

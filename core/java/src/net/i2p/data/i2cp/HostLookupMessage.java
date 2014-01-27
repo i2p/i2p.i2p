@@ -47,6 +47,7 @@ public class HostLookupMessage extends I2CPMessageImpl {
             throw new IllegalArgumentException();
         if (timeout <= 0 || timeout > MAX_INT)
             throw new IllegalArgumentException();
+        _sessionId = id;
         _hash = h;
         _reqID = reqID;
         _timeout = timeout;
@@ -64,6 +65,7 @@ public class HostLookupMessage extends I2CPMessageImpl {
             throw new IllegalArgumentException();
         if (timeout <= 0 || timeout > MAX_INT)
             throw new IllegalArgumentException();
+        _sessionId = id;
         _host = host;
         _reqID = reqID;
         _timeout = timeout;
