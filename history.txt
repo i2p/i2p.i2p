@@ -1,12 +1,46 @@
+2014-01-27 zzz
+Prop from i2p.i2p.zzz.i2cp:
+ * I2CP:
+   - Add support for hostname lookups over I2CP with new
+     HostLookup and HostReply messages.
+   - Move username / password from CreateSession to GetDate for
+     early authentication; this is an incompatible chage.
+     Outside router context with authentication enabled,
+     new clients will not work with old routers.
+     Early authentication is not yet enforced, enable with
+     i2cp.strictAuth=true. Will change default to true in a later release.
+   - Block all actions before authentication.
+   - Better disconnect messages to clients for diagnostics
+   - Improve lookup command, add auth command in i2ptunnel CLI for testing
+   - Don't start ClientWriterRunner thread in constructor
+   - Don't flush in ClientWriterRunner unless necessary
+   - Send GetDate even in SimpleSession outside of RouterContext
+   - Improve SetDate wait logic to reduce locks and break out when Disconnect received
+   - Add Disconnect handler to SimpleSession
+   - Add SessionID to HostLookup/Reply messages, for future
+     use when we have multiple sessions
+   - Throw IAE on invalid SessionID values
+   - Add support for b64 conversion in destLookup()
+   - Catch invalid message length sooner
+ * I2Ping:
+   - Extend I2PTunnelClientBase so non-shared-client,
+     I2CP options, and other features will work
+   - Fixes for fields and threading
+   - Cleanups
+ * Streaming:
+   - Send LS with ping (broken since 0.9.2)
+   - Set the NO_ACK flag on pings and pongs
+
 2014-01-27 zab
  * Move message serialization later in the SSU sending pipeline
-  (Ticket #1183)
+   (Ticket #1183)
  * Up version to -5
 
 2014-01-27 zzz
  * i2ptunnel HTTP Proxy: Fix default enable for outproxy plugin
 
 2014-01-25 zzz
+Prop from i2p.i2p.zzz.outproxy:
  * i2psnark: Lower threshold for auto-stop
  * i2ptunnel HTTP Proxy:
    - Add support for HTTPS
