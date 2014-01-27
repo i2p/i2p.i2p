@@ -701,7 +701,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         s.close();
                         return;
                     } else if(host.contains(".") || host.startsWith("[")) {
-                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USE_OUTPROXY_PLUGIN))) {
+                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USE_OUTPROXY_PLUGIN, "true"))) {
                             ClientAppManager mgr = _context.clientAppManager();
                             if (mgr != null) {
                                 ClientApp op = mgr.getRegisteredApp(Outproxy.NAME);
